@@ -175,3 +175,16 @@ document.getElementsByTagName("head")[0].appendChild(scriptTag);
 //},5000);	//ページを開いて5秒後(5,000ミリ秒後)にシェアボタンを読み込む
 
 }
+
+
+// Googleカスタム検索
+function googleSearch() {
+	var keyword = document.getElementsByClassName('form-control')[0].value;
+	var url = 'https://www.google.co.jp/?ion=1&espv=2#q=' + encodeURIComponent('site:future-architect.github.io/articles ' + keyword);
+
+	//window.location.href = url;
+	window.open(url) ;
+
+	document.getElementByClassName('googleSearch')[0].action=url;
+
+}
