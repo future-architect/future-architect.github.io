@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2016-09-15T08:24:07.000Z</updated>
+  <updated>2016-09-29T02:38:30.789Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <author>
@@ -16,11 +16,155 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！</title>
+    <link href="https://future-architect.github.io/articles/20160920/"/>
+    <id>https://future-architect.github.io/articles/20160920/</id>
+    <published>2016-09-20T09:00:00.000Z</published>
+    <updated>2016-09-29T02:38:30.789Z</updated>
+    
+    <content type="html">&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_00.jpg&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h2&gt;&lt;p&gt;こんにちは。近藤です。&lt;/p&gt;
+&lt;p&gt;みなさん、Redmineを使っていますか？&lt;/p&gt;
+&lt;p&gt;私は使っています。Redmineはタスクをチケット管理する上で便利ですよね。&lt;/p&gt;
+&lt;p&gt;一方で、Redmineにはデータの可視化機能が標準で搭載されていないという課題があります。&lt;/p&gt;
+&lt;p&gt;例えばこれが、標準のサマリ画面。グラフがないから傾向とか分かりづらいんですよね。。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_01.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;参考:&lt;a href=&quot;http://www.redmine.org/projects/redmine/issues/report&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;redmine.org&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;そこで、本日はKibana＋Timelionを使ってRedmineデータをグラフ表示する方法を紹介します。&lt;/p&gt;
+&lt;p&gt;例えば、Kibana+Timelionを利用すると、チケット発生件数の4週移動平均を簡単に表示することができるのです。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_02.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;これがあれば、平均して毎週どれくらいのタスクが発生しているかが分かりますね。（このテストデータの場合は9月時点で毎週28件のタスクが発生している）&lt;/p&gt;
+&lt;p&gt;では早速、Kibana+Timelionを使ってみましょう。&lt;/p&gt;
+&lt;p&gt;なお、下記を前提としています。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Windows環境で構築する。&lt;/li&gt;
+&lt;li&gt;Redmineのデータベース(MySQL)に直接接続する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;大まかな流れ&quot;&gt;&lt;a href=&quot;#大まかな流れ&quot; class=&quot;headerlink&quot; title=&quot;大まかな流れ&quot;&gt;&lt;/a&gt;大まかな流れ&lt;/h2&gt;&lt;p&gt;下記の手順でグラフを表示します。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;ELKのインストール&lt;/li&gt;
+&lt;li&gt;RedmineデータをELKに取り込む&lt;/li&gt;
+&lt;li&gt;グラフ表示&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&quot;1-ELKのインストール&quot;&gt;&lt;a href=&quot;#1-ELKのインストール&quot; class=&quot;headerlink&quot; title=&quot;1.ELKのインストール&quot;&gt;&lt;/a&gt;1.ELKのインストール&lt;/h2&gt;&lt;p&gt;はじめに、ELKの説明です。&lt;/p&gt;
+&lt;p&gt;ELKはelastic社が提供する、データ可視化OSSの総称。&lt;/p&gt;
+&lt;p&gt;Elastic Search＋Logstash＋Kibanaそれぞれの頭文字をとって、ELKと呼びます。&lt;/p&gt;
+&lt;p&gt;今回、ELKを利用して、Redmineデータの可視化環境を構築します。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_03.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;ではまず、Elastic Searchをダウンロードします。&lt;/p&gt;
+&lt;p&gt;◆Elastic Search Download URL&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.elastic.co/jp/downloads/elasticsearch&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://www.elastic.co/jp/downloads/elasticsearch&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;→私の場合は、「Elasticsearch 2.4.0」をダウンロードしました。&lt;/p&gt;
+&lt;p&gt;次に、Kibanaをダウンロード。&lt;/p&gt;
+&lt;p&gt;◆Kibana Download URL&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.elastic.co/downloads/kibana&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://www.elastic.co/downloads/kibana&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;→私の場合は、「Kibana 4.6.1」をダウンロードしました。&lt;/p&gt;
+&lt;p&gt;最後に、Logstashをダウンロードします。&lt;/p&gt;
+&lt;p&gt;◆Logstash Download URL&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.elastic.co/downloads/logstash&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://www.elastic.co/downloads/logstash&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;→私の場合は、「Logstash 2.4.0 All Plugins」をダウンロードしました。&lt;/p&gt;
+&lt;p&gt;次に、「c:\elastic」というフォルダを作成。そこへ、それぞれのダウンロードした圧縮ファイルを解凍し配置します。&lt;/p&gt;
+&lt;p&gt;最終的には下記のようなフォルダ構成になります。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_04.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;2-RedmineデータをELKに取り込む&quot;&gt;&lt;a href=&quot;#2-RedmineデータをELKに取り込む&quot; class=&quot;headerlink&quot; title=&quot;2.RedmineデータをELKに取り込む&quot;&gt;&lt;/a&gt;2.RedmineデータをELKに取り込む&lt;/h2&gt;&lt;p&gt;まず、JDBCドライバをダウンロードします。&lt;/p&gt;
+&lt;p&gt;私のRemineはMysqlを利用しているので、今回はMysqlのJDBCドライバーをインストールしました。&lt;/p&gt;
+&lt;p&gt;◆Mysql JDBC ドライバ URL&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://dev.mysql.com/downloads/connector/j/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://dev.mysql.com/downloads/connector/j/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;→私の場合は、「Platform Independent (Architecture Independent), ZIP Archive」をダウンロードしました。&lt;/p&gt;
+&lt;p&gt;ダウンロードしたファイル内の「mysql-connector-java-5.1.39-bin.jar」というファイルを、&lt;br&gt;「C:\elastic\logstash-all-plugins-2.4.0\logstash-2.4.0\bin」以下に配置します。&lt;/p&gt;
+&lt;p&gt;次に、「redmine.txt」というファイルを作成。中身は下記のようにします。（★を含む箇所は皆様の環境に合わせた値へ変えて下さい。）&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;14&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;15&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;16&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;17&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;18&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;19&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;20&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;input &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    jdbc &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        jdbc_connection_string =&amp;gt; &quot;jdbc:mysql://★IP★:3306/★サービス名★&quot;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        jdbc_user =&amp;gt; &quot;★ユーザ名★&quot;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        jdbc_password =&amp;gt; &quot;★パスワード★&quot;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        jdbc_driver_library =&amp;gt;&quot;mysql-connector-java-5.1.39-bin.jar&quot;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        jdbc_driver_class =&amp;gt; &quot;com.mysql.jdbc.Driver&quot;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        statement =&amp;gt; &quot;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;select&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	*&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;from&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	issues&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&quot;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;output &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    elasticsearch &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	document_id =&amp;gt; &quot;%&amp;#123;id&amp;#125;&quot;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;「redmine.txt」も「C:\elastic\logstash-all-plugins-2.4.0\logstash-2.4.0\bin」に配置。&lt;/p&gt;
+&lt;p&gt;結果的に、下記のようなフォルダ構成になります。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_05.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;では、ElasticSearchを実行します。ElasticSearchのbinフォルダで下記のコマンドを実行。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;elasticsearch.bat&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_06.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;次にLogstashを使って、RedmineのデータをElasticSearchへ取り込みます。Logstashのbinフォルダで下記コマンドを実行。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;logstash.bat -f redmine.txt&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_07.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;取り込みが完了しました。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_08.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;3-グラフ表示&quot;&gt;&lt;a href=&quot;#3-グラフ表示&quot; class=&quot;headerlink&quot; title=&quot;3.グラフ表示&quot;&gt;&lt;/a&gt;3.グラフ表示&lt;/h2&gt;&lt;p&gt;最初に、timelionをインストールします。kibanaのbinフォルダで下記のコマンドを実行。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;kibana plugin -i elastic/timelion&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_09.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;次に、Kibanaを起動します。下記のコマンドを実行。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;kibana.bat&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_10.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Kibanaが起動しました。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_11.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;では、Kibanaを表示します。ブラウザで &lt;code&gt;http://localhost:5601&lt;/code&gt;を開く。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_12.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;[Configure an index pattern]という画面が開くので、[Time-field name]に”created_on”を指定します。&lt;/p&gt;
+&lt;p&gt;そして、[Create]をクリック。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_13.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;[★logstash-*]という画面が開くので、画面上部一番右のブロックボタンをクリック。&lt;/p&gt;
+&lt;p&gt;次に[Timelion]ボタンをクリックします。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_14.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;[Welcome to timelion]という画面が開きます。&lt;/p&gt;
+&lt;p&gt;[Don’t show again]をクリック。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_15.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;これでグラフ表示は完了です。&lt;/p&gt;
+&lt;p&gt;では、実際にRedmineにおける週別チケット発生数のグラフを表示してみます。&lt;/p&gt;
+&lt;h2 id=&quot;週別チケット発生数のグラフ表示&quot;&gt;&lt;a href=&quot;#週別チケット発生数のグラフ表示&quot; class=&quot;headerlink&quot; title=&quot;週別チケット発生数のグラフ表示&quot;&gt;&lt;/a&gt;週別チケット発生数のグラフ表示&lt;/h2&gt;&lt;p&gt;まず、右上の[Last 15 minutes]をクリック。画面上部真ん中の”Last 1 years”をクリックします。&lt;/p&gt;
+&lt;p&gt;そうすると、直近1年間以内に登録されたチケットの情報が表示されます。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_16.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;次に、右側の”auto”を”1w”に変更。&lt;/p&gt;
+&lt;p&gt;左下の”Full screen”をクリックします。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_17.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;そして、&lt;code&gt;.es(*)&lt;/code&gt;という記載を&lt;br&gt;&lt;code&gt;.es(metric=&amp;#39;count:id&amp;#39;, timefield=&amp;#39;created_on&amp;#39;).label(&amp;#39;【週別】open&amp;#39;).bars()&lt;/code&gt;&lt;br&gt;に変更します。&lt;/p&gt;
+&lt;p&gt;すると、週ごとの発生チケット数が棒グラフで表示されます。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_18.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;次に、&lt;br&gt;&lt;code&gt;.es(metric=&amp;#39;count:id&amp;#39;, timefield=&amp;#39;created_on&amp;#39;).label(&amp;#39;【週別】open&amp;#39;).bars(),.es(metric=&amp;#39;count:id&amp;#39;, timefield=&amp;#39;created_on&amp;#39;).movingaverage(4).label(&amp;#39;【4週移動平均】open&amp;#39;)&lt;/code&gt;&lt;br&gt;という記載に変更します。&lt;/p&gt;
+&lt;p&gt;すると、発生チケット数の4週移動平均が折れ線グラフで表示されます。&lt;/p&gt;
+&lt;p&gt;timelion便利ですね！&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_19.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;そして、&lt;br&gt;&lt;code&gt;.es(metric=&amp;#39;count:id&amp;#39;, timefield=&amp;#39;created_on&amp;#39;).label(&amp;#39;【週別】open&amp;#39;).bars(),.es(metric=&amp;#39;count:id&amp;#39;, timefield=&amp;#39;created_on&amp;#39;).movingaverage(4).label(&amp;#39;【4週移動平均】open&amp;#39;),.es(metric=&amp;#39;count:id&amp;#39;, timefield=&amp;#39;created_on&amp;#39;).cusum().label(&amp;#39;[累積]open&amp;#39;),.es(metric=&amp;#39;count:id&amp;#39;, timefield=&amp;#39;closed_on&amp;#39;).cusum().label(&amp;#39;[累積]close&amp;#39;)&lt;/code&gt;&lt;br&gt;という記載に変更すると、累積のチケット発生数、累積のチケットクローズ数が表示されます。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20160928_20.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;これがあると、&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;全部でどれくらいのチケットが発生しているの？&lt;/li&gt;
+&lt;li&gt;全部でどれくらいのチケットが対応完了しているの？&lt;/li&gt;
+&lt;li&gt;週にどれくらいのチケットが発生しているの？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;という問いに回答できますね。&lt;/p&gt;
+&lt;p&gt;例えば、チームの増員要否についても検討出来そうです。&lt;/p&gt;
+&lt;h2 id=&quot;最後に&quot;&gt;&lt;a href=&quot;#最後に&quot; class=&quot;headerlink&quot; title=&quot;最後に&quot;&gt;&lt;/a&gt;最後に&lt;/h2&gt;&lt;p&gt;今回は、累積グラフと、移動平均グラフを表示しました。&lt;/p&gt;
+&lt;p&gt;それ以外のグラフも簡単に追加することが可能です。&lt;/p&gt;
+&lt;p&gt;詳しくは下記Timelionのリファレンスをご参照ください。&lt;/p&gt;
+&lt;p&gt;◆Timelion function reference&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/elastic/timelion/blob/master/FUNCTIONS.md&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/elastic/timelion/blob/master/FUNCTIONS.md&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;いかがでしたでしょうか？RedmineをKibana＋Timelionと組み合わせることで、グラフ表示が可能になり、結果的にプロジェクト状況の把握が容易になります。&lt;/p&gt;
+&lt;p&gt;本記事が、皆様のプロジェクトマネジメントに役に立てば幸いです。&lt;/p&gt;
+&lt;p&gt;なお、今後私がブログを執筆する際は、EVM表示、グラフのドリルダウン、プロジェクトダッシュボードの構築、ダッシュボード画像のメール配信に関する方法を記載していく予定。&lt;/p&gt;
+&lt;p&gt;これらの記事が、みなさまにとって参考になりそうでしたら「いいね！」をクリックして頂けますと幸いです。執筆の励みになります。＾＾&lt;/p&gt;
+&lt;p&gt;今後ともよろしくお願い致します。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;img src=&quot;/images/photo_20160928_00.jpg&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h2&gt;&lt;p&gt;こんにちは。
+    
+    </summary>
+    
+      <category term="プロジェクトマネジメント" scheme="https://future-architect.github.io/categories/%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%83%9E%E3%83%8D%E3%82%B8%E3%83%A1%E3%83%B3%E3%83%88/"/>
+    
+    
+      <category term="Kibana" scheme="https://future-architect.github.io/tags/Kibana/"/>
+    
+      <category term="Redmine" scheme="https://future-architect.github.io/tags/Redmine/"/>
+    
+      <category term="Timelion" scheme="https://future-architect.github.io/tags/Timelion/"/>
+    
+  </entry>
+  
+  <entry>
     <title>システム屋さんがうれしいJava8対応のコーディング規約を公開します！！</title>
     <link href="https://future-architect.github.io/articles/20160902/"/>
     <id>https://future-architect.github.io/articles/20160902/</id>
     <published>2016-09-02T04:00:00.000Z</published>
-    <updated>2016-09-15T08:24:07.000Z</updated>
+    <updated>2016-09-23T07:36:44.949Z</updated>
     
     <content type="html">&lt;h2 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h2&gt;&lt;p&gt;こんにちは。星です。&lt;/p&gt;
 &lt;p&gt;弊社では、お客様の基幹システム構築をする際、Java言語を採用することが多いのですが、2015年4月末にJava7のサポート切れになったことを受けて、昨年よりJava8で開発をしています。&lt;/p&gt;
@@ -129,12 +273,12 @@
 &lt;p&gt;さらに、CheckStyle定義やフォーマッタ、スニペットなども用意していきたいなとチーム内でも話をしてますが、なかなか手が回らず。。。&lt;/p&gt;
 &lt;p&gt;これからも改善したいと思っていますので、プルリクお待ちしています！！&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;https://github.com/future-architect/coding-standards&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/future-architect/coding-standards&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;参考：イメージキャラクターについて&quot;&gt;&lt;a href=&quot;#参考：イメージキャラクターについて&quot; class=&quot;headerlink&quot; title=&quot;参考：イメージキャラクターについて&quot;&gt;&lt;/a&gt;参考：イメージキャラクターについて&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/photo_20160902_01.png&quot; style=&quot;width:200px;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;参考：JBeeくん&quot;&gt;&lt;a href=&quot;#参考：JBeeくん&quot; class=&quot;headerlink&quot; title=&quot;参考：JBeeくん&quot;&gt;&lt;/a&gt;参考：JBeeくん&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/photo_20160902_01.png&quot; style=&quot;width:200px;&quot;&gt;&lt;/p&gt;
 &lt;h3 id=&quot;特徴&quot;&gt;&lt;a href=&quot;#特徴&quot; class=&quot;headerlink&quot; title=&quot;特徴&quot;&gt;&lt;/a&gt;特徴&lt;/h3&gt;&lt;ul&gt;
 &lt;li&gt;目と触覚の配色はDukeをリスペクト&lt;/li&gt;
 &lt;li&gt;針ではなく葉っぱが生えてる（「Javaハチ」 -&amp;gt; 「Java鉢」 -&amp;gt; 鉢植えには葉っぱが生えてる）&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;イメージキャラクターは、&lt;a href=&quot;https://future-architect.github.io/articles/20160721/&quot;&gt;前回記事&lt;/a&gt;のアイコンセット作者の木村さん作成です。&lt;/p&gt;
+&lt;p&gt;イメージキャラクター？のJBeeくんは、&lt;a href=&quot;https://future-architect.github.io/articles/20160721/&quot;&gt;前回記事&lt;/a&gt;のアイコンセット作者の木村さん作成です。&lt;/p&gt;
 </content>
     
     <summary type="html">
@@ -158,7 +302,7 @@
     <link href="https://future-architect.github.io/articles/20160721/"/>
     <id>https://future-architect.github.io/articles/20160721/</id>
     <published>2016-07-21T08:44:04.000Z</published>
-    <updated>2016-08-31T15:20:20.000Z</updated>
+    <updated>2016-07-21T13:37:14.543Z</updated>
     
     <content type="html">&lt;p&gt;こんにちは。&lt;a href=&quot;https://github.com/chanomaru&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;@chanomaru&lt;/a&gt;です。&lt;/p&gt;
 &lt;p&gt;みなさん、スライドを作ってますか？&lt;br&gt;最近はビジネスパーソンだけでなく、学生さんもプレゼンテーションをする機会が多くなってきていますよね。&lt;/p&gt;
@@ -196,7 +340,7 @@
     <link href="https://future-architect.github.io/articles/20160719/"/>
     <id>https://future-architect.github.io/articles/20160719/</id>
     <published>2016-07-19T08:50:41.000Z</published>
-    <updated>2016-08-31T15:20:20.000Z</updated>
+    <updated>2016-07-21T07:15:52.934Z</updated>
     
     <content type="html">&lt;p&gt;JANOG38にてVulsの発表を行いました&lt;/p&gt;
 &lt;p&gt;めんそーれ！！！&lt;br&gt;初投稿となります、ちまたで話題沸騰中のLinux/FreeBSD脆弱性スキャナ &lt;a href=&quot;https://github.com/future-architect/vuls&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Vuls&lt;/a&gt; 作者の神戸です。&lt;/p&gt;
@@ -306,7 +450,7 @@
     <link href="https://future-architect.github.io/articles/20160718/"/>
     <id>https://future-architect.github.io/articles/20160718/</id>
     <published>2016-07-18T09:14:46.000Z</published>
-    <updated>2016-08-31T15:20:20.000Z</updated>
+    <updated>2016-07-20T08:45:26.173Z</updated>
     
     <content type="html">&lt;p&gt;第四回LT大会～あひると住宅ローンとまたもやキーボード～&lt;br&gt;&lt;img src=&quot;/images/photo_20160718_01.jpeg&quot;&gt;&lt;/p&gt;
 &lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h1&gt;&lt;p&gt;こんにちは。真野です。&lt;br&gt;2016年6月3日(金)に開催された、LT大会#4についてご報告します。&lt;/p&gt;
@@ -489,7 +633,7 @@
     <link href="https://future-architect.github.io/articles/20160530/"/>
     <id>https://future-architect.github.io/articles/20160530/</id>
     <published>2016-05-29T23:40:24.000Z</published>
-    <updated>2016-08-31T15:20:20.000Z</updated>
+    <updated>2016-07-17T08:52:33.036Z</updated>
     
     <content type="html">&lt;p&gt;&lt;img src=&quot;/images/photo_20160530_01.png&quot;&gt;&lt;/p&gt;
 &lt;p&gt;私が参加した、前回のハッカソン記録は&lt;a href=&quot;http://future-architect.github.io/articles/20160511/&quot;&gt;こちら&lt;/a&gt;を見て下さい！&lt;/p&gt;
@@ -625,7 +769,7 @@
     <link href="https://future-architect.github.io/articles/20160527/"/>
     <id>https://future-architect.github.io/articles/20160527/</id>
     <published>2016-05-27T11:09:16.000Z</published>
-    <updated>2016-08-31T15:20:20.000Z</updated>
+    <updated>2016-05-27T15:14:18.558Z</updated>
     
     <content type="html">&lt;p&gt;&lt;img src=&quot;/images/photo_20160527_01.jpg&quot;&gt;&lt;/p&gt;
 &lt;p&gt;こんにちは。真野です。&lt;/p&gt;
@@ -941,7 +1085,7 @@
     <link href="https://future-architect.github.io/articles/20160512/"/>
     <id>https://future-architect.github.io/articles/20160512/</id>
     <published>2016-05-12T00:05:59.000Z</published>
-    <updated>2016-08-31T15:20:20.000Z</updated>
+    <updated>2016-05-20T05:29:33.658Z</updated>
     
     <content type="html">&lt;h1 id=&quot;Space-Apps-Challengeとは&quot;&gt;&lt;a href=&quot;#Space-Apps-Challengeとは&quot; class=&quot;headerlink&quot; title=&quot;Space Apps Challengeとは&quot;&gt;&lt;/a&gt;Space Apps Challengeとは&lt;/h1&gt;&lt;p&gt;Space Apps Challenge は宇宙関係のオープンデータの活用を目指し、NASA（アメリカ航空宇宙局）の呼びかけにより始まったハッカソンで、2012年から毎年1回4月に開催されています。&lt;br&gt;&lt;a href=&quot;https://2016.spaceappschallenge.org/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;2016年&lt;/a&gt;は世界135の都市で同時開催し、日本国内では会津、つくば、東京、相模原、福井、宇部、熊本（平成28年熊本震災の影響のため、熊本会場は中止となりました）で開催します。&lt;/p&gt;
 &lt;h1 id=&quot;People’s-Choice&quot;&gt;&lt;a href=&quot;#People’s-Choice&quot; class=&quot;headerlink&quot; title=&quot;People’s Choice&quot;&gt;&lt;/a&gt;People’s Choice&lt;/h1&gt;&lt;p&gt;各都市の上位2作品が、後日開催される国際コンペティションに参戦し、世界中から選出された作品とその成果を競います！&lt;/p&gt;
@@ -976,7 +1120,7 @@
     <link href="https://future-architect.github.io/articles/20160511/"/>
     <id>https://future-architect.github.io/articles/20160511/</id>
     <published>2016-05-11T06:07:34.000Z</published>
-    <updated>2016-08-31T15:20:20.000Z</updated>
+    <updated>2016-05-18T01:44:59.528Z</updated>
     
     <content type="html">&lt;p&gt;&lt;img src=&quot;/images/photo_20160511_01.png&quot; class=&quot;img-middle-size&quot;&gt;&lt;/p&gt;
 &lt;p&gt;投票はこちら（※2016/05/16迄です！）&lt;br&gt;&lt;a href=&quot;https://2016.spaceappschallenge.org/challenges/mars/space-recreation/projects/the-zen&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://2016.spaceappschallenge.org/challenges/mars/space-recreation/projects/the-zen&lt;/a&gt;&lt;/p&gt;
@@ -1074,7 +1218,7 @@
     <link href="https://future-architect.github.io/articles/20160420/"/>
     <id>https://future-architect.github.io/articles/20160420/</id>
     <published>2016-04-20T12:25:28.000Z</published>
-    <updated>2016-08-31T15:20:20.000Z</updated>
+    <updated>2016-04-21T05:35:32.428Z</updated>
     
     <content type="html">&lt;h1 id=&quot;始章-二度目の挑戦&quot;&gt;&lt;a href=&quot;#始章-二度目の挑戦&quot; class=&quot;headerlink&quot; title=&quot;始章　二度目の挑戦&quot;&gt;&lt;/a&gt;始章　二度目の挑戦&lt;/h1&gt;&lt;p&gt;こんにちは。FutureArchitectの清田です。&lt;br&gt;先日、弊社デザインワークスチームにて、 2度目のハッカソンとなる&lt;a href=&quot;http://spajam.jp/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;SPAJAM2016&lt;/a&gt;に参加しました。&lt;br&gt;今回はその様子をお伝えしたいと思います。&lt;br&gt;（前回挑戦したサバフェスの様子は&lt;a href=&quot;http://future-architect.github.io/articles/20160406/&quot;&gt;こちら&lt;/a&gt;）&lt;br&gt;&lt;img src=&quot;/images/photo_20160420_01.jpg&quot; class=&quot;img-small-size&quot;&gt;&lt;/p&gt;
 &lt;p&gt;SPAJAMは「温泉でスマホアプリを作る」ことをテーマにしたハッカソンです。&lt;br&gt;予選は6地域9会場で開催され、&lt;strong&gt;国内でも有数の規模&lt;/strong&gt; を誇ります。&lt;/p&gt;
@@ -1145,7 +1289,7 @@
     <link href="https://future-architect.github.io/articles/20160413/"/>
     <id>https://future-architect.github.io/articles/20160413/</id>
     <published>2016-04-13T05:37:37.000Z</published>
-    <updated>2016-08-31T15:20:20.000Z</updated>
+    <updated>2016-04-15T03:09:38.097Z</updated>
     
     <content type="html">&lt;p&gt;こんにちは。齋場です。&lt;br&gt;大好評に終わった第一回社内LT大会に続き、2016年3月11日(金)に「LT大会#2」を開催しました。&lt;/p&gt;
 &lt;h1 id=&quot;経緯&quot;&gt;&lt;a href=&quot;#経緯&quot; class=&quot;headerlink&quot; title=&quot;経緯&quot;&gt;&lt;/a&gt;経緯&lt;/h1&gt;&lt;p&gt;2016年1月28日(金)に開催された第一回LT大会は大盛況に終わりました。&lt;/p&gt;
@@ -1381,7 +1525,7 @@
     <link href="https://future-architect.github.io/articles/20160406/"/>
     <id>https://future-architect.github.io/articles/20160406/</id>
     <published>2016-04-06T05:37:37.000Z</published>
-    <updated>2016-08-31T15:20:20.000Z</updated>
+    <updated>2016-05-27T10:49:44.770Z</updated>
     
     <content type="html">&lt;h1 id=&quot;始章-まずは挨拶。これ礼儀。&quot;&gt;&lt;a href=&quot;#始章-まずは挨拶。これ礼儀。&quot; class=&quot;headerlink&quot; title=&quot;始章　まずは挨拶。これ礼儀。&quot;&gt;&lt;/a&gt;始章　まずは挨拶。これ礼儀。&lt;/h1&gt;&lt;p&gt;こんにちは。FutureArchitectの清田です。&lt;br&gt;先日、弊社デザインワークスチームにて、 &lt;strong&gt;&lt;a href=&quot;http://2016.serverfesta.info/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;サバフェス２０１６&lt;/a&gt;&lt;/strong&gt; というハッカソンに出場してまいりました。&lt;br&gt;今回はその様子をお伝えしたいと思います。&lt;/p&gt;
 &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
@@ -1443,7 +1587,7 @@
     <link href="https://future-architect.github.io/articles/20160323/"/>
     <id>https://future-architect.github.io/articles/20160323/</id>
     <published>2016-03-23T04:49:26.000Z</published>
-    <updated>2016-08-31T15:20:20.000Z</updated>
+    <updated>2016-03-24T08:16:54.603Z</updated>
     
     <content type="html">&lt;p&gt;Startup Geeks #1開催報告&lt;br&gt;こんにちわ。FutureArchitectの小川です。&lt;br&gt;先月(2月8日月曜日)に弊社で開催した&lt;a href=&quot;http://startupgeeks.connpass.com/event/24126/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Startup Geeks #1&lt;/a&gt;の開催報告です。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;br&gt;&lt;img src=&quot;/images/thumbnail_0004.png&quot; class=&quot;img-small-size&quot;&gt;&lt;/p&gt;
 &lt;p&gt;当日は、合計80名ほどの方に参加頂き、弊社会議室で以下のタイムラインで開催しました。&lt;/p&gt;
@@ -1574,7 +1718,7 @@
     <link href="https://future-architect.github.io/articles/20160218/"/>
     <id>https://future-architect.github.io/articles/20160218/</id>
     <published>2016-02-18T02:31:15.000Z</published>
-    <updated>2016-02-22T17:47:28.000Z</updated>
+    <updated>2016-02-22T15:34:10.729Z</updated>
     
     <content type="html">&lt;p&gt;2016年1/22(金)に実施したLT大会の発表資料を共有します。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;※&lt;strong&gt;&lt;a href=&quot;/articles/20160217/&quot;&gt;前回の記事&lt;/a&gt;の続き&lt;/strong&gt; です&lt;/p&gt;
@@ -1638,7 +1782,7 @@
     <link href="https://future-architect.github.io/articles/20160217/"/>
     <id>https://future-architect.github.io/articles/20160217/</id>
     <published>2016-02-17T00:09:12.000Z</published>
-    <updated>2016-02-22T17:47:28.000Z</updated>
+    <updated>2016-02-22T03:04:31.850Z</updated>
     
     <content type="html">&lt;p&gt;こんにちは、真野です。&lt;/p&gt;
 &lt;p&gt;ごあいさつの記事を除くと、最初の記事ですね！&lt;br&gt;今回は2016年1月に社内で実施した &lt;strong&gt;LT大会&lt;/strong&gt; の様子についてお伝えします。&lt;br&gt;私は企画・司会を担当していましたので、そういった側面でも伝えられればと思います。&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
@@ -1756,7 +1900,7 @@
     <link href="https://future-architect.github.io/articles/20160216/"/>
     <id>https://future-architect.github.io/articles/20160216/</id>
     <published>2016-02-16T00:02:14.000Z</published>
-    <updated>2016-02-22T17:47:28.000Z</updated>
+    <updated>2016-02-22T03:06:17.231Z</updated>
     
     <content type="html">&lt;p&gt;はじめまして、真野です。&lt;br&gt;本日からフューチャーアーキテクトは技術ブログを開設しました！&lt;br&gt;&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;/images/photo_0001.jpg&quot;&gt;&lt;/p&gt;
