@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2016-09-29T02:38:30.789Z</updated>
+  <updated>2016-10-06T02:22:57.676Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <author>
@@ -14,6 +14,257 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>「基幹業務もHadoopで!!」のその後　〜性能編〜</title>
+    <link href="https://future-architect.github.io/articles/20161005/"/>
+    <id>https://future-architect.github.io/articles/20161005/</id>
+    <published>2016-10-05T04:34:31.000Z</published>
+    <updated>2016-10-06T02:22:57.676Z</updated>
+    
+    <content type="html">&lt;p&gt;&lt;img src=&quot;/images/photo_20161005_00.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;こんにちは、須田です。&lt;/p&gt;
+&lt;p&gt;今年の初めに&lt;strong&gt;「基幹業務もHadoopで!! -ローソンにおける店舗発注業務へのHadoop + Hive導入と その取り組みについて-」&lt;/strong&gt;と題しまして、&lt;a href=&quot;http://hadoop.apache.jp/hcj2016-program/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hadoop / Spark Conference Japan 2016&lt;/a&gt;にて発表させて頂きました。&lt;/p&gt;
+&lt;p&gt;カンファレンスでの発表時は絶賛開発中だったこともあり、いかに業務要件を設計/実装に落としていったかという話を中心に行いました。&lt;/p&gt;
+&lt;p&gt;本エントリでは、&lt;strong&gt;「カンファレンスのその後」&lt;/strong&gt;と題しまして、開発後の性能テストを通じて、いかにプロダクト環境に耐えられる品質にまで高めていったのかについて記載します。&lt;/p&gt;
+&lt;p&gt;ピーク時では数百HiveQL/秒を処理するこのシステムにおいて、どういった課題があり、そのために実施した対策やチューニングポイントについてまとめます。&lt;br&gt;主にHiveおよびYARNを中心にその取り組みについて記載していきます。&lt;/p&gt;
+&lt;p&gt;ぜひ本エントリを読み進めて頂く前に、カンファレンス時の資料を一読して頂ければと思います。&lt;/p&gt;
+&lt;p&gt;&lt;iframe src=&quot;//www.slideshare.net/slideshow/embed_code/key/deltaDtgJAnbpQ&quot; width=&quot;595&quot; height=&quot;485&quot; frameborder=&quot;0&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; scrolling=&quot;no&quot; style=&quot;border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;&quot; allowfullscreen&gt; &lt;/iframe&gt; &lt;div style=&quot;margin-bottom:5px&quot;&gt; &lt;strong&gt; &lt;a href=&quot;//www.slideshare.net/keigosuda/hadoop-hadoop-hive&quot; title=&quot;基幹業務もHadoopで!! -ローソンにおける店舗発注業務へのHadoop + Hive導入と その取り組みについて-&quot; target=&quot;_blank&quot;&gt;基幹業務もHadoopで!! -ローソンにおける店舗発注業務へのHadoop + Hive導入と その取り組みについて-&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a target=&quot;_blank&quot; href=&quot;//www.slideshare.net/keigosuda&quot;&gt;Keigo Suda&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h2 id=&quot;対応内容-ざっと整理&quot;&gt;&lt;a href=&quot;#対応内容-ざっと整理&quot; class=&quot;headerlink&quot; title=&quot;対応内容(ざっと整理)&quot;&gt;&lt;/a&gt;&lt;strong&gt;対応内容(ざっと整理)&lt;/strong&gt;&lt;/h2&gt;&lt;p&gt;チューニングの一環として検討・確認を行った項目は以下の通りです。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;対象&lt;/th&gt;
+&lt;th&gt;対応内容&lt;/th&gt;
+&lt;th&gt;対応詳細&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Hive&lt;/td&gt;
+&lt;td&gt;クエリチューニング&lt;/td&gt;
+&lt;td&gt;・パーティショニング &lt;br&gt;・作成ワーク数の削減&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Hive&lt;/td&gt;
+&lt;td&gt;ファイルフォーマットの変更&lt;/td&gt;
+&lt;td&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Hive&lt;/td&gt;
+&lt;td&gt;データ圧縮&lt;/td&gt;
+&lt;td&gt;・圧縮アルゴリズムの選択 &lt;br&gt;・中間データの圧縮 &lt;br&gt;・転送データの圧縮&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Hive&lt;/td&gt;
+&lt;td&gt;アクセスプランの効率化&lt;/td&gt;
+&lt;td&gt;・Vectrizationの有効化 &lt;br&gt;・CBO有効化&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Hive&lt;/td&gt;
+&lt;td&gt;処理プロセス(スレッド数)の効率化&lt;/td&gt;
+&lt;td&gt;・Reducer数の調整 &lt;br&gt;・Shuffleコネクション数の調整&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Hive&lt;/td&gt;
+&lt;td&gt;結合処理の最適化&lt;/td&gt;
+&lt;td&gt;・バケットの利用 &lt;br&gt;・MapJoinの利用&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Hive&lt;/td&gt;
+&lt;td&gt;リソース利用の最適化&lt;/td&gt;
+&lt;td&gt;・JVMヒープサイズの変更 &lt;br&gt;・Tezコンテナの再利用&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;YARN&lt;/td&gt;
+&lt;td&gt;コンテナ配布の最適化&lt;/td&gt;
+&lt;td&gt;・割当コンテナサイズの範囲調整 &lt;br&gt;・コンテナサイズの変更&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;YARN&lt;/td&gt;
+&lt;td&gt;スケジューラ調整&lt;/td&gt;
+&lt;td&gt;・スケジューラの変更 &lt;br&gt;・処理用キューの設定&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;HDFS&lt;/td&gt;
+&lt;td&gt;NameNode関連&lt;/td&gt;
+&lt;td&gt;・NameNode処理スレッド数調整&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;その他&lt;/td&gt;
+&lt;td&gt;システム構成変更&lt;/td&gt;
+&lt;td&gt;タスクインスタンスグループの追加&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;上記に記した項目は一通り性能数値を取得し比較検討を行ったものです。&lt;br&gt;中にはそもそも採用に至らなかったものもあります。&lt;/p&gt;
+&lt;p&gt;今回は上記の中でも特に効果のあったものや、本システムで特徴的だったもののみをピックアップして取り扱います。&lt;br&gt;以下のパートに分けてこの後対応内容の詳細について記載します。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;1. Hive編&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;2. YARN編&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h1 id=&quot;1-Hive編&quot;&gt;&lt;a href=&quot;#1-Hive編&quot; class=&quot;headerlink&quot; title=&quot;1. Hive編&quot;&gt;&lt;/a&gt;&lt;strong&gt;1. Hive編&lt;/strong&gt;&lt;/h1&gt;&lt;p&gt;まずはHiveに関連するチューニング対応の内容について記載します。&lt;br&gt;対応内容としては大きく以下の2つです。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;1-1. HiveQLチューニング&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;1-2. Hiveパラメータチューニング&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;対応した内容の中でも効果が大きかったもの、本システムに特徴的なものを中心に取り上げていきます。&lt;/p&gt;
+&lt;h2 id=&quot;1-1-HiveQLチューニング&quot;&gt;&lt;a href=&quot;#1-1-HiveQLチューニング&quot; class=&quot;headerlink&quot; title=&quot;1-1. HiveQLチューニング&quot;&gt;&lt;/a&gt;&lt;strong&gt;1-1. HiveQLチューニング&lt;/strong&gt;&lt;/h2&gt;&lt;p&gt;HiveQLのチューニングは正攻法で行っています。&lt;/p&gt;
+&lt;p&gt;開発に入る前にHiveQLのコーディング規約を整備しておいたおかげで、処理負荷が特定ノードに寄ってしまうような処理(ソート処理など)は最低限に留めることができていました。&lt;br&gt;そのため、チューニングの観点としては以下にHiveにとって効率的に処理ができるようにワーク作成処理を組み替えていくか、作りかえていくかというものでした。&lt;/p&gt;
+&lt;p&gt;主に実施したHiveQLチューニングは以下の通りです。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;a) 作成ワーク数の削減&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;b) パーティション作成の廃止&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3 id=&quot;a-作成ワーク数の削減&quot;&gt;&lt;a href=&quot;#a-作成ワーク数の削減&quot; class=&quot;headerlink&quot; title=&quot;a) 作成ワーク数の削減&quot;&gt;&lt;/a&gt;&lt;strong&gt;a) 作成ワーク数の削減&lt;/strong&gt;&lt;/h3&gt;&lt;p&gt;ソースコードおよびHive実行プランの可読性を上げる(効率の悪い書き方をしているクエリがないかといったレビュー観点でも見通しが良くなる)ために小さい単位でワーク作成処理を行うことを大方針としていました。&lt;br&gt;そのため、HiveQLの開発規約の中ではワークテーブルの作成基準を明確にしていました。&lt;br&gt;例えば以下のような感じです。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;１ワーク処理の中での結合数に上限を設け、その上限を超えるようであればワークを分割する&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;インラインビューが2段階以上になる場合はワークを分割する  etc&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;基本的には規約に基づくワーク分割の方針で問題なかったのですが、規約に厳密に則ったために、かえって不効率なワーク処理も見受けられました。&lt;br&gt;例えば、1つのクエリで結合できるテーブル数に上限(最大5としていました)を設けていたために、同一のワークテーブルに追記していくような処理も、クエリが分割されていました。&lt;br&gt;そのためさばくデータ量的にも一つのクエリとしてまとめあげて処理した方がIO効率が良さそうな処理も細かく割れてしまってました。&lt;/p&gt;
+&lt;figure class=&quot;highlight sql&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;14&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;15&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;16&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;17&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;18&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;19&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;20&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;21&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;22&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;23&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;24&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;25&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;26&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;27&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;28&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;29&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;30&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;31&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;32&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;33&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;34&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;35&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;36&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;37&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;38&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;39&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;//これまでは規約に則っていたので、以下のようにクエリが分割されてしまっているものもあった&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;-- *****************************************************************************&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;-- 処理名　　xxxxxx&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;-- 処理概要   xxxxxx&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;-- *****************************************************************************&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;operator&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;TABLE&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    WORK_TABLE&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;SELECT&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	COL1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;,	COL2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;,	COL3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;FROM&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	TABLE02&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;GROUP&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;BY&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	COL1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;,	COL2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;HAVING&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;keyword&quot;&gt;MAX&lt;/span&gt;(COL3)	!=	&lt;span class=&quot;string&quot;&gt;&#39;some_value&#39;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;-- *****************************************************************************&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;-- 処理名　　xxxxxx&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;-- 処理概要   xxxxxx&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;-- *****************************************************************************&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;operator&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;TABLE&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    WORK_TABLE&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;SELECT&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	COL1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;,	COL2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;,	COL3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;FROM&lt;/span&gt;	TABLE03&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;INNER&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;JOIN&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	TABLE04&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;ON&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	TABLE03.COL1	=	TABLE04.COL1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;WHERE&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	TABLE03.COL2	=	&lt;span class=&quot;string&quot;&gt;&#39;some_value&#39;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;こういった同一のワークテーブルへのSELECT INSERT処理のようなものはUNION(もしくはUNION ALL)などでまとめあげて1処理に集約していきました。&lt;/p&gt;
+&lt;p&gt;UNION(もしくはUNION ALL)で繋ぐぶんには、コメントで区切るなどで極端なソースの可読性劣化もなかったので許容することにしました。&lt;br&gt;また、プランの可読性についても、UNION ALLでまとめていく分には、どこが処理の境目になっているかがわかりやすいので、依然として把握しやすい状態を保てていたため特段問題とはなりませんでした。&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight sql&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;14&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;15&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;16&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;17&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;18&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;19&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;20&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;21&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;22&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;23&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;24&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;25&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;26&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;27&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;28&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;29&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;30&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;31&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;32&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;33&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;//同一ワークテーブルへの追記処理はまとめあげる&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;operator&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;TABLE&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    WORK_TABLE&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;SELECT&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	COL1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;,	COL2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;,	COL3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;FROM&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	TABLE02&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;GROUP&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;BY&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	COL1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;,	COL2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;HAVING&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;keyword&quot;&gt;MAX&lt;/span&gt;(COL3)	!=	&lt;span class=&quot;string&quot;&gt;&#39;some_value&#39;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;UNION&lt;/span&gt; ALL&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;-- *****************************************************************************&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;-- 処理名　　xxxxxx&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;-- 処理概要   xxxxxx&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;-- *****************************************************************************&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;SELECT&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	COL1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;,	COL2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;,	COL3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;FROM&lt;/span&gt;	TABLE03&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;INNER&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;JOIN&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	TABLE04&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;ON&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	TABLE03.COL1	=	TABLE04.COL1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;WHERE&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	TABLE03.COL2	=	&lt;span class=&quot;string&quot;&gt;&#39;some_value&#39;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;UNION&lt;/span&gt; ALL&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;・・・・&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3 id=&quot;b-パーティション作成の廃止&quot;&gt;&lt;a href=&quot;#b-パーティション作成の廃止&quot; class=&quot;headerlink&quot; title=&quot;b) パーティション作成の廃止&quot;&gt;&lt;/a&gt;&lt;strong&gt;b) パーティション作成の廃止&lt;/strong&gt;&lt;/h3&gt;&lt;p&gt;パーティション作成はいわゆるHiveにおける王道チューニングかもしれませんが、本システムでは利用していません。&lt;br&gt;当初は全マスタデータ作成処理の結合時に利用される共通キー(店舗コード)をもとにdynamic partitionによる動的パーティショニングを実施していました。&lt;br&gt;実際に本番相当の各種データを準備してみると、全部が全部巨大なデータサイズではなかったこともあり、逆に無理にパーティショニングすることで以下の弊害がありました。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;パーティション後のファイルサイズが小さくなりがちで、結果IO効率が悪くなっていった&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;パーティション作成処理のオーバーヘッドの積み重ねが処理時間のウェイトを占めるようになっていた&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;本システムで主に扱うのがマスタデータということもあり、その性質上トランザクション系のデータに比べてボリュームがそれほど大きくないということから、パーティションは作成せずパワーでやりきる方が全体としてパフォーマンスが良い結果となりました。&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h2 id=&quot;1-2-Hiveパラメータチューニング&quot;&gt;&lt;a href=&quot;#1-2-Hiveパラメータチューニング&quot; class=&quot;headerlink&quot; title=&quot;1-2. Hiveパラメータチューニング&quot;&gt;&lt;/a&gt;&lt;strong&gt;1-2. Hiveパラメータチューニング&lt;/strong&gt;&lt;/h2&gt;&lt;p&gt;特に効果があった対応としては以下のものでした。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;a) Hive on Tezへの変更&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;b) MapJoinの積極的活用&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;c) Reducer数の変更&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;d) 圧縮とファイルフォーマット&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3 id=&quot;a-Hive-on-Tezへの変更&quot;&gt;&lt;a href=&quot;#a-Hive-on-Tezへの変更&quot; class=&quot;headerlink&quot; title=&quot;a) Hive on Tezへの変更&quot;&gt;&lt;/a&gt;&lt;strong&gt;a) Hive on Tezへの変更&lt;/strong&gt;&lt;/h3&gt;&lt;p&gt;発表当時は以下の理由によりHiveエンジンの実行エンジンMapReduceを利用していました。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;当時のEMRの公開バージョンではTezが正式サポートされていなかった&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;巨大なデータの結合を繰り返す処理が多く、オンメモリでの扱いに慎重だった&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;前者については、EMRの起動時にインストールアプリケーションとして標準で提供されていなかったことをさしています。&lt;br&gt;EMRへのTezインストールスクリプトは提供されていたため、ステップ処理でインストール処理を記述すればインストール自体は可能だったため、事前検証は上記提供スクリプトを利用していました。&lt;/p&gt;
+&lt;p&gt;また、後者ですが確実にクエリが流れ切るということを重視し、必ずディスクを介するMapReduceでの処理する方が安心感がありました。&lt;/p&gt;
+&lt;p&gt;しかし、開発後の性能テストにて本番相当のデータ量を用いてテストを実施すると、どうしてもMapReduce特有のオーバーヘッドやディスクIOによるIOネックが顕著になってしまい、思っていた以上に処理性能が出ませんでした。&lt;/p&gt;
+&lt;p&gt;特に本システムの開発においては、ソースコードおよびHiveQL実行プランの可読性を重視するため、なるべくワークテーブルは小さく保ち、小さいワークテーブルを経ながら処理を実施する方針としていたために、上記のオーバーヘッドがチリツモで大きくなっていました。&lt;/p&gt;
+&lt;p&gt;そんな矢先、EMRバージョン4.7にて正式にTezサポートされたこともあり、Hiveの実行エンジンをMapReduceからTezへ切り替えることにしました。&lt;br&gt;その結果、Tezへの切り替えのみで処理時間をおよそ&lt;strong&gt;1/3&lt;/strong&gt;にまで減らすことができました。&lt;/p&gt;
+&lt;p&gt;以下はデータノードのHDFSへのデータ読み取り・書き込み時のブロック操作数ですが、かなり顕著に差が出ていました。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20161005_01.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20161005_02.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;しかし、メモリ関連のパラメータチューニングは必須で、そのためメモリ関連のパラメータ、特にYARNでのTezコンテナサイズの調整をメインに対応していきました。&lt;br&gt;この詳細については後半の&lt;strong&gt;YARN編&lt;/strong&gt;にて記載します。&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3 id=&quot;b-MapJoinの積極的活用&quot;&gt;&lt;a href=&quot;#b-MapJoinの積極的活用&quot; class=&quot;headerlink&quot; title=&quot;b) MapJoinの積極的活用&quot;&gt;&lt;/a&gt;&lt;strong&gt;b) MapJoinの積極的活用&lt;/strong&gt;&lt;/h3&gt;&lt;p&gt;本システムでは実行されるクエリ数も多く、各クエリを見極めてヒント句でMapJoinに縛るのが難しかったこともあり、以下パラメータにより自動的にMapJoinへ誘導する運用としました。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;hive.auto.convert.join&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;hive.auto.convert.join.noconditionaltask.size&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;hive.auto.convert.join.noconditionaltask.size&lt;/strong&gt;の値ですが、これは性能テストの中で本番相当のデータ量をもとに実行サイズを調整していきました。&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3 id=&quot;c-Reducer数の変更&quot;&gt;&lt;a href=&quot;#c-Reducer数の変更&quot; class=&quot;headerlink&quot; title=&quot;c) Reducer数の変更&quot;&gt;&lt;/a&gt;&lt;strong&gt;c) Reducer数の変更&lt;/strong&gt;&lt;/h3&gt;&lt;p&gt;Tezの変更により、中間データのディスクIOは減らせたものの、最終的にできあがるマスタデータのうち、データサイズが大きなものは依然として最後のHDFSへのファイル書き込みがボトルネックとなってしまっていました。&lt;/p&gt;
+&lt;p&gt;そこで以下パラメータにより起動するReducer数を調整していきました。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;hive.exec.reducers.bytes.per.reducer&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;最後の書き込み処理だけを考慮してReducer数を起動しすぎてしまうと、ワーク処理の過程にも影響がでてしまう(プロセスが起動しすぎてしまう)のもあり、これは性能テストの中で調整をしていきました。&lt;br&gt;現状は&lt;strong&gt;一律64MB&lt;/strong&gt;としています。&lt;/p&gt;
+&lt;p&gt;Reducer数を上げすぎてしまうと、ファイルが小さくなりすぎてIO効率が悪くなってしまうのではないかと思われるかもしれません。&lt;br&gt;本システムにおいては、最終的にできあがったマスタデータはRDSへエクスポートして利用されます。&lt;br&gt;そのため、できあがったマスタデータが細かくファイルが割れてしまったとしても、直接EMRに対して検索クエリを実行するわけではなかったので、このような対応としました。&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3 id=&quot;d-圧縮とファイルフォーマット&quot;&gt;&lt;a href=&quot;#d-圧縮とファイルフォーマット&quot; class=&quot;headerlink&quot; title=&quot;d) 圧縮とファイルフォーマット&quot;&gt;&lt;/a&gt;&lt;strong&gt;d) 圧縮とファイルフォーマット&lt;/strong&gt;&lt;/h3&gt;&lt;p&gt;これもまたまた王道チューニングですね。&lt;br&gt;圧縮オプションとファイルフォーマットの組み合わせは、ファイル分割が可能な組み合わせとなるよう考慮し、性能テストの中で最も性能がよかった以下の組み合わせを採用しています。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ファイルフォーマット：SequeanceFile&lt;/li&gt;
+&lt;li&gt;圧縮オプション: Snappy&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;実現可能な組み合わせのパターンは一通り試したのですが、本システムでは結合をメインとしたワーク処理を積み重ねていく処理のためか、ORCなどのカラムなファイルフォーマットだと処理性能が出ず、Sequence Fileを採用することになりました。&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h1 id=&quot;2-YARN編&quot;&gt;&lt;a href=&quot;#2-YARN編&quot; class=&quot;headerlink&quot; title=&quot;2. YARN編&quot;&gt;&lt;/a&gt;&lt;strong&gt;2. YARN編&lt;/strong&gt;&lt;/h1&gt;&lt;p&gt;本システムで一番肝となったのがYARN関連の対応でした。&lt;br&gt;具体的には以下の対応を中心に実施しました。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;2-1. コンテナサイズの調整&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;2-2. 処理特性に応じたキュー設定&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;なおYARNの基本的な仕組みについての説明は省略いたしますのでご了承ください。&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h2 id=&quot;2-1-コンテナサイズの調整&quot;&gt;&lt;a href=&quot;#2-1-コンテナサイズの調整&quot; class=&quot;headerlink&quot; title=&quot;2-1. コンテナサイズの調整&quot;&gt;&lt;/a&gt;&lt;strong&gt;2-1. コンテナサイズの調整&lt;/strong&gt;&lt;/h2&gt;&lt;p&gt;今回YARNのリソースコントロール配下におかれるアプリケーションは以下でした。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;a) MRアプリケーション(Apache Sqoopで利用)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;b) Tezアプリケーション&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;アプリケーションごとに基準となるコンテナサイズ(主にメモリサイズ)を変えています。&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3 id=&quot;a-MRアプリケーション&quot;&gt;&lt;a href=&quot;#a-MRアプリケーション&quot; class=&quot;headerlink&quot; title=&quot;a) MRアプリケーション&quot;&gt;&lt;/a&gt;&lt;strong&gt;a) MRアプリケーション&lt;/strong&gt;&lt;/h3&gt;&lt;p&gt;MRアプリケーションについて、SqoopによるRDSからのインポート/エクスポート処理はsqoopコマンド実行時にmap数の指定が可能です。&lt;br&gt;そのため、消費コンテナ数を調整可能なので、パフォーマンスは落とさず1コンテナあたりのメモリサイズをどこまで減らすことができるかという観点でメモリサイズの調整行っていきました。&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3 id=&quot;b-Tezアプリケーション&quot;&gt;&lt;a href=&quot;#b-Tezアプリケーション&quot; class=&quot;headerlink&quot; title=&quot;b) Tezアプリケーション&quot;&gt;&lt;/a&gt;&lt;strong&gt;b) Tezアプリケーション&lt;/strong&gt;&lt;/h3&gt;&lt;p&gt;Tezアプリケーションの場合、Sqoopのような利用コンテナ数の調整は難しいため、性能テストの中でコンテナサイズを調整していきました。&lt;br&gt;主に以下の観点でコンテナサイズの調整を実施しました。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;MapJoinを行えるだけのメモリ確保が可能か(同時にhive.auto.convert.join.noconditionaltask.sizeの調整も実施)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;同時実行されるジョブ数に割り当てられるだけのコンテナサイズの確保が可能か&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;なおコンテナサイズで指定したメモリの利用内訳については、下記を参考にしました。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;https://community.hortonworks.com/articles/14309/demystify-tez-tuning-step-by-step.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Demystify Apache Tez Memory Tuning - Step by Step&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;これはもう地道に様々なコンテナサイズで処理を回してみて、適切な値を出しました。&lt;br&gt;最終的にTezアプリケーションでのコンテナサイズは&lt;strong&gt;メモリ4GB・vCPU1コア/コンテナ&lt;/strong&gt;が標準として落ち着きました。&lt;/p&gt;
+&lt;figure class=&quot;highlight sql&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;-- コンテナサイズ&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;operator&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;SET&lt;/span&gt; hive.tez.&lt;span class=&quot;keyword&quot;&gt;container&lt;/span&gt;.&lt;span class=&quot;keyword&quot;&gt;size&lt;/span&gt;=&lt;span class=&quot;number&quot;&gt;4096&lt;/span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;operator&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;SET&lt;/span&gt; hive.tez.&lt;span class=&quot;keyword&quot;&gt;java&lt;/span&gt;.opts=-Xmx3200m;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;operator&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;SET&lt;/span&gt; hive.tez.cpu.vcores=&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;ただし、Hive編で記載した通り、MapJoinに処理をよせるにあたり、作成するマスタデータによってはコンテナあたりのメモリサイズを大きくする必要がありました。&lt;br&gt;そういったマスタデータ作成処理のみ例外的にコンテナのメモリサイズを大きくするといった対応を実施しています。&lt;/p&gt;
+&lt;p&gt;なお、処理ピーク時に同時稼働ジョブがかなり多くこともあり、なるべくクラスタトータルでメモリの使用を抑えたかったこともあり、TezアプリケーションもMRアプリケーションも起動するApplication Master用のコンテナサイズをデフォルトから小さくしています。&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h2 id=&quot;2-2-処理特性に応じたキュー設定&quot;&gt;&lt;a href=&quot;#2-2-処理特性に応じたキュー設定&quot; class=&quot;headerlink&quot; title=&quot;2-2. 処理特性に応じたキュー設定&quot;&gt;&lt;/a&gt;&lt;strong&gt;2-2. 処理特性に応じたキュー設定&lt;/strong&gt;&lt;/h2&gt;&lt;p&gt;本システムではピーク時では常に数百のクエリを処理し続けるといったかなりハードワークです。&lt;br&gt;また作成するマスタデータごとに処理の複雑度合や利用するテーブルのデータサイズなどかなりまちまちです。&lt;br&gt;そのため、作成するマスタデータの業務優先度やそのワークロードに応じたリソース配分が必要となりました。&lt;/p&gt;
+&lt;p&gt;そのために以下の対応を実施しました。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;a) YARNのスケジューラの変更&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;b) 業務優先度や処理特性に応じたキュー設定とリソース制御&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3 id=&quot;a-YARNのスケジューラ変更&quot;&gt;&lt;a href=&quot;#a-YARNのスケジューラ変更&quot; class=&quot;headerlink&quot; title=&quot;a) YARNのスケジューラ変更&quot;&gt;&lt;/a&gt;&lt;strong&gt;a) YARNのスケジューラ変更&lt;/strong&gt;&lt;/h3&gt;&lt;p&gt;YARNのデフォルトのスケジューラはFIFO(First in First Out)であるため、最初に実行されたジョブに利用可能なコンテナをほとんど持って行かれてしまい、同時に複数ジョブを投入してもペンディングが多発していました。&lt;br&gt;そのためジョブの実行多重度をあげるために他のスケジューリングアルゴリズムを採用することにしました。&lt;/p&gt;
+&lt;p&gt;YARNでは他にFair Scheduler、Capacity Schedulerといったスケジューリングアルゴリズムを選択可能なのですが、今回はFair Schedulerを採用することにしました。&lt;/p&gt;
+&lt;p&gt;Capacity Schedulerでは、利用リソース量に基づいたスケジューリングが可能なのです。&lt;/p&gt;
+&lt;p&gt;ただFair Shcedulerでもキュー単位でリソース使用量や重み付けが可能であったのと、Capacity Schedulerの場合、キュー間ではリソース利用に応じて細かな制御は可能なのですが、同一キューに投入されたジョブはFIFOで処理されていたため、今回の要件には少し不足気味だったため採用を見送りました。(もしかしたら挙動を変える方法があった・・・？)&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3 id=&quot;b-業務優先度や処理特性に応じたキュー設定とリソース制御&quot;&gt;&lt;a href=&quot;#b-業務優先度や処理特性に応じたキュー設定とリソース制御&quot; class=&quot;headerlink&quot; title=&quot;b) 業務優先度や処理特性に応じたキュー設定とリソース制御&quot;&gt;&lt;/a&gt;&lt;strong&gt;b) 業務優先度や処理特性に応じたキュー設定とリソース制御&lt;/strong&gt;&lt;/h3&gt;&lt;p&gt;クラスタ上で複数のジョブが同時に走るようになったものの、FairSchedulerでは特に設定をしない限りはクラスタに投入されたジョブはみな等しくリソースが按分されて処理が行われます。&lt;/p&gt;
+&lt;p&gt;そのため、それほどリソースを利用しなくても処理が十分回るもの、そうでないものも全て同じくリソースが按分されることになります。&lt;/p&gt;
+&lt;p&gt;今回のバッチ処理の特性としては、実行多重度がかなり高く、ひとつひとつの作成処理量の重さもばらつきがあります。&lt;/p&gt;
+&lt;p&gt;そのため、同時に処理する量が増えてくるほど一向に処理が完了しないマスタ作成処理もでてきてしまうといった事態が発生していました。&lt;/p&gt;
+&lt;p&gt;そこで必要となるリソース量や業務的な優先度を鑑みて、ジョブを投入するキューを分けることにしました。&lt;br&gt;キュー見直し後の構成は以下のようになりました。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/photo_20161005_03.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;キュー単位に指定している利用可能なリソースウェイトですが、これは最大ピーク時の多重度を考慮した割合としています。&lt;br&gt;実際に性能数値を確認しながら最も全体として短い時間で終わるような重み付けを探っていった具体です。&lt;br&gt;そのため、ピーク時間帯以外で他キューに空きがあればその分のリソースを他キューからも利用できるようにしています。&lt;/p&gt;
+&lt;p&gt;キュー単位でのリソース制御ですが、リソースを絶対量で指定もできますが、割合による重み付けを利用しています。&lt;br&gt;理由としては、今後クラスタサイズが変更になりトータルのリソース量が変わってしまった際に都度細かな数値を見直さなくても大丈夫なようにするためです。&lt;/p&gt;
+&lt;h2 id=&quot;最後に&quot;&gt;&lt;a href=&quot;#最後に&quot; class=&quot;headerlink&quot; title=&quot;最後に&quot;&gt;&lt;/a&gt;&lt;strong&gt;最後に&lt;/strong&gt;&lt;/h2&gt;&lt;p&gt;ざっとですが、これまでの取り組みについて記載しました。&lt;br&gt;実はもう一つ大きな戦いがあって、EMRで作成したマスタデータをAPI参照のためにRDS(MySQL)へSqoopでエクスポートする処理がなかなか性能がでず、ごりごりMySQLチューニングを実施した話とか、その頑張りをあっさりAmazon Auroraに追いつかれてしまった話などまだまだ話は尽きないのですが、それはまた別の機会に。&lt;/p&gt;
+&lt;p&gt;お付き合い頂きありがとうございました。&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;img src=&quot;/images/photo_20161005_00.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;こんにちは、須田です。&lt;/p&gt;
+&lt;p&gt;今年の初めに&lt;strong&gt;「基幹業務もHadoopで!! -ローソンにおける店舗発注業務へのHadoop + Hive導入と その取り組
+    
+    </summary>
+    
+      <category term="開発" scheme="https://future-architect.github.io/categories/%E9%96%8B%E7%99%BA/"/>
+    
+    
+      <category term="AWS" scheme="https://future-architect.github.io/tags/AWS/"/>
+    
+      <category term="EMR" scheme="https://future-architect.github.io/tags/EMR/"/>
+    
+      <category term="Hadoop" scheme="https://future-architect.github.io/tags/Hadoop/"/>
+    
+      <category term="Hive" scheme="https://future-architect.github.io/tags/Hive/"/>
+    
+      <category term="YARN" scheme="https://future-architect.github.io/tags/YARN/"/>
+    
+  </entry>
   
   <entry>
     <title>マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！</title>
@@ -164,7 +415,7 @@
     <link href="https://future-architect.github.io/articles/20160902/"/>
     <id>https://future-architect.github.io/articles/20160902/</id>
     <published>2016-09-02T04:00:00.000Z</published>
-    <updated>2016-09-23T07:36:44.949Z</updated>
+    <updated>2016-10-06T02:22:57.670Z</updated>
     
     <content type="html">&lt;h2 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h2&gt;&lt;p&gt;こんにちは。星です。&lt;/p&gt;
 &lt;p&gt;弊社では、お客様の基幹システム構築をする際、Java言語を採用することが多いのですが、2015年4月末にJava7のサポート切れになったことを受けて、昨年よりJava8で開発をしています。&lt;/p&gt;
@@ -273,12 +524,12 @@
 &lt;p&gt;さらに、CheckStyle定義やフォーマッタ、スニペットなども用意していきたいなとチーム内でも話をしてますが、なかなか手が回らず。。。&lt;/p&gt;
 &lt;p&gt;これからも改善したいと思っていますので、プルリクお待ちしています！！&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;https://github.com/future-architect/coding-standards&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://github.com/future-architect/coding-standards&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id=&quot;参考：JBeeくん&quot;&gt;&lt;a href=&quot;#参考：JBeeくん&quot; class=&quot;headerlink&quot; title=&quot;参考：JBeeくん&quot;&gt;&lt;/a&gt;参考：JBeeくん&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/photo_20160902_01.png&quot; style=&quot;width:200px;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;参考：イメージキャラクターについて&quot;&gt;&lt;a href=&quot;#参考：イメージキャラクターについて&quot; class=&quot;headerlink&quot; title=&quot;参考：イメージキャラクターについて&quot;&gt;&lt;/a&gt;参考：イメージキャラクターについて&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/photo_20160902_01.png&quot; style=&quot;width:200px;&quot;&gt;&lt;/p&gt;
 &lt;h3 id=&quot;特徴&quot;&gt;&lt;a href=&quot;#特徴&quot; class=&quot;headerlink&quot; title=&quot;特徴&quot;&gt;&lt;/a&gt;特徴&lt;/h3&gt;&lt;ul&gt;
 &lt;li&gt;目と触覚の配色はDukeをリスペクト&lt;/li&gt;
 &lt;li&gt;針ではなく葉っぱが生えてる（「Javaハチ」 -&amp;gt; 「Java鉢」 -&amp;gt; 鉢植えには葉っぱが生えてる）&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;イメージキャラクター？のJBeeくんは、&lt;a href=&quot;https://future-architect.github.io/articles/20160721/&quot;&gt;前回記事&lt;/a&gt;のアイコンセット作者の木村さん作成です。&lt;/p&gt;
+&lt;p&gt;イメージキャラクターは、&lt;a href=&quot;https://future-architect.github.io/articles/20160721/&quot;&gt;前回記事&lt;/a&gt;のアイコンセット作者の木村さん作成です。&lt;/p&gt;
 </content>
     
     <summary type="html">
