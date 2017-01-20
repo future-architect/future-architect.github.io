@@ -308,7 +308,7 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 <p><br></p>
 <p>パーティションテーブルでBloom_Filter利用するSQLを実行します。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SELECT</span> <span class="comment">/*+ gather_plan_statistics */</span></span><br><span class="line">  TIMES.CALENDAR_QUARTER_DESC,</span><br><span class="line">  <span class="keyword">SUM</span>(SALES.AMOUNT_SOLD)</span><br><span class="line"><span class="keyword">FROM</span> SALES SALES</span><br><span class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> TIMES TIMES <span class="keyword">ON</span> (SALES.TIME_ID = TIMES.TIME_ID)</span><br><span class="line"><span class="keyword">WHERE</span> <span class="number">1</span>=<span class="number">1</span></span><br><span class="line"><span class="keyword">AND</span> TIMES.CALENDAR_YEAR=<span class="string">'2001'</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">TIMES.CALENDAR_QUARTER_DESC;</span></span><br></pre></td></tr></table></figure></p>
 <p>続いて、実行計画を確認します。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">table</span>(dbms_xplan.display_cursor(<span class="literal">null</span>,<span class="literal">null</span>,<span class="string">'ALLSTATS ALL'</span>));</span></span><br><span class="line">PLAN_TABLE_OUTPUT</span><br><span class="line"><span class="comment">------------------------------------------------------------------------------</span></span><br><span class="line">| Id  | Operation                     | Name    | E-Rows | Pstart| Pstop | A-Rows |</span><br><span class="line">|   0 | <span class="operator"><span class="keyword">SELECT</span> <span class="keyword">STATEMENT</span>              |         |        |       |       |      <span class="number">4</span> |</span><br><span class="line">|   <span class="number">1</span> |  <span class="keyword">HASH</span> <span class="keyword">GROUP</span> <span class="keyword">BY</span>                |         |     <span class="number">20</span> |       |       |      <span class="number">4</span> |</span><br><span class="line">|*  <span class="number">2</span> |   <span class="keyword">HASH</span> <span class="keyword">JOIN</span>                   |         |    <span class="number">229</span><span class="keyword">K</span>|       |       |    <span class="number">259</span><span class="keyword">K</span>|</span><br><span class="line">|   <span class="number">3</span> |    PART <span class="keyword">JOIN</span> FILTER <span class="keyword">CREATE</span>    | :BF0000 |    <span class="number">365</span> |       |       |    <span class="number">365</span> |</span><br><span class="line">|*  <span class="number">4</span> |     <span class="keyword">TABLE</span> <span class="keyword">ACCESS</span> <span class="keyword">FULL</span>         | TIMES   |    <span class="number">365</span> |       |       |    <span class="number">365</span> |</span><br><span class="line">|   <span class="number">5</span> |    <span class="keyword">PARTITION</span> <span class="keyword">RANGE</span> <span class="keyword">JOIN</span>-FILTER|         |    <span class="number">918</span><span class="keyword">K</span>|:BF0000|:BF0000|    <span class="number">259</span><span class="keyword">K</span>|</span><br><span class="line">|   <span class="number">6</span> |     <span class="keyword">TABLE</span> <span class="keyword">ACCESS</span> <span class="keyword">FULL</span>         | SALES   |    <span class="number">918</span><span class="keyword">K</span>|:BF0000|:BF0000|    <span class="number">259</span><span class="keyword">K</span>|</span><br><span class="line"><span class="comment">------------------------------------------------------------------------------</span></span></span><br></pre></td></tr></table></figure></p>
-<p>最後に、パーティション内のデータ件数を確認します。<br><figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> to_char(a.TIME_ID,<span class="string">'YYYY'</span>) time_id_year,count<span class="comment">(*)</span><br><span class="line">from sales a</span><br><span class="line">group by to_char(a.TIME_ID,'YYYY');</span><br><span class="line"></span><br><span class="line">TIME   COUNT(*)</span></span><br><span class="line">---- ----------</span><br><span class="line"><span class="number">2000</span>     <span class="number">232646</span></span><br><span class="line"><span class="number">2001</span>     <span class="number">259418</span></span><br><span class="line"><span class="number">1999</span>     <span class="number">247945</span></span><br><span class="line"><span class="number">1998</span>     <span class="number">178834</span></span><br></pre></td></tr></table></figure></p>
+<p>最後に、パーティション内のデータ件数を確認します。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select to_char(a.TIME_ID,&#39;YYYY&#39;) time_id_year,count(*)&#10;from sales a&#10;group by to_char(a.TIME_ID,&#39;YYYY&#39;);&#10;&#10;TIME   COUNT(*)&#10;---- ----------&#10;2000     232646&#10;2001     259418&#10;1999     247945&#10;1998     178834</span><br></pre></td></tr></table></figure></p>
 <p>実行計画のLINE#3(id=3の部分) 「PART JOIN FILTER CREATE」でフィルタ(BF000)を作成<br>LINE#6 BF000を利用してアクセスパーティション範囲を特定しているのが分かります。<br>アクセスした行数は259Kレコードで、SALESの2001年のデータとレコード数が一致しています。</p>
 <p>例ではSALESのパーションキーに対応していたので、Bloom Filterの効果がはっきりとわかりましたが、条件によってはパーティションの特定が出来ずにフィルタ効果がないこともあり得ます。（たとえば、TIMES.CALENDAR_YEAR between ‘1995’ and ‘2000’ という条件の場合、SALESの全データが必要になるためパーティションフィルタによる効果はゼロです）</p>
 <p><strong>パーティションのフィルタ効果が出るかは条件によりますが、Bloom Filterによるパフォーマンス上の副作用もないので、ディメンジョン表とファクト表がパーティションキーで結合される場合ほぼ間違いなく実行計画に登場します。</strong></p>
@@ -546,6 +546,10 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
     <ul class="nav sidebar-categories margin-bottom-40">
       
 	<li>
+	  <a href="/categories/プロジェクトマネジメント/">プロジェクトマネジメント (2)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/インフラ/">インフラ (1)</a>
 	</li>
       
@@ -567,10 +571,6 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
       
 	<li>
 	  <a href="/categories/開発/">開発 (2)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/プロジェクトマネジメント/">プロジェクトマネジメント (1)</a>
 	</li>
       
 	<li>
@@ -619,6 +619,19 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 <!-- BEGIN FEATURED POSTS -->
 <h2>Featured Posts</h2>
 <div class="recent-news margin-bottom-10">
+  
+    
+      <a href="https://future-architect.github.io/articles/20170119/">
+        <div class="row margin-bottom-10">
+          <div class="col-md-4">
+            <img src="/images/thumbnail_0016.jpg" class="img-responsive ">
+          </div>
+          <div class="col-md-8">
+            <h3>マネージャーがうれしいRedmineデータのEVM表示方法を公開します！！</h3>
+          </div>
+        </div>
+      </a>
+    
   
     
       <a href="https://future-architect.github.io/articles/20170109/">
