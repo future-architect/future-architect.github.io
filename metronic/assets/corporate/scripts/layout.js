@@ -208,6 +208,7 @@ var Layout = function () {
         }
     }
 
+/*
     var handleFancybox = function () {
         if (!jQuery.fancybox) {
             return;
@@ -243,6 +244,7 @@ var Layout = function () {
             });
         }
     }
+*/
 
     // Handles Bootstrap Accordions.
     var handleAccordions = function () {
@@ -314,7 +316,7 @@ var Layout = function () {
             handleResponsiveOnResize();
             handleIEFixes();
             handleSearch();
-            handleFancybox();
+//            handleFancybox();
             handleDifInits();
             handleSidebarMenu();
             handleAccordions();
@@ -324,6 +326,7 @@ var Layout = function () {
             handleMobiToggler();
         },
 
+/*
         initUniform: function (els) {
             if (els) {
                 jQuery(els).each(function () {
@@ -336,6 +339,7 @@ var Layout = function () {
                 handleUniform();
             }
         },
+*/
 
         initTwitter: function () {
             !function(d,s,id){
@@ -379,7 +383,7 @@ var Layout = function () {
                 NavScrolling ();
             });
         },
-
+/*
         initOWL: function () {
             $(".owl-carousel6-brands").owlCarousel({
                 pagination: false,
@@ -460,12 +464,13 @@ var Layout = function () {
                 ],
             });
         },
+*/
 
         initImageZoom: function () {
             $('.product-main-image').zoom({url: $('.product-main-image img').attr('data-BigImgSrc')});
         },
 
-        initSliderRange: function () {
+/*        initSliderRange: function () {
             $( "#slider-range" ).slider({
               range: true,
               min: 0,
@@ -478,6 +483,7 @@ var Layout = function () {
             $( "#amount" ).val( "$" + $( "#slider-range" ).slider( "values", 0 ) +
             " - $" + $( "#slider-range" ).slider( "values", 1 ) );
         },
+*/
 
         // wrapper function to scroll(focus) to an element
         scrollTo: function (el, offeset) {
