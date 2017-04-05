@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2017-04-04T01:26:30.806Z</updated>
+  <updated>2017-04-05T06:35:50.758Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <author>
@@ -14,6 +14,79 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>HoloLensの空間共有サービスを使ってみよう</title>
+    <link href="https://future-architect.github.io/articles/20170405/"/>
+    <id>https://future-architect.github.io/articles/20170405/</id>
+    <published>2017-04-05T03:00:00.000Z</published>
+    <updated>2017-04-05T06:35:50.758Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。HoloLens記事第二弾です。</p>
+<ul>
+<li>前回の記事は<a href="https://future-architect.github.io/articles/20170210/">こちら</a>をご参照ください。</li>
+</ul>
+<p>今回は、HoloLensでこれから多く使われるであろう<font color="red"><strong>空間共有サービス（以下シェアリングサービス）</strong></font>の特性と実装方法の触りについて紹介します。</p>
+<h1 id="HoloLensの空間共有サービスとは"><a href="#HoloLensの空間共有サービスとは" class="headerlink" title="HoloLensの空間共有サービスとは"></a>HoloLensの空間共有サービスとは</h1><p>HoloLensの醍醐味は、現実世界と仮想世界が融合することです。つまりHoloLensゴーグルをかけると、スマホを通さずとも視野の中にに様々な情報や仮想的なオブジェクトを出現させることができます。</p>
+<p>ARとして流行ったポケモンGOを例にすると、スマホの画面上で現実の背景の上にポケモンの画像が合成されて表示されていましたよね？HoloLensを身につけると、散歩中にふと公園を見ると「ピカチュウが花壇から出てきた！」という風景を自然に見ることができます。また、HoloLensは<strong>現実世界のオブジェクトをスキャンしてマッピング</strong>を行っているので、「ピカチュウが滑り台を滑る」といったことが比較的容易に実現できちゃいます。</p>
+<p>でも悲しいかな、HoloLensをそのまま装着しても、みんな別々、パラレルワールドのマサラタウンにいるのです。ある人はそこにピカチュウがいるというけれど、私には見えない、そんな状態です。それでは盛り上がりもかけますし、結局は自分にしか見えない仮想的なものなんだという儚い気持ちになってしまいますよね。</p>
+<p>そこで登場HoloLensの<strong><font color="red">シェアリングサービス</font></strong>です。<strong>これを使うと、あるHoloLensで見ているものが、他のHoloLensでも同様に見ることができ、空間の共有が行えます。</strong>「ベンチの上でピカチュウがバク転した！かわゆす」というのを皆で一緒に見ることが可能となります。</p>
+<h1 id="閑話。（仮想現実と現実に対する哲学的考察をちょっと）"><a href="#閑話。（仮想現実と現実に対する哲学的考察をちょっと）" class="headerlink" title="閑話。（仮想現実と現実に対する哲学的考察をちょっと）"></a>閑話。（仮想現実と現実に対する哲学的考察をちょっと）</h1><p>みんながそこにピカチュウがいると言う。これはもはやピカチュウが現実となったと言えるのではないでしょうか。</p>
+<p><strong>「この世は人間に記録（観測）されるまでは存在しない」</strong>とどこかの偉い方が言いましたが、逆に認識されればそれは現実の世界になるのです。HoloLensを通さないと見えないから現実の世界なわけないじゃんというあなた、あなたは視覚を司る「目」という器官を通して世界を認識しています。この世界も目が無いと、見えなくなるから現実な世界なわけないと言っているのと同じかなと思います。</p>
+<p><strong>昆虫は紫外線を見ることができるため、人間とは全く別の世界が広がっていますが、HoleLensが映し出す世界も似たようなものではないでしょうか。</strong>また、実際触れるじゃないかと思ったあなた、触れるという現象も触覚も持って感知しているにすぎず、本当の意味でそこに物体があるかどうかなんてだれにもわからないのではないかなと思います。</p>
+<h1 id="シェアリングサービスの仕組み"><a href="#シェアリングサービスの仕組み" class="headerlink" title="シェアリングサービスの仕組み"></a>シェアリングサービスの仕組み</h1><p>哲学の話は置いて、本題に戻りましょう。<br>シェアリングを行うためには、<strong>お互いの空間情報を中継するためのサーバー（PC）が必要</strong>です。</p>
+<p>アプリケーションの構成によりますが、本記事ではMicrosoftがHoloLensの開発ノウハウを公開している<a href="https://developer.microsoft.com/en-us/windows/mixed-reality/academy" target="_blank" rel="external">HolographicAcademy</a>にてシェアリングサービスを紹介している<a href="https://developer.microsoft.com/en-us/windows/mixed-reality/holograms_240" target="_blank" rel="external">Holograms240</a>の仕組みを説明します。</p>
+<p>まず試したいという方は、<a href="https://developer.microsoft.com/en-us/windows/mixed-reality/holograms_240" target="_blank" rel="external">Holograms240の公式サイト</a>に実行方法が記載されています。<br>もしくは日本語で実施方法を記載してくださっている方がいるので<a href="https://docs.com/kaorun55/7627/hololens-sharing?c=euXVvL" target="_blank" rel="external">ここ</a>を見ると良いと思います。</p>
+<p>Holograms240では<strong><a href="https://github.com/Microsoft/HoloToolkit-Unity" target="_blank" rel="external">HoloToolKit-Unity</a></strong>というUnity上でHoloLensの機能を使用するためのツール群を利用しています。このHoloToolKit-Unityにはシェアリングサービスが含まれています。開発者はこれを使用して、複数HoloLens間でのシェアリングを行うことができます。またHoloToolKit-Unityの中には、<strong>サーバーで起動するためのシェアリングサービスの実行ファイルが準備されている</strong>ので、シェアリングを行うためにはこれをPC上で実行して利用することができます。</p>
+<p><strong>Holograms240は以下のような仕組みで動いています（下図）。</strong><br>まずはアプリ起動時にアンカー情報と呼ばれる、現実世界のマッピングとUnity上での座標を紐づけるための目印を共有します。<br><img src="/images/photo_201670405_01.jpeg"></p>
+<p>次に、アプリ内で共有が必要なデータを逐次送受信して、同じオブジェクトの同期を行っています。<br><img src="/images/photo_201670405_02.jpeg"></p>
+<p><strong>実空間とのマッピングがされているのはアンカーだけです。</strong></p>
+<p>実空間をスキャンした情報とアンカーとのマッピング情報はデータ量が多いです。同期するのに長いと1分以上の時間がかかります！その後の共有情報はデータ量は少ないですが、<strong>各オブジェクトやアクションごとにデータの型や、送信処理、受信時の動作を実装してあげなくてはいけません。</strong>さすがに楽々と視野すべてを一括で同期して、というのはできないのですね…。今後もっと便利なライブラリができることを期待します。</p>
+<h1 id="HoloToolKit-Unityの仕組みを少しだけ紹介"><a href="#HoloToolKit-Unityの仕組みを少しだけ紹介" class="headerlink" title="HoloToolKit-Unityの仕組みを少しだけ紹介"></a>HoloToolKit-Unityの仕組みを少しだけ紹介</h1><p>次にHoloToolKit-Unity内で何が行われているのか、かいつまんで紹介します。</p>
+<h2 id="ImportExportAnchorManager"><a href="#ImportExportAnchorManager" class="headerlink" title="ImportExportAnchorManager"></a>ImportExportAnchorManager</h2><p>Holograms240ではこれを、HologramCollection（HoloLensで扱うオブジェクトの大親）につけてますね。このスクリプトは1機目ではアンカー（Unity上のオブジェクト）を物理的に固定（現実世界にマッピング）して、そのアンカー情報を共有サーバーにエクスポートしています。また2機目以降は、1機目のアンカー情報をインポートして、自身の現実世界のマッピング情報上にアンカーを設置します。これによって<strong>Unityの世界では1機目と2機目の座標軸がアンカーを中心として一致</strong>します。</p>
+<h2 id="CustomMessages"><a href="#CustomMessages" class="headerlink" title="CustomMessages"></a>CustomMessages</h2><p>デバイス間で共有するデータの形式の定義と、送受信時の処理が記載されていますこれはアプリの仕様ごとに、がっつり個別実装する必要があります。<br>以下の流れで見ていきます。</p>
+<ol>
+<li>送受信用のデータ形式</li>
+<li>送信処理について</li>
+<li>受信処理について</li>
+</ol>
+<h3 id="1-送受信用のデータ形式"><a href="#1-送受信用のデータ形式" class="headerlink" title="1. 送受信用のデータ形式"></a>1. 送受信用のデータ形式</h3><p>TestMessageIDは<strong>デバイス間で共有（送受信）するデータを定義しています。</strong><br>オブジェクトやアクションの種類ごとに定義しています。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">enum</span> TestMessageID : byte</div><div class="line">&#123;</div><div class="line">    HeadTransform = MessageID.UserMessageIDStart,</div><div class="line">    UserAvatar,</div><div class="line">    UserHit,</div><div class="line">    ShootProjectile,</div><div class="line">    StageTransform,</div><div class="line">    ResetStage,</div><div class="line">    ExplodeTarget,</div><div class="line">    Max</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="2-送信処理について"><a href="#2-送信処理について" class="headerlink" title="2. 送信処理について"></a>2. 送信処理について</h3><p><strong>Sendメソッドは送信処理を実装しています。</strong><br>例えばSendShootProjectleはユーザーがゲーム内で発射するオブジェクトの送信処理です。<br>起点となるpositionと打ち出される方向directionをアンカーからの相対位置に変換して送信しています。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SendShootProjectile</span><span class="params">(Vector3 position, Vector3 direction)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="comment">// If we are connected to a session, broadcast our head info</span></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.serverConnection != null &amp;&amp; <span class="keyword">this</span>.serverConnection.IsConnected())</div><div class="line">    &#123;</div><div class="line">        <span class="comment">// Create an outgoing network message to contain all the info we want to send</span></div><div class="line">        NetworkOutMessage msg = CreateMessage((byte)TestMessageID.ShootProjectile);</div><div class="line"></div><div class="line">        AppendVector3(msg, position + (direction * <span class="number">0.016f</span>));</div><div class="line">        AppendVector3(msg, direction);</div><div class="line"></div><div class="line">        <span class="comment">// Send the message as a broadcast, which will cause the server to forward it to all other users in the session.</span></div><div class="line">        <span class="keyword">this</span>.serverConnection.Broadcast(</div><div class="line">            msg,</div><div class="line">            MessagePriority.Immediate,</div><div class="line">            MessageReliability.Reliable,</div><div class="line">            MessageChannel.Avatar);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="3-受信処理について"><a href="#3-受信処理について" class="headerlink" title="3. 受信処理について"></a>3. 受信処理について</h3><p><strong>受信時の処理はMessageHandlersを使って登録しています。</strong><br>例えば上記で送信している発射物の受信時の処理はProjectileLauncher.csに記載されています。下記のコードで受信時イベントの登録を行っています。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">CustomMessages.Instance.MessageHandlers[CustomMessages.TestMessageID.ShootProjectile] = <span class="keyword">this</span>.ProcessRemoteProjectile;</div></pre></td></tr></table></figure>
+<p>そして、実際の受信処理は下記のProcessRemoteProjectileです。受信した発射物のアンカーからの位置情報（Position）と方向（Direction）から同じ位置にオブジェクトを生成しています。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">ProcessRemoteProjectile</span><span class="params">(NetworkInMessage msg)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="comment">// Parse the message</span></div><div class="line">    <span class="keyword">long</span> userID = msg.ReadInt64();</div><div class="line">    Vector3 remoteProjectilePosition = CustomMessages.Instance.ReadVector3(msg);</div><div class="line"></div><div class="line">    Vector3 remoteProjectileDirection = CustomMessages.Instance.ReadVector3(msg);</div><div class="line"></div><div class="line">    Transform anchor = ImportExportAnchorManager.Instance.gameObject.transform;</div><div class="line">    ShootProjectile(anchor.TransformPoint(remoteProjectilePosition), anchor.TransformDirection(remoteProjectileDirection), userID);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>このように、<strong>現実世界上の位置情報として同期されるのはアンカーだけで、その他のオブジェクトを同期したい場合は、個別に定義して処理を記載する必要</strong>があります。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><ul>
+<li>シェアリングサービスはHoloToolKit-Unityを使うことで実装できる</li>
+<li>実空間に固定されているのはアンカーだけであり、アンカーの同期には時間がかかる</li>
+<li>その他のアプリ内情報は個別に連携データの形式と送受信処理を実装する必要がある</li>
+</ul>
+<h1 id="おまけ～最新（2017-04-03時点）特ダネ情報～"><a href="#おまけ～最新（2017-04-03時点）特ダネ情報～" class="headerlink" title="おまけ～最新（2017/04/03時点）特ダネ情報～"></a>おまけ～最新（2017/04/03時点）特ダネ情報～</h1><ul>
+<li><a href="https://github.com/HoloMagicians/HolographicAcademyJP" target="_blank" rel="external">英語弱者（筆者も）待望！Holographic Academyを日本語訳してくださっている神サイト</a></li>
+<li><a href="https://github.com/the6th/StartupScene-for-Academy-240-on-HoloLens" target="_blank" rel="external">SharingサービスのサーバーIPをアプリ起動時に設定できるようにするプラグイン</a></li>
+<li><a href="https://docs.com/xin9le/1447/sharing-deep-dive" target="_blank" rel="external">Hololens meetup vol2で発表されたHoloToolKitよりイケている共有サービス</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h1&gt;&lt;p&gt;こんにちは。HoloLens記事第二弾です。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;前回の記事は&lt;a href=&quot;https://fut
+    
+    </summary>
+    
+      <category term="VR" scheme="https://future-architect.github.io/categories/VR/"/>
+    
+    
+      <category term="Unity" scheme="https://future-architect.github.io/tags/Unity/"/>
+    
+      <category term="HoloLens" scheme="https://future-architect.github.io/tags/HoloLens/"/>
+    
+  </entry>
   
   <entry>
     <title>Elastic{ON}-2017 レポート ~セッション編~</title>
@@ -2563,144 +2636,6 @@
       <category term="Kibana" scheme="https://future-architect.github.io/tags/Kibana/"/>
     
       <category term="Redmine" scheme="https://future-architect.github.io/tags/Redmine/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>システム屋さんがうれしいJava8対応のコーディング規約を公開します！！</title>
-    <link href="https://future-architect.github.io/articles/20160902/"/>
-    <id>https://future-architect.github.io/articles/20160902/</id>
-    <published>2016-09-02T04:00:00.000Z</published>
-    <updated>2017-04-04T01:26:30.779Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは。星です。</p>
-<p>弊社では、お客様の基幹システム構築をする際、Java言語を採用することが多いのですが、2015年4月末にJava7のサポート切れになったことを受けて、昨年よりJava8で開発をしています。</p>
-<p>弊社でもそれなりの規模の案件になると、社員やパートナーの皆様を合わせて、数百人が同時に開発することも珍しくありませんので、私の所属する技術部隊でコーディング規約をはじめとして、開発をするにあたってのガイドラインの整備やEclipse等の開発環境の整備などのタスクを実施して、標準化とクオリティの担保を推進しています。</p>
-<p>さて、Java8においては、Java7において実装見送りとなったStream APIやラムダ式といった大きな機能追加がありました。とはいえ、これらの機能を使ったとして、性能的に大丈夫なのかとか、どういったコーディングスタイルが良いのか？など、エンタープライズ領域において、どう利用していくのかを決める必要がありました。</p>
-<h2 id="世の中のJavaのコーディング規約"><a href="#世の中のJavaのコーディング規約" class="headerlink" title="世の中のJavaのコーディング規約"></a>世の中のJavaのコーディング規約</h2><p>インターネット上で公開されているJavaのコーディング規約で、主要なものを挙げてみました。</p>
-<table>
-<thead>
-<tr>
-<th>規約</th>
-<th>著作者</th>
-<th>URL</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Code Conventions for the Java Programming Language</td>
-<td>Sun Microsystems</td>
-<td><a href="http://www.oracle.com/technetwork/java/codeconvtoc-136057.html" target="_blank" rel="external">http://www.oracle.com/technetwork/java/codeconvtoc-136057.html</a></td>
-</tr>
-<tr>
-<td>Writing Robust Java Code</td>
-<td>Scott W. Ambler</td>
-<td><a href="http://www.ambysoft.com/downloads/javaCodingStandards.pdf" target="_blank" rel="external">http://www.ambysoft.com/downloads/javaCodingStandards.pdf</a></td>
-</tr>
-<tr>
-<td>オブジェクト倶楽部版 Javaコーディング標準</td>
-<td>オブジェクト倶楽部</td>
-<td><a href="http://objectclub.jp/community/codingstandard/CodingStd.pdf" target="_blank" rel="external">http://objectclub.jp/community/codingstandard/CodingStd.pdf</a></td>
-</tr>
-<tr>
-<td>電通国際情報際サービス版 Javaコーディング規約2004</td>
-<td>電通国際情報サービス</td>
-<td><a href="http://objectclub.jp/community/codingstandard/JavaCodingStandard2004.pdf" target="_blank" rel="external">http://objectclub.jp/community/codingstandard/JavaCodingStandard2004.pdf</a></td>
-</tr>
-<tr>
-<td>JJGuideline （Java - J2EE Conventions and Guidelines）</td>
-<td>Stephan.J &amp; JCS Team</td>
-<td><a href="http://www.fedict.belgium.be/sites/default/files/downloads/Java_J2EE_conventions_and_guidelines_EN.pdf" target="_blank" rel="external">http://www.fedict.belgium.be/sites/default/files/downloads/Java_J2EE_conventions_and_guidelines_EN.pdf</a></td>
-</tr>
-<tr>
-<td>Google Java Style (非公式和訳)</td>
-<td>Google</td>
-<td><a href="https://kazurof.github.io/GoogleJavaStyle-ja/" target="_blank" rel="external">https://kazurof.github.io/GoogleJavaStyle-ja/</a></td>
-</tr>
-<tr>
-<td>Acroquest Technology Javaコーディング規約</td>
-<td>Acroquest Technology</td>
-<td><a href="https://www.acroquest.co.jp/webworkshop/javacordingrule/Acroquest_JavaCodingStandard_6_7.pdf" target="_blank" rel="external">https://www.acroquest.co.jp/webworkshop/javacordingrule/Acroquest_JavaCodingStandard_6_7.pdf</a></td>
-</tr>
-</tbody>
-</table>
-<p>作成したのが2000年代で古いものが多く、Stream APIやラムダ式についての記載があるものは見当たらず、参考になりませんでした。</p>
-<h2 id="Future-Enterprise-Coding-Standards"><a href="#Future-Enterprise-Coding-Standards" class="headerlink" title="Future Enterprise Coding Standards"></a>Future Enterprise Coding Standards</h2><p><img src="/images/photo_20160902_01.png" alt=""></p>
-<p>世の中になければ自分たちで作るというのは弊社の行動理念でもあるので、社内で伝統的に受け継がれ、細かな改善をしてきたコーディング規約をベースに技術チーム有志にてJava8対応版を作りました。<br>(ちなみにモチーフがなぜハチなのかは、わかりますよね？)</p>
-<p>そして、「Future Enterprise Coding Standards」と名付けて、せっかくなので、Githubに公開しました！！</p>
-<ul>
-<li>Future Enterprise Coding Standards for Java<ul>
-<li><a href="https://future-architect.github.io/coding-standards/">https://future-architect.github.io/coding-standards/</a></li>
-</ul>
-</li>
-</ul>
-<p>Java8対応以外にも、性能の考慮も含めたコーディング規約になってます。<br>その一部をここで紹介します。</p>
-<h3 id="Java8に対応"><a href="#Java8に対応" class="headerlink" title="Java8に対応"></a>Java8に対応</h3><p>例えばStream APIですが、皆さんだったら、下記3パターンのうち、どれを標準にしますか？</p>
-<h4 id="パターン1"><a href="#パターン1" class="headerlink" title="パターン1"></a>パターン1</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">List&lt;Character&gt; alphabetLower = list</div><div class="line">    .stream()</div><div class="line">    .filter(Character::isAlphabetic)</div><div class="line">    .map(Character::toLowerCase)</div><div class="line">    .collect(Collectors.toList());</div></pre></td></tr></table></figure>
-<h4 id="パターン２"><a href="#パターン２" class="headerlink" title="パターン２"></a>パターン２</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">List&lt;Character&gt; alphabetLower = list.stream()</div><div class="line">                                    .filter(Character::isAlphabetic)</div><div class="line">                                    .map(Character::toLowerCase)</div><div class="line">                                    .collect(Collectors.toList());</div></pre></td></tr></table></figure>
-<h4 id="パターン3"><a href="#パターン3" class="headerlink" title="パターン3"></a>パターン3</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">List&lt;Character&gt; alphabetLower = list.stream()</div><div class="line">    .filter(Character::isAlphabetic)</div><div class="line">    .map(Character::toLowerCase)</div><div class="line">    .collect(Collectors.toList());</div></pre></td></tr></table></figure>
-<p>パターン1だと1行目が気持ち悪いと感じる人がいそうですね。<br>パターン2は一見美しく見えるのですが、Eclipse等でフォーマッタの設定が難しかったりします。<br>そんなわけで、私達が設定したコーディング規約では可読性とフォーマッタとの相性も踏まえて、パターン3にしてます。</p>
-<h3 id="性能の考慮"><a href="#性能の考慮" class="headerlink" title="性能の考慮"></a>性能の考慮</h3><p>次は性能についてです。下記2つのパターン、どちらも等価のリストを返しますが、<br>どちらのパターンで実装したらよいでしょうか？</p>
-<h4 id="1-拡張for文パターン"><a href="#1-拡張for文パターン" class="headerlink" title="1. 拡張for文パターン"></a>1. 拡張for文パターン</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; list = <span class="comment">//数値文字列のList</span></div><div class="line">List&lt;String&gt; resultList = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line"><span class="keyword">for</span> (String string : list) &#123;</div><div class="line">    <span class="keyword">if</span> (string.endsWith(<span class="string">"0"</span>)) &#123;</div><div class="line">        resultList.add(string);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">return</span> resultList;</div></pre></td></tr></table></figure>
-<h4 id="2-StreamAPIパターン"><a href="#2-StreamAPIパターン" class="headerlink" title="2. StreamAPIパターン"></a>2. StreamAPIパターン</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">List&lt;String&gt; list = <span class="comment">//数値文字列のList</span></div><div class="line">List&lt;String&gt; resultList = list.stream()</div><div class="line">    .filter(s -&gt; s.endsWith(<span class="string">"0"</span>))</div><div class="line">    .collect(Collectors.toList());</div><div class="line"><span class="keyword">return</span> resultList;</div></pre></td></tr></table></figure>
-<p>Java8を使っているし、せっかくだからStream APIで実装しようと思っても、<br>実は性能がシビアに求められる処理だったりしませんか？</p>
-<h4 id="計測結果"><a href="#計測結果" class="headerlink" title="計測結果"></a>計測結果</h4><table>
-<thead>
-<tr>
-<th style="text-align:right">処理するListの件数</th>
-<th style="text-align:right">拡張for文 (ms)</th>
-<th style="text-align:right">StreamAPI (ms)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:right">100万件</td>
-<td style="text-align:right">7</td>
-<td style="text-align:right">9</td>
-</tr>
-<tr>
-<td style="text-align:right">1,000万件</td>
-<td style="text-align:right">88</td>
-<td style="text-align:right">114</td>
-</tr>
-<tr>
-<td style="text-align:right">1億件</td>
-<td style="text-align:right">949</td>
-<td style="text-align:right">1,026</td>
-</tr>
-<tr>
-<td style="text-align:right">2億件</td>
-<td style="text-align:right">1,822</td>
-<td style="text-align:right">2,081</td>
-</tr>
-</tbody>
-</table>
-<p>このように従来通りの拡張for文のほうが速かったりするので、性能も踏まえて実装をどうすべきかを判断する必要があります。こういった性能への考慮事項もコーディング規約に組み込んであります。</p>
-<h2 id="コーディング規約の今後について"><a href="#コーディング規約の今後について" class="headerlink" title="コーディング規約の今後について"></a>コーディング規約の今後について</h2><p>今後はWebアプリケーション編など実践的な内容なども盛り込んでいきたいなと思ってます。<br>またSQLやJavaScriptなど、他の言語についても公開していきたいと思っています。</p>
-<p>さらに、CheckStyle定義やフォーマッタ、スニペットなども用意していきたいなとチーム内でも話をしてますが、なかなか手が回らず。。。</p>
-<p>これからも改善したいと思っていますので、プルリクお待ちしています！！</p>
-<p><a href="https://github.com/future-architect/coding-standards" target="_blank" rel="external">https://github.com/future-architect/coding-standards</a></p>
-<h2 id="参考：イメージキャラクターについて"><a href="#参考：イメージキャラクターについて" class="headerlink" title="参考：イメージキャラクターについて"></a>参考：イメージキャラクターについて</h2><p><img src="/images/photo_20160902_01.png" style="width:200px;"></p>
-<h3 id="特徴"><a href="#特徴" class="headerlink" title="特徴"></a>特徴</h3><ul>
-<li>目と触覚の配色はDukeをリスペクト</li>
-<li>針ではなく葉っぱが生えてる（「Javaハチ」 -&gt; 「Java鉢」 -&gt; 鉢植えには葉っぱが生えてる）</li>
-</ul>
-<p>イメージキャラクターは、<a href="https://future-architect.github.io/articles/20160721/">前回記事</a>のアイコンセット作者の木村さん作成です。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h2&gt;&lt;p&gt;こんにちは。星です。&lt;/p&gt;
-&lt;p&gt;弊社では、お客様の基幹システム構築をする際、Java言語を採用することが多いのですが、2
-    
-    </summary>
-    
-      <category term="Development" scheme="https://future-architect.github.io/categories/Development/"/>
-    
-    
-      <category term="Java" scheme="https://future-architect.github.io/tags/Java/"/>
-    
-      <category term="Styleguide" scheme="https://future-architect.github.io/tags/Styleguide/"/>
     
   </entry>
   
