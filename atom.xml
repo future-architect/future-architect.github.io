@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2017-05-02T06:14:57.231Z</updated>
+  <updated>2017-05-12T07:56:11.976Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <author>
@@ -16,11 +16,259 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>マネージャーがうれしいRedmineデータのダッシュボード表示方法を公開します！！</title>
+    <link href="https://future-architect.github.io/articles/20170510/"/>
+    <id>https://future-architect.github.io/articles/20170510/</id>
+    <published>2017-05-10T09:00:00.000Z</published>
+    <updated>2017-05-12T07:56:11.976Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/images/20170510/photo_20170510_00.jpg" alt=""></p>
+<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは。近藤です。</p>
+<p>前回までの関連記事です</p>
+<ul>
+<li><a href="https://future-architect.github.io/articles/20160920/">1記事目</a> はRedmineのデータをKibanaで表示しました</li>
+<li><a href="https://future-architect.github.io/articles/20170119/">2記事目</a> はRedmineのデータからEVMグラフを作成しKibanaで表示しました</li>
+</ul>
+<p>3記事目となる本記事ではRedmineデータを可視化するダッシュボードをKibana上に構築します。Kibanaを使うことによって例えば、担当者別のタスク量、トラッカー別のタスク量、EVMグラフを同時に把握できます。</p>
+<p>◆ダッシュボード例</p>
+<p><img src="/images/20170510/photo_20170510_39.png" alt=""></p>
+<p>では早速、Kibanaを使ってみましょう。</p>
+<p>なお、下記を前提としています。</p>
+<ul>
+<li>Windows環境で構築する</li>
+<li>Redmineのデータベース(MySQL)に直接接続する</li>
+</ul>
+<h2 id="大まかな流れ"><a href="#大まかな流れ" class="headerlink" title="大まかな流れ"></a>大まかな流れ</h2><p>下記の手順でグラフを表示します。</p>
+<ol>
+<li>環境構築</li>
+<li>データ投入</li>
+<li>ダッシュボード構築 </li>
+</ol>
+<h2 id="1-環境構築"><a href="#1-環境構築" class="headerlink" title="1.環境構築"></a>1.環境構築</h2><p>今回もELK+Timelionを利用して、Redmineデータの可視化環境を構築します。</p>
+<p><img src="/images/20170510/photo_20170510_99.png" alt=""></p>
+<h3 id="モジュールのダウンロード"><a href="#モジュールのダウンロード" class="headerlink" title="モジュールのダウンロード"></a>モジュールのダウンロード</h3><p>前回の投稿から時間がたち、ELKのバージョンが上がったのであらためて最新のモジュールをダウンロードします。</p>
+<ul>
+<li>Elastic Search Download URL<ul>
+<li><a href="https://www.elastic.co/jp/downloads/elasticsearch" target="_blank" rel="external">https://www.elastic.co/jp/downloads/elasticsearch</a></li>
+<li>私の場合は、「elasticsearch-5.4.0.zip」をダウンロードしました。</li>
+</ul>
+</li>
+<li>Kibana Download URL<ul>
+<li><a href="https://www.elastic.co/downloads/kibana" target="_blank" rel="external">https://www.elastic.co/downloads/kibana</a></li>
+<li>私の場合は、「kibana-5.4.0-windows-x86.zip」をダウンロードしました。</li>
+</ul>
+</li>
+<li>Logstash Download URL<ul>
+<li><a href="https://www.elastic.co/downloads/logstash" target="_blank" rel="external">https://www.elastic.co/downloads/logstash</a></li>
+<li>私の場合は、「logstash-5.4.0.zip」をダウンロードしました。</li>
+</ul>
+</li>
+</ul>
+<h3 id="モジュールの配備"><a href="#モジュールの配備" class="headerlink" title="モジュールの配備"></a>モジュールの配備</h3><p>次に、「C:\elastic」というフォルダを作成。そして、先ほどダウンロードしたそれぞれの圧縮ファイルを解凍し、「C:\elastic」へ配置します。</p>
+<p>最終的には下記のようなフォルダ構成になります。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">C:\elastic</div><div class="line"> └ elasticsearch<span class="number">-5.4</span><span class="number">.0</span></div><div class="line"> └ kibana<span class="number">-5.4</span><span class="number">.0</span>-windows-x86</div><div class="line"> └ logstash<span class="number">-5.4</span><span class="number">.0</span></div></pre></td></tr></table></figure></p>
+<h3 id="JDBCドライバ設定"><a href="#JDBCドライバ設定" class="headerlink" title="JDBCドライバ設定"></a>JDBCドライバ設定</h3><p>次に、JDBCドライバを用意します。</p>
+<p><a href="https://future-architect.github.io/articles/20160920/">前々回</a>ダウンロードした「mysql-connector-java-5.1.39-bin.jar」というファイルを、<br>「C:\elastic\logstash-5.4.0\bin」以下に配置します。</p>
+<p>次に、「redmine.txt」というファイルを作成。中身は下記のようにします。（★を含む箇所は皆様の環境に合わせた値へ変えてください。）</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">input &#123;</div><div class="line">    jdbc &#123;</div><div class="line">        jdbc_connection_string =&gt; <span class="string">"jdbc:mysql://★IP★:3306/★サービス名★"</span></div><div class="line">        jdbc_user =&gt; <span class="string">"★ユーザ名★"</span></div><div class="line">        jdbc_password =&gt; <span class="string">"★パスワード★"</span></div><div class="line">        jdbc_driver_library =&gt;<span class="string">"mysql-connector-java-5.1.39-bin.jar"</span></div><div class="line">        jdbc_driver_class =&gt; <span class="string">"com.mysql.jdbc.Driver"</span></div><div class="line">        statement =&gt; <span class="string">"</span></div><div class="line">select</div><div class="line">	iss.due_date due_date</div><div class="line">	, iss.updated_on updated_on</div><div class="line">	, iss.estimated_hours pv</div><div class="line">	, iss.estimated_hours * iss.done_ratio / 100 ev</div><div class="line">	, tim.hours ac</div><div class="line">	, concat(usr.lastname, usr.firstname) user_name</div><div class="line">	, tra.name tracker_name</div><div class="line">from</div><div class="line">	issues iss</div><div class="line">	left join (</div><div class="line">		select</div><div class="line">			issue_id</div><div class="line">			, sum(hours) hours</div><div class="line">		from</div><div class="line">			time_entries</div><div class="line">		group by</div><div class="line">			issue_id</div><div class="line">	) tim</div><div class="line">	on iss.id = tim.issue_id</div><div class="line">	left join users usr</div><div class="line">	on iss.assigned_to_id = usr.id</div><div class="line">	left join trackers tra</div><div class="line">	on iss.tracker_id = tra.id</div><div class="line">"</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">output &#123;</div><div class="line">    elasticsearch &#123;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>中に記載されているSQLでは、下記7つの値を取得します。なお、pv、ec、acについては、<a href="https://future-architect.github.io/articles/20170119/#EVMとは？">前回の記事:EVMとは？</a>をご参照ください。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">SQL上の項目名</th>
+<th style="text-align:left">Redmine上の項目名 　</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">due_date 　</td>
+<td style="text-align:left">「期日」 　　　　　　　　</td>
+</tr>
+<tr>
+<td style="text-align:left">updated_on</td>
+<td style="text-align:left">「更新日」　　　　　　　</td>
+</tr>
+<tr>
+<td style="text-align:left">pv 　　　　　</td>
+<td style="text-align:left">「予定工数」        　</td>
+</tr>
+<tr>
+<td style="text-align:left">ev</td>
+<td style="text-align:left">「予定工数」×「進捗率」</td>
+</tr>
+<tr>
+<td style="text-align:left">ac     　　</td>
+<td style="text-align:left">「作業時間の記録」 　　　</td>
+</tr>
+<tr>
+<td style="text-align:left">user_name</td>
+<td style="text-align:left">「担当者名」 　　　</td>
+</tr>
+<tr>
+<td style="text-align:left">tracker_name</td>
+<td style="text-align:left">「トラッカー名」 　　　</td>
+</tr>
+</tbody>
+</table>
+<p>この「redmine.txt」も「C:\elastic\logstash-5.4.0\bin」に配置します。</p>
+<p>結果的に、下記のようなフォルダ構成になります。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">C:\elastic</div><div class="line"> └ elasticsearch<span class="number">-5.4</span><span class="number">.0</span></div><div class="line"> └ kibana<span class="number">-5.4</span><span class="number">.0</span>-windows-x86</div><div class="line"> └ logstash<span class="number">-5.4</span><span class="number">.0</span></div><div class="line"> └ bin</div><div class="line">   └ mysql-connector-java<span class="number">-5.1</span><span class="number">.39</span>-bin.jar</div><div class="line">   └ redmine.txt</div></pre></td></tr></table></figure>
+<h2 id="2-RedmineデータをELKに取り込む"><a href="#2-RedmineデータをELKに取り込む" class="headerlink" title="2.RedmineデータをELKに取り込む"></a>2.RedmineデータをELKに取り込む</h2><h3 id="ElasticSearchの起動"><a href="#ElasticSearchの起動" class="headerlink" title="ElasticSearchの起動"></a>ElasticSearchの起動</h3><p>まず、ElasticSearchを実行します。<br>「C:\elasticsearch-5.4.0\bin」フォルダで下記のコマンドを実行。</p>
+<p><code>elasticsearch.bat</code></p>
+<p>コマンドプロンプトの右下に”started”と表示されたら起動完了です。</p>
+<h3 id="Logstashを使ったデータ取り込み"><a href="#Logstashを使ったデータ取り込み" class="headerlink" title="Logstashを使ったデータ取り込み"></a>Logstashを使ったデータ取り込み</h3><p>次に、Logstashを使って、RedmineのデータをElasticSearchへ取り込みます。<br>「C:\elastic\logstash-5.4.0\bin」フォルダで下記コマンドを実行。</p>
+<p><code>logstash.bat -f redmine.txt</code></p>
+<p><img src="/images/20170510/photo_20170510_40.png" alt=""></p>
+<p>取り込みが完了しました。</p>
+<h3 id="Kibanaの起動"><a href="#Kibanaの起動" class="headerlink" title="Kibanaの起動"></a>Kibanaの起動</h3><p>次に、Kibanaを起動します。<br>「C:\elastic\kibana-5.4.0-windows-x86\bin」フォルダで下記コマンドを実行。</p>
+<p><code>kibana.bat</code></p>
+<p><img src="/images/20170510/photo_20170510_02.png" alt=""></p>
+<p>Kibanaが起動しました。</p>
+<h3 id="Kibanaでグラフ表示"><a href="#Kibanaでグラフ表示" class="headerlink" title="Kibanaでグラフ表示"></a>Kibanaでグラフ表示</h3><p>では、Kibanaを表示します。ブラウザで <code>http://localhost:5601</code>を開く。</p>
+<p><img src="/images/20170510/photo_20170510_03.png" alt=""></p>
+<p>[Configure an index pattern]という画面が開くので、[Time-field name]に”due_date”を指定します。</p>
+<p>そして、[Create]をクリック。</p>
+<p><img src="/images/20170510/photo_20170510_10.png" alt=""></p>
+<p>そして、左側の[Visualize]をクリックすると、Visualizeの画面が開きます。</p>
+<p><img src="/images/20170510/photo_20170510_06.png" alt=""></p>
+<p>ここで、「Create a visualizetion」をクリック。</p>
+<p><img src="/images/20170510/photo_20170510_11.png" alt=""></p>
+<p>[Select visualization type]画面が表示されるので、「Vertical bar」をクリックします。</p>
+<p><img src="/images/20170510/photo_20170510_08.png" alt=""></p>
+<p>そして、「logstash-*」をクリックすると、</p>
+<p><img src="/images/20170510/photo_20170510_12.png" alt=""></p>
+<p>グラフ画面が出ましたね！</p>
+<h3 id="担当者別のPVグラフ作成"><a href="#担当者別のPVグラフ作成" class="headerlink" title="担当者別のPVグラフ作成"></a>担当者別のPVグラフ作成</h3><p>次は、担当者別のPVを表示するグラフを作成。下記の設定箇所にそれぞれの値を設定します。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">設定箇所</th>
+<th style="text-align:left">値 　</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">[metrics]-&gt;[Y-Axis]-&gt;[Aggregation]</td>
+<td style="text-align:left">Sum</td>
+</tr>
+<tr>
+<td style="text-align:left">[metrics]-&gt;[Y-Axis]-&gt;[Field]</td>
+<td style="text-align:left">pv</td>
+</tr>
+<tr>
+<td style="text-align:left">[buckets]-&gt;[X-Axis]-&gt;[Terms]</td>
+<td style="text-align:left">user_name.keyword</td>
+</tr>
+</tbody>
+</table>
+<p>そして、画面左上の「再生ボタン」をクリックすると、</p>
+<p><img src="/images/20170510/photo_20170510_13.png" alt=""></p>
+<p>担当者別のPVが表示されました！</p>
+<p>では、グラフを保存します。</p>
+<p>画面右上の「Save」をクリック。<br>テキストボックスが表示されるので”PvUser”と入力します。</p>
+<p><img src="/images/20170510/photo_20170510_15.png" alt=""></p>
+<p>そして、青色の「Save」をクリックすると、グラフが保存されました。</p>
+<h2 id="3-ダッシュボード構築"><a href="#3-ダッシュボード構築" class="headerlink" title="3.ダッシュボード構築"></a>3.ダッシュボード構築</h2><p>続いて、画面左側の「Dashboard」をクリックします。</p>
+<p><img src="/images/20170510/photo_20170510_16.png" alt=""></p>
+<p>画面中央の「Create a dashboard」をクリック。</p>
+<p><img src="/images/20170510/photo_20170510_17.png" alt=""></p>
+<p>そして、画面中央の「Add」をクリックします。</p>
+<p><img src="/images/20170510/photo_20170510_18.png" alt=""></p>
+<p>続いて、「PvUser」をクリックすると、</p>
+<p><img src="/images/20170510/photo_20170510_19.png" alt=""></p>
+<p>グラフが追加されました！</p>
+<p><img src="/images/20170510/photo_20170510_19.png" alt=""></p>
+<p>次にダッシュボードを保存します。</p>
+<p>右上の「Save」をクリックし、表示されたテキストボックスに”main”と入力。</p>
+<p><img src="/images/20170510/photo_20170510_20.png" alt=""></p>
+<p>「Save」をクリックします。これで作成したダッシュボードが保存されました。</p>
+<p><img src="/images/20170510/photo_20170510_21.png" alt=""></p>
+<p>では、もう一つグラフを作成します。</p>
+<p>作成したグラフの上にカーソルを当てると、右上にボタンが出てくるので、</p>
+<p><img src="/images/20170510/photo_20170510_22.png" alt=""></p>
+<p>その中の「鉛筆マーク」をクリックします。</p>
+<p><img src="/images/20170510/photo_20170510_23.png" alt=""></p>
+<p>グラフの編集画面が開きました。</p>
+<p>今度、トラッカー別のPVを表示するグラフを作成。下記の通り値を変更し、「再生ボタン」をクリックし、画面右上の「Save」をクリック。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">設定箇所</th>
+<th style="text-align:left">値 　</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">[buckets]-&gt;[X-Axis]-&gt;[Terms]</td>
+<td style="text-align:left">tracker_name.keyword</td>
+</tr>
+</tbody>
+</table>
+<p>表示されたテキストボックスに”PvTracker”と入力し、「Save as a new visualization」にチェックを入れます。</p>
+<p><img src="/images/20170510/photo_20170510_27.png" alt=""></p>
+<p>そして、「Save」をクリック。グラフが保存されます。</p>
+<p>画面左の「Dashboard」をクリック。そして、画面右上の、「Add」をクリックします。</p>
+<p><img src="/images/20170510/photo_20170510_25.png" alt=""></p>
+<p>「PvTracker」をクリックすると、</p>
+<p><img src="/images/20170510/photo_20170510_28.png" alt=""></p>
+<p>トラッカー別PVグラフが追加されました。</p>
+<p>次に右上の「Add new Visualization」ボタンをクリック。</p>
+<p><img src="/images/20170510/photo_20170510_30.png" alt=""></p>
+<p>「Select visualization type」画面で「Timelion」をクリックします。</p>
+<p>ここで、EVMグラフを作成します。</p>
+<p>内容は<a href="https://future-architect.github.io/articles/20170119/">前回</a>のEVMグラフと一緒。</p>
+<p>まず、「Timelion」画面が開くので、「Interval」に”1d”を指定。</p>
+<p>次に、「Timelion Expression」に下記の値を指定し、再生ボタンをクリックします。</p>
+<p><code>.es(metric=&#39;sum:pv&#39;, timefield=&#39;due_date&#39;).cusum().label(&#39;[累積]pv&#39;),.es(metric=&#39;sum:ev&#39;, timefield=&#39;updated_on&#39;).cusum().label(&#39;[累積]ev&#39;),.es(metric=&#39;sum:ac&#39;, timefield=&#39;updated_on&#39;).cusum().label(&#39;[累積]ac&#39;)</code></p>
+<p><img src="/images/20170510/photo_20170510_31.png" alt=""></p>
+<p>EVMグラフが表示されました。</p>
+<p>右上の「Save」をクリック。表示されるテキストボックスに、”EvmAll”と入力し、青い「Save」をクリックします。</p>
+<p>これでEVMグラフが保存されました。</p>
+<p>画面左側の「Dashboard」をクリック。</p>
+<p>そして、画面右上の「Add」をクリックし、「EvmAll」をクリックします。</p>
+<p><img src="/images/20170510/photo_20170510_33.png" alt=""></p>
+<p>さらに、画面右上の”＾”をクリックすると、</p>
+<p><img src="/images/20170510/photo_20170510_34.png" alt=""></p>
+<p>EVMグラフの大きさを調整すると、</p>
+<p><img src="/images/20170510/photo_20170510_35.png" alt=""></p>
+<p>ダッシュボードの完成です。</p>
+<p>ではドリルダウン機能も使ってみましょう。</p>
+<p>操作はとても簡単。</p>
+<p>例えば、特定の担当者名をクリックすると。</p>
+<p><img src="/images/20170510/photo_20170510_36.png" alt=""></p>
+<p>その担当者が、アサインされているチケットのトラッカー、及び担当者のEVMが表示されます。</p>
+<p><img src="/images/20170510/photo_20170510_37.png" alt=""></p>
+<p>また、表示期間を絞り込む事もできます。Timelion上で期間を選択することで、</p>
+<p><img src="/images/20170510/photo_20170510_38.png" alt=""></p>
+<p>この通り。選択された期間で絞り込むことができました。</p>
+<h2 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h2><p>今回は、Redmineデータを可視化するダッシュボードを構築しました。今回の設定を拡張することで、様々な軸で、様々な値を可視化することが可能。RedmineをKibanaと組み合わせることで、結果的にプロジェクト状況の把握が容易になります。</p>
+<p>本記事が、皆様のプロジェクトマネジメントに役に立てば幸いです。<br>みなさまにとって参考になりそうでしたら「いいね！」をクリックして頂けますと幸いです。執筆の励みになります。＾＾</p>
+<p>なお、次回以降私がブログを執筆する際は、ダッシュボード画像のメール配信に関する方法を記載する予定。<br>今後ともよろしくお願い致します。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;img src=&quot;/images/20170510/photo_20170510_00.jpg&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h2&gt;
+    
+    </summary>
+    
+      <category term="Management" scheme="https://future-architect.github.io/categories/Management/"/>
+    
+    
+      <category term="Elastic-Stack" scheme="https://future-architect.github.io/tags/Elastic-Stack/"/>
+    
+      <category term="Kibana" scheme="https://future-architect.github.io/tags/Kibana/"/>
+    
+      <category term="Redmine" scheme="https://future-architect.github.io/tags/Redmine/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Unity未経験者がHoloLensアプリの開発をしてみた</title>
     <link href="https://future-architect.github.io/articles/20170421/"/>
     <id>https://future-architect.github.io/articles/20170421/</id>
     <published>2017-04-21T03:00:00.000Z</published>
-    <updated>2017-05-02T06:14:57.231Z</updated>
+    <updated>2017-05-09T01:57:18.468Z</updated>
     
     <content type="html"><![CDATA[<p>Unity, C# の未経験者がHoloLensのアプリを開発しました。<br>まだまだHoloLensについての開発情報が少ないと思いますので、アプリを作っていく流れをまとめます。<br>なにか少しでもお役に立てれば嬉しいです！</p>
 <p>HoloLensに関する過去記事はこちらをどうぞ。</p>
@@ -182,7 +430,7 @@
     <link href="https://future-architect.github.io/articles/20170414/"/>
     <id>https://future-architect.github.io/articles/20170414/</id>
     <published>2017-04-14T03:00:00.000Z</published>
-    <updated>2017-05-02T06:14:57.230Z</updated>
+    <updated>2017-05-09T01:57:18.463Z</updated>
     
     <content type="html"><![CDATA[<p><img src="/images/20170412/photo_20170412_01.png" class="img-small-size"></p>
 <h1 id="Elixir-Conf-Japan-2017-に参加しました"><a href="#Elixir-Conf-Japan-2017-に参加しました" class="headerlink" title="Elixir Conf Japan 2017 に参加しました"></a>Elixir Conf Japan 2017 に参加しました</h1><p>弊社がミッションクリティカルなシステムを構築する際には、実績やノウハウが充実した固い技術要素を選択することも多いのですが、絶え間無く進化する技術の恩恵を享受すると共に自身もコミッタとして貢献するべく、先端技術のキャッチアップにも注力しています。そんな技術調査の一環として4月1日、秋葉原コンベンションホールで開催された<a href="http://www.elixirconf.jp/" target="_blank" rel="external">Elixir Conf Japan 2017</a>に参加してきました。<br>未だ社内には採用実績が無くウォッチャーも少ない言語の為、言語仕様と歴史的背景の大まかな理解のみを携えて、まずは採用事例やその背景を伺う事を目的としました。</p>
@@ -414,7 +662,7 @@
     <link href="https://future-architect.github.io/articles/20170405/"/>
     <id>https://future-architect.github.io/articles/20170405/</id>
     <published>2017-04-05T03:00:00.000Z</published>
-    <updated>2017-05-02T06:14:57.230Z</updated>
+    <updated>2017-05-09T01:57:18.457Z</updated>
     
     <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。HoloLens記事第二弾です。</p>
 <ul>
@@ -487,7 +735,7 @@
     <link href="https://future-architect.github.io/articles/20170403/"/>
     <id>https://future-architect.github.io/articles/20170403/</id>
     <published>2017-04-03T03:00:00.000Z</published>
-    <updated>2017-05-02T06:14:57.229Z</updated>
+    <updated>2017-05-09T01:57:18.452Z</updated>
     
     <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは！齋場です。<br>本記事ではElastic{ON}-2017のセッション内容を紹介します。カンファレンスの様子は<a href="https://future-architect.github.io/articles/20170331/">こちらの記事</a>で紹介しています。</p>
 <p><img src="/images/20170403/photo_20170403_01.jpeg"></p>
@@ -614,7 +862,7 @@
     <link href="https://future-architect.github.io/articles/20170331/"/>
     <id>https://future-architect.github.io/articles/20170331/</id>
     <published>2017-03-31T01:57:43.000Z</published>
-    <updated>2017-05-02T06:14:57.229Z</updated>
+    <updated>2017-05-09T01:57:18.446Z</updated>
     
     <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは！齋場です。</p>
 <p>今回、サンフランシスコで行われた<strong><a href="https://www.elastic.co/elasticon/conf/2017/sf" target="_blank" rel="external">Elastic{ON}-2017</a></strong> に参加してきましたのでレポートさせていただきます！</p>
@@ -728,7 +976,7 @@
     <link href="https://future-architect.github.io/articles/20170327/"/>
     <id>https://future-architect.github.io/articles/20170327/</id>
     <published>2017-03-27T03:00:00.000Z</published>
-    <updated>2017-05-02T06:14:57.228Z</updated>
+    <updated>2017-05-09T01:57:18.441Z</updated>
     
     <content type="html"><![CDATA[<p><img src="/images/20170327/photo_20170327_00.jpeg"></p>
 <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。星です。</p>
@@ -825,7 +1073,7 @@
     <link href="https://future-architect.github.io/articles/20170323/"/>
     <id>https://future-architect.github.io/articles/20170323/</id>
     <published>2017-03-23T03:00:00.000Z</published>
-    <updated>2017-05-02T06:14:57.228Z</updated>
+    <updated>2017-05-09T01:57:18.436Z</updated>
     
     <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>皆さん、<a href="https://teratail.com/" target="_blank" rel="external">teratail</a>使ってますか？</p>
 <p>エンジニアの方にはお馴染みのプログラミング系Q＆Aサイトですが、実は3/16より「teratail Report」というのができたのはご存知でしょうか？</p>
@@ -899,9 +1147,9 @@
       <category term="BigData" scheme="https://future-architect.github.io/categories/BigData/"/>
     
     
-      <category term="Conference" scheme="https://future-architect.github.io/tags/Conference/"/>
-    
       <category term="IoT" scheme="https://future-architect.github.io/tags/IoT/"/>
+    
+      <category term="Conference" scheme="https://future-architect.github.io/tags/Conference/"/>
     
       <category term="AWS" scheme="https://future-architect.github.io/tags/AWS/"/>
     
@@ -912,7 +1160,7 @@
     <link href="https://future-architect.github.io/articles/20170322/"/>
     <id>https://future-architect.github.io/articles/20170322/</id>
     <published>2017-03-22T03:00:00.000Z</published>
-    <updated>2017-05-02T06:14:57.227Z</updated>
+    <updated>2017-05-09T01:57:18.431Z</updated>
     
     <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは♪<br>またまた、ゆるふわエンジニアの前原ですヽ(*ﾟдﾟ)ノ</p>
 <p><a href="/articles/20170321/">前回の記事（スタンフォード大学で食べたピーナッツサラダは、格別だった♥）</a>ではスタンフォード大学をいろいろ見て回りました。</p>
@@ -991,7 +1239,7 @@
     <link href="https://future-architect.github.io/articles/20170321/"/>
     <id>https://future-architect.github.io/articles/20170321/</id>
     <published>2017-03-21T03:00:00.000Z</published>
-    <updated>2017-05-02T06:14:57.226Z</updated>
+    <updated>2017-05-09T01:57:18.426Z</updated>
     
     <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>おはようございます！<br>ゆるふわエンジニアの前原ですー</p>
 <p><a href="https://www.elastic.co/elasticon" target="_blank" rel="external">Elastic{ON}</a>に参加のためにサンフランシスコまでやってきましたー<br>しかし天気はあいにくの曇り模様…<br>でもでも、今日の気持ちは晴れです！</p>
@@ -1068,9 +1316,9 @@
       <category term="Event" scheme="https://future-architect.github.io/categories/Event/"/>
     
     
-      <category term="Conference" scheme="https://future-architect.github.io/tags/Conference/"/>
-    
       <category term="DesignThinking" scheme="https://future-architect.github.io/tags/DesignThinking/"/>
+    
+      <category term="Conference" scheme="https://future-architect.github.io/tags/Conference/"/>
     
       <category term="Elastic-Stack" scheme="https://future-architect.github.io/tags/Elastic-Stack/"/>
     
@@ -1081,7 +1329,7 @@
     <link href="https://future-architect.github.io/articles/20170314/"/>
     <id>https://future-architect.github.io/articles/20170314/</id>
     <published>2017-03-14T05:00:00.000Z</published>
-    <updated>2017-05-02T06:14:57.226Z</updated>
+    <updated>2017-05-09T01:57:18.421Z</updated>
     
     <content type="html"><![CDATA[<p>こんにちは。データ分析チームの米谷悠です。</p>
 <p>フューチャーアーキテクトのデータ分析チームは各プロジェクトと連携しながら、いま流行りのDeepLearning等を使った画像処理・自然言語処理や、従来からある多変量解析や機械学習の方法を使った社会科学・経済・マーケティング・経営組織等に関するデータの分析を行っています。こうしたデータサイエンス領域における基礎の一つとして統計学があることはみなさんもご存知かと思います。本Blogでは日常のニュースで報道される数字を統計学的に説明することによって、統計学の基本的な考え方に触れていきたいと思います。<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>。</p>
@@ -1145,7 +1393,7 @@
     <link href="https://future-architect.github.io/articles/20170228/"/>
     <id>https://future-architect.github.io/articles/20170228/</id>
     <published>2017-02-28T03:00:00.000Z</published>
-    <updated>2017-05-02T06:14:57.225Z</updated>
+    <updated>2017-05-09T01:57:18.416Z</updated>
     
     <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>はじめまして、太田です。<br>今回、弊社謹製のSQLフォーマッター<a href="https://github.com/future-architect/uroboroSQL-formatter" target="_blank" rel="external"><strong>uroboroSQL formatter</strong></a>を公開しましたので、その紹介をさせていただきます。<br>また、<a href="https://future-architect.github.io/articles/20160902/">弊社、星が昨年投稿した記事</a>の中で<a href="https://future-architect.github.io/coding-standards/documents/forJava/Javaコーディング規約.html">Javaのコーディング規約</a>を公開しましたが、今回その第2弾として、<a href="https://future-architect.github.io/coding-standards/documents/forSQL/SQLコーディング規約（Oracle）.html">SQLのコーディング規約（Oracle限定）</a>も公開いたしましたので、こちらについても触れたいと思います。</p>
 <p><a href="https://github.com/future-architect/uroboroSQL-formatter" target="_blank" rel="external"><br><img src="/images/20170227/photo_20170227_01.png" class="img-middle-size"><br></a></p>
@@ -1279,7 +1527,7 @@
     <link href="https://future-architect.github.io/articles/20170216/"/>
     <id>https://future-architect.github.io/articles/20170216/</id>
     <published>2017-02-16T01:30:00.000Z</published>
-    <updated>2017-05-02T06:14:57.224Z</updated>
+    <updated>2017-05-09T01:57:18.406Z</updated>
     
     <content type="html"><![CDATA[<p><img src="/images/20170216/photo_20170216_00.jpg"></p>
 <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a><strong>はじめに</strong></h1><p>みなさま、こんにちは。第六回LT大会の幹事を務めました入社一年目の谷村です。<br>2016年11月18日（金）に開催された社内LT大会6についてご報告です。</p>
@@ -1419,7 +1667,7 @@
     <link href="https://future-architect.github.io/articles/20170210/"/>
     <id>https://future-architect.github.io/articles/20170210/</id>
     <published>2017-02-10T04:00:00.000Z</published>
-    <updated>2017-05-02T06:14:57.224Z</updated>
+    <updated>2017-05-09T01:57:18.410Z</updated>
     
     <content type="html"><![CDATA[<h1 id="HoloLensとは…？"><a href="#HoloLensとは…？" class="headerlink" title="HoloLensとは…？"></a>HoloLensとは…？</h1><p><a href="https://www.microsoft.com/microsoft-hololens/ja-jp" target="_blank" rel="external">HoloLens</a>とはざっくり言いますと、</p>
 <p><img src="/images/20170210/photo_20170210_01.png" class="img-small-size"></p>
@@ -1507,7 +1755,7 @@
     <link href="https://future-architect.github.io/articles/20170127/"/>
     <id>https://future-architect.github.io/articles/20170127/</id>
     <published>2017-01-27T03:25:15.000Z</published>
-    <updated>2017-05-02T06:14:57.223Z</updated>
+    <updated>2017-05-09T01:57:18.397Z</updated>
     
     <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>Futureグループでは、「２Way戦略」と呼ばれるスローガンの元、今までのB2BだけでなくB2Cなど別の領域へ自らがサービスを提供し、ビジネスを広げていく事を目指した活動が盛んに行われています。</p>
 <p>まだまだ、ローンチされたサービスは少ないのですが、その中の一つであるBluetoothのビーコンを使ったIoT系就活サービスの「縁採Quest」（<a href="http://www.entryquest.com/" target="_blank" rel="external">エントリクエスト公式サイト</a>, <a href="https://play.google.com/store/apps/details?id=jp.co.future.entryquest&amp;hl=ja" target="_blank" rel="external">Google Play</a>, <a href="https://itunes.apple.com/jp/app/yuan-caiquest/id1191383379?mt=8" target="_blank" rel="external">App Store</a> ）で、3Dプリンタを使ったモノづくりをしたので、その時の3Dプリンタに関する話をしたいと思います。</p>
@@ -1576,7 +1824,7 @@
     <link href="https://future-architect.github.io/articles/20170119/"/>
     <id>https://future-architect.github.io/articles/20170119/</id>
     <published>2017-01-19T09:00:00.000Z</published>
-    <updated>2017-05-02T06:14:57.223Z</updated>
+    <updated>2017-05-12T07:56:11.972Z</updated>
     
     <content type="html"><![CDATA[<p><img src="/images/20160928/photo_20160928_00.jpg" alt=""></p>
 <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは。近藤です。</p>
@@ -1711,9 +1959,9 @@
 </tr>
 </tbody>
 </table>
-<p>この「redmine.txt」も「C:\elastic\logstash-all-plugins-2.4.0\logstash-2.4.0\bin」に配置。</p>
+<p>この「redmine.txt」も「C:\elastic\logstash-5.1.2\bin」に配置。</p>
 <p>結果的に、下記のようなフォルダ構成になります。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">C:\elastic</div><div class="line">  └elasticsearch-5.1.2</div><div class="line">  └kibana-5.1.2-windows-x86</div><div class="line">  └logstash-5.1.2</div><div class="line">     └mysql-connector-java-5.1.39-bin.jar</div><div class="line">     └redmine.txt</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">C:\elastic</div><div class="line">└elasticsearch-5.1.2</div><div class="line">└kibana-5.1.2-windows-x86</div><div class="line">└logstash-5.1.2</div><div class="line"> └bin </div><div class="line">  └mysql-connector-java-5.1.39-bin.jar</div><div class="line">  └redmine.txt</div></pre></td></tr></table></figure>
 <p>では、ElasticSearchを実行します。<br>「C:\elasticsearch-5.1.2\bin」フォルダで下記のコマンドを実行。</p>
 <p><code>elasticsearch.bat</code></p>
 <p>コマンドプロンプトの右下に”started”と表示されたら起動完了です。</p>
@@ -1814,7 +2062,7 @@
     <link href="https://future-architect.github.io/articles/20170109/"/>
     <id>https://future-architect.github.io/articles/20170109/</id>
     <published>2017-01-09T02:01:06.000Z</published>
-    <updated>2017-05-02T06:14:57.222Z</updated>
+    <updated>2017-05-09T01:57:18.392Z</updated>
     
     <content type="html"><![CDATA[<p><img src="/images/20170109/photo_20170109_01.jpg"></p>
 <h1 id="１．はじめに"><a href="#１．はじめに" class="headerlink" title="１．はじめに"></a>１．はじめに</h1><p>業務・アプリ実装からすると影のイメージがあるインフラについて、この領域をやりたいと思う人を増やすべく、入門編を記載していきます。<br>（もちろんここでいうインフラとはITインフラのことになります）<br>また入門編の内容に入る前に、今回はまずは「意義」や「興味」を感じて頂くことを目的に記載します。<br>その後、「おっ、ちょっとやってみよう」と一歩を踏み出して頂けるような、入門ネタを記載したいと思っています。</p>
@@ -1896,7 +2144,7 @@
     <link href="https://future-architect.github.io/articles/20161209/"/>
     <id>https://future-architect.github.io/articles/20161209/</id>
     <published>2016-12-09T01:56:44.000Z</published>
-    <updated>2017-05-02T06:14:57.222Z</updated>
+    <updated>2017-05-09T01:57:18.386Z</updated>
     
     <content type="html"><![CDATA[<h1 id="1-はじめに"><a href="#1-はじめに" class="headerlink" title="1. はじめに"></a>1. はじめに</h1><p>「IoT」は、昨今、聞かない日はないくらい、バズワード化した単語になりました。<br>同時に、様々な国や企業が、 <strong>IoTの標準仕様</strong> を抑えることによって、市場において有利なポジションを築くために、それぞれがIoT団体・プロジェクト・OSSプロダクトを支援展開しています。<br>2016年12月9日現在、押さえておきたいIoTに関係する団体・プロジェクトとオープンソースソフトウェアの概要を紹介したいと思います。</p>
 <h1 id="2-団体・プロジェクト"><a href="#2-団体・プロジェクト" class="headerlink" title="2. 団体・プロジェクト"></a>2. 団体・プロジェクト</h1><p>今回紹介するIoT関連の団体とプロジェクトの一覧です。</p>
@@ -2103,7 +2351,7 @@
     <link href="https://future-architect.github.io/articles/20161109/"/>
     <id>https://future-architect.github.io/articles/20161109/</id>
     <published>2016-11-09T05:14:24.000Z</published>
-    <updated>2017-05-02T06:14:57.221Z</updated>
+    <updated>2017-05-09T01:57:18.378Z</updated>
     
     <content type="html"><![CDATA[<p><img src="/images/20161109/photo_20161109_01.png"></p>
 <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a><strong>背景</strong></h1><ul>
@@ -2205,7 +2453,7 @@
     <link href="https://future-architect.github.io/articles/20161031/"/>
     <id>https://future-architect.github.io/articles/20161031/</id>
     <published>2016-10-31T03:21:10.000Z</published>
-    <updated>2017-05-02T06:14:57.220Z</updated>
+    <updated>2017-05-09T01:57:18.372Z</updated>
     
     <content type="html"><![CDATA[<p><img src="/images/20161102/photo_20161102_00.png" class="img-small-size"></p>
 <h1 id="1-初めに"><a href="#1-初めに" class="headerlink" title="1. 初めに"></a><strong>1. 初めに</strong></h1><p>DBにおける処理はSQLによって記述しますが、データの取得するために具体的にどのような内部処理を行うかという点までは記述しません。</p>
@@ -2512,132 +2760,6 @@
       <category term="DB" scheme="https://future-architect.github.io/tags/DB/"/>
     
       <category term="SQL" scheme="https://future-architect.github.io/tags/SQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>第五回社内LT大会～頑張る人は光るらしい</title>
-    <link href="https://future-architect.github.io/articles/20161013/"/>
-    <id>https://future-architect.github.io/articles/20161013/</id>
-    <published>2016-10-13T02:06:05.000Z</published>
-    <updated>2017-05-02T06:14:57.220Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a><strong>はじめに</strong></h1><p>2016年8月10日（金）に開催された社内LT大会5についてご報告です。</p>
-<p>LTとはLightning Talksの略で、持ち時間が5分程度のプレゼンテーションのことです。<br>短い時間で印象に残るということからLightning（稲妻、電光石火）という言葉が使われるようになったそうです。</p>
-<h1 id="開催の概要"><a href="#開催の概要" class="headerlink" title="開催の概要"></a><strong>開催の概要</strong></h1><p>LT大会は3つの目的で実施されています！</p>
-<ul>
-<li>PR/ブランディング</li>
-<li>採用（新卒・キャリアの採用チームとも協力）</li>
-<li>人材育成（技術力底上げ・プレゼンスキルの向上・社外カンファレンス登壇へのステップアップ）</li>
-</ul>
-<p>ありがたいことに、会社から予算を頂き公式的な社内行事として活動をさせていただいています。<br>会長からは「大いに盛り上げて下さい」と激励を頂いています！</p>
-<p>今回は、社員の他に学生さんが <strong>13名</strong>、社外の社会人登壇者の方が <strong>1名</strong> 参加してくださいました。</p>
-<h1 id="発表の様子"><a href="#発表の様子" class="headerlink" title="発表の様子"></a><strong>発表の様子</strong></h1><p>お盆前開催が影響してなのか、過去最高に人が少ないLT大会になってしまいました。汗<br>前向きに捉えると、イベントの開催時期は連休などを避けた方が良いだろうということを学びました。</p>
-<p><img src="/images/20161013/photo_20161013_01.jpeg"></p>
-<p>人がまばらとは言え、武田さん謹製のオリジナルツールのデモはみんなワクワクして食い入るように見ていました。ELKスタック好きをアピールするため、ElasticのTシャツを着るという気合の入りぶりです。笑<br><img src="/images/20161013/photo_20161013_02.jpeg"></p>
-<p>今回、会場を湧かせたのは学生さんの二人です！<br>LT中に突然、「エナジードリンク」をクーラーボックスから取り出すなど、ウィットに富んだプレゼンで大盛り上がりでした！</p>
-<p><img src="/images/20161013/photo_20161013_03.jpeg"></p>
-<p>IoTネタはみんな興味津々です。<br>でも一番盛り上がったのは最初の掴みのお料理ネタでした。</p>
-<p><img src="/images/20161013/photo_20161013_04.jpeg"></p>
-<h1 id="資料"><a href="#資料" class="headerlink" title="資料"></a><strong>資料</strong></h1><table>
-<thead>
-<tr>
-<th>時間</th>
-<th>テーマ</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>ソシャゲ解析～パケットフィルタリング編（谷村さん）</td>
-</tr>
-<tr>
-<td>2</td>
-<td>ログモニタリングツールを自作した話（武田さん）<br><iframe src="//www.slideshare.net/slideshow/embed_code/key/qgCbxwLGJmPpPF" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/HirokiTakeda/ss-65958208" title="ログモニタリングツールを自作した話" target="_blank">ログモニタリングツールを自作した話</a> </strong> from <strong><a target="_blank" href="//www.slideshare.net/HirokiTakeda">Hiroki Takeda</a></strong> </div></td>
-</tr>
-<tr>
-<td>3</td>
-<td>(続々々)FutureのDNAについてのお話（石橋さん）</td>
-</tr>
-<tr>
-<td>4</td>
-<td>WindowsでもLinuxコマンド使いたい！そんな時はCygwinでしょ！！（山上さん）<br><iframe src="//www.slideshare.net/slideshow/embed_code/key/vnxBNzGoGZk0WK" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/SanYamagami/20160810ltcygwin" title="20160810-lt-cygwin" target="_blank">20160810-lt-cygwin</a> </strong> from <strong><a target="_blank" href="//www.slideshare.net/SanYamagami">Future Architect.Inc</a></strong> </div></td>
-</tr>
-<tr>
-<td>5</td>
-<td>某PJ をSpring Bootで書き直してみた（木佐貫さん）</td>
-</tr>
-<tr>
-<td>6</td>
-<td>車載IoTネタでなにか（上和田さん：学生さん）<br><iframe src="//www.slideshare.net/slideshow/embed_code/key/EnE0qLQNE8usVU" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/masaokamiwada/20160811-66855840" title="20160811車載" target="_blank">20160811車載</a> </strong> from <strong><a target="_blank" href="//www.slideshare.net/masaokamiwada">masao kamiwada</a></strong> </div></td>
-</tr>
-<tr>
-<td>7</td>
-<td>学生流   作業効率を114514倍高める方法（中野さん：学生さん） <br><iframe src="//www.slideshare.net/slideshow/embed_code/key/tMLDPy0Jb1c5fO" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/YutoNakano/114514" title="学生流 能率を114514倍高める方法" target="_blank">学生流 能率を114514倍高める方法</a> </strong> from <strong><a target="_blank" href="//www.slideshare.net/YutoNakano">Yuto Nakano</a></strong> </div></td>
-</tr>
-<tr>
-<td>8</td>
-<td>Struts2でできること（東さん：スペシャルゲスト）</td>
-</tr>
-<tr>
-<td>9</td>
-<td>「禅とオートバイ修理技術」に学ぶエンジニア魂（田中（洋）さん）<br><iframe src="//www.slideshare.net/slideshow/embed_code/key/j1ck2YQjLQWP49" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/YosukeTanaka10/futurelt20160810" title="Future_Lt20160810" target="_blank">Future_Lt20160810</a> </strong> from <strong><a target="_blank" href="//www.slideshare.net/YosukeTanaka10">Yosuke Tanaka</a></strong> </div></td>
-</tr>
-<tr>
-<td>10</td>
-<td>非IT系ですが、特許出願しました。（浅倉さん）</td>
-</tr>
-</tbody>
-</table>
-<h1 id="表彰＆贈呈"><a href="#表彰＆贈呈" class="headerlink" title="表彰＆贈呈"></a><strong>表彰＆贈呈</strong></h1><p>気になる投票結果は次のようになりました！<br>最優秀者とブービーの2名の方に豪華プレゼントを進呈しました。<br>以下、司会兼幹事の塚本さんより頂いたコメントと併せて紹介します。</p>
-<h2 id="第一位（中野さん）学生流-作業効率を114514倍高める方法）"><a href="#第一位（中野さん）学生流-作業効率を114514倍高める方法）" class="headerlink" title="第一位（中野さん）学生流 作業効率を114514倍高める方法）"></a><strong>第一位（中野さん）学生流 作業効率を114514倍高める方法）</strong></h2><p><img src="/images/20161013/photo_20161013_05.png"></p>
-<p>レッドブル、GABA（チョコレート）、カフェイン錠剤…<br>勢い良く繰り出される数々のアイテムで、注目を集め、学生さんでは初めて一位となりました。<br>今後の活躍にも大いに期待！</p>
-<p>ちなみに、商品はGoProでした。<br>噂に聞くと中野さんは既にGoProを所有しているそうなのですが、何か新しい使いドコロを見つけてほしいと願わんばかりです。</p>
-<h2 id="第二位（谷村さん）ソシャゲ解析～パケットフィルタリング編）"><a href="#第二位（谷村さん）ソシャゲ解析～パケットフィルタリング編）" class="headerlink" title="第二位（谷村さん）ソシャゲ解析～パケットフィルタリング編）"></a><strong>第二位（谷村さん）ソシャゲ解析～パケットフィルタリング編）</strong></h2><p>先発発表から、ダークでギークなテーマで、会場のボルテージを一気に上げてくれました。<br>（※ダークすぎるので資料は非公開です）</p>
-<h2 id="第三位（浅倉さん）非IT系ですが、特許出願しました。）"><a href="#第三位（浅倉さん）非IT系ですが、特許出願しました。）" class="headerlink" title="第三位（浅倉さん）非IT系ですが、特許出願しました。）"></a><strong>第三位（浅倉さん）非IT系ですが、特許出願しました。）</strong></h2><p>まさかの「化学」系LTです。<br>おもむろに取り出した家庭的なタッパーの中には、可愛らしいマフィンカップに盛られた…コンクリート並に硬い”新素材”が入っていました！<br>自然に土に還るエコな素材とのことで、よくわからないけどなんかすごい！<br>ちなみに「特許出願中につき、資料公開は控えさせてください」という素敵な断れ方をされました。</p>
-<h2 id="ブービー（田中さん）「禅とオートバイ修理技術」に学ぶエンジニア魂）"><a href="#ブービー（田中さん）「禅とオートバイ修理技術」に学ぶエンジニア魂）" class="headerlink" title="ブービー（田中さん）「禅とオートバイ修理技術」に学ぶエンジニア魂）"></a><strong>ブービー（田中さん）「禅とオートバイ修理技術」に学ぶエンジニア魂）</strong></h2><p>バイク狂という田中さんが、こじらせ系LTをフルスイングして頂きました。</p>
-<p>もはや言葉は不要です。</p>
-<p>気になる方は、発表資料を御覧ください。</p>
-<h1 id="振り返り"><a href="#振り返り" class="headerlink" title="振り返り"></a><strong>振り返り</strong></h1><p>司会兼幹事を担当された塚本さんより、振り返り内容を頂いています。</p>
-<ul>
-<li><p><strong>Keep</strong></p>
-<ul>
-<li>準備は一ヶ月前からが丁度よい</li>
-<li>準備関連での不備発生は0件に出来た</li>
-</ul>
-</li>
-<li><p><strong>Problem</strong></p>
-<ul>
-<li>発表全般LTにしては長い。もっと短く衝撃的に</li>
-<li>学生と社員の交流が図れる工夫が少ない。（発表を聞いているだけ）</li>
-<li>（お盆前もあり）途中退室者が多い</li>
-</ul>
-</li>
-<li><p><strong>Try</strong></p>
-<ul>
-<li>発表内容はネタがバラバラになるよう、順番を上手く考えよう</li>
-<li>各部署のトップにLTしてもらって、普段参加されない人に来てもらおう</li>
-<li>最後にお楽しみ企画を用意して、途中退室者を減らそう</li>
-</ul>
-</li>
-</ul>
-<h1 id="お知らせ"><a href="#お知らせ" class="headerlink" title="お知らせ"></a>お知らせ</h1><p>第六回LT大会も開催が決定しています。<br>より多くの人が盛り上がる事が出来るイベントを目指し、新しい仕組みを導入予定です。<br>乞うご期待！</p>
-<ul>
-<li>開催日時： 2016年11月18日（金）</li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;&lt;strong&gt;はじめに&lt;/strong&gt;&lt;/h1&gt;&lt;p&gt;2016年8月10日（金）に開催された社内LT大会5についてご報告です。&lt;/p&gt;
-&lt;p&gt;L
-    
-    </summary>
-    
-      <category term="Culture" scheme="https://future-architect.github.io/categories/Culture/"/>
-    
-    
-      <category term="LT" scheme="https://future-architect.github.io/tags/LT/"/>
     
   </entry>
   
