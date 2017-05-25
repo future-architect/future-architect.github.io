@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2017-05-12T07:56:11.976Z</updated>
+  <updated>2017-05-25T09:25:56.333Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <author>
@@ -14,6 +14,141 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>AIを使って顔画像から「常連さん」を判定しよう！</title>
+    <link href="https://future-architect.github.io/articles/20170526/"/>
+    <id>https://future-architect.github.io/articles/20170526/</id>
+    <published>2017-05-26T07:15:31.000Z</published>
+    <updated>2017-05-25T09:25:56.333Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。データ分析チーム・入社1年目のルーキー、小池です。<br>データ分析チームでは、画像処理・自然言語処理など様々な分野に取り組んでおり、機械学習や多変量解析を用いたデータの分析を行っています。</p>
+<p>そんな中で私は機械学習・Deep Learningによる画像処理系の分析を行っています。<br>本記事では、私達の取り組みの一部をご紹介すると同時に、画像分析の面白さを体感していただければと思います。</p>
+<h1 id="今回のテーマ"><a href="#今回のテーマ" class="headerlink" title="今回のテーマ"></a>今回のテーマ</h1><p>今回のテーマは、AI(機械学習・Deep Learning等)を用いて、 <strong>大量にある顔画像の中から同一人物をクラスタリングし、頻出する顔画像の抽出</strong> を行いたいと思います。<br>簡単に言うと、 <strong>たくさんある画像から同じ人を見つけること</strong> を機械(AI)にやらせるということです。</p>
+<h1 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h1><p>「たくさんある画像から同じ人を見るけること」ができれば、以下1～3の流れで、店舗に来るお客さんが常連さんか否かが判定ができるのではないかと考えています。</p>
+<ol>
+<li>店舗にカメラを設置し、1ヶ月程来店したお客さんの顔画像を収集</li>
+<li>収集した顔画像に対して同じ人の画像があるかどうかを見つける</li>
+<li>同じ人の画像が見つからなかったら新規のお客さん、見つかったら常連さんと判定</li>
+</ol>
+<p>画像により新規のお客さん・常連さんの判定ができたとすると、マーケティング分析やサービスの向上への活用が期待できそうです。</p>
+<ul>
+<li>よく来店するお客さんと初めて来店されるお客さんの購買行動を比較し、マーケティング戦略に活かす</li>
+<li>今回のテーマで抽出した顔画像を元にDeep Learningのモデルを作り、その場で常連さんか否かを判断し、現場のサービス向上につなげる</li>
+</ul>
+<p>前者の顧客分析は、従来はポイントカードを発行しPOSレジをお店に導入しないとなかなか実現できなかったのではないかと思います。また、後者のサービス向上についても、現時点では店員さんの記憶や経験だけに頼っている現場が多いのが実情では無いでしょうか？</p>
+<p>こういったことが、今回のような画像処理技術とカメラ1つで実現できそうだということで、非常にワクワクしています。</p>
+<h1 id="方針"><a href="#方針" class="headerlink" title="方針"></a>方針</h1><p>「たくさんある画像から同じ人を見るけること」実現に向け、下記1～3で進めていきます。</p>
+<p><img src="/images/20170523/photo_20170523_01.png"></p>
+<ol>
+<li>OpenFace API(Deep Learning)を利用し、顔画像を抽出・表現獲得を行う<ul>
+<li>結果は128次元ベクトルに変換される</li>
+</ul>
+</li>
+<li>顔画像に対して次元削減を行い、ユークリッド平面にプロットし可視化</li>
+<li>表現獲得した画像をクラスタリングして同一人物をまとめる</li>
+</ol>
+<h1 id="開発環境の構築"><a href="#開発環境の構築" class="headerlink" title="開発環境の構築"></a>開発環境の構築</h1><h2 id="画像解析と相性が良いDockerを使おう"><a href="#画像解析と相性が良いDockerを使おう" class="headerlink" title="画像解析と相性が良いDockerを使おう"></a>画像解析と相性が良いDockerを使おう</h2><p><a href="https://www.docker.com/" target="_blank" rel="external">Docker</a>とは、仮想化のためのオープンソースで、1つのOS上に複数の仮想環境を簡単に用意できます。<br>また、Docker HubというDockerで構築された環境をシェアする仕組みがあり、ありがたいことにエンジニアが数日間かけて構築したような複雑な環境も数多く共有されています。</p>
+<p>今回のような画像分析の開発構築は、一昔前までちょっとした環境差異でインストールができなかったりと非常に苦労を伴ったそうですが、今ならDockerを利用することでコマンド一つで準備できます。<br>また、Deep LearningではGPGPUを用いていますが、<a href="https://github.com/NVIDIA/nvidia-docker" target="_blank" rel="external">nvidia-docker</a>があればGPGPU環境も整います。<br>みなさんもぜひ導入してみて下さい。<br>今回はGPU環境を利用しないので、Dockerのみ入っていればOKです。</p>
+<h2 id="開発環境"><a href="#開発環境" class="headerlink" title="開発環境"></a>開発環境</h2><ul>
+<li>Ubuntu 16.04 LTS<ul>
+<li>私はUbuntuを開発で利用していますが、Dockerが入っていれば問題ないと思います</li>
+</ul>
+</li>
+<li>Docker 1.13.0 (Client,Server)</li>
+</ul>
+<h2 id="環境構築手順"><a href="#環境構築手順" class="headerlink" title="環境構築手順"></a>環境構築手順</h2><p>Dockerは導入されている前提で進めます。</p>
+<h3 id="1-コンテナを取得-amp-実行"><a href="#1-コンテナを取得-amp-実行" class="headerlink" title="1. コンテナを取得 &amp; 実行"></a>1. コンテナを取得 &amp; 実行</h3><p>bamosさんの作成したopenface(後に記述）の環境を使わせていただきます。<br>python2,3、numpy、OpenCV、scikit-learn、Dlibが入っているのですぐに画像解析が始めることができます。</p>
+<figure class="highlight dos"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ docker pull bamos/openface</div><div class="line">$ docker run -v /home/&#123;your <span class="built_in">dir</span>&#125;:/home/ -it bamos/openface /bin/bash</div></pre></td></tr></table></figure>
+<p><code>-v</code> オプションで、コンテナとホスト側でディレクトリを共有できます。<br><code>{your dir}</code> は自分の共有したいディレクトリに書き換えてください。</p>
+<h3 id="2-ディレクトリの確認"><a href="#2-ディレクトリの確認" class="headerlink" title="2. ディレクトリの確認"></a>2. ディレクトリの確認</h3><figure class="highlight dos"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ <span class="built_in">cd</span> /root/openface/demos</div></pre></td></tr></table></figure>
+<p>無事demosディレクトリに入れたら環境構築完了です。<br>Dockerは便利です！</p>
+<h1 id="OpenFaceによる表現獲得"><a href="#OpenFaceによる表現獲得" class="headerlink" title="OpenFaceによる表現獲得"></a>OpenFaceによる表現獲得</h1><p>さて、いよいよ画像解析をはじめていきましょう！<br>顔画像から表現を獲得する方法はいくつかありますが、今回はGoogleが出している<a href="http://www.cv-foundation.org/openaccess/content_cvpr_2015/app/1A_089.pdf" target="_blank" rel="external">FaceNet:A Unified Embedding for Recognition and Clustering</a>に記載されている手法を実装した、<a href="https://cmusatyalab.github.io/openface/" target="_blank" rel="external">OpenFace</a>を使います。</p>
+<p><img src="/images/20170523/photo_20170523_02.jpg"></p>
+<p>OpenFaceのAPIを利用すると、人の顔画像を128次元ベクトルへ変換し、画像同士のユークリッド距離が直接類似度となるようにマッピングを行ってくれます。</p>
+<p>実際に2つの画像を特徴変換し、ユーグリッド距離（類似度）を出してみましょう。<br>利用する画像は次の2枚です。(Dockerコンテナを立てた際にこの2枚のサンプル画像も入っています)</p>
+<p><img src="/images/20170523/photo_20170523_03.jpeg"><br>lennon-1.jpg</p>
+<p><img src="/images/20170523/photo_20170523_04.jpeg"><br>carell.jpg</p>
+<p><code>/root/openface/demo/</code> フォルダに以下のファイルを作成します。</p>
+<figure class="highlight py"><figcaption><span>compare_images.py</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python2</span></div><div class="line"><span class="comment"># -*-coding:utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">import</span> cv2</div><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line">np.set_printoptions(precision=<span class="number">2</span>)</div><div class="line"></div><div class="line"><span class="keyword">import</span> sys</div><div class="line"><span class="keyword">import</span> os</div><div class="line"><span class="keyword">import</span> openface</div><div class="line"><span class="keyword">import</span> glob</div><div class="line"><span class="keyword">import</span> itertools</div><div class="line"></div><div class="line">fileDir = os.path.dirname(os.path.realpath(__file__))</div><div class="line">modelDir = os.path.join(fileDir, <span class="string">'..'</span>, <span class="string">'models'</span>)</div><div class="line">dlibModelDir = os.path.join(modelDir, <span class="string">'dlib'</span>)</div><div class="line">openfaceModelDir = os.path.join(modelDir, <span class="string">'openface'</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rep</span>:</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line"></div><div class="line">        <span class="comment"># モデル読み込み</span></div><div class="line">        self.align = openface.AlignDlib(os.path.join(dlibModelDir, <span class="string">"shape_predictor_68_face_landmarks.dat"</span>))</div><div class="line">        self.net = openface.TorchNeuralNet(os.path.join(openfaceModelDir, <span class="string">'nn4.small2.v1.t7'</span>), <span class="number">96</span>)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_rep</span><span class="params">(self,imgPath)</span>:</span></div><div class="line"></div><div class="line">        <span class="comment"># 画像の読み込み</span></div><div class="line">        bgrImg = cv2.imread(imgPath)</div><div class="line">        rgbImg = cv2.cvtColor(bgrImg, cv2.COLOR_BGR2RGB)</div><div class="line"></div><div class="line">        <span class="comment"># boundingboxやalign faceなどを作成</span></div><div class="line">        bb = self.align.getLargestFaceBoundingBox(rgbImg)</div><div class="line">        alignedFace = self.align.align(<span class="number">96</span>, rgbImg, bb,landmarkIndices=openface.AlignDlib.OUTER_EYES_AND_NOSE)</div><div class="line"></div><div class="line">        <span class="comment"># 128D vectorに変換</span></div><div class="line">        rep = self.net.forward(alignedFace)</div><div class="line">        <span class="keyword">return</span> rep</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__==<span class="string">"__main__"</span>:</div><div class="line"></div><div class="line">    reps = Rep()</div><div class="line">    img1,img2 = sys.argv[<span class="number">1</span>],sys.argv[<span class="number">2</span>]</div><div class="line"></div><div class="line">    <span class="comment"># get rep array</span></div><div class="line"></div><div class="line">    img1_rep, img2_rep = reps.get_rep(img1),reps.get_rep(img2)</div><div class="line"></div><div class="line">    <span class="comment"># 各画像のベクトル表示</span></div><div class="line">    <span class="comment">#print(img1_rep,img2_rep)</span></div><div class="line"></div><div class="line">    <span class="comment"># 類似度計算</span></div><div class="line">    d = img1_rep - img2_rep</div><div class="line">    print(np.dot(d,d))</div></pre></td></tr></table></figure>
+<p>実行は以下のコマンドで行います。</p>
+<figure class="highlight dos"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ python compare_images.py /root/openface/images/examples/lennon-<span class="number">1</span>.jpg /root/openface/images/examples/carell.jpg</div><div class="line"></div><div class="line"><span class="number">1</span>.<span class="number">9628270995</span></div></pre></td></tr></table></figure>
+<p>この場合は第一引数に <code>lennon-1.jpg</code> 、第二引数に <code>carell.jpg</code> をとり、両者を比較しています。</p>
+<p><code>1.9628270995</code> という実行結果はユークリッド距離（類似度）で、0に近いほど同一人物ということが言えます。<br>論文では、類似度の閾値を1.1程度としています。つまり、類似度が1.1以下なら同一人物、<br>1.1以上なら別人物というわけですね。ただし、光の加減やピクセル数等によって閾値は多少前後します。1.1を基準とし、しっくりくる閾値を見つけてみてください。</p>
+<p>本テーマである来店数の多い人（常連さん）を発見するには、画像から取得した表現をユーグリッド空間にプロットし、それをクラスタリングすることで、同一人物のクラスタを作成することを考えます。</p>
+<p>参考として、どのようなことをすればよいかを可視化しました。<br>可視化のために各画像を主成分分析(PCA<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>)により50次元まで次元削減し、t-sne<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>によって2次元まで顔画像を落としこみプロットしています。<br>koike,liさん,yonetaniさんの顔画像を50枚前後用意し、次元削減を行い2次元に無理やり落とし込みました。<br>(※次元削減しているので、各点間の距離が直接の類似度になるとは限らないので注意）</p>
+<p><img src="/images/20170523/photo_20170523_05.png"></p>
+<p>各点は、顔画像を無理やりに２次元に落とし込んだものです。<br>なんとなくクラスタリングできそうですね！</p>
+<h1 id="クラスタリング手法について"><a href="#クラスタリング手法について" class="headerlink" title="クラスタリング手法について"></a>クラスタリング手法について</h1><p>では、クラスタリングはどのように行えば良いでしょうか。<br>今回のクラスタリングは、 <strong>クラスタ数が事前にわかりません</strong>。<br>来店するお客さんの例で説明すると、来店した人の顔画像はあるけど、よく来店する人の数（クラスター数）はわからない状況です。<br>そこで、クラスタリングの中でもクラスタ数を指定しないアプローチをしなければなりません。<br>クラスター数を指定しないアルゴリズムはMeanShift、DBSCAN、x-meansなどがありますが<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>、<br>今回はDBSCANを利用してクラスタリングを行います。</p>
+<h1 id="DBSCANによるクラスタリング"><a href="#DBSCANによるクラスタリング" class="headerlink" title="DBSCANによるクラスタリング"></a>DBSCANによるクラスタリング</h1><p>DBSCANの簡単な説明をします。<br>ある点 \(p\) から近傍半径 \(\xi\) 以内に少なくとも \(minPts\) 数の点があれば、<br>その点 \(p\) は \(core-points\) といいます。また、近傍半径内にある点を到達可能点と言います。<br>点pの近傍半径 \(\xi\) 内の点を \(core-points\) か判断し、\(core-points\) を移動させながら同じ動作を繰り返します。<br>各点から到達可能である点は同じクラスタと判断します。<br>視覚的に表すと以下のようになり、密接な点を同一クラスとみなしてクラスタリングを行っていることがわかります。</p>
+<p><img src="/images/20170523/photo_20170523_06.png"></p>
+<p>(厳密に言うと、条件があったり等少々異なった箇所がありますが、今回はこのような理解で構いません。)</p>
+<p>DBSCANは、指定するパラメータは2で良いです。1つは近傍半径 \(\xi\) 、もう1つは円内に含まれる最低オブジェクト数 \(minPts\) です。<br>今回のクラスタリングは、\(\xi = 0.7\)、\(minPts = 1\)として行いました。<br>（ただし、先ほど類似度の所でも述べましたが、被写体の光の具合・撮影距離等によって近傍半径の調整が必要です。クラスタリングを行う場合、まずは少数データで近傍半径を調整した後にクラスタリングすることをおすすめします）</p>
+<p>このクラスタリングを行うにはいろいろな人の顔画像を用意する必要があります。<br>顔画像データセットを <code>/home/</code> 以下に設置してください。<br>(ディレクトリを共有しているので、ホスト側の<code>/home/{your dir}</code>に画像データをおいてOKです。)</p>
+<p>なお、今回私は以下のように画像を用意しました。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">/home/</div><div class="line">|-- 0aaa.jpg</div><div class="line">|-- 0bbb.jpg</div><div class="line">|-- 0ccc.jpg</div><div class="line">|-- 0ddd.jpg</div><div class="line">|-- 10bbb.jpg</div><div class="line">|-- 10ccc.jpg</div><div class="line">|-- 11aaa.jpg</div><div class="line">|-- 11bbb.jpg</div><div class="line">|-- 11ccc.jpg</div><div class="line">|-- 12bbb.jpg</div><div class="line">|-- 8aaa.jpg</div><div class="line">|-- 8bbb.jpg</div><div class="line">|-- 8ccc.jpg</div><div class="line">|-- 9bbb.jpg</div><div class="line">|-- 9ccc.jpg</div><div class="line">|-- carell.jpg</div><div class="line">|-- lennon-1.jpg</div><div class="line">(以下略)</div></pre></td></tr></table></figure>
+<p>それぞれの合計枚数は下表のとおりです。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">名前</th>
+<th style="text-align:center">画像枚数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">aaaさん</td>
+<td style="text-align:center">10</td>
+</tr>
+<tr>
+<td style="text-align:center">bbbさん</td>
+<td style="text-align:center">17</td>
+</tr>
+<tr>
+<td style="text-align:center">cccさん</td>
+<td style="text-align:center">20</td>
+</tr>
+<tr>
+<td style="text-align:center">dddさん</td>
+<td style="text-align:center">3</td>
+</tr>
+<tr>
+<td style="text-align:center">carellさん</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">lenon-1さん</td>
+<td style="text-align:center">1</td>
+</tr>
+</tbody>
+</table>
+<p>この5人の顔画像をランダムに集め、 <code>/home/</code> に置きました。lenonさん、carellさんは先ほどのサンプル画像をそのまま使用しています。<br>なお、カメラ撮影の関係でファイル名は <code>index+名前.jpg</code> となっています<br>（例えば、 <code>0aaa.jpg</code> はaaaさんが映った画像です）</p>
+<p>そして以下のpythonファイルを作成し、実行します。</p>
+<figure class="highlight py"><figcaption><span>dbscan.py</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python2</span></div><div class="line"><span class="comment"># -*-coding:utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">import</span> cv2</div><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line">np.set_printoptions(precision=<span class="number">2</span>)</div><div class="line"></div><div class="line"><span class="keyword">import</span> os</div><div class="line"><span class="keyword">import</span> openface</div><div class="line"><span class="keyword">import</span> glob</div><div class="line"><span class="keyword">import</span> itertools</div><div class="line"></div><div class="line"><span class="keyword">from</span> sklearn.cluster <span class="keyword">import</span> DBSCAN</div><div class="line"></div><div class="line">fileDir = os.path.dirname(os.path.realpath(__file__))</div><div class="line">modelDir = os.path.join(fileDir, <span class="string">'..'</span>, <span class="string">'models'</span>)</div><div class="line">dlibModelDir = os.path.join(modelDir, <span class="string">'dlib'</span>)</div><div class="line">openfaceModelDir = os.path.join(modelDir, <span class="string">'openface'</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Rep</span>:</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        self.align = openface.AlignDlib(os.path.join(</div><div class="line">            dlibModelDir, <span class="string">"shape_predictor_68_face_landmarks.dat"</span>))</div><div class="line">        self.net = openface.TorchNeuralNet(os.path.join(</div><div class="line">            openfaceModelDir, <span class="string">'nn4.small2.v1.t7'</span>), <span class="number">96</span>)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_rep</span><span class="params">(self, imgPath)</span>:</span></div><div class="line"></div><div class="line">        bgrImg = cv2.imread(imgPath)</div><div class="line">        rgbImg = cv2.cvtColor(bgrImg, cv2.COLOR_BGR2RGB)</div><div class="line">        bb = self.align.getLargestFaceBoundingBox(rgbImg)</div><div class="line"></div><div class="line">        alignedFace = self.align.align(</div><div class="line">            <span class="number">96</span>, rgbImg, bb, landmarkIndices=openface.AlignDlib.OUTER_EYES_AND_NOSE)</div><div class="line">        rep = self.net.forward(alignedFace)</div><div class="line">        <span class="keyword">return</span> rep</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_all_reps</span><span class="params">(self, files)</span>:</span></div><div class="line"></div><div class="line">        <span class="comment"># initialize x</span></div><div class="line">        reps = <span class="keyword">None</span></div><div class="line"></div><div class="line">        <span class="keyword">for</span> file <span class="keyword">in</span> files:</div><div class="line">            <span class="keyword">if</span> reps <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">                reps = self.get_rep(file)</div><div class="line">            <span class="keyword">else</span>:</div><div class="line">                <span class="comment"># 画像に顔がなかった場合の例外処理</span></div><div class="line">                <span class="keyword">try</span>:</div><div class="line">                    reps = np.vstack((reps, self.get_rep(file)))</div><div class="line">                <span class="keyword">except</span>:</div><div class="line">                    <span class="keyword">pass</span></div><div class="line"></div><div class="line">        <span class="keyword">return</span> reps</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line"></div><div class="line">    getreps = Rep()</div><div class="line"></div><div class="line">    <span class="comment"># get files</span></div><div class="line">    files = glob.glob(<span class="string">"/home/*.jpg"</span>)</div><div class="line"></div><div class="line">    <span class="comment"># get Reps</span></div><div class="line">    reps = getreps.get_all_reps(files)</div><div class="line"></div><div class="line">    print(reps)</div><div class="line">    EPS = <span class="number">0.7</span></div><div class="line">    MINPTS = <span class="number">1</span></div><div class="line"></div><div class="line">    <span class="comment"># dbscan clustering</span></div><div class="line">    dbscan = DBSCAN(eps=EPS, min_samples=MINPTS).fit(reps)</div><div class="line">    ans = dbscan.fit_predict(reps)</div><div class="line"></div><div class="line">    print(<span class="string">"class"</span>, <span class="string">"img"</span>)</div><div class="line">    <span class="keyword">for</span> a, f <span class="keyword">in</span> zip(ans, files):</div><div class="line">        print(a, f)</div></pre></td></tr></table></figure>
+<p>出力は、<code>(クラスタ番号,画像名）</code> となっています。</p>
+<figure class="highlight sh"><figcaption><span>実行結果</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">(<span class="string">'class'</span>, <span class="string">'img'</span>)</div><div class="line">(0, <span class="string">'/home/0aaa.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/9bbb.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/3ccc.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/17ccc.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/11ccc.jpg'</span>)</div><div class="line">(3, <span class="string">'/home/lennon-1.jpg'</span>)</div><div class="line">(0, <span class="string">'/home/17aaa.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/3bbb.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/18ccc.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/2ccc.jpg'</span>)</div><div class="line">(0, <span class="string">'/home/19aaa.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/18bbb.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/13bbb.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/15ccc.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/11bbb.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/15bbb.jpg'</span>)</div><div class="line">(4, <span class="string">'/home/1ddd.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/13ccc.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/5bbb.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/12bbb.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/9ccc.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/0ccc.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/14ccc.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/0bbb.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/16ccc.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/6ccc.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/7ccc.jpg'</span>)</div><div class="line">(0, <span class="string">'/home/6aaa.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/1ccc.jpg'</span>)</div><div class="line">(5, <span class="string">'/home/carell.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/10bbb.jpg'</span>)</div><div class="line">(0, <span class="string">'/home/13aaa.jpg'</span>)</div><div class="line">(4, <span class="string">'/home/2ddd.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/4ccc.jpg'</span>)</div><div class="line">(0, <span class="string">'/home/15aaa.jpg'</span>)</div><div class="line">(6, <span class="string">'/home/19bbb.jpg'</span>)</div><div class="line">(0, <span class="string">'/home/8aaa.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/10ccc.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/14bbb.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/16bbb.jpg'</span>)</div><div class="line">(0, <span class="string">'/home/11aaa.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/8ccc.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/12ccc.jpg'</span>)</div><div class="line">(0, <span class="string">'/home/14aaa.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/5ccc.jpg'</span>)</div><div class="line">(4, <span class="string">'/home/0ddd.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/1bbb.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/6bbb.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/8bbb.jpg'</span>)</div><div class="line">(1, <span class="string">'/home/17bbb.jpg'</span>)</div><div class="line">(2, <span class="string">'/home/19ccc.jpg'</span>)</div><div class="line">(0, <span class="string">'/home/16aaa.jpg'</span>)</div></pre></td></tr></table></figure>
+<p>出力を確認すると、aaaさんはクラスタ0、bbbさんはクラスタ1、cccさんはクラスタ2、dddさんはクラスタ4、lennon-1さんはクラスタ3、carellさんはクラスタ5にうまく分類されていることがわかります。<br>この結果から、常連さんをSVMまたはCNNで学習させモデルを作成することで、次回から常連さんをその場で判別させることができると思います。</p>
+<h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>今回は複数枚ある顔画像からよく頻出する人をクラスタリングし、常連（よく出現する人）さんを機械的に抽出できることを具体的なコードを追いながら実践しました。<br>この技術の応用方法は多くあり、さまざまビジネスへつなげることができると考えています。</p>
+<p>フューチャーアーキテクトのデータ分析チームでは、技術的視点だけでなく、ビジネス視点からも応用先を考え技術検証を行っています。</p>
+<p>これからもどんどん面白そうな記事を書いていきますので、よろしくお願いします。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">PCAについては <a href="http://d.hatena.ne.jp/hgshrs/20130407/1365335916" target="_blank" rel="external">こちら</a> も参考にしてください</span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">2.</span><span style="display: inline-block; vertical-align: top;">t-sneについては <a href="http://blog.albert2005.co.jp/2015/12/02/tsne/" target="_blank" rel="external">こちら</a> も参考にしてください</span><a href="#fnref:2" rev="footnote"> ↩</a></li><li id="fn:3"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">3.</span><span style="display: inline-block; vertical-align: top;">k-meansのクラスタ数をhyperparameterとしてグリッドサーチするのも1つの手ですが。</span><a href="#fnref:3" rev="footnote"> ↩</a></li></ol></div></div>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h1&gt;&lt;p&gt;こんにちは。データ分析チーム・入社1年目のルーキー、小池です。&lt;br&gt;データ分析チームでは、画像処理・自然言語処理など様々な
+    
+    </summary>
+    
+      <category term="DataScience" scheme="https://future-architect.github.io/categories/DataScience/"/>
+    
+    
+      <category term="Python" scheme="https://future-architect.github.io/tags/Python/"/>
+    
+      <category term="MachineLearning" scheme="https://future-architect.github.io/tags/MachineLearning/"/>
+    
+      <category term="DeepLearning" scheme="https://future-architect.github.io/tags/DeepLearning/"/>
+    
+  </entry>
   
   <entry>
     <title>マネージャーがうれしいRedmineデータのダッシュボード表示方法を公開します！！</title>
@@ -1147,9 +1282,9 @@
       <category term="BigData" scheme="https://future-architect.github.io/categories/BigData/"/>
     
     
-      <category term="IoT" scheme="https://future-architect.github.io/tags/IoT/"/>
-    
       <category term="Conference" scheme="https://future-architect.github.io/tags/Conference/"/>
+    
+      <category term="IoT" scheme="https://future-architect.github.io/tags/IoT/"/>
     
       <category term="AWS" scheme="https://future-architect.github.io/tags/AWS/"/>
     
@@ -1316,9 +1451,9 @@
       <category term="Event" scheme="https://future-architect.github.io/categories/Event/"/>
     
     
-      <category term="DesignThinking" scheme="https://future-architect.github.io/tags/DesignThinking/"/>
-    
       <category term="Conference" scheme="https://future-architect.github.io/tags/Conference/"/>
+    
+      <category term="DesignThinking" scheme="https://future-architect.github.io/tags/DesignThinking/"/>
     
       <category term="Elastic-Stack" scheme="https://future-architect.github.io/tags/Elastic-Stack/"/>
     
@@ -2445,321 +2580,6 @@
     
     
       <category term="Conference" scheme="https://future-architect.github.io/tags/Conference/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>SQL実行時のブルームフィルタ(Bloom Filter)アルゴリズム</title>
-    <link href="https://future-architect.github.io/articles/20161031/"/>
-    <id>https://future-architect.github.io/articles/20161031/</id>
-    <published>2016-10-31T03:21:10.000Z</published>
-    <updated>2017-05-09T01:57:18.372Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/20161102/photo_20161102_00.png" class="img-small-size"></p>
-<h1 id="1-初めに"><a href="#1-初めに" class="headerlink" title="1. 初めに"></a><strong>1. 初めに</strong></h1><p>DBにおける処理はSQLによって記述しますが、データの取得するために具体的にどのような内部処理を行うかという点までは記述しません。</p>
-<p>ここでいう内部処理とは「SQLの書き換え」「インデックスの使用」「結合アルゴリズムの選択」などがDBMSのオプティマイザによって選択されて実施されることを指します。</p>
-<p>SQLのパフォーマンスを見るにあたっては上記の内部処理について正しく理解する必要があります。</p>
-<p>本Blogでは、重要なアルゴリズムであるにもかかわらず、まとまった情報が少ないSQL実行時におけるブルームフィルタ(Bloom Filter)についてOracleをもとに紹介を行います。</p>
-<p>Bloom Filterは結合処理を効率化するために、結合の前段階で利用される技術になります。</p>
-<p><img src="/images/20161102/photo_20161102_01.png"></p>
-<p>公式なドキュメントとしては以下になります。<br><a href="http://docs.oracle.com/cd/E49329_01/server.121/b71277/tgsql_join.htm#BABEGJHI" target="_blank" rel="external">Oracle Database SQLチューニング・ガイド 12cリリース1(12.1) 結合の最適化 ブルーム・フィルタ</a></p>
-<h1 id="2-Bloom-Filterとは"><a href="#2-Bloom-Filterとは" class="headerlink" title="2. Bloom Filterとは"></a><strong>2. Bloom Filterとは</strong></h1><p>Bloom Filterの概要は他サイトを参照してください。</p>
-<ul>
-<li><a href="https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%AB%E3%83%BC%E3%83%A0%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF" target="_blank" rel="external">Wiki ブルームフィルタ</a></li>
-<li><a href="https://blogs.oracle.com/datawarehousing/entry/big_data_sql_quick_start4" target="_blank" rel="external">The Data Warehouse Insider</a></li>
-</ul>
-<p><br></p>
-<p>ポイントとしては以下になります。</p>
-<ul>
-<li>ある集合データからBloom Filterを作成した場合、Bloom Filterを利用してその集合の中にデータが含まれているかどうかを判定できる</li>
-<li>その判定は100%正しくなく、「存在する」判定されたが実際は「存在しない」という誤検知を含む<ul>
-<li>これを <strong>偽陽性[false positive]</strong> と呼びます</li>
-</ul>
-</li>
-<li>Bloom Filterは非常に小さいサイズとなることから、「インメモリで保持が可能」「別の処理（プロセス）にフィルタを渡すことが可能」というメリットがある</li>
-</ul>
-<h1 id="3-サンプルスキーマ"><a href="#3-サンプルスキーマ" class="headerlink" title="3. サンプルスキーマ"></a><strong>3. サンプルスキーマ</strong></h1><p>今回の説明は、Oracleのサンプルスキーマを用いて説明を行います。<br>説明に必要なカラム以外は省略しています。</p>
-<p><a href="http://docs.oracle.com/cd/E57425_01/121/COMSC/toc.htm" target="_blank" rel="external">Oracle Database Sample Schemas</a></p>
-<p><img src="/images/20161102/photo_20161102_02.png"></p>
-<p>DWHにおけるスタースキーマ構成となっています。</p>
-<ul>
-<li>SALES表がファクト（OLPTでいうトランザクション表）</li>
-<li>TIME表、CUSTOMOER表、PRODUCTION表がディメンジョン（OLTPでいうマスタ表）</li>
-<li>レコード数はファクト表が非常に多く、ディメンジョン表はそれほど多くはない</li>
-</ul>
-<p>実場面ではSALES表にはBitmap Indexを作成する例も多いのですが、今回は無しの状態で議論を進めます。</p>
-<h1 id="4-SQL実行時のBloom-Filter"><a href="#4-SQL実行時のBloom-Filter" class="headerlink" title="4. SQL実行時のBloom Filter"></a><strong>4. SQL実行時のBloom Filter</strong></h1><p>SQL実行時におけるBloom Filterは「テーブル結合(Join)」で利用されます。</p>
-<p>また、「結合操作はハッシュ結合(Hash-Join)であること」という大前提があります。<br>その理由はハッシュテーブルを作成するタイミングでBloom Filterを同時に作成するからです。（ハッシュ結合については<a href="http://www.atmarkit.co.jp/ait/articles/0408/25/news101.html" target="_blank" rel="external">ここ</a>など参考にどうぞ）</p>
-<h2 id="4-1-Bloom-Filterを使わない場合のハッシュ結合"><a href="#4-1-Bloom-Filterを使わない場合のハッシュ結合" class="headerlink" title="4-1. Bloom Filterを使わない場合のハッシュ結合"></a><strong>4-1. Bloom Filterを使わない場合のハッシュ結合</strong></h2><p>サンプルスキーマにおけるハッシュ結合の具体的なフローは以下のようになります。<br><img src="/images/20161102/photo_20161102_03.png"></p>
-<ol>
-<li>ディメンジョン表(TIMES)を全スキャンしてハッシュテーブルを作成</li>
-<li>ファクト表(SALES)を全スキャン</li>
-<li>ハッシュテーブルを確認して結合できるかを判断する（値の比較）</li>
-</ol>
-<h2 id="4-2-Bloom-Filterを用いた場合のハッシュ結合"><a href="#4-2-Bloom-Filterを用いた場合のハッシュ結合" class="headerlink" title="4-2. Bloom Filterを用いた場合のハッシュ結合"></a><strong>4-2. Bloom Filterを用いた場合のハッシュ結合</strong></h2><p>これが、Bloom Filterを使うと以下のようになります。<br><img src="/images/20161102/photo_20161102_04.png"></p>
-<ol>
-<li>ディメンジョン表(TIMES)を全スキャンしてハッシュテーブルとBloom Filterを作成<ul>
-<li>このBloom FilterをチェックするとTIMESに該当レコードが含まれているかが判断できます</li>
-</ul>
-</li>
-<li>ファクト表(SALES)を全スキャン</li>
-<li>Bloom FilterをチェックしFilterを通過（TIMESに該当レコードがあると判断した）したレコードについてハッシュテーブルで結合を実施<ul>
-<li>このフローにより結合操作の対象をフィルタすることができるのが分かります</li>
-</ul>
-</li>
-</ol>
-<p>Bloom Filterには偽陽性を含むため、Bloom Filterを通過するレコードは実際には必要のないレコードも含まれてしまいます。このレコードについてはハッシュテーブルの確認をした際に結合対象なしと判断されて除外されます。</p>
-<h2 id="4-3-Bloom-Filterを用いた複数テーブルの結合"><a href="#4-3-Bloom-Filterを用いた複数テーブルの結合" class="headerlink" title="4-3. Bloom Filterを用いた複数テーブルの結合"></a><strong>4-3. Bloom Filterを用いた複数テーブルの結合</strong></h2><p>さらに、複数のテーブル結合の場合以下のようになります。<br><img src="/images/20161102/photo_20161102_05.png"></p>
-<ol>
-<li>ディメンジョン表(TIMES)を全スキャンしてハッシュテーブルとBloom Filterを作成</li>
-<li>ディメンジョン表(PRODUCTS)を全スキャンしてハッシュテーブルとBloom Filterを作成</li>
-<li>ファクト表(SALES)を全スキャン</li>
-<li>2つのBloom FilterをチェックしてFilterしたレコードに対してハッシュ結合を2回（PRODUCTS、TIMESの順番に）実施<ul>
-<li>結合前に2つのBloom Filterを組み合わせてチェック（双方のフィルタを通過する必要がある）しているので、ハッシュ結合の対象データをいきなり減らすことができます</li>
-</ul>
-</li>
-</ol>
-<p><br></p>
-<p>この挙動をサンプルスキーマ（スタースキーマ）で実際に利用するSQLをベースに説明します。</p>
-<p><strong>スタースキーマにおける複数テーブルを結合するSQL</strong><br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span></div><div class="line">  TIMES.CALENDAR_QUARTER_DESC,</div><div class="line">  PRODUCTS.PROD_CATEGORY_DESC,</div><div class="line">  <span class="keyword">SUM</span>(SALES.AMOUNT_SOLD)</div><div class="line"><span class="keyword">FROM</span> SALES SALES</div><div class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> PRODUCTS PRODUCTS <span class="keyword">ON</span> (SALES.PROD_ID = PRODUCTS.PROD_ID)</div><div class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> TIMES TIMES <span class="keyword">ON</span> (SALES.TIME_ID = TIMES.TIME_ID)</div><div class="line"><span class="keyword">WHERE</span> <span class="number">1</span>=<span class="number">1</span></div><div class="line"><span class="keyword">AND</span> TIMES.CALENDAR_YEAR=<span class="string">'2001'</span></div><div class="line"><span class="keyword">AND</span> PRODUCTS.PROD_CATEGORY=<span class="string">'Photo'</span></div><div class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></div><div class="line">TIMES.CALENDAR_QUARTER_DESC,</div><div class="line">PRODUCTS.PROD_CATEGORY_DESC;</div></pre></td></tr></table></figure></p>
-<p>例として各テーブルは以下の条件でデータが存在すると仮定します。</p>
-<ul>
-<li>SALESテーブルに全レコードが100万件存在する</li>
-<li>TIMES.CALENDAR_YEAR=’2001’に該当するレコードが10万件存在する</li>
-<li>PRODUCTS.PROD_CATEGORY=’Photo’に該当するレコードが1000件存在する</li>
-</ul>
-<p>という場合、Bloom Filterを利用することで(4)の結合は1000レコードに減らすことができます。<br>100万レコードが1000レコードになる。Excelent!!</p>
-<p>と、ここまで書くと非常に素晴らしい機能のように見えます。<br>しかし残念ながら、DWHにおいて最も負荷の高い(3)ファクト表の全スキャンについては何も変わっていないためパフォーマンス上の効果は限定的なのです。</p>
-<h2 id="4-4-SQL実行時のBloom-Filterまとめ"><a href="#4-4-SQL実行時のBloom-Filterまとめ" class="headerlink" title="4-4. SQL実行時のBloom Filterまとめ"></a><strong>4-4. SQL実行時のBloom Filterまとめ</strong></h2><p>まとめると、SQL実行時におけるBloom Filterの利用について以下のことが言えます。</p>
-<ul>
-<li>テーブル結合(Join)時に結合対象のデータを減らす効果はあるが、ファクト表のスキャン量は変わらないため普通に使うと効果は限定的</li>
-<li>ファクト表のスキャンサイズを減らすことが出来れば効果は出そう</li>
-</ul>
-<p><br></p>
-<p><strong>この「普通に使うと効果は限定的」という条件があるため「パーティション表」「パラレルクエリ」においてBloom Filterは利用されます（後述）が、非パラレルクエリでは効果が無いため利用されません。</strong></p>
-<h1 id="5-OracleにおけるBloom-Filterの利用"><a href="#5-OracleにおけるBloom-Filterの利用" class="headerlink" title="5. OracleにおけるBloom Filterの利用"></a><strong>5. OracleにおけるBloom Filterの利用</strong></h1><p>ここまでを踏まえて、Oracleにおいてどのように利用されているか見ていきます。</p>
-<p><a href="http://docs.oracle.com/cd/E49329_01/server.121/b71277/tgsql_join.htm#BABEGJHI" target="_blank" rel="external">Oracle Database SQLチューニング・ガイド 12cリリース1(12.1) 結合の最適化 ブルーム・フィルタ</a>では以下の4つにおいて利用されるとあります。</p>
-<ul>
-<li>5-1. パーティションテーブル結合<ul>
-<li>不要なパーティションのアクセスを排除（パーティションプルーニング）するために利用</li>
-</ul>
-</li>
-<li>5-2. パラレルクエリ<ul>
-<li>パラレルクエリ実行時のスレーブプロセス間で転送されるデータ量を低減させるために利用</li>
-</ul>
-</li>
-<li>5-3. Exadataにおけるストレージサーバ（セルサーバ）からDBサーバに転送されるデータ量を低減させるために利用</li>
-<li>5-4. サーバの結果キャッシュにデータが存在するかどうかをチェックするため</li>
-</ul>
-<p>(5-4)についてはSQL実行の利用ではないのでここでは除外します。</p>
-<h2 id="5-1-パーティションテーブル結合におけるBloom-Filter"><a href="#5-1-パーティションテーブル結合におけるBloom-Filter" class="headerlink" title="5-1. パーティションテーブル結合におけるBloom Filter"></a><strong>5-1. パーティションテーブル結合におけるBloom Filter</strong></h2><p>Bloom Filterの原則「テーブル結合(Join)時に結合対象のデータを減らす効果はあるが、ファクト表のスキャン量は変わらないため普通に使うと効果は限定的」を前提に、ファクト表がパーティションならパーティション単位でデータを減らせる可能性があるので適用しようというコンセプトです。</p>
-<p><img src="/images/20161102/photo_20161102_06.png"></p>
-<ul>
-<li>(1)ディメンジョン表(TIMES)を全スキャンしてCALENDER_YEAR=’2001’に合致するデータでハッシュテーブルとBloom Filterを作成。ディクショナリよりSALES表のパーティション定義を取得して、結合対象データが存在するパーティションのリストをBloom Filterとして保持しています。<ul>
-<li>（SALESのパーティションキーはTIME_IDでTIMES.CALENDER_YEARから導出可能です）</li>
-</ul>
-</li>
-<li>(2)Bloom Filterを利用してファクト表(SALES)の必要なパーティションのみをスキャンして結合を実施します。</li>
-</ul>
-<p><br></p>
-<p>具体的にSQLの実行計画（プラン）を見ていきます。</p>
-<blockquote>
-<p><strong>Tips: </strong></p>
-<ul>
-<li>SQLに <code>gather_plan_statistics</code> ヒントを入れて実行した場合、SQL実行時の統計が記録されます。</li>
-<li>実行後に <code>dbms_xplan.display_cursor</code> を利用することで記録された内容を確認することができます。</li>
-<li>A-Rowsを見ると、SQL実行中にアクセスした行数が分かります。</li>
-<li>[参考URL]<ul>
-<li><a href="https://jonathanlewis.wordpress.com/2006/11/09/dbms_xplan-in-10g/" target="_blank" rel="external">Oracle Scratchpad: dbms_xplan in 10g</a></li>
-<li><a href="http://kerryosborne.oracle-guy.com/2010/02/gather_plan_statistics/" target="_blank" rel="external">Kerry Osborne’s Oracle Blog: GATHER_PLAN_STATISTICS</a></li>
-</ul>
-</li>
-</ul>
-</blockquote>
-<p><br></p>
-<p>パーティションテーブルでBloom_Filter利用するSQLを実行します。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> <span class="comment">/*+ gather_plan_statistics */</span></div><div class="line">  TIMES.CALENDAR_QUARTER_DESC,</div><div class="line">  <span class="keyword">SUM</span>(SALES.AMOUNT_SOLD)</div><div class="line"><span class="keyword">FROM</span> SALES SALES</div><div class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> TIMES TIMES <span class="keyword">ON</span> (SALES.TIME_ID = TIMES.TIME_ID)</div><div class="line"><span class="keyword">WHERE</span> <span class="number">1</span>=<span class="number">1</span></div><div class="line"><span class="keyword">AND</span> TIMES.CALENDAR_YEAR=<span class="string">'2001'</span></div><div class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></div><div class="line">TIMES.CALENDAR_QUARTER_DESC;</div></pre></td></tr></table></figure></p>
-<p>続いて、実行計画を確認します。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">table</span>(dbms_xplan.display_cursor(<span class="literal">null</span>,<span class="literal">null</span>,<span class="string">'ALLSTATS ALL'</span>));</div><div class="line">PLAN_TABLE_OUTPUT</div><div class="line"><span class="comment">------------------------------------------------------------------------------</span></div><div class="line">| Id  | Operation                     | Name    | E-Rows | Pstart| Pstop | A-Rows |</div><div class="line">|   0 | <span class="keyword">SELECT</span> <span class="keyword">STATEMENT</span>              |         |        |       |       |      <span class="number">4</span> |</div><div class="line">|   <span class="number">1</span> |  <span class="keyword">HASH</span> <span class="keyword">GROUP</span> <span class="keyword">BY</span>                |         |     <span class="number">20</span> |       |       |      <span class="number">4</span> |</div><div class="line">|*  <span class="number">2</span> |   <span class="keyword">HASH</span> <span class="keyword">JOIN</span>                   |         |    <span class="number">229</span>K|       |       |    <span class="number">259</span>K|</div><div class="line">|   <span class="number">3</span> |    PART <span class="keyword">JOIN</span> FILTER <span class="keyword">CREATE</span>    | :BF0000 |    <span class="number">365</span> |       |       |    <span class="number">365</span> |</div><div class="line">|*  <span class="number">4</span> |     <span class="keyword">TABLE</span> <span class="keyword">ACCESS</span> <span class="keyword">FULL</span>         | TIMES   |    <span class="number">365</span> |       |       |    <span class="number">365</span> |</div><div class="line">|   <span class="number">5</span> |    <span class="keyword">PARTITION</span> <span class="keyword">RANGE</span> <span class="keyword">JOIN</span>-FILTER|         |    <span class="number">918</span>K|:BF0000|:BF0000|    <span class="number">259</span>K|</div><div class="line">|   <span class="number">6</span> |     <span class="keyword">TABLE</span> <span class="keyword">ACCESS</span> <span class="keyword">FULL</span>         | SALES   |    <span class="number">918</span>K|:BF0000|:BF0000|    <span class="number">259</span>K|</div><div class="line"><span class="comment">------------------------------------------------------------------------------</span></div></pre></td></tr></table></figure></p>
-<p>最後に、パーティション内のデータ件数を確認します。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">select to_char(a.TIME_ID,&apos;YYYY&apos;) time_id_year,count(*)</div><div class="line">from sales a</div><div class="line">group by to_char(a.TIME_ID,&apos;YYYY&apos;);</div><div class="line"></div><div class="line">TIME   COUNT(*)</div><div class="line">---- ----------</div><div class="line">2000     232646</div><div class="line">2001     259418</div><div class="line">1999     247945</div><div class="line">1998     178834</div></pre></td></tr></table></figure></p>
-<p>実行計画のLINE#3(id=3の部分) 「PART JOIN FILTER CREATE」でフィルタ(BF000)を作成<br>LINE#6 BF000を利用してアクセスパーティション範囲を特定しているのが分かります。<br>アクセスした行数は259Kレコードで、SALESの2001年のデータとレコード数が一致しています。</p>
-<p>例ではSALESのパーションキーに対応していたので、Bloom Filterの効果がはっきりとわかりましたが、条件によってはパーティションの特定が出来ずにフィルタ効果がないこともあり得ます。（たとえば、TIMES.CALENDAR_YEAR between ‘1995’ and ‘2000’ という条件の場合、SALESの全データが必要になるためパーティションフィルタによる効果はゼロです）</p>
-<p><strong>パーティションのフィルタ効果が出るかは条件によりますが、Bloom Filterによるパフォーマンス上の副作用もないので、ディメンジョン表とファクト表がパーティションキーで結合される場合ほぼ間違いなく実行計画に登場します。</strong></p>
-<p>このSQLの実行操作についてはBloom Filterの特徴を活用していないためBloom Filter操作の一つとすることにあまりしっくりきません。むしろ「PARTION RANGE JOIN-FILTER」という名称の方が理解しやすいのではと感じます。</p>
-<h2 id="5-2-パラレルクエリにおけるBloom-Filter"><a href="#5-2-パラレルクエリにおけるBloom-Filter" class="headerlink" title="5-2. パラレルクエリにおけるBloom Filter"></a><strong>5-2. パラレルクエリにおけるBloom Filter</strong></h2><p>Bloom Filterの原則「 テーブル結合(Join)時に結合対象のデータを減らす効果はあるが、ファクト表のスキャン量は変わらないため普通に使うと効果は限定的」を前提に、パラレルプロセス間のデータ転送量を減らすときに適用しようというコンセプトです。</p>
-<blockquote>
-<ul>
-<li>パラレルクエリとは、クエリ実行を複数のプロセスで並列化実行する機能です。</li>
-<li>詳細は<a href="http://www.oracle.com/technetwork/jp/database/articles/tsushima/index-1741351-ja.html" target="_blank" rel="external">こちら</a>を参照してください。</li>
-</ul>
-</blockquote>
-<p><br></p>
-<h3 id="実行計画の確認"><a href="#実行計画の確認" class="headerlink" title="実行計画の確認"></a><strong>実行計画の確認</strong></h3><p>具体的にSQLの実行計画（プラン）を見ていきます。</p>
-<blockquote>
-<p><strong>Tips: </strong><br>今回はSQLの実行計画だけを参照するため、 <code>explain plan for</code> をSQLの前につけることで実行計画の作成を行なった後、 <code>dbms_xplan.display</code> を実行することでSQL実行計画の表示を行っています。</p>
-</blockquote>
-<p><br></p>
-<p>パラレルクエリでBloom_Filterを利用するSQLを実行します。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">explain</span> plan <span class="keyword">for</span></div><div class="line"><span class="keyword">SELECT</span> <span class="comment">/*+parallel(4)*/</span>  <span class="comment">--パラレルクエリ実行のためのヒント</span></div><div class="line">  TIMES.CALENDAR_QUARTER_DESC,</div><div class="line">  PRODUCTS.PROD_CATEGORY_DESC,</div><div class="line">  CUSTOMERS.CUST_CITY,</div><div class="line">  <span class="keyword">SUM</span>(SALES.AMOUNT_SOLD)</div><div class="line"><span class="keyword">FROM</span> SALES SALES</div><div class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> PRODUCTS PRODUCTS <span class="keyword">ON</span> (SALES.PROD_ID = PRODUCTS.PROD_ID)</div><div class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> TIMES TIMES <span class="keyword">ON</span> (SALES.TIME_ID = TIMES.TIME_ID)</div><div class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> CUSTOMERS <span class="keyword">ON</span> (SALES.CUST_ID = CUSTOMERS.CUST_ID)</div><div class="line"><span class="keyword">WHERE</span> <span class="number">1</span>=<span class="number">1</span></div><div class="line"><span class="keyword">AND</span> TIMES.CALENDAR_YEAR=<span class="string">'2001'</span></div><div class="line"><span class="keyword">AND</span> CUSTOMERS.CUST_CITY=<span class="string">'Tokyo'</span></div><div class="line"><span class="keyword">AND</span> PRODUCTS.PROD_CATEGORY=<span class="string">'Photo'</span></div><div class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></div><div class="line">TIMES.CALENDAR_QUARTER_DESC,</div><div class="line">PRODUCTS.PROD_CATEGORY_DESC,</div><div class="line">CUSTOMERS.CUST_CITY;</div></pre></td></tr></table></figure></p>
-<p>続いて、実行計画を確認します。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">table</span>(dbms_xplan.display(<span class="literal">null</span>, <span class="literal">null</span>, <span class="string">'ALL allstats last outline'</span>));</div><div class="line"><span class="comment">-----------------------------------------------------------------------------------------------------------</span></div><div class="line">| Id  | Operation                       | Name      | E-Rows | Pstart| Pstop |    TQ  |IN-OUT| PQ Distrib |</div><div class="line"><span class="comment">-----------------------------------------------------------------------------------------------------------</span></div><div class="line">|   0 | <span class="keyword">SELECT</span> <span class="keyword">STATEMENT</span>                |           |     <span class="number">50</span> |       |       |        |      |            |</div><div class="line">|   <span class="number">1</span> |  PX COORDINATOR                 |           |        |       |       |        |      |            |</div><div class="line">|   <span class="number">2</span> |   PX SEND QC (RANDOM)           | :TQ10001  |     <span class="number">50</span> |       |       |  Q1,<span class="number">01</span> | P-&gt;S | QC (<span class="keyword">RAND</span>)  |</div><div class="line">|   <span class="number">3</span> |    <span class="keyword">HASH</span> <span class="keyword">GROUP</span> <span class="keyword">BY</span>                |           |     <span class="number">50</span> |       |       |  Q1,<span class="number">01</span> | PCWP |            |</div><div class="line">|   <span class="number">4</span> |     PX RECEIVE                  |           |     <span class="number">50</span> |       |       |  Q1,<span class="number">01</span> | PCWP |            |</div><div class="line">|   <span class="number">5</span> |      PX SEND <span class="keyword">HASH</span>               | :TQ10000  |     <span class="number">50</span> |       |       |  Q1,<span class="number">00</span> | P-&gt;P | <span class="keyword">HASH</span>       |</div><div class="line">|   <span class="number">6</span> |       <span class="keyword">HASH</span> <span class="keyword">GROUP</span> <span class="keyword">BY</span>             |           |     <span class="number">50</span> |       |       |  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line">|*  <span class="number">7</span> |        <span class="keyword">HASH</span> <span class="keyword">JOIN</span>                |           |    <span class="number">583</span> |       |       |  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line">|   <span class="number">8</span> |         <span class="keyword">JOIN</span> FILTER <span class="keyword">CREATE</span>      | :BF0001   |    <span class="number">365</span> |       |       |  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line">|   <span class="number">9</span> |          PART <span class="keyword">JOIN</span> FILTER <span class="keyword">CREATE</span>| :BF0000   |    <span class="number">365</span> |       |       |  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line">|* <span class="number">10</span> |           <span class="keyword">TABLE</span> <span class="keyword">ACCESS</span> <span class="keyword">FULL</span>     | TIMES     |    <span class="number">365</span> |       |       |  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line">|* <span class="number">11</span> |         <span class="keyword">HASH</span> <span class="keyword">JOIN</span>               |           |   <span class="number">2330</span> |       |       |  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line">|  <span class="number">12</span> |          <span class="keyword">JOIN</span> FILTER <span class="keyword">CREATE</span>     | :BF0002   |     <span class="number">14</span> |       |       |  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line">|* <span class="number">13</span> |           <span class="keyword">TABLE</span> <span class="keyword">ACCESS</span> <span class="keyword">FULL</span>     | PRODUCTS  |     <span class="number">14</span> |       |       |  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line">|* <span class="number">14</span> |          <span class="keyword">HASH</span> <span class="keyword">JOIN</span>              |           |  <span class="number">11652</span> |       |       |  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line">|  <span class="number">15</span> |           <span class="keyword">JOIN</span> FILTER <span class="keyword">CREATE</span>    | :BF0003   |     <span class="number">90</span> |       |       |  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line">|* <span class="number">16</span> |            <span class="keyword">TABLE</span> <span class="keyword">ACCESS</span> <span class="keyword">FULL</span>    | CUSTOMERS |     <span class="number">90</span> |       |       |  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line">|  <span class="number">17</span> |           <span class="keyword">JOIN</span> FILTER <span class="keyword">USE</span>       | :BF0001   |    <span class="number">918</span>K|       |       |  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line">|  <span class="number">18</span> |            <span class="keyword">JOIN</span> FILTER <span class="keyword">USE</span>      | :BF0002   |    <span class="number">918</span>K|       |       |  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line">|  <span class="number">19</span> |             <span class="keyword">JOIN</span> FILTER <span class="keyword">USE</span>     | :BF0003   |    <span class="number">918</span>K|       |       |  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line">|  <span class="number">20</span> |              PX <span class="keyword">BLOCK</span> ITERATOR  |           |    <span class="number">918</span>K|:BF0000|:BF0000|  Q1,<span class="number">00</span> | PCWC |            |</div><div class="line">|* <span class="number">21</span> |               <span class="keyword">TABLE</span> <span class="keyword">ACCESS</span> <span class="keyword">FULL</span> | SALES     |    <span class="number">918</span>K|:BF0000|:BF0000|  Q1,<span class="number">00</span> | PCWP |            |</div><div class="line"><span class="comment">-----------------------------------------------------------------------------------------------------------</span></div><div class="line">Predicate Information (<span class="keyword">identified</span> <span class="keyword">by</span> operation <span class="keyword">id</span>):</div><div class="line"><span class="comment">---------------------------------------------------</span></div><div class="line">   <span class="number">7</span> - <span class="keyword">access</span>(<span class="string">"SALES"</span>.<span class="string">"TIME_ID"</span>=<span class="string">"TIMES"</span>.<span class="string">"TIME_ID"</span>)</div><div class="line">  <span class="number">10</span> - filter(<span class="string">"TIMES"</span>.<span class="string">"CALENDAR_YEAR"</span>=<span class="number">2001</span>)</div><div class="line">  <span class="number">11</span> - <span class="keyword">access</span>(<span class="string">"SALES"</span>.<span class="string">"PROD_ID"</span>=<span class="string">"PRODUCTS"</span>.<span class="string">"PROD_ID"</span>)</div><div class="line">  <span class="number">13</span> - filter(<span class="string">"PRODUCTS"</span>.<span class="string">"PROD_CATEGORY"</span>=<span class="string">'Photo'</span>)</div><div class="line">  <span class="number">14</span> - <span class="keyword">access</span>(<span class="string">"SALES"</span>.<span class="string">"CUST_ID"</span>=<span class="string">"CUSTOMERS"</span>.<span class="string">"CUST_ID"</span>)</div><div class="line">  <span class="number">16</span> - filter(<span class="string">"CUSTOMERS"</span>.<span class="string">"CUST_CITY"</span>=<span class="string">'Tokyo'</span>)</div><div class="line">  <span class="number">21</span> - filter(SYS_OP_BLOOM_FILTER_LIST(SYS_OP_BLOOM_FILTER(:BF0003,<span class="string">"SALES"</span>.<span class="string">"CUST_ID"</span>),SYS_OP_BLOOM_FILTER(:BF0002,<span class="string">"SALES"</span>.<span class="string">"PROD_ID"</span></div><div class="line">              ),SYS_OP_BLOOM_FILTER(:BF0001,<span class="string">"SALES"</span>.<span class="string">"</span></div></pre></td></tr></table></figure></p>
-<p>図示すると以下のような流れになっているのがわかります。</p>
-<p><img src="/images/20161102/photo_20161102_07.png"></p>
-<ol>
-<li>TIMES表をスレーブプロセス群(Q01,00)はパラレルスキャンしてハッシュテーブルとBloom Filterを作成。この時、パーティションフィルタ用(BF0000)と、パラレルプロセス用(BF0001)の2つを作成</li>
-<li>PRODUCTS表をスレーブプロセス群(Q01,00)はパラレルスキャンしてハッシュテーブルとBloom Filter(BF0002)を作成</li>
-<li>CUSTOMERS表をスレーブプロセス群(Q01,00)はパラレルスキャンしてハッシュテーブルとBloom Filter(BF0003)を作成</li>
-<li>SALES表に対してBF0000を利用して必要なパーティションのみスレーブプロセス群(Q01,00)はパラレルスキャン</li>
-<li>スレーブプロセス群(Q01,00)は3つのBloom Filter(BF0001,BF0002,BF0003)を利用して、転送するデータを削減して、別のスレーブプロセス群(Q01,01)に転送</li>
-<li>スレーブプロセス群(Q01,01)はハッシュテーブルを利用してパラレル結合を実施して結果をQCプロセスに転送</li>
-</ol>
-<p><br></p>
-<p>ここでのポイントは(5)において転送データの削減を行っているところにあります。<br>実行計画でのLINE#21を見ると、3つのBloom Filter(BF0000,BF0001,BF0002)を同時に利用してデータを絞り込んでいるのが分かります。</p>
-<blockquote>
-<p><code>filter(SYS_OP_BLOOM_FILTER_LIST(SYS_OP_BLOOM_FILTER(:BF0003,&quot;SALES&quot;.&quot;CUST_ID&quot;),SYS_OP_BLOOM_FILTER(:BF0002,&quot;SALES&quot;.&quot;PROD_ID&quot;),SYS_OP_BLOOM_FILTER(:BF0001,&quot;SALES&quot;.&quot;TIME_ID&quot;)))</code></p>
-</blockquote>
-<p><br></p>
-<h3 id="Bloom-Filterの効果計測"><a href="#Bloom-Filterの効果計測" class="headerlink" title="Bloom Filterの効果計測"></a><strong>Bloom Filterの効果計測</strong></h3><p>次に、Bloom Filterの有り無しでSQLの実行計画とI/Oがどのように変化するか見てみます。</p>
-<p>まずはBloom Filterを利用しない場合の実行計画を確認します。</p>
-<blockquote>
-<p><strong>Tips: </strong></p>
-<ul>
-<li>Bloom Filterを使用しないヒント句として <code>no_px_join_filter(テーブル名)</code> があります。</li>
-<li>これを使用することで指定テーブルに対してBloom Filterは作成されなくなります。</li>
-</ul>
-</blockquote>
-<p><strong>パラレルクエリ：Bloom_Filterなし※データは整形済み</strong><br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">（使用したヒント:SQL本文は省略）</div><div class="line">parallel(4)</div><div class="line">no_px_join_filter(CUSTOMERS)</div><div class="line">no_px_join_filter(PRODUCTS)</div><div class="line">no_px_join_filter(SALES)</div><div class="line">no_px_join_filter(TIMES)</div><div class="line"></div><div class="line">call     count       cpu    elapsed       disk      query    current        rows  process</div><div class="line">------- ------  -------- ---------- ---------- ---------- ----------  ---------- --------</div><div class="line">Execute      1      0.00       0.40          0       1266         64           0       QC</div><div class="line">Execute      1      0.00       0.40          0          0          0           0    Q1,01</div><div class="line">Execute      1      0.00       0.40          0          0          0           0    Q1,01</div><div class="line">Execute      1      0.16       0.39       4460       6909         72           0    Q1,00</div><div class="line">Execute      1      0.15       0.40       4214       6573         68           0    Q1,00</div><div class="line"></div><div class="line">----------------------------------------------------------------------------------------------------------</div><div class="line">| Id  | Operation                      | Name      | Pstart| Pstop |    TQ  |IN-OUT| PQ Distrib | A-Rows |</div><div class="line">----------------------------------------------------------------------------------------------------------</div><div class="line">|   0 | SELECT STATEMENT               |           |       |       |        |      |            |        |</div><div class="line">|   1 |  PX COORDINATOR                |           |       |       |        |      |            |       4|</div><div class="line">|   2 |   PX SEND QC (RANDOM)          | :TQ10001  |       |       |  Q1,01 | P-&gt;S | QC (RAND)  |       4|</div><div class="line">|   3 |    HASH GROUP BY               |           |       |       |  Q1,01 | PCWP |            |       4|</div><div class="line">|   4 |     PX RECEIVE                 |           |       |       |  Q1,01 | PCWP |            |       8|</div><div class="line">|   5 |      PX SEND HASH              | :TQ10000  |       |       |  Q1,00 | P-&gt;P | HASH       |       8|</div><div class="line">|   6 |       HASH GROUP BY            |           |       |       |  Q1,00 | PCWP |            |       8|</div><div class="line">|*  7 |        HASH JOIN               |           |       |       |  Q1,00 | PCWP |            |    1328|</div><div class="line">|   8 |         PART JOIN FILTER CREATE| :BF0000   |       |       |  Q1,00 | PCWP |            |     730|</div><div class="line">|*  9 |          TABLE ACCESS FULL     | TIMES     |       |       |  Q1,00 | PCWP |            |     730|</div><div class="line">|* 10 |         HASH JOIN              |           |       |       |  Q1,00 | PCWP |            |    1328|</div><div class="line">|* 11 |          TABLE ACCESS FULL     | PRODUCTS  |       |       |  Q1,00 | PCWP |            |      20|</div><div class="line">|* 12 |          HASH JOIN             |           |       |       |  Q1,00 | PCWP |            |    9424|</div><div class="line">|* 13 |           TABLE ACCESS FULL    | CUSTOMERS |       |       |  Q1,00 | PCWP |            |      32|</div><div class="line">|  14 |           PX BLOCK ITERATOR    |           |:BF0000|:BF0000|  Q1,00 | PCWC |            | 4150688|</div><div class="line">|  15 |            TABLE ACCESS FULL   | SALES     |:BF0000|:BF0000|  Q1,00 | PCWP |            | 4150688|</div><div class="line">----------------------------------------------------------------------------------------------------------</div></pre></td></tr></table></figure></p>
-<p>続いて、Bloom Filterを利用する場合の実行計画を確認します。<br>変更したのはヒント句のみです。</p>
-<p><strong>パラレルクエリ：Bloom_Filterあり※データは整形済み</strong><br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">（使用したヒント:SQL本文は省略）</div><div class="line">parallel(4)</div><div class="line"></div><div class="line">call     count       cpu    elapsed       disk      query    current        rows  process</div><div class="line">------- ------  -------- ---------- ---------- ---------- ----------  ---------- --------</div><div class="line">Execute      1      0.00       0.00          0        130          0           0       QC</div><div class="line">Execute      1      0.00       0.23          0          0          0           0    Q1,01</div><div class="line">Execute      1      0.00       0.23          0          0          0           0    Q1,01</div><div class="line">Execute      1      0.14       0.23       4774       5620          0           0    Q1,00</div><div class="line">Execute      1      0.12       0.23       3900       4726          0           0    Q1,00</div><div class="line"></div><div class="line">-----------------------------------------------------------------------------------------------------------</div><div class="line">| Id  | Operation                       | Name      | Pstart| Pstop |    TQ  |IN-OUT| PQ Distrib | A-Rows |</div><div class="line">-----------------------------------------------------------------------------------------------------------</div><div class="line">|   0 | SELECT STATEMENT                |           |       |       |        |      |            |        |</div><div class="line">|   1 |  PX COORDINATOR                 |           |       |       |        |      |            |       4|</div><div class="line">|   2 |   PX SEND QC (RANDOM)           | :TQ10001  |       |       |  Q1,01 | P-&gt;S | QC (RAND)  |       4|</div><div class="line">|   3 |    HASH GROUP BY                |           |       |       |  Q1,01 | PCWP |            |       4|</div><div class="line">|   4 |     PX RECEIVE                  |           |       |       |  Q1,01 | PCWP |            |       8|</div><div class="line">|   5 |      PX SEND HASH               | :TQ10000  |       |       |  Q1,00 | P-&gt;P | HASH       |       8|</div><div class="line">|   6 |       HASH GROUP BY             |           |       |       |  Q1,00 | PCWP |            |       8|</div><div class="line">|*  7 |        HASH JOIN                |           |       |       |  Q1,00 | PCWP |            |      83|</div><div class="line">|   8 |         JOIN FILTER CREATE      | :BF0001   |       |       |  Q1,00 | PCWP |            |     730|</div><div class="line">|   9 |          PART JOIN FILTER CREATE| :BF0000   |       |       |  Q1,00 | PCWP |            |     730|</div><div class="line">|* 10 |           TABLE ACCESS FULL     | TIMES     |       |       |  Q1,00 | PCWP |            |     730|</div><div class="line">|* 11 |         HASH JOIN               |           |       |       |  Q1,00 | PCWP |            |    1328|</div><div class="line">|  12 |          JOIN FILTER CREATE     | :BF0002   |       |       |  Q1,00 | PCWP |            |      20|</div><div class="line">|* 13 |           TABLE ACCESS FULL     | PRODUCTS  |       |       |  Q1,00 | PCWP |            |      20|</div><div class="line">|* 14 |          HASH JOIN              |           |       |       |  Q1,00 | PCWP |            |    1328|</div><div class="line">|  15 |           JOIN FILTER CREATE    | :BF0003   |       |       |  Q1,00 | PCWP |            |      32|</div><div class="line">|* 16 |            TABLE ACCESS FULL    | CUSTOMERS |       |       |  Q1,00 | PCWP |            |      32|</div><div class="line">|  17 |           JOIN FILTER USE       | :BF0001   |       |       |  Q1,00 | PCWP |            |    1328|</div><div class="line">|  18 |            JOIN FILTER USE      | :BF0002   |       |       |  Q1,00 | PCWP |            |    1328|</div><div class="line">|  19 |             JOIN FILTER USE     | :BF0003   |       |       |  Q1,00 | PCWP |            |    1328|</div><div class="line">|  20 |              PX BLOCK ITERATOR  |           |:BF0000|:BF0000|  Q1,00 | PCWC |            |    1328|</div><div class="line">|* 21 |               TABLE ACCESS FULL | SALES     |:BF0000|:BF0000|  Q1,00 | PCWP |            |    1328|</div><div class="line">-----------------------------------------------------------------------------------------------------------</div></pre></td></tr></table></figure></p>
-<p>Bloom Filterありとなしの実行計画を見てみると、実際にアクセスしたレコード数(A-Rows)は1/3000になっていますが、読み込みデーブロック数(query)はそれほど変わっていないため、実行時間(elapsed)も劇的には変わっていません。</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">#</th>
-<th style="text-align:left">実際にアクセスしたレコード数(A-Rows)</th>
-<th style="text-align:left">読み込みデーブロック数(query)</th>
-<th style="text-align:left">実行時間(elapsed)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Bloom Filterなし</td>
-<td style="text-align:left">4,150,688</td>
-<td style="text-align:left">13,482(6909+6573)</td>
-<td style="text-align:left">0.4</td>
-</tr>
-<tr>
-<td style="text-align:left">Bloom Filterあり</td>
-<td style="text-align:left">1,328</td>
-<td style="text-align:left">10,346(5620+4726)</td>
-<td style="text-align:left">0.23</td>
-</tr>
-</tbody>
-</table>
-<p><strong>一見パフォーマンスに効果がありそうだけど、実際はいまいちの効果です。結合対象レコードは減らせるのですが、そもそもファクト表をスキャンするサイズは変わらないからです。<br>過度の期待は禁物です。</strong></p>
-<h2 id="5-3-ExadataのストレージサーバにおけるBloom-Filter"><a href="#5-3-ExadataのストレージサーバにおけるBloom-Filter" class="headerlink" title="5-3. ExadataのストレージサーバにおけるBloom Filter"></a><strong>5-3. ExadataのストレージサーバにおけるBloom Filter</strong></h2><p>これは「パラレルクエリにおけるBloom Filter」のコンセプトをExadata のストレージサーバ（セルサーバ）とDBサーバに適用するというコンセプトになります。</p>
-<p>処理の流れは、パラレルクエリの時と考え方は同じです。パラレルプロセスがストレージサーバに置き換えて考えます。</p>
-<p><img src="/images/20161102/photo_20161102_08.png"></p>
-<ol>
-<li>ディメンジョン表(TIMES)をスキャンしてハッシュテーブルとBloom Filterを作成</li>
-<li>Bloom Filterをストレージサーバに転送する</li>
-<li>ストレージサーバ側でファクト表(SALES)をスキャンしBloom Filterを通過したデータのみをDBサーバに転送</li>
-</ol>
-<p><br></p>
-<p><strong>ExadataでのBloom_Filter例</strong><br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">（使用したヒント:SQL本文は省略）</div><div class="line">parallel(4)</div><div class="line"></div><div class="line">----------------------------------------------------------------------------------------------------------------------------</div><div class="line">| Id  | Operation                          | Name                 | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | Pstart| Pstop |</div><div class="line">----------------------------------------------------------------------------------------------------------------------------</div><div class="line">|   0 | SELECT STATEMENT                   |                      |     50 |  4750 |   661   (2)| 00:00:10 |       |       |</div><div class="line">|   1 |  HASH GROUP BY                     |                      |     50 |  4750 |   661   (2)| 00:00:10 |       |       |</div><div class="line">|*  2 |   HASH JOIN                        |                      |    583 | 55385 |   660   (2)| 00:00:10 |       |       |</div><div class="line">|   3 |    JOIN FILTER CREATE              | :BF0001              |    365 |  7300 |    13   (0)| 00:00:01 |       |       |</div><div class="line">|   4 |     PART JOIN FILTER CREATE        | :BF0000              |    365 |  7300 |    13   (0)| 00:00:01 |       |       |</div><div class="line">|*  5 |      TABLE ACCESS STORAGE FULL     | TIMES                |    365 |  7300 |    13   (0)| 00:00:01 |       |       |</div><div class="line">|*  6 |    HASH JOIN                       |                      |   2330 |   170K|   647   (2)| 00:00:10 |       |       |</div><div class="line">|   7 |     JOIN FILTER CREATE             | :BF0002              |     14 |   532 |     2   (0)| 00:00:01 |       |       |</div><div class="line">|   8 |      TABLE ACCESS BY INDEX ROWID   | PRODUCTS             |     14 |   532 |     2   (0)| 00:00:01 |       |       |</div><div class="line">|*  9 |       INDEX RANGE SCAN             | PRODUCTS_PROD_CAT_IX |     14 |       |     1   (0)| 00:00:01 |       |       |</div><div class="line">|* 10 |     HASH JOIN                      |                      |  11652 |   421K|   645   (2)| 00:00:10 |       |       |</div><div class="line">|  11 |      JOIN FILTER CREATE            | :BF0003              |     90 |  1350 |   278   (1)| 00:00:04 |       |       |</div><div class="line">|* 12 |       TABLE ACCESS STORAGE FULL    | CUSTOMERS            |     90 |  1350 |   278   (1)| 00:00:04 |       |       |</div><div class="line">|  13 |      JOIN FILTER USE               | :BF0001              |    918K|    19M|   365   (2)| 00:00:06 |       |       |</div><div class="line">|  14 |       JOIN FILTER USE              | :BF0002              |    918K|    19M|   365   (2)| 00:00:06 |       |       |</div><div class="line">|  15 |        JOIN FILTER USE             | :BF0003              |    918K|    19M|   365   (2)| 00:00:06 |       |       |</div><div class="line">|  16 |         PARTITION RANGE JOIN-FILTER|                      |    918K|    19M|   365   (2)| 00:00:06 |:BF0000|:BF0000|</div><div class="line">|* 17 |          TABLE ACCESS STORAGE FULL | SALES                |    918K|    19M|   365   (2)| 00:00:06 |:BF0000|:BF0000|</div><div class="line">----------------------------------------------------------------------------------------------------------------------------</div><div class="line"></div><div class="line">   2 - access(<span class="string">"SALES"</span>.<span class="string">"TIME_ID"</span>=<span class="string">"TIMES"</span>.<span class="string">"TIME_ID"</span>)</div><div class="line">   5 - storage(<span class="string">"TIMES"</span>.<span class="string">"CALENDAR_YEAR"</span>=2001)</div><div class="line">       filter(<span class="string">"TIMES"</span>.<span class="string">"CALENDAR_YEAR"</span>=2001)</div><div class="line">   6 - access(<span class="string">"SALES"</span>.<span class="string">"PROD_ID"</span>=<span class="string">"PRODUCTS"</span>.<span class="string">"PROD_ID"</span>)</div><div class="line">   9 - access(<span class="string">"PRODUCTS"</span>.<span class="string">"PROD_CATEGORY"</span>=<span class="string">'Photo'</span>)</div><div class="line">  10 - access(<span class="string">"SALES"</span>.<span class="string">"CUST_ID"</span>=<span class="string">"CUSTOMERS"</span>.<span class="string">"CUST_ID"</span>)</div><div class="line">  12 - storage(<span class="string">"CUSTOMERS"</span>.<span class="string">"CUST_CITY"</span>=<span class="string">'Tokyo'</span>)</div><div class="line">       filter(<span class="string">"CUSTOMERS"</span>.<span class="string">"CUST_CITY"</span>=<span class="string">'Tokyo'</span>)</div><div class="line">  17 - storage(SYS_OP_BLOOM_FILTER_LIST(SYS_OP_BLOOM_FILTER(:BF0003,<span class="string">"SALES"</span>.<span class="string">"CUST_ID"</span>),SYS_OP_BLOOM_FILTER(:BF0002,<span class="string">"</span></div><div class="line">              SALES".<span class="string">"PROD_ID"</span>),SYS_OP_BLOOM_FILTER(:BF0001,<span class="string">"SALES"</span>.<span class="string">"TIME_ID"</span>)))</div><div class="line">       filter(SYS_OP_BLOOM_FILTER_LIST(SYS_OP_BLOOM_FILTER(:BF0003,<span class="string">"SALES"</span>.<span class="string">"CUST_ID"</span>),SYS_OP_BLOOM_FILTER(:BF0002,<span class="string">"S</span></div><div class="line">              ALES".<span class="string">"PROD_ID"</span>),SYS_OP_BLOOM_FILTER(:BF0001,<span class="string">"SALES"</span>.<span class="string">"TIME_ID"</span>)))</div></pre></td></tr></table></figure></p>
-<p>LINE#17がストレージサーバでのBloom Filterの適用を示します。</p>
-<blockquote>
-<p><code>storage(SYS_OP_BLOOM_FILTER_LIST(SYS_OP_BLOOM_FILTER(:BF0003,&quot;SALES&quot;.&quot;CUST_ID&quot;),SYS_OP_BLOOM_FILTER(:BF0002,&quot;             SALES&quot;.&quot;PROD_ID&quot;),SYS_OP_BLOOM_FILTER(:BF0001,&quot;SALES&quot;.&quot;TIME_ID&quot;)))</code></p>
-</blockquote>
-<p><br></p>
-<p>さらに、Exadataの持つStorage IndexとBloom FilterデータのMin/Max値を利用してさらにデータを絞り込無ことが可能です。これによりBloom FilterによるデータSCAN処理効果が得られます。<br>Storage Indexは、ストレージサーバにおいて、あるデータの格納単位における列データのmin/maxを保持することで、そのデータ格納単位を読み込む必要があるかを判断することができるExadata特有の機能です。<br><a href="https://docs.oracle.com/cd/E50790_01/doc/doc.121/e50471/concepts.htm#SAGUG21112" target="_blank" rel="external">Oracle Exadata Storage Server Software User’s Guide “Improved Join Performance Using Storage Index”</a></p>
-<p><img src="/images/20161102/photo_20161102_09.png"></p>
-<p>例では、min=3,max=3という値でStorage Indexを利用してファクト表のSCANサイズを削減しています。min=3, max=100という幅広い値である場合はStorage Indexの効果は得られないため、この効果はデータ内容に依存したものとなります。</p>
-<p><strong>データ内容に依存はするけど、ファクト表のSCANサイズを減らすことができる」ここ重要なポイントです。</strong></p>
-<h2 id="5-4-In-Memory機能におけるBloom-Filter"><a href="#5-4-In-Memory機能におけるBloom-Filter" class="headerlink" title="5-4. In-Memory機能におけるBloom Filter"></a><strong>5-4. In-Memory機能におけるBloom Filter</strong></h2><p>ここまで見ていきましたがBloom Filterはたしかに効果はあるのだけど、画期的というほどでもないのが実情でした。具体的にはマニュアルには記載されていないのですが、In-Memory機能がある場合は事情が変わります。<br>ここでの図は全て<a href="http://www.oracle.com/technetwork/jp/ondemand/od12c-coretech-aug2014-2283256-ja.html#anc_08" target="_blank" rel="external">Oracle Database In-Memory詳細編 検索処理の詳細</a>より引用しています。</p>
-<p><img src="/images/20161102/photo_20161102_10.png"></p>
-<p>この絵の例で結果取得までの流れは以下の通りです。（パラレルクエリーでのみ動作します)</p>
-<ol>
-<li>「店舗」表でBloom Filter（図ではジョンフィルタと書かれています）を作成</li>
-<li>「商品」表でBloom Filter作成</li>
-<li>「売上」表をスキャン（具体的には謎ですが、列指向なので列ごとにアクセスしているのではないかと推測します。StoreID列でフィルタに該当するものを調査→Prod ID列でフィルタに該当するものを調査→StoraID列、Prod ID列の双方で必要なAmount列という流れでアクセスしていると思われます）</li>
-<li>「商品」表でHash結合</li>
-<li>「店舗」表とHash結合</li>
-</ol>
-<p><img src="/images/20161102/photo_20161102_11.png"></p>
-<p>もう少し具体的なイメージ図は上記のとおりです。<br>(3)「フィルタ条件にマッチするファクト表（最大件数表）の列、行を抽出」の効率化がポイントです。ここではIn-Memoryの備える以下の機能が利用されます。</p>
-<ul>
-<li>列指向による必要な列のみアクセス</li>
-<li>カラムデータ保持単位(IMCU)に設定されているインメモリ・ストレージ索引（ExadataのStorage Indexと同じです)</li>
-<li>SIMD(Single Instruction Multiple Data)による効果的な値の比較</li>
-</ul>
-<p>これらのすべてが利用されることで結合処理が非常に高速で実行可能となります。</p>
-<h1 id="6-OracleにおけるBloom-Filterの利用のまとめ"><a href="#6-OracleにおけるBloom-Filterの利用のまとめ" class="headerlink" title="6. OracleにおけるBloom Filterの利用のまとめ"></a><strong>6. OracleにおけるBloom Filterの利用のまとめ</strong></h1><p>ここまでの話をまとめると、以下のようになります。</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">#</th>
-<th style="text-align:left">Bloom Filter適用シーン</th>
-<th style="text-align:left">Filter効果</th>
-<th style="text-align:left">ファクト表SCAN処理 低減効果</th>
-<th style="text-align:left">効果</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">5-1</td>
-<td style="text-align:left">パーティション表結合</td>
-<td style="text-align:left">パーティションの選択</td>
-<td style="text-align:left">なし</td>
-<td style="text-align:left">効果小</td>
-</tr>
-<tr>
-<td style="text-align:left">5-2</td>
-<td style="text-align:left">パラレルクエリ</td>
-<td style="text-align:left">スレーブプロセス間転送サイズ</td>
-<td style="text-align:left">なし</td>
-<td style="text-align:left">効果小</td>
-</tr>
-<tr>
-<td style="text-align:left">5-3</td>
-<td style="text-align:left">Exadataストレージサーバ</td>
-<td style="text-align:left">ストレージサーバからの転送</td>
-<td style="text-align:left">Storage Indexの利用</td>
-<td style="text-align:left">効果中</td>
-</tr>
-<tr>
-<td style="text-align:left">5-4</td>
-<td style="text-align:left">In-Memory</td>
-<td style="text-align:left">スレーブ プロセス間転送サイズ</td>
-<td style="text-align:left">列指向型データ保持、In-Memory Strage Index、SIMDの利用</td>
-<td style="text-align:left">効果大</td>
-</tr>
-</tbody>
-</table>
-<p>Bloom Filterが利用される(5-1)(5-2)(5-3)(5-4)のすべてにおいて、Filter効果（結合対象データの削減）は確かに有効ではあるのですが、パフォーマンス重要なファクト表のSCAN処理の低減効果があるのは(5-3)(5-4)についてとなります。パフォーマンスという点では(5-3)(5-4)の場面で大きな効果が見込めます。</p>
-<p>(5-3)はExadataの機能、(5-4)はOracle In-Memoryオプションによる機能ということで、通常のEnterprise Editionにおいては利用できないのは残念です。</p>
-<h1 id="7-終わりに"><a href="#7-終わりに" class="headerlink" title="7. 終わりに"></a><strong>7. 終わりに</strong></h1><p>Bloom Filterについて詳しく見ていく中で、Filter自体の効果よりファクト表のSCANサイズを減らすことがパフォーマンス上に効果を与えることが有効であることがわかりました（ある意味当たり前の結論ですが）。この視点で見てみると（Exadataについては特殊なのでおいておくと）Oracle In-Memoryについては本質的には列指向データ保持による効果と言えます。（Oracle In-MemoryはOLTPにも対応しているのでメモリを利用していますが、分析用であればインメモリである必要はないので列指向であることが重要と言えます）</p>
-<p>また、データが大規模になるほどBloom Filterの「Bloom Filterは非常に小さいサイズとなることから、「インメモリで保持が可能」「別の処理（プロセス）にフィルタを渡すことが可能」という効果が重要になってきます。そのため、分散DB（シャーディング機能による複数のサーバにおけるデータを分散保持）においてExadataと同じくサーバ間でBloom Filterを渡すことで処理を効率よく結合処理を分散させることができると言えます。</p>
-<p><strong>Bloom Filterアルゴリズムは「列指向型データベース」「分散DB」に有効であることから今後も利用が広がると予測されます。</strong></p>
-<h1 id="8-さらなる終わりに"><a href="#8-さらなる終わりに" class="headerlink" title="8. さらなる終わりに"></a><strong>8. さらなる終わりに</strong></h1><p>Oracleのマニュアルは読み物としても質が高いためバージョンアップが行われた際は、Oracleに携わることの多いエンジニアの方はぜひ読み込むことをお勧めします。</p>
-<p>12c(12.1)のリリースが行われた際に、SQLチューニングについて新しいドキュメントが追加されました。従来「パフォーマンスチューニングガイド」の一部を独立させて、内容を充実させてドキュメントにしたものです。上級者にとっても新しい発見があると思います。</p>
-<ul>
-<li>Oracle 12c R1のドキュメント &gt; Oracle Database SQLチューニング・ガイド 12cリリース1(12.1)<ul>
-<li><a href="http://docs.oracle.com/cd/E49329_01/server.121/b71277/toc.htm" target="_blank" rel="external">http://docs.oracle.com/cd/E49329_01/server.121/b71277/toc.htm</a></li>
-</ul>
-</li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;img src=&quot;/images/20161102/photo_20161102_00.png&quot; class=&quot;img-small-size&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;1-初めに&quot;&gt;&lt;a href=&quot;#1-初めに&quot; class=&quot;headerlink&quot; title=&quot;1
-    
-    </summary>
-    
-      <category term="DB" scheme="https://future-architect.github.io/categories/DB/"/>
-    
-    
-      <category term="DB" scheme="https://future-architect.github.io/tags/DB/"/>
-    
-      <category term="SQL" scheme="https://future-architect.github.io/tags/SQL/"/>
     
   </entry>
   
