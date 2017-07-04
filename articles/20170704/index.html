@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>インフラ入門vol.2(ネットワーク) | Future Tech Blog - フューチャーアーキテクト</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにみなさま、こんにちは。洞内です。
+今回はインフラ入門のvol.2と題して、インフラエンジニアの若手がネットワーク設計の現場で向き合っていく事柄（ここでは手段ではなく、設計の検討で外してはいけないポイント）について、説明します。
+
+前記事はこちらです
+
+ネットワークって？ネットワークとは「網状に作られた何か」（by Wikipedia）ですが、ITインフラにおけるネットワークとは、コンピュー">
+<meta property="og:type" content="article">
+<meta property="og:title" content="インフラ入門vol.2(ネットワーク)">
+<meta property="og:url" content="https://future-architect.github.io/articles/20170704/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="はじめにみなさま、こんにちは。洞内です。
+今回はインフラ入門のvol.2と題して、インフラエンジニアの若手がネットワーク設計の現場で向き合っていく事柄（ここでは手段ではなく、設計の検討で外してはいけないポイント）について、説明します。
+
+前記事はこちらです
+
+ネットワークって？ネットワークとは「網状に作られた何か」（by Wikipedia）ですが、ITインフラにおけるネットワークとは、コンピュー">
+<meta property="og:image" content="https://future-architect.github.io/images/20170704/photo_20170704_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20170704/photo_20170704_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20170704/photo_20170704_03.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20170704/photo_20170704_04.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20170704/photo_20170704_05.png">
+<meta property="og:updated_time" content="2017-07-03T02:32:15.556Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="インフラ入門vol.2(ネットワーク)">
+<meta name="twitter:description" content="はじめにみなさま、こんにちは。洞内です。
+今回はインフラ入門のvol.2と題して、インフラエンジニアの若手がネットワーク設計の現場で向き合っていく事柄（ここでは手段ではなく、設計の検討で外してはいけないポイント）について、説明します。
+
+前記事はこちらです
+
+ネットワークって？ネットワークとは「網状に作られた何か」（by Wikipedia）ですが、ITインフラにおけるネットワークとは、コンピュー">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20170704/photo_20170704_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="インフラ入門vol.2(ネットワーク) | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="インフラ入門vol.2(ネットワーク),Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="/events/"><i class="fa fa-flag-o"></i>Event</a>
+					</li>
+					
+					<li class="">
+						<a href="/slides/"><i class="fa fa-slideshare"></i>Slide</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<li class="">
+						<a href="https://www.facebook.com/future.saiyo/"><i class="fa fa-facebook-square"></i>Facebook</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Tech Blog</div>
+        <div class="header-title-sub">フューチャーアーキテクト開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20170704/">インフラ入門vol.2(ネットワーク)</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20170704-infra-nw" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> 洞内惇</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2017-07-04T06:04:04.000Z" itemprop="datePublished">2017/07/04</time>
+
+	</li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+	  
+  
+    <a href="/tags/Infrastructure/" title="Infrastructure">Infrastructure</a>,
+  
+    <a href="/tags/Network/" title="Network">Network</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    Categories:
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>みなさま、こんにちは。洞内です。</p>
+<p>今回はインフラ入門のvol.2と題して、インフラエンジニアの若手がネットワーク設計の現場で向き合っていく事柄（ここでは手段ではなく、設計の検討で外してはいけないポイント）について、説明します。</p>
+<ul>
+<li>前記事は<a href="https://future-architect.github.io/articles/20170109/">こちら</a>です</li>
+</ul>
+<h1 id="ネットワークって？"><a href="#ネットワークって？" class="headerlink" title="ネットワークって？"></a>ネットワークって？</h1><p>ネットワークとは「網状に作られた何か」（by Wikipedia）ですが、ITインフラにおけるネットワークとは、<strong>コンピューターAからコンピューターBへとデータを送るための通信経路</strong> の事を指します。<br><img src="/images/20170704/photo_20170704_01.png"></p>
+<p>身近なものでイメージをするのであれば、電話、メール、SNS等はネットワークが存在して、その上をデータがやり取りされている事が大前提となる機能です。<br>電話であれば「音声データ」、メールやSNSであれば「文字データや画像データ」等を、相手のスマートフォンに届けるために、通信経路となる「ネットワーク」が使われている訳ですね。<br><img src="/images/20170704/photo_20170704_02.png"></p>
+<p>身近なものを例に挙げましたが、業務システム（業務アプリケーション）でも同じことが言えます。<br>例えば、お店で不足した商品を補充する発注業務等でもネットワークを通じて、商品を注文していますし、遠く離れた相手とTV会議をするにもネットワークが使われています。</p>
+<p>では、様々な場面で利用されているネットワークですが、どのようなポイントを意識して設計するのかを考えていきたいと思います。</p>
+<h1 id="設計の要件"><a href="#設計の要件" class="headerlink" title="設計の要件"></a>設計の要件</h1><p>ネットワークを設計する際のポイントとなる要件は以下です。</p>
+<ol>
+<li>だれがどのように使うのか</li>
+<li>どの位のデータが流れるのか</li>
+<li>機械の故障等による停止はどの程度まで許容できるのか</li>
+</ol>
+<p>上から順番に見てみましょう。</p>
+<h2 id="1-だれがどのように使うのか"><a href="#1-だれがどのように使うのか" class="headerlink" title="1. だれがどのように使うのか"></a>1. だれがどのように使うのか</h2><p>例えば、以下のように状況によって用意すべきネットワークは異なります。</p>
+<p><strong>a. 会社員の方が、必ず会社のオフィスの自席で使う</strong><br>→この場合、ネットワークは有線で用意すれば良いでしょう</p>
+<p><strong>b. 会社員の方が、会社のオフィス内の色々な場所で使う</strong><br>→この場合、ネットワークは無線の方が良いですね？</p>
+<p><strong>c. 会社員の方が、客先でお客様と商談をしながら使う</strong><br>→こうなってくると、モバイルWi-Fiを使う事も検討する必要がでてきます</p>
+<p><img src="/images/20170704/photo_20170704_03.png"></p>
+<p>利用者がどのようなシチュエーションで利用するのかは、ネットワークを設計する上での非常に重要なポイントですね。</p>
+<p>他にも、考慮すべき点は色々考えられると思います。</p>
+<p><strong>d. インターネット上にWebサイトを公開するので、不特定多数の人がアクセスする</strong><br>→この場合は、使い勝手の話だけではなく、不正アクセスの対策等も必要になってきます。<br>（もちろん、アプリケーションに不具合を作らない事も重要ですが、ネットワークの設計や設定としても不要な通信は通さないといった事を考える必要があります）</p>
+<h2 id="2-どの位のデータが流れるのか"><a href="#2-どの位のデータが流れるのか" class="headerlink" title="2. どの位のデータが流れるのか"></a>2. どの位のデータが流れるのか</h2><p>例えば、家庭のインターネットサービスでも、10Mbps、100Mbps、1Gbps等の通信速度の違うサービスがありますね。<br>これは用途にあったサービスプランを選ぶと思います。</p>
+<ul>
+<li>メールや、ちょっと調べ物をしたいだけの人は10Mbps</li>
+<li>動画をたくさん見たい人は100Mbps～1Gbps</li>
+</ul>
+<p>動画をたくさん見たい人が、10Mbpsの回線を契約した場合は通信速度が遅くて動画がカクカクしてしまうかもしれませんね。また、<strong>複数人で同じ10Mbpsの回線を使っている場合、他の人もなかなかメールが送れない</strong>といった状況になるかもしれません。</p>
+<p><img src="/images/20170704/photo_20170704_04.png"></p>
+<p>ネットワークの設計をする上では、<strong>どの位のデータが流れるのか</strong> や <strong>今後、どの位のデータが流れるのか</strong> を考慮する必要があります。</p>
+<p>家庭用のインターネットサービスでは、契約を変更して、機械を取り換えれば大体の場合は増速ができますが、会社の中のネットワークで増速しようとすると、大規模な工事が必要になる場合がほとんどです。</p>
+<p>そのため、<strong>目的や使用用途を明確にして、どの位のデータがネットワークを流れるのか</strong>を見極めて設計をする必要があります。</p>
+<h2 id="3-機械の故障等による停止はどの程度まで許容できるのか"><a href="#3-機械の故障等による停止はどの程度まで許容できるのか" class="headerlink" title="3. 機械の故障等による停止はどの程度まで許容できるのか"></a>3. 機械の故障等による停止はどの程度まで許容できるのか</h2><p>ネットワークを構成している機械もモノなので、いつかは故障しますし、それは突然訪れる事がままあります。</p>
+<p>そんな突然故障した時に、ネットワークはどの程度の時間、使えないままになるのでしょうか？<br>5分？1時間？1日？</p>
+<p>企業のネットワークがまるまる1日止まってしまったら大損失ですね。<br>そんな時のために、予備の機械を用意したり、壊れたときにすぐに自動で切り替えができる機械を用意したりすることを考えます。</p>
+<p>当然、予備の機械の用意や、自動切り替えの機能がついた機械は値段も高くなりますので、<strong>全体の中で通信が止まってはいけないポイントはどこなのか</strong> を整理して、重要な箇所から優先的に投資を行うことが必要となってきます。</p>
+<p><img src="/images/20170704/photo_20170704_05.png"></p>
+<h1 id="設計の構成"><a href="#設計の構成" class="headerlink" title="設計の構成"></a>設計の構成</h1><p>前述の要件に加え、企業のネットワーク構成の設計には、以下の3つのポイントがあります。</p>
+<ol>
+<li>ネットワークのコア</li>
+<li>LANとWANの利用</li>
+<li>クラウドの利用</li>
+</ol>
+<p>こちらも順番にみていきましょう。</p>
+<h2 id="1-ネットワークのコア"><a href="#1-ネットワークのコア" class="headerlink" title="1. ネットワークのコア"></a>1. ネットワークのコア</h2><p>ネットワークを構築する際、ほとんどの場合がコアルーターやコアスイッチと呼ばれるような、ネットワークの中心となる機械を用意します。</p>
+<p>コアには沢山のデータが集まるため末端の機械よりも高い処理能力が必要になります。</p>
+<p>また、通信が集中するため、不要な通信をブロックするファイアウォール機能や、通信の流量をコントロール（トラフィックシェーピング）して、セキュリティ性を高めたり、皆が快適に使えたりするといった制御を担うのがコアになります。</p>
+<p>そのため、コアとなる機械が故障すると、全ネットワークが停止する恐れがあるため、先ほど挙げた<strong>機械の故障等による停止はどの程度まで許容できるのか</strong>という考え方の中で、非常に重要度の高いポイントと言えますね。</p>
+<p> </p>
+<h2 id="2-LANとWANの利用"><a href="#2-LANとWANの利用" class="headerlink" title="2. LANとWANの利用"></a>2. LANとWANの利用</h2><p>そもそも、LANとWANとはなんぞや？という方もいらっしゃると思いますので、簡単に説明します。</p>
+<blockquote>
+<ul>
+<li>LAN(Local Area Network) <ul>
+<li>1つの建物や、1つの組織の中で運用されるネットワークを指す言葉</li>
+</ul>
+</li>
+<li>WAN(Wide Area Network):<ul>
+<li>LANに対して、もっと広範囲に広がるネットワークを指す言葉。一般的にはインターネットサービスプロバイダが持つネットワークをWANと呼ぶ。</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>LANは、何となくイメージが出来るかもしれません。<br>でも、WANはどうでしょうか？ちょっとぼんやりしたイメージかもしれませんね。<br>もう少し具体的にしましょう。</p>
+<p>私たちが家庭でインターネットを利用する際、ほとんどの人が、インターネットサービスプロバイダと契約をして、インターネットを利用していると思います。<br>この時、契約内容にもよりますが、多くの場合はルーターと呼ばれる機械を用意して、このルーターに複数のPCやTV、ゲーム機等を接続して、インターネットを利用していると思います。<br>実はこのルーターの下に繋いだPC、TV、ゲーム機は1つのネットワークに所属しており、このネットワークの事をLANと言います。</p>
+<p>また、ルーターを挟んで反対側(インターネットサービスプロバイダ側)をWANと言います。<br>このWANと呼ばれる、インターネットサービスプロバイダ側のネットワークがたくさん集まり、繋がっている物がインターネットと呼ばれるものです。言い換えると、インターネットとは様々なWANの集合体ということですね。</p>
+<p>さて、話を戻して、当社の顧客には企業規模の大きなお客様が多く、オフィスも1つではなく、たくさんの拠点を構えていらっしゃいます。そのため1つの建物内で構成されたLANでは、業務遂行にあたり不便な部分が出てきてしまいます。</p>
+<p>例えば、会計処理をするにあたり東京、名古屋、大阪それぞれのオフィスで処理したものを集めて、また合算するよりも、1ヶ所で処理をした方が早いですよね？</p>
+<p>他にも同じ文書ファイルを各オフィスに配布するときに、それぞれの拠点の担当者にメールで配布をするよりも、ファイルサーバ上に置いて、1ヶ所から皆が参照をする方が効率的ですね。そのため、各拠点のLANをWANで繋いで、1つのLANとして扱うような設計を行う事が多くあります。</p>
+<p>このように複数の拠点をまたぐLANを設計する場合、先ほど挙げたようなポイントを検討する必要があります。</p>
+<ul>
+<li>通信内容をどのように保護(第三者に傍受されないように)するのか。</li>
+<li>ネットワークのコアをどこに配置するのか</li>
+<li>だれがどのように使うのか。</li>
+<li>どの位のデータが流れるのか。</li>
+<li>機械の故障等による停止はどの程度まで許容できるのか。</li>
+</ul>
+<p>他にも、</p>
+<ul>
+<li>ネットワーク上の住所となるIPアドレスをどのように割り当てるのか。</li>
+<li>将来拠点が増えたら、どのように拡張するのか。</li>
+<li>重要なデータのある場所へのアクセス制御の有無。</li>
+<li>通信のレイテンシ(遅延)はどうか。</li>
+</ul>
+<p>などなど考えることは様々です。</p>
+<h2 id="3-クラウドの利用"><a href="#3-クラウドの利用" class="headerlink" title="3. クラウドの利用"></a>3. クラウドの利用</h2><p>昨今、このクラウドという単語は、IT業界だけではなく一般的にも浸透してきたのではないでしょうか？<br>一言でクラウドといっても、多種多様なサービスがありますが、共通していることがいくつかあります。</p>
+<ul>
+<li>必要な時に必要な分だけ機能やサービスを利用する</li>
+<li>ネットワーク経由での利用が前提</li>
+</ul>
+<p>クラウドサービスはネットワーク経由での利用が前提になっているのですね。<br>クラウドへの接続の方法は、多くはインターネット経由ですが、クラウドサービスの提供側が対応していれば、WAN経由での接続も可能です。</p>
+<p>先ほど、WANを使って各拠点のLANを1つにまとめるといった話をしましたが、クラウドサービスも、そんなLANの1つとして扱う事ができる訳ですね。</p>
+<p>ただし、当然ですが何でもかんでも繋げば良いという事ではなく、限られた予算の中でどのようにするのが一番良いのかを常に考えて、不要なのであれば切り捨てるといった判断をする事も必要です。</p>
+<h1 id="プロジェクトを進める上でのネットワーク"><a href="#プロジェクトを進める上でのネットワーク" class="headerlink" title="プロジェクトを進める上でのネットワーク"></a>プロジェクトを進める上でのネットワーク</h1><p>実際にプロジェクトの中では、ほとんどの企業が既にネットワークを持っている場合が多いのですが、新しく作るシステムを作る上で、ネットワークを拡張するための設計や対応が必要な場合があります。</p>
+<p>そんな時、インフラの構築の中でも特にネットワークはプロジェクト全体の進行に対して大きく先行して進めなければなりません。</p>
+<p>ネットワークを作るためには、機械の発注や購入だけではなく、建物工事や、通信が正しく行えるか疎通試験等も行う必要があるからです。</p>
+<p>その他にも、お客様自身が自社のネットワークを網羅しきれておらず、現行のネットワーク調査を行う必要が有る場合等もあります。</p>
+<p>こういった作業に対するスケジュールや、見積り、設計を誤ってしまうと、プロジェクトの進行が大きく遅れるだけではなく、お客様に想定外の出費をさせてしまう可能性があります。</p>
+<p>実際に、当社の中でも建物工事を行う業者の繁忙期閑散期を見誤り、実際に工事が行えるタイミングが当初想定より遅れてしまいギリギリでの対応となったことや、いざ使い始めてみると、当初の想定見積よりも多くの通信が流れており、通信の圧縮処理や、通信処理が集中する時間を分散させて影響を最小限に留めるように業務処理の見直しを行った事などもあります。</p>
+<h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>いかがでしたでしょうか？<br>普段、多くの方々はあまりネットワークについて意識をしていないかもしれません。</p>
+<p>その理由は<a href="https://future-architect.github.io/articles/20170109/">インフラ入門vol1</a>にもありましたが、ITインフラが<strong>動いて当たり前</strong>だからです。ただ、実際に壊れない機器は無いですし、<strong>メールだけ出来れば良い</strong> としていた環境でだれかが勝手に<strong>動画も配信！</strong> となれば、その元々の要件下での <strong>動いて当たり前</strong> は崩れてしまいます。</p>
+<p>この <strong>動いて当たり前</strong> を崩れないようにしっかりと作りつつ、今後の拡張性や、セキュリティ、予算等のバランスを取って作り上げる事がネットワークの設計に求められることです。</p>
+<p>では、また次回をお楽しみに。</p>
+
+      
+    </div>
+  </div>
+    
+  <!-- シェアボタン START -->
+  <div class="social-area">
+  <ul class="social-button">
+
+      <!-- twitter -->
+      <li class="sc-tw social-button-twitter">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-hashtags="future_architect">ツイート</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      </li>
+      
+      <!-- Facebookいいね -->
+      <li class="social-button-fb">
+          <div id="fb-root"></div>
+          <script>(function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.8";
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));</script>
+          <div class="fb-like" data-href="https://future-architect.github.io/articles/20170704/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+      </li>
+
+      <!-- 	google+ -->
+      <li class="social-button-g">
+      <script src="https://apis.google.com/js/platform.js" async defer>
+      {lang: 'ja'}
+      </script>
+      <div class="g-plusone" data-size="medium"></div>
+      </li>
+
+      <!-- はてなブックマーク -->
+      <li class="social-button-hatebu"><a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20170704/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></li>
+
+      <!-- pocket -->
+      <li class="social-button-pocket"><a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
+          <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+      </li>
+
+  </ul>
+  </div>
+<!-- シェアボタン END -->
+
+
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/articles/20170605/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">ES2015 Web componentsと国産Web componentsフレームワークUrushi</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- OSS LOGO START -->
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="list-inline oss">
+      <li>
+        <a href="https://github.com/future-architect/vuls" target="_blank">
+          <img src="/metronic/assets/corporate/img/Vuls.png" alt="Vuls">
+      </a>
+      </li>
+      <li>
+        <a href="https://future-architect.github.io/uroborosql-doc/" target="_blank">
+          <img src="/metronic/assets/corporate/img/uroboroSQL-logo.png" alt="uroboroSQL">
+      </a>
+      </li>
+      <li>
+        <a href="http://future-architect.github.io/urushi/" target="_blank">
+          <img src="/metronic/assets/corporate/img/Urushi-logo.png" alt="Urushi">
+      </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- OSS LOGO START -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Event/">Event (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (5)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (5)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Development/">Development (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/BigData/">BigData (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Frontend/">Frontend (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20170421/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20170418/thumbnail_20170418.jpg" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>Unity未経験者がHoloLensアプリの開発をしてみた</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20170704/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20170704/thumbnail_20170704.jpg" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>インフラ入門vol.2(ネットワーク)</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20170414/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20170412/thumbnail_20170412.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>Elixir Conf Japan 2017 参加レポート</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20170526/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20170523/thumbnail_20170523.jpg" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>AIを使って顔画像から「常連さん」を判定しよう！</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20170510/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20170510/thumbnail_20170510.jpg" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>マネージャーがうれしいRedmineデータのダッシュボード表示方法を公開します！！</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20170605/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20170530/thumbnail_20170530.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>ES2015 Web componentsと国産Web componentsフレームワークUrushi</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20170405/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20170405/thumbnail_20170405.jpg" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>HoloLensの空間共有サービスを使ってみよう</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20170403/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20170403/thumbnail_20170403.jpg" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>Elastic{ON}-2017 レポート ~セッション編~</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- BEGIN BLOG TAGS -->
+<div class="blog-tags margin-bottom-20">
+  <h2>Tags</h2>
+  
+  <div class="widget-wrap">
+    <div class="widget">
+      
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/3D-Printer/"><i class='fa fa-tags'></i>3D-Printer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AWS/"><i class='fa fa-tags'></i>AWS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference/"><i class='fa fa-tags'></i>Conference</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DB/"><i class='fa fa-tags'></i>DB</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DeepLearning/"><i class='fa fa-tags'></i>DeepLearning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DesignThinking/"><i class='fa fa-tags'></i>DesignThinking</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Elastic-Stack/"><i class='fa fa-tags'></i>Elastic-Stack</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Elixir/"><i class='fa fa-tags'></i>Elixir</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hackathon/"><i class='fa fa-tags'></i>Hackathon</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/"><i class='fa fa-tags'></i>Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HoloLens/"><i class='fa fa-tags'></i>HoloLens</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Infrastructure/"><i class='fa fa-tags'></i>Infrastructure</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/IoT/"><i class='fa fa-tags'></i>IoT</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/"><i class='fa fa-tags'></i>Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/"><i class='fa fa-tags'></i>JavaScript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kibana/"><i class='fa fa-tags'></i>Kibana</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LT/"><i class='fa fa-tags'></i>LT</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MachineLearning/"><i class='fa fa-tags'></i>MachineLearning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Network/"><i class='fa fa-tags'></i>Network</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/"><i class='fa fa-tags'></i>Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redmine/"><i class='fa fa-tags'></i>Redmine</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/"><i class='fa fa-tags'></i>SQL</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Statistics/"><i class='fa fa-tags'></i>Statistics</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Styleguide/"><i class='fa fa-tags'></i>Styleguide</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-UX/"><i class='fa fa-tags'></i>UI/UX</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unity/"><i class='fa fa-tags'></i>Unity</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Urushi/"><i class='fa fa-tags'></i>Urushi</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web-component/"><i class='fa fa-tags'></i>Web component</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/icon/"><i class='fa fa-tags'></i>icon</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/uroboroSQL/"><i class='fa fa-tags'></i>uroboroSQL</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuls/"><i class='fa fa-tags'></i>vuls</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+</div>
+<!-- END BLOG TAGS -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーアーキテクトの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+          <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+
+    <!-- Twitterフォローボタン -->
+    <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+	  <a data-tweet-limit="1" class="twitter-timeline"
+	  href="https://twitter.com/future_techblog"
+	  data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+
+	  <script>!function(d,s,id){var
+	  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+          </div>
+          <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2017 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
