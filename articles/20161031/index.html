@@ -13,16 +13,14 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   
-  <meta name="description" content="1. 初めにDBにおける処理はSQLによって記述しますが、データの取得するために具体的にどのような内部処理を行うかという点までは記述しません。
-ここでいう内部処理とは「SQLの書き換え」「インデックスの使用」「結合アルゴリズムの選択」などがDBMSのオプティマイザによって選択されて実施されることを指します。
-SQLのパフォーマンスを見るにあたっては上記の内部処理について正しく理解する必要がありま">
+  <meta name="description" content="1. 初めにDBにおける処理はSQLによって記述しますが、データの取得するために具体的にどのような内部処理を行うかという点までは記述しません。 ここでいう内部処理とは「SQLの書き換え」「インデックスの使用」「結合アルゴリズムの選択」などがDBMSのオプティマイザによって選択されて実施されることを指します。 SQLのパフォーマンスを見るにあたっては上記の内部処理について正しく理解する必要がありま">
+<meta name="keywords" content="DB,SQL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SQL実行時のブルームフィルタ(Bloom Filter)アルゴリズム">
 <meta property="og:url" content="https://future-architect.github.io/articles/20161031/index.html">
 <meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
-<meta property="og:description" content="1. 初めにDBにおける処理はSQLによって記述しますが、データの取得するために具体的にどのような内部処理を行うかという点までは記述しません。
-ここでいう内部処理とは「SQLの書き換え」「インデックスの使用」「結合アルゴリズムの選択」などがDBMSのオプティマイザによって選択されて実施されることを指します。
-SQLのパフォーマンスを見るにあたっては上記の内部処理について正しく理解する必要がありま">
+<meta property="og:description" content="1. 初めにDBにおける処理はSQLによって記述しますが、データの取得するために具体的にどのような内部処理を行うかという点までは記述しません。 ここでいう内部処理とは「SQLの書き換え」「インデックスの使用」「結合アルゴリズムの選択」などがDBMSのオプティマイザによって選択されて実施されることを指します。 SQLのパフォーマンスを見るにあたっては上記の内部処理について正しく理解する必要がありま">
+<meta property="og:locale" content="ja">
 <meta property="og:image" content="https://future-architect.github.io/images/20161102/photo_20161102_00.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20161102/photo_20161102_01.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20161102/photo_20161102_02.png">
@@ -38,9 +36,7 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 <meta property="og:updated_time" content="2017-05-09T01:57:18.372Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SQL実行時のブルームフィルタ(Bloom Filter)アルゴリズム">
-<meta name="twitter:description" content="1. 初めにDBにおける処理はSQLによって記述しますが、データの取得するために具体的にどのような内部処理を行うかという点までは記述しません。
-ここでいう内部処理とは「SQLの書き換え」「インデックスの使用」「結合アルゴリズムの選択」などがDBMSのオプティマイザによって選択されて実施されることを指します。
-SQLのパフォーマンスを見るにあたっては上記の内部処理について正しく理解する必要がありま">
+<meta name="twitter:description" content="1. 初めにDBにおける処理はSQLによって記述しますが、データの取得するために具体的にどのような内部処理を行うかという点までは記述しません。 ここでいう内部処理とは「SQLの書き換え」「インデックスの使用」「結合アルゴリズムの選択」などがDBMSのオプティマイザによって選択されて実施されることを指します。 SQLのパフォーマンスを見るにあたっては上記の内部処理について正しく理解する必要がありま">
 <meta name="twitter:image" content="https://future-architect.github.io/images/20161102/photo_20161102_00.png">
   
     <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
@@ -197,11 +193,11 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 <p>本Blogでは、重要なアルゴリズムであるにもかかわらず、まとまった情報が少ないSQL実行時におけるブルームフィルタ(Bloom Filter)についてOracleをもとに紹介を行います。</p>
 <p>Bloom Filterは結合処理を効率化するために、結合の前段階で利用される技術になります。</p>
 <p><img src="/images/20161102/photo_20161102_01.png"></p>
-<p>公式なドキュメントとしては以下になります。<br><a href="http://docs.oracle.com/cd/E49329_01/server.121/b71277/tgsql_join.htm#BABEGJHI" target="_blank" rel="external">Oracle Database SQLチューニング・ガイド 12cリリース1(12.1) 結合の最適化 ブルーム・フィルタ</a></p>
+<p>公式なドキュメントとしては以下になります。<br><a href="http://docs.oracle.com/cd/E49329_01/server.121/b71277/tgsql_join.htm#BABEGJHI" target="_blank" rel="noopener">Oracle Database SQLチューニング・ガイド 12cリリース1(12.1) 結合の最適化 ブルーム・フィルタ</a></p>
 <h1 id="2-Bloom-Filterとは"><a href="#2-Bloom-Filterとは" class="headerlink" title="2. Bloom Filterとは"></a><strong>2. Bloom Filterとは</strong></h1><p>Bloom Filterの概要は他サイトを参照してください。</p>
 <ul>
-<li><a href="https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%AB%E3%83%BC%E3%83%A0%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF" target="_blank" rel="external">Wiki ブルームフィルタ</a></li>
-<li><a href="https://blogs.oracle.com/datawarehousing/entry/big_data_sql_quick_start4" target="_blank" rel="external">The Data Warehouse Insider</a></li>
+<li><a href="https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%AB%E3%83%BC%E3%83%A0%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF" target="_blank" rel="noopener">Wiki ブルームフィルタ</a></li>
+<li><a href="https://blogs.oracle.com/datawarehousing/entry/big_data_sql_quick_start4" target="_blank" rel="noopener">The Data Warehouse Insider</a></li>
 </ul>
 <p><br></p>
 <p>ポイントとしては以下になります。</p>
@@ -214,7 +210,7 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 <li>Bloom Filterは非常に小さいサイズとなることから、「インメモリで保持が可能」「別の処理（プロセス）にフィルタを渡すことが可能」というメリットがある</li>
 </ul>
 <h1 id="3-サンプルスキーマ"><a href="#3-サンプルスキーマ" class="headerlink" title="3. サンプルスキーマ"></a><strong>3. サンプルスキーマ</strong></h1><p>今回の説明は、Oracleのサンプルスキーマを用いて説明を行います。<br>説明に必要なカラム以外は省略しています。</p>
-<p><a href="http://docs.oracle.com/cd/E57425_01/121/COMSC/toc.htm" target="_blank" rel="external">Oracle Database Sample Schemas</a></p>
+<p><a href="http://docs.oracle.com/cd/E57425_01/121/COMSC/toc.htm" target="_blank" rel="noopener">Oracle Database Sample Schemas</a></p>
 <p><img src="/images/20161102/photo_20161102_02.png"></p>
 <p>DWHにおけるスタースキーマ構成となっています。</p>
 <ul>
@@ -224,7 +220,7 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 </ul>
 <p>実場面ではSALES表にはBitmap Indexを作成する例も多いのですが、今回は無しの状態で議論を進めます。</p>
 <h1 id="4-SQL実行時のBloom-Filter"><a href="#4-SQL実行時のBloom-Filter" class="headerlink" title="4. SQL実行時のBloom Filter"></a><strong>4. SQL実行時のBloom Filter</strong></h1><p>SQL実行時におけるBloom Filterは「テーブル結合(Join)」で利用されます。</p>
-<p>また、「結合操作はハッシュ結合(Hash-Join)であること」という大前提があります。<br>その理由はハッシュテーブルを作成するタイミングでBloom Filterを同時に作成するからです。（ハッシュ結合については<a href="http://www.atmarkit.co.jp/ait/articles/0408/25/news101.html" target="_blank" rel="external">ここ</a>など参考にどうぞ）</p>
+<p>また、「結合操作はハッシュ結合(Hash-Join)であること」という大前提があります。<br>その理由はハッシュテーブルを作成するタイミングでBloom Filterを同時に作成するからです。（ハッシュ結合については<a href="http://www.atmarkit.co.jp/ait/articles/0408/25/news101.html" target="_blank" rel="noopener">ここ</a>など参考にどうぞ）</p>
 <h2 id="4-1-Bloom-Filterを使わない場合のハッシュ結合"><a href="#4-1-Bloom-Filterを使わない場合のハッシュ結合" class="headerlink" title="4-1. Bloom Filterを使わない場合のハッシュ結合"></a><strong>4-1. Bloom Filterを使わない場合のハッシュ結合</strong></h2><p>サンプルスキーマにおけるハッシュ結合の具体的なフローは以下のようになります。<br><img src="/images/20161102/photo_20161102_03.png"></p>
 <ol>
 <li>ディメンジョン表(TIMES)を全スキャンしてハッシュテーブルを作成</li>
@@ -273,7 +269,7 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 <p><br></p>
 <p><strong>この「普通に使うと効果は限定的」という条件があるため「パーティション表」「パラレルクエリ」においてBloom Filterは利用されます（後述）が、非パラレルクエリでは効果が無いため利用されません。</strong></p>
 <h1 id="5-OracleにおけるBloom-Filterの利用"><a href="#5-OracleにおけるBloom-Filterの利用" class="headerlink" title="5. OracleにおけるBloom Filterの利用"></a><strong>5. OracleにおけるBloom Filterの利用</strong></h1><p>ここまでを踏まえて、Oracleにおいてどのように利用されているか見ていきます。</p>
-<p><a href="http://docs.oracle.com/cd/E49329_01/server.121/b71277/tgsql_join.htm#BABEGJHI" target="_blank" rel="external">Oracle Database SQLチューニング・ガイド 12cリリース1(12.1) 結合の最適化 ブルーム・フィルタ</a>では以下の4つにおいて利用されるとあります。</p>
+<p><a href="http://docs.oracle.com/cd/E49329_01/server.121/b71277/tgsql_join.htm#BABEGJHI" target="_blank" rel="noopener">Oracle Database SQLチューニング・ガイド 12cリリース1(12.1) 結合の最適化 ブルーム・フィルタ</a>では以下の4つにおいて利用されるとあります。</p>
 <ul>
 <li>5-1. パーティションテーブル結合<ul>
 <li>不要なパーティションのアクセスを排除（パーティションプルーニング）するために利用</li>
@@ -305,8 +301,8 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 <li>実行後に <code>dbms_xplan.display_cursor</code> を利用することで記録された内容を確認することができます。</li>
 <li>A-Rowsを見ると、SQL実行中にアクセスした行数が分かります。</li>
 <li>[参考URL]<ul>
-<li><a href="https://jonathanlewis.wordpress.com/2006/11/09/dbms_xplan-in-10g/" target="_blank" rel="external">Oracle Scratchpad: dbms_xplan in 10g</a></li>
-<li><a href="http://kerryosborne.oracle-guy.com/2010/02/gather_plan_statistics/" target="_blank" rel="external">Kerry Osborne’s Oracle Blog: GATHER_PLAN_STATISTICS</a></li>
+<li><a href="https://jonathanlewis.wordpress.com/2006/11/09/dbms_xplan-in-10g/" target="_blank" rel="noopener">Oracle Scratchpad: dbms_xplan in 10g</a></li>
+<li><a href="http://kerryosborne.oracle-guy.com/2010/02/gather_plan_statistics/" target="_blank" rel="noopener">Kerry Osborne’s Oracle Blog: GATHER_PLAN_STATISTICS</a></li>
 </ul>
 </li>
 </ul>
@@ -323,7 +319,7 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 <blockquote>
 <ul>
 <li>パラレルクエリとは、クエリ実行を複数のプロセスで並列化実行する機能です。</li>
-<li>詳細は<a href="http://www.oracle.com/technetwork/jp/database/articles/tsushima/index-1741351-ja.html" target="_blank" rel="external">こちら</a>を参照してください。</li>
+<li>詳細は<a href="http://www.oracle.com/technetwork/jp/database/articles/tsushima/index-1741351-ja.html" target="_blank" rel="noopener">こちら</a>を参照してください。</li>
 </ul>
 </blockquote>
 <p><br></p>
@@ -403,11 +399,11 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 <p><code>storage(SYS_OP_BLOOM_FILTER_LIST(SYS_OP_BLOOM_FILTER(:BF0003,&quot;SALES&quot;.&quot;CUST_ID&quot;),SYS_OP_BLOOM_FILTER(:BF0002,&quot;             SALES&quot;.&quot;PROD_ID&quot;),SYS_OP_BLOOM_FILTER(:BF0001,&quot;SALES&quot;.&quot;TIME_ID&quot;)))</code></p>
 </blockquote>
 <p><br></p>
-<p>さらに、Exadataの持つStorage IndexとBloom FilterデータのMin/Max値を利用してさらにデータを絞り込無ことが可能です。これによりBloom FilterによるデータSCAN処理効果が得られます。<br>Storage Indexは、ストレージサーバにおいて、あるデータの格納単位における列データのmin/maxを保持することで、そのデータ格納単位を読み込む必要があるかを判断することができるExadata特有の機能です。<br><a href="https://docs.oracle.com/cd/E50790_01/doc/doc.121/e50471/concepts.htm#SAGUG21112" target="_blank" rel="external">Oracle Exadata Storage Server Software User’s Guide “Improved Join Performance Using Storage Index”</a></p>
+<p>さらに、Exadataの持つStorage IndexとBloom FilterデータのMin/Max値を利用してさらにデータを絞り込無ことが可能です。これによりBloom FilterによるデータSCAN処理効果が得られます。<br>Storage Indexは、ストレージサーバにおいて、あるデータの格納単位における列データのmin/maxを保持することで、そのデータ格納単位を読み込む必要があるかを判断することができるExadata特有の機能です。<br><a href="https://docs.oracle.com/cd/E50790_01/doc/doc.121/e50471/concepts.htm#SAGUG21112" target="_blank" rel="noopener">Oracle Exadata Storage Server Software User’s Guide “Improved Join Performance Using Storage Index”</a></p>
 <p><img src="/images/20161102/photo_20161102_09.png"></p>
 <p>例では、min=3,max=3という値でStorage Indexを利用してファクト表のSCANサイズを削減しています。min=3, max=100という幅広い値である場合はStorage Indexの効果は得られないため、この効果はデータ内容に依存したものとなります。</p>
 <p><strong>データ内容に依存はするけど、ファクト表のSCANサイズを減らすことができる」ここ重要なポイントです。</strong></p>
-<h2 id="5-4-In-Memory機能におけるBloom-Filter"><a href="#5-4-In-Memory機能におけるBloom-Filter" class="headerlink" title="5-4. In-Memory機能におけるBloom Filter"></a><strong>5-4. In-Memory機能におけるBloom Filter</strong></h2><p>ここまで見ていきましたがBloom Filterはたしかに効果はあるのだけど、画期的というほどでもないのが実情でした。具体的にはマニュアルには記載されていないのですが、In-Memory機能がある場合は事情が変わります。<br>ここでの図は全て<a href="http://www.oracle.com/technetwork/jp/ondemand/od12c-coretech-aug2014-2283256-ja.html#anc_08" target="_blank" rel="external">Oracle Database In-Memory詳細編 検索処理の詳細</a>より引用しています。</p>
+<h2 id="5-4-In-Memory機能におけるBloom-Filter"><a href="#5-4-In-Memory機能におけるBloom-Filter" class="headerlink" title="5-4. In-Memory機能におけるBloom Filter"></a><strong>5-4. In-Memory機能におけるBloom Filter</strong></h2><p>ここまで見ていきましたがBloom Filterはたしかに効果はあるのだけど、画期的というほどでもないのが実情でした。具体的にはマニュアルには記載されていないのですが、In-Memory機能がある場合は事情が変わります。<br>ここでの図は全て<a href="http://www.oracle.com/technetwork/jp/ondemand/od12c-coretech-aug2014-2283256-ja.html#anc_08" target="_blank" rel="noopener">Oracle Database In-Memory詳細編 検索処理の詳細</a>より引用しています。</p>
 <p><img src="/images/20161102/photo_20161102_10.png"></p>
 <p>この絵の例で結果取得までの流れは以下の通りです。（パラレルクエリーでのみ動作します)</p>
 <ol>
@@ -476,7 +472,7 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 <p>12c(12.1)のリリースが行われた際に、SQLチューニングについて新しいドキュメントが追加されました。従来「パフォーマンスチューニングガイド」の一部を独立させて、内容を充実させてドキュメントにしたものです。上級者にとっても新しい発見があると思います。</p>
 <ul>
 <li>Oracle 12c R1のドキュメント &gt; Oracle Database SQLチューニング・ガイド 12cリリース1(12.1)<ul>
-<li><a href="http://docs.oracle.com/cd/E49329_01/server.121/b71277/toc.htm" target="_blank" rel="external">http://docs.oracle.com/cd/E49329_01/server.121/b71277/toc.htm</a></li>
+<li><a href="http://docs.oracle.com/cd/E49329_01/server.121/b71277/toc.htm" target="_blank" rel="noopener">http://docs.oracle.com/cd/E49329_01/server.121/b71277/toc.htm</a></li>
 </ul>
 </li>
 </ul>
@@ -593,11 +589,11 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 	</li>
       
 	<li>
-	  <a href="/categories/IoT/">IoT (5)</a>
+	  <a href="/categories/Event/">Event (6)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Event/">Event (6)</a>
+	  <a href="/categories/IoT/">IoT (6)</a>
 	</li>
       
 	<li>
@@ -605,11 +601,11 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 	</li>
       
 	<li>
-	  <a href="/categories/Security/">Security (1)</a>
+	  <a href="/categories/Development/">Development (1)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Development/">Development (1)</a>
+	  <a href="/categories/Security/">Security (1)</a>
 	</li>
       
 	<li>
@@ -625,11 +621,11 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 	</li>
       
 	<li>
-	  <a href="/categories/DB/">DB (2)</a>
+	  <a href="/categories/Infrastructure/">Infrastructure (2)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (2)</a>
+	  <a href="/categories/DB/">DB (2)</a>
 	</li>
       
 	<li>
@@ -673,6 +669,51 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
   
     
       
+        <a href="https://future-architect.github.io/articles/20170704/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20170704/thumbnail_20170704.jpg" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>インフラ入門vol.2(ネットワーク)</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20171005/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20171006/thumbnail_20171006.jpeg" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>社内ヘルプデスクをＡＩで！</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20171207/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20171207/thumbnail_20171207.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>Future IoT デバイス</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
         <a href="https://future-architect.github.io/articles/20171030/">
           <div class="row margin-bottom-10">
             <div class="col-md-4">
@@ -703,6 +744,21 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
   
     
       
+        <a href="https://future-architect.github.io/articles/20170804/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20170804/thumbnail_20170804.jpg" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>古典的ゲームAIを用いたAlphaGo解説</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
         <a href="https://future-architect.github.io/articles/20170828/">
           <div class="row margin-bottom-10">
             <div class="col-md-4">
@@ -718,61 +774,17 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
   
     
       
-        <a href="https://future-architect.github.io/articles/20171005/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-4">
-              <img src="/images/20171006/thumbnail_20171006.jpeg" class="img-responsive ">
-            </div>
-            <div class="col-md-8">
-              <h3>社内ヘルプデスクをＡＩで！</h3>
-            </div>
-          </div>
-        </a>
+	
+  
+    
       
 	
   
     
       
-        <a href="https://future-architect.github.io/articles/20170704/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-4">
-              <img src="/images/20170704/thumbnail_20170704.jpg" class="img-responsive ">
-            </div>
-            <div class="col-md-8">
-              <h3>インフラ入門vol.2(ネットワーク)</h3>
-            </div>
-          </div>
-        </a>
-      
 	
   
     
-      
-        <a href="https://future-architect.github.io/articles/20170605/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-4">
-              <img src="/images/20170530/thumbnail_20170530.png" class="img-responsive ">
-            </div>
-            <div class="col-md-8">
-              <h3>ES2015 Web componentsと国産Web componentsフレームワークUrushi</h3>
-            </div>
-          </div>
-        </a>
-      
-	
-  
-    
-      
-        <a href="https://future-architect.github.io/articles/20170526/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-4">
-              <img src="/images/20170523/thumbnail_20170523.jpg" class="img-responsive ">
-            </div>
-            <div class="col-md-8">
-              <h3>AIを使って顔画像から「常連さん」を判定しよう！</h3>
-            </div>
-          </div>
-        </a>
       
 	
   
@@ -803,18 +815,10 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
     
   
     
-      
-	
   
     
       
 	
-  
-    
-      
-	
-  
-    
   
     
   
@@ -833,8 +837,6 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 	
   
     
-      
-	
   
     
       
@@ -843,14 +845,6 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
     
       
 	
-  
-    
-      
-	
-  
-    
-  
-    
   
     
       
@@ -871,6 +865,12 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
 	
   
     
+  
+    
+  
+    
+      
+	
   
     
   
@@ -904,7 +904,7 @@ SQLのパフォーマンスを見るにあたっては上記の内部処理に�
   <div class="widget-wrap">
     <div class="widget">
       
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/3D-Printer/"><i class='fa fa-tags'></i>3D-Printer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AWS/"><i class='fa fa-tags'></i>AWS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CoSpaces/"><i class='fa fa-tags'></i>CoSpaces</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference/"><i class='fa fa-tags'></i>Conference</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DB/"><i class='fa fa-tags'></i>DB</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DeepLearning/"><i class='fa fa-tags'></i>DeepLearning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DesignThinking/"><i class='fa fa-tags'></i>DesignThinking</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Elastic-Stack/"><i class='fa fa-tags'></i>Elastic-Stack</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Elixir/"><i class='fa fa-tags'></i>Elixir</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hackathon/"><i class='fa fa-tags'></i>Hackathon</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/"><i class='fa fa-tags'></i>Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HoloLens/"><i class='fa fa-tags'></i>HoloLens</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Infrastructure/"><i class='fa fa-tags'></i>Infrastructure</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/IoT/"><i class='fa fa-tags'></i>IoT</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/"><i class='fa fa-tags'></i>Java</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/"><i class='fa fa-tags'></i>JavaScript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kibana/"><i class='fa fa-tags'></i>Kibana</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LT/"><i class='fa fa-tags'></i>LT</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MachineLearning/"><i class='fa fa-tags'></i>MachineLearning</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NLP/"><i class='fa fa-tags'></i>NLP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Network/"><i class='fa fa-tags'></i>Network</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/"><i class='fa fa-tags'></i>Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redmine/"><i class='fa fa-tags'></i>Redmine</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/"><i class='fa fa-tags'></i>SQL</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Statistics/"><i class='fa fa-tags'></i>Statistics</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Styleguide/"><i class='fa fa-tags'></i>Styleguide</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-UX/"><i class='fa fa-tags'></i>UI/UX</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unity/"><i class='fa fa-tags'></i>Unity</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Urushi/"><i class='fa fa-tags'></i>Urushi</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web-component/"><i class='fa fa-tags'></i>Web component</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/icon/"><i class='fa fa-tags'></i>icon</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/uroboroSQL/"><i class='fa fa-tags'></i>uroboroSQL</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuls/"><i class='fa fa-tags'></i>vuls</a><span class="tag-list-count">2</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/3D-Printer/"><i class='fa fa-tags'></i>3D-Printer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AWS/"><i class='fa fa-tags'></i>AWS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CoSpaces/"><i class='fa fa-tags'></i>CoSpaces</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference/"><i class='fa fa-tags'></i>Conference</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DB/"><i class='fa fa-tags'></i>DB</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DeepLearning/"><i class='fa fa-tags'></i>DeepLearning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DesignThinking/"><i class='fa fa-tags'></i>DesignThinking</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Elastic-Stack/"><i class='fa fa-tags'></i>Elastic-Stack</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Elixir/"><i class='fa fa-tags'></i>Elixir</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hackathon/"><i class='fa fa-tags'></i>Hackathon</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/"><i class='fa fa-tags'></i>Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HoloLens/"><i class='fa fa-tags'></i>HoloLens</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Infrastructure/"><i class='fa fa-tags'></i>Infrastructure</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/IoT/"><i class='fa fa-tags'></i>IoT</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/"><i class='fa fa-tags'></i>Java</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/"><i class='fa fa-tags'></i>JavaScript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kibana/"><i class='fa fa-tags'></i>Kibana</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LT/"><i class='fa fa-tags'></i>LT</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MachineLearning/"><i class='fa fa-tags'></i>MachineLearning</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NLP/"><i class='fa fa-tags'></i>NLP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Network/"><i class='fa fa-tags'></i>Network</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/"><i class='fa fa-tags'></i>Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redmine/"><i class='fa fa-tags'></i>Redmine</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/"><i class='fa fa-tags'></i>SQL</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Statistics/"><i class='fa fa-tags'></i>Statistics</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Styleguide/"><i class='fa fa-tags'></i>Styleguide</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-UX/"><i class='fa fa-tags'></i>UI/UX</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unity/"><i class='fa fa-tags'></i>Unity</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Urushi/"><i class='fa fa-tags'></i>Urushi</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web-component/"><i class='fa fa-tags'></i>Web component</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/icon/"><i class='fa fa-tags'></i>icon</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/uroboroSQL/"><i class='fa fa-tags'></i>uroboroSQL</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuls/"><i class='fa fa-tags'></i>vuls</a><span class="tag-list-count">2</span></li></ul>
     </div>
   </div>
 
