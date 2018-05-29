@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>データベースマイグレーション ～OracleからPostgreSQLへ～　ー第１回ー | Future Tech Blog - フューチャーアーキテクト</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="1. 初めにこんにちは。Technology Innovation Groupの岸田です。 データベースシステムに対しては、高い信頼性・可用性・安定性が求められることから、データベースとしては、Oracle Database（以降はOracleと記載）やMicrosoft SQL Serverなどの商用製品が採用されてきました。 十数年前より、商用データベースの高いコストに不満を持つ企業において、">
+<meta name="keywords" content="Migration,PostgresSQL,Oracle">
+<meta property="og:type" content="article">
+<meta property="og:title" content="データベースマイグレーション ～OracleからPostgreSQLへ～　ー第１回ー">
+<meta property="og:url" content="https://future-architect.github.io/articles/20180529/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="1. 初めにこんにちは。Technology Innovation Groupの岸田です。 データベースシステムに対しては、高い信頼性・可用性・安定性が求められることから、データベースとしては、Oracle Database（以降はOracleと記載）やMicrosoft SQL Serverなどの商用製品が採用されてきました。 十数年前より、商用データベースの高いコストに不満を持つ企業において、">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/migration_phase.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/demo.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/outerjoin_result_SQL.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/outerjoin_result_SQL.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/outerjoin_result_postgres.PNG">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/decode_oracle.PNG">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/decode_postgres.PNG">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/merge_empup.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/merge_result.PNG">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/upsert_result.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/insert_CTE_result.png">
+<meta property="og:updated_time" content="2018-05-29T02:35:54.398Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="データベースマイグレーション ～OracleからPostgreSQLへ～　ー第１回ー">
+<meta name="twitter:description" content="1. 初めにこんにちは。Technology Innovation Groupの岸田です。 データベースシステムに対しては、高い信頼性・可用性・安定性が求められることから、データベースとしては、Oracle Database（以降はOracleと記載）やMicrosoft SQL Serverなどの商用製品が採用されてきました。 十数年前より、商用データベースの高いコストに不満を持つ企業において、">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20180529/migration_phase.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="データベースマイグレーション ～OracleからPostgreSQLへ～　ー第１回ー | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="データベースマイグレーション ～OracleからPostgreSQLへ～　ー第１回ー,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="/events/"><i class="fa fa-flag-o"></i>Event</a>
+					</li>
+					
+					<li class="">
+						<a href="/slides/"><i class="fa fa-slideshare"></i>Slide</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<li class="">
+						<a href="https://www.facebook.com/future.saiyo/"><i class="fa fa-facebook-square"></i>Facebook</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Tech Blog</div>
+        <div class="header-title-sub">フューチャーアーキテクト開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20180529/">データベースマイグレーション ～OracleからPostgreSQLへ～　ー第１回ー</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20180529-dbmigration1" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> 岸田聡</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2018-05-29T02:06:05.000Z" itemprop="datePublished">2018/05/29</time>
+
+	</li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+	  
+  
+    <a href="/tags/Migration/" title="Migration">Migration</a>,
+  
+    <a href="/tags/PostgresSQL/" title="PostgresSQL">PostgresSQL</a>,
+  
+    <a href="/tags/Oracle/" title="Oracle">Oracle</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    Categories:
+    <a class="article-category-link" href="/categories/DB/">DB</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="1-初めに"><a href="#1-初めに" class="headerlink" title="1. 初めに"></a>1. 初めに</h2><p>こんにちは。Technology Innovation Groupの岸田です。</p>
+<p>データベースシステムに対しては、高い信頼性・可用性・安定性が求められることから、データベースとしては、Oracle Database（以降はOracleと記載）やMicrosoft SQL Serverなどの商用製品が採用されてきました。</p>
+<p>十数年前より、商用データベースの高いコストに不満を持つ企業において、OSSデータベースに注目が集まってきており、近年では基幹システムにおいてもOSSデータベースが採用されるケースも多くなっています。<br>このような背景から技術者としてもOSSデータベースのスキルは非常に求められている状況かと思います。</p>
+<p>元々高額なライセンス料に加え、仮想基盤における課金体系の問題や2016年のOracle Database Standard Edition Oneの廃止などにより、基盤更改などを契機にOSS検討事例が増えてきました。<br>また、クラウド基盤を選択肢に入れた場合にも、柔軟にスケールアップが可能なOSSを採用したいという要望もあります。</p>
+<p>OSSデータベースで広く採用されているのはPostgreSQLとMySQLがあります。今回は、エンタープライズ領域においてマイグレーション例が多いOracleからPostgreSQLについて、考慮すべき事項について2回にわたり紹介していきます。</p>
+<h2 id="2-マイグレーションの流れ"><a href="#2-マイグレーションの流れ" class="headerlink" title="2. マイグレーションの流れ"></a>2. マイグレーションの流れ</h2><h3 id="データベースの選定（アセスメント）"><a href="#データベースの選定（アセスメント）" class="headerlink" title="データベースの選定（アセスメント）"></a>データベースの選定（アセスメント）</h3><p>単にコスト面に問題を抱えているからといって、安易にOSSデータベースへのマイグレーションを決断することは危険です。そのシステムにおいて提供しているサービスに関して、マイグレーションによって機能要件及び非機能要件を満たせなくなっては元も子もありません。</p>
+<p>マイグレーションの検討については、OracleとPostgreSQLの技術的な検討だけでなく、コスト算定（コストメリット）、移行期間やテストなどで多方面での検討が必要となります。この検討については、以下のようにQCDの視点で検討を行う必要があります。</p>
+<h4 id="Quality（品質）"><a href="#Quality（品質）" class="headerlink" title="Quality（品質）"></a>Quality（品質）</h4><p>「アプリケーション機能面」「システム非機能面」の両面について実現性を検討し、ノックアウト項目が存在しないかを評価します。システムによっては現行システムとのデータ連携や災害対策目的で別サイトへのレプリケーションを実現する必要が出てきます。この時点で抜け漏れが発生してしまわないように、現行の運用面を含めた細かい評価が必要となります。</p>
+<h4 id="Cost（コスト）"><a href="#Cost（コスト）" class="headerlink" title="Cost（コスト）"></a>Cost（コスト）</h4><p>マイグレーションに関連するコスト評価をおこないます。以下の2点が考えられます。</p>
+<ol>
+<li>マイグレーションに関連する費用：「アプリケーションソース移行」「データベースミドルウェア自体の移行」「データ移行」  </li>
+<li>新基盤での費用：「ソフトウェアライセンス、基盤費用」</li>
+</ol>
+<h4 id="Delivery（納期）"><a href="#Delivery（納期）" class="headerlink" title="Delivery（納期）"></a>Delivery（納期）</h4><p>マイグレーション実現にむけたスケジュールの評価を行います。基盤更改期限がある場合についはその期間内に実現可能かという評価が必要になります。</p>
+<p>これらの検討結果を基にデータベースマイグレーションの判断を行います。</p>
+<h3 id="マイグレーション決定後の作業イメージ"><a href="#マイグレーション決定後の作業イメージ" class="headerlink" title="マイグレーション決定後の作業イメージ"></a>マイグレーション決定後の作業イメージ</h3><p>データベースのマイグレーションが決定した後は、一例として以下のように進めていきます。</p>
+<p><img src="/images/20180529/migration_phase.png"></p>
+<p>赤字となっている作業については、実装されているアプリケーションにより作業量が大きく変動するものとなります。<br>データベースのマイグレーションの成功は、現状アプリケーションの正確な把握に直結すると考えておりますので、現状把握については専門技術者を交えてしっかりと実施することをお奨め致します。</p>
+<h2 id="3-マイグレーションのポイント"><a href="#3-マイグレーションのポイント" class="headerlink" title="3. マイグレーションのポイント"></a>3. マイグレーションのポイント</h2><p>前章にてマイグレーションの流れを説明しましたが、この章では実際にマイグレーションを実施するにあたりポイントとなる点を記載していきます。ポイントとしては以下の3点となります。</p>
+<ol>
+<li><strong>スキーマ移行</strong><ul>
+<li>データベースの内部環境（オブジェクト等）の移行</li>
+<li>2章のDB設計・データベース移行（定義移行）にあたる</li>
+</ul>
+</li>
+<li><strong>アプリケーション移行</strong><ul>
+<li>アプリケーションプログラムの移行。主にSQL改修となる</li>
+</ul>
+</li>
+<li><strong>データ移行</strong><ul>
+<li>データベースに格納されているデータの移行</li>
+</ul>
+</li>
+</ol>
+<p>上記それぞれについてみていきます。（今回はデータ移行は紹介まで）</p>
+<h3 id="3-1-スキーマ移行（データベースオブジェクト）"><a href="#3-1-スキーマ移行（データベースオブジェクト）" class="headerlink" title="3-1. スキーマ移行（データベースオブジェクト）"></a>3-1. スキーマ移行（データベースオブジェクト）</h3><p>2章で記載しましたDB設計フェーズにて方針を設計し、データベース移行フェーズにて実装致します。</p>
+<p>Oracleに存在する主なオブジェクトについてPostgreSQLの存在有無は以下の通りです。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Oracle</th>
+<th style="text-align:left">PostgreSQL</th>
+<th style="text-align:left">備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">テーブル</td>
+<td style="text-align:left">〇</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">インデックス</td>
+<td style="text-align:left">△</td>
+<td style="text-align:left">B-Treeインデックスとパーティションインデックスが存在。逆キーインデックス、ビットマップインデックス等は存在しない。</td>
+</tr>
+<tr>
+<td style="text-align:left">ビュー</td>
+<td style="text-align:left">〇</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">マテリアライズド・ビュー</td>
+<td style="text-align:left">〇</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">シノニム</td>
+<td style="text-align:left">×</td>
+<td style="text-align:left">一部ビューで代替可能。</td>
+</tr>
+<tr>
+<td style="text-align:left">シーケンス</td>
+<td style="text-align:left">〇</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">トリガー</td>
+<td style="text-align:left">〇</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">データベースリンク</td>
+<td style="text-align:left">×</td>
+<td style="text-align:left">dblink関数または、FDW(Foreign Data Wrapper) で代替可能。</td>
+</tr>
+<tr>
+<td style="text-align:left">パッケージ</td>
+<td style="text-align:left">×</td>
+<td style="text-align:left">3-2で記載。</td>
+</tr>
+<tr>
+<td style="text-align:left">プロシージャ</td>
+<td style="text-align:left">×</td>
+<td style="text-align:left">3-2で記載。</td>
+</tr>
+<tr>
+<td style="text-align:left">ファンクション</td>
+<td style="text-align:left">〇</td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<p>〇：存在　△：一部存在　×：無し</p>
+<p>インデックスについては一部の種類のインデックスは存在しませんが、インデックス自体は性能要件を満たすために作成されていますので、インデックスの存在自体がマイグレーションに影響を及ぼすことはありません。ただし、マイグレーション後の性能要件を満たすために別の方法を検討する可能性があります。</p>
+<p>その他につきましては、代替機能を含めてPostgreSQLにて実装ができると考えております。</p>
+<p>ストアド・パッケージ／プロシージャ／ファンクションについては3-2.アプリケーション移行で記載致します。</p>
+<h4 id="データ型の変換"><a href="#データ型の変換" class="headerlink" title="データ型の変換"></a>データ型の変換</h4><p>テーブルのコンバージョンの際には、データ型を意識する必要があります。OracleとPostgreSQLのデータ型の対応表は以下の通りです。数値型にはいくつかのデータ型が存在しますので、システムとしてルールを定めることをお奨め致します。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">属性</th>
+<th style="text-align:left">Oracleのデータ型</th>
+<th style="text-align:left">PostgreSQLのデータ型</th>
+<th style="text-align:left">備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">文字列</td>
+<td style="text-align:left">CHAR/NCHAR/VARCHAR2/NVARCHAR2</td>
+<td style="text-align:left">char/varchar</td>
+<td style="text-align:left">PostgreSQLの文字型の精度は文字数を意味する</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">CLOB/LONG</td>
+<td style="text-align:left">text</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">数値</td>
+<td style="text-align:left">NUMBER</td>
+<td style="text-align:left">smallint/bigint/integer/decimal/real/double precision</td>
+<td style="text-align:left">精度によってデータ型を選択</td>
+</tr>
+<tr>
+<td style="text-align:left">日付</td>
+<td style="text-align:left">DATE/TIMESTAMP</td>
+<td style="text-align:left">timestamp</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">バイナリ</td>
+<td style="text-align:left">BLOB/RAW</td>
+<td style="text-align:left">bytea</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">その他</td>
+<td style="text-align:left">ROWID</td>
+<td style="text-align:left">oid</td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-2-アプリケーション（SQL）移行"><a href="#3-2-アプリケーション（SQL）移行" class="headerlink" title="3-2.アプリケーション（SQL）移行"></a>3-2.アプリケーション（SQL）移行</h3><p>アプリケーションの移行については、同じ製品のバージョンアップをする場合であっても一通りアプリケーションの動作確認（結果の現新一致確認）は実施することが多いと思います。</p>
+<p>データベースのマイグレーションの場合は、このアプリケーションの動作確認において結果の不一致による原因究明やアプリケーションの見直しが発生する可能性が高くなることが考えられるため、当初よりアプリケーションの移行作業の作業量を多めに見積もることが大事だと思います。3章で説明したツールなどを利用して自動的なコンバージョンでアプリケーションの改修にかかる時間は削減できますが、アプリケーションの動作確認は必ず実施してください。</p>
+<p>アプリケーションの動作確認と同様に重要なのは、性能テストとなります。データベースのマイグレーションでは、データベースの機能の差異がありますので、SQLの処理性能は事前の机上予測が難しいといえます。この性能テストについてもデータベースのバージョンアップ時のテスト作業量よりも多めに見積もっておくことをお奨め致します。</p>
+<p>Oracleにて実装されているSQLについて、Oracle独自の記法であったとしてもPostgreSQLにて実装は可能であると考えておりますので、アプリケーション改修によりマイグレーションがNGとなることは無いと思います。</p>
+<p>ただし、アプリケーションに依存して、改修作業や改修後の確認テストの作業量が変動していきますので注意が必要です。</p>
+<p>アプリケーション移行についての考え方及び対策の一部を以下に紹介していきます。</p>
+<h4 id="ストアド・サブプログラム変換"><a href="#ストアド・サブプログラム変換" class="headerlink" title="ストアド・サブプログラム変換"></a>ストアド・サブプログラム変換</h4><p>ストアド・サブプログラムは、Oracleでのストアド・パッケージ、ストアド・プロシージャ、ストアド・ファンクションの総称です。<br>PostgreSQLにはパッケージ及びプロシージャが存在しません。<br>Oracleのストアド・パッケージ及びストアド・プロシージャはPostgreSQLのファンクションで実装することになります。<br>プロシージャ、ファンクションの集合体であるパッケージはスキーマで代用します。<br>まとめると以下のようになります。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Oracle</th>
+<th style="text-align:left">PostgreSQL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">パッケージ</td>
+<td style="text-align:left">スキーマ</td>
+</tr>
+<tr>
+<td style="text-align:left">プロシージャ</td>
+<td style="text-align:left">ファンクション</td>
+</tr>
+<tr>
+<td style="text-align:left">ファンクション</td>
+<td style="text-align:left">ファンクション</td>
+</tr>
+</tbody>
+</table>
+<p>PostgreSQLのファンクションでOracleと大きく異なる部分は、トランザクションの制御となります。PostgreSQLのファンクションは、呼び出し元のトランザクションに依存するため、ファンクション内でCOMMITの発行はできません。つまり、ファンクション内でエラーが発生した場合は、ファンクション内の処理はすべてロールバックします。</p>
+<p>参考までに、Oracleでは、<code>PRAGMA AUTONOMOUS_TRANSACTION</code>を利用して呼び出し元とトランザクションを分離することができます。Oracleのストアド・サブプログラム内でトランザクションを分離している場合は、PostgreSQLではロジックを見直す必要があります。</p>
+<h4 id="外部結合"><a href="#外部結合" class="headerlink" title="外部結合"></a>外部結合</h4><p>Oracle独自の記法としては外部結合が挙げられます。外部結合はSQLにおいて結合条件で対応するレコードが存在しない場合でも優先となるテーブルについてはレコードが除外されない結合方法です。</p>
+<p>Oracle 9i以降はSQL標準である<code>[LEFT | RIGHT] OUTER JOIN</code>の記述がサポートされるようになり、オラクル社としても同バージョンからOUTER JOINによる記法を<a href="https://docs.oracle.com/cd/E82638_01/SQLRF/Joins.htm#GUID-29A4584C-0741-4E6A-A89B-DCFAA222994A" target="_blank" rel="noopener">マニュアル上でも推奨しています</a>。</p>
+<p>とはいえ、Oracleで動かすSQLの外部結合は(+)表記をよく目にします。<br>主な理由としては以下じゃないかなと思ってます。</p>
+<ul>
+<li>Oracle 8i 以前に作成したSQLが今でも使われている。（バージョンアップを繰り返していて改修していない。）</li>
+<li>以前プロジェクトとして作成していたシステムのSQLコーディング基準書では(+)表記で記載することが基準となっており、現状でも(+)表記自体は利用可能であるため、基準書自体を修正することができていない。また、成功したプロジェクトの基準書を横展開している。</li>
+<li>プログラムの改修や新機能導入においても、現行で動作しているSQLを踏襲して作成する。</li>
+</ul>
+<p>PostgreSQLにおいて外部結合は当然SQL標準であるOUTER JOINの記載となりますので、データベースマイグレーションの際にはSQLのコンバージョンが必要です。</p>
+<p>(+)表記での外部結合をコンバージョンするときに気を付けなければならないのは、リテラル値に対する外部結合の条件がある場合です。</p>
+<p>言葉だけでは分かりづらいと思いますので、Oracleで用意されているサンプルスキーマ（SCOTTユーザ）で見ていきます。テーブルはEMP表とDEPT表を使います。デフォルトの状態から少しだけ値を変えているところはあります。</p>
+<p><img src="/images/20180529/demo.png"></p>
+<p>2種類の外部結合表記のSQL文を用意しました。</p>
+<p>①リテラル条件にも「(+)」を付与したパターン</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> d.deptno, d.dname, e.empno, e.ename, e.comm</div><div class="line"><span class="keyword">FROM</span> emp e, dept d</div><div class="line"><span class="keyword">WHERE</span> e.deptno(+) = d.deptno</div><div class="line"><span class="keyword">AND</span> e.comm(+) = <span class="number">300</span>;</div></pre></td></tr></table></figure>
+<p>②リテラル条件には「(+)」を付与しないパターン<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> d.deptno, d.dname, e.empno, e.ename, e.comm</div><div class="line"><span class="keyword">FROM</span> emp e, dept d</div><div class="line"><span class="keyword">WHERE</span> e.deptno(+) = d.deptno</div><div class="line"><span class="keyword">AND</span> e.comm = <span class="number">300</span>;</div></pre></td></tr></table></figure></p>
+<p>検索結果は以下の通りです。</p>
+<p><img src="/images/20180529/outerjoin_result_SQL.png"></p>
+<p>①の場合は結合前にリテラル条件で絞っている、②の場合は結合後にリテラル条件で絞っている、ということです。</p>
+<p>これをSQL標準であるOUTER JOINで記載すると以下のようになります。OUTER JOINの条件となるか全体の条件となるかの違いがSQL標準の方が分かりやすいですね。</p>
+<p>①<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> d.deptno, d.dname, e.empno, e.ename, e.comm</div><div class="line"><span class="keyword">FROM</span> scott.emp e</div><div class="line">    <span class="keyword">RIGHT</span> <span class="keyword">OUTER</span> <span class="keyword">JOIN</span> scott.dept d</div><div class="line">        <span class="keyword">ON</span> (e.deptno = d.deptno <span class="keyword">AND</span> e.comm = <span class="number">300</span>);</div></pre></td></tr></table></figure></p>
+<p>②<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> d.deptno, d.dname, e.empno, e.ename, e.comm</div><div class="line"><span class="keyword">FROM</span> scott.emp e</div><div class="line">    <span class="keyword">RIGHT</span> <span class="keyword">OUTER</span> <span class="keyword">JOIN</span> scott.dept d</div><div class="line">        <span class="keyword">ON</span> (e.deptno = d.deptno)</div><div class="line"><span class="keyword">WHERE</span> e.comm = <span class="number">300</span>;</div></pre></td></tr></table></figure></p>
+<p>念のため結果も。</p>
+<p><img src="/images/20180529/outerjoin_result_SQL.png"></p>
+<p>PostgreSQLでも。</p>
+<p><img src="/images/20180529/outerjoin_result_postgres.PNG"></p>
+<p>同じですね。</p>
+<p>将来のことを考えて、外部結合はSQL標準のOUTER JOINで記述していくことにしましょう。</p>
+<h4 id="組み込み関数"><a href="#組み込み関数" class="headerlink" title="組み込み関数"></a>組み込み関数</h4><p>組み込み関数はデータベース毎に事前に用意されている関数です。データベース毎に仕様が異なることもありますので、移行の際には注意が必要です。OracleとPostgreSQLの組み込み関数の対比表については<a href="https://www.pgecons.org/wp-content/uploads/PGECons/2012/WG2/10_Built-inFunctionMigrationResearch/10_Appendix_01_Built-inFunctionComparativeTable(Oracle-PostgreSQL).pdf" target="_blank" rel="noopener">こちら</a>に詳しく載っておりますので、参考にしてください。</p>
+<p>OracleとPostgreSQLの両方で用意されていますが、機能仕様が全く異なる関数としては<code>DECODE</code>があります。<br>OracleではDECODE関数は条件分岐として使われています。構文としては以下です。</p>
+<p><img src="/images/20180529/decode_oracle.PNG" class="img-middle-size"></p>
+<p>PostgreSQLでは、DECODE関数はテキスト表現からバイナリデータを復号する関数となっております。構文としては以下です。（formatオプションはbase64/hex/escapeから選択。）</p>
+<p><img src="/images/20180529/decode_postgres.PNG" class="img-small-size"></p>
+<p>OracleでのDECODE関数はPostgreSQLではcase文に変換します。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> empno, ename, deptno,</div><div class="line"><span class="keyword">DECODE</span>( deptno, <span class="number">10</span>, <span class="string">'ACCOUNTING'</span>,</div><div class="line">                <span class="number">20</span>, <span class="string">'RESEARCH'</span>,</div><div class="line">                <span class="number">30</span>, <span class="string">'SALES'</span>,</div><div class="line">                <span class="number">40</span>, <span class="string">'OPERATIONS'</span> ) <span class="keyword">as</span> dname</div><div class="line"><span class="keyword">FROM</span> emp;</div></pre></td></tr></table></figure>
+<p>変換後は以下となります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> empno, ename, deptno,</div><div class="line"><span class="keyword">CASE</span> deptno <span class="keyword">WHEN</span> <span class="number">10</span> <span class="keyword">THEN</span> <span class="string">'ACCOUNTING'</span></div><div class="line">            <span class="keyword">WHEN</span> <span class="number">20</span> <span class="keyword">THEN</span> <span class="string">'RESEARCH'</span></div><div class="line">            <span class="keyword">WHEN</span> <span class="number">30</span> <span class="keyword">THEN</span> <span class="string">'SALES'</span></div><div class="line">            <span class="keyword">WHEN</span> <span class="number">40</span> <span class="keyword">THEN</span> <span class="string">'OPERATIONS'</span> <span class="keyword">END</span> <span class="keyword">as</span> dname</div><div class="line"><span class="keyword">FROM</span> emp;</div></pre></td></tr></table></figure>
+<p>DECODEについては以上です。</p>
+<p>一部のOracle独自の組み込み関数は、orafceモジュールをインストールすることで、いくつかOracleと同じ関数が実装されます。orafceで実装される関数については<a href="http://orafce.github.io/orafce/index-ja.html" target="_blank" rel="noopener">こちら</a>を参考にしてください。また、AWSのRDSでも事前にOracleからの移行用にモジュール（スキーマ：aws_oracle_ext）が準備されています。</p>
+<h4 id="行レベルロック"><a href="#行レベルロック" class="headerlink" title="行レベルロック"></a>行レベルロック</h4><p>一般的に業務ロジック上では競合による不整合を回避するため、<code>SELECT ～ FOR UPDATE</code>により行レベルでロックを取得し、トランザクション中のレコードが他から更新・削除されることを防ぎます。</p>
+<p>Oracleにおいては、<code>FOR UPDATE</code>句として<code>[WAIT n|NOWAIT]</code>の記述ができます。どちらも指定しない場合は、行が使用可能になるまで待機した後でSELECT文の結果が戻されます。（そんな記載はできませんが、<code>WAIT ∞</code>の指定のような挙動です。）</p>
+<p>PostgreSQLでは、<code>WAIT n</code>が存在しないため、WAITと記載するとOracleにおける<code>WAIT</code>句を未指定とした場合と同様の挙動となります。つまり、Oracleにおいて<code>WAIT n</code>が指定されていた場合は、PostgreSQLではSQLにて実装することができません。</p>
+<p>代替となるかは実行形式によりますが、<code>lock_timeout</code>のパラメータを指定することでOracleと同じ挙動となる可能性はあります。このパラメータを設定して<code>SELECT ～ FOR UPDATE</code>を発行しすると、該当レコードがロック状態であった場合は設定したパラメータの時間経過するとエラーとなります。<code>lock_timeout</code>はセッションレベルでの変更も可能ですので、トランザクション開始時にパラメータを設定をしてSQLを実行、トランザクション終了時にパラメータをリセットするという処理仕様とすることもできます。</p>
+<h4 id="ヒント句"><a href="#ヒント句" class="headerlink" title="ヒント句"></a>ヒント句</h4><p>OracleにおいてSQLの性能問題は実行計画が原因であることが多いのではないでしょうか。確かに、Oracleにおける性能劣化対策としての「ヒント句を記載して実行計画を固定化する」は、統計情報に依存せずにSQLの性能を安定させる最適な解決策なのかもしれません。（バージョンアップの時にヒントが無くなったり、オプティマイザの機能向上により性能の良い実行計画が選ばれないというデメリット(?)もあります。）また、システムのSQLコーディング基準でヒント句を記載するといったルールがある場合もあるでしょう。</p>
+<p>PostgreSQLではバージョン9.1以降<code>pg_hint_plan</code>モジュールをインストールすることでヒント句の記載はできますが、Oracleほど数多くの種類のヒントがあるわけではありません。（参考までにヒント句の種類としては、pg_hint_plan 1.1で23個、Oracle 12cR1で332個あります。）</p>
+<p>データベースによりオプティマイザが全く異なりますので、データベースをマイグレーションすると実行計画が変化するのは致し方無いと考えております。そこで、ヒント句の記載のあるSQLについては、コンバージョン時には一旦ヒント句を削除して性能を見ることになります。処理性能が思わしくない場合は個別にチューニングの対応を施すことになります。</p>
+<h4 id="NULLと空文字"><a href="#NULLと空文字" class="headerlink" title="NULLと空文字"></a>NULLと空文字</h4><p>OracleではNULLと空文字は同義で、空文字はNULLとして扱われます。PostgreSQLではNULLと空文字は別物です。従いまして、Oracle上で動作するSQL内で条件句として<code>WHERE COL is NULL</code>といった記載がある場合は、マイグレーションにより結果が異なってくる可能性があるので注意が必要です。</p>
+<p>PostgreSQLでは、NULLの使用を禁止するといった基準を作った方が良いと思います。その場合は、データの移行時にNULLはすべて空文字に変換することは忘れずに！</p>
+<p>NULLの四則演算やNULLと文字列の連結については、すべてNULLとなってしまうため、NULLが格納される可能性がある列を取り扱う場合は、必ず<code>COALESCE</code>関数を使って処理してください。（OracleでいうところのNVL関数ですね。）</p>
+<h4 id="MERGE文"><a href="#MERGE文" class="headerlink" title="MERGE文"></a>MERGE文</h4><p>OracleではMERGE文が利用できますが、PosrgreSQLではMERGE文は存在しません。<br>PosrgreSQL 9.5からUPSERT文（INSERT ON CONFLICT）が使用可能となります。</p>
+<p>こちらもサンプルスキーマ環境で見てみましょう。<br>empと同じ定義のemp_up表を作成してます。</p>
+<p><img src="/images/20180529/merge_empup.png"></p>
+<p>emp_up表のレコードを見てemp表にレコードが存在した場合はUPDATEをして、emp表にレコードが無ければINSERTをするというMERGE文を作ってみました。（今回はSAL列とCOMM列だけをUPDATEしてます。）</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">MERGE</span> <span class="keyword">INTO</span> emp e</div><div class="line"><span class="keyword">USING</span> emp_up u <span class="keyword">ON</span> (e.empno = u.empno)</div><div class="line">  <span class="keyword">WHEN</span> <span class="keyword">MATCHED</span> <span class="keyword">THEN</span></div><div class="line">    <span class="keyword">UPDATE</span> <span class="keyword">SET</span> e.sal = u.sal, e.comm = u.comm</div><div class="line">  <span class="keyword">WHEN</span> <span class="keyword">NOT</span> <span class="keyword">MATCHED</span> <span class="keyword">THEN</span></div><div class="line">    <span class="keyword">INSERT</span> <span class="keyword">VALUES</span> ( u.empno, u.ename, u.job, u.mgr, u.hiredate, u.sal, u.comm, u.deptno );</div></pre></td></tr></table></figure>
+<p>実行結果です。</p>
+<p><img src="/images/20180529/merge_result.PNG"></p>
+<p>empno:7369のsal列が変更され、empno:8000のレコードが作成されていますね。</p>
+<p>これをPostgreSQLで実装すると以下のようになります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> scott.emp</div><div class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> scott.emp_up</div><div class="line"><span class="keyword">ON</span> CONFLICT (empno)</div><div class="line"><span class="keyword">DO</span> <span class="keyword">UPDATE</span> <span class="keyword">SET</span> sal = excluded.sal, comm = excluded.comm ;</div></pre></td></tr></table></figure>
+<p>実行結果です。</p>
+<p><img src="/images/20180529/upsert_result.png"></p>
+<p>同じ結果となりました。</p>
+<p>このUPSERT文ですが、PostgreSQL 9におけるパーティションテーブルに対しては機能しません。理由としては、PostgreSQLのパーティションテーブルは親となるテーブルとパーティション単位の個別テーブルを作成して、親テーブルへのDML発行時にはトリガーにより該当のパーティションテーブルを更新しており、親表に対して<code>INSERT ON CONFLICT</code>を発行したとしてもトリガーとしては該当パーティションテーブルに対して<code>INSERT ON CONFLICT</code>を発行しないからです。</p>
+<p>それであれば、トリガー内でのパーティションテーブルに対する構文を<code>INSERT ON CONFLICT</code>となるように作り直せば良いかというとそうもいきません。それは通常のINSERT文が発行された際もON CONFLICT付きのINSERTとなってしまうからです。</p>
+<p>では、パーティションテーブルに対するMERGE文の変換はどうすればよいかというと、PostgreSQL 9.1で導入されたCommon Table Expression(CTE)を使って代替ができます。SQL文としては以下のようになります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">WITH insrt AS (<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> scott.emp_up),</div><div class="line">     updt  <span class="keyword">AS</span> (<span class="keyword">UPDATE</span> scott.emp <span class="keyword">set</span> sal = insrt.sal <span class="keyword">FROM</span> insrt</div><div class="line">                             <span class="keyword">WHERE</span> emp.empno = insrt.empno <span class="keyword">RETURNING</span> emp.empno)</div><div class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> scott.emp</div><div class="line">(<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> insrt <span class="keyword">WHERE</span> empno <span class="keyword">NOT</span> <span class="keyword">IN</span> (<span class="keyword">SELECT</span> empno <span class="keyword">FROM</span> updt));</div></pre></td></tr></table></figure>
+<p>実行結果です。</p>
+<p><img src="/images/20180529/insert_CTE_result.png"></p>
+<p>通常テーブルであれば、もちろんUPSERTでもCTEでも結果は一緒ですね。</p>
+<h3 id="3-3-データ移行について"><a href="#3-3-データ移行について" class="headerlink" title="3-3. データ移行について"></a>3-3. データ移行について</h3><p>データ移行については今回のブログでは詳細な記載は割愛しますが、データ移行もマイグレーションにおいては非常に重要な作業となります。移行時間、キャラクタセットの違いやデータ抽出方法など、移行要件を満たすために様々な検討・設計が必要となります。</p>
+<p>データベースの切替時にはデータベースを利用する業務の全面停止が必要にはなりますが、その停止時間を最小限とする要件を持つシステムも多いと思います。その場合は、データの事前移行＋切替直前まで常時レプリケーション⇒切替といった方式で業務停止時間を最短とする案もあります。事前移行方法やレプリケーション方式については機会があれば詳しく書こうとは思いますが、検討する事項はたくさんあります。<br>レプリケーション方式の一例としては、SaaSとして提供されているAWS Database Migration Serviceがあります。こちらのサービスは移行先のデータベースがAWSのPaaSを利用している場合となります。<br>AWS DMSの詳細は<a href="https://aws.amazon.com/jp/dms/" target="_blank" rel="noopener">こちら</a>を参照してください。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>第1回では、データベースマイグレーションの背景や流れと一般的なマイグレーションのポイントとなる点について記載していきました。データベースオブジェクト（スキーマ）、アプリケーション（SQL）について、多くの場合は一定ルールに基づき変更可能であることが分かります。</p>
+<p>次回は、一般的に利用されているマイグレーションツールと、実際のアプリケーションにてマイグレーションの評価をおこなった例ついて記載していきたいと思います。</p>
+
+      
+    </div>
+  </div>
+    
+  <!-- シェアボタン START -->
+  <div class="social-area">
+  <ul class="social-button">
+
+      <!-- twitter -->
+      <li class="sc-tw social-button-twitter">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-hashtags="future_architect">ツイート</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      </li>
+      
+      <!-- Facebookいいね -->
+      <li class="social-button-fb">
+          <div id="fb-root"></div>
+          <script>(function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.8";
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));</script>
+          <div class="fb-like" data-href="https://future-architect.github.io/articles/20180529/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+      </li>
+
+      <!-- 	google+ -->
+      <li class="social-button-g">
+      <script src="https://apis.google.com/js/platform.js" async defer>
+      {lang: 'ja'}
+      </script>
+      <div class="g-plusone" data-size="medium"></div>
+      </li>
+
+      <!-- はてなブックマーク -->
+      <li class="social-button-hatebu"><a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20180529/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></li>
+
+      <!-- pocket -->
+      <li class="social-button-pocket"><a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
+          <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+      </li>
+
+  </ul>
+  </div>
+<!-- シェアボタン END -->
+
+
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/articles/20180522/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">IoT/M2M展（音声認識サービス）の展示</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- OSS LOGO START -->
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="list-inline oss">
+      <li>
+        <a href="https://github.com/future-architect/vuls" target="_blank">
+          <img src="/metronic/assets/corporate/img/Vuls.png" alt="Vuls">
+      </a>
+      </li>
+      <li>
+        <a href="https://future-architect.github.io/uroborosql-doc/" target="_blank">
+          <img src="/metronic/assets/corporate/img/uroboroSQL-logo.png" alt="uroboroSQL">
+      </a>
+      </li>
+      <li>
+        <a href="http://future-architect.github.io/urushi/" target="_blank">
+          <img src="/metronic/assets/corporate/img/Urushi-logo.png" alt="Urushi">
+      </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- OSS LOGO START -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (9)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Event/">Event (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Development/">Development (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/BigData/">BigData (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Frontend/">Frontend (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Custure/">Custure (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/MachineLearning/">MachineLearning (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20180522/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20180523/photo_20180523_01.jpg" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>IoT/M2M展（音声認識サービス）の展示</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20180413/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20180403/thumbnail_20180403.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>ICLR2018 LT大会</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20180301/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20180301/thumbnail_20180301.jpeg" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>Future AI EXPO 開催！</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20180222/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20180222/thumbnail_20180222.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>NIPS2017 LT報告</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20180209/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20180209/thumbnail_20180209.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>エンプラ&オンプレでもAnsible導入成功したのでユーザー会で発表してきた</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20171217/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20171217/thumbnail_20171217.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>第1回Future開発合宿</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20171207/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20171207/thumbnail_20171207.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>Future IoT デバイス</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20171113/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20171113/thumbnail_20171113.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>最新テクノロジーでスポーツアイデアソンをやって中高生に教わった大事なこと</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- BEGIN BLOG TAGS -->
+<div class="blog-tags margin-bottom-20">
+  <h2>Tags</h2>
+  
+  <div class="widget-wrap">
+    <div class="widget">
+      
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/3D-Printer/"><i class='fa fa-tags'></i>3D-Printer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AWS/"><i class='fa fa-tags'></i>AWS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ansible/"><i class='fa fa-tags'></i>Ansible</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Camp/"><i class='fa fa-tags'></i>Camp</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CoSpaces/"><i class='fa fa-tags'></i>CoSpaces</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference/"><i class='fa fa-tags'></i>Conference</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DB/"><i class='fa fa-tags'></i>DB</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DeepLearning/"><i class='fa fa-tags'></i>DeepLearning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DesignThinking/"><i class='fa fa-tags'></i>DesignThinking</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Elastic-Stack/"><i class='fa fa-tags'></i>Elastic-Stack</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Elixir/"><i class='fa fa-tags'></i>Elixir</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hackathon/"><i class='fa fa-tags'></i>Hackathon</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/"><i class='fa fa-tags'></i>Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HoloLens/"><i class='fa fa-tags'></i>HoloLens</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Infrastructure/"><i class='fa fa-tags'></i>Infrastructure</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/IoT/"><i class='fa fa-tags'></i>IoT</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/"><i class='fa fa-tags'></i>Java</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/"><i class='fa fa-tags'></i>JavaScript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kibana/"><i class='fa fa-tags'></i>Kibana</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LT/"><i class='fa fa-tags'></i>LT</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MachineLearning/"><i class='fa fa-tags'></i>MachineLearning</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Migration/"><i class='fa fa-tags'></i>Migration</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NLP/"><i class='fa fa-tags'></i>NLP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Network/"><i class='fa fa-tags'></i>Network</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oracle/"><i class='fa fa-tags'></i>Oracle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PostgresSQL/"><i class='fa fa-tags'></i>PostgresSQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/"><i class='fa fa-tags'></i>Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redmine/"><i class='fa fa-tags'></i>Redmine</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/"><i class='fa fa-tags'></i>SQL</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Statistics/"><i class='fa fa-tags'></i>Statistics</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Styleguide/"><i class='fa fa-tags'></i>Styleguide</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-UX/"><i class='fa fa-tags'></i>UI/UX</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unity/"><i class='fa fa-tags'></i>Unity</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Urushi/"><i class='fa fa-tags'></i>Urushi</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web-component/"><i class='fa fa-tags'></i>Web component</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/icon/"><i class='fa fa-tags'></i>icon</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/uroboroSQL/"><i class='fa fa-tags'></i>uroboroSQL</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuls/"><i class='fa fa-tags'></i>vuls</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+</div>
+<!-- END BLOG TAGS -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年#1</a>
+      </li>
+      <li>
+        <a href="https://adventar.org/calendars/2449" target="_blank">2017年#2</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーアーキテクトの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+          <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+
+    <!-- Twitterフォローボタン -->
+    <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+	  <a data-tweet-limit="1" class="twitter-timeline"
+	  href="https://twitter.com/future_techblog"
+	  data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+
+	  <script>!function(d,s,id){var
+	  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+          </div>
+          <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2018 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

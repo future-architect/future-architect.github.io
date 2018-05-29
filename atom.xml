@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2018-05-22T05:58:15.910Z</updated>
+  <updated>2018-05-29T02:35:54.398Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <author>
@@ -14,6 +14,293 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>データベースマイグレーション ～OracleからPostgreSQLへ～　ー第１回ー</title>
+    <link href="https://future-architect.github.io/articles/20180529/"/>
+    <id>https://future-architect.github.io/articles/20180529/</id>
+    <published>2018-05-29T02:06:05.000Z</published>
+    <updated>2018-05-29T02:35:54.398Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="1-初めに"><a href="#1-初めに" class="headerlink" title="1. 初めに"></a>1. 初めに</h2><p>こんにちは。Technology Innovation Groupの岸田です。</p>
+<p>データベースシステムに対しては、高い信頼性・可用性・安定性が求められることから、データベースとしては、Oracle Database（以降はOracleと記載）やMicrosoft SQL Serverなどの商用製品が採用されてきました。</p>
+<p>十数年前より、商用データベースの高いコストに不満を持つ企業において、OSSデータベースに注目が集まってきており、近年では基幹システムにおいてもOSSデータベースが採用されるケースも多くなっています。<br>このような背景から技術者としてもOSSデータベースのスキルは非常に求められている状況かと思います。</p>
+<p>元々高額なライセンス料に加え、仮想基盤における課金体系の問題や2016年のOracle Database Standard Edition Oneの廃止などにより、基盤更改などを契機にOSS検討事例が増えてきました。<br>また、クラウド基盤を選択肢に入れた場合にも、柔軟にスケールアップが可能なOSSを採用したいという要望もあります。</p>
+<p>OSSデータベースで広く採用されているのはPostgreSQLとMySQLがあります。今回は、エンタープライズ領域においてマイグレーション例が多いOracleからPostgreSQLについて、考慮すべき事項について2回にわたり紹介していきます。</p>
+<h2 id="2-マイグレーションの流れ"><a href="#2-マイグレーションの流れ" class="headerlink" title="2. マイグレーションの流れ"></a>2. マイグレーションの流れ</h2><h3 id="データベースの選定（アセスメント）"><a href="#データベースの選定（アセスメント）" class="headerlink" title="データベースの選定（アセスメント）"></a>データベースの選定（アセスメント）</h3><p>単にコスト面に問題を抱えているからといって、安易にOSSデータベースへのマイグレーションを決断することは危険です。そのシステムにおいて提供しているサービスに関して、マイグレーションによって機能要件及び非機能要件を満たせなくなっては元も子もありません。</p>
+<p>マイグレーションの検討については、OracleとPostgreSQLの技術的な検討だけでなく、コスト算定（コストメリット）、移行期間やテストなどで多方面での検討が必要となります。この検討については、以下のようにQCDの視点で検討を行う必要があります。</p>
+<h4 id="Quality（品質）"><a href="#Quality（品質）" class="headerlink" title="Quality（品質）"></a>Quality（品質）</h4><p>「アプリケーション機能面」「システム非機能面」の両面について実現性を検討し、ノックアウト項目が存在しないかを評価します。システムによっては現行システムとのデータ連携や災害対策目的で別サイトへのレプリケーションを実現する必要が出てきます。この時点で抜け漏れが発生してしまわないように、現行の運用面を含めた細かい評価が必要となります。</p>
+<h4 id="Cost（コスト）"><a href="#Cost（コスト）" class="headerlink" title="Cost（コスト）"></a>Cost（コスト）</h4><p>マイグレーションに関連するコスト評価をおこないます。以下の2点が考えられます。</p>
+<ol>
+<li>マイグレーションに関連する費用：「アプリケーションソース移行」「データベースミドルウェア自体の移行」「データ移行」  </li>
+<li>新基盤での費用：「ソフトウェアライセンス、基盤費用」</li>
+</ol>
+<h4 id="Delivery（納期）"><a href="#Delivery（納期）" class="headerlink" title="Delivery（納期）"></a>Delivery（納期）</h4><p>マイグレーション実現にむけたスケジュールの評価を行います。基盤更改期限がある場合についはその期間内に実現可能かという評価が必要になります。</p>
+<p>これらの検討結果を基にデータベースマイグレーションの判断を行います。</p>
+<h3 id="マイグレーション決定後の作業イメージ"><a href="#マイグレーション決定後の作業イメージ" class="headerlink" title="マイグレーション決定後の作業イメージ"></a>マイグレーション決定後の作業イメージ</h3><p>データベースのマイグレーションが決定した後は、一例として以下のように進めていきます。</p>
+<p><img src="/images/20180529/migration_phase.png"></p>
+<p>赤字となっている作業については、実装されているアプリケーションにより作業量が大きく変動するものとなります。<br>データベースのマイグレーションの成功は、現状アプリケーションの正確な把握に直結すると考えておりますので、現状把握については専門技術者を交えてしっかりと実施することをお奨め致します。</p>
+<h2 id="3-マイグレーションのポイント"><a href="#3-マイグレーションのポイント" class="headerlink" title="3. マイグレーションのポイント"></a>3. マイグレーションのポイント</h2><p>前章にてマイグレーションの流れを説明しましたが、この章では実際にマイグレーションを実施するにあたりポイントとなる点を記載していきます。ポイントとしては以下の3点となります。</p>
+<ol>
+<li><strong>スキーマ移行</strong><ul>
+<li>データベースの内部環境（オブジェクト等）の移行</li>
+<li>2章のDB設計・データベース移行（定義移行）にあたる</li>
+</ul>
+</li>
+<li><strong>アプリケーション移行</strong><ul>
+<li>アプリケーションプログラムの移行。主にSQL改修となる</li>
+</ul>
+</li>
+<li><strong>データ移行</strong><ul>
+<li>データベースに格納されているデータの移行</li>
+</ul>
+</li>
+</ol>
+<p>上記それぞれについてみていきます。（今回はデータ移行は紹介まで）</p>
+<h3 id="3-1-スキーマ移行（データベースオブジェクト）"><a href="#3-1-スキーマ移行（データベースオブジェクト）" class="headerlink" title="3-1. スキーマ移行（データベースオブジェクト）"></a>3-1. スキーマ移行（データベースオブジェクト）</h3><p>2章で記載しましたDB設計フェーズにて方針を設計し、データベース移行フェーズにて実装致します。</p>
+<p>Oracleに存在する主なオブジェクトについてPostgreSQLの存在有無は以下の通りです。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Oracle</th>
+<th style="text-align:left">PostgreSQL</th>
+<th style="text-align:left">備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">テーブル</td>
+<td style="text-align:left">〇</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">インデックス</td>
+<td style="text-align:left">△</td>
+<td style="text-align:left">B-Treeインデックスとパーティションインデックスが存在。逆キーインデックス、ビットマップインデックス等は存在しない。</td>
+</tr>
+<tr>
+<td style="text-align:left">ビュー</td>
+<td style="text-align:left">〇</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">マテリアライズド・ビュー</td>
+<td style="text-align:left">〇</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">シノニム</td>
+<td style="text-align:left">×</td>
+<td style="text-align:left">一部ビューで代替可能。</td>
+</tr>
+<tr>
+<td style="text-align:left">シーケンス</td>
+<td style="text-align:left">〇</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">トリガー</td>
+<td style="text-align:left">〇</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">データベースリンク</td>
+<td style="text-align:left">×</td>
+<td style="text-align:left">dblink関数または、FDW(Foreign Data Wrapper) で代替可能。</td>
+</tr>
+<tr>
+<td style="text-align:left">パッケージ</td>
+<td style="text-align:left">×</td>
+<td style="text-align:left">3-2で記載。</td>
+</tr>
+<tr>
+<td style="text-align:left">プロシージャ</td>
+<td style="text-align:left">×</td>
+<td style="text-align:left">3-2で記載。</td>
+</tr>
+<tr>
+<td style="text-align:left">ファンクション</td>
+<td style="text-align:left">〇</td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<p>〇：存在　△：一部存在　×：無し</p>
+<p>インデックスについては一部の種類のインデックスは存在しませんが、インデックス自体は性能要件を満たすために作成されていますので、インデックスの存在自体がマイグレーションに影響を及ぼすことはありません。ただし、マイグレーション後の性能要件を満たすために別の方法を検討する可能性があります。</p>
+<p>その他につきましては、代替機能を含めてPostgreSQLにて実装ができると考えております。</p>
+<p>ストアド・パッケージ／プロシージャ／ファンクションについては3-2.アプリケーション移行で記載致します。</p>
+<h4 id="データ型の変換"><a href="#データ型の変換" class="headerlink" title="データ型の変換"></a>データ型の変換</h4><p>テーブルのコンバージョンの際には、データ型を意識する必要があります。OracleとPostgreSQLのデータ型の対応表は以下の通りです。数値型にはいくつかのデータ型が存在しますので、システムとしてルールを定めることをお奨め致します。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">属性</th>
+<th style="text-align:left">Oracleのデータ型</th>
+<th style="text-align:left">PostgreSQLのデータ型</th>
+<th style="text-align:left">備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">文字列</td>
+<td style="text-align:left">CHAR/NCHAR/VARCHAR2/NVARCHAR2</td>
+<td style="text-align:left">char/varchar</td>
+<td style="text-align:left">PostgreSQLの文字型の精度は文字数を意味する</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">CLOB/LONG</td>
+<td style="text-align:left">text</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">数値</td>
+<td style="text-align:left">NUMBER</td>
+<td style="text-align:left">smallint/bigint/integer/decimal/real/double precision</td>
+<td style="text-align:left">精度によってデータ型を選択</td>
+</tr>
+<tr>
+<td style="text-align:left">日付</td>
+<td style="text-align:left">DATE/TIMESTAMP</td>
+<td style="text-align:left">timestamp</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">バイナリ</td>
+<td style="text-align:left">BLOB/RAW</td>
+<td style="text-align:left">bytea</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">その他</td>
+<td style="text-align:left">ROWID</td>
+<td style="text-align:left">oid</td>
+<td style="text-align:left"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-2-アプリケーション（SQL）移行"><a href="#3-2-アプリケーション（SQL）移行" class="headerlink" title="3-2.アプリケーション（SQL）移行"></a>3-2.アプリケーション（SQL）移行</h3><p>アプリケーションの移行については、同じ製品のバージョンアップをする場合であっても一通りアプリケーションの動作確認（結果の現新一致確認）は実施することが多いと思います。</p>
+<p>データベースのマイグレーションの場合は、このアプリケーションの動作確認において結果の不一致による原因究明やアプリケーションの見直しが発生する可能性が高くなることが考えられるため、当初よりアプリケーションの移行作業の作業量を多めに見積もることが大事だと思います。3章で説明したツールなどを利用して自動的なコンバージョンでアプリケーションの改修にかかる時間は削減できますが、アプリケーションの動作確認は必ず実施してください。</p>
+<p>アプリケーションの動作確認と同様に重要なのは、性能テストとなります。データベースのマイグレーションでは、データベースの機能の差異がありますので、SQLの処理性能は事前の机上予測が難しいといえます。この性能テストについてもデータベースのバージョンアップ時のテスト作業量よりも多めに見積もっておくことをお奨め致します。</p>
+<p>Oracleにて実装されているSQLについて、Oracle独自の記法であったとしてもPostgreSQLにて実装は可能であると考えておりますので、アプリケーション改修によりマイグレーションがNGとなることは無いと思います。</p>
+<p>ただし、アプリケーションに依存して、改修作業や改修後の確認テストの作業量が変動していきますので注意が必要です。</p>
+<p>アプリケーション移行についての考え方及び対策の一部を以下に紹介していきます。</p>
+<h4 id="ストアド・サブプログラム変換"><a href="#ストアド・サブプログラム変換" class="headerlink" title="ストアド・サブプログラム変換"></a>ストアド・サブプログラム変換</h4><p>ストアド・サブプログラムは、Oracleでのストアド・パッケージ、ストアド・プロシージャ、ストアド・ファンクションの総称です。<br>PostgreSQLにはパッケージ及びプロシージャが存在しません。<br>Oracleのストアド・パッケージ及びストアド・プロシージャはPostgreSQLのファンクションで実装することになります。<br>プロシージャ、ファンクションの集合体であるパッケージはスキーマで代用します。<br>まとめると以下のようになります。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Oracle</th>
+<th style="text-align:left">PostgreSQL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">パッケージ</td>
+<td style="text-align:left">スキーマ</td>
+</tr>
+<tr>
+<td style="text-align:left">プロシージャ</td>
+<td style="text-align:left">ファンクション</td>
+</tr>
+<tr>
+<td style="text-align:left">ファンクション</td>
+<td style="text-align:left">ファンクション</td>
+</tr>
+</tbody>
+</table>
+<p>PostgreSQLのファンクションでOracleと大きく異なる部分は、トランザクションの制御となります。PostgreSQLのファンクションは、呼び出し元のトランザクションに依存するため、ファンクション内でCOMMITの発行はできません。つまり、ファンクション内でエラーが発生した場合は、ファンクション内の処理はすべてロールバックします。</p>
+<p>参考までに、Oracleでは、<code>PRAGMA AUTONOMOUS_TRANSACTION</code>を利用して呼び出し元とトランザクションを分離することができます。Oracleのストアド・サブプログラム内でトランザクションを分離している場合は、PostgreSQLではロジックを見直す必要があります。</p>
+<h4 id="外部結合"><a href="#外部結合" class="headerlink" title="外部結合"></a>外部結合</h4><p>Oracle独自の記法としては外部結合が挙げられます。外部結合はSQLにおいて結合条件で対応するレコードが存在しない場合でも優先となるテーブルについてはレコードが除外されない結合方法です。</p>
+<p>Oracle 9i以降はSQL標準である<code>[LEFT | RIGHT] OUTER JOIN</code>の記述がサポートされるようになり、オラクル社としても同バージョンからOUTER JOINによる記法を<a href="https://docs.oracle.com/cd/E82638_01/SQLRF/Joins.htm#GUID-29A4584C-0741-4E6A-A89B-DCFAA222994A" target="_blank" rel="noopener">マニュアル上でも推奨しています</a>。</p>
+<p>とはいえ、Oracleで動かすSQLの外部結合は(+)表記をよく目にします。<br>主な理由としては以下じゃないかなと思ってます。</p>
+<ul>
+<li>Oracle 8i 以前に作成したSQLが今でも使われている。（バージョンアップを繰り返していて改修していない。）</li>
+<li>以前プロジェクトとして作成していたシステムのSQLコーディング基準書では(+)表記で記載することが基準となっており、現状でも(+)表記自体は利用可能であるため、基準書自体を修正することができていない。また、成功したプロジェクトの基準書を横展開している。</li>
+<li>プログラムの改修や新機能導入においても、現行で動作しているSQLを踏襲して作成する。</li>
+</ul>
+<p>PostgreSQLにおいて外部結合は当然SQL標準であるOUTER JOINの記載となりますので、データベースマイグレーションの際にはSQLのコンバージョンが必要です。</p>
+<p>(+)表記での外部結合をコンバージョンするときに気を付けなければならないのは、リテラル値に対する外部結合の条件がある場合です。</p>
+<p>言葉だけでは分かりづらいと思いますので、Oracleで用意されているサンプルスキーマ（SCOTTユーザ）で見ていきます。テーブルはEMP表とDEPT表を使います。デフォルトの状態から少しだけ値を変えているところはあります。</p>
+<p><img src="/images/20180529/demo.png"></p>
+<p>2種類の外部結合表記のSQL文を用意しました。</p>
+<p>①リテラル条件にも「(+)」を付与したパターン</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> d.deptno, d.dname, e.empno, e.ename, e.comm</div><div class="line"><span class="keyword">FROM</span> emp e, dept d</div><div class="line"><span class="keyword">WHERE</span> e.deptno(+) = d.deptno</div><div class="line"><span class="keyword">AND</span> e.comm(+) = <span class="number">300</span>;</div></pre></td></tr></table></figure>
+<p>②リテラル条件には「(+)」を付与しないパターン<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> d.deptno, d.dname, e.empno, e.ename, e.comm</div><div class="line"><span class="keyword">FROM</span> emp e, dept d</div><div class="line"><span class="keyword">WHERE</span> e.deptno(+) = d.deptno</div><div class="line"><span class="keyword">AND</span> e.comm = <span class="number">300</span>;</div></pre></td></tr></table></figure></p>
+<p>検索結果は以下の通りです。</p>
+<p><img src="/images/20180529/outerjoin_result_SQL.png"></p>
+<p>①の場合は結合前にリテラル条件で絞っている、②の場合は結合後にリテラル条件で絞っている、ということです。</p>
+<p>これをSQL標準であるOUTER JOINで記載すると以下のようになります。OUTER JOINの条件となるか全体の条件となるかの違いがSQL標準の方が分かりやすいですね。</p>
+<p>①<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> d.deptno, d.dname, e.empno, e.ename, e.comm</div><div class="line"><span class="keyword">FROM</span> scott.emp e</div><div class="line">    <span class="keyword">RIGHT</span> <span class="keyword">OUTER</span> <span class="keyword">JOIN</span> scott.dept d</div><div class="line">        <span class="keyword">ON</span> (e.deptno = d.deptno <span class="keyword">AND</span> e.comm = <span class="number">300</span>);</div></pre></td></tr></table></figure></p>
+<p>②<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> d.deptno, d.dname, e.empno, e.ename, e.comm</div><div class="line"><span class="keyword">FROM</span> scott.emp e</div><div class="line">    <span class="keyword">RIGHT</span> <span class="keyword">OUTER</span> <span class="keyword">JOIN</span> scott.dept d</div><div class="line">        <span class="keyword">ON</span> (e.deptno = d.deptno)</div><div class="line"><span class="keyword">WHERE</span> e.comm = <span class="number">300</span>;</div></pre></td></tr></table></figure></p>
+<p>念のため結果も。</p>
+<p><img src="/images/20180529/outerjoin_result_SQL.png"></p>
+<p>PostgreSQLでも。</p>
+<p><img src="/images/20180529/outerjoin_result_postgres.PNG"></p>
+<p>同じですね。</p>
+<p>将来のことを考えて、外部結合はSQL標準のOUTER JOINで記述していくことにしましょう。</p>
+<h4 id="組み込み関数"><a href="#組み込み関数" class="headerlink" title="組み込み関数"></a>組み込み関数</h4><p>組み込み関数はデータベース毎に事前に用意されている関数です。データベース毎に仕様が異なることもありますので、移行の際には注意が必要です。OracleとPostgreSQLの組み込み関数の対比表については<a href="https://www.pgecons.org/wp-content/uploads/PGECons/2012/WG2/10_Built-inFunctionMigrationResearch/10_Appendix_01_Built-inFunctionComparativeTable(Oracle-PostgreSQL).pdf" target="_blank" rel="noopener">こちら</a>に詳しく載っておりますので、参考にしてください。</p>
+<p>OracleとPostgreSQLの両方で用意されていますが、機能仕様が全く異なる関数としては<code>DECODE</code>があります。<br>OracleではDECODE関数は条件分岐として使われています。構文としては以下です。</p>
+<p><img src="/images/20180529/decode_oracle.PNG" class="img-middle-size"></p>
+<p>PostgreSQLでは、DECODE関数はテキスト表現からバイナリデータを復号する関数となっております。構文としては以下です。（formatオプションはbase64/hex/escapeから選択。）</p>
+<p><img src="/images/20180529/decode_postgres.PNG" class="img-small-size"></p>
+<p>OracleでのDECODE関数はPostgreSQLではcase文に変換します。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> empno, ename, deptno,</div><div class="line"><span class="keyword">DECODE</span>( deptno, <span class="number">10</span>, <span class="string">'ACCOUNTING'</span>,</div><div class="line">                <span class="number">20</span>, <span class="string">'RESEARCH'</span>,</div><div class="line">                <span class="number">30</span>, <span class="string">'SALES'</span>,</div><div class="line">                <span class="number">40</span>, <span class="string">'OPERATIONS'</span> ) <span class="keyword">as</span> dname</div><div class="line"><span class="keyword">FROM</span> emp;</div></pre></td></tr></table></figure>
+<p>変換後は以下となります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> empno, ename, deptno,</div><div class="line"><span class="keyword">CASE</span> deptno <span class="keyword">WHEN</span> <span class="number">10</span> <span class="keyword">THEN</span> <span class="string">'ACCOUNTING'</span></div><div class="line">            <span class="keyword">WHEN</span> <span class="number">20</span> <span class="keyword">THEN</span> <span class="string">'RESEARCH'</span></div><div class="line">            <span class="keyword">WHEN</span> <span class="number">30</span> <span class="keyword">THEN</span> <span class="string">'SALES'</span></div><div class="line">            <span class="keyword">WHEN</span> <span class="number">40</span> <span class="keyword">THEN</span> <span class="string">'OPERATIONS'</span> <span class="keyword">END</span> <span class="keyword">as</span> dname</div><div class="line"><span class="keyword">FROM</span> emp;</div></pre></td></tr></table></figure>
+<p>DECODEについては以上です。</p>
+<p>一部のOracle独自の組み込み関数は、orafceモジュールをインストールすることで、いくつかOracleと同じ関数が実装されます。orafceで実装される関数については<a href="http://orafce.github.io/orafce/index-ja.html" target="_blank" rel="noopener">こちら</a>を参考にしてください。また、AWSのRDSでも事前にOracleからの移行用にモジュール（スキーマ：aws_oracle_ext）が準備されています。</p>
+<h4 id="行レベルロック"><a href="#行レベルロック" class="headerlink" title="行レベルロック"></a>行レベルロック</h4><p>一般的に業務ロジック上では競合による不整合を回避するため、<code>SELECT ～ FOR UPDATE</code>により行レベルでロックを取得し、トランザクション中のレコードが他から更新・削除されることを防ぎます。</p>
+<p>Oracleにおいては、<code>FOR UPDATE</code>句として<code>[WAIT n|NOWAIT]</code>の記述ができます。どちらも指定しない場合は、行が使用可能になるまで待機した後でSELECT文の結果が戻されます。（そんな記載はできませんが、<code>WAIT ∞</code>の指定のような挙動です。）</p>
+<p>PostgreSQLでは、<code>WAIT n</code>が存在しないため、WAITと記載するとOracleにおける<code>WAIT</code>句を未指定とした場合と同様の挙動となります。つまり、Oracleにおいて<code>WAIT n</code>が指定されていた場合は、PostgreSQLではSQLにて実装することができません。</p>
+<p>代替となるかは実行形式によりますが、<code>lock_timeout</code>のパラメータを指定することでOracleと同じ挙動となる可能性はあります。このパラメータを設定して<code>SELECT ～ FOR UPDATE</code>を発行しすると、該当レコードがロック状態であった場合は設定したパラメータの時間経過するとエラーとなります。<code>lock_timeout</code>はセッションレベルでの変更も可能ですので、トランザクション開始時にパラメータを設定をしてSQLを実行、トランザクション終了時にパラメータをリセットするという処理仕様とすることもできます。</p>
+<h4 id="ヒント句"><a href="#ヒント句" class="headerlink" title="ヒント句"></a>ヒント句</h4><p>OracleにおいてSQLの性能問題は実行計画が原因であることが多いのではないでしょうか。確かに、Oracleにおける性能劣化対策としての「ヒント句を記載して実行計画を固定化する」は、統計情報に依存せずにSQLの性能を安定させる最適な解決策なのかもしれません。（バージョンアップの時にヒントが無くなったり、オプティマイザの機能向上により性能の良い実行計画が選ばれないというデメリット(?)もあります。）また、システムのSQLコーディング基準でヒント句を記載するといったルールがある場合もあるでしょう。</p>
+<p>PostgreSQLではバージョン9.1以降<code>pg_hint_plan</code>モジュールをインストールすることでヒント句の記載はできますが、Oracleほど数多くの種類のヒントがあるわけではありません。（参考までにヒント句の種類としては、pg_hint_plan 1.1で23個、Oracle 12cR1で332個あります。）</p>
+<p>データベースによりオプティマイザが全く異なりますので、データベースをマイグレーションすると実行計画が変化するのは致し方無いと考えております。そこで、ヒント句の記載のあるSQLについては、コンバージョン時には一旦ヒント句を削除して性能を見ることになります。処理性能が思わしくない場合は個別にチューニングの対応を施すことになります。</p>
+<h4 id="NULLと空文字"><a href="#NULLと空文字" class="headerlink" title="NULLと空文字"></a>NULLと空文字</h4><p>OracleではNULLと空文字は同義で、空文字はNULLとして扱われます。PostgreSQLではNULLと空文字は別物です。従いまして、Oracle上で動作するSQL内で条件句として<code>WHERE COL is NULL</code>といった記載がある場合は、マイグレーションにより結果が異なってくる可能性があるので注意が必要です。</p>
+<p>PostgreSQLでは、NULLの使用を禁止するといった基準を作った方が良いと思います。その場合は、データの移行時にNULLはすべて空文字に変換することは忘れずに！</p>
+<p>NULLの四則演算やNULLと文字列の連結については、すべてNULLとなってしまうため、NULLが格納される可能性がある列を取り扱う場合は、必ず<code>COALESCE</code>関数を使って処理してください。（OracleでいうところのNVL関数ですね。）</p>
+<h4 id="MERGE文"><a href="#MERGE文" class="headerlink" title="MERGE文"></a>MERGE文</h4><p>OracleではMERGE文が利用できますが、PosrgreSQLではMERGE文は存在しません。<br>PosrgreSQL 9.5からUPSERT文（INSERT ON CONFLICT）が使用可能となります。</p>
+<p>こちらもサンプルスキーマ環境で見てみましょう。<br>empと同じ定義のemp_up表を作成してます。</p>
+<p><img src="/images/20180529/merge_empup.png"></p>
+<p>emp_up表のレコードを見てemp表にレコードが存在した場合はUPDATEをして、emp表にレコードが無ければINSERTをするというMERGE文を作ってみました。（今回はSAL列とCOMM列だけをUPDATEしてます。）</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">MERGE</span> <span class="keyword">INTO</span> emp e</div><div class="line"><span class="keyword">USING</span> emp_up u <span class="keyword">ON</span> (e.empno = u.empno)</div><div class="line">  <span class="keyword">WHEN</span> <span class="keyword">MATCHED</span> <span class="keyword">THEN</span></div><div class="line">    <span class="keyword">UPDATE</span> <span class="keyword">SET</span> e.sal = u.sal, e.comm = u.comm</div><div class="line">  <span class="keyword">WHEN</span> <span class="keyword">NOT</span> <span class="keyword">MATCHED</span> <span class="keyword">THEN</span></div><div class="line">    <span class="keyword">INSERT</span> <span class="keyword">VALUES</span> ( u.empno, u.ename, u.job, u.mgr, u.hiredate, u.sal, u.comm, u.deptno );</div></pre></td></tr></table></figure>
+<p>実行結果です。</p>
+<p><img src="/images/20180529/merge_result.PNG"></p>
+<p>empno:7369のsal列が変更され、empno:8000のレコードが作成されていますね。</p>
+<p>これをPostgreSQLで実装すると以下のようになります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> scott.emp</div><div class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> scott.emp_up</div><div class="line"><span class="keyword">ON</span> CONFLICT (empno)</div><div class="line"><span class="keyword">DO</span> <span class="keyword">UPDATE</span> <span class="keyword">SET</span> sal = excluded.sal, comm = excluded.comm ;</div></pre></td></tr></table></figure>
+<p>実行結果です。</p>
+<p><img src="/images/20180529/upsert_result.png"></p>
+<p>同じ結果となりました。</p>
+<p>このUPSERT文ですが、PostgreSQL 9におけるパーティションテーブルに対しては機能しません。理由としては、PostgreSQLのパーティションテーブルは親となるテーブルとパーティション単位の個別テーブルを作成して、親テーブルへのDML発行時にはトリガーにより該当のパーティションテーブルを更新しており、親表に対して<code>INSERT ON CONFLICT</code>を発行したとしてもトリガーとしては該当パーティションテーブルに対して<code>INSERT ON CONFLICT</code>を発行しないからです。</p>
+<p>それであれば、トリガー内でのパーティションテーブルに対する構文を<code>INSERT ON CONFLICT</code>となるように作り直せば良いかというとそうもいきません。それは通常のINSERT文が発行された際もON CONFLICT付きのINSERTとなってしまうからです。</p>
+<p>では、パーティションテーブルに対するMERGE文の変換はどうすればよいかというと、PostgreSQL 9.1で導入されたCommon Table Expression(CTE)を使って代替ができます。SQL文としては以下のようになります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">WITH insrt AS (<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> scott.emp_up),</div><div class="line">     updt  <span class="keyword">AS</span> (<span class="keyword">UPDATE</span> scott.emp <span class="keyword">set</span> sal = insrt.sal <span class="keyword">FROM</span> insrt</div><div class="line">                             <span class="keyword">WHERE</span> emp.empno = insrt.empno <span class="keyword">RETURNING</span> emp.empno)</div><div class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> scott.emp</div><div class="line">(<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> insrt <span class="keyword">WHERE</span> empno <span class="keyword">NOT</span> <span class="keyword">IN</span> (<span class="keyword">SELECT</span> empno <span class="keyword">FROM</span> updt));</div></pre></td></tr></table></figure>
+<p>実行結果です。</p>
+<p><img src="/images/20180529/insert_CTE_result.png"></p>
+<p>通常テーブルであれば、もちろんUPSERTでもCTEでも結果は一緒ですね。</p>
+<h3 id="3-3-データ移行について"><a href="#3-3-データ移行について" class="headerlink" title="3-3. データ移行について"></a>3-3. データ移行について</h3><p>データ移行については今回のブログでは詳細な記載は割愛しますが、データ移行もマイグレーションにおいては非常に重要な作業となります。移行時間、キャラクタセットの違いやデータ抽出方法など、移行要件を満たすために様々な検討・設計が必要となります。</p>
+<p>データベースの切替時にはデータベースを利用する業務の全面停止が必要にはなりますが、その停止時間を最小限とする要件を持つシステムも多いと思います。その場合は、データの事前移行＋切替直前まで常時レプリケーション⇒切替といった方式で業務停止時間を最短とする案もあります。事前移行方法やレプリケーション方式については機会があれば詳しく書こうとは思いますが、検討する事項はたくさんあります。<br>レプリケーション方式の一例としては、SaaSとして提供されているAWS Database Migration Serviceがあります。こちらのサービスは移行先のデータベースがAWSのPaaSを利用している場合となります。<br>AWS DMSの詳細は<a href="https://aws.amazon.com/jp/dms/" target="_blank" rel="noopener">こちら</a>を参照してください。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>第1回では、データベースマイグレーションの背景や流れと一般的なマイグレーションのポイントとなる点について記載していきました。データベースオブジェクト（スキーマ）、アプリケーション（SQL）について、多くの場合は一定ルールに基づき変更可能であることが分かります。</p>
+<p>次回は、一般的に利用されているマイグレーションツールと、実際のアプリケーションにてマイグレーションの評価をおこなった例ついて記載していきたいと思います。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;1-初めに&quot;&gt;&lt;a href=&quot;#1-初めに&quot; class=&quot;headerlink&quot; title=&quot;1. 初めに&quot;&gt;&lt;/a&gt;1. 初めに&lt;/h2&gt;&lt;p&gt;こんにちは。Technology Innovation Groupの岸田です。&lt;/p&gt;
+&lt;p&gt;データベースシステ
+    
+    </summary>
+    
+      <category term="DB" scheme="https://future-architect.github.io/categories/DB/"/>
+    
+    
+      <category term="Migration" scheme="https://future-architect.github.io/tags/Migration/"/>
+    
+      <category term="PostgresSQL" scheme="https://future-architect.github.io/tags/PostgresSQL/"/>
+    
+      <category term="Oracle" scheme="https://future-architect.github.io/tags/Oracle/"/>
+    
+  </entry>
   
   <entry>
     <title>IoT/M2M展（音声認識サービス）の展示</title>
@@ -2219,79 +2506,6 @@
     
     
       <category term="Elixir" scheme="https://future-architect.github.io/tags/Elixir/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>HoloLensの空間共有サービスを使ってみよう</title>
-    <link href="https://future-architect.github.io/articles/20170405/"/>
-    <id>https://future-architect.github.io/articles/20170405/</id>
-    <published>2017-04-05T03:00:00.000Z</published>
-    <updated>2017-05-09T01:57:18.457Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。HoloLens記事第二弾です。</p>
-<ul>
-<li>前回の記事は<a href="https://future-architect.github.io/articles/20170210/">こちら</a>をご参照ください。</li>
-</ul>
-<p>今回は、HoloLensでこれから多く使われるであろう<font color="red"><strong>空間共有サービス（以下シェアリングサービス）</strong></font>の特性と実装方法の触りについて紹介します。</p>
-<h1 id="HoloLensの空間共有サービスとは"><a href="#HoloLensの空間共有サービスとは" class="headerlink" title="HoloLensの空間共有サービスとは"></a>HoloLensの空間共有サービスとは</h1><p>HoloLensの醍醐味は、現実世界と仮想世界が融合することです。つまりHoloLensゴーグルをかけると、スマホを通さずとも視野の中にに様々な情報や仮想的なオブジェクトを出現させることができます。</p>
-<p>ARとして流行ったポケモンGOを例にすると、スマホの画面上で現実の背景の上にポケモンの画像が合成されて表示されていましたよね？HoloLensを身につけると、散歩中にふと公園を見ると「ピカチュウが花壇から出てきた！」という風景を自然に見ることができます。また、HoloLensは<strong>現実世界のオブジェクトをスキャンしてマッピング</strong>を行っているので、「ピカチュウが滑り台を滑る」といったことが比較的容易に実現できちゃいます。</p>
-<p>でも悲しいかな、HoloLensをそのまま装着しても、みんな別々、パラレルワールドのマサラタウンにいるのです。ある人はそこにピカチュウがいるというけれど、私には見えない、そんな状態です。それでは盛り上がりもかけますし、結局は自分にしか見えない仮想的なものなんだという儚い気持ちになってしまいますよね。</p>
-<p>そこで登場HoloLensの<strong><font color="red">シェアリングサービス</font></strong>です。<strong>これを使うと、あるHoloLensで見ているものが、他のHoloLensでも同様に見ることができ、空間の共有が行えます。</strong>「ベンチの上でピカチュウがバク転した！かわゆす」というのを皆で一緒に見ることが可能となります。</p>
-<h1 id="閑話。（仮想現実と現実に対する哲学的考察をちょっと）"><a href="#閑話。（仮想現実と現実に対する哲学的考察をちょっと）" class="headerlink" title="閑話。（仮想現実と現実に対する哲学的考察をちょっと）"></a>閑話。（仮想現実と現実に対する哲学的考察をちょっと）</h1><p>みんながそこにピカチュウがいると言う。これはもはやピカチュウが現実となったと言えるのではないでしょうか。</p>
-<p><strong>「この世は人間に記録（観測）されるまでは存在しない」</strong>とどこかの偉い方が言いましたが、逆に認識されればそれは現実の世界になるのです。HoloLensを通さないと見えないから現実の世界なわけないじゃんというあなた、あなたは視覚を司る「目」という器官を通して世界を認識しています。この世界も目が無いと、見えなくなるから現実な世界なわけないと言っているのと同じかなと思います。</p>
-<p><strong>昆虫は紫外線を見ることができるため、人間とは全く別の世界が広がっていますが、HoleLensが映し出す世界も似たようなものではないでしょうか。</strong>また、実際触れるじゃないかと思ったあなた、触れるという現象も触覚も持って感知しているにすぎず、本当の意味でそこに物体があるかどうかなんてだれにもわからないのではないかなと思います。</p>
-<h1 id="シェアリングサービスの仕組み"><a href="#シェアリングサービスの仕組み" class="headerlink" title="シェアリングサービスの仕組み"></a>シェアリングサービスの仕組み</h1><p>哲学の話は置いて、本題に戻りましょう。<br>シェアリングを行うためには、<strong>お互いの空間情報を中継するためのサーバー（PC）が必要</strong>です。</p>
-<p>アプリケーションの構成によりますが、本記事ではMicrosoftがHoloLensの開発ノウハウを公開している<a href="https://developer.microsoft.com/en-us/windows/mixed-reality/academy" target="_blank" rel="noopener">HolographicAcademy</a>にてシェアリングサービスを紹介している<a href="https://developer.microsoft.com/en-us/windows/mixed-reality/holograms_240" target="_blank" rel="noopener">Holograms240</a>の仕組みを説明します。</p>
-<p>まず試したいという方は、<a href="https://developer.microsoft.com/en-us/windows/mixed-reality/holograms_240" target="_blank" rel="noopener">Holograms240の公式サイト</a>に実行方法が記載されています。<br>もしくは日本語で実施方法を記載してくださっている方がいるので<a href="https://docs.com/kaorun55/7627/hololens-sharing?c=euXVvL" target="_blank" rel="noopener">ここ</a>を見ると良いと思います。</p>
-<p>Holograms240では<strong><a href="https://github.com/Microsoft/HoloToolkit-Unity" target="_blank" rel="noopener">HoloToolKit-Unity</a></strong>というUnity上でHoloLensの機能を使用するためのツール群を利用しています。このHoloToolKit-Unityにはシェアリングサービスが含まれています。開発者はこれを使用して、複数HoloLens間でのシェアリングを行うことができます。またHoloToolKit-Unityの中には、<strong>サーバーで起動するためのシェアリングサービスの実行ファイルが準備されている</strong>ので、シェアリングを行うためにはこれをPC上で実行して利用することができます。</p>
-<p><strong>Holograms240は以下のような仕組みで動いています（下図）。</strong><br>まずはアプリ起動時にアンカー情報と呼ばれる、現実世界のマッピングとUnity上での座標を紐づけるための目印を共有します。<br><img src="/images/20170405/photo_20170405_01.jpeg"></p>
-<p>次に、アプリ内で共有が必要なデータを逐次送受信して、同じオブジェクトの同期を行っています。<br><img src="/images/20170405/photo_20170405_02.jpeg"></p>
-<p><strong>実空間とのマッピングがされているのはアンカーだけです。</strong></p>
-<p>実空間をスキャンした情報とアンカーとのマッピング情報はデータ量が多いです。同期するのに長いと1分以上の時間がかかります！その後の共有情報はデータ量は少ないですが、<strong>各オブジェクトやアクションごとにデータの型や、送信処理、受信時の動作を実装してあげなくてはいけません。</strong>さすがに楽々と視野すべてを一括で同期して、というのはできないのですね…。今後もっと便利なライブラリができることを期待します。</p>
-<h1 id="HoloToolKit-Unityの仕組みを少しだけ紹介"><a href="#HoloToolKit-Unityの仕組みを少しだけ紹介" class="headerlink" title="HoloToolKit-Unityの仕組みを少しだけ紹介"></a>HoloToolKit-Unityの仕組みを少しだけ紹介</h1><p>次にHoloToolKit-Unity内で何が行われているのか、かいつまんで紹介します。</p>
-<h2 id="ImportExportAnchorManager"><a href="#ImportExportAnchorManager" class="headerlink" title="ImportExportAnchorManager"></a>ImportExportAnchorManager</h2><p>Holograms240ではこれを、HologramCollection（HoloLensで扱うオブジェクトの大親）につけてますね。このスクリプトは1機目ではアンカー（Unity上のオブジェクト）を物理的に固定（現実世界にマッピング）して、そのアンカー情報を共有サーバーにエクスポートしています。また2機目以降は、1機目のアンカー情報をインポートして、自身の現実世界のマッピング情報上にアンカーを設置します。これによって<strong>Unityの世界では1機目と2機目の座標軸がアンカーを中心として一致</strong>します。</p>
-<h2 id="CustomMessages"><a href="#CustomMessages" class="headerlink" title="CustomMessages"></a>CustomMessages</h2><p>デバイス間で共有するデータの形式の定義と、送受信時の処理が記載されていますこれはアプリの仕様ごとに、がっつり個別実装する必要があります。<br>以下の流れで見ていきます。</p>
-<ol>
-<li>送受信用のデータ形式</li>
-<li>送信処理について</li>
-<li>受信処理について</li>
-</ol>
-<h3 id="1-送受信用のデータ形式"><a href="#1-送受信用のデータ形式" class="headerlink" title="1. 送受信用のデータ形式"></a>1. 送受信用のデータ形式</h3><p>TestMessageIDは<strong>デバイス間で共有（送受信）するデータを定義しています。</strong><br>オブジェクトやアクションの種類ごとに定義しています。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">enum</span> TestMessageID : byte</div><div class="line">&#123;</div><div class="line">    HeadTransform = MessageID.UserMessageIDStart,</div><div class="line">    UserAvatar,</div><div class="line">    UserHit,</div><div class="line">    ShootProjectile,</div><div class="line">    StageTransform,</div><div class="line">    ResetStage,</div><div class="line">    ExplodeTarget,</div><div class="line">    Max</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="2-送信処理について"><a href="#2-送信処理について" class="headerlink" title="2. 送信処理について"></a>2. 送信処理について</h3><p><strong>Sendメソッドは送信処理を実装しています。</strong><br>例えばSendShootProjectleはユーザーがゲーム内で発射するオブジェクトの送信処理です。<br>起点となるpositionと打ち出される方向directionをアンカーからの相対位置に変換して送信しています。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SendShootProjectile</span><span class="params">(Vector3 position, Vector3 direction)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="comment">// If we are connected to a session, broadcast our head info</span></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.serverConnection != null &amp;&amp; <span class="keyword">this</span>.serverConnection.IsConnected())</div><div class="line">    &#123;</div><div class="line">        <span class="comment">// Create an outgoing network message to contain all the info we want to send</span></div><div class="line">        NetworkOutMessage msg = CreateMessage((byte)TestMessageID.ShootProjectile);</div><div class="line"></div><div class="line">        AppendVector3(msg, position + (direction * <span class="number">0.016f</span>));</div><div class="line">        AppendVector3(msg, direction);</div><div class="line"></div><div class="line">        <span class="comment">// Send the message as a broadcast, which will cause the server to forward it to all other users in the session.</span></div><div class="line">        <span class="keyword">this</span>.serverConnection.Broadcast(</div><div class="line">            msg,</div><div class="line">            MessagePriority.Immediate,</div><div class="line">            MessageReliability.Reliable,</div><div class="line">            MessageChannel.Avatar);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="3-受信処理について"><a href="#3-受信処理について" class="headerlink" title="3. 受信処理について"></a>3. 受信処理について</h3><p><strong>受信時の処理はMessageHandlersを使って登録しています。</strong><br>例えば上記で送信している発射物の受信時の処理はProjectileLauncher.csに記載されています。下記のコードで受信時イベントの登録を行っています。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">CustomMessages.Instance.MessageHandlers[CustomMessages.TestMessageID.ShootProjectile] = <span class="keyword">this</span>.ProcessRemoteProjectile;</div></pre></td></tr></table></figure>
-<p>そして、実際の受信処理は下記のProcessRemoteProjectileです。受信した発射物のアンカーからの位置情報（Position）と方向（Direction）から同じ位置にオブジェクトを生成しています。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">ProcessRemoteProjectile</span><span class="params">(NetworkInMessage msg)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="comment">// Parse the message</span></div><div class="line">    <span class="keyword">long</span> userID = msg.ReadInt64();</div><div class="line">    Vector3 remoteProjectilePosition = CustomMessages.Instance.ReadVector3(msg);</div><div class="line"></div><div class="line">    Vector3 remoteProjectileDirection = CustomMessages.Instance.ReadVector3(msg);</div><div class="line"></div><div class="line">    Transform anchor = ImportExportAnchorManager.Instance.gameObject.transform;</div><div class="line">    ShootProjectile(anchor.TransformPoint(remoteProjectilePosition), anchor.TransformDirection(remoteProjectileDirection), userID);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>このように、<strong>現実世界上の位置情報として同期されるのはアンカーだけで、その他のオブジェクトを同期したい場合は、個別に定義して処理を記載する必要</strong>があります。</p>
-<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><ul>
-<li>シェアリングサービスはHoloToolKit-Unityを使うことで実装できる</li>
-<li>実空間に固定されているのはアンカーだけであり、アンカーの同期には時間がかかる</li>
-<li>その他のアプリ内情報は個別に連携データの形式と送受信処理を実装する必要がある</li>
-</ul>
-<h1 id="おまけ～最新（2017-04-03時点）特ダネ情報～"><a href="#おまけ～最新（2017-04-03時点）特ダネ情報～" class="headerlink" title="おまけ～最新（2017/04/03時点）特ダネ情報～"></a>おまけ～最新（2017/04/03時点）特ダネ情報～</h1><ul>
-<li><a href="https://github.com/HoloMagicians/HolographicAcademyJP" target="_blank" rel="noopener">英語弱者（筆者も）待望！Holographic Academyを日本語訳してくださっている神サイト</a></li>
-<li><a href="https://github.com/the6th/StartupScene-for-Academy-240-on-HoloLens" target="_blank" rel="noopener">SharingサービスのサーバーIPをアプリ起動時に設定できるようにするプラグイン</a></li>
-<li><a href="https://docs.com/xin9le/1447/sharing-deep-dive" target="_blank" rel="noopener">Hololens meetup vol2で発表されたHoloToolKitよりイケている共有サービス</a></li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h1&gt;&lt;p&gt;こんにちは。HoloLens記事第二弾です。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;前回の記事は&lt;a href=&quot;https://fut
-    
-    </summary>
-    
-      <category term="VR" scheme="https://future-architect.github.io/categories/VR/"/>
-    
-    
-      <category term="Unity" scheme="https://future-architect.github.io/tags/Unity/"/>
-    
-      <category term="HoloLens" scheme="https://future-architect.github.io/tags/HoloLens/"/>
     
   </entry>
   
