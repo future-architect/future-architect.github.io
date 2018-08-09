@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2018-07-23T05:11:28.147Z</updated>
+  <updated>2018-08-09T05:31:32.626Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <author>
@@ -14,6 +14,499 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>データベースマイグレーション ～OracleからPostgreSQLへ～　－第２回ー</title>
+    <link href="https://future-architect.github.io/articles/20180809/"/>
+    <id>https://future-architect.github.io/articles/20180809/</id>
+    <published>2018-08-09T06:00:36.000Z</published>
+    <updated>2018-08-09T05:31:32.626Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="1-初めに"><a href="#1-初めに" class="headerlink" title="1. 初めに"></a>1. 初めに</h2><p>こんにちは。Technology Innovation Groupの岸田です。</p>
+<p>前回に引き続き、データベースのマイグレーションがテーマです。<br>第1回はデータベースマイグレーションについて流れやポイントとなる点について記載してきました。<br>第2回は以下3点について紹介します。</p>
+<ul>
+<li>移行支援ツールの紹介</li>
+<li>実際にシステムで稼働しているデータベース環境とアプリケーション（SQL）を使った評価</li>
+<li>データベースマイグレーションの検討の方針</li>
+</ul>
+<h2 id="2-移行支援ツール"><a href="#2-移行支援ツール" class="headerlink" title="2. 移行支援ツール"></a>2. 移行支援ツール</h2><p>データベースのマイグレーションに際しては、移行ツールがいくつか公開されているため、それを利用するのが良いでしょう。このようなツールを利用してマイグレーションの作業量を削減していくことになります。</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>ツール名称</th>
+<th>説明</th>
+<th>参照先</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>ora2pg</td>
+<td>GPLにもとづくオープンソースフリーソフトウェア</td>
+<td><a href="http://ora2pg.darold.net/" target="_blank" rel="noopener">ora2pgのHP</a></td>
+</tr>
+<tr>
+<td>2</td>
+<td>AWS Schema Conversion Tool</td>
+<td>AWSにて公開のツール</td>
+<td><a href="https://docs.aws.amazon.com/ja_jp/SchemaConversionTool/latest/userguide/CHAP_Welcome.html" target="_blank" rel="noopener">AWS Schema Conversion Tool</a></td>
+</tr>
+</tbody>
+</table>
+<p>簡単ではありますが、2つの移行ツール(ora2pg/AWS Schema Conversion Tool)について紹介します。<br>移行ツールは現利用環境のデータベース定義を別環境に再現（ライセンスに注意！）し、再現環境に接続してツールを実行します。<br>もちろん、現利用環境に直接接続できる場合は別環境を用意する必要はございません。</p>
+<h3 id="2-1-ora2pg"><a href="#2-1-ora2pg" class="headerlink" title="2-1 ora2pg"></a>2-1 ora2pg</h3><p>ora2pgはOracle/MySQLからPostgreSQLへの移行を支援するツールです。動作環境はLinuxとなります。</p>
+<h4 id="できること"><a href="#できること" class="headerlink" title="できること"></a>できること</h4><p>ora2pgでは以下を行うことが可能です。</p>
+<ul>
+<li>スキーマ定義のコンバージョン用DDLの作成<ul>
+<li>接続した環境からOracleデータベースにあるオブジェクト定義からPostgreSQLで実行可能なDDLの出力</li>
+</ul>
+</li>
+<li>スキーマコンバージョンのレポート出力<ul>
+<li>PostgreSQLに変換する際の評価レポート</li>
+</ul>
+</li>
+<li>データ移行SQLの作成<ul>
+<li>PostgreSQLで実行可能なINSERT文またはCOPY文の形式によるDMLの出力</li>
+</ul>
+</li>
+<li>SQLファイルのコンバージョン</li>
+</ul>
+<p>ora2pgの具体的な利用方法は<a href="https://ora2pg.darold.net/documentation.html" target="_blank" rel="noopener">こちら</a>を参照してください。<br>参考までに、本ブログではora2pgはバージョン18.2を利用して確認しております。</p>
+<p>コンバージョンの実行は、confファイル内で<code>TYPE</code>句にて指定し、個々に確認していきます。インストール時に用意されているconfファイル内にTYPEで指定できるキーワードが記載されております。（SYNONYMとDBLINKは記載がありませんが、指定が可能です。）<br>TYPEで指定できるキーワードとしては大きく3つの種類に分けられます。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">種別</th>
+<th style="text-align:left">キーワード</th>
+<th style="text-align:left">説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">TABLE</td>
+<td style="text-align:left">テーブル、インデックス、制約等のテーブルに関連するオブジェクト</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">PACKAGE</td>
+<td style="text-align:left">パッケージ ⇒ シノニム＋ファンクションに変換</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">VIEW</td>
+<td style="text-align:left">ビュー</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">GRANT</td>
+<td style="text-align:left">オブジェクトの権限</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">SEQUENCE</td>
+<td style="text-align:left">順序</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">TRIGGER</td>
+<td style="text-align:left">トリガー</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">FUNCTION</td>
+<td style="text-align:left">ファンクション</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">PROCEDURE</td>
+<td style="text-align:left">プロシージャ ⇒ ファンクションに変換</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">TABLESPACE</td>
+<td style="text-align:left">表領域</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">TYPE</td>
+<td style="text-align:left">タイプ</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">PARTITION</td>
+<td style="text-align:left">パーティション表 ⇒ 親子型のパーティション表に変換</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">FDW</td>
+<td style="text-align:left">外部表</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">MVIEW</td>
+<td style="text-align:left">マテリアライズド・ビュー</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">KETTLE</td>
+<td style="text-align:left">XMLテンプレート</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">SYNONYM</td>
+<td style="text-align:left">シノニム</td>
+</tr>
+<tr>
+<td style="text-align:left">オブジェクト</td>
+<td style="text-align:left">DBLINK</td>
+<td style="text-align:left">データベース・リンク</td>
+</tr>
+<tr>
+<td style="text-align:left">データ</td>
+<td style="text-align:left">INSERT</td>
+<td style="text-align:left">データ登録DML（INSERT形式）</td>
+</tr>
+<tr>
+<td style="text-align:left">データ</td>
+<td style="text-align:left">COPY</td>
+<td style="text-align:left">データ登録DML（COPY形式）</td>
+</tr>
+<tr>
+<td style="text-align:left">SQL</td>
+<td style="text-align:left">QUERY</td>
+<td style="text-align:left">SQL文の変換</td>
+</tr>
+</tbody>
+</table>
+<p>スキーマコンバージョンのレポートは以下のようなコマンドとなります。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/usr/local/bin/ora2pg -c /etc/ora2pg/ora2pg.conf -t SHOW_REPORT --estimate_cost --dump_as_html &gt; report.html</div></pre></td></tr></table></figure></p>
+<p>レポートの出力結果例は以下です。</p>
+<p><img src="/images/20180809/ora2pg_report.png" alt=""></p>
+<p>ora2pgのSQLの変換については、ファイル単位にコンバートしていくため、各SQLファイルに対してora2pgを実行する必要があります。多少手間ではありますが、シェルを組んでディレクトリ内のファイル（例えば拡張子がsqlのものとか）に対してora2pgを実行することになるでしょう。また、コンバートできないものについてはエラーが出力されることなく、そのままの記載内容でアウトプットファイルが出力されますので、個々にコンバージョン結果の確認が必要となります。</p>
+<h3 id="2-2-AWS-Schema-Conversion-Tool-AWS-SCT"><a href="#2-2-AWS-Schema-Conversion-Tool-AWS-SCT" class="headerlink" title="2-2 AWS Schema Conversion Tool(AWS-SCT)"></a>2-2 AWS Schema Conversion Tool(AWS-SCT)</h3><p>AWS-SCTは、AWSが提供しているツールです。オンプレのデータベースシステムをAWSクラウドへシフトする支援用のツールとなっていまして、変換可能なデータベースが多数存在します。<br>変換可能なデータベースの対応表は以下の通りです。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">変換元データベース</th>
+<th style="text-align:left">変換先データベース</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">MS SQL Server</td>
+<td style="text-align:left">MySQL/PostgreSQL/Redshift</td>
+</tr>
+<tr>
+<td style="text-align:left">MySQL</td>
+<td style="text-align:left">PostgreSQL</td>
+</tr>
+<tr>
+<td style="text-align:left">Oracle</td>
+<td style="text-align:left">MySQL/PostgreSQL/Redshift</td>
+</tr>
+<tr>
+<td style="text-align:left">PostgreSQL</td>
+<td style="text-align:left">MySQL</td>
+</tr>
+<tr>
+<td style="text-align:left">Greenplum</td>
+<td style="text-align:left">Redshift</td>
+</tr>
+<tr>
+<td style="text-align:left">Netezza</td>
+<td style="text-align:left">Redshift</td>
+</tr>
+<tr>
+<td style="text-align:left">Vertica</td>
+<td style="text-align:left">Redshift</td>
+</tr>
+</tbody>
+</table>
+<p>AWS-SCTを起動して、プロジェクト（作業領域）をオープンすると、変換元と変換先を選択することになります。<br>例えば、接続元がOracle(OLTP)を選択すると接続先で選べるのは、以下となっております。</p>
+<ul>
+<li>Amazon RDS for MySQL</li>
+<li>Amazon Aurora (MySQL compatible)</li>
+<li>Amazon RDS for PostgreSQL</li>
+<li>Amazon Aurora (PostgreSQL compatible)</li>
+<li>Amazon RDS for Oracle</li>
+</ul>
+<h4 id="できること-1"><a href="#できること-1" class="headerlink" title="できること"></a>できること</h4><p>AWS-SCTでは以下を行うことが可能です。</p>
+<ul>
+<li>スキーマ定義のコンバージョン用DDLの作成<ul>
+<li>接続した環境からOracleデータベースのオブジェクト定義からPostgreSQLで実行可能なDDLの出力</li>
+</ul>
+</li>
+<li>スキーマコンバージョンのレポート出力<ul>
+<li>PostgreSQLに変換する際の評価レポート</li>
+</ul>
+</li>
+<li>変換先データベースに対するスキーマの作成<ul>
+<li>上記DDLを実行して変換先のデータベースにスキーマ及びオブジェクトを作成</li>
+</ul>
+</li>
+<li>SQLファイルのコンバージョン</li>
+</ul>
+<p>AWS-SCTはGUIでの操作なのでユーザフレンドリーですね。また、レポートについても画面で表示されるため、イメージしやすいです。<br>スキーマのコンバージョンレポートイメージは以下。</p>
+<p><img src="/images/20180809/AWS-SCT_user_report.png" alt=""></p>
+<p>以下はオブジェクトの詳細イメージ。</p>
+<p><img src="/images/20180809/AWS-SCT_object_report.png" alt=""></p>
+<p>緑は自動変換可能、グレーっぽいのは単純変換で対応可能、黄色は多少手を加える必要がある、赤は要見直しという感じに考えていただければよいです。</p>
+<p>AWS-SCTの中でとても便利な機能はアプリケーションのコンバージョンです。<br>Windows上の指定したフォルダ配下に格納されているファイル（もちろんサブフォルダも対象）の中からSQLを抽出してコンバージョンを評価します。ファイルの形式はJAVA/C++/C#といったものが選択できます。もちろんSQLのみが記載されているファイルでもOKです。スキーマのコンバージョン同様に抽出したSQL単位に対応内容をグルーピングします。レポート結果イメージは以下です。</p>
+<p><img src="/images/20180809/AWS-SCT_sql_report.png" alt=""></p>
+<p>また、各SQL毎にGUI上でツールによって変換された内容を見ることができます。</p>
+<p>下図の例では、4つのSQL文が記述されているファイルに対するコンバージョン結果を表示しております。上部の左上の欄にはソースファイルの内容が表示されます。その下の枠には、ソースファイルから抽出されたSQL文が表示されます。1つのファイルに複数のSQL文が記載されていた場合は、SQLを選択することで個別に表示されます。抽出されたSQLの右の枠にPostgreSQL用に変換されたSQLが表示されます。その枠の上部のApplyボタンで元ファイルへの反映ができ、右上の枠内に反映結果が表示されます。その枠の上部のSaveボタンで反映結果を元のファイルへ保存することも可能です。現時点では評価したファイルすべてに対して一括反映⇒一括保存ができるような機能は無いと思われますので、コンバージョン結果の反映は面倒ですね。（そのような機能があるのかもしれませんが見つけられてません。）</p>
+<p><img src="/images/20180809/AWS-SCT_sql_conv.png" alt=""></p>
+<p>自動変換ができないものについては、各SQL単位にアドバイスが出力されます。そのアドバイスから、手動でメンテナンスを実施していくことになります。</p>
+<h2 id="3-移行支援ツール検証"><a href="#3-移行支援ツール検証" class="headerlink" title="3. 移行支援ツール検証"></a>3. 移行支援ツール検証</h2><p>実際にとあるシステムのDB環境及びアプリケーションに対して移行ツールを使ってみました。</p>
+<h3 id="3-1-テーブルのコンバージョン"><a href="#3-1-テーブルのコンバージョン" class="headerlink" title="3-1 テーブルのコンバージョン"></a>3-1 テーブルのコンバージョン</h3><p>実際のテーブルのデータ型についてはツールにより自動変換されます。ora2pgではconfファイル内で、変換ルールを定義することも可能です。<br>あくまでもルールに基づいた変換となっておりますので、システム内での標準化基準があるようでしたら、そちらに従うようにしてください。<br>それぞれのツールでのデフォルトの自動変換ルールは以下の表のようになっております。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">属性</th>
+<th style="text-align:left">Oracleのデータ型</th>
+<th style="text-align:left">ora2pgでの変換後のデータ型</th>
+<th style="text-align:left">AWS-SCTでの変換後のデータ型</th>
+<th>備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">文字列</td>
+<td style="text-align:left">CHAR(n)</td>
+<td style="text-align:left">char(n)</td>
+<td style="text-align:left">character(n)</td>
+<td>PostgreSQLのnは文字数</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">NCHAR(n)</td>
+<td style="text-align:left">char(n)</td>
+<td style="text-align:left">character(n)</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">VARCHAR2(n)</td>
+<td style="text-align:left">varchar(n)</td>
+<td style="text-align:left">character varying(n)</td>
+<td>PostgreSQLのnは文字数</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">NVARCHAR2(n)</td>
+<td style="text-align:left">varchar(n)</td>
+<td style="text-align:left">character varying(n)</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">CLOB</td>
+<td style="text-align:left">text</td>
+<td style="text-align:left">text</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">LONG</td>
+<td style="text-align:left">text</td>
+<td style="text-align:left">text</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">数値</td>
+<td style="text-align:left">NUMBER</td>
+<td style="text-align:left">bigint</td>
+<td style="text-align:left">double</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">NUMBER(n)</td>
+<td style="text-align:left">smallint</td>
+<td style="text-align:left">numeric(n,0)</td>
+<td>n=1～4</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">NUMBER(n)</td>
+<td style="text-align:left">integer</td>
+<td style="text-align:left">numeric(n,0)</td>
+<td>n=5～9</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">NUMBER(n)</td>
+<td style="text-align:left">bigint</td>
+<td style="text-align:left">numeric(n,0)</td>
+<td>n=10～19</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">NUMBER(n)</td>
+<td style="text-align:left">decimal</td>
+<td style="text-align:left">numeric(n,0)</td>
+<td>n=20～38</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">NUMBER(n,m)</td>
+<td style="text-align:left">real</td>
+<td style="text-align:left">numeric(n,m)</td>
+<td>n=2～6</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">NUMBER(n,m)</td>
+<td style="text-align:left">double precision</td>
+<td style="text-align:left">numeric(n,m)</td>
+<td>n=7～15</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">NUMBER(n,m)</td>
+<td style="text-align:left">decimal</td>
+<td style="text-align:left">numeric(n,m)</td>
+<td>n=16～38</td>
+</tr>
+<tr>
+<td style="text-align:left">日付</td>
+<td style="text-align:left">DATE</td>
+<td style="text-align:left">timestamp</td>
+<td style="text-align:left">timestamp</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">TIMESTAMP</td>
+<td style="text-align:left">timestamp</td>
+<td style="text-align:left">timestamp</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">バイナリ</td>
+<td style="text-align:left">BLOB</td>
+<td style="text-align:left">bytea</td>
+<td style="text-align:left">bytea</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">RAW</td>
+<td style="text-align:left">bytea</td>
+<td style="text-align:left">bytea</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left">その他</td>
+<td style="text-align:left">ROWID</td>
+<td style="text-align:left">oid</td>
+<td style="text-align:left">character(255)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>特殊型については個別に御確認ください。</p>
+<h3 id="3-2-アプリケーションソースのコンバージョン"><a href="#3-2-アプリケーションソースのコンバージョン" class="headerlink" title="3-2 アプリケーションソースのコンバージョン"></a>3-2 アプリケーションソースのコンバージョン</h3><p>スキーマ定義のコンバージョンは一定ルールで変更できるのが確認できましたが、マイグレーション検討を行うにあたって一番の壁がアプリケーションソースのコンバージョンです。SQLは各製品で互換性がない部分があるためソース(SQL)を一つ一つ確認していく必要があります。そのためソースの全量を把握することがまず最初の第一歩となります。</p>
+<p>今回利用したシステムのアプリケーション(java)はDBに対するクエリはjavaソース内に記載されているのではなく、SQLごとにファイルが作成される実装方式のためSQLファイルを1か所に纏めてコンバージョンの検証を実行することができました。SQLの本数は1,150本です。</p>
+<p>ora2pgはアプリケーションコードのファイル単位に実行が必要であり、また実行結果も目視確認しなければならないことから、今回はAWS-SCTの実行事例をご紹介致します。</p>
+<p>SQLのコンバージョン結果レポートを出力させると<strong>SQLConversion Actionsタブ</strong>にコンバージョン評価に対するアドバイスの一覧が表示されます。各ISSUEが発生しているSQL数が<strong>Number of occurrences</strong>として記載されており、▶をクリックすることでそのISSUEが発生しているファイルの一覧を表示することができますので、どのSQLでどのISSUEが発生しているか一目でわかるようになっています。また、各ISSUEの部分を見てわかる通り、ISSUEに関連した記載のあるマニュアルのURLも表示されていますので、実際にどのように直すかの参考になります。</p>
+<p><img src="/images/20180809/AWS-SCT_sql_conv_detail.png" alt=""></p>
+<p>今回コンバージョン検証をでてきた中で見直さなくてはいけないものとしてはどのようなものがあったのでしょう。少し見ていきます。</p>
+<h3 id="SQL自動変換"><a href="#SQL自動変換" class="headerlink" title="SQL自動変換"></a>SQL自動変換</h3><p>前回のブログにて記載した内容（外部結合・DECODE関数・HINT句）については自動的に変換されます。<br>加えて、Oracleでは省略が可能な表や列の別名の定義の際に記載する<code>AS</code>の補完等も実施されます。<br>注意が必要なのは、AWS-SCTでの変換は変換後のデータベースをRDSを想定しているため、RDSで用意されているOracle互換用のスキーマ（aws_oracle_ext）で代替が可能な記載については自動的に変換されます。例えば、<code>SYSDATE</code>、<code>ADD_MONTHS</code>、<code>TO_DATE</code>、<code>TO_CHAR</code>等があります。</p>
+<h4 id="UPDATE文"><a href="#UPDATE文" class="headerlink" title="UPDATE文"></a>UPDATE文</h4><p>UPDATE文については2種類のISSUEとして挙がってきています。<code>5065</code>と<code>5608</code>です。改修ポイントとして以下に纏めます。それぞれ、最新のPostgreSQLでは修正点は少なくて済みます。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">ISSUE番号</th>
+<th style="text-align:left">メッセージ</th>
+<th style="text-align:left">詳細内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">5065</td>
+<td style="text-align:left">PostgreSQL doesn’t support the UPDATE statement for a subquery</td>
+<td style="text-align:left">UPDATEの対象テーブルにサブクエリ(VIEW)を指定することができない　⇒　9.1以降であればCTE等を使って改修してください。</td>
+</tr>
+<tr>
+<td style="text-align:left">5608</td>
+<td style="text-align:left">Unable to convert the UPDATE statement with multiple-column subquery in SET clause</td>
+<td style="text-align:left">SET句に複数行を指定し、更新後の値をサブクエリで指定する方法はサポートされていない  → 9.5以降で記載できるようになったため、そのままで実行可能となります。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="結果相違"><a href="#結果相違" class="headerlink" title="結果相違"></a>結果相違</h4><p>OracleとPostgreSQLでの実行で検索結果が異なる可能性があります。<br>ここで挙がったSQLについては改修後のテストで重点的に新旧結果比較をすることをお奨め致します。</p>
+<p>今回の検証で挙がった事象としては3種類ありました。</p>
+<p>まずは、関数の<code>GREATEST</code>と<code>LEAST</code>です。検証結果としては<code>5271</code>と<code>5272</code>となります。<br>PostgreSQLだと関数で指定した列内にNULLが含まれるとNULLが返ります。そのため、COALESCE関数でNULLを変換する必要がでてきます。</p>
+<p>次に、正規表現になります。検証結果としては<code>5617</code>となります。Oracleでは、<code>REGEXP_LIKE</code>関数となりますが、PostgreSQLにはそのような関数が無く、AWS-SCTでは<code>~</code>に自動変換されます。正規表現の判定がOracleとPostgreSQLで異なる可能性があり警告として出力されているものと考えております。</p>
+<h4 id="変換不可"><a href="#変換不可" class="headerlink" title="変換不可"></a>変換不可</h4><p>移行支援ツールで自動変換が困難なものが、検証結果の<code>5340</code>、<code>5621</code>と<code>9996</code>にあたります。</p>
+<p>MERGE文、PostgreSQLでは実装されていない事前定義関数で代替が困難なもの（今回はSUBSTRB関数）や複雑なSQL文のようなものとなります。コンバージョン結果としては何も変換されずにISSUEで挙がっている文言が記載されます。<br>参考までに、MERGE文については前回のブログを参照していただければ修正ポイントが分かります。</p>
+<h4 id="変換結果まとめ"><a href="#変換結果まとめ" class="headerlink" title="変換結果まとめ"></a>変換結果まとめ</h4><p>AWS-SCTのSQLのコンバージョン検証結果を纏めると以下のようになります。</p>
+<p><img src="/images/20180809/AWS-SCT_sql_conv_summary2.png" alt=""></p>
+<p>AWS-SCTによる分類のうちSUCCESSとLOWがそこまで労力をかけない修正（変換）でPostgreSQLで実行可能となります。また、上記で記載したようにSET句でのサブクエリの指定はPostgreSQL 9.5以降では可能となっているため、そちらを加えると<strong>88.2%</strong>となります。HIGHと分類されている、行ロックについては第1回にて説明しておりますので、そちらを参考にしてセッションパラメータの設定にて対処可能ですので、大きな修正となるのはMERGE文、サブクエリの更新とSUBSTRB関数の実装のみとなり、全体の6%程度に過ぎません。</p>
+<p>このように、ソース全体のうち修正が必要なSQL量をざっと確認することができ、かつ修正難易度の目安についても確認できることが分かりました。コンバージョン計画立案時のコスト、スケジュール算出にとしても有用なものとなりそうです。</p>
+<h5 id="参考までに"><a href="#参考までに" class="headerlink" title="参考までに"></a>参考までに</h5><p>ora2pgについても、外部結合やDECODE等の変換ができていることは確認しております。驚いたのは、ora2pgの外部結合の変換はすべてLEFT OUTER JOINに統一されているところです。（AWS-SCTは(+)の記載位置によりRIGHT OUTER JOINの変換もあります。）すべてを目視確認する場合はora2pgのSQL変換でも良いかもしれません。</p>
+<h2 id="3-データベースマイグレーション検討の方針"><a href="#3-データベースマイグレーション検討の方針" class="headerlink" title="3. データベースマイグレーション検討の方針"></a>3. データベースマイグレーション検討の方針</h2><p>データベースマイグレーションを検討する際には、作業項目毎マイグレーションの難易度をに評価して実現性を検討していくことになります。どのようなシステムがマイグレーションがし易いのか考えてみます。</p>
+<h3 id="データベースオブジェクト"><a href="#データベースオブジェクト" class="headerlink" title="データベースオブジェクト"></a>データベースオブジェクト</h3><p>データベースオブジェクトについての変換は第1回でも触れましたが、圧倒的にストアド・サブプログラムが難易度が高いです。その他についてはPostgreSQLで実装されていないOracle固有のオブジェクトを利用している場合は検討が必要となってきます。</p>
+<h3 id="アプリケーションソース"><a href="#アプリケーションソース" class="headerlink" title="アプリケーションソース"></a>アプリケーションソース</h3><p>アプリケーションについては、ソースがファイルとして保持しているようであれば、変換ツールを施行することが可能となります。そのため、ソースファイルのような形でツールが利用できない場合は難易度が高くなります。動的にSQLを組んで実行する形やアプリケーション内にSQLが分散している場合などがそれにあたります。</p>
+<p>また、ストアド・プログラムが存在する場合は、コンバージョン及びテストの難易度が上がります。<br>PostgreSQLのPL/pgSQLでファンクションとして作成することは可能ですが、コンバージョンのタイミングでアプリケーション側にロジックを寄せる検討をすることも視野に入れてください。<br>PL/SQLをPL/pgSQLにコンバージョンする際に気を付ける点としては、以下となります。</p>
+<ul>
+<li>PL/pgSQL関数内部ではCOMMITが使用できない</li>
+<li>エラーが発生した場合は内部処理はすべてロールバックされる</li>
+<li>パッケージが存在しないため、関数を跨った変数を定義できない</li>
+<li>変数はすべて宣言する必要がある</li>
+</ul>
+<p>データベースへの接続方法としては、OracleもPostgreSQLも変わらないため特に意識する必要はありません。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">難易度</th>
+<th style="text-align:left">アプリケーション実装方法</th>
+<th style="text-align:left">システム例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>高</strong></td>
+<td style="text-align:left">PL/SQLの実行／動的SQL</td>
+<td style="text-align:left">バックグラウンドでの集計処理メインのシステム、分析用の検索システム</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>低</strong></td>
+<td style="text-align:left">実行されるSQLが外出しされている</td>
+<td style="text-align:left">定型フォームのオンライン検索システム</td>
+</tr>
+</tbody>
+</table>
+<h3 id="非機能要件"><a href="#非機能要件" class="headerlink" title="非機能要件"></a>非機能要件</h3><p>これまでは、アプリケーションについて触れてきましたが、PostgreSQLはシステム内ではデータベースサーバとして稼働していくことになりますので、非機能要件についても要件を満たすかどうかを検討していくことになります。</p>
+<p>現行システムで可用性要件や性能要件のためにOracle RAC構成を取っている場合があると思います。<br>Oracle RACはShared Everythingのデータベース構成となっていて、複数台のサーバがアクティブ状態で1つのデータベースを共有して稼動しますので、単体のサーバ障害ではシステムが停止しないということが大きな特徴です。また、複数台がアクティブに稼働しておりますので、分散処理も可能となります。  この要件が崩せない場合は、やはりOracleからのマイグレーションは難しくなります。</p>
+<p>PostgreSQLでは、可用性を上げるために3rdベンダのクラスタウェアを利用したActive-Standby構成が考えられます。また、分散処理の一例としてレプリケーション機能を利用したMaster-Slave構成として参照処理をSlave側で実行させるといったことも考えられます。</p>
+<p>その他、運用（バックアップ／監視／セキュリティ）等、非機能要件を確認したうえで、マイグレーションの評価をしていってください。OracleのEnterprise Editionの場合、PostgreSQLにはない機能が豊富にふくまれているため細かく確認が必要です。</p>
+<p>クラウドサービスの場合、可用性（レプリケーション）、運用（バックアップ、監視、セキュリティ）がDB機能として提供されています（例えば、AWS RDS）のでこの部分のハードルはぐっと低くなると考えています。</p>
+<h3 id="データ移行"><a href="#データ移行" class="headerlink" title="データ移行"></a>データ移行</h3><p>データベースのマイグレーションではなくても、システムの刷新時には検討されるのが、データの移行です。すいません、データ移行は非常に様々な検討項目があるため、書くとなると1回分くらいになってしまうかと思いますので、第2回のブログでも割愛させていただきます。<br>ただ、マイグレーションの難易度の評価は割愛せずに必ず実施してください。</p>
+<h2 id="4-最後に"><a href="#4-最後に" class="headerlink" title="4. 最後に"></a>4. 最後に</h2><p>ここまでデータベースのマイグレーション（PostgreSQL）について確認してきましたが、ツールを利用したマイグレーションが有用であることが確認できました。また、実際のコンバージョンだけでなくプロジェクト計画を立てる際の一次評価としても有用と言えます。</p>
+<p>第1回・第2回とはデータベースのマイグレーションに特化した内容で記載してきましたが、PostgreSQLへのマイグレーションの判断が下された後には、もちろんPostgreSQLとしてのデータベース設計は必要です。パラメータや配置などの物理設計や統計情報取得、VACUUM処理、バックアップ等の運用設計もしっかりとやっていきましょう。</p>
+<p>フューチャーでは仮想的なDBチームが形成されており、各プロジェクトへの横断的に支援しております。OracleやPostgreSQLを中心としたノウハウの蓄積・共有なども活発に行っていますので、ご興味ある方は是非一緒に働いていきましょう！！</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;1-初めに&quot;&gt;&lt;a href=&quot;#1-初めに&quot; class=&quot;headerlink&quot; title=&quot;1. 初めに&quot;&gt;&lt;/a&gt;1. 初めに&lt;/h2&gt;&lt;p&gt;こんにちは。Technology Innovation Groupの岸田です。&lt;/p&gt;
+&lt;p&gt;前回に引き続き、デ
+    
+    </summary>
+    
+      <category term="DB" scheme="https://future-architect.github.io/categories/DB/"/>
+    
+    
+      <category term="Migration" scheme="https://future-architect.github.io/tags/Migration/"/>
+    
+      <category term="PostgresSQL" scheme="https://future-architect.github.io/tags/PostgresSQL/"/>
+    
+      <category term="Oracle" scheme="https://future-architect.github.io/tags/Oracle/"/>
+    
+  </entry>
   
   <entry>
     <title>人工知能学会（JSAI2018）参加報告</title>
@@ -2175,168 +2668,6 @@
       <category term="Kibana" scheme="https://future-architect.github.io/tags/Kibana/"/>
     
       <category term="Redmine" scheme="https://future-architect.github.io/tags/Redmine/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Unity未経験者がHoloLensアプリの開発をしてみた</title>
-    <link href="https://future-architect.github.io/articles/20170421/"/>
-    <id>https://future-architect.github.io/articles/20170421/</id>
-    <published>2017-04-21T03:00:00.000Z</published>
-    <updated>2017-05-09T01:57:18.468Z</updated>
-    
-    <content type="html"><![CDATA[<p>Unity, C# の未経験者がHoloLensのアプリを開発しました。<br>まだまだHoloLensについての開発情報が少ないと思いますので、アプリを作っていく流れをまとめます。<br>なにか少しでもお役に立てれば嬉しいです！</p>
-<p>HoloLensに関する過去記事はこちらをどうぞ。</p>
-<ul>
-<li><a href="https://future-architect.github.io/articles/20170210/">会社に届いたHoloLensを使ってみた</a></li>
-<li><a href="https://future-architect.github.io/articles/20170405/">HoloLensの空間共有サービスを使ってみよう</a></li>
-</ul>
-<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>はじめまして。名古屋大学の澤田周吾です。就職活動中にフューチャーアーキテクト株式会社さんと出会い、 インターンとしてHoloLens アプリの開発を担当させていただきました。</p>
-<p>キッカケはある懇親会の時。私がいきなり「来週からホロレンズ開発のインターンさせてください！」という要望をぶつけたのですが、あっさり「いいよ」と一言。インターンの日程もサクサク決まりHoloLensアプリの開発が始まりました。無茶振りにも華麗に応えてくれるフューチャーさん、好きです。</p>
-<h1 id="何を作ったか"><a href="#何を作ったか" class="headerlink" title="何を作ったか"></a>何を作ったか</h1><p>人の前で発表する時って、やっぱり緊張しますよね。<br><img src="/images/20170418/photo_20170418_00.png"></p>
-<p>真面目な人の顔って、圧迫感がありますから。</p>
-<p><img src="/images/20170418/photo_20170418_01.png"></p>
-<p>このような人達の前で発表するのは相当緊張すると思います。<br>しかし、この人達が全てジャガイモだったらどうでしょうか。</p>
-<p><img src="/images/20170418/photo_20170418_02.png"><br>発表しやすくなった！<br>みなさん、そう感じると思います。ジャガイモって、ほっこりしますよね。<br>ということで、人類芋化計画を実現させていきます。</p>
-<p>つまり <strong>人の顔をジャガイモに置き換える</strong> アプリ、名づけて <strong>Potato Heads</strong> です。</p>
-<p>実現に向けての技術的な見通しは…</p>
-<ol>
-<li>HoloLensのカメラから、顔認証技術を使って顔の部分の位置座標を検出</li>
-<li>そこに画像の大きさを合わせて出力する<br>という2段構えで実現できると考えました。</li>
-</ol>
-<p>実際に作った Potato Heads の動画はこちら↓↓↓</p>
-<p><blockquote class="twitter-tweet" data-lang="ja"><p lang="ja" dir="ltr">私が作ったHoloLensアプリの Potato Heads !<br>人の顔をジャガイモにします！ <a href="https://t.co/nu5SOPSrME" target="_blank" rel="noopener">pic.twitter.com/nu5SOPSrME</a></p>&mdash; sSgo (@ssogoss) <a href="https://twitter.com/ssogoss/status/852385164814450688" target="_blank" rel="noopener">2017年4月13日</a></blockquote></p>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-
-<h1 id="使用したもの"><a href="#使用したもの" class="headerlink" title="使用したもの"></a>使用したもの</h1><ul>
-<li>HoloLens</li>
-<li>Unity 5.5</li>
-<li>C#</li>
-<li>HoloToolkit-Unity</li>
-<li>OpenCV For Unity</li>
-<li>HoloLensWithOpenCVForUnityExample.unitypackage</li>
-<li>PCスペック<ul>
-<li>windows10 Home<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
-<li>メモリ4GB<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></li>
-</ul>
-</li>
-</ul>
-<h1 id="開発環境構築"><a href="#開発環境構築" class="headerlink" title="開発環境構築"></a>開発環境構築</h1><p>UnityとVisual Studioのインストールについてはこちらを参考にさせていただきました。<br><a href="http://azure-recipe.kc-cloud.jp/2016/12/hololens-install/" target="_blank" rel="noopener">HoloLens UnityとVisual Studioのインストール | ナレコムazureレシピ</a></p>
-<h2 id="Unityのプロジェクトを作成"><a href="#Unityのプロジェクトを作成" class="headerlink" title="Unityのプロジェクトを作成"></a>Unityのプロジェクトを作成</h2><ol>
-<li>Unityを起動</li>
-<li>右上のNEWボタンを押します</li>
-<li>Project Name 記入、任意の保存先選択、3Dを選択</li>
-<li>Create projectボタンを押します</li>
-</ol>
-<p>これで新しいプロジェクトが作成されます。</p>
-<p>Unityのレイアウトについては右上のLayoutドロップダウンから2by3を選択すると以下のように配置されます。</p>
-<p><img src="/images/20170418/photo_20170418_03.png"><br>(引用：<a href="http://qiita.com/2dgames_jp/items/11bb76167fb44bb5af5f" target="_blank" rel="noopener">http://qiita.com/2dgames_jp/items/11bb76167fb44bb5af5f</a>)</p>
-<h2 id="HoloToolkit-Unityのダウンロード"><a href="#HoloToolkit-Unityのダウンロード" class="headerlink" title="HoloToolkit-Unityのダウンロード"></a>HoloToolkit-Unityのダウンロード</h2><p>アプリ開発を効率よくしてくれる HoloToolkit は、Unity用に HoloToolkit-Unity が存在するので、Unityで開発する場合はそちらを利用します。<br><a href="https://github.com/Microsoft/HoloToolkit-Unity" target="_blank" rel="noopener">GitHub:HoloToolkit-Unity</a><br>↑ここからZIPファイルをダウンロードして、任意の場所に展開しておきます。</p>
-<h2 id="初期設定"><a href="#初期設定" class="headerlink" title="初期設定"></a>初期設定</h2><ol>
-<li>先ほどダウンロードして展開しておいたHoloToolkit-Unityフォルダを開き、<br><code>任意の場所\HoloToolkit-Unity-master\Assets</code> 内の <code>HoloToolkitフォルダ</code> と<br><code>HoloToolkit.meta</code> をProjectビューのAssetsにドラッグアンドドロップします。<br>インポートが始まるのでしばし待ちます。<br>ここまでうまくいっていればメインメニューに「 HoloToolkit 」が追加されているはずです。<br>ここからHoloLensアプリに必要な初期設定を簡単に行うことができます。</li>
-<li>まずはプロジェクトの初期設定<ol>
-<li><code>メインメニューのHoloToolkit &gt; Configure &gt; ApplyHoloLensProjextSettings</code> をクリック<br><img src="/images/20170418/photo_20170418_04.png"></li>
-<li>以下のようなポップアウトが開くので全てにチェックを入れてApplyボタンを押します。<br><img src="/images/20170418/photo_20170418_05.png"></li>
-<li>Reload now? と聞かれるのでYesをクリックします。</li>
-<li>いったんUnityが閉じ、開き直されます。<br>これでプロジェクトの初期設定は完了です。</li>
-</ol>
-</li>
-<li>次にメインカメラの初期設定をします。<ol>
-<li><code>メインメニューのHoloToolkit &gt; Configure &gt; ApplyHoloLensSceneSettings</code> をクリック<br><img src="/images/20170418/photo_20170418_06.png"><br>2.先ほどと同じようにポップアウトが開くので全てにチェックを入れてApplyボタンを押します。<br><img src="/images/20170418/photo_20170418_07.png"></li>
-</ol>
-</li>
-</ol>
-<p>HoloLensでは黒は透過を意味するので、背景は黒に設定する必要があり、そのような設定がここで行われています。</p>
-<p>ここまでで、初期設定は終了です。<br>アプリを作る際、ここまでの作業は毎回行うことになると思います。</p>
-<h2 id="余談"><a href="#余談" class="headerlink" title="余談"></a>余談</h2><p>HoloLensにおいて <strong>現実世界のモノを消す技術</strong>（＝DR: DIMINISHED REALITY）は難しいです。<br>カメラ映像の世界では何年も前からDRが実現できている<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>ので不思議に思った方も多いと思います。</p>
-<p>HoloLensは現実世界の物は透過して、プラスしたいモノをレンズに光をプラスすることによって、上乗せて表示させるような原理になっています。そのため、何か消したいとしても光を上乗せすることしかできず、それゆえどうしてもリアリティの差が出てしまいます。現実世界の物とプラスした光の物の区別ができないレベルまでリアリティをもたすことができれば可能になると思いますが、まだまだ技術の進歩を待つ必要がありそうです。</p>
-<h1 id="アプリ開発"><a href="#アプリ開発" class="headerlink" title="アプリ開発"></a>アプリ開発</h1><p>ここからHoloLensアプリケーション開発の流れを説明します。</p>
-<h2 id="簡単なオブジェクトの作成"><a href="#簡単なオブジェクトの作成" class="headerlink" title="簡単なオブジェクトの作成"></a>簡単なオブジェクトの作成</h2><p>簡単な物なら、<code>Hierarchyビュー右クリック &gt; 3D Object &gt; Cube</code> から立方体を作成します。<br>Inspectorビューの設定を以下のようにすると視認性が高く表示できます。</p>
-<ul>
-<li>Position : 0, 0, 1</li>
-<li>Rotation : 45, 45, 45</li>
-<li>Scale : 0.1, 0.1, 0.1<br><img src="/images/20170418/photo_20170418_08.png"></li>
-</ul>
-<p>作業を残したい場合は <code>メインメニュー File &gt; Save Scenes</code> から作成したSceneに任意の名前を入力して保存できます。</p>
-<h2 id="Potato-Headsのつくり方"><a href="#Potato-Headsのつくり方" class="headerlink" title="Potato Headsのつくり方"></a>Potato Headsのつくり方</h2><p>Potato Headsの設定をここから記載します。<br>とりあえず簡単なものを動かしてみたい方は、上記の簡単なオブジェクトを作成したら、この小段落は飛ばしてビルドに移ってください。</p>
-<ol>
-<li>導入するアセットを下記からダウンロード<ul>
-<li>顔認証を使うために OpenCV を導入します。また、OpenCV を HoloLens で動くようにするためのアセットが HoloLensWithOpenCVForUnityExample.unitypackage です<ul>
-<li><a href="https://www.assetstore.unity3d.com/jp/#!/content/21088" target="_blank" rel="noopener">OpenCV For Unity</a>　(私は2.1.5を購入)</li>
-<li><a href="https://github.com/EnoxSoftware/HoloLensWithOpenCVForUnityExample" target="_blank" rel="noopener">HoloLensWithOpenCVForUnityExample.unitypackage</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>先ほどHoloToolkit-Unityをインポートした時と同様に、インポート<ol>
-<li><code>OpenCVforUnity/Assets</code> 内の OpenCVForUnity, OpenCVForUnity.meta をプロジェックトの Assets にドラッグアンドドロップ</li>
-<li><code>HoloLensWithOpenCVForUnityExample/Assets</code> 内のすべて4ファイルをプロジェクトのAssets にドラッグアンドドロップ</li>
-<li><code>Assets/OpenCVForUnity/StreamingAssets</code> を Assets 直下に出します</li>
-<li><code>Assets/OpenCVForUnity/OpenCVForUnityUWP_Beta3</code> 圧縮ファイルを展開</li>
-<li><code>Assets/OpenCVForUnity/OpenCVForUnityUWP_Beta3/OpenCVForUnityUWP_Beta3</code> を実行</li>
-<li>OpenCV を HoloLens で使用するために必要なファイルがインポートされるので、Allを選択し、Importボタンをクリック</li>
-</ol>
-</li>
-</ol>
-<p>ここまでできていれば以下の画像のようなAssets構造になっているはずです。<br><img src="/images/20170418/photo_20170418_09.png"></p>
-<p>この状態で <code>HoloLensWithOpenCVForUnityExample/Scenes</code>内のサンプルはHoloLens上でも動きます。</p>
-<p>ここで私は <code>Scene/HoloLensAnonymousFaceExample</code> を使用します。<br>人の顔を検知して画像をかぶせるサンプルです。</p>
-<p>好きな画像にしたい場合は、以下の1～2手順で変更できます。</p>
-<ol>
-<li><code>Assets/HoloLensAnonymousFaceExample/Resources</code> に画像を保存</li>
-<li><code>Assets/HoloLensAnonymousFaceExample/Scripts/Overlay/AnonymousRectQuad</code> のInspectorビューの一番下の AnonymousRectQuadMaterial の左下の下三角を押すと詳細がでるので、そこで画像のSelectから好きな画像を選択（下画像を参照）<br><img src="/images/20170418/photo_20170418_10.png"></li>
-</ol>
-<h1 id="ビルド"><a href="#ビルド" class="headerlink" title="ビルド"></a>ビルド</h1><ol>
-<li><code>メインメニュー &gt; Build Settings</code> をクリック</li>
-<li>以下の設定の確認します<ul>
-<li>SDK : Universal 10</li>
-<li>UWP Build Type : D3D</li>
-</ul>
-</li>
-<li>Unity C# Projects にチェックをつけます</li>
-<li>Add Open Scenesボタンから先ほどビルドしたいSceneを追加します</li>
-<li>Build ボタンをクリック<br><img src="/images/20170418/photo_20170418_11.png"></li>
-<li>ビルド先が聞かれるので、開かれるフォルダの中にAppフォルダを作って、そこをビルド先にするといいです</li>
-<li>ビルドが完了したら、フォルダが自動で開かれるので、先ほどのビルド先フォルダ内の <code>[プロジェクト名].sln</code> をVisual Studioで開きます</li>
-<li>Visual Studioで開いたら、上にあるドロップダウンを Release, x86, Device に設定します<br><img src="/images/20170418/photo_20170418_12.png"></li>
-<li>HoloLensをPCに接続し、電源をつけておきます</li>
-<li><code>メインメニュー デバッグ &gt; デバッグなしで開始</code> をクリック</li>
-</ol>
-<p>1～10の作業を行えば、HoloLens用にアプリがビルド・デプロイされます。<br>うまく完了すれば、HoloLensに転送したアプリが自動で起動して、開発したアプリを見ることができるはずです。</p>
-<p>以上で、一連のHoloLensアプリの開発は完了です。</p>
-<h1 id="デバッグについて"><a href="#デバッグについて" class="headerlink" title="デバッグについて"></a>デバッグについて</h1><p>私はWindows10 Home で開発していて、Emulatorが使えない環境だったので、HoloLensで起動しているアプリのログをとることができませんでした。<br>そのため「3D Text」をつくり、それを変更することでログとしての役割を持たせデバッグしていました。</p>
-<figure class="highlight c"><figcaption><span>TextChange.cs</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">using</span> System.Collections;</div><div class="line"><span class="keyword">using</span> System.Collections.Generic;</div><div class="line"><span class="keyword">using</span> UnityEngine;</div><div class="line"></div><div class="line"><span class="keyword">namespace</span> DlibFaceLandmarkDetectorExample &#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">class</span> TextChange : MonoBehaviour &#123;</div><div class="line">        <span class="built_in">string</span> text = <span class="string">""</span>;</div><div class="line"></div><div class="line">        <span class="comment">// Use this for initialization</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">Start</span><span class="params">()</span> </span>&#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// Update is called once per frame</span></div><div class="line">        <span class="function"><span class="keyword">void</span> <span class="title">Update</span><span class="params">()</span> </span>&#123;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Change</span><span class="params">(<span class="built_in">string</span> newtext)</span></span></div><div class="line">        &#123;</div><div class="line">            text = text + newtext;</div><div class="line">            GetComponent&lt;TextMesh&gt;().text = text;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>上のメソッドを用意しておいて、デバッグしたいコードの中でこのメソッドに飛ばすという形です。<br>クラスの中でパスを定義↓しまして…</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">TextChange textChange;</div><div class="line">GameObject refObj;</div><div class="line">refObj = GameObject.Find(<span class="string">"3DText名"</span>);</div></pre></td></tr></table></figure>
-<p>メソッドに飛ばします↓</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">textChange = refObj.GetComponent&lt;TextChange&gt;();            </div><div class="line">textChange.Change(<span class="string">"test\n"</span>);</div></pre></td></tr></table></figure>
-<p>この手法を用いてデバッグを行いました。</p>
-<h1 id="インターン成果発表会"><a href="#インターン成果発表会" class="headerlink" title="インターン成果発表会"></a>インターン成果発表会</h1><p>インターン当初はもっと高度なことをやろうと計画立てていましたが、開発期間4日間という短い期間だったため、途中で方向転換し、期間内で物をつくりあげることを大切にしました。</p>
-<p><img src="/images/20170418/photo_20170418_13.png"></p>
-<p>最後の発表会はHoloLensをつけて、オーディエンスをイモにしてリラックスしながら進めました。笑</p>
-<p><img src="/images/20170418/photo_20170418_14.png"></p>
-<p>発表会の後には体験もしてもらい、なぜかイモになる側が盛り上がりました。</p>
-<p><img src="/images/20170418/photo_20170418_15.png"></p>
-<p>HoloLensごしから撮影すると上記のような感じです。<br>無理やり撮影しているので色がおかしいですが、人間が見るとキレイにジャガイモに見えます。<br>ちなみに、距離が離れたメガネの人は顔認識が行いにくいようです。</p>
-<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>Unity上では動くけれどHoloLensに転送するとうまく動かないといったものもあり、大変なところもありました。<br>具体的には、入力画像をマトリックスで処理していく際、その処理のメソッドに飛ばすところで止まってしまうことがありました。</p>
-<p>HoloLensのアプリを開発するにあたって、使用する技術の分野は未経験でしたがアプリとして形にすることができました。<br>フューチャーさんの技術的アドバイスがあったからこそだと感じています。</p>
-<p>Potato Heads はストア申請をしていて、近日中にWindowsストアに公開されると思います！<br>→公開されました！(2017/04/14時点)<br>　<a href="https://www.microsoft.com/en-us/store/p/poteto-heads/9pmqvw7znj1v" target="_blank" rel="noopener">Potato Heads - Microsoft Store</a></p>
-<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">エディションHomeは HoloLens のアプリ開発ではイバラの道。PC上でシミュレーションできるemulatorが入らないからです</span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">2.</span><span style="display: inline-block; vertical-align: top;">windowsの推奨は8GBですが、4GBでも開発できました</span><a href="#fnref:2" rev="footnote"> ↩</a></li><li id="fn:3"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">3.</span><span style="display: inline-block; vertical-align: top;">(参考) <a href="http://developer.cybozu.co.jp/akky/2010/10/ar-diminished/" target="_blank" rel="noopener">http://developer.cybozu.co.jp/akky/2010/10/ar-diminished/</a></span><a href="#fnref:3" rev="footnote"> ↩</a></li></ol></div></div>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;Unity, C# の未経験者がHoloLensのアプリを開発しました。&lt;br&gt;まだまだHoloLensについての開発情報が少ないと思いますので、アプリを作っていく流れをまとめます。&lt;br&gt;なにか少しでもお役に立てれば嬉しいです！&lt;/p&gt;
-&lt;p&gt;HoloLensに関する過去
-    
-    </summary>
-    
-      <category term="VR" scheme="https://future-architect.github.io/categories/VR/"/>
-    
-    
-      <category term="Unity" scheme="https://future-architect.github.io/tags/Unity/"/>
-    
-      <category term="HoloLens" scheme="https://future-architect.github.io/tags/HoloLens/"/>
     
   </entry>
   
