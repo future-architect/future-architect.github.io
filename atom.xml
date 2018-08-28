@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2018-08-09T05:31:32.626Z</updated>
+  <updated>2018-08-28T04:42:22.974Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <author>
@@ -14,6 +14,249 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>5TB/日 のデータをAWS Glueでさばくためにやったこと（概要編</title>
+    <link href="https://future-architect.github.io/articles/20180828/"/>
+    <id>https://future-architect.github.io/articles/20180828/</id>
+    <published>2018-08-28T04:27:14.000Z</published>
+    <updated>2018-08-28T04:42:22.974Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/images/20180828/photo_20180828_01.png"></p>
+<p>みなさん、初めまして、お久しぶりです、こんにちは。<br>フューチャーアーキテクト2018年新卒入社、1年目エンジニアのTIG（Technology Innovation Group）所属の澤田周吾です。大学では機械航空工学を専攻しており、学生時代のインターンなどがキッカケで入社を決意しました。</p>
+<p>実は、本記事でフューチャーテックブログの2記事目となります。インターン時代も <a href="https://future-architect.github.io/articles/20170421/">ジャガイモARの記事</a>  を書かせて頂きました。入社してからもこうして業務で学んだIT技術を記事に書くという機会を貰え、なんだか懐かしいやら感慨深いやらの思いで一杯です。</p>
+<p>さて、3ヶ月の新人研修後にすぐに配属されたプロジェクトで、AWSを使ったビックデータ分析のための基盤構築をお手伝いをしています。わたしは分析のための前処理であるETL（Extract、Transform、Load）処理部分をちょっと変わった性格の先輩方と一緒に開発しており、今回はそれに用いているサービスであるAWS Glueについて紹介いたします。</p>
+<p>※記事は2回にわけて発信していきたいと考えています。<br>第一弾として、題名の大規模データを処理するために行った様々な工夫を説明する前に、Glueの概要や開発Tips、制約について書かせていただきます</p>
+<h1 id="AWS-Glueとは"><a href="#AWS-Glueとは" class="headerlink" title="AWS Glueとは"></a>AWS Glueとは</h1><p>ご存知の方も多いかと思いますが、簡単にGlueについての説明です。</p>
+<blockquote>
+<p>AWS Glue は抽出、変換、ロード (ETL) を行う完全マネージド型のサービスで、お客様の分析用データの準備とロードを簡単にします。AWS マネジメントコンソールで数回クリックするだけで、ETL ジョブを作成および実行できます。<br><a href="https://aws.amazon.com/jp/glue/" target="_blank" rel="noopener">引用:AWS公式サイト</a></p>
+</blockquote>
+<p>簡単に言うと、「データ処理を行うサービス」です。<br>公式サイトにも書かれていますが、Glueの特徴として、5点挙げられます。</p>
+<ol>
+<li>AWSの一つであること</li>
+<li>ETL処理を行うサービスであること</li>
+<li>完全マネージド型であること</li>
+<li>Scala、Python、Apache Spark を使用できること</li>
+<li>並立分散処理ができること</li>
+</ol>
+<h1 id="今回実現したいこと"><a href="#今回実現したいこと" class="headerlink" title="今回実現したいこと"></a>今回実現したいこと</h1><p>S3やDynamoDBに配備された入力データを、少々複雑な加工ロジックが入ったETL処理を何度か繰り返し、蓄積用のDynamoDBと、分析用のS3に出力することです。<br>入力のマスタデータは日次程度の洗い替えでOK、入力データは10分毎にzip圧縮後で35GB程度がDataLakeに供給され、それらを逐次バッチ的に処理します。ETLの処理ウインドウ時間は10分以内となり、1日では合計5TBに及びます。</p>
+<p><img src="/images/20180828/photo_20180828_02.png"></p>
+<p>データ量が多いため、Glueが利用できる前だとSpark on EMRで処理することを検討していたと思います。EMRも良いサービスだと認識していますが、10分毎に処理する要件だと、EMRクラスタを常時立ち上げざる得ないため、EMRの保守運用を考えるとマネージドでSparkを扱えるGlueを採用したほうが良いのでは？という判断がなされました。他にもAWS Athenaなども候補に上がりましたが、読み込み時のパーティションは可能なものの、2018.08時点ではクエリ結果をS3に書き込む際に、DynamicPartitionができないという点がネックで採用には至りませんでした。</p>
+<p>ETL処理の中身を簡単に言うと…</p>
+<ol>
+<li>処理対象のフィルター（例: 異常値の排除など）</li>
+<li>コンテンツへのエンリッチメント（例: マスタデータと結合し非正規化処理など）</li>
+<li>多様な分析へののグルーピング（例: ユーザID軸、ユーザの属性軸など）</li>
+<li>逆ジオコーディングのために外部サービスにアクセスが必要</li>
+<li>k-meansライクなクラスタリング処理が必要</li>
+</ol>
+<p>などがあります。<br>特に4,5は少し毛色が変わっており、処理特性の違いからETLのパイプラインを当初より少し多めに分割する必要性がでてきました。今回は4つのステップに分割しました。そのため、各ステップは10分よりずっと短い時間で処理を完了させる必要があります。</p>
+<p>また、今回の要件だとワークフローは複雑な分岐や待ち合わせが存在せず、前のジョブAが終わったら素直に後ろのジョブBを起動すれば良いだけだったため、StepFunctionなどを導入せずGlueで完結して構築しています。</p>
+<h1 id="EMR-と-Glue-比較"><a href="#EMR-と-Glue-比較" class="headerlink" title="EMR と Glue 比較"></a>EMR と Glue 比較</h1><p>EMRとGlueですが、アプリケーションの実装としてはどちらもSparkを利用する以上は差が出ないため、インフラレベルで比較した表となります。どうやら、Glueは内部的にEMRを起動させているようなので、GlueはSparkクラスタを構築せずジョブが実行できるといった仕組みと捉えたほうが理解しやすいかと思います。</p>
+<p>EMRの方が細かくチューニングが可能ですが、先に述べたように保守運用性の観点からGlueを採用しました。</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>EMR</th>
+<th>Glue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pros</td>
+<td>ブートストラップアクション/ステップ処理を通じてOSレベルからの設定変更が可能</td>
+<td>ランタイム環境がフルマネージドで提供されるため、クラスタの管理が不要</td>
+</tr>
+<tr>
+<td></td>
+<td>コアノード/タスクノード数を調整することでシステムリソース量の調整が可能</td>
+<td>サービスとしての単一障害点がない</td>
+</tr>
+<tr>
+<td></td>
+<td>Spark以外のツールを利用可能</td>
+<td>データカタログを他AWSサービスと共有可能</td>
+</tr>
+<tr>
+<td>Cons</td>
+<td>マスタノードが単一障害点（特に常駐起動させておく場合にネック）</td>
+<td>ランタイム環境がフルマネージドで提供されるため、OSレベル・クラスタレベルでの設定変更が不可能(システムリソースは調整可能)</td>
+</tr>
+<tr>
+<td></td>
+<td>EMRクラスタの設定や起動処理の設計・実装が必要</td>
+<td>ー</td>
+</tr>
+</tbody>
+</table>
+<h1 id="Glueで行えること"><a href="#Glueで行えること" class="headerlink" title="Glueで行えること"></a>Glueで行えること</h1><p>具体的なイメージが湧きにくいと思いますので、早速ですが、コードベースでどういうことができるかいくつか例示していきたいと思います。<br>今回、コードはPythonで説明していきます。</p>
+<h2 id="S3上のファイルの読み書き"><a href="#S3上のファイルの読み書き" class="headerlink" title="S3上のファイルの読み書き"></a>S3上のファイルの読み書き</h2><p>以下のコードでS3に対して読み込み・書き込みが行えます。<br>ファイル形式を変更することで、CSV、JSON、Parquetなどの形式に対応できます。</p>
+<p>Glueで定義されたデータ構造のDynamicFrameを使っていきます。<br>使い方はSparkのDataFrameのように扱うことができます。</p>
+<figure class="highlight python"><figcaption><span>S3からCSVファイルの読み込み処理</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">df = glueContext.create_dynamic_frame.from_options(</div><div class="line">    connection_type=<span class="string">"s3"</span>,</div><div class="line">    connection_options=&#123;</div><div class="line">        <span class="string">"paths"</span>: [<span class="string">"s3://&#123;0&#125;"</span>.format(<span class="string">"バケット名"</span>)]&#125;,</div><div class="line">    format=<span class="string">"csv"</span>,  <span class="comment"># ファイル形式指定 json, parquet等に変更可</span></div><div class="line">    format_options=&#123;<span class="string">"withHeader"</span>: <span class="keyword">True</span>&#125;  <span class="comment"># 1行目をスキーマ名として認識True</span></div><div class="line">    )</div></pre></td></tr></table></figure>
+<figure class="highlight python"><figcaption><span>DynamicFrame(df)をS3にcsv形式で出力処理</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">datasink = glueContext.write_dynamic_frame.from_options(</div><div class="line">        frame=df,  <span class="comment"># 出力するDynamicFrameを指定</span></div><div class="line">        connection_type=<span class="string">"s3"</span>,</div><div class="line">        connection_options=&#123;</div><div class="line">            <span class="string">"path"</span>: [<span class="string">"s3://&#123;0&#125;"</span>.format(<span class="string">"バケット名"</span>)],</div><div class="line">            <span class="string">"partitionKeys"</span>: <span class="string">"パーティションを切るキー名"</span>&#125;,</div><div class="line">        format=<span class="string">"csv"</span>  <span class="comment"># ファイル形式指定</span></div><div class="line">        )</div></pre></td></tr></table></figure>
+<p>他のファイル形式については<a href="https://docs.aws.amazon.com/ja_jp/glue/latest/dg/aws-glue-programming-etl-format.html" target="_blank" rel="noopener">AWS Glue の ETL 出力用の形式オプション
+</a> を参考ください。CSVであれば区切り文字やヘッダ行出力の有無もオプションで指定できます。</p>
+<h2 id="DaynamoDBからの読み込み、書き込み"><a href="#DaynamoDBからの読み込み、書き込み" class="headerlink" title="DaynamoDBからの読み込み、書き込み"></a>DaynamoDBからの読み込み、書き込み</h2><p>DynamoDBへのアクセスはAWS SDK for Pythonなboto3を利用します。<br>2018.08時点では標準のコネクタは存在しないようです。</p>
+<figure class="highlight python"><figcaption><span>DynamoDB初期化</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">dynamo_region=<span class="string">"AWSリージョン名"</span></div><div class="line">dynamodb = boto3.resource(</div><div class="line">        <span class="string">'dynamodb'</span>,　</div><div class="line">        region_name=dynamo_region,</div><div class="line">        endpoint_url=<span class="string">'http://dynamodb.'</span> + dynamo_region + <span class="string">'.amazonaws.com'</span></div><div class="line">        )</div></pre></td></tr></table></figure>
+<p>あとは素直にget, put すれば読み書きできます。</p>
+<figure class="highlight python"><figcaption><span>DynamoDBからデータベースの読み込み</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">table = dynamodb.Table(<span class="string">"テーブル名"</span>)</div><div class="line">response = table.get_item(</div><div class="line">        Key=&#123; <span class="string">'xxx'</span>: xxx, <span class="string">'yyy'</span>: yyy &#125;</div><div class="line">    )</div><div class="line">print(response)</div></pre></td></tr></table></figure>
+<figure class="highlight python"><figcaption><span>DynamoDBへデータ出力</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">table = dynamodb.Table(<span class="string">"テーブル名"</span>)</div><div class="line">response = table.put_item(</div><div class="line">    Item=&#123;<span class="string">'xxx'</span>: xxx, <span class="string">'yyy'</span>: yyy&#125;</div><div class="line">)</div><div class="line">print(response)</div></pre></td></tr></table></figure>
+<p>もし、DynamoDBへのR/Wを行う場合は、Read/Writeのキャパシティーユニットを確認するとともに、レスポンスでスループット超過時のエラーハンドリングもお忘れないように注意ください。</p>
+<h2 id="加工処理"><a href="#加工処理" class="headerlink" title="加工処理"></a>加工処理</h2><p>入力で取得したデータは例えば以下のようにSQLクエリを用いて加工することができます。</p>
+<figure class="highlight python"><figcaption><span>SQLを利用した加工処理</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># DynamicFrameをDataFrameに変換</span></div><div class="line">dataFrame = df.toDF()</div><div class="line"></div><div class="line"><span class="comment"># DataFrameにテーブル名を割り当て</span></div><div class="line">dataFrame.registerTempTable(<span class="string">'table_name'</span>)</div><div class="line"></div><div class="line"><span class="comment"># SparkSQL文にてデータ加工</span></div><div class="line">select_table = spark.sql(<span class="string">'SELECT * FROM table_name'</span>)</div></pre></td></tr></table></figure>
+<p>今回の開発では情報量が多いことと開発チームメンバーのスキルセットからDataFrameに変換後にSQLで加工する手法を使いました。</p>
+<h2 id="ジョブのワークフロー"><a href="#ジョブのワークフロー" class="headerlink" title="ジョブのワークフロー"></a>ジョブのワークフロー</h2><p>GlueのTriggerを利用することで、Glue内でジョブのワークフローを作ることができます。<br>また、起動を制御するためのTriggerは3種類用意されています。</p>
+<ol>
+<li>Triggerの開始をタイマーで行う ＝ <strong>スケジュール</strong></li>
+<li>ジョブイベントが監視対象リストに一致した場合に行う ＝ <strong>ジョブイベント</strong></li>
+<li>手動で開始させる ＝ <strong>オンデマンド</strong></li>
+</ol>
+<p>1のスケジュールトリガー、3のオンデマンドトリガーについてはイメージがつくと思います。<br>2のジョブイベントトリガーについて補足していきます。</p>
+<p>ジョブイベントトリガーは、ジョブXが終わったら次のジョブYを起動する、といった依存関係を設定することができます。<br>具体的にはジョブイベントトリガー作成時には以下の項目を選択することができます。</p>
+<ul>
+<li>監視対象ジョブ（複数可）</li>
+<li>トリガーするジョブ（複数可）</li>
+<li>「成功、失敗、停止、タイムアウト」の４つのジョブステータス</li>
+<li>監視対象ジョブとステータスが全一致でトリガーするか、部分一致でトリガーするか</li>
+<li>起動時に渡すパラメータ（セキュリティ設定、ブックマーク、タイムアウト、キー/値）</li>
+</ul>
+<p>例：ジョブイベントトリガーを利用して以下の様なフローを３つのジョブイベントトリガーを設定することで実現することができます</p>
+<p><img src="/images/20180828/photo_20180828_03.png"></p>
+<ul>
+<li>トリガー1はジョブAが成功したらジョブB, Cを起動</li>
+<li>トリガー2はジョブBが成功したらジョブDを起動</li>
+<li>トリガー3はジョブC, Dが成功したらジョブEを起動</li>
+</ul>
+<h1 id="Glue開発Tips"><a href="#Glue開発Tips" class="headerlink" title="Glue開発Tips"></a>Glue開発Tips</h1><p>この1ヶ月で学んだGlueで開発を行う上でのコツをお伝えします</p>
+<h2 id="Tips1-Glueデバックについて"><a href="#Tips1-Glueデバックについて" class="headerlink" title="Tips1. Glueデバックについて"></a>Tips1. Glueデバックについて</h2><p>Glueの開発・デバッグには、開発エンドポイントを利用すると便利です。</p>
+<p>ローカルのコンソール上から開発エンドポイントへSSH接続することで、Glueに対しpythonやscalaのREPLを使用できます。</p>
+<p>エンドポイント作成はGlueのDPU数を指定し、SSH用の鍵を設定するのみです。わずか数クリック、1~2分で完了できます。ただし、エンドポイント作成後は裏でGlue(Spark)のクラスタ構築が行われるため、実際に使用可能となるのはその完了後（約15分ほどかかりました）です。</p>
+<p>作成したエンドポイントへApache Zeppelin ノートブックを接続し、ノートブックでの開発も可能なようですが、今回は必要でなかったため使用しませんでした。ノートブックはローカルでもEC2上でも利用可能なようです。詳細は以下をご覧ください。<br><a href="https://docs.aws.amazon.com/ja_jp/glue/latest/dg/dev-endpoint.html" target="_blank" rel="noopener">https://docs.aws.amazon.com/ja_jp/glue/latest/dg/dev-endpoint.html</a></p>
+<p>また開発エンドポイントも裏ではGlueのクラスタが上がっているため、通常通りのGlue料金が請求されます。開発エンドポイントのDPU数はデフォルトで5、料金は1DPUあたり$0.44/時かかります。(公式ドキュメントには$0.44/秒と誤記されてますが、そんな高くないです)。</p>
+<p>仮に終業時に開発エンドポイントを落とし忘れた場合、翌出社までに以下の金額がかかります。<br>　　5 <em> $0.44 </em> 14時間(20時退社、10時出社) = $30.8<br>1回の飲み代程度です。一晩にしてはなかなかです。自動で落とす方法もちょっと調べてみましたが見つけられず…。<br>忘れずに落とすようにしましょう！</p>
+<h3 id="※開発エンドポイントを使わない場合※"><a href="#※開発エンドポイントを使わない場合※" class="headerlink" title="※開発エンドポイントを使わない場合※"></a>※開発エンドポイントを使わない場合※</h3><p>開発開始直後は開発エンドポイントの存在を知らず、Glueコンソール上でソースを編集し実行することで開発をしていました。<br>その当時の開発スタイルの状況も悪い例として記載します。<strong>興味が無い場合はスキップください。</strong></p>
+<p><strong>（※開発エンドポインを利用すれば解決できる内容です。開発エンドポイントをぜひ利用しましょう！）</strong></p>
+<ul>
+<li><p>ジョブ実行に時間かかる</p>
+<ul>
+<li>Glueジョブは実行の都度リソースを確保しクラスタの構成を行います。そのため純粋なコンピューティング以外で毎回10分ほど待たされます</li>
+<li>ソースを編集 → 実行(10分以上かかる) → 結果を確認、ソースを修正 → 実行(10分以上かかる) → …</li>
+</ul>
+</li>
+<li><p>不要なログが多く目的のログに辿り着けない</p>
+<ul>
+<li>Glueの実行ログはCloudWatch上から確認可能ですが、実行スクリプトのログとSparkのログが同一のログストリーム上に出力されます<ul>
+<li>そのため大量のSparkのログに目的のスクリプトログが埋もれます</li>
+<li>CloudWatchから目的のログに辿り着けるよう、ログにプレフィクスなどをつけるなど工夫が必要でした</li>
+</ul>
+</li>
+<li>ソースを編集 → 実行(10分以上かかる) → CloudWatchのログストリーム表示 → プレフィクスで目的のログ検索 → 結果を確認 → ソースを修正 → 実行(10分以上かかる) → …</li>
+</ul>
+</li>
+<li><p>ソース修正、実行のための画面遷移が多い</p>
+<ul>
+<li>ジョブの一覧画面からスクリプトを参照することはできますが、編集するには専用の編集画面で行う必要があります。そのため編集の都度画面遷移が必要です</li>
+<li>また、編集画面にはジョブの実行ボタンが存在しますが、このボタンが反応せずほとんど実行開始してくれません(原因は不明)。そのため実行の都度またジョブ一覧画面へと遷移する必要があります</li>
+<li>ソースを編集 → 編集画面から実行画面へ → 実行(10分以上かかる) → CloudWatchのログストリーム表示 → プレフィクスで目的のログ検索 → 結果を確認 → 実行画面から編集画面へ → ソースを修正 → 編集画面から実行画面へ → 実行(10分以上かかる) → …</li>
+</ul>
+</li>
+</ul>
+<p>どうでしょう？壮絶な開発状況を想像していただけたでしょうか？<br>エンジニアたるもの、あるものは利用して賢く効率よく働きたいと、改めて思いました…</p>
+<p>これらの苦労は <strong>開発エンドポイントを利用すれば</strong> その多くが回避できます。ぜひ利用しましょう！</p>
+<h2 id="Tips2-AWS-Athenaで簡易的にデータ確認"><a href="#Tips2-AWS-Athenaで簡易的にデータ確認" class="headerlink" title="Tips2. AWS Athenaで簡易的にデータ確認"></a>Tips2. AWS Athenaで簡易的にデータ確認</h2><p>Glueのテーブルを使用する場合は、Athenaのクエリで中身を確認できるため開発が捗りました。</p>
+<p>Athenaからテーブルに対して、 <code>SELECT * FROM TABLE</code> などのクエリを投げても良いですし、Glueコンソールのテーブル一覧画面から「アクション」→「データの確認」を選択しても良いです。後者の場合は自動でAthenaから <code>SELECT * FROM TABLE limit 10</code> というクエリを投げてくれます。どちらの場合もAthenaの料金が発生するため、読み取りデータ量には注意が必要です。</p>
+<p>また、開発にSparkSQLを用いる場合はAthenaも同じSQLであるため、AthenaでSQLを開発してからSparkへ移植という使い方が可能です。ただし、AthenaはPrestoベース、SparkSQLはHiveSQLのスタイルをベースに開発されており、利用できる構文に微妙な差異がるため注意が必要です。<br>Athenaで開発したSQLをそのまま移植しようとした時に少しハマりもしました。</p>
+<p>例えば文字列結合の場合、以下のようなSQLはAthenaでは利用できてSparkSQLでは利用できません。</p>
+<figure class="highlight sql"><figcaption><span>AthenaSQLとSparkSQL</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- AthenaではOK、SparkSQLではNG</span></div><div class="line"><span class="keyword">SELECT</span> <span class="string">'str1'</span> || <span class="string">'str2'</span> || <span class="string">'str3'</span></div><div class="line"></div><div class="line"><span class="comment">-- SparkSQLでOK</span></div><div class="line"><span class="keyword">SELECT</span> <span class="keyword">CONCAT</span>(<span class="string">'str1'</span>, <span class="string">'str2'</span>, <span class="string">'str3'</span>)</div></pre></td></tr></table></figure>
+<p>SparkSQLの詳細については、GlueのVersionが2018.08月時点では2.1.1ですので、下記のガイドを参考ください。<br><a href="https://spark.apache.org/docs/2.1.1/sql-programming-guide.html" target="_blank" rel="noopener">https://spark.apache.org/docs/2.1.1/sql-programming-guide.html</a></p>
+<h2 id="Tips3-Glueのカタログデータについて"><a href="#Tips3-Glueのカタログデータについて" class="headerlink" title="Tips3. Glueのカタログデータについて"></a>Tips3. Glueのカタログデータについて</h2><p>Glueといえばカタログデータ、という印象がありましたが実はカタログが未登録でもETLジョブは実行可能です。</p>
+<p>GlueのデータカタログはApache Hive メタストアとの互換性がありますが、EMR以外にもAthenaやRedshift Spectrum でも利用できます。</p>
+<p>開発Tips2であるように一部のS3バケットに対してはAthenaのクエリを発行したかったためデータカタログを設定しましたが、ETL処理に閉じて見た場合に恩恵が無いように感じられたため最終的にはデータカタログを利用しませんでした。</p>
+<h2 id="Tips4-DataFrameとDynamicFrameについて"><a href="#Tips4-DataFrameとDynamicFrameについて" class="headerlink" title="Tips4. DataFrameとDynamicFrameについて"></a>Tips4. DataFrameとDynamicFrameについて</h2><p>Glueでは2種類のDataFrameを利用することができます。<br>SparkのDataFrameと、Glueで独自に定義されたDynamicFrameです。</p>
+<p>両者ともテーブルの構造でデータを持ち、データ操作を行えるという点は共通していますが、DynamicFrameはchoice型を扱うという点で差異があります。choice型とは、同一列に複数のデータ型を持つことができる型です。</p>
+<p>例えば、同一列にstringとdoubleを含むデータをDynamicFrameに読み込んだ場合、以下のようなイメージとなります。</p>
+<p>取り込み元データ</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">col1</th>
+<th style="text-align:left">col2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">1</td>
+<td style="text-align:left">str</td>
+</tr>
+<tr>
+<td style="text-align:left">2</td>
+<td style="text-align:left">20.3</td>
+</tr>
+</tbody>
+</table>
+<p>取り込み後DynamicFrame</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">root</div><div class="line">┣- col1: int</div><div class="line">┣- col2: choice</div><div class="line">┃┣- string</div><div class="line">┃┣- double</div></pre></td></tr></table></figure>
+<p>col2は2種類の型のデータが存在するためchoice型となり、stringとdouble両方を保持します。<br>様々なデータ取り込みに対応可能とするため、このような構造になっているのでしょう。</p>
+<p>ただchoice型はこのままでは扱いにくいため、resolveChoice関数によって扱いやすい形へ変換してあげるとよいです。<br>resolveChoice関数では以下のことができます。</p>
+<ul>
+<li>choice列を任意の型にcastする。(choice列を、例えばstring列へ変換する)</li>
+<li>choice列に含まれる型別に、新しく列を生成する。(stringとdoubleの2列を生成する)</li>
+<li>choice列に含まれる型を保持できる構造体の列を生成する。(stringとdoubleを保持できる構造体列を1列生成する)</li>
+<li>choice列を任意の型にcastした列を生成する。(例えばstring列を1列生成する)</li>
+</ul>
+<p>今回は、調査時の情報量が圧倒的にSparkのDataFrameの方が多く使いやすいため、データの取り込み後choice列は早々にstringへ変換し、かつSparkのDataFrameへ変換して使用しています。</p>
+<p>データの取り込みはDynamicFrameで行い、本格的なデータの加工はSparkのDataFrameで行う、という使い分けが良いかと思います。</p>
+<p>DynamicFrameやresolveChoiceの詳細は以下を参考ください。<br><a href="https://docs.aws.amazon.com/ja_jp/glue/latest/dg/aws-glue-api-crawler-pyspark-extensions-dynamic-frame.html" target="_blank" rel="noopener">https://docs.aws.amazon.com/ja_jp/glue/latest/dg/aws-glue-api-crawler-pyspark-extensions-dynamic-frame.html</a> (edited)</p>
+<h1 id="Glueの注意点"><a href="#Glueの注意点" class="headerlink" title="Glueの注意点"></a>Glueの注意点</h1><p>Glueを利用して感じた注意点をまとめます。</p>
+<h2 id="注意1-既存データに対するUpdate"><a href="#注意1-既存データに対するUpdate" class="headerlink" title="注意1. 既存データに対するUpdate"></a>注意1. 既存データに対するUpdate</h2><p>Glueではカラムの加工、テーブルの新規作成（SQLでいうCreate As Select）、テーブルのJoinなどETL処理ができます。またその特性上、中間データはS3上に配備されることが多いと思います。</p>
+<p>しかしS3上にある既存カラムの <strong>Updateはできません</strong> ので注意が必要です。<br>これは裏側で動くSparkがあくまでS3へ追記しか行っていないからでしょう。<br>どうしてもUpdateしたいときは以下で代用できないかなど追加の検討が必要です。</p>
+<ol>
+<li>Delete &amp; Insert でテーブルやパーティション自体を再作成する</li>
+<li>既存データの更新せずデータを追記し、抽出時にDistinctするロジックを追加する</li>
+</ol>
+<p>どちらにしても、書き込みや読み込みに余分な処理が発生するため処理コストが多くかかってしまいます。<br>最終的な利用元である分析に対して、どれくらいのデータ鮮度が求められるか、費用対効果で考える必要があると思います。</p>
+<p>※ちなみに、DynamoDBに対しては書き換えたい情報だけに絞り込んでInsertすることで、実質的にUpdate処理が可能となりますが、DynamoDBのRCP・WCPの費用を考えると利用したいユースケースは少なそうです。</p>
+<h2 id="注意2-C言語に依存するパッケージ（Pandas等）が利用不可"><a href="#注意2-C言語に依存するパッケージ（Pandas等）が利用不可" class="headerlink" title="注意2. C言語に依存するパッケージ（Pandas等）が利用不可"></a>注意2. C言語に依存するパッケージ（Pandas等）が利用不可</h2><p><a href="https://docs.aws.amazon.com/ja_jp/glue/latest/dg/aws-glue-programming-python-libraries.html" target="_blank" rel="noopener">リファレンスにも記載</a>がありますが、Glueの仕様でC言語依存パッケージを使うことができません。<br>Scikit_learnを使いたかったのですが、内部パッケージにpandasが使われているため起動できず、Scikit_learnの処理は違うアーキテクチャ（ECS）に切り分けました。すでに使いたいものが決まっている場合は注意してください。</p>
+<p>もともとは、PySparkのUDFで処理可能と想定していましたが、Glueのこの制約を見逃していて、半日潰してしまいました。</p>
+<p>C言語依存パッケージがGlueで使えない理由としては、コンパイルが絡んでいるのではないかと考えています。今後のGlueの機能拡張で使えるようになってくれると便利さが増しますね。</p>
+<h2 id="注意3-ジョブブックマークが対応していない入力"><a href="#注意3-ジョブブックマークが対応していない入力" class="headerlink" title="注意3. ジョブブックマークが対応していない入力"></a>注意3. ジョブブックマークが対応していない入力</h2><p>Glueの機能にジョブブックマークというすでに処理されたデータかどうかを判定し、処理済みであれば次のジョブでは入力データに含めないという機能があります。<br>2018.08時点ではJSON、CSVなどには対応しているものの、zipファイルやParquestには対応していませんでした。<br><a href="https://docs.aws.amazon.com/ja_jp/glue/latest/dg/monitor-continuations.html" target="_blank" rel="noopener">https://docs.aws.amazon.com/ja_jp/glue/latest/dg/monitor-continuations.html</a></p>
+<p>そのため、もしジョブブックマーク非対応の入力に対しては、手動でオフセット管理する必要があります。<br>今回、わたしたしは入力ディレクトリに処理済みかどうかのフラグファイルを配備し、Glueジョブ上でその有無を確認することで処理対象とするか判定するロジックを追加しました。</p>
+<h2 id="注意4-S3上のソースファイルの実行"><a href="#注意4-S3上のソースファイルの実行" class="headerlink" title="注意4. S3上のソースファイルの実行"></a>注意4. S3上のソースファイルの実行</h2><p>S3にソースファイルを配置する際に複数ファイルの場合は、zip圧縮する必要があります。<br>地味ですが忘れると動かないのでご注意を。</p>
+<h2 id="注意5-並立分散処理"><a href="#注意5-並立分散処理" class="headerlink" title="注意5. 並立分散処理"></a>注意5. 並立分散処理</h2><p>Sparkの設定にちょっとした工夫が必要です。<br>第2回目の記事で詳しく説明したいと思います。</p>
+<h2 id="注意6-料金について"><a href="#注意6-料金について" class="headerlink" title="注意6. 料金について"></a>注意6. 料金について</h2><p>Glueの料金計算はやや特殊でDPU (Data Processing Unit) という数に基づいて時間（1秒）ごとに課金が発生します。2018.08時点では1DPUでは4vCPU・16GBメモリが提供されます。<br>2018.08時点では <strong>10分の最小期間が設定</strong> されているため、処理時間が10分以下のミニバッチを連続的に起動させたい場合にはコスト的には不利になってしまいます。</p>
+<p><a href="https://aws.amazon.com/jp/glue/pricing/" target="_blank" rel="noopener">https://aws.amazon.com/jp/glue/pricing/</a></p>
+<p>これを避けるために分析部門にとってはデータの鮮度は下がるものの、20-30分単になどに処理頻度を変更する余地が無いか、費用対効果から見た全体最適の視点で検討中です。</p>
+<h2 id="注意7-リソースの確保について"><a href="#注意7-リソースの確保について" class="headerlink" title="注意7. リソースの確保について"></a>注意7. リソースの確保について</h2><p>（2018.08時点、東京リージョンで発生した事象です）Glueのリソースは先に述べたDPUという単位でコンピューティングされます。これを性能検証のために、数十DPUといった比較的大きめに確保しようとするとリソースが確保できず起動できなかったことが何度かありました。<br>2018.08時点ではGlueリソースをリザーブド化することもできず、設定レベルでの回避が難しい状態です。</p>
+<p>東京リージョンでGlueが利用可能になったのは<a href="https://aws.amazon.com/jp/about-aws/whats-new/2017/12/aws-glue-is-now-available-in-the-asia-pacific-tokyo-aws-region/" target="_blank" rel="noopener">2017.12</a> と比較的新しく、今後も継続的にリソースの増強などが期待されるため、改善に向かうと予想しています。現時点では実行タイミングによっては確保が難しい場合があるようです。人気のサービスであるとう証拠なのかもしれませんね。</p>
+<p>他の時間帯・日本国外リージョンなどを試すことや、処理粒度をある程度細かくし急激に大きなDPUを確保しないようにするなどの工夫が必要になってきます。また、どうしても確実に実行できないと困る！という場合は、EMRを利用するしか無いようです。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>Glue（直訳：のり）とはよく名を付けたものだと感じています。<br>粗削りで膨大なデータを、使いやすい形に成形してあげる。つまり、データと後続のシステムをうまくつなぎ合わせることができるものがGlueです。</p>
+<p>以下にあてはまる方はGlueの導入を考えてみたらどうでしょうか。</p>
+<ul>
+<li>ビッグデータの処理が必要</li>
+<li>起動時間は常時ではなく短い</li>
+<li>サーバーを立てる余裕がない</li>
+<li>運用、保守する余裕がない</li>
+<li>パイオニア精神がある</li>
+</ul>
+<p>実はGlueの記事はネット上にはまだ多くない状態です。<br>そのため、Glue開発を導いていきたいというパイオニア精神ある方におすすめの領域だと思います。</p>
+<h1 id="次回のGlueの記事について"><a href="#次回のGlueの記事について" class="headerlink" title="次回のGlueの記事について"></a>次回のGlueの記事について</h1><p>次回の内容はGlueを用いた性能改善を予定しています。<br>皆さんの参考になれば光栄です。</p>
+<p>Glueを検討の方はご気軽にご連絡ください。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;img src=&quot;/images/20180828/photo_20180828_01.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;みなさん、初めまして、お久しぶりです、こんにちは。&lt;br&gt;フューチャーアーキテクト2018年新卒入社、1年目エンジニアのTIG（Technology Inno
+    
+    </summary>
+    
+      <category term="BigData" scheme="https://future-architect.github.io/categories/BigData/"/>
+    
+    
+      <category term="AWS" scheme="https://future-architect.github.io/tags/AWS/"/>
+    
+  </entry>
   
   <entry>
     <title>データベースマイグレーション ～OracleからPostgreSQLへ～　－第２回ー</title>
@@ -2420,254 +2663,6 @@
       <category term="MachineLearning" scheme="https://future-architect.github.io/tags/MachineLearning/"/>
     
       <category term="DeepLearning" scheme="https://future-architect.github.io/tags/DeepLearning/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>マネージャーがうれしいRedmineデータのダッシュボード表示方法を公開します！！</title>
-    <link href="https://future-architect.github.io/articles/20170510/"/>
-    <id>https://future-architect.github.io/articles/20170510/</id>
-    <published>2017-05-10T09:00:00.000Z</published>
-    <updated>2017-05-12T07:56:11.977Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/20170510/photo_20170510_00.jpg" alt=""></p>
-<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは。近藤です。</p>
-<p>前回までの関連記事です</p>
-<ul>
-<li><a href="https://future-architect.github.io/articles/20160920/">1記事目</a> はRedmineのデータをKibanaで表示しました</li>
-<li><a href="https://future-architect.github.io/articles/20170119/">2記事目</a> はRedmineのデータからEVMグラフを作成しKibanaで表示しました</li>
-</ul>
-<p>3記事目となる本記事ではRedmineデータを可視化するダッシュボードをKibana上に構築します。Kibanaを使うことによって例えば、担当者別のタスク量、トラッカー別のタスク量、EVMグラフを同時に把握できます。</p>
-<p>◆ダッシュボード例</p>
-<p><img src="/images/20170510/photo_20170510_39.png" alt=""></p>
-<p>では早速、Kibanaを使ってみましょう。</p>
-<p>なお、下記を前提としています。</p>
-<ul>
-<li>Windows環境で構築する</li>
-<li>Redmineのデータベース(MySQL)に直接接続する</li>
-</ul>
-<h2 id="大まかな流れ"><a href="#大まかな流れ" class="headerlink" title="大まかな流れ"></a>大まかな流れ</h2><p>下記の手順でグラフを表示します。</p>
-<ol>
-<li>環境構築</li>
-<li>データ投入</li>
-<li>ダッシュボード構築 </li>
-</ol>
-<h2 id="1-環境構築"><a href="#1-環境構築" class="headerlink" title="1.環境構築"></a>1.環境構築</h2><p>今回もELK+Timelionを利用して、Redmineデータの可視化環境を構築します。</p>
-<p><img src="/images/20170510/photo_20170510_99.png" alt=""></p>
-<h3 id="モジュールのダウンロード"><a href="#モジュールのダウンロード" class="headerlink" title="モジュールのダウンロード"></a>モジュールのダウンロード</h3><p>前回の投稿から時間がたち、ELKのバージョンが上がったのであらためて最新のモジュールをダウンロードします。</p>
-<ul>
-<li>Elastic Search Download URL<ul>
-<li><a href="https://www.elastic.co/jp/downloads/elasticsearch" target="_blank" rel="noopener">https://www.elastic.co/jp/downloads/elasticsearch</a></li>
-<li>私の場合は、「elasticsearch-5.4.0.zip」をダウンロードしました。</li>
-</ul>
-</li>
-<li>Kibana Download URL<ul>
-<li><a href="https://www.elastic.co/downloads/kibana" target="_blank" rel="noopener">https://www.elastic.co/downloads/kibana</a></li>
-<li>私の場合は、「kibana-5.4.0-windows-x86.zip」をダウンロードしました。</li>
-</ul>
-</li>
-<li>Logstash Download URL<ul>
-<li><a href="https://www.elastic.co/downloads/logstash" target="_blank" rel="noopener">https://www.elastic.co/downloads/logstash</a></li>
-<li>私の場合は、「logstash-5.4.0.zip」をダウンロードしました。</li>
-</ul>
-</li>
-</ul>
-<h3 id="モジュールの配備"><a href="#モジュールの配備" class="headerlink" title="モジュールの配備"></a>モジュールの配備</h3><p>次に、「C:\elastic」というフォルダを作成。そして、先ほどダウンロードしたそれぞれの圧縮ファイルを解凍し、「C:\elastic」へ配置します。</p>
-<p>最終的には下記のようなフォルダ構成になります。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">C:\elastic</div><div class="line"> └ elasticsearch<span class="number">-5.4</span><span class="number">.0</span></div><div class="line"> └ kibana<span class="number">-5.4</span><span class="number">.0</span>-windows-x86</div><div class="line"> └ logstash<span class="number">-5.4</span><span class="number">.0</span></div></pre></td></tr></table></figure></p>
-<h3 id="JDBCドライバ設定"><a href="#JDBCドライバ設定" class="headerlink" title="JDBCドライバ設定"></a>JDBCドライバ設定</h3><p>次に、JDBCドライバを用意します。</p>
-<p><a href="https://future-architect.github.io/articles/20160920/">前々回</a>ダウンロードした「mysql-connector-java-5.1.39-bin.jar」というファイルを、<br>「C:\elastic\logstash-5.4.0\bin」以下に配置します。</p>
-<p>次に、「redmine.txt」というファイルを作成。中身は下記のようにします。（★を含む箇所は皆様の環境に合わせた値へ変えてください。）</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">input &#123;</div><div class="line">    jdbc &#123;</div><div class="line">        jdbc_connection_string =&gt; <span class="string">"jdbc:mysql://★IP★:3306/★サービス名★"</span></div><div class="line">        jdbc_user =&gt; <span class="string">"★ユーザ名★"</span></div><div class="line">        jdbc_password =&gt; <span class="string">"★パスワード★"</span></div><div class="line">        jdbc_driver_library =&gt;<span class="string">"mysql-connector-java-5.1.39-bin.jar"</span></div><div class="line">        jdbc_driver_class =&gt; <span class="string">"com.mysql.jdbc.Driver"</span></div><div class="line">        statement =&gt; <span class="string">"</span></div><div class="line">select</div><div class="line">	iss.due_date due_date</div><div class="line">	, iss.updated_on updated_on</div><div class="line">	, iss.estimated_hours pv</div><div class="line">	, iss.estimated_hours * iss.done_ratio / 100 ev</div><div class="line">	, tim.hours ac</div><div class="line">	, concat(usr.lastname, usr.firstname) user_name</div><div class="line">	, tra.name tracker_name</div><div class="line">from</div><div class="line">	issues iss</div><div class="line">	left join (</div><div class="line">		select</div><div class="line">			issue_id</div><div class="line">			, sum(hours) hours</div><div class="line">		from</div><div class="line">			time_entries</div><div class="line">		group by</div><div class="line">			issue_id</div><div class="line">	) tim</div><div class="line">	on iss.id = tim.issue_id</div><div class="line">	left join users usr</div><div class="line">	on iss.assigned_to_id = usr.id</div><div class="line">	left join trackers tra</div><div class="line">	on iss.tracker_id = tra.id</div><div class="line">"</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">output &#123;</div><div class="line">    elasticsearch &#123;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>中に記載されているSQLでは、下記7つの値を取得します。なお、pv、ec、acについては、<a href="https://future-architect.github.io/articles/20170119/#EVMとは？">前回の記事:EVMとは？</a>をご参照ください。</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">SQL上の項目名</th>
-<th style="text-align:left">Redmine上の項目名 　</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">due_date 　</td>
-<td style="text-align:left">「期日」 　　　　　　　　</td>
-</tr>
-<tr>
-<td style="text-align:left">updated_on</td>
-<td style="text-align:left">「更新日」　　　　　　　</td>
-</tr>
-<tr>
-<td style="text-align:left">pv 　　　　　</td>
-<td style="text-align:left">「予定工数」        　</td>
-</tr>
-<tr>
-<td style="text-align:left">ev</td>
-<td style="text-align:left">「予定工数」×「進捗率」</td>
-</tr>
-<tr>
-<td style="text-align:left">ac     　　</td>
-<td style="text-align:left">「作業時間の記録」 　　　</td>
-</tr>
-<tr>
-<td style="text-align:left">user_name</td>
-<td style="text-align:left">「担当者名」 　　　</td>
-</tr>
-<tr>
-<td style="text-align:left">tracker_name</td>
-<td style="text-align:left">「トラッカー名」 　　　</td>
-</tr>
-</tbody>
-</table>
-<p>この「redmine.txt」も「C:\elastic\logstash-5.4.0\bin」に配置します。</p>
-<p>結果的に、下記のようなフォルダ構成になります。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">C:\elastic</div><div class="line"> └ elasticsearch<span class="number">-5.4</span><span class="number">.0</span></div><div class="line"> └ kibana<span class="number">-5.4</span><span class="number">.0</span>-windows-x86</div><div class="line"> └ logstash<span class="number">-5.4</span><span class="number">.0</span></div><div class="line"> └ bin</div><div class="line">   └ mysql-connector-java<span class="number">-5.1</span><span class="number">.39</span>-bin.jar</div><div class="line">   └ redmine.txt</div></pre></td></tr></table></figure>
-<h2 id="2-RedmineデータをELKに取り込む"><a href="#2-RedmineデータをELKに取り込む" class="headerlink" title="2.RedmineデータをELKに取り込む"></a>2.RedmineデータをELKに取り込む</h2><h3 id="ElasticSearchの起動"><a href="#ElasticSearchの起動" class="headerlink" title="ElasticSearchの起動"></a>ElasticSearchの起動</h3><p>まず、ElasticSearchを実行します。<br>「C:\elasticsearch-5.4.0\bin」フォルダで下記のコマンドを実行。</p>
-<p><code>elasticsearch.bat</code></p>
-<p>コマンドプロンプトの右下に”started”と表示されたら起動完了です。</p>
-<h3 id="Logstashを使ったデータ取り込み"><a href="#Logstashを使ったデータ取り込み" class="headerlink" title="Logstashを使ったデータ取り込み"></a>Logstashを使ったデータ取り込み</h3><p>次に、Logstashを使って、RedmineのデータをElasticSearchへ取り込みます。<br>「C:\elastic\logstash-5.4.0\bin」フォルダで下記コマンドを実行。</p>
-<p><code>logstash.bat -f redmine.txt</code></p>
-<p><img src="/images/20170510/photo_20170510_40.png" alt=""></p>
-<p>取り込みが完了しました。</p>
-<h3 id="Kibanaの起動"><a href="#Kibanaの起動" class="headerlink" title="Kibanaの起動"></a>Kibanaの起動</h3><p>次に、Kibanaを起動します。<br>「C:\elastic\kibana-5.4.0-windows-x86\bin」フォルダで下記コマンドを実行。</p>
-<p><code>kibana.bat</code></p>
-<p><img src="/images/20170510/photo_20170510_02.png" alt=""></p>
-<p>Kibanaが起動しました。</p>
-<h3 id="Kibanaでグラフ表示"><a href="#Kibanaでグラフ表示" class="headerlink" title="Kibanaでグラフ表示"></a>Kibanaでグラフ表示</h3><p>では、Kibanaを表示します。ブラウザで <code>http://localhost:5601</code>を開く。</p>
-<p><img src="/images/20170510/photo_20170510_03.png" alt=""></p>
-<p>[Configure an index pattern]という画面が開くので、[Time-field name]に”due_date”を指定します。</p>
-<p>そして、[Create]をクリック。</p>
-<p><img src="/images/20170510/photo_20170510_10.png" alt=""></p>
-<p>そして、左側の[Visualize]をクリックすると、Visualizeの画面が開きます。</p>
-<p><img src="/images/20170510/photo_20170510_06.png" alt=""></p>
-<p>ここで、「Create a visualizetion」をクリック。</p>
-<p><img src="/images/20170510/photo_20170510_11.png" alt=""></p>
-<p>[Select visualization type]画面が表示されるので、「Vertical bar」をクリックします。</p>
-<p><img src="/images/20170510/photo_20170510_08.png" alt=""></p>
-<p>そして、「logstash-*」をクリックすると、</p>
-<p><img src="/images/20170510/photo_20170510_12.png" alt=""></p>
-<p>グラフ画面が出ましたね！</p>
-<h3 id="担当者別のPVグラフ作成"><a href="#担当者別のPVグラフ作成" class="headerlink" title="担当者別のPVグラフ作成"></a>担当者別のPVグラフ作成</h3><p>次は、担当者別のPVを表示するグラフを作成。下記の設定箇所にそれぞれの値を設定します。</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">設定箇所</th>
-<th style="text-align:left">値 　</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">[metrics]-&gt;[Y-Axis]-&gt;[Aggregation]</td>
-<td style="text-align:left">Sum</td>
-</tr>
-<tr>
-<td style="text-align:left">[metrics]-&gt;[Y-Axis]-&gt;[Field]</td>
-<td style="text-align:left">pv</td>
-</tr>
-<tr>
-<td style="text-align:left">[buckets]-&gt;[X-Axis]-&gt;[Terms]</td>
-<td style="text-align:left">user_name.keyword</td>
-</tr>
-</tbody>
-</table>
-<p>そして、画面左上の「再生ボタン」をクリックすると、</p>
-<p><img src="/images/20170510/photo_20170510_13.png" alt=""></p>
-<p>担当者別のPVが表示されました！</p>
-<p>では、グラフを保存します。</p>
-<p>画面右上の「Save」をクリック。<br>テキストボックスが表示されるので”PvUser”と入力します。</p>
-<p><img src="/images/20170510/photo_20170510_15.png" alt=""></p>
-<p>そして、青色の「Save」をクリックすると、グラフが保存されました。</p>
-<h2 id="3-ダッシュボード構築"><a href="#3-ダッシュボード構築" class="headerlink" title="3.ダッシュボード構築"></a>3.ダッシュボード構築</h2><p>続いて、画面左側の「Dashboard」をクリックします。</p>
-<p><img src="/images/20170510/photo_20170510_16.png" alt=""></p>
-<p>画面中央の「Create a dashboard」をクリック。</p>
-<p><img src="/images/20170510/photo_20170510_17.png" alt=""></p>
-<p>そして、画面中央の「Add」をクリックします。</p>
-<p><img src="/images/20170510/photo_20170510_18.png" alt=""></p>
-<p>続いて、「PvUser」をクリックすると、</p>
-<p><img src="/images/20170510/photo_20170510_19.png" alt=""></p>
-<p>グラフが追加されました！</p>
-<p><img src="/images/20170510/photo_20170510_19.png" alt=""></p>
-<p>次にダッシュボードを保存します。</p>
-<p>右上の「Save」をクリックし、表示されたテキストボックスに”main”と入力。</p>
-<p><img src="/images/20170510/photo_20170510_20.png" alt=""></p>
-<p>「Save」をクリックします。これで作成したダッシュボードが保存されました。</p>
-<p><img src="/images/20170510/photo_20170510_21.png" alt=""></p>
-<p>では、もう一つグラフを作成します。</p>
-<p>作成したグラフの上にカーソルを当てると、右上にボタンが出てくるので、</p>
-<p><img src="/images/20170510/photo_20170510_22.png" alt=""></p>
-<p>その中の「鉛筆マーク」をクリックします。</p>
-<p><img src="/images/20170510/photo_20170510_23.png" alt=""></p>
-<p>グラフの編集画面が開きました。</p>
-<p>今度、トラッカー別のPVを表示するグラフを作成。下記の通り値を変更し、「再生ボタン」をクリックし、画面右上の「Save」をクリック。</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">設定箇所</th>
-<th style="text-align:left">値 　</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">[buckets]-&gt;[X-Axis]-&gt;[Terms]</td>
-<td style="text-align:left">tracker_name.keyword</td>
-</tr>
-</tbody>
-</table>
-<p>表示されたテキストボックスに”PvTracker”と入力し、「Save as a new visualization」にチェックを入れます。</p>
-<p><img src="/images/20170510/photo_20170510_27.png" alt=""></p>
-<p>そして、「Save」をクリック。グラフが保存されます。</p>
-<p>画面左の「Dashboard」をクリック。そして、画面右上の、「Add」をクリックします。</p>
-<p><img src="/images/20170510/photo_20170510_25.png" alt=""></p>
-<p>「PvTracker」をクリックすると、</p>
-<p><img src="/images/20170510/photo_20170510_28.png" alt=""></p>
-<p>トラッカー別PVグラフが追加されました。</p>
-<p>次に右上の「Add new Visualization」ボタンをクリック。</p>
-<p><img src="/images/20170510/photo_20170510_30.png" alt=""></p>
-<p>「Select visualization type」画面で「Timelion」をクリックします。</p>
-<p>ここで、EVMグラフを作成します。</p>
-<p>内容は<a href="https://future-architect.github.io/articles/20170119/">前回</a>のEVMグラフと一緒。</p>
-<p>まず、「Timelion」画面が開くので、「Interval」に”1d”を指定。</p>
-<p>次に、「Timelion Expression」に下記の値を指定し、再生ボタンをクリックします。</p>
-<p><code>.es(metric=&#39;sum:pv&#39;, timefield=&#39;due_date&#39;).cusum().label(&#39;[累積]pv&#39;),.es(metric=&#39;sum:ev&#39;, timefield=&#39;updated_on&#39;).cusum().label(&#39;[累積]ev&#39;),.es(metric=&#39;sum:ac&#39;, timefield=&#39;updated_on&#39;).cusum().label(&#39;[累積]ac&#39;)</code></p>
-<p><img src="/images/20170510/photo_20170510_31.png" alt=""></p>
-<p>EVMグラフが表示されました。</p>
-<p>右上の「Save」をクリック。表示されるテキストボックスに、”EvmAll”と入力し、青い「Save」をクリックします。</p>
-<p>これでEVMグラフが保存されました。</p>
-<p>画面左側の「Dashboard」をクリック。</p>
-<p>そして、画面右上の「Add」をクリックし、「EvmAll」をクリックします。</p>
-<p><img src="/images/20170510/photo_20170510_33.png" alt=""></p>
-<p>さらに、画面右上の”＾”をクリックすると、</p>
-<p><img src="/images/20170510/photo_20170510_34.png" alt=""></p>
-<p>EVMグラフの大きさを調整すると、</p>
-<p><img src="/images/20170510/photo_20170510_35.png" alt=""></p>
-<p>ダッシュボードの完成です。</p>
-<p>ではドリルダウン機能も使ってみましょう。</p>
-<p>操作はとても簡単。</p>
-<p>例えば、特定の担当者名をクリックすると。</p>
-<p><img src="/images/20170510/photo_20170510_36.png" alt=""></p>
-<p>その担当者が、アサインされているチケットのトラッカー、及び担当者のEVMが表示されます。</p>
-<p><img src="/images/20170510/photo_20170510_37.png" alt=""></p>
-<p>また、表示期間を絞り込む事もできます。Timelion上で期間を選択することで、</p>
-<p><img src="/images/20170510/photo_20170510_38.png" alt=""></p>
-<p>この通り。選択された期間で絞り込むことができました。</p>
-<h2 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h2><p>今回は、Redmineデータを可視化するダッシュボードを構築しました。今回の設定を拡張することで、様々な軸で、様々な値を可視化することが可能。RedmineをKibanaと組み合わせることで、結果的にプロジェクト状況の把握が容易になります。</p>
-<p>本記事が、皆様のプロジェクトマネジメントに役に立てば幸いです。<br>みなさまにとって参考になりそうでしたら「いいね！」をクリックして頂けますと幸いです。執筆の励みになります。＾＾</p>
-<p>なお、次回以降私がブログを執筆する際は、ダッシュボード画像のメール配信に関する方法を記載する予定。<br>今後ともよろしくお願い致します。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;img src=&quot;/images/20170510/photo_20170510_00.jpg&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h2&gt;
-    
-    </summary>
-    
-      <category term="Management" scheme="https://future-architect.github.io/categories/Management/"/>
-    
-    
-      <category term="Elastic-Stack" scheme="https://future-architect.github.io/tags/Elastic-Stack/"/>
-    
-      <category term="Kibana" scheme="https://future-architect.github.io/tags/Kibana/"/>
-    
-      <category term="Redmine" scheme="https://future-architect.github.io/tags/Redmine/"/>
     
   </entry>
   

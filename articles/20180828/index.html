@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>5TB/日 のデータをAWS Glueでさばくためにやったこと（概要編 | Future Tech Blog - フューチャーアーキテクト</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="みなさん、初めまして、お久しぶりです、こんにちは。フューチャーアーキテクト2018年新卒入社、1年目エンジニアのTIG（Technology Innovation Group）所属の澤田周吾です。大学では機械航空工学を専攻しており、学生時代のインターンなどがキッカケで入社を決意しました。 実は、本記事でフューチャーテックブログの2記事目となります。インターン時代も ジャガイモARの記事  を書か">
+<meta name="keywords" content="AWS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="5TB&#x2F;日 のデータをAWS Glueでさばくためにやったこと（概要編">
+<meta property="og:url" content="https://future-architect.github.io/articles/20180828/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="みなさん、初めまして、お久しぶりです、こんにちは。フューチャーアーキテクト2018年新卒入社、1年目エンジニアのTIG（Technology Innovation Group）所属の澤田周吾です。大学では機械航空工学を専攻しており、学生時代のインターンなどがキッカケで入社を決意しました。 実は、本記事でフューチャーテックブログの2記事目となります。インターン時代も ジャガイモARの記事  を書か">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20180828/photo_20180828_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180828/photo_20180828_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180828/photo_20180828_03.png">
+<meta property="og:updated_time" content="2018-08-28T04:42:22.974Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="5TB&#x2F;日 のデータをAWS Glueでさばくためにやったこと（概要編">
+<meta name="twitter:description" content="みなさん、初めまして、お久しぶりです、こんにちは。フューチャーアーキテクト2018年新卒入社、1年目エンジニアのTIG（Technology Innovation Group）所属の澤田周吾です。大学では機械航空工学を専攻しており、学生時代のインターンなどがキッカケで入社を決意しました。 実は、本記事でフューチャーテックブログの2記事目となります。インターン時代も ジャガイモARの記事  を書か">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20180828/photo_20180828_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="5TB/日 のデータをAWS Glueでさばくためにやったこと（概要編 | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="5TB/日 のデータをAWS Glueでさばくためにやったこと（概要編,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="/events/"><i class="fa fa-flag-o"></i>Event</a>
+					</li>
+					
+					<li class="">
+						<a href="/slides/"><i class="fa fa-slideshare"></i>Slide</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<li class="">
+						<a href="https://www.facebook.com/future.saiyo/"><i class="fa fa-facebook-square"></i>Facebook</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Tech Blog</div>
+        <div class="header-title-sub">フューチャーアーキテクト開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20180828/">5TB/日 のデータをAWS Glueでさばくためにやったこと（概要編</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20180828-gluw" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> 澤田周吾</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2018-08-28T04:27:14.000Z" itemprop="datePublished">2018/08/28</time>
+
+	</li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+	  
+  
+    <a href="/tags/AWS/" title="AWS">AWS</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    Categories:
+    <a class="article-category-link" href="/categories/BigData/">BigData</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/images/20180828/photo_20180828_01.png"></p>
+<p>みなさん、初めまして、お久しぶりです、こんにちは。<br>フューチャーアーキテクト2018年新卒入社、1年目エンジニアのTIG（Technology Innovation Group）所属の澤田周吾です。大学では機械航空工学を専攻しており、学生時代のインターンなどがキッカケで入社を決意しました。</p>
+<p>実は、本記事でフューチャーテックブログの2記事目となります。インターン時代も <a href="https://future-architect.github.io/articles/20170421/">ジャガイモARの記事</a>  を書かせて頂きました。入社してからもこうして業務で学んだIT技術を記事に書くという機会を貰え、なんだか懐かしいやら感慨深いやらの思いで一杯です。</p>
+<p>さて、3ヶ月の新人研修後にすぐに配属されたプロジェクトで、AWSを使ったビックデータ分析のための基盤構築をお手伝いをしています。わたしは分析のための前処理であるETL（Extract、Transform、Load）処理部分をちょっと変わった性格の先輩方と一緒に開発しており、今回はそれに用いているサービスであるAWS Glueについて紹介いたします。</p>
+<p>※記事は2回にわけて発信していきたいと考えています。<br>第一弾として、題名の大規模データを処理するために行った様々な工夫を説明する前に、Glueの概要や開発Tips、制約について書かせていただきます</p>
+<h1 id="AWS-Glueとは"><a href="#AWS-Glueとは" class="headerlink" title="AWS Glueとは"></a>AWS Glueとは</h1><p>ご存知の方も多いかと思いますが、簡単にGlueについての説明です。</p>
+<blockquote>
+<p>AWS Glue は抽出、変換、ロード (ETL) を行う完全マネージド型のサービスで、お客様の分析用データの準備とロードを簡単にします。AWS マネジメントコンソールで数回クリックするだけで、ETL ジョブを作成および実行できます。<br><a href="https://aws.amazon.com/jp/glue/" target="_blank" rel="noopener">引用:AWS公式サイト</a></p>
+</blockquote>
+<p>簡単に言うと、「データ処理を行うサービス」です。<br>公式サイトにも書かれていますが、Glueの特徴として、5点挙げられます。</p>
+<ol>
+<li>AWSの一つであること</li>
+<li>ETL処理を行うサービスであること</li>
+<li>完全マネージド型であること</li>
+<li>Scala、Python、Apache Spark を使用できること</li>
+<li>並立分散処理ができること</li>
+</ol>
+<h1 id="今回実現したいこと"><a href="#今回実現したいこと" class="headerlink" title="今回実現したいこと"></a>今回実現したいこと</h1><p>S3やDynamoDBに配備された入力データを、少々複雑な加工ロジックが入ったETL処理を何度か繰り返し、蓄積用のDynamoDBと、分析用のS3に出力することです。<br>入力のマスタデータは日次程度の洗い替えでOK、入力データは10分毎にzip圧縮後で35GB程度がDataLakeに供給され、それらを逐次バッチ的に処理します。ETLの処理ウインドウ時間は10分以内となり、1日では合計5TBに及びます。</p>
+<p><img src="/images/20180828/photo_20180828_02.png"></p>
+<p>データ量が多いため、Glueが利用できる前だとSpark on EMRで処理することを検討していたと思います。EMRも良いサービスだと認識していますが、10分毎に処理する要件だと、EMRクラスタを常時立ち上げざる得ないため、EMRの保守運用を考えるとマネージドでSparkを扱えるGlueを採用したほうが良いのでは？という判断がなされました。他にもAWS Athenaなども候補に上がりましたが、読み込み時のパーティションは可能なものの、2018.08時点ではクエリ結果をS3に書き込む際に、DynamicPartitionができないという点がネックで採用には至りませんでした。</p>
+<p>ETL処理の中身を簡単に言うと…</p>
+<ol>
+<li>処理対象のフィルター（例: 異常値の排除など）</li>
+<li>コンテンツへのエンリッチメント（例: マスタデータと結合し非正規化処理など）</li>
+<li>多様な分析へののグルーピング（例: ユーザID軸、ユーザの属性軸など）</li>
+<li>逆ジオコーディングのために外部サービスにアクセスが必要</li>
+<li>k-meansライクなクラスタリング処理が必要</li>
+</ol>
+<p>などがあります。<br>特に4,5は少し毛色が変わっており、処理特性の違いからETLのパイプラインを当初より少し多めに分割する必要性がでてきました。今回は4つのステップに分割しました。そのため、各ステップは10分よりずっと短い時間で処理を完了させる必要があります。</p>
+<p>また、今回の要件だとワークフローは複雑な分岐や待ち合わせが存在せず、前のジョブAが終わったら素直に後ろのジョブBを起動すれば良いだけだったため、StepFunctionなどを導入せずGlueで完結して構築しています。</p>
+<h1 id="EMR-と-Glue-比較"><a href="#EMR-と-Glue-比較" class="headerlink" title="EMR と Glue 比較"></a>EMR と Glue 比較</h1><p>EMRとGlueですが、アプリケーションの実装としてはどちらもSparkを利用する以上は差が出ないため、インフラレベルで比較した表となります。どうやら、Glueは内部的にEMRを起動させているようなので、GlueはSparkクラスタを構築せずジョブが実行できるといった仕組みと捉えたほうが理解しやすいかと思います。</p>
+<p>EMRの方が細かくチューニングが可能ですが、先に述べたように保守運用性の観点からGlueを採用しました。</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>EMR</th>
+<th>Glue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pros</td>
+<td>ブートストラップアクション/ステップ処理を通じてOSレベルからの設定変更が可能</td>
+<td>ランタイム環境がフルマネージドで提供されるため、クラスタの管理が不要</td>
+</tr>
+<tr>
+<td></td>
+<td>コアノード/タスクノード数を調整することでシステムリソース量の調整が可能</td>
+<td>サービスとしての単一障害点がない</td>
+</tr>
+<tr>
+<td></td>
+<td>Spark以外のツールを利用可能</td>
+<td>データカタログを他AWSサービスと共有可能</td>
+</tr>
+<tr>
+<td>Cons</td>
+<td>マスタノードが単一障害点（特に常駐起動させておく場合にネック）</td>
+<td>ランタイム環境がフルマネージドで提供されるため、OSレベル・クラスタレベルでの設定変更が不可能(システムリソースは調整可能)</td>
+</tr>
+<tr>
+<td></td>
+<td>EMRクラスタの設定や起動処理の設計・実装が必要</td>
+<td>ー</td>
+</tr>
+</tbody>
+</table>
+<h1 id="Glueで行えること"><a href="#Glueで行えること" class="headerlink" title="Glueで行えること"></a>Glueで行えること</h1><p>具体的なイメージが湧きにくいと思いますので、早速ですが、コードベースでどういうことができるかいくつか例示していきたいと思います。<br>今回、コードはPythonで説明していきます。</p>
+<h2 id="S3上のファイルの読み書き"><a href="#S3上のファイルの読み書き" class="headerlink" title="S3上のファイルの読み書き"></a>S3上のファイルの読み書き</h2><p>以下のコードでS3に対して読み込み・書き込みが行えます。<br>ファイル形式を変更することで、CSV、JSON、Parquetなどの形式に対応できます。</p>
+<p>Glueで定義されたデータ構造のDynamicFrameを使っていきます。<br>使い方はSparkのDataFrameのように扱うことができます。</p>
+<figure class="highlight python"><figcaption><span>S3からCSVファイルの読み込み処理</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">df = glueContext.create_dynamic_frame.from_options(</div><div class="line">    connection_type=<span class="string">"s3"</span>,</div><div class="line">    connection_options=&#123;</div><div class="line">        <span class="string">"paths"</span>: [<span class="string">"s3://&#123;0&#125;"</span>.format(<span class="string">"バケット名"</span>)]&#125;,</div><div class="line">    format=<span class="string">"csv"</span>,  <span class="comment"># ファイル形式指定 json, parquet等に変更可</span></div><div class="line">    format_options=&#123;<span class="string">"withHeader"</span>: <span class="keyword">True</span>&#125;  <span class="comment"># 1行目をスキーマ名として認識True</span></div><div class="line">    )</div></pre></td></tr></table></figure>
+<figure class="highlight python"><figcaption><span>DynamicFrame(df)をS3にcsv形式で出力処理</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">datasink = glueContext.write_dynamic_frame.from_options(</div><div class="line">        frame=df,  <span class="comment"># 出力するDynamicFrameを指定</span></div><div class="line">        connection_type=<span class="string">"s3"</span>,</div><div class="line">        connection_options=&#123;</div><div class="line">            <span class="string">"path"</span>: [<span class="string">"s3://&#123;0&#125;"</span>.format(<span class="string">"バケット名"</span>)],</div><div class="line">            <span class="string">"partitionKeys"</span>: <span class="string">"パーティションを切るキー名"</span>&#125;,</div><div class="line">        format=<span class="string">"csv"</span>  <span class="comment"># ファイル形式指定</span></div><div class="line">        )</div></pre></td></tr></table></figure>
+<p>他のファイル形式については<a href="https://docs.aws.amazon.com/ja_jp/glue/latest/dg/aws-glue-programming-etl-format.html" target="_blank" rel="noopener">AWS Glue の ETL 出力用の形式オプション
+</a> を参考ください。CSVであれば区切り文字やヘッダ行出力の有無もオプションで指定できます。</p>
+<h2 id="DaynamoDBからの読み込み、書き込み"><a href="#DaynamoDBからの読み込み、書き込み" class="headerlink" title="DaynamoDBからの読み込み、書き込み"></a>DaynamoDBからの読み込み、書き込み</h2><p>DynamoDBへのアクセスはAWS SDK for Pythonなboto3を利用します。<br>2018.08時点では標準のコネクタは存在しないようです。</p>
+<figure class="highlight python"><figcaption><span>DynamoDB初期化</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">dynamo_region=<span class="string">"AWSリージョン名"</span></div><div class="line">dynamodb = boto3.resource(</div><div class="line">        <span class="string">'dynamodb'</span>,　</div><div class="line">        region_name=dynamo_region,</div><div class="line">        endpoint_url=<span class="string">'http://dynamodb.'</span> + dynamo_region + <span class="string">'.amazonaws.com'</span></div><div class="line">        )</div></pre></td></tr></table></figure>
+<p>あとは素直にget, put すれば読み書きできます。</p>
+<figure class="highlight python"><figcaption><span>DynamoDBからデータベースの読み込み</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">table = dynamodb.Table(<span class="string">"テーブル名"</span>)</div><div class="line">response = table.get_item(</div><div class="line">        Key=&#123; <span class="string">'xxx'</span>: xxx, <span class="string">'yyy'</span>: yyy &#125;</div><div class="line">    )</div><div class="line">print(response)</div></pre></td></tr></table></figure>
+<figure class="highlight python"><figcaption><span>DynamoDBへデータ出力</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">table = dynamodb.Table(<span class="string">"テーブル名"</span>)</div><div class="line">response = table.put_item(</div><div class="line">    Item=&#123;<span class="string">'xxx'</span>: xxx, <span class="string">'yyy'</span>: yyy&#125;</div><div class="line">)</div><div class="line">print(response)</div></pre></td></tr></table></figure>
+<p>もし、DynamoDBへのR/Wを行う場合は、Read/Writeのキャパシティーユニットを確認するとともに、レスポンスでスループット超過時のエラーハンドリングもお忘れないように注意ください。</p>
+<h2 id="加工処理"><a href="#加工処理" class="headerlink" title="加工処理"></a>加工処理</h2><p>入力で取得したデータは例えば以下のようにSQLクエリを用いて加工することができます。</p>
+<figure class="highlight python"><figcaption><span>SQLを利用した加工処理</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># DynamicFrameをDataFrameに変換</span></div><div class="line">dataFrame = df.toDF()</div><div class="line"></div><div class="line"><span class="comment"># DataFrameにテーブル名を割り当て</span></div><div class="line">dataFrame.registerTempTable(<span class="string">'table_name'</span>)</div><div class="line"></div><div class="line"><span class="comment"># SparkSQL文にてデータ加工</span></div><div class="line">select_table = spark.sql(<span class="string">'SELECT * FROM table_name'</span>)</div></pre></td></tr></table></figure>
+<p>今回の開発では情報量が多いことと開発チームメンバーのスキルセットからDataFrameに変換後にSQLで加工する手法を使いました。</p>
+<h2 id="ジョブのワークフロー"><a href="#ジョブのワークフロー" class="headerlink" title="ジョブのワークフロー"></a>ジョブのワークフロー</h2><p>GlueのTriggerを利用することで、Glue内でジョブのワークフローを作ることができます。<br>また、起動を制御するためのTriggerは3種類用意されています。</p>
+<ol>
+<li>Triggerの開始をタイマーで行う ＝ <strong>スケジュール</strong></li>
+<li>ジョブイベントが監視対象リストに一致した場合に行う ＝ <strong>ジョブイベント</strong></li>
+<li>手動で開始させる ＝ <strong>オンデマンド</strong></li>
+</ol>
+<p>1のスケジュールトリガー、3のオンデマンドトリガーについてはイメージがつくと思います。<br>2のジョブイベントトリガーについて補足していきます。</p>
+<p>ジョブイベントトリガーは、ジョブXが終わったら次のジョブYを起動する、といった依存関係を設定することができます。<br>具体的にはジョブイベントトリガー作成時には以下の項目を選択することができます。</p>
+<ul>
+<li>監視対象ジョブ（複数可）</li>
+<li>トリガーするジョブ（複数可）</li>
+<li>「成功、失敗、停止、タイムアウト」の４つのジョブステータス</li>
+<li>監視対象ジョブとステータスが全一致でトリガーするか、部分一致でトリガーするか</li>
+<li>起動時に渡すパラメータ（セキュリティ設定、ブックマーク、タイムアウト、キー/値）</li>
+</ul>
+<p>例：ジョブイベントトリガーを利用して以下の様なフローを３つのジョブイベントトリガーを設定することで実現することができます</p>
+<p><img src="/images/20180828/photo_20180828_03.png"></p>
+<ul>
+<li>トリガー1はジョブAが成功したらジョブB, Cを起動</li>
+<li>トリガー2はジョブBが成功したらジョブDを起動</li>
+<li>トリガー3はジョブC, Dが成功したらジョブEを起動</li>
+</ul>
+<h1 id="Glue開発Tips"><a href="#Glue開発Tips" class="headerlink" title="Glue開発Tips"></a>Glue開発Tips</h1><p>この1ヶ月で学んだGlueで開発を行う上でのコツをお伝えします</p>
+<h2 id="Tips1-Glueデバックについて"><a href="#Tips1-Glueデバックについて" class="headerlink" title="Tips1. Glueデバックについて"></a>Tips1. Glueデバックについて</h2><p>Glueの開発・デバッグには、開発エンドポイントを利用すると便利です。</p>
+<p>ローカルのコンソール上から開発エンドポイントへSSH接続することで、Glueに対しpythonやscalaのREPLを使用できます。</p>
+<p>エンドポイント作成はGlueのDPU数を指定し、SSH用の鍵を設定するのみです。わずか数クリック、1~2分で完了できます。ただし、エンドポイント作成後は裏でGlue(Spark)のクラスタ構築が行われるため、実際に使用可能となるのはその完了後（約15分ほどかかりました）です。</p>
+<p>作成したエンドポイントへApache Zeppelin ノートブックを接続し、ノートブックでの開発も可能なようですが、今回は必要でなかったため使用しませんでした。ノートブックはローカルでもEC2上でも利用可能なようです。詳細は以下をご覧ください。<br><a href="https://docs.aws.amazon.com/ja_jp/glue/latest/dg/dev-endpoint.html" target="_blank" rel="noopener">https://docs.aws.amazon.com/ja_jp/glue/latest/dg/dev-endpoint.html</a></p>
+<p>また開発エンドポイントも裏ではGlueのクラスタが上がっているため、通常通りのGlue料金が請求されます。開発エンドポイントのDPU数はデフォルトで5、料金は1DPUあたり$0.44/時かかります。(公式ドキュメントには$0.44/秒と誤記されてますが、そんな高くないです)。</p>
+<p>仮に終業時に開発エンドポイントを落とし忘れた場合、翌出社までに以下の金額がかかります。<br>　　5 <em> $0.44 </em> 14時間(20時退社、10時出社) = $30.8<br>1回の飲み代程度です。一晩にしてはなかなかです。自動で落とす方法もちょっと調べてみましたが見つけられず…。<br>忘れずに落とすようにしましょう！</p>
+<h3 id="※開発エンドポイントを使わない場合※"><a href="#※開発エンドポイントを使わない場合※" class="headerlink" title="※開発エンドポイントを使わない場合※"></a>※開発エンドポイントを使わない場合※</h3><p>開発開始直後は開発エンドポイントの存在を知らず、Glueコンソール上でソースを編集し実行することで開発をしていました。<br>その当時の開発スタイルの状況も悪い例として記載します。<strong>興味が無い場合はスキップください。</strong></p>
+<p><strong>（※開発エンドポインを利用すれば解決できる内容です。開発エンドポイントをぜひ利用しましょう！）</strong></p>
+<ul>
+<li><p>ジョブ実行に時間かかる</p>
+<ul>
+<li>Glueジョブは実行の都度リソースを確保しクラスタの構成を行います。そのため純粋なコンピューティング以外で毎回10分ほど待たされます</li>
+<li>ソースを編集 → 実行(10分以上かかる) → 結果を確認、ソースを修正 → 実行(10分以上かかる) → …</li>
+</ul>
+</li>
+<li><p>不要なログが多く目的のログに辿り着けない</p>
+<ul>
+<li>Glueの実行ログはCloudWatch上から確認可能ですが、実行スクリプトのログとSparkのログが同一のログストリーム上に出力されます<ul>
+<li>そのため大量のSparkのログに目的のスクリプトログが埋もれます</li>
+<li>CloudWatchから目的のログに辿り着けるよう、ログにプレフィクスなどをつけるなど工夫が必要でした</li>
+</ul>
+</li>
+<li>ソースを編集 → 実行(10分以上かかる) → CloudWatchのログストリーム表示 → プレフィクスで目的のログ検索 → 結果を確認 → ソースを修正 → 実行(10分以上かかる) → …</li>
+</ul>
+</li>
+<li><p>ソース修正、実行のための画面遷移が多い</p>
+<ul>
+<li>ジョブの一覧画面からスクリプトを参照することはできますが、編集するには専用の編集画面で行う必要があります。そのため編集の都度画面遷移が必要です</li>
+<li>また、編集画面にはジョブの実行ボタンが存在しますが、このボタンが反応せずほとんど実行開始してくれません(原因は不明)。そのため実行の都度またジョブ一覧画面へと遷移する必要があります</li>
+<li>ソースを編集 → 編集画面から実行画面へ → 実行(10分以上かかる) → CloudWatchのログストリーム表示 → プレフィクスで目的のログ検索 → 結果を確認 → 実行画面から編集画面へ → ソースを修正 → 編集画面から実行画面へ → 実行(10分以上かかる) → …</li>
+</ul>
+</li>
+</ul>
+<p>どうでしょう？壮絶な開発状況を想像していただけたでしょうか？<br>エンジニアたるもの、あるものは利用して賢く効率よく働きたいと、改めて思いました…</p>
+<p>これらの苦労は <strong>開発エンドポイントを利用すれば</strong> その多くが回避できます。ぜひ利用しましょう！</p>
+<h2 id="Tips2-AWS-Athenaで簡易的にデータ確認"><a href="#Tips2-AWS-Athenaで簡易的にデータ確認" class="headerlink" title="Tips2. AWS Athenaで簡易的にデータ確認"></a>Tips2. AWS Athenaで簡易的にデータ確認</h2><p>Glueのテーブルを使用する場合は、Athenaのクエリで中身を確認できるため開発が捗りました。</p>
+<p>Athenaからテーブルに対して、 <code>SELECT * FROM TABLE</code> などのクエリを投げても良いですし、Glueコンソールのテーブル一覧画面から「アクション」→「データの確認」を選択しても良いです。後者の場合は自動でAthenaから <code>SELECT * FROM TABLE limit 10</code> というクエリを投げてくれます。どちらの場合もAthenaの料金が発生するため、読み取りデータ量には注意が必要です。</p>
+<p>また、開発にSparkSQLを用いる場合はAthenaも同じSQLであるため、AthenaでSQLを開発してからSparkへ移植という使い方が可能です。ただし、AthenaはPrestoベース、SparkSQLはHiveSQLのスタイルをベースに開発されており、利用できる構文に微妙な差異がるため注意が必要です。<br>Athenaで開発したSQLをそのまま移植しようとした時に少しハマりもしました。</p>
+<p>例えば文字列結合の場合、以下のようなSQLはAthenaでは利用できてSparkSQLでは利用できません。</p>
+<figure class="highlight sql"><figcaption><span>AthenaSQLとSparkSQL</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- AthenaではOK、SparkSQLではNG</span></div><div class="line"><span class="keyword">SELECT</span> <span class="string">'str1'</span> || <span class="string">'str2'</span> || <span class="string">'str3'</span></div><div class="line"></div><div class="line"><span class="comment">-- SparkSQLでOK</span></div><div class="line"><span class="keyword">SELECT</span> <span class="keyword">CONCAT</span>(<span class="string">'str1'</span>, <span class="string">'str2'</span>, <span class="string">'str3'</span>)</div></pre></td></tr></table></figure>
+<p>SparkSQLの詳細については、GlueのVersionが2018.08月時点では2.1.1ですので、下記のガイドを参考ください。<br><a href="https://spark.apache.org/docs/2.1.1/sql-programming-guide.html" target="_blank" rel="noopener">https://spark.apache.org/docs/2.1.1/sql-programming-guide.html</a></p>
+<h2 id="Tips3-Glueのカタログデータについて"><a href="#Tips3-Glueのカタログデータについて" class="headerlink" title="Tips3. Glueのカタログデータについて"></a>Tips3. Glueのカタログデータについて</h2><p>Glueといえばカタログデータ、という印象がありましたが実はカタログが未登録でもETLジョブは実行可能です。</p>
+<p>GlueのデータカタログはApache Hive メタストアとの互換性がありますが、EMR以外にもAthenaやRedshift Spectrum でも利用できます。</p>
+<p>開発Tips2であるように一部のS3バケットに対してはAthenaのクエリを発行したかったためデータカタログを設定しましたが、ETL処理に閉じて見た場合に恩恵が無いように感じられたため最終的にはデータカタログを利用しませんでした。</p>
+<h2 id="Tips4-DataFrameとDynamicFrameについて"><a href="#Tips4-DataFrameとDynamicFrameについて" class="headerlink" title="Tips4. DataFrameとDynamicFrameについて"></a>Tips4. DataFrameとDynamicFrameについて</h2><p>Glueでは2種類のDataFrameを利用することができます。<br>SparkのDataFrameと、Glueで独自に定義されたDynamicFrameです。</p>
+<p>両者ともテーブルの構造でデータを持ち、データ操作を行えるという点は共通していますが、DynamicFrameはchoice型を扱うという点で差異があります。choice型とは、同一列に複数のデータ型を持つことができる型です。</p>
+<p>例えば、同一列にstringとdoubleを含むデータをDynamicFrameに読み込んだ場合、以下のようなイメージとなります。</p>
+<p>取り込み元データ</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">col1</th>
+<th style="text-align:left">col2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">1</td>
+<td style="text-align:left">str</td>
+</tr>
+<tr>
+<td style="text-align:left">2</td>
+<td style="text-align:left">20.3</td>
+</tr>
+</tbody>
+</table>
+<p>取り込み後DynamicFrame</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">root</div><div class="line">┣- col1: int</div><div class="line">┣- col2: choice</div><div class="line">┃┣- string</div><div class="line">┃┣- double</div></pre></td></tr></table></figure>
+<p>col2は2種類の型のデータが存在するためchoice型となり、stringとdouble両方を保持します。<br>様々なデータ取り込みに対応可能とするため、このような構造になっているのでしょう。</p>
+<p>ただchoice型はこのままでは扱いにくいため、resolveChoice関数によって扱いやすい形へ変換してあげるとよいです。<br>resolveChoice関数では以下のことができます。</p>
+<ul>
+<li>choice列を任意の型にcastする。(choice列を、例えばstring列へ変換する)</li>
+<li>choice列に含まれる型別に、新しく列を生成する。(stringとdoubleの2列を生成する)</li>
+<li>choice列に含まれる型を保持できる構造体の列を生成する。(stringとdoubleを保持できる構造体列を1列生成する)</li>
+<li>choice列を任意の型にcastした列を生成する。(例えばstring列を1列生成する)</li>
+</ul>
+<p>今回は、調査時の情報量が圧倒的にSparkのDataFrameの方が多く使いやすいため、データの取り込み後choice列は早々にstringへ変換し、かつSparkのDataFrameへ変換して使用しています。</p>
+<p>データの取り込みはDynamicFrameで行い、本格的なデータの加工はSparkのDataFrameで行う、という使い分けが良いかと思います。</p>
+<p>DynamicFrameやresolveChoiceの詳細は以下を参考ください。<br><a href="https://docs.aws.amazon.com/ja_jp/glue/latest/dg/aws-glue-api-crawler-pyspark-extensions-dynamic-frame.html" target="_blank" rel="noopener">https://docs.aws.amazon.com/ja_jp/glue/latest/dg/aws-glue-api-crawler-pyspark-extensions-dynamic-frame.html</a> (edited)</p>
+<h1 id="Glueの注意点"><a href="#Glueの注意点" class="headerlink" title="Glueの注意点"></a>Glueの注意点</h1><p>Glueを利用して感じた注意点をまとめます。</p>
+<h2 id="注意1-既存データに対するUpdate"><a href="#注意1-既存データに対するUpdate" class="headerlink" title="注意1. 既存データに対するUpdate"></a>注意1. 既存データに対するUpdate</h2><p>Glueではカラムの加工、テーブルの新規作成（SQLでいうCreate As Select）、テーブルのJoinなどETL処理ができます。またその特性上、中間データはS3上に配備されることが多いと思います。</p>
+<p>しかしS3上にある既存カラムの <strong>Updateはできません</strong> ので注意が必要です。<br>これは裏側で動くSparkがあくまでS3へ追記しか行っていないからでしょう。<br>どうしてもUpdateしたいときは以下で代用できないかなど追加の検討が必要です。</p>
+<ol>
+<li>Delete &amp; Insert でテーブルやパーティション自体を再作成する</li>
+<li>既存データの更新せずデータを追記し、抽出時にDistinctするロジックを追加する</li>
+</ol>
+<p>どちらにしても、書き込みや読み込みに余分な処理が発生するため処理コストが多くかかってしまいます。<br>最終的な利用元である分析に対して、どれくらいのデータ鮮度が求められるか、費用対効果で考える必要があると思います。</p>
+<p>※ちなみに、DynamoDBに対しては書き換えたい情報だけに絞り込んでInsertすることで、実質的にUpdate処理が可能となりますが、DynamoDBのRCP・WCPの費用を考えると利用したいユースケースは少なそうです。</p>
+<h2 id="注意2-C言語に依存するパッケージ（Pandas等）が利用不可"><a href="#注意2-C言語に依存するパッケージ（Pandas等）が利用不可" class="headerlink" title="注意2. C言語に依存するパッケージ（Pandas等）が利用不可"></a>注意2. C言語に依存するパッケージ（Pandas等）が利用不可</h2><p><a href="https://docs.aws.amazon.com/ja_jp/glue/latest/dg/aws-glue-programming-python-libraries.html" target="_blank" rel="noopener">リファレンスにも記載</a>がありますが、Glueの仕様でC言語依存パッケージを使うことができません。<br>Scikit_learnを使いたかったのですが、内部パッケージにpandasが使われているため起動できず、Scikit_learnの処理は違うアーキテクチャ（ECS）に切り分けました。すでに使いたいものが決まっている場合は注意してください。</p>
+<p>もともとは、PySparkのUDFで処理可能と想定していましたが、Glueのこの制約を見逃していて、半日潰してしまいました。</p>
+<p>C言語依存パッケージがGlueで使えない理由としては、コンパイルが絡んでいるのではないかと考えています。今後のGlueの機能拡張で使えるようになってくれると便利さが増しますね。</p>
+<h2 id="注意3-ジョブブックマークが対応していない入力"><a href="#注意3-ジョブブックマークが対応していない入力" class="headerlink" title="注意3. ジョブブックマークが対応していない入力"></a>注意3. ジョブブックマークが対応していない入力</h2><p>Glueの機能にジョブブックマークというすでに処理されたデータかどうかを判定し、処理済みであれば次のジョブでは入力データに含めないという機能があります。<br>2018.08時点ではJSON、CSVなどには対応しているものの、zipファイルやParquestには対応していませんでした。<br><a href="https://docs.aws.amazon.com/ja_jp/glue/latest/dg/monitor-continuations.html" target="_blank" rel="noopener">https://docs.aws.amazon.com/ja_jp/glue/latest/dg/monitor-continuations.html</a></p>
+<p>そのため、もしジョブブックマーク非対応の入力に対しては、手動でオフセット管理する必要があります。<br>今回、わたしたしは入力ディレクトリに処理済みかどうかのフラグファイルを配備し、Glueジョブ上でその有無を確認することで処理対象とするか判定するロジックを追加しました。</p>
+<h2 id="注意4-S3上のソースファイルの実行"><a href="#注意4-S3上のソースファイルの実行" class="headerlink" title="注意4. S3上のソースファイルの実行"></a>注意4. S3上のソースファイルの実行</h2><p>S3にソースファイルを配置する際に複数ファイルの場合は、zip圧縮する必要があります。<br>地味ですが忘れると動かないのでご注意を。</p>
+<h2 id="注意5-並立分散処理"><a href="#注意5-並立分散処理" class="headerlink" title="注意5. 並立分散処理"></a>注意5. 並立分散処理</h2><p>Sparkの設定にちょっとした工夫が必要です。<br>第2回目の記事で詳しく説明したいと思います。</p>
+<h2 id="注意6-料金について"><a href="#注意6-料金について" class="headerlink" title="注意6. 料金について"></a>注意6. 料金について</h2><p>Glueの料金計算はやや特殊でDPU (Data Processing Unit) という数に基づいて時間（1秒）ごとに課金が発生します。2018.08時点では1DPUでは4vCPU・16GBメモリが提供されます。<br>2018.08時点では <strong>10分の最小期間が設定</strong> されているため、処理時間が10分以下のミニバッチを連続的に起動させたい場合にはコスト的には不利になってしまいます。</p>
+<p><a href="https://aws.amazon.com/jp/glue/pricing/" target="_blank" rel="noopener">https://aws.amazon.com/jp/glue/pricing/</a></p>
+<p>これを避けるために分析部門にとってはデータの鮮度は下がるものの、20-30分単になどに処理頻度を変更する余地が無いか、費用対効果から見た全体最適の視点で検討中です。</p>
+<h2 id="注意7-リソースの確保について"><a href="#注意7-リソースの確保について" class="headerlink" title="注意7. リソースの確保について"></a>注意7. リソースの確保について</h2><p>（2018.08時点、東京リージョンで発生した事象です）Glueのリソースは先に述べたDPUという単位でコンピューティングされます。これを性能検証のために、数十DPUといった比較的大きめに確保しようとするとリソースが確保できず起動できなかったことが何度かありました。<br>2018.08時点ではGlueリソースをリザーブド化することもできず、設定レベルでの回避が難しい状態です。</p>
+<p>東京リージョンでGlueが利用可能になったのは<a href="https://aws.amazon.com/jp/about-aws/whats-new/2017/12/aws-glue-is-now-available-in-the-asia-pacific-tokyo-aws-region/" target="_blank" rel="noopener">2017.12</a> と比較的新しく、今後も継続的にリソースの増強などが期待されるため、改善に向かうと予想しています。現時点では実行タイミングによっては確保が難しい場合があるようです。人気のサービスであるとう証拠なのかもしれませんね。</p>
+<p>他の時間帯・日本国外リージョンなどを試すことや、処理粒度をある程度細かくし急激に大きなDPUを確保しないようにするなどの工夫が必要になってきます。また、どうしても確実に実行できないと困る！という場合は、EMRを利用するしか無いようです。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>Glue（直訳：のり）とはよく名を付けたものだと感じています。<br>粗削りで膨大なデータを、使いやすい形に成形してあげる。つまり、データと後続のシステムをうまくつなぎ合わせることができるものがGlueです。</p>
+<p>以下にあてはまる方はGlueの導入を考えてみたらどうでしょうか。</p>
+<ul>
+<li>ビッグデータの処理が必要</li>
+<li>起動時間は常時ではなく短い</li>
+<li>サーバーを立てる余裕がない</li>
+<li>運用、保守する余裕がない</li>
+<li>パイオニア精神がある</li>
+</ul>
+<p>実はGlueの記事はネット上にはまだ多くない状態です。<br>そのため、Glue開発を導いていきたいというパイオニア精神ある方におすすめの領域だと思います。</p>
+<h1 id="次回のGlueの記事について"><a href="#次回のGlueの記事について" class="headerlink" title="次回のGlueの記事について"></a>次回のGlueの記事について</h1><p>次回の内容はGlueを用いた性能改善を予定しています。<br>皆さんの参考になれば光栄です。</p>
+<p>Glueを検討の方はご気軽にご連絡ください。</p>
+
+      
+    </div>
+  </div>
+    
+  <!-- シェアボタン START -->
+  <div class="social-area">
+  <ul class="social-button">
+
+      <!-- twitter -->
+      <li class="sc-tw social-button-twitter">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-hashtags="future_architect">ツイート</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      </li>
+      
+      <!-- Facebookいいね -->
+      <li class="social-button-fb">
+          <div id="fb-root"></div>
+          <script>(function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.8";
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));</script>
+          <div class="fb-like" data-href="https://future-architect.github.io/articles/20180828/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+      </li>
+
+      <!-- 	google+ -->
+      <li class="social-button-g">
+      <script src="https://apis.google.com/js/platform.js" async defer>
+      {lang: 'ja'}
+      </script>
+      <div class="g-plusone" data-size="medium"></div>
+      </li>
+
+      <!-- はてなブックマーク -->
+      <li class="social-button-hatebu"><a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20180828/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></li>
+
+      <!-- pocket -->
+      <li class="social-button-pocket"><a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
+          <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+      </li>
+
+  </ul>
+  </div>
+<!-- シェアボタン END -->
+
+
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/articles/20180809/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">データベースマイグレーション ～OracleからPostgreSQLへ～　－第２回ー</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- OSS LOGO START -->
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="list-inline oss">
+      <li>
+        <a href="https://github.com/future-architect/vuls" target="_blank">
+          <img src="/metronic/assets/corporate/img/Vuls.png" alt="Vuls">
+      </a>
+      </li>
+      <li>
+        <a href="https://future-architect.github.io/uroborosql-doc/" target="_blank">
+          <img src="/metronic/assets/corporate/img/uroboroSQL-logo.png" alt="uroboroSQL">
+      </a>
+      </li>
+      <li>
+        <a href="http://future-architect.github.io/urushi/" target="_blank">
+          <img src="/metronic/assets/corporate/img/Urushi-logo.png" alt="Urushi">
+      </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- OSS LOGO START -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (9)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Event/">Event (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Development/">Development (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/BigData/">BigData (4)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (4)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (9)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Frontend/">Frontend (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Custure/">Custure (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/MachineLearning/">MachineLearning (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20180828/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20180828/thumbnail_20180828.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>5TB/日 のデータをAWS Glueでさばくためにやったこと（概要編</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20180809/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20180809/thumbnail.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>データベースマイグレーション ～OracleからPostgreSQLへ～　－第２回ー</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20180723/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20180723/thumbnail_20180723.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>人工知能学会（JSAI2018）参加報告</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20180522/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20180523/photo_20180523_01.jpg" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>IoT/M2M展（音声認識サービス）の展示</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20180413/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20180403/thumbnail_20180403.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>ICLR2018 LT大会</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20180301/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20180301/thumbnail_20180301.jpeg" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>Future AI EXPO 開催！</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20180222/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20180222/thumbnail_20180222.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>NIPS2017 LT報告</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20180209/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-4">
+              <img src="/images/20180209/thumbnail_20180209.png" class="img-responsive ">
+            </div>
+            <div class="col-md-8">
+              <h3>エンプラ&オンプレでもAnsible導入成功したのでユーザー会で発表してきた</h3>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- BEGIN BLOG TAGS -->
+<div class="blog-tags margin-bottom-20">
+  <h2>Tags</h2>
+  
+  <div class="widget-wrap">
+    <div class="widget">
+      
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/3D-Printer/"><i class='fa fa-tags'></i>3D-Printer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AWS/"><i class='fa fa-tags'></i>AWS</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ansible/"><i class='fa fa-tags'></i>Ansible</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Camp/"><i class='fa fa-tags'></i>Camp</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CoSpaces/"><i class='fa fa-tags'></i>CoSpaces</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference/"><i class='fa fa-tags'></i>Conference</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DB/"><i class='fa fa-tags'></i>DB</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DeepLearning/"><i class='fa fa-tags'></i>DeepLearning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DesignThinking/"><i class='fa fa-tags'></i>DesignThinking</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Elastic-Stack/"><i class='fa fa-tags'></i>Elastic-Stack</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Elixir/"><i class='fa fa-tags'></i>Elixir</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hackathon/"><i class='fa fa-tags'></i>Hackathon</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/"><i class='fa fa-tags'></i>Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HoloLens/"><i class='fa fa-tags'></i>HoloLens</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Infrastructure/"><i class='fa fa-tags'></i>Infrastructure</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/IoT/"><i class='fa fa-tags'></i>IoT</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/"><i class='fa fa-tags'></i>Java</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/"><i class='fa fa-tags'></i>JavaScript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kibana/"><i class='fa fa-tags'></i>Kibana</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LT/"><i class='fa fa-tags'></i>LT</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MachineLearning/"><i class='fa fa-tags'></i>MachineLearning</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MachineLearning8/"><i class='fa fa-tags'></i>MachineLearning8</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Migration/"><i class='fa fa-tags'></i>Migration</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NLP/"><i class='fa fa-tags'></i>NLP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Network/"><i class='fa fa-tags'></i>Network</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oracle/"><i class='fa fa-tags'></i>Oracle</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PostgresSQL/"><i class='fa fa-tags'></i>PostgresSQL</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/"><i class='fa fa-tags'></i>Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redmine/"><i class='fa fa-tags'></i>Redmine</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/"><i class='fa fa-tags'></i>SQL</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Statistics/"><i class='fa fa-tags'></i>Statistics</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Styleguide/"><i class='fa fa-tags'></i>Styleguide</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UI-UX/"><i class='fa fa-tags'></i>UI/UX</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unity/"><i class='fa fa-tags'></i>Unity</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Urushi/"><i class='fa fa-tags'></i>Urushi</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web-component/"><i class='fa fa-tags'></i>Web component</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/icon/"><i class='fa fa-tags'></i>icon</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/uroboroSQL/"><i class='fa fa-tags'></i>uroboroSQL</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vuls/"><i class='fa fa-tags'></i>vuls</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+</div>
+<!-- END BLOG TAGS -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年#1</a>
+      </li>
+      <li>
+        <a href="https://adventar.org/calendars/2449" target="_blank">2017年#2</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーアーキテクトの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+          <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+
+    <!-- Twitterフォローボタン -->
+    <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+	  <a data-tweet-limit="1" class="twitter-timeline"
+	  href="https://twitter.com/future_techblog"
+	  data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+
+	  <script>!function(d,s,id){var
+	  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+          </div>
+          <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2018 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
