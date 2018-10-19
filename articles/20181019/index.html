@@ -26,7 +26,7 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20181019/3.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20181019/4.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20181019/5.png">
-<meta property="og:updated_time" content="2018-10-19T05:37:34.694Z">
+<meta property="og:updated_time" content="2018-10-19T05:43:44.695Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="PostgreSQLパーティションプルーニングの動作を確認する">
 <meta name="twitter:description" content="PostgreSQL10までのパーティション機能を利用したプロジェクトにおいて、遅延SQLの調査をするなかで以下のような長い長い実行計画を目にすることがありました。 こちらはサンプルテーブルでそれを再現したものです。長いので畳みました。1234567891011121314151617181920212223242526272829303132333435363738394041424344454">
@@ -196,7 +196,7 @@
 <p><code>PARTITION RANGE ITERATOR</code>のところがまさに、WK_INPUTの各行に対応するパーティションへのアクセスを示しています。</p>
 <p>では、PostgreSQL10ではどのようになるかというと<code>explain analyze</code>で先のselect文を実行すると以下のような出力になりました。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">Nested Loop  (cost=0.42..93.60 rows=1 width=31) (actual time=66.130..275.215 rows=3 loops=1)</div><div class="line">  -&gt;  Seq Scan on wk_input a  (cost=0.00..1.03 rows=3 width=15) (actual time=16.125..16.261 rows=3 loops=1)</div><div class="line">  -&gt;  Append  (cost=0.42..30.82 rows=4 width=16) (actual time=69.391..86.303 rows=1 loops=3)</div><div class="line">        -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 b  (cost=0.42..8.44 rows=1 width=16) (actual time=48.916..51.817 rows=0 loops=3★)</div><div class="line">              Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</div><div class="line">        -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 b_1  (cost=0.42..8.44 rows=1 width=16) (actual time=17.012..21.819 rows=0 loops=3★)</div><div class="line">              Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</div><div class="line">        -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 b_2  (cost=0.42..8.44 rows=1 width=16) (actual time=12.144..12.594 rows=0 loops=3★)</div><div class="line">              Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</div><div class="line">        -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 b_3  (cost=0.15..5.50 rows=1 width=68) (actual time=0.013..0.013 rows=0 loops=3★)</div><div class="line">              Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</div><div class="line">Planning time: 118.634 ms</div><div class="line">Execution time: 275.380 ms</div></pre></td></tr></table></figure>
-<p>注目は3行目の <code>loops=3</code> のところでしょうか。どのパーティションにもwk_inputの3行に対し3回のアクセスがあることが確認できます。</p>
+<p>注目は★マークを付けた4,6,8,10行目の <code>loops=3</code> のところでしょうか。どのパーティションにもwk_inputの3行に対し3回のアクセスがあることが確認できます。</p>
 <p>図にすると次のようなイメージです。<br><img src="/images/20181019/3.png"></p>
 <p>つまりPostgreSQL10ではクエリ実行時にwk_inputのレコードの値をみて、パーティションプルーニングするような動作はできないことがわかります。<br>これを踏まえたうえで、パーティションテーブルとパーティションテーブルの結合を考えてみます。</p>
 <p>冒頭の実行計画は以下のクエリをexplainしたものです。</p>
