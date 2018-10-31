@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2018-10-19T05:43:44.695Z</updated>
+  <updated>2018-10-31T01:15:34.990Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <author>
@@ -14,6 +14,325 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>その問い合わせ、AIが解決します！～Redmineチケットレコメンドシステムのご紹介～</title>
+    <link href="https://future-architect.github.io/articles/20181031/"/>
+    <id>https://future-architect.github.io/articles/20181031/</id>
+    <published>2018-10-31T00:54:57.000Z</published>
+    <updated>2018-10-31T01:15:34.990Z</updated>
+    
+    <content type="html"><![CDATA[<p>こんにちは、フューチャーアーキテクト2017年4月入社、TIG（Technology Innovation Group）所属の竹林です。<br>大学では主にIoTの研究をしており、趣味で作ったArduinoベースのIoTラジコンカーを<a href="https://future-architect.github.io/articles/20160718/">入社前にフューチャーのLT大会で発表したり</a>していました。</p>
+<p>研修終了後のOJTではフューチャーの社内インフラ構築・運用に関する業務を担当・経験し、現在はQA(Quality Assurance)チームとして、フューチャーにおける各プロジェクト成果物の品質管理全般に関わるツールの改善業務やサポート業務などを主に行っております。</p>
+<h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><h3 id="作ったもの"><a href="#作ったもの" class="headerlink" title="作ったもの"></a>作ったもの</h3><ul>
+<li>AIコンシェルジュの<a href="https://future-architect.github.io/articles/20171005/"><strong>あいちゃん</strong></a>がパワーアップして帰ってきました！<ul>
+<li>新たに「<strong>チケットレコメンド</strong>業務」をこなしてもらえるようになりました</li>
+</ul>
+</li>
+<li>何が出来るのか<ul>
+<li>社内ヘルプデスクで使われているチケット管理OSS「<a href="https://www.redmine.org" target="_blank" rel="noopener">Redmine</a>」に起票された問い合わせチケットの内容と過去の同様事例チケットを自動検索します</li>
+<li>検索結果として得られた類似度の高いチケット(以下、<strong>類似チケット</strong>)を、関連チケットへの紐付けによりユーザに提供します</li>
+</ul>
+</li>
+</ul>
+<h4 id="デモ"><a href="#デモ" class="headerlink" title="デモ"></a>デモ</h4><ul>
+<li><p>手順1. 社内問い合わせ窓口のRedmineにチケットを起票<br><img src="/images/20181031/1.png" class="img-middle-size"></p>
+</li>
+<li><p>手順2. 起票してから<strong>10~20秒後</strong>、画面をリロードする</p>
+<ul>
+<li>類似チケットが自動で紐付けられます！</li>
+<li>紐付けられたチケットの順番は類似度の高い順でソート済み</li>
+</ul>
+<p><img src="/images/20181031/2.png" class="img-middle-size"></p>
+</li>
+</ul>
+<h2 id="メリットはなにか"><a href="#メリットはなにか" class="headerlink" title="メリットはなにか"></a>メリットはなにか</h2><p>本システムを使うことにより、起票者(質問者)と回答者の双方が過去の回答チケットを検索する手間を省略することができます。</p>
+<ul>
+<li>チケットクローズまでの<strong>回答コストを削減</strong></li>
+<li>削減により生まれた時間をメインタスクに割り当て、生産性を向上できる</li>
+</ul>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p><a href="https://www.future.co.jp/" target="_blank" rel="noopener">フューチャー</a>では社内問い合わせのみならず、各プロジェクトの管理としてRedmineを活用していますが、改善要望の声が上がっていました。</p>
+<ul>
+<li>「過去チケットの検索に時間が掛かるので、何とかしてほしい」</li>
+<li>「障害発生時に、過去の同様の事例を参照できる仕組みがほしい」 などなど…</li>
+</ul>
+<p>フューチャーでは、RedmineでのAI活用実績として既に、萩原さんによる<a href="https://future-architect.github.io/articles/20171005/">チケットカテゴリ振り分けシステム</a>があります。<br>今回、AI活用の次なるステップとして「<strong>全文検索アルゴリズム</strong>」技術に注目し、これがチケット検索の改善に活かせるのではないかと考え開発に踏み切りました。</p>
+<h2 id="システムについて"><a href="#システムについて" class="headerlink" title="システムについて"></a>システムについて</h2><h3 id="使用したソフトウェア・ライブラリ"><a href="#使用したソフトウェア・ライブラリ" class="headerlink" title="使用したソフトウェア・ライブラリ"></a>使用したソフトウェア・ライブラリ</h3><ul>
+<li>チケットレコメンドのアルゴリズムはPythonで実装しました。<ul>
+<li>Redmineチケット分類・スコア化<ul>
+<li>Python (3.5.2)<ul>
+<li>mecab-python3 (0.7)</li>
+<li>scikit-learn (0.19.0)</li>
+<li>gensim(3.1.0)</li>
+<li>Flask (0.12.2)</li>
+</ul>
+</li>
+<li>Elasticsearch (5.6.10)</li>
+</ul>
+</li>
+<li>ジョブ管理<ul>
+<li>Jenkins (2.60.3)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="システム構成図"><a href="#システム構成図" class="headerlink" title="システム構成図"></a>システム構成図</h3><p>システムは大きく分けて、既存システムの「Redmine」グループと、今回新規構築する「チケットレコメンド」の2つのグループから構成されます。(下図点線枠部分)</p>
+<p><img src="/images/20181031/3.png" class="img-middle-size"></p>
+<p>「Redmine」グループでは、既に構築済みのRedmine APに向けて新たにRedmine拡張プラグインを開発・実装を実施しました。<br>拡張プラグインに実装した機能は以下の2つです。</p>
+<ul>
+<li>関連チケットへ「類似チケット」の表示・追加機能</li>
+<li><a href="http://www.redmine.org/projects/redmine/wiki/Hooks_List" target="_blank" rel="noopener">Redmine Plugin Hook</a>を用いたチケット起票時でのJenkinsジョブキック＆類似チケットの自動付与機能</li>
+</ul>
+<p>チケットレコメンドグループ内のサーバは、ES(Elasticsearch)を除きすべてECS(ElasticContainerService)として新規構築しました。<br>ESは、AWSマネージドの<a href="https://aws.amazon.com/jp/elasticsearch-service/" target="_blank" rel="noopener">ElasticsearchService</a>を使用し、保守・運用コストを抑えることにしました。</p>
+<hr>
+<ul>
+<li>補足: ECSの起動タイプについて<ul>
+<li>ECSの起動タイプは「Fargate」と「EC2」の2種類から選べるが、今回はEC2を利用</li>
+<li>Dockerイメージは社内のプライベートリポジトリで管理する必要があり、その場合だとEC2しか選択できない<ul>
+<li>Fargate起動タイプは、AWS ECR又はDocker Hubリポジトリのみをサポートのため利用不可のため。</li>
+<li>参照: <a href="https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/task_definition_parameters.html#standard_container_definition_params" target="_blank" rel="noopener">https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/task_definition_parameters.html#standard_container_definition_params</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<p>チケットレコメンドグループは、更に細かく分けると「ジョブ管理」「レコメンドAPIサーバ群」の2つから構成されます(下図オレンジ色枠線部分)</p>
+<p><img src="/images/20181031/4.png" class="img-middle-size"></p>
+<p>ジョブ管理の仕組みとして、Jenkinsを使用しました。Jenkinsでは、RedmineからWebhookとして飛んでくるリアルタイムジョブ、日次実行ジョブなどを管理します。<br>レコメンドAPIサーバ群では、入力として検索対象チケット本文を受け取り、出力として類似チケットの番号とスコアのセットを返します。</p>
+<p>Redmine,ECS→ECS間のHTTPS/HTTP通信を実現するため、ALB(Application Load Balancer)において以下の振り分けルール設定を行っています。</p>
+<ul>
+<li>パスパターンが<code>/jenkins/*</code> → ECSのJenkinsサーバにリクエスト転送</li>
+<li>パスパターンが<code>/flask-scdv/*</code> → ECSのSCDVサーバにリクエスト転送</li>
+<li>パスパターンが<code>/flask-score/*</code> → ECSのスコア合算サーバにリクエスト転送</li>
+</ul>
+<p>参考: <a href="https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/load-balancer-listeners.html#path-conditions" target="_blank" rel="noopener">https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/load-balancer-listeners.html#path-conditions</a></p>
+<h2 id="検索アルゴリズムについて"><a href="#検索アルゴリズムについて" class="headerlink" title="検索アルゴリズムについて"></a>検索アルゴリズムについて</h2><blockquote>
+<p>※本セクションは、SAIG小池さんにより執筆していただきました。</p>
+</blockquote>
+<p>検索アルゴリズムは、「類似文書検索」と「キーワード検索」のハイブリッド手法を用いることにより、より精度を向上させる試みを行いました。</p>
+<p>類似文書検索は、機械学習のトップカンファレンス<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> で発表された<strong>SCDV</strong>(sparse Composite Document Vector)と呼ばれるEmbedding手法を用い、キーワード検索は現在有力とされている<strong>BM25</strong>を用いました。</p>
+<p>本システムのもっとも肝な部分は、SCDV（文書検索）×BM25（キーワード検索）の<strong>ハイブリッドアルゴリズム</strong>を実装した点にあります。詳細は下記で説明します。</p>
+<p><br></p>
+<h3 id="SCDVについて"><a href="#SCDVについて" class="headerlink" title="SCDVについて"></a>SCDVについて</h3><h4 id="SCDVの概要"><a href="#SCDVの概要" class="headerlink" title="SCDVの概要"></a>SCDVの概要</h4><p>SCDV(Sparse Composite Document Vectors)とは、簡単にいってしまえば文書（本ブログではチケット）を<strong>ベクトルに変換する技術</strong>です。<br>文書をベクトル化することによって、各文書の類似度を測ることができます。また、ベクトルに変換することにより、分類問題やクラスタリングなどさまざまなタスクに応用することができます。</p>
+<p>文書のベクトル化手法は多く提案されていますが、本システムを構築した時点では<strong>SoTA</strong>(最高精度)でした。<br>SCDVのアルゴリズムについてはここでは詳しくは述べませんが、<a href="https://arxiv.org/pdf/1612.06778.pdf" target="_blank" rel="noopener">論文</a>は非常にわかりやすいので、参考にしてもらえればと思います。</p>
+<h4 id="SCDVの選定理由"><a href="#SCDVの選定理由" class="headerlink" title="SCDVの選定理由"></a>SCDVの選定理由</h4><p>みなさん今流行りのword2vecはご存知でしょうか。<br>word2vevは現在自然言語処理分野において最も注目されている技術の1つで、言葉通り単語をベクトルに変換する技術のことです。</p>
+<p>word2vecの良い点は、<strong>教師なし学習</strong>で類似単語を獲得できる点にあります。<br>つまり、「PC」と「コンピューター」といった単語ベクトルの類似度は大きくなり、「PC」と「鉛筆」といった単語ベクトルの類似度は小さくなります。<br>w2vでは、表現が揺れていても（例、「PC」と「コンピューター」）、似たような単語ベクトルの獲得が可能です。</p>
+<p>さて、前置きが長くなりましたが、SCDVを用いるメリットを説明します。</p>
+<p>SCDVはword2vecを元に文書ベクトルを獲得します。したがって、上記のword2vecの表現の揺れが吸収でき、なおかつ<strong>文書同士の類似度を測ることができる</strong>のがSCDVのメリットと言えるでしょう。<br>選定理由としては、このような単語の揺れを吸収できる点・SoTAであるという2点から、SCDVを選定しました。</p>
+<p><br></p>
+<h3 id="BM25について"><a href="#BM25について" class="headerlink" title="BM25について"></a>BM25について</h3><h4 id="BM25の概要"><a href="#BM25の概要" class="headerlink" title="BM25の概要"></a>BM25の概要</h4><p>BM25<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>は、キーワード検索アルゴリズムの1種です。</p>
+<p>キーワード検索といっても、単純にキーワードで引っかかった文書を提示するようなものではなく、各キーワードに重みを付けて、<strong>キーワードと文書のマッチ度をスコア化する</strong>ことができます。<br>BM25は、キーワード検索においてかなりの威力を発揮しています。</p>
+<p>今回はElastic Search(ES)にBM25が実装されていたので、<strong>ESを使えば簡単に利用することができます</strong>。</p>
+<h3 id="BM25の選定理由"><a href="#BM25の選定理由" class="headerlink" title="BM25の選定理由"></a>BM25の選定理由</h3><p>キーワード検索のアルゴリズムは多くあります。その中で、BM25をなぜ選んだかというと、実験の結果BM25が最も検索精度がよかったのが理由です。多くのキーワード検索アルゴリズムを試し、ハイパーパラメーターがあるものはグリッドサーチ的なことを行った結果、BM25が<strong>最も高精度</strong>でした。</p>
+<p><br></p>
+<h3 id="SCDV×BM25のハイブリッド"><a href="#SCDV×BM25のハイブリッド" class="headerlink" title="SCDV×BM25のハイブリッド"></a>SCDV×BM25のハイブリッド</h3><p>さて、チケット検索の具体的なアルゴリズムについて話していきたいと思います。<br>SCDVを用いて全チケットをベクトル化します。クエリーとなるチケットを<code>q</code>、任意のチケットを<code>p</code>とおくと、SCDVによるチケットp,q間の類似度は<code>SCDVscore(p,q)</code>で表すことができます。</p>
+<p>BM25ではチケットqの文書を形態素解析（単語に分解）し、ストップワーズの除去（「て」、「に」、「を」、「は」等多く頻出するが意味のない単語）を行ったあとに残ったワードをキーワードとして突っ込みます。<br>そうすると、チケットp,qの類似度として<code>BM25score(q,p)</code>が算出することができます。<br>SCDVscore(q,p)は、単純にコサイン類似度としました。</p>
+<p>この2つのスコアに対して正規化を行い、重みwをかけ、線形和をとり最終的なスコアとして算出します。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Score(q,p) = BM25score(p,q)  + w * SCDVscore(p,q)</div></pre></td></tr></table></figure>
+<p>ここでの<code>w</code>は、どちらの<strong>重み</strong>を重視するかといったパラメーターで、<strong>教師あり学習</strong>を用いて決定します。<br>つまり、あらかじめ検索チケットと見つかってほしいチケットのデータセットを用意しておき、それに従って最適なwを見つけることをしています。今回は損失関数を定義するまでもないので、wの最適化にはバイナリーサーチを用いて、ある程度最適なwの更新にとどめています。</p>
+<p>上記式は、BM25とSCDVの「おいしいところ取り」をしたい意図があります。</p>
+<p>BM25とSCDVでは、検索結果に見つかってほしいチケットに差が生じました。<br>上記式では、適切な重み<code>w</code>を選ぶことにより、同じチケットでもSCDVでは見つかっているのに、BM25では見つけられないチケットが存在するような場合も検索することができるようになりました。まさに「<strong>おいしいところ取り</strong>」です😁</p>
+<p>本アルゴリズムでのチケット検索実験の結果、最もよかった<strong>BM25の最高精度を8%上回る結果</strong>となりました。</p>
+<h2 id="システムの解説"><a href="#システムの解説" class="headerlink" title="システムの解説"></a>システムの解説</h2><h3 id="システムの流れについて"><a href="#システムの流れについて" class="headerlink" title="システムの流れについて"></a>システムの流れについて</h3><p>ここからは、システムの処理の流れに沿って、本システムの解説を行います。<br>まず、本システムの処理フローについて説明します。</p>
+<ul>
+<li><ol>
+<li>(夜間処理)RedmineチケットをES(Elasticsearch)に格納する</li>
+</ol>
+</li>
+<li><ol>
+<li>(夜間処理)SCDVモデルを最新化する</li>
+</ol>
+</li>
+<li><ol>
+<li>(日中処理)Redmine拡張プラグインが、チケット起票タイミングでJenkisをキック</li>
+</ol>
+</li>
+<li><ol>
+<li>(日中処理)SCDVモデル・ESのスコアをマージし、類似チケット候補のフィルターを実行</li>
+</ol>
+</li>
+<li><ol>
+<li>(日中処理)類似チケットセットをRedmine関連チケットに紐付ける</li>
+</ol>
+</li>
+</ul>
+<p>処理フロー1～5を図で示すと以下のようになります。<br><img src="/images/20181031/5.png" class="img-middle-size"></p>
+<p>以下、個々のフローの解説になります。</p>
+<h3 id="1-夜間処理-RedmineチケットをES-Elasticsearch-に格納する"><a href="#1-夜間処理-RedmineチケットをES-Elasticsearch-に格納する" class="headerlink" title="1. (夜間処理)RedmineチケットをES(Elasticsearch)に格納する"></a>1. (夜間処理)RedmineチケットをES(Elasticsearch)に格納する</h3><p>まずは、類似チケットを検索するためのインデックスやモデルの最新化処理について説明します。<br>平日夜間(3:00)に、Jenkinsの定期実行機能をトリガとしてESインデックス内ドキュメント(※)の更新処理を実施するところからスタートします。</p>
+<p>※インデックス: RDBにおける「テーブル」に相当。今回は、RedmineプロジェクトのIdentifier(識別子,RedmineサーバURLの<code>/projects/XXXX</code>の<code>XXXX</code>部分に相当)をインデックス名として使用<br>※ドキュメント: RDBにおける「レコード」に相当</p>
+<p>まずは<a href="http://www.redmine.org/projects/redmine/wiki/Rest_Issues" target="_blank" rel="noopener">Redmine Issues API</a>より対象Redmineプロジェクトの全量チケットを取得します(下図①)。<br><img src="/images/20181031/6.png" class="img-middle-size"></p>
+<p>ポイントとして、Issues APIでは一度に取得可能なチケット数は100までとなっています。<br>ですので、「<code>総チケット数/100</code>回分のリクエストを送信し、レスポンスのJSONデータをマージし保存する」ための実装をする必要があります。</p>
+<p>続いて、取得できたチケット全量をESに送信し、ドキュメントとして格納します(下図①’)。<br><img src="/images/20181031/7.png" class="img-middle-size"></p>
+<p>先程得たJSON形式のチケットデータを、<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html" target="_blank" rel="noopener">Elasticsearch Bulk API</a>のフォーマットへと変換後、バルクインサートを実行します。<br>変換前のJSONフォーマットと変換後のバルクインサート用データバイナリのイメージは以下のとおりです。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;issues&quot;: [</div><div class="line">    &#123;</div><div class="line">      &quot;id&quot;: 1,</div><div class="line">      &quot;start_date&quot;: &quot;201X-YY-ZZ&quot;,</div><div class="line">      (省略)</div><div class="line">      &quot;project&quot;: &#123;</div><div class="line">        &quot;id&quot;: XX,</div><div class="line">        &quot;name&quot;: &quot;社内問い合わせプロジェクト&quot;</div><div class="line">      &#125;,</div><div class="line">      &quot;subject&quot;: &quot;～～～のDB接続について&quot;,</div><div class="line">      &quot;description&quot;: &quot;～～～のDBコネクションが時間が立つと切れてしまっているようです。\r\nプロセス自体は上がったままなのですが、添付ファイルのログのように～～～とメッセージが出ます。\r\n\r\nお手数ですがよろしくお願い致します。\r\n&quot;,</div><div class="line">      (省略)</div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">      &quot;id&quot;: 2,</div><div class="line">      (省略)</div><div class="line">	&#125;,</div><div class="line">    (省略)</div><div class="line">  ],</div><div class="line">  &quot;total&quot;: 3930,</div><div class="line">  &quot;max_id&quot;: 4248</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&#123; &quot;index&quot; : &#123;&quot;_id&quot;: &quot;1&quot; &#125; &#125;</div><div class="line">&#123;&quot;id&quot;: 1, &quot;start_date&quot;: &quot;201X-YY-ZZ&quot;, (省略) &quot;project&quot;: &#123;&quot;id&quot;: XX, &quot;name&quot;: &quot;社内問い合わせプロジェクト&quot;&#125;, &quot;subject&quot;: &quot;～～～のDB接続について&quot;, &quot;description&quot;: &quot;～～～のDBコネクションが時間が立つと切れてしまっているようです。\r\nプロセス自体は上がったままなのですが、添付ファイルのログのように～～～とメッセージが出ます。\r\n\r\nお手数ですがよろしくお願い致します。\r\n&quot;, (省略)&#125;</div><div class="line">&#123; &quot;index&quot; : &#123;&quot;_id&quot;: &quot;2&quot; &#125; &#125;</div><div class="line">(省略)</div></pre></td></tr></table></figure>
+<p>上記のバルクインサート用データへ変換したら、まずは既存のESドキュメントを一度消去します。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -X POST &quot;$&#123;ELASTICSEARCH_URL&#125;/$&#123;REDMINE_PROJECT_IDENTIFIER&#125;/issues/_delete_by_query&quot;</div></pre></td></tr></table></figure>
+<p>続いて、以下のようにESに向けてバルクインサートを実行します。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -X POST &quot;$&#123;ELASTICSEARCH_URL&#125;/$&#123;REDMINE_PROJECT_IDENTIFIER&#125;/issues/_bulk&quot; --data-binary @ target/$&#123;REDMINE_PROJECT_IDENTIFIER&#125;.dat</div></pre></td></tr></table></figure>
+<h3 id="2-夜間処理-SCDVモデルを最新化する"><a href="#2-夜間処理-SCDVモデルを最新化する" class="headerlink" title="2. (夜間処理)SCDVモデルを最新化する"></a>2. (夜間処理)SCDVモデルを最新化する</h3><p>続いて、SCDVモデルの更新を行います。(下図②)<br><img src="/images/20181031/8.png" class="img-middle-size"></p>
+<p>SCDVサーバはFlaskによるAPIサーバとして稼働しており、下記のURLにPOSTリクエストを送信することで、SCDVモデルの更新が可能となる仕組みです。</p>
+<ul>
+<li>リクエストURL: <code>http://[SCDVサーバのアドレス]/flask-scdv/v1/model/{redmine_project_identifier}</code></li>
+</ul>
+<p>SCDVサーバがリクエストを受信すると、ESからチケット取得・モデルの最新化を実行します。(下図②’)<br><img src="/images/20181031/9.png" class="img-middle-size"></p>
+<p>SCDVはPythonを用いて実装していますが、こちらのソースコードの解説はボリュームが多めとなるため今回の記事では割愛とさせていただきます。</p>
+<p>これで、夜間処理としての各種モデル最新化のための処理が完了しました。</p>
+<h3 id="3-日中処理-Redmine拡張プラグインが、チケット起票タイミングでJenkisをキック"><a href="#3-日中処理-Redmine拡張プラグインが、チケット起票タイミングでJenkisをキック" class="headerlink" title="3. (日中処理)Redmine拡張プラグインが、チケット起票タイミングでJenkisをキック"></a>3. (日中処理)Redmine拡張プラグインが、チケット起票タイミングでJenkisをキック</h3><p>ここからは、ユーザが起票したチケットに対し類似チケットの付与をするまでの処理の解説となります。<br>まず、ユーザが問い合わせチケットを起票したタイミングでJenkinsのジョブを自動実行する仕組みを見てみましょう。</p>
+<p>本レコメンドシステム用に実装したRedmine拡張プラグインにより、ユーザのチケット起票のタイミング(下図③)でJenkinsへのキックを可能とします(下図③’)。<br><img src="/images/20181031/10.png" class="img-middle-size"></p>
+<p>こちらの仕組みの詳細は、<a href="https://future-architect.github.io/articles/20171005/#Redmine-Pluginの作成">過去の萩原さんの記事</a>を併せて参照下さい。</p>
+<h3 id="4-日中処理-SCDVモデル・Elasticsearchのスコアをマージし、類似チケット候補のフィルターを実行"><a href="#4-日中処理-SCDVモデル・Elasticsearchのスコアをマージし、類似チケット候補のフィルターを実行" class="headerlink" title="4. (日中処理)SCDVモデル・Elasticsearchのスコアをマージし、類似チケット候補のフィルターを実行"></a>4. (日中処理)SCDVモデル・Elasticsearchのスコアをマージし、類似チケット候補のフィルターを実行</h3><p>続いて、Redmineよりチケット起票の通知を受け取ったJenkinsがスコア合算サーバに向けてリクエストを送信します。(下図④)<br><img src="/images/20181031/11.png" class="img-middle-size"></p>
+<p>スコア合算サーバもSCDVサーバと同様、FlaskによるAPIサーバとして稼働しています。以下のようなPOSTリクエストを送信することで、レンスポンスとしてレコメンドチケットセットを得ることが出来ます。</p>
+<ul>
+<li>リクエストURL: <code>http://[スコア合算サーバのアドレス]/flask-score/v1/recommended_issue/{redmine_project_identifier}/{issue_id}</code></li>
+<li>リクエストボディ: 下記JSON参照</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;text&quot;: &quot;～～～のDB接続について ～～～のDBコネクションが時間が立つと切れてしまっているようです。 プロセス自体は上がったままなのですが、添付ファイルのログのように～～～とメッセージが出ます。 お手数ですがよろしくお願い致します。&quot; // チケットのタイトル＋本文(説明欄)をクエリとして送信</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;input_id&quot;: &quot;1&quot;,</div><div class="line">  &quot;output_list&quot;: [ // スコアが高い順にソート済み</div><div class="line">    &#123;</div><div class="line">        &quot;id&quot;: &quot;1559&quot;,</div><div class="line">        &quot;score&quot;: 0.98765</div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">        &quot;id&quot;: &quot;11&quot;,</div><div class="line">        &quot;score&quot;: 0.87654</div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">        &quot;id&quot;: &quot;2485&quot;,</div><div class="line">        &quot;score&quot;: 0.65432</div><div class="line">    &#125;,</div><div class="line">    ...</div><div class="line">  ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>スコア合算サーバでは、SCDV及びESより得たチケットセット・スコアを合算し(下図④’)、合算結果をレスポンスとして返却します。<br><img src="/images/20181031/12.png" class="img-middle-size"></p>
+<p>SCDVとESのスコアのマージ方法ですが、片方のスコアを正規化した上で、お互いのスコアを合算させるという方式を取りました。</p>
+<p>まずは、SCDVとESのスコアの仕様について比較してみましょう。</p>
+<ul>
+<li>SCDV<ul>
+<li>最小値は0、最大値は1</li>
+<li>スコアの例: 0.9198</li>
+</ul>
+</li>
+<li>ES(Elasticsearch)<ul>
+<li>最小値は0、最大値は不定</li>
+<li>スコアの例: 613.9819</li>
+</ul>
+</li>
+</ul>
+<p>ESの最大値が不定となっていることが分かります。このため、ここではES側のスコアを正規化した上でSCDVのスコアと合算させるようにしました。</p>
+<p>具体的には、ESスコアを1～0の範囲となるようESスコアの最大値<code>ESmax</code>と重み値<code>w</code>を使って正規化をした上で、1～0の値の範囲を取るSCDVのスコアとマージし、更にスコア順で再ソートを実行します(下図参照)。<br><img src="/images/20181031/13.png" class="img-middle-size"></p>
+<p>上図の例で<code>チケットID=1111</code>が重複して2回出ているように、ESとSCDVのスコアを合算するためチケットの重複が発生します。<br>このため実際のプログラムでは、スコアの合算後にチケット重複分を取り除く処理を入れてから、レスポンスとしてチケットIDの一覧を返すようにしています。</p>
+<h3 id="5-日中処理-類似チケットセットをRedmine関連チケットに紐付ける"><a href="#5-日中処理-類似チケットセットをRedmine関連チケットに紐付ける" class="headerlink" title="5. (日中処理)類似チケットセットをRedmine関連チケットに紐付ける"></a>5. (日中処理)類似チケットセットをRedmine関連チケットに紐付ける</h3><p>最後に、受け取ったレコメンドチケットセットを<a href="https://www.redmine.org/projects/redmine/wiki/Rest_IssueRelations" target="_blank" rel="noopener">Redmine Issue Relations API</a>に向けて送信すれば紐付けが完了します。(下図⑤)<br><img src="/images/20181031/14.png" class="img-middle-size"></p>
+<p>今回は起票された1チケットにつき、スコアの高い順に4件(件数固定)の類似チケットの紐付けを行うようにします。<br>Issue Relations APIは1リクエストに付き1件の関連チケット紐付けを行いますので、リクエストを4回、紐付け先IDを変えながら送信します。</p>
+<p>送信するPOSTリクエストは、以下のようになります。</p>
+<ul>
+<li>リクエストURL: <code>https://[Redmineサーバのアドレス]/redmine/issues/XX/relations.json</code></li>
+<li>リクエストボディ: 下記JSON参照</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;relation&quot;: &#123;</div><div class="line">    &quot;issue_to_id&quot;: YY,</div><div class="line">    &quot;relation_type&quot;: &quot;recommends&quot;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上記リクエストボディには、<code>relation_type: recommends</code>という独自の関連チケットタイプを用いております。<br>こちらについて、<code>relation_type: recommends</code>を含むリクエスト送信デフォルト環境のRedmineに向けて実行すると、下記のようにバリデーションエラーが発生してしまいます。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;errors&quot;: [</div><div class="line">        &quot;relation_type は一覧にありません。&quot;</div><div class="line">    ]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>そのため、<code>relation_type: recommends</code>をバリデータに許可してもらうためにモンキーパッチを作る必要があります。</p>
+<p>関連チケットのモデルは<a href="https://www.redmine.org/projects/redmine/repository/entry/branches/3.4-stable/app/models/issue_relation.rb" target="_blank" rel="noopener">app/models/issue_relation.rb</a>で管理しているため、こちらのソースコードで定義されたvalidatorに対するモンキーパッチを当てることで対応しました。</p>
+<h3 id="工夫ポイント-Docker-ECSを使ってサービスのコンテナ化を実現"><a href="#工夫ポイント-Docker-ECSを使ってサービスのコンテナ化を実現" class="headerlink" title="工夫ポイント: Docker+ECSを使ってサービスのコンテナ化を実現"></a>工夫ポイント: Docker+ECSを使ってサービスのコンテナ化を実現</h3><p>EC2などを使ってOS上に直接Pythonプログラムを載せるのではなく、機能単位でFlask APIサーバ化＆Dockerイメージ化をしました。<br>これにより、AWS ECSの使用が可能となり、多くの恩恵を受けることが出来ました。</p>
+<ul>
+<li>ST環境、本番環境の<strong>構築コストが大幅に削減</strong><ul>
+<li>やることは「DockerイメージのPush」「タスク定義の作成」「サービス定義の作成」「クラスタの作成」のみ</li>
+</ul>
+</li>
+<li>ST環境、本番環境の<strong>運用コストも大幅に削減</strong><ul>
+<li>アップデート作業も「DockerイメージのPush」「タスク定義の更新」「サービス定義の更新」の3ステップで完了</li>
+<li>スケールアップやスケールアウトもECSのWebコンソール画面から操作可能</li>
+</ul>
+</li>
+</ul>
+<h2 id="結果と今後の展望"><a href="#結果と今後の展望" class="headerlink" title="結果と今後の展望"></a>結果と今後の展望</h2><h3 id="導入した結果"><a href="#導入した結果" class="headerlink" title="導入した結果"></a>導入した結果</h3><ul>
+<li>類似チケットの精度について<ul>
+<li>運用・保守フェーズを担当する1プロジェクトにご協力頂き、「チケットに紐付けられた類似チケットが参考になるか？」をPJメンバの皆様に見てもらいました。<ul>
+<li>サンプリング対象: 26チケット</li>
+<li>チケットで扱う内容: クライアントからの問い合わせ、サーバメンテナンス・障害連絡など(定常業務・非定常業務の双方含む)</li>
+</ul>
+</li>
+<li>結果<ul>
+<li>26件中、22件(<strong>84.6%</strong>)のチケットに対して「いずれか1つ以上存在の類似チケットが<strong>参考になった</strong>」との回答をいただきました。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>システムの応答時間について<ul>
+<li>類似チケットの探索時間は、検索対象チケット数に比例して増加します。</li>
+<li>チケット起票から類似チケットがRedmineに紐づくまでの時間は、対象チケット<strong>4000件</strong>のRedmineプロジェクトにおいて平均<strong>9.39秒</strong>という結果でした。</li>
+</ul>
+</li>
+</ul>
+<h3 id="感想"><a href="#感想" class="headerlink" title="感想"></a>感想</h3><ul>
+<li>想像以上にいい精度が出てよかった<ul>
+<li>開発着手前は、参考になる類似チケットが含まれるのはせいぜい5割程度と見積もっていましたが、予想以上の結果(8割超)を得ることが出来ました。</li>
+</ul>
+</li>
+<li>少人数・短期間で、簡単に構築することができた<ul>
+<li>設計・開発は私一人がメインで、レビューやAI技術に関するアドバイスとしてTIG(Technology Innovation Group)・SAIG(Strategic AI Group)の先輩方にご協力をいただきました。</li>
+<li>ECSを用いることで、サーバ管理が<strong>かなり楽</strong>になりました。<ul>
+<li>DockerイメージとECSタスク定義さえ作れば、EC2のような初期構築作業が一切不要</li>
+<li>メモリリソース不足等でサーバダウンの際は自動で再起動してくれる</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>紙とペンを使った、手書きのアウトプットの有用性に気付かされた<ul>
+<li>システムの設計段階においてサーバ構成やデータ処理の流れを考える必要がありましたが、うまくイメージがまとまらず、今までのように「頭の中で考えて、イメージが固まってからパワポ等で作る」だけでは通用しないことが分かりました。</li>
+<li>そこで、ノートをアウトプットの土台とし「まずは頭に浮かんだ個々のイメージをノートに吐き出す」→「出来上がった全体像を俯瞰して、おかしい部分を修正する」という作業に落とし込むことで、スムーズに設計作業を進めることが出来ました。</li>
+</ul>
+</li>
+</ul>
+<h3 id="苦労したところ・ハマりポイント"><a href="#苦労したところ・ハマりポイント" class="headerlink" title="苦労したところ・ハマりポイント"></a>苦労したところ・ハマりポイント</h3><ul>
+<li>AWS ElasticsearchServiceでは一度に送信できる<strong>バルクインサートのサイズに制限あり</strong><ul>
+<li>1度のPOSTで挿入できるデータ量は<strong>10MB(※)まで</strong> ※インスタンスタイプにより異なる<ul>
+<li>参考: <a href="https://docs.aws.amazon.com/ja_jp/elasticsearch-service/latest/developerguide/aes-limits.html#network-limits" target="_blank" rel="noopener">https://docs.aws.amazon.com/ja_jp/elasticsearch-service/latest/developerguide/aes-limits.html#network-limits</a></li>
+<li>およそ1000件以上のチケットを纏めて格納しようとするとエラーとなってしまう</li>
+</ul>
+</li>
+<li>この仕様を後から知ったため、バルク分割のためのスクリプトを追加で開発することになってしまった💦</li>
+</ul>
+</li>
+<li>Elasticsearchの<strong>最新版(6系)では、インデックス内の複数タイプ使用が不可</strong><ul>
+<li>参考: <a href="https://dev.classmethod.jp/server-side/elasticsearch/elasticsearch-6-breaking-changes/" target="_blank" rel="noopener">https://dev.classmethod.jp/server-side/elasticsearch/elasticsearch-6-breaking-changes/</a></li>
+<li>開発時点では5系をベースとしていた＆6系の変更点を洗い出せていなかったため、5系依存のプログラムを作ってしまった<ul>
+<li>「Elasticsearchのインデックス内タイプ」と「RedmineのプロジェクトID(プロジェクト識別子)」を紐付ける仕様としたため、そのままでは6系アップグレードが不可能になってしまった</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>AWS ECS環境で<strong>メモリリソース不足</strong>によるコンテナ強制終了が頻発<ul>
+<li>開発環境(ローカルマシン)から検証環境(AWS)へ移行後、メモリリソース不足によるコンテナ強制終了が頻発した<ul>
+<li>開発機環境における検証段階で、APIサーバ単位・合計の消費メモリのチェックをすべきだった</li>
+<li>APIサーバごとのメモリ使用量調査など、追加検証が幾つか必要になった</li>
+</ul>
+</li>
+<li>EC2サーバの台数を増やすことで対処できた<ul>
+<li>ただし、今もSCDVモデルの書き出し処理の最中で強制終了されることがあり、要改善</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="今後の展望"><a href="#今後の展望" class="headerlink" title="今後の展望"></a>今後の展望</h3><p>今回のシステムは「チケット起票時」に注目したものでしたが、<br>今後はチケットをわざわざ<strong>起票せずとも</strong>システムを使えるよう、以下のUI機能実装を考えています。</p>
+<ul>
+<li>チケット起票画面で、フォーム入力状況からリアルタイムにレコメンド結果を表示する<strong>インクリメンタルサーチ</strong>機能</li>
+<li>対話形式であいちゃんBotと会話することによりリアルタイムにレコメンド結果を得られる<strong>チャットボット</strong>機能</li>
+</ul>
+<p>また、システム面においてはレコメンドシステムの<strong>サーバレス化</strong>のため、JenkinsをAWS Lambdaに置き換えることを予定しております。</p>
+<h3 id="スペシャルサンクス"><a href="#スペシャルサンクス" class="headerlink" title="スペシャルサンクス"></a>スペシャルサンクス</h3><ul>
+<li>フューチャーSAIG(Strategic AI Group)所属の<strong>小池さん</strong></li>
+</ul>
+<p>レコメンド機能の設計・開発のアドバイスに加え、本記事のアルゴリズム解説の執筆担当をしていただきました！<br>ありがとうございます。</p>
+<h3 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h3><p>PythonライブラリやAWSのクラウド資源を活用することにより、<br>AIを活用したレコメンドシステムを少人数・短期間で構築＆デプロイすることができました。</p>
+<p>各種機械学習ライブラリやクラウド資源、Web上のナレッジベースの普及により、AIを使ったシステム開発・構築の<strong>ハードルはかなり下がっている</strong>な、と私自身も実感しました。</p>
+<p>皆さんの身近な環境に、「このシステムは使いづらい」「検索などの定常作業を取り除きたい」といった”悩みの種”はありませんか？<br>チケット管理システムなどの<strong>社内で眠ったままの豊富なリソース</strong>と<strong>AI技術</strong>とを結びつけることで、多くの人に恩恵を与えるシステムを作り上げることが出来ますよ！</p>
+<p>是非、チャレンジしてみて下さい💪</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">EMNLP2018</span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">2.</span><span style="display: inline-block; vertical-align: top;">okapi BM25（<a href="https://ja.wikipedia.org/wiki/Okapi_BM25）" target="_blank" rel="noopener">https://ja.wikipedia.org/wiki/Okapi_BM25）</a></span><a href="#fnref:2" rev="footnote"> ↩</a></li></ol></div></div>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;こんにちは、フューチャーアーキテクト2017年4月入社、TIG（Technology Innovation Group）所属の竹林です。&lt;br&gt;大学では主にIoTの研究をしており、趣味で作ったArduinoベースのIoTラジコンカーを&lt;a href=&quot;https://fut
+    
+    </summary>
+    
+      <category term="DataScience" scheme="https://future-architect.github.io/categories/DataScience/"/>
+    
+    
+      <category term="Redmine" scheme="https://future-architect.github.io/tags/Redmine/"/>
+    
+      <category term="MachineLearning" scheme="https://future-architect.github.io/tags/MachineLearning/"/>
+    
+  </entry>
   
   <entry>
     <title>PostgreSQLパーティションプルーニングの動作を確認する</title>
@@ -2429,135 +2748,6 @@
     
     
       <category term="MachineLearning" scheme="https://future-architect.github.io/tags/MachineLearning/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>インフラ入門vol.2(ネットワーク)</title>
-    <link href="https://future-architect.github.io/articles/20170704/"/>
-    <id>https://future-architect.github.io/articles/20170704/</id>
-    <published>2017-07-04T06:04:04.000Z</published>
-    <updated>2017-07-03T02:32:15.556Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>みなさま、こんにちは。洞内です。</p>
-<p>今回はインフラ入門のvol.2と題して、インフラエンジニアの若手がネットワーク設計の現場で向き合っていく事柄（ここでは手段ではなく、設計の検討で外してはいけないポイント）について、説明します。</p>
-<ul>
-<li>前記事は<a href="https://future-architect.github.io/articles/20170109/">こちら</a>です</li>
-</ul>
-<h1 id="ネットワークって？"><a href="#ネットワークって？" class="headerlink" title="ネットワークって？"></a>ネットワークって？</h1><p>ネットワークとは「網状に作られた何か」（by Wikipedia）ですが、ITインフラにおけるネットワークとは、<strong>コンピューターAからコンピューターBへとデータを送るための通信経路</strong> の事を指します。<br><img src="/images/20170704/photo_20170704_01.png"></p>
-<p>身近なものでイメージをするのであれば、電話、メール、SNS等はネットワークが存在して、その上をデータがやり取りされている事が大前提となる機能です。<br>電話であれば「音声データ」、メールやSNSであれば「文字データや画像データ」等を、相手のスマートフォンに届けるために、通信経路となる「ネットワーク」が使われている訳ですね。<br><img src="/images/20170704/photo_20170704_02.png"></p>
-<p>身近なものを例に挙げましたが、業務システム（業務アプリケーション）でも同じことが言えます。<br>例えば、お店で不足した商品を補充する発注業務等でもネットワークを通じて、商品を注文していますし、遠く離れた相手とTV会議をするにもネットワークが使われています。</p>
-<p>では、様々な場面で利用されているネットワークですが、どのようなポイントを意識して設計するのかを考えていきたいと思います。</p>
-<h1 id="設計の要件"><a href="#設計の要件" class="headerlink" title="設計の要件"></a>設計の要件</h1><p>ネットワークを設計する際のポイントとなる要件は以下です。</p>
-<ol>
-<li>だれがどのように使うのか</li>
-<li>どの位のデータが流れるのか</li>
-<li>機械の故障等による停止はどの程度まで許容できるのか</li>
-</ol>
-<p>上から順番に見てみましょう。</p>
-<h2 id="1-だれがどのように使うのか"><a href="#1-だれがどのように使うのか" class="headerlink" title="1. だれがどのように使うのか"></a>1. だれがどのように使うのか</h2><p>例えば、以下のように状況によって用意すべきネットワークは異なります。</p>
-<p><strong>a. 会社員の方が、必ず会社のオフィスの自席で使う</strong><br>→この場合、ネットワークは有線で用意すれば良いでしょう</p>
-<p><strong>b. 会社員の方が、会社のオフィス内の色々な場所で使う</strong><br>→この場合、ネットワークは無線の方が良いですね？</p>
-<p><strong>c. 会社員の方が、客先でお客様と商談をしながら使う</strong><br>→こうなってくると、モバイルWi-Fiを使う事も検討する必要がでてきます</p>
-<p><img src="/images/20170704/photo_20170704_03.png"></p>
-<p>利用者がどのようなシチュエーションで利用するのかは、ネットワークを設計する上での非常に重要なポイントですね。</p>
-<p>他にも、考慮すべき点は色々考えられると思います。</p>
-<p><strong>d. インターネット上にWebサイトを公開するので、不特定多数の人がアクセスする</strong><br>→この場合は、使い勝手の話だけではなく、不正アクセスの対策等も必要になってきます。<br>（もちろん、アプリケーションに不具合を作らない事も重要ですが、ネットワークの設計や設定としても不要な通信は通さないといった事を考える必要があります）</p>
-<h2 id="2-どの位のデータが流れるのか"><a href="#2-どの位のデータが流れるのか" class="headerlink" title="2. どの位のデータが流れるのか"></a>2. どの位のデータが流れるのか</h2><p>例えば、家庭のインターネットサービスでも、10Mbps、100Mbps、1Gbps等の通信速度の違うサービスがありますね。<br>これは用途にあったサービスプランを選ぶと思います。</p>
-<ul>
-<li>メールや、ちょっと調べ物をしたいだけの人は10Mbps</li>
-<li>動画をたくさん見たい人は100Mbps～1Gbps</li>
-</ul>
-<p>動画をたくさん見たい人が、10Mbpsの回線を契約した場合は通信速度が遅くて動画がカクカクしてしまうかもしれませんね。また、<strong>複数人で同じ10Mbpsの回線を使っている場合、他の人もなかなかメールが送れない</strong>といった状況になるかもしれません。</p>
-<p><img src="/images/20170704/photo_20170704_04.png"></p>
-<p>ネットワークの設計をする上では、<strong>どの位のデータが流れるのか</strong> や <strong>今後、どの位のデータが流れるのか</strong> を考慮する必要があります。</p>
-<p>家庭用のインターネットサービスでは、契約を変更して、機械を取り換えれば大体の場合は増速ができますが、会社の中のネットワークで増速しようとすると、大規模な工事が必要になる場合がほとんどです。</p>
-<p>そのため、<strong>目的や使用用途を明確にして、どの位のデータがネットワークを流れるのか</strong>を見極めて設計をする必要があります。</p>
-<h2 id="3-機械の故障等による停止はどの程度まで許容できるのか"><a href="#3-機械の故障等による停止はどの程度まで許容できるのか" class="headerlink" title="3. 機械の故障等による停止はどの程度まで許容できるのか"></a>3. 機械の故障等による停止はどの程度まで許容できるのか</h2><p>ネットワークを構成している機械もモノなので、いつかは故障しますし、それは突然訪れる事がままあります。</p>
-<p>そんな突然故障した時に、ネットワークはどの程度の時間、使えないままになるのでしょうか？<br>5分？1時間？1日？</p>
-<p>企業のネットワークがまるまる1日止まってしまったら大損失ですね。<br>そんな時のために、予備の機械を用意したり、壊れたときにすぐに自動で切り替えができる機械を用意したりすることを考えます。</p>
-<p>当然、予備の機械の用意や、自動切り替えの機能がついた機械は値段も高くなりますので、<strong>全体の中で通信が止まってはいけないポイントはどこなのか</strong> を整理して、重要な箇所から優先的に投資を行うことが必要となってきます。</p>
-<p><img src="/images/20170704/photo_20170704_05.png"></p>
-<h1 id="設計の構成"><a href="#設計の構成" class="headerlink" title="設計の構成"></a>設計の構成</h1><p>前述の要件に加え、企業のネットワーク構成の設計には、以下の3つのポイントがあります。</p>
-<ol>
-<li>ネットワークのコア</li>
-<li>LANとWANの利用</li>
-<li>クラウドの利用</li>
-</ol>
-<p>こちらも順番にみていきましょう。</p>
-<h2 id="1-ネットワークのコア"><a href="#1-ネットワークのコア" class="headerlink" title="1. ネットワークのコア"></a>1. ネットワークのコア</h2><p>ネットワークを構築する際、ほとんどの場合がコアルーターやコアスイッチと呼ばれるような、ネットワークの中心となる機械を用意します。</p>
-<p>コアには沢山のデータが集まるため末端の機械よりも高い処理能力が必要になります。</p>
-<p>また、通信が集中するため、不要な通信をブロックするファイアウォール機能や、通信の流量をコントロール（トラフィックシェーピング）して、セキュリティ性を高めたり、皆が快適に使えたりするといった制御を担うのがコアになります。</p>
-<p>そのため、コアとなる機械が故障すると、全ネットワークが停止する恐れがあるため、先ほど挙げた<strong>機械の故障等による停止はどの程度まで許容できるのか</strong>という考え方の中で、非常に重要度の高いポイントと言えますね。</p>
-<p> </p>
-<h2 id="2-LANとWANの利用"><a href="#2-LANとWANの利用" class="headerlink" title="2. LANとWANの利用"></a>2. LANとWANの利用</h2><p>そもそも、LANとWANとはなんぞや？という方もいらっしゃると思いますので、簡単に説明します。</p>
-<blockquote>
-<ul>
-<li>LAN(Local Area Network) <ul>
-<li>1つの建物や、1つの組織の中で運用されるネットワークを指す言葉</li>
-</ul>
-</li>
-<li>WAN(Wide Area Network):<ul>
-<li>LANに対して、もっと広範囲に広がるネットワークを指す言葉。一般的にはインターネットサービスプロバイダが持つネットワークをWANと呼ぶ。</li>
-</ul>
-</li>
-</ul>
-</blockquote>
-<p>LANは、何となくイメージが出来るかもしれません。<br>でも、WANはどうでしょうか？ちょっとぼんやりしたイメージかもしれませんね。<br>もう少し具体的にしましょう。</p>
-<p>私たちが家庭でインターネットを利用する際、ほとんどの人が、インターネットサービスプロバイダと契約をして、インターネットを利用していると思います。<br>この時、契約内容にもよりますが、多くの場合はルーターと呼ばれる機械を用意して、このルーターに複数のPCやTV、ゲーム機等を接続して、インターネットを利用していると思います。<br>実はこのルーターの下に繋いだPC、TV、ゲーム機は1つのネットワークに所属しており、このネットワークの事をLANと言います。</p>
-<p>また、ルーターを挟んで反対側(インターネットサービスプロバイダ側)をWANと言います。<br>このWANと呼ばれる、インターネットサービスプロバイダ側のネットワークがたくさん集まり、繋がっている物がインターネットと呼ばれるものです。言い換えると、インターネットとは様々なWANの集合体ということですね。</p>
-<p>さて、話を戻して、当社の顧客には企業規模の大きなお客様が多く、オフィスも1つではなく、たくさんの拠点を構えていらっしゃいます。そのため1つの建物内で構成されたLANでは、業務遂行にあたり不便な部分が出てきてしまいます。</p>
-<p>例えば、会計処理をするにあたり東京、名古屋、大阪それぞれのオフィスで処理したものを集めて、また合算するよりも、1ヶ所で処理をした方が早いですよね？</p>
-<p>他にも同じ文書ファイルを各オフィスに配布するときに、それぞれの拠点の担当者にメールで配布をするよりも、ファイルサーバ上に置いて、1ヶ所から皆が参照をする方が効率的ですね。そのため、各拠点のLANをWANで繋いで、1つのLANとして扱うような設計を行う事が多くあります。</p>
-<p>このように複数の拠点をまたぐLANを設計する場合、先ほど挙げたようなポイントを検討する必要があります。</p>
-<ul>
-<li>通信内容をどのように保護(第三者に傍受されないように)するのか。</li>
-<li>ネットワークのコアをどこに配置するのか</li>
-<li>だれがどのように使うのか。</li>
-<li>どの位のデータが流れるのか。</li>
-<li>機械の故障等による停止はどの程度まで許容できるのか。</li>
-</ul>
-<p>他にも、</p>
-<ul>
-<li>ネットワーク上の住所となるIPアドレスをどのように割り当てるのか。</li>
-<li>将来拠点が増えたら、どのように拡張するのか。</li>
-<li>重要なデータのある場所へのアクセス制御の有無。</li>
-<li>通信のレイテンシ(遅延)はどうか。</li>
-</ul>
-<p>などなど考えることは様々です。</p>
-<h2 id="3-クラウドの利用"><a href="#3-クラウドの利用" class="headerlink" title="3. クラウドの利用"></a>3. クラウドの利用</h2><p>昨今、このクラウドという単語は、IT業界だけではなく一般的にも浸透してきたのではないでしょうか？<br>一言でクラウドといっても、多種多様なサービスがありますが、共通していることがいくつかあります。</p>
-<ul>
-<li>必要な時に必要な分だけ機能やサービスを利用する</li>
-<li>ネットワーク経由での利用が前提</li>
-</ul>
-<p>クラウドサービスはネットワーク経由での利用が前提になっているのですね。<br>クラウドへの接続の方法は、多くはインターネット経由ですが、クラウドサービスの提供側が対応していれば、WAN経由での接続も可能です。</p>
-<p>先ほど、WANを使って各拠点のLANを1つにまとめるといった話をしましたが、クラウドサービスも、そんなLANの1つとして扱う事ができる訳ですね。</p>
-<p>ただし、当然ですが何でもかんでも繋げば良いという事ではなく、限られた予算の中でどのようにするのが一番良いのかを常に考えて、不要なのであれば切り捨てるといった判断をする事も必要です。</p>
-<h1 id="プロジェクトを進める上でのネットワーク"><a href="#プロジェクトを進める上でのネットワーク" class="headerlink" title="プロジェクトを進める上でのネットワーク"></a>プロジェクトを進める上でのネットワーク</h1><p>実際にプロジェクトの中では、ほとんどの企業が既にネットワークを持っている場合が多いのですが、新しく作るシステムを作る上で、ネットワークを拡張するための設計や対応が必要な場合があります。</p>
-<p>そんな時、インフラの構築の中でも特にネットワークはプロジェクト全体の進行に対して大きく先行して進めなければなりません。</p>
-<p>ネットワークを作るためには、機械の発注や購入だけではなく、建物工事や、通信が正しく行えるか疎通試験等も行う必要があるからです。</p>
-<p>その他にも、お客様自身が自社のネットワークを網羅しきれておらず、現行のネットワーク調査を行う必要が有る場合等もあります。</p>
-<p>こういった作業に対するスケジュールや、見積り、設計を誤ってしまうと、プロジェクトの進行が大きく遅れるだけではなく、お客様に想定外の出費をさせてしまう可能性があります。</p>
-<p>実際に、当社の中でも建物工事を行う業者の繁忙期閑散期を見誤り、実際に工事が行えるタイミングが当初想定より遅れてしまいギリギリでの対応となったことや、いざ使い始めてみると、当初の想定見積よりも多くの通信が流れており、通信の圧縮処理や、通信処理が集中する時間を分散させて影響を最小限に留めるように業務処理の見直しを行った事などもあります。</p>
-<h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>いかがでしたでしょうか？<br>普段、多くの方々はあまりネットワークについて意識をしていないかもしれません。</p>
-<p>その理由は<a href="https://future-architect.github.io/articles/20170109/">インフラ入門vol1</a>にもありましたが、ITインフラが<strong>動いて当たり前</strong>だからです。ただ、実際に壊れない機器は無いですし、<strong>メールだけ出来れば良い</strong> としていた環境でだれかが勝手に<strong>動画も配信！</strong> となれば、その元々の要件下での <strong>動いて当たり前</strong> は崩れてしまいます。</p>
-<p>この <strong>動いて当たり前</strong> を崩れないようにしっかりと作りつつ、今後の拡張性や、セキュリティ、予算等のバランスを取って作り上げる事がネットワークの設計に求められることです。</p>
-<p>では、また次回をお楽しみに。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h1&gt;&lt;p&gt;みなさま、こんにちは。洞内です。&lt;/p&gt;
-&lt;p&gt;今回はインフラ入門のvol.2と題して、インフラエンジニアの若手がネットワー
-    
-    </summary>
-    
-      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
-    
-    
-      <category term="Infrastructure" scheme="https://future-architect.github.io/tags/Infrastructure/"/>
-    
-      <category term="Network" scheme="https://future-architect.github.io/tags/Network/"/>
     
   </entry>
   
