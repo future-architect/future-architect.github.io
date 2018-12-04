@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2018-12-02T06:03:36.058Z</updated>
+  <updated>2018-12-04T14:54:05.811Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <author>
@@ -14,6 +14,486 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>5TB/日 のデータをAWS Glueでさばくためにやったこと（性能編）</title>
+    <link href="https://future-architect.github.io/articles/20181205/"/>
+    <id>https://future-architect.github.io/articles/20181205/</id>
+    <published>2018-12-05T14:18:17.000Z</published>
+    <updated>2018-12-04T14:54:05.811Z</updated>
+    
+    <content type="html"><![CDATA[<p><a href="https://qiita.com/advent-calendar/2018/future" target="_blank" rel="noopener">フューチャー Advent Calendar 2018 Qiita</a> 5日目の記事です。</p>
+<p>みなさん、こんにちは。<br>本記事は、AWS Glueについてのサービス概要や開発Tipsを紹介する<a href="https://future-architect.github.io/articles/20180828">5TB/日 のデータをAWS Glueでさばくためにやったこと（概要編）</a>の続編で、Glueの性能検証した内容を共有していきます。</p>
+<h2 id="検証について"><a href="#検証について" class="headerlink" title="検証について"></a>検証について</h2><p>Glueの性能がテーマですが、Glueそのものには設定できるパラメータが少ないためチューニングの余地が比較的小さいです。</p>
+<p>その中で、Glueの機能に着目すると以下の1~4が挙げられると思います。</p>
+<ol>
+<li>DPU数<ul>
+<li>ジョブに使用されるDPU(Data Processing Unit)の数、Sparkで言うところのworker nodeの数に該当</li>
+<li>1DPUは4vCPU、16GBのメモリを持ち、これ以外を選択することは不可</li>
+<li>ジョブ実行に使用できるDPU数は最低2つ、最大で100まで設定可能  </li>
+</ul>
+</li>
+<li>データカタログの使用有無<ul>
+<li>Glueは、クローリングによりデータカタログというメタデータを自動生成できる</li>
+<li>データを読み込む際は、このデータカタログを利用することも、利用しないこともできる</li>
+</ul>
+</li>
+<li>ファイル形式<ul>
+<li>Glueではデータの入出力にGlueContextを使用します</li>
+<li>様々な形式のファイルに対応していますが、ファイルの形式別にリードライトに性能差がある</li>
+<li>以下のファイルフォーマットは入力・出力の両方に対応<ul>
+<li>avro</li>
+<li>csv</li>
+<li>json</li>
+<li>orc</li>
+<li>parquet</li>
+</ul>
+</li>
+<li>以下のファイルフォーマットは入力のみに対応<ul>
+<li>ion</li>
+<li>grokLog</li>
+<li>xml</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>ファイルパーティション<ul>
+<li>GlueContextを使用してS3へファイルを出力する際に、特定の項目でパーティション分割することが可能</li>
+<li>これにより読み込む際に必要なファイルのみを読み込むことが可能</li>
+</ul>
+</li>
+</ol>
+<p>今回は、「1.DPU」を除いた、2~4を検証していきます。</p>
+<p>※Glueの内部で利用されているSparkそのものの性能についてはスコープ外としてますのでご了承ください。</p>
+<h2 id="検証用データ"><a href="#検証用データ" class="headerlink" title="検証用データ"></a>検証用データ</h2><p>検証用ダミーデータには以下のものを使用しました。</p>
+<ul>
+<li>件数 : 2000万レコード</li>
+<li>カラム数 : 4パターンの連番を持つ4カラム</li>
+<li>データ　: 1 ~ 1000000までの値</li>
+</ul>
+<p>データイメージ</p>
+<table>
+<thead>
+<tr>
+<th>No</th>
+<th>column1</th>
+<th>column2</th>
+<th>column3</th>
+<th>column4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>…</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>19</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>20</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>21</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>22</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>…</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1999</td>
+<td>100</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2000</td>
+<td>100</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2001</td>
+<td>101</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2002</td>
+<td>101</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>…</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>199999</td>
+<td>10000</td>
+<td>100</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>200000</td>
+<td>10000</td>
+<td>100</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>200001</td>
+<td>10001</td>
+<td>101</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr>
+<td>200002</td>
+<td>10001</td>
+<td>101</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr>
+<td>…</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>19999999</td>
+<td>1000000</td>
+<td>10000</td>
+<td>100</td>
+<td>1</td>
+</tr>
+<tr>
+<td>20000000</td>
+<td>1000000</td>
+<td>10000</td>
+<td>100</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>またデータの形式は以下のものを用意しました。</p>
+<table>
+<thead>
+<tr>
+<th>拡張子</th>
+<th>ファイルサイズ</th>
+<th>備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>csv</td>
+<td>334.0MB</td>
+<td></td>
+</tr>
+<tr>
+<td>avro</td>
+<td>414.1MB</td>
+<td></td>
+</tr>
+<tr>
+<td>json.gz</td>
+<td>58.5MB</td>
+<td>jsonをgzipで圧縮。Glueで対応しており、未解凍で読み込み可能</td>
+</tr>
+<tr>
+<td>json</td>
+<td>1.65GB</td>
+<td></td>
+</tr>
+<tr>
+<td>snappy.orc</td>
+<td>83.5MB</td>
+<td>圧縮方式にsnappyを選択したorcバイナリファイル</td>
+</tr>
+<tr>
+<td>snappy.parquet</td>
+<td>86.8MB</td>
+<td>圧縮方式にsnappyを選択したparquetバイナリファイル</td>
+</tr>
+</tbody>
+</table>
+<p>Glueは数百GB、数億カラムレベルのデータサイズも対応可能ですが、今回はこのデータで検証を行います。(データを作るのが大変だったため…)</p>
+<h2 id="検証結果"><a href="#検証結果" class="headerlink" title="検証結果"></a>検証結果</h2><p>先に説明したダミーデータを用いて検証します。<br>環境はGlue、S3ともに東京リージョンを利用しています。特に明記しない場合は、ファイル形式はCSVを利用し、検証結果は10回計測した平均値を記載しています。<br><br></p>
+<h3 id="検証①-DPU数"><a href="#検証①-DPU数" class="headerlink" title="検証① DPU数"></a>検証① DPU数</h3><p>DPU数を増やすと時間がかかるタスクも高速化が期待できますが、今回の検証からは割愛します。<br><br></p>
+<h3 id="検証②-データカタログの使用有無"><a href="#検証②-データカタログの使用有無" class="headerlink" title="検証② データカタログの使用有無"></a>検証② データカタログの使用有無</h3><p>データカタログの利用する、しないで検証しました。<br>しないケースはさらに、2種類のAPIで比較して検証しました。</p>
+<ul>
+<li>検証結果</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>読み込み時間[s]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>データカタログ利用</td>
+<td>0.3019</td>
+</tr>
+<tr>
+<td>GlueContextのfrom_option利用</td>
+<td>0.2461</td>
+</tr>
+<tr>
+<td>Sparkのread.csvを利用</td>
+<td>0.7811</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>コメント<ul>
+<li>結果にあまり差が出なかったため、実装方式に合わせて任意のものを選択するで良いと思います</li>
+</ul>
+</li>
+</ul>
+<p><br></p>
+<h3 id="検証③-ファイル形式"><a href="#検証③-ファイル形式" class="headerlink" title="検証③ ファイル形式"></a>検証③ ファイル形式</h3><p>パーティションを切らず、いくつかのファイル形式でS3から読込/書出 を行い検証しました。</p>
+<ul>
+<li>読込結果</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>拡張子</th>
+<th>読み込み時間[s]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>csv</td>
+<td>0.1305</td>
+</tr>
+<tr>
+<td>avro</td>
+<td>0.1144</td>
+</tr>
+<tr>
+<td>json.gz</td>
+<td>0.1211</td>
+</tr>
+<tr>
+<td>json</td>
+<td>0.3420</td>
+</tr>
+<tr>
+<td>snappy.orc</td>
+<td>0.4451</td>
+</tr>
+<tr>
+<td>snappy.parquet</td>
+<td>0.3794</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>書出結果</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>拡張子</th>
+<th>書き出し時間[s]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>csv</td>
+<td>6.9508</td>
+</tr>
+<tr>
+<td>avro</td>
+<td>12.8020</td>
+</tr>
+<tr>
+<td>json</td>
+<td>15.1127</td>
+</tr>
+<tr>
+<td>snappy.orc</td>
+<td>13.9531</td>
+</tr>
+<tr>
+<td>snappy.parquet</td>
+<td>11.6287</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>コメント<ul>
+<li>読込に関してはほとんど差が見受けられませんでした。10回実施した際の各回にもばらつきがあるため、誤差の範囲内かと思われます</li>
+<li>書出には明確な差が出ました<ul>
+<li>特にjsonは遅く、変換に時間がかかったものと推測</li>
+<li>CSVが一番早いですが、ファイルサイズが大きくなってしまうのがネック</li>
+</ul>
+</li>
+<li>性能やファイルサイズを考えると、avroやparquetといった、バイナリファイルの選択が有力ではないでしょうか<ul>
+<li>今回のわたしの在籍していたPJではparquetを採用しました</li>
+<li>バイナリファイルは、内容の確認やデータ作成に一手間かかるため、開発時にはCSVを使い、テストや本運用の時のみparquetを利用するという手法が良いかと思います</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="検証④-ファイルパーティション"><a href="#検証④-ファイルパーティション" class="headerlink" title="検証④ ファイルパーティション"></a>検証④ ファイルパーティション</h2><p>パーティション数を変化させてS3から読込/書出 を実施しました。</p>
+<ul>
+<li>読込結果（5回計測、その平均値）</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>拡張子</th>
+<th>読み込み時間[s]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0.0793</td>
+</tr>
+<tr>
+<td>100</td>
+<td>0.1565</td>
+</tr>
+<tr>
+<td>10000</td>
+<td>0.1986</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>書出結果（5回計測、その平均値）</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>拡張子</th>
+<th>書き出し時間[s]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>70.1816</td>
+</tr>
+<tr>
+<td>100</td>
+<td>58.3604</td>
+</tr>
+<tr>
+<td>10000</td>
+<td>410.1765</td>
+</tr>
+<tr>
+<td>1000000</td>
+<td>6時間待っても終了しなかったので中断</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>コメント<ul>
+<li>読込はあまり差が出ませんでした。（実は読み込まれていないのでは？と不安に思い、別の手段でも確かめましたが同じ結果でした） </li>
+<li>書出はパーティション数を増やした場合に著しく性能が落ちました</li>
+<li>開発時は細かくパーティションを切った方が目的のファイルにたどり着きやすく、デバッグしやすかったです</li>
+<li>パーティション設計はGlue利用時の肝ですが、実アプリへ適用したパーティション設計は、後続処理の内容やサービスに依存するため一言では言い難いです<ul>
+<li>例1: 後続がGlueの場合、時間課金ですので出力時にはパーティションは大きくは切らず、短時間で出力し切った方がコストを削減できます。</li>
+<li>例2: 後続がAthenaの場合、読み取ったデータサイズに対して課金されますのでパーティションを細かく切り、余計なデータは読まないようにした方がコストは削減できます</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="その他"><a href="#その他" class="headerlink" title="その他"></a>その他</h2><p>ここまで処理時間について検証しましたが、見逃しやすくもネックになりやすいのはGlueのクラスタ構築にかかる時間です。</p>
+<p>Glue jobを実行する場合は、必ずクラスタの構築が開始されますが、このクラスタ構築が曲者で、構築に必要なDPUの確保に数分の時間がかかる場合があります。</p>
+<p>もちろんjobが数時間レベルのものであれば、数分間は誤差かもしれません。</p>
+<p>しかし最悪の場合、時間がかかるだけでなくそもそもDPUの確保に失敗し、job自体が動かないという事象が発生します。</p>
+<p>クラスタ構築時間、job失敗率は要求するDPUの数に応じて大きくなります。DPU確保失敗時には設定回数を上限としたリトライも可能ですが、それでも100%実行できるという保証はありません。</p>
+<p>残念ながらGlueにはリザーブドの考え方は存在しないため、DPU確保に関する問題を回避する方法は現在のところ存在しません。</p>
+<p>2018年11月時点での東京リージョンで触ってみた感覚では、以下のような感じです。</p>
+<ul>
+<li>10(デフォルト):クラスタ構築に5~10分前後ほどかかる。DPU確保失敗はほぼ起こらない</li>
+<li>20:クラスタ構築に15分ほどかかる。DPU確保失敗する割合は五分五分程度</li>
+<li>30:DPU確保にほぼ失敗する</li>
+</ul>
+<p>ただし実行する時間帯も関係するようで、朝5時など利用者が少ないような時間だとDPUの確保できる成功率が高くなるようです。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><ul>
+<li>データの読込は、ファイルの形式やパーティションの切り方に関わらず高速</li>
+<li>データの書出は、parquetなどの圧縮形式が高速で、サイズも小さい。またパーティション数が多いほど時間がかかる</li>
+<li>ミニサイズのジョブにおいて、性能面で最も考慮すべきはGlueのDPU確保の不安定さ。DPU確保にかかる時間は要注意。最悪、確保できずに実行失敗する。今後のサービスの成熟に期待</li>
+</ul>
+<h2 id="あとがき"><a href="#あとがき" class="headerlink" title="あとがき"></a>あとがき</h2><p>いかがだったでしょうか？性能編と言っておきながら最後はサービスとしてまだ発展途上という終わり方になってしまいましたが、AWSのサービスの成熟スピードはとても早いため、きっと近い将来に改善されているのではと思います。</p>
+<p>実際、Glueを日々使っている中で新しい機能がどんどん追加されていき、便利に使いやすくなっていきました。</p>
+<p>開発をしながら機能追加に驚き、裏の改善を行なっているであろうAWSのエンジニアさんのことを想い、一緒に仕事ができているようで尊敬やら激励やらの念を抱いていた当時のことを、記事を書きながら思い出しました。</p>
+<p>私も彼らに負けないよう、のっぴきならない人生を乗り越えていくために、さらに切磋琢磨していきたいと想います。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;a href=&quot;https://qiita.com/advent-calendar/2018/future&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;フューチャー Advent Calendar 2018 Qiita&lt;/a&gt; 5日目の記事です。&lt;/p
+    
+    </summary>
+    
+      <category term="BigData" scheme="https://future-architect.github.io/categories/BigData/"/>
+    
+    
+      <category term="AWS" scheme="https://future-architect.github.io/tags/AWS/"/>
+    
+  </entry>
   
   <entry>
     <title>AmazonConnect BootCampセッションでハンズオン受けてきた話</title>
@@ -2894,126 +3374,6 @@
       <category term="MachineLearning" scheme="https://future-architect.github.io/tags/MachineLearning/"/>
     
       <category term="NLP" scheme="https://future-architect.github.io/tags/NLP/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>uroboroSQL x Spring BootによるWebアプリケーション開発</title>
-    <link href="https://future-architect.github.io/articles/20170828/"/>
-    <id>https://future-architect.github.io/articles/20170828/</id>
-    <published>2017-08-28T03:00:00.000Z</published>
-    <updated>2017-09-13T07:18:14.720Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="uroboroSQLについて"><a href="#uroboroSQLについて" class="headerlink" title="uroboroSQLについて"></a>uroboroSQLについて</h1><p>こんにちは。星です。</p>
-<p>今回は本技術ブログにもロゴが掲載されている弊社OSSプロダクトの一つ、「<a href="https://future-architect.github.io/uroborosql-doc/">uroboroSQL</a>」を利用してWebアプリケーションをどうやって開発すればよいのか？という話をさせて頂きたいと思います。</p>
-<p>今年3月に実施されたオープンソースカンファレンス2017 Tokyo/Springを皮切りに、5月の名古屋、そして、8月の京都の開催においてもブース出展・セミナーでご紹介してきましたが、来場者の方々に興味をもって頂き、さまざまなフィードバックを頂き、OSSにした実感を得ています。</p>
-<p>JavaでRDBにアクセスするアプリケーションを開発する場合、Java標準のJPA(Java Persistence API)や、Hiberate、MyBatis、EclipseLink、DBFlute、Domaなど、多くの選択肢が存在しています。</p>
-<p>uroboroSQLもこういったJavaにおけるDB永続化ライブラリの一つであり、ORマッピングの機能も持っていますが、基本的にはJavaからSQLを生成することよりも、SQLに足りないところをJavaで補うアプローチを採用しているのが特徴です。</p>
-<blockquote>
-<p>uroboroSQLに興味を持たれた方は、公式サイトおよび私がオープンソースカンファレンス2017 Nagoyaにて、講演した資料をご覧ください。</p>
-<p>uroboroSQL公式サイト<br><a href="https://future-architect.github.io/uroborosql-doc/">https://future-architect.github.io/uroborosql-doc/</a></p>
-<p>uroboroSQLの紹介 (OSC2017 Nagoya) #oscnagoya<br><a href="https://www.slideshare.net/KenichiHoshi1/uroborosql-osc2017-nagoya-oscnagoya" target="_blank" rel="noopener">https://www.slideshare.net/KenichiHoshi1/uroborosql-osc2017-nagoya-oscnagoya</a></p>
-</blockquote>
-<h1 id="uroboroSQLを利用したSpring-BootによるWebアプリケーション"><a href="#uroboroSQLを利用したSpring-BootによるWebアプリケーション" class="headerlink" title="uroboroSQLを利用したSpring BootによるWebアプリケーション"></a>uroboroSQLを利用したSpring BootによるWebアプリケーション</h1><p>さて、JavaでWebアプリケーションを開発するとき、いわゆるWebアプリケーションフレームワークをどうするかという話がありますが、有償のWebアプリケーションサーバを利用する前提であれば、JavaEEは有力な選択肢でしょうし、そうでなければ、Spring Framework(Spring Boot)、Play Frameworkなどが有力かなと思います。特に最近はPaaSなどでコンテナ上で動かす場合は、TomcatやJettyなどを組み込んで、実行可能jarにしてデプロイするという方式もトレンドでしょうか。</p>
-<p>uroboroSQLは、特定のWebアプリケーションフレームワークには依存しませんが、現在コマンドラインのサンプルぐらいしか用意できていないので、実際にWebアプリケーションを開発する場合のイメージがわかないという声も聞こえてくるようになりました。</p>
-<p>そこで、現在最も人気のあるJavaのWebアプリケーションフレームワークの一つである「Spring Boot」を採用して、uroboroSQLのリファレンスとなるWebアプリケーションを開発してみました。</p>
-<p>そして、今回採用するSpring Bootが「Spring PetClinic」というサンプルアプリケーションを公開していることもあり、それを見習って、「uroboroSQL PetClinic」を作ってみました。</p>
-<p>なお、最近フロントエンドはJSフレームワーク利用のケースが多いかと思いますので、Thymeleafによるサーバサイドレンダリングではなく、Vue.jsを用いて実装しています。本サンプルのメイン部分ではありませんので、本記事では詳細には触れませんが、興味がある方はソースをご覧ください。</p>
-<ul>
-<li>uroboroSQL PetClinic<ul>
-<li><a href="https://github.com/shout-star/uroborosql-springboot-demo" target="_blank" rel="noopener">https://github.com/shout-star/uroborosql-springboot-demo</a></li>
-</ul>
-</li>
-</ul>
-<h1 id="uroboroSQL-PetClinic"><a href="#uroboroSQL-PetClinic" class="headerlink" title="uroboroSQL PetClinic"></a>uroboroSQL PetClinic</h1><p><img src="/images/20170828/photo_20170828_01.jpg" class="img-middle-size"></p>
-<p>トップページはSpring PetClinicをご存じの方だったら、ピンと来るかなと思います。<br>基本的に仕様はほぼ踏襲しています。</p>
-<p>簡単にこのアプリケーションの説明をすると、動物病院のペット・飼い主の管理システムですね。「Find Owner」から飼い主を検索して、その飼い主のペットの登録やペットの来院履歴の登録ができるといったものです。</p>
-<p><img src="/images/20170828/photo_20170828_02.png" class="img-middle-size"></p>
-<p><img src="/images/20170828/photo_20170828_03.png" class="img-middle-size"></p>
-<p>ログイン不要で利用できたり、DBの排他制御がなかったりと、あくまでサンプルという位置づけですね。</p>
-<h1 id="uroboroSQLとSpring-Boot連携"><a href="#uroboroSQLとSpring-Boot連携" class="headerlink" title="uroboroSQLとSpring Boot連携"></a>uroboroSQLとSpring Boot連携</h1><p>Spring Bootだと、通常はSpring Data JPAを利用することが多いかと思いますが、今回は uroboroSQLと連携させるので、application.ymlで定義した<code>DataSource</code>を、uroboroSQLのSqlConfigに渡してやる必要があります。</p>
-<p>今回はSpring BootのControllerの親クラス(BaseController)にて、その実装をしてみました。</p>
-<p>なお、RDBはH2 Database、コネクションプールは、Tomcat JDBC Connection Poolを利用しています。</p>
-<p><strong>application.yml（抜粋）</strong></p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="attr">spring:</span></div><div class="line"><span class="attr">  datasource:</span></div><div class="line"><span class="attr">    url:</span> jdbc:h2:file:./target/db/petclinic;AUTOCOMMIT=<span class="literal">FALSE</span></div><div class="line"><span class="attr">    username:</span> sa</div><div class="line"><span class="attr">    password:</span></div><div class="line"><span class="attr">    driver-class-name:</span> org.h2.Driver</div><div class="line"><span class="attr">    name:</span> jdbc/petclinic</div></pre></td></tr></table></figure>
-<p><strong>BaseController.java（抜粋）</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseController</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> DataSource dataSource;</div><div class="line"></div><div class="line">    <span class="meta">@Autowired</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BaseController</span><span class="params">(DataSource dataSource)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.dataSource = dataSource;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * create &lt;code&gt;SqlAgent&lt;/code&gt; instance.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@return</span> &lt;code&gt;SqlAgent&lt;/code&gt;</div><div class="line">     */</div><div class="line">    <span class="function">SqlAgent <span class="title">createAgent</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            SqlConfig config = DefaultSqlConfig.getConfig(dataSource.getConnection());</div><div class="line"></div><div class="line">            config.getSqlFilterManager().addSqlFilter(<span class="keyword">new</span> DebugSqlFilter());</div><div class="line">            config.getSqlFilterManager().initialize();</div><div class="line"></div><div class="line">            <span class="keyword">return</span> config.createAgent();</div><div class="line">        &#125; <span class="keyword">catch</span> (SQLException e) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(e);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/* 以下略 */</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>本来は<code>DefaultSqlConfig#getConfig</code>に直接<code>DataSource</code>を渡したいところだったんですが、uroboroSQL v0.2ではそのインタフェースがなくて、<code>getConnection</code>することにしました。ちなみに、v0.3では<code>DataSource</code>を直接渡せるようにする予定です。</p>
-<h1 id="検索処理の実装"><a href="#検索処理の実装" class="headerlink" title="検索処理の実装"></a>検索処理の実装</h1><p>飼い主の検索画面(Find Owner)で、飼い主(Owner)の名字(LastName)で検索ボタンを押下したときに呼び出される実装は下記のようになります。</p>
-<p><strong>OwnerController.java（抜粋）</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RestController</span></div><div class="line"><span class="meta">@CrossOrigin</span></div><div class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/api/owners"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OwnerController</span> <span class="keyword">extends</span> <span class="title">BaseController</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">OwnerController</span><span class="params">(DataSource dataSource)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(dataSource);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@RequestMapping</span>(method = RequestMethod.GET)</div><div class="line">    <span class="keyword">public</span> List&lt;Map&lt;String, Object&gt;&gt; find(<span class="meta">@RequestParam</span>(required = <span class="keyword">false</span>) String lastName) <span class="keyword">throws</span> SQLException &#123;</div><div class="line">        <span class="keyword">try</span> (SqlAgent agent = createAgent()) &#123;</div><div class="line">            <span class="keyword">return</span> agent.query(<span class="string">"owners-find"</span>)</div><div class="line">                .param(<span class="string">"lastName"</span>, lastName)</div><div class="line">                .collect(CaseFormat.CamelCase);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">/* 以下略 */</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>owner-find.sql</strong></p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> <span class="comment">/* _SQL_ID_ */</span></div><div class="line">  OWNERS.ID</div><div class="line">, OWNERS.FIRST_NAME</div><div class="line">, OWNERS.LAST_NAME</div><div class="line">, OWNERS.ADDRESS</div><div class="line">, OWNERS.CITY</div><div class="line">, OWNERS.TELEPHONE</div><div class="line">, <span class="keyword">GROUP_CONCAT</span>(PETS.NAME)   <span class="keyword">AS</span>  PETS_NAME</div><div class="line"><span class="keyword">FROM</span></div><div class="line">  OWNERS</div><div class="line"><span class="keyword">LEFT</span> <span class="keyword">OUTER</span> <span class="keyword">JOIN</span></div><div class="line">  PETS</div><div class="line"><span class="keyword">ON</span></div><div class="line">  OWNERS.ID = PETS.OWNER_ID</div><div class="line"><span class="comment">/*BEGIN*/</span></div><div class="line"><span class="keyword">WHERE</span></div><div class="line"><span class="comment">/*IF SF.isNotEmpty(lastName) */</span></div><div class="line">  LAST_NAME   <span class="keyword">LIKE</span>  <span class="string">'%'</span> ||  <span class="comment">/*lastName*/</span><span class="string">''</span>  ||  <span class="string">'%'</span></div><div class="line"><span class="comment">/*END*/</span></div><div class="line"><span class="comment">/*END*/</span></div><div class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> OWNERS.ID</div><div class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> OWNERS.ID</div></pre></td></tr></table></figure>
-<p>uroboroSQLはSQLを実装する方式のライブラリなので、ご覧の通りControllerの実装は非常に簡潔で、パラメータを渡して呼び出すのみの実装です。</p>
-<p>実際にSQL出力する際は、uroboroSQLの2-way SQLの機能により、名字(lastName)が未入力ならWHERE句自体がなくなり、全件検索するSQLになります。</p>
-<p>なお、実際に自分で実装してみて、<code>SQLException</code>の検査例外が邪魔に感じたので、uroboroSQL v0.3からは実行時例外にする予定です。<br>やはり自身で実装してみると気づきがあるものですね。</p>
-<h1 id="登録処理の実装"><a href="#登録処理の実装" class="headerlink" title="登録処理の実装"></a>登録処理の実装</h1><p><img src="/images/20170828/photo_20170828_04.png" class="img-middle-size"></p>
-<p>次に飼い主の登録画面の実装を見てみます。</p>
-<p><strong>OwnerController.java（抜粋）</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RestController</span></div><div class="line"><span class="meta">@CrossOrigin</span></div><div class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/api/owners"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OwnerController</span> <span class="keyword">extends</span> <span class="title">BaseController</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"/new"</span>, method = RequestMethod.POST)</div><div class="line">    <span class="function"><span class="keyword">public</span> Map&lt;String, Object&gt; <span class="title">create</span><span class="params">(@Validated @RequestBody Owner owner)</span> <span class="keyword">throws</span> SQLException </span>&#123;</div><div class="line">        <span class="keyword">return</span> handleCreate(owner);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/* 以下略 */</span></div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>BaseController.java（抜粋）</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseController</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * get generate keys.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> agent SqlAgent</div><div class="line">     * <span class="doctag">@return</span> keys as &#123;<span class="doctag">@literal</span> Map&lt;String, Object&gt;&#125;</div><div class="line">     * <span class="doctag">@throws</span> SQLException SQLException</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">private</span> Map&lt;String, Object&gt; <span class="title">generatedKeys</span><span class="params">(SqlAgent agent)</span> <span class="keyword">throws</span> SQLException </span>&#123;</div><div class="line">        <span class="keyword">return</span> agent.queryWith(<span class="string">"SELECT SCOPE_IDENTITY() AS ID"</span>)</div><div class="line">            .collect(CaseFormat.CamelCase)</div><div class="line">            .get(<span class="number">0</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function">Map&lt;String, Object&gt; <span class="title">handleCreate</span><span class="params">(BaseModel model)</span> <span class="keyword">throws</span> SQLException </span>&#123;</div><div class="line">        <span class="keyword">try</span> (SqlAgent agent = createAgent()) &#123;</div><div class="line">            <span class="keyword">return</span> agent.required(() -&gt; &#123;</div><div class="line">                agent.insert(model);</div><div class="line">                <span class="keyword">return</span> generatedKeys(agent);</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>Owner.java（抜粋）</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Table</span>(name = <span class="string">"OWNERS"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Owner</span> <span class="keyword">extends</span> <span class="title">BaseModel</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@NotEmpty</span></div><div class="line">    <span class="meta">@Size</span>(max = <span class="number">30</span>)</div><div class="line">    <span class="keyword">private</span> String firstName;</div><div class="line"></div><div class="line">    <span class="meta">@NotEmpty</span></div><div class="line">    <span class="meta">@Size</span>(max = <span class="number">30</span>)</div><div class="line">    <span class="keyword">private</span> String lastName;</div><div class="line"></div><div class="line">    <span class="meta">@NotEmpty</span></div><div class="line">    <span class="meta">@Size</span>(max = <span class="number">255</span>)</div><div class="line">    <span class="keyword">private</span> String address;</div><div class="line"></div><div class="line">    <span class="meta">@NotEmpty</span></div><div class="line">    <span class="meta">@Size</span>(max = <span class="number">80</span>)</div><div class="line">    <span class="keyword">private</span> String city;</div><div class="line"></div><div class="line">    <span class="meta">@NotEmpty</span></div><div class="line">    <span class="meta">@Digits</span>(fraction = <span class="number">0</span>, integer = <span class="number">10</span>)</div><div class="line">    <span class="keyword">private</span> String telephone;</div><div class="line"></div><div class="line">    <span class="comment">/* 以下getter/setter */</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>実際に呼ばれるControllerのメソッドは親に委譲しているだけにシンプルですね。<br>Spring Bootによって、フロントエンドから渡されたJSONがOwnerというエンティティクラスに自動的にマッピングされて、かつ、BeanValidationが実行され、問題なければDB登録処理が呼び出されます。</p>
-<p>uroboroSQLもv0.2より、JPAライクなORマッピング機能を追加したことにより、INSERT/UPDATEといった処理はSQL不要でシンプルに実装することができました。</p>
-<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>というわけで、uroboroSQLとSpring BootのWebアプリケーションの実装を見てきましたが、いかがでしたしょうか？</p>
-<p>私自身、Spring Framework自体はこれまでも使ってきたものの、Spring Bootは初体験でしたが、うまい具合にSpring Frameworkの面倒だったところを隠していることもあり、非常にスマートですね。</p>
-<p>RestControllerにおける検索処理では、uroboroSQLの<code>SqlAgent#query</code>の結果をそのまま返すだけでも事足りるケースも多く、Spring Bootとの相性は良いと感じました。<br>uroboroSQL自体がシンプルな仕様なこともあり、初見でも簡単に実装できることがわかって頂けたのではないかと思います。</p>
-<p>むしろ、Vue.jsでのフロントエンドの実装ボリュームのほうが圧倒的に多いですね。。。</p>
-<p>uroboroSQLは現在v0.3に向けて、鋭意開発を進めており、まだまだ進化していきますので、是非使ってみてください！！</p>
-<p>uroboroSQL PetClinicも認証機能など、エンタープライズ用途の参考になるような機能をまだまだ追加していきたいと思っていますので、こちらもよろしくお願いします。</p>
-<h2 id="番外編：SQLログ表示機能"><a href="#番外編：SQLログ表示機能" class="headerlink" title="番外編：SQLログ表示機能"></a>番外編：SQLログ表示機能</h2><p><img src="/images/20170828/photo_20170828_05.png" class="img-middle-size"></p>
-<p>本家Spring Clinicには存在しない機能ですが、サーバサイドで実行されたuroboroSQLの出力するログを画面上で表示する機能を追加してみました。画面左下の目のアイコンをクリックするとログウィンドウが表示されます。</p>
-<p>もちろん、実業務ではこのような機能はセキュリティホールになってしまいますが、これでどんな操作によってどんなSQLが実行されたのか、画面から見ることができますので、uroboroSQLのデモにも使えるかなと思っています。</p>
-<p>そういうわけで、2017/9/9(土)、2017/9/10(日)に開催されるオープンソースカンファレンス2017 Tokyo/Fallにて、ブースでお見せしたいと思いますので、興味のある方は是非、当日フューチャーアーキテクト  ブースまで足を運んでください！！</p>
-<ul>
-<li>オープンソースカンファレンス2017 Tokyo/Fall - オープンソースの文化祭！<ul>
-<li><a href="https://www.ospn.jp/osc2017-fall/" target="_blank" rel="noopener">https://www.ospn.jp/osc2017-fall/</a></li>
-</ul>
-</li>
-</ul>
-<h1 id="関連サイト"><a href="#関連サイト" class="headerlink" title="関連サイト"></a>関連サイト</h1><ul>
-<li>uroboroSQL PetClinic<ul>
-<li><a href="https://github.com/shout-star/uroborosql-springboot-demo" target="_blank" rel="noopener">https://github.com/shout-star/uroborosql-springboot-demo</a></li>
-</ul>
-</li>
-<li>uroboroSQL Github Repository<ul>
-<li><a href="https://github.com/future-architect/uroborosql" target="_blank" rel="noopener">https://github.com/future-architect/uroborosql</a></li>
-</ul>
-</li>
-<li>uroboroSQL Document<ul>
-<li><a href="https://future-architect.github.io/uroborosql-doc/">https://future-architect.github.io/uroborosql-doc/</a></li>
-</ul>
-</li>
-</ul>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li>Spring Boot<ul>
-<li><a href="https://projects.spring.io/spring-boot/" target="_blank" rel="noopener">https://projects.spring.io/spring-boot/</a></li>
-</ul>
-</li>
-<li>Spring PetClinic<ul>
-<li><a href="https://github.com/spring-projects/spring-petclinic" target="_blank" rel="noopener">https://github.com/spring-projects/spring-petclinic</a>)</li>
-</ul>
-</li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;h1 id=&quot;uroboroSQLについて&quot;&gt;&lt;a href=&quot;#uroboroSQLについて&quot; class=&quot;headerlink&quot; title=&quot;uroboroSQLについて&quot;&gt;&lt;/a&gt;uroboroSQLについて&lt;/h1&gt;&lt;p&gt;こんにちは。星です。&lt;/p&gt;
-&lt;p&gt;今回は本
-    
-    </summary>
-    
-      <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
-    
-    
-      <category term="Java" scheme="https://future-architect.github.io/tags/Java/"/>
-    
-      <category term="SQL" scheme="https://future-architect.github.io/tags/SQL/"/>
-    
-      <category term="uroboroSQL" scheme="https://future-architect.github.io/tags/uroboroSQL/"/>
     
   </entry>
   
