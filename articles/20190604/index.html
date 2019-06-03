@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>OpenCensus(OpenTelemetry)とは | Future Tech Blog - フューチャーアーキテクト</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="うちの会社では、各種クラウドサービスの知見を共有する勉強会を毎週行なっています。弊社ではコンサルティング事業をしていて、次々と多くの案件をこなしているし、各案件の要件も異なるため、自社でもっている知見もバラエティーに富んでいます。既存のサービスではこういう制約があってハマったとか、今回これで作りきったけど、次回クリーンに作り直すならこうしたい、みたいな話が赤裸々に語られる楽しい会です。で、僕はイン">
+<meta name="keywords" content="Monitoring,Go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenCensus(OpenTelemetry)とは">
+<meta property="og:url" content="https://future-architect.github.io/articles/20190604/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="うちの会社では、各種クラウドサービスの知見を共有する勉強会を毎週行なっています。弊社ではコンサルティング事業をしていて、次々と多くの案件をこなしているし、各案件の要件も異なるため、自社でもっている知見もバラエティーに富んでいます。既存のサービスではこういう制約があってハマったとか、今回これで作りきったけど、次回クリーンに作り直すならこうしたい、みたいな話が赤裸々に語られる楽しい会です。で、僕はイン">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20190604/opencentus_dashboard.png">
+<meta property="og:updated_time" content="2019-06-03T23:38:59.205Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OpenCensus(OpenTelemetry)とは">
+<meta name="twitter:description" content="うちの会社では、各種クラウドサービスの知見を共有する勉強会を毎週行なっています。弊社ではコンサルティング事業をしていて、次々と多くの案件をこなしているし、各案件の要件も異なるため、自社でもっている知見もバラエティーに富んでいます。既存のサービスではこういう制約があってハマったとか、今回これで作りきったけど、次回クリーンに作り直すならこうしたい、みたいな話が赤裸々に語られる楽しい会です。で、僕はイン">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20190604/opencentus_dashboard.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="OpenCensus(OpenTelemetry)とは | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="OpenCensus(OpenTelemetry)とは,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Tech Blog</div>
+        <div class="header-title-sub">フューチャーアーキテクト開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20190604/">OpenCensus(OpenTelemetry)とは</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20190604-trace" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> 澁川喜規</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2019-06-04T00:00:51.000Z" itemprop="datePublished">2019/06/04</time>
+
+	</li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+	  
+  
+    <a href="/tags/Monitoring/" title="Monitoring">Monitoring</a>,
+  
+    <a href="/tags/Go/" title="Go">Go</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    Categories:
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>うちの会社では、各種クラウドサービスの知見を共有する勉強会を毎週行なっています。弊社ではコンサルティング事業をしていて、次々と多くの案件をこなしているし、各案件の要件も異なるため、自社でもっている知見もバラエティーに富んでいます。既存のサービスではこういう制約があってハマったとか、今回これで作りきったけど、次回クリーンに作り直すならこうしたい、みたいな話が赤裸々に語られる楽しい会です。で、僕はインフラをやることはあまりないのだけど、話を聞くだけでは申し訳ないので、2週間前の会で、最近ハマっているOpenCensusについて紹介しました。</p>
+<p>「分散トレースとは」という話がまとまっていて、初学者に「これ読んどいて」と言えるようなページがなかったので社内向けの資料をベースに技術ブログでも公開します。</p>
+<h1 id="トレーシングとメトリックス"><a href="#トレーシングとメトリックス" class="headerlink" title="トレーシングとメトリックス"></a>トレーシングとメトリックス</h1><p>トレーシングはどの処理がどの順番で行われているか、どのぐらい処理時間がかかっているかをミクロに見ていくことによって、システムの状況を把握しやすくする。</p>
+<p>メトリックスは、マクロな統計情報。だいたい平均は100mSで終わってる、80パーセンタイルの処理時間は120mS、95パーセンタイルは400mSみたいな、「なんとなく」を掴む方法。メモリ使用量、CPUなどのシステムの状態を把握し、異常が起きそうかどうか、余裕があるかどうかを把握するために使うもので、SRE本ではかなり強調されているもの。</p>
+<p>OpenCensusでは、メトリックスはビューというものをあらかじめ定義する。どういった単位の数字で、どういった感じの値分布になるのか、を定義する。ちょうど、OpenCensusのGoライブラリのデフォルト定義がわかりやすい。</p>
+<ul>
+<li><a href="https://github.com/census-instrumentation/opencensus-go/blob/master/plugin/ochttp/stats.go#L129" target="_blank" rel="noopener">HTTPクライアント向けのビュー定義</a></li>
+</ul>
+<p>この分布に含まれるリクエスト数がいくつ、みたいなカウント数が集計されるので、数万件のアクセス時にも、収集されるデータ量はあまり大きくならない。トレーシングはどの処理がどの順番に行われたか、どれだけ時間がかかったかを個別に収集するため、ビューといったものはない。アクセス数に比例した分量の詳細なログが出力されるが、データ量削減のために、トレーシングも、間引いて（サンプラーの設定による）収集することがある。</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><ul>
+<li>Googleが社内のサービスの監視のために、Borgmonを作る<ul>
+<li>Borgmonはトレーシングのためのツール。システムが正しく動作しているかどうかのモニタリングを行う</li>
+<li>元Googleの人がBorgmonに触発されてOSSでPrometheusを作る</li>
+</ul>
+</li>
+<li>Googleが社内のサービスのトレーシングのために、Dapperを作る<ul>
+<li>Dapperの論文が2010年ごろに出る</li>
+<li>この論文をもとに、Zipkin(Twitter)、Jaeger(Uber)といったOSSが作成される</li>
+</ul>
+</li>
+<li>New Relic, Datadog, Treasure Dataなどのサービスがここ10年ぐらいのあいだで生まれた<ul>
+<li>モニタリング・分析などのビッグデータ的な文脈</li>
+</ul>
+</li>
+<li>統合APIの機運<ul>
+<li>いろんなバックエンドサービスが生まれたが、それぞれの専用のSDKをアプリケーションに組み込む必要があった</li>
+<li>OpenTracingというプロジェクトができ、Cloud Native Computing Foundation配下に入る</li>
+<li>Googleが社内のCensusというライブラリの公開版のOpenCensusを作成する<ul>
+<li>トレーシングと、モニタリングを両方サポート</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>統合APIの統合<ul>
+<li>OpenCensusとOpenTracingの統合が発表される</li>
+<li>この2つがマージして、CNCF配下のOpenTelemetryというものが作られることが発表される(先週)</li>
+</ul>
+</li>
+</ul>
+<h1 id="分散トレーシング"><a href="#分散トレーシング" class="headerlink" title="分散トレーシング"></a>分散トレーシング</h1><p>各処理にどれだけ時間がかかったのかを、ルールに従って出力することにより、複雑に関連しあったタスクでどこに問題があるのかを一目で見れるようにする。たんなるログではなく、親子関係の構造を持つログ。</p>
+<ul>
+<li>タスクのスタートと終了時に、特別なAPIを使って記録する（この1区画をスパンと呼ぶ）</li>
+<li>スパンを作る時には、親のスパンのIDをAPIに渡すことで、親子関係があることを通知する</li>
+<li>バッチ処理から作られるワーカーの場合は、スパンIDどうしをリンクすることで、関連するスパンであることを通知する</li>
+<li>ネットワーク越しにタスクを投げる時は、X-B3-TraceId, X-B3-ParentSpanIdといったヘッダー、gRPCのメタデータなどを介して、別プロセスでも親子関係のあるタスクを行なっていることを通知する</li>
+<li>スパンに対してログ、タグといったものを出力することもできる</li>
+<li>分散トレースの文脈では、スパンの集合=トレース</li>
+</ul>
+<p>この情報を使うことで、下記のようなグラフを表示することができる。</p>
+<p><img width="993" alt="" src="/images/20190604/opencentus_dashboard.png"></p>
+<h1 id="OpenCensusとは"><a href="#OpenCensusとは" class="headerlink" title="OpenCensusとは"></a>OpenCensusとは</h1><p>Borgmon由来のメトリクス、Dapper由来のトレーシングの両方に対応したライブラリ</p>
+<p>次のような言語に対応している</p>
+<ul>
+<li>Go</li>
+<li>Java</li>
+<li>C++</li>
+<li>C#</li>
+<li>Python</li>
+<li>PHP</li>
+<li>Ruby</li>
+<li>Erlang/Elixir</li>
+</ul>
+<p>出力先がプラグインで切り替えられる。Goのものだと、次のようなものに対応している。</p>
+<ul>
+<li>GCPのStackDriver</li>
+<li>Datadog</li>
+<li>AWSのX-Ray</li>
+<li>Jaeger</li>
+<li>Zipkin</li>
+<li>Honeycomb</li>
+</ul>
+<h1 id="どうやって出力するのか？"><a href="#どうやって出力するのか？" class="headerlink" title="どうやって出力するのか？"></a>どうやって出力するのか？</h1><h2 id="自動出力"><a href="#自動出力" class="headerlink" title="自動出力"></a>自動出力</h2><p>データの出力は、OpenCensusのAPIで行うが、Instrumentと呼ばれる特別なプラグインを入れると、システムの入出力で勝手にログを取ってくれる。Pythonだと次のようなものが公式で提供されている、</p>
+<ul>
+<li>DB API, Django, Flask, Google Cloud Client Library, gRPC, httplib, PostgreSQL, MongoDB, MySQL, Pyramid, Requests, SQLAlchemy, threading</li>
+</ul>
+<p>Node.jsではOpenCensusをimportするだけで、勝手にHTTPのログが出力されるようになる。プロセスをまたぐような通信のログが勝手に取得できる。</p>
+<p>Envoyというコンテナ間の通信プロキシが通信のトレース出力機能を持っているのため、Kubernetesを使うと勝手に出力される</p>
+<h2 id="手動でメトリックスを出力する"><a href="#手動でメトリックスを出力する" class="headerlink" title="手動でメトリックスを出力する"></a>手動でメトリックスを出力する</h2><p>測定したい単位、評価基準をプログラムで作り、定期的にstats.Recordで送信する。アプリケーションでどのようなメトリックスが必要かを考えて項目を設定する。あるいは、既成の自動出力のinstrumentを参考にすると良さそう。</p>
+<p>下記のコードはExporter設定は省略しています</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> main</div><div class="line"></div><div class="line"><span class="keyword">import</span> (</div><div class="line">	<span class="string">"go.opencensus.io/stats"</span></div><div class="line">)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">	mLatencyMs = stats.Float64(<span class="string">"latency"</span>, <span class="string">"The latency in milliseconds"</span>, <span class="string">"ms"</span>)</div><div class="line">	mLines = stats.Int64(<span class="string">"lines_in"</span>, <span class="string">"The number of lines processed"</span>, <span class="string">"1"</span>)</div><div class="line">	mBytesIn = stats.Int64(<span class="string">"bytes_in"</span>, <span class="string">"The number of bytes received"</span>, <span class="string">"By"</span>)</div><div class="line"></div><div class="line">	<span class="comment">// Invoking .M produces measurements that we then record against</span></div><div class="line">	<span class="comment">// a context "ctx" with tags.</span></div><div class="line">	stats.Record(ctx,</div><div class="line">		mLatencyMs.M(<span class="number">17</span>),</div><div class="line">		mLines.M(<span class="number">238</span>),</div><div class="line">		mBytesIn.M(<span class="number">7000</span>))</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>メトリックスの出力先としてPrometheus（PULL型)を設定しておくと、Prometheusが読みにくるためのAPIが作成され、定期的に出力された数値を取得しにくるようになる。</p>
+<h2 id="手動でトレースを出力する"><a href="#手動でトレースを出力する" class="headerlink" title="手動でトレースを出力する"></a>手動でトレースを出力する</h2><p>StartSpanとEndでスパンを出力していく</p>
+<p>下記のコードはExporter設定は省略しています</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> main</div><div class="line"></div><div class="line"><span class="keyword">import</span> (</div><div class="line">    <span class="string">"go.opencensus.io/trace"</span></div><div class="line">)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">	<span class="comment">// Create a span with the background context, making this the parent span.</span></div><div class="line">	<span class="comment">// A span must be closed.</span></div><div class="line">	ctx, span := trace.StartSpan(context.Background(), <span class="string">"main"</span>)</div><div class="line">	<span class="comment">// Make the span close at the end of this function.</span></div><div class="line">	<span class="keyword">defer</span> span.End()</div><div class="line"></div><div class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">10</span>; i++ &#123;</div><div class="line">		doWork(ctx)</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="OpenCensusの使いどころ"><a href="#OpenCensusの使いどころ" class="headerlink" title="OpenCensusの使いどころ"></a>OpenCensusの使いどころ</h1><p>複数のサービスに別れているシステムだと、分散トレーシングはかなり便利なはず。</p>
+<ol>
+<li>ローカル開発では、分散トレース収集可視化のJaeger/Zipkinと、メトリクス収集可視化のPrometheusがDockerで簡単に起動できるので、これを出力先にして開発を行う<ol>
+<li>デバッグ出力するときも、トレースでタグとして情報を出力しておくと、かなり良い</li>
+<li>ステージング環境ではStackdriverとX-Rayで</li>
+<li>たてなくても, zPageという簡易のビューアはついてくる（かなり簡易）</li>
+</ol>
+</li>
+<li>本番環境では、Stackdriverの無料枠がかなり小さいので、サンプリング頻度をかなり下げて使うか、予算に入れてきちんとお金を払う？<ol>
+<li>トレーシングはいらないので、メトリクスだけとかに絞るとか</li>
+<li>あるいは自前でPrometheus、Jaeger(Zipkin)を立てる？</li>
+</ol>
+</li>
+</ol>
+<p>OpenCensusの初期化とか環境設定がなかなかめんどいので、それを簡単にする<a href="https://github.com/future-architect/futureot/tree/master/occonfig" target="_blank" rel="noopener">occonfig</a>というGoのパッケージをチームのハックデー等を使って作りました。Node.js版も公開はしてないけど<a href="https://github.com/future-architect/futureot/tree/master/occonfig-node" target="_blank" rel="noopener">実装はしました</a>。READMEに環境設定のもろもろを書いたので、参考にしてください。まあ、本当に作ったばかりの状態で実戦投入はまだなので、実際に使うといろいろ出るかもですが。OpenTelemetryへの追従もやっていきます。</p>
+<p>また、気軽にローカルの開発で使い始められるように、今Go界隈で一番いけているという話題のロガーの<a href="https://github.com/uber-go/zap" target="_blank" rel="noopener">zap</a>経由でコンソールに出力する<a href="https://github.com/future-architect/futureot/tree/master/exporters/opencensus-go-exporter-zap" target="_blank" rel="noopener">エクスポーター</a>も実装しました。Instrumentsも色々今後は仕事しながら足していきたいな、と思っています。</p>
+<h1 id="今後とか"><a href="#今後とか" class="headerlink" title="今後とか"></a>今後とか</h1><ul>
+<li>OpenTelemetryになっても、アプリケーションに対して（Record、StartSpan, End等の)後方互換APIは用意されるとのこと<ul>
+<li>ExporterやInstrumentの実装者はそのままではいかないかもしれない</li>
+<li>出力先の設定部分以外のアプリケーションコードに埋め込まれた部分は大丈夫そうなので、とりあえず今からやるならOpenCensusでやっていけば良さそう。</li>
+</ul>
+</li>
+<li>OpenCensusはGoがプライマリーの扱いだったが、OpenTelemetryはリポジトリを見る限りでは、Java中心<ul>
+<li><a href="https://opentelemetry.io/" target="_blank" rel="noopener">https://opentelemetry.io/</a></li>
+</ul>
+</li>
+<li>OpenCensus時代にも、Agent/Collectorというものが作られていた<ul>
+<li>fluentdみたいなやつ。Exporterをアプリケーションで設定するのではなくて、Agentに設定すると、アプリケーションが相手先のシステムが何かを知らずに（気にせずに）出力できる</li>
+<li>CollectorはAgentの出力を集めて、実際の集計サーバーに転送する、というコンセプト</li>
+<li>現在でも安定はしていないが、<a href="https://medium.com/opentracing/a-roadmap-to-convergence-b074e5815289" target="_blank" rel="noopener">OpenTelemetryはProxy, Sidecar, AgentというのがProject Overviewに明記されている</a>ので、こちらが主流になる？とはいえ、C#のリポジトリを見ると、<a href="https://github.com/open-telemetry/opentelemetry-dotnet" target="_blank" rel="noopener">exporterも依然として存在する模様</a> </li>
+</ul>
+</li>
+<li>用語が少し整理される？<ul>
+<li>InstrumentはCollectorとなる？</li>
+</ul>
+</li>
+</ul>
+<h1 id="その他の情報源"><a href="#その他の情報源" class="headerlink" title="その他の情報源"></a>その他の情報源</h1><p>OpenCensusの情報はまとまっていなかったので、次のページを作ってみました。</p>
+<ul>
+<li><a href="https://github.com/shibukawa/awesome-opencensus" target="_blank" rel="noopener">https://github.com/shibukawa/awesome-opencensus</a></li>
+</ul>
+
+      
+    </div>
+  </div>
+    
+  <!-- シェアボタン START -->
+  <div class="social-area">
+  <ul class="social-button">
+
+      <!-- twitter -->
+      <li class="sc-tw social-button-twitter">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-hashtags="future_architect">ツイート</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      </li>
+      
+      <!-- Facebookいいね -->
+      <li class="social-button-fb">
+          <div id="fb-root"></div>
+          <script>(function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.8";
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));</script>
+          <div class="fb-like" data-href="https://future-architect.github.io/articles/20190604/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+      </li>
+
+      <!-- はてなブックマーク -->
+      <li class="social-button-hatebu"><a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20190604/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></li>
+
+      <!-- pocket -->
+      <li class="social-button-pocket"><a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
+          <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+      </li>
+
+  </ul>
+  </div>
+<!-- シェアボタン END -->
+
+
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/articles/20190530/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">【合格記】GCP Professional Cloud Architect認定資格を振り返る</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (21)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (5)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Cloud/">Cloud (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (5)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (4)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (13)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/object-Object/">[object Object] (0)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190604/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                OpenCensus(OpenTelemetry)とは
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190513/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                第1回PG Battle参戦記
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190425/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Qiita Jobsを始めました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190422/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                LT Free Style Battle（VS リクルートテクノロジーズ）を開催しました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20181205/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                5TB/日 のデータをAWS Glueでさばくためにやったこと（性能編）
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーアーキテクトの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+          <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+
+    <!-- Twitterフォローボタン -->
+    <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+	  <a data-tweet-limit="1" class="twitter-timeline"
+	  href="https://twitter.com/future_techblog"
+	  data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+
+	  <script>!function(d,s,id){var
+	  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+          </div>
+          <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2019 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
