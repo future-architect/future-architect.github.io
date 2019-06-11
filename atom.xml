@@ -213,7 +213,7 @@
     <link href="https://future-architect.github.io/articles/20190604/"/>
     <id>https://future-architect.github.io/articles/20190604/</id>
     <published>2019-06-04T00:00:51.000Z</published>
-    <updated>2019-06-03T23:38:59.205Z</updated>
+    <updated>2019-06-11T15:46:10.324Z</updated>
     
     <content type="html"><![CDATA[<p>うちの会社では、各種クラウドサービスの知見を共有する勉強会を毎週行なっています。弊社ではコンサルティング事業をしていて、次々と多くの案件をこなしているし、各案件の要件も異なるため、自社でもっている知見もバラエティーに富んでいます。既存のサービスではこういう制約があってハマったとか、今回これで作りきったけど、次回クリーンに作り直すならこうしたい、みたいな話が赤裸々に語られる楽しい会です。で、僕はインフラをやることはあまりないのだけど、話を聞くだけでは申し訳ないので、2週間前の会で、最近ハマっているOpenCensusについて紹介しました。</p>
 <p>「分散トレースとは」という話がまとまっていて、初学者に「これ読んどいて」と言えるようなページがなかったので社内向けの資料をベースに技術ブログでも公開します。</p>
@@ -286,13 +286,13 @@
 <li>Zipkin</li>
 <li>Honeycomb</li>
 </ul>
-<h1 id="どうやって出力するのか？"><a href="#どうやって出力するのか？" class="headerlink" title="どうやって出力するのか？"></a>どうやって出力するのか？</h1><h2 id="自動出力"><a href="#自動出力" class="headerlink" title="自動出力"></a>自動出力</h2><p>データの出力は、OpenCensusのAPIで行うが、Instrumentと呼ばれる特別なプラグインを入れると、システムの入出力で勝手にログを取ってくれる。Pythonだと次のようなものが公式で提供されている、</p>
+<h1 id="どうやって出力するのか？"><a href="#どうやって出力するのか？" class="headerlink" title="どうやって出力するのか？"></a>どうやって出力するのか？</h1><h2 id="自動出力"><a href="#自動出力" class="headerlink" title="自動出力"></a>自動出力</h2><p>データの出力は、OpenCensusのAPIで行うが、Integrationと呼ばれる特別なプラグインを入れると、システムの入出力で勝手にログを取ってくれる。Pythonだと次のようなものが公式で提供されている、</p>
 <ul>
 <li>DB API, Django, Flask, Google Cloud Client Library, gRPC, httplib, PostgreSQL, MongoDB, MySQL, Pyramid, Requests, SQLAlchemy, threading</li>
 </ul>
 <p>Node.jsではOpenCensusをimportするだけで、勝手にHTTPのログが出力されるようになる。プロセスをまたぐような通信のログが勝手に取得できる。</p>
 <p>Envoyというコンテナ間の通信プロキシが通信のトレース出力機能を持っているのため、Kubernetesを使うと勝手に出力される</p>
-<h2 id="手動でメトリックスを出力する"><a href="#手動でメトリックスを出力する" class="headerlink" title="手動でメトリックスを出力する"></a>手動でメトリックスを出力する</h2><p>測定したい単位、評価基準をプログラムで作り、定期的にstats.Recordで送信する。アプリケーションでどのようなメトリックスが必要かを考えて項目を設定する。あるいは、既成の自動出力のinstrumentを参考にすると良さそう。</p>
+<h2 id="手動でメトリックスを出力する"><a href="#手動でメトリックスを出力する" class="headerlink" title="手動でメトリックスを出力する"></a>手動でメトリックスを出力する</h2><p>測定したい単位、評価基準をプログラムで作り、定期的にstats.Recordで送信する。アプリケーションでどのようなメトリックスが必要かを考えて項目を設定する。あるいは、既成の自動出力のIntegrationを参考にすると良さそう。</p>
 <p>下記のコードはExporter設定は省略しています</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> main</div><div class="line"></div><div class="line"><span class="keyword">import</span> (</div><div class="line">	<span class="string">"go.opencensus.io/stats"</span></div><div class="line">)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">	mLatencyMs = stats.Float64(<span class="string">"latency"</span>, <span class="string">"The latency in milliseconds"</span>, <span class="string">"ms"</span>)</div><div class="line">	mLines = stats.Int64(<span class="string">"lines_in"</span>, <span class="string">"The number of lines processed"</span>, <span class="string">"1"</span>)</div><div class="line">	mBytesIn = stats.Int64(<span class="string">"bytes_in"</span>, <span class="string">"The number of bytes received"</span>, <span class="string">"By"</span>)</div><div class="line"></div><div class="line">	<span class="comment">// Invoking .M produces measurements that we then record against</span></div><div class="line">	<span class="comment">// a context "ctx" with tags.</span></div><div class="line">	stats.Record(ctx,</div><div class="line">		mLatencyMs.M(<span class="number">17</span>),</div><div class="line">		mLines.M(<span class="number">238</span>),</div><div class="line">		mBytesIn.M(<span class="number">7000</span>))</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>メトリックスの出力先としてPrometheus（PULL型)を設定しておくと、Prometheusが読みにくるためのAPIが作成され、定期的に出力された数値を取得しにくるようになる。</p>
@@ -339,6 +339,10 @@
 <h1 id="その他の情報源"><a href="#その他の情報源" class="headerlink" title="その他の情報源"></a>その他の情報源</h1><p>OpenCensusの情報はまとまっていなかったので、次のページを作ってみました。</p>
 <ul>
 <li><a href="https://github.com/shibukawa/awesome-opencensus" target="_blank" rel="noopener">https://github.com/shibukawa/awesome-opencensus</a></li>
+</ul>
+<p>あとは、Observability JapanというDiscordのグループもあります。</p>
+<ul>
+<li><a href="https://discordapp.com/invite/dcvSbt2" target="_blank" rel="noopener">https://discordapp.com/invite/dcvSbt2</a></li>
 </ul>
 ]]></content>
     
