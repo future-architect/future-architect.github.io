@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>GCPのIAMポリシー周りでドハマりした話 | Future Tech Blog - フューチャーアーキテクト</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="&amp;#x306F;&amp;#x3058;&amp;#x3081;&amp;#x306B;&amp;#x3053;&amp;#x3093;&amp;#x306B;&amp;#x3061;&amp;#x306F;&amp;#x3001;Technology Innovation Group&amp;#x306E;DX&amp;#x30E6;&amp;#x30CB;&amp;#x30C3;&amp;#x30C8;&amp;#x6240;&amp;#x5C5E;&amp;#x306E;&amp;#x6751;&amp;#x7530;&amp;#x3068;&amp;#x">
+<meta name="keywords" content="GCP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GCPのIAMポリシー周りでドハマりした話">
+<meta property="og:url" content="https://future-architect.github.io/articles/20190708/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="&amp;#x306F;&amp;#x3058;&amp;#x3081;&amp;#x306B;&amp;#x3053;&amp;#x3093;&amp;#x306B;&amp;#x3061;&amp;#x306F;&amp;#x3001;Technology Innovation Group&amp;#x306E;DX&amp;#x30E6;&amp;#x30CB;&amp;#x30C3;&amp;#x30C8;&amp;#x6240;&amp;#x5C5E;&amp;#x306E;&amp;#x6751;&amp;#x7530;&amp;#x3068;&amp;#x">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20190708/photo_20190708_01.png">
+<meta property="og:updated_time" content="2019-07-07T23:59:10.264Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GCPのIAMポリシー周りでドハマりした話">
+<meta name="twitter:description" content="&amp;#x306F;&amp;#x3058;&amp;#x3081;&amp;#x306B;&amp;#x3053;&amp;#x3093;&amp;#x306B;&amp;#x3061;&amp;#x306F;&amp;#x3001;Technology Innovation Group&amp;#x306E;DX&amp;#x30E6;&amp;#x30CB;&amp;#x30C3;&amp;#x30C8;&amp;#x6240;&amp;#x5C5E;&amp;#x306E;&amp;#x6751;&amp;#x7530;&amp;#x3068;&amp;#x">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20190708/photo_20190708_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="GCPのIAMポリシー周りでドハマりした話 | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="GCPのIAMポリシー周りでドハマりした話,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Tech Blog</div>
+        <div class="header-title-sub">フューチャーアーキテクト開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20190708/">GCPのIAMポリシー周りでドハマりした話</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20190708-gcp-iam" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> 村田靖拓</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2019-07-07T23:33:22.000Z" itemprop="datePublished">2019/07/08</time>
+
+	</li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+	  
+  
+    <a href="/tags/GCP/" title="GCP">GCP</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    Categories:
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="&#x306F;&#x3058;&#x3081;&#x306B;"><a href="#&#x306F;&#x3058;&#x3081;&#x306B;" class="headerlink" title="&#x306F;&#x3058;&#x3081;&#x306B;"></a>&#x306F;&#x3058;&#x3081;&#x306B;</h1><p>&#x3053;&#x3093;&#x306B;&#x3061;&#x306F;&#x3001;Technology Innovation Group&#x306E;DX&#x30E6;&#x30CB;&#x30C3;&#x30C8;&#x6240;&#x5C5E;&#x306E;<a href="https://twitter.com/famipapamart" target="_blank" rel="noopener">&#x6751;&#x7530;</a>&#x3068;&#x7533;&#x3057;&#x307E;&#x3059;&#xFF01;<br>DX&#x30E6;&#x30CB;&#x30C3;&#x30C8;&#x3068;&#x306F;&#x30C7;&#x30B8;&#x30BF;&#x30EB;&#x30C8;&#x30E9;&#x30F3;&#x30B9;&#x30D5;&#x30A9;&#x30FC;&#x30E1;&#x30FC;&#x30B7;&#x30E7;&#x30F3;&#x306B;&#x95A2;&#x308F;&#x308B;&#x4ED5;&#x4E8B;&#x3092;&#x4E3B;&#x306B;&#x63A8;&#x9032;&#x3057;&#x3066;&#x3044;&#x304F;&#x30C1;&#x30FC;&#x30E0;&#x3067;&#x3059;&#x3002;<br>&#x79C1;&#x306F;&#x73FE;&#x5728;<a href="https://www.future.co.jp/about_us/#tab-iot" target="_blank" rel="noopener">Future IoT</a>&#x30D7;&#x30ED;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x306B;&#x643A;&#x308F;&#x3063;&#x3066;&#x304A;&#x308A;&#x3001;&#x6700;&#x8FD1;&#x306F;&#x3082;&#x3063;&#x3071;&#x3089;&#x30AF;&#x30E9;&#x30A6;&#x30C9;&#x30A4;&#x30F3;&#x30D5;&#x30E9;&#x306B;&#x5F93;&#x4E8B;&#x3057;&#x3066;&#x3044;&#x307E;&#x3059;&#x3002;</p>
+<p>&#x30E1;&#x30A4;&#x30F3;&#x306E;&#x3057;&#x3054;&#x3068;&#x306F;&#x8907;&#x6570;&#x306E;Google Cloud Platform(&#x4EE5;&#x4E0B;&#x3001;GCP)&#x30D7;&#x30ED;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x3068;&#x305D;&#x308C;&#x305E;&#x308C;&#x306E;&#x74B0;&#x5883;&#xFF08;Production/Staging/Development&#x306A;&#x3069;&#xFF09;&#x306E;&#x69CB;&#x7BC9;&#x30FB;&#x904B;&#x7528;&#x3067;&#x3059;&#x3002;<br>&#x3053;&#x306E;&#x4E2D;&#x3067;&#x500B;&#x4EBA;&#x7684;&#x306B;&#x3068;&#x3066;&#x3082;&#x9762;&#x767D;&#x3044;&#x3068;&#x601D;&#x3063;&#x305F;&#x77E5;&#x898B;&#x3092;&#x5F97;&#x305F;&#x306E;&#x3067;&#x300C;&#x3053;&#x308C;&#x306F;&#x305C;&#x3072;&#x30D6;&#x30ED;&#x30B0;&#x306B;&#x3057;&#x3088;&#x3046;&#xFF01;&#x300D;&#x3068;&#x3044;&#x307E;&#x7B46;&#x3092;&#x8D70;&#x3089;&#x305B;&#x3066;&#x3044;&#x307E;&#x3059;&#x3002;</p>
+<h1 id="&#x30AF;&#x30E9;&#x30A6;&#x30C9;&#x30A4;&#x30F3;&#x30D5;&#x30E9;&#x306E;&#x4F7F;&#x547D;"><a href="#&#x30AF;&#x30E9;&#x30A6;&#x30C9;&#x30A4;&#x30F3;&#x30D5;&#x30E9;&#x306E;&#x4F7F;&#x547D;" class="headerlink" title="&#x30AF;&#x30E9;&#x30A6;&#x30C9;&#x30A4;&#x30F3;&#x30D5;&#x30E9;&#x306E;&#x4F7F;&#x547D;"></a>&#x30AF;&#x30E9;&#x30A6;&#x30C9;&#x30A4;&#x30F3;&#x30D5;&#x30E9;&#x306E;&#x4F7F;&#x547D;</h1><p>&#x30AF;&#x30E9;&#x30A6;&#x30C9;&#x30A4;&#x30F3;&#x30D5;&#x30E9;&#x3068;&#x4E00;&#x8A00;&#x3067;&#x8A00;&#x3063;&#x3066;&#x3082;&#x610F;&#x5473;&#x3059;&#x308B;&#x7BC4;&#x56F2;&#x306F;&#x3068;&#x3066;&#x3082;&#x5E83;&#x3044;&#x3067;&#x3059;&#x304C;&#x3001;&#x79C1;&#x304C;&#x3053;&#x306E;&#x30D6;&#x30ED;&#x30B0;&#x3067;&#x7D39;&#x4ECB;&#x3059;&#x308B;&#x5185;&#x5BB9;&#x306F;&#x3069;&#x3061;&#x3089;&#x304B;&#x3068;&#x3044;&#x3046;&#x3068;&#x5730;&#x5473;&#x304B;&#x3082;&#x3057;&#x308C;&#x307E;&#x305B;&#x3093;&#x3002;</p>
+<p>&#x79C1;&#x304C;&#x4ECA;&#x65E5;&#x7D39;&#x4ECB;&#x3057;&#x305F;&#x3044;&#x306E;&#x306F;&#x3001;GCP&#x306E;&#x300C;IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x7BA1;&#x7406;&#x306E;&#x91CD;&#x8981;&#x6027;&#x300D;&#x3067;&#x3059;&#x3002;</p>
+<h2 id="Infrastructure-as-a-Code-&#x306E;&#x5FB9;&#x5E95;"><a href="#Infrastructure-as-a-Code-&#x306E;&#x5FB9;&#x5E95;" class="headerlink" title="Infrastructure as a Code &#x306E;&#x5FB9;&#x5E95;"></a>Infrastructure as a Code &#x306E;&#x5FB9;&#x5E95;</h2><p>Infrastructure as a Code &#x3068;&#x3044;&#x3046;&#x3082;&#x306E;&#x306E;&#x6982;&#x5FF5;&#x306B;&#x3064;&#x3044;&#x3066;&#x306F;&#x6628;&#x4ECA;&#x591A;&#x304F;&#x306E;&#x65B9;&#x304C;&#x81EA;&#x5206;&#x306A;&#x308A;&#x306E;&#x7406;&#x89E3;&#x3092;&#x6301;&#x3061;&#x3001;&#x305D;&#x308C;&#x3092;&#x5B9F;&#x52D9;&#x306B;&#x6D3B;&#x304B;&#x3059;&#x3079;&#x304F;&#x5B9F;&#x8DF5;&#x3059;&#x308B;&#x30D5;&#x30A7;&#x30FC;&#x30BA;&#x306B;&#x81F3;&#x3063;&#x3066;&#x3044;&#x308B;&#x304B;&#x3068;&#x601D;&#x3044;&#x307E;&#x3059;&#x304C;&#x3001;&#x79C1;&#x306E;&#x30D7;&#x30ED;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x3082;&#x4F8B;&#x5916;&#x3067;&#x306F;&#x3042;&#x308A;&#x307E;&#x305B;&#x3093;&#x3002;</p>
+<p>&#x305F;&#x3068;&#x3048;&#x3070;&#x79C1;&#x306E;&#x73FE;&#x5728;&#x306E;&#x30D7;&#x30ED;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x3067;&#x306F;Terraform&#x3092;&#x5229;&#x7528;&#x3057;&#x3066;GCP&#x30EA;&#x30BD;&#x30FC;&#x30B9;&#x3092;&#x7BA1;&#x7406;&#x3057;&#x3066;&#x304A;&#x308A;&#x3001;&#x305D;&#x306E;&#x904B;&#x7528;&#x3084;&#x4F55;&#x3092;&#x3069;&#x3053;&#x307E;&#x3067;&#x30B9;&#x30AF;&#x30EA;&#x30D7;&#x30C8;&#x5316;&#x3057;&#x305F;&#x308A;&#x81EA;&#x52D5;&#x5316;&#x3059;&#x308B;&#x304B;&#x306B;&#x3064;&#x3044;&#x3066;&#x65E5;&#x3005;&#x30E1;&#x30F3;&#x30D0;&#x30FC;&#x3068;&#x982D;&#x3092;&#x60A9;&#x307E;&#x305B;&#x3066;&#x3044;&#x307E;&#x3059;&#x3002;<br>(Cloud Deployment Manager&#x3092;&#x4F7F;&#x308F;&#x306A;&#x3044;&#x306E;&#xFF1F;&#x3068;&#x3044;&#x3046;&#x58F0;&#x3082;&#x805E;&#x3053;&#x3048;&#x3066;&#x304D;&#x305D;&#x3046;&#x3067;&#x3059;&#x304C;&#x3001;&#x8272;&#x3005;&#x306A;&#x4E8B;&#x60C5;&#x304C;&#x3042;&#x308A;&#x30E1;&#x30A4;&#x30F3;&#x306E;&#x30C4;&#x30FC;&#x30EB;&#x306F;Terraform&#x3092;&#x5229;&#x7528;&#x3057;&#x3066;&#x3044;&#x307E;&#x3059;)</p>
+<p>&#x3055;&#x3066;&#x3001;&#x8A71;&#x3092;&#x5143;&#x306B;&#x623B;&#x3057;&#x307E;&#x3059;&#x304C;&#x3001;&#x3053;&#x306E;&#x300C;&#x30EA;&#x30BD;&#x30FC;&#x30B9;&#x3092;&#x30B9;&#x30AF;&#x30EA;&#x30D7;&#x30C8;&#x7BA1;&#x7406;&#x3059;&#x308B;&#x300D;&#x3068;&#x3044;&#x3046;&#x3053;&#x3068;&#x306B;&#x306F;&#x5927;&#x4E8B;&#x306A;&#x524D;&#x63D0;&#x304C;&#x3042;&#x308A;&#x307E;&#x3059;&#x3002;<br>&#x305D;&#x308C;&#x306F;&#x3059;&#x306A;&#x308F;&#x3061;&#x300C;&#x30B9;&#x30AF;&#x30EA;&#x30D7;&#x30C8;&#x3068;&#x5B9F;&#x30EA;&#x30BD;&#x30FC;&#x30B9;&#x306B;&#x30BA;&#x30EC;&#x304C;&#x7121;&#x3044;&#x300D;&#x3068;&#x3044;&#x3046;&#x3053;&#x3068;&#x3067;&#x3059;&#x3002;</p>
+<p>&#x500B;&#x4EBA;&#x3067;&#x6271;&#x3046;GCP&#x30D7;&#x30ED;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x306A;&#x3089;&#x307E;&#x3060;&#x3057;&#x3082;&#x3001;&#x8907;&#x6570;&#x4EBA;&#xFF08;&#x3057;&#x304B;&#x3082;&#x8907;&#x6570;&#x30D9;&#x30F3;&#x30C0;&#x30FC;&#xFF09;&#x304C;&#x540C;&#x6642;&#x306B;&#x6271;&#x3046;&#x30D7;&#x30ED;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x3068;&#x3082;&#x306A;&#x308C;&#x3070;&#x30BA;&#x30EC;&#x3092;&#x7121;&#x304F;&#x3057;&#x6574;&#x5408;&#x6027;&#x3092;&#x4FDD;&#x3064;&#x306E;&#x306B;&#x3082;&#x4E00;&#x82E6;&#x52B4;&#x3067;&#x3059;&#x3002;</p>
+<p>&#x3082;&#x3061;&#x308D;&#x3093;&#x3001;&#x672C;&#x756A;&#x74B0;&#x5883;&#x3084;&#x30B9;&#x30C6;&#x30FC;&#x30B8;&#x30F3;&#x30B0;&#x74B0;&#x5883;&#x3067;&#x3042;&#x308C;&#x3070;&#x30A4;&#x30F3;&#x30D5;&#x30E9;&#x30C1;&#x30FC;&#x30E0;&#x3068;&#x30A2;&#x30D7;&#x30EA;&#x30B1;&#x30FC;&#x30B7;&#x30E7;&#x30F3;&#x958B;&#x767A;&#x30C1;&#x30FC;&#x30E0;&#x3068;&#x306E;&#x68F2;&#x307F;&#x5206;&#x3051;&#x3092;&#x3057;&#x3063;&#x304B;&#x308A;&#x884C;&#x3046;&#x3067;&#x3057;&#x3087;&#x3046;&#x304B;&#x3089;&#x3001;&#x4E0A;&#x8A18;&#x306E;&#x3088;&#x3046;&#x306A;&#x72B6;&#x614B;&#x306B;&#x306F;&#x306A;&#x3089;&#x306A;&#x3044;&#x3067;&#x3057;&#x3087;&#x3046;&#x3002;</p>
+<p>&#x3057;&#x304B;&#x3057;&#x3001;&#x521D;&#x671F;&#x306E;&#x958B;&#x767A;&#x74B0;&#x5883;&#x3084;&#x8CA0;&#x8377;&#x30C6;&#x30B9;&#x30C8;&#x74B0;&#x5883;&#x306A;&#x3069;&#x306F;&#x3001;&#x30A2;&#x30D7;&#x30EA;&#x30C1;&#x30FC;&#x30E0;&#x5074;&#x3067;&#x3082;&#x30B5;&#x30F3;&#x30C9;&#x30DC;&#x30C3;&#x30AF;&#x30B9;&#x7684;&#x306B;&#x3042;&#x308B;&#x7A0B;&#x5EA6;&#x81EA;&#x7531;&#x306B;&#x30A4;&#x30F3;&#x30D5;&#x30E9;&#x64CD;&#x4F5C;&#x3092;&#x3057;&#x305F;&#x3044;&#x3068;&#x3044;&#x3046;&#x8981;&#x671B;&#x3082;&#x3042;&#x308A;&#x3001;&#x3067;&#x306F;&#x3053;&#x306E;&#x6A29;&#x9650;&#x3092;&#x4ED8;&#x4E0E;&#x3057;&#x3066;&#x2026;&#x3068;&#x3064;&#x3044;&#x306A;&#x3063;&#x3066;&#x3057;&#x307E;&#x3044;&#x304C;&#x3061;&#x3067;&#x3059;&#x3002;</p>
+<p>&#x30AF;&#x30E9;&#x30A6;&#x30C9;&#x306A;&#x6642;&#x4EE3;&#x3067;&#x3059;&#x3057;&#x3001;&#x30EA;&#x30BD;&#x30FC;&#x30B9;&#x306B;&#x5909;&#x66F4;&#x3092;&#x52A0;&#x3048;&#x305F;&#x3044;&#x3068;&#x304D;&#x306F;&#x30B3;&#x30F3;&#x30BD;&#x30FC;&#x30EB;&#x3067;&#x30DD;&#x30C1;&#x30C3;&#x3068;&#x3084;&#x308C;&#x3066;&#x3057;&#x307E;&#x3044;&#x307E;&#x3059;&#x3002;<br>&#x3053;&#x308C;&#x306F;&#x30AF;&#x30E9;&#x30A6;&#x30C9;&#x306E;&#x30E1;&#x30EA;&#x30C3;&#x30C8;&#x3067;&#x3042;&#x308A;&#x5927;&#x304D;&#x306A;&#x5F37;&#x307F;&#x3067;&#x3059;&#x3002;<br>&#x305F;&#x3060;&#x305D;&#x306E;&#x4E00;&#x65B9;&#x3067;&#x3001;&#x4ECA;&#x56DE;&#x63A8;&#x3057;&#x9032;&#x3081;&#x305F;&#x3044; Infrastructure as a Code &#x306B;&#x3068;&#x3063;&#x3066;&#x306F;&#x9023;&#x7D61;&#x306A;&#x3057;&#x306B;&#x3044;&#x3064;&#x306E;&#x9593;&#x306B;&#x304B;&#x30EA;&#x30BD;&#x30FC;&#x30B9;&#x304C;&#x5897;&#x3048;&#x3066;&#x3044;&#x308B;&#x3068;&#x3044;&#x3063;&#x305F;&#x90AA;&#x60AA;&#x306A;&#x6575;&#x306B;&#x3082;&#x306A;&#x308A;&#x5F97;&#x307E;&#x3059;&#x3002;</p>
+<p>&#x30A4;&#x30F3;&#x30D5;&#x30E9;&#x30B9;&#x30AF;&#x30EA;&#x30D7;&#x30C8;&#x3092;&#x7BA1;&#x7406;&#x3059;&#x308B;&#x30C1;&#x30FC;&#x30E0;&#x3068;&#x5B9F;&#x969B;&#x306B;&#x30EA;&#x30BD;&#x30FC;&#x30B9;&#x3092;&#x5229;&#x7528;&#x3059;&#x308B;&#x30C1;&#x30FC;&#x30E0;&#x304C;&#x5225;&#x3067;&#x3001;&#x4E92;&#x3044;&#x306E;&#x30B3;&#x30DF;&#x30E5;&#x30CB;&#x30B1;&#x30FC;&#x30B7;&#x30E7;&#x30F3;&#x4E0D;&#x8DB3;&#x304B;&#x3089;&#x30B9;&#x30AF;&#x30EA;&#x30D7;&#x30C8;&#x3068;&#x5B9F;&#x30EA;&#x30BD;&#x30FC;&#x30B9;&#x304C;&#x4E56;&#x96E2;&#x3001;&#x3069;&#x3093;&#x3069;&#x3093;&#x30AB;&#x30AA;&#x30B9;&#x5316;&#x3057;&#x3066;&#x3044;&#x304F;&#x2026;&#x3068;&#x3044;&#x3046;&#x72B6;&#x6CC1;&#x306F;&#x60F3;&#x50CF;&#x306B;&#x96E3;&#x304F;&#x306A;&#x3044;&#x306F;&#x305A;&#x3067;&#x3059;&#x3002;</p>
+<h2 id="IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x7BA1;&#x7406;&#x306E;&#x91CD;&#x8981;&#x6027;"><a href="#IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x7BA1;&#x7406;&#x306E;&#x91CD;&#x8981;&#x6027;" class="headerlink" title="IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x7BA1;&#x7406;&#x306E;&#x91CD;&#x8981;&#x6027;"></a>IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x7BA1;&#x7406;&#x306E;&#x91CD;&#x8981;&#x6027;</h2><p>&#x30AB;&#x30AA;&#x30B9;&#x306A;&#x72B6;&#x6CC1;&#x3092;&#x6253;&#x958B;&#x3059;&#x308B;&#x305F;&#x3081;&#x306E;&#x65BD;&#x7B56;&#x306F;&#x69D8;&#x3005;&#x8003;&#x3048;&#x3089;&#x308C;&#x307E;&#x3059;&#x304C;&#x3001;&#x79C1;&#x304C;&#x4ECA;&#x56DE;&#x9078;&#x629E;&#x3057;&#x305F;&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x306F;&#x300C;IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x7BA1;&#x7406;&#x3092;&#x5FB9;&#x5E95;&#x3059;&#x308B;&#x300D;&#x3068;&#x3044;&#x3046;&#x81F3;&#x6975;&#x666E;&#x901A;&#x306A;&#x5F53;&#x305F;&#x308A;&#x524D;&#x306E;&#x3082;&#x306E;&#x3067;&#x3057;&#x305F;&#x3002;<br>&#x57FA;&#x672C;&#x306B;&#x5FE0;&#x5B9F;&#x3067;&#x3042;&#x308B;&#x3053;&#x3068;&#x306F;&#x975E;&#x5E38;&#x306B;&#x5927;&#x4E8B;&#x3060;&#x306A;&#x3068;&#x65E5;&#x3005;&#x611F;&#x3058;&#x3066;&#x3044;&#x307E;&#x3059;</p>
+<p>&#x540C;&#x6642;&#x306B;&#x3001;&#x521D;&#x671F;&#x306E;&#x958B;&#x767A;&#x74B0;&#x5883;&#x306F;IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x3092;&#x7DE9;&#x3081;&#x3001;&#x3060;&#x308C;&#x3067;&#x3082;&#x30A4;&#x30F3;&#x30D5;&#x30E9;&#x64CD;&#x4F5C;&#x3092;&#x884C;&#x3048;&#x308B;&#x53CD;&#x9762;&#x3001;&#x3053;&#x306E;&#x6BB5;&#x968E;&#x3067;&#x306F;Terraform&#x3067;&#x306E;&#x904B;&#x7528;&#x3092;&#x884C;&#x308F;&#x306A;&#x3044;&#x5272;&#x308A;&#x5207;&#x308A;&#x307E;&#x3057;&#x305F;&#x3002;<br>&#x305D;&#x306E;&#x6B21;&#x306E;&#x958B;&#x767A;&#x30D5;&#x30A7;&#x30FC;&#x30BA;&#x304B;&#x3089;&#x306F;&#x30A2;&#x30D7;&#x30EA;&#x30C1;&#x30FC;&#x30E0;&#x306E;&#x7533;&#x8ACB;&#x30D9;&#x30FC;&#x30B9;&#x3067;Terraform&#x5316;&#x3092;&#x884C;&#x3044;&#x3057;&#x3063;&#x304B;&#x308A;&#x7BA1;&#x7406;&#x3059;&#x308B;&#x3088;&#x3046;&#x306A;&#x30D5;&#x30ED;&#x30FC;&#x3092;&#x6574;&#x3048;&#x307E;&#x3057;&#x305F;&#x3002;</p>
+<p>IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x7BA1;&#x7406;&#x3068;&#x904B;&#x7528;&#x30D5;&#x30ED;&#x30FC;&#x306E;&#x6574;&#x5099;&#x3092;&#x5FB9;&#x5E95;&#x3059;&#x308B;&#x3053;&#x3068;&#x3067;&#x4E88;&#x671F;&#x305B;&#x306C;&#x5909;&#x66F4;&#x304C;&#x305D;&#x3082;&#x305D;&#x3082;&#x8D77;&#x3053;&#x308A;&#x3048;&#x306A;&#x3044;&#x72B6;&#x6CC1;&#x3092;&#x4F5C;&#x308A;&#x51FA;&#x3057;&#x3001;&#x5143;&#x3005;&#x63A8;&#x3057;&#x9032;&#x3081;&#x305F;&#x304B;&#x3063;&#x305F; Infrastructure as a Code &#x306E;&#x5B9F;&#x73FE;&#x306B;&#x5C11;&#x3057;&#x305A;&#x3064;&#x8FD1;&#x3065;&#x3051;&#x3066;&#x3044;&#x304D;&#x307E;&#x3057;&#x305F;&#x3002;</p>
+<h1 id="&#x4ECA;&#x56DE;&#x30CF;&#x30DE;&#x3063;&#x305F;&#x30DD;&#x30A4;&#x30F3;&#x30C8;-Cloud-Function&#x3068;&#x306E;&#x95D8;&#x3044;"><a href="#&#x4ECA;&#x56DE;&#x30CF;&#x30DE;&#x3063;&#x305F;&#x30DD;&#x30A4;&#x30F3;&#x30C8;-Cloud-Function&#x3068;&#x306E;&#x95D8;&#x3044;" class="headerlink" title="&#x4ECA;&#x56DE;&#x30CF;&#x30DE;&#x3063;&#x305F;&#x30DD;&#x30A4;&#x30F3;&#x30C8; Cloud Function&#x3068;&#x306E;&#x95D8;&#x3044;"></a>&#x4ECA;&#x56DE;&#x30CF;&#x30DE;&#x3063;&#x305F;&#x30DD;&#x30A4;&#x30F3;&#x30C8; <del>Cloud Function&#x3068;&#x306E;&#x95D8;&#x3044;</del></h1><p>&#x3068;&#x3001;&#x3053;&#x3053;&#x307E;&#x3067;&#x9577;&#x3044;&#x524D;&#x7F6E;&#x304D;&#x3068;&#x306A;&#x308A;&#x307E;&#x3057;&#x305F;&#x304C;&#x3001;&#x3084;&#x3063;&#x3068;&#x30E1;&#x30A4;&#x30F3;&#x30CD;&#x30BF;&#x3067;&#x3059;&#x3002;<br>IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x306E;&#x7BA1;&#x7406;&#x3046;&#x3093;&#x306C;&#x3093;&#x3001;&#x307F;&#x305F;&#x3044;&#x306A;&#x8A71;&#x3092;&#x3057;&#x3066;&#x304D;&#x307E;&#x3057;&#x305F;&#x304C;&#x3001;&#x5225;&#x306B;&#x300C;&#x7BA1;&#x7406;&#x304C;&#x5927;&#x5909;&#x306A;&#x3093;&#x3058;&#x3083;&#x300D;&#x3068;&#x304B;&#x300C;&#x7BA1;&#x7406;&#xFF57;&#x30AB;&#x30AA;&#x30B9;&#xFF57;&#xFF57;&#x300D;&#x3068;&#x304B;&#x8A00;&#x3044;&#x305F;&#x3044;&#x308F;&#x3051;&#x3067;&#x306F;&#x306A;&#x3044;&#x3067;&#x3059;&#x3002;&#x7B11;</p>
+<p>&#x6700;&#x521D;&#x306B;&#x7D50;&#x8AD6;&#x3092;&#x8A00;&#x3063;&#x3066;&#x3057;&#x307E;&#x3046;&#x306E;&#x3067;&#x3059;&#x304C;&#x3001;&#x300C;GCP&#x306B;&#x304A;&#x3051;&#x308B;&#x30AA;&#x30FC;&#x30CA;&#x30FC;&#x6A29;&#x9650;&#x306F;&#x6700;&#x5F37;&#x3067;&#x306F;&#x306A;&#x3044;&#x300D;&#x3068;&#x3044;&#x3046;&#x77E5;&#x898B;&#x3092;&#x5F97;&#x307E;&#x3057;&#x305F;&#x3002;<br>&#x3053;&#x308C;&#x304C;&#x3053;&#x306E;&#x30A8;&#x30F3;&#x30C8;&#x30EA;&#x30FC;&#x3067;&#x4E00;&#x756A;&#x4F1D;&#x3048;&#x305F;&#x3044;&#x3053;&#x3068;&#x3067;&#x3001;IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x5468;&#x308A;&#x306E;&#x4ED5;&#x4E8B;&#x3092;&#x9032;&#x3081;&#x308B;&#x4E2D;&#x3067;&#x5F97;&#x305F;&#x79C1;&#x306E;&#x4E00;&#x756A;&#x306E;&#x77E5;&#x898B;&#x3067;&#x3059;&#x3002;</p>
+<h2 id="Google&#x7BA1;&#x7406;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x3068;&#x306F;&#xFF1F;"><a href="#Google&#x7BA1;&#x7406;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x3068;&#x306F;&#xFF1F;" class="headerlink" title="Google&#x7BA1;&#x7406;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x3068;&#x306F;&#xFF1F;"></a>Google&#x7BA1;&#x7406;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x3068;&#x306F;&#xFF1F;</h2><p>&#x4E00;&#x77AC;&#x8A71;&#x306F;&#x5909;&#x308F;&#x308A;&#x307E;&#x3059;&#x304C;&#x3001;&#x7686;&#x3055;&#x3093;GCP&#x306E;Google&#x7BA1;&#x7406;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x3063;&#x3066;&#x3054;&#x5B58;&#x77E5;&#x3067;&#x3059;&#x304B;&#xFF1F;<br><img src="/images/20190708/photo_20190708_01.png"><br>&#x2191;&#x2191;<br>&#x3053;&#x308C;&#x3067;&#x3059;&#x306D;&#x3002;</p>
+<p><a href="https://cloud.google.com/iam/docs/service-accounts?&amp;_ga=2.185771177.-1847946762.1548816048#google-managed_service_accounts" target="_blank" rel="noopener">&#x516C;&#x5F0F;&#x30DA;&#x30FC;&#x30B8;</a>&#x306B;&#x3088;&#x308B;&#x3068;&#x2026;</p>
+<blockquote>
+<p>Google &#x7BA1;&#x7406;&#x30B5;&#x30FC;&#x30D3;&#x30B9; &#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;<br>&#x30E6;&#x30FC;&#x30B6;&#x30FC;&#x304C;&#x7BA1;&#x7406;&#x3059;&#x308B;&#x30B5;&#x30FC;&#x30D3;&#x30B9; &#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x306B;&#x52A0;&#x3048;&#x3066;&#x3001;&#x30D7;&#x30ED;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x306E; IAM &#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x307E;&#x305F;&#x306F; GCP Console &#x306B;&#x3044;&#x304F;&#x3064;&#x304B;&#x306E;&#x8FFD;&#x52A0;&#x30B5;&#x30FC;&#x30D3;&#x30B9; &#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x304C;&#x8868;&#x793A;&#x3055;&#x308C;&#x308B;&#x3053;&#x3068;&#x304C;&#x3042;&#x308A;&#x307E;&#x3059;&#x3002;&#x3053;&#x308C;&#x3089;&#x306E;&#x30B5;&#x30FC;&#x30D3;&#x30B9; &#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x306F; Google &#x304C;&#x4F5C;&#x6210;&#x3057;&#x6240;&#x6709;&#x3057;&#x3066;&#x3044;&#x307E;&#x3059;&#x3002;&#x3053;&#x308C;&#x3089;&#x306E;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x306F;&#x3055;&#x307E;&#x3056;&#x307E;&#x306A; Google &#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x3092;&#x8868;&#x3057;&#x3001;&#x5404;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x306B;&#x306F; GCP &#x30D7;&#x30ED;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x306B;&#x30A2;&#x30AF;&#x30BB;&#x30B9;&#x3059;&#x308B;&#x305F;&#x3081;&#x306E; IAM &#x306E;&#x5F79;&#x5272;&#x304C;&#x81EA;&#x52D5;&#x7684;&#x306B;&#x4ED8;&#x4E0E;&#x3055;&#x308C;&#x307E;&#x3059;&#x3002;</p>
+</blockquote>
+<p>&#x2026;&#x3068;&#x3042;&#x308A;&#x307E;&#x3059;&#x3002;<br>&#x66F8;&#x3044;&#x3066;&#x3042;&#x308B;&#x901A;&#x308A;&#x3067;&#x3059;&#x304C;&#x3001;GCP&#x5074;&#x304C;&#x5229;&#x7528;&#x3059;&#x308B;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x306B;&#x5FDC;&#x3058;&#x3066;&#x81EA;&#x52D5;&#x7684;&#x306B;&#x8FFD;&#x52A0;&#x3057;&#x3066;&#x304F;&#x308C;&#x308B;IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x3067;&#x3059;&#x3002;<br>&#x4F8B;&#x3048;&#x3070;&#x4E0A;&#x5199;&#x771F;&#x306B;&#x3042;&#x308B;<code>Cloud Functions Service Agent</code>&#x3068;&#x306F;&#x305D;&#x306E;&#x540D;&#x306E;&#x901A;&#x308A;Cloud Functions&#x3092;&#x5229;&#x7528;&#x3059;&#x308B;&#x969B;&#x306B;&#x81EA;&#x52D5;&#x7684;&#x306B;&#x8FFD;&#x52A0;&#x3055;&#x308C;&#x307E;&#x3059;&#x3002;</p>
+<p>&#x3053;&#x308C;&#x3089;&#x306E;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x306F;&#x5404;GCP&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x3092;&#x52D5;&#x4F5C;&#x3055;&#x305B;&#x308B;&#x305F;&#x3081;&#x306B;&#x5FC5;&#x8981;&#x306A;&#x3082;&#x306E;&#x3067;&#x3001;&#x3053;&#x306E;IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x304C;&#x306A;&#x3051;&#x308C;&#x3070;&#x30A2;&#x30D7;&#x30EA;&#x30B1;&#x30FC;&#x30B7;&#x30E7;&#x30F3;&#x52D5;&#x4F5C;&#x6642;&#x306B;<code>Permission Denied Error</code>&#x7B49;&#x767A;&#x751F;&#x3057;&#x3066;&#x3057;&#x307E;&#x3044;&#x307E;&#x3059;&#x3002;</p>
+<h2 id="IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x3063;&#x3066;&#x597D;&#x304D;&#x52DD;&#x624B;&#x6D88;&#x305B;&#x308B;&#x3093;&#x3067;&#x3059;"><a href="#IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x3063;&#x3066;&#x597D;&#x304D;&#x52DD;&#x624B;&#x6D88;&#x305B;&#x308B;&#x3093;&#x3067;&#x3059;" class="headerlink" title="IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x3063;&#x3066;&#x597D;&#x304D;&#x52DD;&#x624B;&#x6D88;&#x305B;&#x308B;&#x3093;&#x3067;&#x3059;"></a>IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x3063;&#x3066;&#x597D;&#x304D;&#x52DD;&#x624B;&#x6D88;&#x305B;&#x308B;&#x3093;&#x3067;&#x3059;</h2><p>&#x30AA;&#x30FC;&#x30CA;&#x30FC;&#x6A29;&#x9650;&#x3092;&#x6301;&#x3063;&#x3066;&#x3044;&#x308C;&#x3070;IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x306E;&#x8FFD;&#x52A0;&#x30FB;&#x7DE8;&#x96C6;&#x30FB;&#x524A;&#x9664;&#x304C;&#x81EA;&#x7531;&#x306B;&#x884C;&#x3048;&#x308B;&#x306E;&#x306F;&#x7686;&#x3055;&#x3093;&#x3054;&#x5B58;&#x77E5;&#x306E;&#x901A;&#x308A;&#x304B;&#x3068;&#x601D;&#x3044;&#x307E;&#x3059;&#x304C;&#x3001;&#x3053;&#x308C;&#x306F;Google&#x7BA1;&#x7406;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x3082;&#x4F8B;&#x5916;&#x3067;&#x306F;&#x3042;&#x308A;&#x307E;&#x305B;&#x3093;&#x3002;<br>&#x305D;&#x3046;&#x306A;&#x3093;&#x3067;&#x3059;&#x3001; <strong>&#x300C;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x306E;&#x52D5;&#x4F5C;&#x306B;&#x5FC5;&#x8981;&#x306A;&#x81EA;&#x52D5;&#x4F5C;&#x6210;&#x3055;&#x308C;&#x308B;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x300D;&#x3082;&#x81EA;&#x7531;&#x306B;&#x7DE8;&#x96C6;&#x30FB;&#x524A;&#x9664;&#x3067;&#x304D;&#x3066;&#x3057;&#x307E;&#x3046;</strong> &#x306E;&#x3067;&#x3059;&#x3002;</p>
+<h2 id="&#x6DF1;&#x3044;&#x6CBC;&#x3067;&#x3057;&#x305F;"><a href="#&#x6DF1;&#x3044;&#x6CBC;&#x3067;&#x3057;&#x305F;" class="headerlink" title="&#x6DF1;&#x3044;&#x6CBC;&#x3067;&#x3057;&#x305F;"></a>&#x6DF1;&#x3044;&#x6CBC;&#x3067;&#x3057;&#x305F;</h2><p>&#x6DF1;&#x3044;&#x6CBC;&#x3067;&#x3057;&#x305F;&#xFF08;2&#x56DE;&#x76EE;&#xFF09;<br>&#x3068;&#x3044;&#x3046;&#x306E;&#x3082;&#x3001;&#x3053;&#x306E;Google&#x7BA1;&#x7406;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x3001;&#x65B0;&#x898F;&#x306B;&#x30D7;&#x30ED;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x3092;&#x4F5C;&#x6210;&#x3057;&#x3066;&#x6700;&#x521D;&#x306B;&#x8A72;&#x5F53;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x3092;&#x5229;&#x7528;&#x3059;&#x308B;&#x969B;&#x306B;&#x4F5C;&#x6210;&#x3055;&#x308C;&#x307E;&#x3059;&#x304C;&#x3001;&#x305D;&#x306E;&#x5F8C;&#x306F;&#x81EA;&#x52D5;&#x7684;&#x306B;&#x4F5C;&#x6210;&#x3055;&#x308C;&#x308B;&#x3053;&#x3068;&#x306F;&#x3042;&#x308A;&#x307E;&#x305B;&#x3093;&#x3002;<br>&#x4E00;&#x5EA6;&#x7DE8;&#x96C6;&#x30FB;&#x524A;&#x9664;&#x3057;&#x3066;&#x3057;&#x307E;&#x3063;&#x305F;&#x3089;&#x6700;&#x5F8C;&#x3001;&#x5143;&#x306E;&#x72B6;&#x614B;&#x3078;&#x5FA9;&#x5143;&#x3059;&#x308B;&#x305F;&#x3081;&#x306B;&#x306F;&#x624B;&#x52D5;&#x3067;&#x5FA9;&#x65E7;&#x3059;&#x308B;&#x3057;&#x304B;&#x306A;&#x3044;&#x306E;&#x3067;&#x3059;&#x3002;</p>
+<p>&#x4ECA;&#x56DE;&#x79C1;&#x304C;&#x5F15;&#x304D;&#x7D99;&#x3044;&#x3060;&#x3068;&#x3042;&#x308B;GCP&#x74B0;&#x5883;&#x3067;&#x306F;&#x3001;IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x6574;&#x7406;&#x3068;&#x79F0;&#x3057;&#x69D8;&#x3005;&#x306A;&#x300C;&#x4E0D;&#x8981;&#x3068;&#x601D;&#x308F;&#x308C;&#x308B;&#x300D;&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x306E;&#x524A;&#x9664;&#x304C;&#x5B9F;&#x65BD;&#x3055;&#x308C;&#x3066;&#x3044;&#x307E;&#x3057;&#x305F;&#x3002;<br>&#x307F;&#x306A;&#x3055;&#x3093;&#x3082;&#x3046;&#x304A;&#x6C17;&#x3065;&#x304D;&#x304B;&#x3068;&#x601D;&#x3044;&#x307E;&#x3059;&#x304C;&#x3001;&#x3053;&#x306E;&#x300C;&#x4E0D;&#x8981;&#x3068;&#x601D;&#x308F;&#x308C;&#x308B;&#x300D;&#x3068;&#x3044;&#x3046;&#x306E;&#x304C;&#x4E0D;&#x8981;&#x3067;&#x306F;&#x306A;&#x304B;&#x3063;&#x305F;&#x3068;&#x3044;&#x3046;&#x30AA;&#x30C1;&#x3067;&#x3059;&#x3002;</p>
+<p>&#x305D;&#x306E;&#x74B0;&#x5883;&#x306E;IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x304B;&#x3089;&#x306F;Cloud Functions&#x95A2;&#x9023;&#x306E;&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x304C;&#x4E00;&#x5207;&#x6D88;&#x5931;&#x3057;&#x3066;&#x3044;&#x307E;&#x3057;&#x305F;&#x3002;<br>&#x305D;&#x3046;&#x3068;&#x306F;&#x77E5;&#x3089;&#x305A;&#x306B;Cloud Functions&#x306E;&#x30C7;&#x30D7;&#x30ED;&#x30A4;&#x3092;&#x8A66;&#x307F;&#x305F;&#x79C1;&#x306F;&#x6DF1;&#x3044;&#x6CBC;&#x306B;&#x30CF;&#x30DE;&#x3063;&#x3066;&#x3044;&#x304D;&#x307E;&#x3057;&#x305F;&#x2026;</p>
+<p>&#x305D;&#x308C;&#x3082;&#x305D;&#x306E;&#x306F;&#x305A;&#x3002;</p>
+<p>&#x81EA;&#x52D5;&#x4F5C;&#x6210;&#x3055;&#x308C;&#x308B;Google&#x7BA1;&#x7406;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x306F;&#x6587;&#x5B57;&#x901A;&#x308A;&#x81EA;&#x52D5;&#x3067;&#x4F5C;&#x6210;&#x3055;&#x308C;&#x3066;&#x3044;&#x308B;&#x306E;&#x3067;&#x3042;&#x3063;&#x3066;&#x3001;&#x660E;&#x793A;&#x7684;&#x306B;&#x305D;&#x306E;&#x5B58;&#x5728;&#x3092;&#x610F;&#x8B58;&#x3057;&#x3066;&#x4F5C;&#x696D;&#x3092;&#x884C;&#x3046;&#x3053;&#x3068;&#x306F;&#x3042;&#x307E;&#x308A;&#x591A;&#x304F;&#x3042;&#x308A;&#x307E;&#x305B;&#x3093;&#x3002;<br>&#xFF08;&#x3053;&#x306E;&#x4E00;&#x4EF6;&#x306E;&#x304A;&#x304B;&#x3052;&#x3067;&#x3044;&#x307E;&#x3067;&#x306F;Google&#x7BA1;&#x7406;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x3082;&#x3057;&#x3063;&#x304B;&#x308A;&#x6C17;&#x306B;&#x304B;&#x3051;&#x308B;&#x3088;&#x3046;&#x306B;&#x306A;&#x308A;&#x307E;&#x3057;&#x305F;&#xFF09;</p>
+<p>Cloud Functions&#x306E;&#x5B9F;&#x884C;&#x306F;&#x30A8;&#x30E9;&#x30FC;&#x306B;&#x963B;&#x307E;&#x308C;&#x6210;&#x529F;&#x305B;&#x305A;&#x3001;&#x305D;&#x3053;&#x304B;&#x3089;&#x5207;&#x308A;&#x5206;&#x3051;&#x304C;&#x30B9;&#x30BF;&#x30FC;&#x30C8;&#x3057;&#x307E;&#x3057;&#x305F;&#x3002;</p>
+<p>&#x4F59;&#x8AC7;&#x3067;&#x3059;&#x304C;&#x3001;&#x3053;&#x306E;&#x6642;&#x767A;&#x751F;&#x3057;&#x305F;&#x30A8;&#x30E9;&#x30FC;&#x306F;&#x30B7;&#x30F3;&#x30D7;&#x30EB;&#x306A;&#x30BF;&#x30A4;&#x30E0;&#x30A2;&#x30A6;&#x30C8;&#x30A8;&#x30E9;&#x30FC;&#x3067;&#x3057;&#x305F;&#x3002;<br>&#x771F;&#x56E0;&#x306F;&#x6A29;&#x9650;&#x30A8;&#x30E9;&#x30FC;&#x3060;&#x3063;&#x305F;&#x306E;&#x3067;&#x3059;&#x304C;&#x3001;<code>Permission denied</code>&#x3068;&#x3044;&#x3046;&#x30A8;&#x30E9;&#x30FC;&#x30E1;&#x30C3;&#x30BB;&#x30FC;&#x30B8;&#x304C;&#x51FA;&#x3066;&#x304F;&#x308C;&#x305A;&#x3001;&#x5207;&#x308A;&#x5206;&#x3051;&#x304C;&#x96E3;&#x822A;&#x3057;&#x307E;&#x3057;&#x305F;&#x2026;</p>
+<h2 id="&#x30AA;&#x30FC;&#x30CA;&#x30FC;&#x6A29;&#x9650;&#x306F;&#x6700;&#x5F37;&#x3067;&#x306F;&#x306A;&#x3044;"><a href="#&#x30AA;&#x30FC;&#x30CA;&#x30FC;&#x6A29;&#x9650;&#x306F;&#x6700;&#x5F37;&#x3067;&#x306F;&#x306A;&#x3044;" class="headerlink" title="&#x30AA;&#x30FC;&#x30CA;&#x30FC;&#x6A29;&#x9650;&#x306F;&#x6700;&#x5F37;&#x3067;&#x306F;&#x306A;&#x3044;"></a>&#x30AA;&#x30FC;&#x30CA;&#x30FC;&#x6A29;&#x9650;&#x306F;&#x6700;&#x5F37;&#x3067;&#x306F;&#x306A;&#x3044;</h2><p>&#x8ABF;&#x67FB;&#x306E;&#x4E2D;&#x3067;2&#x7A2E;&#x985E;&#x306E;Google&#x7BA1;&#x7406;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x304C;&#x6D88;&#x5931;&#x3057;&#x3066;&#x3044;&#x308B;&#x3053;&#x3068;&#x306B;&#x6C17;&#x3065;&#x304D;&#x307E;&#x3057;&#x305F;&#x3002;<br>&#x3072;&#x3068;&#x3064;&#x306F;<code>PROJECT_ID@appspot.gserviceaccount.com</code>&#x3067;&#x3059;&#x3002;<br><a href="https://cloud.google.com/functions/docs/concepts/iam?hl=ja" target="_blank" rel="noopener">&#x516C;&#x5F0F;&#x30DA;&#x30FC;&#x30B8;</a>&#x3067;&#x306F;&#x4EE5;&#x4E0B;&#x306E;&#x3088;&#x3046;&#x306B;&#x8AAC;&#x660E;&#x3055;&#x308C;&#x3066;&#x3044;&#x307E;&#x3059;&#x3002;</p>
+<blockquote>
+<p>&#x30E9;&#x30F3;&#x30BF;&#x30A4;&#x30E0; &#x30B5;&#x30FC;&#x30D3;&#x30B9; &#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;<br>&#x5B9F;&#x884C;&#x6642;&#x306B;&#x3001;Cloud Functions &#x3067;&#x306F;&#x30D7;&#x30ED;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x306E;&#x7DE8;&#x96C6;&#x8005;&#x306E;&#x5F79;&#x5272;&#x3092;&#x6301;&#x3064;&#x30B5;&#x30FC;&#x30D3;&#x30B9; &#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8; <a href="mailto:PROJECT_ID@appspot.gserviceaccount.com" target="_blank" rel="noopener">PROJECT_ID@appspot.gserviceaccount.com</a> &#x3092;&#x4F7F;&#x7528;&#x3057;&#x307E;&#x3059;&#x3002;&#x3053;&#x306E;&#x30B5;&#x30FC;&#x30D3;&#x30B9; &#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x306E;&#x5F79;&#x5272;&#x3092;&#x5909;&#x66F4;&#x3057;&#x3066;&#x3001;&#x5B9F;&#x884C;&#x4E2D;&#x306E;&#x95A2;&#x6570;&#x306B;&#x5BFE;&#x3059;&#x308B;&#x6A29;&#x9650;&#x3092;&#x5236;&#x9650;&#x307E;&#x305F;&#x306F;&#x62E1;&#x5F35;&#x3059;&#x308B;&#x3053;&#x3068;&#x304C;&#x3067;&#x304D;&#x307E;&#x3059;&#x3002;</p>
+</blockquote>
+<p>&#x3082;&#x3046;&#x4E00;&#x3064;&#x306F;<code>PROJECT_ID@gcf-admin-robot.iam.gserviceaccount.com</code>&#x3067;&#x3059;&#x3002;<br>&#x3053;&#x308C;&#x306B;&#x3064;&#x3044;&#x3066;&#x306F;&#x65E5;&#x672C;&#x8A9E;&#x306E;&#x30C9;&#x30AD;&#x30E5;&#x30E1;&#x30F3;&#x30C8;&#x306B;&#x306F;&#x8A18;&#x8F09;&#x304C;&#x306A;&#x304F;(2019/07/02&#x73FE;&#x5728;)&#x3001;<a href="https://cloud.google.com/functions/docs/concepts/iam" target="_blank" rel="noopener">&#x82F1;&#x8A9E;&#x7248;</a>&#x3092;&#x53C2;&#x7167;&#x3059;&#x308B;&#x5FC5;&#x8981;&#x304C;&#x3042;&#x308A;&#x307E;&#x3057;&#x305F;&#x3002;<br>&#x4EE5;&#x4E0B;&#x306E;&#x3088;&#x3046;&#x306A;&#x8A18;&#x8F09;&#x304C;&#x3042;&#x308A;&#x307E;&#x3059;&#x3002;</p>
+<blockquote>
+<p>Cloud Functions service account<br>For administrative actions on your project during the creation, updating, or deletion of functions, the Cloud Functions service uses the Google Cloud Functions service agent service account (<a href="mailto:service-PROJECT_NUMBER@gcf-admin-robot.iam.gserviceaccount.com" target="_blank" rel="noopener">service-PROJECT_NUMBER@gcf-admin-robot.iam.gserviceaccount.com</a>).</p>
+</blockquote>
+<blockquote>
+<p>By default, this service account has the cloudfunctions.serviceAgent role on your project. Creating, updating, and deleting functions may fail if you change this account&#x2019;s permissions.</p>
+</blockquote>
+<p>&#x79C1;&#x306F;&#x624B;&#x52D5;&#x3067;&#x4E0A;&#x8A18;2&#x3064;&#x306E;Google&#x7BA1;&#x7406;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x306E;&#x5FA9;&#x65E7;&#x3092;&#x8A66;&#x307F;&#x307E;&#x3057;&#x305F;&#x3002;<br><code>PROJECT_ID@appspot.gserviceaccount.com</code>&#x306F;<code>&#x7DE8;&#x96C6;&#x8005;</code>&#x30ED;&#x30FC;&#x30EB;&#x304C;&#x4ED8;&#x4E0E;&#x3055;&#x308C;&#x3066;&#x3044;&#x308C;&#x3070;&#x3088;&#x3044;&#x306E;&#x3067;&#x30B3;&#x30F3;&#x30BD;&#x30FC;&#x30EB;&#x753B;&#x9762;&#x304B;&#x3089;IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x3092;&#x8FFD;&#x52A0;&#x3057;&#x307E;&#x3057;&#x305F;&#x3002;<br>&#x554F;&#x984C;&#x306F;&#x3082;&#x3046;&#x4E00;&#x3064;&#x306E;&#x65B9;&#x3067;&#x3057;&#x305F;&#x3002;<br><code>PROJECT_ID@gcf-admin-robot.iam.gserviceaccount.com</code>&#x306B;&#x306F;<code>Cloud Functions Service Agent</code>&#x306E;&#x30ED;&#x30FC;&#x30EB;&#x304C;&#x4ED8;&#x4E0E;&#x3055;&#x308C;&#x3066;&#x3044;&#x308B;&#x5FC5;&#x8981;&#x304C;&#x3042;&#x308B;&#x306E;&#x3067;&#x3059;&#x304C;&#x3001;&#x3053;&#x306E;&#x30ED;&#x30FC;&#x30EB;&#x304C;&#x30B3;&#x30F3;&#x30BD;&#x30FC;&#x30EB;&#x304B;&#x3089;&#x9078;&#x629E;&#x3067;&#x304D;&#x306A;&#x304B;&#x3063;&#x305F;&#x306E;&#x3067;&#x3059;&#x3002;</p>
+<p>gcloud&#x30B3;&#x30DE;&#x30F3;&#x30C9;&#x7D4C;&#x7531;&#x3067;&#x554F;&#x984C;&#x306A;&#x304F;&#x8A72;&#x5F53;&#x30ED;&#x30FC;&#x30EB;&#x306E;&#x4ED8;&#x4E0E;&#x306F;&#x3067;&#x304D;&#x308B;&#x306E;&#x3067;&#x3059;&#x304C;&#x3001;&#x5F53;&#x6642;&#x79C1;&#x306F;&#x5207;&#x308A;&#x5206;&#x3051;&#x3068;&#x3057;&#x3066;&#x300C;<code>PROJECT_ID@gcf-admin-robot.iam.gserviceaccount.com</code>&#x306B;<code>&#x30AA;&#x30FC;&#x30CA;&#x30FC;</code>&#x6A29;&#x9650;&#x3092;&#x4ED8;&#x4E0E;&#x3059;&#x308B;&#x300D;&#x3068;&#x3044;&#x3046;&#x3053;&#x3068;&#x3092;&#x884C;&#x3044;&#x307E;&#x3057;&#x305F;&#x3002;</p>
+<p>&#x30AA;&#x30FC;&#x30CA;&#x30FC;&#x6A29;&#x9650;&#x306F;&#x6700;&#x5F37;&#x3060;&#x308D;&#x3046;&#x3068;&#x601D;&#x3063;&#x3066;&#x3044;&#x305F;&#x306E;&#x3067;&#x3059;&#x3002;<br>&#x6A29;&#x9650;&#x5468;&#x308A;&#x3067;&#x30CF;&#x30DE;&#x3063;&#x3066;&#x3044;&#x308B;&#x306E;&#x3067;&#x3042;&#x308C;&#x3070;&#x3068;&#x308A;&#x3042;&#x3048;&#x305A;&#x30AA;&#x30FC;&#x30CA;&#x30FC;&#x4ED8;&#x4E0E;&#x3057;&#x3061;&#x3083;&#x3048;&#x3070;&#x7A81;&#x7834;&#x3067;&#x304D;&#x308B;&#x306F;&#x305A;&#x3001;&#x3068;&#x3002;</p>
+<p>&#x9055;&#x3044;&#x307E;&#x3057;&#x305F;&#x3002;<br>Google&#x7BA1;&#x7406;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x30A2;&#x30AB;&#x30A6;&#x30F3;&#x30C8;&#x306B;&#x4ED8;&#x4E0E;&#x3055;&#x308C;&#x308B;&#x30ED;&#x30FC;&#x30EB;&#x7FA4;&#x3001;&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x30A8;&#x30FC;&#x30B8;&#x30A7;&#x30F3;&#x30C8;&#x9054;&#x306F;&#x30AA;&#x30FC;&#x30CA;&#x30FC;&#x6A29;&#x9650;&#x3067;&#x306F;&#x6301;&#x3063;&#x3066;&#x3044;&#x306A;&#x3044;&#x7279;&#x6B8A;&#x306A;&#x6A29;&#x9650;&#x3092;&#x6301;&#x3063;&#x3066;&#x3044;&#x305F;&#x306E;&#x3067;&#x3059;&#x3002;</p>
+<p>gcloud &#x30B3;&#x30DE;&#x30F3;&#x30C9;&#x3092;&#x4F7F;&#x3063;&#x3066;<code>Cloud Functions Service Agent</code>&#x306B;&#x4ED8;&#x4E0E;&#x3055;&#x308C;&#x3066;&#x3044;&#x308B;&#x6A29;&#x9650;&#x3092;&#x898B;&#x3066;&#x307F;&#x307E;&#x3059;&#x3002;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcloud iam roles describe roles/cloudfunctions.serviceAgent</span><br></pre></td></tr></table></figure>
+
+<p>&#x4E0B;&#x8A18;&#x304C;&#x7D50;&#x679C;&#x3067;&#x3059;&#x3002;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">description: Gives Cloud Functions service account access to managed resources.</span><br><span class="line">etag: AA==</span><br><span class="line">includedPermissions:</span><br><span class="line">- clientauthconfig.clients.list</span><br><span class="line">- cloudfunctions.functions.invoke</span><br><span class="line">- firebasedatabase.instances.get</span><br><span class="line">- firebasedatabase.instances.update</span><br><span class="line">- iam.serviceAccounts.getAccessToken</span><br><span class="line">- iam.serviceAccounts.signBlob</span><br><span class="line">- pubsub.subscriptions.consume</span><br><span class="line">- pubsub.subscriptions.create</span><br><span class="line">- pubsub.subscriptions.delete</span><br><span class="line">- pubsub.subscriptions.get</span><br><span class="line">- pubsub.subscriptions.getIamPolicy</span><br><span class="line">- pubsub.subscriptions.list</span><br><span class="line">- pubsub.subscriptions.setIamPolicy</span><br><span class="line">- pubsub.subscriptions.update</span><br><span class="line">- pubsub.topics.attachSubscription</span><br><span class="line">- pubsub.topics.create</span><br><span class="line">- pubsub.topics.get</span><br><span class="line">- resourcemanager.projects.get</span><br><span class="line">- resourcemanager.projects.getIamPolicy</span><br><span class="line">- serviceusage.quotas.get</span><br><span class="line">- serviceusage.services.disable</span><br><span class="line">- serviceusage.services.enable</span><br><span class="line">- storage.buckets.get</span><br><span class="line">- storage.buckets.update</span><br><span class="line">name: roles/cloudfunctions.serviceAgent</span><br><span class="line">stage: ALPHA</span><br><span class="line">title: Cloud Functions Service Agent</span><br></pre></td></tr></table></figure>
+
+<p>&#x3053;&#x308C;&#x3068;&#x30AA;&#x30FC;&#x30CA;&#x30FC;&#x6A29;&#x9650;&#x3092;&#x6BD4;&#x3079;&#x3066;&#x307F;&#x307E;&#x3059;&#x3002;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcloud iam roles describe roles/owner</span><br></pre></td></tr></table></figure>
+
+<p>&#x3053;&#x3063;&#x3061;&#x306F;&#x3042;&#x307E;&#x308A;&#x306B;&#x3082;&#x7D50;&#x679C;&#x304C;&#x591A;&#x3044;&#x306E;&#x3067;&#x5272;&#x611B;&#x3057;&#x307E;&#x3059;&#x3002;<br>&#x6C17;&#x306B;&#x306A;&#x3063;&#x305F;&#x65B9;&#x306F;&#x8ABF;&#x3079;&#x3066;&#x307F;&#x3066;&#x304F;&#x3060;&#x3055;&#x3044;&#x3002;</p>
+<p>diff&#x3092;&#x53D6;&#x3063;&#x3066;&#x307F;&#x308B;&#x3068;&#x3001;<code>Cloud Functions Service Agent</code>&#x306B;&#x3042;&#x3063;&#x3066;&#x30AA;&#x30FC;&#x30CA;&#x30FC;&#x6A29;&#x9650;&#x3067;&#x306F;&#x6301;&#x3063;&#x3066;&#x3044;&#x306A;&#x3044;&#x5F79;&#x5272;&#x304C;&#x3042;&#x308B;&#x3053;&#x3068;&#x304C;&#x308F;&#x304B;&#x308A;&#x307E;&#x3057;&#x305F;&#x3002;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- iam.serviceAccounts.getAccessToken</span><br><span class="line">- iam.serviceAccounts.signBlob</span><br><span class="line">- storage.buckets.get</span><br><span class="line">- storage.buckets.update</span><br></pre></td></tr></table></figure>
+
+<p>&#x4ECA;&#x56DE;&#x306E;&#x30A8;&#x30E9;&#x30FC;&#x306E;&#x539F;&#x56E0;&#x306F;<code>iam.serviceAccounts.getAccessToken</code>&#x3067;&#x3057;&#x305F;&#x3002;</p>
+<p>(<code>storage.buckets.get</code>&#x3042;&#x305F;&#x308A;&#x304C;&#x30AA;&#x30FC;&#x30CA;&#x30FC;&#x6A29;&#x9650;&#x3067;&#x3084;&#x308C;&#x306A;&#x3044;&#x306E;&#x306F;&#x3053;&#x306E;&#x8A18;&#x4E8B;&#x3092;&#x66F8;&#x3044;&#x3066;&#x3066;&#x521D;&#x3081;&#x3066;&#x77E5;&#x308A;&#x307E;&#x3057;&#x305F;&#x7B11;)</p>
+<p>&#x79C1;&#x305F;&#x3061;&#x306E;&#x52D5;&#x304B;&#x305D;&#x3046;&#x3068;&#x3057;&#x3066;&#x3044;&#x305F;Cloud Functuions&#x306E;&#x30D7;&#x30ED;&#x30B0;&#x30E9;&#x30E0;&#x306F;BigQuery&#x3078;&#x306E;&#x30A2;&#x30AF;&#x30BB;&#x30B9;&#x3092;&#x884C;&#x3063;&#x3066;&#x3044;&#x307E;&#x3057;&#x305F;&#x3002;<br>&#x8A70;&#x307E;&#x3063;&#x3066;&#x3044;&#x305F;&#x306E;&#x306F;BigQuery&#x3078;&#x306E;<a href="https://cloud.google.com/bigquery/docs/authorization?hl=ja" target="_blank" rel="noopener">API&#x30EA;&#x30AF;&#x30A8;&#x30B9;&#x30C8;&#x306E;&#x627F;&#x8A8D;</a>&#x3060;&#x3063;&#x305F;&#x3068;&#x3044;&#x3046;&#x3053;&#x3068;&#x304C;&#x5224;&#x660E;&#x3057;&#x307E;&#x3057;&#x305F;&#x3002;</p>
+<blockquote>
+<p>&#x3053;&#x306E;&#x30AC;&#x30A4;&#x30C9;&#x3067;&#x306F;&#x3001;Google BigQuery API &#x306B;&#x30A2;&#x30AF;&#x30BB;&#x30B9; &#x30C8;&#x30FC;&#x30AF;&#x30F3;&#x3092;&#x63D0;&#x4F9B;&#x3059;&#x308B;&#x65B9;&#x6CD5;&#x3092;&#x8AAC;&#x660E;&#x3057;&#x307E;&#x3059;&#x3002;BigQuery &#x30AF;&#x30E9;&#x30A4;&#x30A2;&#x30F3;&#x30C8; &#x30E9;&#x30A4;&#x30D6;&#x30E9;&#x30EA;&#x3092;&#x4F7F;&#x7528;&#x3057;&#x3066;&#x3044;&#x308B;&#x5834;&#x5408;&#x306F;&#x81EA;&#x52D5;&#x7684;&#x306B;&#x5B9F;&#x884C;&#x3055;&#x308C;&#x308B;&#x305F;&#x3081;&#x3001;&#x3053;&#x306E;&#x30AC;&#x30A4;&#x30C9;&#x306B;&#x5F93;&#x3046;&#x5FC5;&#x8981;&#x306F;&#x3042;&#x308A;&#x307E;&#x305B;&#x3093;&#x3002;</p>
+</blockquote>
+<p>&#x3068;&#x3044;&#x3046;&#x8A18;&#x8F09;&#x304C;&#x3042;&#x308B;&#x306E;&#x3067;&#x3059;&#x304C;&#x3001;&#x307E;&#x3055;&#x306B;&#x3053;&#x306E;<a href="https://cloud.google.com/bigquery/docs/reference/libraries?hl=ja" target="_blank" rel="noopener">BigQuery&#x30AF;&#x30E9;&#x30A4;&#x30A2;&#x30F3;&#x30C8;&#x30E9;&#x30A4;&#x30D6;&#x30E9;&#x30EA;</a>&#x3092;&#x5229;&#x7528;&#x3057;&#x305F;&#x30D7;&#x30ED;&#x30B0;&#x30E9;&#x30E0;&#x3092;&#x5B9F;&#x88C5;&#x3057;&#x3066;&#x3044;&#x307E;&#x3057;&#x305F;&#x3002;</p>
+<p>BigQuery&#x30AF;&#x30E9;&#x30A4;&#x30A2;&#x30F3;&#x30C8;&#x30E9;&#x30A4;&#x30D6;&#x30E9;&#x30EA;&#x5185;&#x3067;&#x884C;&#x308F;&#x308C;&#x3066;&#x3044;&#x308B;&#x30A2;&#x30AF;&#x30BB;&#x30B9;&#x30C8;&#x30FC;&#x30AF;&#x30F3;&#x306E;&#x53D6;&#x5F97;&#x304C;&#x3001;<code>iam.serviceAccounts.getAccessToken</code>&#x306E;&#x6B20;&#x5982;&#x306B;&#x3088;&#x308A;&#x5931;&#x6557;&#x3059;&#x308B;&#x3068;&#x3044;&#x3046;&#x306E;&#x304C;&#x771F;&#x306E;&#x539F;&#x56E0;&#x3067;&#x3057;&#x305F;&#x3002;</p>
+<h2 id="&#x5927;&#x5207;&#x306A;&#x5B66;&#x3073;"><a href="#&#x5927;&#x5207;&#x306A;&#x5B66;&#x3073;" class="headerlink" title="&#x5927;&#x5207;&#x306A;&#x5B66;&#x3073;"></a>&#x5927;&#x5207;&#x306A;&#x5B66;&#x3073;</h2><p>&#x79C1;&#x306F;&#x4ECA;&#x56DE;&#x306E;&#x4E00;&#x4EF6;&#x3067;2&#x3064;&#x306E;&#x3068;&#x3066;&#x3082;&#x5927;&#x5207;&#x306A;&#x5B66;&#x3073;&#x3092;&#x5F97;&#x307E;&#x3057;&#x305F;&#x3002;</p>
+<ul>
+<li>&#x30AA;&#x30FC;&#x30CA;&#x30FC;&#x6A29;&#x9650;&#x306F;&#x6700;&#x5F37;&#x3067;&#x306F;&#x306A;&#x3044;</li>
+<li>Google&#x30B5;&#x30FC;&#x30D3;&#x30B9;&#x306B;&#x3088;&#x3063;&#x3066;&#x81EA;&#x52D5;&#x4F5C;&#x6210;&#x3055;&#x308C;&#x305F;IAM&#x30DD;&#x30EA;&#x30B7;&#x30FC;&#x306F;&#x6D88;&#x3055;&#x306A;&#x3044;&#xFF08;&#x3053;&#x308C;&#x306F;&#x672C;&#x5F53;&#x306B;&#x5927;&#x4E8B;&#xFF09;</li>
+</ul>
+<h1 id="&#x304A;&#x308F;&#x308A;&#x306B;"><a href="#&#x304A;&#x308F;&#x308A;&#x306B;" class="headerlink" title="&#x304A;&#x308F;&#x308A;&#x306B;"></a>&#x304A;&#x308F;&#x308A;&#x306B;</h1><p>&#x9577;&#x6587;&#x8AAD;&#x3093;&#x3067;&#x9802;&#x304D;&#x3042;&#x308A;&#x304C;&#x3068;&#x3046;&#x3054;&#x3056;&#x3044;&#x307E;&#x3057;&#x305F;&#xFF01;<br>&#x30AF;&#x30E9;&#x30A6;&#x30C9;&#x30A4;&#x30F3;&#x30D5;&#x30E9;&#x306B;&#x3064;&#x3044;&#x3066;&#x306E;&#x601D;&#x3044;&#x306E;&#x8A71;&#x304B;&#x3089;&#x59CB;&#x307E;&#x308A;&#x3001;&#x305D;&#x306E;&#x4E2D;&#x3067;&#x5F97;&#x305F;&#x8D85;&#x5177;&#x4F53;&#x7684;&#x306A;&#x77E5;&#x898B;&#x306E;&#x8A71;&#x306B;&#x81F3;&#x308B;&#x307E;&#x3067;&#x3001;&#x4F1D;&#x3048;&#x305F;&#x304B;&#x3063;&#x305F;&#x3053;&#x3068;&#x306F;&#x3057;&#x3063;&#x304B;&#x308A;&#x8A00;&#x8449;&#x306B;&#x3067;&#x304D;&#x307E;&#x3057;&#x305F;&#x3002;</p>
+<p>&#x4F55;&#x4E8B;&#x3082;&#x5B9F;&#x7269;&#x3092;&#x898B;&#x305A;&#x306B;&#x5224;&#x65AD;&#x3057;&#x3066;&#x306F;&#x3044;&#x3051;&#x306A;&#x3044;&#x3068;&#x3088;&#x304F;&#x8A00;&#x3044;&#x307E;&#x3059;&#x304C;&#x3001;&#x307E;&#x3055;&#x306B;&#x4ECA;&#x56DE;&#x306E;&#x4E8B;&#x4F8B;&#x304C;&#x305D;&#x308C;&#x3060;&#x306A;&#x30FC;&#x3068;&#x5B9F;&#x611F;&#x3057;&#x3066;&#x3044;&#x307E;&#x3059;&#x3002;<br>GCP&#x306B;&#x304A;&#x3044;&#x3066;&#x3001;&#x30AA;&#x30FC;&#x30CA;&#x30FC;&#x6A29;&#x9650;&#x304C;&#x6700;&#x5F37;&#x3067;&#x306F;&#x306A;&#x3044;&#x3001;&#x3068;&#x3044;&#x3046;&#x306E;&#x306F;&#x899A;&#x3048;&#x3066;&#x304A;&#x3044;&#x3066;&#x640D;&#x306E;&#x306A;&#x3044;&#x77E5;&#x898B;&#x304B;&#x3068;&#x601D;&#x3044;&#x307E;&#x3059;&#x306E;&#x3067;&#x3001;&#x982D;&#x306E;&#x7247;&#x9685;&#x306B;&#x7559;&#x3081;&#x3066;&#x304A;&#x3044;&#x3066;&#x3082;&#x3089;&#x3048;&#x308B;&#x3068;&#x3053;&#x306E;&#x8A18;&#x4E8B;&#x81EA;&#x8EAB;&#x3082;&#x305D;&#x308C;&#x3092;&#x66F8;&#x3044;&#x305F;&#x79C1;&#x3082;&#x3068;&#x3066;&#x3082;&#x559C;&#x3073;&#x307E;&#x3059;&#x3002;</p>
+<p>&#x3053;&#x306E;&#x8A18;&#x4E8B;&#x304C;&#x5C11;&#x3057;&#x3067;&#x3082;&#x7686;&#x3055;&#x3093;&#x306E;&#x5F79;&#x306B;&#x305F;&#x3066;&#x3070;&#x5E78;&#x3044;&#x3067;&#x3059;&#x3002;</p>
+<p>&#x3067;&#x306F;&#x3001;&#x3053;&#x308C;&#x304B;&#x3089;&#x3082;<a href="https://future-architect.github.io/">Future Tech Blog</a>&#x3092;&#x3088;&#x308D;&#x3057;&#x304F;&#x304A;&#x9858;&#x3044;&#x3057;&#x307E;&#x3059;&#xFF01;&#xFF01;</p>
+
+      
+    </div>
+  </div>
+    
+  <!-- シェアボタン START -->
+  <div class="social-area">
+  <ul class="social-button">
+
+      <!-- twitter -->
+      <li class="sc-tw social-button-twitter">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-hashtags="future_architect">ツイート</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      </li>
+      
+      <!-- Facebookいいね -->
+      <li class="social-button-fb">
+          <div id="fb-root"></div>
+          <script>(function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.8";
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));</script>
+          <div class="fb-like" data-href="https://future-architect.github.io/articles/20190708/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+      </li>
+
+      <!-- はてなブックマーク -->
+      <li class="social-button-hatebu"><a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20190708/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></li>
+
+      <!-- pocket -->
+      <li class="social-button-pocket"><a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
+          <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+      </li>
+
+  </ul>
+  </div>
+<!-- シェアボタン END -->
+
+
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/articles/20190703/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！（Metabase編） </div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (21)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (5)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (14)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (5)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (15)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190708/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCPのIAMポリシー周りでドハマりした話
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190703/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！（Metabase編） 
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190702/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AWS Datalake Hands-on(2019 May)メモ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190627/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                人工知能学会（JSAI2019） 参加報告
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーアーキテクトの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+          <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+
+    <!-- Twitterフォローボタン -->
+    <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+	  <a data-tweet-limit="1" class="twitter-timeline"
+	  href="https://twitter.com/future_techblog"
+	  data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+
+	  <script>!function(d,s,id){var
+	  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+          </div>
+          <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2019 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
