@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>WAFとして go-swagger を選択してみた | Future Tech Blog - フューチャーアーキテクト</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="こんにちは、TIG DXチーム1の多賀です。2019年7月にキャリア入社しました。 概要Go のWebアプリケーションフレームワークを検討した際に、 go-swagger が良いのではと思い、比較調査してみました。 その結果、実際にPJへ導入しています。 バージョン   名称 バージョン    Go 1.12.7   go-swagger v0.19.0   swaggo/swag v1.6.2">
+<meta name="keywords" content="Go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WAFとして go-swagger を選択してみた">
+<meta property="og:url" content="https://future-architect.github.io/articles/20190814/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="こんにちは、TIG DXチーム1の多賀です。2019年7月にキャリア入社しました。 概要Go のWebアプリケーションフレームワークを検討した際に、 go-swagger が良いのではと思い、比較調査してみました。 その結果、実際にPJへ導入しています。 バージョン   名称 バージョン    Go 1.12.7   go-swagger v0.19.0   swaggo/swag v1.6.2">
+<meta property="og:locale" content="ja">
+<meta property="og:updated_time" content="2019-08-14T01:18:37.523Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WAFとして go-swagger を選択してみた">
+<meta name="twitter:description" content="こんにちは、TIG DXチーム1の多賀です。2019年7月にキャリア入社しました。 概要Go のWebアプリケーションフレームワークを検討した際に、 go-swagger が良いのではと思い、比較調査してみました。 その結果、実際にPJへ導入しています。 バージョン   名称 バージョン    Go 1.12.7   go-swagger v0.19.0   swaggo/swag v1.6.2">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="WAFとして go-swagger を選択してみた | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="WAFとして go-swagger を選択してみた,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Tech Blog</div>
+        <div class="header-title-sub">フューチャーアーキテクト開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20190814/">WAFとして go-swagger を選択してみた</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20190814-go-swagger" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> 多賀聡一朗</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2019-08-14T01:30:07.000Z" itemprop="datePublished">2019/08/14</time>
+
+	</li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+	  
+  
+    <a href="/tags/Go/" title="Go">Go</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    Categories:
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>こんにちは、TIG DXチーム<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>の多賀です。<br>2019年7月にキャリア入社しました。</p>
+<h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>Go のWebアプリケーションフレームワークを検討した際に、 <code>go-swagger</code> が良いのではと思い、比較調査してみました。</p>
+<p>その結果、実際にPJへ導入しています。</p>
+<h2 id="バージョン"><a href="#バージョン" class="headerlink" title="バージョン"></a>バージョン</h2><table>
+<thead>
+<tr>
+<th align="left">名称</th>
+<th align="left">バージョン</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Go</td>
+<td align="left">1.12.7</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/go-swagger/go-swagger" target="_blank" rel="noopener">go-swagger</a></td>
+<td align="left">v0.19.0</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/swaggo/swag" target="_blank" rel="noopener">swaggo/swag</a></td>
+<td align="left">v1.6.2</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/OpenAPITools/openapi-generator" target="_blank" rel="noopener">openapi-generator</a></td>
+<td align="left">4.0.3</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/gin-gonic/gin" target="_blank" rel="noopener">gin</a></td>
+<td align="left">v1.4.0</td>
+</tr>
+</tbody></table>
+<h2 id="開発物"><a href="#開発物" class="headerlink" title="開発物"></a>開発物</h2><p>以下の実装を行うとします。<br>Web API を作成して、Swagger でドキュメントを管理しましょうというよくある構成かと思います。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>作成物</td>
+<td>Web API</td>
+</tr>
+<tr>
+<td>仕様定義</td>
+<td>Swagger</td>
+</tr>
+<tr>
+<td>言語</td>
+<td>Go</td>
+</tr>
+<tr>
+<td>仕様変更</td>
+<td>高頻度</td>
+</tr>
+</tbody></table>
+<h2 id="Go-のフレームワークに求めるもの"><a href="#Go-のフレームワークに求めるもの" class="headerlink" title="Go のフレームワークに求めるもの"></a>Go のフレームワークに求めるもの</h2><p>この場合、フレームワークに対して何を求めるでしょうか。<br>私は以下を重要視していました。</p>
+<h3 id="重要視したこと"><a href="#重要視したこと" class="headerlink" title="重要視したこと"></a>重要視したこと</h3><p>ドキュメントと実装の乖離をなくすことで、認識齟齬なく開発を行うこと</p>
+<h4 id="なぜ？"><a href="#なぜ？" class="headerlink" title="なぜ？"></a>なぜ？</h4><ol>
+<li>ドキュメントと実装のズレを解消するコストが高いため<ul>
+<li>Web API 開発をする中で最も困ることは <strong>ドキュメントと実装がかけ離れること</strong> です。ドキュメントととのずれによる、コミュニケーションを極力減らしたいと考えました</li>
+</ul>
+</li>
+<li>インターフェイスが頻繁に変わることが想定されたため<ul>
+<li>データ定義の部分が固く決まっていなかったため、データに引きずられて API 仕様の変更も頻繁に起きるだろうと思いました</li>
+</ul>
+</li>
+<li>インターフェイスのやり取りの物理的な距離が遠いため<ul>
+<li>同一の会社内だけでなく会社間をまたいだ開発も想定されたため、コミュニケーションコストがより高くなると想定しました</li>
+</ul>
+</li>
+</ol>
+<h2 id="フレームワーク比較"><a href="#フレームワーク比較" class="headerlink" title="フレームワーク比較"></a>フレームワーク比較</h2><p>ドキュメントと実装の整合性を重要視する考えのもと、下記 2 パターンの方式を検討しました。</p>
+<ol>
+<li>ドキュメントからコードを生成</li>
+<li>コードからドキュメントを生成</li>
+</ol>
+<p>それぞれの方式についてサンプルを作りながら検討しました。<br>結果としては、<strong>1 のパターンのほうが重要視した要件を満たす</strong> と考えました。</p>
+<h3 id="1-ドキュメントからコードを生成"><a href="#1-ドキュメントからコードを生成" class="headerlink" title="1. ドキュメントからコードを生成"></a>1. ドキュメントからコードを生成</h3><p>Swagger ファイルから Go のソースコードが生成できないかを考えました。<br>ライブラリとして、 <a href="https://github.com/go-swagger/go-swagger" target="_blank" rel="noopener">go-swagger</a> をあげています。</p>
+<h4 id="go-swagger"><a href="#go-swagger" class="headerlink" title="go-swagger"></a><a href="https://github.com/go-swagger/go-swagger" target="_blank" rel="noopener">go-swagger</a></h4><p>Swaggerファイルを入力にGoのコードを生成することができるツールです。<br>生成されるコードは、<a href="https://github.com/go-openapi" target="_blank" rel="noopener">go-openapi</a> で管理されているモジュールが利用されています。</p>
+<h4 id="サンプル"><a href="#サンプル" class="headerlink" title="サンプル"></a>サンプル</h4><p>swagger.yml (一部抜粋)</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">paths:</span></span><br><span class="line">  <span class="string">/data/&#123;name&#125;:</span></span><br><span class="line"><span class="attr">    post:</span></span><br><span class="line"><span class="attr">      operationId:</span> <span class="string">dataId</span></span><br><span class="line"><span class="attr">      consumes:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">application/json</span></span><br><span class="line"><span class="attr">      produces:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">application/json</span></span><br><span class="line"><span class="attr">      parameters:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">name</span></span><br><span class="line"><span class="attr">          in:</span> <span class="string">path</span></span><br><span class="line"><span class="attr">          required:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">データ名</span></span><br><span class="line"><span class="attr">          type:</span> <span class="string">string</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">body</span></span><br><span class="line"><span class="attr">          in:</span> <span class="string">body</span></span><br><span class="line"><span class="attr">          schema:</span></span><br><span class="line">            <span class="string">$ref:</span> <span class="string">"#/definitions/Sample"</span></span><br><span class="line"><span class="attr">      responses:</span></span><br><span class="line">        <span class="string">"200"</span><span class="string">:</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">OK</span></span><br><span class="line"><span class="attr">          schema:</span></span><br><span class="line">            <span class="string">$ref:</span> <span class="string">"#/definitions/ApiResponse"</span></span><br><span class="line">        <span class="string">"404"</span><span class="string">:</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">Data</span> <span class="string">Not</span> <span class="string">Found</span></span><br><span class="line">        <span class="string">"500"</span><span class="string">:</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">Internal</span> <span class="string">Server</span> <span class="string">Error</span></span><br></pre></td></tr></table></figure>
+
+<p>生成コードを利用した handler</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">dataHandler</span><span class="params">(params operations.DataIDParams)</span> <span class="title">middleware</span>.<span class="title">Responder</span></span> &#123;</span><br><span class="line">	<span class="comment">// リクエスト</span></span><br><span class="line">	<span class="comment">// params にすべての情報が含まれている</span></span><br><span class="line">	log.Println(params)</span><br><span class="line">	log.Println(*params.Body)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// ビジネスロジック層にリクエスト情報を渡す</span></span><br><span class="line">	service := service.New()</span><br><span class="line">	<span class="keyword">if</span> err := service.Save(params.Body); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// エラーの場合</span></span><br><span class="line">		<span class="comment">// 500エラー返せる</span></span><br><span class="line">		<span class="keyword">return</span> operations.NewDataIDInternalServerError()</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// レスポンス</span></span><br><span class="line">	dummyResponse := &amp;models.APIResponse&#123;</span><br><span class="line">		Message: <span class="string">"OK"</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 200 レスポンス</span></span><br><span class="line">	<span class="keyword">return</span> operations.NewDataIDOK().WithPayload(dummyResponse)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="メリット"><a href="#メリット" class="headerlink" title="メリット"></a>メリット</h4><ol>
+<li>Swagger と実装が乖離することはない<ul>
+<li>Swagger から自動生成でリクエスト/レスポンスの struct を吐き出します。自動生成部分も CI で必ず生成して build するようにすれば、漏れることはないです。</li>
+</ul>
+</li>
+<li>go-swagger でリクエスト/レスポンスのオブジェクト型を 生成してくれるためロジックに集中できる<ul>
+<li>リクエスト/レスポンスの型だけでなく、リクエストを受ける/レスポンスを返す実装も合わせて生成されます。そのため、実装者は生成されたコードから リクエストパラメータ struct を受け取る → レスポンス struct を生成 までを実装すればよいです</li>
+</ul>
+</li>
+</ol>
+<h4 id="デメリット"><a href="#デメリット" class="headerlink" title="デメリット"></a>デメリット</h4><ol>
+<li>Swagger の定義を手で書く必要がある<ul>
+<li>Swagger の yml 定義を手でメンテする必要がある点は、デメリットになるかと思います。</li>
+</ul>
+</li>
+</ol>
+<h3 id="2-コードからドキュメントを生成"><a href="#2-コードからドキュメントを生成" class="headerlink" title="2. コードからドキュメントを生成"></a>2. コードからドキュメントを生成</h3><p>実装コードを正として、ドキュメント(Swagger ファイル)を出せないかを考えました。<br>現状対応しているライブラリとしては、<a href="https://github.com/swaggo/swag" target="_blank" rel="noopener">swaggo/swag</a> があげられました。</p>
+<h4 id="swaggo-swag"><a href="#swaggo-swag" class="headerlink" title="swaggo/swag"></a><a href="https://github.com/swaggo/swag" target="_blank" rel="noopener">swaggo/swag</a></h4><p>Go のソースコードを静的解析して、Swagger ドキュメントを生成してくれるツールです。<br>以下のフレームワークとの連携をサポートしています。</p>
+<ul>
+<li><a href="https://github.com/gin-gonic/gin" target="_blank" rel="noopener">gin</a></li>
+<li><a href="https://github.com/labstack/echo" target="_blank" rel="noopener">echo</a></li>
+<li><a href="https://github.com/gobuffalo/buffalo" target="_blank" rel="noopener">buffalo</a></li>
+<li><a href="https://golang.org/pkg/net/http/" target="_blank" rel="noopener">net/http</a></li>
+</ul>
+<h4 id="サンプル-1"><a href="#サンプル-1" class="headerlink" title="サンプル"></a>サンプル</h4><p>gin を利用したパターンの handler サンプルコードです。<br>Swagger ファイルは自動生成されるため割愛します。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DataHandler godoc</span></span><br><span class="line"><span class="comment">// @Summary Show a account</span></span><br><span class="line"><span class="comment">// @Description get string by ID</span></span><br><span class="line"><span class="comment">// @ID dataId</span></span><br><span class="line"><span class="comment">// @Accept  json</span></span><br><span class="line"><span class="comment">// @Produce  json</span></span><br><span class="line"><span class="comment">// @Param name path string true "data name"</span></span><br><span class="line"><span class="comment">// @Param id body int true "id"</span></span><br><span class="line"><span class="comment">// @Param info body string false "info"</span></span><br><span class="line"><span class="comment">// @Success 200 &#123;object&#125; APIResponse</span></span><br><span class="line"><span class="comment">// @Failure 400 &#123;object&#125; APIResponse</span></span><br><span class="line"><span class="comment">// @Failure 500 &#123;object&#125; APIResponse</span></span><br><span class="line"><span class="comment">// @Router /data/&#123;name&#125; [post]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">DataHandler</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> params DataRequestParams</span><br><span class="line">	<span class="keyword">if</span> err := c.ShouldBindJSON(&amp;params); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    c.JSON(http.StatusBadRequest, &amp;APIResponse&#123;Message: <span class="string">"Error"</span>&#125;)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">	service := service.New()</span><br><span class="line">	<span class="keyword">if</span> err := service.Save(params.Body); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    c.JSON(http.StatusInternalServerError, &amp;APIResponse&#123;Message: <span class="string">"Error"</span>&#125;)</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">	res := APIResponse&#123;Message: <span class="string">"OK"</span>&#125;</span><br><span class="line">	c.JSON(http.StatusOK, &amp;res)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="メリット-1"><a href="#メリット-1" class="headerlink" title="メリット"></a>メリット</h4><ol>
+<li>コードが正になり、コードの修正がドキュメントに反映される</li>
+<li>コードのコメントで Swagger の仕様定義を実施できる</li>
+<li>Swagger ファイル生成時に、コードのコメントのバリデーションを一部実行してくれる</li>
+<li>有力フレームワークの機能をそのまま活用できる</li>
+</ol>
+<h4 id="デメリット-1"><a href="#デメリット-1" class="headerlink" title="デメリット"></a>デメリット</h4><ol>
+<li>仕様定義漏れを目見でチェックする必要がある<ul>
+<li>コメントの解析をベースに、Swagger 生成をしていますが、定義が漏れている場合にエラーになりませんでした。(パラメータの記載漏れ、レスポンスのステータスコード漏れ 等確認しました。) そのため、実装とコメントが乖離していないかは目見で確認しないといけませんでした。コメントの量も多く、目見での確認には漏れが出ることが想像されました。</li>
+</ul>
+</li>
+<li>コメント+実装ベースのため Swagger との連携度が低い</li>
+</ol>
+<h3 id="補足-コード生成系フレームワーク比較"><a href="#補足-コード生成系フレームワーク比較" class="headerlink" title="補足: コード生成系フレームワーク比較"></a>補足: コード生成系フレームワーク比較</h3><p>実際、go-swagger 以外にも Swagger -&gt; コード生成ツールは存在します。<br>ですが、<a href="https://github.com/OpenAPITools/openapi-generator" target="_blank" rel="noopener">openapi-generator</a> での生成コードは現状はまだ、運用に耐えるレベルではない考えます。</p>
+<p>特に、Handlerとリクエスト/レスポンスの型定義がマッチされたコードが生成されない点が辛いです。<br>せっかくコード生成したのに、各 API ごとにドキュメントと見比べながらモデルを紐付けるのはいまいちだと思いました。<br>(生成コードが薄いことは良かったですが、紐付けを固くする選択をしました。)</p>
+<p>比較表</p>
+<table>
+<thead>
+<tr>
+<th align="left">対象</th>
+<th align="left">評価</th>
+<th align="left">メリット</th>
+<th align="left">デメリット</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">go-swagger</td>
+<td align="left">o</td>
+<td align="left">- リクエスト/レスポンスの型が定まる <br><br>- リクエストを受け取る/レスポンスを返す 部分を意識しなくて良い <br><br> - リクエストパラメータのバリデーションを自動で実行 <br><br>- 編集不要ファイルは DO NOT EDIT コメントがついている<br><br> - デフォルトで未実装エラーが出る Handler が登録される</td>
+<td align="left">- 自動生成だけでは API 受け付けられない (configure_xxx.go 内の修正が必須) <br><br>- Router 周りのコードが長い</td>
+</tr>
+<tr>
+<td align="left">openapi generator (net/http)</td>
+<td align="left">x</td>
+<td align="left">- 生成コード量が少なく明瞭</td>
+<td align="left">- 非編集ファイルが明確にされていない <br><br>- リクエスト/レスポンスの型定義が Handler に紐付いていない</td>
+</tr>
+<tr>
+<td align="left">openapi generator (gin)</td>
+<td align="left">x</td>
+<td align="left">- 生成コード量が少なく明瞭</td>
+<td align="left">- 非編集ファイルが明確にされていない <br><br>- リクエスト/レスポンスの型定義が Handler に紐付いていない</td>
+</tr>
+</tbody></table>
+<h4 id="openapi-generator-サンプル-gin-version"><a href="#openapi-generator-サンプル-gin-version" class="headerlink" title="openapi-generator サンプル (gin version)"></a>openapi-generator サンプル (gin version)</h4><details><summary>サンプルコード</summary><div>
+swagger.yml (一部抜粋)
+
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">paths:</span></span><br><span class="line">  <span class="string">"/data/&#123;name&#125;"</span><span class="string">:</span></span><br><span class="line"><span class="attr">    post:</span></span><br><span class="line"><span class="attr">      operationId:</span> <span class="string">dataId</span></span><br><span class="line"><span class="attr">      parameters:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">name</span></span><br><span class="line"><span class="attr">          in:</span> <span class="string">path</span></span><br><span class="line"><span class="attr">          required:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">データ名</span></span><br><span class="line"><span class="attr">          schema:</span></span><br><span class="line"><span class="attr">            type:</span> <span class="string">string</span></span><br><span class="line"><span class="attr">      requestBody:</span></span><br><span class="line"><span class="attr">        content:</span></span><br><span class="line">          <span class="string">application/json:</span></span><br><span class="line"><span class="attr">            schema:</span></span><br><span class="line">              <span class="string">$ref:</span> <span class="string">"#/components/schemas/Sample"</span></span><br><span class="line"><span class="attr">      responses:</span></span><br><span class="line">        <span class="string">"200"</span><span class="string">:</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">OK</span></span><br><span class="line"><span class="attr">          content:</span></span><br><span class="line">            <span class="string">application/json:</span></span><br><span class="line"><span class="attr">              schema:</span></span><br><span class="line">                <span class="string">$ref:</span> <span class="string">"#/components/schemas/ApiResponse"</span></span><br><span class="line">        <span class="string">"404"</span><span class="string">:</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">Data</span> <span class="string">Not</span> <span class="string">Found</span></span><br><span class="line">        <span class="string">"500"</span><span class="string">:</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">Internal</span> <span class="string">Server</span> <span class="string">Error</span></span><br></pre></td></tr></table></figure>
+
+<p>handler</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DataId -</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">DataId</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">  c.JSON(http.StatusOK, gin.H&#123;&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>model</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> ApiResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">  Message <span class="keyword">string</span> <span class="string">`json:"message,omitempty"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>(handler に model が紐付いていないことが伝わればよいかと思います)</p>
+</div></details>
+
+<h2 id="所感"><a href="#所感" class="headerlink" title="所感"></a>所感</h2><p>複数のフレームワークを比較検討してみました。</p>
+<p>ドキュメントベースで開発して、コミュニケーションコストを下げたい目的があれば、<code>go-swagger</code> の利用はおすすめできると思います。<br>開発進めてみて知見が溜まってきたら、また公開していきます。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。その中でもDXチームは特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+      
+    </div>
+  </div>
+    
+  <!-- シェアボタン START -->
+  <div class="social-area">
+  <ul class="social-button">
+
+      <!-- twitter -->
+      <li class="sc-tw social-button-twitter">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-hashtags="future_architect">ツイート</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      </li>
+      
+      <!-- Facebookいいね -->
+      <li class="social-button-fb">
+          <div id="fb-root"></div>
+          <script>(function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.8";
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));</script>
+          <div class="fb-like" data-href="https://future-architect.github.io/articles/20190814/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+      </li>
+
+      <!-- はてなブックマーク -->
+      <li class="social-button-hatebu"><a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20190814/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></li>
+
+      <!-- pocket -->
+      <li class="social-button-pocket"><a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
+          <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+      </li>
+
+  </ul>
+  </div>
+<!-- シェアボタン END -->
+
+
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/articles/20190809/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Google Cloud Next &#39;19 in Tokyo Day3 セッションレポート</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190814/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                WAFとして go-swagger を選択してみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190729/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                社内技術書輪読会とSite Reliability Engineering
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190731/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                俺のインフラデザインパターン　～過去の失敗に学ぶニッチなインフラの話～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (0)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (0)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (0)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (0)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (0)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (0)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (0)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (0)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (0)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーアーキテクトの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+          <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+
+    <!-- Twitterフォローボタン -->
+    <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+	  <a data-tweet-limit="1" class="twitter-timeline"
+	  href="https://twitter.com/future_techblog"
+	  data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+
+	  <script>!function(d,s,id){var
+	  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+          </div>
+          <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2019 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
