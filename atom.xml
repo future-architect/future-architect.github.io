@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2019-08-08T23:54:38.736Z</updated>
+  <updated>2019-08-14T01:18:37.523Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>WAFとして go-swagger を選択してみた</title>
+    <link href="https://future-architect.github.io/articles/20190814/"/>
+    <id>https://future-architect.github.io/articles/20190814/</id>
+    <published>2019-08-14T01:30:07.000Z</published>
+    <updated>2019-08-14T01:18:37.523Z</updated>
+    
+    <content type="html"><![CDATA[<p>こんにちは、TIG DXチーム<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>の多賀です。<br>2019年7月にキャリア入社しました。</p><h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>Go のWebアプリケーションフレームワークを検討した際に、 <code>go-swagger</code> が良いのではと思い、比較調査してみました。</p><p>その結果、実際にPJへ導入しています。</p><h2 id="バージョン"><a href="#バージョン" class="headerlink" title="バージョン"></a>バージョン</h2><table><thead><tr><th align="left">名称</th><th align="left">バージョン</th></tr></thead><tbody><tr><td align="left">Go</td><td align="left">1.12.7</td></tr><tr><td align="left"><a href="https://github.com/go-swagger/go-swagger" target="_blank" rel="noopener">go-swagger</a></td><td align="left">v0.19.0</td></tr><tr><td align="left"><a href="https://github.com/swaggo/swag" target="_blank" rel="noopener">swaggo/swag</a></td><td align="left">v1.6.2</td></tr><tr><td align="left"><a href="https://github.com/OpenAPITools/openapi-generator" target="_blank" rel="noopener">openapi-generator</a></td><td align="left">4.0.3</td></tr><tr><td align="left"><a href="https://github.com/gin-gonic/gin" target="_blank" rel="noopener">gin</a></td><td align="left">v1.4.0</td></tr></tbody></table><h2 id="開発物"><a href="#開発物" class="headerlink" title="開発物"></a>開発物</h2><p>以下の実装を行うとします。<br>Web API を作成して、Swagger でドキュメントを管理しましょうというよくある構成かと思います。</p><table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><td>作成物</td><td>Web API</td></tr><tr><td>仕様定義</td><td>Swagger</td></tr><tr><td>言語</td><td>Go</td></tr><tr><td>仕様変更</td><td>高頻度</td></tr></tbody></table><h2 id="Go-のフレームワークに求めるもの"><a href="#Go-のフレームワークに求めるもの" class="headerlink" title="Go のフレームワークに求めるもの"></a>Go のフレームワークに求めるもの</h2><p>この場合、フレームワークに対して何を求めるでしょうか。<br>私は以下を重要視していました。</p><h3 id="重要視したこと"><a href="#重要視したこと" class="headerlink" title="重要視したこと"></a>重要視したこと</h3><p>ドキュメントと実装の乖離をなくすことで、認識齟齬なく開発を行うこと</p><h4 id="なぜ？"><a href="#なぜ？" class="headerlink" title="なぜ？"></a>なぜ？</h4><ol><li>ドキュメントと実装のズレを解消するコストが高いため<ul><li>Web API 開発をする中で最も困ることは <strong>ドキュメントと実装がかけ離れること</strong> です。ドキュメントととのずれによる、コミュニケーションを極力減らしたいと考えました</li></ul></li><li>インターフェイスが頻繁に変わることが想定されたため<ul><li>データ定義の部分が固く決まっていなかったため、データに引きずられて API 仕様の変更も頻繁に起きるだろうと思いました</li></ul></li><li>インターフェイスのやり取りの物理的な距離が遠いため<ul><li>同一の会社内だけでなく会社間をまたいだ開発も想定されたため、コミュニケーションコストがより高くなると想定しました</li></ul></li></ol><h2 id="フレームワーク比較"><a href="#フレームワーク比較" class="headerlink" title="フレームワーク比較"></a>フレームワーク比較</h2><p>ドキュメントと実装の整合性を重要視する考えのもと、下記 2 パターンの方式を検討しました。</p><ol><li>ドキュメントからコードを生成</li><li>コードからドキュメントを生成</li></ol><p>それぞれの方式についてサンプルを作りながら検討しました。<br>結果としては、<strong>1 のパターンのほうが重要視した要件を満たす</strong> と考えました。</p><h3 id="1-ドキュメントからコードを生成"><a href="#1-ドキュメントからコードを生成" class="headerlink" title="1. ドキュメントからコードを生成"></a>1. ドキュメントからコードを生成</h3><p>Swagger ファイルから Go のソースコードが生成できないかを考えました。<br>ライブラリとして、 <a href="https://github.com/go-swagger/go-swagger" target="_blank" rel="noopener">go-swagger</a> をあげています。</p><h4 id="go-swagger"><a href="#go-swagger" class="headerlink" title="go-swagger"></a><a href="https://github.com/go-swagger/go-swagger" target="_blank" rel="noopener">go-swagger</a></h4><p>Swaggerファイルを入力にGoのコードを生成することができるツールです。<br>生成されるコードは、<a href="https://github.com/go-openapi" target="_blank" rel="noopener">go-openapi</a> で管理されているモジュールが利用されています。</p><h4 id="サンプル"><a href="#サンプル" class="headerlink" title="サンプル"></a>サンプル</h4><p>swagger.yml (一部抜粋)</p><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">paths:</span></span><br><span class="line">  <span class="string">/data/&#123;name&#125;:</span></span><br><span class="line"><span class="attr">    post:</span></span><br><span class="line"><span class="attr">      operationId:</span> <span class="string">dataId</span></span><br><span class="line"><span class="attr">      consumes:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">application/json</span></span><br><span class="line"><span class="attr">      produces:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">application/json</span></span><br><span class="line"><span class="attr">      parameters:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">name</span></span><br><span class="line"><span class="attr">          in:</span> <span class="string">path</span></span><br><span class="line"><span class="attr">          required:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">データ名</span></span><br><span class="line"><span class="attr">          type:</span> <span class="string">string</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">body</span></span><br><span class="line"><span class="attr">          in:</span> <span class="string">body</span></span><br><span class="line"><span class="attr">          schema:</span></span><br><span class="line">            <span class="string">$ref:</span> <span class="string">"#/definitions/Sample"</span></span><br><span class="line"><span class="attr">      responses:</span></span><br><span class="line">        <span class="string">"200"</span><span class="string">:</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">OK</span></span><br><span class="line"><span class="attr">          schema:</span></span><br><span class="line">            <span class="string">$ref:</span> <span class="string">"#/definitions/ApiResponse"</span></span><br><span class="line">        <span class="string">"404"</span><span class="string">:</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">Data</span> <span class="string">Not</span> <span class="string">Found</span></span><br><span class="line">        <span class="string">"500"</span><span class="string">:</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">Internal</span> <span class="string">Server</span> <span class="string">Error</span></span><br></pre></td></tr></table></figure><p>生成コードを利用した handler</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">dataHandler</span><span class="params">(params operations.DataIDParams)</span> <span class="title">middleware</span>.<span class="title">Responder</span></span> &#123;</span><br><span class="line"><span class="comment">// リクエスト</span></span><br><span class="line"><span class="comment">// params にすべての情報が含まれている</span></span><br><span class="line">log.Println(params)</span><br><span class="line">log.Println(*params.Body)</span><br><span class="line"></span><br><span class="line"><span class="comment">// ビジネスロジック層にリクエスト情報を渡す</span></span><br><span class="line">service := service.New()</span><br><span class="line"><span class="keyword">if</span> err := service.Save(params.Body); err != <span class="literal">nil</span> &#123;</span><br><span class="line"><span class="comment">// エラーの場合</span></span><br><span class="line"><span class="comment">// 500エラー返せる</span></span><br><span class="line"><span class="keyword">return</span> operations.NewDataIDInternalServerError()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// レスポンス</span></span><br><span class="line">dummyResponse := &amp;models.APIResponse&#123;</span><br><span class="line">Message: <span class="string">"OK"</span>,</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 200 レスポンス</span></span><br><span class="line"><span class="keyword">return</span> operations.NewDataIDOK().WithPayload(dummyResponse)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h4 id="メリット"><a href="#メリット" class="headerlink" title="メリット"></a>メリット</h4><ol><li>Swagger と実装が乖離することはない<ul><li>Swagger から自動生成でリクエスト/レスポンスの struct を吐き出します。自動生成部分も CI で必ず生成して build するようにすれば、漏れることはないです。</li></ul></li><li>go-swagger でリクエスト/レスポンスのオブジェクト型を 生成してくれるためロジックに集中できる<ul><li>リクエスト/レスポンスの型だけでなく、リクエストを受ける/レスポンスを返す実装も合わせて生成されます。そのため、実装者は生成されたコードから リクエストパラメータ struct を受け取る → レスポンス struct を生成 までを実装すればよいです</li></ul></li></ol><h4 id="デメリット"><a href="#デメリット" class="headerlink" title="デメリット"></a>デメリット</h4><ol><li>Swagger の定義を手で書く必要がある<ul><li>Swagger の yml 定義を手でメンテする必要がある点は、デメリットになるかと思います。</li></ul></li></ol><h3 id="2-コードからドキュメントを生成"><a href="#2-コードからドキュメントを生成" class="headerlink" title="2. コードからドキュメントを生成"></a>2. コードからドキュメントを生成</h3><p>実装コードを正として、ドキュメント(Swagger ファイル)を出せないかを考えました。<br>現状対応しているライブラリとしては、<a href="https://github.com/swaggo/swag" target="_blank" rel="noopener">swaggo/swag</a> があげられました。</p><h4 id="swaggo-swag"><a href="#swaggo-swag" class="headerlink" title="swaggo/swag"></a><a href="https://github.com/swaggo/swag" target="_blank" rel="noopener">swaggo/swag</a></h4><p>Go のソースコードを静的解析して、Swagger ドキュメントを生成してくれるツールです。<br>以下のフレームワークとの連携をサポートしています。</p><ul><li><a href="https://github.com/gin-gonic/gin" target="_blank" rel="noopener">gin</a></li><li><a href="https://github.com/labstack/echo" target="_blank" rel="noopener">echo</a></li><li><a href="https://github.com/gobuffalo/buffalo" target="_blank" rel="noopener">buffalo</a></li><li><a href="https://golang.org/pkg/net/http/" target="_blank" rel="noopener">net/http</a></li></ul><h4 id="サンプル-1"><a href="#サンプル-1" class="headerlink" title="サンプル"></a>サンプル</h4><p>gin を利用したパターンの handler サンプルコードです。<br>Swagger ファイルは自動生成されるため割愛します。</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DataHandler godoc</span></span><br><span class="line"><span class="comment">// @Summary Show a account</span></span><br><span class="line"><span class="comment">// @Description get string by ID</span></span><br><span class="line"><span class="comment">// @ID dataId</span></span><br><span class="line"><span class="comment">// @Accept  json</span></span><br><span class="line"><span class="comment">// @Produce  json</span></span><br><span class="line"><span class="comment">// @Param name path string true "data name"</span></span><br><span class="line"><span class="comment">// @Param id body int true "id"</span></span><br><span class="line"><span class="comment">// @Param info body string false "info"</span></span><br><span class="line"><span class="comment">// @Success 200 &#123;object&#125; APIResponse</span></span><br><span class="line"><span class="comment">// @Failure 400 &#123;object&#125; APIResponse</span></span><br><span class="line"><span class="comment">// @Failure 500 &#123;object&#125; APIResponse</span></span><br><span class="line"><span class="comment">// @Router /data/&#123;name&#125; [post]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">DataHandler</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line"><span class="keyword">var</span> params DataRequestParams</span><br><span class="line"><span class="keyword">if</span> err := c.ShouldBindJSON(&amp;params); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    c.JSON(http.StatusBadRequest, &amp;APIResponse&#123;Message: <span class="string">"Error"</span>&#125;)</span><br><span class="line"><span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">service := service.New()</span><br><span class="line"><span class="keyword">if</span> err := service.Save(params.Body); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    c.JSON(http.StatusInternalServerError, &amp;APIResponse&#123;Message: <span class="string">"Error"</span>&#125;)</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">res := APIResponse&#123;Message: <span class="string">"OK"</span>&#125;</span><br><span class="line">c.JSON(http.StatusOK, &amp;res)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h4 id="メリット-1"><a href="#メリット-1" class="headerlink" title="メリット"></a>メリット</h4><ol><li>コードが正になり、コードの修正がドキュメントに反映される</li><li>コードのコメントで Swagger の仕様定義を実施できる</li><li>Swagger ファイル生成時に、コードのコメントのバリデーションを一部実行してくれる</li><li>有力フレームワークの機能をそのまま活用できる</li></ol><h4 id="デメリット-1"><a href="#デメリット-1" class="headerlink" title="デメリット"></a>デメリット</h4><ol><li>仕様定義漏れを目見でチェックする必要がある<ul><li>コメントの解析をベースに、Swagger 生成をしていますが、定義が漏れている場合にエラーになりませんでした。(パラメータの記載漏れ、レスポンスのステータスコード漏れ 等確認しました。) そのため、実装とコメントが乖離していないかは目見で確認しないといけませんでした。コメントの量も多く、目見での確認には漏れが出ることが想像されました。</li></ul></li><li>コメント+実装ベースのため Swagger との連携度が低い</li></ol><h3 id="補足-コード生成系フレームワーク比較"><a href="#補足-コード生成系フレームワーク比較" class="headerlink" title="補足: コード生成系フレームワーク比較"></a>補足: コード生成系フレームワーク比較</h3><p>実際、go-swagger 以外にも Swagger -&gt; コード生成ツールは存在します。<br>ですが、<a href="https://github.com/OpenAPITools/openapi-generator" target="_blank" rel="noopener">openapi-generator</a> での生成コードは現状はまだ、運用に耐えるレベルではない考えます。</p><p>特に、Handlerとリクエスト/レスポンスの型定義がマッチされたコードが生成されない点が辛いです。<br>せっかくコード生成したのに、各 API ごとにドキュメントと見比べながらモデルを紐付けるのはいまいちだと思いました。<br>(生成コードが薄いことは良かったですが、紐付けを固くする選択をしました。)</p><p>比較表</p><table><thead><tr><th align="left">対象</th><th align="left">評価</th><th align="left">メリット</th><th align="left">デメリット</th></tr></thead><tbody><tr><td align="left">go-swagger</td><td align="left">o</td><td align="left">- リクエスト/レスポンスの型が定まる <br><br>- リクエストを受け取る/レスポンスを返す 部分を意識しなくて良い <br><br> - リクエストパラメータのバリデーションを自動で実行 <br><br>- 編集不要ファイルは DO NOT EDIT コメントがついている<br><br> - デフォルトで未実装エラーが出る Handler が登録される</td><td align="left">- 自動生成だけでは API 受け付けられない (configure_xxx.go 内の修正が必須) <br><br>- Router 周りのコードが長い</td></tr><tr><td align="left">openapi generator (net/http)</td><td align="left">x</td><td align="left">- 生成コード量が少なく明瞭</td><td align="left">- 非編集ファイルが明確にされていない <br><br>- リクエスト/レスポンスの型定義が Handler に紐付いていない</td></tr><tr><td align="left">openapi generator (gin)</td><td align="left">x</td><td align="left">- 生成コード量が少なく明瞭</td><td align="left">- 非編集ファイルが明確にされていない <br><br>- リクエスト/レスポンスの型定義が Handler に紐付いていない</td></tr></tbody></table><h4 id="openapi-generator-サンプル-gin-version"><a href="#openapi-generator-サンプル-gin-version" class="headerlink" title="openapi-generator サンプル (gin version)"></a>openapi-generator サンプル (gin version)</h4><details><summary>サンプルコード</summary><div>swagger.yml (一部抜粋)<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">paths:</span></span><br><span class="line">  <span class="string">"/data/&#123;name&#125;"</span><span class="string">:</span></span><br><span class="line"><span class="attr">    post:</span></span><br><span class="line"><span class="attr">      operationId:</span> <span class="string">dataId</span></span><br><span class="line"><span class="attr">      parameters:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">name</span></span><br><span class="line"><span class="attr">          in:</span> <span class="string">path</span></span><br><span class="line"><span class="attr">          required:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">データ名</span></span><br><span class="line"><span class="attr">          schema:</span></span><br><span class="line"><span class="attr">            type:</span> <span class="string">string</span></span><br><span class="line"><span class="attr">      requestBody:</span></span><br><span class="line"><span class="attr">        content:</span></span><br><span class="line">          <span class="string">application/json:</span></span><br><span class="line"><span class="attr">            schema:</span></span><br><span class="line">              <span class="string">$ref:</span> <span class="string">"#/components/schemas/Sample"</span></span><br><span class="line"><span class="attr">      responses:</span></span><br><span class="line">        <span class="string">"200"</span><span class="string">:</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">OK</span></span><br><span class="line"><span class="attr">          content:</span></span><br><span class="line">            <span class="string">application/json:</span></span><br><span class="line"><span class="attr">              schema:</span></span><br><span class="line">                <span class="string">$ref:</span> <span class="string">"#/components/schemas/ApiResponse"</span></span><br><span class="line">        <span class="string">"404"</span><span class="string">:</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">Data</span> <span class="string">Not</span> <span class="string">Found</span></span><br><span class="line">        <span class="string">"500"</span><span class="string">:</span></span><br><span class="line"><span class="attr">          description:</span> <span class="string">Internal</span> <span class="string">Server</span> <span class="string">Error</span></span><br></pre></td></tr></table></figure><p>handler</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DataId -</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">DataId</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">  c.JSON(http.StatusOK, gin.H&#123;&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>model</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> ApiResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">  Message <span class="keyword">string</span> <span class="string">`json:"message,omitempty"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>(handler に model が紐付いていないことが伝わればよいかと思います)</p></div></details><h2 id="所感"><a href="#所感" class="headerlink" title="所感"></a>所感</h2><p>複数のフレームワークを比較検討してみました。</p><p>ドキュメントベースで開発して、コミュニケーションコストを下げたい目的があれば、<code>go-swagger</code> の利用はおすすめできると思います。<br>開発進めてみて知見が溜まってきたら、また公開していきます。</p><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。その中でもDXチームは特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;こんにちは、TIG DXチーム&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; rel=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;の多賀です。&lt;br&gt;2019年7月にキャリア入社しました。&lt;/p&gt;
+&lt;h2 id=&quot;概要&quot;&gt;&lt;a href=&quot;#概要&quot; cl
+      
+    
+    </summary>
+    
+      <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
+    
+    
+      <category term="Go" scheme="https://future-architect.github.io/tags/Go/"/>
+    
+  </entry>
   
   <entry>
     <title>Google Cloud Next &#39;19 in Tokyo Day3 セッションレポート</title>
@@ -34,10 +60,6 @@
     
     </summary>
     
-      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
-    
-    
-      <category term="GCP" scheme="https://future-architect.github.io/tags/GCP/"/>
     
   </entry>
   
@@ -59,10 +81,6 @@
     
     </summary>
     
-      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
-    
-    
-      <category term="GCP" scheme="https://future-architect.github.io/tags/GCP/"/>
     
   </entry>
   
@@ -84,10 +102,6 @@
     
     </summary>
     
-      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
-    
-    
-      <category term="Infrastructure" scheme="https://future-architect.github.io/tags/Infrastructure/"/>
     
   </entry>
   
@@ -110,10 +124,6 @@
     
     </summary>
     
-      <category term="Culture" scheme="https://future-architect.github.io/categories/Culture/"/>
-    
-    
-      <category term="Infrastructure" scheme="https://future-architect.github.io/tags/Infrastructure/"/>
     
   </entry>
   
@@ -135,10 +145,6 @@
     
     </summary>
     
-      <category term="IoT" scheme="https://future-architect.github.io/categories/IoT/"/>
-    
-    
-      <category term="IoT" scheme="https://future-architect.github.io/tags/IoT/"/>
     
   </entry>
   
@@ -161,10 +167,6 @@
     
     </summary>
     
-      <category term="DB" scheme="https://future-architect.github.io/categories/DB/"/>
-    
-    
-      <category term="DB" scheme="https://future-architect.github.io/tags/DB/"/>
     
   </entry>
   
@@ -186,10 +188,6 @@
     
     </summary>
     
-      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
-    
-    
-      <category term="gcp" scheme="https://future-architect.github.io/tags/gcp/"/>
     
   </entry>
   
@@ -211,10 +209,6 @@
     
     </summary>
     
-      <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
-    
-    
-      <category term="Go" scheme="https://future-architect.github.io/tags/Go/"/>
     
   </entry>
   
@@ -238,10 +232,6 @@
     
     </summary>
     
-      <category term="Culture" scheme="https://future-architect.github.io/categories/Culture/"/>
-    
-    
-      <category term="アルバイト報告" scheme="https://future-architect.github.io/tags/%E3%82%A2%E3%83%AB%E3%83%90%E3%82%A4%E3%83%88%E5%A0%B1%E5%91%8A/"/>
     
   </entry>
   
@@ -263,10 +253,6 @@
     
     </summary>
     
-      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
-    
-    
-      <category term="GCP" scheme="https://future-architect.github.io/tags/GCP/"/>
     
   </entry>
   
@@ -290,12 +276,6 @@
     
     </summary>
     
-      <category term="Management" scheme="https://future-architect.github.io/categories/Management/"/>
-    
-    
-      <category term="Redmine" scheme="https://future-architect.github.io/tags/Redmine/"/>
-    
-      <category term="Metabase" scheme="https://future-architect.github.io/tags/Metabase/"/>
     
   </entry>
   
@@ -317,10 +297,6 @@
     
     </summary>
     
-      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
-    
-    
-      <category term="AWS" scheme="https://future-architect.github.io/tags/AWS/"/>
     
   </entry>
   
@@ -342,10 +318,6 @@
     
     </summary>
     
-      <category term="DataScience" scheme="https://future-architect.github.io/categories/DataScience/"/>
-    
-    
-      <category term="MachineLearning" scheme="https://future-architect.github.io/tags/MachineLearning/"/>
     
   </entry>
   
@@ -367,10 +339,6 @@
     
     </summary>
     
-      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
-    
-    
-      <category term="AWS" scheme="https://future-architect.github.io/tags/AWS/"/>
     
   </entry>
   
@@ -393,10 +361,6 @@
     
     </summary>
     
-      <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
-    
-    
-      <category term="Redmine" scheme="https://future-architect.github.io/tags/Redmine/"/>
     
   </entry>
   
@@ -418,10 +382,6 @@
     
     </summary>
     
-      <category term="DataScience" scheme="https://future-architect.github.io/categories/DataScience/"/>
-    
-    
-      <category term="MachineLearning" scheme="https://future-architect.github.io/tags/MachineLearning/"/>
     
   </entry>
   
@@ -443,10 +403,6 @@
     
     </summary>
     
-      <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
-    
-    
-      <category term="TypeScript" scheme="https://future-architect.github.io/tags/TypeScript/"/>
     
   </entry>
   
@@ -469,10 +425,6 @@
     
     </summary>
     
-      <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
-    
-    
-      <category term="Styleguide" scheme="https://future-architect.github.io/tags/Styleguide/"/>
     
   </entry>
   
@@ -494,35 +446,6 @@
     
     </summary>
     
-      <category term="Management" scheme="https://future-architect.github.io/categories/Management/"/>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>OpenCensus(OpenTelemetry)とは</title>
-    <link href="https://future-architect.github.io/articles/20190604/"/>
-    <id>https://future-architect.github.io/articles/20190604/</id>
-    <published>2019-06-04T00:00:51.000Z</published>
-    <updated>2019-06-24T13:37:27.537Z</updated>
-    
-    <content type="html"><![CDATA[<p>うちの会社では、各種クラウドサービスの知見を共有する勉強会を毎週行なっています。弊社ではコンサルティング事業をしていて、次々と多くの案件をこなしているし、各案件の要件も異なるため、自社でもっている知見もバラエティーに富んでいます。既存のサービスではこういう制約があってハマったとか、今回これで作りきったけど、次回クリーンに作り直すならこうしたい、みたいな話が赤裸々に語られる楽しい会です。で、僕はインフラをやることはあまりないのだけど、話を聞くだけでは申し訳ないので、2週間前の会で、最近ハマっているOpenCensusについて紹介しました。</p><p>「分散トレースとは」という話がまとまっていて、初学者に「これ読んどいて」と言えるようなページがなかったので社内向けの資料をベースに技術ブログでも公開します。</p><h1 id="トレーシングとメトリックス"><a href="#トレーシングとメトリックス" class="headerlink" title="トレーシングとメトリックス"></a>トレーシングとメトリックス</h1><p>トレーシングはどの処理がどの順番で行われているか、どのぐらい処理時間がかかっているかをミクロに見ていくことによって、システムの状況を把握しやすくする。</p><p>メトリックスは、マクロな統計情報。だいたい平均は100mSで終わってる、80パーセンタイルの処理時間は120mS、95パーセンタイルは400mSみたいな、「なんとなく」を掴む方法。メモリ使用量、CPUなどのシステムの状態を把握し、異常が起きそうかどうか、余裕があるかどうかを把握するために使うもので、SRE本ではかなり強調されているもの。</p><p>OpenCensusでは、メトリックスはビューというものをあらかじめ定義する。どういった単位の数字で、どういった感じの値分布になるのか、を定義する。ちょうど、OpenCensusのGoライブラリのデフォルト定義がわかりやすい。</p><ul><li><a href="https://github.com/census-instrumentation/opencensus-go/blob/master/plugin/ochttp/stats.go#L129" target="_blank" rel="noopener">HTTPクライアント向けのビュー定義</a></li></ul><p>この分布に含まれるリクエスト数がいくつ、みたいなカウント数が集計されるので、数万件のアクセス時にも、収集されるデータ量はあまり大きくならない。トレーシングはどの処理がどの順番に行われたか、どれだけ時間がかかったかを個別に収集するため、ビューといったものはない。アクセス数に比例した分量の詳細なログが出力されるが、データ量削減のために、トレーシングも、間引いて（サンプラーの設定による）収集することがある。</p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><ul><li>Googleが社内のサービスの監視のために、Borgmonを作る<ul><li>Borgmonはモニタリングのためのツール。システムが正しく動作しているかどうかのモニタリングを行う</li><li>元Googleの人がBorgmonに触発されてOSSでPrometheusを作る</li></ul></li><li>Googleが社内のサービスのトレーシングのために、Dapperを作る<ul><li>Dapperの論文が2010年ごろに出る</li><li>この論文をもとに、Zipkin(Twitter)、Jaeger(Uber)といったOSSが作成される</li></ul></li><li>New Relic, Datadog, Treasure Dataなどのサービスがここ10年ぐらいのあいだで生まれた<ul><li>モニタリング・分析などのビッグデータ的な文脈</li></ul></li><li>統合APIの機運<ul><li>いろんなバックエンドサービスが生まれたが、それぞれの専用のSDKをアプリケーションに組み込む必要があった</li><li>OpenTracingというプロジェクトができ、Cloud Native Computing Foundation配下に入る</li><li>Googleが社内のCensusというライブラリの公開版のOpenCensusを作成する<ul><li>トレーシングと、モニタリングを両方サポート</li></ul></li></ul></li><li>統合APIの統合<ul><li>OpenCensusとOpenTracingの統合が発表される</li><li>この2つがマージして、CNCF配下のOpenTelemetryというものが作られることが発表される(先週)</li></ul></li></ul><h1 id="分散トレーシング"><a href="#分散トレーシング" class="headerlink" title="分散トレーシング"></a>分散トレーシング</h1><p>各処理にどれだけ時間がかかったのかを、ルールに従って出力することにより、複雑に関連しあったタスクでどこに問題があるのかを一目で見れるようにする。たんなるログではなく、親子関係の構造を持つログ。</p><ul><li>タスクのスタートと終了時に、特別なAPIを使って記録する（この1区画をスパンと呼ぶ）</li><li>スパンを作る時には、親のスパンのIDをAPIに渡すことで、親子関係があることを通知する</li><li>バッチ処理から作られるワーカーの場合は、スパンIDどうしをリンクすることで、関連するスパンであることを通知する</li><li>ネットワーク越しにタスクを投げる時は、X-B3-TraceId, X-B3-ParentSpanIdといったヘッダー、gRPCのメタデータなどを介して、別プロセスでも親子関係のあるタスクを行なっていることを通知する</li><li>スパンに対してログ、タグといったものを出力することもできる</li><li>分散トレースの文脈では、スパンの集合=トレース</li></ul><p>この情報を使うことで、下記のようなグラフを表示することができる。</p><img width="993" alt src="/images/20190604/opencentus_dashboard.png"><h1 id="OpenCensusとは"><a href="#OpenCensusとは" class="headerlink" title="OpenCensusとは"></a>OpenCensusとは</h1><p>Borgmon由来のメトリクス、Dapper由来のトレーシングの両方に対応したライブラリ</p><p>次のような言語に対応している</p><ul><li>Go</li><li>Java</li><li>C++</li><li>C#</li><li>Python</li><li>PHP</li><li>Ruby</li><li>Erlang/Elixir</li></ul><p>出力先がプラグインで切り替えられる。Goのものだと、次のようなものに対応している。</p><ul><li>GCPのStackdriver</li><li>Datadog</li><li>AWSのX-Ray</li><li>Jaeger</li><li>Zipkin</li><li>Honeycomb</li></ul><h1 id="どうやって出力するのか？"><a href="#どうやって出力するのか？" class="headerlink" title="どうやって出力するのか？"></a>どうやって出力するのか？</h1><h2 id="自動出力"><a href="#自動出力" class="headerlink" title="自動出力"></a>自動出力</h2><p>データの出力は、OpenCensusのAPIで行うが、Integrationと呼ばれる特別なプラグインを入れると、システムの入出力で勝手にログを取ってくれる。Pythonだと次のようなものが公式で提供されている、</p><ul><li>DB API, Django, Flask, Google Cloud Client Library, gRPC, httplib, PostgreSQL, MongoDB, MySQL, Pyramid, Requests, SQLAlchemy, threading</li></ul><p>Node.jsではOpenCensusをimportするだけで、勝手にHTTPのログが出力されるようになる。プロセスをまたぐような通信のログが勝手に取得できる。</p><p>Envoyというコンテナ間の通信プロキシが通信のトレース出力機能を持っているのため、Kubernetesを使うと勝手に出力される</p><h2 id="手動でメトリックスを出力する"><a href="#手動でメトリックスを出力する" class="headerlink" title="手動でメトリックスを出力する"></a>手動でメトリックスを出力する</h2><p>測定したい単位、評価基準をプログラムで作り、定期的にstats.Recordで送信する。アプリケーションでどのようなメトリックスが必要かを考えて項目を設定する。あるいは、既成の自動出力のIntegrationを参考にすると良さそう。</p><p>下記のコードはExporter設定は省略しています</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line"><span class="string">"go.opencensus.io/stats"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">mLatencyMs = stats.Float64(<span class="string">"latency"</span>, <span class="string">"The latency in milliseconds"</span>, <span class="string">"ms"</span>)</span><br><span class="line">mLines = stats.Int64(<span class="string">"lines_in"</span>, <span class="string">"The number of lines processed"</span>, <span class="string">"1"</span>)</span><br><span class="line">mBytesIn = stats.Int64(<span class="string">"bytes_in"</span>, <span class="string">"The number of bytes received"</span>, <span class="string">"By"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Invoking .M produces measurements that we then record against</span></span><br><span class="line"><span class="comment">// a context "ctx" with tags.</span></span><br><span class="line">stats.Record(ctx,</span><br><span class="line">mLatencyMs.M(<span class="number">17</span>),</span><br><span class="line">mLines.M(<span class="number">238</span>),</span><br><span class="line">mBytesIn.M(<span class="number">7000</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>メトリックスの出力先としてPrometheus（PULL型)を設定しておくと、Prometheusが読みにくるためのAPIが作成され、定期的に出力された数値を取得しにくるようになる。</p><h2 id="手動でトレースを出力する"><a href="#手動でトレースを出力する" class="headerlink" title="手動でトレースを出力する"></a>手動でトレースを出力する</h2><p>StartSpanとEndでスパンを出力していく</p><p>下記のコードはExporter設定は省略しています</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"go.opencensus.io/trace"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"><span class="comment">// Create a span with the background context, making this the parent span.</span></span><br><span class="line"><span class="comment">// A span must be closed.</span></span><br><span class="line">ctx, span := trace.StartSpan(context.Background(), <span class="string">"main"</span>)</span><br><span class="line"><span class="comment">// Make the span close at the end of this function.</span></span><br><span class="line"><span class="keyword">defer</span> span.End()</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">10</span>; i++ &#123;</span><br><span class="line">doWork(ctx)</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h1 id="OpenCensusの使いどころ"><a href="#OpenCensusの使いどころ" class="headerlink" title="OpenCensusの使いどころ"></a>OpenCensusの使いどころ</h1><p>複数のサービスに別れているシステムだと、分散トレーシングはかなり便利なはず。</p><ol><li>ローカル開発では、分散トレース収集可視化のJaeger/Zipkinと、メトリクス収集可視化のPrometheusがDockerで簡単に起動できるので、これを出力先にして開発を行う<ol start="2"><li>デバッグ出力するときも、トレースでタグとして情報を出力しておくと、かなり良い</li><li>ステージング環境ではStackdriverとX-Rayで</li><li>たてなくても, zPageという簡易のビューアはついてくる（かなり簡易）</li></ol></li><li>本番環境では、Stackdriverの無料枠がかなり小さいので、サンプリング頻度をかなり下げて使うか、予算に入れてきちんとお金を払う？<ol start="3"><li>トレーシングはいらないので、メトリクスだけとかに絞るとか</li><li>あるいは自前でPrometheus、Jaeger(Zipkin)を立てる？</li></ol></li></ol><p>OpenCensusの初期化とか環境設定がなかなかめんどいので、それを簡単にする<a href="https://github.com/future-architect/futureot/tree/master/occonfig" target="_blank" rel="noopener">occonfig</a>というGoのパッケージをチームのハックデー等を使って作りました。Node.js版も公開はしてないけど<a href="https://github.com/future-architect/futureot/tree/master/occonfig-node" target="_blank" rel="noopener">実装はしました</a>。READMEに環境設定のもろもろを書いたので、参考にしてください。まあ、本当に作ったばかりの状態で実戦投入はまだなので、実際に使うといろいろ出るかもですが。OpenTelemetryへの追従もやっていきます。</p><p>また、気軽にローカルの開発で使い始められるように、今Go界隈で一番いけているという話題のロガーの<a href="https://github.com/uber-go/zap" target="_blank" rel="noopener">zap</a>経由でコンソールに出力する<a href="https://github.com/future-architect/futureot/tree/master/exporters/opencensus-go-exporter-zap" target="_blank" rel="noopener">エクスポーター</a>も実装しました。Instrumentsも色々今後は仕事しながら足していきたいな、と思っています。</p><h1 id="今後とか"><a href="#今後とか" class="headerlink" title="今後とか"></a>今後とか</h1><ul><li>OpenTelemetryになっても、アプリケーションに対して（Record、StartSpan, End等の)後方互換APIは用意されるとのこと<ul><li>ExporterやInstrumentの実装者はそのままではいかないかもしれない</li><li>出力先の設定部分以外のアプリケーションコードに埋め込まれた部分は大丈夫そうなので、とりあえず今からやるならOpenCensusでやっていけば良さそう。</li></ul></li><li>OpenCensusはGoがプライマリーの扱いだったが、OpenTelemetryはリポジトリを見る限りでは、Java中心<ul><li><a href="https://opentelemetry.io/" target="_blank" rel="noopener">https://opentelemetry.io/</a></li></ul></li><li>OpenCensus時代にも、Agent/Collectorというものが作られていた<ul><li>fluentdみたいなやつ。Exporterをアプリケーションで設定するのではなくて、Agentに設定すると、アプリケーションが相手先のシステムが何かを知らずに（気にせずに）出力できる</li><li>CollectorはAgentの出力を集めて、実際の集計サーバーに転送する、というコンセプト</li><li>現在でも安定はしていないが、<a href="https://medium.com/opentracing/a-roadmap-to-convergence-b074e5815289" target="_blank" rel="noopener">OpenTelemetryはProxy, Sidecar, AgentというのがProject Overviewに明記されている</a>ので、こちらが主流になる？とはいえ、C#のリポジトリを見ると、<a href="https://github.com/open-telemetry/opentelemetry-dotnet" target="_blank" rel="noopener">exporterも依然として存在する模様</a> </li></ul></li><li>用語が少し整理される？<ul><li>InstrumentはCollectorとなる？</li></ul></li></ul><h1 id="その他の情報源"><a href="#その他の情報源" class="headerlink" title="その他の情報源"></a>その他の情報源</h1><p>OpenCensusの情報はまとまっていなかったので、次のページを作ってみました。</p><ul><li><a href="https://github.com/shibukawa/awesome-opencensus" target="_blank" rel="noopener">https://github.com/shibukawa/awesome-opencensus</a></li></ul><p>あとは、Observability JapanというDiscordのグループもあります。</p><ul><li><a href="https://discordapp.com/invite/dcvSbt2" target="_blank" rel="noopener">https://discordapp.com/invite/dcvSbt2</a></li></ul>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;うちの会社では、各種クラウドサービスの知見を共有する勉強会を毎週行なっています。弊社ではコンサルティング事業をしていて、次々と多くの案件をこなしているし、各案件の要件も異なるため、自社でもっている知見もバラエティーに富んでいます。既存のサービスではこういう制約があってハマっ
-      
-    
-    </summary>
-    
-      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
-    
-    
-      <category term="Monitoring" scheme="https://future-architect.github.io/tags/Monitoring/"/>
-    
-      <category term="Go" scheme="https://future-architect.github.io/tags/Go/"/>
     
   </entry>
   
