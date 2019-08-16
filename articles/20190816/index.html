@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>はじめてのTerraform 0.12 ～環境構築～ | Future Tech Blog - フューチャーアーキテクト</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにこんにちはーTIG DXチーム1のゆるふわエンジニアの前原です。 最近は、プラットフォームを新規で構築するプロジェクトや、既存の環境を運用改善していくプロジェクトに従事しています。その中で私はクラウドインフラ部分を担当しており、アーキテクチャデザインや、Terraform・Ansible・Packerといった構成管理ツールを利用したAWSやGCP環境の構築をしています。 本記事では、最近バ">
+<meta name="keywords" content="AWS,Terraform">
+<meta property="og:type" content="article">
+<meta property="og:title" content="はじめてのTerraform 0.12 ～環境構築～">
+<meta property="og:url" content="https://future-architect.github.io/articles/20190816/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="はじめにこんにちはーTIG DXチーム1のゆるふわエンジニアの前原です。 最近は、プラットフォームを新規で構築するプロジェクトや、既存の環境を運用改善していくプロジェクトに従事しています。その中で私はクラウドインフラ部分を担当しており、アーキテクチャデザインや、Terraform・Ansible・Packerといった構成管理ツールを利用したAWSやGCP環境の構築をしています。 本記事では、最近バ">
+<meta property="og:locale" content="ja">
+<meta property="og:updated_time" content="2019-08-16T03:52:03.233Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="はじめてのTerraform 0.12 ～環境構築～">
+<meta name="twitter:description" content="はじめにこんにちはーTIG DXチーム1のゆるふわエンジニアの前原です。 最近は、プラットフォームを新規で構築するプロジェクトや、既存の環境を運用改善していくプロジェクトに従事しています。その中で私はクラウドインフラ部分を担当しており、アーキテクチャデザインや、Terraform・Ansible・Packerといった構成管理ツールを利用したAWSやGCP環境の構築をしています。 本記事では、最近バ">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="はじめてのTerraform 0.12 ～環境構築～ | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="はじめてのTerraform 0.12 ～環境構築～,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Tech Blog</div>
+        <div class="header-title-sub">フューチャーアーキテクト開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20190816/">はじめてのTerraform 0.12 ～環境構築～</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20190816-terraform1" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> 前原応光</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2019-08-16T03:43:21.000Z" itemprop="datePublished">2019/08/16</time>
+
+	</li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+	  
+  
+    <a href="/tags/AWS/" title="AWS">AWS</a>,
+  
+    <a href="/tags/Terraform/" title="Terraform">Terraform</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    Categories:
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちはー<br>TIG DXチーム<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>のゆるふわエンジニアの前原です。</p>
+<p>最近は、プラットフォームを新規で構築するプロジェクトや、既存の環境を運用改善していくプロジェクトに従事しています。その中で私はクラウドインフラ部分を担当しており、アーキテクチャデザインや、Terraform・Ansible・Packerといった構成管理ツールを利用したAWSやGCP環境の構築をしています。</p>
+<p>本記事では、最近バージョンアップしたTerraform 0.12の構文がこんな感じで変わったよー的な話を伝えていきます。</p>
+<p>大きくは以下の流れで進めます。</p>
+<ol>
+<li>Terraformの事始め (今回の記事です)</li>
+<li>Terraform 0.12でVPCを構築する （次回の記事で説明します！）</li>
+</ol>
+<p>これからTerraformを触っていきたいといった方にもわかるように書いていきます。<br>そのため少し長めの内容になってしまいますが、お付き合いください。</p>
+<h1 id="Terraformとは"><a href="#Terraformとは" class="headerlink" title="Terraformとは"></a>Terraformとは</h1><p><a href="https://www.terraform.io/" target="_blank" rel="noopener">Terraform</a>は、<a href="https://www.hashicorp.com/" target="_blank" rel="noopener">HashiCorp</a>によって開発された構成管理ツールで、主にクラウド環境（クラウド以外でも利用可能）を構築するときに利用します。</p>
+<p>Terraformなどのツールを利用しない場合は、ブラウザを通してGUIから構築するケースがあるかと思います。その場合は、作業ミスをなくすために設定手順書やパラメータシートを元に構築するかとおもいますが、規模が大きくなったり関わる人が多くなってくると、人による設定ミスなどが発生することも多いのでは無いでしょうか。ミスを回避するために、各種施策やドキュメントの陳腐化を防ぐ方法に時間を費やすことも多々あるでしょう。</p>
+<p>そういったケースにTerraformのような構成管理ツールを利用することで、インフラの構成をコードに落とし込み、状態を定義することができるようになります。</p>
+<p>これにより誰が実行しても結果が同じになることで、ミスを低減することが可能です。また、コードを見ることで常にインフラの最新状態を把握することができます。また、コード化しているため、Gitなどのバージョン管理システムで管理することもできます。</p>
+<p>…と、ここまでメリットについて書きましたが、いざTerraformを使用するとそれなりに学習コストが必要となります。</p>
+<h1 id="Terraformの事始め"><a href="#Terraformの事始め" class="headerlink" title="Terraformの事始め"></a>Terraformの事始め</h1><p>ここでは、Terraformを実行するための環境をつくります。</p>
+<h2 id="環境"><a href="#環境" class="headerlink" title="環境"></a>環境</h2><p>Terraformを体験するために以下の環境で行います。</p>
+<ul>
+<li><code>AWS</code></li>
+<li><code>Terraform: 0.12.6</code> &amp; <code>0.11.14</code></li>
+<li><code>tfenv: 1.0.1</code></li>
+<li><code>MacBook Pro Mojave</code> or <code>Windows10 64bit</code></li>
+</ul>
+<h2 id="Terraformのインストール"><a href="#Terraformのインストール" class="headerlink" title="Terraformのインストール"></a>Terraformのインストール</h2><p>Terraformのインストールを行います。</p>
+<h3 id="MacOSの場合"><a href="#MacOSの場合" class="headerlink" title="MacOSの場合"></a>MacOSの場合</h3><p>Terraformの実行環境を準備します。<br>今回は、バージョンの切り替えを楽にしてくれる<a href="https://github.com/tfutils/tfenv" target="_blank" rel="noopener">tfenv</a>を利用します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">### Install tfenv</span></span><br><span class="line">$ brew install tfenv</span><br><span class="line">$ tfenv -v</span><br><span class="line">tfenv 1.0.1</span><br></pre></td></tr></table></figure>
+
+<p>tfenvでterraformをインストールし、使用可能なバージョンを確認します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ tfenv install latest</span><br><span class="line">$ tfenv install 0.11.14</span><br><span class="line">$ tfenv list</span><br><span class="line">* 0.12.6 (<span class="built_in">set</span> by /usr/<span class="built_in">local</span>/Cellar/tfenv/1.0.1/version)</span><br><span class="line">  0.11.14</span><br></pre></td></tr></table></figure>
+
+<p>バージョンの切り替えは、<code>use</code>を利用することで簡単に切り替えることができます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ tfenv use 0.11.14</span><br><span class="line">[INFO] Switching to v0.11.14</span><br><span class="line">[INFO] Switching completed</span><br></pre></td></tr></table></figure>
+
+<p>tfenvを使用しない場合は、<a href="https://learn.hashicorp.com/terraform/getting-started/install.html" target="_blank" rel="noopener">こちら</a>のサイトを確認してください。</p>
+<h3 id="Windowsの場合"><a href="#Windowsの場合" class="headerlink" title="Windowsの場合"></a>Windowsの場合</h3><p>Terraformを<a href="https://www.terraform.io/downloads.html" target="_blank" rel="noopener">ダウンロード</a>します。<br>ダウンロードしたファイルを解凍し、<code>C:¥Windows</code>配下に<code>terraform.exe</code>を配置します。<br>コマンドプロントもしくはお使いのターミナルを開き、以下のコマンドを発行します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ terraform version</span><br><span class="line">Terraform v0.12.6</span><br></pre></td></tr></table></figure>
+
+<p>ここでは試しておりませんが、Windowsもtfenv（only git-bash）に対応しているので興味のある方は試して頂ければと思います。  </p>
+<ul>
+<li>GitHub: <a href="https://github.com/tfutils/tfenv" target="_blank" rel="noopener">tfenv</a></li>
+</ul>
+<h2 id="Terraform-を実行するまでにやること"><a href="#Terraform-を実行するまでにやること" class="headerlink" title="Terraform を実行するまでにやること"></a>Terraform を実行するまでにやること</h2><h3 id="環境変数の設定"><a href="#環境変数の設定" class="headerlink" title="環境変数の設定"></a>環境変数の設定</h3><p>AWSのAPIを発行するために必要な設定です。<br>AWSのIAM Userであらかじめユーザを作成し、アクセスキーとシークレットキーを環境変数にセットします。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># MacOSの場合</span></span><br><span class="line">$ <span class="built_in">export</span> AWS_ACCESS_KEY_ID=xxx</span><br><span class="line">$ <span class="built_in">export</span> AWS_SECRET_ACCESS_KEY=xxx</span><br><span class="line"></span><br><span class="line"><span class="comment"># Windowsの場合</span></span><br><span class="line">$ <span class="built_in">set</span> AWS_ACCESS_KEY_ID=xxx</span><br><span class="line">$ <span class="built_in">set</span> AWS_SECRET_ACCESS_KEY=xxx</span><br></pre></td></tr></table></figure>
+
+<p>MacOSの場合に限りますが、複数のAWSアカウント扱っている場合は、<a href="https://direnv.net/" target="_blank" rel="noopener">direnv</a>を利用するとディレクトリ単位で環境変数を切り替えることができるため便利です。</p>
+<p>もし、HTTP Proxy配下の環境で実行したい場合は以下のオプションも追加で設定ください。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># MacOSの場合</span></span><br><span class="line"><span class="built_in">export</span> HTTPS_PROXY=https://proxy.example.com:443</span><br><span class="line"></span><br><span class="line"><span class="comment"># Windowsの場合</span></span><br><span class="line"><span class="built_in">set</span> HTTPS_PROXY=https://proxy.example.com:443</span><br></pre></td></tr></table></figure>
+
+<h3 id="tfstateファイルの管理について"><a href="#tfstateファイルの管理について" class="headerlink" title="tfstateファイルの管理について"></a>tfstateファイルの管理について</h3><p>tfstateファイルは、Terraformで管理しているインフラの状態を管理するためのファイルです。<br>このファイルは非常に大切です。</p>
+<p>通常、tfstateファイルを保存する場所を指定しない場合は、Terraformを実行したディレクトリに保存されます。<br>そのため、複数人でTerraformを実行する環境や、可用性を意識するとローカルでの保存はイケてないです。</p>
+<p>そこで、tfstateファイルを管理するためのS3 バケットを用意します。<br>（<a href="https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/install-macos.html" target="_blank" rel="noopener">AWS CLI</a>が実行できることを前提とします）<br>また、バケットはバージョニングの設定をします。<br>バージョニングすることでtfstateファイルに予期せぬ更新や、壊してしまった時に戻せるようにするためです。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">### バケットの作成</span></span><br><span class="line">$ aws s3 mb s3://example-bucket --region ap-southeast-2</span><br><span class="line"><span class="comment">### バージョニングの設定</span></span><br><span class="line">$ aws s3api put-bucket-versioning --bucket example-bucket --versioning-configuration Status=Enabled</span><br><span class="line"><span class="comment">### バージョニングの設定ができていることを確認します</span></span><br><span class="line">$ aws s3api get-bucket-versioning --bucket example-bucket</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"Status"</span>: <span class="string">"Enabled"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="リージョンの選択"><a href="#リージョンの選択" class="headerlink" title="リージョンの選択"></a>リージョンの選択</h3><p>リージョンは適切に選択してください。<br>もし学習用途であればバージニア（us-east-1）を利用することを個人的におすすめします。<br>理由は、単純に安いからです！</p>
+<p>ただ、本記事は諸事情によりシドニーで構築しています（ap-southeast-2）</p>
+<h2 id="Terraformのディレクトリ構成"><a href="#Terraformのディレクトリ構成" class="headerlink" title="Terraformのディレクトリ構成"></a>Terraformのディレクトリ構成</h2><p>以下のようなフラットなディレクトリ構成で、1つのディレクトリにtfファイルを配置する設計にします。</p>
+<p>以下の3つのtfファイルについては、次章以降で説明します。</p>
+<ul>
+<li>backend.tf</li>
+<li>provider.tf</li>
+<li>versions.tf</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── backend.tf</span><br><span class="line">├── provider.tf</span><br><span class="line">├── versions.tf</span><br><span class="line">└── ...(次回の記事で説明します)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Backendの指定"><a href="#Backendの指定" class="headerlink" title="Backendの指定"></a>Backendの指定</h2><p>tfstateファイルをS3 バケットで管理するため、Backend用のtfファイルを作成します。<br>先ほどAWS CLIで作成したバケットを指定します。</p>
+<figure class="highlight bash"><figcaption><span>backend.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">terraform &#123;</span><br><span class="line">  backend <span class="string">"s3"</span> &#123;</span><br><span class="line">    bucket = <span class="string">"example-bucket"</span></span><br><span class="line">    key    = <span class="string">"state/service"</span></span><br><span class="line">    region = <span class="string">"ap-southeast-2"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Providerの指定"><a href="#Providerの指定" class="headerlink" title="Providerの指定"></a>Providerの指定</h2><p>Terraformは、AWSだけでなく、GCP、Alibaba Cloudなど様々なプロバイダに対応しています。<br>今回は、AWSを利用するための定義をします。<br>また、リージョンを指定します。</p>
+<figure class="highlight bash"><figcaption><span>provider.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">provider <span class="string">"aws"</span> &#123;</span><br><span class="line">  region = <span class="string">"ap-southeast-2"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Versions"><a href="#Versions" class="headerlink" title="Versions"></a>Versions</h3><p>このファイルはなくても問題ないのですが、Terraform 0.12から構文が変わっているため、明示的に記述します。<br>以下により<code>0.12</code>以上のバージョンでないと実行できないようになっています。<br>（Terraformのアップグレードコマンドで0.12にした場合は、自動で作成されます）</p>
+<figure class="highlight bash"><figcaption><span>versions.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">terraform &#123;</span><br><span class="line">  required_version = <span class="string">"&gt;= 0.12"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Terraform-init"><a href="#Terraform-init" class="headerlink" title="Terraform init"></a>Terraform init</h2><p>準備が整ったので、Terraformを実行します。<br>まず、Terraformのワークスペースの初期化や、プラグインをダウンロードするために<code>terraform init</code>を実行します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ terraform init</span><br></pre></td></tr></table></figure>
+
+<p>問題がなければ以下のようなメッセージが出力されます。</p>
+<blockquote>
+<p>Terraform has been successfully initialized!</p>
+</blockquote>
+<p>仮に<code>0.11.14</code>で<code>terraform init</code>を実行すると以下の結果になります。</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> terraform init</span></span><br><span class="line"></span><br><span class="line">Initializing the backend...</span><br><span class="line">Backend configuration changed!</span><br><span class="line"></span><br><span class="line">Terraform has detected that the configuration specified for the backend</span><br><span class="line">has changed. Terraform will now check for existing state in the backends.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Successfully configured the backend "s3"! Terraform will automatically</span><br><span class="line">use this backend unless the backend configuration changes.</span><br><span class="line"></span><br><span class="line">Error: The currently running version of Terraform doesn't meet the</span><br><span class="line">version requirements explicitly specified by the configuration.</span><br><span class="line">Please use the required version or update the configuration.</span><br><span class="line">Note that version requirements are usually set for a reason, so</span><br><span class="line">we recommend verifying with whoever set the version requirements</span><br><span class="line">prior to making any manual changes.</span><br><span class="line"></span><br><span class="line">  Module: root</span><br><span class="line">  Required version: &gt;= 0.12</span><br><span class="line">  Current version: 0.11.14</span><br></pre></td></tr></table></figure>
+
+<h2 id="Workspaces-の準備"><a href="#Workspaces-の準備" class="headerlink" title="Workspaces の準備"></a>Workspaces の準備</h2><p>本構成は、<code>stg</code>と<code>prd</code> の二つの環境を構築します。<br>stgはStaging(検証環境)、prdはProduction(本番環境)の略です。</p>
+<p>Terraformでは、複数の環境を構築するにあたって便利な<code>Workkspace</code>があります。<br>Workspaceを使うことで、ディレクトリで環境を分けることなく、コード内で識別することが可能となります。</p>
+<p>それでは、Workspaceコマンドで<code>stg</code>と<code>prd</code>を作成します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ terraform workspace new stg</span><br><span class="line">Created and switched to workspace <span class="string">"stg"</span>!</span><br><span class="line">$ terraform workspace new prd</span><br><span class="line">Created and switched to workspace <span class="string">"prd"</span>!</span><br></pre></td></tr></table></figure>
+
+<p>現在のWorkspaceを確認します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ terraform workspace show</span><br><span class="line">prd</span><br></pre></td></tr></table></figure>
+
+<p>最後に作成した<code>prd</code>が対象になっているため、変更します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ terraform workspace select stg</span><br><span class="line">Switched to workspace <span class="string">"stg"</span>.</span><br><span class="line">$ terraform workspace show</span><br><span class="line">stg</span><br></pre></td></tr></table></figure>
+
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>これで、いよいよTerraformで環境構築できる準備が整いました。<br>次回の記事では実際のAWSリソースのTerraform定義から、VPCを作成する手順を説明していきますのでお楽しみに！</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。その中でもDXチームは特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+      
+    </div>
+  </div>
+    
+  <!-- シェアボタン START -->
+  <div class="social-area">
+  <ul class="social-button">
+
+      <!-- twitter -->
+      <li class="sc-tw social-button-twitter">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-hashtags="future_architect">ツイート</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      </li>
+      
+      <!-- Facebookいいね -->
+      <li class="social-button-fb">
+          <div id="fb-root"></div>
+          <script>(function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.8";
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));</script>
+          <div class="fb-like" data-href="https://future-architect.github.io/articles/20190816/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+      </li>
+
+      <!-- はてなブックマーク -->
+      <li class="social-button-hatebu"><a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20190816/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></li>
+
+      <!-- pocket -->
+      <li class="social-button-pocket"><a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
+          <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+      </li>
+
+  </ul>
+  </div>
+<!-- シェアボタン END -->
+
+
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/articles/20190814/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">WAFとして go-swagger を選択してみた</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190816/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                はじめてのTerraform 0.12 ～環境構築～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190814/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                WAFとして go-swagger を選択してみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190731/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                俺のインフラデザインパターン　～過去の失敗に学ぶニッチなインフラの話～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (10)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (19)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (5)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (15)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーアーキテクトの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+          <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+
+    <!-- Twitterフォローボタン -->
+    <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+	  <a data-tweet-limit="1" class="twitter-timeline"
+	  href="https://twitter.com/future_techblog"
+	  data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+
+	  <script>!function(d,s,id){var
+	  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+          </div>
+          <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2019 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>

@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2019-08-14T01:18:37.523Z</updated>
+  <updated>2019-08-16T03:52:03.233Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>はじめてのTerraform 0.12 ～環境構築～</title>
+    <link href="https://future-architect.github.io/articles/20190816/"/>
+    <id>https://future-architect.github.io/articles/20190816/</id>
+    <published>2019-08-16T03:43:21.000Z</published>
+    <updated>2019-08-16T03:52:03.233Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちはー<br>TIG DXチーム<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>のゆるふわエンジニアの前原です。</p><p>最近は、プラットフォームを新規で構築するプロジェクトや、既存の環境を運用改善していくプロジェクトに従事しています。その中で私はクラウドインフラ部分を担当しており、アーキテクチャデザインや、Terraform・Ansible・Packerといった構成管理ツールを利用したAWSやGCP環境の構築をしています。</p><p>本記事では、最近バージョンアップしたTerraform 0.12の構文がこんな感じで変わったよー的な話を伝えていきます。</p><p>大きくは以下の流れで進めます。</p><ol><li>Terraformの事始め (今回の記事です)</li><li>Terraform 0.12でVPCを構築する （次回の記事で説明します！）</li></ol><p>これからTerraformを触っていきたいといった方にもわかるように書いていきます。<br>そのため少し長めの内容になってしまいますが、お付き合いください。</p><h1 id="Terraformとは"><a href="#Terraformとは" class="headerlink" title="Terraformとは"></a>Terraformとは</h1><p><a href="https://www.terraform.io/" target="_blank" rel="noopener">Terraform</a>は、<a href="https://www.hashicorp.com/" target="_blank" rel="noopener">HashiCorp</a>によって開発された構成管理ツールで、主にクラウド環境（クラウド以外でも利用可能）を構築するときに利用します。</p><p>Terraformなどのツールを利用しない場合は、ブラウザを通してGUIから構築するケースがあるかと思います。その場合は、作業ミスをなくすために設定手順書やパラメータシートを元に構築するかとおもいますが、規模が大きくなったり関わる人が多くなってくると、人による設定ミスなどが発生することも多いのでは無いでしょうか。ミスを回避するために、各種施策やドキュメントの陳腐化を防ぐ方法に時間を費やすことも多々あるでしょう。</p><p>そういったケースにTerraformのような構成管理ツールを利用することで、インフラの構成をコードに落とし込み、状態を定義することができるようになります。</p><p>これにより誰が実行しても結果が同じになることで、ミスを低減することが可能です。また、コードを見ることで常にインフラの最新状態を把握することができます。また、コード化しているため、Gitなどのバージョン管理システムで管理することもできます。</p><p>…と、ここまでメリットについて書きましたが、いざTerraformを使用するとそれなりに学習コストが必要となります。</p><h1 id="Terraformの事始め"><a href="#Terraformの事始め" class="headerlink" title="Terraformの事始め"></a>Terraformの事始め</h1><p>ここでは、Terraformを実行するための環境をつくります。</p><h2 id="環境"><a href="#環境" class="headerlink" title="環境"></a>環境</h2><p>Terraformを体験するために以下の環境で行います。</p><ul><li><code>AWS</code></li><li><code>Terraform: 0.12.6</code> &amp; <code>0.11.14</code></li><li><code>tfenv: 1.0.1</code></li><li><code>MacBook Pro Mojave</code> or <code>Windows10 64bit</code></li></ul><h2 id="Terraformのインストール"><a href="#Terraformのインストール" class="headerlink" title="Terraformのインストール"></a>Terraformのインストール</h2><p>Terraformのインストールを行います。</p><h3 id="MacOSの場合"><a href="#MacOSの場合" class="headerlink" title="MacOSの場合"></a>MacOSの場合</h3><p>Terraformの実行環境を準備します。<br>今回は、バージョンの切り替えを楽にしてくれる<a href="https://github.com/tfutils/tfenv" target="_blank" rel="noopener">tfenv</a>を利用します。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">### Install tfenv</span></span><br><span class="line">$ brew install tfenv</span><br><span class="line">$ tfenv -v</span><br><span class="line">tfenv 1.0.1</span><br></pre></td></tr></table></figure><p>tfenvでterraformをインストールし、使用可能なバージョンを確認します。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ tfenv install latest</span><br><span class="line">$ tfenv install 0.11.14</span><br><span class="line">$ tfenv list</span><br><span class="line">* 0.12.6 (<span class="built_in">set</span> by /usr/<span class="built_in">local</span>/Cellar/tfenv/1.0.1/version)</span><br><span class="line">  0.11.14</span><br></pre></td></tr></table></figure><p>バージョンの切り替えは、<code>use</code>を利用することで簡単に切り替えることができます。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ tfenv use 0.11.14</span><br><span class="line">[INFO] Switching to v0.11.14</span><br><span class="line">[INFO] Switching completed</span><br></pre></td></tr></table></figure><p>tfenvを使用しない場合は、<a href="https://learn.hashicorp.com/terraform/getting-started/install.html" target="_blank" rel="noopener">こちら</a>のサイトを確認してください。</p><h3 id="Windowsの場合"><a href="#Windowsの場合" class="headerlink" title="Windowsの場合"></a>Windowsの場合</h3><p>Terraformを<a href="https://www.terraform.io/downloads.html" target="_blank" rel="noopener">ダウンロード</a>します。<br>ダウンロードしたファイルを解凍し、<code>C:¥Windows</code>配下に<code>terraform.exe</code>を配置します。<br>コマンドプロントもしくはお使いのターミナルを開き、以下のコマンドを発行します。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ terraform version</span><br><span class="line">Terraform v0.12.6</span><br></pre></td></tr></table></figure><p>ここでは試しておりませんが、Windowsもtfenv（only git-bash）に対応しているので興味のある方は試して頂ければと思います。  </p><ul><li>GitHub: <a href="https://github.com/tfutils/tfenv" target="_blank" rel="noopener">tfenv</a></li></ul><h2 id="Terraform-を実行するまでにやること"><a href="#Terraform-を実行するまでにやること" class="headerlink" title="Terraform を実行するまでにやること"></a>Terraform を実行するまでにやること</h2><h3 id="環境変数の設定"><a href="#環境変数の設定" class="headerlink" title="環境変数の設定"></a>環境変数の設定</h3><p>AWSのAPIを発行するために必要な設定です。<br>AWSのIAM Userであらかじめユーザを作成し、アクセスキーとシークレットキーを環境変数にセットします。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># MacOSの場合</span></span><br><span class="line">$ <span class="built_in">export</span> AWS_ACCESS_KEY_ID=xxx</span><br><span class="line">$ <span class="built_in">export</span> AWS_SECRET_ACCESS_KEY=xxx</span><br><span class="line"></span><br><span class="line"><span class="comment"># Windowsの場合</span></span><br><span class="line">$ <span class="built_in">set</span> AWS_ACCESS_KEY_ID=xxx</span><br><span class="line">$ <span class="built_in">set</span> AWS_SECRET_ACCESS_KEY=xxx</span><br></pre></td></tr></table></figure><p>MacOSの場合に限りますが、複数のAWSアカウント扱っている場合は、<a href="https://direnv.net/" target="_blank" rel="noopener">direnv</a>を利用するとディレクトリ単位で環境変数を切り替えることができるため便利です。</p><p>もし、HTTP Proxy配下の環境で実行したい場合は以下のオプションも追加で設定ください。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># MacOSの場合</span></span><br><span class="line"><span class="built_in">export</span> HTTPS_PROXY=https://proxy.example.com:443</span><br><span class="line"></span><br><span class="line"><span class="comment"># Windowsの場合</span></span><br><span class="line"><span class="built_in">set</span> HTTPS_PROXY=https://proxy.example.com:443</span><br></pre></td></tr></table></figure><h3 id="tfstateファイルの管理について"><a href="#tfstateファイルの管理について" class="headerlink" title="tfstateファイルの管理について"></a>tfstateファイルの管理について</h3><p>tfstateファイルは、Terraformで管理しているインフラの状態を管理するためのファイルです。<br>このファイルは非常に大切です。</p><p>通常、tfstateファイルを保存する場所を指定しない場合は、Terraformを実行したディレクトリに保存されます。<br>そのため、複数人でTerraformを実行する環境や、可用性を意識するとローカルでの保存はイケてないです。</p><p>そこで、tfstateファイルを管理するためのS3 バケットを用意します。<br>（<a href="https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/install-macos.html" target="_blank" rel="noopener">AWS CLI</a>が実行できることを前提とします）<br>また、バケットはバージョニングの設定をします。<br>バージョニングすることでtfstateファイルに予期せぬ更新や、壊してしまった時に戻せるようにするためです。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">### バケットの作成</span></span><br><span class="line">$ aws s3 mb s3://example-bucket --region ap-southeast-2</span><br><span class="line"><span class="comment">### バージョニングの設定</span></span><br><span class="line">$ aws s3api put-bucket-versioning --bucket example-bucket --versioning-configuration Status=Enabled</span><br><span class="line"><span class="comment">### バージョニングの設定ができていることを確認します</span></span><br><span class="line">$ aws s3api get-bucket-versioning --bucket example-bucket</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"Status"</span>: <span class="string">"Enabled"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="リージョンの選択"><a href="#リージョンの選択" class="headerlink" title="リージョンの選択"></a>リージョンの選択</h3><p>リージョンは適切に選択してください。<br>もし学習用途であればバージニア（us-east-1）を利用することを個人的におすすめします。<br>理由は、単純に安いからです！</p><p>ただ、本記事は諸事情によりシドニーで構築しています（ap-southeast-2）</p><h2 id="Terraformのディレクトリ構成"><a href="#Terraformのディレクトリ構成" class="headerlink" title="Terraformのディレクトリ構成"></a>Terraformのディレクトリ構成</h2><p>以下のようなフラットなディレクトリ構成で、1つのディレクトリにtfファイルを配置する設計にします。</p><p>以下の3つのtfファイルについては、次章以降で説明します。</p><ul><li>backend.tf</li><li>provider.tf</li><li>versions.tf</li></ul><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── backend.tf</span><br><span class="line">├── provider.tf</span><br><span class="line">├── versions.tf</span><br><span class="line">└── ...(次回の記事で説明します)</span><br></pre></td></tr></table></figure><h2 id="Backendの指定"><a href="#Backendの指定" class="headerlink" title="Backendの指定"></a>Backendの指定</h2><p>tfstateファイルをS3 バケットで管理するため、Backend用のtfファイルを作成します。<br>先ほどAWS CLIで作成したバケットを指定します。</p><figure class="highlight bash"><figcaption><span>backend.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">terraform &#123;</span><br><span class="line">  backend <span class="string">"s3"</span> &#123;</span><br><span class="line">    bucket = <span class="string">"example-bucket"</span></span><br><span class="line">    key    = <span class="string">"state/service"</span></span><br><span class="line">    region = <span class="string">"ap-southeast-2"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="Providerの指定"><a href="#Providerの指定" class="headerlink" title="Providerの指定"></a>Providerの指定</h2><p>Terraformは、AWSだけでなく、GCP、Alibaba Cloudなど様々なプロバイダに対応しています。<br>今回は、AWSを利用するための定義をします。<br>また、リージョンを指定します。</p><figure class="highlight bash"><figcaption><span>provider.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">provider <span class="string">"aws"</span> &#123;</span><br><span class="line">  region = <span class="string">"ap-southeast-2"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="Versions"><a href="#Versions" class="headerlink" title="Versions"></a>Versions</h3><p>このファイルはなくても問題ないのですが、Terraform 0.12から構文が変わっているため、明示的に記述します。<br>以下により<code>0.12</code>以上のバージョンでないと実行できないようになっています。<br>（Terraformのアップグレードコマンドで0.12にした場合は、自動で作成されます）</p><figure class="highlight bash"><figcaption><span>versions.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">terraform &#123;</span><br><span class="line">  required_version = <span class="string">"&gt;= 0.12"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="Terraform-init"><a href="#Terraform-init" class="headerlink" title="Terraform init"></a>Terraform init</h2><p>準備が整ったので、Terraformを実行します。<br>まず、Terraformのワークスペースの初期化や、プラグインをダウンロードするために<code>terraform init</code>を実行します。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ terraform init</span><br></pre></td></tr></table></figure><p>問題がなければ以下のようなメッセージが出力されます。</p><blockquote><p>Terraform has been successfully initialized!</p></blockquote><p>仮に<code>0.11.14</code>で<code>terraform init</code>を実行すると以下の結果になります。</p><figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> terraform init</span></span><br><span class="line"></span><br><span class="line">Initializing the backend...</span><br><span class="line">Backend configuration changed!</span><br><span class="line"></span><br><span class="line">Terraform has detected that the configuration specified for the backend</span><br><span class="line">has changed. Terraform will now check for existing state in the backends.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Successfully configured the backend "s3"! Terraform will automatically</span><br><span class="line">use this backend unless the backend configuration changes.</span><br><span class="line"></span><br><span class="line">Error: The currently running version of Terraform doesn't meet the</span><br><span class="line">version requirements explicitly specified by the configuration.</span><br><span class="line">Please use the required version or update the configuration.</span><br><span class="line">Note that version requirements are usually set for a reason, so</span><br><span class="line">we recommend verifying with whoever set the version requirements</span><br><span class="line">prior to making any manual changes.</span><br><span class="line"></span><br><span class="line">  Module: root</span><br><span class="line">  Required version: &gt;= 0.12</span><br><span class="line">  Current version: 0.11.14</span><br></pre></td></tr></table></figure><h2 id="Workspaces-の準備"><a href="#Workspaces-の準備" class="headerlink" title="Workspaces の準備"></a>Workspaces の準備</h2><p>本構成は、<code>stg</code>と<code>prd</code> の二つの環境を構築します。<br>stgはStaging(検証環境)、prdはProduction(本番環境)の略です。</p><p>Terraformでは、複数の環境を構築するにあたって便利な<code>Workkspace</code>があります。<br>Workspaceを使うことで、ディレクトリで環境を分けることなく、コード内で識別することが可能となります。</p><p>それでは、Workspaceコマンドで<code>stg</code>と<code>prd</code>を作成します。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ terraform workspace new stg</span><br><span class="line">Created and switched to workspace <span class="string">"stg"</span>!</span><br><span class="line">$ terraform workspace new prd</span><br><span class="line">Created and switched to workspace <span class="string">"prd"</span>!</span><br></pre></td></tr></table></figure><p>現在のWorkspaceを確認します。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ terraform workspace show</span><br><span class="line">prd</span><br></pre></td></tr></table></figure><p>最後に作成した<code>prd</code>が対象になっているため、変更します。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ terraform workspace select stg</span><br><span class="line">Switched to workspace <span class="string">"stg"</span>.</span><br><span class="line">$ terraform workspace show</span><br><span class="line">stg</span><br></pre></td></tr></table></figure><h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>これで、いよいよTerraformで環境構築できる準備が整いました。<br>次回の記事では実際のAWSリソースのTerraform定義から、VPCを作成する手順を説明していきますのでお楽しみに！</p><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。その中でもDXチームは特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h1&gt;&lt;p&gt;こんにちはー&lt;br&gt;TIG DXチーム&lt;sup id=&quot;fnref:1&quot;&gt;&lt;a href=&quot;#fn:1&quot; rel=&quot;foot
+      
+    
+    </summary>
+    
+      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
+    
+    
+      <category term="AWS" scheme="https://future-architect.github.io/tags/AWS/"/>
+    
+      <category term="Terraform" scheme="https://future-architect.github.io/tags/Terraform/"/>
+    
+  </entry>
   
   <entry>
     <title>WAFとして go-swagger を選択してみた</title>
@@ -60,6 +87,10 @@
     
     </summary>
     
+      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
+    
+    
+      <category term="GCP" scheme="https://future-architect.github.io/tags/GCP/"/>
     
   </entry>
   
@@ -81,6 +112,10 @@
     
     </summary>
     
+      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
+    
+    
+      <category term="GCP" scheme="https://future-architect.github.io/tags/GCP/"/>
     
   </entry>
   
@@ -102,6 +137,10 @@
     
     </summary>
     
+      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
+    
+    
+      <category term="Infrastructure" scheme="https://future-architect.github.io/tags/Infrastructure/"/>
     
   </entry>
   
@@ -124,6 +163,10 @@
     
     </summary>
     
+      <category term="Culture" scheme="https://future-architect.github.io/categories/Culture/"/>
+    
+    
+      <category term="Infrastructure" scheme="https://future-architect.github.io/tags/Infrastructure/"/>
     
   </entry>
   
@@ -145,6 +188,10 @@
     
     </summary>
     
+      <category term="IoT" scheme="https://future-architect.github.io/categories/IoT/"/>
+    
+    
+      <category term="IoT" scheme="https://future-architect.github.io/tags/IoT/"/>
     
   </entry>
   
@@ -167,6 +214,10 @@
     
     </summary>
     
+      <category term="DB" scheme="https://future-architect.github.io/categories/DB/"/>
+    
+    
+      <category term="DB" scheme="https://future-architect.github.io/tags/DB/"/>
     
   </entry>
   
@@ -188,6 +239,10 @@
     
     </summary>
     
+      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
+    
+    
+      <category term="gcp" scheme="https://future-architect.github.io/tags/gcp/"/>
     
   </entry>
   
@@ -209,6 +264,10 @@
     
     </summary>
     
+      <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
+    
+    
+      <category term="Go" scheme="https://future-architect.github.io/tags/Go/"/>
     
   </entry>
   
@@ -232,6 +291,10 @@
     
     </summary>
     
+      <category term="Culture" scheme="https://future-architect.github.io/categories/Culture/"/>
+    
+    
+      <category term="アルバイト報告" scheme="https://future-architect.github.io/tags/%E3%82%A2%E3%83%AB%E3%83%90%E3%82%A4%E3%83%88%E5%A0%B1%E5%91%8A/"/>
     
   </entry>
   
@@ -253,6 +316,10 @@
     
     </summary>
     
+      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
+    
+    
+      <category term="GCP" scheme="https://future-architect.github.io/tags/GCP/"/>
     
   </entry>
   
@@ -276,6 +343,12 @@
     
     </summary>
     
+      <category term="Management" scheme="https://future-architect.github.io/categories/Management/"/>
+    
+    
+      <category term="Redmine" scheme="https://future-architect.github.io/tags/Redmine/"/>
+    
+      <category term="Metabase" scheme="https://future-architect.github.io/tags/Metabase/"/>
     
   </entry>
   
@@ -297,6 +370,10 @@
     
     </summary>
     
+      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
+    
+    
+      <category term="AWS" scheme="https://future-architect.github.io/tags/AWS/"/>
     
   </entry>
   
@@ -318,6 +395,10 @@
     
     </summary>
     
+      <category term="DataScience" scheme="https://future-architect.github.io/categories/DataScience/"/>
+    
+    
+      <category term="MachineLearning" scheme="https://future-architect.github.io/tags/MachineLearning/"/>
     
   </entry>
   
@@ -339,6 +420,10 @@
     
     </summary>
     
+      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
+    
+    
+      <category term="AWS" scheme="https://future-architect.github.io/tags/AWS/"/>
     
   </entry>
   
@@ -361,6 +446,10 @@
     
     </summary>
     
+      <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
+    
+    
+      <category term="Redmine" scheme="https://future-architect.github.io/tags/Redmine/"/>
     
   </entry>
   
@@ -382,6 +471,10 @@
     
     </summary>
     
+      <category term="DataScience" scheme="https://future-architect.github.io/categories/DataScience/"/>
+    
+    
+      <category term="MachineLearning" scheme="https://future-architect.github.io/tags/MachineLearning/"/>
     
   </entry>
   
@@ -403,6 +496,10 @@
     
     </summary>
     
+      <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
+    
+    
+      <category term="TypeScript" scheme="https://future-architect.github.io/tags/TypeScript/"/>
     
   </entry>
   
@@ -425,27 +522,10 @@
     
     </summary>
     
+      <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
     
-  </entry>
-  
-  <entry>
-    <title>デブサミ2019に登壇しました</title>
-    <link href="https://future-architect.github.io/articles/20190607/"/>
-    <id>https://future-architect.github.io/articles/20190607/</id>
-    <published>2019-06-07T00:00:00.000Z</published>
-    <updated>2019-06-06T16:27:55.912Z</updated>
     
-    <content type="html"><![CDATA[<p>2019/02/15に<a href="https://event.shoeisha.jp/devsumi/20190214" target="_blank" rel="noopener">Developers Summit 2019</a>のランチセッションにて、Redmineとそのプラグインである<a href="https://lychee-redmine.jp/" target="_blank" rel="noopener">Lychee</a>のユーザ事例として登壇しました。</p><p>登壇内容は、<a href="https://event.shoeisha.jp/devsumi/20190214/session/1978/" target="_blank" rel="noopener">【導入事例】Lychee Redmineのユーザが語る！トラブル予防としての使い方</a>です。</p><p>ここに至るまでの背景と、当日の状況についてレポートします。</p><h1 id="Redmineとは"><a href="#Redmineとは" class="headerlink" title="Redmineとは"></a>Redmineとは</h1><p>RedmineとはOSSのいわゆるタスク管理ツールです。<br>ワークフローや管理項目などを自由にカスタマイズして利用することが可能です。<br>Ruby On Railsで構築されており、たくさんのプラグインを組み合わせてユーザ自身の手で機能拡張させることも可能です。</p><p>弊社では社内の標準的なプロジェクト管理ツールとして広く利用しています。</p><h1 id="Lycheeとは"><a href="#Lycheeとは" class="headerlink" title="Lycheeとは"></a>Lycheeとは</h1><p>Lycheeはアジャイルウェアさんが開発されたRedmineのプラグインの一種です。<br><a href="https://lychee-redmine.jp/" target="_blank" rel="noopener">https://lychee-redmine.jp/</a></p><p>プロジェクト管理に便利なツールが多く、重宝しています。</p><h1 id="筆者について"><a href="#筆者について" class="headerlink" title="筆者について"></a>筆者について</h1><p>新卒でフューチャーに入社し、我ながらぞっとしますが勤続20年以上になります。</p><p>Windows95が出た3年後に入社し、当時は社員数が100人くらいのでした（※2018年12月末だと連結で1984名）。</p><p>「いわゆる名の知れた大学と大学院まで出たのに、未上場の会社に入るなんて！」といった当時の世間の常識や、親の涙に抗い、社会人生活をスタートさせました。</p><p>Futureは難易度の高いプロジェクトを手掛けるわりに、トラブルは少ない方だと思います。</p><p>しかし、私はほぼトラブル中のプロジェクトにアサインされ続け、かなり厳しくソフトウェアの品質について考え抜きながらプロジェクトマネジメントを経験してきました。</p><p>そこが評価されたのか、2013年から社内の品質管理の室長に任命され、全社の品質基準の策定、プロジェクト状況の可視化、分析など多くの取り組みを行いました。</p><p>苦しい時もありましたが、人生は苦味も含めて味わうと豊かになるものだなーと最近は考えています。</p><p>そんな折、2018年10月になぜか人事の責任者になりました。<br>品質管理室長からは離れなかったので、現在兼務です。</p><p>品質管理室ではRailsでアジャイル開発し、その前はミッションクリティカルな基幹系システムを開発してきましたが、人事と兼務ともなるとそれはなかなか出来ません。</p><p>したがって、他のデブサミ登壇者に比べると私はかなり異色な背景を持っているし、純粋なITエンジニアリングの力で比較すると彼らの方が上でしょう。</p><p>入社当時に考えていたキャリアとは遠いのか近いのか、今ひとつ分からない所もありますが、人間万事塞翁が馬だと考えれば、もはや何でもありですね。</p><h2 id="デブサミ登壇に至るまで"><a href="#デブサミ登壇に至るまで" class="headerlink" title="デブサミ登壇に至るまで"></a>デブサミ登壇に至るまで</h2><p>RedmineにLycheeをかけ合わせて利用しているのは、「単に便利だから」という理由ではなく、品質管理の一環として必要な機能だと思って利用しています。</p><p>そのため、それなりのこだわりやコツもあったこともあり、事例紹介自体は問題なかったのですが、果たしてデブサミにふさわしいコンテンツなのか？？というのは非常に心配でした。</p><p>エンジニアというのは、如何に自由に大空を飛びまわれるか？ということを追及している人種に違いない。</p><p>大空というのは制約のない世界だと思うので、私のような「品質管理」なんてものは「制約万歳」に脳内変換されてるんだろうなーと思うわけです。</p><p>ただし、引き受けた以上はやりきるのがビジネスパーソンの矜持。</p><p>価値というのは相手によって変わるので、完全アウェイであっても、喜んでもらえるコンテンツを提供せねばならない・・。</p><p>会場も50人くらいなのかな？と思っていたら200人くらいは入るかなりご立派な部屋になっており、じわじわと迫る後悔とプレッシャーの中で当日を迎えました。</p><h1 id="発表コンテンツ"><a href="#発表コンテンツ" class="headerlink" title="発表コンテンツ"></a>発表コンテンツ</h1><p>単なるプラグインの使い方を説明しても面白くもないし、役に立たないと考え、トラブルの予防にターゲットを絞りました。</p><p>なぜなら、エンジニアであればチャレンジしてるに違いない<br>↓チャレンジしてるとトラブルに会う確率は高いに違いない<br>↓みんなトラブルは嫌だろうなー<br>↓じゃあ予防出来たらみんな幸せだろうなー。そうだそうだー。</p><p>…ということで、「Lychee Redmineのユーザが語る！トラブル予防としての使い方」という、今見ると大してキャッチ―でもない普通のタイトルで出陣しました。</p><h1 id="当日の様子"><a href="#当日の様子" class="headerlink" title="当日の様子"></a>当日の様子</h1><p>デブサミだけあって、来場者の大半はエンジニアです。フリーダム感漂う参加者が多く、会場に入った瞬間からアウェイを満喫。うむ。予想通り。</p><p>登壇者は専用の控室が用意されており、逃げ込むように控室にたどり着きます。</p><p>しかし、控室にいらっしゃった他の登壇者の方々は、フリーダムに一層の年季が加わっており、実に堂々たる風貌。圧倒されました。むむ。予想外。</p><p>ここでは気持ちが落ち着かないなーということで、多少のホーム感を感じる小ぶりなスポンサー控室に移動しました。</p><p>私の前に話すはずのスポンサー社長がなかなか来場しないというハプニングもありましたが、コーヒーを無駄におかわりしながら前日まで推敲していた資料を確認し、登壇の時間を待ちます。</p><h1 id="発表しました"><a href="#発表しました" class="headerlink" title="発表しました"></a>発表しました</h1><img src="/images/20190607/1.jpg" class="img-small-size"><p>来ていただいた人に、何かしら価値あるものを持って帰ってもうことをミッションに設定し登壇しました。</p><p>タイトルがタイトルなだけに、ご来場の方々の年齢層は少し高かったように見え、エンジニアというよりは管理者の人が多かったような印象を受けました。</p><iframe src="//www.slideshare.net/slideshow/embed_code/key/KjD1yfZ505Rfzn" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/agileware_jp/4-136539333" title="【導入事例】Lychee Redmineユーザーが語る！トラブル予防としての使い方" target="_blank">【導入事例】Lychee Redmineユーザーが語る！トラブル予防としての使い方</a> </strong> from <strong><a href="https://www.slideshare.net/agileware_jp" target="_blank">agileware_jp</a></strong> </div><br><p>当日の発表の様子もCodeZine様より記事になっております。<br><a href="https://codezine.jp/article/detail/11427" target="_blank" rel="noopener">https://codezine.jp/article/detail/11427</a></p><p>極力平易な言葉と、エピソードを織り交ぜて話すようにしたので、集中して聞いてくれていたように思います。</p><p>後でツイッターを見ましたが、時間が足りなくて省略した部分についてもっと聞きたい、というような声も上がっており、概ね良かったのかな？と思います。</p><p>声を褒められたのはうれしかったかな＾＾</p><h1 id="感想"><a href="#感想" class="headerlink" title="感想"></a>感想</h1><p>今回、ニーズにあっていたのかどうかが正直なところ一番の不安でした。<br>しかし、こういった場に出ることで、自分の頭が整理されますし、客観的に振り返ることが出来るには、とてもいいタイミングだったなと改めて思いました。</p><p>それと同時に、本来はもっとこうしたいが、できていないこともまた浮き彫りになります。</p><p>別の方の発表の中で、「組織を変えるにはルールと設備と風土の３つが大事」、といったことを発言されており、心に深く突き刺さっています。</p><p>風土を変えるのが一番難易度が高いし、時間がかかりますよね。</p><p>今回の私が登壇した内容も、ルールと設備に限った話でしたので、次回は風土に対する取り組みも話せるようにしたいと思います。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;2019/02/15に&lt;a href=&quot;https://event.shoeisha.jp/devsumi/20190214&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Developers Summit 2019&lt;/a&gt;のランチセッションにて、Redm
-      
-    
-    </summary>
-    
+      <category term="Styleguide" scheme="https://future-architect.github.io/tags/Styleguide/"/>
     
   </entry>
   
