@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>初めてのGCPで環境構築してハマったこと | Future Tech Blog - フューチャーアーキテクト</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにはじめまして。TIG DXチーム1所属、ゲームとボルダリング好きなエンジニアの椎名@417yskです。 お仕事でGCP使って環境を構築することがあったのですが、色々とハマることが多かったので供養を兼ねて共有したいと思います。 当時の私の経験値としては「AWSの一部サービスは触ったことがある」程度でクラウド環境を下地から構築するのは初めての経験でした。一度触ってみれば常識だよねって内容が多い">
+<meta name="keywords" content="GCP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初めてのGCPで環境構築してハマったこと">
+<meta property="og:url" content="https://future-architect.github.io/articles/20190820/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="はじめにはじめまして。TIG DXチーム1所属、ゲームとボルダリング好きなエンジニアの椎名@417yskです。 お仕事でGCP使って環境を構築することがあったのですが、色々とハマることが多かったので供養を兼ねて共有したいと思います。 当時の私の経験値としては「AWSの一部サービスは触ったことがある」程度でクラウド環境を下地から構築するのは初めての経験でした。一度触ってみれば常識だよねって内容が多い">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20190820/photo_20190820_01.png">
+<meta property="og:updated_time" content="2019-08-20T00:30:16.491Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="初めてのGCPで環境構築してハマったこと">
+<meta name="twitter:description" content="はじめにはじめまして。TIG DXチーム1所属、ゲームとボルダリング好きなエンジニアの椎名@417yskです。 お仕事でGCP使って環境を構築することがあったのですが、色々とハマることが多かったので供養を兼ねて共有したいと思います。 当時の私の経験値としては「AWSの一部サービスは触ったことがある」程度でクラウド環境を下地から構築するのは初めての経験でした。一度触ってみれば常識だよねって内容が多い">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20190820/photo_20190820_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="初めてのGCPで環境構築してハマったこと | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="初めてのGCPで環境構築してハマったこと,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Tech Blog</div>
+        <div class="header-title-sub">フューチャーアーキテクト開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20190820/">初めてのGCPで環境構築してハマったこと</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20190820-gcp-tips" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> 椎名祐介</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2019-08-20T00:19:49.000Z" itemprop="datePublished">2019/08/20</time>
+
+	</li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+	  
+  
+    <a href="/tags/GCP/" title="GCP">GCP</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    Categories:
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>はじめまして。TIG DXチーム<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>所属、ゲームとボルダリング好きなエンジニアの椎名@417yskです。</p>
+<p>お仕事でGCP使って環境を構築することがあったのですが、色々とハマることが多かったので供養を兼ねて共有したいと思います。</p>
+<p>当時の私の経験値としては「AWSの一部サービスは触ったことがある」程度でクラウド環境を下地から構築するのは初めての経験でした。一度触ってみれば常識だよねって内容が多いですが、初心者が小石につまずいてもすぐに立ち上れるようになれば幸いです。</p>
+<h1 id="今回構築した環境の概要"><a href="#今回構築した環境の概要" class="headerlink" title="今回構築した環境の概要"></a>今回構築した環境の概要</h1><ul>
+<li>既存のオンプレ環境との共存を前提とし、使えるアドレス範囲もオンプレのNWから払い出し</li>
+<li>オンプレ環境とインターネットVPNでつなぐプロジェクトは1つ（ホストプロジェクト）</li>
+<li>各環境（production、staging・・）は共有VPCで接続（サービスプロジェクト）</li>
+</ul>
+<img src="/images/20190820/photo_20190820_01.png">
+
+<p>なお、構築はTerraform, Ansibleで行いました。</p>
+<h1 id="GCPで環境構築してハマったこと"><a href="#GCPで環境構築してハマったこと" class="headerlink" title="GCPで環境構築してハマったこと"></a>GCPで環境構築してハマったこと</h1><p>本編です。<br>カテゴリ別に記載しています。</p>
+<h2 id="1-GKE関連"><a href="#1-GKE関連" class="headerlink" title="1. GKE関連"></a>1. GKE関連</h2><h3 id="1-1-GKEのコア数を増やせない"><a href="#1-1-GKEのコア数を増やせない" class="headerlink" title="1-1. GKEのコア数を増やせない"></a>1-1. GKEのコア数を増やせない</h3><h4 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h4><p>アカウントあたりの割り当て上限に達していた。</p>
+<h4 id="対応"><a href="#対応" class="headerlink" title="対応"></a>対応</h4><p>制限変更を依頼することで解消しました。<br>自分が依頼したときは数分で対応してくれましたが、常に数分で対応されるかは定かではありません。<br>サービスインする前は想定されるスケール具合に合わせて事前に拡張しておきましょう。<br>割り当て増加の手順は他の方が書かれていますのでこちらをご参考に。<br><a href="https://qiita.com/mouse2/items/dd136453798804f99de7" target="_blank" rel="noopener">https://qiita.com/mouse2/items/dd136453798804f99de7</a><br><a href="https://cloud.google.com/compute/quotas?hl=ja&amp;_ga=1.181298212.2042940000.1483498197" target="_blank" rel="noopener">https://cloud.google.com/compute/quotas?hl=ja&amp;_ga=1.181298212.2042940000.1483498197</a></p>
+<h3 id="1-2-プライベートGKEクラスタからインターネットアクセスできない"><a href="#1-2-プライベートGKEクラスタからインターネットアクセスできない" class="headerlink" title="1-2. プライベートGKEクラスタからインターネットアクセスできない"></a>1-2. プライベートGKEクラスタからインターネットアクセスできない</h3><h4 id="原因-1"><a href="#原因-1" class="headerlink" title="原因"></a>原因</h4><p>プライベートクラスタではノード（pod）に外部IPが付与されないため。</p>
+<h4 id="対応-1"><a href="#対応-1" class="headerlink" title="対応"></a>対応</h4><p>CloudNATを設定しNAT経由でインターネットに出るようにしました。<br>今回はシステム要件で外部IPの付与が不可でしたが、外部IPが付与されていれば問題なくインターネットアクセスできます。</p>
+<h3 id="1-3-GKEへのデプロイ時、kubectlコマンドが接続できない"><a href="#1-3-GKEへのデプロイ時、kubectlコマンドが接続できない" class="headerlink" title="1-3. GKEへのデプロイ時、kubectlコマンドが接続できない"></a>1-3. GKEへのデプロイ時、kubectlコマンドが接続できない</h3><h4 id="原因-2"><a href="#原因-2" class="headerlink" title="原因"></a>原因</h4><p>デプロイサーバが外部IPしか持っていなかったため。<br>GKEクラスタはこの時点でプライベートクラスタであった。</p>
+<h4 id="対応-2"><a href="#対応-2" class="headerlink" title="対応"></a>対応</h4><p>システム要件もありデプロイサーバに内部IPを付与し、外部IPを削除しました。<br>その上でGKEクラスタの承認済みネットワークにデプロイサーバの属するサブネットを追加しました。</p>
+<h3 id="1-4-GKEのLBでフロントのIPが固定できない"><a href="#1-4-GKEのLBでフロントのIPが固定できない" class="headerlink" title="1-4. GKEのLBでフロントのIPが固定できない"></a>1-4. GKEのLBでフロントのIPが固定できない</h3><h4 id="事象"><a href="#事象" class="headerlink" title="事象"></a>事象</h4><p>LB作成時にフロントエンドのIPが自動的に割り振られてしまう。</p>
+<h4 id="対応-3"><a href="#対応-3" class="headerlink" title="対応"></a>対応</h4><p>Ingressを利用して意図したIPを割り当てました。<br>詳細は他の方が書かれていますのでこちらをご参考に。<br><a href="https://qiita.com/tinjyuu/items/fd7a97b0b81963dcc7f2" target="_blank" rel="noopener">https://qiita.com/tinjyuu/items/fd7a97b0b81963dcc7f2</a></p>
+<h3 id="1-5-共有VPC上のGKEクラスタのセカンダリCIDR設計"><a href="#1-5-共有VPC上のGKEクラスタのセカンダリCIDR設計" class="headerlink" title="1-5. 共有VPC上のGKEクラスタのセカンダリCIDR設計"></a>1-5. 共有VPC上のGKEクラスタのセカンダリCIDR設計</h3><h4 id="事象-1"><a href="#事象-1" class="headerlink" title="事象"></a>事象</h4><p>オンプレ環境と接続する1つの共有VPC上にproduction, stagingなど複数プロジェクトを相乗りさせる場合、各プロジェクトで利用するセカンダリCIDRの設計が必要。</p>
+<h4 id="対応-4"><a href="#対応-4" class="headerlink" title="対応"></a>対応</h4><p>GKEで必要なセカンダリCIDRを本腰入れて設計しました。<br>スタンダードなこれと言った解はなく、必要な環境数、オンプレ環境から割り当てられたIP範囲から適宜設計する必要があります。<br>ここだけでも1記事くらいのボリュームになりそうなので詳細はまた別途。</p>
+<h3 id="1-6-GKEクラスタが大量に作成できない"><a href="#1-6-GKEクラスタが大量に作成できない" class="headerlink" title="1-6. GKEクラスタが大量に作成できない"></a>1-6. GKEクラスタが大量に作成できない</h3><h4 id="原因-3"><a href="#原因-3" class="headerlink" title="原因"></a>原因</h4><p>利用可能なセカンダリCIDRの上限に掛かるため。<br>共有VPC上にプライベートGKEクラスタを構築するためには、1クラスタあたりに2つのアドレス範囲（pod/service）を割り当てる必要があるが、1サブネット内にセカンダリCIDRは上限5つまでしか作成できない。<br>今回、1プロジェクト=1サブネットを共有するという方針であったため、1プロジェクト当たりに2つしかクラスタを作成できなかった。</p>
+<h4 id="対応-5"><a href="#対応-5" class="headerlink" title="対応"></a>対応</h4><p>用途に応じてクラスタを分けるのではなく、ノードプールを分ける方針としました。<br>GKEの設計でクラスタを分けるかノードプールを分けるかはしばしば話に挙がりますが、共有VPC上に構築する場合はノードプールを分けるしかないです。</p>
+<h2 id="2-CloudSQL関連"><a href="#2-CloudSQL関連" class="headerlink" title="2. CloudSQL関連"></a>2. CloudSQL関連</h2><h3 id="2-1-CloudSQLのインスタンスが再作成できない"><a href="#2-1-CloudSQLのインスタンスが再作成できない" class="headerlink" title="2-1. CloudSQLのインスタンスが再作成できない"></a>2-1. CloudSQLのインスタンスが再作成できない</h3><h4 id="原因-4"><a href="#原因-4" class="headerlink" title="原因"></a>原因</h4><p>同じインスタンス名は数日間（1週間ほど）は作成できない仕様であったため。</p>
+<h4 id="対応-6"><a href="#対応-6" class="headerlink" title="対応"></a>対応</h4><p>初期構築時は連番やタイムスタンプなどを入れ確実に構築可能なことの保証が取れてから真名で構築することにしました。<br>インスタンス名にタイムスタンプなどを入れてクライアント側の接続情報を変更していく運用も考えましたが、担当した案件では開発に複数社入っていたりする状況もあり諦めました。</p>
+<h3 id="2-2-CloudSQLのアクセス制限"><a href="#2-2-CloudSQLのアクセス制限" class="headerlink" title="2-2. CloudSQLのアクセス制限"></a>2-2. CloudSQLのアクセス制限</h3><h4 id="事象-2"><a href="#事象-2" class="headerlink" title="事象"></a>事象</h4><p>CloudSQLにアクセス可能なインスタンスを同一プロジェクトのインスタンスに絞りたいが、以下の制約がある。</p>
+<ul>
+<li>Firewall Ruleはサブネット単位（今回の構成のプロジェクト単位）で指定できない</li>
+<li>CloudSQLにFirewall Ruleで利用するネットワークタグを設定できない。</li>
+<li>承認済みネットワークにプライベートIPは設定できない</li>
+</ul>
+<h4 id="対応-7"><a href="#対応-7" class="headerlink" title="対応"></a>対応</h4><p>出来上がったCloudSQLのIPを、gcloudで取得して、それをFirewall Ruleに設定しました。なおFirewall Ruleはインスタンスに対して適応されるため、インスタンスからの下りに対して制御をかけることしかできません。</p>
+<p>デフォルトは下りが全てallowされているので、まずはCloudSQLのIP範囲にdenyをかけて、その上で接続するSQLインスタンスのみallowするという対応をしています。<br>Firewall Ruleの話だけで1記事くらいのボリュームになりそうなので詳細はまた別途書きます。</p>
+<h3 id="2-3-CloudSQL-のパスワードが有効では無かった"><a href="#2-3-CloudSQL-のパスワードが有効では無かった" class="headerlink" title="2-3. CloudSQL のパスワードが有効では無かった"></a>2-3. CloudSQL のパスワードが有効では無かった</h3><h4 id="原因-5"><a href="#原因-5" class="headerlink" title="原因"></a>原因</h4><p>Terraformでデプロイしていたが、その定義が不正だったため。<br>後述のサンプルだとインスタンス名が正しく紐づかない。GCPは関係なくTerraformの記述ミスが原因でした。</p>
+<h4 id="対応-8"><a href="#対応-8" class="headerlink" title="対応"></a>対応</h4><p>依存関係があるリソースは、ハードコードで名称を設定しない。<br>${xxxxx}を使用して実際に設定されている名称を取得する。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// インスタンスの作成</span></span><br><span class="line">resource <span class="string">"google_sql_database_instance"</span> <span class="string">"db-instance-test"</span> &#123;</span><br><span class="line">    name = <span class="string">"test-instance"</span></span><br><span class="line">    <span class="comment">/*省略*/</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// パスワード設定：NGパターン</span></span><br><span class="line">resource <span class="string">"google_sql_user"</span> <span class="string">"test-postgres-user"</span> &#123;</span><br><span class="line">    name = <span class="string">"postgres"</span></span><br><span class="line">    instance = <span class="string">"test-instance"</span></span><br><span class="line">    password = <span class="string">"postgres"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// パスワード設定：OKパターン</span></span><br><span class="line">resource <span class="string">"google_sql_user"</span> <span class="string">"test-postgres-user"</span> &#123;</span><br><span class="line">    name = <span class="string">"postgres"</span></span><br><span class="line">    instance = <span class="string">"$&#123;google_sql_database_instance.db-instance-test.name&#125;"</span></span><br><span class="line">    password = <span class="string">"postgres"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-4-CloudSqlProxyを使ってSQLインスタンスにつながらない"><a href="#2-4-CloudSqlProxyを使ってSQLインスタンスにつながらない" class="headerlink" title="2-4. CloudSqlProxyを使ってSQLインスタンスにつながらない"></a>2-4. CloudSqlProxyを使ってSQLインスタンスにつながらない</h3><h4 id="原因-6"><a href="#原因-6" class="headerlink" title="原因"></a>原因</h4><p>Cloud SQL Administration APIが有効化されていないため。<br>CloudSqlProxyを使う際は有効化する必要があります。<br><a href="https://cloud.google.com/sql/docs/postgres/connect-external-app?hl=ja" target="_blank" rel="noopener">https://cloud.google.com/sql/docs/postgres/connect-external-app?hl=ja</a></p>
+<h4 id="対応-9"><a href="#対応-9" class="headerlink" title="対応"></a>対応</h4><p>Cloud SQL Administration APIを有効化します。<br>環境の断面が増えてくると、Administration APIの有効化手順が漏れるので、これもちゃんと<a href="https://www.terraform.io/docs/providers/google/r/google_project_services.html" target="_blank" rel="noopener">Terraformで管理</a>することになりました。<br>（※それまでは手動で有効にしていました☠）</p>
+<h3 id="2-5-CloudSQLの接続CIDRが任意のアドレス範囲で作成されてしまった"><a href="#2-5-CloudSQLの接続CIDRが任意のアドレス範囲で作成されてしまった" class="headerlink" title="2-5. CloudSQLの接続CIDRが任意のアドレス範囲で作成されてしまった"></a>2-5. CloudSQLの接続CIDRが任意のアドレス範囲で作成されてしまった</h3><h4 id="原因-7"><a href="#原因-7" class="headerlink" title="原因"></a>原因</h4><p>IPアドレスの設計前にCloudSQLのインスタンスを立てて検証していたため初期構築時にCIDRの割り当てを明確に行っていなかった。</p>
+<h4 id="対応-10"><a href="#対応-10" class="headerlink" title="対応"></a>対応</h4><p>GCPのSREチーム（米国）へ変更対応を依頼しました（ちょうどクリスマスシーズンだったので大変でした）。2019年1月時点では、このCIDRは一度設定するとGUIやコマンドで変更できないため依頼する必要があります。<br>共有VPCの環境でCloudSQLのアドレス範囲を明示的に定めたい場合は注意しましょう。</p>
+<h3 id="2-6-GCEからCloudSQLへ接続ができない"><a href="#2-6-GCEからCloudSQLへ接続ができない" class="headerlink" title="2-6. GCEからCloudSQLへ接続ができない"></a>2-6. GCEからCloudSQLへ接続ができない</h3><h4 id="原因-8"><a href="#原因-8" class="headerlink" title="原因"></a>原因</h4><p>GCEインスタンスには内部IPのみで外部IPが付与されておらず、SQLインスタンスには外部IPのみで内部IPを付与していなかった（β版のため）。<br>SQL Proxyが上手いことやってくれると淡い期待をしたがダメであった。</p>
+<h4 id="対応-11"><a href="#対応-11" class="headerlink" title="対応"></a>対応</h4><p>他のシステム要件からCloudSQLに内部IPを付与しました</p>
+<h2 id="3-LB関連"><a href="#3-LB関連" class="headerlink" title="3. LB関連"></a>3. LB関連</h2><h3 id="3-1-Internal-特定の通信においてInternal-LBで負荷分散されない"><a href="#3-1-Internal-特定の通信においてInternal-LBで負荷分散されない" class="headerlink" title="3-1. Internal 特定の通信においてInternal LBで負荷分散されない"></a>3-1. Internal 特定の通信においてInternal LBで負荷分散されない</h3><h4 id="原因-9"><a href="#原因-9" class="headerlink" title="原因"></a>原因</h4><p>コネクションを貼って通信していたため。<br>Internal LBでセッションアフィニティをOFFにしてもコネクション貼って通信するものはコネクション貼ったバックエンドに流れる仕様であった。</p>
+<p>※参考<br><a href="https://cloud.google.com/load-balancing/docs/backend-service?hl=ja&amp;_ga=2.47555939.-570213192.1545967516" target="_blank" rel="noopener">https://cloud.google.com/load-balancing/docs/backend-service?hl=ja&amp;_ga=2.47555939.-570213192.1545967516</a><br><a href="https://cloud.google.com/compute/docs/reference/rest/v1/backendServices?hl=ja" target="_blank" rel="noopener">https://cloud.google.com/compute/docs/reference/rest/v1/backendServices?hl=ja</a></p>
+<h4 id="対応-12"><a href="#対応-12" class="headerlink" title="対応"></a>対応</h4><p>クライアント側で定期的にコネクションを貼りなおすようにした。<br>大量のクライアントがいる処理であれば正常時はコネクションを貼る時点で後ろのノードは分散されれるので問題ないですが、ノード障害で別ノードとコネクション貼ってしまうとノード復旧時に再度振り分けられなくなってしまうのを回避するためです。</p>
+<h3 id="3-2-Internal-LBのヘルスチェックが通らない"><a href="#3-2-Internal-LBのヘルスチェックが通らない" class="headerlink" title="3-2. Internal LBのヘルスチェックが通らない"></a>3-2. Internal LBのヘルスチェックが通らない</h3><h4 id="原因-10"><a href="#原因-10" class="headerlink" title="原因"></a>原因</h4><p>Internal LBのヘルスチェックが「130.211.0.0/22」と「35.191.0.0/16」 内のアドレスから送信されるため。<br>これらの接続を許可するようにFirewall Ruleを設定する必要があった。</p>
+<h4 id="対応-13"><a href="#対応-13" class="headerlink" title="対応"></a>対応</h4><p>ヘルスチェックの通信元のIPに対して通信を許可するようにファイアウォールルールを追加しました。</p>
+<h2 id="4-GCPプロジェクト"><a href="#4-GCPプロジェクト" class="headerlink" title="4. GCPプロジェクト"></a>4. GCPプロジェクト</h2><h3 id="4-1-新規に環境構築できない"><a href="#4-1-新規に環境構築できない" class="headerlink" title="4-1. 新規に環境構築できない"></a>4-1. 新規に環境構築できない</h3><h4 id="原因-11"><a href="#原因-11" class="headerlink" title="原因"></a>原因</h4><p>課金プロジェクトの作成数に限りがあったため</p>
+<h4 id="対応-14"><a href="#対応-14" class="headerlink" title="対応"></a>対応</h4><p>サポートに連絡して上限を上げてもらった。<br>コア数の上限同様に事前に確認すべきでした。</p>
+<h3 id="4-2-プロジェクトID-名を指定してリソースにアクセスできない。"><a href="#4-2-プロジェクトID-名を指定してリソースにアクセスできない。" class="headerlink" title="4-2. プロジェクトID/名を指定してリソースにアクセスできない。"></a>4-2. プロジェクトID/名を指定してリソースにアクセスできない。</h3><h4 id="原因-12"><a href="#原因-12" class="headerlink" title="原因"></a>原因</h4><p>プロジェクトID＝プロジェクト名を前提としてリソースにアクセスしていたが、プロジェクトIDとプロジェクト名が異なっていた。</p>
+<h4 id="対応-15"><a href="#対応-15" class="headerlink" title="対応"></a>対応</h4><p>プロジェクトIDとプロジェクト名を同じに変更しました。<br>特に制約が無ければ同じにしておいた方がハマりどころ減ります。</p>
+<h3 id="4-3-突然CloudSQLやGKEにアクセスできなくなった。"><a href="#4-3-突然CloudSQLやGKEにアクセスできなくなった。" class="headerlink" title="4-3. 突然CloudSQLやGKEにアクセスできなくなった。"></a>4-3. 突然CloudSQLやGKEにアクセスできなくなった。</h3><h4 id="原因-13"><a href="#原因-13" class="headerlink" title="原因"></a>原因</h4><p>アカウントが有効なクレジットと紐付いていなかった(!!!)。<br>最初は無料利用枠で動いてしまうため、構築して数日後に発覚した。</p>
+<h4 id="対応-16"><a href="#対応-16" class="headerlink" title="対応"></a>対応</h4><p>アカウントを有効なクレジットと紐付けた。<br>プロジェクト構築時のオペレーションとして手順化した。</p>
+<h2 id="5-踏み台"><a href="#5-踏み台" class="headerlink" title="5. 踏み台"></a>5. 踏み台</h2><h3 id="5-1-踏み台サーバにsshで接続できない"><a href="#5-1-踏み台サーバにsshで接続できない" class="headerlink" title="5-1. 踏み台サーバにsshで接続できない"></a>5-1. 踏み台サーバにsshで接続できない</h3><h4 id="原因-14"><a href="#原因-14" class="headerlink" title="原因"></a>原因</h4><p>IAMの権限不足。<br>「編集者」をベースとしたカスタム権限を作成していたが、GCEのログイン権限が継承されていなかった。</p>
+<h4 id="対応-17"><a href="#対応-17" class="headerlink" title="対応"></a>対応</h4><p>IAMに「編集者」を直接付与する形式に変更。<br>アクセスするメンバーが限られていたため、カスタム権限で細かく制御は不要と判断しました。</p>
+<h3 id="5-2-どの環境の踏み台サーバで作業しているか分からない"><a href="#5-2-どの環境の踏み台サーバで作業しているか分からない" class="headerlink" title="5-2. どの環境の踏み台サーバで作業しているか分からない"></a>5-2. どの環境の踏み台サーバで作業しているか分からない</h3><h4 id="原因-15"><a href="#原因-15" class="headerlink" title="原因"></a>原因</h4><p>踏み台サーバのインスタンス名が全ての環境（productionとかstagingとか）で同一のため。<br>CloudShellだとURL部分にPJ名が出るので判断可能であるがsshのターミナルツールによっては判別できない。</p>
+<h4 id="対応-18"><a href="#対応-18" class="headerlink" title="対応"></a>対応</h4><p>踏み台にはインスタンス名に環境名を付与した。<br>命名規約上他のインスタンスに対して環境名を付けないとしても、実際にログインして作業することが多い踏み台だけは付けてあげた方が優しいです。</p>
+<h2 id="6-その他"><a href="#6-その他" class="headerlink" title="6. その他"></a>6. その他</h2><h3 id="6-1-共有VPC設定ができない"><a href="#6-1-共有VPC設定ができない" class="headerlink" title="6-1. 共有VPC設定ができない"></a>6-1. 共有VPC設定ができない</h3><h4 id="原因-16"><a href="#原因-16" class="headerlink" title="原因"></a>原因</h4><p>共有VPCを設定するためには「共有 VPC 管理者」権限が必要であったが権限がなかった。<br><a href="https://cloud.google.com/vpc/docs/provisioning-shared-vpc#nominating_shared_vpc_admins_for_the_organization" target="_blank" rel="noopener">https://cloud.google.com/vpc/docs/provisioning-shared-vpc#nominating_shared_vpc_admins_for_the_organization</a><br>更には「共有 VPC 管理者」を付与するために「組織管理者」権限が必要であるが、構築メンバーが誰も権限を持っていなかった。</p>
+<h4 id="対応-19"><a href="#対応-19" class="headerlink" title="対応"></a>対応</h4><p>「組織管理者」権限は契約者しか権限持っていなかったため依頼して操作ユーザに対して「組織管理者」権限を付与し、その上で「共有 VPC 管理者」を付与しました。</p>
+<h3 id="6-2-特定アプリケーションのインストールができない"><a href="#6-2-特定アプリケーションのインストールができない" class="headerlink" title="6-2. 特定アプリケーションのインストールができない"></a>6-2. 特定アプリケーションのインストールができない</h3><h4 id="原因-17"><a href="#原因-17" class="headerlink" title="原因"></a>原因</h4><p>外部サイトへアクティベーションが必要であったが外部IPが無く接続できなかったため。</p>
+<h4 id="対応-20"><a href="#対応-20" class="headerlink" title="対応"></a>対応</h4><p>一時的に外部IPを付与してインストールを行った。<br>※前述のCloudNAT導入前だったためこのような対応しています。<br>※CloudNAT導入後であれば問題なく出来たと思われます。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>ここまでお疲れ様でした。<br>忙しい人向けに、全体通してのまとめです。</p>
+<ul>
+<li>全体的にネットワーク、権限周りがハマりどころ多かった。</li>
+<li>GKEは共有VPC、ネットワークの制約によるハマりどころが多かった。</li>
+<li>逆にこの辺りがすんなりいけば簡単に環境作れる感じがした。</li>
+<li>GCP、ネットワーク知識いらないって聞いてた（自分だけ？）けど結構必要。</li>
+<li>オンプレ環境と密な構成は難易度が跳ね上がる。</li>
+</ul>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。その中でもDXチームは特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+      
+    </div>
+  </div>
+    
+  <!-- シェアボタン START -->
+  <div class="social-area">
+  <ul class="social-button">
+
+      <!-- twitter -->
+      <li class="sc-tw social-button-twitter">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-hashtags="future_architect">ツイート</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      </li>
+      
+      <!-- Facebookいいね -->
+      <li class="social-button-fb">
+          <div id="fb-root"></div>
+          <script>(function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.8";
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));</script>
+          <div class="fb-like" data-href="https://future-architect.github.io/articles/20190820/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+      </li>
+
+      <!-- はてなブックマーク -->
+      <li class="social-button-hatebu"><a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20190820/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></li>
+
+      <!-- pocket -->
+      <li class="social-button-pocket"><a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
+          <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+      </li>
+
+  </ul>
+  </div>
+<!-- シェアボタン END -->
+
+
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/articles/20190819/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">はじめてのTerraform 0.12 ～実践編～</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190820/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                初めてのGCPで環境構築してハマったこと
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190819/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                はじめてのTerraform 0.12 ～実践編～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190816/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                はじめてのTerraform 0.12 ～環境構築～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (10)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (21)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (5)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (15)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーアーキテクトの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+          <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+
+    <!-- Twitterフォローボタン -->
+    <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+	  <a data-tweet-limit="1" class="twitter-timeline"
+	  href="https://twitter.com/future_techblog"
+	  data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+
+	  <script>!function(d,s,id){var
+	  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+          </div>
+          <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2019 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
