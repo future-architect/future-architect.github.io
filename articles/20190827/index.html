@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話 | Future Tech Blog - フューチャーアーキテクト</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにこんにちは、TIG所属DXユニット1の市川燿と申します。 現在は、プロジェクト内で利用しているGoogle Cloud Platform(以下GCP)の環境構築と、Go言語でバックエンドアプリの開発などをしています。 今回は、GCPのKubernetesサービスであるGoogle Kubernetes Engine(以下GKE)を利用している際にハマった事象について共有します。 GKEとは">
+<meta name="keywords" content="GCP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話">
+<meta property="og:url" content="https://future-architect.github.io/articles/20190827/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="はじめにこんにちは、TIG所属DXユニット1の市川燿と申します。 現在は、プロジェクト内で利用しているGoogle Cloud Platform(以下GCP)の環境構築と、Go言語でバックエンドアプリの開発などをしています。 今回は、GCPのKubernetesサービスであるGoogle Kubernetes Engine(以下GKE)を利用している際にハマった事象について共有します。 GKEとは">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20190828/photo_20190828_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190828/photo_20190828_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190828/photo_20190828_03.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190828/photo_20190828_04.png">
+<meta property="og:updated_time" content="2019-08-27T15:02:04.432Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話">
+<meta name="twitter:description" content="はじめにこんにちは、TIG所属DXユニット1の市川燿と申します。 現在は、プロジェクト内で利用しているGoogle Cloud Platform(以下GCP)の環境構築と、Go言語でバックエンドアプリの開発などをしています。 今回は、GCPのKubernetesサービスであるGoogle Kubernetes Engine(以下GKE)を利用している際にハマった事象について共有します。 GKEとは">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20190828/photo_20190828_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話 | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Tech Blog</div>
+        <div class="header-title-sub">フューチャーアーキテクト開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20190827/">GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20190828-gcp-ip" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> 市川燿</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2019-08-27T14:39:01.000Z" itemprop="datePublished">2019/08/27</time>
+
+	</li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+	  
+  
+    <a href="/tags/GCP/" title="GCP">GCP</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    Categories:
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは、TIG所属DXユニット<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>の市川燿と申します。</p>
+<p>現在は、プロジェクト内で利用しているGoogle Cloud Platform(以下GCP)の環境構築と、Go言語でバックエンドアプリの開発などをしています。</p>
+<p>今回は、GCPのKubernetesサービスである<a href="https://cloud.google.com/kubernetes-engine/" target="_blank" rel="noopener">Google Kubernetes Engine</a>(以下GKE)を利用している際にハマった事象について共有します。</p>
+<h2 id="GKEとは"><a href="#GKEとは" class="headerlink" title="GKEとは"></a>GKEとは</h2><blockquote>
+<p>コンテナ化されたアプリケーションをデプロイするための、本番稼働に対応したマネージド型環境です。<br><a href="https://cloud.google.com/kubernetes-engine/?hl=ja" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/?hl=ja</a></p>
+</blockquote>
+<h2 id="ハマった事象"><a href="#ハマった事象" class="headerlink" title="ハマった事象"></a>ハマった事象</h2><p><strong>GKE内のPodから他のGCPプロジェクトのプライベートIPアドレスに対し接続できない</strong>ことです。<br>もちろんFirewall Ruleの設定上は接続できる状態です。</p>
+<img src="/images/20190828/photo_20190828_01.png">
+
+<p>具体的には、CurlによるHTTPやTelnetはもちろん、pingによるICMPも接続ができません。不思議なことにGKEを構成するGCEノードにssh接続し、そこから外部のプライベートIPアドレスを持つリソースに対しては”接続が可能”でした。</p>
+<p>実はパブリックIPが付与されていた、といったオチもありません。全てプライベートIPのみを持っているインスタンスです。</p>
+<h2 id="システム構成前提"><a href="#システム構成前提" class="headerlink" title="システム構成前提"></a>システム構成前提</h2><p>今回の環境は以下の設定を使用しています。</p>
+<ul>
+<li>VPC<ul>
+<li>専有VPCを利用</li>
+</ul>
+</li>
+<li>GKE<ul>
+<li>バージョン: v1.12.7-gke.10</li>
+<li><a href="https://cloud.google.com/vpc/docs/legacy" target="_blank" rel="noopener">レガシーネットワーク</a>を利用</li>
+</ul>
+</li>
+<li>他GCPプロジェクトとの接続<ul>
+<li><a href="https://cloud.google.com/vpc/docs/vpc-peering" target="_blank" rel="noopener">VPCネットワークピアリング</a>を設定済み</li>
+</ul>
+</li>
+</ul>
+<p>各サービスは以下のCIDRが設定してある前提で説明します。</p>
+<table>
+<thead>
+<tr>
+<th>サービス</th>
+<th>CIDR</th>
+<th>レンジ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>接続元プロジェクト</td>
+<td>10.1.0.0/16</td>
+<td>10.1.0.0～10.1.255.254</td>
+</tr>
+<tr>
+<td>接続先プロジェクト</td>
+<td>10.2.0.0/16</td>
+<td>10.2.0.0～10.2.255.254</td>
+</tr>
+<tr>
+<td>接続元のGKE</td>
+<td>172.16.0.0/16</td>
+<td>172.16.0.0～172.16.255.254</td>
+</tr>
+</tbody></table>
+<h2 id="設定・接続状況"><a href="#設定・接続状況" class="headerlink" title="設定・接続状況"></a>設定・接続状況</h2><p>設定や接続確認し情報を整理したところ以下のことが分かっています。</p>
+<img src="/images/20190828/photo_20190828_02.png">
+
+<ul>
+<li>GKE内Podから他プロジェクト内GCEへの接続は不可能 <strong>(<em>a</em>)</strong></li>
+<li>GKE内Pod(my-pod)から自プロジェクト内GCE(test-gce-01)への接続は可能 <strong>(<em>b</em>)</strong></li>
+<li>自プロジェクトと接続先のプロジェクトとのVPC Peeringは設定済み</li>
+<li>自プロジェクトのGCE上(test-gce-01)から他プロジェクトGCE(target-gce-01)へ接続は可能 <strong>(<em>c</em>)</strong></li>
+<li>GKE内Podが稼働している物理Node(gke-node-02)から他プロジェクトGCEへの接続も可能</li>
+</ul>
+<p>GKE内Podとプロジェクト内GCE、テスト用GCEと他プロジェクトGCEはそれぞれきちんと繋がるのに、GKE内Podと他プロジェクトGCEは繋がらないので、そんなことありうるのかと当時とても焦りました。</p>
+<h2 id="試した方法その2-プロキシサーバ経由でアクセス"><a href="#試した方法その2-プロキシサーバ経由でアクセス" class="headerlink" title="試した方法その2: プロキシサーバ経由でアクセス"></a>試した方法その2: プロキシサーバ経由でアクセス</h2><p>解決手段としてまず思いついたのは手軽にnginxなどをプロキシサーバ代わりにして方法です。</p>
+<ul>
+<li>通信経路<br>GKE内Pod =&gt; nginxなどのプロキシサーバ =&gt; 他プロジェクトGCE</li>
+</ul>
+<p>しかし、GKE内Podとしてnginxを作ってしまうとnginxと他プロジェクトGCE間での通信ができず目的が達成できません。</p>
+<p>nginxをGCE上にインストールしてインストールする必要があります。</p>
+<img src="/images/20190828/photo_20190828_03.png">
+
+<figure class="highlight nginx"><figcaption><span>nginx.conf(設定サンプル)</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">worker_processes</span>  <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="section">events</span> &#123;</span><br><span class="line">  <span class="attribute">worker_connections</span>  <span class="number">1024</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">stream</span> &#123;</span><br><span class="line">  <span class="section">server</span> &#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">proxy_pass</span> <span class="number">10.2.0.1:80</span>; <span class="comment"># target-gce-01</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>この方法で不格好ですが、無事にGKE内Podから他プロジェクトGCEにアクセスすることができました。<br>GCE上にプロキシサーバをインストールしているため、冗長性やオートヒーリングとしてKubernetesの機能が利用できず<br>別の方法で担保する必要があります。</p>
+<h2 id="試した方法その2-IPマスカレードエージェントを利用してアクセス-本題"><a href="#試した方法その2-IPマスカレードエージェントを利用してアクセス-本題" class="headerlink" title="試した方法その2: IPマスカレードエージェントを利用してアクセス (本題)"></a>試した方法その2: IPマスカレードエージェントを利用してアクセス (本題)</h2><p>やっと本題です。</p>
+<p>もう少し調べてみるとkubernetes-incubator配下にIPマスカレードエージェント(ip-masq-agent)というプロダクトがあり今回のケースに使えそうなことが分かりました。</p>
+<p>IPマスカレードエージェントを利用することで、PodのアドレスからPodが稼働している物理Nodeのアドレスへとアドレスの変換を行い、物理Nodeのアドレスとして接続GKE外部のアドレスに接続しに行きます。</p>
+<img src="/images/20190828/photo_20190828_04.png">
+
+<p>GKEでもバージョン1.7以上で<a href="https://cloud.google.com/kubernetes-engine/docs/how-to/ip-masquerade-agent#how_ipmasq_works" target="_blank" rel="noopener">一定条件を満たすと</a>デフォルトで有効になっており、追加インストール作業が不要で利用できます。</p>
+<p>IPマスカレードエージェントの使い方はとても簡単で、kubernetesのconfig mapを登録だけで適用されます。</p>
+<p>GKE内部のネットワーク(172.16.0.0/16)と自プロジェクトネットワーク(10.1.0.0/16)のみIPマスカレードエージェントの<strong>対象外</strong>としたい場合には、以下のようにファイルを編集し<strong>config</strong>のファイル名で保存した後、</p>
+<figure class="highlight yaml"><figcaption><span>config</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">nonMasqueradeCIDRs:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="number">172.16</span><span class="number">.0</span><span class="number">.0</span><span class="string">/16</span> <span class="comment"># my-gke-cluster CIDR</span></span><br><span class="line"><span class="bullet">  -</span> <span class="number">10.1</span><span class="number">.0</span><span class="number">.0</span><span class="string">/16</span>   <span class="comment"># my-project CIDR</span></span><br><span class="line"><span class="attr">resyncInterval:</span> <span class="number">60</span><span class="string">s</span></span><br></pre></td></tr></table></figure>
+
+<p>以下のコマンドを実行することで適用されます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create configmap ip-masq-agent --from-file config --namespace kube-system</span><br></pre></td></tr></table></figure>
+
+<p>※<strong>config</strong>以外の名前でファイルを保存すると上手く適用されないため注意</p>
+<p>私の環境ではkubectlコマンド実行から1分ほどで、設定が適用されアクセスできるようになりました。</p>
+<figure class="highlight bash"><figcaption><span>GKE内Podから他プロジェクトIPへの確認コマンド</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl <span class="built_in">exec</span> my-pod -- curl http://10.2.0.1/health</span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+
+<p>この方法であれば、GKE内で完結し、コマンドも1コマンドだけなので、とてもスマートに実現できます。</p>
+<h2 id="その他"><a href="#その他" class="headerlink" title="その他"></a>その他</h2><p>今回は試しませんでしたが、紹介した2の方法以外にも以下の方法も検討していました。<br>ケースによっては検討するのも有りだと思います。</p>
+<ul>
+<li><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/alias-ips" target="_blank" rel="noopener">Nativeクラスタ</a>を利用</li>
+<li><a href="https://cloud.google.com/vpc/docs/shared-vpc" target="_blank" rel="noopener">共有VPC</a>を利用</li>
+<li>Publicなネットワーク経由での利用</li>
+</ul>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>GKE内Podから他プロジェクトのIPへの接続する方法について紹介しました。本記事ではGCPの別PJでしたが、AWSへのVPC Peeringであったり、オンプレミスに対するVPN接続でも同じ事象が発生しうると思います。</p>
+<p>IPマスカレードエージェントを利用することで、プロキシサーバなど余分なサーバを作る必要なくアクセスできます。</p>
+<p>本記事を通して、皆さまのGCP・GKEライフが少しでも快適になれば幸いです。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。その中でもDXチームは特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+      
+    </div>
+  </div>
+    
+  <!-- シェアボタン START -->
+  <div class="social-area">
+  <ul class="social-button">
+
+      <!-- twitter -->
+      <li class="sc-tw social-button-twitter">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-hashtags="future_architect">ツイート</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      </li>
+      
+      <!-- Facebookいいね -->
+      <li class="social-button-fb">
+          <div id="fb-root"></div>
+          <script>(function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.8";
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));</script>
+          <div class="fb-like" data-href="https://future-architect.github.io/articles/20190827/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+      </li>
+
+      <!-- はてなブックマーク -->
+      <li class="social-button-hatebu"><a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20190827/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></li>
+
+      <!-- pocket -->
+      <li class="social-button-pocket"><a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
+          <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+      </li>
+
+  </ul>
+  </div>
+<!-- シェアボタン END -->
+
+
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/articles/20190826/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">ソフトとハードの垣根を越えろ - IoTハードウェアの開発をソフト屋視点で解説します</div>
+    </a>
+  
+</nav>
+
+  
+  <br>
+</article>
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190827/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190826/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                ソフトとハードの垣根を越えろ - IoTハードウェアの開発をソフト屋視点で解説します
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190821/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                システム開発で得たRedis利用ノウハウ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (10)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (5)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (22)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (15)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーアーキテクトの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+          <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+
+    <!-- Twitterフォローボタン -->
+    <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+	  <a data-tweet-limit="1" class="twitter-timeline"
+	  href="https://twitter.com/future_techblog"
+	  data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+
+	  <script>!function(d,s,id){var
+	  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+          </div>
+          <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2019 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

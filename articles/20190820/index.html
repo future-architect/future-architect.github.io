@@ -22,7 +22,7 @@
 <meta property="og:description" content="はじめにはじめまして。TIG DXチーム1所属、ゲームとボルダリング好きなエンジニアの椎名@417yskです。 お仕事でGCP使って環境を構築することがあったのですが、色々とハマることが多かったので供養を兼ねて共有したいと思います。 当時の私の経験値としては「AWSの一部サービスは触ったことがある」程度でクラウド環境を下地から構築するのは初めての経験でした。一度触ってみれば常識だよねって内容が多い">
 <meta property="og:locale" content="ja">
 <meta property="og:image" content="https://future-architect.github.io/images/20190820/photo_20190820_01.png">
-<meta property="og:updated_time" content="2019-08-20T00:30:16.491Z">
+<meta property="og:updated_time" content="2019-08-27T15:15:51.480Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="初めてのGCPで環境構築してハマったこと">
 <meta name="twitter:description" content="はじめにはじめまして。TIG DXチーム1所属、ゲームとボルダリング好きなエンジニアの椎名@417yskです。 お仕事でGCP使って環境を構築することがあったのですが、色々とハマることが多かったので供養を兼ねて共有したいと思います。 当時の私の経験値としては「AWSの一部サービスは触ったことがある」程度でクラウド環境を下地から構築するのは初めての経験でした。一度触ってみれば常識だよねって内容が多い">
@@ -183,7 +183,14 @@
 <h4 id="対応-3"><a href="#対応-3" class="headerlink" title="対応"></a>対応</h4><p>Ingressを利用して意図したIPを割り当てました。<br>詳細は他の方が書かれていますのでこちらをご参考に。<br><a href="https://qiita.com/tinjyuu/items/fd7a97b0b81963dcc7f2" target="_blank" rel="noopener">https://qiita.com/tinjyuu/items/fd7a97b0b81963dcc7f2</a></p>
 <h3 id="1-5-共有VPC上のGKEクラスタのセカンダリCIDR設計"><a href="#1-5-共有VPC上のGKEクラスタのセカンダリCIDR設計" class="headerlink" title="1-5. 共有VPC上のGKEクラスタのセカンダリCIDR設計"></a>1-5. 共有VPC上のGKEクラスタのセカンダリCIDR設計</h3><h4 id="事象-1"><a href="#事象-1" class="headerlink" title="事象"></a>事象</h4><p>オンプレ環境と接続する1つの共有VPC上にproduction, stagingなど複数プロジェクトを相乗りさせる場合、各プロジェクトで利用するセカンダリCIDRの設計が必要。</p>
 <h4 id="対応-4"><a href="#対応-4" class="headerlink" title="対応"></a>対応</h4><p>GKEで必要なセカンダリCIDRを本腰入れて設計しました。<br>スタンダードなこれと言った解はなく、必要な環境数、オンプレ環境から割り当てられたIP範囲から適宜設計する必要があります。<br>ここだけでも1記事くらいのボリュームになりそうなので詳細はまた別途。</p>
-<h3 id="1-6-GKEクラスタが大量に作成できない"><a href="#1-6-GKEクラスタが大量に作成できない" class="headerlink" title="1-6. GKEクラスタが大量に作成できない"></a>1-6. GKEクラスタが大量に作成できない</h3><h4 id="原因-3"><a href="#原因-3" class="headerlink" title="原因"></a>原因</h4><p>利用可能なセカンダリCIDRの上限に掛かるため。<br>共有VPC上にプライベートGKEクラスタを構築するためには、1クラスタあたりに2つのアドレス範囲（pod/service）を割り当てる必要があるが、1サブネット内にセカンダリCIDRは上限5つまでしか作成できない。<br>今回、1プロジェクト=1サブネットを共有するという方針であったため、1プロジェクト当たりに2つしかクラスタを作成できなかった。</p>
+<h3 id="1-6-GKEクラスタが大量に作成できない"><a href="#1-6-GKEクラスタが大量に作成できない" class="headerlink" title="1-6. GKEクラスタが大量に作成できない"></a>1-6. GKEクラスタが大量に作成できない</h3><h4 id="原因-3"><a href="#原因-3" class="headerlink" title="原因"></a>原因</h4><p>利用可能なセカンダリCIDRの上限に掛かるため。<br>共有VPC上にプライベートGKEクラスタを構築するためには、1クラスタあたりに2つのアドレス範囲（pod/service）を割り当てる必要があるが、1サブネット内にセカンダリCIDRは <del>上限5つまで</del> しか作成できない。</p>
+<p>今回、1プロジェクト=1サブネットを共有するという方針であったため、1プロジェクト当たりに2つしかクラスタを作成できなかった。</p>
+<p>(2019/08/28追記)上限が30までに緩和されたようです。</p>
+<blockquote>
+<p>必要に応じて、サブネットごとに最大 30 個のセカンダリ CIDR ブロックを定義できます。このセカンダリ IP 範囲は、エイリアス IP アドレスにのみ使用できます。この上限を引き上げることはできません。<br><a href="https://cloud.google.com/vpc/docs/quota#per_network" target="_blank" rel="noopener">https://cloud.google.com/vpc/docs/quota#per_network</a></p>
+</blockquote>
+<p><a href="https://twitter.com/urasoko" target="_blank" rel="noopener">@urasoko</a>さん、ご指摘ありがとうございます！</p>
+<p>これで、GKEのクラスタ数を増やしたい時も対応できます。</p>
 <h4 id="対応-5"><a href="#対応-5" class="headerlink" title="対応"></a>対応</h4><p>用途に応じてクラスタを分けるのではなく、ノードプールを分ける方針としました。<br>GKEの設計でクラスタを分けるかノードプールを分けるかはしばしば話に挙がりますが、共有VPC上に構築する場合はノードプールを分けるしかないです。</p>
 <h2 id="2-CloudSQL関連"><a href="#2-CloudSQL関連" class="headerlink" title="2. CloudSQL関連"></a>2. CloudSQL関連</h2><h3 id="2-1-CloudSQLのインスタンスが再作成できない"><a href="#2-1-CloudSQLのインスタンスが再作成できない" class="headerlink" title="2-1. CloudSQLのインスタンスが再作成できない"></a>2-1. CloudSQLのインスタンスが再作成できない</h3><h4 id="原因-4"><a href="#原因-4" class="headerlink" title="原因"></a>原因</h4><p>同じインスタンス名は数日間（1週間ほど）は作成できない仕様であったため。</p>
 <h4 id="対応-6"><a href="#対応-6" class="headerlink" title="対応"></a>対応</h4><p>初期構築時は連番やタイムスタンプなどを入れ確実に構築可能なことの保証が取れてから真名で構築することにしました。<br>インスタンス名にタイムスタンプなどを入れてクライアント側の接続情報を変更していく運用も考えましたが、担当した案件では開発に複数社入っていたりする状況もあり諦めました。</p>
@@ -202,7 +209,9 @@
 <h3 id="2-4-CloudSqlProxyを使ってSQLインスタンスにつながらない"><a href="#2-4-CloudSqlProxyを使ってSQLインスタンスにつながらない" class="headerlink" title="2-4. CloudSqlProxyを使ってSQLインスタンスにつながらない"></a>2-4. CloudSqlProxyを使ってSQLインスタンスにつながらない</h3><h4 id="原因-6"><a href="#原因-6" class="headerlink" title="原因"></a>原因</h4><p>Cloud SQL Administration APIが有効化されていないため。<br>CloudSqlProxyを使う際は有効化する必要があります。<br><a href="https://cloud.google.com/sql/docs/postgres/connect-external-app?hl=ja" target="_blank" rel="noopener">https://cloud.google.com/sql/docs/postgres/connect-external-app?hl=ja</a></p>
 <h4 id="対応-9"><a href="#対応-9" class="headerlink" title="対応"></a>対応</h4><p>Cloud SQL Administration APIを有効化します。<br>環境の断面が増えてくると、Administration APIの有効化手順が漏れるので、これもちゃんと<a href="https://www.terraform.io/docs/providers/google/r/google_project_services.html" target="_blank" rel="noopener">Terraformで管理</a>することになりました。<br>（※それまでは手動で有効にしていました☠）</p>
 <h3 id="2-5-CloudSQLの接続CIDRが任意のアドレス範囲で作成されてしまった"><a href="#2-5-CloudSQLの接続CIDRが任意のアドレス範囲で作成されてしまった" class="headerlink" title="2-5. CloudSQLの接続CIDRが任意のアドレス範囲で作成されてしまった"></a>2-5. CloudSQLの接続CIDRが任意のアドレス範囲で作成されてしまった</h3><h4 id="原因-7"><a href="#原因-7" class="headerlink" title="原因"></a>原因</h4><p>IPアドレスの設計前にCloudSQLのインスタンスを立てて検証していたため初期構築時にCIDRの割り当てを明確に行っていなかった。</p>
-<h4 id="対応-10"><a href="#対応-10" class="headerlink" title="対応"></a>対応</h4><p>GCPのSREチーム（米国）へ変更対応を依頼しました（ちょうどクリスマスシーズンだったので大変でした）。2019年1月時点では、このCIDRは一度設定するとGUIやコマンドで変更できないため依頼する必要があります。<br>共有VPCの環境でCloudSQLのアドレス範囲を明示的に定めたい場合は注意しましょう。</p>
+<h4 id="対応-10"><a href="#対応-10" class="headerlink" title="対応"></a>対応</h4><p>GCPのSREチーム（米国）へ変更対応を依頼しました（ちょうどクリスマスシーズンだったので大変でした）。2019年1月時点では、このCIDRは一度設定するとGUIやコマンドで変更できないため依頼する必要がありました。<br><del>共有VPCの環境でCloudSQLのアドレス範囲を明示的に定めたい場合は注意しましょう。</del></p>
+<p>(2019/08/28追記) 2019年4月以降は <code>gcloud services vpc-peerings update</code> コマンドで更新できるそうです。<br><a href="https://issuetracker.google.com/issues/118849070" target="_blank" rel="noopener">https://issuetracker.google.com/issues/118849070</a></p>
+<p>これからは、わざわざサポートに連絡を取る必要はありません！間違っても比較的気軽にやり直せるようになったのは嬉しいですね。</p>
 <h3 id="2-6-GCEからCloudSQLへ接続ができない"><a href="#2-6-GCEからCloudSQLへ接続ができない" class="headerlink" title="2-6. GCEからCloudSQLへ接続ができない"></a>2-6. GCEからCloudSQLへ接続ができない</h3><h4 id="原因-8"><a href="#原因-8" class="headerlink" title="原因"></a>原因</h4><p>GCEインスタンスには内部IPのみで外部IPが付与されておらず、SQLインスタンスには外部IPのみで内部IPを付与していなかった（β版のため）。<br>SQL Proxyが上手いことやってくれると淡い期待をしたがダメであった。</p>
 <h4 id="対応-11"><a href="#対応-11" class="headerlink" title="対応"></a>対応</h4><p>他のシステム要件からCloudSQLに内部IPを付与しました</p>
 <h2 id="3-LB関連"><a href="#3-LB関連" class="headerlink" title="3. LB関連"></a>3. LB関連</h2><h3 id="3-1-Internal-特定の通信においてInternal-LBで負荷分散されない"><a href="#3-1-Internal-特定の通信においてInternal-LBで負荷分散されない" class="headerlink" title="3-1. Internal 特定の通信においてInternal LBで負荷分散されない"></a>3-1. Internal 特定の通信においてInternal LBで負荷分散されない</h3><h4 id="原因-9"><a href="#原因-9" class="headerlink" title="原因"></a>原因</h4><p>コネクションを貼って通信していたため。<br>Internal LBでセッションアフィニティをOFFにしてもコネクション貼って通信するものはコネクション貼ったバックエンドに流れる仕様であった。</p>
@@ -306,6 +315,20 @@
   
     
       
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
         <a href="https://future-architect.github.io/articles/20190625/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
@@ -320,11 +343,11 @@
   
     
       
-        <a href="https://future-architect.github.io/articles/20190713/">
+        <a href="https://future-architect.github.io/articles/20190827/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
               <li>
-                Goを学ぶときにつまずきやすいポイントFAQ
+                GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話
               </li>
             </div>
           </div>
@@ -347,8 +370,6 @@
 	
   
     
-  
-    
       
         <a href="https://future-architect.github.io/articles/20190821/">
           <div class="row margin-bottom-10">
@@ -364,20 +385,6 @@
   
     
       
-        <a href="https://future-architect.github.io/articles/20190816/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                はじめてのTerraform 0.12 ～環境構築～
-              </li>
-            </div>
-          </div>
-        </a>
-      
-	
-  
-    
-      
 	
   
     
@@ -425,64 +432,6 @@
 	
   
     
-  
-    
-      
-	
-  
-    
-      
-	
-  
-    
-      
-	
-  
-    
-      
-	
-  
-    
-      
-	
-  
-    
-      
-	
-  
-    
-  
-    
-  
-    
-      
-	
-  
-    
-  
-    
-  
-    
-      
-	
-  
-    
-      
-	
-  
-    
-  
-    
-      
-	
-  
-    
-  
-    
-      
-	
-  
-    
       
 	
   
@@ -509,6 +458,44 @@
 	
   
     
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
       
 	
   
@@ -519,6 +506,20 @@
     
       
 	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
   
     
       
@@ -589,22 +590,8 @@
 	
   
     
-  
-    
       
 	
-  
-    
-      
-	
-  
-    
-      
-	
-  
-    
-  
-    
   
     
       
@@ -629,6 +616,14 @@
     
   
     
+  
+    
+  
+    
+      
+	
+  
+    
       
 	
   
@@ -639,10 +634,28 @@
     
   
     
+      
+	
   
     
       
 	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
   
     
       
@@ -721,11 +734,11 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (21)</a>
+	  <a href="/categories/Management/">Management (5)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (5)</a>
+	  <a href="/categories/Infrastructure/">Infrastructure (22)</a>
 	</li>
       
 	<li>
