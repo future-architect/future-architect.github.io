@@ -13,22 +13,22 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   
-  <meta name="description" content="はじめにこんにちは、TIG所属DXユニット1の市川燿と申します。 現在は、プロジェクト内で利用しているGoogle Cloud Platform(以下GCP)の環境構築と、Go言語でバックエンドアプリの開発などをしています。 今回は、GCPのKubernetesサービスであるGoogle Kubernetes Engine(以下GKE)を利用している際にハマった事象について共有します。 GKEとは">
+  <meta name="description" content="はじめにこんにちは、TIG所属DXユニット1の市川燿と申します。 現在は、プロジェクト内で利用しているGoogle Cloud Platform(以下GCP)の環境構築と、Go言語でバックエンドアプリの開発などをしています。 今回は、GCPのKubernetesサービスであるGoogle Kubernetes Engine(以下GKE)を利用している際にハマった事象について共有します。 本記事につ">
 <meta name="keywords" content="GCP">
 <meta property="og:type" content="article">
 <meta property="og:title" content="GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話">
 <meta property="og:url" content="https://future-architect.github.io/articles/20190827/index.html">
 <meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
-<meta property="og:description" content="はじめにこんにちは、TIG所属DXユニット1の市川燿と申します。 現在は、プロジェクト内で利用しているGoogle Cloud Platform(以下GCP)の環境構築と、Go言語でバックエンドアプリの開発などをしています。 今回は、GCPのKubernetesサービスであるGoogle Kubernetes Engine(以下GKE)を利用している際にハマった事象について共有します。 GKEとは">
+<meta property="og:description" content="はじめにこんにちは、TIG所属DXユニット1の市川燿と申します。 現在は、プロジェクト内で利用しているGoogle Cloud Platform(以下GCP)の環境構築と、Go言語でバックエンドアプリの開発などをしています。 今回は、GCPのKubernetesサービスであるGoogle Kubernetes Engine(以下GKE)を利用している際にハマった事象について共有します。 本記事につ">
 <meta property="og:locale" content="ja">
 <meta property="og:image" content="https://future-architect.github.io/images/20190828/photo_20190828_01.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20190828/photo_20190828_02.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20190828/photo_20190828_03.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20190828/photo_20190828_04.png">
-<meta property="og:updated_time" content="2019-08-27T15:02:04.432Z">
+<meta property="og:updated_time" content="2019-09-01T23:45:52.027Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話">
-<meta name="twitter:description" content="はじめにこんにちは、TIG所属DXユニット1の市川燿と申します。 現在は、プロジェクト内で利用しているGoogle Cloud Platform(以下GCP)の環境構築と、Go言語でバックエンドアプリの開発などをしています。 今回は、GCPのKubernetesサービスであるGoogle Kubernetes Engine(以下GKE)を利用している際にハマった事象について共有します。 GKEとは">
+<meta name="twitter:description" content="はじめにこんにちは、TIG所属DXユニット1の市川燿と申します。 現在は、プロジェクト内で利用しているGoogle Cloud Platform(以下GCP)の環境構築と、Go言語でバックエンドアプリの開発などをしています。 今回は、GCPのKubernetesサービスであるGoogle Kubernetes Engine(以下GKE)を利用している際にハマった事象について共有します。 本記事につ">
 <meta name="twitter:image" content="https://future-architect.github.io/images/20190828/photo_20190828_01.png">
   
     <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
@@ -167,6 +167,7 @@
         <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは、TIG所属DXユニット<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>の市川燿と申します。</p>
 <p>現在は、プロジェクト内で利用しているGoogle Cloud Platform(以下GCP)の環境構築と、Go言語でバックエンドアプリの開発などをしています。</p>
 <p>今回は、GCPのKubernetesサービスである<a href="https://cloud.google.com/kubernetes-engine/" target="_blank" rel="noopener">Google Kubernetes Engine</a>(以下GKE)を利用している際にハマった事象について共有します。</p>
+<h2 id="本記事について"><a href="#本記事について" class="headerlink" title="本記事について"></a>本記事について</h2><p>(2019/09/02) GKEのクラスタがルートベースである旨を追記<br>(2019/09/02) Export設定について追記</p>
 <h2 id="GKEとは"><a href="#GKEとは" class="headerlink" title="GKEとは"></a>GKEとは</h2><blockquote>
 <p>コンテナ化されたアプリケーションをデプロイするための、本番稼働に対応したマネージド型環境です。<br><a href="https://cloud.google.com/kubernetes-engine/?hl=ja" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/?hl=ja</a></p>
 </blockquote>
@@ -220,6 +221,7 @@
 <img src="/images/20190828/photo_20190828_02.png">
 
 <ul>
+<li>クラスタのネットワークは<a href="https://cloud.google.com/kubernetes-engine/docs/how-to/routes-based-cluster" target="_blank" rel="noopener">ルートベース</a></li>
 <li>GKE内Podから他プロジェクト内GCEへの接続は不可能 <strong>(<em>a</em>)</strong></li>
 <li>GKE内Pod(my-pod)から自プロジェクト内GCE(test-gce-01)への接続は可能 <strong>(<em>b</em>)</strong></li>
 <li>自プロジェクトと接続先のプロジェクトとのVPC Peeringは設定済み</li>
@@ -227,7 +229,31 @@
 <li>GKE内Podが稼働している物理Node(gke-node-02)から他プロジェクトGCEへの接続も可能</li>
 </ul>
 <p>GKE内Podとプロジェクト内GCE、テスト用GCEと他プロジェクトGCEはそれぞれきちんと繋がるのに、GKE内Podと他プロジェクトGCEは繋がらないので、そんなことありうるのかと当時とても焦りました。</p>
-<h2 id="試した方法その2-プロキシサーバ経由でアクセス"><a href="#試した方法その2-プロキシサーバ経由でアクセス" class="headerlink" title="試した方法その2: プロキシサーバ経由でアクセス"></a>試した方法その2: プロキシサーバ経由でアクセス</h2><p>解決手段としてまず思いついたのは手軽にnginxなどをプロキシサーバ代わりにして方法です。</p>
+<h2 id="Pod-gt-他Project-IPへの接続がうまくいかない原因"><a href="#Pod-gt-他Project-IPへの接続がうまくいかない原因" class="headerlink" title="Pod=&gt;他Project IPへの接続がうまくいかない原因"></a>Pod=&gt;他Project IPへの接続がうまくいかない原因</h2><p>GKE用のCIDRが接続先PJのCloud Routerに上手く連携されていないため、戻りのルーティング失敗していると思われます(未確認)。</p>
+<p>「Pod=&gt;同一Project IP」への接続については、GKEクラスタを作成した際に以下のようなルートがGKE物理ノードごとに自動作成されます。<br>そのため、同一PJの同一VPC内のPod通信は問題有りませんでした。</p>
+<table>
+<thead>
+<tr>
+<th>名前</th>
+<th>説明</th>
+<th>送信先 IP 範囲</th>
+<th>優先度</th>
+<th>インスタンス タグ</th>
+<th>ネクストホップ</th>
+<th>ネットワーク</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>my-gke-default-pool-xxx</td>
+<td>k8s-node-route</td>
+<td>172.25.0.0/24</td>
+<td>1000</td>
+<td>なし</td>
+<td>インスタンス my-gke-default-pool-xxx（ゾーン asia-northeast1-a）</td>
+<td>my-network</td>
+</tr>
+</tbody></table>
+<h2 id="試した方法その1-プロキシサーバ経由でアクセス"><a href="#試した方法その1-プロキシサーバ経由でアクセス" class="headerlink" title="試した方法その1: プロキシサーバ経由でアクセス"></a>試した方法その1: プロキシサーバ経由でアクセス</h2><p>解決手段としてまず思いついたのは手軽にnginxなどをプロキシサーバ代わりにして方法です。</p>
 <ul>
 <li>通信経路<br>GKE内Pod =&gt; nginxなどのプロキシサーバ =&gt; 他プロジェクトGCE</li>
 </ul>
@@ -256,6 +282,11 @@
 <figure class="highlight bash"><figcaption><span>GKE内Podから他プロジェクトIPへの確認コマンド</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl <span class="built_in">exec</span> my-pod -- curl http://10.2.0.1/health</span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
 
 <p>この方法であれば、GKE内で完結し、コマンドも1コマンドだけなので、とてもスマートに実現できます。</p>
+<h2 id="2019-09-02-追記-カスタムルートのimport-export"><a href="#2019-09-02-追記-カスタムルートのimport-export" class="headerlink" title="(2019/09/02 追記) カスタムルートのimport/export"></a>(2019/09/02 追記) カスタムルートのimport/export</h2><p><code>--import-custom-routes</code>, <code>--export-custom-route</code>の設定を追加してVPC Peeringの構築をすれば、異なるGCP PJのVPC間でもGKEのルートが上手くExport/Importされるようです。</p>
+<blockquote>
+<p>If you have GKE clusters without VPC native addressing, you might have multiple static routes to direct traffic to VM instances that are hosting your containers. You can export these static routes so that the containers are reachable from peered networks.<br><a href="https://cloud.google.com/vpc/docs/vpc-peering#benefits_of_exchanging_custom_routes" target="_blank" rel="noopener">https://cloud.google.com/vpc/docs/vpc-peering#benefits_of_exchanging_custom_routes</a></p>
+</blockquote>
+<p>今回のように、 172.16.0.0/16のようなGKEのPODに割り当てるCIDRが、接続先のGCP PJで重複していない前提であればこちらの手法のほうが良いかもしれません。</p>
 <h2 id="その他"><a href="#その他" class="headerlink" title="その他"></a>その他</h2><p>今回は試しませんでしたが、紹介した2の方法以外にも以下の方法も検討していました。<br>ケースによっては検討するのも有りだと思います。</p>
 <ul>
 <li><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/alias-ips" target="_blank" rel="noopener">Nativeクラスタ</a>を利用</li>
@@ -309,6 +340,15 @@
     
 <nav id="article-nav">
   
+    <a href="/articles/20190902/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          AWS IAMロールの信頼関係の気になる動作
+        
+      </div>
+    </a>
+  
   
     <a href="/articles/20190826/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
@@ -327,6 +367,20 @@
 <h2>Featured Posts</h2>
 <div class="recent-news margin-bottom-10">
   
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190902/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AWS IAMロールの信頼関係の気になる動作
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
   
     
       
@@ -385,16 +439,6 @@
 	
   
     
-      
-        <a href="https://future-architect.github.io/articles/20190821/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                システム開発で得たRedis利用ノウハウ
-              </li>
-            </div>
-          </div>
-        </a>
       
 	
   
@@ -753,7 +797,7 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (22)</a>
+	  <a href="/categories/Infrastructure/">Infrastructure (23)</a>
 	</li>
       
 	<li>
