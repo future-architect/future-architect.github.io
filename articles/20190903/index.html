@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Terraformのベストなプラクティスってなんだろうか | Future Tech Blog - フューチャーアーキテクト</title>
+
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにこんにちは、TIG DXユニット1の木村です。 入社以降ずっと触ってきたTerraformですが、巷ではWorkspace派だったり、module派だったり、ディレクトリ完全分離派だったり、様々な流派(プラクティス)が乱立しているのを目にします。私自身ベストな構成を模索していく中で辿り着いた結論は、ケースバイケースで全てのデザインパターンに対応できる万能なものは存在しないのかな (当たり障">
+<meta name="keywords" content="Terraform">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Terraformのベストなプラクティスってなんだろうか">
+<meta property="og:url" content="https://future-architect.github.io/articles/20190903/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="はじめにこんにちは、TIG DXユニット1の木村です。 入社以降ずっと触ってきたTerraformですが、巷ではWorkspace派だったり、module派だったり、ディレクトリ完全分離派だったり、様々な流派(プラクティス)が乱立しているのを目にします。私自身ベストな構成を模索していく中で辿り着いた結論は、ケースバイケースで全てのデザインパターンに対応できる万能なものは存在しないのかな (当たり障">
+<meta property="og:locale" content="ja">
+<meta property="og:updated_time" content="2019-09-04T23:49:36.033Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Terraformのベストなプラクティスってなんだろうか">
+<meta name="twitter:description" content="はじめにこんにちは、TIG DXユニット1の木村です。 入社以降ずっと触ってきたTerraformですが、巷ではWorkspace派だったり、module派だったり、ディレクトリ完全分離派だったり、様々な流派(プラクティス)が乱立しているのを目にします。私自身ベストな構成を模索していく中で辿り着いた結論は、ケースバイケースで全てのデザインパターンに対応できる万能なものは存在しないのかな (当たり障">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="Terraformのベストなプラクティスってなんだろうか | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="Terraformのベストなプラクティスってなんだろうか,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Tech Blog</div>
+        <div class="header-title-sub">フューチャーアーキテクト開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20190903/">Terraformのベストなプラクティスってなんだろうか</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20190904-terraform-practice" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+      <ul class="blog-info">
+	<li><i class="fa fa-user"></i> 木村拓海</li>
+	<li><i class="fa fa-calendar"></i>
+	  <time datetime="2019-09-03T06:20:52.000Z" itemprop="datePublished">2019/09/03</time>
+
+	</li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+	  
+  
+    <a href="/tags/Terraform/" title="Terraform">Terraform</a>
+  
+
+
+	</li>
+      </ul>
+      
+  <div class="article-category">
+    
+    Category: 
+    
+    Categories:
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIG DXユニット<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>の木村です。</p>
+<p>入社以降ずっと触ってきたTerraformですが、巷ではWorkspace派だったり、module派だったり、ディレクトリ完全分離派だったり、様々な流派(プラクティス)が乱立しているのを目にします。私自身ベストな構成を模索していく中で辿り着いた結論は、ケースバイケースで全てのデザインパターンに対応できる万能なものは存在しないのかな (当たり障りないですね..)ということです。</p>
+<p>そんなわけで、様々なTerraformの流派を紹介し、各流派がどのようなパターンに向いているのか(はたまた不向きなのか)の個人的見解をまとめてみました。</p>
+<p>※本記事中のサンプルコードはすべて Terraform <code>0.12</code>、 provider <code>google cloud</code> で解説してます</p>
+<h1 id="Terraformとは？"><a href="#Terraformとは？" class="headerlink" title="Terraformとは？"></a>Terraformとは？</h1><p>当社過去記事に解説があります。Terraformの概要や、0.12におけるシンタックス変更点や便利機能が詳細に記載されていますので、ぜひ併せてご覧ください。</p>
+<ul>
+<li><a href="https://future-architect.github.io/articles/20190816/">はじめてのTerraform 0.12 ～環境構築～</a></li>
+<li><a href="https://future-architect.github.io/articles/20190819/">はじめてのTerraform 0.12 ～実践編～</a></li>
+</ul>
+<h1 id="環境をどのように分けるか"><a href="#環境をどのように分けるか" class="headerlink" title="環境をどのように分けるか"></a>環境をどのように分けるか</h1><p>開発環境、検証環境、本番環境といった環境間の構成やパラメータ差異をどのように扱うのがベストなのでしょうか。</p>
+<p>以下の順番で各流派について説明していきます。</p>
+<ol>
+<li>Workspace</li>
+<li>Module</li>
+<li>ディレクトリ分離</li>
+</ol>
+<h2 id="1-Workspace派"><a href="#1-Workspace派" class="headerlink" title="1. Workspace派"></a>1. Workspace派</h2><p>Terraform ver 0.10 から導入された機能で、同一Terraformソースに対して、Workspaceを切り替えることで環境が切替可能となります。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ terraform workspace select &#123;workspace名&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="メリット"><a href="#メリット" class="headerlink" title="メリット"></a>メリット</h3><ul>
+<li>workspace名を変数のkey名に設定することで、環境依存の変数のみ切り出せるので可読性が高くなります。</li>
+<li>また、環境間でソースを共用するという性質上、特定環境のみへの設定抜け・漏れが発生しにくいです。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 変数定義側</span></span><br><span class="line">locals &#123;</span><br><span class="line">  instance_web = &#123;</span><br><span class="line">    production = &#123;</span><br><span class="line">      machine_type   = <span class="string">"n1-standard-4"</span></span><br><span class="line">      bootdisk_size  = 500</span><br><span class="line">    &#125;</span><br><span class="line">    staging = &#123;</span><br><span class="line">      machine_type   = <span class="string">"n1-standard-2"</span></span><br><span class="line">      bootdisk_size  = 100</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">## 変数呼び出し側</span></span><br><span class="line">resource <span class="string">"google_compute_instance"</span> <span class="string">"web"</span> &#123;</span><br><span class="line">  name         = <span class="string">"web-server"</span></span><br><span class="line">  machine_type = local.instance_web[terraform.workspace][machine_type]</span><br><span class="line">  boot_disk &#123;</span><br><span class="line">    <span class="built_in">source</span>     = google_compute_disk.web.self_link</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">"google_compute_disk"</span> <span class="string">"web"</span> &#123;</span><br><span class="line">  name  = <span class="string">"web-server"</span></span><br><span class="line">  size  = local.instance_web[terraform.workspace][bootdisk_size]</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="デメリット"><a href="#デメリット" class="headerlink" title="デメリット"></a>デメリット</h3><ul>
+<li>環境間で構成差異が大きい場合は、差分を吸収するためのロジックを組み込む必要があり、かえって可読性が悪くなりメンテが大変になることがあります</li>
+</ul>
+<p>以下の例は、本番環境のみに存在するリソースと検証環境のみに存在するリソースをcountを使って制御しています。見通しが悪いですね。</p>
+<figure class="highlight bash"><figcaption><span>環境間で構成の差異が大きい場合の例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">locals &#123;</span><br><span class="line">  instance_web = &#123;</span><br><span class="line">    production = &#123;</span><br><span class="line">      ...</span><br><span class="line">    &#125;</span><br><span class="line">    staging = &#123;</span><br><span class="line">      ...</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  instance_ap = &#123;</span><br><span class="line">    production = &#123;</span><br><span class="line">      count          = 1</span><br><span class="line">      ...</span><br><span class="line">    &#125;</span><br><span class="line">    staging = &#123;</span><br><span class="line">      count          = 0</span><br><span class="line">      ...</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  instance_proxy = &#123;</span><br><span class="line">    production = &#123;</span><br><span class="line">      count          = 0</span><br><span class="line">      ...</span><br><span class="line">    &#125;</span><br><span class="line">    staging = &#123;</span><br><span class="line">      count          = 1</span><br><span class="line">      ...</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">"google_compute_instance"</span> <span class="string">"web"</span> &#123;</span><br><span class="line">  name         = <span class="string">"web-server"</span></span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">"google_compute_instance"</span> <span class="string">"ap"</span> &#123;</span><br><span class="line">  count        = local.instance_ap[terraform.workspace][count]</span><br><span class="line">//count        = <span class="string">"<span class="variable">$&#123;terraform.workspace == "production" ? 1 : 0&#125;</span>"</span> <span class="comment"># こういう書き方もあるけどいずれにしろ可読性悪い</span></span><br><span class="line">  name         = <span class="string">"ap-server"</span></span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">"google_compute_instance"</span> <span class="string">"proxy"</span> &#123;</span><br><span class="line">  count        = local.instance_proxy[terraform.workspace][count]</span><br><span class="line">  name         = <span class="string">"proxy-server"</span></span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="こんなケースにおすすめ"><a href="#こんなケースにおすすめ" class="headerlink" title="こんなケースにおすすめ"></a>こんなケースにおすすめ</h3><ul>
+<li>環境間で構成差異が少ない場合は、Workspaceの利用がおすすめです。</li>
+<li>また、リリースフローとして 本番と同等の環境での事前検証-&gt; リリース判定 -&gt; 本番環境構築 といった流れが義務付けられている場合は、 Workspaceを切り替えるだけなので、本番環境適用時のデグレ発生のリスクは減らせそうで精神衛生上良さそうです。</li>
+</ul>
+<h2 id="2-Module派"><a href="#2-Module派" class="headerlink" title="2. Module派"></a>2. Module派</h2><p>module自体は、複数リソースから構成されるサービス(たとえばLB)や特定リソースをテンプレ化する機能です。 <code>module</code>ディレクトリ内でテンプレ化するリソースを定義し、Moduleを呼び出す側( <code>production</code>, <code>staging</code> 等)で環境差異を制御できます。</p>
+<figure class="highlight plain"><figcaption><span>モジュール利用時のディレクトリ構成例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">├── module</span><br><span class="line">│   ├── gce</span><br><span class="line">│   │   ├── main.tf</span><br><span class="line">│   │   ├── output.tf</span><br><span class="line">│   │   └── variables.tf</span><br><span class="line">│   └── iam</span><br><span class="line">│   └── ...</span><br><span class="line">├── production</span><br><span class="line">│   ├── main.tf</span><br><span class="line">│   └── variable.tf</span><br><span class="line">└── staging</span><br><span class="line">    ├── main.tf</span><br><span class="line">    └── variable.tf</span><br></pre></td></tr></table></figure>
+
+<h3 id="メリット-1"><a href="#メリット-1" class="headerlink" title="メリット"></a>メリット</h3><ul>
+<li>複数resourceから構成されるサービス(LB等)をテンプレ化することでmodule利用側のソースは簡潔になります</li>
+</ul>
+<p>以下の例はGCEをmodule化した例です。instance、internal ip、diskといった個別リソースをひとつのmoduleとして定義することで、モジュール呼び出し側は、リソース間の依存関係やパラメータ以外の固定値を意識しなくてよいのは嬉しいですね。</p>
+<figure class="highlight bash"><figcaption><span>module/gce/main.tf(モジュール定義側)</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">"google_compute_address"</span> <span class="string">"template"</span> &#123;</span><br><span class="line">  name = <span class="string">"<span class="variable">$&#123;var.name&#125;</span>-internal"</span></span><br><span class="line"></span><br><span class="line">  address_type = <span class="string">"INTERNAL"</span></span><br><span class="line">  address      = <span class="string">"var.internal_ip"</span></span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">"google_compute_instance"</span> <span class="string">"template"</span> &#123;</span><br><span class="line">  name         = <span class="string">"<span class="variable">$&#123;var.name&#125;</span>"</span></span><br><span class="line">  machine_type = var.machine_type</span><br><span class="line"></span><br><span class="line">  boot_disk &#123;</span><br><span class="line">    <span class="built_in">source</span>     = google_compute_disk.template.self_link</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  network_interface &#123;</span><br><span class="line">    network_ip    = google_compute_address.template.address</span><br><span class="line">    access_config = &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">"google_compute_disk"</span> <span class="string">"template"</span> &#123;</span><br><span class="line">  name  = <span class="string">"<span class="variable">$&#123;var.name&#125;</span>"</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">type</span>  = <span class="string">"pd-ssd"</span></span><br><span class="line">  size  = var.bootdisk_size</span><br><span class="line">  image = centos-cloud/centos-7<span class="string">"</span></span><br><span class="line"><span class="string">  ...  </span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><figcaption><span>production/main.tf(モジュール呼び出し側)</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">module <span class="string">"gce_web"</span> &#123;</span><br><span class="line">  <span class="built_in">source</span> = <span class="string">"../module/gce"</span></span><br><span class="line">  </span><br><span class="line">  name         = <span class="string">"web"</span></span><br><span class="line">  internal_ip  = <span class="string">"10.xx.xx.xx"</span></span><br><span class="line">  machine_type = <span class="string">"n1-standard-4"</span></span><br><span class="line">  boot_disk    = <span class="string">"500"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>また、 <a href="https://registry.terraform.io/" target="_blank" rel="noopener">Terraform Module Registry</a>でHashiCorp社公認のmoduleが公開されており、これらを使うことができます。</p>
+<h3 id="デメリット-1"><a href="#デメリット-1" class="headerlink" title="デメリット"></a>デメリット</h3><ul>
+<li>moduleを定義する際に、どこまでmoduleを汎化(変数化)させるかを決めるのが難しいです。moduleへの変更は、 そのmoduleを利用するすべての呼び出し元へ影響を与えます。安易にmoudle内に固定値を設定しておくと、後ほどその値がパラメータ(変数)となった際の手当てが大変です。とはいえ、何でもかんでも汎化すると、moduleを利用する旨味がなくなってしまいます。</li>
+<li>設定方法が複雑で、Terraform初心者には運用が難しいです。初心者含む不特定多数のメンバーがterraformを触る機会がある場合や、運用担当者のスキルレベルを考慮した際に導入が難しい場合があるかもしれません。</li>
+</ul>
+<h3 id="こんなケースにおすすめ-1"><a href="#こんなケースにおすすめ-1" class="headerlink" title="こんなケースにおすすめ"></a>こんなケースにおすすめ</h3><ul>
+<li>moduleは、Terraformにある程度精通したメンバーが運用する前提で利用されることになるかと思います。</li>
+<li>また、リソースの利用にあたり、共通化された規約や思想が前提としてある場合は、moduleを利用することで、固定化された部分を運用側に意識させず、ガバナンスを効かせることができます。</li>
+</ul>
+<h2 id="3-環境毎にディレクトリで分離派"><a href="#3-環境毎にディレクトリで分離派" class="headerlink" title="3. 環境毎にディレクトリで分離派"></a>3. 環境毎にディレクトリで分離派</h2><p>環境毎に完全にディレクトリを分離し、個別にTerraformソースを用意する(Workspaceもmoduleも一切利用しない)流派です。</p>
+<figure class="highlight plain"><figcaption><span>完全分離派のディレクトリ構成例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">├── production</span><br><span class="line">│   ├── backend.tf</span><br><span class="line">│   ├── compute_address.tf</span><br><span class="line">│   ├── compute_firewall.tf</span><br><span class="line">│   ├── compute_instance.tf</span><br><span class="line">│   ├── project.tf</span><br><span class="line">│   ├── variable.tf</span><br><span class="line">│   └── ...</span><br><span class="line">└── staging</span><br><span class="line">    ├── backend.tf</span><br><span class="line">    ├── compute_address.tf</span><br><span class="line">    ├── compute_firewall.tf</span><br><span class="line">    ├── compute_instance.tf</span><br><span class="line">    ├── project.tf</span><br><span class="line">    ├── variable.tf</span><br><span class="line">    └── ...</span><br></pre></td></tr></table></figure>
+
+<h3 id="メリット-2"><a href="#メリット-2" class="headerlink" title="メリット"></a>メリット</h3><ul>
+<li>各環境の構成が各ディレクトリ内で完結しているため、最も直感的で理解しやすくTerraformに精通していないメンバーに易しい構成です。</li>
+<li>Terraformソースが環境毎に独立しているため(Workspace派のデメリットで紹介したような)環境間の差異を意識する必要がありません。</li>
+</ul>
+<h3 id="デメリット-2"><a href="#デメリット-2" class="headerlink" title="デメリット"></a>デメリット</h3><ul>
+<li>全ての環境へ同じ変更を加えたい場合、各ディレクトリ配下のtfソースに変更を加える必要があり、2度手間3度手間になるうえに、特定環境への変更に抜け漏れが生じる可能性があります。</li>
+<li>環境間の差異を把握するのが難しく見通しが悪いです。</li>
+</ul>
+<h3 id="こんなケースにおすすめ-2"><a href="#こんなケースにおすすめ-2" class="headerlink" title="こんなケースにおすすめ"></a>こんなケースにおすすめ</h3><ul>
+<li>環境間で構成の差異が大きいケースは、環境間の差異を吸収するロジックを組み込む必要がない本構成が使えます。</li>
+<li>デメリットで上げたような特定環境への変更漏れ等のリスクはありますが、Terraform初心者や運用担当者のスキルレベルによっては最もシンプルな本構成が、運用負荷が低く、運用しやすいかもしれません。</li>
+</ul>
+<h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>今回は、各機能を独立して利用した場合のシンプルでベーシックな流派を紹介しましたが、moduleとWorkspaceを組み合わせる(環境依存の変数をWorkspaceで切り替える)流派なども存在します。最後のディレクトリ完全分離パターンは、個人的には利用したくないパターンですが、Terraform初心者でも運用可能な点でいうと、一概に否定はできないのかなと思っています。</p>
+<p>本記事が、Terraformを利用する上での参考になれば幸いです。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">TIGとはTechnology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。その中でもDXチームは特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+      
+    </div>
+  </div>
+    
+  <!-- シェアボタン START -->
+  <div class="social-area">
+  <ul class="social-button">
+
+      <!-- twitter -->
+      <li class="sc-tw social-button-twitter">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-hashtags="future_architect">ツイート</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      </li>
+      
+      <!-- Facebookいいね -->
+      <li class="social-button-fb">
+          <div id="fb-root"></div>
+          <script>(function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.8";
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));</script>
+          <div class="fb-like" data-href="https://future-architect.github.io/articles/20190903/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+      </li>
+
+      <!-- はてなブックマーク -->
+      <li class="social-button-hatebu"><a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20190903/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></li>
+
+      <!-- pocket -->
+      <li class="social-button-pocket"><a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
+          <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+      </li>
+
+  </ul>
+  </div>
+<!-- シェアボタン END -->
+
+
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190903/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Terraformのベストなプラクティスってなんだろうか
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190902/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AWS IAMロールの信頼関係の気になる動作
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190827/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190826/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                ソフトとハードの垣根を越えろ - IoTハードウェアの開発をソフト屋視点で解説します
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190821/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                システム開発で得たRedis利用ノウハウ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190820/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                初めてのGCPで環境構築してハマったこと
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190819/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                はじめてのTerraform 0.12 ～実践編～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190816/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                はじめてのTerraform 0.12 ～環境構築～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (10)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (5)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (24)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (15)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーアーキテクトの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+	
+          <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+
+    <!-- Twitterフォローボタン -->
+    <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+	  <a data-tweet-limit="1" class="twitter-timeline"
+	  href="https://twitter.com/future_techblog"
+	  data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+
+	  <script>!function(d,s,id){var
+	  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+          </div>
+          <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2019 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
