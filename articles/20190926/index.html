@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Go言語のDBレイヤーライブラリの評価 | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="自己紹介小林と申します。アルバイトとして2019年2月からフューチャーで働いている大学生です。 アルバイトとして入社後は、Goを用いてツール開発、Vue.jsでコンポーネントの開発など沢山のプログラミングの機会を頂いており、日々成長を感じています。現在、GoとDBの連携について学んでおり、沢山の知見を得たため、アウトプットとして、筆を走らせています。 本記事ではGoのDBレイヤーライブラリである、">
+<meta name="keywords" content="Go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go言語のDBレイヤーライブラリの評価">
+<meta property="og:url" content="https://future-architect.github.io/articles/20190926/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="自己紹介小林と申します。アルバイトとして2019年2月からフューチャーで働いている大学生です。 アルバイトとして入社後は、Goを用いてツール開発、Vue.jsでコンポーネントの開発など沢山のプログラミングの機会を頂いており、日々成長を感じています。現在、GoとDBの連携について学んでおり、沢山の知見を得たため、アウトプットとして、筆を走らせています。 本記事ではGoのDBレイヤーライブラリである、">
+<meta property="og:locale" content="ja">
+<meta property="og:updated_time" content="2019-09-26T02:33:06.075Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Go言語のDBレイヤーライブラリの評価">
+<meta name="twitter:description" content="自己紹介小林と申します。アルバイトとして2019年2月からフューチャーで働いている大学生です。 アルバイトとして入社後は、Goを用いてツール開発、Vue.jsでコンポーネントの開発など沢山のプログラミングの機会を頂いており、日々成長を感じています。現在、GoとDBの連携について学んでおり、沢山の知見を得たため、アウトプットとして、筆を走らせています。 本記事ではGoのDBレイヤーライブラリである、">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="Go言語のDBレイヤーライブラリの評価 | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="Go言語のDBレイヤーライブラリの評価,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.svg" alt="logo" class="logo-img" width="200px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20190926/">Go言語のDBレイヤーライブラリの評価</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20190926-go-orm" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 小林澪司</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2019-09-26T01:00:00.000Z" itemprop="datePublished">2019/09/26</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/Go/" title="Go">Go</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="自己紹介"><a href="#自己紹介" class="headerlink" title="自己紹介"></a>自己紹介</h1><p>小林と申します。アルバイトとして2019年2月からフューチャーで働いている大学生です。</p>
+<p>アルバイトとして入社後は、Goを用いてツール開発、Vue.jsでコンポーネントの開発など沢山のプログラミングの機会を頂いており、日々成長を感じています。現在、GoとDBの連携について学んでおり、沢山の知見を得たため、アウトプットとして、筆を走らせています。</p>
+<p>本記事ではGoのDBレイヤーライブラリである、<a href="https://github.com/jinzhu/gorm" target="_blank" rel="noopener">GORM</a>,<a href="https://github.com/volatiletech/sqlboiler" target="_blank" rel="noopener">SQLBoiler</a>,<a href="https://github.com/go-xorm/xorm" target="_blank" rel="noopener">xorm</a>の三つについて、それぞれの特徴や違いを押さえられる様まとめてみました。DBレイヤーのライブラリ検討の手がかりとなれば幸いです。</p>
+<h1 id="ORMとは？"><a href="#ORMとは？" class="headerlink" title="ORMとは？"></a>ORMとは？</h1><p><strong>Object-Relational-Mapping</strong> の頭文字を取った略称です。直訳すると <strong>オブジェクト関係マッピング</strong> でしょうか。名前だけでは少し分かりにくいのでもう簡単に表現すると、<strong>オブジェクト(指向のプログラミング言語)と関係(データベース)のデータの対応付けをしてくれるもの</strong> となります。</p>
+<p>ORMライブラリが持つ機能はたくさんありますが、以下のような機能を持つことが多いです。</p>
+<ul>
+<li>DBのRecordとのMapping</li>
+<li>SQL文の組み立て</li>
+</ul>
+<p>それでは、GORM, SQLBoiler, xormについて比較していきます。</p>
+<h1 id="結果サマリ"><a href="#結果サマリ" class="headerlink" title="結果サマリ"></a>結果サマリ</h1><p>AutomMigrationを始めとした各機能の説明は追って説明していきます。</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>自動生成の経路</th>
+<th>AutoMigration</th>
+<th>Schemaからのリバース</th>
+<th>Relation機能のライブラリ提供</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GORM</td>
+<td>Struct -&gt; Schema生成</td>
+<td>○</td>
+<td>-</td>
+<td>○</td>
+</tr>
+<tr>
+<td>SQLBoiler</td>
+<td>Schema -&gt; Struct生成</td>
+<td>-</td>
+<td>○</td>
+<td>-</td>
+</tr>
+<tr>
+<td>XORM</td>
+<td>Schema -&gt; Struct生成</td>
+<td>○</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody></table>
+<h1 id="バージョン情報"><a href="#バージョン情報" class="headerlink" title="バージョン情報"></a>バージョン情報</h1><ul>
+<li>Go <code>v1.12.9</code></li>
+<li>ライブラリ<ul>
+<li>gorm <code>v1.9.10</code></li>
+<li>sqlboiler <code>v3.5.0</code></li>
+<li>xorm <code>v0.7.6</code></li>
+</ul>
+</li>
+<li>PostgreSQL <code>11.5</code><ul>
+<li>検証環境は、<a href="https://hub.docker.com/_/postgres" target="_blank" rel="noopener">Docker公式のpostgresコンテナ</a>を使用し、<code>docker run --rm --name db -p 15432:5432 -d postgres:11.5</code> で起動しています</li>
+</ul>
+</li>
+</ul>
+<h1 id="比較"><a href="#比較" class="headerlink" title="比較"></a>比較</h1><h2 id="GORM"><a href="#GORM" class="headerlink" title="GORM"></a>GORM</h2><ul>
+<li><a href="https://github.com/jinzhu/gorm" target="_blank" rel="noopener">GORM</a></li>
+<li>特徴<ul>
+<li>GoのDBレイヤーライブラリとしては最もGitHubのスター数が多い (14500+)</li>
+<li>オートマイグレーション機能がある。 (※後述)</li>
+</ul>
+</li>
+<li>所感<ul>
+<li>分かりやすく、直感的で非常に使いやすい</li>
+<li>structは自分で書く必要がある(DBからコードに落としてくれる機能はない)</li>
+</ul>
+</li>
+</ul>
+<p>それではコードレベルで紹介していきます。</p>
+<h3 id="テーブル定義"><a href="#テーブル定義" class="headerlink" title="テーブル定義"></a>テーブル定義</h3><p>以下のような usersテーブルで存在するとします。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">postgres=<span class="comment"># \d</span></span><br><span class="line">         List of relations</span><br><span class="line"> Schema | Name  | Type  |  Owner</span><br><span class="line">--------+-------+-------+----------</span><br><span class="line"> public | users | table | postgres</span><br><span class="line">(1 row)</span><br><span class="line"></span><br><span class="line">postgres=<span class="comment"># \d users</span></span><br><span class="line">              Table <span class="string">"public.users"</span></span><br><span class="line"> Column | Type | Collation | Nullable | Default</span><br><span class="line">--------+------+-----------+----------+---------</span><br><span class="line"> name   | text |           |          |</span><br></pre></td></tr></table></figure>
+
+<h3 id="CRUDサンプル"><a href="#CRUDサンプル" class="headerlink" title="CRUDサンプル"></a>CRUDサンプル</h3><p>GORM経由でCRUDを行ってみます。</p>
+<figure class="highlight go"><figcaption><span>CURDサンプルコード</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"github.com/jinzhu/gorm"</span></span><br><span class="line">	_ <span class="string">"github.com/lib/pq"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// User</span></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name   <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Array of User</span></span><br><span class="line"><span class="keyword">type</span> Users []User</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	db, err := gorm.Open(<span class="string">"postgres"</span>, <span class="string">"host=localhost port=15432 user=postgres sslmode=disable"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// TODO error handling</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> db.Close()</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// INSERT</span></span><br><span class="line">	db.Create(&amp;User&#123;Name: <span class="string">"hoge"</span>&#125;)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// SELECT 1</span></span><br><span class="line">	users := Users&#123;&#125;</span><br><span class="line">	db.Find(&amp;users) <span class="comment">// SELECT * FROM users</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// SELECT 2</span></span><br><span class="line">	user := User&#123;&#125;</span><br><span class="line">	db.Take(&amp;user) <span class="comment">// SELECT * FROM users LIMIT 1;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// UPDATE</span></span><br><span class="line">	db.Model(&amp;user).Update(<span class="string">"Name"</span>, <span class="string">"huga"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// DELETE</span></span><br><span class="line">	db.Delete(&amp;user)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="オートマイグレーション機能"><a href="#オートマイグレーション機能" class="headerlink" title="オートマイグレーション機能"></a>オートマイグレーション機能</h3><p>Goの構造体とDBのスキーマを比較して、不足しているものを追加してくれる機能です。DBスキーマを簡単に作成してくれるので非常に有用です。しかし、カラムの削除や変更は出来ません。</p>
+<p>例えば、UserテーブルにNameだけでなく年齢(Age)も足したくなった場合、Userの構造体を更新し、<code>db.Automigrate(&amp;User)</code> とするだけで自動的にカラムが追加されます。ではコードを見ていきましょう。</p>
+<p>まず、Structに属性を追加します。</p>
+<figure class="highlight go"><figcaption><span>usersの更新のためのStruct</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name <span class="keyword">string</span></span><br><span class="line">	Age <span class="keyword">uint</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>次に、オートマイグレーションのための <code>AutoMigrate</code> を呼び出します。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	db, err := gorm.Open(<span class="string">"postgres"</span>, <span class="string">"host=localhost port=15432 user=postgres sslmode=disable"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// TODO error handling</span></span><br><span class="line">	&#125;</span><br><span class="line">    <span class="keyword">defer</span> db.Close()</span><br><span class="line">    <span class="comment">// オートマイグレーション</span></span><br><span class="line">	db.AutoMigrate(&amp;User&#123;&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>次にDBのスキーマを確認します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">postgres=<span class="comment"># \d users</span></span><br><span class="line">               Table <span class="string">"public.users"</span></span><br><span class="line"> Column |  Type   | Collation | Nullable | Default</span><br><span class="line">--------+---------+-----------+----------+---------</span><br><span class="line"> name   | text    |           |          |</span><br><span class="line"> age    | <span class="built_in">integer</span> |           |          |</span><br></pre></td></tr></table></figure>
+
+<p>テーブルにageカラムが追加されていることが分かりました。簡単ですね。</p>
+<h3 id="Relation-Association"><a href="#Relation-Association" class="headerlink" title="Relation(Association)"></a>Relation(Association)</h3><p>GORMは簡単にRelation(Association)を組むことが出来ます。今回はUserがCreditCardを複数枚持つようなHasManyの関係を作ります。</p>
+<p>※Userテーブルなしの状態(コンテナ作り立ての状態)からAutoMigrationします。（<a href="http://gorm.io/ja_JP/docs/has_many.html" target="_blank" rel="noopener">参考</a>)</p>
+<p>構造体を以下のように定義します。</p>
+<figure class="highlight go"><figcaption><span>Relationサンプル</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name <span class="keyword">string</span></span><br><span class="line">	ID <span class="keyword">uint</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CreditCard <span class="keyword">struct</span> &#123;</span><br><span class="line">	UserID <span class="keyword">uint</span></span><br><span class="line">	Number <span class="keyword">string</span></span><br><span class="line">	ID <span class="keyword">uint</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>そしてオートマイグレーションを実施してDBのスキーマを更新します。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	db, err := gorm.Open(<span class="string">"postgres"</span>, <span class="string">"host=localhost port=15432 user=postgres sslmode=disable"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// TODO error handling</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> db.Close()</span><br><span class="line">	db.AutoMigrate(&amp;User&#123;&#125;,&amp;CreditCard&#123;&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>psqlで結果を確認数と、外部キーは貼られていない気が・・しますね。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">postgres=<span class="comment"># \d</span></span><br><span class="line">                 List of relations</span><br><span class="line"> Schema |        Name         |   Type   |  Owner</span><br><span class="line">--------+---------------------+----------+----------</span><br><span class="line"> public | credit_cards        | table    | postgres</span><br><span class="line"> public | credit_cards_id_seq | sequence | postgres</span><br><span class="line"> public | users               | table    | postgres</span><br><span class="line"> public | users_id_seq        | sequence | postgres</span><br><span class="line">(4 rows)</span><br><span class="line"></span><br><span class="line">postgres=<span class="comment"># \d credit_cards</span></span><br><span class="line">                             Table <span class="string">"public.credit_cards"</span></span><br><span class="line"> Column  |  Type   | Collation | Nullable |                 Default</span><br><span class="line">---------+---------+-----------+----------+------------------------------------------</span><br><span class="line"> user_id | <span class="built_in">integer</span> |           |          |</span><br><span class="line"> number  | text    |           |          |</span><br><span class="line"> id      | <span class="built_in">integer</span> |           | not null | nextval(<span class="string">'credit_cards_id_seq'</span>::regclass)</span><br><span class="line">Indexes:</span><br><span class="line">    <span class="string">"credit_cards_pkey"</span> PRIMARY KEY, btree (id)</span><br><span class="line"></span><br><span class="line">postgres=<span class="comment"># \d users</span></span><br><span class="line">                            Table <span class="string">"public.users"</span></span><br><span class="line"> Column |  Type   | Collation | Nullable |              Default</span><br><span class="line">--------+---------+-----------+----------+-----------------------------------</span><br><span class="line"> name   | text    |           |          |</span><br><span class="line"> id     | <span class="built_in">integer</span> |           | not null | nextval(<span class="string">'users_id_seq'</span>::regclass)</span><br><span class="line">Indexes:</span><br><span class="line">    <span class="string">"users_pkey"</span> PRIMARY KEY, btree (id)</span><br></pre></td></tr></table></figure>
+
+<h4 id="リレーションサンプル"><a href="#リレーションサンプル" class="headerlink" title="リレーションサンプル"></a>リレーションサンプル</h4><p>ユーザのIDからCreditCardの情報を得てみます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// INSERT</span></span><br><span class="line">db.Create(&amp;User&#123;Name: <span class="string">"hoge"</span>,</span><br><span class="line">	ID:<span class="number">20</span>,</span><br><span class="line">	CreditCards: []CreditCard&#123;</span><br><span class="line">		&#123;Number:<span class="string">"1x"</span>, ID:<span class="number">1</span>&#125;,</span><br><span class="line">		&#123;Number:<span class="string">"2x"</span>, ID:<span class="number">2</span>&#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// SELECT</span></span><br><span class="line">u := User&#123;ID: <span class="number">20</span>&#125;</span><br><span class="line">cs := []CreditCard&#123;&#125;</span><br><span class="line">db.Model(&amp;u).Related(&amp;cs)</span><br><span class="line"></span><br><span class="line">fmt.Println(cs) <span class="comment">// -&gt; [&#123;20 1x 1&#125; &#123;20 2x 2&#125;]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="GORMの所感"><a href="#GORMの所感" class="headerlink" title="GORMの所感"></a>GORMの所感</h2><ul>
+<li>全体的に分かりやすく、直感的で非常に使いやすい</li>
+<li>structは自分で書く必要がある(DBからコードに落としてくれる機能はない)</li>
+<li>記事には載せていませんが、構造体にgorm.Modelを定義することで、ID,CreatedAt,DeletedAtのカラムが追加され、論理削除となる機能もある<ul>
+<li>ORMでこういったレイヤーまでサポートしてくれるのは面白いですね</li>
+</ul>
+</li>
+</ul>
+<h2 id="SQLBoiler"><a href="#SQLBoiler" class="headerlink" title="SQLBoiler"></a>SQLBoiler</h2><ul>
+<li><a href="https://github.com/volatiletech/sqlboiler" target="_blank" rel="noopener">SQLBoiler</a></li>
+<li>特徴<ul>
+<li>高速(らしい) 参考:<a href="https://github.com/volatiletech/sqlboiler#benchmarks" target="_blank" rel="noopener">sqlboilerのベンチマーク</a></li>
+<li>SQLとの接続部分は自前で実装する必要がある</li>
+<li>DBからコードを自動生成するためにtomlファイルを書く必要がある。</li>
+<li>SQL文の自動生成がメイン機能</li>
+</ul>
+</li>
+</ul>
+<h3 id="テーブル定義-1"><a href="#テーブル定義-1" class="headerlink" title="テーブル定義"></a>テーブル定義</h3><p>サンプルで用いるusersテーブルとシーケンスです。</p>
+<p>primary keyがないテーブルにはSQLBoilerは使用できない(<code>Error: unable to initialize tables: primary key missing in tables</code>) のでご注意を。</p>
+<figure class="highlight bash"><figcaption><span>サンプルで利用するDBテーブル</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">postgres=<span class="comment"># \d </span></span><br><span class="line">              List of relations</span><br><span class="line"> Schema |     Name     |   Type   |  Owner</span><br><span class="line">--------+--------------+----------+----------</span><br><span class="line"> public | users        | table    | postgres</span><br><span class="line"> public | users_id_seq | sequence | postgres</span><br><span class="line">(2 rows)</span><br><span class="line"></span><br><span class="line">postgres=<span class="comment"># \d users </span></span><br><span class="line">                            Table <span class="string">"public.users"</span> </span><br><span class="line"> Column |  Type   | Collation | Nullable |              Default</span><br><span class="line">--------+---------+-----------+----------+-----------------------------------</span><br><span class="line"> name   | text    |           |          |</span><br><span class="line"> id     | <span class="built_in">integer</span> |           | not null | nextval(<span class="string">'users_id_seq'</span>::regclass)</span><br><span class="line">Indexes:</span><br><span class="line">    <span class="string">"users_pkey"</span> PRIMARY KEY, btree (id)</span><br></pre></td></tr></table></figure>
+
+<h3 id="自動生成"><a href="#自動生成" class="headerlink" title="自動生成"></a>自動生成</h3><p>SQLBoilerは、DBスキーマとTOMLファイルから生成されたパッケージをインポートして使うのが基本となります。</p>
+<p>まずは、プロジェクトのルートに<code>sqlboiler.toml</code>を置きます。そのtomlファイルにDBの接続先情報やオプションなどの設定を書いていきます。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">pkgname</span>=<span class="string">"db"</span></span><br><span class="line"><span class="attr">output</span>=<span class="string">"app/db"</span></span><br><span class="line"><span class="attr">add-global-variants</span>=<span class="literal">true</span></span><br><span class="line"><span class="attr">add-panic-variants</span>=<span class="literal">true</span></span><br><span class="line"><span class="section">[psql]</span></span><br><span class="line">  dbname="postgres"</span><br><span class="line">  host="localhost"</span><br><span class="line">  port=15432</span><br><span class="line">  user="postgres"</span><br><span class="line">  sslmode="disable"</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>TOMLファイルに<code>add-global-variants=true</code>を記述すると、グローバルに設定したコネクションを用いたDBの操作メソッドが追加されます。</li>
+<li><code>add-panic-variants=true</code>を記述すると、error発生時にerrorを返す代わりにpanicを起こすDBの操作メソッドが追加されます。</li>
+</ul>
+<p>TOMLを書いたらコード生成に必要なパッケージをインストールしていきます。</p>
+<figure class="highlight bash"><figcaption><span>インストール</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go get -u github.com/volatiletech/sqlboiler</span><br><span class="line">go get -u github.com/volatiletech/sqlboiler/drivers/sqlboiler-psql</span><br></pre></td></tr></table></figure>
+
+<p>インストールしたらいざコード生成を行います。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqlboiler --wipe psql</span><br></pre></td></tr></table></figure>
+
+<p><code>--wipe</code>はコード生成前する前にoutputフォルダがあった際、そのフォルダを削除するフラグです。つけておいて損はほぼなさそうです。</p>
+<p>生成後のプロジェクトファイル構造はこのようになります。(main.goは自分で作成したものです)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">└─main.go</span><br><span class="line">└─sqlboiler.toml</span><br><span class="line">└─app</span><br><span class="line">  └─db</span><br><span class="line">    └─boil_main_test.go</span><br><span class="line">    └─boil_queries.go</span><br><span class="line">    └─boil_queries_test.go</span><br><span class="line">    └─boil_suites_test.go</span><br><span class="line">    └─boil_table_names.go</span><br><span class="line">    └─boil_types.go</span><br><span class="line">    └─psql_main_test.go</span><br><span class="line">    └─psql_suites_test.go</span><br><span class="line">    └─psql_upsert.go</span><br><span class="line">    └─users.go</span><br><span class="line">    └─users_test.go</span><br></pre></td></tr></table></figure>
+
+<h3 id="CRUDサンプルコード"><a href="#CRUDサンプルコード" class="headerlink" title="CRUDサンプルコード"></a>CRUDサンプルコード</h3><p>自動生成したコードを用いてCRUDアクセスします。</p>
+<figure class="highlight go"><figcaption><span>CRUDサンプルコード</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"database/sql"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"./app/db"</span></span><br><span class="line">	_ <span class="string">"github.com/lib/pq"</span></span><br><span class="line">	<span class="string">"github.com/volatiletech/null"</span></span><br><span class="line">	<span class="string">"github.com/volatiletech/sqlboiler/boil"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	con, err := sql.Open(<span class="string">"postgres"</span>, <span class="string">"host=localhost port=15432 user=postgres sslmode=disable"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// TODO error handling</span></span><br><span class="line">	&#125;</span><br><span class="line">	boil.SetDB(con)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// INSERT</span></span><br><span class="line">	user := db.User&#123;Name: null.StringFrom(<span class="string">"hoge"</span>), ID: <span class="number">1</span>&#125;</span><br><span class="line">	user.InsertGP(context.Background(), boil.Infer())</span><br><span class="line"></span><br><span class="line">	<span class="comment">// SELECT</span></span><br><span class="line">	users := db.Users().AllGP(context.Background())</span><br><span class="line"></span><br><span class="line">	<span class="comment">// UPDATE</span></span><br><span class="line">	user = db.User&#123;ID:<span class="number">1</span>, Name: null.StringFrom(<span class="string">"huga"</span>)&#125;</span><br><span class="line">	user.UpdateGP(context.Background(), boil.Infer())</span><br><span class="line"></span><br><span class="line">	<span class="comment">// DELETE</span></span><br><span class="line">	user.DeleteGP(context.Background())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Relation"><a href="#Relation" class="headerlink" title="Relation"></a>Relation</h3><p>コード生成の段階でRelationを貼っておく必要があります。本当は検証のためにGORMのAutoMigrationでサクッと外部キーを貼ろうとしたがAutoMigrationでは貼ってくれないようなので自分でテーブルを作ります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># create table users ( id serial primary key, name text );</span></span><br><span class="line"><span class="comment"># create table credit_card ( id serial primary key, number text, user_id int references users(id) );</span></span><br></pre></td></tr></table></figure>
+
+<p>上記スキーマでテーブルを作りデータを投入します。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">user := db.User&#123;Name: null.StringFrom(<span class="string">"hoge"</span>), ID: <span class="number">3</span>&#125;</span><br><span class="line">c1 := db.CreditCard&#123;Number: null.StringFrom(<span class="string">"n"</span>), ID: <span class="number">21</span>&#125;</span><br><span class="line">c2 := db.CreditCard&#123;Number: null.StringFrom(<span class="string">"n2"</span>), ID: <span class="number">22</span>&#125;</span><br><span class="line"></span><br><span class="line">user.InsertGP(context.Background(), boil.Infer())</span><br><span class="line">user.SetCreditCardsGP(context.Background(), <span class="literal">true</span>, &amp;c1, &amp;c2)</span><br></pre></td></tr></table></figure>
+
+<p>postgres側でレコードの確認します。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">postgres=# <span class="keyword">select</span> * from credit_card;</span><br><span class="line"> id | number | user_id </span><br><span class="line">----+--------+---------</span><br><span class="line"> <span class="number">21</span> | n      |       <span class="number">3</span></span><br><span class="line"> <span class="number">22</span> | n2     |       <span class="number">3</span></span><br><span class="line">(<span class="number">2</span> rows)</span><br><span class="line"></span><br><span class="line">postgres=# <span class="keyword">select</span> * from users;</span><br><span class="line"> id | name </span><br><span class="line">----+------</span><br><span class="line">  <span class="number">3</span> | hoge</span><br><span class="line">(<span class="number">1</span> row)</span><br></pre></td></tr></table></figure>
+
+<p>適切にレコードが追加されていますね。</p>
+<p>以下はdbからuserのレコードを一件持ってきて、userに結びついているcardを持ってくるコードです。<br>かなり直感的に書けます。コード読んで何しているか分かりやすいです。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">users := db.Users().OneGP(context.Background())</span><br><span class="line">cards := users.CreditCards().AllGP(context.Background())</span><br></pre></td></tr></table></figure>
+
+<h3 id="備考：Tips-null-StringFromやnull-IntFromの話"><a href="#備考：Tips-null-StringFromやnull-IntFromの話" class="headerlink" title="備考：Tips null.StringFromやnull.IntFromの話"></a>備考：Tips null.StringFromやnull.IntFromの話</h3><p>db操作する際にstringを入れる事はできず、null.StringFromを利用する必要がありましたが、なぜそうなっているのか、どのような振る舞いをするのか調査しました。</p>
+<p>そこで、定義を見に行きました。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">StringFrom</span><span class="params">(s <span class="keyword">string</span>)</span> <span class="title">String</span></span></span><br></pre></td></tr></table></figure>
+
+<p>ぱっと見「？？？」となるのですがよく見ると、<em>string</em> を引数にして <em>String</em> を返しています。</p>
+<p>そして <em>String</em> は以下のように定義されています。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> String <span class="keyword">struct</span> &#123;</span><br><span class="line">    sql.NullString</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>sql.NullStringを包んでいますね。sql.NullStringの定義を確認してみます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> NullString <span class="keyword">struct</span> &#123;</span><br><span class="line">    String <span class="keyword">string</span></span><br><span class="line">    Valid  <span class="keyword">bool</span> <span class="comment">// Valid is true if String is not NULL</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Validの値を見て値がNULLかどうかを判別しています。</p>
+<p>なぜこのような実装になっているかというと、golangにはnilがありますが、pointer型にしか使えないからです。</p>
+<p>例えば、stringのゼロ値は””となり、NULLとの区別をつけることが出来ません。</p>
+<p>このようにGoの型定義とSQLの型定義には差異があるためその差を埋めるためにnullパッケージが誕生し、それを介することでNULLの表現を可能にしています。</p>
+<h3 id="SQLBoiler所感"><a href="#SQLBoiler所感" class="headerlink" title="SQLBoiler所感"></a>SQLBoiler所感</h3><ul>
+<li>contextを明示的に用いているため非同期処理が比較的簡単に出来る。</li>
+<li>tomlにすでに接続先情報が書かれているので正直sql.Openで再度接続先を明記するのは二度手間に感じた。</li>
+<li>Relationは個人的にgormよりも直感的に扱えると感じた。</li>
+</ul>
+<h2 id="xorm"><a href="#xorm" class="headerlink" title="xorm"></a>xorm</h2><ul>
+<li><a href="https://github.com/go-xorm/xorm" target="_blank" rel="noopener">xorm</a></li>
+<li>特徴<ul>
+<li>生のSQL実行をサポートしている。</li>
+<li><a href="https://github.com/go-xorm/cmd" target="_blank" rel="noopener">コマンドラインツール</a>が提供されている<ul>
+<li>DBからコードを生成する機能などを持つ</li>
+</ul>
+</li>
+<li>生成コードにテスト用コードも付属しているのが良い</li>
+</ul>
+</li>
+</ul>
+<h3 id="テーブル定義-2"><a href="#テーブル定義-2" class="headerlink" title="テーブル定義"></a>テーブル定義</h3><p>SQLBoilerと同じスキーマを利用します。折角なのでコマンドラインツールを用いてDBから構造体の生成もやります。</p>
+<p>まずは <code>go get github.com/go-xorm/cmd/xorm</code> でインストールします。</p>
+<p>その後、このコマンドで構造体を作成します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> <span class="variable">$GOPATH</span>/src/github.com/go-xorm/cmd/xorm</span><br><span class="line">xorm reverse postgres <span class="string">"dbname=postgres host=localhost port=15432 user=postgres sslmode=disable"</span> templates/goxorm</span><br></pre></td></tr></table></figure>
+
+<p><code>./models/users.go</code> が出来ていると思います。それを自分のプロジェクトフォルダに持ってくればOK。</p>
+<p>生成されたusers.goの中身はこちらになりました。</p>
+<figure class="highlight go"><figcaption><span>users.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> models</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Users <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name <span class="keyword">string</span> <span class="string">`xorm:"TEXT"`</span></span><br><span class="line">	Id   <span class="keyword">int</span>    <span class="string">`xorm:"not null pk autoincr INTEGER"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>それではこのコードを用いてCRUDしてみます。</p>
+<h2 id="CRUDサンプル-1"><a href="#CRUDサンプル-1" class="headerlink" title="CRUDサンプル"></a>CRUDサンプル</h2><figure class="highlight go"><figcaption><span>xormのCRUDサンプル</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line">	model <span class="string">"./models"</span></span><br><span class="line">	<span class="string">"github.com/go-xorm/xorm"</span></span><br><span class="line">	_ <span class="string">"github.com/lib/pq"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	engine, err := xorm.NewEngine(<span class="string">"postgres"</span>, <span class="string">"dbname=postgres host=localhost port=15432 user=postgres sslmode=disable"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// TODO error handling</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> engine.Close()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// INSERT</span></span><br><span class="line">	user := model.Users&#123;Id: <span class="number">3</span>, Name: <span class="string">"hoge"</span>&#125;</span><br><span class="line">	engine.Insert(&amp;user)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// SELECT</span></span><br><span class="line">	<span class="keyword">var</span> users []model.Users</span><br><span class="line">	engine.Find(&amp;users)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// UPDATE</span></span><br><span class="line">	user.Name = <span class="string">"huga"</span></span><br><span class="line">	engine.ID(<span class="number">3</span>).Update(&amp;user)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// DELETE</span></span><br><span class="line">	engine.ID(<span class="number">3</span>).Delete(&amp;user)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="xorm所感"><a href="#xorm所感" class="headerlink" title="xorm所感"></a>xorm所感</h2><ul>
+<li>xorm.NewEngineでインスタンスを作成してそれを操作していく形で分かりやすい</li>
+<li>リレーションを貼ることが出来ない？(SQLで書く必要がある？。)<a href="https://github.com/go-xorm/xorm/issues/41" target="_blank" rel="noopener">ORM Cascading Proposal · Issue #41 · go-xorm/xorm</a></li>
+</ul>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><ul>
+<li>GoのORMである、GORM, SQLBoiler, xormについて比較した</li>
+<li>ORMと名乗っていても、オートマイグレーション機能や、コードの自動生成機能、論理削除など各ライブラリ特有の差別化要素がある</li>
+<li>構造体からSchemaを生成してくれるAutoMigrationはとても魅力的な機能ですが、過信せず生成されたDBスキーマを確認する事が大切</li>
+</ul>
+<p>今回わたしのPJでは社内ナレッジが蓄積されている点でGORMを採用しました。（CRUD操作が直感的で取っ付きやすいので個人的にも良いと思いました）。実際の開発や運用を通して得られたナレッジなどは別途ブログ化したいと思っています。</p>
+<h1 id="作成したコード"><a href="#作成したコード" class="headerlink" title="作成したコード"></a>作成したコード</h1><p><a href="https://github.com/reud/blog-orm" target="_blank" rel="noopener">https://github.com/reud/blog-orm</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a href="https://qiita.com/niisan-tokyo/items/156eb35c6eeaf07b9b65#2-%E3%82%B2%E3%83%83%E3%82%BF%E3%83%BC%E3%82%BB%E3%83%83%E3%82%BF%E3%83%BC%E3%81%AE%E4%BB%95%E7%B5%84%E3%81%BF%E3%82%92%E5%88%A9%E7%94%A8%E3%81%A7%E3%81%8D%E3%82%8B" target="_blank" rel="noopener">もっとORMを使えるようになりたいので、見直してみた - Qiita</a></li>
+<li><a href="https://www.atmarkit.co.jp/ait/articles/0404/13/news075.html" target="_blank" rel="noopener">O/Rマッピングの役割とメリット：Hibernateで理解するO/Rマッピング（1） - ＠IT</a></li>
+<li><a href="http://gorm.io/docs/migration.html#Auto-Migration" target="_blank" rel="noopener">Migration | GORM - The fantastic ORM library for Golang, aims to be developer friendly.</a></li>
+<li><a href="http://sakataharumi.hatenablog.jp/entry/2018/06/14/143710" target="_blank" rel="noopener">gormでRelationを組む方法とn+1の回避 - 女子高生になりたい</a></li>
+<li><a href="https://github.com/volatiletech/sqlboiler" target="_blank" rel="noopener">volatiletech/sqlboiler: Generate a Go ORM tailored to your database schema.</a></li>
+<li><a href="https://github.com/jinzhu/gorm" target="_blank" rel="noopener">jinzhu/gorm: The fantastic ORM library for Golang, aims to be developer friendly</a></li>
+<li><a href="https://ken-aio.github.io/post/2019/02/13/golang-sqlboiler/" target="_blank" rel="noopener">GolangのORM SQLBoilerを使ってみる - セットアップ編 - ken-aio’s blog</a></li>
+<li><a href="http://gorm.io/ja_JP/docs/has_many.html" target="_blank" rel="noopener">Has Many | GORM - The fantastic ORM library for Golang, aims to be developer friendly.</a></li>
+<li><a href="https://qiita.com/uhey22e/items/640a4ae861d123b15b53" target="_blank" rel="noopener">Goの新定番？ORMのSQLBoilerを使ってみる - Qiita</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="Go言語のDBレイヤーライブラリの評価" data-url="https://future-architect.github.io/articles/20190926/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20190926/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20190926/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20190926/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190926/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go言語のDBレイヤーライブラリの評価
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190925/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                 Oculus Questで作る入院中の子どもたちに向けたパラスポーツ体験
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190918/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                サステナブルなエンジニア組織デザイン（後編） ～デザインパターンと10のリファクタリング～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190917/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                サステナブルなエンジニア組織デザイン（前編） ～よくある設計とジレンマ～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190909/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                 Let's Try GCP #1 ～Cloud Run Buttonを使った楽々コンテナデプロイをやってみた～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190903/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Terraformのベストなプラクティスってなんだろうか
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190819/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                はじめてのTerraform 0.12 ～実践編～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190827/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (26)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (15)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2019 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
