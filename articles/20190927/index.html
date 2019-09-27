@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Let&#39;s Try GCP #2 ～Cloud FunctionをVPC connectorと一緒に使ってみる～ | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにこんにちは、TIG/DXユニット所属の村田と申します！DXユニットとはデジタルトランスフォーメーションに関わる仕事を主に推進していくチームで、直近で私はとあるIoTの案件に携わっています。 この記事は”素早くサービスの使い所を把握してもらう”ことや”新しいサービスをさくっと試すための手助けをする”ことを目的に書いたGCPサービスに特化した記事です。前回のCloud Run Button編に">
+<meta name="keywords" content="GCP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Let&#39;s Try GCP #2 ～Cloud FunctionをVPC connectorと一緒に使ってみる～">
+<meta property="og:url" content="https://future-architect.github.io/articles/20190927/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="はじめにこんにちは、TIG/DXユニット所属の村田と申します！DXユニットとはデジタルトランスフォーメーションに関わる仕事を主に推進していくチームで、直近で私はとあるIoTの案件に携わっています。 この記事は”素早くサービスの使い所を把握してもらう”ことや”新しいサービスをさくっと試すための手助けをする”ことを目的に書いたGCPサービスに特化した記事です。前回のCloud Run Button編に">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_03.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_04.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_05.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_06.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_07.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_08.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_09.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_10.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_11.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_12.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_13.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_14.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_15.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190927/photo_20190927_16.png">
+<meta property="og:updated_time" content="2019-09-27T01:04:33.672Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Let&#39;s Try GCP #2 ～Cloud FunctionをVPC connectorと一緒に使ってみる～">
+<meta name="twitter:description" content="はじめにこんにちは、TIG/DXユニット所属の村田と申します！DXユニットとはデジタルトランスフォーメーションに関わる仕事を主に推進していくチームで、直近で私はとあるIoTの案件に携わっています。 この記事は”素早くサービスの使い所を把握してもらう”ことや”新しいサービスをさくっと試すための手助けをする”ことを目的に書いたGCPサービスに特化した記事です。前回のCloud Run Button編に">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20190927/photo_20190927_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="Let&#39;s Try GCP #2 ～Cloud FunctionをVPC connectorと一緒に使ってみる～ | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="Let&#39;s Try GCP #2 ～Cloud FunctionをVPC connectorと一緒に使ってみる～,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.svg" alt="logo" class="logo-img" width="200px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20190927/">Let&#39;s Try GCP #2 ～Cloud FunctionをVPC connectorと一緒に使ってみる～</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20190927-gcp-2" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 村田靖拓</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2019-09-27T00:34:14.000Z" itemprop="datePublished">2019/09/27</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/GCP/" title="GCP">GCP</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIG/DXユニット所属の<a href="https://twitter.com/famipapamart" target="_blank" rel="noopener">村田</a>と申します！<br>DXユニットとはデジタルトランスフォーメーションに関わる仕事を主に推進していくチームで、直近で私はとあるIoTの案件に携わっています。</p>
+<p>この記事は”素早くサービスの使い所を把握してもらう”ことや”新しいサービスをさくっと試すための手助けをする”ことを目的に書いたGCPサービスに特化した記事です。<br>前回のCloud Run Button編に続き、気軽にクラウドに慣れ親しんでもらうためのコンテンツの第2弾となります。（前回の記事は<a href="https://future-architect.github.io/articles/20190909/">こちら</a>）</p>
+<p>今回はCloud FunctionをVPC Connectorと一緒に利用します。</p>
+<h1 id="Cloud-Functionsとは"><a href="#Cloud-Functionsとは" class="headerlink" title="Cloud Functionsとは"></a>Cloud Functionsとは</h1><p>Cloud FunctionsはGCPが提供するマネージドサービスの一つであり、サーバーレスでアプリケーションを実行できます。ユーザは対応した言語でアプリケーションをデプロイするだけでOK。後はGCPが必要な時に必要な分のサーバリソースを立ち上げ、その上でアプリケーションを実行してくれます。AWSに慣れた人であれば、AWS Lambdaを思い浮かべてもらえると理解しやすいかと思います。</p>
+<p>イベントドリブンで稼働する本サービスですが、様々なイベントに対応していて、特にGCPの他のマネージドサービスとの連携に優れています。例えばシンプルなHTTPリクエスト起点の動作のみならず、Cloud StorageやCloud Pub/Subにて発火するイベント起点での動作にも対応しており、アーキテクチャデザインの幅が広がります。</p>
+<h1 id="Cloud-Functionsを使ってみる"><a href="#Cloud-Functionsを使ってみる" class="headerlink" title="Cloud Functionsを使ってみる"></a>Cloud Functionsを使ってみる</h1><p>では早速Cloud Functionsを使ってみましょう。</p>
+<h2 id="シンプルに使ってみる"><a href="#シンプルに使ってみる" class="headerlink" title="シンプルに使ってみる"></a>シンプルに使ってみる</h2><h3 id="Functionの作成"><a href="#Functionの作成" class="headerlink" title="Functionの作成"></a>Functionの作成</h3><p>まずはコンソールから「CREATE FUNCTION」ボタンを押下します。<br><img src="/images/20190927/photo_20190927_01.png" style="border:solid 1px #000000"></p>
+<p>以下のような画面に遷移します。<code>Name</code>やその他項目群はデフォルトが埋まっているので、そのまま作成してしまうことも可能です。画面は<code>Trigger</code>選択のプルダウンを開いた状態のものですが、先述の通り様々なイベントをトリガーとして利用することが可能です。<br><img src="/images/20190927/photo_20190927_02.png" style="border:solid 1px #000000" class="img-middle-size"></p>
+<p>デフォルトで選択されている<code>Runtime</code>は<code>Node.js</code>ですが、<code>Go</code>などを選択することも可能です。また、各言語では予め<code>HelloWorld</code>が準備されており、例えば<code>Node.js</code>では<code>index.js</code>にて<code>helloWorld</code>関数が最初から定義されています。<br><img src="/images/20190927/photo_20190927_03.png" style="border:solid 1px #000000" class="img-middle-size"></p>
+<p>下部には<code>Advanced options</code>の欄があり、Functionを作成する<code>Region</code>や実行時の権限に関わる<code>Service account</code>の設定が可能です。設定内容に問題がなければ「Create」ボタンを押下します。<br><img src="/images/20190927/photo_20190927_04.png" style="border:solid 1px #000000" class="img-middle-size"></p>
+<p><code>function-1</code>作成中…（アイコンが緑のチェックマークに変わるまで待ちます）<br><img src="/images/20190927/photo_20190927_05.png" style="border:solid 1px #000000" class="img-middle-size"></p>
+<h3 id="作成したFunctionを試す"><a href="#作成したFunctionを試す" class="headerlink" title="作成したFunctionを試す"></a>作成したFunctionを試す</h3><p>Functionが作成されたら、右のコンテキストメニューからテスト実行できます。「Test function」を選択します。<br><img src="/images/20190927/photo_20190927_06.png" style="border:solid 1px #000000" class="img-small-size"></p>
+<p>以下はhelloWorldのソースコードの中身です。RequestのQueryもしくはBodyの中を参照し、<code>message</code>というキーで格納されている値をResponseに詰めて返却します。また、Requestで受け取った値がない場合（正確には<code>False判定される値</code>だった場合）には<code>Hello World!</code>という文字列が返却されます。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Responds to any HTTP request.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param &#123;!express:Request&#125; req HTTP request context.</span></span><br><span class="line"><span class="comment"> * @param &#123;!express:Response&#125; res HTTP response context.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">exports.helloWorld = <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> message = req.query.message || req.body.message || <span class="string">'Hello World!'</span>;</span><br><span class="line">  res.status(<span class="number">200</span>).send(message);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><code>Triggering event</code>の中身を空のJSONにして「Test the function」を押下してみます。<br><img src="/images/20190927/photo_20190927_07.png" style="border:solid 1px #000000" class="img-middle-size"><br>すると、<code>Output</code>欄にて<code>Hello World!</code>の文字列が期待通り表示されました。</p>
+<p>次は<code>message</code>に値を詰めてみます。<br><img src="/images/20190927/photo_20190927_08.png" style="border:solid 1px #000000" class="img-middle-size"><br>ちゃんと期待通り<code>Try Cloud Functions</code>の文字列が返却されました。<code>Logs</code>の部分には実行時のログが表示されます。ログから今回のFunction実行に3msを要したことが分かります。</p>
+<p>クエリ文字列からもmessageを渡すことができるのでブラウザを使ってやってみます。<br><img src="/images/20190927/photo_20190927_09.png" style="border:solid 1px #000000" class="img-middle-size"><br>しっかりと<code>TryQuery</code>の文字列が返却されることが確認できました。</p>
+<h2 id="VPC-connectorを組み合わせる"><a href="#VPC-connectorを組み合わせる" class="headerlink" title="VPC connectorを組み合わせる"></a>VPC connectorを組み合わせる</h2><p>さて、ここからはVPC connectorの設定をしていきます。</p>
+<h3 id="概要説明"><a href="#概要説明" class="headerlink" title="概要説明"></a>概要説明</h3><img src="/images/20190927/photo_20190927_10.png" style="border:solid 1px #000000">
+https://cloud.google.com/vpc/docs/configure-serverless-vpc-access?hl=ja
+
+<p>上の図は公式ページにて記載されているServerless VPC Access connectorの説明から引用したものです。インターネット越しの通信がCloud Functionsに届き、Serverless VPC Access connectorを経由してVPC内のリソースへアクセスします。</p>
+<p>これにより通信はセキュアに保たれつつも、様々なことがFunctionにて実現できるようになります。</p>
+<h3 id="APIの有効化"><a href="#APIの有効化" class="headerlink" title="APIの有効化"></a>APIの有効化</h3><p>それでは早速手順の解説に移りますが、まずは<code>Serverless VPC Access API</code>の有効化が必要です。以下のコマンドを実行します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcloud services <span class="built_in">enable</span> vpcaccess.googleapis.com --project &lt;your-project&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Connectorの作成"><a href="#Connectorの作成" class="headerlink" title="Connectorの作成"></a>Connectorの作成</h3><p>コンソールから<code>Serverless VPC Access</code>のページを開き、「CREATE CONNECTOR」を選択します。<br><img src="/images/20190927/photo_20190927_11.png" style="border:solid 1px #000000"></p>
+<p><code>Name</code> <code>Network</code> <code>IP range</code>などの必須項目を埋めて「CREATE」を押下します。<br><img src="/images/20190927/photo_20190927_12.png" style="border:solid 1px #000000"></p>
+<p>ここで注意していただきたいのは<code>Only one region is currently available</code>という記述です。現在（2019年9月20日）、Serverless VPC connectorは<code>us-central1</code>でしか利用することができません。</p>
+<blockquote>
+<p>Serverless VPC Access コネクタは、それを使用する関数と同じプロジェクトおよび同じリージョンに配置する必要がありますが、異なるリージョンのリソースにトラフィックを送信できます。複数の関数が同じコネクタを使用できます。</p>
+</blockquote>
+<p><a href="https://cloud.google.com/functions/docs/connecting-vpc?hl=ja" target="_blank" rel="noopener">https://cloud.google.com/functions/docs/connecting-vpc?hl=ja</a></p>
+<p>上記は公式ドキュメントの記載ですが、VPC connectorが<code>us-central1</code>でしか利用できないので、紐付け先のFunctionは同じ<code>us-central1</code>に作成する必要があります。</p>
+<p>ただし、<code>us-central1</code>に配置されたconnectorを経由して例えば<code>us-east1</code>など別のリージョンと通信することは可能です。</p>
+<h3 id="サービスアカウントの権限設定"><a href="#サービスアカウントの権限設定" class="headerlink" title="サービスアカウントの権限設定"></a>サービスアカウントの権限設定</h3><p>次はCloud Functionsサービスアカウントに適切な権限設定を行います。</p>
+<p>IAMの画面からCloud Functionsのサービスアカウントを見つけます。このサービスアカウントはCloud Functions APIを有効化することで自動作成されます。<br><img src="/images/20190927/photo_20190927_13.png" style="border:solid 1px #000000" class="img-middle-size"></p>
+<p>このサービスアカウントに新たに2つの役割を追加します。</p>
+<ul>
+<li>プロジェクトの<code>Viewer</code></li>
+<li><code>Compute Network User</code></li>
+</ul>
+<img src="/images/20190927/photo_20190927_14.png" style="border:solid 1px #000000" class="img-middle-size">
+
+<p>「SAVE」を押下して完了です。</p>
+<h3 id="FunctionとConnectorを紐付ける"><a href="#FunctionとConnectorを紐付ける" class="headerlink" title="FunctionとConnectorを紐付ける"></a>FunctionとConnectorを紐付ける</h3><p>ここまで準備ができたら、後はFunctionとConnectorを紐付けるだけです。FunctionのAdvanced options内にある<code>VPC connector</code>欄にて先程作成したConnectorを選択します。</p>
+<img src="/images/20190927/photo_20190927_15.png" style="border:solid 1px #000000" class="img-middle-size">
+
+<p>出来上がったFunctionの詳細画面にて<code>VPC connector</code>が期待通り設定されていることが確認できました。これにて設定はすべて完了です。<br><img src="/images/20190927/photo_20190927_16.png" style="border:solid 1px #000000" class="img-small-size"></p>
+<h3 id="注意事項"><a href="#注意事項" class="headerlink" title="注意事項"></a>注意事項</h3><blockquote>
+<p>サーバーレス VPC アクセスでは、Cloud VPN と VPC ネットワーク ピアリングを使用して接続された VPC ネットワークとの通信がサポートされています。レガシー ネットワークや共有 VPC ネットワークはサポートされていません。</p>
+</blockquote>
+<p><a href="https://cloud.google.com/functions/docs/connecting-vpc?hl=ja" target="_blank" rel="noopener">https://cloud.google.com/functions/docs/connecting-vpc?hl=ja</a></p>
+<p>公式ドキュメントに記載がありますが、このVPC connectorを利用したアクセスでは共有VPCネットワークなど一部のネットワーク構成をサポートしていません。ご注意ください。</p>
+<h1 id="終わりに"><a href="#終わりに" class="headerlink" title="終わりに"></a>終わりに</h1><p>今回はCloud FunctionsとVPC connectorをご紹介しました。いかがだったでしょうか？</p>
+<p>イベントドリブンなサーバーレスアーキテクチャを採用すると、自然と「アプリケーションをステートレスに保とうとする」意識が働きます。これによりシステムの疎結合化が進み、アーキテクチャとしてより交換可能でマイクロなものになっていくと思います。</p>
+<p>今回ご紹介したVPC connectorを利用することで、いままではCloud Functionsを採用することができなかった場面でも選択肢として選べるようになり、アーキテクチャ選定の幅、ひいてはサービスの可能性が広がるかと思います。</p>
+<p>本記事が読んだ皆さんの糧になれば幸いです。<br>今後ともFuture Tech Blogをよろしくお願いします！！</p>
+<hr>
+<ul>
+<li><a href="https://future-architect.github.io/articles/20190909/">こちら</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="Let's Try GCP #2 ～Cloud FunctionをVPC connectorと一緒に使ってみる～" data-url="https://future-architect.github.io/articles/20190927/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20190927/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20190927/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20190927/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190927/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Let's Try GCP #2 ～Cloud FunctionをVPC connectorと一緒に使ってみる～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190926/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go言語のDBレイヤーライブラリの評価
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190925/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                 Oculus Questで作る入院中の子どもたちに向けたパラスポーツ体験
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190918/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                サステナブルなエンジニア組織デザイン（後編） ～デザインパターンと10のリファクタリング～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190917/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                サステナブルなエンジニア組織デザイン（前編） ～よくある設計とジレンマ～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190909/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                 Let's Try GCP #1 ～Cloud Run Buttonを使った楽々コンテナデプロイをやってみた～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190903/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Terraformのベストなプラクティスってなんだろうか
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190819/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                はじめてのTerraform 0.12 ～実践編～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (15)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2019 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
