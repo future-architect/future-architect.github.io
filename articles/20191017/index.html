@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>GKEクラスタに割り当てるCIDRを設計する | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにお久しぶりです。スパルタンになった椎名@417yskです。 前回投稿したGCP記事で紹介したGKEクラスタのCIDR設計について、深堀りした記事になります。  1-5. 共有VPC上のGKEクラスタのセカンダリCIDR設計 事象: オンプレ環境と接続する1つの共有VPC上にproduction, stagingなど複数プロジェクトを相乗りさせる場合、各プロジェクトで利用するセカンダリCID">
+<meta name="keywords" content="GCP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GKEクラスタに割り当てるCIDRを設計する">
+<meta property="og:url" content="https://future-architect.github.io/articles/20191017/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="はじめにお久しぶりです。スパルタンになった椎名@417yskです。 前回投稿したGCP記事で紹介したGKEクラスタのCIDR設計について、深堀りした記事になります。  1-5. 共有VPC上のGKEクラスタのセカンダリCIDR設計 事象: オンプレ環境と接続する1つの共有VPC上にproduction, stagingなど複数プロジェクトを相乗りさせる場合、各プロジェクトで利用するセカンダリCID">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20191017/1.png">
+<meta property="og:updated_time" content="2019-10-17T02:01:00.697Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GKEクラスタに割り当てるCIDRを設計する">
+<meta name="twitter:description" content="はじめにお久しぶりです。スパルタンになった椎名@417yskです。 前回投稿したGCP記事で紹介したGKEクラスタのCIDR設計について、深堀りした記事になります。  1-5. 共有VPC上のGKEクラスタのセカンダリCIDR設計 事象: オンプレ環境と接続する1つの共有VPC上にproduction, stagingなど複数プロジェクトを相乗りさせる場合、各プロジェクトで利用するセカンダリCID">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20191017/1.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="GKEクラスタに割り当てるCIDRを設計する | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="GKEクラスタに割り当てるCIDRを設計する,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.svg" alt="logo" class="logo-img" width="200px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20191017/">GKEクラスタに割り当てるCIDRを設計する</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20191017-gke-cidr" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 椎名祐介</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2019-10-16T23:02:12.000Z" itemprop="datePublished">2019/10/17</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/GCP/" title="GCP">GCP</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>お久しぶりです。<a href="https://www.spartanrace.jp/en" target="_blank" rel="noopener">スパルタン</a>になった椎名@417yskです。</p>
+<p><a href="/articles/20190820/">前回投稿したGCP記事</a>で紹介したGKEクラスタのCIDR設計について、深堀りした記事になります。</p>
+<blockquote>
+<p><strong>1-5. 共有VPC上のGKEクラスタのセカンダリCIDR設計</strong></p>
+<p><strong>事象</strong>: オンプレ環境と接続する1つの共有VPC上にproduction, stagingなど複数プロジェクトを相乗りさせる場合、各プロジェクトで利用するセカンダリCIDRの設計が必要。<br><strong>対応</strong>: GKEで必要なセカンダリCIDRを本腰入れて設計しました。スタンダードなこれと言った解はなく、必要な環境数、オンプレ環境から割り当てられたIP範囲から適宜設計する必要があります。</p>
+</blockquote>
+<p>記載通りですが、GKEクラスタを構築する際に、実際に設計した内容を元に制約や設計のポイントを紹介したいと思います。</p>
+<h1 id="GKEとは"><a href="#GKEとは" class="headerlink" title="GKEとは"></a>GKEとは</h1><blockquote>
+<p>コンテナ化されたアプリケーションをデプロイするための、本番稼働に対応したマネージド型環境です。<br><a href="https://cloud.google.com/kubernetes-engine/" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/</a></p>
+</blockquote>
+<h1 id="CIDRとは"><a href="#CIDRとは" class="headerlink" title="CIDRとは"></a>CIDRとは</h1><blockquote>
+<p>Classless Inter-Domain Routing（CIDR、サイダー）は、インターネット上のルーターにおけるルーティングテーブルの肥大化速度を低減させるための機構であり、ISPや組織にクラスA、B、Cを全部ではなく部分的に割り当てることでIPアドレスの浪費を防ぐ機構である。CIDR記法でアドレスを記述でき、アドレスの集約的表現が可能で、アドレスブロックの委譲も容易である。<br>「CIDR」の読みは「サイダー」とするのが一般的である<br><a href="https://ja.wikipedia.org/wiki/Classless_Inter-Domain_Routing" target="_blank" rel="noopener">https://ja.wikipedia.org/wiki/Classless_Inter-Domain_Routing</a></p>
+</blockquote>
+<p>CIDR記法は <code>10.0.0.0/8</code>、<code>172.16.0.0/12</code>、 <code>192.168.0.0/16</code> といったIPアドレスとビット数を指定する方法です。</p>
+<p>詳細は次項で説明していきますが、ある条件でGKEクラスタを構築すると、このCIDR設計が必須になってきます</p>
+<h1 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h1><p>アーキテクチャ設計上の要件と、GKEクラスタの制約の2つが設計上の考慮事項となります。</p>
+<h2 id="アーキクチャ設計上の要件"><a href="#アーキクチャ設計上の要件" class="headerlink" title="アーキクチャ設計上の要件"></a>アーキクチャ設計上の要件</h2><p>今回GKEクラスタを構築する上で2つの前提がありました。</p>
+<ol>
+<li><a href="https://cloud.google.com/vpc/docs/shared-vpc" target="_blank" rel="noopener">共有VPC</a>を利用すること</li>
+<li>パブリックエンドポイントへのアクセスが制限された<a href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters" target="_blank" rel="noopener">限定公開クラスタ</a>にすること</li>
+</ol>
+<p>※オンプレ環境とインターネットVPNで繋ぐため1つのVPCを複数環境で利用したかったのと、セキュリティポリシーから外部アクセス禁止となっていたためです。</p>
+<h3 id="共有VPCとは"><a href="#共有VPCとは" class="headerlink" title="共有VPCとは"></a>共有VPCとは</h3><p>共有VPCとは、あるホストとなるプロジェクトのVPCを、複数のGCPプロジェクトがリソースとして利用できるようになる機能です。これにより、サブネット、ルート、ファイアウォールなどのネットワーク リソースを集中管理しながら、インスタンスの作成や管理などの管理責任をサービス プロジェクト管理者に委任できます。</p>
+<p>以下は<a href="/articles/20190820/">前回投稿したGCP記事</a>で紹介した構成図です。Shared VPCと書かれた領域にある、Subnetをサービスと呼ばれる別GCPプロジェクトが利用しています。</p>
+<img src="/images/20191017/1.png">
+
+<p>VPC Peeringとの違いはいくつかありますが、ホストとなるプロジェクト側でファイアウォールルールなどを集中管理できる点などが異なります。（今回はこの点が重視し共有VPCを選択しました）</p>
+<h3 id="限定公開クラスタとは"><a href="#限定公開クラスタとは" class="headerlink" title="限定公開クラスタとは"></a>限定公開クラスタとは</h3><blockquote>
+<p>限定公開クラスタでは、ノードに RFC 1918 の内部 IP アドレスのみがあるため、ワークロードが公共のインターネットから隔離されるようになります。<br><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters</a></p>
+</blockquote>
+<p>引用文そのままですが、限定公開クラスタの設定を行うと、各GKEノードにPublic IPを付与せずGKEクラスタを構築することができます。セキュリティ要件からこちらの設定が必須となりました。</p>
+<h2 id="GKEクラスタの制約"><a href="#GKEクラスタの制約" class="headerlink" title="GKEクラスタの制約"></a>GKEクラスタの制約</h2><ol>
+<li>共有VPC上にGKEクラスタ構築する制約<br>クラスタの<strong>ポッド</strong>と<strong>サービス</strong>に使用するサブネットとセカンダリCIDRを指定する必要があります。<br><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#verify_usable_subnets" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#verify_usable_subnets</a></li>
+<li>パブリックエンドポイントへのアクセスが制限された限定公開クラスタによる制約<br>クラスタ<strong>マスター</strong>が使用する /28 分の RFC 1918 アドレス範囲を指定する必要があります。<br><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#public_master" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#public_master</a></li>
+<li>セカンダリCIDRの上限によるクラスタ数の制約<br>ポッドとサービスに対して割り当てるセカンダリCIDRですが、1サブネット内に設定可能なセカンダリCIDR数に上限があり、この上限数/2が構築可能なクラスタ数になります。<br><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#notes_about_secondary_ranges" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#notes_about_secondary_ranges</a><br>私が構築した時点ではセカンダリCIDRの上限は5つだったためクラスタの上限は2つでしたが、現在はセカンダリCIDRの上限は30まで拡張されており15クラスタまで作成可能なのでさほど設計上の制約にはならないかもしれません。<br>※日本語ドキュメントはまだ5のままにですが英語では30になっています。（2019/10/17時点）</li>
+</ol>
+<h1 id="実際に設計してみる"><a href="#実際に設計してみる" class="headerlink" title="実際に設計してみる"></a>実際に設計してみる</h1><p>本編です。</p>
+<p>前項の制約から1GKEクラスタに対して <strong>3つのCIDR(ポッド、サービス、マスター)を割り当てる必要</strong> が出てきました。またこれらは <strong>同一の共有VPC上に構築するため構築される全てのプロジェクトをまたいで全てのCIDRが被ってはいけない</strong> という制約もあります。</p>
+<p>この辺りに注意してCIDR設計したいと思います。</p>
+<h2 id="1-全体の設計方針"><a href="#1-全体の設計方針" class="headerlink" title="1. 全体の設計方針"></a>1. 全体の設計方針</h2><p>設定上はプロジェクトが異なればポッドやサービスのCIDRは全く異なる範囲や体系で設定可能です。<br>ですが、各プロジェクト（環境）毎に設計のポリシーを合わせるために全プロジェクトに対してポッド、サービス、マスタ別にCIDRを概念的に割り当て、そこから各プロジェクトごとに実際のCIDRを割り当てるといった設計方針をとりました。</p>
+<h2 id="2-ポッド＆サービスCIDR"><a href="#2-ポッド＆サービスCIDR" class="headerlink" title="2. ポッド＆サービスCIDR"></a>2. ポッド＆サービスCIDR</h2><h3 id="2-1-共有VPC上の全プロジェクトに対するCIDR"><a href="#2-1-共有VPC上の全プロジェクトに対するCIDR" class="headerlink" title="2.1. 共有VPC上の全プロジェクトに対するCIDR"></a>2.1. 共有VPC上の全プロジェクトに対するCIDR</h3><p>こちらは172.16.0.0/12（クラスB）を概念的に割り当てました。<br>GKEのポッド＆サービスに割り当て可能なCIDRはRFC 1918 ブロック（10.0.0.0/8、172.16.0.0/12、または 192.168.0.0/16）の制約があります。<br><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/routes-based-cluster#pod_address_range" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/docs/how-to/routes-based-cluster#pod_address_range</a></p>
+<p>10.0.0.0/8はGCP環境以外も含めたシステム全体で利用しているのと、192.168.0.0/16は後述のマスタのアドレス範囲に利用するためクラスB（172.16.0.0/12）を選択しました。</p>
+<p>なお基本的にはクラスBの範囲を使うことができますが、公式ドキュメントには<code>172.17.0.0/16</code>を利用することができない旨の記載があります。<br>該当範囲を指定してもクラスタ構築時にエラーとなるわけではないのでご注意下さい。</p>
+<blockquote>
+<p>Restrictions<br>Private clusters have the following restrictions:<br>You cannot use a cluster master, node, Pod, or Service IP range that overlaps with 172.17.0.0/16.<br><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#restrictions" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#restrictions</a></p>
+</blockquote>
+<h3 id="2-2-各プロジェクトにおけるCIDR"><a href="#2-2-各プロジェクトにおけるCIDR" class="headerlink" title="2.2. 各プロジェクトにおけるCIDR"></a>2.2. 各プロジェクトにおけるCIDR</h3><p>こちらに対してはさらに3段階の概念でCIDRを設計しました。</p>
+<ul>
+<li>プロジェクト毎のCIDR</li>
+<li>ポッド/サービス毎のCIDR</li>
+<li>クラスタ毎のCIDR</li>
+</ul>
+<p>まずプロジェクトごとのCIDRですが、全体でいくつのプロジェクトを作成するかを設計します。<br>本番、ステージングはよくある環境ですが、他に非機能テスト、開発時の機能検証用を想定すると4面、これに加えて実データ使ったデモ環境、並行して動かす別バージョン環境・・などを考慮し最大7断面を想定しました。<br>これによって172.16.0.0/12以下に3bit加えて以下のCIDRが割当たります。</p>
+<table>
+<thead>
+<tr>
+<th align="left">環境</th>
+<th align="left">CIDR</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">本番</td>
+<td align="left">172.18.0.0/15</td>
+</tr>
+<tr>
+<td align="left">ステージング</td>
+<td align="left">172.20.0.0/15</td>
+</tr>
+<tr>
+<td align="left">非機能</td>
+<td align="left">172.22.0.0/15</td>
+</tr>
+<tr>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+</tr>
+</tbody></table>
+<p>※172.16.0.0/15は前述の172.17.0.0/16を含むため利用しませんでした。</p>
+<p>次にポッド/サービスですが、これは2値のため次の1bitを割り当てます</p>
+<table>
+<thead>
+<tr>
+<th align="left">環境</th>
+<th align="left">CIDR</th>
+<th align="left">種別</th>
+<th align="left">CIDR</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">本番</td>
+<td align="left">172.16.0.0/15</td>
+<td align="left">ポッド</td>
+<td align="left">172.18.0.0/16</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left">172.19.0.0/16</td>
+</tr>
+<tr>
+<td align="left">ステージング</td>
+<td align="left">172.18.0.0/15</td>
+<td align="left">ポッド</td>
+<td align="left">172.20.0.0/16</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left">172.21.0.0/16</td>
+</tr>
+<tr>
+<td align="left">非機能</td>
+<td align="left">172.20.0.0/15</td>
+<td align="left">ポッド</td>
+<td align="left">172.22.0.0/16</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left">172.23.0.0/16</td>
+</tr>
+<tr>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+</tr>
+</tbody></table>
+<p>そして最後に実際にクラスタに割り当てるCIDRに分割します。<br>ここは実際に構築するクラスタ数に応じて細分化します。</p>
+<table>
+<thead>
+<tr>
+<th align="left">環境</th>
+<th align="left">CIDR</th>
+<th align="left">種別</th>
+<th align="left">CIDR</th>
+<th align="left">クラスタ</th>
+<th align="left">CIDR</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">本番</td>
+<td align="left">172.16.0.0/15</td>
+<td align="left">ポッド</td>
+<td align="left">172.18.0.0/16</td>
+<td align="left">クラスタA</td>
+<td align="left"><strong>172.18.0.0/18</strong></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">ポッド</td>
+<td align="left"></td>
+<td align="left">クラスタB</td>
+<td align="left"><strong>172.18.64.0/18</strong></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left">172.19.0.0/16</td>
+<td align="left">クラスタA</td>
+<td align="left"><strong>172.19.0.0/18</strong></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left"></td>
+<td align="left">クラスタB</td>
+<td align="left"><strong>172.19.64.0/18</strong></td>
+</tr>
+<tr>
+<td align="left">ステージング</td>
+<td align="left">172.18.0.0/15</td>
+<td align="left">ポッド</td>
+<td align="left">172.20.0.0/16</td>
+<td align="left">クラスタA</td>
+<td align="left"><strong>172.20.0.0/18</strong></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">ポッド</td>
+<td align="left"></td>
+<td align="left">クラスタB</td>
+<td align="left"><strong>172.20.64.0/18</strong></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left">172.21.0.0/16</td>
+<td align="left">クラスタA</td>
+<td align="left"><strong>172.21.0.0/18</strong></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left"></td>
+<td align="left">クラスタB</td>
+<td align="left"><strong>172.21.64.0/18</strong></td>
+</tr>
+<tr>
+<td align="left">非機能</td>
+<td align="left">172.20.0.0/15</td>
+<td align="left">ポッド</td>
+<td align="left">172.22.0.0/16</td>
+<td align="left">クラスタA</td>
+<td align="left"><strong>172.22.0.0/18</strong></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">ポッド</td>
+<td align="left"></td>
+<td align="left">クラスタB</td>
+<td align="left"><strong>172.22.64.0/18</strong></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left">172.23.0.0/16</td>
+<td align="left">クラスタA</td>
+<td align="left"><strong>172.23.0.0/18</strong></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left"></td>
+<td align="left">クラスタB</td>
+<td align="left"><strong>172.23.64.0/18</strong></td>
+</tr>
+<tr>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+</tr>
+</tbody></table>
+<p>なお前述の1環境2クラスタの制限（2019/10/17時点では制約が緩和され15クラスタまで可能なはず）から以下のような切り方も出来たのですが、</p>
+<table>
+<thead>
+<tr>
+<th align="left">環境</th>
+<th align="left">CIDR</th>
+<th align="left">種別</th>
+<th align="left">CIDR</th>
+<th align="left">クラスタ</th>
+<th align="left">CIDR</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">本番</td>
+<td align="left">172.16.0.0/15</td>
+<td align="left">ポッド</td>
+<td align="left">172.16.0.0/16</td>
+<td align="left">クラスタA</td>
+<td align="left"><strong>172.18.0.0/17</strong></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">ポッド</td>
+<td align="left"></td>
+<td align="left">クラスタB</td>
+<td align="left"><strong>172.18.128.0/17</strong></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left">172.17.0.0/16</td>
+<td align="left">クラスタA</td>
+<td align="left"><strong>172.19.0.0/17</strong></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left"></td>
+<td align="left">クラスタB</td>
+<td align="left"><strong>172.19.128.0/17</strong></td>
+</tr>
+<tr>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+</tr>
+</tbody></table>
+<p>以下の理由で/18のアドレス範囲としました。</p>
+<ul>
+<li>今後制約が緩んだ時の拡張性を持たせる<ul>
+<li>クラスタ再作成を覚悟すれば、後で拡張可能であろうという前提です</li>
+</ul>
+</li>
+<li>/18で切ったアドレス範囲内でポッドとサービスの数は十分足りる</li>
+</ul>
+<h3 id="2-3-アドレスに対する意味付け"><a href="#2-3-アドレスに対する意味付け" class="headerlink" title="2.3. アドレスに対する意味付け"></a>2.3. アドレスに対する意味付け</h3><p>ここまでのアドレス設計と並行して、アドレスから容易に環境や用途を判断できるように考慮しました。<br>今回のアドレス設計ではアドレスの２か所に意味を持たせています。</p>
+<p>アドレス体系：172.<strong>XXX.YYY</strong>.0/18</p>
+<ul>
+<li><strong>XXX</strong>の箇所で環境を表す<br>本番（18,19）、ステージング（20,21）・・・</li>
+<li><strong>XXX</strong>の箇所で種別を表す<br>偶数がポッド、奇数がサービスとなっています。</li>
+<li><strong>YYY</strong>の箇所にはクラスタ。<br>クラスタA（0）、クラスタB（64）</li>
+</ul>
+<h2 id="3-マスターCIDR"><a href="#3-マスターCIDR" class="headerlink" title="3. マスターCIDR"></a>3. マスターCIDR</h2><h3 id="3-1-共有VPC上の全プロジェクトに対するCIDR"><a href="#3-1-共有VPC上の全プロジェクトに対するCIDR" class="headerlink" title="3.1. 共有VPC上の全プロジェクトに対するCIDR"></a>3.1. 共有VPC上の全プロジェクトに対するCIDR</h3><p>こちらは192.168.0.0/16（クラスC）を概念的に割り当てました。</p>
+<p>これは10.0.0.0/8（クラスA）の一部をプライマリCIDRで利用していたのと172.16.0.0/12（クラスB）をポッドとサービスのセカンダリCDIRで利用していたためです。</p>
+<p>また制約上/28のCDIRを割り当てればよいため、クラスCのアドレス範囲で十分と判断しました。</p>
+<h3 id="3-2-各プロジェクトにおけるCIDR"><a href="#3-2-各プロジェクトにおけるCIDR" class="headerlink" title="3.2. 各プロジェクトにおけるCIDR"></a>3.2. 各プロジェクトにおけるCIDR</h3><p>こちらに対しては2段階の概念でアドレス範囲を設定しました。</p>
+<ul>
+<li>プロジェクト毎のCIDR</li>
+<li>クラスタ毎のCIDR</li>
+</ul>
+<p>ただし、アドレス範囲を無駄なくキレイには使わずに、分かりやすさを考慮して以下のアドレス範囲を割り当てています。</p>
+<table>
+<thead>
+<tr>
+<th align="left">環境</th>
+<th align="left">クラスタ</th>
+<th align="left">CIDR</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">本番</td>
+<td align="left">クラスタA</td>
+<td align="left">192.168.16.0/28</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">クラスタB</td>
+<td align="left">192.168.17.0/28</td>
+</tr>
+<tr>
+<td align="left">ステージング</td>
+<td align="left">クラスタA</td>
+<td align="left">192.168.32.0/28</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">クラスタB</td>
+<td align="left">192.168.33.0/28</td>
+</tr>
+<tr>
+<td align="left">非機能</td>
+<td align="left">クラスタA</td>
+<td align="left">192.168.48.0/28</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">クラスタB</td>
+<td align="left">192.168.49.0/28</td>
+</tr>
+<tr>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+</tr>
+</tbody></table>
+<h3 id="3-3-アドレスに対する意味付け"><a href="#3-3-アドレスに対する意味付け" class="headerlink" title="3.3. アドレスに対する意味付け"></a>3.3. アドレスに対する意味付け</h3><p>ここでもアドレスから容易に環境や用途を判断できるように考慮しました。<br>今回のアドレス設計ではアドレスの２か所に意味を持たせています。</p>
+<p>アドレス体系：192.168.<strong>XXX</strong>.0/28</p>
+<ul>
+<li><strong>XXX</strong>の箇所で環境を表す<br>本番（16,17）、ステージング（32,33）・・・</li>
+<li><strong>XXX</strong>の箇所でクラスタを表す<br>偶数がクラスタA、奇数がクラスタBとなっています。</li>
+</ul>
+<h2 id="4-全体サマリ"><a href="#4-全体サマリ" class="headerlink" title="4. 全体サマリ"></a>4. 全体サマリ</h2><p>全体のアドレスをまとめると以下になります。</p>
+<table>
+<thead>
+<tr>
+<th align="left">環境</th>
+<th align="left">クラスタ</th>
+<th align="left">種別</th>
+<th align="left">CIDR</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">本番</td>
+<td align="left">クラスタA</td>
+<td align="left">ポッド</td>
+<td align="left">172.18.0.0/18</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left">172.19.0.0/18</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">マスター</td>
+<td align="left">192.168.16.0/28</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">クラスタB</td>
+<td align="left">ポッド</td>
+<td align="left">172.18.64.0/18</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left">172.19.64.0/18</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">マスター</td>
+<td align="left">192.168.17.0/28</td>
+</tr>
+<tr>
+<td align="left">ステージング</td>
+<td align="left">クラスタA</td>
+<td align="left">ポッド</td>
+<td align="left">172.20.0.0/18</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left">172.21.0.0/18</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">マスター</td>
+<td align="left">192.168.32.0/28</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">クラスタB</td>
+<td align="left">ポッド</td>
+<td align="left">172.20.64.0/18</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">サービス</td>
+<td align="left">172.21.64.0/18</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">マスター</td>
+<td align="left">192.168.33.0/28</td>
+</tr>
+<tr>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+<td align="left">・・・</td>
+</tr>
+</tbody></table>
+<h1 id="あとがき"><a href="#あとがき" class="headerlink" title="あとがき"></a>あとがき</h1><p>今回は実際に設計した事例を元にGCP上の制約や設計時に考えたことを紹介させて頂きました。<br>この辺りの設計は制約や重視するポイントで結構変わってくるのでこれと言った正解はありませんが、１つの例として構築の際にお役に立てれば幸いです。</p>
+<hr>
+<p>関連記事：</p>
+<ul>
+<li><a href="/articles/20190820/">初めてのGCPで環境構築してハマったこと</a></li>
+<li><a href="/articles/20190927/">Let’s Try GCP #2 ～Cloud FunctionをVPC connectorと一緒に使ってみる～</a></li>
+<li><a href="/articles/20190909/">Let’s Try GCP #1 ～Cloud Run Buttonを使った楽々コンテナデプロイをやってみた～</a></li>
+<li><a href="/articles/20190827/">GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="GKEクラスタに割り当てるCIDRを設計する" data-url="https://future-architect.github.io/articles/20191017/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20191017/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20191017/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20191017/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191017/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GKEクラスタに割り当てるCIDRを設計する
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191016/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Software Design 後記
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191009/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AWS Session Managerでセッションを切断されにくくする方法
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191008/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                 本当に使ってよかったOpenAPI (Swagger) ツール
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191001/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                一周回って、人間が読み書きする設定ファイルはJSONが良いと思った
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191002/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                CUEを試して見る
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190927/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Let's Try GCP #2 ～Cloud FunctionをVPC connectorと一緒に使ってみる～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190918/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                サステナブルなエンジニア組織デザイン（後編） ～デザインパターンと10のリファクタリング～
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (14)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (29)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (16)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2019 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
