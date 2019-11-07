@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>インフラ入門vol.3(ネットワーク冗長化構成) | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにこんにちは、TIG所属インフラエンジニアの市川です。 記事のテーマについてvol.2との棲み分けをどうしようかと思っていたのですが、前職がゴリゴリのネットワークエンジニアということもあり、折角なのでネットワークを深掘りしたいと思います。 クラウド全盛期の今でも社内ネットワークや既存のオンプレシステムなどネットワークなしにシステムを語ることはできません。いつでも繋がるネットワークを構築するた">
+<meta name="keywords" content="Network">
+<meta property="og:type" content="article">
+<meta property="og:title" content="インフラ入門vol.3(ネットワーク冗長化構成)">
+<meta property="og:url" content="https://future-architect.github.io/articles/20191107/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="はじめにこんにちは、TIG所属インフラエンジニアの市川です。 記事のテーマについてvol.2との棲み分けをどうしようかと思っていたのですが、前職がゴリゴリのネットワークエンジニアということもあり、折角なのでネットワークを深掘りしたいと思います。 クラウド全盛期の今でも社内ネットワークや既存のオンプレシステムなどネットワークなしにシステムを語ることはできません。いつでも繋がるネットワークを構築するた">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/layer2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/spanning_tree.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/spanning_tree_block.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/stack_virtual_chassis.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/stack_virtual_chassis_mec.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/Ethernet_Fabric.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/stack_mec.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/floating-static-2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/photo_20191107_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/photo_20191107_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/photo_20191107_03.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/photo_20191107_04.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/photo_20191107_05.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/photo_20191107_06.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/photo_20191107_07.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191107/photo_20191107_08.png">
+<meta property="og:updated_time" content="2019-11-07T02:20:36.458Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="インフラ入門vol.3(ネットワーク冗長化構成)">
+<meta name="twitter:description" content="はじめにこんにちは、TIG所属インフラエンジニアの市川です。 記事のテーマについてvol.2との棲み分けをどうしようかと思っていたのですが、前職がゴリゴリのネットワークエンジニアということもあり、折角なのでネットワークを深掘りしたいと思います。 クラウド全盛期の今でも社内ネットワークや既存のオンプレシステムなどネットワークなしにシステムを語ることはできません。いつでも繋がるネットワークを構築するた">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20191107/layer2.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="インフラ入門vol.3(ネットワーク冗長化構成) | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="インフラ入門vol.3(ネットワーク冗長化構成),Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.svg" alt="logo" class="logo-img" width="200px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20191107/">インフラ入門vol.3(ネットワーク冗長化構成)</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20191107-infra3" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 市川諒</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2019-11-07T02:01:01.000Z" itemprop="datePublished">2019/11/07</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/Network/" title="Network">Network</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは、TIG所属インフラエンジニアの市川です。</p>
+<p>記事のテーマについてvol.2との棲み分けをどうしようかと思っていたのですが、前職がゴリゴリのネットワークエンジニアということもあり、折角なのでネットワークを深掘りしたいと思います。</p>
+<p>クラウド全盛期の今でも社内ネットワークや既存のオンプレシステムなどネットワークなしにシステムを語ることはできません。いつでも繋がるネットワークを構築するために、サービスをエンドユーザー様に快適に使っていただくために、冗長化設計は避けて通れません。とは言え、ネットワークは簡単に作り直せない分、古き良き？構成が残ったままになりがちです。</p>
+<p>お客様先でもまだまだ課題となっている冗長化構成の改善について、打ち合わせについていった新人さんが「なんだ、、、この呪文は、、、」とならないための入門記事をしたためようと思います。</p>
+<p><strong>⚠️[WARNING]この記事はとても長いです⚠️</strong></p>
+<h2 id="過去記事について"><a href="#過去記事について" class="headerlink" title="過去記事について"></a>過去記事について</h2><ol>
+<li><a href="https://future-architect.github.io/articles/20170109/">インフラ入門vol.1</a>：インフラ全般に興味を持ってもらうためのアツい記事です。</li>
+<li><a href="https://future-architect.github.io/articles/20170704/">インフラ入門vol.2(ネットワーク)</a>：ネットワークって何さ？から仕様検討の上での入門知識が書かれた記事です。</li>
+<li>インフラ入門vol.3(ネットワーク冗長化構成)：この記事。冗長構成にスポットライトをあてた若干ニッチな記事です。</li>
+</ol>
+<h2 id="なぜ冗長化？？？"><a href="#なぜ冗長化？？？" class="headerlink" title="なぜ冗長化？？？"></a>なぜ冗長化？？？</h2><p>そもそもなぜ冗長化なのでしょう。というか冗長って何でしょうか。</p>
+<p><a href="https://ja.wikipedia.org/wiki/%E5%86%97%E9%95%B7%E5%8C%96" target="_blank" rel="noopener">Wikipedia</a>によると…</p>
+<blockquote>
+<p>冗長化（じょうちょうか）とは、システムの一部に何らかの障害が発生した場合に備えて、障害発生後でもシステム全体の機能を維持し続けられるように、予備装置を平常時からバックアップとして配置し運用しておくこと。冗長化によって得られる安全性は冗長性と呼ばれ、英語ではredundancyと呼ぶ。</p>
+<p>常に実用稼動が可能な状態を保ち、使用しているシステムに障害が生じたときに瞬時に切り替えることが可能な仕組みを持つ。障害によってシステムが本来の機能を失うと、人命や財産が失われたり、企業活動が大きな打撃を受けるような場合には、冗長性設計が必須となっている。</p>
+</blockquote>
+<p>ナルホド。1段落目にとっても重要なことが書いてあります。</p>
+<p>ネットワークが、サーバが、故障しました！<br>→ ヤバい！予備がない！<br>→ 発注して、データセンタへの設置のために色々申請をして。<br>→ バックアップがあればそこから戻して・・・あ！機器の構成管理してない！<br>→ 手動でコンフィグのインストールして・・・。</p>
+<p>―― おそらくこの時点で2, 3ヶ月はかかっているでしょう。<br>何故こうなったか説明を求められるでしょうし、もしかしたら賠償になるかも。人命に関わることもあるかもしれません。まぁ、この例は流石に杜撰すぎますが。</p>
+<p>今やネットワークインフラやその上で提供される数多のサービスは電気や水道のように生活になくてはならない<strong>ライフライン</strong>です。一般的な日本語では冗長は「無駄」という意味合いがありますが、冗長設計をすることは決して無駄でなく、<strong>お客様とその快適な生活を守るために必要な最低限考慮すべき事項</strong>です。</p>
+<h2 id="何をどこまでやるのか"><a href="#何をどこまでやるのか" class="headerlink" title="何をどこまでやるのか"></a>何をどこまでやるのか</h2><p>冗長化とは<strong>SPOF（Single Point of Failure / 単一障害点）</strong>を排除することだと認識しています。</p>
+<p>SPOF排除における基本的な考え方は、</p>
+<ul>
+<li>負荷分散及び障害時の迂回経路を提供するActive/Active構成</li>
+<li>障害時に自動で切り替わるような迂回経路を提供するActive/Standby構成</li>
+</ul>
+<p>上記は<strong>ホットスタンバイ</strong>といい、冗長機器は常に稼働し続け、<strong>「自動」</strong>での切り替わりを提供します。<br>一般にデータセンタや中・大規模な顧客拠点（オフィスネットワーク）、保守員のいない遠隔地ではこの構成が取られます。</p>
+<p>また、小規模な顧客拠点などでは<strong>コールドスタンバイ</strong>という構成を取ることもあります。ホットスタンバイなActive/Standby構成をとった場合、Standbyの機器に通信がやってくるのは障害時かメンテナンス時くらいです。</p>
+<p>もしかしたらラックのスペースがないかもしれませんし、電気が足りないかも・・・。お金もかかる。そういう場合には予め本番機同等の設定をした予備機を用意することで障害時に差し替えを行い、障害時間をある程度短縮するといった手法が取られます。</p>
+<p>さて、上記の構成が取られることはわかりましたが、実際問題どこまで対策すればよいのでしょうか。</p>
+<ul>
+<li>LANケーブルや光ケーブル、電源を複数持たせればOK？</li>
+<li>機器筐体そのものを複数もたせる？</li>
+<li>この際回線も複数もたせる？衛星回線用意する？<ul>
+<li>回線事業者分けたり、通る収容局分けたり、収容される機器分けたり！？（どこまで対応してくれるかですが。）</li>
+</ul>
+</li>
+<li>都内数カ所とかにデータセンタを複数構築する？</li>
+<li>大規模災害起きたらだから、BCP（Business continuity planning / 事業継続計画）拠点も作る？</li>
+</ul>
+<p><a href="https://future-architect.github.io/articles/20170704/">インフラ入門vol.2(ネットワーク)</a>にもありますが、「<strong>機械の故障等による停止はどの程度まで許容できるのか</strong>」が重要なポイントです。モノの納期や金銭的問題、例えばBCP発動時の手順の整備・訓練など対策を講じれば講じるほど運用は難度を増します。</p>
+<p><strong>非機能要件定義</strong>の段階で十分にお客様と調整を行いましょう。</p>
+<p>※よく打ち合わせなんかでMTBFとかMTTRなんて言葉も出てくるので、覚えておきましょう。</p>
+<ul>
+<li>MTBF: Mean Time Between Failures / 平均故障間隔</li>
+<li>MTTR: Mean Time To Repair / 平均復旧時間</li>
+</ul>
+<h2 id="具体的な設計について"><a href="#具体的な設計について" class="headerlink" title="具体的な設計について"></a>具体的な設計について</h2><p>前置きが長くなりました。</p>
+<p>さて、冗長構成はレイヤごとに分けて考えるとたくさんやることがあります。</p>
+<p>よくインフラ屋さんが使う言葉に<strong>OSI参照モデル</strong>というものがあります。いわゆるネットワークの統一規格で下記の7層に分けることができます。</p>
+<table>
+<thead>
+<tr>
+<th>レイヤ</th>
+<th>層名称</th>
+<th>役割</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>物理層</td>
+<td>LANケーブル、光ケーブル、無線などの信号規約などを提供する</td>
+</tr>
+<tr>
+<td>2</td>
+<td>データリンク層</td>
+<td>機器間のデータ伝送や経路選択を提供する</td>
+</tr>
+<tr>
+<td>3</td>
+<td>ネットワーク層</td>
+<td>複数のネットワークにまたがった経路選択を提供する</td>
+</tr>
+<tr>
+<td>4</td>
+<td>トランスポート層</td>
+<td>ネットワーク接続された端末間のエンドツーエンドの通信を提供する</td>
+</tr>
+<tr>
+<td>5</td>
+<td>セッション層</td>
+<td>通信の開始から終了の規定を提供する</td>
+</tr>
+<tr>
+<td>6</td>
+<td>プレゼンテーション層</td>
+<td>文字コードや圧縮形式、暗号化の方法などを提供する</td>
+</tr>
+<tr>
+<td>7</td>
+<td>アプリケーション層</td>
+<td>サービスプロトコル（HTTP/FTPなど）にネットワーク機能を提供する</td>
+</tr>
+</tbody></table>
+<p>ここからはそれぞれのレイヤごとに対策を見ていきましょう。<br>※筆者はCisco機器を扱うことが多かったので、Cisco用語がそれとなく出てきます。あしからず。</p>
+<h2 id="レイヤ1（物理層）"><a href="#レイヤ1（物理層）" class="headerlink" title="レイヤ1（物理層）"></a>レイヤ1（物理層）</h2><p>※実際は信号規約なのでアレですが広義に捉えます。広い心で。</p>
+<h3 id="電源冗長（RPS-Redundant-Power-Supply）"><a href="#電源冗長（RPS-Redundant-Power-Supply）" class="headerlink" title="電源冗長（RPS / Redundant Power Supply）"></a>電源冗長（RPS / Redundant Power Supply）</h3><p>ネットワーク機器やサーバにはモジュラタイプの電源を複数搭載可能なモデルがあります。<br>筐体（機械）の本体を開けたりドライバーがなくても引っこ抜いて差し込む作業だけで電源の交換が可能です。<br>RPSを利用するなら最低限電源を取得する分電盤もPS（Power Supply）ごとに分けるようにしましょう。</p>
+<h3 id="FAN冗長"><a href="#FAN冗長" class="headerlink" title="FAN冗長"></a>FAN冗長</h3><p>コレは割とオマケですが、サーバの中には冗長FANを搭載できるモデルがあります。<br>熱で死んでいった機械をたくさん見てきたので、CPUぶん回す処理が多いことがわかっていたら備えておきましょう。<br>そもそも空調設計的なものもかかわってきますが。</p>
+<h2 id="レイヤ2（データリンク層）"><a href="#レイヤ2（データリンク層）" class="headerlink" title="レイヤ2（データリンク層）"></a>レイヤ2（データリンク層）</h2><h3 id="Teaming-Link-Aggregation"><a href="#Teaming-Link-Aggregation" class="headerlink" title="Teaming / Link Aggregation"></a>Teaming / Link Aggregation</h3><img src="/images/20191107/layer2.png">
+
+<p>NIC（ネットワークインターフェースカード）を複数搭載した機器同士の物理リンクを束ねて一本の物理リンクとして取り扱う機能で、NICやケーブルの障害対策、あるいは負荷分散のために利用されます。</p>
+<p>ちなみにドキュメントに記載された名称がベンダによって違います。</p>
+<ul>
+<li>WIndows系 → チーミング（Teaming）</li>
+<li>Linux系 → ボンディング（Bonding）</li>
+<li>Cisco系 → イーサチャンネル（Ether channel） ※Port channelと呼ぶことも。</li>
+<li>その他① → リンクアグリゲーション（Link Aggregation） ※この呼び方をよく使っていました。<strong>LAG</strong>ですね。</li>
+<li>その他② → ポートトランキング（Port trunking） ※ProCurveなどがこの呼び方。</li>
+</ul>
+<p>また、束ねるケーブルがFastEther（100Mbps）だと<strong>FEC</strong>、GigabitEther（1Gbps）だと<strong>GEC</strong>とか言ったりします。</p>
+<p>重要なのが、サーバでは<strong>NICそのものの障害</strong>、L2SW/L3SWでは<strong>ASIC</strong>（Application Specific Integrated Circuit / スイッチング用の専用回路）の障害、シャーシ型の場合はスイッチングモジュールの障害を念頭に置く必要があります。</p>
+<p>せっかく冗長化しててもPCIeスロットが同じNICを使ってたり、同じASICやスイッチングモジュールに所属するポートを利用していては可用性が低下します。サービスレベルによっては上記のような点もしっかり抑えておきましょう。</p>
+<p><strong>【動作モード】</strong><br>Teaming / Link Aggregationでは静的あるいは動的に同じグループとして束ねられるポートを選択します。</p>
+<p>また、ややこしいことにこのモード次第で負荷分散方式が変わったりします。</p>
+<ul>
+<li><p><strong>「スイッチに依存しない」モード</strong></p>
+<ul>
+<li>負荷分散を行わないActive/Standby構成（フォールトトレランス）やActive/Active構成でもサーバから送信されるトラフィックのみ負荷分散を行うモード。</li>
+</ul>
+</li>
+<li><p><strong>「静的 / static」モード</strong></p>
+<ul>
+<li>Active/Active構成で送受信ともに負荷分散を行うが、機械にネゴシエーションをさせず、手動で割当を決める方式。</li>
+<li>正直後述のLACPに対応してるなら選定することはほぼないかなという所感。</li>
+</ul>
+</li>
+<li><p><strong>「動的 / LACP」モード</strong></p>
+<ul>
+<li>Active/Active構成で送受信ともに負荷分散を行い、障害時にメンバーポートをLAG（Link Aggregation Group）から切り離します。</li>
+<li>Cisco独自のPAgPというモードもありましたが、機器を選ぶので選定することはないはずです。</li>
+</ul>
+</li>
+</ul>
+<p><strong>【ハッシュポリシー】</strong><br>負荷分散の際に何を基準にして分散するか、を選択できます。ちょっと脇道なので、サラッと説明しますが、Layer2、Layer2+3、Layer3+4などの種類があります。詳しくは<a href="https://access.redhat.com/documentation/ja-jp/red_hat_enterprise_linux/7/html/networking_guide/sec-using_channel_bonding" target="_blank" rel="noopener">RHELのドキュメントに・・・</a></p>
+<p>推奨はLayer3+4ですが、IPパケットフラグメントなど無視できない問題があったりするので、Layer2+3を選ぶことが多い印象です。</p>
+<h3 id="スパニングツリー（Spanning-Tree）"><a href="#スパニングツリー（Spanning-Tree）" class="headerlink" title="スパニングツリー（Spanning Tree）"></a>スパニングツリー（Spanning Tree）</h3><img src="/images/20191107/spanning_tree.png">
+
+<p>L2スイッチでは通常、受信したフレームの宛先が不明な場合など特定の状況下で、一旦すべてのポートにそのフレームを転送します。（<strong>フラッディング</strong>）
+上図のようにその動作を円環（ループ構成）で行ったらどうなるでしょう。<br>フレームはぐるぐると機器間を回り続け、ネットワークが使用不可になってしまいます。（<strong>ブロードキャストストーム</strong>）</p>
+<p>これを防ぐためのプロトコルが<strong>Spanning Tree Protocol</strong>と呼ばれるものです。<br>簡単に説明すると下図のように「利用可能な経路の一つをバックアップ用として利用不可にすることでループ構成を排除する」というものになります。（いくつかのルールによって木構造を構成します。）<br><img src="/images/20191107/spanning_tree_block.png"></p>
+<p>非常に単純なプロトコルなのですが、ベンダごとの（というかCiscoの）独自実装や既存機器の設定によって影響を受けることもあり、数多くのネットワークエンジニアを泣かせた機能だと（勝手に）思っています。</p>
+<p>STP関連のプロトコルは実装は複数あり、</p>
+<ul>
+<li>CST（Common Spanning Tree）: すべての仮想LAN（VLAN）で同じ木構造を取る。</li>
+<li>PVST+（Per Vlan Spanning Tree Plus）：各VLANで個別の木構造を取ることが可能。</li>
+<li>RST（Rapid Spanning Tree）：CSTの高速化版。障害発生時最大50秒の通信断が発生していたが、RSTPでは1秒未満に短縮。</li>
+<li>RPVST+（Rapid Per Vlan Spanning Tree Plus）：PVSTの高速化版。障害発生時最大50秒の通信断が発生していたが、RPVST+では1秒未満に短縮。</li>
+<li>MST（Multiple Spanning Tree）：RPVST+と似た実装。設計は複雑になりがちだが、RPVST+より負荷が軽く、効率が良い。</li>
+</ul>
+<p>遅いCSTやPVST+を積極的に採用することはないですが、小型機はこれらしかサポートしてない場合もあります。<br>そして厄介なことにSTPトポロジ内に一個でもCSTやPVST+が混ざっていると、全体がそちらに引っ張られて収束が遅くなるので注意・・・・。<br>中規模でCiscoロックインであればRPVST+（一部HPEのスイッチなどは互換性がある。）、Vlanの数が非常に多い、あるいは複数ベンダ機器が混在する場合はMSTで実装すると良いでしょう。<br>とはいえ、既存ネットワークの状態、運用者のスキルにもよるので、ヒアリングを欠かさないこと。</p>
+<p>STPの構成ではどうしても一つ利用されない経路が存在します。これを利用するようにするにはPVSTやMSTでもある程度解決できますが、より実装が複雑になったり、思わぬ動作を引き起こす場合があります。<br>帯域の利用率が非常に高いネットワークでは後述のスタックなど、別な方法で冗長化構成を取るべきです。</p>
+<h3 id="スタック、バーチャルシャーシ（StackWise-VSS-IRF）など"><a href="#スタック、バーチャルシャーシ（StackWise-VSS-IRF）など" class="headerlink" title="スタック、バーチャルシャーシ（StackWise / VSS / IRF）など"></a>スタック、バーチャルシャーシ（StackWise / VSS / IRF）など</h3><img src="/images/20191107/stack_virtual_chassis.png">
+
+<p>スタック、バーチャルシャーシは<strong>物理的に2台のスイッチを仮想的に1台として</strong>扱うことのできる技術です。<br>コンフィグの管理も1台分だけすればよく、設定管理などが簡素になります。（機種によっては3台以上をまとめることも可能）<br>また、未使用帯域が存在するなどのSTPの問題を解決する構成が可能となります。<br>スタックは通常BOX型のスイッチの、バーチャルシャーシはシャーシ型のスイッチでの呼び方となります。</p>
+<p>最も有効な構成としてはLink Aggregationと組み合わせた構成があります。<br>下図の構成では、三角形のループ構造のように見えますが、実際は上図と同じ様にループフリー構成として運用が可能です。<br>MECとありますが、Multi Chassis Ether Channelの略です。</p>
+<img src="/images/20191107/stack_virtual_chassis_mec.png">
+
+<p>が、この技術も若干デメリットが有り、下記の制約があります。</p>
+<ul>
+<li>同じファームウェアバージョンである必要がある</li>
+<li>フィーチャーセット（機能レベル）が同じ必要がある</li>
+<li>SDMテンプレートが同一である必要がある（Ciscoの場合）</li>
+</ul>
+<p>上記制約のため、機器が対応していない場合は容易にOSのアップデートができない、メンテナンス時の通信の片寄時に通信断が発生する可能性があるなどの問題が発生する場合があります。</p>
+<p>なお、スイッチ間をつなぐケーブルにはDAC（Direct Attach Cable）と言われるSFP+と光ケーブルがセットになったケーブルや、個別にSFP+と光ケーブルを購入してつなぐ、などのパターンがあります。購入し忘れに注意しましょう。</p>
+<h3 id="Ethernet-Fabric"><a href="#Ethernet-Fabric" class="headerlink" title="Ethernet Fabric"></a>Ethernet Fabric</h3><img src="/images/20191107/Ethernet_Fabric.png">
+
+<p>これまではツリー型構造を前提としたネットワーク構成での冗長化がベースでしたが、より大規模なデータセンターネットワークにおいてレイヤ2の概念を置き換える考え方が登場しました。<br>ツリー構造ではなくメッシュ構造に近く、非常に柔軟なネットワークを提供することができます。</p>
+<p>ベースとなっているのは以下の技術です。</p>
+<ul>
+<li>Trill（Transparent Interconnect of Lots of Links）</li>
+<li>SPB（Shortest Path Bridging）</li>
+</ul>
+<p>ざっくりというと下記の特徴があります。（ベンダごとに細かい拡張があるのでそこは割愛）</p>
+<ul>
+<li>STPフリー：L2スイッチのような筐体はモジュールとして動作するため、仮想的に1つの筐体のポートとして扱える。</li>
+<li>コンフィグの一元化：スタック同様、中央集中的にコンフィグの管理が可能</li>
+</ul>
+<p>機器が非常に高価なのと、高密度に集約されることでケーブル配線やラック配置の設計難度があがります。</p>
+<h2 id="レイヤ3（ネットワーク層）"><a href="#レイヤ3（ネットワーク層）" class="headerlink" title="レイヤ3（ネットワーク層）"></a>レイヤ3（ネットワーク層）</h2><h3 id="VRRP-HSRP-GLBP"><a href="#VRRP-HSRP-GLBP" class="headerlink" title="VRRP / HSRP / GLBP"></a>VRRP / HSRP / GLBP</h3><img src="/images/20191107/stack_mec.png">
+
+<p>VRRP（Virtual Router Redundancy Protocol）とHSRP（Hot Standby Router Protocol）は基本的にActive/Standbyの<strong>ゲートウェイ冗長化</strong>機能を提供する機能です。（2台以上での冗長化も可能）</p>
+<ul>
+<li>HSRPはCisco独自機能で、VRRPは標準規格です。若干の仕様の違いはあれどすごく雑に言うと概ね同じ仕組みで動作します。</li>
+<li>VRRPではMulti-Group、HSRPではMultiple実装があり、グループごとに主系/副系を変えることで簡易的にActive/Activeな構成を取ることも可能です。</li>
+<li>GLBP（ Gateway Load Balancing Protocol ）は、またものすごくざっくりいうとゲートウェイに対応したMACアドレスをラウンドロビン方式で順番に返すことで標準でActive/Activeな構成を取る事ができるCisco独自機能です。（変更可能）</li>
+</ul>
+<p>基本的にはVRRPが後発でプロトコル実装的にIPパケットで動作するので、VRRPを使うことが多いです。<br>　※HSRPはUDPで動作しますので、若干のオーバーヘッドを嫌いたくなります。<br>　※GLBPは上述のEthernet FabricのCisco版で使うことがあるかも。（使ったことはないですが・・・）</p>
+<h3 id="ECMP（Equal-Cost-Multi-Path）"><a href="#ECMP（Equal-Cost-Multi-Path）" class="headerlink" title="ECMP（Equal Cost Multi Path）"></a>ECMP（Equal Cost Multi Path）</h3><img src="/images/20191107/floating-static-2.png">
+
+<p>動的ルーティングプロトコルでは経路交換時に同じ宛先の経路が複数ある場合、最もコストが低い経路をルーティングテーブルに読み込みます。<br>このとき各経路のコストが等しい場合、複数の経路をルーティングテーブルに持ち、負荷分散することが可能です。これをEMCPと呼びます。</p>
+<p>EMCPはそのバランシングにより下記の2つの実装があります。</p>
+<ul>
+<li><p>Per packet ECMP</p>
+<ul>
+<li>パケットごとに経路を振り分けてくれる。</li>
+<li>理想的にバランシングされる一方、リンクに求められる遅延差がシビアで、実は障害に弱い（影響を受けやすい）。<ul>
+<li>TCPやUDPにおいてフラグメントされたパケットの処理やパフォーマンスに問題が出ることも。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Per flow ECMP</p>
+<ul>
+<li>フローごとに経路を振り分けてくれる。（フローの定義はベンダによって異なる）</li>
+<li>Per packet ECMPで起きる問題が発生しない。</li>
+<li>バランシングを完璧にこなすのは考慮事項が多く、非常に困難。</li>
+<li>一般的にはこちらが採用されている。</li>
+</ul>
+</li>
+</ul>
+<p>よく利用されるルーティングプロトコルにはBGP、OSPFがあり、概ね以下の区分けです。</p>
+<ul>
+<li>OSPF（Open Shortest Path Fast）：内部ネットワークでの経路交換に利用されるプロトコル。</li>
+<li>BGP（Border Gateway Protocol）：外部ネットワークとの経路交換に利用されるプロトコル。最近内部ネットワークでもレイヤ2排除のために使われる。</li>
+</ul>
+<h2 id="レイヤ4（トランスポート層）／レイヤ7（アプリケーション層）"><a href="#レイヤ4（トランスポート層）／レイヤ7（アプリケーション層）" class="headerlink" title="レイヤ4（トランスポート層）／レイヤ7（アプリケーション層）"></a>レイヤ4（トランスポート層）／レイヤ7（アプリケーション層）</h2><p>主にロードバランサ、ファイアウォール、セキュリティアプライアンス系がこの層に該当します。</p>
+<blockquote>
+<p>図がシングル構成になっていますが、コレまで紹介した機能と心の目で冗長化してみてください。</p>
+</blockquote>
+<h3 id="ロードバランサ"><a href="#ロードバランサ" class="headerlink" title="ロードバランサ"></a>ロードバランサ</h3><p>ロードバランサ（LB）の構成は通信経路の途中に横付けするワンアーム構成（LANが1本だから）と経路に挟み込むツーアーム（インライン）構成があります。<br>大まかにワンアームとツーアームはどっち選べば！？という点については個人的にはワンアームが良いと考えています。<br>現状動作しているネットワークにLBを挟み込む場合でも物理構成に変更を与えることなく追加が可能な点と、経路上にLBが存在しないため、メンテナンスし易いことが挙げられます。</p>
+<h4 id="ワンアーム（One-arm）構成／SNAT-DSR構成"><a href="#ワンアーム（One-arm）構成／SNAT-DSR構成" class="headerlink" title="ワンアーム（One-arm）構成／SNAT/DSR構成"></a>ワンアーム（One-arm）構成／SNAT/DSR構成</h4><p>ワンアーム構成一つとっても（知ってる限りで）3つの構成を取ることができます。</p>
+<p>1つ目はリアルサーバ、バーチャルサーバ、デフォルトGWを同一セグメントにする、あるいはリアルサーバのデフォルトGWをバーチャルサーバ（LB）のIPアドレスを指定する場合です。<br>すべての通信はわかりやすくLBを通過するため、セグメントに余裕があれば構成しやすいのがメリットかなと思います。<br><img src="/images/20191107/photo_20191107_01.png" style="border:solid 1px #000000"></p>
+<p>2つ目はSNAT構成です。例えばリアルサーバ群がVMなど横にスケールする構成で、もうIPの空きに余裕がない、とか、通信要件でリアルサーバのGWはL3SWでないとダメ。といった場合にはSNATという機能を使います。</p>
+<p>行き帰りの通信経路が異なる場合、LBはセッションを確立することができないため、NAT（Network Address Translation）機能を利用して、送信元IPをLBのIPに変換することで強制的にLBを通すということが可能です。<br><img src="/images/20191107/photo_20191107_02.png" style="border:solid 1px #000000"></p>
+<p>3つめはDSR（Direct Server Return）構成です。<br>DSRはその名の通り、ロードバランサに着信したクライアントからのパケットを帰りは<strong>LBを経由せずに直接</strong>クライアントに返す構成です。イマドキのLB構成においてDSRは敢えて選択する方式ではないという認識です。</p>
+<p>ちなみにこの構成もL3DSRとL2DSRです。</p>
+<img src="/images/20191107/photo_20191107_03.png" style="border:solid 1px #000000">
+
+
+<p><strong>メリット</strong></p>
+<ul>
+<li>LBでSNATなどの処理を行う必要がなくなるため、リソースに余裕ができる＆スループットが向上する。</li>
+</ul>
+<p><strong>デメリット</strong></p>
+<ul>
+<li>L4ロードバランサとしてしか利用できない（SSL終端とかは無理）</li>
+<li>みんな大好きARP/GARP（L2機能）を使うため、面倒を見るレイヤがちょっと広くなる。（L2DSRの場合）</li>
+<li>方式によるが、MTU（トンネル方式）やDSCP（DSCP方式）の値に制限がでる（L3DSRの場合）</li>
+</ul>
+<p>そもそも最近の（大手だと）BIG-IPやA10のロードバランサは十分な処理速度があり、SSLもなんならLBのアクセラレータを通したほうがスループット向上に寄与したりするので、必要でなければDSR以外を選びたいところです。</p>
+<h4 id="ツーアーム（Two-arm）構成"><a href="#ツーアーム（Two-arm）構成" class="headerlink" title="ツーアーム（Two-arm）構成"></a>ツーアーム（Two-arm）構成</h4><p>ツーアーム構成はその名の通り2本の腕で通信経路中に挟み込まれる構成です。</p>
+<p>ネットワークエンジニアとサーバエンジニアが分かれているときなど、ネットワーク屋さんだけでLBを構成する場合はこちらの構成が単純で問題も少ないです。<br>こんな構成にするんじゃない、って話ですが、下図のような構成をとったときにLBに関係ないサーバもLBを通るという状況が発生しますので注意が必要なのと、帯域は十分に確保したほうが良いです。</p>
+<blockquote>
+<p>だってL3SWに空きポートが無いんだもんとか、歴史的理由によりサーバは子のSW配下にしかつけちゃダメとかの背景でやむを得ずこんな構成になったり</p>
+</blockquote>
+<img src="/images/20191107/photo_20191107_04.png" style="border:solid 1px #000000">
+
+<h3 id="セキュリティアプライアンス"><a href="#セキュリティアプライアンス" class="headerlink" title="セキュリティアプライアンス"></a>セキュリティアプライアンス</h3><p>ニッチ＆ニッチですが、Fire eyeなどのセキュリティアプライアンスを導入する場合も構成方法が複数あります。<br>当然ですが、セキュリティアプライアンスはそれを通過するパケットを監視します。したがって、何らかの方法でパケットをセキュリティアプライアンスに入れてあげることが必要です。</p>
+<h4 id="スパン・タップ構成"><a href="#スパン・タップ構成" class="headerlink" title="スパン・タップ構成"></a>スパン・タップ構成</h4><p>ネットワーク機器にはSPAN（Switched Port Analyzer）という機能が存在する機種があります。<br>要は特定のポートを通過したパケットを別なポートにコピーする機能です。当然といえば当然ですが、SPANはCPUを使った処理になるので、ルータやスイッチの負荷が上がりがちです。</p>
+<img src="/images/20191107/photo_20191107_05.png" style="border:solid 1px #000000">
+
+
+
+<p>上記問題を解決するためにタップという機器もあります。通信経路に挟み込んで信号を分岐するための機器で、電源故障時も通信をバイパスすることで可用性を下げることなく（機種によります）導入することが可能です。高価ですが・・・。</p>
+<img src="/images/20191107/photo_20191107_06.png" style="border:solid 1px #000000">
+
+<p>通信に影響をあたえることがないため、インライン構成よりこちらの構成がおすすめです。ネットワーク的には。<br>とはいえ、セキュリティアプライアンスの機能をフルに活用する場合にはインライン構成の方がベターだったりしますので、要件次第ですね。</p>
+<h4 id="インライン構成"><a href="#インライン構成" class="headerlink" title="インライン構成"></a>インライン構成</h4><p>セキュリティアプライアンスに搭載されている冗長化（HA）機能を利用することが一般的です。<br>構成としてはLBと同じくとてもわかり易いですね。</p>
+<img src="/images/20191107/photo_20191107_07.png" style="border:solid 1px #000000">
+
+
+<h3 id="ファイアウォール"><a href="#ファイアウォール" class="headerlink" title="ファイアウォール"></a>ファイアウォール</h3><p>前提として<strong>ステートフルフェイルオーバー</strong>に対応しているか否かを事前に確認しましょう。<br>だいたい対応しているとは思いますが、対応していない場合はVRRPでの冗長構成が一般的ですが、そもそもセッションなどのステート（状態）を引き継がないため、切り替わり時に通信断が発生するなど、辛い現実を突きつけられることも。。。</p>
+<img src="/images/20191107/photo_20191107_08.png" style="border:solid 1px #000000">
+
+<h4 id="Active-Passive"><a href="#Active-Passive" class="headerlink" title="Active/Passive"></a>Active/Passive</h4><p>この構成は単純で、よくある構成です。<br><strong>ステートフルフェイルオーバー</strong>に対応したファイアウォールではスタンバイ機への同期は常に行われ、障害時の切り替わりに備えています。<br>OSのバージョンアップなどのメンテナンス行為もしやすく、通信路の帯域などが許す場合はこちらがおすすめです。</p>
+<h4 id="Active-Active"><a href="#Active-Active" class="headerlink" title="Active/Active"></a>Active/Active</h4><p>この構成では常に両方のファイアウォールでのトラフィック検査を行います。<br><strong>ステートフルフェイルオーバー</strong>に対応したファイアウォールでは相互にセッションのやり取りを同期します。<br>機種によっては行き帰りのトラフィックが異なるファイアウォールを通る場合、破棄される可能性があります。十分に検証しましょう。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>まとめと言ってもとっちらかってしまうのですが、ココまで読まれたアナタは鋼のメンタルがあるのでぜひ一緒にインフラ屋さんをやりましょう。</p>
+<p><strong>動いて当たり前</strong>なネットワークインフラの背景にはネットワークエンジニアがアレコレ頭を捻ったネットワークトポロジが存在しています。</p>
+<p>前述しましたとおり、クラウドサービスの台頭でなかなかガッツリ触ることのなくなってきたネットワークですが、ネットワーク技術がなくなることは今後もないでしょうし、オンプレのネットワークに触れるときがあればこんな記事があったな、と思いだしてもらえると幸いです。</p>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="インフラ入門vol.3(ネットワーク冗長化構成)" data-url="https://future-architect.github.io/articles/20191107/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20191107/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20191107/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20191107/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191107/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                インフラ入門vol.3(ネットワーク冗長化構成)
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191101/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AWS Glueの開発エンドポイントがそこそこお高いのでローカル開発環境を用意しました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191030/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GoでCUEのバリデーション機能を利用しつつ、.cue/.json/.yaml形式の設定ファイルを読み込む
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191029/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                フロントエンドでシステム開発を2年半続けてハマったことから得た教訓3つ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191025/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Anthosについて改めて知る(GCPUG Anthos day 参加レポ)
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191023/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                工場をハックするための基本知識　前編
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191018/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                第1回社内ロボコン開催記-ライントレーサー編-
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191017/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GKEクラスタに割り当てるCIDRを設計する
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191016/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Software Design 後記
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191009/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AWS Session Managerでセッションを切断されにくくする方法
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (10)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (16)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (32)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (17)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/XXX/">XXX (0)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2019 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
