@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Go Cloud#2 Pub/Subの概要紹介 | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにこんにちは。TIG DXチーム1の辻です。今回は Go Cloudシリーズの第二弾として、Go Cloud の Pub/Sub を紹介します。 ビジネスニーズとして、今までは AWS のみでアプリケーションを構成していたけど、GCP のサービスも取り入れてマルチクラウド構成にしていきたいという声も聞きます。 また Google Trends で過去 5 年間の検索傾向を見ると、ゆるやかな上">
+<meta name="keywords" content="Go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go Cloud#2 Pub&#x2F;Subの概要紹介">
+<meta property="og:url" content="https://future-architect.github.io/articles/20191112/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="はじめにこんにちは。TIG DXチーム1の辻です。今回は Go Cloudシリーズの第二弾として、Go Cloud の Pub/Sub を紹介します。 ビジネスニーズとして、今までは AWS のみでアプリケーションを構成していたけど、GCP のサービスも取り入れてマルチクラウド構成にしていきたいという声も聞きます。 また Google Trends で過去 5 年間の検索傾向を見ると、ゆるやかな上">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20191112/photo_20191112_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191112/photo_20191112_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191112/photo_20191112_03.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191112/photo_20191112_04.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191112/photo_20191112_05.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191112/photo_20191112_06.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191112/photo_20191112_07.png">
+<meta property="og:updated_time" content="2019-11-12T04:04:39.123Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Go Cloud#2 Pub&#x2F;Subの概要紹介">
+<meta name="twitter:description" content="はじめにこんにちは。TIG DXチーム1の辻です。今回は Go Cloudシリーズの第二弾として、Go Cloud の Pub/Sub を紹介します。 ビジネスニーズとして、今までは AWS のみでアプリケーションを構成していたけど、GCP のサービスも取り入れてマルチクラウド構成にしていきたいという声も聞きます。 また Google Trends で過去 5 年間の検索傾向を見ると、ゆるやかな上">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20191112/photo_20191112_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="Go Cloud#2 Pub/Subの概要紹介 | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="Go Cloud#2 Pub/Subの概要紹介,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.svg" alt="logo" class="logo-img" width="200px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20191112/">Go Cloud#2 Pub/Subの概要紹介</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20191112-gocloud2" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 辻大志郎</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2019-11-12T01:46:59.000Z" itemprop="datePublished">2019/11/12</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/Go/" title="Go">Go</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは。TIG DXチーム<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>の辻です。今回は Go Cloudシリーズの第二弾として、Go Cloud の <a href="https://gocloud.dev/howto/pubsub/" target="_blank" rel="noopener">Pub/Sub</a> を紹介します。</p>
+<p>ビジネスニーズとして、今までは AWS のみでアプリケーションを構成していたけど、GCP のサービスも取り入れてマルチクラウド構成にしていきたいという声も聞きます。</p>
+<p>また Google Trends で過去 5 年間の検索傾向を見ると、ゆるやかな上昇傾向にあるように見えます。</p>
+<img src="/images/20191112/photo_20191112_01.png" style="border:solid 1px #000000">
+
+<p>マルチクラウドなアプリケーションの実装としては、各サービスのインターフェースに依存することが多く、独自に各サービスのインターフェースをラップして実装するのもなかなか大変なのではないでしょうか。</p>
+<p>Go Cloud はアプリケーションのポータビリティに役に立つと考えています。</p>
+<p>Go Cloud記事はこちらもご参考ください。</p>
+<ul>
+<li><a href="https://future-architect.github.io/articles/20191111/">Go Cloud#1 概要とBlobへの活用方法</a></li>
+</ul>
+<h2 id="Pub-Sub"><a href="#Pub-Sub" class="headerlink" title="Pub/Sub"></a>Pub/Sub</h2><p>Producer-Consumer モデルを用いたメッセージングは、サーバーレスアーキテクチャやマイクロサービスアーキテクチャでよく利用されるような、非同期サービス間通信のモデルです。</p>
+<p>キューイングサービスとしてよく用いられるサービスとして、AWS だと Amazon Simple Queue Service 、GCP だと Google Cloud Pub/Sub、ミドルウェアだと Kafka などが挙げられます。</p>
+<p>現時点(2019/11/08)では以下のサービスをサポートしています。</p>
+<ul>
+<li>Google Cloud Pub/Sub</li>
+<li>Amazon Simple Notification Service</li>
+<li>Amazon Simple Queue Service</li>
+<li>Azure Service Bus</li>
+<li>RabbitMQ</li>
+<li>NATS</li>
+<li>Kafka</li>
+<li>In-Memory</li>
+</ul>
+<p>本記事では Google Cloud Pub/Sub と Amazon Simple Queue Service と In-Memory について Go Cloud で Publish / Subscribe した例を紹介します。</p>
+<h2 id="GCP"><a href="#GCP" class="headerlink" title="GCP"></a>GCP</h2><p>Go Cloud を用いて Google Cloud Pub/Sub に対して Publish と Subscribe をしてみます。</p>
+<p>先に topic は手動で作成しておきます。クレデンシャルはデフォルトのクレデンシャルを用います。サービスアカウントキーを払い出しておきましょう。<br>今回は環境変数 <code>GOOGLE_APPLICATION_CREDENTIALS</code> にサービスアカウントキーの json へのパスが設定されているものとします。</p>
+<img src="/images/20191112/photo_20191112_02.png" style="border:solid 1px #000000">
+
+<h3 id="Publish"><a href="#Publish" class="headerlink" title="Publish"></a>Publish</h3><p>以下のようにして topic に Publish できます。</p>
+<figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"gocloud.dev/pubsub"</span></span><br><span class="line">	_ <span class="string">"gocloud.dev/pubsub/gcppubsub"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	topic, err := pubsub.OpenTopic(ctx, <span class="string">"gcppubsub://projects/develop-123456/topics/test-topic"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> topic.Shutdown(ctx)</span><br><span class="line"></span><br><span class="line">	err = topic.Send(ctx, &amp;pubsub.Message&#123;</span><br><span class="line">		Body: []<span class="keyword">byte</span>(<span class="string">"Hello, World!\n"</span>),</span><br><span class="line">		Metadata: <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">string</span>&#123;</span><br><span class="line">			<span class="string">"Env"</span>: <span class="string">"test"</span>,</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>管理コンソールから確認すると topic にメッセージが Publish されていることが分かります。</p>
+<img src="/images/20191112/photo_20191112_03.png" style="border:solid 1px #000000">
+
+<h3 id="Subscribe"><a href="#Subscribe" class="headerlink" title="Subscribe"></a>Subscribe</h3><p>続いて topic から Subscribe してみます。</p>
+<p>以下の実装で topic を監視します。この状態でコンソールからメッセージを publish します。</p>
+<figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"gocloud.dev/pubsub"</span></span><br><span class="line">	_ <span class="string">"gocloud.dev/pubsub/gcppubsub"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	subscription, err := pubsub.OpenSubscription(ctx, <span class="string">"gcppubsub://projects/develop-123456/subscriptions/test-sub"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Errorf(<span class="string">"could not open topic subscription: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> subscription.Shutdown(ctx)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		msg, err := subscription.Receive(ctx)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Printf(<span class="string">"Receiving message: %v"</span>, err)</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line">		&#125;</span><br><span class="line">		fmt.Printf(<span class="string">"Got message: %q\n"</span>, msg.Body)</span><br><span class="line">		msg.Ack()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/images/20191112/photo_20191112_04.png" style="border:solid 1px #000000" class="img-middle-size">
+
+<p>メッセージを公開すると、標準出力に</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Got message: &quot;test-msg&quot;</span><br></pre></td></tr></table></figure>
+
+<p>と出力されることが確認できました。管理コンソールからもメッセージが削除され、取得できていることが確認できました。</p>
+<h2 id="SQS"><a href="#SQS" class="headerlink" title="SQS"></a>SQS</h2><p>GCP の Pub/Sub と同様に AWS の SQS でも Go Cloud を試してみます。</p>
+<p>キューは予め作成しておきました。標準キューです。<br><img src="/images/20191112/photo_20191112_05.png" style="border:solid 1px #000000"></p>
+<h3 id="Publish-1"><a href="#Publish-1" class="headerlink" title="Publish"></a>Publish</h3><p>キューにメッセージを送信してみます。</p>
+<figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"gocloud.dev/pubsub/awssnssqs"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws/session"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"gocloud.dev/pubsub"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	sess, err := session.NewSession(&amp;aws.Config&#123;</span><br><span class="line">		Region: aws.String(<span class="string">"ap-northeast-1"</span>),</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">const</span> queueURL = <span class="string">"https://sqs.ap-northeast-1.amazonaws.com/123456789012/test-queue"</span></span><br><span class="line">	topic := awssnssqs.OpenSQSTopic(ctx, sess, queueURL, <span class="literal">nil</span>)</span><br><span class="line">	<span class="keyword">defer</span> topic.Shutdown(ctx)</span><br><span class="line"></span><br><span class="line">	err = topic.Send(ctx, &amp;pubsub.Message&#123;</span><br><span class="line">		Body: []<span class="keyword">byte</span>(<span class="string">"Hello, World!\n"</span>),</span><br><span class="line">		Metadata: <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">string</span>&#123;</span><br><span class="line">			<span class="string">"Env"</span>: <span class="string">"test"</span>,</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>送信できていることがコンソールから確認できました。</p>
+<img src="/images/20191112/photo_20191112_06.png" style="border:solid 1px #000000">
+
+<h3 id="Subscribe-1"><a href="#Subscribe-1" class="headerlink" title="Subscribe"></a>Subscribe</h3><p>続いてキューからメッセージを Subscribe します。以下のようなメッセージをコンソールから送信します。</p>
+<img src="/images/20191112/photo_20191112_07.png" style="border:solid 1px #000000" class="img-middle-size">
+
+<p>それでは受信してみます。</p>
+<figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"gocloud.dev/pubsub/awssnssqs"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws/session"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	sess, err := session.NewSession(&amp;aws.Config&#123;</span><br><span class="line">		Region: aws.String(<span class="string">"ap-northeast-1"</span>),</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">const</span> queueURL = <span class="string">"https://sqs.ap-northeast-1.amazonaws.com/123456789012/test-queue"</span></span><br><span class="line">	subscription := awssnssqs.OpenSubscription(ctx, sess, queueURL, <span class="literal">nil</span>)</span><br><span class="line">	<span class="keyword">defer</span> subscription.Shutdown(ctx)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		msg, err := subscription.Receive(ctx)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Printf(<span class="string">"Receiving message: %v"</span>, err)</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line">		&#125;</span><br><span class="line">		fmt.Printf(<span class="string">"Got message: %q\n"</span>, msg.Body)</span><br><span class="line">		msg.Ack()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>コンソールから送信すると、以下のように標準出力されることを確認できました。キューからもメッセージが削除されていました。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Got message: &quot;test-msg&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="In-Memory"><a href="#In-Memory" class="headerlink" title="In-Memory"></a>In-Memory</h2><p>最後に In-Memory を扱ってみます。<a href="https://godoc.org/gocloud.dev/pubsub/mempubsub" target="_blank" rel="noopener">GoDoc</a> にもあるように本番では使ってはダメです。ローカルでの開発とテストを目的としています。</p>
+<blockquote>
+<p>mempubsub should not be used for production: it is intended for local development and testing.</p>
+</blockquote>
+<h3 id="Publish-and-Subscribe"><a href="#Publish-and-Subscribe" class="headerlink" title="Publish and Subscribe"></a>Publish and Subscribe</h3><p>In-Memory で Publish と Subscriber の動作は以下のようにして確認できました。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"gocloud.dev/pubsub"</span></span><br><span class="line">	_ <span class="string">"gocloud.dev/pubsub/mempubsub"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line"></span><br><span class="line">	topic, err := pubsub.OpenTopic(ctx, <span class="string">"mem://myTopic"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> topic.Shutdown(ctx)</span><br><span class="line"></span><br><span class="line">	subscription, err := pubsub.OpenSubscription(ctx, <span class="string">"mem://myTopic"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> subscription.Shutdown(ctx)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := topic.Send(ctx, &amp;pubsub.Message&#123;Body: []<span class="keyword">byte</span>(<span class="string">"test-msg"</span>)&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	msg, err := subscription.Receive(ctx)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Printf(<span class="string">"Receiving message: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Printf(<span class="string">"Got message: %q\n"</span>, msg.Body)</span><br><span class="line">	msg.Ack()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Got message: &quot;test-msg&quot;</span><br></pre></td></tr></table></figure>
+
+<p>ちなみに Google Cloud Pub/Sub や Amazon Simple Queue Service のときは必要ありませんでしたが、In-Memeory の場合は明示的に OpenTopic する必要があります。OpenTopic しないと、以下のようにエラーになります。エラーになる理由は <a href="https://github.com/google/go-cloud/blob/master/pubsub/mempubsub/mem.go" target="_blank" rel="noopener">mem.go</a> を見れば分かります。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2019/11/11 20:27:50 open subscription mem://myTopic: no topic &quot;myTopic&quot; has been created</span><br></pre></td></tr></table></figure>
+
+<h2 id="所感"><a href="#所感" class="headerlink" title="所感"></a>所感</h2><p>Go Cloud の API から Google Cloud Pub/Sub と Amazon Simple Queue Service 、ローカルの In-Memeory での Publish/Subscribe を操作できることが確認できました。GoDoc からもわかりますが API として指定できるパラメータは少ないです。キューイングサービスをエンタープライズで利用する上で、ポーリング間隔や可視性タイムアウト(確認応答期限)などは気になるポイントだと思います。</p>
+<p>細かい実装はドキュメントには記載されておらず、<a href="https://github.com/google/go-cloud/blob/master/pubsub/pubsub.go" target="_blank" rel="noopener">pubsub.go</a> を見ると、各ドライバーの SendAcks や ReceiveBatch メソッドなどの実装に依存することがわかります。OSS はコードを確認すれば挙動が把握できるので便利ですね。</p>
+<h2 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h2><p>今回は Go Cloud を用いた Pub/Sub の簡単な例を紹介しました。API としてベンダー中立な汎用 API を提供し、マルチクラウドの展開をサポートする試みは非常に興味深いです。</p>
+<p>以下にあるように Go Cloud プロジェクトはアルファ版で枯れておらず、今後より発展していくと考えられます。プロジェクトで検証/導入するチャンスを見つけてフィードバックしていきたいですね。</p>
+<blockquote>
+<p>The APIs are still in alpha, but we think they are production-ready and are actively looking for feedback from early adopters. If you have comments or questions, you can post to the Go Cloud mailing list or email us at <a href="mailto:go-cdk-feedback@google.com" target="_blank" rel="noopener">go-cdk-feedback@google.com</a>.</p>
+</blockquote>
+<hr>
+<p>Go Cloud記事はこちらもご参考ください。</p>
+<ul>
+<li><a href="https://future-architect.github.io/articles/20191111/">Go Cloud#1 概要とBlobへの活用方法</a></li>
+</ul>
+<p>関連記事：</p>
+<ul>
+<li><a href="/articles/20190814/">WAFとして go-swagger を選択してみた</a></li>
+<li><a href="/articles/20191001/">一周回って、人間が読み書きする設定ファイルはJSONが良いと思った</a></li>
+<li><a href="/articles/20191002/">CUEを試して見る</a></li>
+<li><a href="/articles/20191030/">GoでCUEのバリデーション機能を利用しつつ、.cue/.json/.yaml形式の設定ファイルを読み込む</a><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。その中でも DX チームは特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="Go Cloud#2 Pub/Subの概要紹介" data-url="https://future-architect.github.io/articles/20191112/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20191112/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20191112/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20191112/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191112/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go Cloud#2 Pub/Subの概要紹介
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191111/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go Cloud#1 概要とBlobへの活用方法
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191107/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                インフラ入門vol.3(ネットワーク冗長化構成)
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191101/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AWS Glueの開発エンドポイントがそこそこお高いのでローカル開発環境を用意しました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191030/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GoでCUEのバリデーション機能を利用しつつ、.cue/.json/.yaml形式の設定ファイルを読み込む
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191029/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                フロントエンドでシステム開発を2年半続けてハマったことから得た教訓3つ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191025/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Anthosについて改めて知る(GCPUG Anthos day 参加レポ)
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191023/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                工場をハックするための基本知識　前編
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191018/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                第1回社内ロボコン開催記-ライントレーサー編-
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191017/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GKEクラスタに割り当てるCIDRを設計する
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (10)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (18)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (32)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (17)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/XXX/">XXX (0)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2019 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
