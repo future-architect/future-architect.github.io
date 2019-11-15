@@ -12,18 +12,18 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   
-  <meta name="description" content="TIG DX Unitの渋川です。今回はGo Cloudの紹介の連載の第3弾です。  Go Cloud#1 概要とBlobへの活用方法 Go Cloud#2 Pub/Subの概要紹介 Go Cloud#3 Go CloudのDocStoreを使う（この記事です） Go Cloud#4 URLを編集するパッケージ   Go Cloudにはいろいろ便利な機能がありますが、ほとんどの機能は既存のAPIへ">
+  <meta name="description" content="TIG DX Unitの渋川です。今回はGo Cloudの紹介の連載の第3弾です。  Go Cloud#1 概要とBlobへの活用方法 Go Cloud#2 Pub/Subの概要紹介 Go Cloud#3 Go CloudのDocStoreを使う（この記事です） Go Cloud#4 URLを編集するパッケージ Go Cloud#5 AWSのローカルモック環境であるLocalStackを活用する">
 <meta name="keywords" content="Go">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Go Cloud#3 Go CloudのDocStoreを使う">
 <meta property="og:url" content="https://future-architect.github.io/articles/20191113/index.html">
 <meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
-<meta property="og:description" content="TIG DX Unitの渋川です。今回はGo Cloudの紹介の連載の第3弾です。  Go Cloud#1 概要とBlobへの活用方法 Go Cloud#2 Pub/Subの概要紹介 Go Cloud#3 Go CloudのDocStoreを使う（この記事です） Go Cloud#4 URLを編集するパッケージ   Go Cloudにはいろいろ便利な機能がありますが、ほとんどの機能は既存のAPIへ">
+<meta property="og:description" content="TIG DX Unitの渋川です。今回はGo Cloudの紹介の連載の第3弾です。  Go Cloud#1 概要とBlobへの活用方法 Go Cloud#2 Pub/Subの概要紹介 Go Cloud#3 Go CloudのDocStoreを使う（この記事です） Go Cloud#4 URLを編集するパッケージ Go Cloud#5 AWSのローカルモック環境であるLocalStackを活用する">
 <meta property="og:locale" content="ja">
-<meta property="og:updated_time" content="2019-11-14T02:24:20.619Z">
+<meta property="og:updated_time" content="2019-11-15T03:12:58.876Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Go Cloud#3 Go CloudのDocStoreを使う">
-<meta name="twitter:description" content="TIG DX Unitの渋川です。今回はGo Cloudの紹介の連載の第3弾です。  Go Cloud#1 概要とBlobへの活用方法 Go Cloud#2 Pub/Subの概要紹介 Go Cloud#3 Go CloudのDocStoreを使う（この記事です） Go Cloud#4 URLを編集するパッケージ   Go Cloudにはいろいろ便利な機能がありますが、ほとんどの機能は既存のAPIへ">
+<meta name="twitter:description" content="TIG DX Unitの渋川です。今回はGo Cloudの紹介の連載の第3弾です。  Go Cloud#1 概要とBlobへの活用方法 Go Cloud#2 Pub/Subの概要紹介 Go Cloud#3 Go CloudのDocStoreを使う（この記事です） Go Cloud#4 URLを編集するパッケージ Go Cloud#5 AWSのローカルモック環境であるLocalStackを活用する">
   
     <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
   
@@ -162,6 +162,7 @@
 <li><a href="/articles/20191112/">Go Cloud#2 Pub/Subの概要紹介</a></li>
 <li>Go Cloud#3 Go CloudのDocStoreを使う（この記事です）</li>
 <li><a href="/articles/20191114/">Go Cloud#4 URLを編集するパッケージ</a></li>
+<li><a href="/articles/20191115/">Go Cloud#5 AWSのローカルモック環境であるLocalStackを活用する</a></li>
 </ul>
 <hr>
 <p>Go Cloudにはいろいろ便利な機能がありますが、ほとんどの機能は既存のAPIへの薄いラッパーだったりします。そんな中、よくぞ実装したな、と思われるのがDocStoreです。</p>
@@ -173,7 +174,7 @@
 </ul>
 <p>オンメモリ版のmemdocstoreでもこのような高度な機能が利用できますし、バックエンドでサポートしていない機能はGo Cloud上でエミュレーションしていたりするらしいです。</p>
 <h1 id="基本的な使い方"><a href="#基本的な使い方" class="headerlink" title="基本的な使い方"></a>基本的な使い方</h1><p>DocStoreは、ORマッパー内臓のストレージAPIのように使えます。Goの構造体に直接マッピングして読み書きできますので、ORマッパーを別途用意する必要はありません。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="comment">// 使いたいバックエンドをこのようにimportしておく</span></span><br><span class="line">	_ <span class="string">"gocloud.dev/docstore/memdocstore"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CounterEntity <span class="keyword">struct</span> &#123;</span><br><span class="line">	ID    <span class="keyword">string</span> <span class="string">`docstore:"id"`</span></span><br><span class="line">	Count <span class="keyword">int</span>    <span class="string">`docstore:"count"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	coll, err := docstore.OpenCollection(context.Background(), <span class="string">"mem://counter/id"</span>)</span><br><span class="line">	<span class="comment">// これでレコードの作成</span></span><br><span class="line">	row := CounterEntity&#123;</span><br><span class="line">		ID:    <span class="number">1</span>,</span><br><span class="line">		Count: <span class="number">1</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	coll.Create(context.Background(), &amp;row)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 読み込みたい時もエンティティの読み書きのオブジェクトを作り、主キーだけ設定しておく</span></span><br><span class="line">	rowToRead := CounterEntity&#123;</span><br><span class="line">		ID:    <span class="number">1</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 主キー以外の要素（ここではCount）に値が設定される</span></span><br><span class="line">	coll.Get(context.Background(), &amp;rowToRead)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="comment">// 使いたいバックエンドをこのようにimportしておく</span></span><br><span class="line">	_ <span class="string">"gocloud.dev/docstore/memdocstore"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CounterEntity <span class="keyword">struct</span> &#123;</span><br><span class="line">	ID    <span class="keyword">string</span> <span class="string">`docstore:"id"`</span></span><br><span class="line">	Count <span class="keyword">int</span>    <span class="string">`docstore:"count"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	coll, err := docstore.OpenCollection(context.Background(), <span class="string">"mem://counter/id"</span>)</span><br><span class="line">	<span class="comment">// これでレコードの作成</span></span><br><span class="line">	row := CounterEntity&#123;</span><br><span class="line">		ID:    <span class="string">"1"</span>,</span><br><span class="line">		Count: <span class="number">1</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	coll.Create(context.Background(), &amp;row)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 読み込みたい時もエンティティの読み書きのオブジェクトを作り、主キーだけ設定しておく</span></span><br><span class="line">	rowToRead := CounterEntity&#123;</span><br><span class="line">		ID:    <span class="string">"1"</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 主キー以外の要素（ここではCount）に値が設定される</span></span><br><span class="line">	coll.Get(context.Background(), &amp;rowToRead)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>簡単ですね。ここではオンメモリで動作するmemdocstoreを使いましたが、awsdynamodb、gcpfirestore、mongodbdocstoreがあります。テーブルを作成する機能はないので、memdocstore以外はawscliやgcloudコマンドなどを利用するなどして事前にテーブルは作っておく必要はあります。</p>
 <p>メソッドとしては次の6つがあります。基本的なCRUD + UPSERT + 更新用の特別なメソッドになります。使い方で迷うことはあまりないでしょう。</p>
@@ -249,6 +250,7 @@
 <li><a href="https://future-architect.github.io/articles/20191112/">Go Cloud#2 Pub/Subの概要紹介</a></li>
 <li>Go Cloud#3 Go CloudのDocStoreを使う（この記事です）</li>
 <li><a href="/articles/20191114/">Go Cloud#4 URLを編集するパッケージ</a></li>
+<li><a href="/articles/20191115/">Go Cloud#5 AWSのローカルモック環境であるLocalStackを活用する</a></li>
 </ul>
 <p>関連記事：</p>
 <ul>
@@ -298,6 +300,8 @@
   
   
     
+  
+    
       
         <a href="https://future-architect.github.io/articles/20191114/">
           <div class="row margin-bottom-10">
@@ -312,32 +316,8 @@
 	
   
     
-      
-        <a href="https://future-architect.github.io/articles/20191113/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                Go Cloud#3 Go CloudのDocStoreを使う
-              </li>
-            </div>
-          </div>
-        </a>
-      
-	
   
     
-      
-        <a href="https://future-architect.github.io/articles/20191112/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                Go Cloud#2 Pub/Subの概要紹介
-              </li>
-            </div>
-          </div>
-        </a>
-      
-	
   
     
       
@@ -441,9 +421,29 @@
   
     
       
+        <a href="https://future-architect.github.io/articles/20191018/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                第1回社内ロボコン開催記-ライントレーサー編-
+              </li>
+            </div>
+          </div>
+        </a>
+      
 	
   
     
+      
+        <a href="https://future-architect.github.io/articles/20191017/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GKEクラスタに割り当てるCIDRを設計する
+              </li>
+            </div>
+          </div>
+        </a>
       
 	
   
@@ -850,7 +850,7 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Programming/">Programming (20)</a>
+	  <a href="/categories/Programming/">Programming (21)</a>
 	</li>
       
 	<li>
