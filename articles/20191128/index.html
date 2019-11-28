@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Go Cloud#7 PubSubドライバー(pubだけ)を実装してみる | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="Go Cloudはいろいろなドライバーが整備されているものの当然のことながら、この世のすべてのバックエンドに対応しているわけではありません。AWSやGCPやAzureが提供されているサービス以外にも、自前で運用しているミドルウェアにも対応したくなったりするはずです。Go Cloudの中を覗き見るついでに、自分でドライバーを実装してみました。 Go CloudにはPubSubを扱うパッケージ群があり">
+<meta name="keywords" content="Go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go Cloud#7 PubSubドライバー(pubだけ)を実装してみる">
+<meta property="og:url" content="https://future-architect.github.io/articles/20191128/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="Go Cloudはいろいろなドライバーが整備されているものの当然のことながら、この世のすべてのバックエンドに対応しているわけではありません。AWSやGCPやAzureが提供されているサービス以外にも、自前で運用しているミドルウェアにも対応したくなったりするはずです。Go Cloudの中を覗き見るついでに、自分でドライバーを実装してみました。 Go CloudにはPubSubを扱うパッケージ群があり">
+<meta property="og:locale" content="ja">
+<meta property="og:updated_time" content="2019-11-28T04:15:59.331Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Go Cloud#7 PubSubドライバー(pubだけ)を実装してみる">
+<meta name="twitter:description" content="Go Cloudはいろいろなドライバーが整備されているものの当然のことながら、この世のすべてのバックエンドに対応しているわけではありません。AWSやGCPやAzureが提供されているサービス以外にも、自前で運用しているミドルウェアにも対応したくなったりするはずです。Go Cloudの中を覗き見るついでに、自分でドライバーを実装してみました。 Go CloudにはPubSubを扱うパッケージ群があり">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="Go Cloud#7 PubSubドライバー(pubだけ)を実装してみる | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="Go Cloud#7 PubSubドライバー(pubだけ)を実装してみる,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.svg" alt="logo" class="logo-img" width="200px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20191128/">Go Cloud#7 PubSubドライバー(pubだけ)を実装してみる</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20191128-gocloud7" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 澁川喜規</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2019-11-28T04:08:47.000Z" itemprop="datePublished">2019/11/28</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/Go/" title="Go">Go</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Go Cloudはいろいろなドライバーが整備されているものの当然のことながら、この世のすべてのバックエンドに対応しているわけではありません。AWSやGCPやAzureが提供されているサービス以外にも、自前で運用しているミドルウェアにも対応したくなったりするはずです。Go Cloudの中を覗き見るついでに、自分でドライバーを実装してみました。</p>
+<p>Go CloudにはPubSubを扱うパッケージ群があります。GCPのPubSub、AWSのSNS/SQS、Azure Service Busというクラウドベンダーのサービス以外に、RabbitMQ、NATS、Kafkaといったオンプレでも使えるミドルウェア（KafkaはAWSのサービスもありますが）もあります。</p>
+<p>アプリケーションのログの収集というと、最近はOpenTelemetryとかNew Relic APMのようなパフォーマンスモニタリングや大規模なマイクロサービスのサポートを目的とした分散トレースなどもありますが、ここで対応されているKafka以外にもFluentdをオンプレやクラウドなどで動かしているお客様も多いので、PubSubのバックエンドとして、Fluentdのpublisherを実装してみます。受け側（Subscription）はなく、サーバーへの送信（Publish）だけなので、fluentdpubという名前でApacheライセンスで公開しました。もとからあるKafkaも合わせれば、ログ収集基盤への送信にもGo Cloudが利用できるようになります。</p>
+<ul>
+<li><a href="https://github.com/future-architect/fluentdpub" target="_blank" rel="noopener">github.com/future-architect/fluentdpub</a></li>
+</ul>
+<p>実装は次の3ステップに分けて実装します。</p>
+<ul>
+<li>Fluentd特化の<code>fluentdpub.OpenTopic()</code>を実装する</li>
+<li><code>fluentdpub.URLOpener</code>を実装する</li>
+<li>Resolverに登録し、<code>pubsub.OpenTopic()</code>で使えるようにする</li>
+</ul>
+<h1 id="Fluentd特化のfluentdpub-OpenTopic-を実装してみる"><a href="#Fluentd特化のfluentdpub-OpenTopic-を実装してみる" class="headerlink" title="Fluentd特化のfluentdpub.OpenTopic()を実装してみる"></a>Fluentd特化の<code>fluentdpub.OpenTopic()</code>を実装してみる</h1><p>Fluentdに実際に接続するのは、公式の<code>&quot;github.com/fluent/fluent-logger-golang/fluent&quot;</code>パッケージを利用します。</p>
+<p>まず、Fluentd特化の<code>OpenTopic()</code>を実装しますが、まず、<code>fluent</code>パッケージのコネクション情報のインスタンスをそのまま受け取るようにします。このようにすることで、<code>fluent</code>パッケージの機能をすべて利用する、という使い方をかんたんにユーザーに提供できます。すべての機能をラップするのは大変ですので。</p>
+<p>Go Cloudのお作法として、インタフェースをあまり使わないというものがあります。PubSubに関しては次のようなコードになります。</p>
+<ul>
+<li><code>gocloud.dev/pubsub/driver</code>パッケージの<code>Topic</code>インタフェースを満たす構造体を作る。これが最終的にFluentdへのアクセスを担うことになる。</li>
+<li><code>Topic</code>インタフェースを満たす構造体のポインタを<code>gocloud.dev/pubsub</code>パッケージの<code>NewTopic()</code>に渡しし、ユーザーに<code>*pubsub.Topic</code>のポインタを返す</li>
+</ul>
+<p>利用者は<code>gocloud.dev/pubsub</code>パッケージだけを知っていればいいが、実装者はそれに加えて<code>gocloud.dev/pubsub/driver</code>パッケージを実装するという区分けになっています。</p>
+<p>それでは実装していきます。PubSubのAPIとFluentdを比べると、Fluentdにはタグがあり、PubSubにはBodyがあるという違いがあります。 <code>OpenTopic()</code> にはこの違いを吸収するオプションを追加します。Bodyで設定されたコンテンツは<code>message</code>の値に設定し、逆に <code>tag</code> で設定された値は<code>tagPrefix</code>と組み合わせてタグとなる（<code>tagPrefix.tag</code>が最終的なタグになる）、というルールにします。このあたりのルールの違いを吸収する方法はここで検討が必要になります。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> TopicOptions <span class="keyword">struct</span> &#123;</span><br><span class="line">	BodyKey <span class="keyword">string</span></span><br><span class="line">	TagKey  <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">OpenTopic</span><span class="params">(f *fluent.Fluent, tagPrefix <span class="keyword">string</span>, opt TopicOptions)</span> <span class="params">(*pubsub.Topic, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> f == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, errors.New(<span class="string">"fluentdpub: fluent.Fluent is required"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> opt.BodyKey == <span class="string">""</span> &#123;</span><br><span class="line">		opt.BodyKey = <span class="string">"message"</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> opt.TagKey == <span class="string">""</span> &#123;</span><br><span class="line">		opt.TagKey = <span class="string">"tag"</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> pubsub.NewTopic(&amp;topic&#123;</span><br><span class="line">		f:         f,</span><br><span class="line">		tagPrefix: tagPrefix,</span><br><span class="line">		bodyKey:   opt.BodyKey,</span><br><span class="line">		tagKey:    opt.TagKey,</span><br><span class="line">	&#125;, <span class="literal">nil</span>), <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>全メソッドの実装の紹介はしませんが、一番のコアとなる<code>SendBatch()</code>メソッドだけ紹介します。メッセージの配列が来るので、自分のモジュールが対象としているエクスポート先（ここではFluentd）に情報を流します。</p>
+<p>メタタグの一部をタグとして取り出して、構造体のフィールドのtagPrefixなどと組み合わせて、出力先のタグ名を決定します。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t topic)</span> <span class="title">SendBatch</span><span class="params">(ctx context.Context, ms []*driver.Message)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> _, msg := <span class="keyword">range</span> ms &#123;</span><br><span class="line">		<span class="keyword">var</span> fullTag <span class="keyword">string</span></span><br><span class="line">		tag, ok := msg.Metadata[t.tagKey]</span><br><span class="line">		<span class="keyword">if</span> ok &#123;</span><br><span class="line">			<span class="built_in">delete</span>(msg.Metadata, t.tagKey)</span><br><span class="line">			<span class="keyword">if</span> t.tagPrefix != <span class="string">""</span> &#123;</span><br><span class="line">				fullTag = t.tagPrefix + <span class="string">"."</span> + tag</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				fullTag = tag</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			fullTag = t.tagPrefix</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> fullTag == <span class="string">""</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> fmt.Errorf(<span class="string">"Message %v doesn't have tag"</span>, msg.AckID)</span><br><span class="line">		&#125;</span><br><span class="line">		msg.Metadata[t.bodyKey] = <span class="keyword">string</span>(msg.Body)</span><br><span class="line">		err := t.f.Post(fullTag, msg.Metadata)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>この<code>OpenTopic</code>も、他のPubSub APIでは公開APIとなっていますし、かんたんですが、これだけでもすでに使えるようになっているはずです。これで、<code>fluentdpub</code>の背骨が出来上がりました。</p>
+<h1 id="fluentdpub-URLOpenerを実装する"><a href="#fluentdpub-URLOpenerを実装する" class="headerlink" title="fluentdpub.URLOpenerを実装する"></a><code>fluentdpub.URLOpener</code>を実装する</h1><p>次に、URLなどの文字列をパースしてFluentdに接続する部分を実装していきます。これはNATS向けのPubSubでも公開構造体・メソッドとして実装されていますが、ドキュメントには書かれていません。</p>
+<p><code>pubsub</code>パッケージの共通初期化関数の場合、対象のサービスを選択する方法はURLしかありません。先ほどの関数は挙動を変えるオプションは<code>TopicOptions</code>構造体を利用していましたが、この追加のオプションも渡せないので、すべてURLの中に情報をもたせる必要があります。</p>
+<p>なお、NATS向けの実装では、オペレーターが気にするNATSサーバーの接続先は<code>NATS_SERVER_URL</code>で指定し、ソースコード中に登場しうるURLにはトピック名などの開発者向けの情報のみという使い分けがされています。これも、Go Cloudの設計思想に従った役割分担と言えます。<code>fluentdpub</code>も、<code>FLUENTD_UPSTREAM_URL</code>という環境変数に接続情報（プロトコル、ホスト、ポート）は任せて、URLはタグ名のみとします。それ以外の情報をここでは扱います。</p>
+<p>TagPrefixというのはFluentd全体でタグを先頭につけたい場合に使うものとします。というのも、PubとSubが対応した他のPubSubのコードの識別子と比べると、Fluentdの方が分析の方は分析に任せるものとして、なるべく詳細な情報をタグに載せようとする分、識別子は長くなります。prodとかdevみたいな文字列をオペレータ視点で入れたくなるかもしれませんので、これを追加できるようにしておきます。</p>
+<p>実装としては以下の通りです。先ほど作った<code>topic</code>構造体に対して<code>、TopicOptions</code>ではなく、URLをキーとして扱えるようにする機能がこれで実現されました。もう少しです。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> URLOpener <span class="keyword">struct</span> &#123;</span><br><span class="line">	Connection *fluent.Fluent</span><br><span class="line">	TagPrefix <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(o *URLOpener)</span> <span class="title">OpenTopicURL</span><span class="params">(ctx context.Context, u *url.URL)</span> <span class="params">(*pubsub.Topic, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> opt TopicOptions</span><br><span class="line">	key := u.Query().Get(<span class="string">"bodykey"</span>)</span><br><span class="line">	<span class="keyword">if</span> key != <span class="string">""</span> &#123;</span><br><span class="line">		opt.BodyKey = key</span><br><span class="line">		u.Query().Del(<span class="string">"bodykey"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	tagkey := u.Query().Get(<span class="string">"tagkey"</span>)</span><br><span class="line">	<span class="keyword">if</span> tagkey != <span class="string">""</span> &#123;</span><br><span class="line">		opt.TagKey = tagkey</span><br><span class="line">		u.Query().Del(<span class="string">"tagkey"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> param := <span class="keyword">range</span> u.Query() &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">"open topic %v: invalid query parameter %s"</span>, u, param)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">var</span> subject <span class="keyword">string</span></span><br><span class="line">	<span class="keyword">if</span> o.TagPrefix != <span class="string">""</span> &amp;&amp; u.Hostname() != <span class="string">""</span> &#123;</span><br><span class="line">		subject = o.TagPrefix + <span class="string">"."</span> + u.Hostname()</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		subject = o.TagPrefix + u.Hostname()</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> OpenTopic(o.Connection, subject, opt)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="リゾルバーに登録"><a href="#リゾルバーに登録" class="headerlink" title="リゾルバーに登録"></a>リゾルバーに登録</h1><p>それでは最終段階に入ります。URLスキーマを登録することで、共通APIの<code>pubsub.OpenTopic()</code>などの関数からも使えるようになり、マルチクラウドに一歩近づきます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Scheme = <span class="string">"fluentd"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	o := <span class="built_in">new</span>(defaultDialer)</span><br><span class="line">	pubsub.DefaultURLMux().RegisterTopic(Scheme, o)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> defaultDialer <span class="keyword">struct</span> &#123;</span><br><span class="line">	opener *URLOpener</span><br><span class="line">	err    error</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(d defaultDialer)</span> <span class="title">OpenTopicURL</span><span class="params">(ctx context.Context, u *url.URL)</span> <span class="params">(*pubsub.Topic, error)</span></span> &#123;</span><br><span class="line">	c, tag, err := parseEnvVar(os.Getenv(<span class="string">"FLUENTD_UPSTREAM_URL"</span>))</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	conn, err := fluent.New(*c)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	o := URLOpener&#123;</span><br><span class="line">		Connection: conn,</span><br><span class="line">		TagPrefix:  tag,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> o.OpenTopicURL(ctx, u)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最終的にはこの内部の先ほど実装した<code>URLOpener.OpenTopicURL()</code>メソッドを呼んでいます。一点異なるのは、環境変数のパース部分でしょう。URL形式で渡されたものを<a href="https://github.com/future-architect/fluentdpub/blob/master/init.go#L81" target="_blank" rel="noopener">パースしています</a>。</p>
+<h1 id="実装したものの整理"><a href="#実装したものの整理" class="headerlink" title="実装したものの整理"></a>実装したものの整理</h1><p>この記事ではストレートに一発でできたかのように書いていますが、実際作成中は何が何をするものか整理ができておらず、結構混乱して手戻りしつつ実装しました。整理をしてみると、コードが少ない薄い機能を先に実装し、徐々にロジックが多い文字列からの初期化に手を出していっていることがわかります。</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">実装したもの</th>
+<th align="center">接続情報</th>
+<th align="center">タグ設定</th>
+<th align="center">最後に何をする？</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">ステップ1</td>
+<td align="center"><code>OpenTopic()</code></td>
+<td align="center">*fluent.Fluent</td>
+<td align="center"><code>TopicOptions</code></td>
+<td align="center"><code>pubsub.NewTopic()</code>呼び出し</td>
+</tr>
+<tr>
+<td align="center">ステップ2</td>
+<td align="center"><code>URLOpener</code></td>
+<td align="center">*fluent.Fluent</td>
+<td align="center"><code>URL</code>をパース</td>
+<td align="center">ステップ1で作ったものを呼び出し</td>
+</tr>
+<tr>
+<td align="center">ステップ3</td>
+<td align="center"><code>defaultDialer</code></td>
+<td align="center">環境変数をパース</td>
+<td align="center"><code>URL</code>をパース</td>
+<td align="center">ステップ2で作ったものを呼び出し</td>
+</tr>
+</tbody></table>
+<h1 id="使い方とまとめ"><a href="#使い方とまとめ" class="headerlink" title="使い方とまとめ"></a>使い方とまとめ</h1><p>テスト用にDockerを起動します。</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> docker run --rm -v $&#123;PWD&#125;/tmp/fluentd:/fluentd/log --name fluentd -p 24224:24224 fluent/fluentd:latest</span><br></pre></td></tr></table></figure>
+
+<p>よく使うと思われるステップ3は、環境変数を設定し、URLとして接続情報を渡す必要があります。ここでは、すべてのタグのプリフィックスとして、<code>first</code>を設定しています(省略可能)。タグ名にピリオドを差し込むことで2段階、3段階でも深いタグを設定できます。</p>
+<figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> export FLUENTD_UPSTREAM_URL=tcp://localhost:24224/first</span><br></pre></td></tr></table></figure>
+
+<p><code>pubsub.OpenTopic</code>にはURLを設定します。プリフィックスの次に設定されるタグも指定します（省略可能）。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">topic, err := pubsub.OpenTopic(context.Background(), <span class="string">"fluentd://second"</span>)</span><br></pre></td></tr></table></figure>
+
+<p>あとは送信だけですね。ここでもタグを設定しています（省略可能）。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">topic.Send(context.Background(), &amp;pubsub.Message&#123;</span><br><span class="line">	Body: []<span class="keyword">byte</span>(<span class="string">"Hello, World!\n"</span>),</span><br><span class="line">	Metadata: <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">string</span>&#123;</span><br><span class="line">		<span class="string">"tag"</span>:        <span class="string">"third"</span>,</span><br><span class="line">		<span class="string">"language"</span>:   <span class="string">"en"</span>,</span><br><span class="line">		<span class="string">"importance"</span>: <span class="string">"high"</span>,</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>3か所でそれぞれタグを設定していますが、それらは結合されて、<code>first.second.third</code>というタグになるという実装にしています。実行してみると、Dockerで起動したFluentdのフォルダにファイルが生成されてログが出力されていることが確認できるでしょう。</p>
+<p>まだ全部のコードを読んだわけではないですが、だいたいはこのような階層構造になっているようです。テストもしやすいですし、もし、何かを実装したくなった場合もこのような手順で実装していくとスムーズでしょう。</p>
+<h1 id="Go-Cloud集中連載の結びの言葉"><a href="#Go-Cloud集中連載の結びの言葉" class="headerlink" title="Go Cloud集中連載の結びの言葉"></a>Go Cloud集中連載の結びの言葉</h1><p>10月ごろに、社内チャットのGoチャンネルにGo Cloudをみんなで集まって技術ブログに集中連載してみませんか？と軽く声をかけたところ、何人かから声があがり、5人で7本の記事が集まりました（1人はPCトラブルで復旧中）。Go Cloudは幅広いライブラリですし、学ぼうとしても、個人の興味のあるところ以外はどうしても手薄になりがちです。いろいろな興味・仕事のメンバーを集めたことで、それぞれの興味がオーバーラップして、紹介記事としてのカバレッジをあげることができました。</p>
+<p>内容としては主要な機能の説明は網羅できたと思いますし、ウェブで情報を見たことがないローカルでのAWS/GCPのエミュレーションと組み合わせたGo Cloudのテスト環境構築、ドライバーの実装と幅も深さも1人では書けない記事をお届けできたと思います。中には、実現のための苦労が滲み出る記事もありましたが、今後も、仕事を通じてGo Cloudのノウハウが溜まったら、不定期で記事を公開していこうと思っています。</p>
+<hr>
+<ul>
+<li><a href="/articles/20191111/">Go Cloud#1 概要とBlobへの活用方法</a></li>
+<li><a href="/articles/20191112/">Go Cloud#2 Pub/Subの概要紹介</a></li>
+<li><a href="/articles/20191113/">Go Cloud#3 Go CloudのDocStoreを使う</a></li>
+<li><a href="/articles/20191114/">Go Cloud#4 URLを編集するパッケージ</a></li>
+<li><a href="/articles/20191115/">Go Cloud#5 AWSのローカルモック環境であるLocalStackを活用する</a></li>
+<li><a href="/articles/20191119/">Go Cloud#6 GCPのローカルエミュレータを活用する</a></li>
+<li>Go Cloud#7 PubSubドライバー(pubだけ)を実装してみる（この記事です）</li>
+</ul>
+<p>関連記事：</p>
+<ul>
+<li><a href="/articles/20190814/">WAFとして go-swagger を選択してみた</a></li>
+<li><a href="/articles/20191002/">CUEを試して見る</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="Go Cloud#7 PubSubドライバー(pubだけ)を実装してみる" data-url="https://future-architect.github.io/articles/20191128/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20191128/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20191128/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20191128/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191121/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                「脱Oracle」の背景にある、Oracle Databaseの価値を改めて考える
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191114/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go Cloud#4 URLを編集するパッケージ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191111/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go Cloud#1 概要とBlobへの活用方法
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191107/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                インフラ入門vol.3(ネットワーク冗長化構成)
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191101/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AWS Glueの開発エンドポイントがそこそこお高いのでローカル開発環境を用意しました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191030/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GoでCUEのバリデーション機能を利用しつつ、.cue/.json/.yaml形式の設定ファイルを読み込む
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191029/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                フロントエンドでシステム開発を2年半続けてハマったことから得た教訓3つ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191025/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Anthosについて改めて知る(GCPUG Anthos day 参加レポ)
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191023/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                工場をハックするための基本知識　前編
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191018/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                第1回社内ロボコン開催記-ライントレーサー編-
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (10)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (24)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (32)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (17)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/XXX/">XXX (0)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2019 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
