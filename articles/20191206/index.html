@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>AWS Glueの単体テスト環境の構築手順 | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="概要フューチャーアドベントカレンダーの6日目のエントリーです。昨日はyut0nさんによる「GoogleカレンダーのイベントをHangouts Chatに通知するbotを作った話」でした。 当記事では、AWS Glue をローカル環境で単体テストするための環境構築方法についてまとめました。 手順 環境構築 pytest の環境構築 conftest.py の設定 テスト対象の作成 テスト実行  実行">
+<meta name="keywords" content="AWS,Glue">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS Glueの単体テスト環境の構築手順">
+<meta property="og:url" content="https://future-architect.github.io/articles/20191206/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="概要フューチャーアドベントカレンダーの6日目のエントリーです。昨日はyut0nさんによる「GoogleカレンダーのイベントをHangouts Chatに通知するbotを作った話」でした。 当記事では、AWS Glue をローカル環境で単体テストするための環境構築方法についてまとめました。 手順 環境構築 pytest の環境構築 conftest.py の設定 テスト対象の作成 テスト実行  実行">
+<meta property="og:locale" content="ja">
+<meta property="og:updated_time" content="2019-12-05T15:30:42.317Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AWS Glueの単体テスト環境の構築手順">
+<meta name="twitter:description" content="概要フューチャーアドベントカレンダーの6日目のエントリーです。昨日はyut0nさんによる「GoogleカレンダーのイベントをHangouts Chatに通知するbotを作った話」でした。 当記事では、AWS Glue をローカル環境で単体テストするための環境構築方法についてまとめました。 手順 環境構築 pytest の環境構築 conftest.py の設定 テスト対象の作成 テスト実行  実行">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="AWS Glueの単体テスト環境の構築手順 | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="AWS Glueの単体テスト環境の構築手順,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.svg" alt="logo" class="logo-img" width="200px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20191206/">AWS Glueの単体テスト環境の構築手順</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20191206-glue" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 多賀聡一朗</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2019-12-05T15:22:02.000Z" itemprop="datePublished">2019/12/06</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/AWS/" title="AWS">AWS</a>,
+  
+    <a href="/tags/Glue/" title="Glue">Glue</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h1><p><a href="https://qiita.com/advent-calendar/2019/future" target="_blank" rel="noopener">フューチャーアドベントカレンダー</a>の6日目のエントリーです。<br>昨日は<a href="https://qiita.com/yut0n" target="_blank" rel="noopener">yut0n</a>さんによる「<a href="https://qiita.com/yut0n/items/02a632c90fc076a21046" target="_blank" rel="noopener">GoogleカレンダーのイベントをHangouts Chatに通知するbotを作った話</a>」でした。</p>
+<p>当記事では、AWS Glue をローカル環境で単体テストするための環境構築方法についてまとめました。</p>
+<h1 id="手順"><a href="#手順" class="headerlink" title="手順"></a>手順</h1><ol>
+<li>環境構築</li>
+<li>pytest の環境構築</li>
+<li>conftest.py の設定</li>
+<li>テスト対象の作成</li>
+<li>テスト実行</li>
+</ol>
+<h1 id="実行環境"><a href="#実行環境" class="headerlink" title="実行環境"></a>実行環境</h1><ul>
+<li>Amazon Linux 2 AMI 2.0.20190618 x86_64 HVM gp2</li>
+<li>Docker 18.06.1-ce</li>
+<li>docker-compose version 1.24.0</li>
+</ul>
+<h2 id="1-環境構築"><a href="#1-環境構築" class="headerlink" title="1. 環境構築"></a>1. 環境構築</h2><p>docker compose を利用します。<br>GlueのDockerfileは、 こちらの記事(<a href="https://future-architect.github.io/articles/20191101/">AWS Glueの開発エンドポイントがそこそこお高いのでローカル開発環境を用意しました | Future Tech Blog - フューチャーアーキテクト</a>) にて、紹介されているDockerfileをベースに利用します。<br>少々イメージサイズが大きかったので、小さくする対応をしていますが基本は同じです。</p>
+<p>ディレクトリ構成</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">├── Dockerfile</span><br><span class="line">├── docker-compose.yml</span><br><span class="line">├── src                 <span class="comment"># ETLスクリプト</span></span><br><span class="line">└── tests               <span class="comment"># テストファイル</span></span><br></pre></td></tr></table></figure>
+
+<details><summary>Dockerfile</summary><div>
+
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> centos:<span class="number">7</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># https://omohikane.com/centos7_docker_python36/</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> yum update -y \</span></span><br><span class="line"><span class="bash">  &amp;&amp; yum install -y gcc gcc-c++ make openssl-devel readline-devel zlib-devel wget curl unzip vim epel-release git \</span></span><br><span class="line"><span class="bash">  &amp;&amp; yum install -y vim-enhanced bash-completion net-tools <span class="built_in">bind</span>-utils \</span></span><br><span class="line"><span class="bash">  &amp;&amp; yum install -y https://centos7.iuscommunity.org/ius-release.rpm \</span></span><br><span class="line"><span class="bash">  &amp;&amp; yum install -y python36u python36u-libs python36u-devel python36u-pip \</span></span><br><span class="line"><span class="bash">  &amp;&amp; yum install -y java java-1.8.0-openjdk-devel \</span></span><br><span class="line"><span class="bash">  &amp;&amp; rm -rf /var/cache/yum/* \</span></span><br><span class="line"><span class="bash">  &amp;&amp; yum clean all</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> localedef -f UTF-8 -i ja_JP ja_JP.UTF-8</span></span><br><span class="line"><span class="keyword">ENV</span> LANG ja_JP.UTF-<span class="number">8</span></span><br><span class="line"><span class="keyword">ENV</span> LC_CTYPE <span class="string">"ja_JP.UTF-8"</span></span><br><span class="line"><span class="keyword">ENV</span> LC_NUMERIC <span class="string">"ja_JP.UTF-8"</span></span><br><span class="line"><span class="keyword">ENV</span> LC_TIME <span class="string">"ja_JP.UTF-8"</span></span><br><span class="line"><span class="keyword">ENV</span> LC_COLLATE <span class="string">"ja_JP.UTF-8"</span></span><br><span class="line"><span class="keyword">ENV</span> LC_MONETARY <span class="string">"ja_JP.UTF-8"</span></span><br><span class="line"><span class="keyword">ENV</span> LC_MESSAGES <span class="string">"ja_JP.UTF-8"</span></span><br><span class="line"><span class="keyword">ENV</span> LC_PAPER <span class="string">"ja_JP.UTF-8"</span></span><br><span class="line"><span class="keyword">ENV</span> LC_NAME <span class="string">"ja_JP.UTF-8"</span></span><br><span class="line"><span class="keyword">ENV</span> LC_ADDRESS <span class="string">"ja_JP.UTF-8"</span></span><br><span class="line"><span class="keyword">ENV</span> LC_TELEPHONE <span class="string">"ja_JP.UTF-8"</span></span><br><span class="line"><span class="keyword">ENV</span> LC_MEASUREMENT <span class="string">"ja_JP.UTF-8"</span></span><br><span class="line"><span class="keyword">ENV</span> LC_IDENTIFICATION <span class="string">"ja_JP.UTF-8"</span></span><br><span class="line"><span class="keyword">ENV</span> LC_ALL ja_JP.UTF-<span class="number">8</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Maven</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> curl -OL https://archive.apache.org/dist/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz \</span></span><br><span class="line"><span class="bash">  &amp;&amp; tar -xzvf apache-maven-3.6.2-bin.tar.gz \</span></span><br><span class="line"><span class="bash">  &amp;&amp; mv apache-maven-3.6.2 /opt/ \</span></span><br><span class="line"><span class="bash">  &amp;&amp; ln -s /opt/apache-maven-3.6.2 /opt/apache-maven \</span></span><br><span class="line"><span class="bash">  &amp;&amp; rm apache-maven-3.6.2-bin.tar.gz</span></span><br><span class="line"><span class="keyword">ENV</span> JAVA_HOME /usr/lib/jvm/java-<span class="number">1.8</span>.<span class="number">0</span>-openjdk/jre/</span><br><span class="line"><span class="keyword">ENV</span> PATH $PATH:/opt/apache-maven/bin</span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> mvn -version</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># spark</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> curl -OL https://aws-glue-etl-artifacts.s3.amazonaws.com/glue-1.0/spark-2.4.3-bin-hadoop2.8.tgz \</span></span><br><span class="line"><span class="bash">  &amp;&amp; tar -xzvf spark-2.4.3-bin-hadoop2.8.tgz \</span></span><br><span class="line"><span class="bash">  &amp;&amp; mv spark-2.4.3-bin-spark-2.4.3-bin-hadoop2.8 /opt/ \</span></span><br><span class="line"><span class="bash">  &amp;&amp; ln -s /opt/spark-2.4.3-bin-spark-2.4.3-bin-hadoop2.8 /opt/spark \</span></span><br><span class="line"><span class="bash">  &amp;&amp; rm ./spark-2.4.3-bin-hadoop2.8.tgz</span></span><br><span class="line"><span class="keyword">ENV</span> SPARK_HOME /opt/spark</span><br><span class="line"></span><br><span class="line"><span class="comment"># python</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> unlink /bin/python \</span></span><br><span class="line"><span class="bash">  &amp;&amp; ln -s /bin/python3 /bin/python \</span></span><br><span class="line"><span class="bash">  &amp;&amp; ln -s /bin/pip3.6 /bin/pip</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Glueライブラリ取得</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> git config --global http.sslVerify <span class="literal">false</span> \</span></span><br><span class="line"><span class="bash">  &amp;&amp; git <span class="built_in">clone</span> -b glue-1.0 --depth 1  https://github.com/awslabs/aws-glue-libs \</span></span><br><span class="line"><span class="bash">  &amp;&amp; ln -s <span class="variable">$&#123;SPARK_HOME&#125;</span>/jars /aws-glue-libs/jarsv1 \</span></span><br><span class="line"><span class="bash">  &amp;&amp; sed -i -e <span class="string">'s/mvn/mvn -T 4/'</span> /aws-glue-libs/bin/glue-setup.sh \</span></span><br><span class="line"><span class="bash">  &amp;&amp; ./aws-glue-libs/bin/gluepyspark</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ENV</span> PATH $PATH:/aws-glue-libs/bin/</span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /opt/src</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="bash"> [<span class="string">"/bin/sh"</span>, <span class="string">"-c"</span>, <span class="string">"while :; do sleep 10; done"</span>]</span></span><br></pre></td></tr></table></figure>
+
+</div></details>
+
+<p>S3の環境が必要だったため、 <a href="https://github.com/localstack/localstack" target="_blank" rel="noopener">LocalStack</a> を利用しています。</p>
+<p>docker-compose.yml</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">"3"</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="string">glue.local:</span></span><br><span class="line"><span class="attr">    build:</span></span><br><span class="line"><span class="attr">      context:</span> <span class="string">./</span></span><br><span class="line"><span class="attr">    container_name:</span> <span class="string">gluelocal</span></span><br><span class="line"><span class="attr">    volumes:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">./src:/opt/src/src</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">./tests:/opt/src/tests</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line">      <span class="comment"># dummy configure</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">AWS_DEFAULT_REGION=ap-northeast-1</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">AWS_DEFAULT_OUTPUT=json</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">AWS_ACCESS_KEY_ID=xxx</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">AWS_SECRET_ACCESS_KEY=xxx</span></span><br><span class="line">  <span class="string">aws.local:</span></span><br><span class="line"><span class="attr">    image:</span> <span class="string">localstack/localstack</span></span><br><span class="line"><span class="attr">    environment:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">SERVICES=s3</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">DEFAULT_REGION=ap-northeast-1</span></span><br><span class="line">      <span class="comment"># dummy configure</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">AWS_DEFAULT_REGION=ap-northeast-1</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">AWS_DEFAULT_OUTPUT=json</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">AWS_ACCESS_KEY_ID=xxx</span></span><br><span class="line"><span class="bullet">      -</span> <span class="string">AWS_SECRET_ACCESS_KEY=xxx</span></span><br></pre></td></tr></table></figure>
+
+<p>コンテナ起動</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose up -d --build</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-pytestの環境構築"><a href="#2-pytestの環境構築" class="headerlink" title="2. pytestの環境構築"></a>2. pytestの環境構築</h2><p>必要なパッケージのインストールをします。<br><a href="https://docs.aws.amazon.com/ja_jp/glue/latest/dg/add-job.html" target="_blank" rel="noopener">Glueバージョン 1.0</a> を想定して、pysparkは2.4.3を明示的にインストールします。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it gluelocal pip install pyspark==2.4.3 boto3 pytest</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-conftest-py-の設定"><a href="#3-conftest-py-の設定" class="headerlink" title="3. conftest.py の設定"></a>3. conftest.py の設定</h2><p>pytestではテストの前後処理を <code>tests/conftest.py</code> 内に実装する慣習があるためそれにならいます。<br>Test実行時に1回だけ実行したい処理をまとめています。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pytest</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> pyspark.context <span class="keyword">import</span> SparkContext</span><br><span class="line"><span class="keyword">from</span> awsglue.context <span class="keyword">import</span> GlueContext</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@pytest.fixture(scope="session", autouse=True)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">scope_session</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># テスト内で使い回せるようにS3のURLを環境変数に設定</span></span><br><span class="line">    os.environ[<span class="string">"TEST_S3_ENDPOINT_URL"</span>] = <span class="string">"http://aws.local:4572"</span></span><br><span class="line">    sc = SparkContext()</span><br><span class="line">    <span class="comment"># S3のエンドポイントをLocalStackへ差し替える</span></span><br><span class="line">    sc._jsc.hadoopConfiguration().set(<span class="string">"fs.s3a.endpoint"</span>, <span class="string">"http://aws.local:4572"</span>)</span><br><span class="line">    sc._jsc.hadoopConfiguration().set(<span class="string">"fs.s3a.path.style.access"</span>, <span class="string">"true"</span>)</span><br><span class="line">    sc._jsc.hadoopConfiguration().set(<span class="string">"fs.s3a.signing-algorithm"</span>, <span class="string">"S3SignerType"</span>)</span><br><span class="line">    pytest.sc = sc</span><br><span class="line">    pytest.glueContext = GlueContext(pytest.sc)</span><br><span class="line">    pytest.spark = pytest.glueContext.spark_session</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-テスト対象の作成"><a href="#4-テスト対象の作成" class="headerlink" title="4. テスト対象の作成"></a>4. テスト対象の作成</h2><p>サンプル程度に、S3上のcsvファイルからDynamicFrameを生成する関数をテストします。</p>
+<p>Glueスクリプト: <code>src/etl.py</code></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> awsglue.dynamicframe <span class="keyword">import</span> DynamicFrame</span><br><span class="line"><span class="keyword">from</span> awsglue.context <span class="keyword">import</span> GlueContext</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_dynamic_frame_from_csv</span><span class="params">(glueContext: GlueContext, spark, bucket: str, path: str)</span> -&gt; DynamicFrame:</span></span><br><span class="line">    p = <span class="string">"s3://&#123;&#125;/&#123;&#125;"</span>.format(bucket, path)</span><br><span class="line">    <span class="keyword">return</span> glueContext.create_dynamic_frame_from_options(</span><br><span class="line">        connection_type=<span class="string">"s3"</span>,</span><br><span class="line">        connection_options=&#123;<span class="string">"paths"</span>: [p]&#125;,</span><br><span class="line">        format=<span class="string">"csv"</span>,</span><br><span class="line">        format_options=&#123;<span class="string">"withHeader"</span>: <span class="literal">True</span>, <span class="string">"separator"</span>: <span class="string">","</span>&#125;,</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+
+<p>テストコード: <code>tests/test_etl.py</code></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pytest</span><br><span class="line"><span class="keyword">import</span> boto3</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> io</span><br><span class="line"><span class="keyword">import</span> csv</span><br><span class="line"><span class="keyword">from</span> src.etl <span class="keyword">import</span> load_dynamic_frame_from_csv</span><br><span class="line"><span class="keyword">from</span> botocore.client <span class="keyword">import</span> Config</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test_load_dynamic_frame_from_csv</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># setup</span></span><br><span class="line">    inputs = [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">"id"</span>: <span class="string">"1"</span>,</span><br><span class="line">        <span class="string">"name"</span>: <span class="string">"xxx"</span>,</span><br><span class="line">        <span class="string">"address"</span>: <span class="string">"xxx@example.co.jp"</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">"id"</span>: <span class="string">"2"</span>,</span><br><span class="line">        <span class="string">"name"</span>: <span class="string">"yyy"</span>,</span><br><span class="line">        <span class="string">"address"</span>: <span class="string">"yyy@example.co.jp"</span></span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">    input_str = io.StringIO()</span><br><span class="line">    w = csv.DictWriter(input_str, fieldnames=inputs[<span class="number">0</span>].keys())</span><br><span class="line">    w.writeheader()</span><br><span class="line">    <span class="keyword">for</span> input <span class="keyword">in</span> inputs:</span><br><span class="line">      w.writerow(input)</span><br><span class="line">    s3 = boto3.resource(</span><br><span class="line">        <span class="string">"s3"</span>,</span><br><span class="line">        endpoint_url=os.environ[<span class="string">"TEST_S3_ENDPOINT_URL"</span>],</span><br><span class="line">        region_name=<span class="string">"ap-northeast-1"</span>,</span><br><span class="line">        use_ssl=<span class="literal">False</span>,</span><br><span class="line">        config=Config(s3=&#123;<span class="string">"addressing_style"</span>: <span class="string">"path"</span>&#125;),</span><br><span class="line">    )</span><br><span class="line">    bucket_name = <span class="string">"test-csv-bucket"</span></span><br><span class="line">    bucket = s3.Bucket(bucket_name)</span><br><span class="line">    bucket.create(ACL=<span class="string">"public-read-write"</span>)</span><br><span class="line">    body = input_str.getvalue()</span><br><span class="line">    key = <span class="string">"user/2019/12/06/users.csv"</span></span><br><span class="line">    bucket.put_object(Key=key, Body=body, ACL=<span class="string">"public-read-write"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># exec</span></span><br><span class="line">    res_df = load_dynamic_frame_from_csv(pytest.glueContext, pytest.spark, bucket_name, key)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># assert</span></span><br><span class="line">    <span class="keyword">assert</span> res_df.count() == len(inputs)</span><br><span class="line">    res_df_json = res_df.toDF().toJSON().take(len(inputs))</span><br><span class="line">    <span class="keyword">for</span> res <span class="keyword">in</span> res_df_json:</span><br><span class="line">      r = json.loads(res)</span><br><span class="line">      <span class="keyword">assert</span> r <span class="keyword">in</span> inputs</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-テスト実行"><a href="#5-テスト実行" class="headerlink" title="5. テスト実行"></a>5. テスト実行</h2><p>Glue環境を構築して pytest を実行する <code>gluepytest</code> コマンドが用意されているため、そちらを利用します。<br>PATHを通してあるので、下記で実行できます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it gluelocal gluepytest</span><br></pre></td></tr></table></figure>
+
+<p>結果</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">  adding: awsglue/ (stored 0%)</span><br><span class="line">  adding: awsglue/README.md (deflated 57%)</span><br><span class="line">  adding: awsglue/__init__.py (deflated 37%)</span><br><span class="line">  adding: awsglue/context.py (deflated 78%)</span><br><span class="line">  adding: awsglue/data_sink.py (deflated 60%)</span><br><span class="line">.</span><br><span class="line">.</span><br><span class="line">.</span><br><span class="line"></span><br><span class="line">================================== <span class="built_in">test</span> session starts ==================================</span><br><span class="line">platform linux -- Python 3.6.8, pytest-5.3.1, py-1.8.0, pluggy-0.13.1</span><br><span class="line">rootdir: /opt/src</span><br><span class="line">collected 1 item</span><br><span class="line"></span><br><span class="line">tests/test_etl.py .                                                               [100%]</span><br><span class="line"></span><br><span class="line">=================================== 1 passed <span class="keyword">in</span> 9.79s ===================================</span><br></pre></td></tr></table></figure>
+
+<h1 id="所感"><a href="#所感" class="headerlink" title="所感"></a>所感</h1><p>Glueをローカル環境にて、単体テストを実施する環境を整備してみました。<br>Glueの動作確認は、開発エンドポイントを利用して確認することが多く、<br>少々面倒かつ再現性がなかったため、テスト環境を構築してテストを実行することで安定して開発を進めていきたいです。<br>Dockerで作成しているため、CI/CD等にも組み込んでいけたらと考えています。<br>(Dockerfileが1GB程度とまだまだ大きいため、もう少しスリムにしたいなとは思っています。)</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a href="https://future-architect.github.io/articles/20191101/">AWS Glueの開発エンドポイントがそこそこお高いのでローカル開発環境を用意しました | Future Tech Blog - フューチャーアーキテクト</a></li>
+<li><a href="https://dev.classmethod.jp/cloud/aws/aws-glue-local/" target="_blank" rel="noopener">AWS Glueをローカル環境で実行してみた ｜ Developers.IO</a></li>
+</ul>
+<hr>
+<p>関連記事：</p>
+<ul>
+<li><a href="/articles/20180828">5TB/日 のデータをAWS Glueでさばくためにやったこと（概要編）</a></li>
+<li><a href="/articles/20181205/">5TB/日 のデータをAWS Glueでさばくためにやったこと（性能編）</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="AWS Glueの単体テスト環境の構築手順" data-url="https://future-architect.github.io/articles/20191206/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20191206/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20191206/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20191206/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191206/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AWS Glueの単体テスト環境の構築手順
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191203/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go Conferenceの📛を作る
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191201/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                SORACOM USBドングルの自動接続
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191129/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GDG DevFest in 信州2019に登壇しました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191121/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                「脱Oracle」の背景にある、Oracle Databaseの価値を改めて考える
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191114/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go Cloud#4 URLを編集するパッケージ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191029/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                フロントエンドでシステム開発を2年半続けてハマったことから得た教訓3つ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191111/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go Cloud#1 概要とBlobへの活用方法
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (10)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (34)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (26)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (17)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2019 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
