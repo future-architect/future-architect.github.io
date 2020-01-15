@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>打鍵テストをCIで回す：Cypress on GitHub Actions | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="つらい打鍵テストをCIで回して、テスト結果をWebダッシュボードでチーム内に共有しようというお話です。 はじめまして。枇榔（びろう）です。サーバ内の脆弱性を検出して管理するWebサービス、FutureVuls( https://vuls.biz/ )の開発をしています。 100台から数千台といった大規模なサーバ運用をしている方向けの、サーバ内の脆弱性情報管理を楽にするWebサービスです。OSSの脆">
+<meta name="keywords" content="Cypress">
+<meta property="og:type" content="article">
+<meta property="og:title" content="打鍵テストをCIで回す：Cypress on GitHub Actions">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200115/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="つらい打鍵テストをCIで回して、テスト結果をWebダッシュボードでチーム内に共有しようというお話です。 はじめまして。枇榔（びろう）です。サーバ内の脆弱性を検出して管理するWebサービス、FutureVuls( https://vuls.biz/ )の開発をしています。 100台から数千台といった大規模なサーバ運用をしている方向けの、サーバ内の脆弱性情報管理を楽にするWebサービスです。OSSの脆">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20200118/photo_20200118_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200118/photo_20200118_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200118/photo_20200118_03.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200118/photo_20200118_04.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200118/photo_20200118_05.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200118/photo_20200118_06.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200118/photo_20200118_07.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200118/photo_20200118_08.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200118/photo_20200118_09.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200118/photo_20200118_10.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200118/photo_20200118_11.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200118/photo_20200118_12.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200118/photo_20200118_13.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200118/photo_20200118_14.png">
+<meta property="og:updated_time" content="2020-01-15T00:47:11.890Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="打鍵テストをCIで回す：Cypress on GitHub Actions">
+<meta name="twitter:description" content="つらい打鍵テストをCIで回して、テスト結果をWebダッシュボードでチーム内に共有しようというお話です。 はじめまして。枇榔（びろう）です。サーバ内の脆弱性を検出して管理するWebサービス、FutureVuls( https://vuls.biz/ )の開発をしています。 100台から数千台といった大規模なサーバ運用をしている方向けの、サーバ内の脆弱性情報管理を楽にするWebサービスです。OSSの脆">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200118/photo_20200118_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="打鍵テストをCIで回す：Cypress on GitHub Actions | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="打鍵テストをCIで回す：Cypress on GitHub Actions,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="200px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200115/">打鍵テストをCIで回す：Cypress on GitHub Actions</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200115-daken-ci" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 枇榔晃裕</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-01-15T00:25:42.000Z" itemprop="datePublished">2020/01/15</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/Cypress/" title="Cypress">Cypress</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/CI-CD/">CI/CD</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>つらい打鍵テストをCIで回して、テスト結果をWebダッシュボードでチーム内に共有しようというお話です。</p>
+<p>はじめまして。枇榔（びろう）です。<br>サーバ内の脆弱性を検出して管理するWebサービス、FutureVuls( <a href="https://vuls.biz/" target="_blank" rel="noopener">https://vuls.biz/</a> )の開発をしています。</p>
+<p>100台から数千台といった大規模なサーバ運用をしている方向けの、サーバ内の脆弱性情報管理を楽にするWebサービスです。<br>OSSの脆弱性スキャナ<a href="https://github.com/future-architect/vuls" target="_blank" rel="noopener">Vuls</a>に、チーム運用向けの機能（タスク管理・自動トリアージ・他チームへ情報共有・脆弱性情報のリスト管理など）を追加したものになります。</p>
+<p><a href="https://vuls.biz/" target="_blank" rel="noopener">https://vuls.biz/</a> の右上から新規登録ですぐに使えるので、ぜひお試しください。</p>
+<h2 id="マイクロサービスのテストが打鍵になりがち問題"><a href="#マイクロサービスのテストが打鍵になりがち問題" class="headerlink" title="マイクロサービスのテストが打鍵になりがち問題"></a>マイクロサービスのテストが打鍵になりがち問題</h2><p>さて、そんなFutureVuls。画面側はReact、裏側はいくつものコンテナという構成で動いています。</p>
+<p>AWS 上でコンテナを立ち上げてマイクロサービスを提供するみたいなこと、増えてきましたよね。イクロサービスアーキテクチャだとスケール・冗長化が簡単で、障害が置きたときの対応や保守が行いやすいといったメリットもたくさんあります。</p>
+<p>しかしながら、導入する上で厄介なのがテスト。各コンテナの中で単体テストがしっかり書かれていても、それぞれのコンテナがきちんと繋がっているかどうか、意図した処理が行われているかどうか確認するため、クライアント端末からのリクエストをもとにしたテストが必要になります。</p>
+<p>コンテナの中はmasterにマージする際にテストを回しているけれども、最終的にデプロイを行う際にはExcelのテストケースを見ながら、Web画面をポチポチ叩いての打鍵テストになってしまっている。そんなプロジェクトも多いのではないかと。</p>
+<p>Excelのテストケースを見ながらポチポチ叩いて、都度スクリーンショットを撮ってまとめる。そんなテストを何度か行いましたが、それだと気軽にテストとはいかず、リリースを行う際にもテスト工数がかなり必要になりますし、使用しているパッケージのアップデートも行いづらいのでセキュリティ的にも問題が出てきます。</p>
+<h2 id="打鍵テストを自動化するOSS-Cypress"><a href="#打鍵テストを自動化するOSS-Cypress" class="headerlink" title="打鍵テストを自動化するOSS Cypress"></a>打鍵テストを自動化するOSS Cypress</h2><p>打鍵テスト自動化したいですよね</p>
+<p>できればコーディングに不慣れな人でもテストコードが書けて、動作中の様子をスクリーンショットなどで保存してくれるとエビデンスで使えるので嬉しい。そんな要望に応えてくれるOSSがCypressです</p>
+<img src="/images/20200118/photo_20200118_01.png">
+
+<p><a href="https://www.cypress.io/" target="_blank" rel="noopener">https://www.cypress.io/</a></p>
+<p>Cypressはブラウザテストツールで、フロントエンドのテストをかなりシンプルに行える仕組みを提供してくれています。フロントエンドの部分だけを単体テストするためにも使えるのですが、統合テストやEnd to End テストにも使える便利な子です。</p>
+<p>似たようなツールにSeleniumがあります。両方とも画面のテストに用いられていて、GitHub Actionsにも組み込める同じような使い方ができるツールなのですが少し差異があります。</p>
+<p>Seleniumはネットワーク越しにブラウザを自動操作するツールで、スクレイピングとか操作の自動化といったマクロのような使い方をしてテストを行います。</p>
+<p>対してCypressはWeb画面のテスト目的に特化したツールです。動的な画面の書き換え完了するまで待ったり、ボタンがdisable設定で表示されているか確認したり、非同期なリクエストが終わるまで待ったりといったことまで行えます。さらに処置は手元で行われるので動作もきびきびとしており、トライ＆エラーも行いやすく実行時間も短縮できます。</p>
+<p>また、スクリーンショットが欲しいタイミングで <code>cy.screenshot</code> と入れておくとspecごとに分かれたフォルダにスクリーンショットを保存してくれます。さらにはテスト開始から完了まで実行の様子をmp4形式の動画にしてくれたりもします。</p>
+<p>個人的な話ですがたまに疲れたとき、池の鯉を見るような感覚でCypressのテスト実行の様子を眺めていたりします。割と癒やされます。</p>
+<h2 id="今回説明すること"><a href="#今回説明すること" class="headerlink" title="今回説明すること"></a>今回説明すること</h2><img src="/images/20200118/photo_20200118_02.png">
+まずは手元のPCでCypressを動かしたのち、GitHub Actionsに乗せてCI内で実行する方法を紹介します。次に実行結果をWeb上に保存できるCypressDashboardの紹介、最後にCIをつなげるところまで行ってみます。
+
+<h2 id="導入方法"><a href="#導入方法" class="headerlink" title="導入方法"></a>導入方法</h2><p>nodejsの入っている端末でE2E用のレポジトリを作って、</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> npx cypress open</span></span><br></pre></td></tr></table></figure>
+
+<p>で、終わり。簡単。<br>しばらくダウンロードなどの処理が走ったあと、Cypressのダイアログが表示されます。<br><img src="/images/20200118/photo_20200118_03.png"></p>
+<p>試しに <code>actions.spec.js</code> をクリックすると、テストコードのサンプルとして <code>https://example.cypress.io/commands/actions</code> へのテストが実行されます。</p>
+<p>実行したディレクトリの中には <code>cypress.json</code> という設定ファイルと <code>cypress</code> というフォルダができてます。<code>cypress.json</code> はコンフィグファイルです。タイムアウトまでの時間やスクリーンショットの出力先フォルダを変えたいときはここを変更しましょう。<br><a href="https://docs.cypress.io/guides/references/configuration.html" target="_blank" rel="noopener">https://docs.cypress.io/guides/references/configuration.html</a></p>
+<p><code>cypress</code> フォルダにはテストコードやプラグインが含まれます。<br><code>cypress\integration\examples\</code> 内のspec.jsファイルがテストケースのサンプルになっているので、参考に書き換えていきましょう。</p>
+<h1 id="Cypressの書き方"><a href="#Cypressの書き方" class="headerlink" title="Cypressの書き方"></a>Cypressの書き方</h1><p>Cypressのドキュメント( <a href="https://docs.cypress.io/" target="_blank" rel="noopener">https://docs.cypress.io/</a> )を見ると非常に様々なコマンドやテスト方法があるのが分かります。<br>たくさんあって物怖じしてしまいますが、まずは <code>cy.contain()</code> <code>cy.get()</code> <code>cy.click()</code>の3つを覚えれば簡単な Web ページのテストができるようになります。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// &lt;reference types="Cypress" /&gt;</span></span><br><span class="line"></span><br><span class="line">context(<span class="string">'Actions'</span>, () =&gt; &#123;</span><br><span class="line">  beforeEach(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    cy.visit(<span class="string">'https://future-architect.github.io/'</span>) <span class="comment">//テストを行う対象のページを入力</span></span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">it(<span class="string">'contain() get() click() のサンプル'</span>, () =&gt; &#123;</span><br><span class="line">    <span class="comment">// ページ内に `フューチャー開発者ブログ` が表示されているか確認</span></span><br><span class="line">    cy.contains(<span class="string">'フューチャー開発者ブログ'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ページ内に `logo-img`をクラスに持つimgタグが表示されているか確認</span></span><br><span class="line">    cy.get(<span class="string">'img.logo-img'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// `.blog-sidebar`(サイドバーのクラス)から `Culture`を探してクリック</span></span><br><span class="line">    cy.get(<span class="string">'.blog-sidebar'</span>).contains(<span class="string">'Culture'</span>).click()</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>以上を実行すると、こうなります。</p>
+<img src="/images/20200118/photo_20200118_04.png">
+
+<p>左側にテストの内容、右側にテスト実行の様子が表示されます。</p>
+<img src="/images/20200118/photo_20200118_05.png">
+
+<p>テストがすべて完了したあとに実行中の様子を確認することができます。<br>行をクリックすると、どの要素が抽出されて、どこをクリックしたのがまでわかるようになっています。</p>
+<img src="/images/20200118/photo_20200118_06.png">
+
+<p><code>blog-sidebar</code>クラス内の <code>Culture</code> をクリックしているのがわかりますね。</p>
+<p><code>cy.contains</code> で画面に表示される日本語を選んで click までならコーディングに不慣れな新人さんにも書いてもらえますし、CSSセレクタを理解している人ならgetも使ってもらえます。<br>ベテランな皆さんには <code>cy.spy()</code> や <code>cy.stub()</code> といったものも用意されていますのでご安心を。</p>
+<p>また <code>cy.viewport(&#39;iphone-6+&#39;)</code> でviewportの動的切替えや、<code>cy.screenshot(&#39;top-page-01&#39;)</code> でスクリーンショットの保存などもできます。</p>
+<p>#GitHub Actionsにつなげる</p>
+<p>さて、ブラウザ上で実行結果を確認しつつテストを行えるCypressですが、CUIでも実行できます。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> npx cypress run</span></span><br></pre></td></tr></table></figure>
+
+<p>こちらの場合は、テストの結果だけ返してくれます。<br><img src="/images/20200118/photo_20200118_07.png"></p>
+<p>実行中の様子をあとから確認したい場合は、<code>\cypress\videos\examples\test.spec.js.mp4</code> として保存される動画ファイルを確認ください。</p>
+<p>CUIで実行できるとなればCIに組み込みたいですよね。<br>では、2019年から使えるようになったGitHub Actionsで動かしてみましょう。</p>
+<p>作成したレポジトリ内で以下を実行します。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> npm init</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> npm install</span></span><br></pre></td></tr></table></figure>
+
+<p>package.json  package-lock.jsonの2ファイルが作成されたのを確認したら、GitHubにプッシュし、GitHubのレポジトリページのタブにある「Actions」&gt; Node.js の「Set up this workflow」のボタンをクリック</p>
+<p>そして、左側に出てくるエディタに以下を入力します。</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">Node</span> <span class="string">CI</span></span><br><span class="line"><span class="attr">on:</span> <span class="string">[push]</span></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line"><span class="attr">  cypress-run:</span></span><br><span class="line"><span class="attr">    runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line"><span class="attr">    steps:</span></span><br><span class="line"><span class="attr">      - uses:</span> <span class="string">actions/checkout@v1</span></span><br><span class="line"><span class="attr">      - uses:</span> <span class="string">cypress-io/github-action@v1</span></span><br></pre></td></tr></table></figure>
+
+<p>これで、レポジトリにpushされたタイミングでCIが動くようになりました。</p>
+<p>実行結果は以下のように表示されます。</p>
+<img src="/images/20200118/photo_20200118_08.png">
+
+<p>いい感じですね</p>
+<p>pushされたタイミングではなく定期的に実行したい場合は</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">on:</span> <span class="string">[push]</span></span><br></pre></td></tr></table></figure>
+
+<p>を</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">on:</span></span><br><span class="line"><span class="attr">  schedule:</span></span><br><span class="line"><span class="attr">    - cron:</span>  <span class="string">'0 0 * * *'</span></span><br></pre></td></tr></table></figure>
+
+<p>のようなcron式に書き換えると定期的にテストが走ります。</p>
+<h1 id="Cypress-Dashboard-につなげる"><a href="#Cypress-Dashboard-につなげる" class="headerlink" title="Cypress Dashboard につなげる"></a>Cypress Dashboard につなげる</h1><p>CypressのテストがGitHub Actions上で定期的に実行されて良かったよかった、で終わりたいのですが問題が一つだけ。</p>
+<p>実行中の様子をあとから確認できない。</p>
+<p>Cypress実行中の様子は <code>\cypress\videos\*.spec.js.mp4</code> に動画ファイルが保存されているはずですが、CI環境上に保存してしまうので、テスト完了後には環境ごと消されてしまっていて見れなくなってしまいます。</p>
+<p>自分でS3あたりにファイルを投げるスクリプトを書かないといけないのか・・・と思っていましたが、Cypressがそのあたりも簡単にする解決策を用意してくれていました。すごい。</p>
+<p>Cypress Dashboard というサービスで、Cypress実行中の様子や結果などを見やすくまとめてくれるWebサービスです。<br><a href="https://docs.cypress.io/guides/dashboard/introduction.html" target="_blank" rel="noopener">https://docs.cypress.io/guides/dashboard/introduction.html</a></p>
+<img src="/images/20200118/photo_20200118_09.png">
+
+<p>それではセットアップ方法を見ていきましょう。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> npx cypress open</span></span><br></pre></td></tr></table></figure>
+
+<p>として、Cypressのダイアログを表示させましょう。</p>
+<img src="/images/20200118/photo_20200118_10.png">
+「Runs」をクリックして右上の「Log In」からCypress Dashboardにユーザ登録してください。
+Google認証とGitHub認証でユーザ登録ができます。
+
+<p>ユーザ登録が終えたら、「Set up project to recoed」の青いボタンを押して設定を完了させます。</p>
+<img src="/images/20200118/photo_20200118_11.png">
+
+
+<p>すると画面が切り替わり、Project ID と Record key が生成されます。<br><code>cypress.json</code> には自動で <code>projectId</code> が入力されてると思いますので、Record keyと一緒に <code>cypress run</code> してみましょう。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> npx cypress run --record --key &#123;Record key&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>すると「Runs」の画面が変化します。</p>
+<img src="/images/20200118/photo_20200118_12.png">
+
+<p>この #1 の行をクリックするとダッシュボードのページに移動して実行結果が確認できます。</p>
+<img src="/images/20200118/photo_20200118_13.png">
+
+<p>1spec1行で並べられて、各行にOutput・Screenshots・Videoのボタンが用意されています。<br>OutputにはCUIのログ、Screenshotsにはエラー時のスクリーンショットと <code>cy.screenshot()</code> の実行結果、Videoにはテスト実行中の様子が動画で保存されます。<br>Web上に結果が保存されるのでチーム間で共有しやすくもなります。</p>
+<p>Dashboardに実行結果が保存されるのを確認したら、GitHub Actionsにも同じようにRecord keyを設定していきましょう。</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># test-cy/.github/workflows/nodejs.yml</span></span><br><span class="line"><span class="attr">name:</span> <span class="string">Node</span> <span class="string">CI</span></span><br><span class="line"><span class="attr">on:</span> <span class="string">[push]</span></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line"><span class="attr">  cypress-run:</span></span><br><span class="line"><span class="attr">    runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line"><span class="attr">    steps:</span></span><br><span class="line"><span class="attr">      - uses:</span> <span class="string">actions/checkout@v1</span></span><br><span class="line"><span class="attr">      - uses:</span> <span class="string">cypress-io/github-action@v1</span></span><br><span class="line"><span class="attr">        with:</span></span><br><span class="line"><span class="attr">          record:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">        env:</span></span><br><span class="line"><span class="attr">          CYPRESS_RECORD_KEY:</span> <span class="number">2899</span><span class="string">ea68-054f-4abc-8fd3-ebff0c3e7bc0</span></span><br></pre></td></tr></table></figure>
+
+<p>書き換えてGitHubにpushすると、GitHubActionsからCypressDashboardに実行結果が送信されます。</p>
+<img src="/images/20200118/photo_20200118_14.png">
+
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>打鍵テストをCI化するのが、それほど苦労なくできることが伝われば幸いです。</p>
+<p>もちろんテストコードを書く必要はありますが、Excelのテストケースに書かれた <code>申し込みボタンをクリックする</code> を <code>cy.contains(&#39;申し込み&#39;).click()</code> に変えるだけで何百回と使えるコードになるのでコストはペイするはずです。</p>
+<p>今回は導入の部分だけを書きましたが、FutureVulsのテストを行う際には</p>
+<ul>
+<li>グループ内の脆弱性情報・タスク情報をDBからクリアする</li>
+<li>スキャン結果をs3にアップロードしてタスクが表示されるか確認する</li>
+<li>脆弱性のスコアが更新された場合に脆弱性情報が書き換わり、タスクのコメントにログが反映されるか見る</li>
+</ul>
+<p>といったこともしています。<br>これらもCypress（といくつかのプラグイン）で実現できます。すごい。</p>
+<p>さくっとテストできる環境を作って、パッケージのアップデートを気楽に行える環境を作っていきましょう。</p>
+<p>それでは、よいテストライフを！</p>
+<hr>
+<p>関連記事：</p>
+<ul>
+<li><a href="/articles/201912010/">SORACOM USBドングルの自動接続</a></li>
+<li><a href="/articles/20190814/">WAFとして go-swagger を選択してみた</a></li>
+<li><a href="/articles/20191001/">一周回って、人間が読み書きする設定ファイルはJSONが良いと思った</a></li>
+<li><a href="/articles/20190612/">TypeScript教育用コンテンツ公開のお知らせ</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="打鍵テストをCIで回す：Cypress on GitHub Actions" data-url="https://future-architect.github.io/articles/20200115/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200115/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200115/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200115/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200115/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                打鍵テストをCIで回す：Cypress on GitHub Actions
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191227/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                 NeurIPS 2019 論文紹介
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191211/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                golang.tokyoで発表してきました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191210/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                 NeurIPS 2019 参加報告
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191206/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AWS Glueの単体テスト環境の構築手順
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191203/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go Conferenceの📛を作る
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191201/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                SORACOM USBドングルの自動接続
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191129/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GDG DevFest in 信州2019に登壇しました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (10)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (34)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (19)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/XXX/">XXX (0)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
