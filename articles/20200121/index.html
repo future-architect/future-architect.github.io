@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>スロットリングとの付き合い方 | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにこんにちは。TIG DXチームの村瀬です。 Googleで「スロットリング」で検索するとパチスロのリングが沢山ヒットするんですね。今回はその「SLOT リング」ではなく「throttling」関して記載します。 スロットリングとは一定時間内に受信可能なリクエスト数を制限し、制限を上回るリクエストがなされた際には受信を拒否しエラーコードを返却すること。時間経過により再び受信可能となる仕組みで">
+<meta name="keywords" content="AWS,GCP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="スロットリングとの付き合い方">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200121/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="はじめにこんにちは。TIG DXチームの村瀬です。 Googleで「スロットリング」で検索するとパチスロのリングが沢山ヒットするんですね。今回はその「SLOT リング」ではなく「throttling」関して記載します。 スロットリングとは一定時間内に受信可能なリクエスト数を制限し、制限を上回るリクエストがなされた際には受信を拒否しエラーコードを返却すること。時間経過により再び受信可能となる仕組みで">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20200121/1.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200121/photo_20200121_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200121/2.png">
+<meta property="og:updated_time" content="2020-01-21T00:13:04.249Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="スロットリングとの付き合い方">
+<meta name="twitter:description" content="はじめにこんにちは。TIG DXチームの村瀬です。 Googleで「スロットリング」で検索するとパチスロのリングが沢山ヒットするんですね。今回はその「SLOT リング」ではなく「throttling」関して記載します。 スロットリングとは一定時間内に受信可能なリクエスト数を制限し、制限を上回るリクエストがなされた際には受信を拒否しエラーコードを返却すること。時間経過により再び受信可能となる仕組みで">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200121/1.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="スロットリングとの付き合い方 | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="スロットリングとの付き合い方,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="200px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200121/">スロットリングとの付き合い方</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200121-throtoling" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 村瀬善則</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-01-20T23:52:16.000Z" itemprop="datePublished">2020/01/21</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/AWS/" title="AWS">AWS</a>,
+  
+    <a href="/tags/GCP/" title="GCP">GCP</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIG DXチームの村瀬です。</p>
+<p>Googleで「スロットリング」で検索するとパチスロのリングが沢山ヒットするんですね。<br>今回はその「SLOT リング」ではなく「throttling」関して記載します。</p>
+<h1 id="スロットリングとは"><a href="#スロットリングとは" class="headerlink" title="スロットリングとは"></a>スロットリングとは</h1><p>一定時間内に受信可能なリクエスト数を制限し、制限を上回るリクエストがなされた際には受信を拒否しエラーコードを返却すること。時間経過により再び受信可能となる仕組みです。</p>
+<p>リクエスト数を制限することでシステムにかかる負荷を抑えたり、スパムメールの送信を防止するのに利用されます。</p>
+<p>SaaSであれば有限のコンピューティングをみんなでシェアするのでより多くの人が快適に利用できるよう、一部のユーザからの大量リクエストを制限するのに利用されます。もし無制限にリクエストを受け入れたとするとシステムに負荷がかかり、クライアントへのレスポンスに時間を要したり待たされた挙句にタイムアウトしてしまいます。</p>
+<img src="/images/20200121/1.png" style="border:solid 1px #000000">
+
+
+<p>これは大人気の遊園地が入場制限することで、入場済みの来場者に快適に過ごしてもらうことに似ています。入場前の来場者にとっては好ましくありませんが。。。</p>
+<h1 id="受信拒否時の対応方法"><a href="#受信拒否時の対応方法" class="headerlink" title="受信拒否時の対応方法"></a>受信拒否時の対応方法</h1><p>リクエストする側としては受信拒否されないに越したことはありませんが、拒否された際には以下の対応をするとお行儀が良いです。<br>・少し待ってからリトライする。<br>・ユーザに対してしばらく経ってから再度アクセスするようにアナウンスする。</p>
+<p>遊園地で入場制限がかかるとその日の入園は絶望的で遠方から訪れていると大変がっかりしますが、コンピュータの世界では極短時間です。システムにもよりますが数秒待ってからリトライしてみましょう。一定回数リトライしてみてダメならユーザにしばらく経ってから再度アクセスするようにアナウンスしましょう。</p>
+<h1 id="リトライに一手間加えてスループットを向上させよう"><a href="#リトライに一手間加えてスループットを向上させよう" class="headerlink" title="リトライに一手間加えてスループットを向上させよう"></a>リトライに一手間加えてスループットを向上させよう</h1><p>一定時間待ってからリトライしようとすると同一タイミングで受信拒否されたアクセス数分一斉にアクセスすることになり再度受信拒否されてしまう可能性が高いです。<br>ここは工夫が必要です。<br>方法はいくつもあると思いますがExponential Backoff And Jitterのテクニックが効果的です。<br>詳細は<a href="https://aws.typepad.com/sajp/2015/03/backoff.html" target="_blank" rel="noopener">AWS Solutions Architect ブログ</a>にまとめられているのでそちらをご覧ください。</p>
+<p>少しだけ説明します。</p>
+<h2 id="Exponential-Backoff"><a href="#Exponential-Backoff" class="headerlink" title="Exponential Backoff"></a>Exponential Backoff</h2><p>リトライの間隔を倍々に増加させてく手法<br>例えばリトライの度に1秒,2秒,4秒,8秒と待ち時間を増やしていく。<br>※あくまで例示ですので適切な時間を経過したらエラーであることをユーザにアナウンスしたほうがユーザーフレンドリーです。</p>
+<h2 id="Jitter"><a href="#Jitter" class="headerlink" title="Jitter"></a>Jitter</h2><p>リトライの間隔にばらつきを持たせる手法<br>クライアント毎にランダムな秒数待ってからリトライする。</p>
+<h2 id="Exponential-Backoff-And-Jitter"><a href="#Exponential-Backoff-And-Jitter" class="headerlink" title="Exponential Backoff And Jitter"></a>Exponential Backoff And Jitter</h2><p>リトライの間隔を倍々に増加させた上でばらつかせる</p>
+<img src="/images/20200121/photo_20200121_01.png" class="img-middle-size" style="border:solid 1px #000000">
+上図は[AWS Solutions Architect ブログ](https://aws.typepad.com/sajp/2015/03/backoff.html)より引用
+
+<p>これらのリトライ手法により単位時間あたりのアクセス数が低減でき、スロットリングの受信拒否が起きにくくなります。</p>
+<h1 id="受信拒否の回避方法"><a href="#受信拒否の回避方法" class="headerlink" title="受信拒否の回避方法"></a>受信拒否の回避方法</h1><p>システムにより状況は異なると思われますが概ね以下のような対応が必要です。<br>・受信拒否される要因を分散させる。<br>　送信元のメールアドレスやIPアドレス、APIキーが要因となりえます。<br>・適切にキューイングやWAITを入れ単位時間あたりのリクエスト数を制限する。</p>
+<h1 id="スロットリングを実装する場合"><a href="#スロットリングを実装する場合" class="headerlink" title="スロットリングを実装する場合"></a>スロットリングを実装する場合</h1><p>これまでスロットリングされているサービスを利用する側の視点で説明してきましたが、反対に自分のサービスにスロットリングを実装することを考えてみましょう。</p>
+<p>単位時間あたりのリクエスト数を正確に計測しようとするとRDBMSを利用してリクエストの度にINSERTし、単位時間あたりのリクエスト数を確認する為にSELECTするなどが必要になります。スロットリング処理の割合が高くなり、本来行うべき処理に支障をきたすのでゆるい制御をすることをおすすめします。</p>
+<p>簡易的に行うのであればリクエスト毎の同期処理で閾値判定処理をするのではなく非同期処理で閾値判定し超えていたら一定時間受信を拒否する仕組みが良いと思います。</p>
+<h2 id="簡易的なスロットリングの仕組み"><a href="#簡易的なスロットリングの仕組み" class="headerlink" title="簡易的なスロットリングの仕組み"></a>簡易的なスロットリングの仕組み</h2><p>APIキーを用いてスロットリングされるものとして説明します。</p>
+<img src="/images/20200121/2.png" style="border:solid 1px #000000">
+
+
+<p><strong>サービスプロセス</strong><br>1.クライアントからサービスへAPIキーを付与してアクセスする<br>2.APIキーを含めたアクセスログを出力する<br>3.受信拒否するかどうかAPIキーに対応するロック状態を取得する<br>4.ロック状態により正常なレスポンスか受信拒否のレスポンスを返却する</p>
+<p><strong>スロットリング制御プロセス</strong><br>1.定期的にアクセスログを取得する<br>2.直近の単位時間あたりのアクセス数をAPIキー毎にカウントし、閾値を超えている場合はロック、超えていない場合は非ロックの状態に変更する</p>
+<p>これらにより重い処理はスロットリング制御プロセスが担い、サービスプロセスに負荷をかけずにスロットリング処理が実現できます。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>一部の利用者のせいでその他の利用者が不快な思いをしないようにする仕組みであるスロットリング。この仕組みのおかげで大多数の利用者が快適にサービスを利用できます。サービスを利用する場合でもサービスを提供する場合でも他の利用者のことを考慮し適切な対応を心掛けましょう。</p>
+<hr>
+<p>関連記事：</p>
+<ul>
+<li><a href="/articles/20191206">AWS Glueの単体テスト環境の構築手順</a></li>
+<li><a href="/articles/20191101/">AWS Glueの開発エンドポイントがそこそこお高いのでローカル開発環境を用意しました</a></li>
+<li><a href="/articles/20191009/">AWS Session Managerでセッションを切断されにくくする方法</a></li>
+<li><a href="/articles/20190902/">AWS IAMロールの信頼関係の気になる動作</a></li>
+<li><a href="/articles/20180828">5TB/日 のデータをAWS Glueでさばくためにやったこと（概要編）</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="スロットリングとの付き合い方" data-url="https://future-architect.github.io/articles/20200121/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200121/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200121/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200121/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200121/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                スロットリングとの付き合い方
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200120/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                工場をハックするための基本知識　後編
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200116/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                実践Drawio
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200115/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                打鍵テストをCIで回す：Cypress on GitHub Actions
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191227/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                 NeurIPS 2019 論文紹介
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191211/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                golang.tokyoで発表してきました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191210/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                 NeurIPS 2019 参加報告
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20191206/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AWS Glueの単体テスト環境の構築手順
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (35)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (19)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
