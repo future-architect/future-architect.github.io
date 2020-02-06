@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Istio on GKEではじめるサービスメッシュ | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにこんにちは、TIGの村田です。GCP連載企画2日目の記事です！ 皆さんは普段どのようなアプリケーションを開発されてますか？私は最近Kubernetes上にデプロイされるマイクロサービスなアプリケーションに携わっています。 今回はIstio on GKEに焦点をあててGCPにおけるサービスメッシュの活用方法をご紹介したいと思います。 GKEクラスタを作成するまずはクラスタを作成します。 基本">
+<meta name="keywords" content="GCP,Istio,Kubernetes,GCP連載">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Istio on GKEではじめるサービスメッシュ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200206/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="はじめにこんにちは、TIGの村田です。GCP連載企画2日目の記事です！ 皆さんは普段どのようなアプリケーションを開発されてますか？私は最近Kubernetes上にデプロイされるマイクロサービスなアプリケーションに携わっています。 今回はIstio on GKEに焦点をあててGCPにおけるサービスメッシュの活用方法をご紹介したいと思います。 GKEクラスタを作成するまずはクラスタを作成します。 基本">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20200206/photo_20200206_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200206/photo_20200206_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200206/photo_20200206_03.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200206/photo_20200206_04.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200206/photo_20200206_05.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200206/photo_20200206_06.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200206/photo_20200206_07.png">
+<meta property="og:updated_time" content="2020-02-06T02:57:44.829Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Istio on GKEではじめるサービスメッシュ">
+<meta name="twitter:description" content="はじめにこんにちは、TIGの村田です。GCP連載企画2日目の記事です！ 皆さんは普段どのようなアプリケーションを開発されてますか？私は最近Kubernetes上にデプロイされるマイクロサービスなアプリケーションに携わっています。 今回はIstio on GKEに焦点をあててGCPにおけるサービスメッシュの活用方法をご紹介したいと思います。 GKEクラスタを作成するまずはクラスタを作成します。 基本">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200206/photo_20200206_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="Istio on GKEではじめるサービスメッシュ | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="Istio on GKEではじめるサービスメッシュ,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="200px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200206/">Istio on GKEではじめるサービスメッシュ</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200206-gcp-istio" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 村田靖拓</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-02-06T02:43:53.000Z" itemprop="datePublished">2020/02/06</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/GCP/" title="GCP">GCP</a>,
+  
+    <a href="/tags/Istio/" title="Istio">Istio</a>,
+  
+    <a href="/tags/Kubernetes/" title="Kubernetes">Kubernetes</a>,
+  
+    <a href="/tags/GCP連載/" title="GCP連載">GCP連載</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIGの村田です。<a href="https://future-architect.github.io/tags/GCP%98A%8D%DA/">GCP連載企画</a>2日目の記事です！</p>
+<p>皆さんは普段どのようなアプリケーションを開発されてますか？私は最近Kubernetes上にデプロイされるマイクロサービスなアプリケーションに携わっています。</p>
+<p>今回はIstio on GKEに焦点をあててGCPにおけるサービスメッシュの活用方法をご紹介したいと思います。</p>
+<h1 id="GKEクラスタを作成する"><a href="#GKEクラスタを作成する" class="headerlink" title="GKEクラスタを作成する"></a>GKEクラスタを作成する</h1><p>まずはクラスタを作成します。</p>
+<p>基本的にはデフォルト値のままクラスタ作成してしまおうと思います。<br>変えるのは一箇所だけ、今回の目玉の部分です。</p>
+<img src="/images/20200206/photo_20200206_01.png" class="img-middle-size">
+
+<p><code>Additional features</code> の <code>Enable Istio</code> にチェック！<br>チェックを入れると <code>Enable mTLS</code> 欄が登場します。</p>
+<p>選べるのは <code>Permissive</code> と <code>Strict</code> の2種類ですが、今回はデフォルト値である <code>Permissive</code> のままとします。詳しくは以下のページを見てみてくださいmm<br><a href="https://cloud.google.com/blog/products/networking/the-service-mesh-era-securing-your-environment-with-istio" target="_blank" rel="noopener">The service mesh era: Securing your environment with Istio</a></p>
+<p>少し待つとクラスタができました！</p>
+<img src="/images/20200206/photo_20200206_02.png">
+
+<p>クラスタ内に作成されたServiceを確認してみましょう。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ gcloud container clusters list --project &lt;your-project&gt;</span><br><span class="line">NAME                LOCATION       MASTER_VERSION  MASTER_IP        MACHINE_TYPE   NODE_VERSION    NUM_NODES  STATUS</span><br><span class="line">standard-cluster-1  us-central1-a  1.13.11-gke.23  130.211.127.151  n1-standard-1  1.13.11-gke.23  3          RUNNING</span><br></pre></td></tr></table></figure>
+
+<p>Istio関連のService(Podも)は <code>istio-system</code> のNamespaceに作成されます。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get service -n istio-system</span><br><span class="line">NAME                     TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                                                                                                                                      AGE</span><br><span class="line">istio-citadel            ClusterIP      10.12.6.189    &lt;none&gt;          8060/TCP,15014/TCP                                                                                                                           49m</span><br><span class="line">istio-galley             ClusterIP      10.12.10.108   &lt;none&gt;          443/TCP,15014/TCP,9901/TCP                                                                                                                   49m</span><br><span class="line">istio-ingressgateway     LoadBalancer   10.12.11.17    34.69.104.178   15020:30222/TCP,80:30345/TCP,443:31293/TCP,31400:31428/TCP,15029:30807/TCP,15030:30916/TCP,15031:32448/TCP,15032:31430/TCP,15443:30612/TCP   49m</span><br><span class="line">istio-pilot              ClusterIP      10.12.15.0     &lt;none&gt;          15010/TCP,15011/TCP,8080/TCP,15014/TCP                                                                                                       49m</span><br><span class="line">istio-policy             ClusterIP      10.12.3.166    &lt;none&gt;          9091/TCP,15004/TCP,15014/TCP                                                                                                                 49m</span><br><span class="line">istio-sidecar-injector   ClusterIP      10.12.5.178    &lt;none&gt;          443/TCP                                                                                                                                      49m</span><br><span class="line">istio-telemetry          ClusterIP      10.12.14.103   &lt;none&gt;          9091/TCP,15004/TCP,15014/TCP,42422/TCP                                                                                                       49m</span><br><span class="line">promsd                   ClusterIP      10.12.3.103    &lt;none&gt;          9090/TCP                                                                                                                                     49m</span><br></pre></td></tr></table></figure>
+
+<p>また、デフォルトでは <code>sidecar injection</code> が有効になっていません。<br>Istioのメリットを最大限享受するためにはサイドカーとして動くEnvoy proxyが必要です。<br>以下のコマンドで有効化します。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl label namespace default istio-injection=enabled</span><br><span class="line">namespace/default labeled</span><br></pre></td></tr></table></figure>
+
+<p>クラスタの準備はひとまず完了です。</p>
+<h1 id="デモアプリケーションをデプロイする"><a href="#デモアプリケーションをデプロイする" class="headerlink" title="デモアプリケーションをデプロイする"></a>デモアプリケーションをデプロイする</h1><p>マイクロサービスのデモアプリケーションといえばこれ、ということで <a href="https://github.com/GoogleCloudPlatform/microservices-demo#hipster-shop-cloud-native-microservices-demo-application" target="_blank" rel="noopener">Hipster Shop: Cloud-Native Microservices Demo Application</a> を早速デプロイします。</p>
+<p>まずは <code>microservices-demo</code> をclone。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git clone https://github.com/GoogleCloudPlatform/microservices-demo.git</span><br></pre></td></tr></table></figure>
+
+<p><code>Docker</code>, <code>kubectl</code>, <code>skaffold</code> が必要とのことでインストール。筆者環境では <code>skaffold</code> のみが無かったのでHomebrew経由で入れました。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ brew install skaffold</span><br></pre></td></tr></table></figure>
+
+<p><code>skaffold</code> はバージョン制約(≥v0.20)があるので念の為チェック。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ skaffold version</span><br><span class="line">v1.3.1</span><br></pre></td></tr></table></figure>
+
+<p>問題なさそうですね。次に進みます。<br>READMEに従う形でMANIFESTをapply。ここの紐解きは後述(★)します。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl apply -f ./istio-manifests</span><br><span class="line">gateway.networking.istio.io/frontend-gateway created</span><br><span class="line">virtualservice.networking.istio.io/frontend-ingress created</span><br><span class="line">virtualservice.networking.istio.io/frontend created</span><br><span class="line">serviceentry.networking.istio.io/whitelist-egress-googleapis created</span><br><span class="line">serviceentry.networking.istio.io/whitelist-egress-google-metadata created</span><br></pre></td></tr></table></figure>
+
+<p>skaffoldを使って一気にイメージ登録からデプロイまでを行います。Docでは30分未満との記述がありましたが、筆者環境では1時間半以上かかりました。。。マシンスペックとネットワークスピードですかね。。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ skaffold run --default-repo=gcr.io/&lt;your-project&gt;</span><br></pre></td></tr></table></figure>
+
+<p>何はともあれ無事にデモアプリのデプロイが完了しました。<br>Podの稼働状況を見てみます。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get po</span><br><span class="line">NAME                                     READY   STATUS    RESTARTS   AGE</span><br><span class="line">adservice-7b456d8f85-29s59               2/2     Running   0          9h</span><br><span class="line">cartservice-7874b9c947-7vgmz             2/2     Running   3          9h</span><br><span class="line">checkoutservice-68c84b95cb-kx7z5         2/2     Running   0          9h</span><br><span class="line">currencyservice-58dc87958b-knkzr         2/2     Running   0          9h</span><br><span class="line">emailservice-5f4d4cc69-4mp75             2/2     Running   0          9h</span><br><span class="line">frontend-75b6b5d576-pxbcv                2/2     Running   6          9h</span><br><span class="line">loadgenerator-554f8b4bc8-9rzzx           2/2     Running   6          9h</span><br><span class="line">paymentservice-58867f6b85-nfcwn          2/2     Running   0          9h</span><br><span class="line">productcatalogservice-5c567d44cf-jsgjx   2/2     Running   0          9h</span><br><span class="line">recommendationservice-6fb9fd5b8f-5p449   2/2     Running   0          9h</span><br><span class="line">redis-cart-698f46b844-f4qr8              2/2     Running   0          9h</span><br><span class="line">shippingservice-6fd9764fc5-b44lc         2/2     Running   0          142m</span><br></pre></td></tr></table></figure>
+
+<p>デフォルトのクラスタ設定ではリソースが足らず、半数以上のPodがPending状態となってしまいました。<br>Autoscalingの設定を入れることで解消しましたが、それに伴いCrashLoopBackoffが発生してしまったPodがいくつか存在しています。</p>
+<p>Autoscale後は <code>n1-standard-1</code> が6台並ぶ構成となりました。（初期3台構成）</p>
+<p><code>sidecar injection</code> を有効にしたので、Podの中も少し覗いてみます。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl describe pod adservice-7b456d8f85-29s59</span><br><span class="line">Name:               adservice-7b456d8f85-29s59</span><br><span class="line">Namespace:          default</span><br><span class="line">Priority:           0   </span><br><span class="line">PriorityClassName:  &lt;none&gt;</span><br><span class="line">・・・</span><br><span class="line">・・・</span><br><span class="line">Containers:</span><br><span class="line">  server:</span><br><span class="line">・・・</span><br><span class="line">・・・</span><br><span class="line">  istio-proxy:</span><br><span class="line">・・・</span><br><span class="line">・・・</span><br></pre></td></tr></table></figure>
+
+<p><code>istio-proxy</code> がコンテナとして稼働していることが確認できました。</p>
+<p>画面へのアクセスも試みてみましょう。<br>まずはIPを取得。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get service frontend-external</span><br><span class="line">NAME                TYPE           CLUSTER-IP    EXTERNAL-IP      PORT(S)        AGE</span><br><span class="line">frontend-external   LoadBalancer   10.12.0.203   35.232.239.135   80:30731/TCP   9h</span><br></pre></td></tr></table></figure>
+
+<p><code>35.232.239.135</code> がIPなのでアクセスすると…</p>
+<img src="/images/20200206/photo_20200206_03.png">
+
+<p>無事にデモ画面が表示されました！！</p>
+<h1 id="サービスモニタリングを行う"><a href="#サービスモニタリングを行う" class="headerlink" title="サービスモニタリングを行う"></a>サービスモニタリングを行う</h1><p>さて、Istioを使う意義の一つであるモニタリングに踏み込んでいきましょう。<br>細かい設定手順は<a href="https://github.com/GoogleCloudPlatform/istio-samples/tree/master/istio-stackdriver#monitoring" target="_blank" rel="noopener">公式のMonitoring解説パート</a>がとても丁寧なので参照すると良いです。</p>
+<p>以下はAdd ChartよりServer LatencyのChartを作成している画面です。<br>各項目設定時は選択候補がとてもたくさんありましたが、インクリメンタルサーチでどんどん絞れるのでストレスなく作成を進められました。</p>
+<img src="/images/20200206/photo_20200206_04.png">
+
+<p>いくつかのメトリクスを追加してみると…</p>
+<img src="/images/20200206/photo_20200206_05.png">
+
+<p>簡単にダッシュボードが作成できました。<br>既に様々なデータがStackdriver Monitoringへ送られているので、それをダッシュボード化すれば良いだけで特段難しいことは無かったです。</p>
+<h1 id="サービストレースを行う"><a href="#サービストレースを行う" class="headerlink" title="サービストレースを行う"></a>サービストレースを行う</h1><p>簡単ですがトレースも行ってみました。<br>Stackdriver Traceの画面にて時系列順にLatencyがplotされます。</p>
+<img src="/images/20200206/photo_20200206_06.png">
+
+<p>ちょうど点線のあたりでポチポチ画面を触っていたのですが、気になるほど高Latencyになってるわけではありませんでした。</p>
+<p>処理ごとのLatencyも確認できます。</p>
+<img src="/images/20200206/photo_20200206_07.png">
+
+<p>もちろん実装次第ではもっとブレークダウンした形でLatencyを参照できます。<br>こんなに簡単に見られることが分かってしまうと、OpenCensusを使った可視化にもっともっとチャレンジしたいという気持ちに包まれます！</p>
+<h1 id="GKEクラスタに適用したIstio用MANIFESTについて"><a href="#GKEクラスタに適用したIstio用MANIFESTについて" class="headerlink" title="GKEクラスタに適用したIstio用MANIFESTについて"></a>GKEクラスタに適用したIstio用MANIFESTについて</h1><blockquote>
+<p>READMEに従う形でMANIFESTをapply。ここの紐解きは後述(★)します。</p>
+</blockquote>
+<p>ここの布石を回収します。<br>applyしたのは<a href="https://github.com/GoogleCloudPlatform/microservices-demo/tree/master/istio-manifests" target="_blank" rel="noopener">ここ</a>にある3つのyamlでした。</p>
+<p>1つ目は <code>frontend-gateway.yaml</code> です。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">networking.istio.io/v1alpha3</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Gateway</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">frontend-gateway</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  selector:</span></span><br><span class="line"><span class="attr">    istio:</span> <span class="string">ingressgateway</span> <span class="comment"># use Istio default gateway implementation</span></span><br><span class="line"><span class="attr">  servers:</span></span><br><span class="line"><span class="attr">  - port:</span></span><br><span class="line"><span class="attr">      number:</span> <span class="number">80</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">http</span></span><br><span class="line"><span class="attr">      protocol:</span> <span class="string">HTTP</span></span><br><span class="line"><span class="attr">    hosts:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">"*"</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">networking.istio.io/v1alpha3</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">VirtualService</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">frontend-ingress</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  hosts:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">"*"</span></span><br><span class="line"><span class="attr">  gateways:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">frontend-gateway</span></span><br><span class="line"><span class="attr">  http:</span></span><br><span class="line"><span class="attr">  - route:</span></span><br><span class="line"><span class="attr">    - destination:</span></span><br><span class="line"><span class="attr">        host:</span> <span class="string">frontend</span></span><br><span class="line"><span class="attr">        port:</span></span><br><span class="line"><span class="attr">          number:</span> <span class="number">80</span></span><br></pre></td></tr></table></figure>
+
+<p>Istioを有効化すると自動的に <code>Ingress Gateway</code> が有効化されるのですが、具体的にGatewayがどのようなリクエストを受け付けるか定義しているのが <code>kind: Gateway</code> の箇所です。全てのHTTPリクエストを受け付ける形で定義されています。</p>
+<p><code>Ingress Gateway</code> 自体の詳細は<a href="https://istio.io/docs/tasks/traffic-management/ingress/ingress-control/" target="_blank" rel="noopener">こちら</a>も参照してみてください。</p>
+<p><code>kind: VirtualService</code> で定義されているのが、Gatewayを通過したリクエストの転送先です。 <code>destination</code> にて具体的な記載があり <code>frontend</code> と記載されているため今回のデモアプリではWeb画面を返却するWebサーバへルーティングされます。</p>
+<p>Ingress GatewayのIPアドレスは以下のコマンドで取得可能です。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ INGRESS_HOST=&quot;$(kubectl -n istio-system get service istio-ingressgateway \</span><br><span class="line">   -o jsonpath=&apos;&#123;.status.loadBalancer.ingress[0].ip&#125;&apos;)&quot;</span><br><span class="line">$ echo &quot;$INGRESS_HOST&quot;</span><br><span class="line">34.69.104.178</span><br></pre></td></tr></table></figure>
+
+<p>2つ目は <code>frontend.yaml</code> です。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">networking.istio.io/v1alpha3</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">VirtualService</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">frontend</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  hosts:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">"frontend.default.svc.cluster.local"</span></span><br><span class="line"><span class="attr">  http:</span></span><br><span class="line"><span class="attr">  - route:</span></span><br><span class="line"><span class="attr">    - destination:</span></span><br><span class="line"><span class="attr">        host:</span> <span class="string">frontend</span></span><br><span class="line"><span class="attr">        port:</span></span><br><span class="line"><span class="attr">          number:</span> <span class="number">80</span></span><br></pre></td></tr></table></figure>
+
+<p>これの存在意義はしっかり腹落ちしきっていないのですが、①IstioのIngress gatewayを使ったアクセスと②LoadBalancerを使ったアクセスではHTTPレスポンスヘッダに差異がありました。</p>
+<p>まずは①の場合。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ curl -v http://34.69.104.178</span><br><span class="line">* Rebuilt URL to: http://34.69.104.178/</span><br><span class="line">* Trying 34.69.104.178...</span><br><span class="line">* TCP_NODELAY set</span><br><span class="line">* Connected to 34.69.104.178 (34.69.104.178) port 80 (#0)</span><br><span class="line">&gt; GET / HTTP/1.1</span><br><span class="line">&gt; Host: 34.69.104.178</span><br><span class="line">&gt; User-Agent: curl/7.54.0</span><br><span class="line">&gt; Accept: */*</span><br><span class="line">&gt;</span><br><span class="line">&lt; HTTP/1.1 200 OK</span><br><span class="line">&lt; set-cookie: shop_session-id=e654493b-ee35-4c30-9cbd-c11b72f89a4d; Max-Age=172800</span><br><span class="line">&lt; date: Wed, 05 Feb 2020 07:23:26 GMT</span><br><span class="line">&lt; content-type: text/html; charset=utf-8</span><br><span class="line">&lt; x-envoy-upstream-service-time: 70</span><br><span class="line">&lt; server: istio-envoy</span><br><span class="line">&lt; transfer-encoding: chunked</span><br></pre></td></tr></table></figure>
+
+<p>次は②の場合。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">$ curl -v http://35.232.239.135</span><br><span class="line">* Rebuilt URL to: http://35.232.239.135/</span><br><span class="line">* Trying 35.232.239.135...</span><br><span class="line">* TCP_NODELAY set</span><br><span class="line">* Connected to 35.232.239.135 (35.232.239.135) port 80 (#0) </span><br><span class="line">&gt; GET / HTTP/1.1 </span><br><span class="line">&gt; Host: 35.232.239.135 </span><br><span class="line">&gt; User-Agent: curl/7.54.0</span><br><span class="line">&gt; Accept: */*</span><br><span class="line">&gt;</span><br><span class="line">&lt; HTTP/1.1 200 OK </span><br><span class="line">&lt; set-cookie: shop_session-id=828d0405-1c54-4605-8156-6178c480540f; Max-Age=172800 </span><br><span class="line">&lt; date: Wed, 05 Feb 2020 07:24:24 GMT</span><br><span class="line">&lt; content-type: text/html; charset=utf-8 </span><br><span class="line">&lt; x-envoy-upstream-service-time: 32</span><br><span class="line">&lt; server: istio-envoy</span><br><span class="line">&lt; x-envoy-decorator-operation: frontend.default.svc.cluster.local:80/* </span><br><span class="line">&lt; transfer-encoding: chunked</span><br></pre></td></tr></table></figure>
+
+<p>②のLoadBalancerを使ったアクセスの場合のみ <code>x-envoy-decorator-operation</code> というヘッダが含まれました。<a href="https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-decorator-operation" target="_blank" rel="noopener">Envoyの公式ドキュメント</a>にてこのヘッダについて言及されているのですが、おそらく内部ルーティングにおける名前解決のために本yamlをapplyしているものと思います。</p>
+<p>3つ目は <code>whitelist-egress-googleapis.yaml</code><br>外部への通信を許可する設定です。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">networking.istio.io/v1alpha3</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ServiceEntry</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">whitelist-egress-googleapis</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  hosts:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">"accounts.google.com"</span> <span class="comment"># Used to get token</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">"*.googleapis.com"</span></span><br><span class="line"><span class="attr">  ports:</span></span><br><span class="line"><span class="attr">  - number:</span> <span class="number">80</span></span><br><span class="line"><span class="attr">    protocol:</span> <span class="string">HTTP</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">http</span></span><br><span class="line"><span class="attr">  - number:</span> <span class="number">443</span></span><br><span class="line"><span class="attr">    protocol:</span> <span class="string">HTTPS</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">https</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">networking.istio.io/v1alpha3</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ServiceEntry</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">whitelist-egress-google-metadata</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  hosts:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">metadata.google.internal</span></span><br><span class="line"><span class="attr">  addresses:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="number">169.254</span><span class="number">.169</span><span class="number">.254</span> <span class="comment"># GCE metadata server</span></span><br><span class="line"><span class="attr">  ports:</span></span><br><span class="line"><span class="attr">  - number:</span> <span class="number">80</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">http</span></span><br><span class="line"><span class="attr">    protocol:</span> <span class="string">HTTP</span></span><br><span class="line"><span class="attr">  - number:</span> <span class="number">443</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">https</span></span><br><span class="line"><span class="attr">    protocol:</span> <span class="string">HTTPS</span></span><br></pre></td></tr></table></figure>
+
+<p>※外部への通信に対する挙動はIstioのバージョンによって異なるので利用バージョンの<a href="https://istio.io/docs/tasks/traffic-management/egress/egress-control/" target="_blank" rel="noopener">公式ドキュメント</a>を確認してください。</p>
+<blockquote>
+<p>all outbound traffic from an Istio-enabled pod is redirected to its sidecar proxy by default</p>
+</blockquote>
+<p>執筆時点(2020.02.05)での最新バージョンは <code>1.4.3</code> で、デフォルトの挙動は「クラスタ外部への通信を許可する」となります。</p>
+<p>ちなみに今回検証で利用したGKEクラスタにインストールしたIstioのバージョンは <code>1.1.7</code> で、正確には <code>Istio 1.1.17-gke.2</code> です。</p>
+<p>以下のページにて、GKEクラスタのバージョンごとのIstioバージョンのマッピングが確認できます。<br><a href="https://cloud.google.com/istio/docs/istio-on-gke/versions" target="_blank" rel="noopener">https://cloud.google.com/istio/docs/istio-on-gke/versions</a></p>
+<h1 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h1><p>今回は触りの部分でしたがGKEにおけるIstio活用について皆さんにお伝えできていれば幸いです。Traffic RoutingなどIstioの真髄とも言える部分への踏み込みはまた別に機会でやれたらと思います。</p>
+<p>以上、GCP連載2日目でした。明日もお楽しみに！！</p>
+<hr>
+<p>連載リンク：</p>
+<ul>
+<li><a href="https://future-architect.github.io/tags/GCP%98A%8D%DA/">GCP連載企画</a></li>
+</ul>
+<p>関連記事：</p>
+<ul>
+<li><a href="https://future-architect.github.io/articles/20200205/">GCP連載: Stackdriver Loggingへ良い感じのログ出力方法を考える</a></li>
+<li><a href="https://future-architect.github.io/articles/20190604/">OpenCensus(OpenTelemetry)とは</a></li>
+<li><a href="https://future-architect.github.io/articles/20191111/">Go Cloud#1 概要とBlobへの活用方法</a></li>
+<li><a href="https://future-architect.github.io/articles/20190713/">Goを学ぶときにつまずきやすいポイントFAQ</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="Istio on GKEではじめるサービスメッシュ" data-url="https://future-architect.github.io/articles/20200206/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200206/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200206/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200206/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200206/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Istio on GKEではじめるサービスメッシュ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200205/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載: Stackdriver Loggingへ良い感じのログ出力方法を考える
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200204/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                これさえあればサービス構成図がだいたい描けるアイコンセットを公開します！
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200203/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                チームで機能設計するためのPlantUML標準化
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200131/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AirflowのTips 11選
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200129/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                リモートワークを促進させるDaily Stand-up Meeting
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200128/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Auth0のRulesを使って認証認可を自在にカスタマイズする
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200127/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Umeda.go 2020 Winterに3名で登壇しました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200123/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Auth0 EmailまたはSMSを使ったパスワードレス認証を設定する
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200122/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Auth0 導入編
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (4)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (28)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (38)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (19)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/認証認可/">認証認可 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/マネジメント/">マネジメント (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
