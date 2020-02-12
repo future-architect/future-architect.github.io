@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>GCP連載#5【もう鍵なくさない】GCPのSecret ManagerとBerglasで幸せになる | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="前書きこんにちは、TIG所属インフラエンジニアの市川です。 突然ですが、普段生活するうえでカギ🔑をなくした、忘れたことはないでしょうか。私はあります。なくしたことはないけど、うっかり置き忘れちゃうんですよね。 それがことインフラ構築の場面ではどうでしょうか。最近はとにかく多くのカギを管理しなくてはなりません。API Keyとか気づいたら何が何だか分からなくなり、苦渋の決断の末、再度払い出すことも">
+<meta name="keywords" content="Python,GCP,Go,GCP連載">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GCP連載#5【もう鍵なくさない】GCPのSecret ManagerとBerglasで幸せになる">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200212/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="前書きこんにちは、TIG所属インフラエンジニアの市川です。 突然ですが、普段生活するうえでカギ🔑をなくした、忘れたことはないでしょうか。私はあります。なくしたことはないけど、うっかり置き忘れちゃうんですよね。 それがことインフラ構築の場面ではどうでしょうか。最近はとにかく多くのカギを管理しなくてはなりません。API Keyとか気づいたら何が何だか分からなくなり、苦渋の決断の末、再度払い出すことも">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20200212/photo_20200212_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200212/photo_20200212_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200212/photo_20200212_03.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200212/photo_20200212_04.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200212/photo_20200212_05.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200212/photo_20200212_06.png">
+<meta property="og:updated_time" content="2020-02-12T00:45:18.458Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GCP連載#5【もう鍵なくさない】GCPのSecret ManagerとBerglasで幸せになる">
+<meta name="twitter:description" content="前書きこんにちは、TIG所属インフラエンジニアの市川です。 突然ですが、普段生活するうえでカギ🔑をなくした、忘れたことはないでしょうか。私はあります。なくしたことはないけど、うっかり置き忘れちゃうんですよね。 それがことインフラ構築の場面ではどうでしょうか。最近はとにかく多くのカギを管理しなくてはなりません。API Keyとか気づいたら何が何だか分からなくなり、苦渋の決断の末、再度払い出すことも">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200212/photo_20200212_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="GCP連載#5【もう鍵なくさない】GCPのSecret ManagerとBerglasで幸せになる | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="GCP連載#5【もう鍵なくさない】GCPのSecret ManagerとBerglasで幸せになる,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="200px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200212/">GCP連載#5【もう鍵なくさない】GCPのSecret ManagerとBerglasで幸せになる</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200212-secret-manager" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 市川諒</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-02-12T00:14:36.000Z" itemprop="datePublished">2020/02/12</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/Python/" title="Python">Python</a>,
+  
+    <a href="/tags/GCP/" title="GCP">GCP</a>,
+  
+    <a href="/tags/Go/" title="Go">Go</a>,
+  
+    <a href="/tags/GCP連載/" title="GCP連載">GCP連載</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="前書き"><a href="#前書き" class="headerlink" title="前書き"></a>前書き</h2><p>こんにちは、TIG所属インフラエンジニアの市川です。</p>
+<p>突然ですが、普段生活するうえでカギ🔑をなくした、忘れたことはないでしょうか。私はあります。なくしたことはないけど、うっかり置き忘れちゃうんですよね。</p>
+<p>それがことインフラ構築の場面ではどうでしょうか。最近はとにかく多くのカギを管理しなくてはなりません。API Keyとか気づいたら何が何だか分からなくなり、苦渋の決断の末、再度払い出すことも多いのでは無いでしょうか。検証ならまぁ…ギリギリですが、本番ではやっちゃダメ絶対です。</p>
+<p>ということで、そんな管理人の皆さんに朗報です。 <strong>遂にGCPにシークレット管理機能がやってきました！</strong> CLIツールのBerglasとGUIで管理するSecret Managerを簡単にご紹介したいと思います。</p>
+<h2 id="Berglasを使ってみる"><a href="#Berglasを使ってみる" class="headerlink" title="Berglasを使ってみる"></a>Berglasを使ってみる</h2><p>サクっと利用するならCloud Shellだよね！ということで、以下Cloud Shellで作業をしています。</p>
+<h3 id="Berglasとは？"><a href="#Berglasとは？" class="headerlink" title="Berglasとは？"></a>Berglasとは？</h3><p><a href="https://github.com/GoogleCloudPlatform/berglas" target="_blank" rel="noopener">Githubページ</a>でこのツールについて確認します。</p>
+<blockquote>
+<p>Berglasは、Google Cloudでシークレットを保存および取得するためのコマンドラインツールおよびライブラリです。シークレットはCloud KMSで暗号化され、Cloud Storageに保存されます。 Secret Managerには相互運用可能なレイヤーもあります。</p>
+<ul>
+<li>CLIとして：Berglasは、Google Cloudでのデータの暗号化、復号化、保存のプロセスを自動化します。</li>
+<li>ライブラリとして：BerglasはさまざまなGoogle Cloudランタイムへのシークレットの組み込みを自動化します</li>
+</ul>
+<p>Berglasは、公式にサポートされているGoogle製品ではありません。</p>
+</blockquote>
+<p>なるほど。GCPのリポジトリで開発されてるのに公式製品ではないのね。CLIとしてもライブラリとしても利用可能というところがイケてますね。</p>
+<h3 id="Berglasのインストール（正確にはバイナリをダウンロード）"><a href="#Berglasのインストール（正確にはバイナリをダウンロード）" class="headerlink" title="Berglasのインストール（正確にはバイナリをダウンロード）"></a>Berglasのインストール（正確にはバイナリをダウンロード）</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> wget https://storage.googleapis.com/berglas/master/linux_amd64/berglas</span><br><span class="line"><span class="meta">$</span> chmod +x berglas</span><br></pre></td></tr></table></figure>
+
+<p>Dockerコンテナもあるようなので、好みに応じて使い分けください。</p>
+<h3 id="環境変数の準備と依存してるAPIの有効化"><a href="#環境変数の準備と依存してるAPIの有効化" class="headerlink" title="環境変数の準備と依存してるAPIの有効化"></a>環境変数の準備と依存してるAPIの有効化</h3><p>サクッと設定しましょう。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 環境変数の設定</span></span><br><span class="line">$ <span class="built_in">export</span> PROJECT_ID=my-secret-project</span><br><span class="line">$ <span class="built_in">export</span> BUCKET_ID=my-secrets-bucket-123</span><br><span class="line"></span><br><span class="line"><span class="comment"># APIの有効化</span></span><br><span class="line">$ gcloud services <span class="built_in">enable</span> --project <span class="variable">$&#123;PROJECT_ID&#125;</span> \</span><br><span class="line">  cloudkms.googleapis.com \</span><br><span class="line">  storage-api.googleapis.com \</span><br><span class="line">  storage-component.googleapis.com</span><br></pre></td></tr></table></figure>
+
+<h3 id="Berglas環境のBootstrap"><a href="#Berglas環境のBootstrap" class="headerlink" title="Berglas環境のBootstrap"></a>Berglas環境のBootstrap</h3><p>次コマンドを実行すると、シークレットを保存するための新しいCloud Storageバケットと、データを暗号化するためのCloud KMSキーが自動的に作成されます。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> berglas bootstrap --project <span class="variable">$PROJECT_ID</span> --bucket <span class="variable">$BUCKET_ID</span></span></span><br></pre></td></tr></table></figure>
+
+<p>成功すると下記のような出力が確認できます！最近のCLIツールってこれでもかってくらい優しくできていますよね。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Successfully created berglas environment:</span><br><span class="line"></span><br><span class="line">  Bucket: my-secrets-bucket-123</span><br><span class="line">  KMS key: projects/my-secret-project/locations/global/keyRings/berglas/cryptoKeys/berglas-key</span><br><span class="line"></span><br><span class="line">To create a secret:</span><br><span class="line"></span><br><span class="line">  berglas create my-secrets-bucket-123/my-secret abcd1234 \</span><br><span class="line">    --key projects/my-secret-project/locations/global/keyRings/berglas/cryptoKeys/berglas-key</span><br><span class="line"></span><br><span class="line">To grant access to that secret:</span><br><span class="line"></span><br><span class="line">  berglas grant my-secrets-bucket-123/my-secret \</span><br><span class="line">    --member user:jane.doe@mycompany.com</span><br><span class="line"></span><br><span class="line">For more help and examples, please run &quot;berglas -h&quot;.</span><br></pre></td></tr></table></figure>
+
+<h3 id="シークレットの作成"><a href="#シークレットの作成" class="headerlink" title="シークレットの作成"></a>シークレットの作成</h3><p>サンプルケースとして、<a href="http://httpbin.org/" target="_blank" rel="noopener">httpbin</a>のBasic認証APIへリクエストを投げ <code>200 OK</code> するのCloud Functionsを作ります。</p>
+<p><a href="http://httpbin.org/" target="_blank" rel="noopener">httpbin</a>のBasic認証は次のようなレスポンスを返すモックサーバです。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 認証情報なしだと401を返す</span></span><br><span class="line">$ curl -i -G <span class="string">"https://httpbin.org/basic-auth/basic-user-name/basic-user-pass"</span></span><br><span class="line">HTTP/2 401</span><br><span class="line">date: Tue, 11 Feb 2020 10:43:43 GMT</span><br><span class="line">content-length: 0</span><br><span class="line">server: gunicorn/19.9.0</span><br><span class="line">www-authenticate: Basic realm=<span class="string">"Fake Realm"</span></span><br><span class="line">access-control-allow-origin: *</span><br><span class="line">access-control-allow-credentials: <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 認証情報を付けて送るとちゃんと200を返す</span></span><br><span class="line">$ curl -i -G -u basic-user-name <span class="string">"https://httpbin.org/basic-auth/basic-user-name/basic-user-pass"</span></span><br><span class="line">Enter host password <span class="keyword">for</span> user <span class="string">'basic-user-name'</span>:</span><br><span class="line">HTTP/2 200</span><br><span class="line">date: Tue, 11 Feb 2020 10:45:16 GMT</span><br><span class="line">content-type: application/json</span><br><span class="line">content-length: 58</span><br><span class="line">server: gunicorn/19.9.0</span><br><span class="line">access-control-allow-origin: *</span><br><span class="line">access-control-allow-credentials: <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">"authenticated"</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="string">"user"</span>: <span class="string">"basic-user-name"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ということで、ユーザ名・パスワードを認証情報としてシークレットにしていきましょう！</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> berglas create <span class="variable">$&#123;BUCKET_ID&#125;</span>/api-user basic-user-name \</span></span><br><span class="line">  --key projects/$&#123;PROJECT_ID&#125;/locations/global/keyRings/berglas/cryptoKeys/berglas-key</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> berglas create <span class="variable">$&#123;BUCKET_ID&#125;</span>/api-pass basic-user-pass \</span></span><br><span class="line">  --key projects/$&#123;PROJECT_ID&#125;/locations/global/keyRings/berglas/cryptoKeys/berglas-key</span><br></pre></td></tr></table></figure>
+
+<h3 id="手順"><a href="#手順" class="headerlink" title="手順"></a>手順</h3><ul>
+<li>Cloud Functionへ渡すサービスアカウントを作成</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcloud iam service-accounts create berglas-service-account \</span></span><br><span class="line">  --project $&#123;PROJECT_ID&#125; \</span><br><span class="line">  --display-name "berglas Cloud Functions Example"</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">export</span> SA_EMAIL=berglas-service-account@<span class="variable">$&#123;PROJECT_ID&#125;</span>.iam.gserviceaccount.com</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Berglasから先ほど作ったサービスアカウントへシークレットへのアクセス権限を渡す"><a href="#Berglasから先ほど作ったサービスアカウントへシークレットへのアクセス権限を渡す" class="headerlink" title="Berglasから先ほど作ったサービスアカウントへシークレットへのアクセス権限を渡す"></a>Berglasから先ほど作ったサービスアカウントへシークレットへのアクセス権限を渡す</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> berglas grant <span class="variable">$&#123;BUCKET_ID&#125;</span>/api-user --member serviceAccount:<span class="variable">$&#123;SA_EMAIL&#125;</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> berglas grant <span class="variable">$&#123;BUCKET_ID&#125;</span>/api-pass --member serviceAccount:<span class="variable">$&#123;SA_EMAIL&#125;</span></span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Goのプログラム"><a href="#Goのプログラム" class="headerlink" title="Goのプログラム"></a>Goのプログラム</h4><p>golangでBASIC認証をする場合は<a href="https://golang.org/pkg/net/http/#Request.SetBasicAuth" target="_blank" rel="noopener"><code>SetBasicAuth</code></a>を使います。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> fn</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"io/ioutil"</span></span><br><span class="line">	<span class="string">"net/http"</span></span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">	<span class="string">"time"</span></span><br><span class="line"></span><br><span class="line">	_ <span class="string">"github.com/GoogleCloudPlatform/berglas/pkg/auto"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">readBody</span><span class="params">(res *http.Response)</span> <span class="title">string</span></span> &#123;</span><br><span class="line">    data, err := ioutil.ReadAll(res.Body)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* dataはbyte型なので、string型に */</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">string</span>(data)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">F</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">	fmt.Fprintf(w, <span class="string">"--- ENV VAR FROM BERGLAS ---\n"</span>)</span><br><span class="line">	fmt.Fprintf(w, <span class="string">"API_USER: %s\n"</span>, os.Getenv(<span class="string">"API_USER"</span>))</span><br><span class="line">	fmt.Fprintf(w, <span class="string">"API_PASS: %s\n"</span>, os.Getenv(<span class="string">"API_PASS"</span>))</span><br><span class="line"></span><br><span class="line">    client := &amp;http.Client&#123;Timeout: time.Duration(<span class="number">3</span>) * time.Second&#125;</span><br><span class="line"></span><br><span class="line">    req, _ := http.NewRequest(<span class="string">"GET"</span>, <span class="string">"https://httpbin.org/basic-auth/basic-user-name/basic-user-pass"</span>, <span class="literal">nil</span>)</span><br><span class="line">    req.SetBasicAuth(os.Getenv(<span class="string">"API_USER"</span>), os.Getenv(<span class="string">"API_PASS"</span>))</span><br><span class="line">    res, err := client.Do(req)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">defer</span> res.Body.Close()</span><br><span class="line"></span><br><span class="line">	fmt.Fprintf(w, <span class="string">"--- HTTPBIN RESPONSE ---\n"</span>)</span><br><span class="line">	fmt.Fprintf(w, readBody(res))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="デプロイ"><a href="#デプロイ" class="headerlink" title="デプロイ"></a>デプロイ</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcloud <span class="built_in">functions</span> deploy berglas-example-go \</span></span><br><span class="line">  --project $&#123;PROJECT_ID&#125; \</span><br><span class="line">  --region us-central1 \</span><br><span class="line">  --runtime go113 \</span><br><span class="line">  --memory 1G \</span><br><span class="line">  --max-instances 10 \</span><br><span class="line">  --service-account $&#123;SA_EMAIL&#125; \</span><br><span class="line">  --set-env-vars "API_USER=berglas://$&#123;BUCKET_ID&#125;/api-user,API_PASS=berglas://$&#123;BUCKET_ID&#125;/api-pass" \</span><br><span class="line">  --entry-point F \</span><br><span class="line">  --trigger-http \</span><br><span class="line">  --allow-unauthenticated</span><br></pre></td></tr></table></figure>
+
+<h4 id="テスト実行"><a href="#テスト実行" class="headerlink" title="テスト実行"></a>テスト実行</h4><p>ちゃんとBerglasで作成したシークレットが取得できましたね！<br>割と道のりが長いですが、GCPのサービスから簡単にアクセスできるのは気持ちが良いですね。<br><img src="/images/20200212/photo_20200212_01.png" class="img-small-size"></p>
+<h2 id="Secret-Managerを利用"><a href="#Secret-Managerを利用" class="headerlink" title="Secret Managerを利用"></a>Secret Managerを利用</h2><p>折り返しです。もうしばしお付き合いください。</p>
+<h3 id="Secret-Manageとは？"><a href="#Secret-Manageとは？" class="headerlink" title="Secret Manageとは？"></a>Secret Manageとは？</h3><blockquote>
+<p>インフラストラクチャとアプリケーションレベルのシークレットを暗号化、保存、管理、監査します。<br><a href="https://cloud.google.com/solutions/secrets-management/" target="_blank" rel="noopener">https://cloud.google.com/solutions/secrets-management/</a></p>
+</blockquote>
+<p>簡潔ですね。CloudKMSはGCPの管理するカギで暗号化、復号などをサポートしたサービスですが、もう一枚レイヤが上なサービスのようです。BerglasのGUI版ぐらいの気持ちでいると良いとお思います。</p>
+<h3 id="Secret-Manager画面"><a href="#Secret-Manager画面" class="headerlink" title="Secret Manager画面"></a>Secret Manager画面</h3><p>GUI画面へは<code>セキュリティ -&gt; シークレット マネージャー</code>でアクセスできます。</p>
+<p>作成画面はかなり簡潔で好感度が高いです。この手のサービスはやたらと入力項目が多くて初見殺しなイメージ（勝手）があったので。</p>
+<img src="/images/20200212/photo_20200212_02.png" class="img-small-size" style="border:solid 1px #000000">
+
+<p>ラベルで整理ができるのも片づけが苦手な私にぴったりです。（今回はつけていないですが。。。）</p>
+<p>有効化、無効化、破棄も非常に容易にできます。新しいバージョンを選択することで、シークレットの中身の更新と過去のシークレットを一括無効にできます。</p>
+<img src="/images/20200212/photo_20200212_03.png" class="img-middle-size" style="border:solid 1px #000000">
+
+<img src="/images/20200212/photo_20200212_04.png" class="img-middle-size" style="border:solid 1px #000000">
+
+<h3 id="Berglasで登録したシークレットをSecret-Managerに移す"><a href="#Berglasで登録したシークレットをSecret-Managerに移す" class="headerlink" title="Berglasで登録したシークレットをSecret Managerに移す"></a>Berglasで登録したシークレットをSecret Managerに移す</h3><p>何やらBerglasと連携もできるようなので、ちょこっと触ってみます。</p>
+<ul>
+<li>BerglasからSecret Managerのキーにアクセス</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> berglas access sm://<span class="variable">$&#123;PROJECT_ID&#125;</span>/the-first-secret</span></span><br><span class="line">sugoi-secret</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>migrate</li>
+</ul>
+<p><a href="https://cloud.google.com/blog/ja/products/identity-security/introducing-google-clouds-secret-manager" target="_blank" rel="noopener">Google Cloud Blog</a>に「1回限りの」って書いてあるのが不穏ｗ</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> berglas migrate <span class="variable">$&#123;BUCKET_ID&#125;</span> --project <span class="variable">$&#123;PROJECT_ID&#125;</span></span></span><br><span class="line">Migrating api-user to projects/my-secret-project/secrets/api-user... done!</span><br><span class="line">Migrating api-pass to projects/my-secret-project/secrets/api-pass... done!</span><br></pre></td></tr></table></figure>
+
+<p>二回目の実行</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> berglas migrate <span class="variable">$&#123;BUCKET_ID&#125;</span> --project <span class="variable">$&#123;PROJECT_ID&#125;</span></span></span><br><span class="line">Migrating api-user to projects/my-secret-project/secrets/api-user... done!</span><br><span class="line">Migrating api-pass to projects/my-secret-project/secrets/api-pass... done!</span><br></pre></td></tr></table></figure>
+
+<p>通りました。</p>
+<ul>
+<li>画面</li>
+</ul>
+<p>イケてますね！当然ですが、最終更新日はUPLOADした時間になります。</p>
+<img src="/images/20200212/photo_20200212_05.png" class="img-middle-size" style="border:solid 1px #000000">
+
+<h3 id="Cloud-FunctionからSecret-Managerを使う"><a href="#Cloud-FunctionからSecret-Managerを使う" class="headerlink" title="Cloud FunctionからSecret Managerを使う"></a>Cloud FunctionからSecret Managerを使う</h3><p>流れとしては、非常に簡単です。</p>
+<ol>
+<li>シークレットアクセサ役割をCloud Functionのサービスアカウントに割り当て</li>
+<li>利用</li>
+</ol>
+<h4 id="サービスアカウントへ役割を割り当て"><a href="#サービスアカウントへ役割を割り当て" class="headerlink" title="サービスアカウントへ役割を割り当て"></a>サービスアカウントへ役割を割り当て</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gcloud beta secrets add-iam-policy-binding the-first-secret \</span><br><span class="line">    --role roles/secretmanager.secretAccessor \</span><br><span class="line">    --member serviceAccount:<span class="variable">$&#123;PROJECT_ID&#125;</span>@appspot.gserviceaccount.com</span><br></pre></td></tr></table></figure>
+
+<h4 id="サンプルプログラム"><a href="#サンプルプログラム" class="headerlink" title="サンプルプログラム"></a>サンプルプログラム</h4><p>シークレットを吐き出すのみというシンプルなコードです。BerglasのクライアントライブラリはgooglecloudがメンテしているのがGoだけでしたが、今回はPythonライブラリがあったのでPythonで書きます。</p>
+<figure class="highlight python"><figcaption><span>main.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> google.cloud <span class="keyword">import</span> secretmanager</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_secret</span><span class="params">(request)</span>:</span></span><br><span class="line">    client = secretmanager.SecretManagerServiceClient()</span><br><span class="line">    secret_name = <span class="string">'the-first-secret'</span></span><br><span class="line">    project_id = os.getenv(<span class="string">'GCP_PROJECT'</span>)</span><br><span class="line">    resource_name = <span class="string">'projects/&#123;&#125;/secrets/&#123;&#125;/versions/latest'</span>.format(project_id, secret_name)</span><br><span class="line">    res = client.access_secret_version(resource_name)</span><br><span class="line">    secret_string = res.payload.data.decode(<span class="string">'utf-8'</span>)</span><br><span class="line">    <span class="keyword">return</span> secret_string</span><br></pre></td></tr></table></figure>
+
+<p>ライブラリ<code>google-cloud-secret-manager</code>が必要なので、<code>requirements.txt</code>も作成しましょう。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">google-cloud-secret-manager==0.1.1</span><br></pre></td></tr></table></figure>
+
+<h4 id="デプロイ-1"><a href="#デプロイ-1" class="headerlink" title="デプロイ"></a>デプロイ</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcloud <span class="built_in">functions</span> deploy print_secret \</span></span><br><span class="line">  --runtime python37 \</span><br><span class="line">  --trigger-http \</span><br><span class="line">  --allow-unauthenticated</span><br></pre></td></tr></table></figure>
+
+<img src="/images/20200212/photo_20200212_06.png">
+
+<p>…ニッコリ😄</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>使い方にちょいとクセというか、お作法があるので、習うより慣れろシリーズだと思います。<br>これでもう、カギの管理に困ることはなくなって、幸せな世界が待っていることでしょう。<br>ご興味のある方は、ぜひ触ってみてはいかがでしょうか。</p>
+<h2 id="関連リンク"><a href="#関連リンク" class="headerlink" title="関連リンク"></a>関連リンク</h2><ul>
+<li><a href="https://future-architect.github.io/tags/GCP%E9%80%A3%E8%BC%89/">GCP連載企画</a></li>
+<li><a href="https://future-architect.github.io/tags/GoCDK/">Go Cloud連載</a></li>
+<li><a href="https://future-architect.github.io/articles/20190909/">Let’s Try GCP #1 ～Cloud Run Buttonを使った楽々コンテナデプロイをやってみた～</a></li>
+<li><a href="https://future-architect.github.io/articles/20190927/">Let’s Try GCP #2 ～Cloud FunctionをVPC connectorと一緒に使ってみる～</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="GCP連載#5【もう鍵なくさない】GCPのSecret ManagerとBerglasで幸せになる" data-url="https://future-architect.github.io/articles/20200212/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200212/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200212/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200212/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200212/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#5【もう鍵なくさない】GCPのSecret ManagerとBerglasで幸せになる
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200209/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                golang.tokyo #29に4名で登壇しました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200210/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#4 Cloud Life Sciencesを見てみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200207/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#3 Goでサーバーレスな管理画面アプリを作る
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200206/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#2 Istio on GKEではじめるサービスメッシュ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200205/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#1 Stackdriver Loggingへ良い感じのログ出力方法を考える
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200204/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                これさえあればサービス構成図がだいたい描けるアイコンセットを公開します！
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200203/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                チームで機能設計するためのPlantUML標準化
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200131/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AirflowのTips 11選
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200129/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                リモートワークを促進させるDaily Stand-up Meeting
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (4)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (30)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (40)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (19)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/認証認可/">認証認可 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/マネジメント/">マネジメント (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
