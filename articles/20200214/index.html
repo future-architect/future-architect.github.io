@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="GCP集中連載の7回目です。 まずは簡単に自己紹介をさせてください。TIGのDXチームに所属している加部です。入社してからは主にインフラやデータベースを中心に仕事をしており、現在はGOでバックエンドのAPIの開発なんかもしています。突然ですがAWSを利用しているけどビッグデータの蓄積や解析はBigQueryで実施したい、なんて意見も最近多くなってきているようですね。実際にS3からBigQueryの">
+<meta name="keywords" content="GCP,GCP連載,BigQuery">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200214/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="GCP集中連載の7回目です。 まずは簡単に自己紹介をさせてください。TIGのDXチームに所属している加部です。入社してからは主にインフラやデータベースを中心に仕事をしており、現在はGOでバックエンドのAPIの開発なんかもしています。突然ですがAWSを利用しているけどビッグデータの蓄積や解析はBigQueryで実施したい、なんて意見も最近多くなってきているようですね。実際にS3からBigQueryの">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20200214/photo_20200214_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200214/photo_20200214_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200214/photo_20200214_03.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200214/photo_20200214_04.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200214/1.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200214/2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200214/photo_20200214_05.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200214/3.png">
+<meta property="og:updated_time" content="2020-02-14T00:50:34.981Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる">
+<meta name="twitter:description" content="GCP集中連載の7回目です。 まずは簡単に自己紹介をさせてください。TIGのDXチームに所属している加部です。入社してからは主にインフラやデータベースを中心に仕事をしており、現在はGOでバックエンドのAPIの開発なんかもしています。突然ですがAWSを利用しているけどビッグデータの蓄積や解析はBigQueryで実施したい、なんて意見も最近多くなってきているようですね。実際にS3からBigQueryの">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200214/photo_20200214_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="200px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200214/">GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200214-datatransfer" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 加部達郎</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-02-14T00:39:28.000Z" itemprop="datePublished">2020/02/14</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/GCP/" title="GCP">GCP</a>,
+  
+    <a href="/tags/GCP連載/" title="GCP連載">GCP連載</a>,
+  
+    <a href="/tags/BigQuery/" title="BigQuery">BigQuery</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="https://future-architect.github.io/tags/GCP%E9%80%A3%E8%BC%89/">GCP集中連載</a>の7回目です。</p>
+<p>まずは簡単に自己紹介をさせてください。TIGのDXチームに所属している加部です。入社してからは主にインフラやデータベースを中心に仕事をしており、現在はGOでバックエンドのAPIの開発なんかもしています。<br>突然ですがAWSを利用しているけどビッグデータの蓄積や解析はBigQueryで実施したい、なんて意見も最近多くなってきているようですね。実際にS3からBigQueryのデータ転送について検索すると、自前でデータ転送を作成してみましたや、データ転送をサービスとして販売しているような会社もあります。そんな中GCPが提供しているBigQeryへのデータ転送サービス<a href="https://cloud.google.com/bigquery/transfer/" target="_blank" rel="noopener">DataTransferService</a>のソース元としてS3が追加され、簡単にS3からBigQueryのデータ転送のジョブを作成できるようになりました。まだ、ベータ版でのリリースのみですが今回は実際にS3からのデータ転送を試してみましょう。</p>
+<h1 id="そもそもDataTransferServiceとは"><a href="#そもそもDataTransferServiceとは" class="headerlink" title="そもそもDataTransferServiceとは"></a>そもそもDataTransferServiceとは</h1><img src="/images/20200214/photo_20200214_01.png" class="img-very-small-size">
+
+
+<blockquote>
+<p>BigQuery Data Transfer Service は、あらかじめ設定されたスケジュールに基づき、BigQuery BigQuery Data Transfer Service は、あらかじめ設定されたスケジュールに基づき、BigQuery へのデータの移動を自動化するマネージド サービスです。そのため、アナリティクス チームが BigQuery データ ウェアハウス基盤を構築する際にコードの作成はまったく必要ありません。<br><a href="https://cloud.google.com/bigquery/transfer" target="_blank" rel="noopener">https://cloud.google.com/bigquery/transfer</a></p>
+</blockquote>
+<p>要はBigQueryに対してデータを転送するジョブをマネージドサービスで簡単に作成できるよということですね。<br>マニュアルによると現在下記のようなサービスとの連携が可能となっています。</p>
+<ul>
+<li>AWS S3 </li>
+<li>キャンペーンマネージャー</li>
+<li>Cloud Strage</li>
+<li>Google アドマネージャー</li>
+<li>Google 広告</li>
+<li>Google Merchant Center</li>
+<li>Google Play</li>
+<li>検索広告360</li>
+<li>YouTubeチャンネル</li>
+<li>YouTubeコンテンツ所有者</li>
+</ul>
+<p>今までは主にGoogle系のサービスとの親和性が高く、AWSのS３は初めてのGoogle以外のソース元のサービスになるのではないでしょうか。</p>
+<h1 id="今回の構成と手順"><a href="#今回の構成と手順" class="headerlink" title="今回の構成と手順"></a>今回の構成と手順</h1><img src="/images/20200214/photo_20200214_02.png" class="img-middle-size">
+
+<p>今回はS3のバケットに格納したCSVファイルのデータを、DataTransferServiceの機能を使ってBiqQueryに転送します。<br>複雑なコマンドや手順があるわけでは無いため、とてもかんたんに設定することができます。本記事では主にコマンドラインによる作成となりますが、もちろんコンソールからポチポチして作成することもできます。</p>
+<ol>
+<li>S3バケットの作成</li>
+<li>シークレットキー、アクセスキーの発行</li>
+<li>DataTransfer APIの有効化</li>
+<li>BigQueryのデータセット、テーブル作成</li>
+<li>転送ジョブの作成</li>
+</ol>
+<h1 id="手順1-AWSでのS3バケットの作成"><a href="#手順1-AWSでのS3バケットの作成" class="headerlink" title="手順1 AWSでのS3バケットの作成"></a>手順1 AWSでのS3バケットの作成</h1><p><strong>S3の作成に関しては下記参照</strong><br><a href="https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/user-guide/create-bucket.html" target="_blank" rel="noopener">https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/user-guide/create-bucket.html</a></p>
+<h1 id="手順2-シークレットキー、アクセスキーの発行"><a href="#手順2-シークレットキー、アクセスキーの発行" class="headerlink" title="手順2 シークレットキー、アクセスキーの発行"></a>手順2 シークレットキー、アクセスキーの発行</h1><p>S3のデータ転送をするためには「AmazonS3ReadOnlyAccess」の権限が必要になるため、シークレットキーとアクセスキーを発行するユーザの権限に追加してください。</p>
+<p><strong>シークレットキー、アクセスキーの発行は下記参照</strong><br><a href="https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cli-services-iam-create-creds.html" target="_blank" rel="noopener">https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cli-services-iam-create-creds.html</a></p>
+<h1 id="手順3-DataTransfer-APIの有効化"><a href="#手順3-DataTransfer-APIの有効化" class="headerlink" title="手順3 DataTransfer APIの有効化"></a>手順3 DataTransfer APIの有効化</h1><p>AWS環境の準備が完了したら次はGCP環境の準備です。まずは<a href="https://cloud.google.com/bigquery-transfer/docs/enable-transfer-service?hl=ja" target="_blank" rel="noopener">DataTransfer APIの有効化</a>にしましょう。</p>
+<p>コンソールタブの「APIとサービス」からライブラリを選択し、「BigQuery Data Transfer API」と入力して検索してください。<br><img src="/images/20200214/photo_20200214_03.png"></p>
+<p>検索したAPIを選択して、有効にするをクリックするとAPIが有効化されます。<br><img src="/images/20200214/photo_20200214_04.png"></p>
+<h1 id="手順4-BigQueryのデータセット、テーブル作成"><a href="#手順4-BigQueryのデータセット、テーブル作成" class="headerlink" title="手順4 BigQueryのデータセット、テーブル作成"></a>手順4 BigQueryのデータセット、テーブル作成</h1><p>今回のサンプルデータとして気象庁のデータから2019年の東京の気温のデータを使います。<br><strong>下記URLから取得</strong><br><a href="http://www.data.jma.go.jp/gmd/risk/obsdl/index.php" target="_blank" rel="noopener">http://www.data.jma.go.jp/gmd/risk/obsdl/index.php</a></p>
+<p><a href="https://cloud.google.com/bigquery/docs/bq-command-line-tool?hl=ja" target="_blank" rel="noopener">bqコマンド</a>でデータセットを作成して、取得したデータを格納できるようなテーブルを作成します。</p>
+<p><strong>データセットの作成</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bq --location=asia-northeast1 mk \</span><br><span class="line">  --dataset <span class="built_in">test</span>-project-268106:from_s3</span><br></pre></td></tr></table></figure>
+
+<p><strong>テーブル作成</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bq mk --table <span class="built_in">test</span>-project-268106:from_s3.temp_tokyo \</span><br><span class="line">  date:string,temp_avg:<span class="built_in">integer</span>,temp_max:<span class="built_in">integer</span>,temp_min:<span class="built_in">integer</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="手順5-転送ジョブの作成"><a href="#手順5-転送ジョブの作成" class="headerlink" title="手順5 転送ジョブの作成"></a>手順5 転送ジョブの作成</h1><p>いよいよS3からの転送ジョブの作成です。こちらもコマンドラインでの作成していきます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">bq mk \</span><br><span class="line">  --transfer_config  \</span><br><span class="line">  --project_id=*** \</span><br><span class="line">  --data_source=amazon_s3 \</span><br><span class="line">  --display_name=data_export_from_s3 \</span><br><span class="line">  --target_dataset=from_s3 \</span><br><span class="line">  --params=<span class="string">'&#123;</span></span><br><span class="line"><span class="string">"data_path":"s3://data-to-bq/temperature/data.csv",</span></span><br><span class="line"><span class="string">"destination_table_name_template":"temp_tokyo",</span></span><br><span class="line"><span class="string">"access_key_id":"***",</span></span><br><span class="line"><span class="string">"secret_access_key":"U***",</span></span><br><span class="line"><span class="string">"file_format":"CSV",</span></span><br><span class="line"><span class="string">"max_bad_records":"0",</span></span><br><span class="line"><span class="string">"ignore_unknown_values":"true",</span></span><br><span class="line"><span class="string">"field_delimiter":",",</span></span><br><span class="line"><span class="string">"skip_leading_rows":"0",</span></span><br><span class="line"><span class="string">"allow_quoted_newlines":"true",</span></span><br><span class="line"><span class="string">"allow_jagged_rows":"false"&#125;'</span></span><br></pre></td></tr></table></figure>
+
+<p>簡単にコマンドラインのオプションについて抜粋して説明を記載します。</p>
+<ul>
+<li><strong>data_source</strong> : BigQueryにデータを転送するデータソース。今回はS3なので「amazon_s3」を選択</li>
+<li><strong>data_path</strong> : S3のURIを入力します。基本的には「S3://バケット名/フォルダ名/オブエジェクト名」</li>
+<li><strong>access_key_id/secret_access_key</strong> : 手順２で作成したユーザのアクセスキーとシークレットキー</li>
+<li><strong>file_format</strong> : 今回はCSVデータがサンプルデータなので「CSV」を入力。CSV以外にも、JSONやPARQUETなどのファイルフォーマットも選択することが可能</li>
+<li><strong>field_delimiter</strong> : 今回はカンマ区切りのCSVのため「,」を入力</li>
+<li><strong>skip_leading_rows</strong> : スキップするヘッダの行数。今回はヘッダ行を含まないデータにしているため「０」</li>
+</ul>
+<p>コマンドを実行するとGoogleアカウントのログイン許可のURLが表示され、URLのリンクに飛び認証コードを入力すると正常に作成されましたと表示されます。コンソールからも転送ジョブが作成されていることが確認できました。<br><img src="/images/20200214/1.png" style="border:solid 1px #000000"></p>
+<p>ジョブが作成されるとその後すぐに実行され、コンソールから実行ログを確認することができます。<br><img src="/images/20200214/2.png" style="border:solid 1px #000000"></p>
+<p>今回は小さなデータでしたが3分ほどかかってジョブは終了しました。<br>実際にSQLでデータを見てみると下記の様に取得することができます。<br><img src="/images/20200214/photo_20200214_05.png" class="img-small-size"></p>
+<h2 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h2><p>注意点としてはコマンドラインからの作成の場合、スケジュールの選択オプションがありませんでした。どうやらデフォルト値である24時間ごと(日時)が自動で選択されているようです。作成後にコンソールからジョブのスケジュールを編集することは可能です。下記のように毎日、毎週、毎月、カスタム、オンデマンドと選ぶことができます。<br><img src="/images/20200214/3.png" class="img-middle-size"></p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>今回はGCPのコマンドラインで作成しましたがInfrastructure as Codeで有名なTerraformなどでも作成することができます。今回の機能を実運用で利用するとなるとS3のパス設計など検討することは他にもあるとは思いますが、AWSを使いつつGCPのBigQueryを利用するなどのマルチクラウドの夢が広がるような機能ですね。今後もさらなる機能拡張を期待します。</p>
+<h2 id="関連リンク"><a href="#関連リンク" class="headerlink" title="関連リンク"></a>関連リンク</h2><ul>
+<li><a href="https://future-architect.github.io/tags/GCP%E9%80%A3%E8%BC%89/">GCP連載企画</a></li>
+<li><a href="https://future-architect.github.io/articles/20190909/">Let’s Try GCP #1 ～Cloud Run Buttonを使った楽々コンテナデプロイをやってみた～</a></li>
+<li><a href="https://future-architect.github.io/articles/20190903/">Terraformのベストなプラクティスってなんだろうか</a></li>
+<li><a href="https://future-architect.github.io/tags/GoCDK/">Go Cloud連載</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる" data-url="https://future-architect.github.io/articles/20200214/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200214/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200214/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200214/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200214/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200213/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#6 Terraform Validatorを使って、GCPのセキュリティポリシーの自動チェックを行う
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200212/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#5【もう鍵なくさない】GCPのSecret ManagerとBerglasで幸せになる
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200209/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                golang.tokyo #29に4名で登壇しました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200210/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#4 Cloud Life Sciencesを見てみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200207/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#3 Goでサーバーレスな管理画面アプリを作る
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200206/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#2 Istio on GKEではじめるサービスメッシュ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200205/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#1 Stackdriver Loggingへ良い感じのログ出力方法を考える
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200204/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                これさえあればサービス構成図がだいたい描けるアイコンセットを公開します！
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200203/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                チームで機能設計するためのPlantUML標準化
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (4)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (30)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (42)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (19)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/認証認可/">認証認可 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/マネジメント/">マネジメント (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/XXX/">XXX (0)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
