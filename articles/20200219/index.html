@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>GCP連載#10 Terraform ではなくCloud Deployment Manager を使ってみよう | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにGCP 連載もいよいよ最終日です！ 普段は、Terraform を使っているのですが、ふとCloud Deployment Manager を使ったことないことに気づきました。そこで、Cloud Deployment Manager について紹介したいと思います。 Cloud Deployment Manager とはCloud Deployment Manager とは、GCP のリソー">
+<meta name="keywords" content="GCP,GCP連載">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GCP連載#10 Terraform ではなくCloud Deployment Manager を使ってみよう">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200219/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="はじめにGCP 連載もいよいよ最終日です！ 普段は、Terraform を使っているのですが、ふとCloud Deployment Manager を使ったことないことに気づきました。そこで、Cloud Deployment Manager について紹介したいと思います。 Cloud Deployment Manager とはCloud Deployment Manager とは、GCP のリソー">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20200219/photo_20200219_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200219/photo_20200219_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200219/photo_20200219_03.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200219/photo_20200219_04.png">
+<meta property="og:updated_time" content="2020-02-19T01:12:15.545Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GCP連載#10 Terraform ではなくCloud Deployment Manager を使ってみよう">
+<meta name="twitter:description" content="はじめにGCP 連載もいよいよ最終日です！ 普段は、Terraform を使っているのですが、ふとCloud Deployment Manager を使ったことないことに気づきました。そこで、Cloud Deployment Manager について紹介したいと思います。 Cloud Deployment Manager とはCloud Deployment Manager とは、GCP のリソー">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200219/photo_20200219_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="GCP連載#10 Terraform ではなくCloud Deployment Manager を使ってみよう | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="GCP連載#10 Terraform ではなくCloud Deployment Manager を使ってみよう,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="200px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200219/">GCP連載#10 Terraform ではなくCloud Deployment Manager を使ってみよう</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200219-gcpmanager" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 前原応光</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-02-19T01:05:30.000Z" itemprop="datePublished">2020/02/19</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/GCP/" title="GCP">GCP</a>,
+  
+    <a href="/tags/GCP連載/" title="GCP連載">GCP連載</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p><a href="https://future-architect.github.io/tags/GCP%E9%80%A3%E8%BC%89/">GCP 連載</a>もいよいよ最終日です！</p>
+<p>普段は、Terraform を使っているのですが、ふとCloud Deployment Manager を使ったことないことに気づきました。そこで、Cloud Deployment Manager について紹介したいと思います。</p>
+<h2 id="Cloud-Deployment-Manager-とは"><a href="#Cloud-Deployment-Manager-とは" class="headerlink" title="Cloud Deployment Manager とは"></a>Cloud Deployment Manager とは</h2><p><a href="https://cloud.google.com/deployment-manager" target="_blank" rel="noopener">Cloud Deployment Manager</a> とは、GCP のリソースをYAML で宣言的に記述し、デプロイできるサービスです。要は、AWS のCloudFormation などにあたるサービスです。</p>
+<p>ちなみにですが、Cloud Deployment Manager は、テンプレートをPython やJinja2 を使って、パラメータ化することもできます。ざっくりですが、以下にCloud Deployment Manager と似たサービスをクラウド毎に記載します。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>GCP</th>
+<th>AWS</th>
+<th>AWS</th>
+<th>Alibaba Cloud</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Management tools</td>
+<td>Cloud Deployment Manager</td>
+<td>AWS CloudFormation</td>
+<td>Cloud Development Kit (CDK)</td>
+<td>Resource Orchestration Service</td>
+</tr>
+<tr>
+<td>Format</td>
+<td>JSON, YAML, Python, Jinja2</td>
+<td>JSON, YAML</td>
+<td>TypeScript, Python, Java, C#</td>
+<td>JSON</td>
+</tr>
+</tbody></table>
+<h2 id="事前準備"><a href="#事前準備" class="headerlink" title="事前準備"></a>事前準備</h2><p>事前に以下は実施済みであることを前提とします。</p>
+<ul>
+<li>プロジェクト作成</li>
+<li><a href="https://cloud.google.com/sdk/docs/quickstarts?hl=ja" target="_blank" rel="noopener">gcloud</a> コマンドが使える状態</li>
+</ul>
+<p>まず、Deployment Manager のAPI を有効化し、次にgcloud コマンドでログインし、プロジェクトを指定します。<br>[MY_PROJECT]にあらかじめ作成したプロジェクトのID を指定します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ gcloud auth login</span><br><span class="line">$ gcloud config <span class="built_in">set</span> project [MY_PROJECT]</span><br></pre></td></tr></table></figure>
+
+<h2 id="Cloud-Deployment-Manager-事始め"><a href="#Cloud-Deployment-Manager-事始め" class="headerlink" title="Cloud Deployment Manager 事始め"></a>Cloud Deployment Manager 事始め</h2><p>まずは、GCE を作成して慣れてみたいと思います。</p>
+<h3 id="定義ファイルの作成"><a href="#定義ファイルの作成" class="headerlink" title="定義ファイルの作成"></a>定義ファイルの作成</h3><p>YAML でリソースを定義します。</p>
+<figure class="highlight yaml"><figcaption><span>vm.yaml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">resources:</span></span><br><span class="line"><span class="attr">- type:</span> <span class="string">compute.v1.instance</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">test-vm</span></span><br><span class="line"><span class="attr">  properties:</span></span><br><span class="line"><span class="attr">    zone:</span> <span class="string">asia-northeast1-a</span></span><br><span class="line"><span class="attr">    machineType:</span> <span class="attr">https://www.googleapis.com/compute/v1/projects/[MY_PROJECT]/zones/asia-northeast1-a/machineTypes/f1-micro</span></span><br><span class="line"><span class="attr">    disks:</span></span><br><span class="line"><span class="attr">    - deviceName:</span> <span class="string">boot</span></span><br><span class="line"><span class="attr">      type:</span> <span class="string">PERSISTENT</span></span><br><span class="line"><span class="attr">      boot:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">      autoDelete:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">      initializeParams:</span></span><br><span class="line"><span class="attr">        sourceImage:</span> <span class="attr">https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-9</span></span><br><span class="line"><span class="attr">    networkInterfaces:</span></span><br><span class="line"><span class="attr">    - network:</span> <span class="attr">https://www.googleapis.com/compute/v1/projects/[MY_PROJECT]/global/networks/default</span></span><br><span class="line"><span class="attr">      accessConfigs:</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">External</span> <span class="string">NAT</span></span><br><span class="line"><span class="attr">        type:</span> <span class="string">ONE_TO_ONE_NAT</span></span><br></pre></td></tr></table></figure>
+
+<p>定義ファイルの設定内容を以下に記載します。</p>
+<ul>
+<li>name: インスタンス名を指定</li>
+<li>zone: 作成するゾーンを指定</li>
+<li>machineType: インスタンスタイプを指定</li>
+</ul>
+<p>また、[MY_PROJECT]は、作成したプロジェクトのID を指定します。</p>
+<h3 id="リソースのデプロイ"><a href="#リソースのデプロイ" class="headerlink" title="リソースのデプロイ"></a>リソースのデプロイ</h3><p>リソースのデプロイは、<code>gcloud</code>をコマンドを使用してデプロイします。</p>
+<p>まずは、プレビューで作成したいと思います。プレビューを指定すると作成や更新前にどのような変化をもたらすかを確認することができます。要は、dry-run 的な用途で使えるオプションです。</p>
+<h4 id="コマンドの構成について"><a href="#コマンドの構成について" class="headerlink" title="コマンドの構成について"></a>コマンドの構成について</h4><p>コマンドの構成について以下に記載します。<br>詳細は、<a href="https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments" target="_blank" rel="noopener">こちら</a>を参考にしてください。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gcloud deployment-manager deployments COMMAND DEPLOYMENT_NAME --config [FILE_PATH] --preview</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>COMMAND: create, delete, update などを指定</li>
+<li>DEPLOYMENT_NAME: デプロイの名前を指定（任意の名前）</li>
+<li>FILE_PATH: 先ほど作成したリソース定義ファイルのパスを指定</li>
+<li>–preview: dry-run 的に実行したい時に指定</li>
+</ul>
+<p>それでは実際に<a href="https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/create" target="_blank" rel="noopener">create</a>コマンドを実行したいと思います。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ gcloud deployment-manager deployments create <span class="built_in">test</span> --config vm.yaml --preview</span><br><span class="line">The fingerprint of the deployment is xxx</span><br><span class="line">Waiting <span class="keyword">for</span> create [xxx]...<span class="keyword">done</span>.</span><br><span class="line">Create operation xxx completed successfully.</span><br><span class="line">NAME     TYPE                 STATE       ERRORS  INTENT</span><br><span class="line"><span class="built_in">test</span>-vm  compute.v1.instance  IN_PREVIEW  []      CREATE_OR_ACQUIRE</span><br></pre></td></tr></table></figure>
+
+<p>実行結果のステータスが、<code>IN_PREVIEW</code>であることからプレビュー状態であることがわかります。<br>プレビュー実行後にブラウザで確認すると以下のように構成などを確認することができます。</p>
+<img src="/images/20200219/photo_20200219_01.png">
+
+
+<p>ブラウザ上からデプロイすることも可能ですが、<code>gcloud</code>コマンドから実行したいと思います。<br><a href="https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/update" target="_blank" rel="noopener">update</a>を指定し、<code>DEPLOYMENT_NAME</code>を指定します（ここではtest）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ gcloud deployment-manager deployments update <span class="built_in">test</span></span><br><span class="line">The fingerprint of the deployment is xxx==</span><br><span class="line">Waiting <span class="keyword">for</span> update [xxx]...<span class="keyword">done</span>.</span><br><span class="line">Update operation xxx completed successfully.</span><br><span class="line">NAME     TYPE                 STATE      ERRORS  INTENT</span><br><span class="line"><span class="built_in">test</span>-vm  compute.v1.instance  COMPLETED  []</span><br></pre></td></tr></table></figure>
+
+<p>実行結果から先ほどまでは<code>IN_PREVIEW</code>だったが、<code>COMPLETED</code>に変わっていることがわかります。</p>
+<p>また、以下のブラウザからもプレビューからデプロイに変わっていることがわかります。</p>
+<p>実際に、GCE コンソールに遷移すると作成されていることが確認できます。</p>
+<img src="/images/20200219/photo_20200219_02.png">
+
+
+<p>その他のコマンドを紹介したいと思います。<br><a href="https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/list" target="_blank" rel="noopener">list</a>コマンドでデプロイの一覧を表示することができます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ gcloud deployment-manager deployments list</span><br><span class="line">NAME  LAST_OPERATION_TYPE  STATUS  DESCRIPTION  MANIFEST  ERRORS</span><br><span class="line"><span class="built_in">test</span>  preview              DONE                           []</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/describe" target="_blank" rel="noopener">describe</a>コマンドでデプロイの詳細情報を確認することができます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ gcloud deployment-manager deployments describe <span class="built_in">test</span></span><br><span class="line">---</span><br><span class="line">fingerprint: xxx==</span><br><span class="line">id: <span class="string">'xxx'</span></span><br><span class="line">insertTime: <span class="string">'xxx'</span></span><br><span class="line">manifest: manifest-xxx</span><br><span class="line">name: <span class="built_in">test</span></span><br><span class="line">operation:</span><br><span class="line">  endTime: <span class="string">'xxx'</span></span><br><span class="line">  name: xxx</span><br><span class="line">  operationType: update</span><br><span class="line">  progress: 100</span><br><span class="line">  startTime: <span class="string">'xxx'</span></span><br><span class="line">  status: DONE</span><br><span class="line">  user: xxx</span><br><span class="line">NAME     TYPE                 STATE      INT</span><br><span class="line"><span class="built_in">test</span>-vm  compute.v1.instance  COMPLETED</span><br></pre></td></tr></table></figure>
+
+<p>もし、デプロイを削除したい場合は、<a href="https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/delete" target="_blank" rel="noopener">delete</a>コマンドを使用します。<br><code>Do you want to continue (y/N)?</code>は、<code>y</code>と入力します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ gcloud deployment-manager deployments delete <span class="built_in">test</span></span><br><span class="line">The following deployments will be deleted:</span><br><span class="line">- <span class="built_in">test</span></span><br><span class="line"></span><br><span class="line">Do you want to <span class="built_in">continue</span> (y/N)?  y</span><br><span class="line"></span><br><span class="line">Waiting <span class="keyword">for</span> delete [xxx]...<span class="keyword">done</span>.</span><br><span class="line">Delete operation xxx completed successfully.</span><br></pre></td></tr></table></figure>
+
+<p>これでGCE の作成から削除までの一連の操作を行いました。</p>
+<h2 id="複数のVM-インスタンスを作成"><a href="#複数のVM-インスタンスを作成" class="headerlink" title="複数のVM インスタンスを作成"></a>複数のVM インスタンスを作成</h2><p>先ほど作成した定義ファイルを複製するかたちで作成します。<br>ファイル名は、<code>vms.yaml</code>とします。</p>
+<figure class="highlight yaml"><figcaption><span>vms.yaml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">resources:</span></span><br><span class="line"><span class="attr">- type:</span> <span class="string">compute.v1.instance</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">test-vm-01</span></span><br><span class="line"><span class="attr">  properties:</span></span><br><span class="line"><span class="attr">    zone:</span> <span class="string">asia-northeast1-a</span></span><br><span class="line"><span class="attr">    machineType:</span> <span class="attr">https://www.googleapis.com/compute/v1/projects/[MY_PROJECT]/zones/asia-northeast1-a/machineTypes/f1-micro</span></span><br><span class="line"><span class="attr">    disks:</span></span><br><span class="line"><span class="attr">    - deviceName:</span> <span class="string">boot</span></span><br><span class="line"><span class="attr">      type:</span> <span class="string">PERSISTENT</span></span><br><span class="line"><span class="attr">      boot:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">      autoDelete:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">      initializeParams:</span></span><br><span class="line"><span class="attr">        sourceImage:</span> <span class="attr">https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-9</span></span><br><span class="line"><span class="attr">    networkInterfaces:</span></span><br><span class="line"><span class="attr">    - network:</span> <span class="attr">https://www.googleapis.com/compute/v1/projects/[MY_PROJECT]/global/networks/default</span></span><br><span class="line"><span class="attr">      accessConfigs:</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">External</span> <span class="string">NAT</span></span><br><span class="line"><span class="attr">        type:</span> <span class="string">ONE_TO_ONE_NAT</span></span><br><span class="line"><span class="attr">- type:</span> <span class="string">compute.v1.instance</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">test-vm-02</span></span><br><span class="line"><span class="attr">  properties:</span></span><br><span class="line"><span class="attr">    zone:</span> <span class="string">asia-northeast1-a</span></span><br><span class="line"><span class="attr">    machineType:</span> <span class="attr">https://www.googleapis.com/compute/v1/projects/[MY_PROJECT]/zones/asia-northeast1-a/machineTypes/f1-micro</span></span><br><span class="line"><span class="attr">    disks:</span></span><br><span class="line"><span class="attr">    - deviceName:</span> <span class="string">boot</span></span><br><span class="line"><span class="attr">      type:</span> <span class="string">PERSISTENT</span></span><br><span class="line"><span class="attr">      boot:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">      autoDelete:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">      initializeParams:</span></span><br><span class="line"><span class="attr">        sourceImage:</span> <span class="attr">https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-9</span></span><br><span class="line"><span class="attr">    networkInterfaces:</span></span><br><span class="line"><span class="attr">    - network:</span> <span class="attr">https://www.googleapis.com/compute/v1/projects/[MY_PROJECT]/global/networks/default</span></span><br><span class="line"><span class="attr">      accessConfigs:</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">External</span> <span class="string">NAT</span></span><br><span class="line"><span class="attr">        type:</span> <span class="string">ONE_TO_ONE_NAT</span></span><br></pre></td></tr></table></figure>
+
+<p><code>name</code>を01と02に分けるかたちでVM を2台分の定義を記述し、デプロイします。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ gcloud deployment-manager deployments create <span class="built_in">test</span>-vms --config vms.yaml</span><br><span class="line">The fingerprint of the deployment is xxx==</span><br><span class="line">Waiting <span class="keyword">for</span> create [xxx]...<span class="keyword">done</span>.</span><br><span class="line">Create operation xxx completed successfully.</span><br><span class="line">NAME        TYPE                 STATE      ERRORS  INTENT</span><br><span class="line"><span class="built_in">test</span>-vm-01  compute.v1.instance  COMPLETED  []</span><br><span class="line"><span class="built_in">test</span>-vm-02  compute.v1.instance  COMPLETED  []</span><br></pre></td></tr></table></figure>
+
+<p>デプロイ後、ブラウザでも2台作成されていることがわかります。</p>
+<img src="/images/20200219/photo_20200219_03.png">
+
+<p>このようにYAML で定義ファイルを書いて作成することができることがわかりました。<br>しかし、このような書き方では冗長さを感じてしまいますね。<br>次は、再利用性を高めるためのテンプレートを紹介します。</p>
+<h2 id="テンプレートを利用する"><a href="#テンプレートを利用する" class="headerlink" title="テンプレートを利用する"></a>テンプレートを利用する</h2><p>テンプレートを利用するとリソースを定義したファイルを独立させて再利用性を高めることができます。テンプレートを作成するには、<font color="DeepSkyBlue">Python</font>や<font color="DeepSkyBlue">Jinja2</font>を使用することができます。Pythonを使用する場合は、Python 3.x で作成する必要があります（公式ドキュメントの日本語サイトだとPython 2.7 と記載がありますが、英語サイトだとPython 3.x と記載があるので注意）</p>
+<h3 id="テンプレートの作成"><a href="#テンプレートの作成" class="headerlink" title="テンプレートの作成"></a>テンプレートの作成</h3><p>今回もGCE 2台作成し、合わせてファイアウォールの設定なども行いたいと思います。<br>以下のファイルを準備します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── firewall_template.py</span><br><span class="line">├── gce_template.py</span><br><span class="line">├── network_template.py</span><br><span class="line">├── vm_template.py</span><br><span class="line">└── vms.yaml</span><br></pre></td></tr></table></figure>
+
+<h3 id="環境変数とプロパティについて"><a href="#環境変数とプロパティについて" class="headerlink" title="環境変数とプロパティについて"></a>環境変数とプロパティについて</h3><p>テンプレートのプロパティは、任意の変数を表します。<br>例えば以下のように変数を指定することができます。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">context.properties[<span class="string">'zone'</span>],</span><br></pre></td></tr></table></figure>
+
+<p>また、デプロイメント固有の環境変数を指定することもできます。<br>環境変数の呼び出し方は、以下の構文を使用することでプロジェクトID を取得します。<br>詳細な環境変数については、<a href="https://cloud.google.com/deployment-manager/docs/configuration/templates/use-environment-variables?hl=ja" target="_blank" rel="noopener">こちら</a>を参考にしてください。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ontext.env[<span class="string">'project'</span>]</span><br></pre></td></tr></table></figure>
+
+<p>VM インスタンスを定義します。</p>
+<figure class="highlight python"><figcaption><span>vm_template.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">COMPUTE_URL_BASE = <span class="string">'https://www.googleapis.com/compute/v1/'</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">GenerateConfig</span><span class="params">(context)</span>:</span></span><br><span class="line">  resources = [&#123;</span><br><span class="line">      <span class="string">'name'</span>: context.env[<span class="string">'name'</span>],</span><br><span class="line">      <span class="string">'type'</span>: <span class="string">'compute.v1.instance'</span>,</span><br><span class="line">      <span class="string">'properties'</span>: &#123;</span><br><span class="line">          <span class="string">'zone'</span>: context.properties[<span class="string">'zone'</span>],</span><br><span class="line">          <span class="string">'machineType'</span>: <span class="string">''</span>.join([COMPUTE_URL_BASE, <span class="string">'projects/'</span>,</span><br><span class="line">                                  context.env[<span class="string">'project'</span>], <span class="string">'/zones/'</span>,</span><br><span class="line">                                  context.properties[<span class="string">'zone'</span>], <span class="string">'/machineTypes/'</span>,</span><br><span class="line">                                  context.properties[<span class="string">'machineType'</span>]]),</span><br><span class="line">          <span class="string">'disks'</span>: [&#123;</span><br><span class="line">              <span class="string">'deviceName'</span>: <span class="string">'boot'</span>,</span><br><span class="line">              <span class="string">'type'</span>: <span class="string">'PERSISTENT'</span>,</span><br><span class="line">              <span class="string">'boot'</span>: <span class="literal">True</span>,</span><br><span class="line">              <span class="string">'autoDelete'</span>: <span class="literal">True</span>,</span><br><span class="line">              <span class="string">'initializeParams'</span>: &#123;</span><br><span class="line">                  <span class="string">'sourceImage'</span>: <span class="string">''</span>.join([COMPUTE_URL_BASE, <span class="string">'projects/'</span>,</span><br><span class="line">                                          <span class="string">'debian-cloud/global/'</span>,</span><br><span class="line">                                          <span class="string">'images/family/debian-9'</span>])</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;],</span><br><span class="line">          <span class="string">'networkInterfaces'</span>: [&#123;</span><br><span class="line">              <span class="string">'network'</span>: <span class="string">'$(ref.'</span> + context.properties[<span class="string">'network'</span>]</span><br><span class="line">                         + <span class="string">'.selfLink)'</span>,</span><br><span class="line">              <span class="string">'accessConfigs'</span>: [&#123;</span><br><span class="line">                  <span class="string">'name'</span>: <span class="string">'External NAT'</span>,</span><br><span class="line">                  <span class="string">'type'</span>: <span class="string">'ONE_TO_ONE_NAT'</span></span><br><span class="line">              &#125;]</span><br><span class="line">          &#125;]</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;]</span><br><span class="line">  <span class="keyword">return</span> &#123;<span class="string">'resources'</span>: resources&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ネットワークを定義します。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">def GenerateConfig(context):</span><br><span class="line">  resources = [&#123;</span><br><span class="line">      &apos;name&apos;: context.env[&apos;name&apos;],</span><br><span class="line">      &apos;type&apos;: &apos;compute.v1.network&apos;,</span><br><span class="line">      &apos;properties&apos;: &#123;</span><br><span class="line">          &apos;routingConfig&apos;: &#123;</span><br><span class="line">              &apos;routingMode&apos;: &apos;REGIONAL&apos;</span><br><span class="line">          &#125;,</span><br><span class="line">          &apos;autoCreateSubnetworks&apos;: True</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;]</span><br><span class="line">  return &#123;&apos;resources&apos;: resources&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ファイアウォールを定義します。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">def GenerateConfig(context):</span><br><span class="line">  resources = [&#123;</span><br><span class="line">      &apos;name&apos;: context.env[&apos;name&apos;],</span><br><span class="line">      &apos;type&apos;: &apos;compute.v1.firewall&apos;,</span><br><span class="line">      &apos;properties&apos;: &#123;</span><br><span class="line">          &apos;network&apos;: &apos;$(ref.&apos; + context.properties[&apos;network&apos;] + &apos;.selfLink)&apos;,</span><br><span class="line">          &apos;sourceRanges&apos;: [&apos;0.0.0.0/0&apos;],</span><br><span class="line">          &apos;allowed&apos;: [&#123;</span><br><span class="line">              &apos;IPProtocol&apos;: &apos;TCP&apos;,</span><br><span class="line">              &apos;ports&apos;: [80]</span><br><span class="line">          &#125;]</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;]</span><br><span class="line">  return &#123;&apos;resources&apos;: resources&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ここで上記のテンプレートに指定する変数の定義を作成します。</p>
+<figure class="highlight python"><figcaption><span>gce_template.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">NETWORK_NAME = <span class="string">'test-network'</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">GenerateConfig</span><span class="params">(unused_context)</span>:</span></span><br><span class="line">  resources = [&#123;</span><br><span class="line">      <span class="string">'name'</span>: <span class="string">'test-vm-01'</span>,</span><br><span class="line">      <span class="string">'type'</span>: <span class="string">'vm_template.py'</span>,</span><br><span class="line">      <span class="string">'properties'</span>: &#123;</span><br><span class="line">          <span class="string">'machineType'</span>: <span class="string">'f1-micro'</span>,</span><br><span class="line">          <span class="string">'zone'</span>: <span class="string">'asia-northeast1-a'</span>,</span><br><span class="line">          <span class="string">'network'</span>: NETWORK_NAME</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">      <span class="string">'name'</span>: <span class="string">'test-vm-02'</span>,</span><br><span class="line">      <span class="string">'type'</span>: <span class="string">'vm_template.py'</span>,</span><br><span class="line">      <span class="string">'properties'</span>: &#123;</span><br><span class="line">          <span class="string">'machineType'</span>: <span class="string">'g1-small'</span>,</span><br><span class="line">          <span class="string">'zone'</span>: <span class="string">'asia-northeast1-a'</span>,</span><br><span class="line">          <span class="string">'network'</span>: NETWORK_NAME</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">      <span class="string">'name'</span>: NETWORK_NAME,</span><br><span class="line">      <span class="string">'type'</span>: <span class="string">'network_template.py'</span></span><br><span class="line">  &#125;, &#123;</span><br><span class="line">      <span class="string">'name'</span>: NETWORK_NAME + <span class="string">'-firewall'</span>,</span><br><span class="line">      <span class="string">'type'</span>: <span class="string">'firewall_template.py'</span>,</span><br><span class="line">      <span class="string">'properties'</span>: &#123;</span><br><span class="line">          <span class="string">'network'</span>: NETWORK_NAME</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;]</span><br><span class="line">  <span class="keyword">return</span> &#123;<span class="string">'resources'</span>: resources&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最後にテンプレートをインポートするための定義ファイルを作成します。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">imports:</span><br><span class="line">- path: vm_template.py</span><br><span class="line">- path: network_template.py</span><br><span class="line">- path: firewall_template.py</span><br><span class="line">- path: gce_template.py</span><br><span class="line"></span><br><span class="line">resources:</span><br><span class="line">- name: gce-setup</span><br><span class="line">  type: gce_template.py</span><br></pre></td></tr></table></figure>
+
+<h3 id="デプロイ"><a href="#デプロイ" class="headerlink" title="デプロイ"></a>デプロイ</h3><p>実行方法は、今まで変わらず<code>gcloud</code> コマンドから実行します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ gcloud deployment-manager deployments create <span class="built_in">test</span>-templates --config vms.yaml</span><br><span class="line">The fingerprint of the deployment is xxx==</span><br><span class="line">Waiting <span class="keyword">for</span> update [xxxx]...<span class="keyword">done</span>.</span><br><span class="line">Update operation xxx completed successfully.</span><br><span class="line">NAME                   TYPE                 STATE      ERRORS  INTENT</span><br><span class="line"><span class="built_in">test</span>-network           compute.v1.network   COMPLETED  []</span><br><span class="line"><span class="built_in">test</span>-network-firewall  compute.v1.firewall  COMPLETED  []</span><br><span class="line"><span class="built_in">test</span>-vm-01             compute.v1.instance  COMPLETED  []</span><br><span class="line"><span class="built_in">test</span>-vm-02             compute.v1.instance  COMPLETED  []</span><br></pre></td></tr></table></figure>
+
+<p>ブラウザ上でもデプロイされていることが確認できます。</p>
+<img src="/images/20200219/photo_20200219_04.png">
+
+<h2 id="エラーメモ"><a href="#エラーメモ" class="headerlink" title="エラーメモ"></a>エラーメモ</h2><p>gcloud コマンドからデプロイした際に何かしらのエラーが発生したとします。コード修正後に以下のように再度<font color="LightCoral">“create”</font>を実行すると<font color="LightCoral">“already exists and cannot be created”</font>というエラーが発生します。</p>
+<p>原因は、失敗したとしても中途半端にデプロイは作られてしまうため、既にあるといったエラーが発生します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ gcloud deployment-manager deployments create <span class="built_in">test</span>-templates --config vms.yaml</span><br><span class="line">ERROR: (gcloud.deployment-manager.deployments.create) ResponseError: code=409, message=<span class="string">'projects/xxx/global/deployments/test-templates'</span> already exists and cannot be created.</span><br></pre></td></tr></table></figure>
+
+<p>それでは、どのように解消するかというと以下のように<font color="LightCoral">“update”</font>を使用します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gcloud deployment-manager deployments update <span class="built_in">test</span>-templates --config vms.yaml</span><br></pre></td></tr></table></figure>
+
+<p>この中途半端に作成されるのは解消されて欲しいですね。。</p>
+<h2 id="感想"><a href="#感想" class="headerlink" title="感想"></a>感想</h2><p>GCP リソースをPython で操れることで、自由度の高いテンプレートを作成できる点は面白いと思いました。<br>また、Terraform は、tfstate というファイルをGCS やS3 に保存する必要があるので、アクセス権限や同時実行などを気にする必要がありますが、CloudFormation 同様に状態管理は、GCP 側でよしなにやってもらえるのもメリットだと感じました。</p>
+<p>ただ、Google 自体は<a href="https://github.com/GoogleCloudPlatform/terraformer" target="_blank" rel="noopener">Terraformer</a>などのツールを作成していることから割とTerraform 推しなのでは？と感じるところもあります（個人的見解）<br>なので、個人的には、GCP だけでなくAWS や、最近ではAlibaba Cloud などのクラウドを利用する機会が多いので、Terraform 一択になってしまうのが本音です。<br>とはいえ、今回のように触れたことのないサービスを使ってみるのも新たな知見として楽しめるので、今後もいろいろ触れていきたいと思います。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://cloud.google.com/deployment-manager/docs?hl=en" target="_blank" rel="noopener">Google Cloud Deployment Manager documentation</a><br><a href="https://cloud.google.com/sdk/gcloud/reference/deployment-manager" target="_blank" rel="noopener">gcloud deployment-manager</a><br><a href="https://github.com/GoogleCloudPlatform/deploymentmanager-samples" target="_blank" rel="noopener">deploymentmanager-samples</a><br><a href="https://cloud.google.com/deployment-manager/docs/configuration/templates/use-environment-variables?hl=ja" target="_blank" rel="noopener">環境変数</a><br><a href="https://cloud.google.com/deployment-manager/docs/configuration/supported-resource-types?hl=en" target="_blank" rel="noopener">サポートしているリソースタイプ</a></p>
+<h2 id="関連リンク"><a href="#関連リンク" class="headerlink" title="関連リンク"></a>関連リンク</h2><ul>
+<li><a href="https://future-architect.github.io/tags/GCP%E9%80%A3%E8%BC%89/">GCP連載企画</a></li>
+<li><a href="https://future-architect.github.io/articles/20190903/">Terraformのベストなプラクティスってなんだろうか</a></li>
+<li><a href="https://future-architect.github.io/articles/20190909/">Let’s Try GCP #1 ～Cloud Run Buttonを使った楽々コンテナデプロイをやってみた～</a></li>
+<li><a href="https://future-architect.github.io/tags/GoCDK/">Go Cloud連載</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="GCP連載#10 Terraform ではなくCloud Deployment Manager を使ってみよう" data-url="https://future-architect.github.io/articles/20200219/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200219/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200219/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200219/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200219/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#10 Terraform ではなくCloud Deployment Manager を使ってみよう
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200218/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#9 初めてのGCP 画像AI(Vision API)をさわってみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200217/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#8 gcloud compute sshじゃなくてsshコマンドを使いたいあなたへ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200214/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200213/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#6 Terraform Validatorを使って、GCPのセキュリティポリシーの自動チェックを行う
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200212/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#5【もう鍵なくさない】GCPのSecret ManagerとBerglasで幸せになる
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200209/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                golang.tokyo #29に4名で登壇しました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200210/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#4 Cloud Life Sciencesを見てみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200207/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#3 Goでサーバーレスな管理画面アプリを作る
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200206/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GCP連載#2 Istio on GKEではじめるサービスメッシュ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (4)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (30)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (45)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (19)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/認証認可/">認証認可 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/マネジメント/">マネジメント (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/XXX/">XXX (0)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
