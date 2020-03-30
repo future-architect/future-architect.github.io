@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Serverless連載4: Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにこんにちは、Android Developerの佐藤です。 サーバーレス連載の4回目を担当します！モバイルアプリ品質強化の強い味方となってくれるFirebase Crashlyticsを紹介したいと思います！ そもそもFirebaseとはFirebaseとは、AndroidやiOSなどのモバイルアプリのバックエンド機能を提供してくれるサービスです。提供されているサービスは、利用状況の解析、">
+<meta name="keywords" content="GCP,Serverless,Serverless連載,Firebase,Android,モバイルアプリ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Serverless連載4: Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200330/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="はじめにこんにちは、Android Developerの佐藤です。 サーバーレス連載の4回目を担当します！モバイルアプリ品質強化の強い味方となってくれるFirebase Crashlyticsを紹介したいと思います！ そもそもFirebaseとはFirebaseとは、AndroidやiOSなどのモバイルアプリのバックエンド機能を提供してくれるサービスです。提供されているサービスは、利用状況の解析、">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20200330/1.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200330/2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200330/3.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200330/4.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200330/5.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200330/6.png">
+<meta property="og:updated_time" content="2020-03-30T01:04:28.075Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Serverless連載4: Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する">
+<meta name="twitter:description" content="はじめにこんにちは、Android Developerの佐藤です。 サーバーレス連載の4回目を担当します！モバイルアプリ品質強化の強い味方となってくれるFirebase Crashlyticsを紹介したいと思います！ そもそもFirebaseとはFirebaseとは、AndroidやiOSなどのモバイルアプリのバックエンド機能を提供してくれるサービスです。提供されているサービスは、利用状況の解析、">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200330/1.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="Serverless連載4: Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="Serverless連載4: Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="200px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200330/">Serverless連載4: Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200330-servlerless4-firebase" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 佐藤尚至</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-03-30T00:45:42.000Z" itemprop="datePublished">2020/03/30</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/GCP/" title="GCP">GCP</a>,
+  
+    <a href="/tags/Serverless/" title="Serverless">Serverless</a>,
+  
+    <a href="/tags/Serverless連載/" title="Serverless連載">Serverless連載</a>,
+  
+    <a href="/tags/Firebase/" title="Firebase">Firebase</a>,
+  
+    <a href="/tags/Android/" title="Android">Android</a>,
+  
+    <a href="/tags/モバイルアプリ/" title="モバイルアプリ">モバイルアプリ</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、Android Developerの佐藤です。</p>
+<p><a href="https://future-architect.github.io/tags/Serverless%E9%80%A3%E8%BC%89/">サーバーレス連載</a>の4回目を担当します！<br>モバイルアプリ品質強化の強い味方となってくれるFirebase Crashlyticsを紹介したいと思います！</p>
+<h1 id="そもそもFirebaseとは"><a href="#そもそもFirebaseとは" class="headerlink" title="そもそもFirebaseとは"></a>そもそもFirebaseとは</h1><p>Firebaseとは、AndroidやiOSなどのモバイルアプリのバックエンド機能を提供してくれるサービスです。<br><a href="https://firebase.google.com/products?hl=ja" target="_blank" rel="noopener">提供されているサービス</a>は、利用状況の解析、クラッシュの検知、認証、通知、ホスティングなど多種多様です。<br>これらのサービスを利用する上で、サーバーの管理が不要なのはもちろん、導入する上で追加のコーディングはほぼ必要ありません。<br><code>Firebase SDK</code>をアプリのソースコードに組み込むだけで、Firebaseの機能を利用することができます。</p>
+<p>※ Firebaseはモバイルアプリだけでなく、Webアプリにも対応しています。サービスごとに、対応しているプラットフォームが異なる点に注意が必要です。</p>
+<h1 id="Firebase-Crashlyticsとは"><a href="#Firebase-Crashlyticsとは" class="headerlink" title="Firebase Crashlyticsとは"></a>Firebase Crashlyticsとは</h1><p>どんなに気をつけていても、予期せずアプリがクラッシュしてしまうことはあります。<br>クラッシュしないようなコーディングに努めることも重要ですが、クラッシュがあったという事実をいち早く検知し、その原因を突き止めることも同じくらい重要です。</p>
+<p>Firebase Crashlyticsはクラッシュの検知とその原因の究明に役立つサービスです。<br>Firebase Crashlyticsを導入することで、以下の情報を簡単に知ることができます。</p>
+<ul>
+<li>いつクラッシュしたのか</li>
+<li>ソースコードのどこでクラッシュしたのか</li>
+<li>クラッシュによって影響を受けているユーザーはどれくらいいるのか</li>
+<li>どのバージョンでクラッシュしたのか</li>
+<li>どの機種でクラッシュしたのか</li>
+</ul>
+<p>以下では、実際にFirebase Crashlyticsを使って、どのようにクラッシュ情報にアクセスできるようになるのかを見ていきます。</p>
+<h1 id="Firebase-Crashlyticsを使ってみる"><a href="#Firebase-Crashlyticsを使ってみる" class="headerlink" title="Firebase Crashlyticsを使ってみる"></a>Firebase Crashlyticsを使ってみる</h1><p>簡単なサンプルアプリを用いて、</p>
+<ul>
+<li>どのようにしたらクラッシュ情報をFirebaseに送ることができるのか</li>
+<li>Firebaseコンソールでどのようなクラッシュレポートを見ることができるのか</li>
+</ul>
+<p>を見ていきましょう。</p>
+<h2 id="サンプルアプリを用意する"><a href="#サンプルアプリを用意する" class="headerlink" title="サンプルアプリを用意する"></a>サンプルアプリを用意する</h2><p>Android Studioで<code>Empty Activity</code>テンプレートをベースにした新規プロジェクトを作成します。<br>ボタンを画像のように2つ追加します。</p>
+<img src="/images/20200330/1.png" class="img-small-size">
+
+
+<p>それぞれのボタンに<code>OnClickListener</code>を実装します。実装例は後述しますが、それぞれのボタンをクリックしたときの振る舞いを簡単に説明すると、以下のようになります。</p>
+<ul>
+<li><code>FATAL</code>ボタンをクリックすると<code>RuntimeException</code>が発生し、アプリが強制終了します。</li>
+<li><code>NON FATAL</code>ボタンをクリックすると<code>RuntimeException</code>が発生しますが、try-catchのエラーハンドリングを実装しているため、アプリが強制終了しません。</li>
+</ul>
+<p>意図的に例外が発生する状況を再現しています。</p>
+<h2 id="Firebaseをセットアップする"><a href="#Firebaseをセットアップする" class="headerlink" title="Firebaseをセットアップする"></a>Firebaseをセットアップする</h2><p>Firebase公式ページを見ながらFirebaseのセットアップを行います。<br><a href="https://firebase.google.com/docs/android/setup" target="_blank" rel="noopener">https://firebase.google.com/docs/android/setup</a><br>(Firebase公式ページには日本語に訳されているページもありますが、英語ページのアップデートに追随していない箇所がいくつかあります。日本語ページを参照する場合は、英語ページも併せてご覧になることをおすすめします。)</p>
+<p>Firebaseコンソール画面も親切にナビゲートしてくれるので安心です。</p>
+<img src="/images/20200330/2.png">
+
+
+
+<h2 id="Firebase-Crashlyticsをセットアップする"><a href="#Firebase-Crashlyticsをセットアップする" class="headerlink" title="Firebase Crashlyticsをセットアップする"></a>Firebase Crashlyticsをセットアップする</h2><p><a href="https://firebase.google.com/docs/android/setup" target="_blank" rel="noopener">Firebaseのセットアップ</a>が完了していれば、<code>build.gradle</code>にコードを数カ所追加するだけでCrashlyticsの最小限の設定は完了です。アプリが異常終了したとき、自動的にFirebaseにクラッシュレポートが送信されます。</p>
+<ul>
+<li>Projectの<code>build.gradle</code></li>
+</ul>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">buildscript</span> &#123;</span><br><span class="line">    <span class="keyword">repositories</span> &#123;</span><br><span class="line">        google()</span><br><span class="line">        jcenter()</span><br><span class="line">        maven &#123;</span><br><span class="line">            url <span class="string">'https://maven.fabric.io/public'</span> <span class="comment">// 追加</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">dependencies</span> &#123;</span><br><span class="line">        <span class="keyword">classpath</span> <span class="string">'com.android.tools.build:gradle:3.6.1'</span></span><br><span class="line">        <span class="keyword">classpath</span> <span class="string">'com.google.gms:google-services:4.3.3'</span></span><br><span class="line">        <span class="keyword">classpath</span> <span class="string">'io.fabric.tools:gradle:1.31.2'</span> <span class="comment">// 追加</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Moduleの<code>build.gradle</code></li>
+</ul>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: <span class="string">'com.android.application'</span></span><br><span class="line">apply plugin: <span class="string">'com.google.gms.google-services'</span></span><br><span class="line">apply plugin: <span class="string">'io.fabric'</span> <span class="comment">// 追加</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    implementation <span class="string">'com.google.firebase:firebase-analytics:17.2.3'</span></span><br><span class="line">    implementation <span class="string">'com.crashlytics.sdk.android:crashlytics:2.10.1'</span> <span class="comment">// 追加</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>※ 2020/3/30現在2つのCrashlytics SDKが存在します。”Fabric系譜のCrashlytics SDK”と”Firebase向けに新調されたSDK”です。後者は、2020/3/30現在beta版となっています。今回はGAになっている前者のSDKを使用しています。</p>
+<h2 id="アプリをクラッシュさせてみる"><a href="#アプリをクラッシュさせてみる" class="headerlink" title="アプリをクラッシュさせてみる"></a>アプリをクラッシュさせてみる</h2><p><code>MainActivity</code>の実装例はこちらです。<code>FATAL</code>ボタン、<code>NON FATAL</code>ボタンに<code>OnClickListener</code>をセットしています。</p>
+<figure class="highlight java"><figcaption><span>アプリクラッシュするMainActivity実装例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// どのユーザーの端末でクラッシュが発生したのかを知りたい場合、</span></span><br><span class="line">        <span class="comment">// CrashlyticsにUserIDを教えてあげる必要がある。</span></span><br><span class="line">        Crashlytics.setUserIdentifier(<span class="string">"user0001"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// FATALボタンをクリックしたときの処理</span></span><br><span class="line">        findViewById(R.id.fatal_button).setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">                <span class="comment">// "FATAL"ボタンをクリックするとアプリが強制終了する。</span></span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Fatal"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// NON FATALボタンをクリックしたときの処理</span></span><br><span class="line">        findViewById(R.id.non_fatal_button).setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">                <span class="comment">// "NON FATAL"ボタンをクリックするとRuntimeExceptionが発生するが、</span></span><br><span class="line">                <span class="comment">// 例外をcatchしているので、アプリが強制終了することはない。</span></span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Non Fatal"</span>);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                    <span class="comment">// logException()メソッド送信されたログは「非致命的(non-fatal)」なログとしてレポートされる。</span></span><br><span class="line">                    Crashlytics.logException(e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Firebase SDK</code>は、開発者が意図しない強制終了(クラッシュ)が発生したときに、自動でスタックトレースをFirebaseに送信してくれます。上のコードでいうと<code>FATAL</code>ボタンをクリックしたときにアプリが強制終了してしまいますが、裏でSDKがクラッシュレポートをFirebaseに送信してくれます。</p>
+<p>クラッシュが起きないようにエラーハンドリングはしているけれど、開発者目線で「この例外の発生は検知したい」というような場合がよくあります。そういった場合は、<code>Crashlytics.logException()</code>メソッドを利用します。発生した例外を「非致命的(Non-fatal)」な例外としてFirebaseに通知することができます。</p>
+<h2 id="Firebaseコンソールでクラッシュレポートを確認する"><a href="#Firebaseコンソールでクラッシュレポートを確認する" class="headerlink" title="Firebaseコンソールでクラッシュレポートを確認する"></a>Firebaseコンソールでクラッシュレポートを確認する</h2><h3 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h3><p>サイドナビの<code>品質</code>から<code>Crashlytics</code>を選択するとCrashlyticsの画面が開きます。<br>こちらの画面からクラッシュ状況の概要がわかります。<br><code>FATAL</code>ボタンをクリックしたときのレポートは「MainActivity.java - line 23」として通知されています。<br><code>NON FATAL</code>ボタンをクリックしたときのレポートは「MainActivity.java - line 30」として通知されています。<br>「評価」項目をみると「クラッシュレポート」なのか「非致命的な例外のレポート」なのかがひと目でわかりますね。</p>
+<img src="/images/20200330/3.png">
+
+
+<h3 id="クラッシュレポート"><a href="#クラッシュレポート" class="headerlink" title="クラッシュレポート"></a>クラッシュレポート</h3><p><code>Fatal</code>ボタンをクリックすることによって発生したクラッシュレポート(MainActivity.java - line 23)を見てみましょう。</p>
+<img src="/images/20200330/4.png">
+
+
+<p>以下がひと目でわかりますね。</p>
+<ul>
+<li>いつクラッシュしたのか</li>
+<li>ソースコードのどこでクラッシュしたのか</li>
+<li>クラッシュによって影響を受けているユーザーはどれくらいいるのか</li>
+<li>どのバージョンでクラッシュしたのか</li>
+<li>どの機種でクラッシュしたのか</li>
+</ul>
+<p>また「スタックトレース」タブからクラッシュしたときのスタックトレースを見ることができます。<br>なぜクラッシュしたのかが詳細にわかります。</p>
+<img src="/images/20200330/5.png">
+
+
+<h3 id="ユーザーIDでの検索"><a href="#ユーザーIDでの検索" class="headerlink" title="ユーザーIDでの検索"></a>ユーザーIDでの検索</h3><p>「ユーザーIDでの検索」も行うことができます。<br>ユーザーから不具合の問い合わせがあった際に、ソースコードのどの箇所で異常があったがゆえにそのユーザーの端末で不具合が発生したのかを素早く知ることができます。<br><img src="/images/20200330/6.png"></p>
+<p>以下のようにSDKにユーザーIDを教えてあげることで、ユーザーIDでの検索が可能になります。</p>
+<figure class="highlight java"><figcaption><span>ユーザID検索</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Crashlytics.setUserIdentifier(<span class="string">"user0001"</span>);</span><br></pre></td></tr></table></figure>
+
+<h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>Firebase Crashlyticsは本当にさくっと導入することができます。<br>ユーザーの端末に埋もれてしまいがちなクラッシュ情報に簡単にアクセスできるのが嬉しいポイントですね。<br><a href="https://firebase.google.com/docs/crashlytics/customize-crash-reports?platform=android" target="_blank" rel="noopener">クラッシュレポートはカスタマイズ</a>もできるのですが、<code>build.gradle</code>にSDKを追加するだけのシンプルな実装だけでも大変役に立ちます。</p>
+<p>ぜひお試しください！</p>
+<h2 id="関連リンク"><a href="#関連リンク" class="headerlink" title="関連リンク"></a>関連リンク</h2><ul>
+<li><a href="https://future-architect.github.io/articles/20160420/">ハッカソン道中記#2～世界はチャンスであふれてる～</a></li>
+<li><a href="https://future-architect.github.io/tags/GCP%E9%80%A3%E8%BC%89/">GCP 連載</a></li>
+<li><a href="/tags/Serverless%E9%80%A3%E8%BC%89/">サーバレス連載</a></li>
+<li><a href="https://future-architect.github.io/tags/GoCDK/">Go Cloud 連載</a></li>
+<li><a href="https://future-architect.github.io/tags/DynamoDB%C3%97Go/">DynamoDB×Go連載</a></li>
+<li><a href="https://future-architect.github.io/articles/20190713/">Goを学ぶときにつまずきやすいポイントFAQ</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="Serverless連載4: Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する" data-url="https://future-architect.github.io/articles/20200330/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200330/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200330/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200330/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200330/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Serverless連載4: Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200327/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Serverless連載3: Goでサーバーレス用の検索エンジンwatertowerを作ってみました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200326/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Serverless連載2: AWS Lambda×Goの開発Tips
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200318/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                【Figma】を使ってチームでUI/UX設計するといいこと
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200325/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go1.14のRelease Partyに登壇しました🎉
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (5)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (43)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (46)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (19)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/認証認可/">認証認可 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/マネジメント/">マネジメント (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/XXX/">XXX (0)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/インタビュー/">インタビュー (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
