@@ -22,7 +22,7 @@
 <meta property="og:locale" content="ja">
 <meta property="og:image" content="https://future-architect.github.io/images/20200401/photo_20200401_01.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20200401/photo_20200401_02.png">
-<meta property="og:updated_time" content="2020-04-13T02:03:57.149Z">
+<meta property="og:updated_time" content="2020-04-14T06:54:00.105Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Vue.js最初の難関、「props down, event up」を初心者にわかるように解説してみた">
 <meta name="twitter:description" content="はじめにこんにちは、とあるプロジェクトでアーキチームに所属している東郷です。 今回はVue.jsの最初の難関（だと思っている）「props down, event up」について、初心者（わたしが主に想定しているのは新卒入社の新人さんです）が読んでもわかるような資料を用意してみようと思います。 プロジェクトで独自のコンポーネントを作ったり、会社として用意しているコンポーネントの利用や改良ができるよ">
@@ -212,6 +212,7 @@
 <p>この記事の題材もそれに倣って、下記のようなファイルの構成で説明を進めます。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># フォルダの階層構造</span></span><br><span class="line">src</span><br><span class="line"> └ components</span><br><span class="line">    ├ ParentLayer.vue</span><br><span class="line">    ├ ChildLayer.vue</span><br><span class="line">    └ GrandChildLayer.vue</span><br><span class="line"></span><br><span class="line"><span class="comment"># Vue内での構造</span></span><br><span class="line">App.vue ─────────────────────────</span><br><span class="line">│ ParentLayer.vue ─────────────────────────</span><br><span class="line">│ │ ChildLayer.vue ─────────────────────────</span><br><span class="line">│ │ │ GrandChildLayer.vue ─────────────────────────</span><br><span class="line">│ │ │ │</span><br></pre></td></tr></table></figure>
 
+<p>※<strong>2020/04/14追記</strong>: なお今回の題材では、3つのコンポーネントを親子孫関係にしていますが、何階層にもわたってデータを連携するのは現場ではあまりお勧めされません。データとイベントの管理が大変になりますのでemitの乱用は避けるべきです。<br>親コンポーネントがもつデータを浅い階層でやり取りするため、再利用性の高いコンポーネントの利用/作成のためと思ってご覧ください。場合によってはVuexを使ったデータ管理も有効かもしれません</p>
 <p>実際の画面はこんな感じです。<br><img src="/images/20200401/photo_20200401_02.png" class="img-small-size"></p>
 <p><code>components</code>配下のvueファイルのソースを下記に示します。<br><code>App.vue</code>は中身を空っぽにして<code>ParentLayer.vue</code>を表示しているだけですので割愛します。</p>
 <figure class="highlight html"><figcaption><span>ParentLayer.vue</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"parent"</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 説明のための表示 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>Parent:&#123;&#123; model.testData &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- THML5 標準の要素に対するデータバインディング --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">id</span>=<span class="string">"ParentInput"</span></span></span><br><span class="line"><span class="tag">           <span class="attr">type</span>=<span class="string">"text"</span></span></span><br><span class="line"><span class="tag">           <span class="attr">v-model</span>=<span class="string">"model.testData"</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 自作のコンポーネントに対するデータバインディング --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">child-layer</span> <span class="attr">class</span>=<span class="string">"child"</span></span></span><br><span class="line"><span class="tag">                 <span class="attr">v-model</span>=<span class="string">"model.testData"</span>&gt;</span><span class="tag">&lt;/<span class="name">child-layer</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line">import ChildLayer from '../components/ChildLayer'</span><br><span class="line"></span><br><span class="line">export default &#123;</span><br><span class="line">  name: 'ParentLayer',</span><br><span class="line">  components: &#123;</span><br><span class="line">    ChildLayer</span><br><span class="line">  &#125;,</span><br><span class="line">  props: &#123;</span><br><span class="line">    msg: String</span><br><span class="line">  &#125;,</span><br><span class="line">  data () &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      model: &#123;</span><br><span class="line">        testData: null  // 上記のtemplete部で合計3箇所にバインドされている。</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">scoped</span> <span class="attr">lang</span>=<span class="string">"less"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">.parent &#123;</span><br><span class="line">  border: solid gray;</span><br><span class="line">  background: pink;</span><br><span class="line">  height: 300px;</span><br><span class="line">  width: 300px;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.child &#123;</span><br><span class="line">  margin-left: 10px;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
@@ -313,6 +314,20 @@
   
     
       
+        <a href="https://future-architect.github.io/articles/20200415/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                【小ネタ】AWS S3 署名付きURLってマネジメントコンソールからでも作れたのね
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
         <a href="https://future-architect.github.io/articles/20200414/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
@@ -368,16 +383,6 @@
 	
   
     
-      
-        <a href="https://future-architect.github.io/articles/20200330/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                Serverless連載4: Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する
-              </li>
-            </div>
-          </div>
-        </a>
       
 	
   
@@ -1008,7 +1013,7 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (47)</a>
+	  <a href="/categories/Infrastructure/">Infrastructure (48)</a>
 	</li>
       
 	<li>
