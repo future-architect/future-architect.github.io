@@ -12,13 +12,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   
-  <meta name="description" content="はじめにこんにちは。TIG DXチーム1の村瀬です。 世の中コンテナ化の流れでEC2インスタンスを直接利用する機会が減ってきていますが、まだまだサーバにSSH接続する機会もあるかと思います。 今回はSSH相当の処理をよりセキュアに行えるSession Managerについて調査・検証してみました。 Session Managerとは Session Manager はフルマネージド型 AWS Sy">
-<meta name="keywords" content="AWS">
+  <meta name="description" content="はじめにこんにちは。TIG DXチーム1の村瀬です。 世の中コンテナ化の流れでEC2インスタンスを直接利用する機会が減ってきていますが、まだまだサーバにSSH接続する機会もあるかと思います。 今回はSSH相当の処理をよりセキュアに行えるSession Managerについて調査・検証してみました。 2020/04/23追記: こちらの記事もぜひ参考ください。  Session Manager と踏">
+<meta name="keywords" content="AWS,Session-Manager">
 <meta property="og:type" content="article">
 <meta property="og:title" content="AWS Session Managerでセッションを切断されにくくする方法">
 <meta property="og:url" content="https://future-architect.github.io/articles/20191009/index.html">
 <meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
-<meta property="og:description" content="はじめにこんにちは。TIG DXチーム1の村瀬です。 世の中コンテナ化の流れでEC2インスタンスを直接利用する機会が減ってきていますが、まだまだサーバにSSH接続する機会もあるかと思います。 今回はSSH相当の処理をよりセキュアに行えるSession Managerについて調査・検証してみました。 Session Managerとは Session Manager はフルマネージド型 AWS Sy">
+<meta property="og:description" content="はじめにこんにちは。TIG DXチーム1の村瀬です。 世の中コンテナ化の流れでEC2インスタンスを直接利用する機会が減ってきていますが、まだまだサーバにSSH接続する機会もあるかと思います。 今回はSSH相当の処理をよりセキュアに行えるSession Managerについて調査・検証してみました。 2020/04/23追記: こちらの記事もぜひ参考ください。  Session Manager と踏">
 <meta property="og:locale" content="ja">
 <meta property="og:image" content="https://future-architect.github.io/images/20191009/1-a.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20191009/2-a.png">
@@ -27,10 +27,10 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20191009/6.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20191009/7.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20191009/8.png">
-<meta property="og:updated_time" content="2019-10-16T01:31:25.788Z">
+<meta property="og:updated_time" content="2020-04-23T01:31:00.090Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="AWS Session Managerでセッションを切断されにくくする方法">
-<meta name="twitter:description" content="はじめにこんにちは。TIG DXチーム1の村瀬です。 世の中コンテナ化の流れでEC2インスタンスを直接利用する機会が減ってきていますが、まだまだサーバにSSH接続する機会もあるかと思います。 今回はSSH相当の処理をよりセキュアに行えるSession Managerについて調査・検証してみました。 Session Managerとは Session Manager はフルマネージド型 AWS Sy">
+<meta name="twitter:description" content="はじめにこんにちは。TIG DXチーム1の村瀬です。 世の中コンテナ化の流れでEC2インスタンスを直接利用する機会が減ってきていますが、まだまだサーバにSSH接続する機会もあるかと思います。 今回はSSH相当の処理をよりセキュアに行えるSession Managerについて調査・検証してみました。 2020/04/23追記: こちらの記事もぜひ参考ください。  Session Manager と踏">
 <meta name="twitter:image" content="https://future-architect.github.io/images/20191009/1-a.png">
   
     <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
@@ -144,7 +144,9 @@
     <li class="hidden-xs"><i class="fa fa-tags"></i>
     
   
-    <a href="/tags/AWS/" title="AWS">AWS</a>
+    <a href="/tags/AWS/" title="AWS">AWS</a>,
+  
+    <a href="/tags/Session-Manager/" title="Session-Manager">Session-Manager</a>
   
 
 
@@ -167,6 +169,10 @@
         <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIG DXチーム<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>の村瀬です。</p>
 <p>世の中コンテナ化の流れでEC2インスタンスを直接利用する機会が減ってきていますが、まだまだサーバにSSH接続する機会もあるかと思います。</p>
 <p>今回はSSH相当の処理をよりセキュアに行えるSession Managerについて調査・検証してみました。</p>
+<p><strong>2020/04/23追記</strong>: こちらの記事もぜひ参考ください。</p>
+<ul>
+<li><a href="/articles/20200423/">Session Manager と踏み台サーバの共存構成</a></li>
+</ul>
 <h1 id="Session-Managerとは"><a href="#Session-Managerとは" class="headerlink" title="Session Managerとは"></a>Session Managerとは</h1><blockquote>
 <p>Session Manager はフルマネージド型 AWS Systems Manager 機能で、インタラクティブなワンクリックブラウザベースのシェル、または AWS CLI を介して Amazon EC2 インスタンスを管理できます。Session Manager は、インバウンドポートを開いたり、踏み台ホストを維持したり、SSH キーを管理したりすることなく、安全で監査可能なインスタンスの管理を提供します。Session Manager は、Amazon EC2 インスタンスへの簡単なワンクリックのクロスプラットフォームアクセスをエンドユーザーに提供しつつ、インスタンスへの制御されたアクセス、厳格なセキュリティプラクティス、インスタンスアクセスの詳細を含む、完全に監査可能なログを必要とする企業ポリシーに準拠することを容易にします。</p>
 </blockquote>
@@ -221,11 +227,11 @@
 <hr>
 <p>関連記事：</p>
 <ul>
+<li><a href="/articles/20200423/">Session Manager と踏み台サーバの共存構成</a></li>
 <li><a href="/articles/20190902/">AWS IAMロールの信頼関係の気になる動作</a></li>
 <li><a href="/articles/20191001/">一周回って、人間が読み書きする設定ファイルはJSONが良いと思った</a></li>
 <li><a href="/articles/20190816/">はじめてのTerraform 0.12 ～環境構築～</a></li>
-<li><a href="/articles/20181205/">5TB/日 のデータをAWS Glueでさばくためにやったこと（性能編）</a></li>
-<li><a href="/articles/20190625/">Amazon Redshiftの仕様を調べてみた</a><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。その中でもDXチームは特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div></li>
+<li><a href="/articles/20181205/">5TB/日 のデータをAWS Glueでさばくためにやったこと（性能編）</a><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。その中でもDXチームは特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div></li>
 </ul>
 
       
@@ -266,6 +272,20 @@
 <h2>Featured Posts</h2>
 <div class="recent-news margin-bottom-10">
   
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200423/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Session Manager と踏み台サーバの共存構成
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
   
     
       
@@ -324,16 +344,6 @@
 	
   
     
-      
-        <a href="https://future-architect.github.io/articles/20200414/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                インフラ入門vol.4（ストレージ）
-              </li>
-            </div>
-          </div>
-        </a>
       
 	
   
@@ -980,7 +990,7 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (49)</a>
+	  <a href="/categories/Infrastructure/">Infrastructure (50)</a>
 	</li>
       
 	<li>

@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Session Manager と踏み台サーバの共存構成 | Future Tech Blog - フューチャーアーキテクト</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにこんにちはーTIG DX Unit のゆるふわエンジニアの前原です。 突然ですが、Session Manager 使ってますか？調べるとブログがたくさん掲載されているので使っているところは多いのかな？って思っています。 また、ブログのタイトルを見ると以下のメッセージが多い印象を受けました。  さよなら踏み台サーバ もういらない踏み台サーバ ..etc  なんか、可哀想になってきますね。。と">
+<meta name="keywords" content="AWS,Session-Manager">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Session Manager と踏み台サーバの共存構成">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200423/index.html">
+<meta property="og:site_name" content="Future Tech Blog - フューチャーアーキテクト">
+<meta property="og:description" content="はじめにこんにちはーTIG DX Unit のゆるふわエンジニアの前原です。 突然ですが、Session Manager 使ってますか？調べるとブログがたくさん掲載されているので使っているところは多いのかな？って思っています。 また、ブログのタイトルを見ると以下のメッセージが多い印象を受けました。  さよなら踏み台サーバ もういらない踏み台サーバ ..etc  なんか、可哀想になってきますね。。と">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20200423/photo_20200423_01.jpeg">
+<meta property="og:image" content="https://future-architect.github.io/images/20200423/photo_20200423_02.jpeg">
+<meta property="og:updated_time" content="2020-04-23T01:34:42.145Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Session Manager と踏み台サーバの共存構成">
+<meta name="twitter:description" content="はじめにこんにちはーTIG DX Unit のゆるふわエンジニアの前原です。 突然ですが、Session Manager 使ってますか？調べるとブログがたくさん掲載されているので使っているところは多いのかな？って思っています。 また、ブログのタイトルを見ると以下のメッセージが多い印象を受けました。  さよなら踏み台サーバ もういらない踏み台サーバ ..etc  なんか、可哀想になってきますね。。と">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200423/photo_20200423_01.jpeg">
+  
+    <link rel="alternative" href="/atom.xml" title="Future Tech Blog - フューチャーアーキテクト" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="Session Manager と踏み台サーバの共存構成 | Future Tech Blog - フューチャーアーキテクト" name="description">
+  <meta content="Session Manager と踏み台サーバの共存構成,Future Tech Blog - フューチャーアーキテクト,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">Future Tech Blog - フューチャーアーキテクト</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="180px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<li class="">
+						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<li class="menu-search">
+						<span class="sep"></span>
+						<i class="fa fa-search search-btn"></i>
+						<div class="search-box">
+							<form action="#" class="googleSearch" onsubmit="googleSearch();">
+								<div class="input-group">
+									<input type="text" placeholder="Search" class="form-control">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit">Search</button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200423/">Session Manager と踏み台サーバの共存構成</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200423-bastion" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 前原応光</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-04-23T01:23:54.000Z" itemprop="datePublished">2020/04/23</time>
+
+    </li>
+
+    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/AWS/" title="AWS">AWS</a>,
+  
+    <a href="/tags/Session-Manager/" title="Session-Manager">Session-Manager</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちはー<br>TIG DX Unit のゆるふわエンジニアの前原です。</p>
+<p>突然ですが、Session Manager 使ってますか？調べるとブログがたくさん掲載されているので使っているところは多いのかな？って思っています。</p>
+<p>また、ブログのタイトルを見ると以下のメッセージが多い印象を受けました。</p>
+<ul>
+<li>さよなら踏み台サーバ</li>
+<li>もういらない踏み台サーバ</li>
+<li>..etc</li>
+</ul>
+<p>なんか、可哀想になってきますね。。<br>とはいえ、こういったメッセージが多い理由としては、以下のメリットからだと考えられます。</p>
+<ul>
+<li>踏み台サーバ不要でAWS リソースに容易にアクセスすることが可能</li>
+<li>SSH のキー管理も不要で、IAM User と必要な権限が付与されていればアクセスできる</li>
+<li>Security Group を意識しなくていい</li>
+<li>操作ログも自動でCloudWatch Logs で取得される</li>
+<li>CloudTrail では、セッションを張った時のイベントが取得される</li>
+</ul>
+<p>仮に踏み台サーバを運用しようとすると上記のことを踏まえて構成、メンテナンスを行う必要があります。<br>これは、Session Manager を利用するのが必然に感じますね。</p>
+<p>しかし、運用している踏み台サーバをSession Manager に移行するのは難しいところもあると思います。例えば、踏み台サーバに色々な役割を持たせているケースもあると思います（例えば、プロビジョニング用途など）。踏み台サーバの本来の役割的には、、と思った人もいると思いますが、現実は割とごった煮サーバになっているケースもあります。</p>
+<p>そこで、踏み台サーバを生かしつつ、Session Manager を利用できる方法について説明したいと思います。</p>
+<h1 id="踏み台サーバとSession-Manager-の共存構成"><a href="#踏み台サーバとSession-Manager-の共存構成" class="headerlink" title="踏み台サーバとSession Manager の共存構成"></a>踏み台サーバとSession Manager の共存構成</h1><p>ここで紹介する構成は、以下です。<br>下記の図に記載されているbastion serverは、踏み台サーバを指しています。</p>
+<ul>
+<li>Session Manager を通してSSH で踏み台サーバへアクセス</li>
+</ul>
+<img src="/images/20200423/photo_20200423_01.jpeg">
+
+<ul>
+<li>ポートフォワードでRDS にアクセス</li>
+</ul>
+<img src="/images/20200423/photo_20200423_02.jpeg">
+
+<h2 id="準備"><a href="#準備" class="headerlink" title="準備"></a>準備</h2><p>サーバ側の準備とクライアント側の準備が必要になります。</p>
+<h3 id="サーバ側の準備"><a href="#サーバ側の準備" class="headerlink" title="サーバ側の準備"></a>サーバ側の準備</h3><p>Session Manager のアクセス許可を行うため、対象のEC2（ここでいう踏み台サーバ）に<a href="https://docs.aws.amazon.com/ja_jp/systems-manager/latest/userguide/session-manager-getting-started-instance-profile.html" target="_blank" rel="noopener">AmazonSSMManagedInstanceCore</a>ポリシを追加します。<br>もし必要なアクションのみを追加したい場合は、以下を追加します。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"Version"</span>: <span class="string">"2012-10-17"</span>,</span><br><span class="line">    <span class="attr">"Statement"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"Effect"</span>: <span class="string">"Allow"</span>,</span><br><span class="line">            <span class="attr">"Action"</span>: [</span><br><span class="line">                <span class="string">"ssmmessages:CreateControlChannel"</span>,</span><br><span class="line">                <span class="string">"ssmmessages:CreateDataChannel"</span>,</span><br><span class="line">                <span class="string">"ssmmessages:OpenControlChannel"</span>,</span><br><span class="line">                <span class="string">"ssmmessages:OpenDataChannel"</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">"Resource"</span>: <span class="string">"*"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"Effect"</span>: <span class="string">"Allow"</span>,</span><br><span class="line">            <span class="attr">"Action"</span>: [</span><br><span class="line">                <span class="string">"logs:CreateLogGroup"</span>,</span><br><span class="line">                <span class="string">"logs:CreateLogStream"</span>,</span><br><span class="line">                <span class="string">"logs:PutLogEvents"</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">"Resource"</span>: <span class="string">"*"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"Effect"</span>: <span class="string">"Allow"</span>,</span><br><span class="line">            <span class="attr">"Action"</span>: [</span><br><span class="line">                <span class="string">"s3:GetEncryptionConfiguration"</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">"Resource"</span>: <span class="string">"*"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"Effect"</span>: <span class="string">"Allow"</span>,</span><br><span class="line">            <span class="attr">"Action"</span>: [</span><br><span class="line">                <span class="string">"kms:Decrypt"</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">"Resource"</span>: <span class="string">"key-name"</span></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>踏み台サーバのSSM エージェントが<code>2.3.672.0</code>以上である必要があります。<br>もし古い場合は、<a href="https://docs.aws.amazon.com/ja_jp/systems-manager/latest/userguide/sysman-manual-agent-install.html" target="_blank" rel="noopener">ここのサイト</a>を参考にしてください。<br>バージョンが古いとSession Manager を通してSSH で接続することができません。</p>
+<h3 id="クライアント側の準備"><a href="#クライアント側の準備" class="headerlink" title="クライアント側の準備"></a>クライアント側の準備</h3><p>Session Manager plugin をインストールします。<br>前提として、<code>AWS CLI</code> が使用できることと、適切なIAM Policy がアタッチされていることを前提とします。</p>
+<h4 id="Mac-インストール方法"><a href="#Mac-インストール方法" class="headerlink" title="Mac インストール方法"></a>Mac インストール方法</h4><p>プラグインをダウンロードします。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ curl <span class="string">"https://s3.amazonaws.com/session-manager-downloads/plugin/latest/mac/sessionmanager-bundle.zip"</span> -o <span class="string">"sessionmanager-bundle.zip"</span></span><br><span class="line">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</span><br><span class="line">                                 Dload  Upload   Total   Spent    Left  Speed</span><br><span class="line">100 4680k  100 4680k    0     0   174k      0  0:00:26  0:00:26 --:--:--  120k</span><br></pre></td></tr></table></figure>
+
+<p>ダウンロードしたファイルを解凍します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ unzip sessionmanager-bundle.zip</span><br><span class="line">Archive:  sessionmanager-bundle.zip</span><br><span class="line">   creating: sessionmanager-bundle/</span><br><span class="line">   creating: sessionmanager-bundle/bin/</span><br><span class="line">  inflating: sessionmanager-bundle/seelog.xml.template</span><br><span class="line">  inflating: sessionmanager-bundle/LICENSE</span><br><span class="line">  inflating: sessionmanager-bundle/VERSION</span><br><span class="line">  inflating: sessionmanager-bundle/install</span><br><span class="line">  inflating: sessionmanager-bundle/bin/session-manager-plugin</span><br></pre></td></tr></table></figure>
+
+<p>プラグインのインストールをします。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ sudo ./sessionmanager-bundle/install -i /usr/<span class="built_in">local</span>/sessionmanagerplugin -b /usr/<span class="built_in">local</span>/bin/session-manager-plugin</span><br><span class="line">Password:</span><br><span class="line">Creating install directories: /usr/<span class="built_in">local</span>/sessionmanagerplugin/bin</span><br><span class="line">Creating Symlink from /usr/<span class="built_in">local</span>/sessionmanagerplugin/bin/session-manager-plugin to /usr/<span class="built_in">local</span>/bin/session-manager-plugin</span><br><span class="line">Installation successful!</span><br></pre></td></tr></table></figure>
+
+<p>バージョンの確認をします。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ session-manager-plugin --version</span><br><span class="line">1.1.54.0</span><br></pre></td></tr></table></figure>
+
+<p>インストールが成功していると以下のメッセージが出力されます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ session-manager-plugin</span><br><span class="line"></span><br><span class="line">The Session Manager plugin was installed successfully. Use the AWS CLI to start a session.</span><br></pre></td></tr></table></figure>
+
+<p>SSH 設定ファイル（~/.ssh/config）に以下を追記します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># SSH over Session Manager</span></span><br><span class="line">host i-* mi-*</span><br><span class="line">    ProxyCommand sh -c <span class="string">"aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'"</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Windows-インストール方法"><a href="#Windows-インストール方法" class="headerlink" title="Windows インストール方法"></a>Windows インストール方法</h4><p>ここでは、Windows にSession Manager Plugin をインストールする方法を記載します。</p>
+<ol>
+<li>インストーラーを<a href="https://s3.amazonaws.com/session-manager-downloads/plugin/latest/windows/SessionManagerPluginSetup.exe" target="_blank" rel="noopener">ダウンロード</a>する</li>
+<li>インストーラーの指示に従う</li>
+<li>インストールの確認のため以下のコマンドでバージョンが表示されたら完了</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ session-manager-plugin --version</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>SSH 設定ファイルに以下を追記する<ul>
+<li>ファイル: C:\Users\username.ssh\config</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># SSH over Session Manager</span></span><br><span class="line">host i-* mi-*</span><br><span class="line">    ProxyCommand C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe <span class="string">"aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters portNumber=%p"</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="補足-プロキシ設定"><a href="#補足-プロキシ設定" class="headerlink" title="補足: プロキシ設定"></a>補足: プロキシ設定</h4><ul>
+<li>Mac</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">export</span> http_proxy=http://&lt;USER_NAMEh&gt;:&lt;PASSWORD&gt;@&lt;PROXY_SERVER&gt;:&lt;PORT&gt;</span><br><span class="line">$ <span class="built_in">export</span> https_proxy=https://&lt;USER_NAMEh&gt;:&lt;PASSWORD&gt;@&lt;PROXY_SERVER&gt;:&lt;PORT&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Windows</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">set</span> http_proxy=http://&lt;USER_NAMEh&gt;:&lt;PASSWORD&gt;@&lt;PROXY_SERVER&gt;:&lt;PORT&gt;</span><br><span class="line">$ <span class="built_in">set</span> https_proxy=https://&lt;USER_NAMEh&gt;:&lt;PASSWORD&gt;@&lt;PROXY_SERVER&gt;:&lt;PORT&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="実際にアクセスしてみる"><a href="#実際にアクセスしてみる" class="headerlink" title="実際にアクセスしてみる"></a>実際にアクセスしてみる</h2><p>今回の二つの構成でのアクセスを行なっていきたいと思います。</p>
+<ul>
+<li>Session Manager を通してSSH で踏み台サーバへアクセス</li>
+<li>ポートフォワードでRDS にアクセス</li>
+</ul>
+<h3 id="Session-Manager-を通してSSH-で踏み台サーバへアクセス"><a href="#Session-Manager-を通してSSH-で踏み台サーバへアクセス" class="headerlink" title="Session Manager を通してSSH で踏み台サーバへアクセス"></a>Session Manager を通してSSH で踏み台サーバへアクセス</h3><p>まずは、踏み台サーバにSession Manager を通してアクセスしたいと思います。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh -i &lt;KEY_NAME&gt;.pem &lt;USER_NAME&gt;@&lt;INSTANCE_ID&gt;</span><br></pre></td></tr></table></figure>
+
+<p>通常のssh でアクセスするときと違う点としては、IP アドレスではなく、Instance ID を指定する点です。<br>ポートは、デフォルトの22 を指定するかたちで問題ありません（Security Group のInbound の22 を開ける必要はありません）<br>AWS マネジメントコンソール（HTTPS）へのアクセスが可能であればアクセスできます。</p>
+<h3 id="ポートフォワードでRDS-にアクセス"><a href="#ポートフォワードでRDS-にアクセス" class="headerlink" title="ポートフォワードでRDS にアクセス"></a>ポートフォワードでRDS にアクセス</h3><p>ポートフォワードも通常のSSH で行う場合と同一のコマンドで行えます。<br>ここでは、PostgreSQL（5432） にアクセスするケースとします。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh -NL 15432:&#123;DB_HOST&#125;:5432 -i &lt;KEY_NAME&gt;.pem &lt;USER_NAME&gt;@&lt;INSTANCE_ID&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="アクセスできない場合"><a href="#アクセスできない場合" class="headerlink" title="アクセスできない場合"></a>アクセスできない場合</h3><p>踏み台サーバにアクセスできず、以下のエラーが発生する場合は、SSM エージェントのサービス再起動をすると解消される可能性があります。<br>（前提としてポリシ周りの誤りがないこと）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The version of SSM Agent on the instance supports Session Manager, but the instance is not configured for use with AWS Systems Manager. Verify that the IAM instance profile attached to the instance includes the required permissions.</span><br></pre></td></tr></table></figure>
+
+<p>再起動コマンド</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl restart amazon-ssm-agent</span><br></pre></td></tr></table></figure>
+
+<h2 id="ログについて"><a href="#ログについて" class="headerlink" title="ログについて"></a>ログについて</h2><p>Session Manager を利用することで、CloudWatch Logs で操作ログの取得ができると冒頭で説明しました。<br>ただ、今回のSSH over Session Manager の構成では、CloudWatch Logs でログが出力されません。<br>したがって、Script コマンドで各ユーザの操作ログの取得が必要となります。<br>また、ポートフォワードした時は、Script コマンドにさえ残らないので、注意が必要です（これはSession Manager 云々の話ではないですが）<br>その場合は、CloudTrail のイベント（Session &amp; Terminate）とRDS のAudit ログから証跡を辿る必要があります。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>いかがでしたでしょうか。<br>既存の踏み台サーバを残しつつ、Session Manager を利用する場合のケースについて書きました。<br>踏み台サーバを簡単になくすことが出来ない構成だけど、Session Manager を利用したいという人のお役に立てれば嬉しいです。<br>もし、完全に踏み台サーバを無くしたい場合は、PrivateLink などを利用した構成や、踏み台サーバに持たせている機能の移行などを検討するのも良いと思います。</p>
+<p>関連記事：</p>
+<ul>
+<li><a href="https://future-architect.github.io/articles/20191009/">AWS Session Managerでセッションを切断されにくくする方法</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="Session Manager と踏み台サーバの共存構成" data-url="https://future-architect.github.io/articles/20200423/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200423/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200423/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200423/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200423/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Session Manager と踏み台サーバの共存構成
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200422/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                PyConJP 2019に登壇しました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200421/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Real World HTTP 第2版はなぜ1.5倍になったのか
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200416/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                ServiceNow+Terraform(+Go) によるインフラ構築自動化
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200415/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                【小ネタ】AWS S3 署名付きURLってマネジメントコンソールからでも作れたのね
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (24)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (5)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (47)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (50)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (19)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/認証認可/">認証認可 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/マネジメント/">マネジメント (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/XXX/">XXX (0)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/インタビュー/">インタビュー (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 Future Tech Blog - フューチャーアーキテクト<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
