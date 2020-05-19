@@ -79,25 +79,7 @@
 						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
 					</li>
 					
-					<li class="">
-						<a href="http://qiita.com/organizations/future"><i class="fa fa-users"></i>Qiita</a>
-					</li>
-					
 					<!-- BEGIN TOP SEARCH -->
-					<li class="menu-search">
-						<span class="sep"></span>
-						<i class="fa fa-search search-btn"></i>
-						<div class="search-box">
-							<form action="#" class="googleSearch" onsubmit="googleSearch();">
-								<div class="input-group">
-									<input type="text" placeholder="Search" class="form-control">
-									<span class="input-group-btn">
-										<button class="btn btn-primary" type="submit">Search</button>
-									</span>
-								</div>
-							</form>
-						</div>
-					</li>
 					<!-- END TOP SEARCH -->
 				</ul>
 			</div>
@@ -137,7 +119,7 @@
 
     </li>
 
-    <li class="hidden-xs"><i class="fa fa-tags"></i>
+    <li><i class="fa fa-tags"></i>
     
   
     <a href="/tags/Python/" title="Python">Python</a>,
@@ -232,7 +214,7 @@
 <figure class="highlight ini"><figcaption><span>deploy/uwsgi.ini</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[uwsgi]</span></span><br><span class="line"><span class="attr">http</span> = <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">8000</span></span><br><span class="line"><span class="attr">chdir</span> = /opt/app/mysite</span><br><span class="line"><span class="attr">wsgi-file</span> = mysite/wsgi.py</span><br><span class="line"><span class="attr">master</span> = <span class="literal">True</span></span><br><span class="line"><span class="attr">processes</span> = <span class="number">2</span></span><br><span class="line"><span class="attr">threads</span> = <span class="number">2</span></span><br><span class="line"><span class="attr">stats</span> = <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">9191</span></span><br><span class="line"><span class="attr">uid</span> = uwsgiusr</span><br><span class="line"><span class="attr">gid</span> = uwsgiusr</span><br></pre></td></tr></table></figure>
 
 <p>Dockerfileはこうなりました。slimの方にはlibxml2などがないので追加します。PostgreSQLのライブラリのlibpq5はまあおまけです。大抵ウェブアプリケーション作るときはPostgreSQLかMySQLは使うでしょうし。もし、使うライブラリがpure python、もしくはC拡張でもwheelによるバイナリ配布をしているパッケージのみであれば、ビルド用イメージも3.8-slim-busterにできます。slimを使っていても、もしライブラリを追加した瞬間にGCCが必要になっても、イメージを3.8-busterに変えるだけなので、このマルチステージビルドの構成は崩さない方が良いでしょう。お仕事であれば問題回避の速度が大事ですからね。</p>
-<figure class="highlight dockerfile"><figcaption><span>Dockerfile</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ここはビルド用のコンテナ</span></span><br><span class="line"><span class="keyword">FROM</span> python:<span class="number">3.8</span>-buster as builder</span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span> /opt/app</span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span> requirements.lock /opt/app</span><br><span class="line"><span class="keyword">RUN</span> pip3 install -r requirements.lock</span><br><span class="line"></span><br><span class="line"><span class="comment"># ここからは実行用コンテナの準備</span></span><br><span class="line"><span class="keyword">FROM</span> python:<span class="number">3.8</span>-slim-buster as runner</span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span> --from=builder /usr/local/lib/python3.8/site-packages /usr/local/lib/python3.8/site-packages</span><br><span class="line"><span class="keyword">COPY</span> --from=builder /usr/local/bin/uwsgi /usr/local/bin/uwsgi</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span> apt update \</span><br><span class="line">  &amp;&amp; apt install -y libpq5 libxml2 \</span><br><span class="line">  &amp;&amp; apt-get clean \</span><br><span class="line">  &amp;&amp; rm -rf /var/lib/apt/lists/*</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span> useradd -r -s /bin/false uwsgiusr</span><br><span class="line"><span class="keyword">RUN</span> mkdir -p /opt/app/src/logs/app_logs</span><br><span class="line"><span class="keyword">RUN</span> touch /opt/app/src/logs/server.log</span><br><span class="line"><span class="keyword">RUN</span> chown -R uwsgiusr /opt/app/src/logs</span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span> deploy/uwsgi.ini /opt/app</span><br><span class="line"><span class="keyword">COPY</span> mysite /opt/app/mysite</span><br><span class="line"></span><br><span class="line"><span class="keyword">USER</span> uwsgiusr</span><br><span class="line"></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">8000</span></span><br><span class="line"><span class="keyword">CMD</span> ["uwsgi", "--ini", "/opt/app/uwsgi.ini"]</span><br></pre></td></tr></table></figure>
+<figure class="highlight dockerfile"><figcaption><span>Dockerfile</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ここはビルド用のコンテナ</span></span><br><span class="line"><span class="keyword">FROM</span> python:<span class="number">3.8</span>-buster as builder</span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /opt/app</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> requirements.lock /opt/app</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip3 install -r requirements.lock</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ここからは実行用コンテナの準備</span></span><br><span class="line"><span class="keyword">FROM</span> python:<span class="number">3.8</span>-slim-buster as runner</span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> --from=builder /usr/<span class="built_in">local</span>/lib/python3.8/site-packages /usr/<span class="built_in">local</span>/lib/python3.8/site-packages</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> --from=builder /usr/<span class="built_in">local</span>/bin/uwsgi /usr/<span class="built_in">local</span>/bin/uwsgi</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt update \</span></span><br><span class="line"><span class="bash">  &amp;&amp; apt install -y libpq5 libxml2 \</span></span><br><span class="line"><span class="bash">  &amp;&amp; apt-get clean \</span></span><br><span class="line"><span class="bash">  &amp;&amp; rm -rf /var/lib/apt/lists/*</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> useradd -r -s /bin/<span class="literal">false</span> uwsgiusr</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> mkdir -p /opt/app/src/logs/app_logs</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> touch /opt/app/src/logs/server.log</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> chown -R uwsgiusr /opt/app/src/logs</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> deploy/uwsgi.ini /opt/app</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> mysite /opt/app/mysite</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">USER</span> uwsgiusr</span><br><span class="line"></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">8000</span></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> [<span class="string">"uwsgi"</span>, <span class="string">"--ini"</span>, <span class="string">"/opt/app/uwsgi.ini"</span>]</span></span><br></pre></td></tr></table></figure>
 
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker build -t pytest .</span><br><span class="line">$ docker run -it --rm -p <span class="string">"8000:8000"</span> pytest</span><br></pre></td></tr></table></figure>
 
@@ -304,6 +286,34 @@
   
     
       
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
         <a href="https://future-architect.github.io/articles/20200518/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
@@ -346,29 +356,13 @@
   
     
       
-        <a href="https://future-architect.github.io/articles/20200513/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                仕事でPythonコンテナをデプロイする人向けのDockerfile (1): オールマイティ編
-              </li>
-            </div>
-          </div>
-        </a>
-      
 	
   
     
       
-        <a href="https://future-architect.github.io/articles/20200512/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                日本製HeadlessCMSのmicroCMSを触ってみた
-              </li>
-            </div>
-          </div>
-        </a>
+	
+  
+    
       
 	
   
@@ -487,30 +481,28 @@
     
   
     
-      
-	
   
     
       
 	
   
     
+      
+	
   
     
+      
+	
   
     
   
     
-      
-	
   
     
       
 	
   
     
-  
-    
       
 	
   
@@ -521,8 +513,6 @@
     
   
     
-      
-	
   
     
       
@@ -543,16 +533,12 @@
     
       
 	
-  
-    
   
     
       
 	
   
     
-      
-	
   
     
       
@@ -613,8 +599,6 @@
     
       
 	
-  
-    
   
     
   
@@ -627,8 +611,6 @@
     
   
     
-      
-	
   
     
       
@@ -687,8 +669,6 @@
     
       
 	
-  
-    
   
     
   
@@ -697,14 +677,14 @@
 	
   
     
-      
-	
   
     
       
 	
   
     
+      
+	
   
     
   
@@ -717,8 +697,6 @@
 	
   
     
-      
-	
   
     
       
@@ -737,6 +715,8 @@
 	
   
     
+      
+	
   
     
       
@@ -747,8 +727,6 @@
     
   
     
-      
-	
   
     
       
@@ -779,6 +757,8 @@
 	
   
     
+      
+	
   
     
       
@@ -793,12 +773,18 @@
 	
   
     
+  
+    
+      
+	
   
     
       
 	
   
     
+  
+    
       
 	
   
@@ -855,28 +841,24 @@
 	
   
     
+      
+	
   
     
   
     
   
     
-      
-	
   
     
       
 	
   
     
-      
-	
   
     
       
 	
-  
-    
   
     
       
@@ -935,6 +917,8 @@
 	
   
     
+      
+	
   
     
       
@@ -947,8 +931,8 @@
     
   
     
-      
-	
+  
+    
   
     
   
@@ -983,6 +967,8 @@
 	
   
     
+      
+	
   
     
   
@@ -991,20 +977,20 @@
 	
   
     
-      
-	
   
     
       
 	
-  
-    
   
     
+      
+	
   
     
       
 	
+  
+    
   
     
   
@@ -1051,23 +1037,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Design/">Design (6)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Security/">Security (1)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Programming/">Programming (54)</a>
+	  <a href="/categories/Design/">Design (6)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (53)</a>
+	  <a href="/categories/Programming/">Programming (55)</a>
 	</li>
       
 	<li>
 	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (53)</a>
 	</li>
       
 	<li>
@@ -1088,10 +1074,6 @@
       
 	<li>
 	  <a href="/categories/マネジメント/">マネジメント (1)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/XXX/">XXX (0)</a>
 	</li>
       
 	<li>
