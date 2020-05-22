@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Go Tips 連載5: エラーコードベースの例外ハンドリングの実装＋morikuni/failureサンプル | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="概要TIG DX所属の多賀です。最近は設計をしつつ Go も触れて引き続き楽しく仕事してます。 今回は、errors package を一部利用して、エラーコードベースのエラーハンドリング処理を実装しました。また、morikuni/failure を利用した実装への書き換えも試してみています。 エラーコードベースの例外ハンドリングについて前提としてGoで書かれた HTTP APIサーバーに対し">
+<meta name="keywords" content="Go,GoTips連載">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go Tips 連載5: エラーコードベースの例外ハンドリングの実装＋morikuni&#x2F;failureサンプル">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200522/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="概要TIG DX所属の多賀です。最近は設計をしつつ Go も触れて引き続き楽しく仕事してます。 今回は、errors package を一部利用して、エラーコードベースのエラーハンドリング処理を実装しました。また、morikuni/failure を利用した実装への書き換えも試してみています。 エラーコードベースの例外ハンドリングについて前提としてGoで書かれた HTTP APIサーバーに対し">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20200522/top.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200522/photo_20200522_01.png">
+<meta property="og:updated_time" content="2020-05-22T00:57:43.401Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Go Tips 連載5: エラーコードベースの例外ハンドリングの実装＋morikuni&#x2F;failureサンプル">
+<meta name="twitter:description" content="概要TIG DX所属の多賀です。最近は設計をしつつ Go も触れて引き続き楽しく仕事してます。 今回は、errors package を一部利用して、エラーコードベースのエラーハンドリング処理を実装しました。また、morikuni/failure を利用した実装への書き換えも試してみています。 エラーコードベースの例外ハンドリングについて前提としてGoで書かれた HTTP APIサーバーに対し">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200522/top.png">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="Go Tips 連載5: エラーコードベースの例外ハンドリングの実装＋morikuni/failureサンプル | フューチャー技術ブログ" name="description">
+  <meta content="Go Tips 連載5: エラーコードベースの例外ハンドリングの実装＋morikuni/failureサンプル,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">フューチャー技術ブログ</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="180px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200522/">Go Tips 連載5: エラーコードベースの例外ハンドリングの実装＋morikuni/failureサンプル</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200522-go-tips-5-failure" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 多賀聡一朗</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-05-21T15:14:52.000Z" itemprop="datePublished">2020/05/22</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/Go/" title="Go">Go</a>,
+  
+    <a href="/tags/GoTips連載/" title="GoTips連載">GoTips連載</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <img src="/images/20200522/top.png">
+
+<h1 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h1><p>TIG DX所属の多賀です。最近は設計をしつつ Go も触れて引き続き楽しく仕事してます。</p>
+<p>今回は、<a href="https://pkg.go.dev/errors?tab=doc" target="_blank" rel="noopener">errors</a> package を一部利用して、エラーコードベースのエラーハンドリング処理を実装しました。また、morikuni/failure を利用した実装への書き換えも試してみています。</p>
+<h1 id="エラーコードベースの例外ハンドリングについて"><a href="#エラーコードベースの例外ハンドリングについて" class="headerlink" title="エラーコードベースの例外ハンドリングについて"></a>エラーコードベースの例外ハンドリングについて</h1><p>前提としてGoで書かれた HTTP APIサーバーに対してのエラーハンドリングについて記載します。</p>
+<p><strong>エラーコードベースの例外ハンドリング</strong>についてですが、アプリケーションで発生するエラーを事前にラベリングしてコード化し、コードをもとにエラーハンドリングを実施することとします。発生時の運用対応や影響について、事前に一覧で整理することで、運用負荷を下げる意味があると考えています。(補足: Futureではメッセージコードと呼称することが多いですが、一般的な命名であるエラーコードで統一します)</p>
+<p>以下のような形で整理しています。<br>実際は、エラーコード別に運用アクションも合わせて整理します。</p>
+<p>エラーコード表 (例)</p>
+<table>
+<thead>
+<tr>
+<th align="left">エラーコード</th>
+<th align="left">エラー名</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">XXX0001</td>
+<td align="left">クライアントエラー</td>
+</tr>
+<tr>
+<td align="left">XXX0002</td>
+<td align="left">DBコネクションエラー</td>
+</tr>
+<tr>
+<td align="left">XXX0003</td>
+<td align="left">外部APIサーバーへのリクエストエラー</td>
+</tr>
+</tbody></table>
+<p>エラーコードを利用した際に重要なことは、エラーコード外のエラーを発生させないことにあると考えています。エラーコード外のエラーが発生した際、何をどうしたらよいかが明文化されていないためです。エラーは、ログより発生を検知し対応するものとした際に、いかにアプリケーションから出力されるログに対して、適切にエラーコードを付与できるかが大事です。</p>
+<h1 id="errors-package-を利用した実装例"><a href="#errors-package-を利用した実装例" class="headerlink" title="errors package を利用した実装例"></a>errors package を利用した実装例</h1><p>アプリケーション側での、コンパイルレベルでの制約は難しくコードレビューでの担保もふくまれますが、以下のようにしてエラーを出力しています。</p>
+<p>パッケージの構造としてはシンプルな以下のイメージです。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── handler    <span class="comment"># httpリクエストをハンドリングする層</span></span><br><span class="line">├── service    <span class="comment"># ビジネスロジック層 </span></span><br><span class="line">└── infra      <span class="comment"># DBや外部API等の外部リソースへアクセスする層</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="エラーコード別のエラーを定義"><a href="#エラーコード別のエラーを定義" class="headerlink" title="エラーコード別のエラーを定義"></a>エラーコード別のエラーを定義</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> apperror</span><br><span class="line"></span><br><span class="line"><span class="comment">// AppError はエラーコードが付与されたエラーのinterface</span></span><br><span class="line"><span class="keyword">type</span> AppError <span class="keyword">interface</span> &#123;</span><br><span class="line">	error</span><br><span class="line">	Code() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以下にエラーコード別にカスタムエラーを定義</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> ClientError <span class="keyword">struct</span> &#123;</span><br><span class="line">	Err error</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e ClientError)</span> <span class="title">Error</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="string">"client error"</span> + <span class="string">": "</span> + e.Err.Error()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e ClientError)</span> <span class="title">Code</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="string">"XXX0001"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e *ClientError)</span> <span class="title">Unwrap</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> e.Err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="handler-層に返却される-error-を必ずエラーコード対応Error型とする"><a href="#handler-層に返却される-error-を必ずエラーコード対応Error型とする" class="headerlink" title="handler 層に返却される error を必ずエラーコード対応Error型とする"></a>handler 層に返却される error を必ずエラーコード対応Error型とする</h2><p>各層のerror を wrappingして handler 層に返却します。ここは愚直にやらないといけないところです。(静的解析ツールを作ってチェックする機構を用意するほうがより良いですね。)</p>
+<p>関数の戻り値の第2引数自体を <code>AppError</code> 型にすることも考えられますが、標準 error インターフェイスを尊重したほうが良いとのノウハウがあるので対応しませんでした。</p>
+<p>参考: <a href="https://www.slideshare.net/yuichi1004/golangtokyo-6-in-japanese?ref=https://golangtokyo.connpass.com/event/57168/presentation/" target="_blank" rel="noopener">初めてGolangで大規模Microservicesを作り得た教訓</a></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> service</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(h User)</span> <span class="title">Search</span><span class="params">(id <span class="keyword">string</span>)</span> <span class="params">(<span class="keyword">string</span>, error)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 処理...</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// err を wrap してエラー情報を追加する</span></span><br><span class="line">		<span class="keyword">return</span> <span class="string">""</span>, apperror.ClientError&#123;Err: fmt.Errorf(<span class="string">"invalid id = %v: %w"</span>, id, err)&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="エラーログを出力する箇所を集約"><a href="#エラーログを出力する箇所を集約" class="headerlink" title="エラーログを出力する箇所を集約"></a>エラーログを出力する箇所を集約</h2><p>handler 層に集約させます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> handler</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">UserHandleFunc</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">	app := service.User&#123;&#125;</span><br><span class="line">	h, err := app.Search(<span class="string">"id1"</span>)</span><br><span class="line">	<span class="comment">// err は 必ずエラーコード定義のエラー</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// エラーから共通のログを出力する関数を呼び出す</span></span><br><span class="line">		errorLog(err)</span><br><span class="line">		w.WriteHeader(<span class="number">500</span>)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">errorLog</span><span class="params">(err error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> e, ok := err.(apperror.AppError); ok &#123;</span><br><span class="line">		<span class="comment">// エラーコードとメッセージをログに出力</span></span><br><span class="line">		log.Printf(<span class="string">"[%v] %v\n"</span>, e.Code(), e.Error())</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="comment">// 予想外のエラー(実装ミス)</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上記の通りに実装することで、エラーコードにエラーを集約すること自体はできました。</p>
+<p>ただ、独自エラーを定義して Wrapするところはもっと書きやすくできないか、検討の余地がありそうだと感じました。</p>
+<h1 id="morikuni-failure-を利用できないか"><a href="#morikuni-failure-を利用できないか" class="headerlink" title="morikuni/failure を利用できないか?"></a>morikuni/failure を利用できないか?</h1><p>morikuni/failure は morikuni さんが作成されたエラーハンドリング向けのライブラリです。errors package 存在前より開発されているライブラリです。</p>
+<p><a href="https://github.com/morikuni/failure" target="_blank" rel="noopener">https://github.com/morikuni/failure</a></p>
+<blockquote>
+<p>Package failure provides an error represented as error code and extensible error interface with wrappers.</p>
+</blockquote>
+<p>とのことなので、エラコードベースの利用にマッチしそうです。</p>
+<p>以前の <a href="https://speakerdeck.com/morikuni/designing-errors" target="_blank" rel="noopener">Go Conference 2019 Spring にて発表されている資料</a> にて、failure と errors (当時は xerrors) の使い分けについて明確に説明されています。とてもわかりやすくて、しっくりきたことを覚えています。</p>
+<img src="/images/20200522/photo_20200522_01.png" style="border:solid 1px #000000">
+
+<p>参考: <a href="https://speakerdeck.com/morikuni/designing-errors?slide=33" target="_blank" rel="noopener">https://speakerdeck.com/morikuni/designing-errors?slide=33</a></p>
+<h2 id="やってみた"><a href="#やってみた" class="headerlink" title="やってみた"></a>やってみた</h2><p>morikuni/failure を利用して上記のコードを書き換えてみました。</p>
+<h3 id="エラーコード別のエラーを定義-1"><a href="#エラーコード別のエラーを定義-1" class="headerlink" title="エラーコード別のエラーを定義"></a>エラーコード別のエラーを定義</h3><p>とてもシンプルですね。追加も簡単になりそうです。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> apperror</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"github.com/morikuni/failure"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	ClientError       failure.StringCode = <span class="string">"XXX0001"</span></span><br><span class="line">	DBConnectionError failure.StringCode = <span class="string">"XXX0002"</span></span><br><span class="line">	XXAPIRequestError failure.StringCode = <span class="string">"XXX0003"</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="handler-層に返却される-error-を必ずエラーコードに対応させた独自エラーとする"><a href="#handler-層に返却される-error-を必ずエラーコードに対応させた独自エラーとする" class="headerlink" title="handler 層に返却される error を必ずエラーコードに対応させた独自エラーとする"></a>handler 層に返却される error を必ずエラーコードに対応させた独自エラーとする</h3><p>morikuni/failure でも、エラーコードへの変換 ( <code>failure.Translate</code>  ) や エラーコードの Wrap ( <code>failure.Wrap</code> ) は可能です。<br>(ちなみに、failureで生成したエラーも errors package のインターフェイスを満たしています。)</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> service</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"errors"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"github.com/xxx/failure_sample/apperror"</span></span><br><span class="line">	<span class="string">"github.com/morikuni/failure"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(h User)</span> <span class="title">Search</span><span class="params">(id <span class="keyword">string</span>)</span> <span class="params">(<span class="keyword">string</span>, error)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 処理...</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// err を wrap してエラー情報を追加する</span></span><br><span class="line">		<span class="keyword">return</span> <span class="string">""</span>, failure.Translate(err, apperror.ClientError, failure.Messagef(<span class="string">"invalid id=%v"</span>, id))</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="エラーログを出力する箇所を集約-1"><a href="#エラーログを出力する箇所を集約-1" class="headerlink" title="エラーログを出力する箇所を集約"></a>エラーログを出力する箇所を集約</h3><p>README の sample を参考にハンドリング処理を実装してみました。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> handler</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">	<span class="string">"net/http"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"github.com/xxx/failure_sample/apperror"</span></span><br><span class="line">	<span class="string">"github.com/xxx/failure_sample/service"</span></span><br><span class="line">	<span class="string">"github.com/morikuni/failure"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">UserHandleFunc</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">	app := service.User&#123;&#125;</span><br><span class="line">	_, err := app.Search(<span class="string">"id1"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		errorLog(err)</span><br><span class="line">		w.WriteHeader(httpStatus(err))</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	w.WriteHeader(http.StatusOK)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">errorLog</span><span class="params">(err error)</span></span> &#123;</span><br><span class="line">	code, ok := failure.CodeOf(err)</span><br><span class="line">	<span class="keyword">if</span> !ok &#123;</span><br><span class="line">		log.Printf(<span class="string">"unexpected error: %v\n"</span>, err)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	log.Printf(<span class="string">"[%v] %v\n"</span>, code, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">httpStatus</span><span class="params">(err error)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">switch</span> c, _ := failure.CodeOf(err); c &#123;</span><br><span class="line">	<span class="keyword">case</span> apperror.ClientError:</span><br><span class="line">		<span class="keyword">return</span> http.StatusBadRequest</span><br><span class="line">	<span class="keyword">default</span>:</span><br><span class="line">		<span class="keyword">return</span> http.StatusInternalServerError</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="感想"><a href="#感想" class="headerlink" title="感想"></a>感想</h1><p>エラーコードベースの例外ハンドリングのTipsについて記載しました。</p>
+<p>failure を利用したほうがよりシンプルに書けて良いのではないかと感じています。<br>また、他のメリットとしては以下がありそうです。</p>
+<ul>
+<li>failureでWrapすることでスタックトレースが残る</li>
+<li>failureの便利関数を利用して Error のコンテキストを文字列以外の形式で作成できる</li>
+</ul>
+<p>failureは実戦で使えてないので、次回チャレンジしてみたいです。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a href="https://blog.golang.org/go1.13-errors" target="_blank" rel="noopener">Working with Errors in Go 1.13 - The Go Blog</a></li>
+<li><a href="https://pkg.go.dev/github.com/morikuni/failure?tab=doc" target="_blank" rel="noopener">failure package · go.dev</a></li>
+<li><a href="https://speakerdeck.com/morikuni/designing-errors" target="_blank" rel="noopener">エラー設計について / Designing Errors - Speaker Deck</a></li>
+</ul>
+<h2 id="関連記事"><a href="#関連記事" class="headerlink" title="関連記事"></a>関連記事</h2><p>Goに関連した他の連載企画です。</p>
+<ul>
+<li><a href="/tags/Serverless%E9%80%A3%E8%BC%89/">Serverless連載</a></li>
+<li><a href="tags/DynamoDB%C3%97Go/">DynamoDB×Go</a></li>
+<li><a href="tags/GCP%E9%80%A3%E8%BC%89/">GCP連載</a></li>
+<li><a href="/tags/GoCDK/">GoCDK</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="Go Tips 連載5: エラーコードベースの例外ハンドリングの実装＋morikuni/failureサンプル" data-url="https://future-architect.github.io/articles/20200522/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200522/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200522/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200522/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200522/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go Tips 連載5: エラーコードベースの例外ハンドリングの実装＋morikuni/failureサンプル
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200520/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go Tips連載3: ファイルを扱うちょっとしたスクリプトをGoで書くときのTips5選
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200521/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go Tips連載4: GoDocの読み方
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (24)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (58)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (53)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (19)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/認証認可/">認証認可 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/マネジメント/">マネジメント (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/インタビュー/">インタビュー (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
