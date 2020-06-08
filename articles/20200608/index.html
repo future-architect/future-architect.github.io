@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head><meta name="generator" content="Hexo 3.9.0">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>春の入門祭り🌸 #6 とあるマイコンのクロスコンパイラ | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにこんにちは、TIG/DXチームの栗田です。もともと宇宙物理を専攻しており、前職では製鉄メーカーでプラントエンジニアをしていました。最近ではもっぱら工場IoT案件で制御系システムとクラウドをつなぐようなことをしていますが、その前は組み込みマイコンで制御系開発をしていました（人工衛星時代の話）。 IT業界で働き始めると、ソースコードを書いてそれを実行してシステムを動かす、ということを行うことに">
+<meta name="keywords" content="clang,Compiler">
+<meta property="og:type" content="article">
+<meta property="og:title" content="春の入門祭り🌸 #6 とあるマイコンのクロスコンパイラ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200608/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、TIG/DXチームの栗田です。もともと宇宙物理を専攻しており、前職では製鉄メーカーでプラントエンジニアをしていました。最近ではもっぱら工場IoT案件で制御系システムとクラウドをつなぐようなことをしていますが、その前は組み込みマイコンで制御系開発をしていました（人工衛星時代の話）。 IT業界で働き始めると、ソースコードを書いてそれを実行してシステムを動かす、ということを行うことに">
+<meta property="og:locale" content="ja">
+<meta property="og:image" content="https://future-architect.github.io/images/20200608/photo_20200608_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200608/photo_20200608_02.png">
+<meta property="og:updated_time" content="2020-06-08T01:46:47.946Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="春の入門祭り🌸 #6 とあるマイコンのクロスコンパイラ">
+<meta name="twitter:description" content="はじめにこんにちは、TIG/DXチームの栗田です。もともと宇宙物理を専攻しており、前職では製鉄メーカーでプラントエンジニアをしていました。最近ではもっぱら工場IoT案件で制御系システムとクラウドをつなぐようなことをしていますが、その前は組み込みマイコンで制御系開発をしていました（人工衛星時代の話）。 IT業界で働き始めると、ソースコードを書いてそれを実行してシステムを動かす、ということを行うことに">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200608/photo_20200608_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="春の入門祭り🌸 #6 とあるマイコンのクロスコンパイラ | フューチャー技術ブログ" name="description">
+  <meta content="春の入門祭り🌸 #6 とあるマイコンのクロスコンパイラ,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+</html>
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">フューチャー技術ブログ</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="180px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200608/">春の入門祭り🌸 #6 とあるマイコンのクロスコンパイラ</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200608-春祭り6-cross-compiler" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 栗田真</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-06-08T01:37:41.000Z" itemprop="datePublished">2020/06/08</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/clang/" title="clang">clang</a>,
+  
+    <a href="/tags/Compiler/" title="Compiler">Compiler</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIG/DXチームの栗田です。もともと宇宙物理を専攻しており、前職では製鉄メーカーでプラントエンジニアをしていました。<br>最近ではもっぱら工場IoT案件で制御系システムとクラウドをつなぐようなことをしていますが、その前は組み込みマイコンで制御系開発をしていました（人工衛星時代の話）。</p>
+<p>IT業界で働き始めると、ソースコードを書いてそれを実行してシステムを動かす、ということを行うことになりますが、その裏で頑張ってくれているのがコンパイラです。普段プログラムを書いていても、「コンパイラ使ったことあるけどその中身までは。。。」「普段Pythonとかで特に意識したことない。」な方もいると思います。</p>
+<p>そこで今回は<a href="https://future-architect.github.io/articles/20200529/">春の入門祭り</a>ということで、自分でコンパイラを作ります。ただしコンパイラはコンパイラでも、イチから全部作るのはなかなか大変なので、公開されているコンパイラのソースコードを使って、「クロスコンパイラ」を作ってみようと思います。</p>
+<h1 id="クロスコンパイラについて"><a href="#クロスコンパイラについて" class="headerlink" title="クロスコンパイラについて"></a>クロスコンパイラについて</h1><p>今回のテーマはクロスコンパイラですが、そもそもコンパイラとはというところから始めようと思います。</p>
+<h2 id="コンパイラって何"><a href="#コンパイラって何" class="headerlink" title="コンパイラって何"></a>コンパイラって何</h2><p>人間が理解しやすいプログラミング言語で記述されたプログラムを、機械が理解できるバイナリにすることをコンパイルと言います。</p>
+<p>このコンパイルを行うプログラムをコンパイラといいます。</p>
+<p>より厳密には言語や開発環境に応じてオブジェクトファイルに変換するプログラムをコンパイラ、各種オブジェクトコードを紐付けて処理するリンクを行うプログラムをリンカ、この一連の流れを通してビルドと呼ぶこともありますが、gccを始めとして世の中でコンパイラと呼ばれるプログラムはこの一連の流れを一手に行えます（もっと細かく言うとプリプロセッサやアセンブルなどの処理もありますが、細かくしすぎること今回の趣旨から外れますので割愛します。）。ここからは平たくプラグラムを実行ファイル（バイナリ）にするプログラムを、コンパイラと呼んでいくことにします。</p>
+<img src="/images/20200608/photo_20200608_01.png">
+
+
+<p>余談ではありますが、同じ環境で実行できるコンパイラは複数存在します。</p>
+<p>Cで使えるコンパイラとしてはgccやclangがあります。WindowsだとVisual Studioに付属しているコンパイラもあります。</p>
+<p>コンパイラも特定の実行環境上で動くプログラムなので、当然実行環境やバージョンによって挙動が違います。そして気をつけなければいけないのが、同じ名前のコマンドを叩いているように見えても実際は違うコマンドを叩いているようなことがあります。代表的なところでいうと、MacのXcodeにてデフォルトで使えるgccの実体は、エイリアスがついたclangです。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">which</span> gcc</span><br><span class="line">/usr/bin/gcc</span><br><span class="line">$ gcc -v</span><br><span class="line">Configured with: --prefix=/Applications/Xcode.app/Contents/Developer/usr --with-gxx-include-dir=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/4.2.1</span><br><span class="line">Apple clang version 11.0.3 (clang-1103.0.32.59)</span><br><span class="line">Target: x86_64-apple-darwin19.5.0</span><br><span class="line">Thread model: posix</span><br><span class="line">InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin</span><br></pre></td></tr></table></figure>
+
+<p>gccもclangもコンパイラであることに変わりはないですが、XcodeでインストールされるclangはAppleが提供するclangでして、古いバージョンのライブラリなどが同梱されていてやられることがあります。</p>
+<p>実際に経験した経験したケースでいうと、コンパイルしてできた実行ファイルが特定サイズを超えると余計なバイナリ文字が入ってしまい、結果プログラムが暴走しました。</p>
+<p>古いバージョンのライブラリが同梱されている理由は各種ライブラリのライセンスの関係などがあるのですが、そういうときは、HomebrewやMacPortsでインストールした適切なコンパイラに切り替えましょう。</p>
+<p>さらに余談ですが、コンパイラもプログラムとすると、コンパイラを作るコンパイラが必要となります。まるで鶏が先か卵が先かと言うような話ですが、特定のプログラムを使って同じバージョンの新しいバージョンを作ることをセルフホスティングと呼びます。例えばGoは1.5以降からセルフホスティングされています。</p>
+<h2 id="クロスコンパイラの必要性"><a href="#クロスコンパイラの必要性" class="headerlink" title="クロスコンパイラの必要性"></a>クロスコンパイラの必要性</h2><img src="/images/20200608/photo_20200608_02.png">
+
+
+<p>大学在学時の研究やあるいは趣味でプログラミングしている場合、開発（コンパイル）環境と実行環境が同じケースが多いかと思いますが、異なる環境で動作させなければならないケースがあります。</p>
+<p>このような「開発（コンパイル）環境と異なる実行環境で動くようにプログラムをコンパイルするプログラム」をクロスコンパイラと呼びます。この場合の環境とはアーキテクチャレベルでの話であり、最たる例はマイコンなどの組み込み開発です。ラズパイのようなOSが搭載されているようなものではなく、もっと低レイヤーのものになります。有名どころだとArduinoなどがそれに当たりますが、他にはSTM32bitマイコン、もっと前だとH8マイコンなどがあります。</p>
+<p>マイコンは昨今だと家電の制御部などを想像していただければ良いですが、これらマイコンは開発環境を備えておらず、起動時に記憶領域に書き込まれたプログラムをロードして動くことになります。となると、このマイコン上で動くプログラムを別のマシン上で作る必要があり、このときに必要となるのがクロスコンパイラです。</p>
+<p>開発環境としてはマイコンを提供している会社がIDEの形で提供しており、書き込み用のツールなどもセットで存在します。このツール、会社によっては有償になっていることがあり、確かに無料で使える試用期間が設けられていますが、やはり長期に渡る開発には向きません。</p>
+<p>こんなときの選択肢は、買うか、作るかです。</p>
+<p>今回は作りましょう。</p>
+<h1 id="実際に作ってみる"><a href="#実際に作ってみる" class="headerlink" title="実際に作ってみる"></a>実際に作ってみる</h1><p>今回作るターゲットは arm-none-eabi-gcc です。</p>
+<p>これはARMという組込みアーキテクチャ用のクロスコンパイラです。環境としては、macOS Catalina 10.15.5 &amp; MacPorts とします。なお、過去Ubuntuでもクロスコンパイラを作成したことはありますが、ここではややこしくなるため省きます。</p>
+<h2 id="材料"><a href="#材料" class="headerlink" title="材料"></a>材料</h2><p>今回の材料は次のとおりです。他にコンパイルに必要なものは、適宜インストールするものとします（さすがにcommand line toolいるでしょ、とかそういう話は特にしません）。</p>
+<p>なお、バージョンとしては基本現時点での最新版でいいと思いますが、gccとbinutilsは直近当てられたパッチ部分がうまく対応してくれなかったので、少し古いものにしました。</p>
+<ul>
+<li>ダウンロードして用意するもの（コンパイルするもの）<ul>
+<li><a href="http://gcc.gnu.org/" target="_blank" rel="noopener">gcc-9.1.0</a></li>
+<li><a href="https://www.gnu.org/software/binutils/" target="_blank" rel="noopener">binutils-2.32</a></li>
+<li><a href="https://sourceware.org/newlib/" target="_blank" rel="noopener">newlib-3.3.0</a></li>
+</ul>
+</li>
+<li>MacPortsでインストールするもの<ul>
+<li>MPC</li>
+<li>GMP</li>
+<li>MPFR</li>
+</ul>
+</li>
+</ul>
+<p>binutilsはアセンブラや逆アセンブラあるいはリンカなどを目的として利用します。</p>
+<p>gccはコンパイラとして利用するために利用します。newlibは組込みシステム向けに実装された標準Cライブラリで、今回gccをコンパイルするときに利用します。</p>
+<p>MacPortsでインストールするとした３つは、gccをコンパイルするときに必要になるものです。</p>
+<p>gcc4.3以降で依存しているMPC, GMP, MPFRをインストールします。</p>
+<h2 id="コマンド"><a href="#コマンド" class="headerlink" title="コマンド"></a>コマンド</h2><h3 id="MacPortsでのインストール"><a href="#MacPortsでのインストール" class="headerlink" title="MacPortsでのインストール"></a>MacPortsでのインストール</h3><p>コマンド一つで終わり、あとは確認です。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ sudo port -v install libmpc</span><br><span class="line">$ port deps libmpc                              </span><br><span class="line">Full Name: libmpc @1.1.0_1</span><br><span class="line">Library Dependencies: gmp, mpfr</span><br><span class="line">$ port installed | grep -e mpc -e gmp -e mpfr      </span><br><span class="line">  gmp @6.2.0_1 (active)</span><br><span class="line">  libmpc @1.1.0_1 (active)</span><br><span class="line">  mpfr @4.0.2_1 (active)</span><br></pre></td></tr></table></figure>
+
+<h3 id="コンパイル時に使うgccの選択"><a href="#コンパイル時に使うgccの選択" class="headerlink" title="コンパイル時に使うgccの選択"></a>コンパイル時に使うgccの選択</h3><p>先程「MacのXcodeでデフォルトされているclang」について説明し、確かにgccで呼び出されているものがAppleのclangだと確認できました。</p>
+<p>これから、コンパイラを切り替えます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ sudo port -v install gcc10</span><br><span class="line">$ port select --list gcc </span><br><span class="line">Available versions <span class="keyword">for</span> gcc:</span><br><span class="line">	mp-gcc10</span><br><span class="line">	none</span><br><span class="line">$ sudo port -v select --<span class="built_in">set</span> gcc mp-gcc10</span><br><span class="line">Password:</span><br><span class="line">Selecting <span class="string">'mp-gcc10'</span> <span class="keyword">for</span> <span class="string">'gcc'</span> succeeded. <span class="string">'mp-gcc10'</span> is now active.</span><br><span class="line">$ gcc -v                            </span><br><span class="line">Using built-in specs.</span><br><span class="line">COLLECT_GCC=gcc</span><br><span class="line">COLLECT_LTO_WRAPPER=/opt/<span class="built_in">local</span>/libexec/gcc/x86_64-apple-darwin19/10.1.0/lto-wrapper</span><br><span class="line">Target: x86_64-apple-darwin19</span><br><span class="line">Configured with: /opt/<span class="built_in">local</span>/var/macports/build/_opt_bblocal_var_buildworker_ports_build_ports_lang_gcc10/gcc10/work/gcc-10.1.0/configure --prefix=/opt/<span class="built_in">local</span> --build=x86_64-apple-darwin19 --<span class="built_in">enable</span>-languages=c,c++,objc,obj-c++,lto,fortran --libdir=/opt/<span class="built_in">local</span>/lib/gcc10 --includedir=/opt/<span class="built_in">local</span>/include/gcc10 --infodir=/opt/<span class="built_in">local</span>/share/info --mandir=/opt/<span class="built_in">local</span>/share/man --datarootdir=/opt/<span class="built_in">local</span>/share/gcc-10 --with-local-prefix=/opt/<span class="built_in">local</span> --with-system-zlib --<span class="built_in">disable</span>-nls --program-suffix=-mp-10 --with-gxx-include-dir=/opt/<span class="built_in">local</span>/include/gcc10/c++/ --with-gmp=/opt/<span class="built_in">local</span> --with-mpfr=/opt/<span class="built_in">local</span> --with-mpc=/opt/<span class="built_in">local</span> --with-isl=/opt/<span class="built_in">local</span> --<span class="built_in">enable</span>-stage1-checking --<span class="built_in">disable</span>-multilib --<span class="built_in">enable</span>-lto --<span class="built_in">enable</span>-libstdcxx-time --with-build-config=bootstrap-debug --with-as=/opt/<span class="built_in">local</span>/bin/as --with-ld=/opt/<span class="built_in">local</span>/bin/ld --with-ar=/opt/<span class="built_in">local</span>/bin/ar --with-bugurl=https://trac.macports.org/newticket --<span class="built_in">disable</span>-tls --with-pkgversion=<span class="string">'MacPorts gcc10 10.1.0_0'</span> --with-sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk</span><br><span class="line">Thread model: posix</span><br><span class="line">Supported LTO compression algorithms: zlib</span><br><span class="line">gcc version 10.1.0 (MacPorts gcc10 10.1.0_0)</span><br></pre></td></tr></table></figure>
+
+<p>確かに、gccが切り替わりました。</p>
+<h3 id="コンパイル"><a href="#コンパイル" class="headerlink" title="コンパイル"></a>コンパイル</h3><p>上述したリンク先から必要なソースをダウンロードし、下記のように配置します。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">work</span><br><span class="line">├── arm-none-eabi-gcc</span><br><span class="line">└── src</span><br><span class="line">    ├── binutils-2.32.tar.xz</span><br><span class="line">    ├── gcc-10.1.0.tar.gz</span><br><span class="line">    └── newlib-3.3.0.tar.gz</span><br></pre></td></tr></table></figure>
+
+<h4 id="binutilsのコンパイル"><a href="#binutilsのコンパイル" class="headerlink" title="binutilsのコンパイル"></a>binutilsのコンパイル</h4><p>一気にいきます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">export</span> CFLAGS=<span class="string">"-I/opt/local/include -O2"</span></span><br><span class="line">$ <span class="built_in">export</span> CXXFLAGS=<span class="string">"-I/opt/local/include -O2"</span></span><br><span class="line">$ <span class="built_in">export</span> LDFLAGS=<span class="string">"-L/opt/local/lib"</span></span><br><span class="line">$ tar zxvf binutils-2.32.tar.xz</span><br><span class="line">$ <span class="built_in">cd</span> binutils-2.32</span><br><span class="line">$ ./configure --prefix=/Users/kurita/work/arm-none-eabi-gcc --<span class="built_in">disable</span>-werror --target=arm-none-eabi --<span class="built_in">enable</span>-interwork --<span class="built_in">enable</span>-multilib</span><br><span class="line">$ make -j4</span><br><span class="line">$ make install</span><br></pre></td></tr></table></figure>
+
+<p>特にエラーなどでなければ成功です。</p>
+<h4 id="gccのコンパイル"><a href="#gccのコンパイル" class="headerlink" title="gccのコンパイル"></a>gccのコンパイル</h4><p>こちらも一気にいきます。なお、newlibはgccのコンパイル時に使用するもので、それ自体でコンパイルすることはしません。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> ~/work/src</span><br><span class="line">$ tar zxvf newlib-3.3.0.tar.gz</span><br><span class="line">$ tar zxvf gcc-9.1.0.tar.gz</span><br><span class="line">$ <span class="built_in">cd</span> gcc-9.1.0</span><br><span class="line">$ ln -s ../newlib-3.3.0/newlib .</span><br><span class="line">$ mkdir build</span><br><span class="line">$ <span class="built_in">cd</span> build</span><br><span class="line">$ ../configure --prefix=/Users/kurita/work/arm-none-eabi-gcc  --target=arm-none-eabi --<span class="built_in">enable</span>-interwork --<span class="built_in">enable</span>-multilib --with-newlib --<span class="built_in">enable</span>-langages=<span class="string">"c,c++"</span></span><br><span class="line">$ make -j4</span><br><span class="line">$ make install</span><br></pre></td></tr></table></figure>
+
+<p>最後に、パスを通して終わりです。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:/Users/kurita/work/arm-none-eabi-gcc/bin</span><br></pre></td></tr></table></figure>
+
+<p>簡単ではありますが、試しに <code>--version</code> で情報表示してみましょう。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ arm-none-eabi-gcc --version</span><br><span class="line">arm-none-eabi-gcc (GCC) 9.1.0</span><br><span class="line">Copyright (C) 2019 Free Software Foundation, Inc.</span><br><span class="line">This is free software; see the <span class="built_in">source</span> <span class="keyword">for</span> copying conditions.  There is NO</span><br><span class="line">warranty; not even <span class="keyword">for</span> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</span><br></pre></td></tr></table></figure>
+
+<p>これでMacでARM開発する準備が整いました。<br>どうやって書き込むのだとかそういう話はありますが、そこはぜひ実際に買ってみて、試行錯誤しながら開発してみていただきたいと思います。</p>
+<h1 id="クロスコンパイラはマイコンの世界だけではない"><a href="#クロスコンパイラはマイコンの世界だけではない" class="headerlink" title="クロスコンパイラはマイコンの世界だけではない"></a>クロスコンパイラはマイコンの世界だけではない</h1><p>「開発（コンパイル）環境と異なる実行環境で動くようにプログラムをコンパイルするプログラムがクロスコンパイラ」と言いましたが、これはマイコンの世界には閉じません。</p>
+<p>次のコマンドはこのFuture Tech Blogでも何度か出てきている、GoのプログラムをAWS Lambda向けの実行ファイルを作るコマンドです。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GOOS=linux GOARCH=amd64 go build -o lambda/lambda ./lambda/main.go</span><br></pre></td></tr></table></figure>
+
+<p>AWS Lambdaで提供されるgoのランタイムはgo1.xなのですが、これはAmazon Linux上で動くことになります。</p>
+<p>そのため、AWS Lambdaに登録するGoのコードは、OSとしてlinuxを指定し、またアーキテクチャとしてamd64を指定します。</p>
+<p>これもクロスコンパイルになります。</p>
+<h1 id="車輪の再実装"><a href="#車輪の再実装" class="headerlink" title="車輪の再実装"></a>車輪の再実装</h1><p>今回のブログで私は一つだけ嘘を付きました。「マイコン用開発環境を用意するときの選択肢は、買うか、作るか」だけではなく、「フリーで公開されているものを使う」という方法が取れます。すでにarm-none-eabi-gccはMacPortsでインストール可能です。Homebrewなどでも公開されているようですので、わざわざ自分で作る必要はありません。</p>
+<p>そのため使いたければ各種パッケージ管理ツールでインストールすればいいだけですが、自分が今使用しているツールがどのようにして作られているかを知ることは、原理原則を理解するには非常に大切かと思います。</p>
+<p>例えば新人さんなど、最初はひたすらポチポチコマンドの写経から始まるかもしれませんが、コマンド一つ一つの意味を考えながら、「このオプションにはこういう意味があるのだ」「今自分はこういうことをしているのだ」ということを理解しながらお仕事していければいいなと思います。</p>
+<h1 id="関連記事"><a href="#関連記事" class="headerlink" title="関連記事:"></a>関連記事:</h1><ul>
+<li><a href="https://future-architect.github.io/articles/20200310/">Goの標準ライブラリのコードリーディングのすすめ</a></li>
+<li><a href="https://future-architect.github.io/articles/20200427/">Goならわかるシステムプログラミングが増刷されて初版4刷になりました</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="春の入門祭り🌸 #6 とあるマイコンのクロスコンパイラ" data-url="https://future-architect.github.io/articles/20200608/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200608/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200608/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200608/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200608/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                春の入門祭り🌸 #6 とあるマイコンのクロスコンパイラ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200605/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                春の入門祭り 🌸 #05　データベース　テーブル設計入門
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200530/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                フューチャー技術ブログの運営で心がけていること
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200601/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                春の入門祭り 🌸 #01 Goのテストに入門してみよう！
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (26)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (65)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (56)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (9)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (19)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/認証認可/">認証認可 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/マネジメント/">マネジメント (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/インタビュー/">インタビュー (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+<![endif]-->
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+<script src="/js/script.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
