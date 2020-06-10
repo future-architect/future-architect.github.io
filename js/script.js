@@ -81,14 +81,3 @@
     $container.removeClass('mobile-nav-on');
   });
 })(jQuery);
-
-
-// Googleカスタム検索
-function googleSearch() {
-	var keyword = document.getElementsByClassName('form-control')[0].value;
-	var url = 'https://www.google.co.jp/?ion=1&espv=2#q=' + encodeURIComponent('site:future-architect.github.io/articles ' + keyword);
-
-	window.open(url) ;
-
-	document.getElementByClassName('googleSearch')[0].action=url;
-}
