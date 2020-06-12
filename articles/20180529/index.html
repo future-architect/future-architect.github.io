@@ -31,11 +31,11 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20180529/upsert_result.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20180529/insert_CTE_result.png">
 <meta property="article:published_time" content="2018-05-29T02:06:05.000Z">
-<meta property="article:modified_time" content="2019-09-17T05:02:38.875Z">
+<meta property="article:modified_time" content="2020-06-12T07:36:16.711Z">
 <meta property="article:author" content="Future Architect Consultants">
 <meta property="article:tag" content="Migration">
-<meta property="article:tag" content="PostgresSQL">
 <meta property="article:tag" content="Oracle">
+<meta property="article:tag" content="PostgreSQL">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://future-architect.github.io/images/20180529/migration_phase.png">
   
@@ -146,9 +146,9 @@
   
     <a href="/tags/Migration/" title="Migration">Migration</a>,
   
-    <a href="/tags/PostgresSQL/" title="PostgresSQL">PostgresSQL</a>,
+    <a href="/tags/Oracle/" title="Oracle">Oracle</a>,
   
-    <a href="/tags/Oracle/" title="Oracle">Oracle</a>
+    <a href="/tags/PostgreSQL/" title="PostgreSQL">PostgreSQL</a>
   
 
 
@@ -401,10 +401,10 @@
 <p>将来のことを考えて、外部結合はSQL標準のOUTER JOINで記述していくことにしましょう。</p>
 <h4 id="組み込み関数"><a href="#組み込み関数" class="headerlink" title="組み込み関数"></a>組み込み関数</h4><p>組み込み関数はデータベース毎に事前に用意されている関数です。データベース毎に仕様が異なることもありますので、移行の際には注意が必要です。OracleとPostgreSQLの組み込み関数の対比表については<a href="https://www.pgecons.org/wp-content/uploads/PGECons/2012/WG2/10_Built-inFunctionMigrationResearch/10_Appendix_01_Built-inFunctionComparativeTable(Oracle-PostgreSQL).pdf" target="_blank" rel="noopener">こちら</a>に詳しく載っておりますので、参考にしてください。</p>
 <p>OracleとPostgreSQLの両方で用意されていますが、機能仕様が全く異なる関数としては<code>DECODE</code>があります。<br>OracleではDECODE関数は条件分岐として使われています。構文としては以下です。</p>
-<img src="/images/20180529/decode_oracle.png" class="img-middle-size">
+<img src="/images/20180529/decode_oracle.png"  class="img-middle-size">
 
 <p>PostgreSQLでは、DECODE関数はテキスト表現からバイナリデータを復号する関数となっております。構文としては以下です。（formatオプションはbase64/hex/escapeから選択。）</p>
-<img src="/images/20180529/decode_postgres.png" class="img-small-size">
+<img src="/images/20180529/decode_postgres.png"  class="img-small-size">
 
 <p>OracleでのDECODE関数はPostgreSQLではcase文に変換します。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> empno, ename, deptno,</span><br><span class="line"><span class="keyword">DECODE</span>( deptno, <span class="number">10</span>, <span class="string">'ACCOUNTING'</span>,</span><br><span class="line">                <span class="number">20</span>, <span class="string">'RESEARCH'</span>,</span><br><span class="line">                <span class="number">30</span>, <span class="string">'SALES'</span>,</span><br><span class="line">                <span class="number">40</span>, <span class="string">'OPERATIONS'</span> ) <span class="keyword">as</span> dname</span><br><span class="line"><span class="keyword">FROM</span> emp;</span><br></pre></td></tr></table></figure>
@@ -437,7 +437,6 @@
 <p>empno:7369のsal列が変更され、empno:8000のレコードが作成されていますね。</p>
 <p>これをPostgreSQLで実装すると以下のようになります。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> scott.emp</span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> scott.emp_up</span><br><span class="line"><span class="keyword">ON</span> CONFLICT (empno)</span><br><span class="line"><span class="keyword">DO</span> <span class="keyword">UPDATE</span> <span class="keyword">SET</span> sal = excluded.sal, comm = excluded.comm ;</span><br></pre></td></tr></table></figure>
-
 <p>実行結果です。</p>
 <img src="/images/20180529/upsert_result.png">
 
@@ -446,7 +445,6 @@
 <p>それであれば、トリガー内でのパーティションテーブルに対する構文を<code>INSERT ON CONFLICT</code>となるように作り直せば良いかというとそうもいきません。それは通常のINSERT文が発行された際もON CONFLICT付きのINSERTとなってしまうからです。</p>
 <p>では、パーティションテーブルに対するMERGE文の変換はどうすればよいかというと、PostgreSQL 9.1で導入されたCommon Table Expression(CTE)を使って代替ができます。SQL文としては以下のようになります。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WITH</span> insrt <span class="keyword">AS</span> (<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> scott.emp_up),</span><br><span class="line">     updt  <span class="keyword">AS</span> (<span class="keyword">UPDATE</span> scott.emp <span class="keyword">set</span> sal = insrt.sal <span class="keyword">FROM</span> insrt</span><br><span class="line">                             <span class="keyword">WHERE</span> emp.empno = insrt.empno <span class="keyword">RETURNING</span> emp.empno)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> scott.emp</span><br><span class="line">(<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> insrt <span class="keyword">WHERE</span> empno <span class="keyword">NOT</span> <span class="keyword">IN</span> (<span class="keyword">SELECT</span> empno <span class="keyword">FROM</span> updt));</span><br></pre></td></tr></table></figure>
-
 <p>実行結果です。</p>
 <img src="/images/20180529/insert_CTE_result.png">
 
@@ -1332,7 +1330,7 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (7)</a>
+	  <a href="/categories/Management/">Management (8)</a>
 	</li>
       
 	<li>
@@ -1353,10 +1351,6 @@
       
 	<li>
 	  <a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (3)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/%E3%83%9E%E3%83%8D%E3%82%B8%E3%83%A1%E3%83%B3%E3%83%88/">マネジメント (1)</a>
 	</li>
       
 	<li>
