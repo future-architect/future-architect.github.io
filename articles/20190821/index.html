@@ -20,9 +20,10 @@
 <meta property="og:description" content="こんにちは。初投稿です。2012年新卒入社の竹内です。入社当時を振り返るとOracle10g,11gを良く利用していおり、データモデリングなどテーブル設計が好きで、2018年4月ぐらいまでRDBとバッチに浸ってました。 さて、現在プロジェクトでRedisを使っているのですが、いままでRDB人間だっただけにKVSやRedisならではの特徴に四苦八苦してます。 苦しんだ分、色々な知見を得ることができて">
 <meta property="og:locale" content="ja_JP">
 <meta property="article:published_time" content="2019-08-20T23:53:57.000Z">
-<meta property="article:modified_time" content="2019-10-28T13:52:36.727Z">
+<meta property="article:modified_time" content="2020-06-23T03:00:36.937Z">
 <meta property="article:author" content="Future Architect Consultants">
 <meta property="article:tag" content="Redis">
+<meta property="article:tag" content="KVS">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
@@ -130,7 +131,9 @@
     <li><i class="fa fa-tags"></i>
     
   
-    <a href="/tags/Redis/" title="Redis">Redis</a>
+    <a href="/tags/Redis/" title="Redis">Redis</a>,
+  
+    <a href="/tags/KVS/" title="KVS">KVS</a>
   
 
 
@@ -252,8 +255,7 @@
 </li>
 </ul>
 <p>1．Transaction開始<br>2．Redisのデータを複数DELETE<br>3．Redisのデータを作成（並列処理） ←並列処理でDELETEが入ったQueue以外のQueueが作成<br>4．Transaction終了</p>
-<p>並列処理で新たなQueueが作られた結果、トランザクション終了のタイミングでDELETE処理を含んでいないQueue、DELETE処理を含んでいるQueueを同時に<code>EXEC</code>。
-同時に動いた結果、3の登録が先に処理されあとで2のDELETEで消されたデータがいたようです。並列化をやめることで解消しました。</p>
+<p>並列処理で新たなQueueが作られた結果、トランザクション終了のタイミングでDELETE処理を含んでいないQueue、DELETE処理を含んでいるQueueを同時に<code>EXEC</code>。<br>同時に動いた結果、3の登録が先に処理されあとで2のDELETEで消されたデータがいたようです。並列化をやめることで解消しました。</p>
 <p>RDBでは都度データを書き換えに行くため、実行順の入替は起こりません。</p>
 <h2 id="3-Hash型はMultiGetできない"><a href="#3-Hash型はMultiGetできない" class="headerlink" title="3. Hash型はMultiGetできない"></a>3. Hash型はMultiGetできない</h2><p>Hash型はKeyの中に複数のFieldとValueを持てるため、RDB慣れしているとついつい使いたくなります。<br>ここに落とし穴があります。</p>
 <p>Hash型はString型のデータと違い複数レコードを一括取得するメソッドが提供されていません。</p>
@@ -302,7 +304,6 @@
 <p>これに保持しているKey情報を登録しておくようにします。</p>
 <p>例えば販売のサマリデータを作成・更新する際に、Sets型にデータ追加のコマンド（<code>SADD</code>）を都度発行します。※Redisの登録は高速（Pipeline処理で計測時は0.01ms程度）なので追加の<code>SADD</code>処理の性能影響は無視できるものと考えてます。</p>
 <figure class="highlight shell"><figcaption><span>redis_sets_command.sh</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Sets型のデータ登録</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># データ登録</span></span></span><br><span class="line">redis-cli -h $&#123;REDIS_HOST&#125; -p $&#123;PORT&#125; SADD sales:keys sales:111</span><br><span class="line">redis-cli -h $&#123;REDIS_HOST&#125; -p $&#123;PORT&#125; SADD sales:keys sales:222</span><br><span class="line">redis-cli -h $&#123;REDIS_HOST&#125; -p $&#123;PORT&#125; SADD sales:keys sales:111</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># データ取得</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## 全件取得</span></span></span><br><span class="line">redis-cli -h $&#123;REDIS_HOST&#125; -p $&#123;PORT&#125; SMEMBERS sales:keys    #sales:111 とsales:222が返ってくる</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## カーソル的に一定件数ずつ取得することも可能</span></span></span><br><span class="line">redis-cli -h $&#123;REDIS_HOST&#125; -p $&#123;PORT&#125; SSCAN sales:keys 0 COUNT 1000</span><br></pre></td></tr></table></figure>
-
 <br>
 
 <h4 id="抜け道：KEYSは使う。負荷を下げる。"><a href="#抜け道：KEYSは使う。負荷を下げる。" class="headerlink" title="抜け道：KEYSは使う。負荷を下げる。"></a>抜け道：KEYSは使う。負荷を下げる。</h4><p>今更変えられないよ！抜け道ないの！？ということでこれも検討しました。<br>設計・実装変えれないときの最終手段に近い位置づけです。最初から選択すべき内容ではないです。</p>
