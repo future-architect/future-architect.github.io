@@ -23,7 +23,7 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20200630/photo_20200630_02.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20200630/photo_20200630_03.png">
 <meta property="article:published_time" content="2020-06-30T01:06:15.000Z">
-<meta property="article:modified_time" content="2020-06-30T01:18:43.583Z">
+<meta property="article:modified_time" content="2020-06-30T03:21:10.237Z">
 <meta property="article:author" content="Future Architect Consultants">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="Swagger">
@@ -203,7 +203,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./exmample-server --host 0.0.0.0 --port 3000</span><br></pre></td></tr></table></figure>
 
 <p><code>--host</code>は<code>$HOST</code>、<code>--port</code>は<code>$PORT</code>という環境変数でも利用できるので、コンテナ化するときなどはこちらを利用するのも良いと思います。特に<a href="https://cloud.google.com/run/docs/reference/container-contract" target="_blank" rel="noopener">GCPのCloudRunは$PORTで待ち受けるのが必須</a>なので、この場合はGCP側にポート設定は任せましょう。</p>
-<h2 id="5-OpenAPIのバージョンを見間違え内容に注意"><a href="#5-OpenAPIのバージョンを見間違え内容に注意" class="headerlink" title="5. OpenAPIのバージョンを見間違え内容に注意"></a>5. OpenAPIのバージョンを見間違え内容に注意</h2><p>go-swaggerが対応しているのは <code>OAS2</code> であるので注意です。最新は <code>OAS3</code> ですが、その記法は利用できないことがあります。特にググった時に出てくる公式ドキュメントが <code>OAS2</code>であることをよく確認しましょう</p>
+<h2 id="5-OpenAPIのバージョンを見間違えないように注意"><a href="#5-OpenAPIのバージョンを見間違えないように注意" class="headerlink" title="5. OpenAPIのバージョンを見間違えないように注意"></a>5. OpenAPIのバージョンを見間違えないように注意</h2><p>go-swaggerが対応しているのは <code>OAS2</code> であるので注意です。最新は <code>OAS3</code> ですが、その記法は利用できないことがあります。特にググった時に出てくる公式ドキュメントが <code>OAS2</code>であることをよく確認しましょう</p>
 <p>大事なポイントなのでちゃんとテストします。次の画像↓はOAS2かOAS3のどちらでしょうか？</p>
 <img src="/images/20200630/photo_20200630_02.png">
 
@@ -303,8 +303,8 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">params := user.NewGetUserParamsWithContext(ctx).WithUserID(userID)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> _, err := api.user.GetUserContract(params); err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Errorf(<span class="string">"getUserContract: %s"</span>, err.Error()) <span class="comment">//=&gt;  getUserContract: &#123;resp:0xc0005325a0&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>これは、ステータスコード別にバインドするStructを自動生成する関係上、想定外のステータスコードの場合に動かしようが無いからだともいます。<a href="https://github.com/go-swagger/go-swagger/issues/1470" target="_blank" rel="noopener">このあたりのIsseuにも似たような議論</a>がありました。これを避けるためには、横断的にエラー時のModelを共通化しておき、全てのエンドポイントごとにDefaultステータスコードを設定しておくことがオススメです。</p>
-<h2 id="16-NewXxxの関数を利用する"><a href="#16-NewXxxの関数を利用する" class="headerlink" title="16. NewXxxの関数を利用する"></a>16. NewXxxの関数を利用する</h2><p>16でもちょっと実装が出ましたが、go-swaggerで生成したクライアントコードを利用して、サーバにリクエストする場合について注意があります。リクエストパラメータの生成には、 <code>NewXxx</code>を利用してStructを作らないと、timeout=0になって、<code>context deadline exceeded</code> エラーとなり上手く動作しません。<a href="https://github.com/go-swagger/go-swagger/issues/919#" target="_blank" rel="noopener">このあたりのIssue</a>でも話題にしています。</p>
-<p>NewXxxの関数を用いるときは、<code>WithContext</code>付きの方を利用すると便利です。あらにチェーンスタイルでパラメータも設定できます。必須属性については <code>swag.String</code> などで *string 型への変換が必要です。</p>
+<h2 id="16-NewXxxの関数を利用する"><a href="#16-NewXxxの関数を利用する" class="headerlink" title="16. NewXxxの関数を利用する"></a>16. NewXxxの関数を利用する</h2><p>15でもちょっと実装が出ましたが、go-swaggerで生成したクライアントコードを利用して、サーバにリクエストする場合について注意があります。リクエストパラメータの生成には、 <code>NewXxx</code>を利用してStructを作らないと、timeout=0になって、<code>context deadline exceeded</code> エラーとなり上手く動作しません。<a href="https://github.com/go-swagger/go-swagger/issues/919#" target="_blank" rel="noopener">このあたりのIssue</a>でも話題にしています。</p>
+<p>NewXxxの関数を用いるときは、<code>WithContext</code>付きの方を利用すると便利です。さらにチェーンスタイルでパラメータも設定できます。必須属性については <code>swag.String</code> などで *string 型への変換が必要です。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">params := user.NewPostUserParamsWithContext(ctx).</span><br><span class="line">	WithHTTPClient(hc).</span><br><span class="line">	WithUserID(userID).</span><br><span class="line">	WithBody(&amp;models.PostUser&#123;</span><br><span class="line">		Name:          swag.String(<span class="string">"未来太郎"</span>),</span><br><span class="line">		MemberType:    swag.String(<span class="string">"一般会員"</span>),</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
 
 
