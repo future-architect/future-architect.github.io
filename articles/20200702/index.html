@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにこんにちは、TIG&#x2F;DXユニットの市川です。 私が所属しているプロジェクトでは認証認可基盤としてAuth0を使用しています。検証段階や初期構築段階では各種設定をダッシュボードから操作することが多いと思いますが、実際に本番運用を行っていると、Auth0の設定やRulesのスクリプトをGit管理し、変更履歴を追えるようにしたいというケースが出てくるかと思います。 今回は、Auth0から提供され">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200702/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、TIG&#x2F;DXユニットの市川です。 私が所属しているプロジェクトでは認証認可基盤としてAuth0を使用しています。検証段階や初期構築段階では各種設定をダッシュボードから操作することが多いと思いますが、実際に本番運用を行っていると、Auth0の設定やRulesのスクリプトをGit管理し、変更履歴を追えるようにしたいというケースが出てくるかと思います。 今回は、Auth0から提供され">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200702/photo_20200702_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200702/photo_20200702_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200702/photo_20200702_03.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200702/photo_20200702_04.png">
+<meta property="article:published_time" content="2020-07-02T00:48:34.000Z">
+<meta property="article:modified_time" content="2020-07-02T00:55:14.657Z">
+<meta property="article:author" content="Future Architect Consultants">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Auth0">
+<meta property="article:tag" content="GitLAb">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200702/photo_20200702_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える | フューチャー技術ブログ" name="description">
+  <meta content="Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+
+  
+<link rel="stylesheet" href="/css/theme-styles.css">
+
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">フューチャー技術ブログ</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="180px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200702/">Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200702-auth0-cicd" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 市川浩暉</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-07-02T00:48:34.000Z" itemprop="datePublished">2020/07/02</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/AWS/" title="AWS">AWS</a>,
+  
+    <a href="/tags/Auth0/" title="Auth0">Auth0</a>,
+  
+    <a href="/tags/GitLAb/" title="GitLAb">GitLAb</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/CI-CD/">CI/CD</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIG/DXユニットの市川です。</p>
+<p>私が所属しているプロジェクトでは認証認可基盤としてAuth0を使用しています。検証段階や初期構築段階では各種設定をダッシュボードから操作することが多いと思いますが、実際に本番運用を行っていると、Auth0の設定やRulesのスクリプトをGit管理し、変更履歴を追えるようにしたいというケースが出てくるかと思います。</p>
+<p>今回は、Auth0から提供されている<a href="https://auth0.com/docs/extensions/deploy-cli" target="_blank" rel="noopener">Auth0 Deploy CLI</a>という拡張機能を利用して、Auth0テナントの設定をエクスポートする方法と私のプロジェクトで実際に行っているAuth0テナントへのデプロイの方法をお伝えします。</p>
+<p>最終的なイメージは下記の通りです。</p>
+<img src="/images/20200702/photo_20200702_01.png">
+
+
+<h1 id="1-実行環境"><a href="#1-実行環境" class="headerlink" title="1. 実行環境"></a>1. 実行環境</h1><p>今回の記事の作成で使用した実行環境は以下の通りです。</p>
+<p><a href="https://www.npmjs.com/package/npm" target="_blank" rel="noopener">npm</a>：6.14.5<br><a href="https://www.npmjs.com/package/auth0-deploy-cli" target="_blank" rel="noopener">auth0-deploy-cli</a>：5.0.0</p>
+<h1 id="2-Auth0-Deploy-CLIとは"><a href="#2-Auth0-Deploy-CLIとは" class="headerlink" title="2. Auth0 Deploy CLIとは"></a>2. Auth0 Deploy CLIとは</h1><p>Auth0 Deploy CLIとはAuth0で提供されている拡張機能です。<br>これを利用するとAuth0テナントの設定情報をエクスポートできることに加え、テナントの設定情報を記載したファイルを、各Auth0テナントへ反映できます。<br>よって、この拡張機能をCI/CDに組み込み、そこからデプロイを行うことも可能です。</p>
+<h1 id="3-既存環境のエクスポート"><a href="#3-既存環境のエクスポート" class="headerlink" title="3. 既存環境のエクスポート"></a>3. 既存環境のエクスポート</h1><p>では早速既存環境のエクスポートから行っていきます。</p>
+<h2 id="3-1-Auth0-Deploy-CLIで使用するアプリケーションを各テナントに作成する"><a href="#3-1-Auth0-Deploy-CLIで使用するアプリケーションを各テナントに作成する" class="headerlink" title="3-1. Auth0 Deploy CLIで使用するアプリケーションを各テナントに作成する"></a>3-1. Auth0 Deploy CLIで使用するアプリケーションを各テナントに作成する</h2><p>Auth0テナントにAuth0 Deploy CLIで使用するアプリケーションを作成します。<br>（各環境ごとにAuth0テナントを作成している場合は、それぞれのテナントごとにApplicationを作成する必要があります）</p>
+<p>Application Type はM2M(Machine to Machine Applications)を指定します。</p>
+<img src="/images/20200702/photo_20200702_02.png">
+
+<p>使用するAPIはAuth0 Management APIを選択し、auth0-deploy-cliを使用するに当たり必要となるSCOPEを設定します。</p>
+<p>必要となるSCOPEは下記をご確認ください。</p>
+<p><a href="https://auth0.com/docs/extensions/deploy-cli/guides/create-deploy-cli-application-manually#required-scopes" target="_blank" rel="noopener">Required Scopes - Create and Configure the Deploy CLI Application Manually</a></p>
+<p>SCOPE設定後、ポップアップ下部のAUTHORIZEを押下します。</p>
+<img src="/images/20200702/photo_20200702_03.png">
+
+
+<h2 id="3-2-ローカル環境にAuth0-Deploy-CLIの拡張機能をインストールする。"><a href="#3-2-ローカル環境にAuth0-Deploy-CLIの拡張機能をインストールする。" class="headerlink" title="3-2. ローカル環境にAuth0 Deploy CLIの拡張機能をインストールする。"></a>3-2. ローカル環境にAuth0 Deploy CLIの拡張機能をインストールする。</h2><p>npmを使用して、auth0-deploy-cliをローカル環境にインストールします。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm i -g auth0-deploy-cli</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-3-エクスポート先のディレクトリの作成"><a href="#3-3-エクスポート先のディレクトリの作成" class="headerlink" title="3-3. エクスポート先のディレクトリの作成"></a>3-3. エクスポート先のディレクトリの作成</h2><p>まずエクスポートする設定の置き場所となる任意のディレクトリを作成します。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir auth0-deploy</span><br><span class="line">$ <span class="built_in">cd</span> auth0-deploy</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-4-設定ファイルのconfig-jsonを作成"><a href="#3-4-設定ファイルのconfig-jsonを作成" class="headerlink" title="3-4 設定ファイルのconfig.jsonを作成"></a>3-4 設定ファイルのconfig.jsonを作成</h2><p>次にエクスポートを行う際に使用するconfig.jsonを作成します。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ touch config.json</span><br></pre></td></tr></table></figure>
+
+<p>作成したconfig.jsonに、先程作成したアプリケーションのdomainやclient id、client secrtetの情報を下記のフォーマットで記載します。</p>
+<figure class="highlight json"><figcaption><span>auth0-deploy/config.json</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"AUTH0_DOMAIN"</span>: <span class="string">"YOUR_DOMAIN"</span>,</span><br><span class="line">  <span class="attr">"AUTH0_CLIENT_ID"</span>: <span class="string">"YOUR_CLIENT_ID"</span>,</span><br><span class="line">  <span class="attr">"AUTH0_CLIENT_SECRET"</span>: <span class="string">"YOUR_CLIENT_SECRET"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>client id等の情報はAuth0のダッシュボードから確認することができます。</p>
+<img src="/images/20200702/photo_20200702_04.png">
+
+
+
+<h2 id="3-5-exportコマンドでエクスポートする"><a href="#3-5-exportコマンドでエクスポートする" class="headerlink" title="3-5. exportコマンドでエクスポートする"></a>3-5. exportコマンドでエクスポートする</h2><p>これでテナントの設定をエクスポートする準備が整いました。<br>下記コマンドを実行して、Auth0テナントの設定をエクスポートします。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ a0deploy <span class="built_in">export</span> -c config.json -f yaml -o ./</span><br></pre></td></tr></table></figure>
+
+
+<p>-cはconfigファイル、-fはフォーマット、-oはエクスポート先のディレクトリを指定します。<br>プロキシ経由の場合はプロキシのオプション（-p）を設定します。</p>
+<p>詳細は<a href="https://auth0.com/docs/extensions/deploy-cli/references/deploy-cli-options#options" target="_blank" rel="noopener">こちら</a>をご確認ください。</p>
+<p>コマンドを実行し、ログの最後に<code>Export Successful</code>が出力されれば、エクスポートは成功です。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ 20XX-YY-ZZ:ZZ:SS.SSSZ - info: Loading Auth0 Tenant Data</span><br><span class="line">$ 20XX-YY-ZZ:ZZ:SS.SSSZ - info: Retrieving rules data from Auth0</span><br><span class="line">...</span><br><span class="line">$ 20XX-YY-ZZ:ZZ:SS.SSSZ - info: Exporting guardianFactorTemplates</span><br><span class="line">$ 20XX-YY-ZZ:ZZ:SS.SSSZ - info: Exporting roles</span><br><span class="line">$ 20XX-YY-ZZ:ZZ:SS.SSSZ - info: Writing tenant.yaml</span><br><span class="line">$ 20XX-YY-ZZ:ZZ:SS.SSSZ - info: Export Successful</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="3-6-ディレクトリ構成"><a href="#3-6-ディレクトリ構成" class="headerlink" title="3-6. ディレクトリ構成"></a>3-6. ディレクトリ構成</h2><p>各環境が設定している内容により異なることはありますが、私が使用しているテナントは下記のようなディレクトリ構成となりました。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">|   <span class="comment"># 新規登録時やアカウントブロック時に送信されるemailテンプレート</span></span><br><span class="line">├── emailTemplates</span><br><span class="line">│   ├── blocked_account.html</span><br><span class="line">│   ├── reset_email.html</span><br><span class="line">│   └── verify_email.html</span><br><span class="line">|</span><br><span class="line">|   <span class="comment"># Universal Loginで使用するログイン画面やパスワード再発行ページ</span></span><br><span class="line">├── pages　　　　　　　　　　　　</span><br><span class="line">|   ├── error_page.html</span><br><span class="line">|   ├── login.html</span><br><span class="line">|   └── password_reset.html</span><br><span class="line">|</span><br><span class="line">|   <span class="comment"># テナントにされている各Rulesのスクリプト</span></span><br><span class="line">├── rules</span><br><span class="line">|   ├── hoge.js</span><br><span class="line">|   └── fuga.js</span><br><span class="line">|</span><br><span class="line">|   <span class="comment"># テナントの設定が記載されているyamlファイル</span></span><br><span class="line">└── tenant.yaml</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-7-各環境ごとのデプロイに対応したディレクトリ構成に変更する"><a href="#3-7-各環境ごとのデプロイに対応したディレクトリ構成に変更する" class="headerlink" title="3-7. 各環境ごとのデプロイに対応したディレクトリ構成に変更する"></a>3-7. 各環境ごとのデプロイに対応したディレクトリ構成に変更する</h2><p>私が所属しているプロジェクトでは3つの環境を使用しているため、Auth0テナントも3つ使用しています。<br>各環境ごとに設定内容が同一ではない項目もあるため、テナントの設定が記載されているyamlファイルを環境ごとに作成しています。<br>よって下記のようなディレクトリ構成となります。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">|   <span class="comment"># 新規登録時やアカウントブロック時に送信されるemailテンプレート</span></span><br><span class="line">├── emailTemplates</span><br><span class="line">│   ├── blocked_account.html</span><br><span class="line">│   ├── reset_email.html</span><br><span class="line">│   └── verify_email.html</span><br><span class="line">|</span><br><span class="line">|   <span class="comment"># Universal Loginで使用するログイン画面やパスワード再発行ページ</span></span><br><span class="line">├── pages　　　　　　　　　　　　</span><br><span class="line">|   ├── error_page.html</span><br><span class="line">|   ├── login.html</span><br><span class="line">|   └── password_reset.html</span><br><span class="line">|</span><br><span class="line">|   <span class="comment"># テナントにされている各Rulesのスクリプト</span></span><br><span class="line">├── rules</span><br><span class="line">|   ├── hoge.js</span><br><span class="line">|   └── fuga.js</span><br><span class="line">|</span><br><span class="line">|   テナントの設定が記載されているyamlファイル</span><br><span class="line">└── tenant-dev.yaml</span><br><span class="line">└── tenant-stg.yaml</span><br><span class="line">└── tenant-prd.yaml</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-環境ごとに差異がある値を環境変数に定義する"><a href="#4-環境ごとに差異がある値を環境変数に定義する" class="headerlink" title="4. 環境ごとに差異がある値を環境変数に定義する"></a>4. 環境ごとに差異がある値を環境変数に定義する</h1><p>テナントの設定をエクスポートした時点ではドメイン等、環境によって変えたい変数がハードコーディングされている状態になっています。<br>もしrulesやemailTemplate配下のファイルで環境ごとにセットしたい値が異なる場合は、環境変数を用いて正しい値がセットされるようにします。</p>
+<p>Auth0 Deploy CLIでは、デプロイ時に指定するconfigファイルに<code>AUTH0_KEYWORD_REPLACE_MAPPINGS</code> を指定して環境変数のセットを行うと、configファイルから値を読み取って環境変数がセットされます。</p>
+<figure class="highlight json"><figcaption><span>auth0-deploy/config.json</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"AUTH0_DOMAIN"</span>: <span class="string">"YOUR_DOMAIN"</span>,</span><br><span class="line">  <span class="attr">"AUTH0_CLIENT_ID"</span>: <span class="string">"YOUR_CLIENT_ID"</span>,</span><br><span class="line">  <span class="attr">"AUTH0_CLIENT_SECRET"</span>: <span class="string">"YOUR_CLIENT_SECRET"</span>,</span><br><span class="line">   <span class="attr">"AUTH0_KEYWORD_REPLACE_MAPPINGS"</span>: &#123;</span><br><span class="line">        <span class="attr">"DOMAIN"</span>: <span class="string">"https://www.example.com"</span>,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下記に例を記載します。</p>
+<p>login.htmlが下記の様になっていた場合、</p>
+<figure class="highlight html"><figcaption><span>auth0-source/pages/login.html</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"##DOMAIN##/sample"</span>&gt;</span>サンプルリンク<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>デプロイ時にはconfig.jsonファイルから環境変数が適用され、環境ごとに値を変えることができます。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"https://www.example.com/sample"</span>&gt;</span>サンプルリンク<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+<h1 id="5-デプロイ環境の整備"><a href="#5-デプロイ環境の整備" class="headerlink" title="5. デプロイ環境の整備"></a>5. デプロイ環境の整備</h1><p>私のプロジェクトではソースコードの管理をGitlabで行っており、上記作業完了後、リモートリポジトリにpushします。</p>
+<p>その後、Gitlab CI/CDを起動して上記テナントのディレクトリをS3へアップロードしたことをトリガーにCodePipelineが起動し、CodeBuild上でAuth0テナントのデプロイを行っています。</p>
+<p>実際に使用しているbuildspec.ymlは下記の通りです。<br>client idやclient secretを指定するconfigファイルはAWSのParameter Storeから読みとった値をCodeBuild上でセットしています。</p>
+<figure class="highlight yml"><figcaption><span>buildspec.yml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="number">0.2</span></span><br><span class="line"><span class="attr">phases:</span></span><br><span class="line">  <span class="attr">pre_build:</span></span><br><span class="line">    <span class="attr">commands:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">npm</span> <span class="string">install</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">npm</span> <span class="string">i</span> <span class="string">-g</span> <span class="string">auth0-deploy-cli@5.0.0</span></span><br><span class="line">  <span class="attr">post_build:</span></span><br><span class="line">    <span class="attr">commands:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">echo</span> <span class="string">creating</span> <span class="string">config</span> <span class="string">file</span> <span class="string">started</span></span><br><span class="line">      <span class="comment"># ↓リポジトリ上ではclient id等をハードコーディングしたconfig.jsonファイルは保持せず、config.jsonのテンプレートファイルのみ保持し、Parameter Storeの値をもとにファイルを新規作成しています。</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">envsubst</span> <span class="string">&lt;</span> <span class="string">config-template.json</span> <span class="string">&gt;</span> <span class="string">config.json</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">echo</span> <span class="string">finished</span> <span class="string">creating</span> <span class="string">config</span> <span class="string">file</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">cat</span> <span class="string">config.json</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">echo</span> <span class="string">auth0-deploy-cli</span> <span class="string">version</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">a0deploy</span> <span class="string">--version</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">echo</span> <span class="string">Auth0</span> <span class="string">Deploy</span> <span class="string">started</span></span><br><span class="line">      <span class="comment"># ↓ENVは環境変数から読み取っています</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">a0deploy</span> <span class="string">import</span> <span class="string">-c</span> <span class="string">config.json</span> <span class="string">-i</span> <span class="string">tenant-$&#123;ENV&#125;.yaml</span> </span><br><span class="line">      <span class="bullet">-</span> <span class="string">echo</span> <span class="string">Auth0</span> <span class="string">Deploy</span> <span class="string">completed</span></span><br></pre></td></tr></table></figure>
+
+<p>これでデプロイ環境を整備することができました。</p>
+<p>基本的には初期構築時のExportファイルを正として管理を行っていますが、Auth0上で大きな設定変更が生じた際は念の為テナント設定のExportを行い、正管理ファイルに誤りがないかどうか、必要に応じて確認を行っています。</p>
+<h1 id="6-最後に"><a href="#6-最後に" class="headerlink" title="6. 最後に"></a>6. 最後に</h1><p>Auth0 Deploy CLIを利用して既存テナントの設定をエクスポートするところから、実際にCI/CDに組み込んでデプロイを行う部分までをご紹介してきました。<br>ただ、Auth0の設定管理は今回扱ったAuth0 Deploy CLIだけでなく、Teraformで管理することも可能です。（<a href="https://www.terraform.io/docs/providers/auth0/index.html）" target="_blank" rel="noopener">https://www.terraform.io/docs/providers/auth0/index.html）</a></p>
+<p>そのため、自身が所属しているプロジェクトの状況に応じて適切なものを選択・利用していくのが良いかと思います。</p>
+<h1 id="7-関連リンク"><a href="#7-関連リンク" class="headerlink" title="7. 関連リンク"></a>7. 関連リンク</h1><p><a href="https://www.npmjs.com/package/auth0-deploy-cli" target="_blank" rel="noopener">Auth0 Deploy CLI Tool</a><br><a href="https://future-architect.github.io/articles/20200122/">Auth0 導入編</a><br><a href="https://future-architect.github.io/articles/20200123/">Auth0 EmailまたはSMSを使ったパスワードレス認証を設定する</a><br><a href="https://future-architect.github.io/articles/20200128/">Auth0のRulesを使って認証認可を自在にカスタマイズする</a></p>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" target="_blank" rel="noopener" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える" data-url="https://future-architect.github.io/articles/20200702/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200702/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200702/" target="_blank" rel="noopener" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200702/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200702/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200701/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Go の Open API 3.0 のジェネレータ oapi-codegen を試してみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200630/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                go-swaggerを用いたWebアプリケーション開発Tips19選
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200606/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                フューチャー夏のインターン2020。リモート開催予定です
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200629/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Terraform Associate合格記
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (29)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (74)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (61)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (10)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (21)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (3)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h2>リンク</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="https://note.future.co.jp/" target="_blank">未来報</a>
+      </li>
+      <li>
+        <a href="https://future-fintech.github.io/" target="_blank">Future Fintech EYE</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2019/future" target="_blank">2019年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/" target="_blank" rel="noopener">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" target="_blank" rel="noopener" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" target="_blank" rel="noopener" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog" target="_blank" rel="noopener"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo" target="_blank" rel="noopener"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future" target="_blank" rel="noopener">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+
+<![endif]-->
+
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
