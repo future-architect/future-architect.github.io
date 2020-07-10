@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2020-07-09T02:25:12.754Z</updated>
+  <updated>2020-07-10T01:41:45.053Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <author>
@@ -15,6 +15,41 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>HashiTalks: Japanに登壇しました</title>
+    <link href="https://future-architect.github.io/articles/20200710/"/>
+    <id>https://future-architect.github.io/articles/20200710/</id>
+    <published>2020-07-10T01:19:54.000Z</published>
+    <updated>2020-07-10T01:41:45.053Z</updated>
+    
+    <content type="html"><![CDATA[<img src="/images/20200710/top.png"><h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは。TIG/DXユニットの<a href="https://twitter.com/kaedemalu" target="_blank" rel="noopener">伊藤</a>です。最近Terraformネタが多くなってきました。さて、本記事の内容はHashiTalks: Japanに登壇したのでその時に話したことを書いていきます。大きめなイベントには初の登壇だったのでなかなかドキドキしましたが、なんとかやりきりました。</p><h2 id="HashiTalks-Japanとは"><a href="#HashiTalks-Japanとは" class="headerlink" title="HashiTalks: Japanとは"></a>HashiTalks: Japanとは</h2><p><a href="https://events.hashicorp.com/hashitalksjapan" target="_blank" rel="noopener">イベントページ</a>から言葉を拝借すると、</p><blockquote><p>HashiTalksは、HashiCorpのツールやコミュニティに焦点を当てたユニークなユースケースやデモをコミュニティメンバーから共有する機会です。</p></blockquote><p>といった感じで、コミュニティベースのイベントになっています。参加者は普段使っている時のナレッジから企業で実践している例などがあり、幅広い内容を取り扱っています。今回のタイムテーブルではTerraformがほどんどそ占めておりますが、中にはConsulとかVaultなどもありました。この辺のツールのちゃんと扱えるようにしたいですね。</p><h2 id="何を発表したか"><a href="#何を発表したか" class="headerlink" title="何を発表したか"></a>何を発表したか</h2><p>私自身は「Cloud MonitoringとTerraformの付き合い方」と題して、TerraformでCloud Monitoringのリソースを作成・管理するときのことをテーマにしました。スライドは以下になりますので、見ていただければと思います。ここからは話した内容のサマリになります。</p><script async class="speakerdeck-embed" data-id="01797d2feb8b41359be8138a65170819" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script><h3 id="監視設定の大変さ"><a href="#監視設定の大変さ" class="headerlink" title="監視設定の大変さ"></a>監視設定の大変さ</h3><p>Terraformは各クラウドプロバイダーのリソースをコードで管理できるInfrastructure as Code(IaC)を実現するツールとして使われています。AWSのCloudFormation、GCPのDeployment Managerではなくクラウドに依存しないツールとしてマルチクラウド戦略を行うところではTerraformを採用されているのではないでしょうか？<br>基本的にクラウド(今回ではGCP)のリソースは全てTerraformで管理されていることが望ましく、それは監視ツールであるCloud Monitoringも例外ではありません。特に私が大変だと感じているのは特定のメトリクスを抽出するためのフィルターです。</p><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">"google_monitoring_alert_policy"</span> <span class="string">"someone_alert_policy"</span> &#123;</span><br><span class="line">  ....</span><br><span class="line">  conditions &#123;</span><br><span class="line">    condition_threshold &#123;</span><br><span class="line">      aggregations &#123;</span><br><span class="line">....</span><br><span class="line">        filter = <span class="string">"metric.type=\"agent.googleapis.com/disk/percent_used\" resource.type=\"gce_instance\" metric.label.\"state\"=\"used\" metric.label.\"device\"=\"rootfs\" metadata.user_labels.\"name\"=\"sample-instance-1\""</span></span><br><span class="line">        ....</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>このように複数の条件を重ねて書くことはとても大変であるので、私はコード化にTerraformerを使っています。</p><h3 id="Terraformerの使いどころ"><a href="#Terraformerの使いどころ" class="headerlink" title="Terraformerの使いどころ"></a>Terraformerの使いどころ</h3><p>TerraformerはGCPに限らず、AWSなどのメジャークラウドに存在するリソースをコマンド一つでコードに落とせる便利なツールです。とても便利ではある反面、Terraformでのリソース名はわかりにくいものになっています。</p><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">"google_monitoring_alert_policy"</span> <span class="string">"tfer--projects--project-name--alertPolicies--17320504"</span> &#123;</span><br><span class="line">  ....</span><br><span class="line">  conditions &#123;</span><br><span class="line">    condition_threshold &#123;</span><br><span class="line">      ....</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>基本的には<code>terraform state mv</code>コマンドを実行してリソース名を変更するかと思いますが、一通り作り切ってからこのコマンドを実行するのもそれなりに時間がかかります。私は、監視のTerraformのコードは特に再利用性が高いと思っており、それであれば雛形として最低限作成して、展開することで時間の節約になったり、コードの変更を最低限で抑えられると考えています。</p><h3 id="セキュリティに気をつけたい"><a href="#セキュリティに気をつけたい" class="headerlink" title="セキュリティに気をつけたい"></a>セキュリティに気をつけたい</h3><p>Cloud Monitoringにはアラート設定をしたときに、その通知先をメールやSlackにすることができます。しかし、SlackのTokenやメールアドレス自体をコード上にハードコードすることは避けなければいけません。Tokenなどを守る方法としては</p><ul><li>tfvarsで逃す</li><li>Vaultを使う</li><li>Secret Manager</li></ul><p>などがあるので、これらを使えばコードとして書かざるを得ない状況は回避できます。しかし、今回は「<strong>コードにはしないけど、リソースとしてはある</strong>」状態を目指してちょっと安全にTerraformでリソースを管理する方法を考えてみます。</p><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">"google_monitoring_alert_policy"</span> <span class="string">"someone_alert_policy"</span> &#123;</span><br><span class="line"> ....</span><br><span class="line">  display_name = <span class="string">"use-80-percent-resource-disk"</span></span><br><span class="line"></span><br><span class="line">  enabled               = <span class="string">"true"</span></span><br><span class="line">  notification_channels = [</span><br><span class="line">    google_monitoring_notification_channel.slack_channel_1.id, <span class="comment"># チャンネルがコード化されている</span></span><br><span class="line">    <span class="string">"projects/project-name/notificationChannels/0123456789"</span>,   <span class="comment"># チャンネルがコード化されていない</span></span><br><span class="line">  ]</span><br><span class="line">  project               = <span class="string">"project-name"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>上の<code>notification_channel</code>ではコード化している部分としていない部分を示しています。IDで書かれている部分では、チャンネル自体はコード化されていないが、アラートの通知先として指定しているので、「コードにはしないけど、リソースとしてはある」状態を達成できているのではないでしょうか。このようにコードにせず、クラウド側で担保することで少し安全にコードにできていると考えています。<br>しかし、これも将来的には先述した、VaultやSecret Managerを使うなどして管理することも視野に入れたいですね。</p><h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>今回発表したことはTerraformとGCPを組み合わせて以来、ずっと直面している問題で、発表するに当たって、自分の中で一つの答えになったかなと思っています。Terraform Associateを取ったり、こういった登壇する挑戦で少しづつではありますが、自分の自信に繋がっているので、今後も発信は媒体に関係なく続けていきたいなと思います。</p><p>最後にこちらが話しているYouTubeになりますのでよければご覧ください。<br><a href="https://www.youtube.com/watch?v=SiCCwE9a1iY&list=PL81sUbsFNc5aWJJrpaclnwARJAzf1-2bV&index=14&t=0s" target="_blank" rel="noopener">Cloud MonitoringとTerraformの付き合い方 - YouTube</a></p><h2 id="関連記事"><a href="#関連記事" class="headerlink" title="関連記事"></a>関連記事</h2><ul><li><a href="/articles/20200629/">Terraform Associate合格記</a></li><li><a href="/articles/20200624/">Terraform 101</a></li><li><a href="tags/Terraform/">Tech Blog内のTerraform記事</a></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;img src=&quot;/images/20200710/top.png&quot;&gt;
+
+
+&lt;h2 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h2&gt;&lt;p&gt;こんにちは。TIG/DXユニットの&lt;a hre
+      
+    
+    </summary>
+    
+    
+      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
+    
+    
+      <category term="登壇資料" scheme="https://future-architect.github.io/tags/%E7%99%BB%E5%A3%87%E8%B3%87%E6%96%99/"/>
+    
+      <category term="GCP" scheme="https://future-architect.github.io/tags/GCP/"/>
+    
+      <category term="Terraform" scheme="https://future-architect.github.io/tags/Terraform/"/>
+    
+      <category term="勉強会" scheme="https://future-architect.github.io/tags/%E5%8B%89%E5%BC%B7%E4%BC%9A/"/>
+    
+  </entry>
   
   <entry>
     <title>GoでWebアプリ開発時にあるあるだったレビューコメント</title>
@@ -605,36 +640,6 @@
       <category term="初心者向け" scheme="https://future-architect.github.io/tags/%E5%88%9D%E5%BF%83%E8%80%85%E5%90%91%E3%81%91/"/>
     
       <category term="Kaggle" scheme="https://future-architect.github.io/tags/Kaggle/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>フューチャーの新人研修後の配属先にかける新人の思いを歌ってみた</title>
-    <link href="https://future-architect.github.io/articles/20200613/"/>
-    <id>https://future-architect.github.io/articles/20200613/</id>
-    <published>2020-06-13T05:20:17.000Z</published>
-    <updated>2020-06-24T06:49:14.969Z</updated>
-    
-    <content type="html"><![CDATA[<img src="/images/20200613/top.png" class="img-middle-size"><h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、フューチャー株式会社の井上拓です。</p><p>Strategic AI Groupというチームで、AIをはじめとするテクノロジーを核としながら、時にお客様と、時に自社主体で、新しいビジネスをデザインする活動に取り組んでいます。</p><p>６月、関東も梅雨入りし、IT企業各社で研修修了した新人たちが現場に配属される時期ではないでしょうか。私の所属するフューチャー株式会社でも修了・配属に向けたお知らせがあり、フレッシュなパワーへの期待に胸を寄せています。</p><p>フューチャーの新人研修は<a href="https://note.future.co.jp/n/nc3982a6a127f" target="_blank" rel="noopener">未来報で公開</a>されているように、<strong>人間嫌い</strong>の現場のITコンサルタントが研修リーダーになったり、実力次第で早期卒業ができたり、2020年はフルリモートだったりと、毎回の試行錯誤と改善を繰り返して行われています。</p><p>特徴的なのは、<strong>年に複数回の入社タイミング</strong> があることでしょうか。春入社に比べて夏・秋入社は個性（クセ）が強いという非科学的な迷信が社内にあったりします。<strong>不思議</strong> ですね。</p><h1 id="“配属”というドラマ"><a href="#“配属”というドラマ" class="headerlink" title="“配属”というドラマ"></a>“配属”というドラマ</h1><p>新人研修で特にドラマが生まれる出来事は <strong>配属（プロジェクトアサイン）</strong> でしょう。</p><p>新人にとっても一番気になる配属先。フューチャーには様々な部署やプロジェクトがあります。大規模/小規模、ビジネス寄り/テクノロジー寄り、といったとても白黒ハッキリした情報をもとに、どこどこのチームに行きたいと新人自ら希望をあげ、配属候補先のリーダが受け入れを検討したりします。先輩社員からすると、配属先はあくまでスタート位置に過ぎず、そこからいくらでも志向・関心は変化するし、成長すると考えています。しかし、新人さんからすると死活問題。中にはダイレクトに配属先のリーダーにアポイントメントを取ってヒューマンハックする技巧派な方もいます。</p><p>つい先日、配属を控えた <strong>とある新人エンジニアの強い思い</strong> に心を動かされ、私が新人だった10年以上前のことを振り返り、<strong>配属にかける思いをオリジナルソングにしてみました</strong> 。すべてのIT企業で、どこか共感できるポイントがあるのではないかと考え、こちらで公開させていただくことにしました。</p><p>いつか新人だった、エンジニアの皆さんに聞いていただければ幸いです。</p><h1 id="「配属前夜」-歌"><a href="#「配属前夜」-歌" class="headerlink" title="「配属前夜」- 歌"></a>「配属前夜」- 歌</h1><iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/839551090&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/nukkq649asbw" title="拓" target="_blank" style="color: #cccccc; text-decoration: none;">拓</a> · <a href="https://soundcloud.com/nukkq649asbw/bpcyfoujejjf" title="配属前夜" target="_blank" style="color: #cccccc; text-decoration: none;">配属前夜</a></div><p><a href="https://soundcloud.com/nukkq649asbw/bpcyfoujejjf" target="_blank" rel="noopener">配属前夜</a> ※SoundCloudリンク</p><h1 id="「配属前夜」-歌詞"><a href="#「配属前夜」-歌詞" class="headerlink" title="「配属前夜」- 歌詞"></a>「配属前夜」- 歌詞</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">二者択一が僕らの全部だった</span><br><span class="line">大規模か小規模か 業務か技術か</span><br><span class="line">こだわり屋の同期は 右左 白黒はっきりしてた</span><br><span class="line">「市場価値がすべてだ」と</span><br><span class="line"></span><br><span class="line">新人研修が終わり</span><br><span class="line">配属先が伝えられる</span><br><span class="line">どこに選ばれるかで</span><br><span class="line">人生決まると本気で信じてた</span><br><span class="line"></span><br><span class="line">配属前夜にメモった</span><br><span class="line">「やりたくないな」リストは</span><br><span class="line">その後マルがついていくたびに</span><br><span class="line">できることが増えてった</span><br><span class="line"></span><br><span class="line">配属前夜によぎった</span><br><span class="line">「いきたくない」ポジションで</span><br><span class="line">出会った人たちに いまも</span><br><span class="line">助けられてここにいる</span><br><span class="line"></span><br><span class="line">目新しさばかり求める</span><br><span class="line">未熟さに気づかされたのは</span><br><span class="line">この手で書いたソースコードが</span><br><span class="line">社会を支え始めた瞬間だった</span><br><span class="line"></span><br><span class="line">配属前夜にメモった</span><br><span class="line">「必須技術！」のリストは</span><br><span class="line">一年も立たないうちに</span><br><span class="line">時代遅れになってた</span><br><span class="line"></span><br><span class="line">配属前夜にもらった</span><br><span class="line">「役に立つコマンド」は</span><br><span class="line">一年も立たないうちに</span><br><span class="line">そらで打つようになってた</span><br><span class="line"></span><br><span class="line">配属前夜に感じた</span><br><span class="line">開発の面白さは</span><br><span class="line">散々な目にあった今でも</span><br><span class="line">やっぱり感じてる</span><br><span class="line"></span><br><span class="line">配属前夜に誓った</span><br><span class="line">「なしとげたいこと」はまだ</span><br><span class="line">10年たったいまでも</span><br><span class="line">変わらないでここにある</span><br></pre></td></tr></table></figure><h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>どこに配属されたとしても、テクノロジーを楽しむことで必ず成長して、やりたいことができるようになる。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;img src=&quot;/images/20200613/top.png&quot; class=&quot;img-middle-size&quot;&gt;
-
-&lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h1&gt;&lt;p&gt;
-      
-    
-    </summary>
-    
-    
-      <category term="Culture" scheme="https://future-architect.github.io/categories/Culture/"/>
-    
-    
-      <category term="応援歌" scheme="https://future-architect.github.io/tags/%E5%BF%9C%E6%8F%B4%E6%AD%8C/"/>
-    
-      <category term="新人研修" scheme="https://future-architect.github.io/tags/%E6%96%B0%E4%BA%BA%E7%A0%94%E4%BF%AE/"/>
     
   </entry>
   
