@@ -180,7 +180,7 @@
 <p><a href="https://github.com/localstack/localstack#using-docker-compose" target="_blank" rel="noopener">公式のドキュメント</a>にも記載されていますが、4567-4584ポートがエミュレートするAWS相当のリソースが利用し(AWSサービス増加に従いだんだん増えていきますので詳細は公式ドキュメントを確認ください)、8080ポートはWeb UIが利用します。</p>
 <p>Versionは2019/11/15時点で最新の <code>0.10.5</code> を利用していますが <code>latest</code> でも良いかと思います。</p>
 <h1 id="Blob"><a href="#Blob" class="headerlink" title="Blob"></a>Blob</h1><p>まず<a href="https://aws.amazon.com/jp/cli/" target="_blank" rel="noopener">AWS CLI</a>を用いてLocalStackにS3バケットを作成します。 <code>--endpoint-url</code> オプションで向き先をLocalStackに切り替えるのが特徴です。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws --endpoint-url=http://localhost:4572 s3api create-bucket --bucket future-example</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws --endpoint-url&#x3D;http:&#x2F;&#x2F;localhost:4572 s3api create-bucket --bucket future-example</span><br></pre></td></tr></table></figure>
 
 <p>作成した <code>future-example</code> バケットにオブジェクトを書き込んでみます。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws/session"</span></span><br><span class="line">	<span class="string">"gocloud.dev/blob"</span></span><br><span class="line">	<span class="string">"gocloud.dev/blob/s3blob"</span></span><br><span class="line">	<span class="string">"io"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	w, err := writer(<span class="string">"future-example"</span>, <span class="string">"test.txt"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> w.Close()</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> _, err := w.Write([]<span class="keyword">byte</span>(<span class="string">"1234567890"</span>)); err != <span class="literal">nil</span> &#123; <span class="comment">// 適当な値</span></span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">writer</span><span class="params">(bucketURL, key <span class="keyword">string</span>)</span> <span class="params">(io.WriteCloser, error)</span></span> &#123;</span><br><span class="line">	sess := session.Must(session.NewSession(&amp;aws.Config&#123;</span><br><span class="line">		Endpoint:         aws.String(<span class="string">"http://localhost:4572"</span>), <span class="comment">// ★必要</span></span><br><span class="line">		S3ForcePathStyle: aws.Bool(<span class="literal">true</span>), <span class="comment">// ★必要</span></span><br><span class="line">	&#125;))</span><br><span class="line">	bucket, err := s3blob.OpenBucket(context.Background(), sess, bucketURL, <span class="literal">nil</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> bucket.NewWriter(context.Background(), key, <span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -272,11 +272,39 @@
   
     
       
-        <a href="https://future-architect.github.io/articles/20200715/">
+        <a href="https://future-architect.github.io/articles/20190713/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
               <li>
-                新人研修有志が初心者向けにバーチャルコンテストを実施しました & Tips
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200702/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える
               </li>
             </div>
           </div>
@@ -300,39 +328,11 @@
   
     
       
-        <a href="https://future-architect.github.io/articles/20200709/">
+        <a href="https://future-architect.github.io/articles/20200716/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
               <li>
-                GoでWebアプリ開発時にあるあるだったレビューコメント
-              </li>
-            </div>
-          </div>
-        </a>
-      
-	
-  
-    
-      
-        <a href="https://future-architect.github.io/articles/20200708/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                Zuora連載2：Zuora REST API 利用と開発環境構築
-              </li>
-            </div>
-          </div>
-        </a>
-      
-	
-  
-    
-      
-        <a href="https://future-architect.github.io/articles/20200707/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                VSCode の Go extension でよく利用するコマンド 7選
+                Zuora連載 Vol.3 Notification及びEventTriggerの話
               </li>
             </div>
           </div>
@@ -369,16 +369,20 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
+      
+	
   
     
   
     
+      
+	
   
     
   
@@ -389,12 +393,12 @@
     
   
     
-      
-	
   
     
   
     
+      
+	
   
     
   
@@ -403,18 +407,16 @@
 	
   
     
-      
-	
   
     
-      
-	
   
     
       
 	
   
     
+      
+	
   
     
   
@@ -423,8 +425,6 @@
     
   
     
-      
-	
   
     
   
@@ -445,12 +445,12 @@
     
   
     
+      
+	
   
     
   
     
-      
-	
   
     
       
@@ -577,18 +577,16 @@
     
       
 	
-  
-    
   
     
       
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -613,6 +611,8 @@
     
       
 	
+  
+    
   
     
       
@@ -623,6 +623,8 @@
 	
   
     
+      
+	
   
     
       
@@ -631,8 +633,6 @@
     
   
     
-      
-	
   
     
       
@@ -653,8 +653,6 @@
     
       
 	
-  
-    
   
     
       
@@ -667,6 +665,8 @@
     
       
 	
+  
+    
   
     
       
@@ -705,6 +705,8 @@
 	
   
     
+  
+    
       
 	
   
@@ -715,6 +717,8 @@
 	
   
     
+      
+	
   
     
   
@@ -789,6 +793,8 @@
     
       
 	
+  
+    
   
     
       
@@ -803,8 +809,6 @@
 	
   
     
-  
-    
       
 	
   
@@ -813,8 +817,6 @@
 	
   
     
-  
-    
       
 	
   
@@ -823,8 +825,6 @@
 	
   
     
-      
-	
   
     
       
@@ -841,6 +841,8 @@
 	
   
     
+      
+	
   
     
       
@@ -849,6 +851,8 @@
     
   
     
+  
+    
       
 	
   
@@ -895,10 +899,10 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -911,10 +915,14 @@
     
   
     
+  
+    
       
 	
   
     
+      
+	
   
     
       
@@ -925,12 +933,12 @@
 	
   
     
+      
+	
   
     
   
     
-      
-	
   
     
       
@@ -949,14 +957,10 @@
 	
   
     
-      
-	
   
     
       
 	
-  
-    
   
     
   
@@ -967,10 +971,10 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -1035,8 +1039,12 @@
     
       
 	
+  
+    
   
     
+      
+	
   
     
   
@@ -1045,14 +1053,14 @@
 	
   
     
+      
+	
   
     
   
     
   
     
-      
-	
   
     
       
@@ -1061,12 +1069,8 @@
     
       
 	
-  
-    
   
     
-      
-	
   
     
       
@@ -1093,8 +1097,6 @@
 	
   
     
-      
-	
   
     
       
@@ -1107,6 +1109,8 @@
     
   
     
+      
+	
   
     
   
@@ -1153,11 +1157,11 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Security/">Security (1)</a>
+	  <a href="/categories/Design/">Design (6)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Design/">Design (6)</a>
+	  <a href="/categories/Security/">Security (1)</a>
 	</li>
       
 	<li>
@@ -1165,11 +1169,11 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
+	  <a href="/categories/Infrastructure/">Infrastructure (64)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (63)</a>
+	  <a href="/categories/Management/">Management (8)</a>
 	</li>
       
 	<li>

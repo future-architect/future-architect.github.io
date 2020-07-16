@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Zuora連載 Vol.3 Notification及びEventTriggerの話 | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにこんにちは。TIGの町田です。 Zuora Central Platform（Zuora社が提供するサブスクリプションプラットフォーム名の正式名称&#x2F;以降 Zuora と記載いたします）の連載の第3回は、Notification(以後、通知機能)とイベントトリガー(EventTrigger)についてのお話です。 通知機能はZuora上の様々なイベントをトリガーに、メール通知やコールアウトによ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zuora連載 Vol.3 Notification及びEventTriggerの話">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200716/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは。TIGの町田です。 Zuora Central Platform（Zuora社が提供するサブスクリプションプラットフォーム名の正式名称&#x2F;以降 Zuora と記載いたします）の連載の第3回は、Notification(以後、通知機能)とイベントトリガー(EventTrigger)についてのお話です。 通知機能はZuora上の様々なイベントをトリガーに、メール通知やコールアウトによ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200716/photo_20200716_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200716/photo_20200716_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200716/photo_20200716_03.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200716/photo_20200716_04.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200716/photo_20200716_05.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200716/photo_20200716_06.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200716/photo_20200716_07.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200716/photo_20200716_08.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200716/photo_20200716_09.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200716/photo_20200716_10.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200716/photo_20200716_11.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200716/photo_20200716_12.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200716/photo_20200716_13.png">
+<meta property="article:published_time" content="2020-07-16T01:49:27.000Z">
+<meta property="article:modified_time" content="2020-07-16T02:23:31.839Z">
+<meta property="article:author" content="Future Architect Consultants">
+<meta property="article:tag" content="Zuora">
+<meta property="article:tag" content="SaaS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200716/photo_20200716_01.png">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="Zuora連載 Vol.3 Notification及びEventTriggerの話 | フューチャー技術ブログ" name="description">
+  <meta content="Zuora連載 Vol.3 Notification及びEventTriggerの話,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+
+  
+<link rel="stylesheet" href="/css/theme-styles.css">
+
+  <!-- Theme styles END --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">フューチャー技術ブログ</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="180px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200716/">Zuora連載 Vol.3 Notification及びEventTriggerの話</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200717-zuora3" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 町田昌旭朗</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-07-16T01:49:27.000Z" itemprop="datePublished">2020/07/16</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/Zuora/" title="Zuora">Zuora</a>,
+  
+    <a href="/tags/SaaS/" title="SaaS">SaaS</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIGの町田です。</p>
+<p>Zuora Central Platform（Zuora社が提供するサブスクリプションプラットフォーム名の正式名称/以降 <strong>Zuora</strong> と記載いたします）の連載の第3回は、Notification(以後、通知機能)とイベントトリガー(EventTrigger)についてのお話です。</p>
+<p>通知機能はZuora上の様々なイベントをトリガーに、メール通知やコールアウトによる通知・連携が行えます。業務フローを設計する際には、必ず理解しておく必要がある機能になるかと思います。通知機能についての概要やできること、設定方法について解説していきます。</p>
+<p>過去のZuora記事は<a href="https://future-architect.github.io/tags/Zuora/">こちら</a>を参照ください。</p>
+<h1 id="目次"><a href="#目次" class="headerlink" title="目次"></a>目次</h1><ul>
+<li><a href="./#概要">概要</a></li>
+<li><a href="./#設定方法">設定方法</a></li>
+<li><a href="./#メールテンプレート">メールテンプレート</a></li>
+<li><a href="./#コールアウト">コールアウト</a></li>
+<li><a href="./#カスタムイベントトリガー">カスタムイベントトリガー</a></li>
+<li><a href="./#最後に">最後に</a></li>
+<li><a href="./#関連リンク集">関連リンク集</a></li>
+</ul>
+<h1 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h1><p>通知機能は、<strong>イベント定義＋Notification(通知)の組み合わせ</strong>で設定します。</p>
+<ul>
+<li><strong>イベント定義</strong>: <a href="./#カスタムイベントトリガー">カスタムイベントトリガー</a>で後述するが、Zuora上でのオペレーションによって起こるオブジェクトなどの登録・更新・削除をトリガーとして後続の処理（通知）を行うための定義のこと</li>
+<li><strong>Notification(通知)</strong>: イベント定義のトリガー発火を受けて、メール送信やコールアウトによるAPI呼び出しを行うための機能のこと</li>
+</ul>
+<img src="/images/20200716/photo_20200716_01.png" class="img-middle-size">
+
+<p>※上記シーケンス図補足</p>
+<table>
+<thead>
+<tr>
+<th>Process</th>
+<th>Comment</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1. Operation</td>
+<td>UserによるZuoraへのなんらかの操作(UI, API, Batchなど)が発生</td>
+</tr>
+<tr>
+<td>2. Polling</td>
+<td>特定の操作やオブジェクトに対する変更を監視</td>
+</tr>
+<tr>
+<td>3. Event fire</td>
+<td>イベント発火による通知機能の実行</td>
+</tr>
+<tr>
+<td>4. Call/Send</td>
+<td>メール通知やCalloutの呼び出し</td>
+</tr>
+</tbody></table>
+<p>ロジックによる制御を挟みたい場合は、通知機能からWorkflowを呼び出すことで実現できます。</p>
+<p>利用場面は以下のようなケースです。</p>
+<ul>
+<li>コールアウトAPIに設定するリクエスト形式がネストしているなど、コールアウトAPIの設計に合わせたリクエストが、通知機能からのコールアウトだけではできない場合</li>
+<li>イベント定義からのパラメータだけではできないデータの取得・加工を行いたい場合<br></li>
+</ul>
+<img src="/images/20200716/photo_20200716_02.png" class="img-middle-size">
+
+<p>※上記シーケンス図補足</p>
+<table>
+<thead>
+<tr>
+<th>Process</th>
+<th>Comment</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1. Operation</td>
+<td>UserによるZuoraへのなんらかの操作(UI, API, Batchなど)が発生</td>
+</tr>
+<tr>
+<td>2. Polling</td>
+<td>特定の操作やオブジェクトに対する変更を監視</td>
+</tr>
+<tr>
+<td>3. Event fire</td>
+<td>イベント発火による通知機能の実行</td>
+</tr>
+<tr>
+<td>4. Call Workflow</td>
+<td>NotificationからWorkflow呼び出し～Workflowsにてロジックによる処理実行</td>
+</tr>
+<tr>
+<td>5. Call/Send</td>
+<td>Workflow内でのメール通知またはCalloutの呼び出し</td>
+</tr>
+</tbody></table>
+<h1 id="設定方法"><a href="#設定方法" class="headerlink" title="設定方法"></a>設定方法</h1><ol>
+<li>Zuoraログイン後の右上ユーザメニューを開き、<code>請求</code>を選択します<br> <img src="/images/20200716/photo_20200716_03.png" class="img-middle-size"></li>
+<li>請求メニューで<code>プロファイル、通知、およびメールテンプレートのセットアップ</code>を選択します<br> <img src="/images/20200716/photo_20200716_04.png" class="img-middle-size" style="border:solid 1px #000000"></li>
+<li>通知設定画面に遷移する。ここで通知の確認や追加・編集・削除を行う。新しい通知を作成する場合は、<code>新しい通知の追加</code>ボタンをクリックします<br> <img src="/images/20200716/photo_20200716_05.png" class="img-middle-size" style="border:solid 1px #000000"></li>
+<li>新しい通知の作成モーダルが開くので、まず初めに<code>関連イベント</code>を選択します<ul>
+<li><strong>関連イベント</strong>: 通知を発火する条件のこと。デフォルトで用意されているイベントやカスタムイベントを選択する</li>
+<li><strong>有効</strong>: このチェックボックスにチェックしておかないと、通知機能が有効とならない<br><img src="/images/20200716/photo_20200716_06.png" class="img-middle-size"></li>
+</ul>
+</li>
+<li>プルダウンで<code>関連イベント</code>を選択すると、イベントパラメータや配信オプションが設定できます<ul>
+<li><strong>イベントパラメータ</strong>: 項目は選択した関連イベントによって異なる。イベントの細かい条件などを設定します</li>
+<li><strong>配信オプション</strong>:  メールとコールアウトが選択可能。メールを選択した場合は、どのメールテンプレートを使用するか選択する。メールテンプレートは予め別画面にて作成しておく必要がある。 そのメールテンプレートにて設定したアドレスに対して通知が送信される。<a href="#メールテンプレート">詳細は後述</a>。コールアウトでは、イベントを受けて配信したいURLに対して、イベントに関連したパラメータを付与してリクエストが可能。<a href="#コールアウト">詳細は後述</a>。<br><img src="/images/20200716/photo_20200716_07.png">
+
+
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="メールテンプレート"><a href="#メールテンプレート" class="headerlink" title="メールテンプレート"></a>メールテンプレート</h1><p>通知機能で使用可能なメールのテンプレートは、デフォルトで用意もされているが、新しく追加することができます。メール本文には、関連イベントから受け取ったパラメータ等の差し込みが可能です。</p>
+<ol>
+<li>通知設定画面にて<code>メールテンプレート</code>タブを選択します<br> <img src="/images/20200716/photo_20200716_08.png"></li>
+<li>メールテンプレートリスト画面に遷移択します。ここではテンプレートの追加・編集・削除ができる。テンプレートを新しく追加したい場合は<code>新規メールテンプレートの追加</code>をクリック択します<br> <img src="/images/20200716/photo_20200716_09.png" style="border:solid 1px #000000"></li>
+<li>テンプレート編集画面<ul>
+<li><strong>基本情報:</strong>: テンプレート名・関連イベントを設定択します。ここで選択した関連イベントに関係するパラメータを差し込みフィールドとしてメール本文に利用できる</li>
+<li><strong>メール情報</strong>: 差出人や宛先を設定可能<br><img src="/images/20200716/photo_20200716_10.png" style="border:solid 1px #000000"></li>
+</ul>
+</li>
+<li>テンプレート本文<ul>
+<li><strong>利用可能な差し込みフィールド</strong>: メール本文に差し込むフィールドのタグが確認可能です。関連イベントを選択すると、そのイベントに関連したパラメータが選択できるようになります</li>
+<li><strong>件名</strong>: メールの件名を設定。ここでも差し込みフィールドの利用は可能です</li>
+<li><strong>本文</strong>: フォーマットはHTMLかプレーンテキストを選択できます<br><img src="/images/20200716/photo_20200716_11.png" style="border:solid 1px #000000">
+
+
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="コールアウト"><a href="#コールアウト" class="headerlink" title="コールアウト"></a>コールアウト</h1><p>コールアウトとは、外部WebサービスのAPIのコール、HTTP要求を送信して応答を受信することです。</p>
+<p><strong>コールアウトの設定画面:</strong></p>
+<ul>
+<li>呼び出すCalloutのURLを設定。Workflowを呼び出す場合は、Workflow設定画面で確認できるURLを設定します<br><img src="/images/20200716/photo_20200716_12.png" style="border:solid 1px #000000"></li>
+<li><strong>パラメータ</strong>: ここで選択可能なパラメータは、選択したイベントに関連したパラメータのみが選択可能。ネストしたパラメータはできない</li>
+<li><strong>HTTPメソッド</strong>: POST,PUT,GET,DELETEが選択可能</li>
+<li><strong>再試行</strong>: チェックした場合、コールアウトの呼び出しエラー時に再試行を行う</li>
+<li><strong>ユーザ名/パスワード/ドメイン</strong>: Basic認証またはNTLM認証のみが選択可能。より安全な認証を利用したい場合は、WorkflowのCalloutで行うことができるため、Workflowを挟む必要がある</li>
+<li><strong>プレビュー</strong>: プレビューボタンをクリックすると、実際に送信するリクエストやヘッダ等の確認ができる</li>
+</ul>
+<h1 id="カスタムイベントトリガー"><a href="#カスタムイベントトリガー" class="headerlink" title="カスタムイベントトリガー"></a>カスタムイベントトリガー</h1><ul>
+<li>通知機能にて利用可能なイベントは、デフォルトで用意されているイベント以外に、カスタムで追加可能です<br>  <img src="/images/20200716/photo_20200716_13.png" style="border:solid 1px #000000"></li>
+<li>イベントトリガーはZuoraAPIを利用してのみ登録・更新・削除が可能です<ul>
+<li>イベントはZuoraのオブジェクト単位で設定が可能です</li>
+<li>設定が可能なオブジェクトやパラメータ等の詳細は、<a href="https://www.zuora.com/developer/api-reference/#operation/POST_EventTrigger" target="_blank" rel="noopener">API Reference - Developer Center - Zuora</a>を参照してください</li>
+<li>追加すると、通機設定画面の関連イベントのプルダウンメニューに追加されます</li>
+</ul>
+</li>
+</ul>
+<p><strong>リクエスト例</strong>:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">curl --location --request POST <span class="string">'https://rest.apisandbox.zuora.com/events/event-triggers'</span> \</span><br><span class="line">--header <span class="string">'Content-Type: application/json; charset=utf-8'</span> \</span><br><span class="line">--data-raw <span class="string">'&#123;</span></span><br><span class="line"><span class="string">    "baseObject": "Subscription",</span></span><br><span class="line"><span class="string">    "condition": "changeType == '</span>\<span class="string">''</span>INSERT<span class="string">'\'</span><span class="string">' || changeType == '</span>\<span class="string">''</span>UPDATE<span class="string">'\'</span><span class="string">'",</span></span><br><span class="line"><span class="string">    "description": "説明",</span></span><br><span class="line"><span class="string">    "eventType": &#123;</span></span><br><span class="line"><span class="string">        "name": "イベント名",</span></span><br><span class="line"><span class="string">        "displayName": "表示名",</span></span><br><span class="line"><span class="string">        "description": "説明"</span></span><br><span class="line"><span class="string">    &#125;,</span></span><br><span class="line"><span class="string">    "active": true</span></span><br><span class="line"><span class="string">&#125;'</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>パラメータ補足:</strong></p>
+<ul>
+<li><strong>baseObject</strong>： 監視するオブジェクトを設定<ul>
+<li>例：Subscription</li>
+</ul>
+</li>
+<li><strong>condition</strong>： baseObjectに設定したオブジェクトのトリガー条件をJEXL式で設定<ul>
+<li>例：オブジェクト登録・更新時にイベントをトリガー:<br><code>changeType == &#39;INSERT&#39; || changeType == &#39;UPDATE&#39;</code></li>
+<li>例：請求が1000を超えた金額で更新された場合にイベントをトリガー:<br><code>changeType == &#39;UPDATE&#39; &amp;&amp; Invoice.Status == &#39;Posted&#39; &amp;&amp; Invoice.Status_old != &#39;Posted&#39; &amp;&amp; Invoice.Amount &gt; 1000</code></li>
+</ul>
+</li>
+</ul>
+<h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>通知機能はZuora上の様々なイベントを業務と繋げるためには、必ず使いこなす必要がある機能です。特にWorkflowを実行するためのトリガーとして利用することも多いでしょう。</p>
+<p>次回はそのWorkflowについて説明します。</p>
+<h1 id="関連リンク集"><a href="#関連リンク集" class="headerlink" title="関連リンク集"></a>関連リンク集</h1><p>通知機能をフル活用するために最低限必要な知識を付けるための関連リンクです。</p>
+<ul>
+<li><a href="https://knowledgecenter.zuora.com/Central_Platform/Notifications" target="_blank" rel="noopener">Notifications - Zuora</a><br>通知機能について概要が書かれています。</li>
+<li><a href="https://knowledgecenter.zuora.com/Central_Platform/Notifications/C_Create_Notifications" target="_blank" rel="noopener">Create and Edit Notifications - Zuora</a><br>通知の作成方法について手順が書かれています。</li>
+<li><a href="https://knowledgecenter.zuora.com/Central_Platform/Notifications/A_Viewing_the_Supported_Event_Types" target="_blank" rel="noopener">Supported Event Types - Zuora</a><br>通知機能で利用できるイベントについて書かれています。ここに記載のイベントはZuoraでデフォルトでサポートされているイベントとなるようです。</li>
+<li><a href="https://www.zuora.com/developer/api-reference/#operation/POST_EventTrigger" target="_blank" rel="noopener">API Reference - Developer Center - Zuora</a><br>Zuoraのオブジェクトに対してカスタムのトリガーを定義するためのAPIのリファレンスです。</li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" target="_blank" rel="noopener" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="Zuora連載 Vol.3 Notification及びEventTriggerの話" data-url="https://future-architect.github.io/articles/20200716/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200716/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200716/" target="_blank" rel="noopener" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200716/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200702/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200710/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                HashiTalks: Japanに登壇しました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200716/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Zuora連載 Vol.3 Notification及びEventTriggerの話
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (29)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (78)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (64)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (21)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (3)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h2>リンク</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="https://note.future.co.jp/" target="_blank">未来報</a>
+      </li>
+      <li>
+        <a href="https://future-fintech.github.io/" target="_blank">Future Fintech EYE</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2019/future" target="_blank">2019年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/" target="_blank" rel="noopener">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" target="_blank" rel="noopener" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" target="_blank" rel="noopener" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog" target="_blank" rel="noopener"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo" target="_blank" rel="noopener"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future" target="_blank" rel="noopener">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+
+<![endif]-->
+
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

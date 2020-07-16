@@ -186,11 +186,11 @@
 <p>余談ですが、この時発生したエラーはシンプルなタイムアウトエラーでした。<br>真因は権限エラーだったのですが、<code>Permission denied</code>というエラーメッセージが出てくれず、切り分けが難航しました…</p>
 <h2 id="オーナー権限は最強ではない"><a href="#オーナー権限は最強ではない" class="headerlink" title="オーナー権限は最強ではない"></a>オーナー権限は最強ではない</h2><p>調査の中で2種類のGoogle管理サービスアカウントが消失していることに気づきました。<br>ひとつは<code>PROJECT_ID@appspot.gserviceaccount.com</code>です。<br><a href="https://cloud.google.com/functions/docs/concepts/iam?hl=ja" target="_blank" rel="noopener">公式ページ</a>では以下のように説明されています。</p>
 <blockquote>
-<p>ランタイム サービス アカウント<br>実行時に、Cloud Functions ではプロジェクトの編集者の役割を持つサービス アカウント <a href="mailto:PROJECT_ID@appspot.gserviceaccount.com" target="_blank" rel="noopener">PROJECT_ID@appspot.gserviceaccount.com</a> を使用します。このサービス アカウントの役割を変更して、実行中の関数に対する権限を制限または拡張することができます。</p>
+<p>ランタイム サービス アカウント<br>実行時に、Cloud Functions ではプロジェクトの編集者の役割を持つサービス アカウント <a href="mailto:PROJECT_ID@appspot.gserviceaccount.com">PROJECT_ID@appspot.gserviceaccount.com</a> を使用します。このサービス アカウントの役割を変更して、実行中の関数に対する権限を制限または拡張することができます。</p>
 </blockquote>
 <p>もう一つは<code>PROJECT_ID@gcf-admin-robot.iam.gserviceaccount.com</code>です。<br>これについては日本語のドキュメントには記載がなく(2019/07/02現在)、<a href="https://cloud.google.com/functions/docs/concepts/iam" target="_blank" rel="noopener">英語版</a>を参照する必要がありました。<br>以下のような記載があります。</p>
 <blockquote>
-<p>Cloud Functions service account<br>For administrative actions on your project during the creation, updating, or deletion of functions, the Cloud Functions service uses the Google Cloud Functions service agent service account (<a href="mailto:service-PROJECT_NUMBER@gcf-admin-robot.iam.gserviceaccount.com" target="_blank" rel="noopener">service-PROJECT_NUMBER@gcf-admin-robot.iam.gserviceaccount.com</a>).</p>
+<p>Cloud Functions service account<br>For administrative actions on your project during the creation, updating, or deletion of functions, the Cloud Functions service uses the Google Cloud Functions service agent service account (<a href="mailto:service-PROJECT_NUMBER@gcf-admin-robot.iam.gserviceaccount.com">service-PROJECT_NUMBER@gcf-admin-robot.iam.gserviceaccount.com</a>).</p>
 </blockquote>
 <blockquote>
 <p>By default, this service account has the cloudfunctions.serviceAgent role on your project. Creating, updating, and deleting functions may fail if you change this account’s permissions.</p>
@@ -200,13 +200,13 @@
 <p>オーナー権限は最強だろうと思っていたのです。<br>権限周りでハマっているのであればとりあえずオーナー付与しちゃえば突破できるはず、と。</p>
 <p>違いました。<br>Google管理サービスアカウントに付与されるロール群、サービスエージェント達はオーナー権限では持っていない特殊な権限を持っていたのです。</p>
 <p>gcloud コマンドを使って<code>Cloud Functions Service Agent</code>に付与されている権限を見てみます。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcloud iam roles describe roles/cloudfunctions.serviceAgent</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcloud iam roles describe roles&#x2F;cloudfunctions.serviceAgent</span><br></pre></td></tr></table></figure>
 
 <p>下記が結果です。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">description: Gives Cloud Functions service account access to managed resources.</span><br><span class="line">etag: AA==</span><br><span class="line">includedPermissions:</span><br><span class="line">- clientauthconfig.clients.list</span><br><span class="line">- cloudfunctions.functions.invoke</span><br><span class="line">- firebasedatabase.instances.get</span><br><span class="line">- firebasedatabase.instances.update</span><br><span class="line">- iam.serviceAccounts.getAccessToken</span><br><span class="line">- iam.serviceAccounts.signBlob</span><br><span class="line">- pubsub.subscriptions.consume</span><br><span class="line">- pubsub.subscriptions.create</span><br><span class="line">- pubsub.subscriptions.delete</span><br><span class="line">- pubsub.subscriptions.get</span><br><span class="line">- pubsub.subscriptions.getIamPolicy</span><br><span class="line">- pubsub.subscriptions.list</span><br><span class="line">- pubsub.subscriptions.setIamPolicy</span><br><span class="line">- pubsub.subscriptions.update</span><br><span class="line">- pubsub.topics.attachSubscription</span><br><span class="line">- pubsub.topics.create</span><br><span class="line">- pubsub.topics.get</span><br><span class="line">- resourcemanager.projects.get</span><br><span class="line">- resourcemanager.projects.getIamPolicy</span><br><span class="line">- serviceusage.quotas.get</span><br><span class="line">- serviceusage.services.disable</span><br><span class="line">- serviceusage.services.enable</span><br><span class="line">- storage.buckets.get</span><br><span class="line">- storage.buckets.update</span><br><span class="line">name: roles/cloudfunctions.serviceAgent</span><br><span class="line">stage: ALPHA</span><br><span class="line">title: Cloud Functions Service Agent</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">description: Gives Cloud Functions service account access to managed resources.</span><br><span class="line">etag: AA&#x3D;&#x3D;</span><br><span class="line">includedPermissions:</span><br><span class="line">- clientauthconfig.clients.list</span><br><span class="line">- cloudfunctions.functions.invoke</span><br><span class="line">- firebasedatabase.instances.get</span><br><span class="line">- firebasedatabase.instances.update</span><br><span class="line">- iam.serviceAccounts.getAccessToken</span><br><span class="line">- iam.serviceAccounts.signBlob</span><br><span class="line">- pubsub.subscriptions.consume</span><br><span class="line">- pubsub.subscriptions.create</span><br><span class="line">- pubsub.subscriptions.delete</span><br><span class="line">- pubsub.subscriptions.get</span><br><span class="line">- pubsub.subscriptions.getIamPolicy</span><br><span class="line">- pubsub.subscriptions.list</span><br><span class="line">- pubsub.subscriptions.setIamPolicy</span><br><span class="line">- pubsub.subscriptions.update</span><br><span class="line">- pubsub.topics.attachSubscription</span><br><span class="line">- pubsub.topics.create</span><br><span class="line">- pubsub.topics.get</span><br><span class="line">- resourcemanager.projects.get</span><br><span class="line">- resourcemanager.projects.getIamPolicy</span><br><span class="line">- serviceusage.quotas.get</span><br><span class="line">- serviceusage.services.disable</span><br><span class="line">- serviceusage.services.enable</span><br><span class="line">- storage.buckets.get</span><br><span class="line">- storage.buckets.update</span><br><span class="line">name: roles&#x2F;cloudfunctions.serviceAgent</span><br><span class="line">stage: ALPHA</span><br><span class="line">title: Cloud Functions Service Agent</span><br></pre></td></tr></table></figure>
 
 <p>これとオーナー権限を比べてみます。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcloud iam roles describe roles/owner</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcloud iam roles describe roles&#x2F;owner</span><br></pre></td></tr></table></figure>
 
 <p>こっちはあまりにも結果が多いので割愛します。<br>気になった方は調べてみてください。</p>
 <p>diffを取ってみると、<code>Cloud Functions Service Agent</code>にあってオーナー権限では持っていない役割があることがわかりました。</p>
@@ -271,11 +271,39 @@
   
     
       
-        <a href="https://future-architect.github.io/articles/20200715/">
+        <a href="https://future-architect.github.io/articles/20190713/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
               <li>
-                新人研修有志が初心者向けにバーチャルコンテストを実施しました & Tips
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200702/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える
               </li>
             </div>
           </div>
@@ -299,39 +327,11 @@
   
     
       
-        <a href="https://future-architect.github.io/articles/20200709/">
+        <a href="https://future-architect.github.io/articles/20200716/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
               <li>
-                GoでWebアプリ開発時にあるあるだったレビューコメント
-              </li>
-            </div>
-          </div>
-        </a>
-      
-	
-  
-    
-      
-        <a href="https://future-architect.github.io/articles/20200708/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                Zuora連載2：Zuora REST API 利用と開発環境構築
-              </li>
-            </div>
-          </div>
-        </a>
-      
-	
-  
-    
-      
-        <a href="https://future-architect.github.io/articles/20200707/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                VSCode の Go extension でよく利用するコマンド 7選
+                Zuora連載 Vol.3 Notification及びEventTriggerの話
               </li>
             </div>
           </div>
@@ -368,16 +368,20 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
+      
+	
   
     
   
     
+      
+	
   
     
   
@@ -388,12 +392,12 @@
     
   
     
-      
-	
   
     
   
     
+      
+	
   
     
   
@@ -402,18 +406,16 @@
 	
   
     
-      
-	
   
     
-      
-	
   
     
       
 	
   
     
+      
+	
   
     
   
@@ -422,8 +424,6 @@
     
   
     
-      
-	
   
     
   
@@ -444,12 +444,12 @@
     
   
     
+      
+	
   
     
   
     
-      
-	
   
     
       
@@ -576,18 +576,16 @@
     
       
 	
-  
-    
   
     
       
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -612,6 +610,8 @@
     
       
 	
+  
+    
   
     
       
@@ -622,6 +622,8 @@
 	
   
     
+      
+	
   
     
       
@@ -630,8 +632,6 @@
     
   
     
-      
-	
   
     
       
@@ -652,8 +652,6 @@
     
       
 	
-  
-    
   
     
       
@@ -666,6 +664,8 @@
     
       
 	
+  
+    
   
     
       
@@ -704,6 +704,8 @@
 	
   
     
+  
+    
       
 	
   
@@ -714,6 +716,8 @@
 	
   
     
+      
+	
   
     
   
@@ -788,6 +792,8 @@
     
       
 	
+  
+    
   
     
       
@@ -802,8 +808,6 @@
 	
   
     
-  
-    
       
 	
   
@@ -812,8 +816,6 @@
 	
   
     
-  
-    
       
 	
   
@@ -822,8 +824,6 @@
 	
   
     
-      
-	
   
     
       
@@ -840,6 +840,8 @@
 	
   
     
+      
+	
   
     
       
@@ -848,6 +850,8 @@
     
   
     
+  
+    
       
 	
   
@@ -894,10 +898,10 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -910,10 +914,14 @@
     
   
     
+  
+    
       
 	
   
     
+      
+	
   
     
       
@@ -924,12 +932,12 @@
 	
   
     
+      
+	
   
     
   
     
-      
-	
   
     
       
@@ -948,14 +956,10 @@
 	
   
     
-      
-	
   
     
       
 	
-  
-    
   
     
   
@@ -966,10 +970,10 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -1034,8 +1038,12 @@
     
       
 	
+  
+    
   
     
+      
+	
   
     
   
@@ -1044,14 +1052,14 @@
 	
   
     
+      
+	
   
     
   
     
   
     
-      
-	
   
     
       
@@ -1060,12 +1068,8 @@
     
       
 	
-  
-    
   
     
-      
-	
   
     
       
@@ -1092,8 +1096,6 @@
 	
   
     
-      
-	
   
     
       
@@ -1106,6 +1108,8 @@
     
   
     
+      
+	
   
     
   
@@ -1152,11 +1156,11 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Security/">Security (1)</a>
+	  <a href="/categories/Design/">Design (6)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Design/">Design (6)</a>
+	  <a href="/categories/Security/">Security (1)</a>
 	</li>
       
 	<li>
@@ -1164,11 +1168,11 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
+	  <a href="/categories/Infrastructure/">Infrastructure (64)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (63)</a>
+	  <a href="/categories/Management/">Management (8)</a>
 	</li>
       
 	<li>

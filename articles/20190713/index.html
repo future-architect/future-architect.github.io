@@ -180,7 +180,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$GOPATH</span><br><span class="line">+ bin</span><br><span class="line">| ... go getで取得してビルドした実行ファイル</span><br><span class="line">+ pkg</span><br><span class="line">| + [os_arch]</span><br><span class="line">| | + ...ビルド済みのライブラリ</span><br><span class="line">| + mod</span><br><span class="line">| | + ...go modでダウンロードしたパッケージのキャッシュ</span><br><span class="line">| + dep</span><br><span class="line">|   + ...今となっては古いdepコマンドでダウンロードしたパッケージのキャッシュ </span><br><span class="line">+ src</span><br><span class="line">  + github.com</span><br><span class="line">    + user</span><br><span class="line">      + app</span><br><span class="line">      + library</span><br></pre></td></tr></table></figure>
 
 <p>複数のリポジトリに分離したプロジェクトを作るときも同じ場所に置きます。ただし、依存ライブラリ側は、github等からダウンロードされて、pkg/mod以下に入れられたバージョンを利用しようとします。一緒に開発したい場合、わざわざ不安定なバージョンをgit pushしなければならない、というのは不便でしょう。幸い、go.modにはreplaceという機能が使えます。appがlibraryを使う場合は、appのgo.modに次の行を加えておくと、同じ場所にあるフォルダを参照してくれます。複数リポジトリを一緒に変更しつつ動作検証するにはこの方法がベストです。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">replace (</span><br><span class="line">    github.com/user/library =&gt; ../library</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">replace (</span><br><span class="line">    github.com&#x2F;user&#x2F;library &#x3D;&gt; ..&#x2F;library</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
 
 <p><strong>memo:</strong> Go 1.12では<code>$GOPATH</code>以下はgo.modが自動では有効にならないため、環境変数設定で、<code>GO111MODULE=on</code>を入れておきましょう。あと数ヶ月で不要になりますが。</p>
 <p>環境構築にはあまり凝りすぎないで、デフォルト多めの方が、世間の情報とのずれが少なく、後から見返すときに楽です。凝りすぎたMakefileやらシェルスクリプトやらは引き継ぎのコストが多くなったりするし、自分でも忘れてしまったりしがちです。</p>
@@ -350,7 +350,7 @@
 <hr>
 <p><strong>A: Goには、待ち合わせには関数呼び出しによるブロックと、チャネルと主に2種類あります。まずはすべてをチャネルに集約して、<code>select</code>に持ち込むのがポイントです。</strong></p>
 <p>例えば、<code>sync.WaitGroup</code>を使う場合は、終了した時にそれを通知するチャネルをあらかじめ作り、<code>Wait()</code>完了後にそのチャネルに送信することで、関数呼び出しのブロックをチャネルに変換できます。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">func NewWaitGroup(count int) (done func(), allDone &lt;-chan struct&#123;&#125;) &#123;</span><br><span class="line">	wait := make(chan struct&#123;&#125;)</span><br><span class="line">	allDone = wait</span><br><span class="line">	var wg sync.WaitGroup</span><br><span class="line">	wg.Add(count)</span><br><span class="line">	done = wg.Done</span><br><span class="line">	go func() &#123;</span><br><span class="line">		wg.Wait()</span><br><span class="line">		wait &lt;- struct&#123;&#125;&#123;&#125;</span><br><span class="line">	&#125;()</span><br><span class="line">	return</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">func NewWaitGroup(count int) (done func(), allDone &lt;-chan struct&#123;&#125;) &#123;</span><br><span class="line">	wait :&#x3D; make(chan struct&#123;&#125;)</span><br><span class="line">	allDone &#x3D; wait</span><br><span class="line">	var wg sync.WaitGroup</span><br><span class="line">	wg.Add(count)</span><br><span class="line">	done &#x3D; wg.Done</span><br><span class="line">	go func() &#123;</span><br><span class="line">		wg.Wait()</span><br><span class="line">		wait &lt;- struct&#123;&#125;&#123;&#125;</span><br><span class="line">	&#125;()</span><br><span class="line">	return</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>チャネルどうしであれば<code>select</code>が使え、どちらか先に解決したほうが実行される、ということが簡単に実現できます。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">done, allDone := NewWaitGroup(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">timeout := time.After(<span class="number">5</span> * time.Second)</span><br><span class="line"></span><br><span class="line"><span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">//何か重い処理</span></span><br><span class="line">	done()</span><br><span class="line">&#125;()</span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> &#123;</span><br><span class="line"><span class="keyword">case</span> &lt;-allDone:</span><br><span class="line">	fmt.Println(<span class="string">"全部終了"</span>)</span><br><span class="line"><span class="keyword">case</span> &lt;-timeout:</span><br><span class="line">	fmt.Println(<span class="string">"タイムアウト"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -376,6 +376,7 @@
 
 <p>最後に、自分でコンテキストの中断をハンドリングさせる方法です。コンテキストの中はチャネルですので、重い処理をすべてチャネルとして取り出せるようにしておけば、<code>select</code>を使ってコンテキストの中断と一緒に扱うことができます。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">launchBatch</span><span class="params">(ctx context.Context)</span></span> &#123;</span><br><span class="line">    resultChan := <span class="built_in">make</span>(<span class="keyword">chan</span> Result)</span><br><span class="line">    <span class="keyword">select</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> result := &lt;-resultChan:</span><br><span class="line">        <span class="comment">// 正常に終了</span></span><br><span class="line">    <span class="keyword">case</span> &lt;-ctx.Done():</span><br><span class="line">        <span class="comment">// 親の都合でキャンセル</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 
 <h3 id="Q-省略可能な引数はどのように実現するのですか？"><a href="#Q-省略可能な引数はどのように実現するのですか？" class="headerlink" title="Q: 省略可能な引数はどのように実現するのですか？"></a>Q: 省略可能な引数はどのように実現するのですか？</h3><p>Pythonや最近のJavaScriptは引数を省略する、デフォルト値を設定する方法を提供しています。Javaはオーバーロードを駆使すれば変数の数によって似たことを実現できます。Goではどのようにするのでしょうか？</p>
 <hr>
@@ -422,6 +423,7 @@
 <p><strong>A: 呼び出しはスコープを抜ける時に行われますが、引数の評価は宣言時に行われています。</strong></p>
 <p>クロージャの時のケースの逆です。このケースではdefer文のところでfinishedのインスタンスのコピーが作られて固定化されてしまっているため、その後finishedを変更してもdeferの中では呼び出し時の状態に固定化されてしまっています。関数終了時の状態が必要であれば、クロージャにする、ポインタを引数で受け取るなどして最終状態にアクセスできるようにしなければなりません。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">finished := <span class="literal">false</span></span><br><span class="line"><span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(finished)</span><br><span class="line">	<span class="comment">// true</span></span><br><span class="line">&#125;()</span><br><span class="line"></span><br><span class="line"><span class="comment">// do something</span></span><br><span class="line"></span><br><span class="line">finished = <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
 
 <h3 id="Q-関数型スタイルのリスト処理がやりたいがGoではどうすれば良いですか？"><a href="#Q-関数型スタイルのリスト処理がやりたいがGoではどうすれば良いですか？" class="headerlink" title="Q: 関数型スタイルのリスト処理がやりたいがGoではどうすれば良いですか？"></a>Q: 関数型スタイルのリスト処理がやりたいがGoではどうすれば良いですか？</h3><p>JavaScriptのArrayのmap/reduce/forEach/filterのメソッドを利用したコーディングが好きです。Javaにもstreamが入りました。Pythonにはリスト内包表記があります。Goではどのようにすればいいでしょうか？</p>
 <hr>
@@ -514,6 +516,7 @@
 <p><code>Go()</code>メソッドはerrorを返す関数で、これがerrorを返すと、すべての並列実行タスクを終了します。これは並列じゃなくてもよくて、順次実行されるジョブでも使えます。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"io/ioutil"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">	<span class="string">"net/http"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"golang.org/x/sync/errgroup"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	eg := errgroup.Group&#123;&#125;</span><br><span class="line"></span><br><span class="line">	results := <span class="built_in">make</span>(<span class="keyword">chan</span> []<span class="keyword">byte</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">	eg.Go(<span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">		res, err := http.Get(<span class="string">"http://shs.sh"</span>)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">defer</span> res.Body.Close()</span><br><span class="line">		result, _ := ioutil.ReadAll(res.Body)</span><br><span class="line">		results &lt;- result</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	eg.Go(<span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">		res, err := http.Get(<span class="string">"http://sh.shs"</span>) <span class="comment">// 間違ったドメイン</span></span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">defer</span> res.Body.Close()</span><br><span class="line">		result, _ := ioutil.ReadAll(res.Body)</span><br><span class="line">		results &lt;- result</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := eg.Wait(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalln(err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+
 <h2 id="ロギング"><a href="#ロギング" class="headerlink" title="ロギング"></a>ロギング</h2><h3 id="Q-ログレベルを設定したログ出力はどのように実現するのか？"><a href="#Q-ログレベルを設定したログ出力はどのように実現するのか？" class="headerlink" title="Q: ログレベルを設定したログ出力はどのように実現するのか？"></a>Q: ログレベルを設定したログ出力はどのように実現するのか？</h3><p>JavaのLog4J、Pythonのloggingパッケージではinfo/warnのようなログの出し分けができますが？Goではどのようにすればいいですか？</p>
 <hr>
 <p><strong>A: Goの標準ライブラリではサポートしていません。<a href="https://github.com/sirupsen/logrus" target="_blank" rel="noopener">logrus</a>や<a href="https://github.com/uber-go/zap" target="_blank" rel="noopener">zap</a>などのサードパーティ製のロギングライブラリを使うのが良いでしょう</strong></p>
@@ -572,11 +575,39 @@
   
     
       
-        <a href="https://future-architect.github.io/articles/20200715/">
+        <a href="https://future-architect.github.io/articles/20190713/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
               <li>
-                新人研修有志が初心者向けにバーチャルコンテストを実施しました & Tips
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200702/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える
               </li>
             </div>
           </div>
@@ -600,39 +631,11 @@
   
     
       
-        <a href="https://future-architect.github.io/articles/20200709/">
+        <a href="https://future-architect.github.io/articles/20200716/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
               <li>
-                GoでWebアプリ開発時にあるあるだったレビューコメント
-              </li>
-            </div>
-          </div>
-        </a>
-      
-	
-  
-    
-      
-        <a href="https://future-architect.github.io/articles/20200708/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                Zuora連載2：Zuora REST API 利用と開発環境構築
-              </li>
-            </div>
-          </div>
-        </a>
-      
-	
-  
-    
-      
-        <a href="https://future-architect.github.io/articles/20200707/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                VSCode の Go extension でよく利用するコマンド 7選
+                Zuora連載 Vol.3 Notification及びEventTriggerの話
               </li>
             </div>
           </div>
@@ -669,16 +672,20 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
+      
+	
   
     
   
     
+      
+	
   
     
   
@@ -689,12 +696,12 @@
     
   
     
-      
-	
   
     
   
     
+      
+	
   
     
   
@@ -703,18 +710,16 @@
 	
   
     
-      
-	
   
     
-      
-	
   
     
       
 	
   
     
+      
+	
   
     
   
@@ -723,8 +728,6 @@
     
   
     
-      
-	
   
     
   
@@ -745,12 +748,12 @@
     
   
     
+      
+	
   
     
   
     
-      
-	
   
     
       
@@ -877,18 +880,16 @@
     
       
 	
-  
-    
   
     
       
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -913,6 +914,8 @@
     
       
 	
+  
+    
   
     
       
@@ -923,6 +926,8 @@
 	
   
     
+      
+	
   
     
       
@@ -931,8 +936,6 @@
     
   
     
-      
-	
   
     
       
@@ -953,8 +956,6 @@
     
       
 	
-  
-    
   
     
       
@@ -967,6 +968,8 @@
     
       
 	
+  
+    
   
     
       
@@ -1005,6 +1008,8 @@
 	
   
     
+  
+    
       
 	
   
@@ -1015,6 +1020,8 @@
 	
   
     
+      
+	
   
     
   
@@ -1089,6 +1096,8 @@
     
       
 	
+  
+    
   
     
       
@@ -1103,8 +1112,6 @@
 	
   
     
-  
-    
       
 	
   
@@ -1113,8 +1120,6 @@
 	
   
     
-  
-    
       
 	
   
@@ -1123,8 +1128,6 @@
 	
   
     
-      
-	
   
     
       
@@ -1141,6 +1144,8 @@
 	
   
     
+      
+	
   
     
       
@@ -1149,6 +1154,8 @@
     
   
     
+  
+    
       
 	
   
@@ -1195,10 +1202,10 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -1211,10 +1218,14 @@
     
   
     
+  
+    
       
 	
   
     
+      
+	
   
     
       
@@ -1225,12 +1236,12 @@
 	
   
     
+      
+	
   
     
   
     
-      
-	
   
     
       
@@ -1249,14 +1260,10 @@
 	
   
     
-      
-	
   
     
       
 	
-  
-    
   
     
   
@@ -1267,10 +1274,10 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -1335,8 +1342,12 @@
     
       
 	
+  
+    
   
     
+      
+	
   
     
   
@@ -1345,14 +1356,14 @@
 	
   
     
+      
+	
   
     
   
     
   
     
-      
-	
   
     
       
@@ -1361,12 +1372,8 @@
     
       
 	
-  
-    
   
     
-      
-	
   
     
       
@@ -1393,8 +1400,6 @@
 	
   
     
-      
-	
   
     
       
@@ -1407,6 +1412,8 @@
     
   
     
+      
+	
   
     
   
@@ -1453,11 +1460,11 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Security/">Security (1)</a>
+	  <a href="/categories/Design/">Design (6)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Design/">Design (6)</a>
+	  <a href="/categories/Security/">Security (1)</a>
 	</li>
       
 	<li>
@@ -1465,11 +1472,11 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
+	  <a href="/categories/Infrastructure/">Infrastructure (64)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (63)</a>
+	  <a href="/categories/Management/">Management (8)</a>
 	</li>
       
 	<li>

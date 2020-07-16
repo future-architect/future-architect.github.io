@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2020-07-15T01:54:17.939Z</updated>
+  <updated>2020-07-16T02:23:31.839Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <author>
@@ -17,13 +17,42 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Zuora連載 Vol.3 Notification及びEventTriggerの話</title>
+    <link href="https://future-architect.github.io/articles/20200716/"/>
+    <id>https://future-architect.github.io/articles/20200716/</id>
+    <published>2020-07-16T01:49:27.000Z</published>
+    <updated>2020-07-16T02:23:31.839Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIGの町田です。</p><p>Zuora Central Platform（Zuora社が提供するサブスクリプションプラットフォーム名の正式名称/以降 <strong>Zuora</strong> と記載いたします）の連載の第3回は、Notification(以後、通知機能)とイベントトリガー(EventTrigger)についてのお話です。</p><p>通知機能はZuora上の様々なイベントをトリガーに、メール通知やコールアウトによる通知・連携が行えます。業務フローを設計する際には、必ず理解しておく必要がある機能になるかと思います。通知機能についての概要やできること、設定方法について解説していきます。</p><p>過去のZuora記事は<a href="https://future-architect.github.io/tags/Zuora/">こちら</a>を参照ください。</p><h1 id="目次"><a href="#目次" class="headerlink" title="目次"></a>目次</h1><ul><li><a href="./#概要">概要</a></li><li><a href="./#設定方法">設定方法</a></li><li><a href="./#メールテンプレート">メールテンプレート</a></li><li><a href="./#コールアウト">コールアウト</a></li><li><a href="./#カスタムイベントトリガー">カスタムイベントトリガー</a></li><li><a href="./#最後に">最後に</a></li><li><a href="./#関連リンク集">関連リンク集</a></li></ul><h1 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h1><p>通知機能は、<strong>イベント定義＋Notification(通知)の組み合わせ</strong>で設定します。</p><ul><li><strong>イベント定義</strong>: <a href="./#カスタムイベントトリガー">カスタムイベントトリガー</a>で後述するが、Zuora上でのオペレーションによって起こるオブジェクトなどの登録・更新・削除をトリガーとして後続の処理（通知）を行うための定義のこと</li><li><strong>Notification(通知)</strong>: イベント定義のトリガー発火を受けて、メール送信やコールアウトによるAPI呼び出しを行うための機能のこと</li></ul><img src="/images/20200716/photo_20200716_01.png" class="img-middle-size"><p>※上記シーケンス図補足</p><table><thead><tr><th>Process</th><th>Comment</th></tr></thead><tbody><tr><td>1. Operation</td><td>UserによるZuoraへのなんらかの操作(UI, API, Batchなど)が発生</td></tr><tr><td>2. Polling</td><td>特定の操作やオブジェクトに対する変更を監視</td></tr><tr><td>3. Event fire</td><td>イベント発火による通知機能の実行</td></tr><tr><td>4. Call/Send</td><td>メール通知やCalloutの呼び出し</td></tr></tbody></table><p>ロジックによる制御を挟みたい場合は、通知機能からWorkflowを呼び出すことで実現できます。</p><p>利用場面は以下のようなケースです。</p><ul><li>コールアウトAPIに設定するリクエスト形式がネストしているなど、コールアウトAPIの設計に合わせたリクエストが、通知機能からのコールアウトだけではできない場合</li><li>イベント定義からのパラメータだけではできないデータの取得・加工を行いたい場合<br></li></ul><img src="/images/20200716/photo_20200716_02.png" class="img-middle-size"><p>※上記シーケンス図補足</p><table><thead><tr><th>Process</th><th>Comment</th></tr></thead><tbody><tr><td>1. Operation</td><td>UserによるZuoraへのなんらかの操作(UI, API, Batchなど)が発生</td></tr><tr><td>2. Polling</td><td>特定の操作やオブジェクトに対する変更を監視</td></tr><tr><td>3. Event fire</td><td>イベント発火による通知機能の実行</td></tr><tr><td>4. Call Workflow</td><td>NotificationからWorkflow呼び出し～Workflowsにてロジックによる処理実行</td></tr><tr><td>5. Call/Send</td><td>Workflow内でのメール通知またはCalloutの呼び出し</td></tr></tbody></table><h1 id="設定方法"><a href="#設定方法" class="headerlink" title="設定方法"></a>設定方法</h1><ol><li>Zuoraログイン後の右上ユーザメニューを開き、<code>請求</code>を選択します<br> <img src="/images/20200716/photo_20200716_03.png" class="img-middle-size"></li><li>請求メニューで<code>プロファイル、通知、およびメールテンプレートのセットアップ</code>を選択します<br> <img src="/images/20200716/photo_20200716_04.png" class="img-middle-size" style="border:solid 1px #000000"></li><li>通知設定画面に遷移する。ここで通知の確認や追加・編集・削除を行う。新しい通知を作成する場合は、<code>新しい通知の追加</code>ボタンをクリックします<br> <img src="/images/20200716/photo_20200716_05.png" class="img-middle-size" style="border:solid 1px #000000"></li><li>新しい通知の作成モーダルが開くので、まず初めに<code>関連イベント</code>を選択します<ul><li><strong>関連イベント</strong>: 通知を発火する条件のこと。デフォルトで用意されているイベントやカスタムイベントを選択する</li><li><strong>有効</strong>: このチェックボックスにチェックしておかないと、通知機能が有効とならない<br><img src="/images/20200716/photo_20200716_06.png" class="img-middle-size"></li></ul></li><li>プルダウンで<code>関連イベント</code>を選択すると、イベントパラメータや配信オプションが設定できます<ul><li><strong>イベントパラメータ</strong>: 項目は選択した関連イベントによって異なる。イベントの細かい条件などを設定します</li><li><strong>配信オプション</strong>:  メールとコールアウトが選択可能。メールを選択した場合は、どのメールテンプレートを使用するか選択する。メールテンプレートは予め別画面にて作成しておく必要がある。 そのメールテンプレートにて設定したアドレスに対して通知が送信される。<a href="#メールテンプレート">詳細は後述</a>。コールアウトでは、イベントを受けて配信したいURLに対して、イベントに関連したパラメータを付与してリクエストが可能。<a href="#コールアウト">詳細は後述</a>。<br><img src="/images/20200716/photo_20200716_07.png"></li></ul></li></ol><h1 id="メールテンプレート"><a href="#メールテンプレート" class="headerlink" title="メールテンプレート"></a>メールテンプレート</h1><p>通知機能で使用可能なメールのテンプレートは、デフォルトで用意もされているが、新しく追加することができます。メール本文には、関連イベントから受け取ったパラメータ等の差し込みが可能です。</p><ol><li>通知設定画面にて<code>メールテンプレート</code>タブを選択します<br> <img src="/images/20200716/photo_20200716_08.png"></li><li>メールテンプレートリスト画面に遷移択します。ここではテンプレートの追加・編集・削除ができる。テンプレートを新しく追加したい場合は<code>新規メールテンプレートの追加</code>をクリック択します<br> <img src="/images/20200716/photo_20200716_09.png" style="border:solid 1px #000000"></li><li>テンプレート編集画面<ul><li><strong>基本情報:</strong>: テンプレート名・関連イベントを設定択します。ここで選択した関連イベントに関係するパラメータを差し込みフィールドとしてメール本文に利用できる</li><li><strong>メール情報</strong>: 差出人や宛先を設定可能<br><img src="/images/20200716/photo_20200716_10.png" style="border:solid 1px #000000"></li></ul></li><li>テンプレート本文<ul><li><strong>利用可能な差し込みフィールド</strong>: メール本文に差し込むフィールドのタグが確認可能です。関連イベントを選択すると、そのイベントに関連したパラメータが選択できるようになります</li><li><strong>件名</strong>: メールの件名を設定。ここでも差し込みフィールドの利用は可能です</li><li><strong>本文</strong>: フォーマットはHTMLかプレーンテキストを選択できます<br><img src="/images/20200716/photo_20200716_11.png" style="border:solid 1px #000000"></li></ul></li></ol><h1 id="コールアウト"><a href="#コールアウト" class="headerlink" title="コールアウト"></a>コールアウト</h1><p>コールアウトとは、外部WebサービスのAPIのコール、HTTP要求を送信して応答を受信することです。</p><p><strong>コールアウトの設定画面:</strong></p><ul><li>呼び出すCalloutのURLを設定。Workflowを呼び出す場合は、Workflow設定画面で確認できるURLを設定します<br><img src="/images/20200716/photo_20200716_12.png" style="border:solid 1px #000000"></li><li><strong>パラメータ</strong>: ここで選択可能なパラメータは、選択したイベントに関連したパラメータのみが選択可能。ネストしたパラメータはできない</li><li><strong>HTTPメソッド</strong>: POST,PUT,GET,DELETEが選択可能</li><li><strong>再試行</strong>: チェックした場合、コールアウトの呼び出しエラー時に再試行を行う</li><li><strong>ユーザ名/パスワード/ドメイン</strong>: Basic認証またはNTLM認証のみが選択可能。より安全な認証を利用したい場合は、WorkflowのCalloutで行うことができるため、Workflowを挟む必要がある</li><li><strong>プレビュー</strong>: プレビューボタンをクリックすると、実際に送信するリクエストやヘッダ等の確認ができる</li></ul><h1 id="カスタムイベントトリガー"><a href="#カスタムイベントトリガー" class="headerlink" title="カスタムイベントトリガー"></a>カスタムイベントトリガー</h1><ul><li>通知機能にて利用可能なイベントは、デフォルトで用意されているイベント以外に、カスタムで追加可能です<br>  <img src="/images/20200716/photo_20200716_13.png" style="border:solid 1px #000000"></li><li>イベントトリガーはZuoraAPIを利用してのみ登録・更新・削除が可能です<ul><li>イベントはZuoraのオブジェクト単位で設定が可能です</li><li>設定が可能なオブジェクトやパラメータ等の詳細は、<a href="https://www.zuora.com/developer/api-reference/#operation/POST_EventTrigger" target="_blank" rel="noopener">API Reference - Developer Center - Zuora</a>を参照してください</li><li>追加すると、通機設定画面の関連イベントのプルダウンメニューに追加されます</li></ul></li></ul><p><strong>リクエスト例</strong>:</p><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">curl --location --request POST <span class="string">'https://rest.apisandbox.zuora.com/events/event-triggers'</span> \</span><br><span class="line">--header <span class="string">'Content-Type: application/json; charset=utf-8'</span> \</span><br><span class="line">--data-raw <span class="string">'&#123;</span></span><br><span class="line"><span class="string">    "baseObject": "Subscription",</span></span><br><span class="line"><span class="string">    "condition": "changeType == '</span>\<span class="string">''</span>INSERT<span class="string">'\'</span><span class="string">' || changeType == '</span>\<span class="string">''</span>UPDATE<span class="string">'\'</span><span class="string">'",</span></span><br><span class="line"><span class="string">    "description": "説明",</span></span><br><span class="line"><span class="string">    "eventType": &#123;</span></span><br><span class="line"><span class="string">        "name": "イベント名",</span></span><br><span class="line"><span class="string">        "displayName": "表示名",</span></span><br><span class="line"><span class="string">        "description": "説明"</span></span><br><span class="line"><span class="string">    &#125;,</span></span><br><span class="line"><span class="string">    "active": true</span></span><br><span class="line"><span class="string">&#125;'</span></span><br></pre></td></tr></table></figure><p><strong>パラメータ補足:</strong></p><ul><li><strong>baseObject</strong>： 監視するオブジェクトを設定<ul><li>例：Subscription</li></ul></li><li><strong>condition</strong>： baseObjectに設定したオブジェクトのトリガー条件をJEXL式で設定<ul><li>例：オブジェクト登録・更新時にイベントをトリガー:<br><code>changeType == &#39;INSERT&#39; || changeType == &#39;UPDATE&#39;</code></li><li>例：請求が1000を超えた金額で更新された場合にイベントをトリガー:<br><code>changeType == &#39;UPDATE&#39; &amp;&amp; Invoice.Status == &#39;Posted&#39; &amp;&amp; Invoice.Status_old != &#39;Posted&#39; &amp;&amp; Invoice.Amount &gt; 1000</code></li></ul></li></ul><h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>通知機能はZuora上の様々なイベントを業務と繋げるためには、必ず使いこなす必要がある機能です。特にWorkflowを実行するためのトリガーとして利用することも多いでしょう。</p><p>次回はそのWorkflowについて説明します。</p><h1 id="関連リンク集"><a href="#関連リンク集" class="headerlink" title="関連リンク集"></a>関連リンク集</h1><p>通知機能をフル活用するために最低限必要な知識を付けるための関連リンクです。</p><ul><li><a href="https://knowledgecenter.zuora.com/Central_Platform/Notifications" target="_blank" rel="noopener">Notifications - Zuora</a><br>通知機能について概要が書かれています。</li><li><a href="https://knowledgecenter.zuora.com/Central_Platform/Notifications/C_Create_Notifications" target="_blank" rel="noopener">Create and Edit Notifications - Zuora</a><br>通知の作成方法について手順が書かれています。</li><li><a href="https://knowledgecenter.zuora.com/Central_Platform/Notifications/A_Viewing_the_Supported_Event_Types" target="_blank" rel="noopener">Supported Event Types - Zuora</a><br>通知機能で利用できるイベントについて書かれています。ここに記載のイベントはZuoraでデフォルトでサポートされているイベントとなるようです。</li><li><a href="https://www.zuora.com/developer/api-reference/#operation/POST_EventTrigger" target="_blank" rel="noopener">API Reference - Developer Center - Zuora</a><br>Zuoraのオブジェクトに対してカスタムのトリガーを定義するためのAPIのリファレンスです。</li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h1&gt;&lt;p&gt;こんにちは。TIGの町田です。&lt;/p&gt;
+&lt;p&gt;Zuora Central Platform（Zuora社が提供するサブスクリ
+      
+    
+    </summary>
+    
+    
+      <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
+    
+    
+      <category term="Zuora" scheme="https://future-architect.github.io/tags/Zuora/"/>
+    
+      <category term="SaaS" scheme="https://future-architect.github.io/tags/SaaS/"/>
+    
+  </entry>
+  
+  <entry>
     <title>新人研修有志が初心者向けにバーチャルコンテストを実施しました &amp; Tips</title>
     <link href="https://future-architect.github.io/articles/20200715/"/>
     <id>https://future-architect.github.io/articles/20200715/</id>
     <published>2020-07-15T01:51:27.000Z</published>
-    <updated>2020-07-15T01:54:17.939Z</updated>
+    <updated>2020-07-16T02:26:02.626Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。現在 SAIG に所属しております、2020 年 4 月入社新人の佐藤と申します。現在競技プログラミング部に所属しており、<a href="https://atcoder.jp/contests/future-contest-2019-final/standings" target="_blank" rel="noopener">HTTF 2019 2 位</a> の <a href="https://atcoder.jp/users/omi" target="_blank" rel="noopener">omi</a> とも申します。</p><p>皆さんは競技プログラミングをやったことはありますか？　聞いたことがあるけれど参加したことがない……そんな人も多いのではないでしょうか。</p><p>そんな新人向けに向けて、新人研修で同期の運営チームメンバーとともに<strong>バーチャルコンテスト</strong>を開催しました！　現在（2020/07/15時点） 6 回開催して、4 月入社の新人だけにとどまらず、キャリア入社の方や 7, 10 月入社予定の同期（現在アルバイト）まで参加しています。</p><p>詳しい経緯については未来報で仁木さんが <a href="https://note.future.co.jp/n/nda51c959f75a" target="_blank" rel="noopener">記事を書いています</a> ので割愛します。<br>本記事は自分たちで未経験者を巻き込んでバーチャルコンテストを開催しようと考えている人たちや、あるいはバーチャルコンテストに参加してみたいけどどんな活動をしているのか知りたいという人に向けた内容となっています。具体的には</p><ul><li>使用しているツールと使い方の紹介</li><li>コンテスト中の運営対応</li><li>コンテスト後の解説について</li></ul><p>となっています。読んでくれた方々の参考になったり、私達の活動を知ってもらえたら幸いです。</p><h1 id="AtCoder-と-AtCoder-Problems"><a href="#AtCoder-と-AtCoder-Problems" class="headerlink" title="AtCoder と AtCoder Problems"></a>AtCoder と AtCoder Problems</h1><p><a href="https://atcoder.jp/home" target="_blank" rel="noopener">AtCoder</a> は日本の競技プログラミング運営サイトです。ほぼ毎週末に開催される ABC(AtCoder Beginner Contest) をはじめとして、多種多様なコンテストが無料で受けられます。さらにオープンなコンテストの過去問は <strong>すべて無償公開</strong> されています。</p><p><a href="https://kenkoooo.com/atcoder/#/table/" target="_blank" rel="noopener">AtCoder Problems</a> は AtCoder の過去問を集めて、ユーザごとの提出・解答状況の管理や難易度推定を行っているサードパーティーのサイトです。ここにバーチャルコンテスト開催機能があり、今回はこちらを利用しました。</p><p>バーチャルコンテスト参加にあたっては双方にアカウントを作成して AtCoder Problems 側での連携設定が必要となります。 AtCoder Problems は GitHub アカウント連携でしかアカウントを生成できず、GitHub アカウントがない人は GitHub アカウントの新規作成が必要になります。運営だけでなく、<strong>参加者も全員必要なのでアカウントを作成してもらいましょう。</strong><br>双方にログインできたら、AtCoder Problems 側で Account → Account Info に AtCoder User ID を入力して Update すれば連携設定完了です。念のため、過去のコンテストから任意の過去問に提出してしばらく待ち、結果が反映されていることを確認すると完璧です。</p><h1 id="コンテストの作成"><a href="#コンテストの作成" class="headerlink" title="コンテストの作成"></a>コンテストの作成</h1><p>AtCoder 右上の Virtual Contest からコンテストを作成できます。</p><p>部外者が、乱立するバーチャルコンテストの中からわざわざ知らない名前を選んで入ってくることは滅多にないのですが、念のため Description に何か書いておくべきかもしれません。私は「身内用」などと記載しておくことにしました。</p><p>次に、その編集画面の下半分で問題を選んでいきます。留意すべきことは大きく 3 点あります。</p><ul><li>ターゲットを明確にすること。<ul><li>第3回 PAST 直前に PAST 過去問演習回を設定して、初心者からは大変不評だった</li><li>初心者向けセットなのか、経験者向けセットなのかは事前に決定し、明確にアナウンスすべき</li></ul></li><li>difficulty に頼り過ぎないこと。<ul><li>特に ABC-B, C あたりは体感難易度のブレが大きく感じる</li><li>純粋な知識問や <a href="https://atcoder.jp/contests/abc169/tasks/abc169_b" target="_blank" rel="noopener">ABC169B</a>, <a href="https://atcoder.jp/contests/abc169/tasks/abc169_c" target="_blank" rel="noopener">ABC169C</a> のように言語仕様上の罠がある問題は不親切<ul><li>事前に解いてみて想定以上に難しくないかチェックしたほうがよい</li></ul></li></ul></li><li>初心者向けセットに水 diff (令和 ABC-E) 以上を出さないこと。<ul><li>ABC-C あたりから手も足も出なくなる人が多いため、出すならやりたい人がやる枠として隔離しておく</li></ul></li></ul><p>最後にコンテスト時間を設定します。時間設定は問題数・難易度勾配よりも大切です。<br>長すぎると座っているだけの時間を作ってしまうことになるので、はじめのうちは長くても 1 時間に留めたほうが良いでしょう。我々は終業 30 分後から 50 分間のコンテストを設定しています。</p><h1 id="コンテスト実施"><a href="#コンテスト実施" class="headerlink" title="コンテスト実施"></a>コンテスト実施</h1><p>コンテスト自体は時間になったら自動的に開始するので、その間運営としてやるべきことは <strong>質問対応</strong> です。各種チャットツールは色々なアナウンスが行われると質問が流れていきやすく、どうしても見逃してしまいます。そこで解説用のハングアウトミートのビデオ会議を早めに準備しておき、困ったらそちらで口頭で質問してもらうようにしています。</p><p>質問は設問そのものに対してよりも、提出ができない、うまく動かないという大雑把な質問が飛んできがちです。適宜ヒアリングを行い、最終的には大体の勘で対応します。</p><p>実施してみて、事前にやっておいたほうが良かったことが 2 点あります。</p><ul><li>入出力、提出のチュートリアルを事前に行うこと。<ul><li>AtCoder 側での提出が出来ることを確かめてもらう</li><li>当社新人研修では Java を用いていたため、新人向けに Java の入出力テンプレートを作成して事前に共有した<ul><li>それでも言語選択欄を見逃して提出できない人が出たのでチュートリアルは必須</li></ul></li></ul></li><li>コードテストの存在を周知すること。<ul><li>悪意のない提出デバッグをしてしまうことがある</li><li><code>WA</code> はともかく <code>CE</code> はコードテストでサンプルを実行するだけでも回避可能<ul><li><code>RE</code> , <code>TLE</code> も ABC-A,B なら大体は回避可能</li></ul></li></ul></li></ul><p>どうしても解決できない質問については、全員の提出から本人の提出コードをチェックして回答しても良いかもしれません。</p><h1 id="コンテスト終了後"><a href="#コンテスト終了後" class="headerlink" title="コンテスト終了後"></a>コンテスト終了後</h1><p>ちゃんと解説をしましょう。その際に一度問題文を読み上げて問題設定を全員に伝えると、後ろの方の問題まで手がつけられなかった人にとって親切です。</p><p>運営側で画面共有をして、 <code>AC</code> できた参加者のコードを数人分映しながら各自のコードを解説してもらうと多くの人がコミットできます。どうしても書いてあることと言っていることが食い違うケースがありますので、経験者が質問したり指摘したりして認識を合わせると全員の成長につながると思います。</p><p>解説のメモとして Google Slides の空スライドを予め用意しておき、書ける人が協力して解説中に書きこんでいます。現在は参加者が 20 名程度なのでうまくいく手法ですが、50-60 名が一斉に開いて編集を試みるとスライドがとてつもなく重くなるため、人数が増えてきたら再考の余地があります。</p><img src="/images/20200715/photo_20200715_01.png"><h1 id="コンテストを実施してみて"><a href="#コンテストを実施してみて" class="headerlink" title="コンテストを実施してみて"></a>コンテストを実施してみて</h1><p>参加した同期からは概ね良好なフィードバックを頂くことが出来ました！　新人の中にはコーディング未経験者も多い中で、入社後すぐに綺麗な、効率の良いコードを書くことはなかなか不可能です。それでも競技プログラミングの経験を通して「綺麗な、効率の良いコード」の威力、大切さを知ってもらうことが出来たと考えています。</p><p>具体的に同期の提出コードを見ていても、はじめ A 問題の $N= 10^9$ 制約に対して、全整数を for loop するコードを書いて <code>TLE</code> していた人が B, C 問題まで解けるようになるまで成長しています。毎回問題を選定していた側としても自分のことのように嬉しくなりました。</p><h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>本企画は多くの運営によって支えられています。しかし運営全員が新人同期の有志であり、今もなお発展途上の企画です。是非参加したい！　という人は一緒にブラッシュアップしていきましょう。よろしくおねがいします。</p><p>当社では AtCoderJobs 経由で <a href="https://jobs.atcoder.jp/offers/list?f.CompanyScreenName=future" target="_blank" rel="noopener">競技プログラミング経験者の採用を行っています</a>。新卒・中途・アルバイトすべての求人がございますので、気になった方は一度ご覧になってください。</p>]]></content>
+    <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。現在 SAIG に所属しております、2020 年 4 月入社新人の佐藤と申します。現在競技プログラミング部に所属しており、<a href="https://atcoder.jp/contests/future-contest-2019-final/standings" target="_blank" rel="noopener">HTTF 2019 2 位</a> の <a href="https://atcoder.jp/users/omi" target="_blank" rel="noopener">omi</a> とも申します。</p><p>皆さんは競技プログラミングをやったことはありますか？　聞いたことがあるけれど参加したことがない……そんな人も多いのではないでしょうか。</p><p>そんな新人向けに向けて、新人研修で同期の運営チームメンバーとともに<strong>バーチャルコンテスト</strong>を開催しました！　現在（2020/07/15時点） 6 回開催して、4 月入社の新人だけにとどまらず、キャリア入社の方や 7, 10 月入社予定の同期（現在アルバイト）まで参加しています。</p><p>詳しい経緯については未来報で仁木さんが <a href="https://note.future.co.jp/n/nda51c959f75a" target="_blank" rel="noopener">記事を書いています</a> ので割愛します。<br>本記事は自分たちで未経験者を巻き込んでバーチャルコンテストを開催しようと考えている人たちや、あるいはバーチャルコンテストに参加してみたいけどどんな活動をしているのか知りたいという人に向けた内容となっています。具体的には</p><ul><li>使用しているツールと使い方の紹介</li><li>コンテスト中の運営対応</li><li>コンテスト後の解説について</li></ul><p>となっています。読んでくれた方々の参考になったり、私達の活動を知ってもらえたら幸いです。</p><h1 id="AtCoder-と-AtCoder-Problems"><a href="#AtCoder-と-AtCoder-Problems" class="headerlink" title="AtCoder と AtCoder Problems"></a>AtCoder と AtCoder Problems</h1><p><a href="https://atcoder.jp/home" target="_blank" rel="noopener">AtCoder</a> は日本の競技プログラミング運営サイトです。ほぼ毎週末に開催される ABC(AtCoder Beginner Contest) をはじめとして、多種多様なコンテストが無料で受けられます。さらにオープンなコンテストの過去問は <strong>すべて無償公開</strong> されています。</p><p><a href="https://kenkoooo.com/atcoder/#/table/" target="_blank" rel="noopener">AtCoder Problems</a> は AtCoder の過去問を集めて、ユーザごとの提出・解答状況の管理や難易度推定を行っているサードパーティーのサイトです。ここにバーチャルコンテスト開催機能があり、今回はこちらを利用しました。</p><p>バーチャルコンテスト参加にあたっては双方にアカウントを作成して AtCoder Problems 側での連携設定が必要となります。 AtCoder Problems は GitHub アカウント連携でしかアカウントを生成できず、GitHub アカウントがない人は GitHub アカウントの新規作成が必要になります。運営だけでなく、<strong>参加者も全員必要なのでアカウントを作成してもらいましょう。</strong><br>双方にログインできたら、AtCoder Problems 側で Account → Account Info に AtCoder User ID を入力して Update すれば連携設定完了です。念のため、過去のコンテストから任意の過去問に提出してしばらく待ち、結果が反映されていることを確認すると完璧です。</p><h1 id="コンテストの作成"><a href="#コンテストの作成" class="headerlink" title="コンテストの作成"></a>コンテストの作成</h1><p>AtCoder 右上の Virtual Contest からコンテストを作成できます。</p><p>部外者が、乱立するバーチャルコンテストの中からわざわざ知らない名前を選んで入ってくることは滅多にないのですが、念のため Description に何か書いておくべきかもしれません。私は「身内用」などと記載しておくことにしました。</p><p>次に、その編集画面の下半分で問題を選んでいきます。留意すべきことは大きく 3 点あります。</p><ul><li>ターゲットを明確にすること。<ul><li>第3回 PAST 直前に PAST 過去問演習回を設定して、初心者からは大変不評だった</li><li>初心者向けセットなのか、経験者向けセットなのかは事前に決定し、明確にアナウンスすべき</li></ul></li><li>difficulty に頼り過ぎないこと。<ul><li>特に ABC-B, C あたりは体感難易度のブレが大きく感じる</li><li>純粋な知識問や <a href="https://atcoder.jp/contests/abc169/tasks/abc169_b" target="_blank" rel="noopener">ABC169B</a>, <a href="https://atcoder.jp/contests/abc169/tasks/abc169_c" target="_blank" rel="noopener">ABC169C</a> のように言語仕様上の罠がある問題は不親切<ul><li>事前に解いてみて想定以上に難しくないかチェックしたほうがよい</li></ul></li></ul></li><li>初心者向けセットに水 diff (令和 ABC-E) 以上を出さないこと。<ul><li>ABC-C あたりから手も足も出なくなる人が多いため、出すならやりたい人がやる枠として隔離しておく</li></ul></li></ul><p>最後にコンテスト時間を設定します。時間設定は問題数・難易度勾配よりも大切です。<br>長すぎると座っているだけの時間を作ってしまうことになるので、はじめのうちは長くても 1 時間に留めたほうが良いでしょう。我々は終業 30 分後から 50 分間のコンテストを設定しています。</p><h1 id="コンテスト実施"><a href="#コンテスト実施" class="headerlink" title="コンテスト実施"></a>コンテスト実施</h1><p>コンテスト自体は時間になったら自動的に開始するので、その間運営としてやるべきことは <strong>質問対応</strong> です。各種チャットツールは色々なアナウンスが行われると質問が流れていきやすく、どうしても見逃してしまいます。そこで解説用のGoogle Meetのビデオ会議を早めに準備しておき、困ったらそちらで口頭で質問してもらうようにしています。</p><p>質問は設問そのものに対してよりも、提出ができない、うまく動かないという大雑把な質問が飛んできがちです。適宜ヒアリングを行い、最終的には大体の勘で対応します。</p><p>実施してみて、事前にやっておいたほうが良かったことが 2 点あります。</p><ul><li>入出力、提出のチュートリアルを事前に行うこと。<ul><li>AtCoder 側での提出が出来ることを確かめてもらう</li><li>当社新人研修では Java を用いていたため、新人向けに Java の入出力テンプレートを作成して事前に共有した<ul><li>それでも言語選択欄を見逃して提出できない人が出たのでチュートリアルは必須</li></ul></li></ul></li><li>コードテストの存在を周知すること。<ul><li>悪意のない提出デバッグをしてしまうことがある</li><li><code>WA</code> はともかく <code>CE</code> はコードテストでサンプルを実行するだけでも回避可能<ul><li><code>RE</code> , <code>TLE</code> も ABC-A,B なら大体は回避可能</li></ul></li></ul></li></ul><p>どうしても解決できない質問については、全員の提出から本人の提出コードをチェックして回答しても良いかもしれません。</p><h1 id="コンテスト終了後"><a href="#コンテスト終了後" class="headerlink" title="コンテスト終了後"></a>コンテスト終了後</h1><p>ちゃんと解説をしましょう。その際に一度問題文を読み上げて問題設定を全員に伝えると、後ろの方の問題まで手がつけられなかった人にとって親切です。</p><p>運営側で画面共有をして、 <code>AC</code> できた参加者のコードを数人分映しながら各自のコードを解説してもらうと多くの人がコミットできます。どうしても書いてあることと言っていることが食い違うケースがありますので、経験者が質問したり指摘したりして認識を合わせると全員の成長につながると思います。</p><p>解説のメモとして Google Slides の空スライドを予め用意しておき、書ける人が協力して解説中に書きこんでいます。現在は参加者が 20 名程度なのでうまくいく手法ですが、50-60 名が一斉に開いて編集を試みるとスライドがとてつもなく重くなるため、人数が増えてきたら再考の余地があります。</p><img src="/images/20200715/photo_20200715_01.png"><h1 id="コンテストを実施してみて"><a href="#コンテストを実施してみて" class="headerlink" title="コンテストを実施してみて"></a>コンテストを実施してみて</h1><p>参加した同期からは概ね良好なフィードバックを頂くことが出来ました！　新人の中にはコーディング未経験者も多い中で、入社後すぐに綺麗な、効率の良いコードを書くことはなかなか不可能です。それでも競技プログラミングの経験を通して「綺麗な、効率の良いコード」の威力、大切さを知ってもらうことが出来たと考えています。</p><p>具体的に同期の提出コードを見ていても、はじめ A 問題の $N= 10^9$ 制約に対して、全整数を for loop するコードを書いて <code>TLE</code> していた人が B, C 問題まで解けるようになるまで成長しています。毎回問題を選定していた側としても自分のことのように嬉しくなりました。</p><h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>本企画は多くの運営によって支えられています。しかし運営全員が新人同期の有志であり、今もなお発展途上の企画です。是非参加したい！　という人は一緒にブラッシュアップしていきましょう。よろしくおねがいします。</p><p>当社では AtCoderJobs 経由で <a href="https://jobs.atcoder.jp/offers/list?f.CompanyScreenName=future" target="_blank" rel="noopener">競技プログラミング経験者の採用を行っています</a>。新卒・中途・アルバイトすべての求人がございますので、気になった方は一度ご覧になってください。</p>]]></content>
     
     <summary type="html">
     
@@ -38,9 +67,9 @@
       <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
     
     
-      <category term="競技プログラミング" scheme="https://future-architect.github.io/tags/%E7%AB%B6%E6%8A%80%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0/"/>
-    
       <category term="新人研修" scheme="https://future-architect.github.io/tags/%E6%96%B0%E4%BA%BA%E7%A0%94%E4%BF%AE/"/>
+    
+      <category term="競技プログラミング" scheme="https://future-architect.github.io/tags/%E7%AB%B6%E6%8A%80%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0/"/>
     
   </entry>
   
@@ -219,9 +248,9 @@
     
       <category term="DB" scheme="https://future-architect.github.io/tags/DB/"/>
     
-      <category term="RDB" scheme="https://future-architect.github.io/tags/RDB/"/>
-    
       <category term="KVS" scheme="https://future-architect.github.io/tags/KVS/"/>
+    
+      <category term="RDB" scheme="https://future-architect.github.io/tags/RDB/"/>
     
   </entry>
   
@@ -340,9 +369,9 @@
       <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
     
     
-      <category term="Terraform" scheme="https://future-architect.github.io/tags/Terraform/"/>
-    
       <category term="合格記" scheme="https://future-architect.github.io/tags/%E5%90%88%E6%A0%BC%E8%A8%98/"/>
+    
+      <category term="Terraform" scheme="https://future-architect.github.io/tags/Terraform/"/>
     
   </entry>
   
@@ -369,9 +398,9 @@
       <category term="DataScience" scheme="https://future-architect.github.io/categories/DataScience/"/>
     
     
-      <category term="Python" scheme="https://future-architect.github.io/tags/Python/"/>
-    
       <category term="MachineLearning" scheme="https://future-architect.github.io/tags/MachineLearning/"/>
+    
+      <category term="Python" scheme="https://future-architect.github.io/tags/Python/"/>
     
       <category term="MLOps" scheme="https://future-architect.github.io/tags/MLOps/"/>
     
@@ -501,11 +530,11 @@
       <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
     
     
+      <category term="ChatOps" scheme="https://future-architect.github.io/tags/ChatOps/"/>
+    
       <category term="初心者向け" scheme="https://future-architect.github.io/tags/%E5%88%9D%E5%BF%83%E8%80%85%E5%90%91%E3%81%91/"/>
     
       <category term="Slack" scheme="https://future-architect.github.io/tags/Slack/"/>
-    
-      <category term="ChatOps" scheme="https://future-architect.github.io/tags/ChatOps/"/>
     
   </entry>
   
@@ -539,11 +568,11 @@
     
       <category term="Frontend" scheme="https://future-architect.github.io/tags/Frontend/"/>
     
-      <category term="初心者向け" scheme="https://future-architect.github.io/tags/%E5%88%9D%E5%BF%83%E8%80%85%E5%90%91%E3%81%91/"/>
+      <category term="webpack" scheme="https://future-architect.github.io/tags/webpack/"/>
     
       <category term="Node.js" scheme="https://future-architect.github.io/tags/Node-js/"/>
     
-      <category term="webpack" scheme="https://future-architect.github.io/tags/webpack/"/>
+      <category term="初心者向け" scheme="https://future-architect.github.io/tags/%E5%88%9D%E5%BF%83%E8%80%85%E5%90%91%E3%81%91/"/>
     
   </entry>
   
@@ -604,37 +633,6 @@
       <category term="アプリ" scheme="https://future-architect.github.io/tags/%E3%82%A2%E3%83%97%E3%83%AA/"/>
     
       <category term="Swift" scheme="https://future-architect.github.io/tags/Swift/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>春の入門祭り 🌸#12 レシートで学ぶデータモデリング入門</title>
-    <link href="https://future-architect.github.io/articles/20200616/"/>
-    <id>https://future-architect.github.io/articles/20200616/</id>
-    <published>2020-06-16T01:22:22.000Z</published>
-    <updated>2020-06-29T01:49:21.699Z</updated>
-    
-    <content type="html"><![CDATA[<p><a href="https://future-architect.github.io/articles/20200529/">春の入門祭り</a>の第12弾です。</p><h1 id="自己紹介"><a href="#自己紹介" class="headerlink" title="自己紹介"></a>自己紹介</h1><p>こんにちは、TIGメディアユニットチームの川島です。</p><p>私は新卒でフューチャーに入社後、基幹系システム刷新PJのDBAからキャリアをスタートしました。その後、小売業の店舗システム刷新PJなど複数のPJで企画フェーズから導入フェーズまで幅広く経験し、現在は、人材サービス企業のクライアントの全社データ活用PJでコンサルティング業務を主として担当しています。</p><p>RDBMSについては論理から物理まで一通り経験していて、データに関わるところは強みがあると思っています。</p><h1 id="記事の背景"><a href="#記事の背景" class="headerlink" title="記事の背景"></a>記事の背景</h1><p>DB設計のデータモデリング入門として、コンビニのレシートを使ったDB設計をやっていきます。</p><p>DB設計はよく物理と論理の両面があると言われますが、今回は論理設計について扱います。</p><p>論理設計の基本はモデリングの技法にあります。モデリングは、設計する人以外必要ないのでは？と思われがちですが、ソフトウェア開発する上でも、または上流フェーズでシステムやサービスの提案をしていく上でも重要なスキルになります。なぜなら、モデリングはその名の通り現実を抽象化して、扱いやすい形式に起こして、他者に伝達する手法だからです。これはITエンジニアやITコンサルタント（ITプロフェッショナル）のコミュニケーションスキルの基本ともいえる部分でもあります。ただし、モデリングというととっつきづらく難しい要素もあるので、特別な道具立てもなく、身近なモノからできる例としてレシートを題材にDB設計することをやっていきたいと思います。具体的に、実務で使える内容ではないですが、ITプロフェッショナルとしての力を鍛える「素振り」と思って、取り組んでいただければ幸いです。</p><p>よりよいテーブルの設計については、今回の入門記事シリーズでも取り扱っています。ぜひそちらも合わせて勉強してみてください。<br><a href="https://future-architect.github.io/articles/20200605/">春の入門祭り 🌸 #05　データベース　テーブル設計入門</a></p><h1 id="記事の対象読者"><a href="#記事の対象読者" class="headerlink" title="記事の対象読者"></a>記事の対象読者</h1><p>対象は、新人エンジニア・ITコンサルタントを想定しています。</p><h1 id="題材"><a href="#題材" class="headerlink" title="題材"></a>題材</h1><p>今回の題材は、某コンビニエンスストアのレシートを使います。</p><p>毎日のように、みなさんが見ているものだと思いますが、このような身近なものにもIT技術が使われており、当然データを格納するDBがあります。DB設計のトレーニングとして身近な帳票（レシートや請求書など、データの印刷されたもの）から、それらを支えるインフラ技術や、プログラムソースコード、DBの設計などを想像することは良い手段です。</p><h2 id="レシート"><a href="#レシート" class="headerlink" title="レシート"></a>レシート</h2><img src="/images/20200616/1.jpg" class="img-middle-size"><h2 id="イベント（出来事）を見つける"><a href="#イベント（出来事）を見つける" class="headerlink" title="イベント（出来事）を見つける"></a>イベント（出来事）を見つける</h2><p>まずは、このレシートが表す主要な「出来事」を見出しましょう。難しく考えず、この紙が表現している行為は何かを考えてみましょう。</p><p>大きく領収書と書かれていますね。</p><p>そうすると、「領収」とか「購入」とかが思い浮かびますが、システムの所有者はコンビニエンスストア側であるので、主語はお店の側とします。すると販売とか売上になりますが、今回は売上にしましょう。</p><img src="/images/20200616/2.png" class="img-small-size"><p>イベント系データは、トランザクションと言われることもあります。企業のビジネスはこのようなトランザクションの連なりと積み重ねで成り立っています。人間の体でいうと、血液のようなものです。</p><h2 id="リソース（資源）を見つける"><a href="#リソース（資源）を見つける" class="headerlink" title="リソース（資源）を見つける"></a>リソース（資源）を見つける</h2><p>次に、売上をあげるにあたって、「誰に」「何を」という部分がないと売上という行為は完結しません。</p><p>6W2Hでもれなくダブりなくデータの種類を書き出してみましょう。（5W1HにWhom、How Muchを加えた6W2Hを使うとよりもれなくダブりなく物事をとらえることができるのでおすすめです）</p><ul><li>Who（誰が）・・販売店、責任者</li><li>When・・販売日時</li><li>What（何を）・・商品</li><li>Whom（誰に）・・会員（顧客）</li><li>Where（どこで）・・レジ</li><li>Why（なぜ）・・とくになし</li><li>How（どのように）・・決済手段</li><li>How Much（いくらで）・・商品価格、消費税、還元ポイント</li></ul><p>全部扱うのは大変なので、 <strong>今回は一部の商品と顧客と価格、消費税について扱います</strong>。他のリソースについてもみなさんもぜひ考えてみてください。</p><p>価格と消費税（率）は商品の一部といえるので、リソースとしてはいったん商品と顧客を書き出します。</p><img src="/images/20200616/3.png" class="img-middle-size"><p>リソース系データは、マスタと言われることもあります。トランザクションが血液なら、マスタは企業のビジネスの骨格をなす部分です。<br>骨格のつくりがおかしいと人間がうまく背が伸びなくなるように、企業のビジネスの成長のボトルネックにもなりかねない部分なのでこの設計は非常に重要です。</p><h2 id="項目を入れる"><a href="#項目を入れる" class="headerlink" title="項目を入れる"></a>項目を入れる</h2><p>データの箱を用意したら、次は項目を入れていきましょう。</p><p>顧客には、コンビニエンスストアからセール情報などを郵送することを想定して、氏名と住所を入れます。<br>商品には、商品名と価格、税率を入れます。売上には、販売数を入れます。商品と顧客も入れるべきですが、のちのち入れていきます。</p><img src="/images/20200616/4.png" class="img-middle-size"><p>税金についてはよくみると、10%対象と8％対象のものがあります。軽減税率制度ですね。</p><p>食料品は8%、それ以外は10%対象になっています。商品マスタ上で、分類があると考えます。消費税は数年後には変わっていくものなので、商品マスタにもっていると変更するのが大変です。なので、税対象カテゴリという新しいテーブルを追加して管理することにしましょう。</p><p>※実用的には、有効期間を設定してある日を過ぎたときから税率が変わるようにすることがあります。ちょうどよい参考文献があるので、末尾に記載します。</p><img src="/images/20200616/5.png"><h2 id="リレーションシップを設定する"><a href="#リレーションシップを設定する" class="headerlink" title="リレーションシップを設定する"></a>リレーションシップを設定する</h2><p>次にテーブル同士の関係性を設定していきます（リレーション）。</p><p>関係性を設定するまえに、各テーブルのデータを一意に表すPK（主キー）を設定します。<br>PKとして空欄にしていた部分に、IDを設定します。</p><p>この主キーに特定の項目を設定し意味をもたせると、その意味が変わったときに他のテーブルとのリレーションが変わってしまいます。そのため、機械的に○○IDもしくは○○コードなどと設定するのが妥当です。具体的には、商品マスタにおいて、商品名はそのデータを一意に表すと自然に考えられます（ナチュラルキー）が、あえて代理のキー（サロゲートキー）を設定して、意味に依存しない形にします。</p><img src="/images/20200616/6.png"><p>そして、各テーブルを関連付ける、FK（外部キー）を設定することでリレーションシップはいったん完成です。<br><img src="/images/20200616/7.png"></p><h2 id="点検する"><a href="#点検する" class="headerlink" title="点検する"></a>点検する</h2><p>作成したモデルが現実をきちんと表現しているか点検をしましょう。出来上がったテーブルとリレーション（ERD)を見て、最初のレシートに立ち戻ってみましょう。</p><p>すると、このERDでは1つの売上で1種類の商品、1人の顧客しか扱えないことがわかります。1売上1顧客は良いとして、1売上で複数の商品があるのは自然なので、修正して売上テーブルを分割することを考えます。<br>売上明細というテーブルを作成します。</p><img src="/images/20200616/8.png"><p>（注）FKが一部間違っていたので修正しました 6/16</p><p>今回は省きますが、加えて以下もやってみると理解が深まるでしょう。</p><ul><li>DDL（CREATE TABLE）を書いてテーブルをRDB（PostgreSQL,MySQL,Oracleなど）上に作成してみる</li><li>テーブルに実データを入れてみる（事前にExcelなどで表を書いてみるのをおすすめします）</li><li>SQLを書いて実行してみる</li></ul><h1 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h1><p>データモデルのポイントは以下のとおりです。</p><ul><li>イベントを見つける</li><li>リソースを見つける（6W2Hでもれなくダブりなく）</li><li>項目を入れる</li><li>リレーションシップを設定する</li><li>点検する（モデルが現実を表現しているか）</li></ul><p>今回はITプロフェッショナルとしての「素振りの仕方」をご紹介しました。<br>日頃、目にするデータから設計をする練習をして、本番の仕事のため（試合）に備えましょう。</p><h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><p><a href="https://www.amazon.co.jp/dp/4798110663" target="_blank" rel="noopener">楽々ERDレッスン (CodeZine BOOKS) (株)スターロジック 羽生 章洋 著</a><br>レシート（帳票）からERDをつくるというアイデアはここからもらっています。DB設計の基本が書かれている良書です。</p><p><a href="https://sikushima.hatenablog.com/entry/2020/06/09/113306" target="_blank" rel="noopener">SQLで消費税の計算</a><br>マスタへの有効期間の設定・SQLの書き方など、実用的な内容が詳細に書かれています。もう一歩踏み込みたい人は読んでみてください。</p><p><a href="https://www.amazon.co.jp/dp/B07TPYY3K1" target="_blank" rel="noopener">業務システムのための上流工程入門 渡辺幸三 著</a><br>DB設計はお客さんとあるべきシステムのイメージの合意をとりながら進めていくものです。データ指向設計の手法が、ロールプレイング形式で具体的に書かれています。上流工程に興味のある人は読んでみてください。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;&lt;a href=&quot;https://future-architect.github.io/articles/20200529/&quot;&gt;春の入門祭り&lt;/a&gt;の第12弾です。&lt;/p&gt;
-&lt;h1 id=&quot;自己紹介&quot;&gt;&lt;a href=&quot;#自己紹介&quot; class=&quot;headerlink&quot; t
-      
-    
-    </summary>
-    
-    
-      <category term="DB" scheme="https://future-architect.github.io/categories/DB/"/>
-    
-    
-      <category term="DB" scheme="https://future-architect.github.io/tags/DB/"/>
-    
-      <category term="初心者向け" scheme="https://future-architect.github.io/tags/%E5%88%9D%E5%BF%83%E8%80%85%E5%90%91%E3%81%91/"/>
-    
-      <category term="DataModel" scheme="https://future-architect.github.io/tags/DataModel/"/>
     
   </entry>
   
