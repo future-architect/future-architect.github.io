@@ -249,6 +249,7 @@
 <h2 id="4-判定する"><a href="#4-判定する" class="headerlink" title="4. 判定する"></a>4. 判定する</h2><p>学習は終わっているので、あとはX(入力データ)を与えると判定できます！<br>また、後続で使うRedmine操作用に、結果を加工しておきます。</p>
 <figure class="highlight py"><figcaption><span>カテゴリ判定サンプル</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">result = model.predict(predictX)</span><br><span class="line"></span><br><span class="line">dfPredicts = pds.DataFrame(retPredict, columns = uniqueCategoryIds)</span><br><span class="line">issues = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> (i, dfPredict) <span class="keyword">in</span> dfPredicts.iterrows():</span><br><span class="line">    <span class="comment"># 可能性が高いものから順から４つだけを取り出します。</span></span><br><span class="line">    sPredicts = dfPredict.sort_values(ascending = <span class="literal">False</span>).nlargest(<span class="number">4</span>)</span><br><span class="line">    <span class="comment"># このredmine操作で使うので、issueオブジェクトに結果を格納します。</span></span><br><span class="line">    issue = &#123;</span><br><span class="line">        <span class="string">"subject"</span>: subject,</span><br><span class="line">        <span class="string">"category_names"</span>: [],</span><br><span class="line">        <span class="string">"category_ids"</span> : [],</span><br><span class="line">        <span class="string">"confidences"</span>: []</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">for</span> (j, sPredict) <span class="keyword">in</span> enumerate(sPredicts):</span><br><span class="line">        category_name = re.split(<span class="string">'\[|\]| '</span>,sPredicts.index[j])[<span class="number">2</span>]</span><br><span class="line">        category_id = re.split(<span class="string">'\[|\]| '</span>,sPredicts.index[j])[<span class="number">1</span>]</span><br><span class="line">        issue[<span class="string">"category_names"</span>].append(category_name)</span><br><span class="line">        issue[<span class="string">"category_ids"</span>].append(int(category_id)),</span><br><span class="line">        issue[<span class="string">"confidences"</span>].append(sPredicts[j])</span><br></pre></td></tr></table></figure>
 
+
 <h1 id="Redmineのチケットを更新"><a href="#Redmineのチケットを更新" class="headerlink" title="Redmineのチケットを更新"></a>Redmineのチケットを更新</h1><p>続いて、Redmine APIを使って、対象のチケットを更新します。<br><img src="/images/20171006/photo_20171006_07.png"></p>
 <p>Python-RedmineとAPIキーを使って、対象のチケットを新しいカテゴリIDで更新します。<br>これをコンテナの最後の処理に差し込めば、Redmineのチケットが更新されます。</p>
 <figure class="highlight rb"><figcaption><span>Redmineチケット更新サンプル.ruby</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">from redminelib import Redmine</span><br><span class="line"></span><br><span class="line">redmine = Redmine(<span class="string">'http://localhost/redmine'</span>, key=<span class="string">'***********************'</span>)</span><br><span class="line">issue = redmine.issue.get(issue_id)</span><br><span class="line">issue.category_id = category_id</span><br><span class="line">issue.save()</span><br></pre></td></tr></table></figure>
@@ -273,6 +274,7 @@
 
 
 <figure class="highlight rb"><figcaption><span>サンプル実装.rb</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">import faraday</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WebhookListener</span> &lt; Redmine::Hook::<span class="title">Listener</span></span></span><br><span class="line">    <span class="comment"># issueが新規に作成されると呼ばれます。</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">controller_issues_new_after_save</span><span class="params">(context = &#123;&#125;)</span></span></span><br><span class="line">      issue = context[<span class="symbol">:issue</span>]</span><br><span class="line">      controller = context[<span class="symbol">:controller</span>]</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">unless</span> webhooks</span><br><span class="line">      post(issue)</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Jenkinsジョブにissue.idをパラメータ付きビルドで渡します。</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">post</span></span></span><br><span class="line">        conn = Faraday.new(<span class="symbol">:url</span> =&gt; <span class="string">'http://jenkins'</span>) <span class="keyword">do</span> <span class="params">|builder|</span></span><br><span class="line">            builder.request  <span class="symbol">:url_encoded</span></span><br><span class="line">            builder.response <span class="symbol">:logger</span></span><br><span class="line">            builder.adapter  <span class="symbol">:net_http</span></span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">        res = conn.post <span class="string">"/JOB_NAME/buildWithParameters"</span>, &#123; <span class="symbol">issue_id:</span> issue.id&#125;</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
 
 <p>以下を参考にしました</p>
 <ul>
@@ -344,11 +346,39 @@
   
     
       
-        <a href="https://future-architect.github.io/articles/20200715/">
+        <a href="https://future-architect.github.io/articles/20190713/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
               <li>
-                新人研修有志が初心者向けにバーチャルコンテストを実施しました & Tips
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200702/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える
               </li>
             </div>
           </div>
@@ -372,39 +402,11 @@
   
     
       
-        <a href="https://future-architect.github.io/articles/20200709/">
+        <a href="https://future-architect.github.io/articles/20200716/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
               <li>
-                GoでWebアプリ開発時にあるあるだったレビューコメント
-              </li>
-            </div>
-          </div>
-        </a>
-      
-	
-  
-    
-      
-        <a href="https://future-architect.github.io/articles/20200708/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                Zuora連載2：Zuora REST API 利用と開発環境構築
-              </li>
-            </div>
-          </div>
-        </a>
-      
-	
-  
-    
-      
-        <a href="https://future-architect.github.io/articles/20200707/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                VSCode の Go extension でよく利用するコマンド 7選
+                Zuora連載 Vol.3 Notification及びEventTriggerの話
               </li>
             </div>
           </div>
@@ -441,16 +443,20 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
+      
+	
   
     
   
     
+      
+	
   
     
   
@@ -461,12 +467,12 @@
     
   
     
-      
-	
   
     
   
     
+      
+	
   
     
   
@@ -475,18 +481,16 @@
 	
   
     
-      
-	
   
     
-      
-	
   
     
       
 	
   
     
+      
+	
   
     
   
@@ -495,8 +499,6 @@
     
   
     
-      
-	
   
     
   
@@ -517,12 +519,12 @@
     
   
     
+      
+	
   
     
   
     
-      
-	
   
     
       
@@ -649,18 +651,16 @@
     
       
 	
-  
-    
   
     
       
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -685,6 +685,8 @@
     
       
 	
+  
+    
   
     
       
@@ -695,6 +697,8 @@
 	
   
     
+      
+	
   
     
       
@@ -703,8 +707,6 @@
     
   
     
-      
-	
   
     
       
@@ -725,8 +727,6 @@
     
       
 	
-  
-    
   
     
       
@@ -739,6 +739,8 @@
     
       
 	
+  
+    
   
     
       
@@ -777,6 +779,8 @@
 	
   
     
+  
+    
       
 	
   
@@ -787,6 +791,8 @@
 	
   
     
+      
+	
   
     
   
@@ -861,6 +867,8 @@
     
       
 	
+  
+    
   
     
       
@@ -875,8 +883,6 @@
 	
   
     
-  
-    
       
 	
   
@@ -885,8 +891,6 @@
 	
   
     
-  
-    
       
 	
   
@@ -895,8 +899,6 @@
 	
   
     
-      
-	
   
     
       
@@ -913,6 +915,8 @@
 	
   
     
+      
+	
   
     
       
@@ -921,6 +925,8 @@
     
   
     
+  
+    
       
 	
   
@@ -967,10 +973,10 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -983,10 +989,14 @@
     
   
     
+  
+    
       
 	
   
     
+      
+	
   
     
       
@@ -997,12 +1007,12 @@
 	
   
     
+      
+	
   
     
   
     
-      
-	
   
     
       
@@ -1021,14 +1031,10 @@
 	
   
     
-      
-	
   
     
       
 	
-  
-    
   
     
   
@@ -1039,10 +1045,10 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -1107,8 +1113,12 @@
     
       
 	
+  
+    
   
     
+      
+	
   
     
   
@@ -1117,14 +1127,14 @@
 	
   
     
+      
+	
   
     
   
     
   
     
-      
-	
   
     
       
@@ -1133,12 +1143,8 @@
     
       
 	
-  
-    
   
     
-      
-	
   
     
       
@@ -1165,8 +1171,6 @@
 	
   
     
-      
-	
   
     
       
@@ -1179,6 +1183,8 @@
     
   
     
+      
+	
   
     
   
@@ -1225,11 +1231,11 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Security/">Security (1)</a>
+	  <a href="/categories/Design/">Design (6)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Design/">Design (6)</a>
+	  <a href="/categories/Security/">Security (1)</a>
 	</li>
       
 	<li>
@@ -1237,11 +1243,11 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
+	  <a href="/categories/Infrastructure/">Infrastructure (64)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (63)</a>
+	  <a href="/categories/Management/">Management (8)</a>
 	</li>
       
 	<li>

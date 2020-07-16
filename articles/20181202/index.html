@@ -465,9 +465,7 @@
 <pre><code>1. 注文情報の読み込み（直近の注文履歴参照用）
 2. キャンセル書き込み用
 3. 配送情報変更用</code></pre><h5 id="注文情報の読み込み（直近の注文履歴参照用）"><a href="#注文情報の読み込み（直近の注文履歴参照用）" class="headerlink" title="注文情報の読み込み（直近の注文履歴参照用）"></a>注文情報の読み込み（直近の注文履歴参照用）</h5><figure class="highlight javascript"><figcaption><span>OrderTableRead</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> AWS = <span class="built_in">require</span>(<span class="string">"aws-sdk"</span>);</span><br><span class="line"><span class="keyword">var</span> docClient = <span class="keyword">new</span> AWS.DynamoDB.DocumentClient();</span><br><span class="line"></span><br><span class="line">exports.handler = <span class="function">(<span class="params">event, context, callback</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">var</span> CallerID = event.Details.Parameters.CallerID;</span><br><span class="line">  <span class="keyword">var</span> paramsQuery = &#123;</span><br><span class="line">    TableName: <span class="string">'CustomerTable'</span>,</span><br><span class="line">    KeyConditionExpression: <span class="string">"CallerID = :varNumber"</span>,</span><br><span class="line">    ExpressionAttributeValues: &#123; <span class="string">":varNumber"</span>: CallerID &#125;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  docClient.query(paramsQuery, <span class="function"><span class="keyword">function</span>(<span class="params">err, data</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (err) &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(err);</span><br><span class="line">      callback(<span class="literal">null</span>, buildResponse(<span class="literal">false</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">"DynamoDB Query Results:"</span> + <span class="built_in">JSON</span>.stringify(data));</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (data.Items.length === <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">"Customer not Found in CustomerTable"</span>);</span><br><span class="line">        <span class="keyword">var</span> recordFound = <span class="string">"False"</span>;</span><br><span class="line">        callback(<span class="literal">null</span>, buildResponse(<span class="literal">true</span>, recordFound));</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">var</span> recordFound = <span class="string">"True"</span></span><br><span class="line">        <span class="keyword">var</span> customerName = data.Items[<span class="number">0</span>].customerName;</span><br><span class="line">        <span class="keyword">var</span> orderId = data.Items[<span class="number">0</span>].orderId;</span><br><span class="line">        <span class="keyword">var</span> orderedItem = data.Items[<span class="number">0</span>].orderedItem;</span><br><span class="line">        <span class="keyword">var</span> shippingDate = data.Items[<span class="number">0</span>].shippingDate;</span><br><span class="line">        <span class="keyword">var</span> isCancel = data.Items[<span class="number">0</span>].isCancel;</span><br><span class="line">        callback(<span class="literal">null</span>, buildResponse(<span class="literal">true</span>, recordFound, customerName, orderId, orderedItem, shippingDate, isCancel));</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">buildResponse</span>(<span class="params">isSuccess, recordFound, customerName, orderId, orderedItem, shippingDate, isCancel</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (isSuccess) &#123;</span><br><span class="line">        <span class="keyword">return</span> &#123;</span><br><span class="line">        recordFound: recordFound,</span><br><span class="line">        customerName: customerName,</span><br><span class="line">        orderId: orderId,</span><br><span class="line">        orderedItem: orderedItem,</span><br><span class="line">        shippingDate: shippingDate,</span><br><span class="line">        isCancel: isCancel,</span><br><span class="line">        lambdaResult: <span class="string">"Success"</span></span><br><span class="line">        &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"Lambda returned error to Connect"</span>);</span><br><span class="line">    <span class="keyword">return</span> &#123; <span class="attr">lambdaResult</span>: <span class="string">"Error"</span> &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <h5 id="キャンセル書き込み用"><a href="#キャンセル書き込み用" class="headerlink" title="キャンセル書き込み用"></a>キャンセル書き込み用</h5><figure class="highlight javascript"><figcaption><span>CancelOrder</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> AWS = <span class="built_in">require</span>(<span class="string">"aws-sdk"</span>);</span><br><span class="line"><span class="keyword">var</span> docClient = <span class="keyword">new</span> AWS.DynamoDB.DocumentClient();</span><br><span class="line"><span class="keyword">var</span> sns = <span class="keyword">new</span> AWS.SNS();</span><br><span class="line"></span><br><span class="line">exports.handler = <span class="function">(<span class="params">event, context, callback</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 発信電話番号の取得</span></span><br><span class="line">  <span class="keyword">var</span> CallerID = event.Details.ContactData.CustomerEndpoint.Address;</span><br><span class="line">  <span class="comment">// 商品名, ID</span></span><br><span class="line">  <span class="keyword">var</span> orderedItem = event.Details.Parameters.orderedItem;</span><br><span class="line">  <span class="keyword">var</span> orderId = event.Details.Parameters.orderId;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> params = &#123;</span><br><span class="line">    TableName: <span class="string">"CustomerTable"</span>,</span><br><span class="line">    Key:&#123;</span><br><span class="line">        <span class="string">"CallerID"</span>: CallerID</span><br><span class="line">    &#125;,</span><br><span class="line">    UpdateExpression: <span class="string">"set isCancel = :c"</span>,</span><br><span class="line">    ExpressionAttributeValues: &#123;</span><br><span class="line">        <span class="string">":c"</span>: <span class="string">"True"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    ReturnValues: <span class="string">"UPDATED_NEW"</span></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  docClient.update(params, <span class="function"><span class="keyword">function</span>(<span class="params">err, data</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (err) &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(err);</span><br><span class="line">      callback(<span class="literal">null</span>, buildResponse(<span class="literal">false</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">"DynamoDB record updated:"</span> + params);</span><br><span class="line">        <span class="keyword">var</span> SMSparams = &#123;</span><br><span class="line">                    Message: <span class="string">'We changed state to cancel.\nItem Name: '</span> + orderedItem + <span class="string">'\nOrder ID: '</span> + orderId,</span><br><span class="line">                    MessageStructure: <span class="string">'string'</span>,</span><br><span class="line">                    PhoneNumber: CallerID</span><br><span class="line">                    &#125;;</span><br><span class="line">            sns.publish(SMSparams, <span class="function"><span class="keyword">function</span>(<span class="params">err, data</span>) </span>&#123;</span><br><span class="line">                    <span class="keyword">if</span> (err) <span class="built_in">console</span>.log(err, err.stack); <span class="comment">// an error occurred</span></span><br><span class="line">                    <span class="keyword">else</span>     <span class="built_in">console</span>.log(data);           <span class="comment">// successful response</span></span><br><span class="line">                    callback(<span class="literal">null</span>, buildResponse(<span class="literal">true</span>));</span><br><span class="line">                    &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">buildResponse</span>(<span class="params">isSuccess</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (isSuccess) &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      lambdaResult: <span class="string">"Success"</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"Lambda returned error to Connect"</span>);</span><br><span class="line">    <span class="keyword">return</span> &#123; <span class="attr">lambdaResult</span>: <span class="string">"Error"</span> &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <h5 id="配送日変更用"><a href="#配送日変更用" class="headerlink" title="配送日変更用"></a>配送日変更用</h5><figure class="highlight javascript"><figcaption><span>ChangeOrderDate</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> AWS = <span class="built_in">require</span>(<span class="string">"aws-sdk"</span>);</span><br><span class="line"><span class="keyword">var</span> docClient = <span class="keyword">new</span> AWS.DynamoDB.DocumentClient();</span><br><span class="line"><span class="keyword">var</span> sns = <span class="keyword">new</span> AWS.SNS();</span><br><span class="line"></span><br><span class="line">exports.handler = <span class="function">(<span class="params">event, context, callback</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 発信電話番号の取得</span></span><br><span class="line">  <span class="keyword">var</span> CallerID = event.Details.ContactData.CustomerEndpoint.Address;</span><br><span class="line">  <span class="comment">// 商品名, ID</span></span><br><span class="line">  <span class="keyword">var</span> orderedItem = event.Details.Parameters.orderedItem;</span><br><span class="line">  <span class="keyword">var</span> orderId = event.Details.Parameters.orderId;</span><br><span class="line">  <span class="comment">// 発送日</span></span><br><span class="line">  <span class="keyword">var</span> shippingDate = event.Details.Parameters.shippingDate;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> params = &#123;</span><br><span class="line">    TableName: <span class="string">"CustomerTable"</span>,</span><br><span class="line">    Key:&#123;</span><br><span class="line">        <span class="string">"CallerID"</span>: CallerID</span><br><span class="line">    &#125;,</span><br><span class="line">    UpdateExpression: <span class="string">"set shippingDate = :s"</span>,</span><br><span class="line">    ExpressionAttributeValues: &#123;</span><br><span class="line">        <span class="string">":s"</span>: shippingDate</span><br><span class="line">    &#125;,</span><br><span class="line">    ReturnValues: <span class="string">"UPDATED_NEW"</span></span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  docClient.update(params, <span class="function"><span class="keyword">function</span>(<span class="params">err, data</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (err) &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(err);</span><br><span class="line">      callback(<span class="literal">null</span>, buildResponse(<span class="literal">false</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">"DynamoDB record updated:"</span> + params);</span><br><span class="line">        <span class="keyword">var</span> SMSparams = &#123;</span><br><span class="line">                    Message: <span class="string">'We changed shipping date to '</span> + shippingDate + <span class="string">'\nItem Name: '</span> + orderedItem + <span class="string">'\nOrder ID: '</span> + orderId,</span><br><span class="line">                    MessageStructure: <span class="string">'string'</span>,</span><br><span class="line">                    PhoneNumber: CallerID</span><br><span class="line">                    &#125;;</span><br><span class="line">            sns.publish(SMSparams, <span class="function"><span class="keyword">function</span>(<span class="params">err, data</span>) </span>&#123;</span><br><span class="line">                    <span class="keyword">if</span> (err) <span class="built_in">console</span>.log(err, err.stack); <span class="comment">// an error occurred</span></span><br><span class="line">                    <span class="keyword">else</span>     <span class="built_in">console</span>.log(data);           <span class="comment">// successful response</span></span><br><span class="line">                    callback(<span class="literal">null</span>, buildResponse(<span class="literal">true</span>));</span><br><span class="line">                    &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">buildResponse</span>(<span class="params">isSuccess</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (isSuccess) &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      lambdaResult: <span class="string">"Success"</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"Lambda returned error to Connect"</span>);</span><br><span class="line">    <span class="keyword">return</span> &#123; <span class="attr">lambdaResult</span>: <span class="string">"Error"</span> &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h4 id="AmazonConnectからLambdaを呼び出すためのパーミッションの設定をします。（現状GUIからは設定不可）"><a href="#AmazonConnectからLambdaを呼び出すためのパーミッションの設定をします。（現状GUIからは設定不可）" class="headerlink" title="AmazonConnectからLambdaを呼び出すためのパーミッションの設定をします。（現状GUIからは設定不可）"></a>AmazonConnectからLambdaを呼び出すためのパーミッションの設定をします。（現状GUIからは設定不可）</h4><ul>
@@ -478,7 +476,6 @@
 </li>
 </ul>
 <figure class="highlight bash"><figcaption><span>AmazonConnectからLambdaを呼び出すためのパーミッションの設定</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">aws lambda add-permission --<span class="keyword">function</span>-name <span class="keyword">function</span>:&lt;Lambda Function名&gt; \</span><br><span class="line"> --statement-id 1 --principal connect.amazonaws.com  \</span><br><span class="line"> --action lambda:InvokeFunction --<span class="built_in">source</span>-account &lt;AWSアカウントID&gt; \</span><br><span class="line"> --<span class="built_in">source</span>-arn &lt;AmazonConnect ARN&gt;</span><br></pre></td></tr></table></figure>
-
 <blockquote>
 <p>※ ARNはAWSコンソール &gt; AmazonConnect &gt; インスタンスエイリアス名　から確認できます。<br><img src="/images/20181202/photo_20181202_12.png" style="border:solid 1px #000000"></p>
 </blockquote>
@@ -499,10 +496,10 @@
 
 
 <p>かいつまんで説明すると、吹き出し部分が重要なところで、データの受け渡しで若干躓くところです。<br>個別に見ていきましょう。</p>
-<h5 id="電話番号の取得"><a href="#電話番号の取得" class="headerlink" title="電話番号の取得"></a>電話番号の取得</h5><p>電話をかけてきた相手の電話番号はシステムの値で取得可能です。<br>宛先キーは使いやすい名称を設定すれば良いと思います。（今回はCallerIDでいきます）<br><img src="/images/20181202/photo_20181202_16.png" class="img-middle-size" style="border:solid 1px #000000"></p>
-<h5 id="Lambdaの呼び出し"><a href="#Lambdaの呼び出し" class="headerlink" title="Lambdaの呼び出し"></a>Lambdaの呼び出し</h5><p>先程取得したCallerID（発信者電話番号）を引数としてセットします。<br>呼び出すLambdaのARNは関数画面から取得してきましょう。<br><img src="/images/20181202/photo_20181202_17.png" class="img-middle-size" style="border:solid 1px #000000"></p>
-<h5 id="値のチェック"><a href="#値のチェック" class="headerlink" title="値のチェック"></a>値のチェック</h5><p>Lambda関数の戻り値をチェックできます。<br>ここでは発信者電話番号をキーとした注文情報レコードの有無を確認することを想定しています。<br><img src="/images/20181202/photo_20181202_18.png" class="img-middle-size" style="border:solid 1px #000000"></p>
-<h5 id="ダイヤルプッシュを取得（IVR）"><a href="#ダイヤルプッシュを取得（IVR）" class="headerlink" title="ダイヤルプッシュを取得（IVR）"></a>ダイヤルプッシュを取得（IVR）</h5><p>IVRの機能を枠ひとつでできてしまいます！<br>ここは特につまずくことなく設定可能かなと思います。<br><img src="/images/20181202/photo_20181202_19.png" style="border:solid 1px #000000"></p>
+<h5 id="電話番号の取得"><a href="#電話番号の取得" class="headerlink" title="電話番号の取得"></a>電話番号の取得</h5><p>電話をかけてきた相手の電話番号はシステムの値で取得可能です。<br>宛先キーは使いやすい名称を設定すれば良いと思います。（今回はCallerIDでいきます）<br><img src="/images/20181202/photo_20181202_16.png"  class="img-middle-size" style="border:solid 1px #000000"></p>
+<h5 id="Lambdaの呼び出し"><a href="#Lambdaの呼び出し" class="headerlink" title="Lambdaの呼び出し"></a>Lambdaの呼び出し</h5><p>先程取得したCallerID（発信者電話番号）を引数としてセットします。<br>呼び出すLambdaのARNは関数画面から取得してきましょう。<br><img src="/images/20181202/photo_20181202_17.png"  class="img-middle-size"  style="border:solid 1px #000000"></p>
+<h5 id="値のチェック"><a href="#値のチェック" class="headerlink" title="値のチェック"></a>値のチェック</h5><p>Lambda関数の戻り値をチェックできます。<br>ここでは発信者電話番号をキーとした注文情報レコードの有無を確認することを想定しています。<br><img src="/images/20181202/photo_20181202_18.png" class="img-middle-size"  style="border:solid 1px #000000"></p>
+<h5 id="ダイヤルプッシュを取得（IVR）"><a href="#ダイヤルプッシュを取得（IVR）" class="headerlink" title="ダイヤルプッシュを取得（IVR）"></a>ダイヤルプッシュを取得（IVR）</h5><p>IVRの機能を枠ひとつでできてしまいます！<br>ここは特につまずくことなく設定可能かなと思います。<br><img src="/images/20181202/photo_20181202_19.png"  style="border:solid 1px #000000"></p>
 <h5 id="キャンセル関数"><a href="#キャンセル関数" class="headerlink" title="キャンセル関数"></a>キャンセル関数</h5><p>複数の引数を持つLambda関数にもちゃんとデータを渡すことができます。<br><img src="/images/20181202/photo_20181202_20.png" style="border:solid 1px #000000"></p>
 <h5 id="Lexで顧客の入力を取得"><a href="#Lexで顧客の入力を取得" class="headerlink" title="Lexで顧客の入力を取得"></a>Lexで顧客の入力を取得</h5><p>前項の「ダイヤルプッシュを取得（IVR）」と同様のことをLexを用いて実装可能です。<br>ボットを選択するだけなので、とても簡単に追加できます。<br><img src="/images/20181202/photo_20181202_21.png" style="border:solid 1px #000000"></p>
 <h5 id="配送日変更関数の呼び出し"><a href="#配送日変更関数の呼び出し" class="headerlink" title="配送日変更関数の呼び出し"></a>配送日変更関数の呼び出し</h5><p>以前までと違うのが、Lexで取得してきた値を引数としたい点です。<br>素晴らしいことにこれもGUIで簡単に取れてしまいます。<br>（Lexの部分だけ抜き取っています。）<br><img src="/images/20181202/photo_20181202_22.png" class="img-middle-size" style="border:solid 1px #000000"></p>
@@ -560,11 +557,39 @@
   
     
       
-        <a href="https://future-architect.github.io/articles/20200715/">
+        <a href="https://future-architect.github.io/articles/20190713/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
               <li>
-                新人研修有志が初心者向けにバーチャルコンテストを実施しました & Tips
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200702/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える
               </li>
             </div>
           </div>
@@ -588,39 +613,11 @@
   
     
       
-        <a href="https://future-architect.github.io/articles/20200709/">
+        <a href="https://future-architect.github.io/articles/20200716/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
               <li>
-                GoでWebアプリ開発時にあるあるだったレビューコメント
-              </li>
-            </div>
-          </div>
-        </a>
-      
-	
-  
-    
-      
-        <a href="https://future-architect.github.io/articles/20200708/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                Zuora連載2：Zuora REST API 利用と開発環境構築
-              </li>
-            </div>
-          </div>
-        </a>
-      
-	
-  
-    
-      
-        <a href="https://future-architect.github.io/articles/20200707/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                VSCode の Go extension でよく利用するコマンド 7選
+                Zuora連載 Vol.3 Notification及びEventTriggerの話
               </li>
             </div>
           </div>
@@ -657,16 +654,20 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
+      
+	
   
     
   
     
+      
+	
   
     
   
@@ -677,12 +678,12 @@
     
   
     
-      
-	
   
     
   
     
+      
+	
   
     
   
@@ -691,18 +692,16 @@
 	
   
     
-      
-	
   
     
-      
-	
   
     
       
 	
   
     
+      
+	
   
     
   
@@ -711,8 +710,6 @@
     
   
     
-      
-	
   
     
   
@@ -733,12 +730,12 @@
     
   
     
+      
+	
   
     
   
     
-      
-	
   
     
       
@@ -865,18 +862,16 @@
     
       
 	
-  
-    
   
     
       
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -901,6 +896,8 @@
     
       
 	
+  
+    
   
     
       
@@ -911,6 +908,8 @@
 	
   
     
+      
+	
   
     
       
@@ -919,8 +918,6 @@
     
   
     
-      
-	
   
     
       
@@ -941,8 +938,6 @@
     
       
 	
-  
-    
   
     
       
@@ -955,6 +950,8 @@
     
       
 	
+  
+    
   
     
       
@@ -993,6 +990,8 @@
 	
   
     
+  
+    
       
 	
   
@@ -1003,6 +1002,8 @@
 	
   
     
+      
+	
   
     
   
@@ -1077,6 +1078,8 @@
     
       
 	
+  
+    
   
     
       
@@ -1091,8 +1094,6 @@
 	
   
     
-  
-    
       
 	
   
@@ -1101,8 +1102,6 @@
 	
   
     
-  
-    
       
 	
   
@@ -1111,8 +1110,6 @@
 	
   
     
-      
-	
   
     
       
@@ -1129,6 +1126,8 @@
 	
   
     
+      
+	
   
     
       
@@ -1137,6 +1136,8 @@
     
   
     
+  
+    
       
 	
   
@@ -1183,10 +1184,10 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -1199,10 +1200,14 @@
     
   
     
+  
+    
       
 	
   
     
+      
+	
   
     
       
@@ -1213,12 +1218,12 @@
 	
   
     
+      
+	
   
     
   
     
-      
-	
   
     
       
@@ -1237,14 +1242,10 @@
 	
   
     
-      
-	
   
     
       
 	
-  
-    
   
     
   
@@ -1255,10 +1256,10 @@
 	
   
     
-      
-	
   
     
+      
+	
   
     
       
@@ -1323,8 +1324,12 @@
     
       
 	
+  
+    
   
     
+      
+	
   
     
   
@@ -1333,14 +1338,14 @@
 	
   
     
+      
+	
   
     
   
     
   
     
-      
-	
   
     
       
@@ -1349,12 +1354,8 @@
     
       
 	
-  
-    
   
     
-      
-	
   
     
       
@@ -1381,8 +1382,6 @@
 	
   
     
-      
-	
   
     
       
@@ -1395,6 +1394,8 @@
     
   
     
+      
+	
   
     
   
@@ -1441,11 +1442,11 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Security/">Security (1)</a>
+	  <a href="/categories/Design/">Design (6)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Design/">Design (6)</a>
+	  <a href="/categories/Security/">Security (1)</a>
 	</li>
       
 	<li>
@@ -1453,11 +1454,11 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
+	  <a href="/categories/Infrastructure/">Infrastructure (64)</a>
 	</li>
       
 	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (63)</a>
+	  <a href="/categories/Management/">Management (8)</a>
 	</li>
       
 	<li>
