@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>AWSサービストリガによるLambda起動 | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="サーバレス連載企画の7回目です。 はじめにこんにちは。TIGのDXチームに所属している加部です。 昨今様々なシステムで利用さているAWSのLambdaですが、サーバレスということもあり何かのイベントをトリガに関数を起動させる方法が一般的かと思います。LambdaはAWSの様々なサービスをトリガとして起動することが可能で、自分たちの利用しているAWSサービスと組み合わせて実装するることでその真価を発">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWSサービストリガによるLambda起動">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200722/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="サーバレス連載企画の7回目です。 はじめにこんにちは。TIGのDXチームに所属している加部です。 昨今様々なシステムで利用さているAWSのLambdaですが、サーバレスということもあり何かのイベントをトリガに関数を起動させる方法が一般的かと思います。LambdaはAWSの様々なサービスをトリガとして起動することが可能で、自分たちの利用しているAWSサービスと組み合わせて実装するることでその真価を発">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200722/2020-07-17T17.05.46.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200722/2020-07-17T17.05.34.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200722/2020-07-17T17.05.23.png">
+<meta property="article:published_time" content="2020-07-21T15:00:00.000Z">
+<meta property="article:modified_time" content="2020-07-22T01:37:32.489Z">
+<meta property="article:author" content="Future Architect Consultants">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="DynamoDB">
+<meta property="article:tag" content="Serverless">
+<meta property="article:tag" content="Serverless連載">
+<meta property="article:tag" content="LocalStack">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200722/2020-07-17T17.05.46.png">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="AWSサービストリガによるLambda起動 | フューチャー技術ブログ" name="description">
+  <meta content="AWSサービストリガによるLambda起動,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー,Future,Tech Blog,技術ブログ,技術,ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+
+  
+<link rel="stylesheet" href="/css/theme-styles.css">
+
+  <!-- Theme styles END -->
+<meta name="generator" content="Hexo 4.2.1"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">フューチャー技術ブログ</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="180px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー開発者ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200722/">AWSサービストリガによるLambda起動</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200722_AWSサービストリガによるLambda起動" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 加部達郎</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-07-21T15:00:00.000Z" itemprop="datePublished">2020/07/22</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/AWS/" title="AWS">AWS</a>,
+  
+    <a href="/tags/Go/" title="Go">Go</a>,
+  
+    <a href="/tags/DynamoDB/" title="DynamoDB">DynamoDB</a>,
+  
+    <a href="/tags/Serverless/" title="Serverless">Serverless</a>,
+  
+    <a href="/tags/Serverless%E9%80%A3%E8%BC%89/" title="Serverless連載">Serverless連載</a>,
+  
+    <a href="/tags/LocalStack/" title="LocalStack">LocalStack</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="/tags/Serverless%E9%80%A3%E8%BC%89/">サーバレス連載企画</a>の7回目です。</p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIGのDXチームに所属している加部です。</p>
+<p>昨今様々なシステムで利用さているAWSのLambdaですが、サーバレスということもあり何かのイベントをトリガに関数を起動させる方法が一般的かと思います。LambdaはAWSの様々なサービスをトリガとして起動することが可能で、自分たちの利用しているAWSサービスと組み合わせて実装するることでその真価を発揮します。</p>
+<p>AWSに少し詳しい人であればLambdaをAWSのサービストリガで起動させる事ができることは知っていると思いますが、いざ実装するとなると具体的にどういった手順で、なんの設定が必要かというところがわからないという人もいるのではないでしょうか。Lambdaには起動型がいくつかあったり、トリガとなるサービスによって起動設定も異なってきます。私自身も業務で利用するまではいわゆる知識勢でした。</p>
+<p>この記事ではAWSのローカルモック環境であるLocalStackを用いて、皆さんのローカル環境でも試せるよう各起動型の設定方法を追っていきます。</p>
+<h1 id="Lambdaの起動型"><a href="#Lambdaの起動型" class="headerlink" title="Lambdaの起動型"></a>Lambdaの起動型</h1><p>まずはLambdaの起動型について見ていきましょう。Lambdaの起動型には同期、非同期、ストリームベースの3つがあります。</p>
+<ol>
+<li><strong>同期</strong><ul>
+<li>イベントを処理する関数を待ってクライアントにレスポンスを返す</li>
+<li>AWS側でのリトライ処理はなく実行は1回となる</li>
+<li>代表的なサービス<ul>
+<li>API Gateway</li>
+<li>Cognito</li>
+<li>Alexa</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>非同期</strong><ul>
+<li>Lambdaは処理のためにイベントをキューに入れ、クライアントにすぐにレスポンスを返す</li>
+<li>呼び出しに失敗した場合は自動的に2回リトライが実施される</li>
+<li>代表的なサービス<ul>
+<li>CloudWatch Events</li>
+<li>Cloud Watch Logs</li>
+<li>Code Commit</li>
+<li>S3</li>
+<li>SNS</li>
+<li>Kinesis Firehose<br>etc…</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>ストリームベース</strong><ul>
+<li>Lambdaサービスが連携元のストリームサービスをポーリングし、必要に応じてLambda関数を呼び出す</li>
+<li>BatchSizeを指定することで、1回のLambda関数起動時のレコード取得数を指定する</li>
+<li>Lambda関数が失敗すると、対象レコードの有効期限が切れるまでエラーが発生した関数をリトライする(リトライ回数は設定で指定可能)</li>
+<li>代表的なサービス<ul>
+<li>Kinesis Data Stream</li>
+<li>Dynamo DB Stream</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="各起動型の設定方法"><a href="#各起動型の設定方法" class="headerlink" title="各起動型の設定方法"></a>各起動型の設定方法</h1><p>基本的な流れとしてはどの起動型も下記のような同じ流れになります。</p>
+<ol>
+<li>Lambdaの作成</li>
+<li>トリガとなるリソースの作成</li>
+<li>Lambdaとトリガとなるリソースの紐付け</li>
+</ol>
+<p>手順3のLambdaのトリガ設定が各起動型で変わってきます。それでは各起動型の設定方法を実践していきましょう。</p>
+<h2 id="事前準備"><a href="#事前準備" class="headerlink" title="事前準備"></a>事前準備</h2><p>LocalStackを<a href="https://github.com/localstack/localstack" target="_blank" rel="noopener">こちら</a>からダウンロードしてください。LocalStack起動コマンド(macOSの場合)</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">TMPDIR=/private<span class="variable">$TMPDIR</span> docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+<p>LocalStackの詳細については<a href="https://future-architect.github.io/articles/20191115/">こちらのブログ</a>で解説しているので興味のある方は読んでみてください。</p>
+<h2 id="同期型"><a href="#同期型" class="headerlink" title="同期型"></a>同期型</h2><p>ではまず同期型の呼び出しから設定/実装方法を見ていきましょう。今回はよくあるAPI Gateway –&gt; Lambdaという構成を参考に進めていきます。</p>
+<p><img src="/images/20200722/2020-07-17T17.05.46.png" alt=""></p>
+<p>それでは早速構築してきましょう。まずは、APIのレスポンスを返すLambdaを作成します。</p>
+<figure class="highlight go"><figcaption><span>テスト用コード</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"github.com/aws/aws-lambda-go/events"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-lambda-go/lambda"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handleRequest</span><span class="params">(ctx context.Context, request events.APIGatewayProxyRequest)</span> <span class="params">(events.APIGatewayProxyResponse, error)</span></span> &#123;</span><br><span class="line">	q := request.QueryStringParameters</span><br><span class="line">	name := q[<span class="string">"name"</span>]</span><br><span class="line">	body := <span class="string">"hello "</span> + name</span><br><span class="line">	<span class="keyword">return</span> events.APIGatewayProxyResponse&#123;</span><br><span class="line">		Body:       body,</span><br><span class="line">		StatusCode: <span class="number">200</span>,</span><br><span class="line">	&#125;, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(handleRequest)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ソースをbuildして、zipで圧縮しLambdaをデプロイします</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">aws lambda create-function \</span><br><span class="line">  --endpoint-url=http://localhost:4574 \</span><br><span class="line">  --<span class="keyword">function</span>-name api-gateway-test \</span><br><span class="line">  --runtime go1.x \</span><br><span class="line">  --handler main \</span><br><span class="line">  --zip-file fileb://main.zip \</span><br><span class="line">  --role r1</span><br></pre></td></tr></table></figure>
+
+<p>Lambdaのデプロイが完了したらAPI GateAwayを作成します。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">aws apigateway create-rest-api \</span><br><span class="line">  --endpoint-url=http://localhost:4567 \</span><br><span class="line">  --name <span class="string">'API Gateway Test'</span></span><br></pre></td></tr></table></figure>
+<p>返ってきたidの値を後のコマンドで利用するので変数に入れておきます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rest_api_id=******</span><br></pre></td></tr></table></figure>
+
+<p>API Gatewayを作成したらルートリソースの配下にAPIリソースを追加します<br>そのために、まずルートリソースのIDを確認しましょう。<br>rest-api-idには先のコマンドでレスポンスで返ってきたidを利用します。<br>ルートリソースのIDを確認</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">aws apigateway get-resources \</span><br><span class="line">  --endpoint-url=http://localhost:4567 \</span><br><span class="line">  --rest-api-id <span class="variable">$&#123;rest_api_id&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>parent-idには一つ前のコマンドで返ってきたidの値を利用します。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">aws apigateway create-resource \</span><br><span class="line">  --endpoint-url=http://localhost:4567 \</span><br><span class="line">  --rest-api-id <span class="variable">$&#123;rest_api_id&#125;</span> \</span><br><span class="line">  --parent-id ****** \</span><br><span class="line">  --path-part hello</span><br></pre></td></tr></table></figure>
+
+<p>作成したリソースに対するメソッドを作成します。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">aws apigateway put-method \</span><br><span class="line">  --endpoint-url=http://localhost:4567 \</span><br><span class="line">  --rest-api-id <span class="variable">$&#123;rest_api_id&#125;</span> \</span><br><span class="line">  --resource-id ****** \</span><br><span class="line">  --http-method GET \</span><br><span class="line">  --authorization-type <span class="string">"NONE"</span></span><br></pre></td></tr></table></figure>
+
+<p>ここまで設定できたらようやくAPI GatewayとLambdaの紐付けの設定になります。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">aws apigateway put-integration \</span><br><span class="line">  --endpoint-url=http://localhost:4567 \</span><br><span class="line">  --rest-api-id <span class="variable">$&#123;rest_api_id&#125;</span> \</span><br><span class="line">  --resource-id ****** \</span><br><span class="line">  --http-method GET \</span><br><span class="line">  --<span class="built_in">type</span> AWS_PROXY \</span><br><span class="line">  --integration-http-method GET \</span><br><span class="line">  --uri arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/<span class="built_in">functions</span>/arn:aws:lambda:us-east-1:000000000000:<span class="keyword">function</span>:api-gateway-test \</span><br><span class="line">  --passthrough-behavior WHEN_NO_MATCH</span><br></pre></td></tr></table></figure>
+
+<p>最後にAPIをデプロイして完了です。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">aws apigateway create-deployment \</span><br><span class="line">  --endpoint-url=http://localhost:4567 \</span><br><span class="line">  --rest-api-id <span class="variable">$&#123;rest_api_id&#125;</span> \</span><br><span class="line">  --stage-name prod</span><br></pre></td></tr></table></figure>
+
+<p>curlコマンドで想定のレスポンスが返ってくるか確認しましょう。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -i http://localhost:4567/restapis/<span class="variable">$&#123;rest_api_id&#125;</span>/prod/_user_request_/hello?name=lambda</span><br><span class="line">hello lambda</span><br></pre></td></tr></table></figure>
+
+<h2 id="非同期型"><a href="#非同期型" class="headerlink" title="非同期型"></a>非同期型</h2><p>続いてS3とLambdaの連携です。API Gatewayに比べるとだいぶ設定が簡単です。S3にローカルPCからオブジェクトをコピーし、Lambdaが起動できることを確認していきます。</p>
+<p><img src="/images/20200722/2020-07-17T17.05.34.png" alt=""></p>
+<p>先程と同じようにまずはLambda関数のデプロイから実施していきます。<br>トリガの起動が確認できればよいので、Lambdaが起動したらメッセージが出力されるようなソースを用意します。<br>テスト用ソース</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"github.com/aws/aws-lambda-go/events"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-lambda-go/lambda"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handler</span><span class="params">(ctx context.Context, event events.S3Event)</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">"S3 trigger Lambda"</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(handler)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>テスト用ソースでLambdaを作成します。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">aws lambda create-function \</span><br><span class="line">  --endpoint-url=http://localhost:4574 \</span><br><span class="line">  --<span class="keyword">function</span>-name s3-trigger-test \</span><br><span class="line">  --runtime go1.x \</span><br><span class="line">  --handler main \</span><br><span class="line">  --zip-file fileb://main.zip \</span><br><span class="line">  --role r1</span><br></pre></td></tr></table></figure>
+
+<p>続いて今回のLambda起動となるS3バケットの作成です。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">aws --endpoint-url=http://localhost:4572 s3 mb s3://<span class="built_in">test</span>-bucket</span><br><span class="line">make_bucket: <span class="built_in">test</span>-bucket</span><br></pre></td></tr></table></figure>
+
+<p>続いて作成したS3に対してLambda起動の権限を追加します。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">aws lambda add-permission \</span><br><span class="line">  --endpoint-url=http://localhost:4574 \</span><br><span class="line">  --region us-east-1 \</span><br><span class="line">  --<span class="keyword">function</span>-name s3-trigger-test \</span><br><span class="line">  --statement-id s3-put-event \</span><br><span class="line">  --principal s3.amazonaws.com \</span><br><span class="line">  --action <span class="string">"lambda:InvokeFunction"</span> \</span><br><span class="line">  --<span class="built_in">source</span>-arn arn:aws:s3:::<span class="built_in">test</span>-bucket</span><br></pre></td></tr></table></figure>
+
+<p>作成したS3バケットに対する操作の通知を設定します。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">aws s3api put-bucket-notification-configuration \</span><br><span class="line">  --endpoint-url=http://localhost:4572 \</span><br><span class="line">  --bucket <span class="built_in">test</span>-bucket \</span><br><span class="line">  --notification-configuration file://s3test-event.json</span><br></pre></td></tr></table></figure>
+
+<p>設定Jsonファイル</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"LambdaFunctionConfigurations"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"LambdaFunctionArn"</span>: <span class="string">""</span>,</span><br><span class="line">      <span class="attr">"Events"</span>: [<span class="string">"s3:ObjectCreated:*"</span>]</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これでS3バケットに対するPUT操作でLambdaが起動する設定ができました。<br>試しにテキストファイルをS3にPUTしてみましょう。<br>オブジェクトPUT</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">aws s3 cp sample.txt s3://<span class="built_in">test</span>-bucket \</span><br><span class="line">  --endpoint-url=http://localhost:4572 \</span><br><span class="line">  --profile localstack</span><br></pre></td></tr></table></figure>
+
+<p>非同期なのでLambdaが実行されたのかどうかはオブジェクトをPUTした時点ではわかりません。<br>Lambdaの実行を確認するために、CloudWatchLogを確認してLambdaの起動を確認しましょう。<br>まずはログストリームの特定をします。log-group-nameは「/aws/lambda/&lt;Lambdaファンクション名&gt;」となります。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">aws logs describe-log-streams \</span><br><span class="line">  --endpoint-url=http://localhost:4586 \</span><br><span class="line">  --<span class="built_in">log</span>-group-name=/aws/lambda/s3-trigger-test</span><br></pre></td></tr></table></figure>
+
+<p>上記コマンドを実行すると下記のようにロググループのログストリームが表示されます。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"logStreams"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"firstEventTimestamp"</span>: <span class="number">1585829767164</span>, </span><br><span class="line">            <span class="attr">"lastEventTimestamp"</span>: <span class="number">1585829767749</span>, </span><br><span class="line">            <span class="attr">"creationTime"</span>: <span class="number">1585829767942</span>, </span><br><span class="line">            <span class="attr">"uploadSequenceToken"</span>: <span class="string">"1"</span>, </span><br><span class="line">            <span class="attr">"logStreamName"</span>: <span class="string">"+52222/12/12/[$LATEST]ec3fbc60"</span>, </span><br><span class="line">            <span class="attr">"lastIngestionTime"</span>: <span class="number">1585829767947</span>, </span><br><span class="line">            <span class="attr">"arn"</span>: <span class="string">"arn:aws:logs:us-east-1:0:log-group:/aws/lambda/s3-trigger-test:log-stream:+52222/12/12/[$LATEST]ec3fbc60"</span>, </span><br><span class="line">            <span class="attr">"storedBytes"</span>: <span class="number">331</span></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ログストリーム名が確認できたら、ログストリームの中身を確認していきます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">aws logs get-log-events \</span><br><span class="line">  --endpoint-url=http://localhost:4586 \</span><br><span class="line">  --<span class="built_in">log</span>-group-name=/aws/lambda/s3-trigger-test \</span><br><span class="line">  --<span class="built_in">log</span>-stream-name <span class="string">'+52222/12/12/[$LATEST]ec3fbc60'</span></span><br></pre></td></tr></table></figure>
+
+<p>ログを確認するとmessageが想定通りに表示されていますね。成功です。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"nextForwardToken"</span>: <span class="string">"f/00000000000000000000000000000000000000000000000000000003"</span>, </span><br><span class="line">    <span class="attr">"events"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"ingestionTime"</span>: <span class="number">1585829767947</span>, </span><br><span class="line">            <span class="attr">"timestamp"</span>: <span class="number">1585829767164</span>, </span><br><span class="line">            <span class="attr">"message"</span>: <span class="string">"\u001b[32mSTART RequestId: 43bd5e82-0bfc-1c43-b8cf-085bc34c3d36 Version: $LATEST\u001b[0m"</span></span><br><span class="line">        &#125;, </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"ingestionTime"</span>: <span class="number">1585829767947</span>, </span><br><span class="line">            <span class="attr">"timestamp"</span>: <span class="number">1585829767359</span>, </span><br><span class="line">            <span class="attr">"message"</span>: <span class="string">"S3 trigger Lambda"</span></span><br><span class="line">        &#125;, </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"ingestionTime"</span>: <span class="number">1585829767947</span>, </span><br><span class="line">            <span class="attr">"timestamp"</span>: <span class="number">1585829767554</span>, </span><br><span class="line">            <span class="attr">"message"</span>: <span class="string">"\u001b[32mEND RequestId: 43bd5e82-0bfc-1c43-b8cf-085bc34c3d36\u001b[0m"</span></span><br><span class="line">        &#125;, </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"ingestionTime"</span>: <span class="number">1585829767947</span>, </span><br><span class="line">            <span class="attr">"timestamp"</span>: <span class="number">1585829767749</span>, </span><br><span class="line">            <span class="attr">"message"</span>: <span class="string">"\u001b[32mREPORT RequestId: 43bd5e82-0bfc-1c43-b8cf-085bc34c3d36\tInit Duration: 103.67 ms\tDuration: 2.44 ms\tBilled Duration: 100 ms\tMemory Size: 1536 MB\tMax Memory Used: 20 MB\t\u001b[0m"</span></span><br><span class="line">        &#125;</span><br><span class="line">    ], </span><br><span class="line">    <span class="attr">"nextBackwardToken"</span>: <span class="string">"b/00000000000000000000000000000000000000000000000000000000"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="ストリームベース"><a href="#ストリームベース" class="headerlink" title="ストリームベース"></a>ストリームベース</h2><p>最後はストリームベーズのLambda起動の設定です。ローカルPCからKinesisへメッセージをPUTしてLambdaを起動させましょう。</p>
+<p><img src="/images/20200722/2020-07-17T17.05.23.png" alt=""></p>
+<p>例によってテスト用のLambdaを作成します。<br>今回はPUTしたメッセージの内容がログに出力されるようなソースを用意します。</p>
+<figure class="highlight go"><figcaption><span>テスト用Lambdaコード</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"github.com/aws/aws-lambda-go/events"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-lambda-go/lambda"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handler</span><span class="params">(ctx context.Context, kinesisEvent events.KinesisEvent)</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> _, record := <span class="keyword">range</span> kinesisEvent.Records &#123;</span><br><span class="line">		kinesisRecord := record.Kinesis</span><br><span class="line">		dataBytes := kinesisRecord.Data</span><br><span class="line">		dataText := <span class="keyword">string</span>(dataBytes)</span><br><span class="line"></span><br><span class="line">		fmt.Printf(<span class="string">"%s Data = %s \n"</span>, record.EventName, dataText)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(handler)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3回目なのでデプロイのコマンドはは割愛します。いままでのコマンドと同じになります。Lambdaが作成できたら次はトリガ起動のもととなるKinesisStreamを作成します。</p>
+<figure class="highlight sh"><figcaption><span>KinesisStream作成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws kinesis --endpoint-url=http://localhost:4568 create-stream --stream-name lambda-test --shard-count 1</span><br></pre></td></tr></table></figure>
+
+<p>必要なリソースが作成できたらKinesisとLambdaの紐付けの設定をします。</p>
+<figure class="highlight sh"><figcaption><span>イベントトリガの設定</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">aws lambda create-event-source-mapping \</span><br><span class="line">  --endpoint-url=http://localhost:4574 \</span><br><span class="line">  --event-source-arn arn:aws:kinesis:us-east-1:000000000000:stream/lambda-test  \</span><br><span class="line">  --<span class="keyword">function</span>-name kinesis-trigger-test</span><br></pre></td></tr></table></figure>
+
+<p>event source mappingの設定ではエラー時のレコード送信先をSQSに設定できたり、バッチ処理するレコードの数など色々なオプションを指定することができます。</p>
+<p>それではKinesisにテストレコードをputしてみましょう。</p>
+<figure class="highlight sh"><figcaption><span>メッセージPUT</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws kinesis --endpoint-url=http://localhost:4568 put-record --stream-name lambda-test --partition-key 123 --data <span class="built_in">test</span></span><br></pre></td></tr></table></figure>
+
+<p>レコードをPUTした時点ではLambdaが起動したかわからないので、S3の時同様CloudWatchを確認しにいきます。</p>
+<p>手順は先程と同じになります。<br>まずは、ログストリームの確認です。</p>
+<figure class="highlight sh"><figcaption><span>ログストリームの確認</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">aws logs describe-log-streams \</span><br><span class="line">  --endpoint-url=http://localhost:4586 \</span><br><span class="line">  --<span class="built_in">log</span>-group-name=/aws/lambda/kinesis-trigger-test</span><br></pre></td></tr></table></figure>
+
+<p>ログストリームの確認ができたらログを確認します。</p>
+<figure class="highlight sh"><figcaption><span>らログを確認</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">aws logs get-log-events \</span><br><span class="line">  --endpoint-url=http://localhost:4586 \</span><br><span class="line">  --<span class="built_in">log</span>-group-name /aws/lambda/kinesis-trigger-test \</span><br><span class="line">  --<span class="built_in">log</span>-stream-name <span class="string">'+52222/12/21/[$LATEST]8d33a723'</span></span><br></pre></td></tr></table></figure>
+
+<p>ログが確認できましたね。KinesisにPUTしたtestという文字列も返ってきています。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"nextForwardToken"</span>: <span class="string">"f/00000000000000000000000000000000000000000000000000000003"</span>, </span><br><span class="line">    <span class="attr">"events"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"ingestionTime"</span>: <span class="number">1585830597603</span>, </span><br><span class="line">            <span class="attr">"timestamp"</span>: <span class="number">1585830596901</span>, </span><br><span class="line">            <span class="attr">"message"</span>: <span class="string">"\u001b[32mSTART RequestId: 38463daf-5f85-1220-65eb-9607f3f807fe Version: $LATEST\u001b[0m"</span></span><br><span class="line">        &#125;, </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"ingestionTime"</span>: <span class="number">1585830597603</span>, </span><br><span class="line">            <span class="attr">"timestamp"</span>: <span class="number">1585830597075</span>, </span><br><span class="line">            <span class="attr">"message"</span>: <span class="string">" Data = test "</span></span><br><span class="line">        &#125;, </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"ingestionTime"</span>: <span class="number">1585830597603</span>, </span><br><span class="line">            <span class="attr">"timestamp"</span>: <span class="number">1585830597250</span>, </span><br><span class="line">            <span class="attr">"message"</span>: <span class="string">"\u001b[32mEND RequestId: 38463daf-5f85-1220-65eb-9607f3f807fe\u001b[0m"</span></span><br><span class="line">        &#125;, </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"ingestionTime"</span>: <span class="number">1585830597603</span>, </span><br><span class="line">            <span class="attr">"timestamp"</span>: <span class="number">1585830597425</span>, </span><br><span class="line">            <span class="attr">"message"</span>: <span class="string">"\u001b[32mREPORT RequestId: 38463daf-5f85-1220-65eb-9607f3f807fe\tInit Duration: 54.77 ms\tDuration: 3.63 ms\tBilled Duration: 100 ms\tMemory Size: 1536 MB\tMax Memory Used: 21 MB\t\u001b[0m"</span></span><br><span class="line">        &#125;</span><br><span class="line">    ], </span><br><span class="line">    <span class="attr">"nextBackwardToken"</span>: <span class="string">"b/00000000000000000000000000000000000000000000000000000000"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="終わりに"><a href="#終わりに" class="headerlink" title="終わりに"></a>終わりに</h2><p>長文ご付き合いありがとうございました。今回はLambdaの各起動型の中から代表的なリソースのイベントによるLambdaの起動設定をおさらいしてきました。</p>
+<p>このあたりの設定に関しては知っていれば難しいことはないのですが、初見だと少し苦労する部分かなと思います。本記事ではCLIによる設定をしていきましたが、もちろんCloudFormationやTerraformなどのInfrastructure as Codeでも設定すべき内容は基本的に同じになります。</p>
+<p>一度マスターしてしまえばどうということ無いことなので、ぜひ一度Localstackを利用して試しに実装してみてください。</p>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" target="_blank" rel="noopener" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="AWSサービストリガによるLambda起動" data-url="https://future-architect.github.io/articles/20200722/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200722/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200722/" target="_blank" rel="noopener" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200722/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200722/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AWSサービストリガによるLambda起動
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200721/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                PythonユーザーのためのGraalVM
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200720/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Zuora連載 Vol.4 Workflowの話
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200716/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Zuora連載 Vol.3 Notification及びEventTriggerの話
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200717/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                CORSのプリフライトリクエスト（OPTIONメソッド）はAPI Keyの認証なしでOKにしておかないと失敗する話
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (29)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (79)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (67)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (21)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (3)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h2>リンク</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="https://note.future.co.jp/" target="_blank">未来報</a>
+      </li>
+      <li>
+        <a href="https://future-fintech.github.io/" target="_blank">Future Fintech EYE</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2019/future" target="_blank">2019年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/" target="_blank" rel="noopener">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" target="_blank" rel="noopener" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" target="_blank" rel="noopener" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog" target="_blank" rel="noopener"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo" target="_blank" rel="noopener"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future" target="_blank" rel="noopener">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+
+<![endif]-->
+
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
