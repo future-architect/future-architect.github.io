@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>GoからAWS KinesisのAggregationFormatを利用する | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="サーバレス連載企画の8回目です。 はじめにTIG DXユニットの真野です。ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。工場をハックするための基本知識やPyConJP 2019に登壇しました の記事を書いた栗田さんや、SORACOM USBドングルの自動接続 の記事を書いた棚井さんと同じチームに所属しています。 サーバレス連載企画 の第8弾目として、Serverl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GoからAWS KinesisのAggregationFormatを利用する">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200727/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="サーバレス連載企画の8回目です。 はじめにTIG DXユニットの真野です。ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。工場をハックするための基本知識やPyConJP 2019に登壇しました の記事を書いた栗田さんや、SORACOM USBドングルの自動接続 の記事を書いた棚井さんと同じチームに所属しています。 サーバレス連載企画 の第8弾目として、Serverl">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200727/abstract.png">
+<meta property="article:published_time" content="2020-07-26T15:00:00.000Z">
+<meta property="article:modified_time" content="2020-07-27T00:25:08.109Z">
+<meta property="article:author" content="Future Architect Consultants">
+<meta property="article:tag" content="IoT">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Serverless">
+<meta property="article:tag" content="Serverless連載">
+<meta property="article:tag" content="Lambda">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200727/abstract.png">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="GoからAWS KinesisのAggregationFormatを利用する | フューチャー技術ブログ" name="description">
+  <meta content="GoからAWS KinesisのAggregationFormatを利用する,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー技術ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+
+  
+<link rel="stylesheet" href="/css/theme-styles.css">
+
+  <!-- Theme styles END -->
+<meta name="generator" content="Hexo 4.2.1"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">フューチャー技術ブログ</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="180px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200727/">GoからAWS KinesisのAggregationFormatを利用する</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200727_GoからAWS_KinesisのAggregationFormatを利用する" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> laqiiz</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-07-26T15:00:00.000Z" itemprop="datePublished">2020/07/27</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/IoT/" title="IoT">IoT</a>,
+  
+    <a href="/tags/AWS/" title="AWS">AWS</a>,
+  
+    <a href="/tags/Go/" title="Go">Go</a>,
+  
+    <a href="/tags/Serverless/" title="Serverless">Serverless</a>,
+  
+    <a href="/tags/Serverless%E9%80%A3%E8%BC%89/" title="Serverless連載">Serverless連載</a>,
+  
+    <a href="/tags/Lambda/" title="Lambda">Lambda</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="https://future-architect.github.io/tags/Serverless%E9%80%A3%E8%BC%89/">サーバレス連載企画</a>の8回目です。</p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG DXユニットの真野です。ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。<a href="https://future-architect.github.io/articles/20191023/">工場をハックするための基本知識</a>や<a href="https://future-architect.github.io/articles/20200422/">PyConJP 2019に登壇しました</a> の記事を書いた栗田さんや、<a href="https://future-architect.github.io/articles/20191201/">SORACOM USBドングルの自動接続</a> の記事を書いた棚井さんと同じチームに所属しています。</p>
+<p><a href="https://future-architect.github.io/tags/Serverless%E9%80%A3%E8%BC%89/">サーバレス連載企画</a> の第8弾目として、Serverlessの代表格であるAWS LambdaでGoを用いてKinesisに対するKPL/KCL相当の処理についてまとめていきます。</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>某IoTをテーマとした案件で、Kinesisを用いたストリーミングETLなパイプラインを構築するにあたって、下図のようにKinesisの後段はGoとLambdaを採用しました。Kinesisが多段になっているのは、Rawデータと加工済みデータを別システムで利用したかったためです。</p>
+<p><img src="/images/20200727/abstract.png" alt=""></p>
+<p>最初にKinesisにPublishするECSはJavaのKPL（Kinesis Producer Library）を用いており、当然Aggregation Format(後述します)を利用していますが、後続のGoアプリでレコードを <strong>DeAggregation</strong> する処理と、後続のKinesisへの再度レコードを <strong>Aggregation</strong> する方法があまり見当たらなかったので、実装例を残します。</p>
+<p>このエントリーで記載しているコードは以下のリポジトリに記載しています。</p>
+<p><a href="https://github.com/laqiiz/go-kinesis-aggr-example" target="_blank" rel="noopener">https://github.com/laqiiz/go-kinesis-aggr-example</a></p>
+<h1 id="Kineis-Data-Streamとは"><a href="#Kineis-Data-Streamとは" class="headerlink" title="Kineis Data Streamとは"></a>Kineis Data Streamとは</h1><blockquote>
+<p>Amazon Kinesis Data Streams (KDS) は、大規模にスケーラブルで持続的なリアルタイムのデータストリーミングサービスです。(中略) 収集データはミリ秒で入手でき、リアルタイム分析をリアルタイムダッシュボードやリアルタイム異常検知、ダイナミックな価格設定などの事例に利用可能です。<br><a href="https://aws.amazon.com/jp/kinesis/data-streams/" target="_blank" rel="noopener">https://aws.amazon.com/jp/kinesis/data-streams/</a></p>
+</blockquote>
+<p>簡単に言うとAWS上でPub-Subメッセージングを行えるサービスです。Kinesisの文脈ではデータを送信するPublish側をProducer、データを受信するSubscribe側をConsumerと呼びます。SQSとはメッセージを非同期に連携する部分は同じですが、Consumer側をN個配置できるところなどが異なります。</p>
+<h1 id="Kinesis-Record-Aggregation-amp-Deaggregation"><a href="#Kinesis-Record-Aggregation-amp-Deaggregation" class="headerlink" title="Kinesis Record Aggregation &amp; Deaggregation"></a>Kinesis Record Aggregation &amp; Deaggregation</h1><p>KinesisにはRecord Aggregation（レコードの集約）といった考え方があります。</p>
+<p>背景としてKDSへメッセージをProduceするときの課金単位は、<a href="https://aws.amazon.com/jp/kinesis/data-streams/faqs/" target="_blank" rel="noopener">25KBをしきい値とした書き込み数で課金</a>されます。25KBより小さくても同じ料金が課金されるため、レコードのサイズが小さい場合はメッセージを集約することが有効です。同時に、小さくて細かいメッセージを1つのメッセージに集約することで、HTTP リクエスト分のオーバーヘッドが無くせるのでスループットを上げる効果も期待できます。</p>
+<figure class="highlight plain"><figcaption><span>集約イメージ</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">record 0 --|</span><br><span class="line">record 1   |        [ Aggregation ]</span><br><span class="line">    ...    |--&gt; Amazon Kinesis record --&gt;  PutRecords Request</span><br><span class="line">    ...    |                              </span><br><span class="line">record A --|</span><br></pre></td></tr></table></figure>
+
+
+<p>AWSでこの25KB以下のメッセージを集約するフォーマットは、<strong>KPL Aggregated Record Format</strong>と呼ぶそうです。仕様は以下に記載されていました。</p>
+<p><a href="https://github.com/awslabs/amazon-kinesis-producer/blob/master/aggregation-format.md" target="_blank" rel="noopener">https://github.com/awslabs/amazon-kinesis-producer/blob/master/aggregation-format.md</a></p>
+<p>概要だけまとめると以下のフォーマットです。</p>
+<ul>
+<li>先頭に4バイトのマジックナンバーは<code>0xF3 0x89 0x9A 0xC2</code> がつく</li>
+<li>プロトコルバッファ（proto2）を利用したバイナリフォーマット</li>
+<li>最後に16バイトのMD5チェックサム</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">0               4                  N          N+15</span><br><span class="line">+---+---+---+---+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;+---+...+---+</span><br><span class="line">|  MAGIC NUMBER | PROTOBUF MESSAGE |    MD5    |</span><br><span class="line">+---+---+---+---+&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;+---+...+---+</span><br></pre></td></tr></table></figure>
+
+<p><code>PROTOBUF MESSAGE</code> 部分は以下の定義です。Proto を知らない人に補足すると <code>repeated</code> はJSONでいう配列を示す宣言です。<code>AggregatedRecord</code> でKinesisのパーティションキーを複数宣言するのが特徴的ですね。もし、複数のレコードが同じパーティションキーを指定するとすると、効率よくシリアライズができそうです。</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">message</span> <span class="title">AggregatedRecord</span> </span>&#123;</span><br><span class="line">  <span class="keyword">repeated</span> <span class="built_in">string</span> partition_key_table     = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">repeated</span> <span class="built_in">string</span> explicit_hash_key_table = <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">repeated</span> Record records                 = <span class="number">3</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// SubMessage</span></span><br><span class="line"><span class="class"><span class="keyword">message</span> <span class="title">Tag</span> </span>&#123;</span><br><span class="line">  <span class="keyword">required</span> <span class="built_in">string</span> key   = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">optional</span> <span class="built_in">string</span> value = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">message</span> <span class="title">Record</span> </span>&#123;</span><br><span class="line">  <span class="keyword">required</span> <span class="built_in">uint64</span> partition_key_index     = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">optional</span> <span class="built_in">uint64</span> explicit_hash_key_index = <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">required</span> <span class="built_in">bytes</span>  data                    = <span class="number">3</span>;</span><br><span class="line">  <span class="keyword">repeated</span> Tag    tags                    = <span class="number">4</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>細かく説明しましたが、KPL Aggregated Record Formatの構造を知らなくても既存のライブラリを活用すれば利用可能ですのでご安心ください。</p>
+<h2 id="Record-Aggregation-と-PutRecordsの区別"><a href="#Record-Aggregation-と-PutRecordsの区別" class="headerlink" title="Record Aggregation と PutRecordsの区別"></a>Record Aggregation と PutRecordsの区別</h2><p>ちょっとややこしいのが、 Kinesisには複数RECORDを一度のリクエストで登録する<a href="https://aws.amazon.com/jp/blogs/aws/kinesis-update-putrecords-api/" target="_blank" rel="noopener">PutRecords</a>というAPIがありますが、 Record Aggregationはそれとは異なります（別の概念なので共存できます）。PutRecordsはあくまで複数のRECORDを1度のリクエストに束ねるものであって、Aggregated Formatは複数メッセージを1メッセージに集約する点が違いです。PutRecordsはHTTP Requestの発行を抑えられる分スループットの向上が期待できる点は、Aggregated Formatと同じですが、メッセージ数は変化ないので料金は同じです。当然別物なのでAggregated FormatのメッセージをPutRecordsもできます。</p>
+<h1 id="実施方法"><a href="#実施方法" class="headerlink" title="実施方法"></a>実施方法</h1><p><a href="https://aws.amazon.com/jp/sdk-for-go/" target="_blank" rel="noopener">AWS SDK for Go</a> でKinesisに対するProduce/Consumeはできますが、標準ではAggregation/DeAggregationはできません。そのため以下のライブラリを利用します。</p>
+<ul>
+<li><strong>Aggregation</strong>:  <a href="https://github.com/a8m/kinesis-producer" target="_blank" rel="noopener">a8m/kinesis-producer</a> </li>
+<li><strong>DeAggregation</strong>: <a href="https://github.com/awslabs/kinesis-aggregation" target="_blank" rel="noopener">awslabs/kinesis-aggregation</a></li>
+</ul>
+<p>DeAggregationに関してはAWSLabのリポジトリを利用できるのでちょっと安心できますね。利用方法は簡単かと言われると？でしたのでここに利用方法を残していきます。</p>
+<h1 id="利用方法"><a href="#利用方法" class="headerlink" title="利用方法"></a>利用方法</h1><p>それぞれのライブラリの利用手順を説明していきます。このエントリーで記載しているコードは以下のリポジトリに記載しています。</p>
+<p><a href="https://github.com/laqiiz/go-kinesis-aggr-example" target="_blank" rel="noopener">https://github.com/laqiiz/go-kinesis-aggr-example</a></p>
+<h2 id="Aggregate（a8m-kinesis-producer）"><a href="#Aggregate（a8m-kinesis-producer）" class="headerlink" title="Aggregate（a8m/kinesis-producer）"></a>Aggregate（a8m/kinesis-producer）</h2><p>最初にコードのサンプルを載せます。</p>
+<figure class="highlight go"><figcaption><span>集約側の実装例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line">	<span class="string">"github.com/a8m/kinesis-producer"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-lambda-go/events"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-lambda-go/lambda"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws/session"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/service/kinesis"</span></span><br><span class="line">	<span class="string">"golang.org/x/sync/errgroup"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> kc = kinesis.New(session.Must(session.NewSession()))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handle</span><span class="params">(e events.KinesisEvent)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">"【Start Aggregation Lambda】"</span>, <span class="built_in">len</span>(e.Records))</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> pr = producer.New(&amp;producer.Config&#123;</span><br><span class="line">		StreamName: os.Getenv(<span class="string">"KINESIS_STREAM"</span>),</span><br><span class="line">		Client:     kc,</span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	eg := errgroup.Group&#123;&#125;</span><br><span class="line"></span><br><span class="line">	pr.Start() <span class="comment">// Producer用のgoroutine起動</span></span><br><span class="line">	eg.Go(<span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> r := <span class="keyword">range</span> pr.NotifyFailures() &#123;</span><br><span class="line">			<span class="keyword">return</span> r</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, r := <span class="keyword">range</span> e.Records &#123;</span><br><span class="line">		<span class="comment">// TODO 取得したレコードに対する何かしらの処理。ここでは単純に集約して終わり</span></span><br><span class="line">		<span class="keyword">if</span> err := pr.Put(r.Kinesis.Data, r.Kinesis.PartitionKey); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	pr.Stop() <span class="comment">// 送信中のレコードのflushと、Producer goroutineの停止</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> eg.Wait()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>フィールドで初期化しているのが、Kinesis Producerのクライアントです。<code>handle</code>関数内部がややこしいですが、最初にRecord Aggregation用のProducerを生成し、<code>pr.Start()</code> で内部で用いるgoroutineを起動、その後にProducerが出すかも知れないerrorを検知するための <code>goroutine</code> を <code>errgroup</code> を利用して起動させます。ちょっとややこしいですが、これを最初に行わないと、エラーを取りこぼす可能性があります。ProducerはStopしたあとにStartしてもchannelを内部でcloseしていたりするので上手く動きませんでした。</p>
+<p><code>Producer</code> に対するPut処理ですが、今回はLambdaだということと、他のデータストアへの書き込みもしないこともあり同期的に行っています。</p>
+<p>最後に <code>pr.Stop()</code> を呼びgoroutineを停止させて、同時に処理中レコードをflushさせます。これを呼び忘れるとFlushされる間隔より前にLambda関数が停止してしまい、エラーは発生しないけどKinesisに送信されていないことが発生する恐れがあります。<code>pr.Stop</code> は <strong>errgroupの待受より前に</strong> 呼び出したいので、<code>defer</code> は利用していません。</p>
+<p>これをGoでLambdaを利用するときのお作法通りにmain関数から呼び出せば完了です。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(handle)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これでGoでLambdaでもKinesisへRecord Aggregationが行えます。</p>
+<h2 id="DeAggregate-awslabs-kinesis-aggregation"><a href="#DeAggregate-awslabs-kinesis-aggregation" class="headerlink" title="DeAggregate(awslabs/kinesis-aggregation])"></a>DeAggregate(awslabs/kinesis-aggregation])</h2><p>awslabs/kinesis-aggregationを利用します。この時、Lambdaの引数として渡される <code>events.KinesisEvent</code> の型と、deaggregatorが求める方が異なるため、自分で型の詰め替え作業が必要です（最初のループ分の部分）。そこが最大の山場で、それさえできてしまえば<code>deagg.DeaggregateRecords</code>を呼び出して、レコードの集約解除が行われます。</p>
+<figure class="highlight go"><figcaption><span>集約解除側の実装例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-lambda-go/events"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-lambda-go/lambda"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/service/kinesis"</span></span><br><span class="line">	deagg <span class="string">"github.com/awslabs/kinesis-aggregation/go/deaggregator"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handle</span><span class="params">(e events.KinesisEvent)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">"【Start DeAggregation Lambda】"</span>, <span class="built_in">len</span>(e.Records))</span><br><span class="line"></span><br><span class="line">	krs := <span class="built_in">make</span>([]*kinesis.Record, <span class="number">0</span>, <span class="built_in">len</span>(e.Records))</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, r := <span class="keyword">range</span> e.Records &#123;</span><br><span class="line">		krs = <span class="built_in">append</span>(krs, &amp;kinesis.Record&#123;</span><br><span class="line">			ApproximateArrivalTimestamp: aws.Time(r.Kinesis.ApproximateArrivalTimestamp.UTC()),</span><br><span class="line">			Data:                        r.Kinesis.Data,</span><br><span class="line">			EncryptionType:              &amp;r.Kinesis.EncryptionType,</span><br><span class="line">			PartitionKey:                &amp;r.Kinesis.EncryptionType,</span><br><span class="line">			SequenceNumber:              &amp;r.Kinesis.SequenceNumber,</span><br><span class="line">		&#125;)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	dars, err := deagg.DeaggregateRecords(krs)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, r := <span class="keyword">range</span> dars &#123;</span><br><span class="line">		<span class="comment">// TODO de-aggregation後レコードに対する処理</span></span><br><span class="line">		fmt.Println(<span class="string">"input"</span>, <span class="keyword">string</span>(r.Data))</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これをGoでLambdaを利用するときのお作法通りにmain関数から呼び出せば完了です。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(handle)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>レコード集約の解除処理は、ことKinesisトリガーのLambdaに対しては常に実装しておいても良い気がします。<br>理由ですが、<code>deagg.DeaggregateRecords</code> が集約済み<strong>ではない</strong> レコードに対して実行してもerrorが発生しないためと、最初は集約レコードじゃない入力だったとしても、途中で集約レコードに切り替わったときに急に動かなくなることを防ぐことも出来るからです。（疎通の1件は通ったけど、結合テストで複数レコードを連携しだすと急に落ちた、みたいなことも回避できます）。特にJavaクライアントがKPLを利用している場合は、集約あり/集約無しはあまり意識しないことが多く、事前のすり合わせでは集約しないと行っていたものの、いざ結合テストをする場合に、集約済みメッセージを連携してきたこともありました。</p>
+<h1 id="動作検証"><a href="#動作検証" class="headerlink" title="動作検証"></a>動作検証</h1><p>下図のような環境を構築して動かしてみます。デプロイ方法はリポジトリのREADMEを参考ください。</p>
+<p>![](/images/20200727/1 (2).png)</p>
+<p>最初のKinesisにはawscli経由で3件データを投入します。</p>
+<figure class="highlight bash"><figcaption><span>テストデータ</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">aws kinesis --profile my_profile put-record --stream-name aggregate --partition-key 123 --data MTIzNDU2Nzg5MA==</span><br><span class="line">aws kinesis --profile my_profile put-record --stream-name aggregate --partition-key 124 --data MTIzNDU2Nzg5MA==</span><br><span class="line">aws kinesis --profile my_profile put-record --stream-name aggregate --partition-key 125 --data MTIzNDU2Nzg5MA==</span><br></pre></td></tr></table></figure>
+
+<p>そうすると、1つ目のLambdaが起動されます。3つのレコードを受け取り、<code>flushing records reason=drain, records=%!s(int=1)</code> にある通り、3件が1レコードに集約されて次のKinesisにProduceされました。タイミングによっては1件だったり2件だったりしますが、2件以上であれば動作確認はできます。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">2020-05-16T16:59:25.659+09:00 START RequestId: da2b6674-a147-4804-9e6c-5d78f633e426 Version: $LATEST</span><br><span class="line">2020-05-16T16:59:25.664+09:00 【Start Aggregation Lambda】 3</span><br><span class="line">2020-05-16T16:59:25.664+09:00 2020&#x2F;05&#x2F;16 07:59:25 starting producer stream&#x3D;aggregate-test</span><br><span class="line">2020-05-16T16:59:25.664+09:00 2020&#x2F;05&#x2F;16 07:59:25 stopping producer backlog&#x3D;%!s(int&#x3D;0)</span><br><span class="line">2020-05-16T16:59:25.664+09:00 2020&#x2F;05&#x2F;16 07:59:25 backlog drained</span><br><span class="line">2020-05-16T16:59:25.664+09:00 2020&#x2F;05&#x2F;16 07:59:25 flushing records reason&#x3D;drain, records&#x3D;%!s(int&#x3D;1)</span><br><span class="line">2020-05-16T16:59:25.690+09:00 2020&#x2F;05&#x2F;16 07:59:25 stopped producer</span><br><span class="line">2020-05-16T16:59:25.690+09:00 END RequestId: da2b6674-a147-4804-9e6c-5d78f633e426</span><br></pre></td></tr></table></figure>
+
+<p>2つ目のLambdaは、集約されたレコードを1件受け取り、集約解除した結果3つのメッセージを標準出力しています。ダミーで送信したデータの中身は全て同じなので3行同じ内容が表示されています。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">2020-05-16T17:01:36.865+09:00 START RequestId: 5f7eb56c-a83c-42c3-927d-0e2703528c6b Version: $LATEST</span><br><span class="line">2020-05-16T17:01:36.870+09:00 【Start DeAggregation Lambda】 1</span><br><span class="line">2020-05-16T17:01:36.870+09:00 input 1234567890</span><br><span class="line">2020-05-16T17:01:36.870+09:00 input 1234567890</span><br><span class="line">2020-05-16T17:01:36.870+09:00 input 1234567890</span><br><span class="line">2020-05-16T17:01:36.870+09:00 END RequestId: 5f7eb56c-a83c-42c3-927d-0e2703528c6b</span><br></pre></td></tr></table></figure>
+
+<p>簡単ではありますがAggregation/DeAggregationの動作確認が取れました。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><ul>
+<li>KPL Aggregated Record Formatを利用することで、Kinesisの利用料金を下げることができる</li>
+<li>GoでLambdaでも、KPL/KCL相当の集約・集約解除は実装できる</li>
+<li>特にDeAggregateする処理は、後々の予期せぬ連携に備えて防御的に実装しておくと良い</li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li>A deep-dive into lessons learned using Amazon Kinesis Streams at scale<ul>
+<li><a href="https://read.acloud.guru/deep-dive-into-aws-kinesis-at-scale-2e131ffcfa08" target="_blank" rel="noopener">https://read.acloud.guru/deep-dive-into-aws-kinesis-at-scale-2e131ffcfa08</a></li>
+</ul>
+</li>
+<li>KPL の主要なコンセプト<ul>
+<li><a href="https://docs.aws.amazon.com/ja_jp/streams/latest/dev/kinesis-kpl-concepts.html" target="_blank" rel="noopener">https://docs.aws.amazon.com/ja_jp/streams/latest/dev/kinesis-kpl-concepts.html</a></li>
+</ul>
+</li>
+<li>KPL Aggregated Record Format<ul>
+<li><a href="https://github.com/awslabs/amazon-kinesis-producer/blob/master/aggregation-format.md" target="_blank" rel="noopener">https://github.com/awslabs/amazon-kinesis-producer/blob/master/aggregation-format.md</a></li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" target="_blank" rel="noopener" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="GoからAWS KinesisのAggregationFormatを利用する" data-url="https://future-architect.github.io/articles/20200727/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200727/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200727/" target="_blank" rel="noopener" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200727/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200727/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GoからAWS KinesisのAggregationFormatを利用する
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200722/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AWSサービストリガによるLambda起動
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200721/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                PythonユーザーのためのGraalVM
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200720/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Zuora連載 Vol.4 Workflowの話
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200716/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Zuora連載 Vol.3 Notification及びEventTriggerの話
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (30)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (79)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (67)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (21)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (3)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h2>リンク</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="https://note.future.co.jp/" target="_blank">未来報</a>
+      </li>
+      <li>
+        <a href="https://future-fintech.github.io/" target="_blank">Future Fintech EYE</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2019/future" target="_blank">2019年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/" target="_blank" rel="noopener">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" target="_blank" rel="noopener" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" target="_blank" rel="noopener" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog" target="_blank" rel="noopener"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo" target="_blank" rel="noopener"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future" target="_blank" rel="noopener">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+
+<![endif]-->
+
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
