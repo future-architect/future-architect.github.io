@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>DBスキーマを駆動にした開発のためのライブラリ調査 | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにGoでデータベースを扱う場合、Gorm, Gorp, sqlx といった ORM がよく使われます。多くの場合は構造体のフィールドとデータベースのカラム名のマッピングをするタグ付きの構造体を実装します。例えば Gorm を用いて users テーブルにアクセスする場合、以下のような構造体が一例として考えられます。 model_user.go12345678type User struct">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DBスキーマを駆動にした開発のためのライブラリ調査">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200728/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにGoでデータベースを扱う場合、Gorm, Gorp, sqlx といった ORM がよく使われます。多くの場合は構造体のフィールドとデータベースのカラム名のマッピングをするタグ付きの構造体を実装します。例えば Gorm を用いて users テーブルにアクセスする場合、以下のような構造体が一例として考えられます。 model_user.go12345678type User struct">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200728/erd.png">
+<meta property="article:published_time" content="2020-07-27T15:00:00.000Z">
+<meta property="article:modified_time" content="2020-07-27T14:48:28.191Z">
+<meta property="article:author" content="Future Architect Consultants">
+<meta property="article:tag" content="DB">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="ORM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200728/erd.png">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="DBスキーマを駆動にした開発のためのライブラリ調査 | フューチャー技術ブログ" name="description">
+  <meta content="DBスキーマを駆動にした開発のためのライブラリ調査,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー技術ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+
+  
+<link rel="stylesheet" href="/css/theme-styles.css">
+
+  <!-- Theme styles END -->
+<meta name="generator" content="Hexo 4.2.1"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">フューチャー技術ブログ</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="180px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200728/">DBスキーマを駆動にした開発のためのライブラリ調査</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200728_DBスキーマを駆動にした開発のためのライブラリ調査" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 辻大志郎</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-07-27T15:00:00.000Z" itemprop="datePublished">2020/07/28</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/DB/" title="DB">DB</a>,
+  
+    <a href="/tags/Go/" title="Go">Go</a>,
+  
+    <a href="/tags/ORM/" title="ORM">ORM</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>Goでデータベースを扱う場合、<a href="https://github.com/go-gorm/gorm" target="_blank" rel="noopener">Gorm</a>, <a href="https://github.com/go-gorp/gorp" target="_blank" rel="noopener">Gorp</a>, <a href="https://github.com/jmoiron/sqlx" target="_blank" rel="noopener">sqlx</a> といった ORM がよく使われます。多くの場合は構造体のフィールドとデータベースのカラム名のマッピングをするタグ付きの構造体を実装します。例えば <code>Gorm</code> を用いて <code>users</code> テーブルにアクセスする場合、以下のような構造体が一例として考えられます。</p>
+<figure class="highlight go"><figcaption><span>model_user.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	UserID    <span class="keyword">string</span>       <span class="string">`gorm:"column:user_id;primary_key"`</span></span><br><span class="line">	UserName  <span class="keyword">string</span>       <span class="string">`gorm:"column:user_name"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(u *User)</span> <span class="title">TableName</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="string">"users"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Gorm</code> や <code>Xorm</code> といった ORM を用いる場合、スキーマから構造体を生成できず、構造体の生成が面倒という問題があります。複数人で開発していたり、テーブルのカラム数が多かったり、テーブルの数が多い場合、スキーマから構造体を自動生成できるとよいな、と考えることでしょう。 <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
+<p>また、当社のメンバと開発するとき SQL が書け適切に index を貼ったり、実行計画からチューニングできるメンバが多いです。素の SQL を書く or 書きたいケースが多く、メソッドチェーンでクエリを生成する <code>Gorm</code> などの ORM と相性が悪いと感じていました。</p>
+<ul>
+<li><strong>スキーマからテーブルのカラムとマッピングできる構造体を自動生成したい</strong></li>
+<li><strong>任意のクエリから結果セットのカラムとマッピングできる構造体を自動生成したい</strong></li>
+</ul>
+<p>上記を満たすようなライブラリを探しつつ、今回は既に存在するデータベースのスキーマやクエリから構造体を生成することができる <code>xo</code> と <code>gen</code> を調査してみました。</p>
+<ul>
+<li><a href="https://github.com/xo/xo" target="_blank" rel="noopener">xo/xo</a></li>
+<li><a href="https://github.com/smallnest/gen" target="_blank" rel="noopener">gen</a></li>
+</ul>
+<p><a href="https://github.com/volatiletech/sqlboiler" target="_blank" rel="noopener">SQLBoiler</a> や <a href="https://github.com/go-xorm/xorm" target="_blank" rel="noopener">Xorm</a> は ORM として使われることが多いので対象から外しました。<code>SQLBoiler</code> や <code>Xorm</code> の所感は <a href="https://future-architect.github.io/articles/20190926/">Go言語のDBレイヤーライブラリの評価</a> の記事に記載しておりますので、あわせてご確認ください。</p>
+<h2 id="概要サマリ"><a href="#概要サマリ" class="headerlink" title="概要サマリ"></a>概要サマリ</h2><p>今回調査するライブラリの2020/07/12時点のデータをもとにした概要サマリです。どちらのライブラリも継続的にメンテナンスされています。</p>
+<table>
+<thead>
+<tr>
+<th>Project Name</th>
+<th>Stars</th>
+<th>Forks</th>
+<th>Open Issues</th>
+<th>Description</th>
+<th>Last Update</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://github.com/xo/xo" target="_blank" rel="noopener">xo</a></td>
+<td>2503</td>
+<td>224</td>
+<td>91</td>
+<td>Command line tool to generate idiomatic Go code for SQL databases supporting PostgreSQL, MySQL, SQLite, Oracle, and Microsoft SQL Server</td>
+<td>2020-07-10 11:12:42</td>
+</tr>
+<tr>
+<td><a href="https://github.com/smallnest/gen" target="_blank" rel="noopener">gen</a></td>
+<td>565</td>
+<td>105</td>
+<td>3</td>
+<td>Converts a database into gorm structs and RESTful api</td>
+<td>2020-07-10 14:19:19</td>
+</tr>
+</tbody></table>
+<ul>
+<li>バージョン</li>
+</ul>
+<p>今回調査したバージョン情報は以下になります。<code>xo</code> はセマンティクスバージョニングされていなかったため、コミット ID を記載しています。</p>
+<table>
+<thead>
+<tr>
+<th>ライブラリ</th>
+<th>バージョン</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>xo</code></td>
+<td><code>7818603ff52bc0b96122715f9c7df7559aeef82d</code></td>
+</tr>
+<tr>
+<td><code>gen</code></td>
+<td><code>v0.9.24</code></td>
+</tr>
+</tbody></table>
+<h2 id="サンプルプロジェクト"><a href="#サンプルプロジェクト" class="headerlink" title="サンプルプロジェクト"></a>サンプルプロジェクト</h2><p>本記事では <code>xo</code> のライブラリにサンプルとして記載されている <code>booktest</code> をサンプルのプロジェクトとして考えてみます。データベースは PostgreSQL を採用することとし、Docker を用いて以下のようにローカルに起動させておきます。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --rm --name my-postgres -e POSTGRES_USER&#x3D;booktest -e POSTGRES_PASSWORD&#x3D;pass -e POSTGRES_DB&#x3D;testdb -d -p 15432:5432 postgres</span><br></pre></td></tr></table></figure>
+
+<p>データベースの ER 図は以下のようになります。</p>
+<p><img src="/images/20200728/erd.png" alt=""></p>
+<p>スキーマを作成する SQL は以下になります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- The MIT License (MIT)</span></span><br><span class="line"><span class="comment">-- </span></span><br><span class="line"><span class="comment">-- Copyright (c) 2015-2016 Kenneth Shaw</span></span><br><span class="line"><span class="comment">-- </span></span><br><span class="line"><span class="comment">-- https://github.com/xo/xo/blob/master/LICENSE</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">SCHEMA</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> booktest <span class="keyword">CASCADE</span>;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> books <span class="keyword">CASCADE</span>;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TYPE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> book_type <span class="keyword">CASCADE</span>;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> <span class="keyword">authors</span> <span class="keyword">CASCADE</span>;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">FUNCTION</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> say_hello(<span class="built_in">text</span>) <span class="keyword">CASCADE</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">SCHEMA</span> booktest;</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">authors</span> (</span><br><span class="line">  author_id <span class="built_in">SERIAL</span> PRIMARY <span class="keyword">KEY</span>,</span><br><span class="line">  <span class="keyword">name</span> <span class="built_in">text</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">''</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">INDEX</span> authors_name_idx <span class="keyword">ON</span> <span class="keyword">authors</span>(<span class="keyword">name</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TYPE</span> book_type <span class="keyword">AS</span> ENUM (</span><br><span class="line">  <span class="string">'FICTION'</span>,</span><br><span class="line">  <span class="string">'NONFICTION'</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> books (</span><br><span class="line">  book_id <span class="built_in">SERIAL</span> PRIMARY <span class="keyword">KEY</span>,</span><br><span class="line">  author_id <span class="built_in">integer</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">REFERENCES</span> <span class="keyword">authors</span>(author_id),</span><br><span class="line">  isbn <span class="built_in">text</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">''</span> <span class="keyword">UNIQUE</span>,</span><br><span class="line">  booktype book_type <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'FICTION'</span>,</span><br><span class="line">  title <span class="built_in">text</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">''</span>,</span><br><span class="line">  <span class="keyword">year</span> <span class="built_in">integer</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="number">2000</span>,</span><br><span class="line">  available <span class="built_in">timestamp</span> <span class="keyword">with</span> <span class="built_in">time</span> zone <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'NOW()'</span>,</span><br><span class="line">  tags <span class="built_in">varchar</span>[] <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'&#123;&#125;'</span>,</span><br><span class="line">  memo <span class="built_in">text</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">INDEX</span> books_title_idx <span class="keyword">ON</span> books(title, <span class="keyword">year</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">FUNCTION</span> say_hello(<span class="built_in">text</span>) <span class="keyword">RETURNS</span> <span class="built_in">text</span> <span class="keyword">AS</span> $$</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">  <span class="keyword">RETURN</span> <span class="keyword">CONCAT</span>(<span class="string">'hello '</span>, $<span class="number">1</span>);</span><br><span class="line"><span class="keyword">END</span>;</span><br><span class="line">$$ LANGUAGE plpgsql;</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">INDEX</span> books_title_lower_idx <span class="keyword">ON</span> books(title);</span><br></pre></td></tr></table></figure>
+
+<h2 id="xo"><a href="#xo" class="headerlink" title="xo"></a>xo</h2><p><code>xo</code> はデータベースのスキーマや任意の SQL からデータベースにアクセスする Go のコードを生成するライブラリです。生成するコードはテンプレートファイルを使って柔軟にカスタマイズできます。ORM を目指したライブラリではなく、静的に型付けされた Go らしいコードを生成することを目的の 1 つとしています。</p>
+<p>まずは <code>xo</code> を試してみます。ディレクトリ構成は以下です。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── go.mod</span><br><span class="line">├── main.go</span><br><span class="line">└── generated</span><br></pre></td></tr></table></figure>
+
+<p>さっそく <code>xo</code> をインストールします。2020/07/13現在、セマンティクスバージョニングはされていないため、master ブランチの最新のコミット(<code>7818603ff52bc0b96122715f9c7df7559aeef82d</code>) を用います。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go get -u github.com&#x2F;xo&#x2F;xo</span><br></pre></td></tr></table></figure>
+
+<p>生成先のディレクトリ名は <code>generated</code> とします。<code>xo</code> コマンドを用いて、構造体を生成します。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xo pgsql:&#x2F;&#x2F;booktest:pass@localhost:15432&#x2F;testdb?sslmode&#x3D;disable --schema booktest --out generated</span><br></pre></td></tr></table></figure>
+
+<p><code>generated</code> ディレクトリ配下にいくつかファイルが生成されました。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── generated</span><br><span class="line">│   ├── author.xo.go</span><br><span class="line">│   ├── book.xo.go</span><br><span class="line">│   ├── booktype.xo.go</span><br><span class="line">│   ├── sp_sayhello.xo.go</span><br><span class="line">│   └── xo_db.xo.go</span><br><span class="line">├── go.mod</span><br><span class="line">└── main.go</span><br></pre></td></tr></table></figure>
+
+<p>生成されたファイル <code>author.xo.go</code> を確認します。ファイルの構成は、大きく SELECT を扱うクエリ用の関数と、それ以外の INSERT, UPDATE, DELETE といったクエリを扱うメソッドと 2 種類に大別できます。</p>
+<h3 id="SELECT系"><a href="#SELECT系" class="headerlink" title="SELECT系"></a>SELECT系</h3><p>SELECT を扱うクエリでは以下の 2 つの関数が生成されています。</p>
+<ul>
+<li><code>AuthorsByName(db XODB, name string) ([]*Author, error)</code> </li>
+<li><code>AuthorByAuthorID(db XODB, authorID int) (*Author, error)</code></li>
+</ul>
+<p>それぞれ関数のドキュメントからデータベースに貼られた index をもとに生成されています。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AuthorsByName retrieves a row from 'booktest.authors' as a Author.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Generated from index 'authors_name_idx'.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">AuthorsByName</span><span class="params">(db XODB, name <span class="keyword">string</span>)</span> <span class="params">([]*Author, error)</span></span> &#123;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// AuthorByAuthorID retrieves a row from 'booktest.authors' as a Author.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Generated from index 'authors_pkey'.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">AuthorByAuthorID</span><span class="params">(db XODB, authorID <span class="keyword">int</span>)</span> <span class="params">(*Author, error)</span></span> &#123;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>関数内に SQL が明示的に記述されていて安心感があります。また index から生成されているので、概ねクエリは高速に動作するでしょう。ただし関数のシグネチャや、データベースアクセスするメソッドのシグネチャから分かるように <code>Context</code> を引数に受け取ることができません。多くのケースでは <code>Context</code> を引き回すケースが一般的ですので、Context 対応はテンプレートなどを用いて拡張する必要がありそうです。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AuthorByAuthorID retrieves a row from 'booktest.authors' as a Author.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Generated from index 'authors_pkey'.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">AuthorByAuthorID</span><span class="params">(db XODB, authorID <span class="keyword">int</span>)</span> <span class="params">(*Author, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> err error</span><br><span class="line"></span><br><span class="line">	<span class="comment">// sql query</span></span><br><span class="line">	<span class="keyword">const</span> sqlstr = <span class="string">`SELECT `</span> +</span><br><span class="line">		<span class="string">`author_id, name `</span> +</span><br><span class="line">		<span class="string">`FROM booktest.authors `</span> +</span><br><span class="line">		<span class="string">`WHERE author_id = $1`</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// run query</span></span><br><span class="line">	XOLog(sqlstr, authorID)</span><br><span class="line">	a := Author&#123;</span><br><span class="line">		_exists: <span class="literal">true</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	err = db.QueryRow(sqlstr, authorID).Scan(&amp;a.AuthorID, &amp;a.Name)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> &amp;a, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="INSERT-UPDATE-DELETE系"><a href="#INSERT-UPDATE-DELETE系" class="headerlink" title="INSERT/UPDATE/DELETE系"></a>INSERT/UPDATE/DELETE系</h3><p>INSERT のクエリも SELECT と同様に、INSERT するメソッドが生成されます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Author represents a row from 'booktest.authors'.</span></span><br><span class="line"><span class="keyword">type</span> Author <span class="keyword">struct</span> &#123;</span><br><span class="line">	AuthorID <span class="keyword">int</span>    <span class="string">`json:"author_id"`</span> <span class="comment">// author_id</span></span><br><span class="line">	Name     <span class="keyword">string</span> <span class="string">`json:"name"`</span>      <span class="comment">// name</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// xo fields</span></span><br><span class="line">	_exists, _deleted <span class="keyword">bool</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Insert inserts the Author to the database.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a *Author)</span> <span class="title">Insert</span><span class="params">(db XODB)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> err error</span><br><span class="line"></span><br><span class="line">	<span class="comment">// if already exist, bail</span></span><br><span class="line">	<span class="keyword">if</span> a._exists &#123;</span><br><span class="line">		<span class="keyword">return</span> errors.New(<span class="string">"insert failed: already exists"</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// sql insert query, primary key provided by sequence</span></span><br><span class="line">	<span class="keyword">const</span> sqlstr = <span class="string">`INSERT INTO booktest.authors (`</span> +</span><br><span class="line">		<span class="string">`name`</span> +</span><br><span class="line">		<span class="string">`) VALUES (`</span> +</span><br><span class="line">		<span class="string">`$1`</span> +</span><br><span class="line">		<span class="string">`) RETURNING author_id`</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// run query</span></span><br><span class="line">	XOLog(sqlstr, a.Name)</span><br><span class="line">	err = db.QueryRow(sqlstr, a.Name).Scan(&amp;a.AuthorID)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// set existence</span></span><br><span class="line">	a._exists = <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>UPDATE, UPSERT, DELETE 用のメソッドも生成されます。本記事では割愛します。</p>
+<h3 id="その他特徴"><a href="#その他特徴" class="headerlink" title="その他特徴"></a>その他特徴</h3><p><code>xo</code> で特徴的な機能は、任意のクエリをもとに構造体を生成できる点です。<code>books</code> テーブルと <code>authors</code> テーブルを JOIN して <code>books</code> の <code>title</code> で文字列検索するクエリの例を考えてみます。以下は <code>xo</code> のコマンド例です。SQL を記述して構造体を生成できます。オプションの詳細は <a href="https://github.com/xo/xo/blob/master/README.md#command-line-options" target="_blank" rel="noopener">README.md</a> を参照ください。 </p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">xo pgsql://booktest:pass@localhost:15432/testdb?sslmode=<span class="built_in">disable</span> -N -M -B -T AuthorBookResult --query-type-comment=<span class="string">'AuthorBookResult is the result of a search.'</span> -o generated &lt;&lt; ENDSQL</span><br><span class="line">SELECT</span><br><span class="line">  a.author_id AS author_id,</span><br><span class="line">  a.name AS author_name,</span><br><span class="line">  b.book_id AS book_id,</span><br><span class="line">  b.isbn AS book_isbn,</span><br><span class="line">  b.title AS book_title,</span><br><span class="line">  b.tags AS book_tags,</span><br><span class="line">  b.memo AS book_memo</span><br><span class="line">FROM books b</span><br><span class="line">JOIN authors a ON a.author_id = b.author_id</span><br><span class="line">WHERE b.title LIKE %%title string%%</span><br><span class="line">ENDSQL</span><br></pre></td></tr></table></figure>
+
+<p>コマンドを実装すると <code>authorbookresult.xo.go</code> というファイルが生成されます。以下のようにコマンドに記述したクエリとデータベースから取得するカラムのレコードを保持する構造体が生成されます。SQL にパラメータとして渡す変数の型は、<code>xo</code> のコマンドに記述する SQL の内に <code>int</code>, <code>string</code> などとして明示的に記述する必要があります。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Package generated contains the types for schema 'public'.</span></span><br><span class="line"><span class="keyword">package</span> generated</span><br><span class="line"></span><br><span class="line"><span class="comment">// Code generated by xo. DO NOT EDIT.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// AuthorBookResult is the result of a search.</span></span><br><span class="line"><span class="keyword">type</span> AuthorBookResult <span class="keyword">struct</span> &#123;</span><br><span class="line">	AuthorID   <span class="keyword">int</span>         <span class="comment">// author_id</span></span><br><span class="line">	AuthorName <span class="keyword">string</span>      <span class="comment">// author_name</span></span><br><span class="line">	BookID     <span class="keyword">int</span>         <span class="comment">// book_id</span></span><br><span class="line">	BookIsbn   <span class="keyword">string</span>      <span class="comment">// book_isbn</span></span><br><span class="line">	BookTitle  <span class="keyword">string</span>      <span class="comment">// book_title</span></span><br><span class="line">	BookTags   StringSlice <span class="comment">// book_tags</span></span><br><span class="line">	BookMemo   <span class="keyword">string</span>      <span class="comment">// book_memo</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// AuthorBookResultsByTitle runs a custom query, returning results as AuthorBookResult.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">AuthorBookResultsByTitle</span><span class="params">(db XODB, title <span class="keyword">string</span>)</span> <span class="params">([]*AuthorBookResult, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> err error</span><br><span class="line"></span><br><span class="line">	<span class="comment">// sql query</span></span><br><span class="line">	<span class="keyword">const</span> sqlstr = <span class="string">`SELECT `</span> +</span><br><span class="line">		<span class="string">`a.author_id AS author_id, `</span> +</span><br><span class="line">		<span class="string">`a.name AS author_name, `</span> +</span><br><span class="line">		<span class="string">`b.book_id AS book_id, `</span> +</span><br><span class="line">		<span class="string">`b.isbn AS book_isbn, `</span> +</span><br><span class="line">		<span class="string">`b.title AS book_title, `</span> +</span><br><span class="line">		<span class="string">`b.tags AS book_tags, `</span> +</span><br><span class="line">		<span class="string">`b.memo AS book_memo `</span> +</span><br><span class="line">		<span class="string">`FROM books b `</span> +</span><br><span class="line">		<span class="string">`JOIN authors a ON a.author_id = b.author_id `</span> +</span><br><span class="line">		<span class="string">`WHERE b.title LIKE $1`</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// run query</span></span><br><span class="line">	XOLog(sqlstr, title)</span><br><span class="line">	q, err := db.Query(sqlstr, title)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> q.Close()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// load results</span></span><br><span class="line">	res := []*AuthorBookResult&#123;&#125;</span><br><span class="line">	<span class="keyword">for</span> q.Next() &#123;</span><br><span class="line">		abr := AuthorBookResult&#123;&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// scan</span></span><br><span class="line">		err = q.Scan(&amp;abr.AuthorID, &amp;abr.AuthorName, &amp;abr.BookID, &amp;abr.BookIsbn, &amp;abr.BookTitle, &amp;abr.BookTags, &amp;abr.BookMemo)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		res = <span class="built_in">append</span>(res, &amp;abr)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> res, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>余談ですが、カスタム SQL から構造体を生成する場合、<code>-- hogehoge</code> というコメントの記述はできません。生成される SQL が壊れます。以下のように、実行時のログを以下のようにして出力すると明らかです。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">generated.XOLog = log.Printf</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>実行結果例</li>
+</ul>
+<p>文字列結合した SQL ですが、<code>--</code> によって意図しない範囲の記述までコメントアウトされてしまいます。<code>/* hogehoge */</code> とコメントを記述すれば OK です。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">2020/07/14 21:59:00 SELECT a.author_id AS author_id, a.name AS author_name, b.book_id AS book_id, b.isbn AS book_isbn, b.title AS book_title, b.tags AS book_tags, -- memo is memo b.memo AS book_memo FROM books b JOIN authors a ON a.author_id = b.author_id WHERE</span><br><span class="line"> b.title LIKE <span class="variable">$1</span>%!(EXTRA string=hoge)</span><br></pre></td></tr></table></figure>
+
+<h3 id="所感"><a href="#所感" class="headerlink" title="所感"></a>所感</h3><ul>
+<li>Good<ul>
+<li>SQL が文字列として明示されていて、どのようなクエリが発行されるか分かる</li>
+<li>クエリを扱う関数やメソッドが扱う型を明示していて扱いやすい</li>
+</ul>
+</li>
+<li>Bad<ul>
+<li>デフォルトで生成されたクエリは Context を扱うことができず、<code>Context</code> を使う場合、テンプレートの実装が必要</li>
+<li>生成されたクエリを <code>psql</code> などで接続してコンソールから直接実行したい場合、文字列結合されたクエリを連結させる必要があり手間</li>
+<li>カスタムクエリでパラメータを使う場合、独自の記述方法が必要。またパラメータ内に Go の型を埋め込む必要があり、煩雑</li>
+<li>カスタムクエリを使う場合、SQL にコメント <code>-- hogehoge</code> が記載されていると、生成されるクエリが壊れる</li>
+</ul>
+</li>
+</ul>
+<h2 id="gen"><a href="#gen" class="headerlink" title="gen"></a>gen</h2><p>続いて <code>gen</code> です。<code>gen</code> はデータベースのスキーマメタデータをもとにしてデータベース(特に <code>Gorm</code>)とマッピング可能な構造体のコードを生成できます。</p>
+<p><code>gen</code> をインストールします。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go get -u github.com/smallnest/gen@v0.9.24</span><br></pre></td></tr></table></figure>
+
+<p>プロジェクト構成は <code>xo</code> を試したときと同様に以下のようにしておきます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── go.mod</span><br><span class="line">├── main.go</span><br><span class="line">└── generated</span><br></pre></td></tr></table></figure>
+
+<p><code>gen</code> コマンドで構造体を生成します。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ gen --connstr=<span class="string">"host=localhost port=15432 user=booktest password=pass dbname=testdb sslmode=disable"</span> --out generated --sqltype postgres --database testdb --no-json --overwrite</span><br><span class="line">table: books unable to generate struct field: tags <span class="built_in">type</span>: _VARCHAR error: unknown sql <span class="built_in">type</span>: _varchar</span><br><span class="line">Generating code <span class="keyword">for</span> the following tables (2)</span><br><span class="line">[0] authors</span><br><span class="line">[1] books</span><br></pre></td></tr></table></figure>
+
+<p><code>generated</code> ディレクトリ配下に <code>model</code> というディレクトリが生成され、ディレクトリの中に <code>authors.go</code>、<code>books.go</code> と <code>model_base.go</code> という 3 つのファイルが生成されました。<code>books</code> テーブルの <code>tags</code> カラムのデータ型は <code>varchar[]</code> 型でしたが、<code>gen</code> で生成するとエラーになり、生成された構造体にはフィールドが存在しませんでした。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── generated</span><br><span class="line">│   └── model</span><br><span class="line">│       ├── authors.go</span><br><span class="line">│       ├── books.go</span><br><span class="line">│       └── model_base.go</span><br><span class="line">├── go.mod</span><br><span class="line">└── go.sum</span><br></pre></td></tr></table></figure>
+
+<p><code>gen</code> ではデータベースのデータ型と構造体の型をマッピングする json ファイルを用意し、コマンド実行時にパラメータ <code>--mapping=</code> でファイルを指定することで任意の型のマッピングが可能になります。お手軽かつ柔軟にカスタマイズできる点は非常に良いと感じています。カラムが NULL を許容するかどうかで NULL を扱える型が生成できる点も嬉しいポイントです。ただし <a href="https://github.com/smallnest/gen/blob/v0.9.24/template/mapping.json" target="_blank" rel="noopener">mapping.json</a> をローカルにダウンロードし、以下のマッピング情報を追加して <code>gen</code> コマンドを実行時にファイルを指定しても</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"sql_type"</span>: <span class="string">"varchar[]"</span>,</span><br><span class="line">  <span class="attr">"go_type"</span>: <span class="string">"[]string"</span>,</span><br><span class="line">  <span class="attr">"json_type"</span>: <span class="string">"Text"</span>,</span><br><span class="line">  <span class="attr">"protobuf_type"</span>: <span class="string">"[]string"</span>,</span><br><span class="line">  <span class="attr">"guregu_type"</span>: <span class="string">"null.String"</span>,</span><br><span class="line">  <span class="attr">"go_nullable_type"</span>: <span class="string">"[]sql.NullString"</span>,</span><br><span class="line">  <span class="attr">"swagger_type"</span>: <span class="string">"string"</span></span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+
+
+<p><code>table: books unable to generate struct field: tags type: _VARCHAR error: unknown sql type: _varchar</code> というエラーは出力されてしまい、フィールドは生成されませんでした。謎のハックですが、エラーメッセージを確認し、以下のように <code>_varchar</code> 型とするとうまく生成できます。</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">    &#123;</span><br><span class="line"><span class="deletion">-     "sql_type": "varchar[]",</span></span><br><span class="line"><span class="addition">+     "sql_type": "_varchar",</span></span><br><span class="line">      "go_type": "[]string",</span><br><span class="line">      "json_type": "Text",</span><br><span class="line">      "protobuf_type": "[]string",</span><br><span class="line">      "guregu_type": "null.String",</span><br><span class="line">      "go_nullable_type": "[]sql.NullString",</span><br><span class="line">      "swagger_type": "string"</span><br><span class="line">    &#125;,</span><br></pre></td></tr></table></figure>
+
+
+<p>さて <code>books.go</code> は以下のようなファイルです。デフォルトだと <code>guregu/null</code> や <code>satori/go.uuid</code> といったモジュールを要求されます。テンプレートで拡張の余地がありそうです。</p>
+<figure class="highlight go"><figcaption><span>books.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> model</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"database/sql"</span></span><br><span class="line">	<span class="string">"time"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"github.com/guregu/null"</span></span><br><span class="line">	<span class="string">"github.com/satori/go.uuid"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> (</span><br><span class="line">	_ = time.Second</span><br><span class="line">	_ = sql.LevelDefault</span><br><span class="line">	_ = null.Bool&#123;&#125;</span><br><span class="line">	_ = uuid.UUID&#123;&#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">DB Table Details</span></span><br><span class="line"><span class="comment">-------------------------------------</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Table: books</span></span><br><span class="line"><span class="comment">[ 0] book_id                                        INT4                 null: false  primary: true   isArray: false  auto: false  col: INT4            len: -1      default: []</span></span><br><span class="line"><span class="comment">[ 1] author_id                                      INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []</span></span><br><span class="line"><span class="comment">[ 2] isbn                                           TEXT                 null: false  primary: false  isArray: false  auto: false  col: TEXT            len: -1      default: ['']</span></span><br><span class="line"><span class="comment">[ 3] booktype                                       USER_DEFINED         null: false  primary: false  isArray: false  auto: false  col: USER_DEFINED    len: -1      default: ['FICTION']</span></span><br><span class="line"><span class="comment">[ 4] title                                          TEXT                 null: false  primary: false  isArray: false  auto: false  col: TEXT            len: -1      default: ['']</span></span><br><span class="line"><span class="comment">[ 5] year                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: [2000]</span></span><br><span class="line"><span class="comment">[ 6] available                                      TIMESTAMPTZ          null: false  primary: false  isArray: false  auto: false  col: TIMESTAMPTZ     len: -1      default: ['2020-07-14 00:11:49.494152+00']</span></span><br><span class="line"><span class="comment">[ 7] tags                                           _VARCHAR             null: false  primary: false  isArray: false  auto: false  col: _VARCHAR        len: -1      default: ['&#123;&#125;']</span></span><br><span class="line"><span class="comment">[ 8] memo                                           TEXT                 null: true   primary: false  isArray: false  auto: false  col: TEXT            len: -1      default: []</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">JSON Sample</span></span><br><span class="line"><span class="comment">-------------------------------------</span></span><br><span class="line"><span class="comment">&#123;    "booktype": 46,    "title": "EBVYCwqfRlayFOFOmrVgcynTE",    "year": 11,    "available": "2272-12-29T02:27:30.083660182+09:00",    "tags": "VHTlEZoMqhtKpSMUrcdhBiUxj",    "book_id": 14,    "author_id": 44,    "isbn": "gxvRbsFhNSFstWgOZBWVeGWvX"&#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Books struct is a row record of the books table in the testdb database</span></span><br><span class="line"><span class="keyword">type</span> Books <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">//[ 0] book_id                                        INT4                 null: false  primary: true   isArray: false  auto: false  col: INT4            len: -1      default: []</span></span><br><span class="line">	BookID <span class="keyword">int32</span></span><br><span class="line">	<span class="comment">//[ 1] author_id                                      INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []</span></span><br><span class="line">	AuthorID <span class="keyword">int32</span></span><br><span class="line">	<span class="comment">//[ 2] isbn                                           TEXT                 null: false  primary: false  isArray: false  auto: false  col: TEXT            len: -1      default: ['']</span></span><br><span class="line">	Isbn <span class="keyword">string</span></span><br><span class="line">	<span class="comment">//[ 3] booktype                                       USER_DEFINED         null: false  primary: false  isArray: false  auto: false  col: USER_DEFINED    len: -1      default: ['FICTION']</span></span><br><span class="line">	Booktype <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">	<span class="comment">//[ 4] title                                          TEXT                 null: false  primary: false  isArray: false  auto: false  col: TEXT            len: -1      default: ['']</span></span><br><span class="line">	Title <span class="keyword">string</span></span><br><span class="line">	<span class="comment">//[ 5] year                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: [2000]</span></span><br><span class="line">	Year <span class="keyword">int32</span></span><br><span class="line">	<span class="comment">//[ 6] available                                      TIMESTAMPTZ          null: false  primary: false  isArray: false  auto: false  col: TIMESTAMPTZ     len: -1      default: ['2020-07-14 00:11:49.494152+00']</span></span><br><span class="line">	Available time.Time</span><br><span class="line">	<span class="comment">//[ 8] memo                                           TEXT                 null: true   primary: false  isArray: false  auto: false  col: TEXT            len: -1      default: []</span></span><br><span class="line">	Memo sql.NullString</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> booksTableInfo = &amp;TableInfo&#123;</span><br><span class="line">	Name: <span class="string">"books"</span>,</span><br><span class="line">	Columns: []*ColumnInfo&#123;</span><br><span class="line"></span><br><span class="line">		&amp;ColumnInfo&#123;</span><br><span class="line">			Index:              <span class="number">0</span>,</span><br><span class="line">			Name:               <span class="string">"book_id"</span>,</span><br><span class="line">			Comment:            <span class="string">``</span>,</span><br><span class="line">			Notes:              <span class="string">``</span>,</span><br><span class="line">			Nullable:           <span class="literal">false</span>,</span><br><span class="line">			DatabaseTypeName:   <span class="string">"INT4"</span>,</span><br><span class="line">			DatabaseTypePretty: <span class="string">"INT4"</span>,</span><br><span class="line">			IsPrimaryKey:       <span class="literal">true</span>,</span><br><span class="line">			IsAutoIncrement:    <span class="literal">false</span>,</span><br><span class="line">			IsArray:            <span class="literal">false</span>,</span><br><span class="line">			ColumnType:         <span class="string">"INT4"</span>,</span><br><span class="line">			ColumnLength:       <span class="number">-1</span>,</span><br><span class="line">			GoFieldName:        <span class="string">"BookID"</span>,</span><br><span class="line">			GoFieldType:        <span class="string">"int32"</span>,</span><br><span class="line">			JSONFieldName:      <span class="string">"book_id"</span>,</span><br><span class="line">			ProtobufFieldName:  <span class="string">"book_id"</span>,</span><br><span class="line">			ProtobufType:       <span class="string">"int32"</span>,</span><br><span class="line">			ProtobufPos:        <span class="number">1</span>,</span><br><span class="line">		&#125;,</span><br><span class="line"></span><br><span class="line">		<span class="comment">// ... 省略</span></span><br><span class="line"></span><br><span class="line">		&amp;ColumnInfo&#123;</span><br><span class="line">			Index:              <span class="number">8</span>,</span><br><span class="line">			Name:               <span class="string">"memo"</span>,</span><br><span class="line">			Comment:            <span class="string">``</span>,</span><br><span class="line">			Notes:              <span class="string">``</span>,</span><br><span class="line">			Nullable:           <span class="literal">true</span>,</span><br><span class="line">			DatabaseTypeName:   <span class="string">"TEXT"</span>,</span><br><span class="line">			DatabaseTypePretty: <span class="string">"TEXT"</span>,</span><br><span class="line">			IsPrimaryKey:       <span class="literal">false</span>,</span><br><span class="line">			IsAutoIncrement:    <span class="literal">false</span>,</span><br><span class="line">			IsArray:            <span class="literal">false</span>,</span><br><span class="line">			ColumnType:         <span class="string">"TEXT"</span>,</span><br><span class="line">			ColumnLength:       <span class="number">-1</span>,</span><br><span class="line">			GoFieldName:        <span class="string">"Memo"</span>,</span><br><span class="line">			GoFieldType:        <span class="string">"sql.NullString"</span>,</span><br><span class="line">			JSONFieldName:      <span class="string">"memo"</span>,</span><br><span class="line">			ProtobufFieldName:  <span class="string">"memo"</span>,</span><br><span class="line">			ProtobufType:       <span class="string">"string"</span>,</span><br><span class="line">			ProtobufPos:        <span class="number">9</span>,</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// TableName sets the insert table name for this struct type</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *Books)</span> <span class="title">TableName</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="string">"books"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// BeforeSave invoked before saving, return an error if field is not populated.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *Books)</span> <span class="title">BeforeSave</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Prepare invoked before saving, can be used to populate fields etc.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *Books)</span> <span class="title">Prepare</span><span class="params">()</span></span> &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Validate invoked before performing action, return an error if field is not populated.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *Books)</span> <span class="title">Validate</span><span class="params">(action Action)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// TableInfo return table meta data</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *Books)</span> <span class="title">TableInfo</span><span class="params">()</span> *<span class="title">TableInfo</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> booksTableInfo</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Gorm</code> を意識したライブラリになっており、<code>gen</code> コマンドに <code>--gorm</code> というパラメータを付与すると生成する構造体に <code>Gorm</code> のタグが付与されます。<code>authors.go</code> ファイルに付与されたタグは以下のようなものです。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Authors struct is a row record of the authors table in the testdb database</span></span><br><span class="line"><span class="keyword">type</span> Authors <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">//[ 0] author_id                                      INT4                 null: false  primary: true   isArray: false  auto: false  col: INT4            len: -1      default: []</span></span><br><span class="line">	AuthorID <span class="keyword">int32</span> <span class="string">`gorm:"primary_key;column:author_id;type:INT4;"`</span></span><br><span class="line">	<span class="comment">//[ 1] name                                           TEXT                 null: false  primary: false  isArray: false  auto: false  col: TEXT            len: -1      default: ['']</span></span><br><span class="line">	Name <span class="keyword">string</span> <span class="string">`gorm:"column:name;type:TEXT;default:'';"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>gorm:&quot;primary_key;column:author_id;type:INT4;&quot;</code> といったタグが付与されています。構造体のメソッドとして付与されている <code>TableName()</code> メソッドもおそらく <code>Gorm</code> を意識したものでしょう。以下のような <code>TableName()</code> メソッドを実装すると <code>Gorm</code> のテーブル名として <code>string</code> の文字列が使用されます。以下の場合テーブル名は <code>authors</code> です。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// TableName sets the insert table name for this struct type</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a *Authors)</span> <span class="title">TableName</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="string">"authors"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ちなみに <code>Gorm</code> の構造体として生成されるタグですが、外部キーは付与されませんでした。<code>books</code> テーブルにおける <code>author_id</code> は <code>authors</code> の外部キーですが、<code>Gorm</code> の構造体を見ると、外部キーであるタグは付与されていません。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Books struct is a row record of the books table in the testdb database</span></span><br><span class="line"><span class="keyword">type</span> Books <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">//[ 0] book_id                                        INT4                 null: false  primary: true   isArray: false  auto: false  col: INT4            len: -1      default: []</span></span><br><span class="line">	BookID <span class="keyword">int32</span> <span class="string">`gorm:"primary_key;column:book_id;type:INT4;"`</span></span><br><span class="line">	<span class="comment">//[ 1] author_id                                      INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: []</span></span><br><span class="line">	AuthorID <span class="keyword">int32</span> <span class="string">`gorm:"column:author_id;type:INT4;"`</span></span><br><span class="line">	<span class="comment">//[ 2] isbn                                           TEXT                 null: false  primary: false  isArray: false  auto: false  col: TEXT            len: -1      default: ['']</span></span><br><span class="line">	Isbn <span class="keyword">string</span> <span class="string">`gorm:"column:isbn;type:TEXT;default:'';"`</span></span><br><span class="line">	<span class="comment">//[ 3] booktype                                       USER_DEFINED         null: false  primary: false  isArray: false  auto: false  col: USER_DEFINED    len: -1      default: ['FICTION']</span></span><br><span class="line">	Booktype <span class="keyword">interface</span>&#123;&#125; <span class="string">`gorm:"column:booktype;"`</span></span><br><span class="line">	<span class="comment">//[ 4] title                                          TEXT                 null: false  primary: false  isArray: false  auto: false  col: TEXT            len: -1      default: ['']</span></span><br><span class="line">	Title <span class="keyword">string</span> <span class="string">`gorm:"column:title;type:TEXT;default:'';"`</span></span><br><span class="line">	<span class="comment">//[ 5] year                                           INT4                 null: false  primary: false  isArray: false  auto: false  col: INT4            len: -1      default: [2000]</span></span><br><span class="line">	Year <span class="keyword">int32</span> <span class="string">`gorm:"column:year;type:INT4;default:2000;"`</span></span><br><span class="line">	<span class="comment">//[ 6] available                                      TIMESTAMPTZ          null: false  primary: false  isArray: false  auto: false  col: TIMESTAMPTZ     len: -1      default: ['2020-07-14 00:11:49.494152+00']</span></span><br><span class="line">	Available time.Time <span class="string">`gorm:"column:available;type:TIMESTAMPTZ;default:'2020-07-14 00:11:49.494152+00';"`</span></span><br><span class="line">	<span class="comment">//[ 8] memo                                           TEXT                 null: true   primary: false  isArray: false  auto: false  col: TEXT            len: -1      default: []</span></span><br><span class="line">	Memo sql.NullString <span class="string">`gorm:"column:memo;type:TEXT;"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="所感-1"><a href="#所感-1" class="headerlink" title="所感"></a>所感</h3><ul>
+<li>Good<ul>
+<li><code>Gorm</code> や <code>db</code> といった ORM と連携できるタグが付与された構造体を生成できる</li>
+<li>拡張できる点が多く、柔軟にカスタマイズできる</li>
+</ul>
+</li>
+<li>Bad<ul>
+<li>デフォルトだと生成される構造体がやや重厚</li>
+<li><code>varchar[]</code> 型があるテーブルから構造体を生成した場合にエラーが発生するなど、デフォルトでは扱えないデータ型がある</li>
+</ul>
+</li>
+</ul>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>スキーマからクエリを扱う関数やメソッド、構造体を生成するライブラリを調査しました</p>
+<p><code>xo</code> は <code>SQLBoiler</code> と同じような系統で、スキーマや SQL をからデータベースアクセス可能な関数やメソッドを生成します。<code>gen</code> はスキーマから構造体を生成するライブラリです。<code>Gorm</code> や <code>sqlx</code> といった ORM などと一緒に使う必要があるでしょう。</p>
+<p>いずれにしてもスキーマから構造体を生成できる点は開発体験として良いと感じています。<code>xo</code> も <code>gen</code> も特徴的で、興味深いライブラリです。ただし、プロジェクトの開発に組み込んでいくにはテンプレートの拡張などいくつか工夫は必要だと感じました。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">スキーマを変更した場合、構造体の生成だけでなくマイグレーション管理が必要ですが、本記事ではマイグレーションの話は割愛します。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" target="_blank" rel="noopener" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="DBスキーマを駆動にした開発のためのライブラリ調査" data-url="https://future-architect.github.io/articles/20200728/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200728/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200728/" target="_blank" rel="noopener" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200728/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200728/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                DBスキーマを駆動にした開発のためのライブラリ調査
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200727/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GoからAWS KinesisのAggregationFormatを利用する
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200722/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                AWSサービストリガによるLambda起動
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200721/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                PythonユーザーのためのGraalVM
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200720/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Zuora連載 Vol.4 Workflowの話
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (30)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (6)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (80)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (67)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (21)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (3)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h2>リンク</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="https://note.future.co.jp/" target="_blank">未来報</a>
+      </li>
+      <li>
+        <a href="https://future-fintech.github.io/" target="_blank">Future Fintech EYE</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2019/future" target="_blank">2019年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/" target="_blank" rel="noopener">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" target="_blank" rel="noopener" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" target="_blank" rel="noopener" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog" target="_blank" rel="noopener"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo" target="_blank" rel="noopener"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future" target="_blank" rel="noopener">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+
+<![endif]-->
+
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
