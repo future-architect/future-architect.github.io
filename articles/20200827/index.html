@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Airflow の SLA設定方法 | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="概要TIG DXチームの多賀です。Airflowの SLA 設定方法を紹介します。 TL;DRsla_miss_callback 関数は以下の引数が必要 1234567def sla_alert(    dag: DAG,    task_list: str,    blocking_task_list: str,    slas: List[SlaMiss],    blocking_tis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Airflow の SLA設定方法">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200827/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="概要TIG DXチームの多賀です。Airflowの SLA 設定方法を紹介します。 TL;DRsla_miss_callback 関数は以下の引数が必要 1234567def sla_alert(    dag: DAG,    task_list: str,    blocking_task_list: str,    slas: List[SlaMiss],    blocking_tis">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200827/feature-image.png">
+<meta property="article:published_time" content="2020-08-26T15:00:00.000Z">
+<meta property="article:modified_time" content="2020-08-27T01:14:14.203Z">
+<meta property="article:author" content="Future Architect Consultants">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Airflow">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200827/feature-image.png">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="Airflow の SLA設定方法 | フューチャー技術ブログ" name="description">
+  <meta content="Airflow の SLA設定方法,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー技術ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+
+  
+<link rel="stylesheet" href="/css/theme-styles.css">
+
+  <!-- Theme styles END -->
+<meta name="generator" content="Hexo 4.2.1"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">フューチャー技術ブログ</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="180px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200827/">Airflow の SLA設定方法</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200827_Airflow_の_SLA設定方法" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 多賀聡一朗</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-08-26T15:00:00.000Z" itemprop="datePublished">2020/08/27</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/Python/" title="Python">Python</a>,
+  
+    <a href="/tags/Airflow/" title="Airflow">Airflow</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <img src="/images/20200827/feature-image.png" class="img-middle-size">
+
+<h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>TIG DXチームの多賀です。Airflowの SLA 設定方法を紹介します。</p>
+<h2 id="TL-DR"><a href="#TL-DR" class="headerlink" title="TL;DR"></a>TL;DR</h2><p>sla_miss_callback 関数は以下の引数が必要</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sla_alert</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    dag: DAG,</span></span></span><br><span class="line"><span class="function"><span class="params">    task_list: str,</span></span></span><br><span class="line"><span class="function"><span class="params">    blocking_task_list: str,</span></span></span><br><span class="line"><span class="function"><span class="params">    slas: List[SlaMiss],</span></span></span><br><span class="line"><span class="function"><span class="params">    blocking_tis: List[TaskInstance]</span></span></span><br><span class="line"><span class="function"><span class="params">)</span>:</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="SLA設定"><a href="#SLA設定" class="headerlink" title="SLA設定"></a>SLA設定</h2><p>SLA とは Service Level Agreement の略で、サービス提供者が保証する品質を明示する際に利用されます。当 Airflow の SLA は、各 Task が指定の時間内に終わることを保証する形で定義されます。</p>
+<p>そのため、Airflow は 各 Task に対して SLA 値(時間) を設定できます。</p>
+<p><a href="https://airflow.apache.org/docs/stable/concepts.html#slas" target="_blank" rel="noopener">Concepts-SLAs</a></p>
+<p>SLA 値は以下のように Task に対して定義します。10秒以上 Task が実行されると SLA 違反となります。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">t1 = PythonOperator(</span><br><span class="line">    task_id=<span class="string">'sla_test'</span>,</span><br><span class="line">    python_callable=example_call,</span><br><span class="line">    sla=timedelta(seconds=<span class="number">10</span>), <span class="comment"># SLA 設定</span></span><br><span class="line">    dag=dag</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+
+<p>SLA 違反をした Task が発生した場合、以下2パターンで通知をすることができます</p>
+<ul>
+<li>Email</li>
+<li>sla_miss_callback (Function) の任意実装</li>
+</ul>
+<p>注意点として、SLA 違反のチェックタイミングは、対象タスクの実行完了後ではなく、対象タスクの次のタスクの実行前(別 run_id の可能性もあり) になります。</p>
+<p>Task 実行時に、過去の SLA 違反の一覧 (sla_miss テーブル) を取得して通知する仕組みになっています。</p>
+<p>また、Task が実行されているいないに関わらず、 start_time と schedule_interval と 現在時刻から 実行されているべき Task を洗い出してエラー通知します。過去分の再実行等を実施すると、現在時刻まで実行されているべき Task まとめて SLA 違反が出たりします。</p>
+<h3 id="Email-設定方法"><a href="#Email-設定方法" class="headerlink" title="Email 設定方法"></a>Email 設定方法</h3><p>ドキュメントと実装を読む限り、Operator の引数に渡す必要がありそうでした。<br>email が設定されていない場合は、エラーになることなく Task の実行が完了します。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">t1 = PythonOperator(</span><br><span class="line">    task_id=<span class="string">'sla_test'</span>,</span><br><span class="line">    python_callable=example_call,</span><br><span class="line">    sla=timedelta(seconds=<span class="number">10</span>),</span><br><span class="line">    email=<span class="string">"xxx.yyy@example.com"</span>,</span><br><span class="line">    dag=dag</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="sla-miss-callback-設定方法"><a href="#sla-miss-callback-設定方法" class="headerlink" title="sla_miss_callback 設定方法"></a>sla_miss_callback 設定方法</h3><p>ドキュメント上は、関数を設定と記載されてますが、以下のように設定しても動きません。</p>
+<p><a href="https://airflow.readthedocs.io/en/1.10.11/_api/airflow/models/dag/index.html#airflow.models.dag.DAG" target="_blank" rel="noopener">https://airflow.readthedocs.io/en/1.10.11/_api/airflow/models/dag/index.html#airflow.models.dag.DAG</a></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sla_alert</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># alert 設定</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">example_call</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># task 処理</span></span><br><span class="line"></span><br><span class="line">dag = DAG(</span><br><span class="line">    dag_id,</span><br><span class="line">    start_date=datetime(<span class="number">2020</span>, <span class="number">8</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="number">0</span>),</span><br><span class="line">    schedule_interval=timedelta(days=<span class="number">1</span>),</span><br><span class="line">    sla_miss_callback=sla_alert,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">t1 = PythonOperator(</span><br><span class="line">    task_id=<span class="string">'sla_test'</span>,</span><br><span class="line">    python_callable=example_call,</span><br><span class="line">    sla=timedelta(seconds=<span class="number">10</span>),</span><br><span class="line">    dag=dag</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>Scheduelr のログを見ると以下がはかれています。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[2020-08-11 18:27:00,766] &#123;&#123;scheduler_job.py:541&#125;&#125; ERROR - Could not call sla_miss_callback <span class="keyword">for</span> DAG example_sla</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"/Users/xxx/.venv/lib/python3.7/site-packages/airflow/jobs/scheduler_job.py"</span>, line 537, <span class="keyword">in</span> manage_slas</span><br><span class="line">    blocking_tis)</span><br><span class="line">TypeError: sla_alert() takes 0 positional arguments but 5 were given</span><br></pre></td></tr></table></figure>
+
+<h4 id="修正"><a href="#修正" class="headerlink" title="修正"></a>修正</h4><p>ソースコードを grep してみると 以下の実装を見つけました。<br>引数が必要みたいですね。</p>
+<p><a href="https://github.com/apache/airflow/blob/master/airflow/jobs/scheduler_job.py#L455" target="_blank" rel="noopener">https://github.com/apache/airflow/blob/master/airflow/jobs/scheduler_job.py#L455</a></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># schduler_job.py</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> dag.sla_miss_callback:</span><br><span class="line">    <span class="comment"># Execute the alert callback</span></span><br><span class="line">    self.log.info(<span class="string">' --------------&gt; ABOUT TO CALL SLA MISS CALL BACK '</span>)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        dag.sla_miss_callback(dag, task_list, blocking_task_list, slas,</span><br><span class="line">                                blocking_tis)</span><br><span class="line">        notification_sent = <span class="literal">True</span></span><br><span class="line">    <span class="keyword">except</span> Exception:  <span class="comment"># pylint: disable=broad-except</span></span><br><span class="line">        self.log.exception(<span class="string">"Could not call sla_miss_callback for DAG %s"</span>,</span><br><span class="line">                            dag.dag_id)</span><br></pre></td></tr></table></figure>
+
+<p>DAG の設定を修正してみると、無事に動きました。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sla_alert</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    dag: DAG,</span></span></span><br><span class="line"><span class="function"><span class="params">    task_list: str,</span></span></span><br><span class="line"><span class="function"><span class="params">    blocking_task_list: str,</span></span></span><br><span class="line"><span class="function"><span class="params">    slas: List[SlaMiss],</span></span></span><br><span class="line"><span class="function"><span class="params">    blocking_tis: List[TaskInstance]</span></span></span><br><span class="line"><span class="function"><span class="params">)</span>:</span></span><br><span class="line">    dag_id = dag.dag_id</span><br><span class="line">    task_id = slas[<span class="number">0</span>].task_id</span><br><span class="line">    execution_date = <span class="string">"&#123;&#125;"</span>.format(slas[<span class="number">0</span>].execution_date) <span class="comment"># UtcDateTime 型のため</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="sla-miss-callback-の引数"><a href="#sla-miss-callback-の引数" class="headerlink" title="sla_miss_callback の引数"></a>sla_miss_callback の引数</h4><table>
+<thead>
+<tr>
+<th align="left">引数</th>
+<th align="left">型</th>
+<th align="left">値</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">dag</td>
+<td align="left">airflow.DAG</td>
+<td align="left">DAG オブジェクト dag.dag_id で ID取得可能</td>
+</tr>
+<tr>
+<td align="left">task_list</td>
+<td align="left">str</td>
+<td align="left">過去のSLA エラーの Task の List <br> 以下フォーマットの文字列リスト <br> <code>${task_id} on ${execution_date}</code></td>
+</tr>
+<tr>
+<td align="left">blocking_task_list</td>
+<td align="left">str</td>
+<td align="left">過去の失敗した Task の List <br> 以下フォーマットの文字列リスト <br> <code>${task_id} on ${execution_date}</code></td>
+</tr>
+<tr>
+<td align="left">slas</td>
+<td align="left">List[airflow.models.SlaMiss]</td>
+<td align="left">過去のSLA エラーオブジェクトの List</td>
+</tr>
+<tr>
+<td align="left">blocking_tis</td>
+<td align="left">List[airflow.models.TaskInstance]</td>
+<td align="left">失敗した TaskInstance の List</td>
+</tr>
+</tbody></table>
+<p>SlaMiss<br><a href="https://airflow.apache.org/docs/stable/_api/airflow/models/slamiss/index.html" target="_blank" rel="noopener">https://airflow.apache.org/docs/stable/_api/airflow/models/slamiss/index.html</a></p>
+<p>TaskInstance<br><a href="https://airflow.apache.org/docs/stable/_api/airflow/models/taskinstance/index.html" target="_blank" rel="noopener">https://airflow.apache.org/docs/stable/_api/airflow/models/taskinstance/index.html</a></p>
+<h2 id="所感"><a href="#所感" class="headerlink" title="所感"></a>所感</h2><p>ドキュメントに記載してほしいところでしたが、見つけられなかったため別途整理しました。</p>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" target="_blank" rel="noopener" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="Airflow の SLA設定方法" data-url="https://future-architect.github.io/articles/20200827/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200827/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200827/" target="_blank" rel="noopener" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200827/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200827/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Airflow の SLA設定方法
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200824/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                go-swaggerでhello world
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200821/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                エンジニアが最低限理解しておくべきOSSライセンスの基礎知識
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200820/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Pythonによるパッケージ開発
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200819/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Firebaseでお手軽！データ管理画面をつくる
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (32)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (12)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (89)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (75)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (3)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h2>リンク</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="https://note.future.co.jp/" target="_blank">未来報</a>
+      </li>
+      <li>
+        <a href="https://future-fintech.github.io/" target="_blank">Future Fintech EYE</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2019/future" target="_blank">2019年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/" target="_blank" rel="noopener">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" target="_blank" rel="noopener" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" target="_blank" rel="noopener" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog" target="_blank" rel="noopener"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo" target="_blank" rel="noopener"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future" target="_blank" rel="noopener">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+
+<![endif]-->
+
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        Layout.initFixHeaderWithPreHeader(); /* Switch On Header Fixing (only if you have pre-header) */
+        Layout.initNavScrolling();
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>

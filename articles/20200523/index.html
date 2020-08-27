@@ -21,7 +21,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20200523/top.png">
 <meta property="article:published_time" content="2020-05-23T02:12:30.000Z">
-<meta property="article:modified_time" content="2020-07-17T01:50:25.421Z">
+<meta property="article:modified_time" content="2020-08-27T01:09:30.423Z">
 <meta property="article:author" content="Future Architect Consultants">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="GoTips連載">
@@ -176,14 +176,14 @@
 </ul>
 <p>この場合はシンプルで良いのですが、AWS SDK for GoなどのerrorをWrapした時に呼び出し側で判定をしたい時、どうすればよいのかが直接的な内容が見当たらなかったのでここにまとめておきたいと思います。</p>
 <h1 id="Handling-Errors-in-the-AWS-SDK-for-Go"><a href="#Handling-Errors-in-the-AWS-SDK-for-Go" class="headerlink" title="Handling Errors in the AWS SDK for Go"></a>Handling Errors in the AWS SDK for Go</h1><p><a href="https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/handling-errors.html" target="_blank" rel="noopener">ドキュメント</a>を読むと例えば、AWSのErorrハンドリングは以下のように、<code>awserr.Error</code> というインターフェースで表現されており、一度errを型アサーションしてから内部的なエラーコードに応じてハンドリングすることになっています。</p>
-<figure class="highlight go"><figcaption><span>AWS-SDKの通常版エラーハンドリング</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> aerr, ok := err.(*awserr.Error); ok &#123;</span><br><span class="line">        <span class="keyword">switch</span> aerr.Code() &#123;</span><br><span class="line">        <span class="keyword">case</span> dynamodb.ErrCodeConditionalCheckFailedException:</span><br><span class="line">            <span class="comment">// エラーハンドリング</span></span><br><span class="line">        <span class="keyword">case</span> dynamodb.ErrCodeProvisionedThroughputExceededException:</span><br><span class="line">            <span class="comment">// エラーハンドリング</span></span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="comment">// エラーハンドリング</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// エラーハンドリング</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>AWS-SDKの通常版エラーハンドリング</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> aerr, ok := err.(awserr.Error); ok &#123;</span><br><span class="line">        <span class="keyword">switch</span> aerr.Code() &#123;</span><br><span class="line">        <span class="keyword">case</span> dynamodb.ErrCodeConditionalCheckFailedException:</span><br><span class="line">            <span class="comment">// エラーハンドリング</span></span><br><span class="line">        <span class="keyword">case</span> dynamodb.ErrCodeProvisionedThroughputExceededException:</span><br><span class="line">            <span class="comment">// エラーハンドリング</span></span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="comment">// エラーハンドリング</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// エラーハンドリング</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>これをWrapされたときは、呼び出し元で単純に型アサーションを行ってもうまく判定できません。</p>
-<figure class="highlight go"><figcaption><span>NGなケース</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">AnyFunc</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">    <span class="comment">// 何かしらのAWS SDKを利用したコード</span></span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> fmt.Errorf(<span class="string">"aws operation: %w"</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> err := AnyFunc(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> aErr, ok := err.(*awserr.Error); ok &#123; <span class="comment">// 🆖型アサーションでは判定できない</span></span><br><span class="line">            <span class="comment">// AWS操作エラー特有のエラーハンドリング</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// その他のエラーハンドリング</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>NGなケース</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">AnyFunc</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">    <span class="comment">// 何かしらのAWS SDKを利用したコード</span></span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> fmt.Errorf(<span class="string">"aws operation: %w"</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> err := AnyFunc(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> aerr, ok := err.(awserr.Error); ok &#123; <span class="comment">// 🆖型アサーションでは判定できない</span></span><br><span class="line">            <span class="comment">// AWS操作エラー特有のエラーハンドリング</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// その他のエラーハンドリング</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>※Go Playgroundでサンプルを載せようと思いましたが、importでTimeoutになったので諦めました</p>
 <h1 id="対応方法"><a href="#対応方法" class="headerlink" title="対応方法"></a>対応方法</h1><p>この <code>awserr.Error</code> を満たすerrorをWrapしたときはどうすべきかというと、 <code>errors.As</code> を用います。<code>errors.As</code> を代入用の変数とともに利用するとうまくいきます。</p>
-<figure class="highlight go"><figcaption><span>OKなコード</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err := AnyFunc(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> aErr *awserr.Error</span><br><span class="line">    <span class="keyword">if</span> ok := errors.As(err, &amp;aErr); ok &#123;</span><br><span class="line">        <span class="keyword">switch</span> aErr.Code() &#123;</span><br><span class="line">        <span class="keyword">case</span> dynamodb.ErrCodeConditionalCheckFailedException:</span><br><span class="line">            <span class="comment">// 何かしらのエラーハンドリング</span></span><br><span class="line">        <span class="keyword">case</span> dynamodb.ErrCodeProvisionedThroughputExceededException:</span><br><span class="line">            <span class="comment">// 何かしらのエラーハンドリング</span></span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="comment">// エラーハンドリング</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// その他のエラーハンドリング</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>OKなコード</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err := AnyFunc(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> aerr awserr.Error</span><br><span class="line">    <span class="keyword">if</span> ok := errors.As(err, &amp;aerr); ok &#123;</span><br><span class="line">        <span class="keyword">switch</span> aerr.Code() &#123;</span><br><span class="line">        <span class="keyword">case</span> dynamodb.ErrCodeConditionalCheckFailedException:</span><br><span class="line">            <span class="comment">// 何かしらのエラーハンドリング</span></span><br><span class="line">        <span class="keyword">case</span> dynamodb.ErrCodeProvisionedThroughputExceededException:</span><br><span class="line">            <span class="comment">// 何かしらのエラーハンドリング</span></span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="comment">// エラーハンドリング</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// その他のエラーハンドリング</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>例として愚直にif分岐をすべて網羅するように書きましたが、早期returnを活用すると、よりネストが浅く見通しが良いコードにできると思います。</p>
 <h2 id="GCP-SDKの場合"><a href="#GCP-SDKの場合" class="headerlink" title="GCP SDKの場合"></a>GCP SDKの場合</h2><p>しばしば<a href="https://godoc.org/cloud.google.com/go/bigquery#hdr-Errors" target="_blank" rel="noopener">以下のエラーを返すことが多い</a>とのことです。</p>
@@ -273,6 +273,20 @@
   
     
       
+        <a href="https://future-architect.github.io/articles/20200827/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Airflow の SLA設定方法
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
         <a href="https://future-architect.github.io/articles/20200824/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
@@ -328,16 +342,6 @@
 	
   
     
-      
-        <a href="https://future-architect.github.io/articles/20200818/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                【入門】私を苦しめたDynamoDB
-              </li>
-            </div>
-          </div>
-        </a>
       
 	
   
@@ -1282,7 +1286,7 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (74)</a>
+	  <a href="/categories/Infrastructure/">Infrastructure (75)</a>
 	</li>
       
 	<li>
