@@ -356,6 +356,7 @@ var Layout = function () {
             $(".quantity-up").html("<i class='fa fa-angle-up'></i>");
         },
 
+        /*
         initFixHeaderWithPreHeader: function () {
             jQuery(window).scroll(function() {
                 if (jQuery(window).scrollTop()>37){
@@ -366,6 +367,7 @@ var Layout = function () {
                 }
             });
         },
+        */
 
         initNavScrolling: function () {
             function NavScrolling () {
