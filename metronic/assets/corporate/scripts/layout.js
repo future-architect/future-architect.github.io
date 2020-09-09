@@ -369,6 +369,7 @@ var Layout = function () {
         },
         */
 
+        /*
         initNavScrolling: function () {
             function NavScrolling () {
                 if (jQuery(window).scrollTop()>60){
@@ -385,6 +386,7 @@ var Layout = function () {
                 NavScrolling ();
             });
         },
+        */
 /*
         initOWL: function () {
             $(".owl-carousel6-brands").owlCarousel({
