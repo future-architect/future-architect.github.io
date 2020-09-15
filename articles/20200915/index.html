@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>メディア向けCMSサービスのインフラ構成のポイント | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにGlyphFeeds連載企画第2弾の記事となります。 はじめまして、TIG中神です。 メディア向けCMSクラウドサービス（以下、GlyphFeedsサービス）のインフラを設計・構築を行いました。メディアならではの特性や構成における重要なポイントについていくつかご紹介します。 メディアCMSの特性メディアCMSサービスに求められる非機能要件の中で、特に重要なものとしては以下の3点があげられま">
+<meta property="og:type" content="article">
+<meta property="og:title" content="メディア向けCMSサービスのインフラ構成のポイント">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200915/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにGlyphFeeds連載企画第2弾の記事となります。 はじめまして、TIG中神です。 メディア向けCMSクラウドサービス（以下、GlyphFeedsサービス）のインフラを設計・構築を行いました。メディアならではの特性や構成における重要なポイントについていくつかご紹介します。 メディアCMSの特性メディアCMSサービスに求められる非機能要件の中で、特に重要なものとしては以下の3点があげられま">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200915/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200915/image_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200915/image_3.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200915/image_4.png">
+<meta property="article:published_time" content="2020-09-14T15:00:00.000Z">
+<meta property="article:modified_time" content="2020-09-15T00:46:23.776Z">
+<meta property="article:author" content="Future Architect Consultants">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="GlyphFeeds">
+<meta property="article:tag" content="CMS">
+<meta property="article:tag" content="基幹システム">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200915/image.png">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="メディア向けCMSサービスのインフラ構成のポイント | フューチャー技術ブログ" name="description">
+  <meta content="メディア向けCMSサービスのインフラ構成のポイント,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー技術ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+
+  
+<link rel="stylesheet" href="/css/theme-styles.css">
+
+  <!-- Theme styles END -->
+<meta name="generator" content="Hexo 4.2.1"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">フューチャー技術ブログ</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="180px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200915/">メディア向けCMSサービスのインフラ構成のポイント</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200915_メディア向けCMSサービスのインフラ構成のポイント" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 中神孝士</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-09-14T15:00:00.000Z" itemprop="datePublished">2020/09/15</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/AWS/" title="AWS">AWS</a>,
+  
+    <a href="/tags/GlyphFeeds/" title="GlyphFeeds">GlyphFeeds</a>,
+  
+    <a href="/tags/CMS/" title="CMS">CMS</a>,
+  
+    <a href="/tags/%E5%9F%BA%E5%B9%B9%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0/" title="基幹システム">基幹システム</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p><a href="https://future-architect.github.io/articles/20200914/">GlyphFeeds</a>連載企画第2弾の記事となります。</p>
+<p>はじめまして、TIG中神です。</p>
+<p>メディア向けCMSクラウドサービス（以下、GlyphFeedsサービス）のインフラを設計・構築を行いました。メディアならではの特性や構成における重要なポイントについていくつかご紹介します。</p>
+<h2 id="メディアCMSの特性"><a href="#メディアCMSの特性" class="headerlink" title="メディアCMSの特性"></a>メディアCMSの特性</h2><p>メディアCMSサービスに求められる非機能要件の中で、特に重要なものとしては以下の3点があげられます。これらの要件はクラウドとの親和性が高いことからGlyphFeedsサービスではクラウドベースのサービスとして設計・構築を行っています。</p>
+<ul>
+<li><strong>①高速なコンテンツ検索ができること</strong></li>
+<li><strong>②24時間365日稼働し、不慮のサービス停止によるダウンタイムを極力短くすること</strong></li>
+<li><strong>③処理量のスパイクに対応できて、かつ柔軟にスケール出来ること</strong></li>
+</ul>
+<h2 id="①高速なコンテンツ検索"><a href="#①高速なコンテンツ検索" class="headerlink" title="①高速なコンテンツ検索"></a>①高速なコンテンツ検索</h2><p>GlyphFeedsサービスの全体像としてはこのようなになっていて、大きく下記のサービス群で構成しています。</p>
+<ol>
+<li>画面を提供するサービス</li>
+<li>APIを提供するサービス</li>
+<li>非同期処理を行うサービス</li>
+<li>コンテンツの加工を行うサービス</li>
+<li>コンテンツデータの蓄積、検索、ステータスの更新を行うサービス</li>
+</ol>
+<p>このうちコンテンツの高速検索においては上記の1、2、3、5のサービス群で実現しています。<br>これらのサービスを、<strong>EC2、ELB、Elasticsearch、DynamoDBといったマネージドサービス</strong>をベースに、なるべくディスクアクセスが入らないように設計・構築しています。<br>性能を引き出すために複数のレイヤーでチューニングを行っていますが、最後の最後までチューニングに苦労したコンピューティングの部分について記載します。</p>
+<p><img src="/images/20200915/image.png" alt=""></p>
+<h3 id="なぜコンテナ（ECS）ではなく仮想サーバー（EC2）を採用したか？"><a href="#なぜコンテナ（ECS）ではなく仮想サーバー（EC2）を採用したか？" class="headerlink" title="なぜコンテナ（ECS）ではなく仮想サーバー（EC2）を採用したか？"></a>なぜコンテナ（ECS）ではなく仮想サーバー（EC2）を採用したか？</h3><p>コンピューティングの部分は、当初コンテナ利用を検討していましたが、導入前の性能テストにて、コンテナよりも仮想サーバーの方がインスンスの性能を使い切れるという結果となり、最終的には仮想サーバーを採用しました。</p>
+<p>以下に検証の概要を記載します。<br>どのような場合もこの結果になるわけではなく、構成や処理特性・ワークロードにより結果は異なってくると思います。</p>
+<h4 id="■検証時の構成"><a href="#■検証時の構成" class="headerlink" title="■検証時の構成"></a>■検証時の構成</h4><p>EC2(Gatling) =&gt; ALB =&gt; <strong>コンピューティング①</strong> =&gt; NLB =&gt; <strong>コンピューティング②</strong> =&gt; Elasticsearch or DynamoDB</p>
+<ul>
+<li>Gatlingを動かすサーバーがボトルネックにならないように無理のないインスタンスタイプを選択して、念のため<a href="https://gatling.io/docs/current/general/operations/" target="_blank" rel="noopener">GatlingのOS Tuning</a>も行っておきます。</li>
+<li><strong>コンピューティング①②</strong>は下記の構成を基準にをベースに「インスタンス数の変更、インスタンスタイプの変更、CPUユニット、メモリの割り当ての変更、JVMヒープ値の変更、コンピューティング①のみEC2構成またはその逆のパターンなど」を様々な組み合わせとなるように変動していいきます。</li>
+</ul>
+<p><strong>コンピューティング①の構成</strong></p>
+<table>
+<thead>
+<tr>
+<th>構成</th>
+<th>インスタンスタイプ</th>
+<th align="center">数量</th>
+<th>OS</th>
+<th>稼働アプリケーション</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ECSの場合</td>
+<td>m4.large(2vCPU 8GiB)</td>
+<td align="center">2</td>
+<td>ECS-optimized AMI(Linux)</td>
+<td>Spring Bootコンテナ<br>・FROM amazonlinux:2 <br> ・割当500CPUユニット 1500MB <br>・各インスタンスで1つずつ稼働</td>
+</tr>
+<tr>
+<td>EC2の場合</td>
+<td>m4.large(2vCPU 8GiB)</td>
+<td align="center">2</td>
+<td>Amazon Linux 2</td>
+<td>Spring Bootアプリケーション <br>・各インスタンスで1つずつ稼働</td>
+</tr>
+</tbody></table>
+<p><strong>コンピューティング②の構成</strong></p>
+<table>
+<thead>
+<tr>
+<th>構成</th>
+<th>インスタンスタイプ</th>
+<th align="center">数量</th>
+<th>OS</th>
+<th>稼働アプリケーション</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ECSの場合</td>
+<td>m4.large(2vCPU 8GiB)</td>
+<td align="center">2</td>
+<td>ECS-optimized AMI(Linux)</td>
+<td>gRPCコンテナ<br>・FROM alpine:3.4 <br> ・割当500CPUユニット 1500MB <br>・各インスタンスで1つずつ稼働</td>
+</tr>
+<tr>
+<td>EC2の場合</td>
+<td>m4.large(2vCPU 8GiB)</td>
+<td align="center">2</td>
+<td>Amazon Linux 2</td>
+<td>gRPCアプリケーション <br>・各インスタンスで1つずつ稼働</td>
+</tr>
+</tbody></table>
+<h4 id="■検証結果"><a href="#■検証結果" class="headerlink" title="■検証結果"></a>■検証結果</h4><p>下記は検証結果のグラフの線形のイメージです。当然どちらの構成でも、処理の多重度があがると処理時間も増加してきますが、同等のインスタンスのスペックで見た場合、ECS構成の方が処理多重度が増えると処理時間の劣化が大きいという結論になりました。</p>
+<p>平常時は大きな性能差はありませんが、高負荷時に処理時間が大きく劣化する可能性があるという結論のため仮想サーバー（EC2）構成の採用に至っています。</p>
+<p>なお、ボトルネック調査のためネットワーク・OSの性能情報や処理のトレースなど各種情報を確認しましたが、処理の多重度があがるとコンテナ上のAPIが実行されるまでのタイムラグが徐々に大きくなっているようでした。ネットワークやホストOS側では異常値などは出ていなかったのですが、状況的にはDockerエンジン部分がボトルネックになっている可能性が想定されました。</p>
+<p><img src="/images/20200915/image_2.png" alt=""></p>
+<p>最近だとコンテナ構成の選択肢が増えたので、どのパターンが最もインスタンス性能を使い切れるのか、性能維持やスケールしやすいのか、性能が頭打ちになった場合の挙動はどうなるのか、フットプリントの軽いベースOSに変えた場合の差など機会があれば検証してみたいですね。</p>
+<ul>
+<li>Docker on EC2</li>
+<li>ECS on EC2</li>
+<li>ECS on Fargate</li>
+<li>EKS</li>
+<li>Anthos GKE on AWS </li>
+</ul>
+<h2 id="②できる限りダウンタイムを短くする"><a href="#②できる限りダウンタイムを短くする" class="headerlink" title="②できる限りダウンタイムを短くする"></a>②できる限りダウンタイムを短くする</h2><p>GlyphFeedsサービスでは、マルチAZ構成を取り各インスタンスは必ず冗長構成を取るようにしています。<br>さらにマルチリージョン構成を採用し、単一のリージョン障害に対する可用性を高めています。<br>このように可用性を高める構成を採用していますが、冗長構成を取っても絶対に停止しないわけではないので、OS上のサービスの自動復旧やEC2のAuto Recoveryなどリソースが落ちたらすぐに復旧するような方式を採用し極力ダウンタイムを短くするアプローチとしています。</p>
+<p>■GlyphFeedsサービスにおける主要な要素</p>
+<table>
+<thead>
+<tr>
+<th>カテゴリ</th>
+<th>マネージドサービス</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>コンピューティング</td>
+<td>EC2</td>
+<td>WEB、API、非同期処理、コンテンツ加工、データ操作API</td>
+</tr>
+<tr>
+<td>コンピューティング</td>
+<td>Lambda</td>
+<td>マネージドサービス間連携、時刻起動処理など</td>
+</tr>
+<tr>
+<td>データベース</td>
+<td>DynamoDB</td>
+<td>コンテンツ（テキスト）格納</td>
+</tr>
+<tr>
+<td>データベース</td>
+<td>RDS</td>
+<td>アプリケーションマスタ格納</td>
+</tr>
+<tr>
+<td>分析</td>
+<td>Elasticsearch Service</td>
+<td>検索エンジン</td>
+</tr>
+<tr>
+<td>ストレージ</td>
+<td>S3</td>
+<td>コンテンツオブジェクト格納</td>
+</tr>
+</tbody></table>
+<h3 id="どのような障害まで想定するか？"><a href="#どのような障害まで想定するか？" class="headerlink" title="どのような障害まで想定するか？"></a>どのような障害まで想定するか？</h3><p>AWSだと、Well-Architectedフレームワークやベストプラクティスに沿って設計/構築するだけで比較的容易にAZ障害に対する対障害性を確保できます。また、東京リージョンを見ても複数のAZで構成されており、自然災害などの物理障害に対しては極めて高い耐性があると思います。</p>
+<p>では、ダウンタイム最少化のためにどのような障害まで想定するか？というところですがAWSでいうと多少検索するだけで過去にどんな障害があったか検索できます。</p>
+<p>過去にマネージドサービスが長時間停止する障害が数回発生していますね。また、それらは単一リージョンに閉じた論理障害です。<br>（センター内の物理的な障害が起因して論理障害になったパターンもあるようですが）</p>
+<p>そのため、複数のリージョンでサービスが稼働する構成の場合は、サービスを継続できていた可能性が高いと想定されます。GlyphFeedsサービスでは単一のリージョンダウンまでは発生しうると想定し、マルチリージョン構成を取ることにより、リージョン停止レベルの大障害が発生しても別リージョンに切り替えることによりダウンタイムを最小化しています。</p>
+<h3 id="構成のポイント"><a href="#構成のポイント" class="headerlink" title="構成のポイント"></a>構成のポイント</h3><p>上記のようにマルチリージョン構成を取ることにより可用性は向上します。</p>
+<p>では、具体的にどのような構成にするか？というところですがDRシナリオにも複数のパターンがありGlyphFeedsサービスでは、コストと効果のバランスを取り、パイロットライトとウォームスタンバイの間くらいの可用性になるように設計し、データのリカバリポイントは5分以内、切替/切戻は60分程度というサービスレベルになっています。</p>
+<img src="/images/20200915/image_3.png" class="img-middle-size">
+
+
+<p>設計やバックアップサイトへの切替についても様々な方式があるので、サービスに適した方式を採用することで切替自体は比較的容易に実現することが可能です。</p>
+<p>どのDRシナリオにしてもポイントになってくるのは非機能要件とクラウド利用料などコストを考慮して最もバランスの良い構成をとること、とデータも含めてメインサイトへの切戻ができることがあげられます。</p>
+<p>より高可用な構成としてマルチクラウドによる構成なども考えられますが、果たしてサービスレベルはあがるのか？意図したように切戻も出来るのか？などこちらも機会があれば検証を行ってみたいですね。</p>
+<h2 id="③柔軟なスケール"><a href="#③柔軟なスケール" class="headerlink" title="③柔軟なスケール"></a>③柔軟なスケール</h2><p>メディアCMS特有かもしれませんが、上の方で記載した特性の中で最も要件として定義が難しく、ぶれやすいのが、処理量のスパイクやデータ量の増加をどう見るか？という点です。メディアCMSでは繁忙期・閑散期というような概念はほぼなく、開催されるイベントの大きさによって著しく処理量や連携データ量（記事、写真、音声、動画などの数量）が増加します。さらに年々の機材の進化で取り扱うデータそのもの（写真、音声、動画など）のサイズが爆発的に大きくなってきています。</p>
+<p>このように外部要因を含めてのサイジング難易度が高いことから、柔軟に自動でスケール出来るマネージドサービスを最大限に活用します。人手を介さず自動でスケールしてくれるという点で多大なメリットがありますがいくつか注意点もあります。</p>
+<h3 id="オートスケールの注意点"><a href="#オートスケールの注意点" class="headerlink" title="オートスケールの注意点"></a>オートスケールの注意点</h3><p>マネージドサービスの裏側ではコンテナやインスタンスが起動してくるので起動が完了するまでの待ち時間が発生します。待ち時間はマネージドサービスにより変わってくると思いますがマネージドサービスによってはスケールが完了するまで数分のタイムラグが発生します。</p>
+<p>短い時間（数分など）に想定の何倍もの処理量が発生するような場合はスケールが追い付かなく、スロットリングが発生しその後タイムアウトや処理遅延が発生する可能性があります。<br>以下のような線形が発生し、あと数回スパイクが発生したら処理のタイムアウトが発生すると思います。<br><img src="/images/20200915/image_4.png" alt=""></p>
+<p>システムのスパイク特性やベースの性能をどう定義するか？スケール条件の閾値をどう定義するか？オートスケールを利用する場合でも完全に任せきりではなく、事前のシミュレーションや性能検証によるチューニングが必要だということになります。</p>
+<h2 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h2><p>当社の中では、自社サービスを展開しながら運用保守で上がってきた課題をダイナミックに改善していくという機会はなかなかないので貴重な経験となりました。設計してきたものが想定通り動いているのか？どの部分が乖離しやすいのか？なぜ乖離したのか？どう改善するか？などは長期的な視点が必要となるのでプロジェクトベースの仕事とは異なる知見が得られたと思いました。</p>
+<p>また、システム特性を見極めることや、非機能要件を定義しどうコントロールしていくかというのは結局オンプレでもクラウドでも同じだなーと改めて思いました。</p>
+<h2 id="参考資料"><a href="#参考資料" class="headerlink" title="参考資料"></a>参考資料</h2><ul>
+<li><a href="https://gatling.io/docs/current/general/operations/" target="_blank" rel="noopener">Gatling OS Tuning</a></li>
+<li><a href="https://aws.amazon.com/jp/about-aws/global-infrastructure/" target="_blank" rel="noopener">AWSグローバルインフラストラクチャ</a></li>
+<li><a href="https://www.slideshare.net/AmazonWebServicesJapan/aws-black-belt-online-seminar-2018-aws-wellarchitected-framework" target="_blank" rel="noopener">AWS Black Belt Online Seminar 2018 AWS Well-Architected Framework</a></li>
+<li><a href="https://www.slideshare.net/AmazonWebServicesJapan/aws-black-belt-online-seminar-awsdisaster-recovery" target="_blank" rel="noopener">AWS Black Belt Online Seminar AWSで実現するDisaster Recovery</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" target="_blank" rel="noopener" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="メディア向けCMSサービスのインフラ構成のポイント" data-url="https://future-architect.github.io/articles/20200915/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20200915/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20200915/" target="_blank" rel="noopener" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20200915/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200915/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                メディア向けCMSサービスのインフラ構成のポイント
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200909/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                キーボードを組み立ててみた話
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20200910/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                「2020年代のコンテナ時代のPythonアーキテクチャ&デプロイ」というテーマでPyCon.jp 2020で発表してきました
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (33)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (12)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (1)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (92)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (81)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (23)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Product/">Product (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h2>リンク</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="https://note.future.co.jp/" target="_blank">未来報</a>
+      </li>
+      <li>
+        <a href="https://future-fintech.github.io/" target="_blank">Future Fintech EYE</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2019/future" target="_blank">2019年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/" target="_blank" rel="noopener">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" target="_blank" rel="noopener" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" target="_blank" rel="noopener" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog" target="_blank" rel="noopener"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo" target="_blank" rel="noopener"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future" target="_blank" rel="noopener">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+
+<![endif]-->
+
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        /*Layout.initFixHeaderWithPreHeader();*/ /* Switch On Header Fixing (only if you have pre-header) */
+        /*Layout.initNavScrolling();*/
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
