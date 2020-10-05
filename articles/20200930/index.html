@@ -24,7 +24,7 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20200930/image.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20200930/image_2.png">
 <meta property="article:published_time" content="2020-09-29T15:00:00.000Z">
-<meta property="article:modified_time" content="2020-09-30T01:28:54.466Z">
+<meta property="article:modified_time" content="2020-10-02T07:42:57.680Z">
 <meta property="article:author" content="Future Architect Consultants">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="Swagger">
@@ -252,10 +252,10 @@
 </li>
 </ul>
 <h2 id="Rego設計"><a href="#Rego設計" class="headerlink" title="Rego設計"></a>Rego設計</h2><p>tagsの数=1を実現するためには<a href="https://www.openpolicyagent.org/docs/latest/policy-reference/#built-in-functions" target="_blank" rel="noopener">ビルトイン関数</a>である <code>count</code> を利用します。</p>
-<figure class="highlight prolog"><figcaption><span>tagsの数チェック</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">package test</span><br><span class="line"></span><br><span class="line">deny_tags_multiple[msg] &#123;</span><br><span class="line">	some path, method</span><br><span class="line">    count(input.paths[path][method].tags) != <span class="number">1</span>               # タグが複数設定</span><br><span class="line">    msg := sprintf(<span class="string">"path(%v) method(%v) tags must keep only one"</span>, [path, method])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">deny_tags_none[msg] &#123;</span><br><span class="line">	some path, method</span><br><span class="line">    object.get(input.paths[path][method], <span class="string">"tags"</span>, <span class="string">"none"</span>) == <span class="string">"none"</span> # タグが存在しない場合</span><br><span class="line">    msg := sprintf(<span class="string">"path(%v) method(%v) tags must keep only one"</span>, [path, method])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight prolog"><figcaption><span>tagsの数チェック</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">package test</span><br><span class="line"></span><br><span class="line">deny_tags_multiple[msg] &#123;</span><br><span class="line">    some path, method</span><br><span class="line">    count(input.paths[path][method].tags) != <span class="number">1</span>               # タグが複数設定</span><br><span class="line">    msg := sprintf(<span class="string">"path(%v) method(%v) tags must keep only one"</span>, [path, method])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">deny_tags_none[msg] &#123;</span><br><span class="line">    some path, method</span><br><span class="line">    object.get(input.paths[path][method], <span class="string">"tags"</span>, <span class="string">"none"</span>) == <span class="string">"none"</span> # タグが存在しない場合</span><br><span class="line">    msg := sprintf(<span class="string">"path(%v) method(%v) tags must keep only one"</span>, [path, method])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>operationIdのcamelCaseのチェック方法は、あまり良い手じゃないですが、snake_caseでないことと、最初の1文字が小文字であることだけチェックします（単語の区切りがムズカシイので）。他にも、<code>split</code>、<code>object.get</code> など多数の組み込み関数を利用しています。</p>
-<figure class="highlight prolog"><figcaption><span>operationIdのチェック      </span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">package test</span><br><span class="line"></span><br><span class="line"># アンダースコアが含まれないことをチェック                                 </span><br><span class="line">deny_opeId_snake_case[msg] &#123;</span><br><span class="line">	some path, method</span><br><span class="line">    opeId := input.paths[path][method].operationId</span><br><span class="line">    </span><br><span class="line">    count(split(opeId, <span class="string">"_"</span>)) != <span class="number">1</span>                           # snake_caseじゃないこと</span><br><span class="line">    msg := sprintf(<span class="string">"path(%v) method(%v) operationId must be camelCase: %v"</span>, [path, method, opeId])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 最初の<span class="number">1</span>文字が小文字である</span><br><span class="line">deny_opeId_not_camel_case[msg] &#123;</span><br><span class="line">	some path, method</span><br><span class="line">    opeId := input.paths[path][method].operationId</span><br><span class="line">    </span><br><span class="line">    substring(opeId, <span class="number">0</span>, <span class="number">1</span>) != lower(substring(opeId, <span class="number">0</span>, <span class="number">1</span>)) # 最初の<span class="number">1</span>文字が小文字</span><br><span class="line">    msg := sprintf(<span class="string">"path(%v) method(%v) operationId must be camelCase: %v"</span>, [path, method, opeId])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># <span class="symbol">HTTP</span>メソッドから始まっていることチェック</span><br><span class="line">deny_opeId_startwith_http_method[msg] &#123;</span><br><span class="line">	some path, method</span><br><span class="line">    opeId := input.paths[path][method].operationId</span><br><span class="line">	</span><br><span class="line">    indexof(opeId, method) != <span class="number">0</span>  # <span class="symbol">HTTP</span>メソッドから始まっていない</span><br><span class="line">    msg := sprintf(<span class="string">"path(%v) method(%v) operationId must be startwith http method: %v"</span>, [path, method, opeId])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight prolog"><figcaption><span>operationIdのチェック      </span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">package test</span><br><span class="line"></span><br><span class="line"># アンダースコアが含まれないことをチェック                                 </span><br><span class="line">deny_opeId_snake_case[msg] &#123;</span><br><span class="line">    some path, method</span><br><span class="line">    opeId := input.paths[path][method].operationId</span><br><span class="line">    </span><br><span class="line">    count(split(opeId, <span class="string">"_"</span>)) != <span class="number">1</span>                           # snake_caseじゃないこと</span><br><span class="line">    msg := sprintf(<span class="string">"path(%v) method(%v) operationId must be camelCase: %v"</span>, [path, method, opeId])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 最初の<span class="number">1</span>文字が小文字である</span><br><span class="line">deny_opeId_not_camel_case[msg] &#123;</span><br><span class="line">    some path, method</span><br><span class="line">    opeId := input.paths[path][method].operationId</span><br><span class="line">    </span><br><span class="line">    substring(opeId, <span class="number">0</span>, <span class="number">1</span>) != lower(substring(opeId, <span class="number">0</span>, <span class="number">1</span>)) # 最初の<span class="number">1</span>文字が小文字</span><br><span class="line">    msg := sprintf(<span class="string">"path(%v) method(%v) operationId must be camelCase: %v"</span>, [path, method, opeId])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># <span class="symbol">HTTP</span>メソッドから始まっていることチェック</span><br><span class="line">deny_opeId_startwith_http_method[msg] &#123;</span><br><span class="line">    some path, method</span><br><span class="line">    opeId := input.paths[path][method].operationId</span><br><span class="line">	</span><br><span class="line">    indexof(opeId, method) != <span class="number">0</span>  # <span class="symbol">HTTP</span>メソッドから始まっていない</span><br><span class="line">    msg := sprintf(<span class="string">"path(%v) method(%v) operationId must be startwith http method: %v"</span>, [path, method, opeId])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>これらを1つのファイルとしてまとめて、<code>policy.rego</code> に保存しておきます。</p>
 <h2 id="入力とする-Open-API-Spec"><a href="#入力とする-Open-API-Spec" class="headerlink" title="入力とする Open API Spec"></a>入力とする Open API Spec</h2><p>OAIのexamplesを参考に入力となる違反した定義を作成します。</p>
@@ -325,6 +325,20 @@
   
     
       
+        <a href="https://future-architect.github.io/articles/20201005/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                TiKVに触れる
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
         <a href="https://future-architect.github.io/articles/20201002/">
           <div class="row margin-bottom-10">
             <div class="col-md-10">
@@ -380,16 +394,6 @@
 	
   
     
-      
-        <a href="https://future-architect.github.io/articles/20190625/">
-          <div class="row margin-bottom-10">
-            <div class="col-md-10">
-              <li>
-                Amazon Redshiftの仕様を調べてみた
-              </li>
-            </div>
-          </div>
-        </a>
       
 	
   
@@ -1442,7 +1446,7 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Programming/">Programming (98)</a>
+	  <a href="/categories/Programming/">Programming (99)</a>
 	</li>
       
 	<li>
