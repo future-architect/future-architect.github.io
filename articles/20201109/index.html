@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>GoのWebアプリ開発で割り切ったパッケージ構成とテスト方針にした結果 | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="digital designerによるPixabayからの画像 はじめにこんにちは、TIG 真野です。秋のブログ週間連載の第9弾です。 1年弱ほどGo言語でWebAPIアプリケーション開発を行っていますが、かなり割り切った構成・テスト方針を採用しました。そろそろ1年弱になり機能開発も比較的落ち着き、保守運用フェーズの割合も徐々に増えてきた頃合いなので、やったこと・学び・反省といった振り返りを共">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GoのWebアプリ開発で割り切ったパッケージ構成とテスト方針にした結果">
+<meta property="og:url" content="https://future-architect.github.io/articles/20201109/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="digital designerによるPixabayからの画像 はじめにこんにちは、TIG 真野です。秋のブログ週間連載の第9弾です。 1年弱ほどGo言語でWebAPIアプリケーション開発を行っていますが、かなり割り切った構成・テスト方針を採用しました。そろそろ1年弱になり機能開発も比較的落ち着き、保守運用フェーズの割合も徐々に増えてきた頃合いなので、やったこと・学び・反省といった振り返りを共">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20201109/carton-4399301_1280.png">
+<meta property="article:published_time" content="2020-11-08T15:00:00.000Z">
+<meta property="article:modified_time" content="2020-11-09T06:41:27.705Z">
+<meta property="article:author" content="Future Architect Consultants">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="秋のブログ連載">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20201109/carton-4399301_1280.png">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="GoのWebアプリ開発で割り切ったパッケージ構成とテスト方針にした結果 | フューチャー技術ブログ" name="description">
+  <meta content="GoのWebアプリ開発で割り切ったパッケージ構成とテスト方針にした結果,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー技術ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+
+  
+<link rel="stylesheet" href="/css/theme-styles.css">
+
+  <!-- Theme styles END -->
+<meta name="generator" content="Hexo 4.2.1"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">フューチャー技術ブログ</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="180px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20201109/">GoのWebアプリ開発で割り切ったパッケージ構成とテスト方針にした結果</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20201109_GoのWebアプリ開発で割り切ったパッケージ構成とテスト方針にした結果" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> laqiiz</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-11-08T15:00:00.000Z" itemprop="datePublished">2020/11/09</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/Go/" title="Go">Go</a>,
+  
+    <a href="/tags/%E7%A7%8B%E3%81%AE%E3%83%96%E3%83%AD%E3%82%B0%E9%80%A3%E8%BC%89/" title="秋のブログ連載">秋のブログ連載</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <img src="/images/20201109/carton-4399301_1280.png" class="img-middle-size">
+
+<p><a href="https://pixabay.com/ja/users/dapple-designers-7874104/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=4399301" target="_blank" rel="noopener">digital designer</a>による<a href="https://pixabay.com/ja/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=4399301" target="_blank" rel="noopener">Pixabay</a>からの画像</p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIG 真野です。<a href="https://future-architect.github.io/articles/20201026/">秋のブログ週間連載</a>の第9弾です。</p>
+<p>1年弱ほどGo言語でWebAPIアプリケーション開発を行っていますが、かなり割り切った構成・テスト方針を採用しました。そろそろ1年弱になり機能開発も比較的落ち着き、保守運用フェーズの割合も徐々に増えてきた頃合いなので、やったこと・学び・反省といった振り返りを共有します。</p>
+<h1 id="Goのパッケージ"><a href="#Goのパッケージ" class="headerlink" title="Goのパッケージ"></a>Goのパッケージ</h1><p>Goのパッケージ構成については澁川さんの以下の記事が社内でよく引用されます。</p>
+<ul>
+<li><a href="https://future-architect.github.io/articles/20200528/">あなたのGoアプリ/ライブラリのパッケージ構成もっとシンプルでよくない？</a></li>
+</ul>
+<p>記事でも触れられていますが、GoでWebAPIで開発するときのパッケージは <a href="https://github.com/golang-standards/project-layout" target="_blank" rel="noopener">golang-standards/project-layout</a>や、<a href="https://postd.cc/golang-clean-archithecture/" target="_blank" rel="noopener">Goでクリーンアーキテクチャを試す</a> の記事を目にすることが多いと思います。</p>
+<p>澁川さん記事に影響を受けて色々削ぎ落としつつ、開発スタイルも色々と割り切りました。割り切りはトレードオフなので当然、対象ドメイン・規模・期間・要員などに依存してその都度の正解は変わってくると思います。一つの実験結果として見てもらえれば幸いです。</p>
+<h1 id="採用したパッケージ構成"><a href="#採用したパッケージ構成" class="headerlink" title="採用したパッケージ構成"></a>採用したパッケージ構成</h1><p><a href="https://future-architect.github.io/articles/20200528/">澁川さん記事</a>でいう、いわゆる “最小構成” を採用しました。これを試してみたという記事は見当たらなかったのでレア度が高い記事かもしれません。チーム規模は3-5人程度がコンスタントに開発していました。</p>
+<ul>
+<li>実行ファイルは <code>cmd</code> フォルダ内にアプリケーション（今回はAWS LambdaとローカルでポートをListenするサーバアプリの2種類）<ul>
+<li>2Wayな起動方法については、<a href="https://future-architect.github.io/articles/20200927/">辻さんの記事</a>や<a href="https://future-architect.github.io/articles/20200630/">この記事</a>に詳細説明があるのでぜひ確認ください</li>
+</ul>
+</li>
+<li>自動生成系は generate の略で <code>gen</code> 配下に出力。アプリ本体と分離するためこちらはあえて分離</li>
+<li><code>docs</code>, <code>testdata</code> などを除くと、後はフラット構成です</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;projectroot&gt;           # projectrootパッケージ</span><br><span class="line">├── cmd</span><br><span class="line">│   ├── lambda          # lambda用のmainパッケージ</span><br><span class="line">|   |   └── main.go</span><br><span class="line">│   └── server          # ローカル起動用のmainパッケージ</span><br><span class="line">|   |   └── main.go</span><br><span class="line">├── gen                 # 自動生成ファイル(go-swaggerの生成物)</span><br><span class="line">│   ├── models</span><br><span class="line">│   └── restapi</span><br><span class="line">├── docs                # ドキュメント(Markdown, draw.io, PlantUML, etc)</span><br><span class="line">├── testdata            # 単体テスト用のデータ</span><br><span class="line">|</span><br><span class="line">├── error.go                 # 共通コード</span><br><span class="line">├── db.go                    # 共通コード</span><br><span class="line">├── log.go                   # 共通コード</span><br><span class="line">├── article_handler.go       # article機能の制御コード</span><br><span class="line">├── article_handler_test.go  # テストコード</span><br><span class="line">├── article_model.go         # article機能のモデルコード</span><br><span class="line">├── article_model_test.go    # テストコード</span><br><span class="line">├── article_db.go            # article機能の永続化コード</span><br><span class="line">├── author_handler.go        # article機能の制御コード</span><br><span class="line">├── author_handler_test.go   # テストコード</span><br><span class="line">├── author_model.go          # article機能のモデルコード</span><br><span class="line">├── author_model_test.go     # テストコード</span><br><span class="line">├── author_db.go             # article機能の永続化コード</span><br><span class="line">├── (省略)</span><br><span class="line">├── device_handler.go        # device機能の制御コード</span><br><span class="line">├── device_handler_test.go   # テストコード</span><br><span class="line">├── device_model.go          # device機能のモデルコード</span><br><span class="line">├── device_model_test.go     # テストコード</span><br><span class="line">└── device_db.go             # device機能の永続化コード</span><br></pre></td></tr></table></figure>
+
+<p>パット見、 <code>&lt;projectroot&gt;</code> の直下に Goファイルが増えすぎない？と思われた方もいると思いますが、そのとおりです。1年くらいで <code>ls -l | grep .go | wc -l</code> すると50ファイル弱と育っていました。</p>
+<p>また、このパッケージ構成を採用するにいたり、同時にいくつかの <strong>割り切り</strong> を行っています。</p>
+<h2 id="dbインターフェースを作らないこと"><a href="#dbインターフェースを作らないこと" class="headerlink" title="dbインターフェースを作らないこと"></a>dbインターフェースを作らないこと</h2><p>パッケージ構成とは別の話になりますが、永続化層などをインターフェース化 &amp; 単体テストをモック化で素早くサイクルを回せるようにすることは良いプラクティスだと思います。しかし今回は採用しませんでした。理由は以下です。</p>
+<ul>
+<li>データ層をMock化すると、Mockコード開発の手間がある<ul>
+<li>慣れれば余裕だと思いますが、毎月新規参画者が入れ替わる環境だったので手間を減らしたかった</li>
+</ul>
+</li>
+<li>Mockでは上手く動いても、実サービス（今回だとDynamoDBや、過去の経験だとRDB）に接続すると動かないケースが過去あった<ul>
+<li>実質的にモック環境と実サービス環境の2種類の動作確認が必要となり、すこし手間だなと感じた</li>
+</ul>
+</li>
+<li><a href="https://github.com/localstack/localstack" target="_blank" rel="noopener">LocalStack</a> という外部モックサービスをフル活用することで、ローカルに閉じてテストは可能<ul>
+<li>起動の手間はdocker-compose化することで抑えられる</li>
+<li>結局モック用のデータを作るのと同様のテストデータ登録が発生するが、awscliなど永続化サービスの機能を経由することで、チームがデプロイ後の操作に早めに慣れることができる</li>
+</ul>
+</li>
+</ul>
+<p>これをやってみた感想を上げておきます（薄々やる前からわかることですが..）</p>
+<ul>
+<li>❌ LocalStackのテストデータ登録・削除がボトルネックになる<ul>
+<li>外部サービスにテストが依存するので、並列でテスト実行が行えず make test待ちになることしばしばです（現在4分程度かかります）</li>
+<li>go test -v -run CreateArticleTest などと開発対象を絞って実行しますが、デグレ防止で全テスト実行したいときは待ち時間が億劫になります。開発規模によっては部分的にモック化するとか、LocalStackのテストテーブルをテストごとに作成するなど工夫が必要になってくるかなと思います</li>
+</ul>
+</li>
+<li>△ そこそこリソースがあるPCじゃないと、LocalStack起動が重い。メモリ16GBあれば問題なしですが、8GBとかだと厳しいと思います<ul>
+<li>現在の社内支給PCだと問題にならなかったですが、4,5年くらい前だとスペック的に厳しい人もいたかも</li>
+</ul>
+</li>
+<li>◎ インターフェースを作らない≒handlerとdb の紐付けは1:1になるので、mainパッケージなど外部からのインジェクションが不要になり、コードがスッキリする（体感的に何割か記述量が減って見通しが良くなりました）</li>
+</ul>
+<h2 id="handler-db-はStruct化しない"><a href="#handler-db-はStruct化しない" class="headerlink" title="handler, db はStruct化しない"></a>handler, db はStruct化しない</h2><p>これもパッケージ構成とは別の話になりますが、handler, dbはStruct化しませんでした。あくまで呼び出す関数だけそのまま公開しています</p>
+<p>例えばDB層は以下のような構成です。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">package &lt;projectroot&gt;</span><br><span class="line"></span><br><span class="line">func Store(ctx context.Context, a *Article) error &#123;</span><br><span class="line">  &#x2F;&#x2F; 略</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func GetByID(ctx context.Context, id int64) (Article, error) &#123;</span><br><span class="line">  &#x2F;&#x2F; 略</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func Update(ctx context.Context, ar *Article) error &#123;</span><br><span class="line">  &#x2F;&#x2F; 略</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>DynamoDBなどのコネクションなどはどこで扱うかですが、db.goで初期化しています。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">package &lt;projectroot&gt;</span><br><span class="line"></span><br><span class="line">var db &#x3D; dynamodb.New(session.Must(session.NewSession(&amp;aws.Config&#123;</span><br><span class="line">			Region: aws.String(&quot;&lt;AWS Region&gt;&quot;),</span><br><span class="line">		&#125;)))</span><br></pre></td></tr></table></figure>
+
+<p>この変数dbを、各xxx_db.go は直接参照しています</p>
+<figure class="highlight go"><figcaption><span>xxx_db.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> &lt;projectroot&gt;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Store</span><span class="params">(ctx context.Context, id <span class="keyword">int64</span>)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">  	av, err := dynamodbattribute.MarshalMap(v)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">"dynamodb attribute marshalling map: %w"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	i := &amp;dynamodb.PutItemInput&#123;</span><br><span class="line">		Item:      av,</span><br><span class="line">		TableName: aws.String(<span class="string">"&lt;table name&gt;"</span>),</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> _, err = db.PutItemWithContext(ctx, i); err != <span class="literal">nil</span> &#123;  # ★同一パッケージにあるdbを直接利用する</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">"dynamodb put item: %w"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>いわゆる 変数db はグローバル変数のように影響度が大き過ぎるかもしれませんが、実用上は非常に楽でした。</p>
+<p>今までは変数dbの初期化をmainパッケージかそれに近いところで行い、<code>articleDB := NewArticleDB(db)</code> のような初期化を行っていましたが、そもそもDB層のインターフェースも辞めたのでStructを作る必要もなくなり、上記のような初期化コードもなくなり、さらにコード量が減りました。</p>
+<p>これをやってみた感想を上げておきます。</p>
+<ul>
+<li>❌テストごとにdbを切り替えたいといった柔軟なことはやりにくい<ul>
+<li>dbを切り替えると、アプリケーションの永続化層の全てが影響を受けるためです</li>
+<li>例えば、あえて接続NGになるdbを設定して、異常系のテストを行うなどは行いにくいですし、今は行えていません</li>
+</ul>
+</li>
+<li>◎永続化層の機能追加が、≒関数追加になるので、思考が楽<ul>
+<li>関数を追加するための、Structを作って初期化して～などがなくなるで、思考のオーバーヘッドは楽になりました<ul>
+<li>過去はこの辺を自動化するgeneratorを作っていましたが、それすら叩かなくて良いのも良いです</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>その他<ul>
+<li>変数dbを書き換えたりといった、お作法破りの開発者は現れなかった</li>
+<li>テスト時はLocalStack上のDynamoDB Localに代入するだけで楽（以下に例をあげます）</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight go"><figcaption><span>article_handler_test.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> &lt;projectroot&gt;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	db = dynamodb.New(session.Must(session.NewSession(&amp;aws.Config&#123;   <span class="comment">// そのまま書き換えるだけ</span></span><br><span class="line">		Endpoint: aws.String(<span class="string">"http://localhost:4566"</span>),</span><br><span class="line">		Region:   aws.String(endpoints.ApNortheast1RegionID),</span><br><span class="line">	&#125;)))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Usecase層を無くした"><a href="#Usecase層を無くした" class="headerlink" title="Usecase層を無くした"></a>Usecase層を無くした</h2><p>xxx_handler.go はフレームワークにロックインされる（echo, go-swaggerなどのパッケージが入るという意味）なので、usecaseという安全地帯を作ろうという考えも最初はありましたが、結局は廃しました。理由は以下です。</p>
+<ul>
+<li>フレームワークを切り替えるときは別途工数を取るとことで開発オーナーと合意</li>
+<li>Goはhttptestなど標準ライブラリのテスト用のパッケージが存在し、仮にフレームワークを乗り換えたとしてもadaptorコードを書けばなんとか動きそう<ul>
+<li>httptestを上手く使えば思ったよりポータブルなテストコードが作れた</li>
+</ul>
+</li>
+<li>echo, go-swaggerなどGoのWebアプリケーションフレームワークは、handlerのテストをサポートしていて、テスタビリティはusecaseを切っても変わらない</li>
+<li>メンバーがusecaseを利用した開発に慣れている訳でもない</li>
+</ul>
+<p>ここまでをまとめると、<code>handler(Endpoint) --&gt; usecase --&gt; repository</code> といったオーソドックスなスタイルではなく、 <code>handler(Endpoint) --&gt; dao的な何か</code> という流れになりました。</p>
+<p>こうすると、usecaseを再利用するような場合に困るんじゃないのと思います。困るときも多いのですが対策としてはなるべく model にビジネスロジックを寄せるという対応を取っています。下手にusecaseが存在しないので、modelはよく真ん丸と天高く馬肥える秋です。</p>
+<h1 id="やってみて困ったこと"><a href="#やってみて困ったこと" class="headerlink" title="やってみて困ったこと"></a>やってみて困ったこと</h1><ul>
+<li>関数宣言で、名前空間がかぶりがち<ul>
+<li>Handlerで CreateArticle という関数を宣言したとき、 DBにも CreateArticle という関数を宣言しがちです。同一パッケージなのでバッティングするのは少し困るときがありました。今回はHandler側はHTTP Method名を先頭に付与するルールなので、 handlerはPostArticle、DBは CreateArticleと住み分けることにしました</li>
+</ul>
+</li>
+<li><code>testdata</code> はフラットにしない方が良い<ul>
+<li>実はtestdata以下のファイルもフラットにしていましたが、そちらは1テスト関数にN個のデータを作るので、現在150ファイル超えです</li>
+<li>120~130ごろから探すのが面倒だなと思ってきます。そのため、testdata配下はフォルダを切った方が良いと思います</li>
+</ul>
+</li>
+<li>なるべくmodelにロジックを寄せる（テストを寄せる）<ul>
+<li>テストケースが増えるとどうしても実行時間が増えるのでビジネスロジックはmodel側に寄せる方針になりました</li>
+</ul>
+</li>
+<li>handler, db, model内でのみ利用する関数を小文字始まりにするなど命名規約は最初に作ったほうが良さそう<ul>
+<li>全て同一パッケージなので、関数のパッケージPrivateにしてもアクセスできてしまうためです</li>
+</ul>
+</li>
+</ul>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>簡単にまとめです。</p>
+<ul>
+<li>パッケージもシンプルにしたけど、同時に極力Struct, Interfaceを排除した</li>
+<li>handler(Endpoint) –&gt; usecase –&gt; repositoryといった流れで制御フローが流すことが世の中多そうだが、endpoint側にロジックを実装、repositoryは無くして直接db層の関数を呼び出した。初期化はdb.goにdbのclientを初期化してそれを使う</li>
+<li>modelになるべくロジックを寄せたた</li>
+<li>testはhandlerの関数単位で行う</li>
+<li>DB層をインターフェースを経由せずに扱うことはLocalStackなど外部モックサービスを利用すれば問題にならなかった</li>
+</ul>
+<p>上記によって色々柔軟性は失われたかもしれませんが、少なくてもコード量はグッと減り開発スピードの向上に寄与できるかもしれません。<br>最後まで読んでもいただき、ありがとうございました！</p>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" target="_blank" rel="noopener" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="GoのWebアプリ開発で割り切ったパッケージ構成とテスト方針にした結果" data-url="https://future-architect.github.io/articles/20201109/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20201109/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20201109/" target="_blank" rel="noopener" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20201109/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20201109/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GoのWebアプリ開発で割り切ったパッケージ構成とテスト方針にした結果
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20201106/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                OSSコミュニティへのフィードバック 
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20201105/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                イノベーションの捉え方
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (38)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (12)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (106)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (91)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (25)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Product/">Product (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h2>リンク</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="https://note.future.co.jp/" target="_blank">未来報</a>
+      </li>
+      <li>
+        <a href="https://future-fintech.github.io/" target="_blank">Future Fintech EYE</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2019/future" target="_blank">2019年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/" target="_blank" rel="noopener">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" target="_blank" rel="noopener" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" target="_blank" rel="noopener" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog" target="_blank" rel="noopener"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo" target="_blank" rel="noopener"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future" target="_blank" rel="noopener">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+
+<![endif]-->
+
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        /*Layout.initFixHeaderWithPreHeader();*/ /* Switch On Header Fixing (only if you have pre-header) */
+        /*Layout.initNavScrolling();*/
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
