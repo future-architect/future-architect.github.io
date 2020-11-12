@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>GoでLambdaからLambdaを呼び出すときに気をつけたいポイント6選 | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにTIGの辻です。サーバーレスなアプリケーションを開発するときにAWS LambdaやCloud RunといったFaaSはとても重宝します。デプロイする関数のコードは1つの関数がモノリシックな大きな関数にならないように、小さな関数を組み合わせて実装するのが基本です。いくつかのユースケースでAWS LambdaからAWS Lambdaを同期的に呼び出したいケースがあったのですが、開発者が意識し">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GoでLambdaからLambdaを呼び出すときに気をつけたいポイント6選">
+<meta property="og:url" content="https://future-architect.github.io/articles/20201112/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIGの辻です。サーバーレスなアプリケーションを開発するときにAWS LambdaやCloud RunといったFaaSはとても重宝します。デプロイする関数のコードは1つの関数がモノリシックな大きな関数にならないように、小さな関数を組み合わせて実装するのが基本です。いくつかのユースケースでAWS LambdaからAWS Lambdaを同期的に呼び出したいケースがあったのですが、開発者が意識し">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20201112/Lambda%E3%81%8B%E3%82%89Lambda.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201112/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201112/image_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201112/Lambda%E3%81%8B%E3%82%89Lambda-VPCLambda.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201112/image_3.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201112/image_4.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201112/image_5.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201112/image_6.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201112/image_7.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201112/image_8.png">
+<meta property="article:published_time" content="2020-11-11T15:00:00.000Z">
+<meta property="article:modified_time" content="2020-11-12T01:11:58.337Z">
+<meta property="article:author" content="Future Architect Consultants">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Lambda">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20201112/Lambda%E3%81%8B%E3%82%89Lambda.png">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="GoでLambdaからLambdaを呼び出すときに気をつけたいポイント6選 | フューチャー技術ブログ" name="description">
+  <meta content="GoでLambdaからLambdaを呼び出すときに気をつけたいポイント6選,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー技術ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+
+  
+<link rel="stylesheet" href="/css/theme-styles.css">
+
+  <!-- Theme styles END -->
+<meta name="generator" content="Hexo 4.2.1"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">フューチャー技術ブログ</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="180px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20201112/">GoでLambdaからLambdaを呼び出すときに気をつけたいポイント6選</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20201112_GoでLambdaからLambdaを呼び出すときに気をつけたいポイント6選" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 辻大志郎</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-11-11T15:00:00.000Z" itemprop="datePublished">2020/11/12</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/AWS/" title="AWS">AWS</a>,
+  
+    <a href="/tags/Go/" title="Go">Go</a>,
+  
+    <a href="/tags/Lambda/" title="Lambda">Lambda</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIGの辻です。サーバーレスなアプリケーションを開発するときにAWS LambdaやCloud RunといったFaaSはとても重宝します。デプロイする関数のコードは1つの関数がモノリシックな大きな関数にならないように、小さな関数を組み合わせて実装するのが基本です。いくつかのユースケースでAWS LambdaからAWS Lambdaを同期的に呼び出したいケースがあったのですが、開発者が意識しておいたほうがいいようなハマりどころがいくつかありました。</p>
+<p>本記事ではGoで<a href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/invocation-sync.html" target="_blank" rel="noopener">AWS LambdaからAWS Lambdaを同期的に呼び出すとき</a>のハマりどころやTipsを紹介します。以下のような構成です。</p>
+<p><img src="/images/20201112/Lambda%E3%81%8B%E3%82%89Lambda.png" alt=""></p>
+<ul>
+<li>ライブラリのバージョン</li>
+</ul>
+<p>確認時のライブラリのバージョンは以下です。</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>ソフトウェア/ライブラリ</th>
+<th>バージョン</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>aws/aws-lambda-go</td>
+<td>1.19.1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>aws/aws-sdk-go</td>
+<td>1.35.7</td>
+</tr>
+</tbody></table>
+<p>またAWSのリージョンは、アジアパシフィック(東京) <code>ap-northeast-1</code> です。Lambda関数のランタイムは <code>Go 1.x</code> を使っています。</p>
+<h1 id="ハマりどころ集"><a href="#ハマりどころ集" class="headerlink" title="ハマりどころ集"></a>ハマりどころ集</h1><h2 id="1-Lambda関数呼び出しのエラーハンドリング"><a href="#1-Lambda関数呼び出しのエラーハンドリング" class="headerlink" title="1. Lambda関数呼び出しのエラーハンドリング"></a>1. Lambda関数呼び出しのエラーハンドリング</h2><p>Lambda関数を呼び出す <code>InvokeWithContext</code> ですが <code>InvokeWithContext</code> は呼び出し先のLambda関数が正常に呼び出された場合は、以下の戻り値の <code>error</code> は常に <code>nil</code> になります。</p>
+<p><code>func (c *Lambda) InvokeWithContext(ctx aws.Context, input *InvokeInput, opts ...request.Option) (*InvokeOutput, error)</code></p>
+<p><code>InvokeInput</code> の関数名が間違っているなど、そもそも呼び出し先のLambda関数が呼び出せなかったときは <code>error</code> が <code>non-nil</code> になります。しかし、呼び出し先のLambda関数を呼び出せた場合は、呼び出し先の関数がエラーを返したどうかに関わらず、呼び出し元の戻り値の <code>error</code> は <code>nil</code> になります。Goは戻り値の <code>erorr</code> が <code>nil</code> かどうかでエラーをハンドリングするのが一般的です。しかし <code>InvokeWithContext</code> を使う場合のエラーハンドリングは、よくあるGoのエラーハンドリングの作法からは外れるので、注意が必要です。</p>
+<p><code>InvokeWithContext</code> をつかってLambda関数を呼び出す場合に、呼び出し先のLambda関数のエラーをハンドリングしたい場合、以下のような実装は間違っています。(呼び出し先のLambda関数では <code>errors.New(&quot;invoked err&quot;)</code> の <code>errorString</code> を返却するようにしています)</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Lambda関数呼び出し</span></span><br><span class="line">resp, err := lmd.InvokeWithContext(ctx, input)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 正常にLambda関数が呼び出せた場合は常にnilになります</span></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> fmt.Errorf(<span class="string">"invoke lambda, function name = %s: %w"</span>, functionName, err)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>呼び出し先のLambda関数でエラーが発生していても、呼び出し元の処理は正常終了しています。</p>
+<p><img src="/images/20201112/image.png" alt=""></p>
+<h3 id="修正例"><a href="#修正例" class="headerlink" title="修正例"></a>修正例</h3><p><strong><code>InvokeOutput</code> の <code>FunctionError</code> が <code>nil</code> かどうかで呼び出し先のLambda関数でエラーが発生したかチェックする</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Lambda関数呼び出し</span></span><br><span class="line">resp, err := lmd.InvokeWithContext(ctx, input)</span><br><span class="line">log.Printf(<span class="string">"invoke err: %v\n"</span>, err)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> fmt.Errorf(<span class="string">"invoke lambda, function name = %s: %w"</span>, functionName, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// resp変数のFunctionErrorがnilかどうかで呼び出し先のLambda関数でエラーが発生したかチェックします</span></span><br><span class="line"><span class="keyword">if</span> resp.FunctionError != <span class="literal">nil</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> fmt.Errorf(<span class="string">"invoke lambda response error, detail: %v: %v"</span>, <span class="keyword">string</span>(resp.Payload), aws.StringValue(resp.FunctionError))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>resp.FunctionError</code> を使ってエラーをチェックすれば、呼び出し先のLambda関数で発生したエラーをハンドリングできます。エラーの詳細は <code>resp.Payload</code> にJSONとして表現されています。今回の場合、呼び出し先のLambda関数で <code>errorString</code> のエラーが発生し、エラーの文字列として <code>&quot;invoked err&quot;</code> となっていることがわかります。</p>
+<p><img src="/images/20201112/image_2.png" alt=""></p>
+<h2 id="2-Contextでは値を伝播できない"><a href="#2-Contextでは値を伝播できない" class="headerlink" title="2. Contextでは値を伝播できない"></a>2. Contextでは値を伝播できない</h2><p>GoではContextという、APIやプロセス間で、処理のデッドラインを設定やリクエストスコープ内に閉じた値を伝播する機能があります。Contextを用いて値を伝播するときは<a href="https://golang.org/pkg/context/#WithValue" target="_blank" rel="noopener">context.WithValue</a>を使って、キーとバリューのセットでコンテキストに値を格納します。</p>
+<details><summary>WithContextを利用する実装例</summary><div>
+
+<p>通常Contextのキーは衝突を防ぐためにパッケージ内で非公開のキーとにしておき、Contextに値をセットしたり、Contextから値を取得したりする関数を用意することが一般的です。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"errors"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> (</span><br><span class="line">	readerKey = <span class="keyword">struct</span>&#123;&#125;&#123;&#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Reader <span class="keyword">struct</span> &#123;</span><br><span class="line">	Message <span class="keyword">string</span></span><br><span class="line">	<span class="comment">//...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RetrieveReader</span><span class="params">(ctx context.Context)</span> <span class="params">(Reader, error)</span></span> &#123;</span><br><span class="line">	r, ok := ctx.Value(readerKey).(Reader)</span><br><span class="line">	<span class="keyword">if</span> !ok &#123;</span><br><span class="line">		<span class="keyword">return</span> Reader&#123;&#125;, errors.New(<span class="string">"not found Reader in the context"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> r, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SetReader</span><span class="params">(ctx context.Context, r Reader)</span> <span class="title">context</span>.<span class="title">Context</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> context.WithValue(ctx, readerKey, r)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ===================================================</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// コンテキストに値を格納</span></span><br><span class="line">	r := Reader&#123;Message: <span class="string">"hello context with value!"</span>&#125;</span><br><span class="line">	ctx = SetReader(ctx, r)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 別の処理を呼び出し</span></span><br><span class="line">	hoge(ctx)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">hoge</span><span class="params">(ctx context.Context)</span></span> &#123;</span><br><span class="line">	r, error := RetrieveReader(ctx)</span><br><span class="line">	<span class="keyword">if</span> error != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// コンテキストに値が含まれなかったときの処理</span></span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(r)</span><br><span class="line">	<span class="comment">// Output: &#123;hello context with value!&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</div></details>
+
+<p>AWSが提供しているGoのSDK <a href="https://github.com/aws/aws-sdk-go" target="_blank" rel="noopener"><code>aws-sdk-go</code></a> では、Lambda関数を呼び出すために以下の3つのAPIが提供されています。(※DeprecatedになっているAPIは除きます。)</p>
+<ul>
+<li><code>func (c *Lambda) Invoke(input *InvokeInput) (*InvokeOutput, error)</code></li>
+<li><code>func (c *Lambda) InvokeRequest(input *InvokeInput) (req *request.Request, output *InvokeOutput)</code></li>
+<li><code>func (c *Lambda) InvokeWithContext(ctx aws.Context, input *InvokeInput, opts ...request.Option) (*InvokeOutput, error)</code></li>
+</ul>
+<p><code>InvokeWithContext</code> は <code>Context</code> を引数に受け取るため、<code>context.WithValue</code> でセットした値を呼び出し先のLambda関数に伝播できるのでは？と思うかもしれません。しかし、呼び出し元で <code>Context</code> に <code>context.WithValue</code> でセットしても値は呼び出し先のLambda関数に伝播されません。なぜなら <code>InvokeWithContext</code> における <code>Context</code> はリクエストのキャンセルするためのもので、値を伝播するためのものではないからです。</p>
+<h3 id="解決策"><a href="#解決策" class="headerlink" title="解決策"></a>解決策</h3><p><strong><code>InvokeInput</code> 型の <code>Payload</code> フィールドを使う</strong></p>
+<p><code>InvokeWithContext</code> を使ってLambdaを呼び出すときに、Inputの情報として <code>InvokeInput</code> を引数にセットします。<code>InvokeInput</code> は以下のような構造体です。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> InvokeInput <span class="keyword">struct</span> &#123;</span><br><span class="line">	ClientContext *<span class="keyword">string</span> <span class="string">`location:"header" locationName:"X-Amz-Client-Context" type:"string"`</span></span><br><span class="line">	FunctionName *<span class="keyword">string</span> <span class="string">`location:"uri" locationName:"FunctionName" min:"1" type:"string" required:"true"`</span></span><br><span class="line">	InvocationType *<span class="keyword">string</span> <span class="string">`location:"header" locationName:"X-Amz-Invocation-Type" type:"string" enum:"InvocationType"`</span></span><br><span class="line">	LogType *<span class="keyword">string</span> <span class="string">`location:"header" locationName:"X-Amz-Log-Type" type:"string" enum:"LogType"`</span></span><br><span class="line">	Payload []<span class="keyword">byte</span> <span class="string">`type:"blob" sensitive:"true"`</span></span><br><span class="line">	Qualifier *<span class="keyword">string</span> <span class="string">`location:"querystring" locationName:"Qualifier" min:"1" type:"string"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Payload</code> フィールドにJSONエンコードしたバイト配列をセットすることで呼び出し先のLambda関数に値を伝播することができます。以下のようにして呼び出し先のLambda関数に値を渡すことができます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 呼び出し先のLambdaに渡したい値</span></span><br><span class="line">r := Reader&#123;Message: <span class="string">"hello world!"</span>&#125;</span><br><span class="line"><span class="comment">// JSONにエンコード</span></span><br><span class="line">b, _ := json.Marshal(r)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Lambda関数呼び出しのInput設定</span></span><br><span class="line">functionName := <span class="string">"invoked"</span></span><br><span class="line">input := &amp;lambda.InvokeInput&#123;</span><br><span class="line">	FunctionName:   aws.String(functionName),</span><br><span class="line">	InvocationType: aws.String(lambda.InvocationTypeRequestResponse),</span><br><span class="line">	<span class="comment">// PayloadにJSONエンコードされた値をセット</span></span><br><span class="line">	Payload:        b,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Lambda関数呼び出し</span></span><br><span class="line">resp, err := lmd.InvokeWithContext(ctx, input)</span><br></pre></td></tr></table></figure>
+
+<details><summary>呼び出し側のLambda関数実装例</summary><div>
+
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"encoding/json"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line"></span><br><span class="line">	mainlambda <span class="string">"github.com/aws/aws-lambda-go/lambda"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws/session"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/service/lambda"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> (</span><br><span class="line">	lmd *lambda.Lambda</span><br><span class="line">)</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lmd = lambda.New(session.Must(session.NewSession(&amp;aws.Config&#123;&#125;)))</span><br><span class="line">	log.SetPrefix(<span class="string">"[DEBUG] "</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// Lambda関数の実行</span></span><br><span class="line">	mainlambda.Start(Handler)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Handler</span><span class="params">(ctx context.Context)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	log.Println(<span class="string">"hello caller lambda!"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 呼び出し先のLambdaに渡したい値</span></span><br><span class="line">	r := model.Reader&#123;Message: <span class="string">"hello world!"</span>&#125;</span><br><span class="line">	<span class="comment">// JSONにエンコード</span></span><br><span class="line">	b, _ := json.Marshal(r)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Lambda関数呼び出しのInput設定</span></span><br><span class="line">	functionName := <span class="string">"invoked"</span></span><br><span class="line">	input := &amp;lambda.InvokeInput&#123;</span><br><span class="line">		FunctionName:   aws.String(functionName),</span><br><span class="line">		InvocationType: aws.String(lambda.InvocationTypeRequestResponse),</span><br><span class="line">		Payload:        b,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Lambda関数呼び出し</span></span><br><span class="line">	resp, err := lmd.InvokeWithContext(ctx, input)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">"invoke lambda, function name = %s: %w"</span>, functionName, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 呼び出し先のLambdaからのレスポンス</span></span><br><span class="line">	log.Printf(<span class="string">"resp.StatusCode: %v\n"</span>, aws.Int64Value(resp.StatusCode))</span><br><span class="line">	log.Printf(<span class="string">"resp.FunctionError: %v\n"</span>, aws.StringValue(resp.FunctionError))</span><br><span class="line">	log.Printf(<span class="string">"resp.Payload: %v\n"</span>, <span class="keyword">string</span>(resp.Payload))</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>model.go</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> model</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Reader <span class="keyword">struct</span> &#123;</span><br><span class="line">	Message <span class="keyword">string</span> <span class="string">`json:"message"`</span></span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</div></details>
+
+<p>呼び出される側のLambda関数では、呼び出し時のペイロードはハンドラの引数として受け取ることができます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ハンドラの第2引数として呼び出し元のペイロードと同じ構造体を含める</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Handler</span><span class="params">(ctx context.Context, r model.Reader)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	log.Printf(<span class="string">"hello invoked lambda!, model.Reader=%#v\n"</span>, r)</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<details><summary>呼び出される側のLambda関数実装例</summary><div>
+
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"caller/model"</span></span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">	<span class="string">"os"</span></span><br><span class="line"></span><br><span class="line">	mainlambda <span class="string">"github.com/aws/aws-lambda-go/lambda"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws/session"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/service/lambda"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> (</span><br><span class="line">	lmd *lambda.Lambda</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	region := os.Getenv(<span class="string">"AWS_REGION"</span>)</span><br><span class="line">	lmd = lambda.New(session.Must(session.NewSession(&amp;aws.Config&#123;</span><br><span class="line">		Region: aws.String(region),</span><br><span class="line">	&#125;)))</span><br><span class="line">	log.SetPrefix(<span class="string">"[DEBUG] "</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// Lambda関数の実行</span></span><br><span class="line">	mainlambda.Start(Handler)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ハンドラの第2引数として呼び出し元のペイロードと同じ構造体を含める</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Handler</span><span class="params">(ctx context.Context, r model.Reader)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	log.Printf(<span class="string">"hello invoked lambda!, model.Reader=%#v\n"</span>, r)</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</div></details>
+
+<ul>
+<li>実行結果(呼び出し元)</li>
+</ul>
+<p>実行するとLambda関数を呼び出したレスポンスが返ってきます。この場合は正常に実行されたことがわかります。なお、今回は呼び出し先のLambda関数にはレスポンスを設定していないため、呼び出し元のLambda関数の <code>resp.Payload</code> が <code>null</code> になっていますが、レスポンスを呼び出し元に渡すこともできます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[DEBUG] 2020/10/11 03:05:17 hello <span class="built_in">caller</span> lambda!</span><br><span class="line">[DEBUG] 2020/10/11 03:05:17 resp.StatusCode: 200</span><br><span class="line">[DEBUG] 2020/10/11 03:05:17 resp.FunctionError: &lt;nil&gt;</span><br><span class="line">[DEBUG] 2020/10/11 03:05:17 resp.Payload: null</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>実行結果(呼び出し先)</li>
+</ul>
+<p>またCloudwatch Logsの呼び出されたLambda関数のログを見るとLambda関数が呼び出されていることがわかります。また呼び出し時にセットされたペイロードが引数の値として含まれていることがわかります。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[DEBUG] 2020/10/11 03:05:17 hello invoked lambda!, model.Reader=model.Reader&#123;Message:<span class="string">"hello world!"</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-VPC-LambdaからVPC-LambdaはInternalな通信では呼び出せない"><a href="#3-VPC-LambdaからVPC-LambdaはInternalな通信では呼び出せない" class="headerlink" title="3. VPC LambdaからVPC LambdaはInternalな通信では呼び出せない"></a>3. VPC LambdaからVPC LambdaはInternalな通信では呼び出せない</h2><p>Transit Gatewayなどを使ってオンプレとクラウドを接続する場合など、いくつかのユースケースでLambda関数をVPC Lambdaとして配置したい場合があります。VPC内にあるLambda関数から(VPC Lambda・非VPC Lambda問わず)別のLambda関数を呼び出す場合には<del>Internalの通信で呼び出せないことに注意が必要です。(2020/10/13現在)</del> VPC Endpointを使ってInternalな通信で呼び出せるようになりました。</p>
+<p>以下のようにLambda関数をVPC内に配置する場合です。サブネットはプライベートサブネットとします。(なお通常VPC Lambda関数は可用性の観点から複数のサブネットに配置します)</p>
+<p><img src="/images/20201112/Lambda%E3%81%8B%E3%82%89Lambda-VPCLambda.png" alt=""></p>
+<h3 id="VPCエンドポイントがなかった従来の場合"><a href="#VPCエンドポイントがなかった従来の場合" class="headerlink" title="VPCエンドポイントがなかった従来の場合"></a>VPCエンドポイントがなかった従来の場合</h3><p>同じVPCに含まれるLambda関数であるため、インターネットを経由せずにInternalな通信でLambda関数からLambda関数を呼び出せることを期待しますが、できません。<code>InvokeWithContext</code> で呼び出すと以下のようになります。</p>
+<p><img src="/images/20201112/image_3.png" alt=""></p>
+<p>ログには以下のように出力されており、Lambda関数自体の呼び出しに失敗しています。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[DEBUG] 2020/10/11 12:21:35 hello <span class="built_in">caller</span> lambda!</span><br><span class="line">[DEBUG] 2020/10/11 12:23:35 invoke err: RequestError: send request failed</span><br><span class="line">caused by: Post <span class="string">"https://lambda.ap-northeast-1.amazonaws.com/2015-03-31/functions/invoked/invocations"</span>: dial tcp 3.112.8.132:443: i/o timeout</span><br><span class="line">invoke lambda, <span class="keyword">function</span> name = invoked: RequestError: send request failed</span><br><span class="line">caused by: Post <span class="string">"https://lambda.ap-northeast-1.amazonaws.com/2015-03-31/functions/invoked/invocations"</span>: dial tcp 3.112.8.132:443: i/o timeout: wrapError</span><br></pre></td></tr></table></figure>
+
+<p>AWSのサービスをSDKで呼び出す場合は、リクエストのエンドポイントは各サービスで提供されているエンドポイントを使用します。Lambdaの場合は <a href="https://docs.aws.amazon.com/ja_jp/general/latest/gr/lambda-service.html" target="_blank" rel="noopener">AWS Lambda エンドポイントとクォータ</a> にあるように、<code>lambda.ap-northeast-1.amazonaws.com</code> となります(リージョンが <code>ap-northeast-1</code> の場合)。ログからも <code>lambda.ap-northeast-1.amazonaws.com</code> となっていることがわかります。VPC LambdaからVPC Lambdaを呼び出す場合においても、サービスが提供しているエンドポイントを経由する必要があるため、SDKでLambda関数を呼び出す場合はインターネットへ抜けるネットワーク経路が必要になります。</p>
+<h3 id="VPCエンドポイントを使う場合"><a href="#VPCエンドポイントを使う場合" class="headerlink" title="VPCエンドポイントを使う場合"></a>VPCエンドポイントを使う場合</h3><p>2020/10/20に公開されたブログにあるように、Lambda関数をVPCエンドポイント経由で呼び出せるようになりました。東京リージョン(<code>ap-northeast-1</code>)にも対応しています。待望のアップデートです。</p>
+<p><a href="https://aws.amazon.com/jp/blogs/aws/new-use-aws-privatelink-to-access-aws-lambda-over-private-aws-network/" target="_blank" rel="noopener">https://aws.amazon.com/jp/blogs/aws/new-use-aws-privatelink-to-access-aws-lambda-over-private-aws-network/</a></p>
+<ul>
+<li>構築手順</li>
+</ul>
+<p>VPCエンドポイントを作成します。</p>
+<p><img src="/images/20201112/image_4.png" alt=""></p>
+<p>VPCエンドポイントの作成が完了すると、DNS名が払い出されます。払い出されたDNS名に対してリクエストするように実装します。</p>
+<p><img src="/images/20201112/image_5.png" alt=""></p>
+<p>以下のようにLambda関数を呼び出すためのクライアントのConfigにエンドポイントをVPCエンドポイントから払い出されたDNS名を指定します。</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">func init() &#123;</span><br><span class="line">	lmd = lambda.New(session.Must(session.NewSession(&amp;aws.Config&#123;</span><br><span class="line"><span class="addition">+		Endpoint: aws.String("vpce-08dbf550d5e0a2b01-bcnnllkp.lambda.ap-northeast-1.vpce.amazonaws.com"),</span></span><br><span class="line">	&#125;)))</span><br><span class="line">	log.SetPrefix("[DEBUG] ")</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再度ビルドしてLambda関数をデプロイします。Lambda関数を実行すると、Lambda関数呼び出しが成功するようになりました。</p>
+<p><img src="/images/20201112/image_6.png" alt=""></p>
+<p>従来は以下の解決策に記載しているような</p>
+<ul>
+<li>NAT Gatewayを構築してインターネットへのアウトバウントの経路を確保する</li>
+<li>VPC Endpointを備えたPrivateなAPI Gatewayを経由してVPC Lambdaを呼び出す</li>
+<li>PrivateなALBを経由してVPC Lambdaを呼び出す</li>
+</ul>
+<p>といった回避策が必要でした。NAT Gatewayが構築できないインフラ構成の場合、どうしても複雑な構成を取らざるを得ませんでした。今回VPC EndpointがLambda関数に対応したことで、プライベートなネットワーク環境内でLambda関数を使うユースケースも増えていくのではないかと思います。</p>
+<h3 id="解決策-1"><a href="#解決策-1" class="headerlink" title="解決策"></a><del>解決策</del></h3><p><del><strong>プライベートなサブネットからインターネットに抜ける経路を構築する</strong></del></p>
+<p><del>SDKでLambda関数を呼び出すためにはプライベートサブネットからインターネットに抜ける経路が必要であるため、プライベートサブネットにNAT Gatewayを構築します。また、パブリックサブネットやInternet Gatewayを構築、各種セキュリティグループやルートテーブルの設定を実施する必要があります。</del></p>
+<p><del>その他の解決策としては、VPC Endpointを備えたPrivateなAPI Gatewayを経由してVPC Lambdaを呼び出す方法や、PrivateなALBを経由してVPC Lambdaを呼び出す方法などが考えられます。このような方法の場合はVPCにInternet Gatewayを備えていなくても、間接的にVPC Lambdaを呼び出せる、というメリットがあります。インフラ構成によっては十分有用な方法です。</del></p>
+<p>2020/10/20現在、VPCエンドポイントがLambdaに対応したため、VPCエンドポイントを使う場合、上記の解決先は不要になりました。</p>
+<h2 id="4-デフォルトでは同期呼び出し"><a href="#4-デフォルトでは同期呼び出し" class="headerlink" title="4. デフォルトでは同期呼び出し"></a>4. デフォルトでは同期呼び出し</h2><p>Lambda関数の呼び出しは2種類あります。1つは呼び出しのレスポンスを待つ同期型、もう一つは呼び出し時は即座に呼び出し元がレスポンスが返し、後で処理が実行される非同期型です。<code>InvokeWithContext</code> を使ってLambda関数を呼び出す場合はデフォルトだと同期型として呼び出します。呼び出し先のLambda関数が重い処理でレスポンスを返すまでに時間がかかる場合は非同期型を選択する場合もあるでしょう。呼び出し方法の選択は <code>InvokeInput</code> の <code>InvocationType</code> フィールドを用いて指定します。同期型の場合は <code>lambda.InvocationTypeRequestResponse</code> (<code>RequestResponse</code> の文字列)で非同期型の場合は <code>lambda.InvocationTypeEvent</code> (<code>Event</code>)となります。</p>
+<p>以下のようにすると非同期としてLambda関数を呼び出します。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">functionName := <span class="string">"invoked"</span></span><br><span class="line">input := &amp;lambda.InvokeInput&#123;</span><br><span class="line">	FunctionName:   aws.String(functionName),</span><br><span class="line">	<span class="comment">// 非同期型として呼び出すためにInvocationTypeにEventを設定します。</span></span><br><span class="line">	InvocationType: aws.String(lambda.InvocationTypeEvent),</span><br><span class="line">	Payload:        b,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-呼び出し先のLambdaの同時実行数以上の同期呼び出しは即座にエラーが返る"><a href="#5-呼び出し先のLambdaの同時実行数以上の同期呼び出しは即座にエラーが返る" class="headerlink" title="5. 呼び出し先のLambdaの同時実行数以上の同期呼び出しは即座にエラーが返る"></a>5. 呼び出し先のLambdaの同時実行数以上の同期呼び出しは即座にエラーが返る</h2><p>Lambda関数は「<a href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/configuration-concurrency.html" target="_blank" rel="noopener">同時実行数</a>」という設定を使って、同時に実行できるLambda関数に制約を付与することができます。非同期型の呼び出しの場合は、呼び出し元には成功のステータスが返されます。Lambda関数はキューイング後、遅延して実行されます。しかし、同期型として呼び出す場合、同時実行数以上の数を呼び出した場合は即座に呼び出し元に <a href="https://pkg.go.dev/github.com/aws/aws-sdk-go@v1.35.7/service/lambda#TooManyRequestsException" target="_blank" rel="noopener"><code>TooManyRequestsException</code></a> のエラーが返ってきます。</p>
+<p><img src="/images/20201112/image_7.png" alt=""></p>
+<p>ログには以下のように出力されます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[DEBUG] 2020/10/11 13:01:21 hello <span class="built_in">caller</span> lambda!</span><br><span class="line">[DEBUG] 2020/10/11 13:01:27 invoke err: TooManyRequestsException: Rate Exceeded.</span><br><span class="line">&#123;</span><br><span class="line">  RespMetadata: &#123;</span><br><span class="line">    StatusCode: 429,</span><br><span class="line">    RequestID: <span class="string">"11b45c8e-3e59-4ab7-8acb-80e1bfa5931f"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  Message_: <span class="string">"Rate Exceeded."</span>,</span><br><span class="line">  Reason: <span class="string">"ReservedFunctionConcurrentInvocationLimitExceeded"</span>,</span><br><span class="line">  Type: <span class="string">"User"</span></span><br><span class="line">&#125;</span><br><span class="line">invoke lambda, <span class="keyword">function</span> name = invoked: TooManyRequestsException: Rate Exceeded.</span><br><span class="line">&#123;</span><br><span class="line">  RespMetadata: &#123;</span><br><span class="line">    StatusCode: 429,</span><br><span class="line">    RequestID: <span class="string">"11b45c8e-3e59-4ab7-8acb-80e1bfa5931f"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  Message_: <span class="string">"Rate Exceeded."</span>,</span><br><span class="line">  Reason: <span class="string">"ReservedFunctionConcurrentInvocationLimitExceeded"</span>,</span><br><span class="line">  Type: <span class="string">"User"</span></span><br><span class="line">&#125;: wrapError</span><br><span class="line">null</span><br></pre></td></tr></table></figure>
+
+<p>呼び出し先のLambda関数からのレスポンスが必要な場合は同期型として呼び出すことになりますが、即座にエラーになる点は注意が必要です。</p>
+<h2 id="6-呼び出し先のLambdaに設定されている環境変数は使える"><a href="#6-呼び出し先のLambdaに設定されている環境変数は使える" class="headerlink" title="6. 呼び出し先のLambdaに設定されている環境変数は使える"></a>6. 呼び出し先のLambdaに設定されている環境変数は使える</h2><p>APIでLambda関数を呼び出した場合、呼び出し元の環境変数が使えなくなるのでは？と思う方もいるかもしれませんが、実は環境変数もちゃんとセットされます。</p>
+<p>呼び出し元のLambda関数のハンドラは以下のようにしておきます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Handler</span><span class="params">(ctx context.Context)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	log.Println(<span class="string">"hello invoked lambda!"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// InvokeWithContextで呼び出された場合でも環境変数はセットされる</span></span><br><span class="line">	logLevel := os.Getenv(<span class="string">"LOG_LEVEL"</span>)</span><br><span class="line">	log.Printf(<span class="string">"logLevel: %s\n"</span>, logLevel)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>またLambda関数に以下のように環境変数 <code>LOG_LEVEL</code> を設定しておきます。</p>
+<p><img src="/images/20201112/image_8.png" alt=""></p>
+<p><code>InvokeWithContext</code> を使って呼び出し元のLambda関数から呼び出し先の関数を呼び出したときのログ出力は以下です。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[DEBUG] 2020/10/11 13:28:08 hello invoked lambda!</span><br><span class="line">[DEBUG] 2020/10/11 13:28:08 logLevel: INFO</span><br></pre></td></tr></table></figure>
+
+<p>想定通り環境変数から設定される変数 <code>logLevel</code> の値がセットされていることがわかります。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>GoでLambda関数からLambda関数を同期的に呼び出すときのハマりどころやTipsを紹介しました。ドキュメントを隅々まで注意深く読んでいないと、はまりがちなポイントだと思いますので、きっと皆さんの役に立つのではないかなと思います。</p>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" target="_blank" rel="noopener" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="GoでLambdaからLambdaを呼び出すときに気をつけたいポイント6選" data-url="https://future-architect.github.io/articles/20201112/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20201112/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20201112/" target="_blank" rel="noopener" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20201112/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20201112/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GoでLambdaからLambdaを呼び出すときに気をつけたいポイント6選
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20201111/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Parcel 2.0 beta.1を試す
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20201109/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GoのWebアプリ開発で割り切ったパッケージ構成とテスト方針にした結果
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (39)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (12)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (108)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (91)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (25)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Product/">Product (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h2>リンク</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="https://note.future.co.jp/" target="_blank">未来報</a>
+      </li>
+      <li>
+        <a href="https://future-fintech.github.io/" target="_blank">Future Fintech EYE</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2019/future" target="_blank">2019年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/" target="_blank" rel="noopener">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" target="_blank" rel="noopener" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" target="_blank" rel="noopener" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog" target="_blank" rel="noopener"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo" target="_blank" rel="noopener"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future" target="_blank" rel="noopener">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+
+<![endif]-->
+
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        /*Layout.initFixHeaderWithPreHeader();*/ /* Switch On Header Fixing (only if you have pre-header) */
+        /*Layout.initNavScrolling();*/
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
