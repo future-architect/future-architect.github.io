@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>LocalStackに向けてTerraformを実行する | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにフューチャーの棚井龍之介です。TIGグループのDXユニットに所属しています。 TerraformはLocalstackに対してもapplyできます。便利な方法なのに日本語のサイトが見当たらないので、技術ブログ化しました。 この記事を読むとできるようになること ローカル環境に立ち上げた localstack に向けて、terraform plan&#x2F;apply&#x2F;destroy を実行できる">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LocalStackに向けてTerraformを実行する">
+<meta property="og:url" content="https://future-architect.github.io/articles/20201113/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにフューチャーの棚井龍之介です。TIGグループのDXユニットに所属しています。 TerraformはLocalstackに対してもapplyできます。便利な方法なのに日本語のサイトが見当たらないので、技術ブログ化しました。 この記事を読むとできるようになること ローカル環境に立ち上げた localstack に向けて、terraform plan&#x2F;apply&#x2F;destroy を実行できる">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20201113/Screen_Shot_2020-10-29_at_15.12.54.png">
+<meta property="article:published_time" content="2020-11-12T15:00:00.000Z">
+<meta property="article:modified_time" content="2020-11-13T02:11:53.641Z">
+<meta property="article:author" content="Future Architect Consultants">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Terraform">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="LocalStack">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20201113/Screen_Shot_2020-10-29_at_15.12.54.png">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="LocalStackに向けてTerraformを実行する | フューチャー技術ブログ" name="description">
+  <meta content="LocalStackに向けてTerraformを実行する,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー技術ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Audiowide|PT+Sans+Narrow|Source+Sans+Pro:200,300,400,600,700,900&amp;subset=all" rel="stylesheet" type="text/css">
+
+  <!-- Global styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+
+  
+<link rel="stylesheet" href="/css/theme-styles.css">
+
+  <!-- Theme styles END -->
+<meta name="generator" content="Hexo 4.2.1"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">フューチャー技術ブログ</a>-->
+		<div class="header-menu">
+			<a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="180px">
+			</a>
+			<a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a>
+			<!-- BEGIN NAVIGATION -->
+			<div class="header-navigation pull-right font-transform-inherit">
+				<ul>
+					
+					<li class="">
+						<a href="/"><i class="fa fa-home"></i>Home</a>
+					</li>
+					
+					<li class="">
+						<a href="/articles/"><i class="fa fa-newspaper-o"></i>Blog</a>
+					</li>
+					
+					<li class="">
+						<a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i>GitHub</a>
+					</li>
+					
+					<!-- BEGIN TOP SEARCH -->
+					<!-- END TOP SEARCH -->
+				</ul>
+			</div>
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title">Future Tech Blog</div>
+        <div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20201113/">LocalStackに向けてTerraformを実行する</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20201113_localstackに向けて、terraformを実行する" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> RuyPKG</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2020-11-12T15:00:00.000Z" itemprop="datePublished">2020/11/13</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/AWS/" title="AWS">AWS</a>,
+  
+    <a href="/tags/Go/" title="Go">Go</a>,
+  
+    <a href="/tags/Terraform/" title="Terraform">Terraform</a>,
+  
+    <a href="/tags/Docker/" title="Docker">Docker</a>,
+  
+    <a href="/tags/LocalStack/" title="LocalStack">LocalStack</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>フューチャーの棚井龍之介です。TIGグループのDXユニットに所属しています。</p>
+<p>TerraformはLocalstackに対してもapplyできます。便利な方法なのに日本語のサイトが見当たらないので、技術ブログ化しました。</p>
+<h1 id="この記事を読むとできるようになること"><a href="#この記事を読むとできるようになること" class="headerlink" title="この記事を読むとできるようになること"></a>この記事を読むとできるようになること</h1><ul>
+<li>ローカル環境に立ち上げた localstack に向けて、terraform plan/apply/destroy を実行できる</li>
+</ul>
+<h1 id="LocalStackとTerraform"><a href="#LocalStackとTerraform" class="headerlink" title="LocalStackとTerraform"></a>LocalStackとTerraform</h1><p>みなさんは、<a href="https://github.com/localstack/localstack" target="_blank" rel="noopener">Localstack</a> や <a href="https://www.terraform.io/" target="_blank" rel="noopener">Terraform</a> を使っていますか？</p>
+<p>アプリのローカル環境テストとしてLocalstackを、インフラ構築にTerraformを用いる開発スタイルは、今やそう珍しいものではないと思います。</p>
+<p>しかしながら、「ローカル環境のLocalStackに向けて、Terraformを打ち込むことができる」というのは、あまり知られていないようです。Googleで「localstack terraform」で検索しても、この方法を説明する日本語の入門記事は見つかりませんでした。docker-composeで立ち上げたlocalstackに向けて terraform apply を実行する方法が分かったら、開発環境の作り方や、E2Eテストの方法が広がると思いませんか？</p>
+<p>以降の内容では、localstackの立ち上げ → terraform plan/apply実行 までを説明します。</p>
+<h1 id="Localstackに向けて、Terraformを打つ"><a href="#Localstackに向けて、Terraformを打つ" class="headerlink" title="Localstackに向けて、Terraformを打つ"></a>Localstackに向けて、Terraformを打つ</h1><p>以下の流れで説明します。</p>
+<ol start="0">
+<li>今回のディレクトリ構造</li>
+<li>docker-composeでlocalstack立ち上げ</li>
+<li>terraformファイルを編集</li>
+<li>localstackにterraform plan/apply</li>
+</ol>
+<p>また、作業では <code>docker-compose</code> と <code>terraform</code> と <code>awscli</code> を利用しますが、これらのコマンドは各自で用意済みの前提とします。</p>
+<p>ローカル完結の作業であるため、各コマンドの実行環境が揃っていれば、<strong>AWSアカウントの準備はもちろん不要</strong>です。</p>
+<p>参考までに、私が本ブログの執筆時に利用したバージョンはこちらです。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ docker-compose --version</span><br><span class="line">docker-compose version 1.27.4, build 40524192</span><br><span class="line"></span><br><span class="line">$ terraform --version</span><br><span class="line">Terraform v0.13.5</span><br><span class="line"></span><br><span class="line">$ aws --version</span><br><span class="line">aws-cli/1.18.166 Python/3.7.4 Darwin/19.6.0 botocore/1.19.6</span><br><span class="line"></span><br><span class="line">$ sw_vers -productName</span><br><span class="line">ProductName:	Mac OS X</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-今回のディレクトリ構造"><a href="#1-今回のディレクトリ構造" class="headerlink" title="1. 今回のディレクトリ構造"></a>1. 今回のディレクトリ構造</h2><p>本記事は以下のディレクトリ構成での作業とします。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sandbox/</span><br><span class="line">  ├ docker-compose.yml</span><br><span class="line">  ├ main.tf</span><br><span class="line">  ├ resources.tf</span><br><span class="line">  ├ hello.go</span><br><span class="line">  └ lambda.zip</span><br></pre></td></tr></table></figure>
+
+<p>各ファイルは <code>$ touch &lt;filename&gt;</code> などを利用して生成してください、Lambdaの中身にまでは踏み込まないので、lambda.zip は 以下の hello.go を build &amp; zip化して生成お願いします</p>
+<figure class="highlight go"><figcaption><span>hello.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fmt.Println(<span class="string">"hello, world"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>build, zipコマンド</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ GOOS=linux GOARCH=amd64 go build -o hello</span><br><span class="line">$ zip lambda.zip hello</span><br></pre></td></tr></table></figure>
+
+<p>以上で、作業前の準備は完了です。</p>
+<h2 id="2-docker-composeでLocalstack立ち上げ"><a href="#2-docker-composeでLocalstack立ち上げ" class="headerlink" title="2. docker-composeでLocalstack立ち上げ"></a>2. docker-composeでLocalstack立ち上げ</h2><p>docker-compose.ymlを編集して、Localstackの定義を追加します。</p>
+<p>Localstackの定義は、本家サイトの記述を参照しています。<br><a href="https://github.com/localstack/localstack/blob/master/docker-compose.yml" target="_blank" rel="noopener">https://github.com/localstack/localstack/blob/master/docker-compose.yml</a></p>
+<figure class="highlight yaml"><figcaption><span>docker-compose.yml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'2.1'</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">localstack:</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">"$&#123;LOCALSTACK_DOCKER_NAME-localstack_main&#125;"</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">localstack/localstack:0.12.1</span></span><br><span class="line">    <span class="attr">network_mode:</span> <span class="string">bridge</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:4566:4566/tcp</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">SERVICES=$&#123;SERVICES-</span> <span class="string">&#125;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">DEBUG=$&#123;DEBUG-</span> <span class="string">&#125;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">DATA_DIR=$&#123;DATA_DIR-</span> <span class="string">&#125;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">LAMBDA_EXECUTOR=$&#123;LAMBDA_EXECUTOR-</span> <span class="string">&#125;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">KINESIS_ERROR_PROBABILITY=$&#123;KINESIS_ERROR_PROBABILITY-</span> <span class="string">&#125;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">DOCKER_HOST=unix:///var/run/docker.sock</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">HOST_TMP_FOLDER=$&#123;TMPDIR&#125;</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">"$&#123;TMPDIR:-/tmp/localstack&#125;:/tmp/localstack"</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">"/var/run/docker.sock:/var/run/docker.sock"</span></span><br></pre></td></tr></table></figure>
+
+<p>yamlファイルに追記完了したら、localstackを立ち上げます。<br><code>$ docker-compose ps</code> で起動が確認できたら、localstack側の準備は完了です。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ docker-compose -f docker-compose.yml up -d localstack</span><br><span class="line">Creating localstack_main ... <span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">$ docker-compose ps</span><br><span class="line">     Name               Command          State                                                        Ports                                                     </span><br><span class="line">----------------------------------------------------------------------------------------------------------------------------------------------------------------</span><br><span class="line">localstack_main   docker-entrypoint.sh   Up      127.0.0.1:4566-&gt;4566/tcp, 4567/tcp, 4568/tcp, 4569/tcp, 4570/tcp, 4571/tcp, 4572/tcp, 4573/tcp, 4574/tcp,      </span><br><span class="line">                                                 4575/tcp, 4576/tcp, 4577/tcp, 4578/tcp, 4579/tcp, 4580/tcp, 4581/tcp, 4582/tcp, 4583/tcp, 4584/tcp, 4585/tcp,  </span><br><span class="line">                                                 4586/tcp, 4587/tcp, 4588/tcp, 4589/tcp, 4590/tcp, 4591/tcp, 4592/tcp, 4593/tcp, 4594/tcp, 4595/tcp, 4596/tcp,  </span><br><span class="line">                                                 4597/tcp, 8080/tcp</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-Terraformファイルを編集"><a href="#3-Terraformファイルを編集" class="headerlink" title="3. Terraformファイルを編集"></a>3. Terraformファイルを編集</h2><p>Terraform定義に、Localstackへplan,applyを打ち込むための設定を記入します。</p>
+<figure class="highlight sh"><figcaption><span>terraform main.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># backend</span></span><br><span class="line">terraform &#123;</span><br><span class="line">  backend <span class="string">"local"</span> &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># provider</span></span><br><span class="line">provider <span class="string">"aws"</span> &#123;</span><br><span class="line">  region = <span class="string">"us-east-1"</span></span><br><span class="line"></span><br><span class="line">  access_key = <span class="string">"mock_access_key"</span></span><br><span class="line">  secret_key = <span class="string">"mock_secret_key"</span></span><br><span class="line"></span><br><span class="line">  s3_force_path_style         = <span class="literal">true</span></span><br><span class="line">  skip_credentials_validation = <span class="literal">true</span></span><br><span class="line">  skip_metadata_api_check     = <span class="literal">true</span></span><br><span class="line">  skip_requesting_account_id  = <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">  endpoints &#123;</span><br><span class="line">    iam      = <span class="string">"http://localhost:4566"</span></span><br><span class="line">    kinesis  = <span class="string">"http://localhost:4566"</span></span><br><span class="line">    lambda   = <span class="string">"http://localhost:4566"</span></span><br><span class="line">    s3       = <span class="string">"http://localhost:4566"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>providerは <code>aws</code> ですが、以下4つの引数をtrueに設定することで、terraformの向き先をローカル環境のMockに設定できます。</p>
+<ul>
+<li>s3_force_path_style</li>
+<li>skip_credentials_validation</li>
+<li>skip_metadata_api_check</li>
+<li>skip_requesting_account_id</li>
+</ul>
+<p>また、ローカル完結作業のため、以下の引数は自由な値を入力して問題ありません。</p>
+<ul>
+<li>region（実在するregionに限る）</li>
+<li>access_key</li>
+<li>secret_key</li>
+</ul>
+<h3 id="endpointsについて"><a href="#endpointsについて" class="headerlink" title="endpointsについて"></a>endpointsについて</h3><p>providerがawsの場合、各awsサービスのendpointsをカスタマイズ可能です。endpointsの向き先を調整することにより、ローカル完結のterraform環境が実現可能という訳です。</p>
+<p>localstackは <a href="https://github.com/localstack/localstack#announcements" target="_blank" rel="noopener">2020-09-15リリース</a> から </p>
+<blockquote>
+<p>all services are now exposed via the edge service (port 4566) only</p>
+</blockquote>
+<p>なので、endpointsのURLは全て <code>http://localhost:4566</code> になります。</p>
+<p>各自でカスタマイズする場合は、terraform で apply 予定のリソース全てをendpoints定義に追加してください。利用可能なサービス一覧は、<a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/custom-service-endpoints#available-endpoint-customizations" target="_blank" rel="noopener">こちら</a> に掲載されています。</p>
+<h3 id="本記事でLocalstackに構築するもの"><a href="#本記事でLocalstackに構築するもの" class="headerlink" title="本記事でLocalstackに構築するもの"></a>本記事でLocalstackに構築するもの</h3><p>backendとproviderの定義は完了したので、次は各種リソースを追加しましょう。本記事では、サーバレス構成でよくある「Kinesisでデータを受けて、Lambdaで取得し、S3に永続化」のインフラ環境を、Terraformを使ってLocalstack内に構築します。</p>
+<p><img src="/images/20201113/Screen_Shot_2020-10-29_at_15.12.54.png" alt=""></p>
+<p>上記構成をterraform定義するのに必要なresourceはこちらです</p>
+<ul>
+<li>aws_kinesis_stream</li>
+<li>aws_lambda_event_source_mapping</li>
+<li>aws_lambda_function</li>
+<li>aws_iam_role</li>
+<li>aws_iam_policy</li>
+<li>aws_iam_role_policy_attachment</li>
+<li>aws_s3_bucket</li>
+</ul>
+<p>Terraform自体の説明は本記事の目的ではないので、一気に追加します</p>
+<figure class="highlight sh"><figcaption><span>terraform resources.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">"aws_kinesis_stream"</span> <span class="string">"local_stream"</span> &#123;</span><br><span class="line">  name             = <span class="string">"local-stream"</span></span><br><span class="line">  shard_count      = 1</span><br><span class="line">  retention_period = 168</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">"aws_lambda_event_source_mapping"</span> <span class="string">"local_mapping"</span> &#123;</span><br><span class="line">  event_source_arn                   = aws_kinesis_stream.local_stream.arn</span><br><span class="line">  function_name                      = aws_lambda_function.local_lambda.arn</span><br><span class="line">  starting_position                  = <span class="string">"LATEST"</span></span><br><span class="line">  maximum_retry_attempts             = 1</span><br><span class="line">  batch_size                         = 100</span><br><span class="line">  maximum_batching_window_in_seconds = 5</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">"aws_lambda_function"</span> <span class="string">"local_lambda"</span> &#123;</span><br><span class="line">  filename      = <span class="string">"lambda.zip"</span></span><br><span class="line">  function_name = <span class="string">"local-lambda"</span></span><br><span class="line">  role          = aws_iam_role.local_role.arn</span><br><span class="line">  handler       = <span class="string">"lambda"</span></span><br><span class="line">  runtime       = <span class="string">"go1.x"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">"aws_iam_role"</span> <span class="string">"local_role"</span> &#123;</span><br><span class="line">  name               = <span class="string">"local-role"</span></span><br><span class="line">  assume_role_policy = &lt;&lt;EOF</span><br><span class="line">&#123;</span><br><span class="line">	<span class="string">"Version"</span>: <span class="string">"2012-10-17"</span>,</span><br><span class="line">	<span class="string">"Statement"</span>: [</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="string">"Action"</span>: <span class="string">"sts:AssumeRole"</span>,</span><br><span class="line">			<span class="string">"Principal"</span>: &#123;</span><br><span class="line">				<span class="string">"Service"</span>: <span class="string">"lambda.amazonaws.com"</span></span><br><span class="line">			&#125;,</span><br><span class="line">			<span class="string">"Effect"</span>: <span class="string">"Allow"</span>,</span><br><span class="line">			<span class="string">"Sid"</span>: <span class="string">""</span></span><br><span class="line">		&#125;</span><br><span class="line">	]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">"aws_iam_policy"</span> <span class="string">"local_policy"</span> &#123;</span><br><span class="line">  name   = <span class="string">"local-iam-policy"</span></span><br><span class="line">  policy = data.aws_iam_policy_document.local_policy_document.json</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">data <span class="string">"aws_iam_policy_document"</span> <span class="string">"local_policy_document"</span> &#123;</span><br><span class="line">  statement &#123;</span><br><span class="line">    effect = <span class="string">"Allow"</span></span><br><span class="line">    actions = [</span><br><span class="line">      <span class="string">"s3:GetObject"</span>,</span><br><span class="line">      <span class="string">"s3:ListBucket"</span>,</span><br><span class="line">      <span class="string">"s3:PutBucketNotification"</span>,</span><br><span class="line">      <span class="string">"s3:PutObject"</span>,</span><br><span class="line">      <span class="string">"s3:DeleteObject"</span>,</span><br><span class="line">    ]</span><br><span class="line">    resources = [<span class="string">"*"</span>]</span><br><span class="line">  &#125;</span><br><span class="line">  statement &#123;</span><br><span class="line">    effect = <span class="string">"Allow"</span></span><br><span class="line">    actions = [</span><br><span class="line">      <span class="string">"kinesis:DescribeStream"</span>,</span><br><span class="line">      <span class="string">"kinesis:GetShardIterator"</span>,</span><br><span class="line">      <span class="string">"kinesis:GetRecords"</span></span><br><span class="line">    ]</span><br><span class="line">    resources = [<span class="string">"*"</span>]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">"aws_iam_role_policy_attachment"</span> <span class="string">"local_poilcy_attachment"</span> &#123;</span><br><span class="line">  role       = aws_iam_role.local_role.name</span><br><span class="line">  policy_arn = aws_iam_policy.local_policy.arn</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">"aws_s3_bucket"</span> <span class="string">"local_archive"</span> &#123;</span><br><span class="line">  bucket = <span class="string">"local-archive"</span></span><br><span class="line">  versioning &#123;</span><br><span class="line">    enabled = <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上により、plan/apply の準備は完了です</p>
+<h2 id="3-Localstackにterraform-plan-apply"><a href="#3-Localstackにterraform-plan-apply" class="headerlink" title="3. Localstackにterraform plan/apply"></a>3. Localstackにterraform plan/apply</h2><h3 id="まずは-terraform-init-から"><a href="#まずは-terraform-init-から" class="headerlink" title="まずは terraform init から"></a>まずは terraform init から</h3><p>新しいディレクトリでterraformを使う場合は、まずは <code>$ terraform init</code> して、backend と provider を設定します</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ terraform init</span><br><span class="line"></span><br><span class="line">Initializing the backend...</span><br><span class="line"></span><br><span class="line">Successfully configured the backend <span class="string">"local"</span>! Terraform will automatically</span><br><span class="line">use this backend unless the backend configuration changes.</span><br><span class="line"></span><br><span class="line">Initializing provider plugins...</span><br><span class="line">(略)</span><br><span class="line"></span><br><span class="line">Terraform has been successfully initialized!</span><br><span class="line">(略)</span><br></pre></td></tr></table></figure>
+
+<p>terraform init が完了しました。</p>
+<h2 id="Localstackに向けて、terraform-plan-を実行"><a href="#Localstackに向けて、terraform-plan-を実行" class="headerlink" title="Localstackに向けて、terraform plan を実行"></a>Localstackに向けて、terraform plan を実行</h2><p>Terraformの実行準備が完了したので、<code>$ terraform plan</code> を実行します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">$ terraform plan</span><br><span class="line">Refreshing Terraform state <span class="keyword">in</span>-memory prior to plan...</span><br><span class="line">The refreshed state will be used to calculate this plan, but will not be</span><br><span class="line">persisted to <span class="built_in">local</span> or remote state storage.</span><br><span class="line"></span><br><span class="line">data.aws_iam_policy_document.local_policy_document: Refreshing state...</span><br><span class="line"></span><br><span class="line">------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">An execution plan has been generated and is shown below.</span><br><span class="line">Resource actions are indicated with the following symbols:</span><br><span class="line">  + create</span><br><span class="line"></span><br><span class="line">Terraform will perform the following actions:</span><br><span class="line"></span><br><span class="line">(略)</span><br><span class="line"></span><br><span class="line">Plan: 7 to add, 0 to change, 0 to destroy.</span><br><span class="line"></span><br><span class="line">------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">Note: You didn<span class="string">'t specify an "-out" parameter to save this plan, so Terraform</span></span><br><span class="line"><span class="string">can'</span>t guarantee that exactly these actions will be performed <span class="keyword">if</span></span><br><span class="line"><span class="string">"terraform apply"</span> is subsequently run.</span><br></pre></td></tr></table></figure>
+
+<p>planも正しく実行できました。</p>
+<h2 id="Localstackに向けて、terraform-apply-を実行"><a href="#Localstackに向けて、terraform-apply-を実行" class="headerlink" title="Localstackに向けて、terraform apply を実行"></a>Localstackに向けて、terraform apply を実行</h2><p><code>$ terraform apply</code><br>（なるべく短いログでapply状況を載せたかったので、–auto-approve を利用しています）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">$ terraform apply --auto-approve</span><br><span class="line">data.aws_iam_policy_document.local_policy_document: Refreshing state...</span><br><span class="line">aws_iam_policy.local_policy: Creating...</span><br><span class="line">aws_kinesis_stream.local_stream: Creating...</span><br><span class="line">aws_iam_role.local_role: Creating...</span><br><span class="line">aws_s3_bucket.local_archive: Creating...</span><br><span class="line">aws_iam_role.local_role: Creation complete after 0s [id=<span class="built_in">local</span>-role]</span><br><span class="line">aws_lambda_function.local_lambda: Creating...</span><br><span class="line">aws_iam_policy.local_policy: Creation complete after 0s [id=arn:aws:iam::000000000000:policy/<span class="built_in">local</span>-iam-policy]</span><br><span class="line">aws_iam_role_policy_attachment.local_poilcy_attachment: Creating...</span><br><span class="line">aws_iam_role_policy_attachment.local_poilcy_attachment: Creation complete after 0s [id=<span class="built_in">local</span>-role-20201029145646394900000001]</span><br><span class="line">aws_s3_bucket.local_archive: Creation complete after 1s [id=<span class="built_in">local</span>-archive]</span><br><span class="line">aws_lambda_function.local_lambda: Creation complete after 6s [id=<span class="built_in">local</span>-lambda]</span><br><span class="line">aws_kinesis_stream.local_stream: Still creating... [10s elapsed]</span><br><span class="line">aws_kinesis_stream.local_stream: Still creating... [20s elapsed]</span><br><span class="line">aws_kinesis_stream.local_stream: Still creating... [30s elapsed]</span><br><span class="line">aws_kinesis_stream.local_stream: Creation complete after 30s [id=arn:aws:kinesis:us-east-1:000000000000:stream/<span class="built_in">local</span>-stream]</span><br><span class="line">aws_lambda_event_source_mapping.local_mapping: Creating...</span><br><span class="line">aws_lambda_event_source_mapping.local_mapping: Creation complete after 0s [id=7029d656-c97d-4256-90bf-a3eb38c50e93]</span><br><span class="line"></span><br><span class="line">Apply complete! Resources: 7 added, 0 changed, 0 destroyed.</span><br><span class="line"></span><br><span class="line">The state of your infrastructure has been saved to the path</span><br><span class="line">below. This state is required to modify and destroy your</span><br><span class="line">infrastructure, so keep it safe. To inspect the complete state</span><br><span class="line">use the `terraform show` <span class="built_in">command</span>.</span><br><span class="line"></span><br><span class="line">State path: terraform.tfstate</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Apply complete! Resources: 7 added, 0 changed, 0 destroyed.</p>
+</blockquote>
+<p>apply成功です！</p>
+<p>awscliを用いて、各リソースの追加を確認することもできます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># S3</span></span><br><span class="line">$ aws --endpoint-url http://localhost:4566 s3 ls</span><br><span class="line">2020-10-29 14:51:17 <span class="built_in">local</span>-archive</span><br><span class="line"></span><br><span class="line"><span class="comment"># Kinesis</span></span><br><span class="line">$ aws --endpoint-url http://localhost:4566 kinesis list-streams</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"StreamNames"</span>: [</span><br><span class="line">        <span class="string">"local-stream"</span></span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># Lambda</span></span><br><span class="line">$ aws --endpoint-url http://localhost:4566 lambda list-functions</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"Functions"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">"FunctionName"</span>: <span class="string">"local-lambda"</span>,</span><br><span class="line">            <span class="string">"FunctionArn"</span>: <span class="string">"arn:aws:lambda:us-east-1:000000000000:function:local-lambda"</span>,</span><br><span class="line">            <span class="string">"Runtime"</span>: <span class="string">"go1.x"</span>,</span><br><span class="line">            <span class="string">"Role"</span>: <span class="string">"arn:aws:iam::000000000000:role/local-role"</span>,</span><br><span class="line">            <span class="string">"Handler"</span>: <span class="string">"lambda"</span>,</span><br><span class="line">            <span class="string">"CodeSize"</span>: 1035298,</span><br><span class="line">            <span class="string">"Description"</span>: <span class="string">""</span>,</span><br><span class="line">            <span class="string">"Timeout"</span>: 3,</span><br><span class="line">            <span class="string">"MemorySize"</span>: 128,</span><br><span class="line">            <span class="string">"LastModified"</span>: <span class="string">"2020-10-29T14:56:46.405+0000"</span>,</span><br><span class="line">            <span class="string">"CodeSha256"</span>: <span class="string">"0rECD6MUpCBF7jIrzT53RTSjH0D1iTBTUd6t+FfP7is="</span>,</span><br><span class="line">            <span class="string">"Version"</span>: <span class="string">"<span class="variable">$LATEST</span>"</span>,</span><br><span class="line">            <span class="string">"VpcConfig"</span>: &#123;&#125;,</span><br><span class="line">            <span class="string">"TracingConfig"</span>: &#123;</span><br><span class="line">                <span class="string">"Mode"</span>: <span class="string">"PassThrough"</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">"RevisionId"</span>: <span class="string">"3fc0da3d-eb5e-471a-9d26-c0a7b3f98d90"</span>,</span><br><span class="line">            <span class="string">"State"</span>: <span class="string">"Active"</span>,</span><br><span class="line">            <span class="string">"LastUpdateStatus"</span>: <span class="string">"Successful"</span></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これで、ローカルに閉じた環境で、Terraformを好き放題使えますね！</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>本記事では、Localstackに向けてTerraformを実行する方法をご紹介しました。</p>
+<p>この手法は何より <strong>AWSアカウントなしで実行可能</strong> なので、例えば…</p>
+<ul>
+<li>インフラ新規参入者向けのterraformコマンド練習環境として</li>
+<li>社内規約でcredentialが発行できず、インフラタスクを振れないアルバイトさん向けの環境として</li>
+<li>他人と絶対にconflictせず、好き勝手にdestroyできる自分だけの<strong>無料の環境</strong>として</li>
+</ul>
+<p>も利用可能です。</p>
+<p>ここまで読んでいただいた皆様も、色々なリソースをterraformコマンドでLocalstackに構築してみてください！</p>
+<h2 id="参照サイト"><a href="#参照サイト" class="headerlink" title="参照サイト"></a>参照サイト</h2><ul>
+<li><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/custom-service-endpoints#available-endpoint-customizations" target="_blank" rel="noopener">Terraform Registory Custom Service Endpoint Configuration</a></li>
+<li><a href="https://www.hashicorp.com/resources/testing-infrastructure-as-code-on-localhost" target="_blank" rel="noopener">Testing Infrastructure as Code on Localhost</a></li>
+<li><a href="https://spin.atomicobject.com/2020/02/03/localstack-terraform-circleci/" target="_blank" rel="noopener">LocalStack + Terraform + CircleCI for Lambda without AWS</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+    <!-- twitter -->
+    <li class="sc-tw social-button-twitter" style="position: static; width:75px; height:20px">
+      <a href="https://twitter.com/share" target="_blank" rel="noopener" class="twitter-share-button" data-via="future_techblog" data-lang="ja" data-text="LocalStackに向けてTerraformを実行する" data-url="https://future-architect.github.io/articles/20201113/">ツイート</a>
+    </li>
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20201113/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:115px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20201113/" target="_blank" rel="noopener" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20201113/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h2>Featured Posts</h2>
+<div class="recent-news margin-bottom-10">
+  
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20201113/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                LocalStackに向けてTerraformを実行する
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190713/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20201112/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                GoでLambdaからLambdaを呼び出すときに気をつけたいポイント6選
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20190625/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Amazon Redshiftの仕様を調べてみた
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+        <a href="https://future-architect.github.io/articles/20201111/">
+          <div class="row margin-bottom-10">
+            <div class="col-md-10">
+              <li>
+                Parcel 2.0 beta.1を試す
+              </li>
+            </div>
+          </div>
+        </a>
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">Categories</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (39)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (12)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (108)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (92)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (25)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Product/">Product (1)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h2>リンク</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="https://note.future.co.jp/" target="_blank">未来報</a>
+      </li>
+      <li>
+        <a href="https://future-fintech.github.io/" target="_blank">Future Fintech EYE</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h2>Advent Calendar</h2>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2019/future" target="_blank">2019年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。IoTやAI(MachineLearning)・Security・VR・Cloud・BigDataといった内容の記事を中心に、業務で利用する幅広い技術について紹介します。また、OSSへの貢献やカンファレンスなどへの登壇など、フューチャーへのエンジニア文化についてもドシドシ紹介していきますのでぜひウォッチ下さい！<br /><br /><a href="http://www.future.co.jp/" target="_blank" rel="noopener">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" target="_blank" rel="noopener" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog" target="_blank" rel="noopener" data-widget-id="732749663766372354">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2020 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      
+      <li><a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li>
+      
+  
+      
+      <li><a href="https://twitter.com/future_techblog" target="_blank" rel="noopener"><i class="fa fa-twitter"></i></a></li>
+      
+  
+      
+      <li><a href="https://www.facebook.com/future.saiyo" target="_blank" rel="noopener"><i class="fa fa-facebook"></i></a></li>
+      
+  
+      
+      <li>
+        <a href="http://qiita.com/organizations/future" target="_blank" rel="noopener">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+      </li>
+      
+  
+      
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+      
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- BEGIN CORE PLUGINS (REQUIRED FOR ALL PAGES) -->
+<!--[if lt IE 9]>
+
+<script src="/metronic/assets/plugins/respond.min.js"></script>
+
+<![endif]-->
+
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/back-to-top.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+        Layout.initTwitter();
+        /*Layout.initFixHeaderWithPreHeader();*/ /* Switch On Header Fixing (only if you have pre-header) */
+        /*Layout.initNavScrolling();*/
+    });
+</script>
+<!-- END CORE PLUGINS -->
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+</body>
+</html>
