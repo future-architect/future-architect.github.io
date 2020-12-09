@@ -96,27 +96,27 @@ var Layout = function () {
     }
 
     // Handles scrollable contents using jQuery SlimScroll plugin.
-    var handleScrollers = function () {
-        $('.scroller').each(function () {
-            var height;
-            if ($(this).attr("data-height")) {
-                height = $(this).attr("data-height");
-            } else {
-                height = $(this).css('height');
-            }
-            $(this).slimScroll({
-                allowPageScroll: true, // allow page scroll when the element scroll is ended
-                size: '7px',
-                color: ($(this).attr("data-handle-color")  ? $(this).attr("data-handle-color") : '#bbb'),
-                railColor: ($(this).attr("data-rail-color")  ? $(this).attr("data-rail-color") : '#eaeaea'),
-                position: isRTL ? 'left' : 'right',
-                height: height,
-                alwaysVisible: ($(this).attr("data-always-visible") == "1" ? true : false),
-                railVisible: ($(this).attr("data-rail-visible") == "1" ? true : false),
-                disableFadeOut: true
-            });
-        });
-    }
+    // var handleScrollers = function () {
+    //     $('.scroller').each(function () {
+    //         var height;
+    //         if ($(this).attr("data-height")) {
+    //             height = $(this).attr("data-height");
+    //         } else {
+    //             height = $(this).css('height');
+    //         }
+    //         $(this).slimScroll({
+    //             allowPageScroll: true, // allow page scroll when the element scroll is ended
+    //             size: '7px',
+    //             color: ($(this).attr("data-handle-color")  ? $(this).attr("data-handle-color") : '#bbb'),
+    //             railColor: ($(this).attr("data-rail-color")  ? $(this).attr("data-rail-color") : '#eaeaea'),
+    //             position: isRTL ? 'left' : 'right',
+    //             height: height,
+    //             alwaysVisible: ($(this).attr("data-always-visible") == "1" ? true : false),
+    //             railVisible: ($(this).attr("data-rail-visible") == "1" ? true : false),
+    //             disableFadeOut: true
+    //         });
+    //     });
+    // }
 
     var handleSearch = function() {
         $('.search-btn').click(function () {
@@ -247,27 +247,27 @@ var Layout = function () {
 */
 
     // Handles Bootstrap Accordions.
-    var handleAccordions = function () {
+    // var handleAccordions = function () {
 
-        jQuery('body').on('shown.bs.collapse', '.accordion.scrollable', function (e) {
-            Layout.scrollTo($(e.target), -100);
-        });
+    //     jQuery('body').on('shown.bs.collapse', '.accordion.scrollable', function (e) {
+    //         Layout.scrollTo($(e.target), -100);
+    //     });
 
-    }
+    // }
 
     // Handles Bootstrap Tabs.
-    var handleTabs = function () {
-        // fix content height on tab click
-        $('body').on('shown.bs.tab', '.nav.nav-tabs', function () {
-            handleSidebarAndContentHeight();
-        });
+    // var handleTabs = function () {
+    //     // fix content height on tab click
+    //     $('body').on('shown.bs.tab', '.nav.nav-tabs', function () {
+    //         handleSidebarAndContentHeight();
+    //     });
 
-        //activate tab if tab id provided in the URL
-        if (location.hash) {
-            var tabid = location.hash.substr(1);
-            $('a[href="#' + tabid + '"]').click();
-        }
-    }
+    //     //activate tab if tab id provided in the URL
+    //     if (location.hash) {
+    //         var tabid = location.hash.substr(1);
+    //         $('a[href="#' + tabid + '"]').click();
+    //     }
+    // }
 
     var handleMobiToggler = function () {
         $(".mobi-toggler").on("click", function(event) {
@@ -319,9 +319,9 @@ var Layout = function () {
 //            handleFancybox();
             handleDifInits();
             handleSidebarMenu();
-            handleAccordions();
+            // handleAccordions();
             handleMenu();
-            handleScrollers();
+//            handleScrollers();
             handleSubMenuExt();
             handleMobiToggler();
         },
@@ -490,28 +490,28 @@ var Layout = function () {
 */
 
         // wrapper function to scroll(focus) to an element
-        scrollTo: function (el, offeset) {
-            var pos = (el && el.size() > 0) ? el.offset().top : 0;
-            if (el) {
-                if ($('body').hasClass('page-header-fixed')) {
-                    pos = pos - $('.header').height();
-                }
-                pos = pos + (offeset ? offeset : -1 * el.height());
-            }
+        // scrollTo: function (el, offeset) {
+        //     var pos = (el && el.size() > 0) ? el.offset().top : 0;
+        //     if (el) {
+        //         if ($('body').hasClass('page-header-fixed')) {
+        //             pos = pos - $('.header').height();
+        //         }
+        //         pos = pos + (offeset ? offeset : -1 * el.height());
+        //     }
 
-            jQuery('html,body').animate({
-                scrollTop: pos
-            }, 'slow');
-        },
+        //     jQuery('html,body').animate({
+        //         scrollTop: pos
+        //     }, 'slow');
+        // },
 
         //public function to add callback a function which will be called on window resize
         addResponsiveHandler: function (func) {
             responsiveHandlers.push(func);
         },
 
-        scrollTop: function () {
-            App.scrollTo();
-        },
+        // scrollTop: function () {
+        //     App.scrollTo();
+        // },
 
         gridOption1: function () {
             $(function(){
