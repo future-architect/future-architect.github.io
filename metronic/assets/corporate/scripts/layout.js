@@ -6,9 +6,6 @@ var Layout = function () {
     var isIE9 = false;
     var isIE10 = false;
     var isIE11 = false;
-
-    var responsive = true;
-
     var responsiveHandlers = [];
 
     var handleInit = function() {
@@ -68,45 +65,11 @@ var Layout = function () {
         }
     }
 
-    var handleIEFixes = function() {
-        //fix html5 placeholder attribute for ie7 & ie8
-        if (isIE8 || isIE9) { // ie8 & ie9
-            // this is html5 placeholder fix for inputs, inputs with placeholder-no-fix class will be skipped(e.g: we need this for password fields)
-            jQuery('input[placeholder]:not(.placeholder-no-fix), textarea[placeholder]:not(.placeholder-no-fix)').each(function () {
-
-                var input = jQuery(this);
-
-                if (input.val() == '' && input.attr("placeholder") != '') {
-                    input.addClass("placeholder").val(input.attr('placeholder'));
-                }
-
-                input.focus(function () {
-                    if (input.val() == input.attr('placeholder')) {
-                        input.val('');
-                    }
-                });
-
-                input.blur(function () {
-                    if (input.val() == '' || input.val() == input.attr('placeholder')) {
-                        input.val(input.attr('placeholder'));
-                    }
-                });
-            });
-        }
-    }
-
     return {
         init: function () {
             // init core variables
             handleInit();
             handleResponsiveOnResize();
-            handleIEFixes();
-        },
-
-        initTwitter: function () {
-            !function(d,s,id){
-                var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}
-            }(document,"script","twitter-wjs");
         },
 
         initTouchspin: function () {
