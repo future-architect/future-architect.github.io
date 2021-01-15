@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>MLOpsことはじめ ～実験管理導入と学習基盤の構築～ | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにはじめまして、Strategic AI Group(以降SAIG)に在籍しています、2019年度入社の真鍋です。学生の頃よりクラウドやHadoop等、大規模分散システムの研究をしていました。その経験と私自身の希望もあり、SAIGでは主にインフラ担当として業務に取り組んでいます。   今回は私がAI分野のインフラに触れ、MLOpsを知り、SAIG全体で利用する学習基盤を構築するまでに得た知見">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MLOpsことはじめ ～実験管理導入と学習基盤の構築～">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210115/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにはじめまして、Strategic AI Group(以降SAIG)に在籍しています、2019年度入社の真鍋です。学生の頃よりクラウドやHadoop等、大規模分散システムの研究をしていました。その経験と私自身の希望もあり、SAIGでは主にインフラ担当として業務に取り組んでいます。   今回は私がAI分野のインフラに触れ、MLOpsを知り、SAIG全体で利用する学習基盤を構築するまでに得た知見">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210115/fig_1.jpg">
+<meta property="og:image" content="https://future-architect.github.io/images/20210115/fig_2.jpg">
+<meta property="og:image" content="https://future-architect.github.io/images/20210115/fig_3.jpg">
+<meta property="article:published_time" content="2021-01-14T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-01-15T01:07:48.697Z">
+<meta property="article:tag" content="MLOps">
+<meta property="article:tag" content="kubernetes">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210115/fig_1.jpg">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="MLOpsことはじめ ～実験管理導入と学習基盤の構築～ | フューチャー技術ブログ" name="description">
+  <meta content="MLOpsことはじめ ～実験管理導入と学習基盤の構築～,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー技術ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+
+  <!-- Global styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+
+  <!-- Global styles END -->
+
+  <!-- Theme styles START -->
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+
+  
+<link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+
+  
+<link rel="stylesheet" href="/css/theme-styles.css">
+
+  <!-- Theme styles END -->
+<meta name="generator" content="Hexo 4.2.1"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<!--<a class="site-logo" href="/" id="logo">フューチャー技術ブログ</a>-->
+		<div class="header-menu">
+			<!-- <a class="site-logo" href="/">
+				<img src="/metronic/assets/corporate/img/site_logo.png" alt="logo" class="logo-img" width="180px">
+			</a> -->
+			<!-- <a href="javascript:void(0);" class="mobi-toggler"><i class="fa fa-bars"></i></a> -->
+			<!-- BEGIN NAVIGATION -->
+		
+		</div>
+		<!-- END NAVIGATION -->
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20210115/">MLOpsことはじめ ～実験管理導入と学習基盤の構築～</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20210115_MLOpsことはじめ_～実験管理導入と学習基盤の構築～" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> 真鍋優</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2021-01-14T15:00:00.000Z" itemprop="datePublished">2021/01/15</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/MLOps/" title="MLOps">MLOps</a>,
+  
+    <a href="/tags/kubernetes/" title="kubernetes">kubernetes</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/DataScience/">DataScience</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>はじめまして、Strategic AI Group(以降SAIG)に在籍しています、2019年度入社の真鍋です。学生の頃よりクラウドやHadoop等、大規模分散システムの研究をしていました。その経験と私自身の希望もあり、SAIGでは主にインフラ担当として業務に取り組んでいます。  </p>
+<p>今回は私がAI分野のインフラに触れ、MLOpsを知り、SAIG全体で利用する学習基盤を構築するまでに得た知見を、一部ではありますが共有させていただければと思い筆を取りました。MLOpsについて興味を持たれていて、具体的な取り組みについて知りたいといった方に読んでいただければ幸いです。</p>
+<h1 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h1><p>本稿は下記の内容で構成しています。  </p>
+<ol>
+<li>MLOpsとは</li>
+<li>SAIGの課題</li>
+<li>施策1：実験管理についての取り組み</li>
+<li>施策2：SAIG学習基盤の構築</li>
+<li>まとめと今後の展望  </li>
+</ol>
+<h1 id="1-MLOpsとは"><a href="#1-MLOpsとは" class="headerlink" title="1. MLOpsとは"></a>1. MLOpsとは</h1><p>私がアサインされたSAIGは、フューチャーの一般的なプロジェクトとは異なり、AI技術を用いて横串で色々な企業様とお仕事をさせていただくことが多く、その中ではPoC(Proof of Concept)と呼ばれる、将来的なシステム構築に向けて、新しいアイデアについて実現できるかどうか検証するという概念実証を行っているプロジェクトが多く走っていました。  </p>
+<p>PoCでは実際にシステム構築を始める前段階として、モデル学習や評価を行うことになるのですが、システム構築を始めるにあたって問題が発生することがあります。PoC時点でどのバージョンのデータを利用して学習したのかが分からなくなったり、実行環境やパッケージに関する整合性の問題でソースコードが動かなくなったり、PoC時点でのメンバーが居なくなった際に引継ぎが十分でなかったたことで当時の再現が難しくなったり等です。  </p>
+<p>上記の理由もあり、SAIGではMLOpsの概念の導入が求められていました。SAIGにおいてMLOpsとは、「機械学習モデルの実装から運用までのライフサイクルを円滑に進めるための管理体制(機械学習基盤)を築くこと、またはその概念全体」と定義しています。<br>詳細は、SAIGにて先んじてMLOpsの導入を進めていた山野さんが網羅的にまとめた<a href="https://qiita.com/noko_qii/items/d2c36b0b22ab0da6c759" target="_blank" rel="noopener">記事</a>を見ていただければと思います。  </p>
+<p>本稿では、一般的なMLOpsについて簡単にまとめるに留めます。<br>MLOpsとはMachine Learning、Develop、Operateをまとめた概念です(<a href="https://www.c-sharpcorner.com/blogs/mlops" target="_blank" rel="noopener">参考</a>)。機械学習のプロジェクトにおいて、モデルの作成・学習は全体から見てほんの一部であるという話は良く聞かれます。<br><img src="/images/20210115/fig_1.jpg" alt=""><br> <em>▲ <a href="https://papers.nips.cc/paper/2015/hash/86df7dcfd896fcaf2674f757a2463eba-Abstract.html" target="_blank" rel="noopener">Hidden Technical Debt in Machine Learning Systems</a>より引用</em></p>
+<p>MLOpsとは、機械学習プロジェクト全体のフローに発生する多様なコストを包括的に削減するための概念だと認識しています。</p>
+<ul>
+<li>元データ・加工後データを格納し、後から参照することを可能にする</li>
+<li>作成したコード・モデル・利用したデータ等についてのバージョン管理</li>
+<li>モデルを使ったサービスを提供するための、モデルのパッケージ化・API化</li>
+<li>サービス展開後のモデル精度監視と、再学習・再デプロイの自動化  </li>
+</ul>
+<p>MLOpsを導入することで、上記のような機械学習プロジェクト全般における課題の解決が期待されます。</p>
+<h1 id="2-SAIGの課題"><a href="#2-SAIGの課題" class="headerlink" title="2. SAIGの課題"></a>2. SAIGの課題</h1><p>1章ではMLOpsの概要と、MLOpsによって解決を期待される課題について列挙しましたが、SAIGにおいてもほぼ同様な課題が存在していました。私達がMLOpsの導入を行うにあたり最初に実施したことは、実際に機械学習プロジェクトを推進している各リーダーや、最前線でモデル学習を行っているメンバーの方々へのヒアリングです。本章では、SAIGにおいて機械学習プロジェクトを進める中で頻出した困りごとについて一部を紹介します。</p>
+<h2 id="後になってから実験の再現ができない"><a href="#後になってから実験の再現ができない" class="headerlink" title="後になってから実験の再現ができない"></a>後になってから実験の再現ができない</h2><p>「PoC終了時の結果をもう一度見せて欲しい」、「新しいデータがあるので、これでもう一度学習してみて欲しい」といったご要望を企業様よりいただくことがあります。当時のメンバーが在籍しており、直近の記憶で再現することが可能なPoC直後なら良いですが、PoC終了の数ヶ月後にこのようなご要望があった場合、必要な情報が揃っていないと困ったことになります。  </p>
+<p>実験の再現に必要なのは、masterブランチのソースコードを動かせる(バグが無く、実行コマンドが分かる)ことはもちろん、再現したいソースコードのバージョン、学習時に利用したデータ、そのデータの前処理方法、各種パラメータ値等、多岐にわたります。セキュリティ・ネットワーク・ファイルのパーミッション等、実行する環境の違いや、利用しているパッケージのアップデートによりソースコードが動かなくなることもあります。また、利用しているモデルが変わることで精度に影響することもあるでしょう。  </p>
+<p>ヒアリングを行った結果、この問題はどの機械学習プロジェクトでも直面する可能性があることが分かりました。あるプロジェクトはExcelやスプレッドシートに結果を記録していたり、あるプロジェクトはGitLabのissueやWikiに結果を各自で投稿していたりと、各々の裁量に任されていました。</p>
+<h2 id="開発におけるリソースが不足している"><a href="#開発におけるリソースが不足している" class="headerlink" title="開発におけるリソースが不足している"></a>開発におけるリソースが不足している</h2><p>モデル学習には膨大な計算機リソースを必要としますが、SAIGの案件拡大に伴うメンバー増員により計算機に関するコストは増大していました。機械学習プロジェクトにおいて、GPUを多く利用するという面や、学習に長い時間を要するという面がコストの増大に大きく影響しています。  </p>
+<p>また、企業様より受領するデータをクラウド環境へアップロードする際には、その調整が難しいケースがあることもヒアリングで明らかになりました。その場合はAWSやGCPといったクラウドサービスを利用できません。  </p>
+<p>SAIGにおいて、プロジェクトを進める上での人的・金銭的コストを抑えた上で、GPUを複数人で利用でき、容量の大きいデータを運用できる計算環境の構築は喫緊の課題でした。</p>
+<h2 id="その他の課題"><a href="#その他の課題" class="headerlink" title="その他の課題"></a>その他の課題</h2><p>上記以外の、現在対応中な課題についても簡単にご紹介します。それらの課題については、また別の場でご紹介させていただければと思います。<br>まず多かったのは「Jupyter Notebookを使いたいが、バージョン管理が難しい」といった課題です。Jupyter Notebookはブラウザ上でセルごとにpythonのコーディング・実行をすることができ、画像等の結果をインタラクティブに表示できる大変優れたツールです。SAIGでも、多くのプロジェクト、特にOCR等の画像を扱うプロジェクトで利用されています。ただ、Notebookファイル(.ipynb)はpythonスクリプト(.py)とは異なり、ファイルに出力結果や実行順番が含まれるため、差分を取ることが難しいという特徴があります。  </p>
+<p>これは少しMLOpsの対象と外れるかもしれないのですが、繰り返し利用するソースコードのライブラリ化についても話に挙がっていました。SAIGでは先ほど述べたOCR等の画像処理だけでなく、言語処理や最適化問題等のプロジェクトも存在しています。それぞれの分野に在籍されているメンバーは、よく使うソースコードを「秘伝のタレ」として持っていますが、それらを全体に共有し別プロジェクトで利用するには一手間かかります。汎用的なライブラリを分野ごとに用意することも将来的なアイデアとして挙がっています。    </p>
+<h1 id="3-施策1：実験管理についての取り組み"><a href="#3-施策1：実験管理についての取り組み" class="headerlink" title="3. 施策1：実験管理についての取り組み"></a>3. 施策1：実験管理についての取り組み</h1><p>MLOpsの導入を進めるにあたり、まずは2章で紹介した「後になってから実験の再現ができない」問題に対して、私達はツールを用いた解決を目指しました。ツールを利用する方針にした理由は、実験の再現に必要な情報は2章で述べた通り多岐に渡るため、ハイパーパラメータチューニングの中で何度も手作業で記録することはコストが高いと判断したためです。私達がツールを選定した基準は下記の通りです。</p>
+<table>
+<thead>
+<tr>
+<th>フェーズ</th>
+<th>処理内容</th>
+<th>概要</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>モデル実装</td>
+<td>Notebook対応</td>
+<td>Jupyter notebookによる利用が可能かどうか</td>
+</tr>
+<tr>
+<td></td>
+<td>複数人の運用</td>
+<td>ソースコードや実行結果等を中央管理できるかどうか</td>
+</tr>
+<tr>
+<td></td>
+<td>GUI</td>
+<td>ブラウザ上で結果を確認するインターフェースを有するかどうか</td>
+</tr>
+<tr>
+<td></td>
+<td>記録</td>
+<td>チューニングにおける実際の値とスコアを保存しておけるかどうか</td>
+</tr>
+<tr>
+<td></td>
+<td>自動チューニング</td>
+<td>パラメータのオートチューニング機能を有するかどうか</td>
+</tr>
+<tr>
+<td>学習</td>
+<td>パラメータ記録</td>
+<td>学習の際に設定したパラメータや、その他設定値を記録できるかどうか</td>
+</tr>
+<tr>
+<td></td>
+<td>出力結果記録</td>
+<td>標準出力の内容や、生成した画像ファイルなどを保管・参照できるかどうか</td>
+</tr>
+<tr>
+<td></td>
+<td>学習の再現</td>
+<td>過去に実行した学習をパラメータを変え再実行できるかどうか</td>
+</tr>
+<tr>
+<td></td>
+<td>並列学習</td>
+<td>学習においてクラスタを利用した並列実行が可能かどうか</td>
+</tr>
+</tbody></table>
+<p>複数のツールについて、上記の観点で実現可能かどうかを実際に動かして調べました。SAIGのプロジェクトは多様であり、1つのツールで全ての要件を満たすことは難しいです。複数のツールを組み合わせ、一部は運用ルールを策定し、一部は基盤に機能を組込むことで上記の要件を満たすことを想定しています。  </p>
+<p>今回は別ツールとの連携やカスタマイズの容易性から、MLライフサイクルを管理するオープンソースプラットフォームであるMLflowの導入を決定しました。MLflowについての詳細は、<a href="https://future-architect.github.io/articles/20200626/">別記事</a>にて山野さんが書いています。<br>詳細はそちらで紹介していますので省略しますが、実験管理として私達が実施した主な施策は下記の通りです。  </p>
+<ul>
+<li>記録するパラメータおよび結果の選定</li>
+<li>インプット・アウトプットデータの保管</li>
+<li>各実験の比較用プログラムの実装  </li>
+</ul>
+<p>上記の施策を見ていただくと分かる通り、私達はただツールを導入しただけではありません。データサイエンティストのメンバーと打ち合わせを重ね、必要なパラメータやインプット・アウトプットデータといった情報の選定を選定しました。加えて、実験結果を比較するための独自の手法を、実験管理ツール内で実行できるような追加機能として実装したりもしています。  </p>
+<p>実際に実験管理ツールを使っていただいたメンバーの方からは、手作業の記録の手間が大幅に省け、作業の効率化が目に見えてできたとコメントをいただいています。MLOpsを実現するためにはツールを入れればOKというわけではなく、環境やサービスを構築するエンジニアと、AIロジックを実装するデータサイエンティストの両立場からの情報の擦り合わせが重要だと感じました。  </p>
+<h1 id="4-SAIG学習基盤の構築"><a href="#4-SAIG学習基盤の構築" class="headerlink" title="4. SAIG学習基盤の構築"></a>4. SAIG学習基盤の構築</h1><p>私達は次の取り組みとして、計算リソースが不足している課題の解決に取り組みました。そのためにローカルで構築する学習基盤は、SAIGのメンバーだけでなく、アルバイトとして業務に協力していただいている方々も含めた大人数が同時に、かつ計算量の大きい学習を長時間回すことが予想されました。  </p>
+<p>SAIG全体で利用する学習基盤を設計するにあたって、まずは実験管理と同様にヒアリングから始めました。その結果、SAIG全体で運用していくにあたってどうしても考慮しなくてはならない課題や、SAIGのデータサイエンティストの方々が求めている条件が明らかになってきました。一部にはなりますがそれぞれの要件について、その概要と対処法について紹介したいと思います。  </p>
+<h2 id="物理マシンの追加・削除に対応する"><a href="#物理マシンの追加・削除に対応する" class="headerlink" title="物理マシンの追加・削除に対応する"></a>物理マシンの追加・削除に対応する</h2><p>今回、物理マシンは新たに購入したものと、リソースが余っていたマシンを活用してクラスタを構築することとなりました。必要に応じてマザーボードから用意することもあれば、GPUやメモリ、追加NICを買い足しマシンを構築しました。全体の構成は下記の図の通りです。  </p>
+<p><img src="/images/20210115/fig_2.jpg" alt=""></p>
+<p>ソフトウェアスタックは下記の通りです。  </p>
+<p><img src="/images/20210115/fig_3.jpg" alt=""></p>
+<p>利用者はログインノードにsshで接続し利用を開始し、実際の学習はGPUノードで実行されます。ログインノードや管理用のマネジメントノードは良いのですが、GPUノードは将来的にスケールアウトが必要になることが想定されます。また、古いマシンも利用しているため、各ノードの入れ替えが必要になるかもしれません。<br>そのたびに環境構築をやり直すのは大変な手間がかかり、復旧に失敗する恐れがあります。実験の再現と同様に、環境構築においても風化しない、私達現行のメンバーが不在になっても問題ない仕組みが必要と考えました。そこで今回は全面的にansibleを使った環境構築を採用しています。<br>ansibleとは構成管理ツールと呼ばれる、サーバ上の環境構築を自動化するアプリケーションです。ansibleの優れている点は、処理ごとの依存関係の設定が可能な点や、実行するノードごとに変数として値を個別に設定できる点にあります。ansibleを利用することでログインノード・マネジメントノード・ファイルサーバ・バックアップサーバ・GPUノードの全ての環境構築を可能としました。</p>
+<h2 id="複数人での利用を想定した環境の構築"><a href="#複数人での利用を想定した環境の構築" class="headerlink" title="複数人での利用を想定した環境の構築"></a>複数人での利用を想定した環境の構築</h2><p>複数人で同一環境を利用するにあたって、各自・各プロジェクトごとに開発環境を整備できるようにしなければならず、誰かが利用している間、他の人は使えないといったことは避けなければなりません。私達は、複数のマシン上で処理を動かす際の可用性と、複数人が実施する処理のスケジューリングが必要だということ、そして全計算リソースの利用状況を可視化する事を目的にKubernetesの導入を決めました。  </p>
+<p>コンテナを利用する利点は、OSの多様化に対応できることや、パッケージを気軽に追加できること、複数のマシンで動かすときの差異に影響されにくい等、枚挙に暇がありません。大規模計算クラスタで多く使われているSlurmも候補に挙がりましたが、ジョブ単位での実行ではなくJupyter Notebookを用いたインタラクティブな利用が多くなることが見込まれたことと、多くのプロジェクトでDockerを用いた開発が進められていたため導入コストが低くなることが期待できたため、導入は見送られました。  </p>
+<h2 id="メンバーごとにプロジェクトへ所属させ、ファイルのパーミッションを適切に限定する"><a href="#メンバーごとにプロジェクトへ所属させ、ファイルのパーミッションを適切に限定する" class="headerlink" title="メンバーごとにプロジェクトへ所属させ、ファイルのパーミッションを適切に限定する"></a>メンバーごとにプロジェクトへ所属させ、ファイルのパーミッションを適切に限定する</h2><p>複数人での利用は、kubernetesのPodと呼ばれるリソース単位でそれぞれ利用することで、他のメンバーへの影響を最小限にした上で開発を進めることができるようになります。ただ、全員が全てのプロジェクトのファイルにアクセスできるようでは、機密性の問題が発生してしまいます。そこで今回はLDAP(Lightweight Directory Access Protocol)を導入しメンバーの権限を一括管理することとしました。Kubernetesには元から権限管理の機能が備わっていますが、Kubernetesに組込まれたマシン以外でもLDAPを利用する想定があったためLDAPを採用しています。現在、学習基盤の利用における権限管理はLDAPの情報を用いて実施していますが、将来的にはKubernetesと各種認証プロトコルの統合も視野に入れています。</p>
+<p>LDAPの構築にあたって、Kubernetesのリソース管理機能を有効活用するため、Deploymentという形式でLDAPのコンテナをデプロイしました。Deploymentで構築することで、Kubernetesクラスタ上において設定した数のPodが起動していることを保証することができます。  </p>
+<h2 id="GPUの利用"><a href="#GPUの利用" class="headerlink" title="GPUの利用"></a>GPUの利用</h2><p>通常Kubernetesを導入する際には、kubeadmを利用する方法が一般的かと思いますが、そのまま利用しただけでは起動したPod内でGPUを認識することができません。今回私たちは、<a href="https://medium.com/nvidiajapan/nvidia-docker-%E3%81%A3%E3%81%A6%E4%BB%8A%E3%81%A9%E3%81%86%E3%81%AA%E3%81%A3%E3%81%A6%E3%82%8B%E3%81%AE-20-09-%E7%89%88-558fae883f44" target="_blank" rel="noopener">こちらの記事</a>を参考にさせていただき、Nvidia Docker2の導入を決めました。  </p>
+<p>Nvidia Driverをインストールした上で、nvidia-docker2を導入し、Dockerの起動設定を下記の通り変更し適用することで、Kubernetes上でGPUを認識することができます。</p>
+<figure class="highlight json"><figcaption><span>daemon.json</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"exec-opts"</span>: [<span class="string">"native.cgroupdriver=systemd"</span>],</span><br><span class="line">  <span class="attr">"log-driver"</span>: <span class="string">"json-file"</span>,</span><br><span class="line">  <span class="attr">"log-opts"</span>: &#123;</span><br><span class="line">    <span class="attr">"max-size"</span>: <span class="string">"100m"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"storage-driver"</span>: <span class="string">"overlay2"</span>,</span><br><span class="line">  <span class="attr">"default-runtime"</span>: <span class="string">"nvidia"</span>,</span><br><span class="line">  <span class="attr">"runtimes"</span>: &#123;</span><br><span class="line">    <span class="attr">"nvidia"</span>: &#123;</span><br><span class="line">      <span class="attr">"path"</span>: <span class="string">"/usr/bin/nvidia-container-runtime"</span>,</span><br><span class="line">      <span class="attr">"runtimeArgs"</span>: []</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"insecure-registries"</span>:[<span class="string">"プライベートレジストリの接続先を記載"</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="高速なファイルの転送"><a href="#高速なファイルの転送" class="headerlink" title="高速なファイルの転送"></a>高速なファイルの転送</h2><p>LDAPと同様に、Kubernetesのリソース管理機能を活用するべく、DockerのプライベートレジストリについてもDeploymentで構築しました。プライベートレジストリとは、各自が作成したイメージを保存・バージョン管理することのできるストレージのようなものです。プライベートレジストリを用意することで、Kubernetesの各ノード上で各自がビルドしたコンテナイメージを利用することができるようになります。  </p>
+<p>ただ、Dockerのイメージは物によってはサイズが大きくなってしまいます。今回のプライベートレジストリは、ファイルサーバ上に構築したNFSに保存するようにしていますが、ネットワークの転送速度には長い時間がかかる恐れがあります。  </p>
+<p>構築前のヒアリングでも要望として上がっていましたが、機械学習プロジェクトでは大規模なモデルや学習データを取り扱う機会が多い事もあり、大容量のファイル送信は必須でした。今回は通常のネットワーク用とは別にNICを各マシンに追加し、外部通信とは別に利用するネットワークを構築することで高速なデータ転送を実現しています。  </p>
+<h2 id="CI-CDの実現"><a href="#CI-CDの実現" class="headerlink" title="CI/CDの実現"></a>CI/CDの実現</h2><p>CI/CDとは継続的インテグレーション・継続的デプロイメントとして広く知られた手法になってきていますが、機械学習プロジェクトにおいても今まで以上に重要な技術です。機械学習プロジェクトでは、ただソースコードが動けば良いだけでなく、モデルの精度についても継続して評価する必要があります。  </p>
+<p>今回はGitLabとKubernetesを連携させ、各プロジェクトごとに利用できるCI環境を構築しています。Kubernetes上でHelmというパッケージ管理ツールを使いGitLab runnerを動かせるようにした上で、設定パラメータにGitLabの情報を入力することで連携することができます。また、Kubernetes環境にMLflowのPodを立てCIの結果を逐一記録することで、継続的なモデル評価を実現できます。  </p>
+<h1 id="5-まとめと今後の展望"><a href="#5-まとめと今後の展望" class="headerlink" title="5. まとめと今後の展望"></a>5. まとめと今後の展望</h1><p>長々と、かつまとまりの無い記事になってしまいましたが、MLOpsを進める中で感じたことは下記の2点です。</p>
+<ul>
+<li>データサイエンティストのメンバーと対話し実情を知るべき</li>
+<li>画一的に技術・ルールを整備するのではなく、状況や案件に合わせて都度カスタマイズするべき  </li>
+</ul>
+<p>データサイエンティストとエンジニアは持つ知識や経験が異なり、片方が常識だと考えていることが一方ではそうではないことは多々あります。それは多様な職種の企業様と行うコンサルティングと同様に、それぞれの理解の擦り合わせを積極的に行うことと、自分の知らない分野に関する知識を学び、より良いモノを作るよう努力を続けるという歩み寄りの姿勢が重要であると感じました。  </p>
+<p>未だSAIG内で表面化している課題の全てには対応できていません。ディレクトリ構成に関する運用ルールを策定するにとどまっているJupyter Notebookのバージョン管理や、データの前処理と学習を一連の処理として扱うパイプラインツールの導入も今後挑戦したいと考えています。<br>引き続き、円滑な機械学習プロジェクト推進の一助となれるよう、MLOpsの導入に力を入れていきたいです。<br>また、MLOpsの導入に力を貸してくれるメンバーも募集していますので、興味のある方は是非、SAIGの門を叩いてみてください！</p>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+
+  <li class="twitter-btn">
+    <a href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210115/&via=future_techblog&related=twitterapi%2Ctwitter&text=MLOpsことはじめ ～実験管理導入と学習基盤の構築～" alt="ツイート"
+      onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow">
+      <i></i><span class="tw-btn-label">ツイート</span>
+    </a>
+  </li>
+
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20210115/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:155px; height:20px">
+       <a href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20210115/" target="_blank" rel="noopener" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20210115/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>人気の記事</h3>
+<div class="widget-wrap">
+  
+  
+    
+      
+        <div class="widget">
+          <ul class="nav">
+            <li>
+              <a href="https://future-architect.github.io/articles/20210115/">
+                MLOpsことはじめ ～実験管理導入と学習基盤の構築～
+              </a>
+            </li>
+          </ul>
+        </div>
+      
+	
+  
+    
+  
+    
+  
+    
+      
+        <div class="widget">
+          <ul class="nav">
+            <li>
+              <a href="https://future-architect.github.io/articles/20210108/">
+                自分の分身(3Dアバター)と自作ワールドを作ってみた
+              </a>
+            </li>
+          </ul>
+        </div>
+      
+	
+  
+    
+      
+        <div class="widget">
+          <ul class="nav">
+            <li>
+              <a href="https://future-architect.github.io/articles/20210107/">
+                Electronの使い方 Web開発の技術でデスクトップアプリを作ろう
+              </a>
+            </li>
+          </ul>
+        </div>
+      
+	
+  
+    
+  
+    
+      
+        <div class="widget">
+          <ul class="nav">
+            <li>
+              <a href="https://future-architect.github.io/articles/20201223/">
+                2021年版Pythonの型ヒントの書き方 (for Python 3.9)
+              </a>
+            </li>
+          </ul>
+        </div>
+      
+	
+  
+    
+  
+    
+      
+        <div class="widget">
+          <ul class="nav">
+            <li>
+              <a href="https://future-architect.github.io/articles/20190713/">
+                Goを学ぶときにつまずきやすいポイントFAQ
+              </a>
+            </li>
+          </ul>
+        </div>
+      
+	
+  
+    
+  
+    
+  
+    
+      
+        <div class="widget">
+          <ul class="nav">
+            <li>
+              <a href="https://future-architect.github.io/articles/20201206/">
+                AWSマネージドAirflow(MWAA)についてのFAQ
+              </a>
+            </li>
+          </ul>
+        </div>
+      
+	
+  
+    
+  
+    
+      
+        <div class="widget">
+          <ul class="nav">
+            <li>
+              <a href="https://future-architect.github.io/articles/20201203/">
+                GoがApple Siliconにネイティブ対応したのでベンチマークをとってみました
+              </a>
+            </li>
+          </ul>
+        </div>
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        <div class="widget">
+          <ul class="nav">
+            <li>
+              <a href="https://future-architect.github.io/articles/20201117/">
+                Goのデバッグ環境 on VSCode
+              </a>
+            </li>
+          </ul>
+        </div>
+      
+	
+  
+    
+  
+    
+      
+        <div class="widget">
+          <ul class="nav">
+            <li>
+              <a href="https://future-architect.github.io/articles/20201113/">
+                LocalStackに向けてTerraformを実行する
+              </a>
+            </li>
+          </ul>
+        </div>
+      
+	
+  
+    
+      
+        <div class="widget">
+          <ul class="nav">
+            <li>
+              <a href="https://future-architect.github.io/articles/20201107/">
+                フューチャーOSS推進タスクフォース始めます
+              </a>
+            </li>
+          </ul>
+        </div>
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+      
+	
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (45)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (13)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (9)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (118)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (94)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (11)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (3)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="https://note.future.co.jp/" target="_blank">未来報</a>
+      </li>
+      <li>
+        <a href="https://future-fintech.github.io/" target="_blank">Future Fintech EYE</a>
+      </li>
+      <li>
+        <a href="https://future.connpass.com/" target="_blank">Conpass</a>
+      </ul>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2020/future" target="_blank">2020年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2019/future" target="_blank">2019年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a href="http://www.future.co.jp/" target="_blank" rel="noopener">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a href="https://twitter.com/future_techblog" target="_blank" rel="noopener" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" target="_blank" rel="noopener" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2021 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      <li><a href="https://github.com/future-architect" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li>
+  
+      <li><a href="https://twitter.com/future_techblog" target="_blank" rel="noopener"><i class="fa fa-twitter"></i></a></li>
+  
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  
+<script src="/metronic/assets/plugins/jquery.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+
+
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+    });
+</script>
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
