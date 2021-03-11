@@ -22,8 +22,8 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20191119/go-cdk-logo-gopherblue.png">
 <meta property="article:published_time" content="2019-11-19T05:39:21.000Z">
 <meta property="article:modified_time" content="2020-08-30T07:00:21.153Z">
-<meta property="article:tag" content="Go">
 <meta property="article:tag" content="GCP">
+<meta property="article:tag" content="Go">
 <meta property="article:tag" content="GoCDK">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://future-architect.github.io/images/20191119/go-cdk-logo-gopherblue.png">
@@ -41,30 +41,24 @@
   <!-- Global styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Global styles END -->
 
   <!-- Theme styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/css/theme-styles.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Theme styles END -->
 <meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
@@ -121,9 +115,9 @@
     <li><i class="fa fa-tags"></i>
     
   
-    <a href="/tags/Go/" title="Go">Go</a>,
-  
     <a href="/tags/GCP/" title="GCP">GCP</a>,
+  
+    <a href="/tags/Go/" title="Go">Go</a>,
   
     <a href="/tags/GoCDK/" title="GoCDK">GoCDK</a>
   
@@ -159,7 +153,7 @@
 </ul>
 <hr>
 <p>本記事では、Go CloudでGCPのエミュレータに接続してみます。同様の企画である<a href="/articles/20191115/">AWS LocalStack版は第5弾</a>でまとめていますので、詳細はそちらを確認ください</p>
-<h1 id="GCPのローカルエミュレータとは"><a href="#GCPのローカルエミュレータとは" class="headerlink" title="GCPのローカルエミュレータとは"></a>GCPのローカルエミュレータとは</h1><p>GCPのリソースを管理するためのコマンドラインインターフェースとして <a href="https://cloud.google.com/sdk/gcloud/" target="_blank" rel="noopener">gcloud</a> があり、このgcloudコマンド経由で各種エミュレータを実行することができます。</p>
+<h1 id="GCPのローカルエミュレータとは"><a href="#GCPのローカルエミュレータとは" class="headerlink" title="GCPのローカルエミュレータとは"></a>GCPのローカルエミュレータとは</h1><p>GCPのリソースを管理するためのコマンドラインインターフェースとして <a target="_blank" rel="noopener" href="https://cloud.google.com/sdk/gcloud/">gcloud</a> があり、このgcloudコマンド経由で各種エミュレータを実行することができます。</p>
 <p>gcloudはAWSでいうAWS CLIに相当しますが、AWS CLIにはもちろんそのような仕組みは備わっていません。代わりにLocalStackというツールを利用することが多いです。それとは異なりGCPは標準コマンドに組み込まれているということで、思想の違いのようなものを感じられ興味深いですね。</p>
 <h1 id="エミューレータ種類について"><a href="#エミューレータ種類について" class="headerlink" title="エミューレータ種類について"></a>エミューレータ種類について</h1><p><code>gcloud alpha emulators --help</code> で確認すると、2019年11月時点でエミュレートできるサービスは4つです。</p>
 <ol>
@@ -169,10 +163,10 @@
 <li>firestore</li>
 </ol>
 <p>現時点ではGo CloudのBlobに相当するCloud Storageのエミュレータは存在しないようです<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>。</p>
-<p>存在しない理由は注釈1のStackOverflowの回答にもありますが、各Cloud StorageのSDKに、ローカルストレージに書き込むオプションが存在するため、エミュレータレベルでは存在しないのでは？と推測します。純製ではないですが <a href="https://github.com/fsouza/fake-gcs-server" target="_blank" rel="noopener">fsouza/fake-gcs-server</a>というツールもあるので、こちらを利用することも検討に値するかもしれません。</p>
+<p>存在しない理由は注釈1のStackOverflowの回答にもありますが、各Cloud StorageのSDKに、ローカルストレージに書き込むオプションが存在するため、エミュレータレベルでは存在しないのでは？と推測します。純製ではないですが <a target="_blank" rel="noopener" href="https://github.com/fsouza/fake-gcs-server">fsouza/fake-gcs-server</a>というツールもあるので、こちらを利用することも検討に値するかもしれません。</p>
 <p>本記事では、gcloud emulator で実行できる、 pubsubとfirestoreに対してGo Cloudでアクセスしていきます。</p>
-<h1 id="Cloud-Pub-Sub"><a href="#Cloud-Pub-Sub" class="headerlink" title="Cloud Pub/Sub"></a>Cloud Pub/Sub</h1><p>Cloud Pub/Sub は送信者と受信者を切り離す多対多の非同期メッセージングを提供することによって、別々に開発されたアプリケーションの間で安全かつ高可用な通信を実現するGCPのプロダクトです。送信側がPublisher、受信側がSubscriberと呼ばれ、1:Nのメッセージのやり取りを行えます。<br><a href="https://cloud.google.com/pubsub/docs/overview" target="_blank" rel="noopener">https://cloud.google.com/pubsub/docs/overview</a></p>
-<p><a href="https://cloud.google.com/pubsub/docs/emulator" target="_blank" rel="noopener">ドキュメント</a>に従いgcloud pubsubエミュレータをインストールします。</p>
+<h1 id="Cloud-Pub-Sub"><a href="#Cloud-Pub-Sub" class="headerlink" title="Cloud Pub/Sub"></a>Cloud Pub/Sub</h1><p>Cloud Pub/Sub は送信者と受信者を切り離す多対多の非同期メッセージングを提供することによって、別々に開発されたアプリケーションの間で安全かつ高可用な通信を実現するGCPのプロダクトです。送信側がPublisher、受信側がSubscriberと呼ばれ、1:Nのメッセージのやり取りを行えます。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/pubsub/docs/overview">https://cloud.google.com/pubsub/docs/overview</a></p>
+<p><a target="_blank" rel="noopener" href="https://cloud.google.com/pubsub/docs/emulator">ドキュメント</a>に従いgcloud pubsubエミュレータをインストールします。</p>
 <figure class="highlight sh"><figcaption><span>Install</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcloud components install pubsub-emulator</span><br></pre></td></tr></table></figure>
 
 <p>インストールが終わったら、以下のコマンドでエミュレータを起動します。</p>
@@ -184,34 +178,34 @@
 
 <p>このまま、gcloudコマンドで起動したpub/subのエミュレータに対してトピックを作成します。…と言いたいところですが、 <strong>実はgcloudはエミュレータに非対応です。</strong></p>
 <blockquote>
-<p>The emulator does not support GCP Console or gcloud pubsub commands.<br>（エミュレータはGCPコンソールやgcloud pubsubコマンドに対応していません）<br><a href="https://cloud.google.com/pubsub/docs/emulator#using_the_emulator" target="_blank" rel="noopener">https://cloud.google.com/pubsub/docs/emulator#using_the_emulator</a></p>
+<p>The emulator does not support GCP Console or gcloud pubsub commands.<br>（エミュレータはGCPコンソールやgcloud pubsubコマンドに対応していません）<br><a target="_blank" rel="noopener" href="https://cloud.google.com/pubsub/docs/emulator#using_the_emulator">https://cloud.google.com/pubsub/docs/emulator#using_the_emulator</a></p>
 </blockquote>
 <p>え、どうやってトピック作るの？って疑問に思いましたが、GCPのSDK経由であれば操作できるようです（そうでないと意味無いので当然ですが）。ドキュメントにPython製のツールがいくつかおいてあるので、そちらをgcloudコマンドの代わりに利用してトピックを作成します。</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ツールの取得</span></span><br><span class="line">$ git <span class="built_in">clone</span> https://github.com/GoogleCloudPlatform/python-docs-samples.git</span><br><span class="line">$ <span class="built_in">cd</span> python-docs-samples/pubsub/cloud-client</span><br><span class="line"></span><br><span class="line"><span class="comment"># インストール</span></span><br><span class="line">$ pip install -r requirements.txt</span><br><span class="line"></span><br><span class="line"><span class="comment"># トピックの作成</span></span><br><span class="line">$ python publisher.py dummy create future-example</span><br></pre></td></tr></table></figure>
 
 <p><code>Topic created: name: &quot;projects/dummy/topics/future-example&quot;</code> といったメッセージが出力されれば成功です。</p>
 <p>ではGo Cloudでさきほど作成した <code>future-example</code> というトピックに対してPublishしてみます。</p>
-<figure class="highlight go"><figcaption><span>サンプルPublish(実はNGケース)</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"gocloud.dev/pubsub"</span></span><br><span class="line">	_ <span class="string">"gocloud.dev/pubsub/gcppubsub"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line"></span><br><span class="line">	topic, err := pubsub.OpenTopic(ctx, <span class="string">"gcppubsub://projects/myproject/topics/mytopic"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> topic.Shutdown(ctx)</span><br><span class="line"></span><br><span class="line">	err = topic.Send(ctx, &amp;pubsub.Message&#123;Body: []<span class="keyword">byte</span>(<span class="string">"Hello, World!"</span>)&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>サンプルPublish(実はNGケース)</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;gocloud.dev/pubsub&quot;</span></span><br><span class="line">	_ <span class="string">&quot;gocloud.dev/pubsub/gcppubsub&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line"></span><br><span class="line">	topic, err := pubsub.OpenTopic(ctx, <span class="string">&quot;gcppubsub://projects/myproject/topics/mytopic&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> topic.Shutdown(ctx)</span><br><span class="line"></span><br><span class="line">	err = topic.Send(ctx, &amp;pubsub.Message&#123;Body: []<span class="keyword">byte</span>(<span class="string">&quot;Hello, World!&quot;</span>)&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>実は上記のコードは2019/11時点のGo CDK 0.1.0では上手く動かないようです。理由は、<code>PUBSUB_EMULATOR_HOST</code> の<a href="https://github.com/google/go-cloud/blob/master/pubsub/gcppubsub/gcppubsub.go#L134" target="_blank" rel="noopener">環境変数は読んでくれているようです</a> が、gRPCのトランスポートがCredentialsがついたたままで、 <a href="https://github.com/google/go-cloud/blob/master/pubsub/gcppubsub/gcppubsub.go#L233" target="_blank" rel="noopener">Insecureオプションへの切り替えが無い</a>からだと思います。PullRequstチャンスだと思いますが、現時点のコードベースだと、gcppubsubパッケージでガンバってInsecureオプションを付ける処理を入れる必要がある気がします。</p>
-<p>ということで、例えば以下のようなコードでWithInsecureで切り替えが必要すれば一応動かすことができます。ちょっと長いですがGCPのCredentailsを環境変数ではなく <a href="https://gocloud.dev/howto/pubsub/publish/#gcp-ctor" target="_blank" rel="noopener">自前で設定する場合のコード</a> に、エミュレータの切り替えを追加しただけです。</p>
-<figure class="highlight go"><figcaption><span>無理やり通すパターン</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> endPoint = <span class="string">"pubsub.googleapis.com:443"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line"></span><br><span class="line">	conn, err := dial(ctx) <span class="comment">// ★エミュレータ対応</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		log.Fatalf(<span class="string">"dial error: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">	pubClient, err := gcppubsub.PublisherClient(ctx, conn)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"publisher client error: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> pubClient.Close()</span><br><span class="line"></span><br><span class="line">	topic, err := gcppubsub.OpenTopicByPath(pubClient, <span class="string">"projects/dummy/topics/future-example"</span>, <span class="literal">nil</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"open topic error: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> topic.Shutdown(ctx)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err = topic.Send(ctx, &amp;pubsub.Message&#123;Body: []<span class="keyword">byte</span>(<span class="string">"Hello, World!"</span>)&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"publish error: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(<span class="string">"done"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ★エミュレータ対応して関数切り出し</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">dial</span><span class="params">(ctx context.Context)</span> <span class="params">(*grpc.ClientConn, error)</span></span> &#123;</span><br><span class="line">	emulatorEndPoint := os.Getenv(<span class="string">"PUBSUB_EMULATOR_HOST"</span>)</span><br><span class="line">	<span class="keyword">if</span> emulatorEndPoint != <span class="string">""</span> &#123;</span><br><span class="line">		endPoint = emulatorEndPoint</span><br><span class="line">		<span class="keyword">return</span> grpc.DialContext(ctx, endPoint,</span><br><span class="line">			grpc.WithInsecure(), <span class="comment">// ★追加</span></span><br><span class="line">			grpc.WithUserAgent(fmt.Sprintf(<span class="string">"%s/%s/%s"</span>, <span class="string">"pubsub"</span>, <span class="string">"go-cdk"</span>, <span class="string">"0.1.0"</span>)),</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	creds, err := gcp.DefaultCredentials(ctx)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> grpc.DialContext(ctx, endPoint,</span><br><span class="line">		grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(<span class="literal">nil</span>, <span class="string">""</span>)),</span><br><span class="line">		grpc.WithPerRPCCredentials(oauth.TokenSource&#123;TokenSource: creds.TokenSource&#125;),</span><br><span class="line">		grpc.WithUserAgent(fmt.Sprintf(<span class="string">"%s/%s/%s"</span>, <span class="string">"pubsub"</span>, <span class="string">"go-cloud"</span>, <span class="string">"0.1.0"</span>)),</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>実は上記のコードは2019/11時点のGo CDK 0.1.0では上手く動かないようです。理由は、<code>PUBSUB_EMULATOR_HOST</code> の<a target="_blank" rel="noopener" href="https://github.com/google/go-cloud/blob/master/pubsub/gcppubsub/gcppubsub.go#L134">環境変数は読んでくれているようです</a> が、gRPCのトランスポートがCredentialsがついたたままで、 <a target="_blank" rel="noopener" href="https://github.com/google/go-cloud/blob/master/pubsub/gcppubsub/gcppubsub.go#L233">Insecureオプションへの切り替えが無い</a>からだと思います。PullRequstチャンスだと思いますが、現時点のコードベースだと、gcppubsubパッケージでガンバってInsecureオプションを付ける処理を入れる必要がある気がします。</p>
+<p>ということで、例えば以下のようなコードでWithInsecureで切り替えが必要すれば一応動かすことができます。ちょっと長いですがGCPのCredentailsを環境変数ではなく <a target="_blank" rel="noopener" href="https://gocloud.dev/howto/pubsub/publish/#gcp-ctor">自前で設定する場合のコード</a> に、エミュレータの切り替えを追加しただけです。</p>
+<figure class="highlight go"><figcaption><span>無理やり通すパターン</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> endPoint = <span class="string">&quot;pubsub.googleapis.com:443&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line"></span><br><span class="line">	conn, err := dial(ctx) <span class="comment">// ★エミュレータ対応</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;dial error: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">	pubClient, err := gcppubsub.PublisherClient(ctx, conn)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;publisher client error: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> pubClient.Close()</span><br><span class="line"></span><br><span class="line">	topic, err := gcppubsub.OpenTopicByPath(pubClient, <span class="string">&quot;projects/dummy/topics/future-example&quot;</span>, <span class="literal">nil</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;open topic error: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> topic.Shutdown(ctx)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err = topic.Send(ctx, &amp;pubsub.Message&#123;Body: []<span class="keyword">byte</span>(<span class="string">&quot;Hello, World!&quot;</span>)&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;publish error: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(<span class="string">&quot;done&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ★エミュレータ対応して関数切り出し</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">dial</span><span class="params">(ctx context.Context)</span> <span class="params">(*grpc.ClientConn, error)</span></span> &#123;</span><br><span class="line">	emulatorEndPoint := os.Getenv(<span class="string">&quot;PUBSUB_EMULATOR_HOST&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> emulatorEndPoint != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">		endPoint = emulatorEndPoint</span><br><span class="line">		<span class="keyword">return</span> grpc.DialContext(ctx, endPoint,</span><br><span class="line">			grpc.WithInsecure(), <span class="comment">// ★追加</span></span><br><span class="line">			grpc.WithUserAgent(fmt.Sprintf(<span class="string">&quot;%s/%s/%s&quot;</span>, <span class="string">&quot;pubsub&quot;</span>, <span class="string">&quot;go-cdk&quot;</span>, <span class="string">&quot;0.1.0&quot;</span>)),</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	creds, err := gcp.DefaultCredentials(ctx)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> grpc.DialContext(ctx, endPoint,</span><br><span class="line">		grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(<span class="literal">nil</span>, <span class="string">&quot;&quot;</span>)),</span><br><span class="line">		grpc.WithPerRPCCredentials(oauth.TokenSource&#123;TokenSource: creds.TokenSource&#125;),</span><br><span class="line">		grpc.WithUserAgent(fmt.Sprintf(<span class="string">&quot;%s/%s/%s&quot;</span>, <span class="string">&quot;pubsub&quot;</span>, <span class="string">&quot;go-cloud&quot;</span>, <span class="string">&quot;0.1.0&quot;</span>)),</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>続いて、Subscribeです。先程のPython製ツールでSubscriptionのエンドポイントを作成します。ProjectID, トピック名を指定し、<code>gocdk-example1</code> としたエンドポイントを指定しました。</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python subscriber.py dummy create future-example gocdk-example1</span><br></pre></td></tr></table></figure>
 
 <p>この <code>gocdk-example1</code> に対してGo Cloudでアクセスします。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line"></span><br><span class="line">	conn, err := dial(ctx) <span class="comment">// ★先程のエミュレータ対応した関数</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		log.Fatalf(<span class="string">"dial error: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">	subClient, err := gcppubsub.SubscriberClient(ctx, conn)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"subscriber client error: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> subClient.Close()</span><br><span class="line"></span><br><span class="line">	sub, err := gcppubsub.OpenSubscriptionByPath(subClient, <span class="string">"projects/dummy/subscriptions/gocdk-example1"</span>, <span class="literal">nil</span>) <span class="comment">// ★さきほど取得したエンドポイントを指定する</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"subscription error: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> sub.Shutdown(ctx)</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		msg, err := sub.Receive(ctx)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Fatalf(<span class="string">"Receiving message: %v"</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">		fmt.Printf(<span class="string">"Got message: %q\n"</span>, msg.Body)</span><br><span class="line">		msg.Ack()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line"></span><br><span class="line">	conn, err := dial(ctx) <span class="comment">// ★先程のエミュレータ対応した関数</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span>&#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;dial error: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">	subClient, err := gcppubsub.SubscriberClient(ctx, conn)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;subscriber client error: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> subClient.Close()</span><br><span class="line"></span><br><span class="line">	sub, err := gcppubsub.OpenSubscriptionByPath(subClient, <span class="string">&quot;projects/dummy/subscriptions/gocdk-example1&quot;</span>, <span class="literal">nil</span>) <span class="comment">// ★さきほど取得したエンドポイントを指定する</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;subscription error: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> sub.Shutdown(ctx)</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		msg, err := sub.Receive(ctx)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Fatalf(<span class="string">&quot;Receiving message: %v&quot;</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;Got message: %q\n&quot;</span>, msg.Body)</span><br><span class="line">		msg.Ack()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>Subscribeのテストをしたい場合は、先程のPythonライブラリにサンプルでPublishするツールも付いているのでそちらで検証すると良いと思います。</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python publisher.py dummy publish future-example</span><br></pre></td></tr></table></figure>
 
 <p>上記は、1から10までpublishする簡単なツールですが、検証用途ととしてはお手軽なのでオススメです。実行すると、Subscription側に標準出力されることが確認できると思います。</p>
-<h1 id="Cloud-Firestore"><a href="#Cloud-Firestore" class="headerlink" title="Cloud Firestore"></a>Cloud Firestore</h1><p>Cloud Firestore は、高速でサーバーレスなフルマネージドのクラウド ネイティブ NoSQL ドキュメント データベースです。<br><a href="https://cloud.google.com/firestore/" target="_blank" rel="noopener">https://cloud.google.com/firestore/</a></p>
-<p>エミュレータのインストールは<a href="https://firebase.google.com/docs/firestore/security/test-rules-emulator" target="_blank" rel="noopener">こちら</a> を参考にできますが、今回はgcloudコマンドを直接叩いて起動させます。</p>
+<h1 id="Cloud-Firestore"><a href="#Cloud-Firestore" class="headerlink" title="Cloud Firestore"></a>Cloud Firestore</h1><p>Cloud Firestore は、高速でサーバーレスなフルマネージドのクラウド ネイティブ NoSQL ドキュメント データベースです。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/firestore/">https://cloud.google.com/firestore/</a></p>
+<p>エミュレータのインストールは<a target="_blank" rel="noopener" href="https://firebase.google.com/docs/firestore/security/test-rules-emulator">こちら</a> を参考にできますが、今回はgcloudコマンドを直接叩いて起動させます。</p>
 <figure class="highlight sh"><figcaption><span>Install</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcloud components install cloud-firestore-emulator</span><br></pre></td></tr></table></figure>
 
-<p>インストールが終わったら、以下のコマンドでエミュレータを起動します。オプションは<a href="https://cloud.google.com/sdk/gcloud/reference/beta/emulators/firestore/" target="_blank" rel="noopener">こちら</a> を参考ください。</p>
+<p>インストールが終わったら、以下のコマンドでエミュレータを起動します。オプションは<a target="_blank" rel="noopener" href="https://cloud.google.com/sdk/gcloud/reference/beta/emulators/firestore/">こちら</a> を参考ください。</p>
 <figure class="highlight sh"><figcaption><span>pubsubエミュレータの起動</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcloud beta emulators firestore start --project dummy --host-port=localhost:8080</span><br></pre></td></tr></table></figure>
 
 <p><code>--host-port</code> オプションでポートを固定できます(指定しないと起動のたびに違うポートが用いられました)。<code>localhost:8080</code> でアクセスすると <code>Ok</code> が返ってくれば起動成功です。</p>
@@ -219,7 +213,7 @@
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> FIRESTORE_EMULATOR_HOST=localhost:8080</span><br><span class="line"><span class="built_in">export</span> FIRESTORE_PROJECT_ID=dummy</span><br></pre></td></tr></table></figure>
 
 <p>続いてコードはこちらです。FirestoreもPub/Subと同様に、エミュレータ対応する関数を用意してスイッチさせています。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Record <span class="keyword">struct</span> &#123;</span><br><span class="line">	ID   <span class="keyword">string</span> <span class="string">`docstore:"id"`</span></span><br><span class="line">	Name <span class="keyword">string</span> <span class="string">`docstore:"name"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> endPoint = <span class="string">"firesotore.googleapis.com:443"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line"></span><br><span class="line">	client, err := dial(ctx) <span class="comment">// ★エミュレータ対応のため関数切り出し</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"dial error: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	resourceID := gcpfirestore.CollectionResourceID(<span class="string">"dummy"</span>, <span class="string">"example-collection"</span>)</span><br><span class="line">	coll, err := gcpfirestore.OpenCollection(client, resourceID, <span class="string">"id"</span>, <span class="literal">nil</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"open collection error: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> coll.Close()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 書き込み</span></span><br><span class="line">	row := Record&#123;</span><br><span class="line">		ID:   <span class="string">"1"</span>,</span><br><span class="line">		Name: <span class="string">"hoge"</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> err := coll.Create(ctx, &amp;row); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"create error: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 読み込み</span></span><br><span class="line">	rowToRead := Record&#123;</span><br><span class="line">		ID: <span class="string">"1"</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> err := coll.Get(ctx, &amp;rowToRead); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">"get error: %v"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">"get: %+v\n"</span>, rowToRead)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 0.1.0時点でエミュレータで動かすため自前で切り替え</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">dial</span><span class="params">(ctx context.Context)</span> <span class="params">(*vkit.Client, error)</span></span> &#123;</span><br><span class="line">	emulatorEndPoint := os.Getenv(<span class="string">"FIRESTORE_EMULATOR_HOST"</span>)</span><br><span class="line">	<span class="keyword">if</span> emulatorEndPoint != <span class="string">""</span> &#123;</span><br><span class="line">		endPoint = emulatorEndPoint</span><br><span class="line"></span><br><span class="line">		conn, err := grpc.DialContext(ctx, endPoint, grpc.WithInsecure())</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> vkit.NewClient(ctx,</span><br><span class="line">			option.WithEndpoint(endPoint),</span><br><span class="line">			option.WithGRPCConn(conn),</span><br><span class="line">			option.WithUserAgent(fmt.Sprintf(<span class="string">"%s/%s/%s"</span>, <span class="string">"firestore"</span>, <span class="string">"go-cloud"</span>, <span class="string">"0.1.0"</span>)),</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	creds, err := gcp.DefaultCredentials(ctx)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	client, _, err := gcpfirestore.Dial(ctx, creds.TokenSource)</span><br><span class="line">	<span class="keyword">return</span> client, err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Record <span class="keyword">struct</span> &#123;</span><br><span class="line">	ID   <span class="keyword">string</span> <span class="string">`docstore:&quot;id&quot;`</span></span><br><span class="line">	Name <span class="keyword">string</span> <span class="string">`docstore:&quot;name&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> endPoint = <span class="string">&quot;firesotore.googleapis.com:443&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line"></span><br><span class="line">	client, err := dial(ctx) <span class="comment">// ★エミュレータ対応のため関数切り出し</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;dial error: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	resourceID := gcpfirestore.CollectionResourceID(<span class="string">&quot;dummy&quot;</span>, <span class="string">&quot;example-collection&quot;</span>)</span><br><span class="line">	coll, err := gcpfirestore.OpenCollection(client, resourceID, <span class="string">&quot;id&quot;</span>, <span class="literal">nil</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;open collection error: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> coll.Close()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 書き込み</span></span><br><span class="line">	row := Record&#123;</span><br><span class="line">		ID:   <span class="string">&quot;1&quot;</span>,</span><br><span class="line">		Name: <span class="string">&quot;hoge&quot;</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> err := coll.Create(ctx, &amp;row); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;create error: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 読み込み</span></span><br><span class="line">	rowToRead := Record&#123;</span><br><span class="line">		ID: <span class="string">&quot;1&quot;</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> err := coll.Get(ctx, &amp;rowToRead); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;get error: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;get: %+v\n&quot;</span>, rowToRead)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 0.1.0時点でエミュレータで動かすため自前で切り替え</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">dial</span><span class="params">(ctx context.Context)</span> <span class="params">(*vkit.Client, error)</span></span> &#123;</span><br><span class="line">	emulatorEndPoint := os.Getenv(<span class="string">&quot;FIRESTORE_EMULATOR_HOST&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> emulatorEndPoint != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">		endPoint = emulatorEndPoint</span><br><span class="line"></span><br><span class="line">		conn, err := grpc.DialContext(ctx, endPoint, grpc.WithInsecure())</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> vkit.NewClient(ctx,</span><br><span class="line">			option.WithEndpoint(endPoint),</span><br><span class="line">			option.WithGRPCConn(conn),</span><br><span class="line">			option.WithUserAgent(fmt.Sprintf(<span class="string">&quot;%s/%s/%s&quot;</span>, <span class="string">&quot;firestore&quot;</span>, <span class="string">&quot;go-cloud&quot;</span>, <span class="string">&quot;0.1.0&quot;</span>)),</span><br><span class="line">		)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	creds, err := gcp.DefaultCredentials(ctx)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	client, _, err := gcpfirestore.Dial(ctx, creds.TokenSource)</span><br><span class="line">	<span class="keyword">return</span> client, err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>コードの中でCreate（登録）とGet（取得）ができました。後はエミュレータを意識すること無く操作することができます。</p>
 <h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>GCPのローカルエミュレータのFirestore, PubSubに対して多少前処理が必要ですがGo Cloudから十分アクセスができます。同時にまだ実装が枯れきっていないので色々PullRequestチャンスだと思います。</p>
@@ -292,20 +286,6 @@
     
   
     
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210310/">
-                  本番データが急に欲しくなったアナタに贈る、CloudSQLのサーバレスエクスポートを試してみた
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
   
     
       
@@ -313,28 +293,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210309/">
-                  PubSubのメッセージスキーマを試してみる
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210308/">
-                  Auth0 Rulesのユニットテストを書きたい
+                <a href="https://future-architect.github.io/articles/20190713/">
+                  Goを学ぶときにつまずきやすいポイントFAQ
                 </a>
               </li>
             </ul>
@@ -350,8 +310,6 @@
     
   
     
-  
-    
       
     
   
@@ -364,66 +322,10 @@
     
   
     
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210303/">
-                  Vis Networkで階層グラフを可視化する
-                </a>
-              </li>
-            </ul>
-          </div>
-        
       
     
   
     
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210207/">
-                  Go 1.16連載が始まります
-                </a>
-              </li>
-            </ul>
-          </div>
-        
       
     
   
@@ -433,24 +335,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210208/">
-                  Go 1.16からリリースされたgo:embedとは
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210205/">
-                  Good First Issue から OSS へコントリビュートしてみた
+                <a href="https://future-architect.github.io/articles/20191107/">
+                  インフラ入門vol.3(ネットワーク冗長化構成)
                 </a>
               </li>
             </ul>
@@ -462,7 +348,7 @@
     
   
     
-  
+      
     
   
     
@@ -470,11 +356,31 @@
     
   
     
-  
+      
     
   
     
+      
+    
   
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210226/">
+                  アクセシビリティ情報を使った壊れにくいE2Eテスト
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
     
   
     
@@ -485,8 +391,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210121/">
-                  DockerでRUNをまとめた方が良いとは限らない
+                <a href="https://future-architect.github.io/articles/20210201/">
+                  自宅仕事環境構築：指向性マイクの勧め
                 </a>
               </li>
             </ul>
@@ -504,13 +410,7 @@
     
   
     
-  
-    
-  
-    
       
-    
-  
     
   
     
@@ -533,8 +433,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201206/">
-                  AWSマネージドAirflow(MWAA)についてのFAQ
+                <a href="https://future-architect.github.io/articles/20201107/">
+                  フューチャーOSS推進タスクフォース始めます
                 </a>
               </li>
             </ul>
@@ -544,6 +444,36 @@
     
   
     
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200910/">
+                  「2020年代のコンテナ時代のPythonアーキテクチャ&デプロイ」というテーマでPyCon.jp 2020で発表してきました
+                </a>
+              </li>
+            </ul>
+          </div>
+        
       
     
   
@@ -556,11 +486,79 @@
     
   
     
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200821/">
+                  エンジニアが最低限理解しておくべきOSSライセンスの基礎知識
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
   
     
       
     
   
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
     
   
     
@@ -577,8 +575,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201113/">
-                  LocalStackに向けてTerraformを実行する
+                <a href="https://future-architect.github.io/articles/20200401/">
+                  Vue.js最初の難関、「props down, event up」を初心者にわかるように解説してみた
                 </a>
               </li>
             </ul>
@@ -588,9 +586,41 @@
     
   
     
-  
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200331/">
+                  Serverless連載5: CloudEventsのGo版SDKをいじってみる
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
     
   
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200327/">
+                  Serverless連載3: Goでサーバーレス用の検索エンジンwatertowerを作ってみました
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+      
     
   
     
@@ -600,17 +630,11 @@
     
   
     
-  
-    
-  
-    
-  
-    
       
     
   
     
-  
+      
     
   
     
@@ -622,112 +646,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
     
   
@@ -737,6 +655,10 @@
   
     
   
+    
+  
+    
+      
     
   
     
@@ -762,88 +684,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
       
         
       
@@ -854,16 +694,6 @@
     
   
     
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
   
     
   
@@ -871,26 +701,6 @@
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
     
   
     
@@ -908,8 +718,6 @@
     
   
     
-      
-    
   
     
       
@@ -917,8 +725,14 @@
   
     
       
-        
-      
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -927,8 +741,6 @@
       
         
       
-    
-  
     
   
     
@@ -956,10 +768,6 @@
     
   
     
-      
-        
-      
-    
   
     
       
@@ -967,14 +775,6 @@
       
     
   
-    
-      
-    
-  
-    
-  
-    
-      
     
   
     
@@ -988,29 +788,11 @@
     
   
     
-      
-        
-      
+  
     
   
     
-      
-        
-      
-    
   
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
     
   
     
@@ -1025,6 +807,22 @@
   
     
       
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1048,57 +846,9 @@
     
   
     
-      
-        
-      
-    
   
     
   
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
     
   
     
@@ -1114,7 +864,31 @@
     
   
     
+  
+    
+  
+    
+  
+    
       
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
     
   
     
@@ -1138,99 +912,7 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
     
   
     
@@ -1272,7 +954,21 @@
     
   
     
-      
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1283,6 +979,22 @@
   
     
       
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1314,10 +1026,298 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
       
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
       
     
   
@@ -1338,53 +1338,13 @@
     
   
     
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
   
     
   
     
   
     
-      
-    
   
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
     
   
     
@@ -1400,27 +1360,39 @@
     
   
     
-  
+      
     
   
     
   
     
   
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
+        
+      
     
   
     
@@ -1434,8 +1406,22 @@
     
   
     
-      
-        
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
       
     
   
@@ -1454,9 +1440,19 @@
     
   
     
+  
+    
+  
+    
       
     
   
+    
+      
+    
+  
+    
+      
     
   
     
@@ -1514,23 +1510,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (105)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/DB/">DB (12)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Programming/">Programming (138)</a>
 	</li>
       
 	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (107)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
 	</li>
       
 	<li>
@@ -1707,19 +1703,15 @@
 
   
 <script src="/metronic/assets/plugins/jquery.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/corporate/scripts/layout.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script type="text/javascript">
@@ -1743,24 +1735,7 @@ ga('send', 'pageview');
 <!-- End Google Analytics -->
 
 
-<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({{ JSON.stringify(config) }});
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i=0; i < all.length; i += 1) {
-      all[i].SourceElement().parentNode.className += ' has-jax';
-    }
-  });
-</script>
-
-<script type="text/javascript" src="{{ src }}">
-</script>
-<!-- End: Injected MathJax -->
-<!-- hexo-inject:end -->
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 
 </body>
 </html>

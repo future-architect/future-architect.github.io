@@ -44,30 +44,24 @@
   <!-- Global styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Global styles END -->
 
   <!-- Theme styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/css/theme-styles.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Theme styles END -->
 <meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
@@ -151,7 +145,7 @@
         <img src="/images/20161005/photo_20161005_00.png">
 
 <p>こんにちは、須田です。</p>
-<p>今年の初めに<strong>「基幹業務もHadoopで!! -ローソンにおける店舗発注業務へのHadoop + Hive導入と その取り組みについて-」</strong>と題しまして、<a href="http://hadoop.apache.jp/hcj2016-program/" target="_blank" rel="noopener">Hadoop / Spark Conference Japan 2016</a>にて発表させて頂きました。</p>
+<p>今年の初めに<strong>「基幹業務もHadoopで!! -ローソンにおける店舗発注業務へのHadoop + Hive導入と その取り組みについて-」</strong>と題しまして、<a target="_blank" rel="noopener" href="http://hadoop.apache.jp/hcj2016-program/">Hadoop / Spark Conference Japan 2016</a>にて発表させて頂きました。</p>
 <p>カンファレンスでの発表時は絶賛開発中だったこともあり、いかに業務要件を設計/実装に落としていったかという話を中心に行いました。</p>
 <p>本エントリでは、<strong>「カンファレンスのその後」</strong>と題しまして、開発後の性能テストを通じて、いかにプロダクト環境に耐えられる品質にまで高めていったのかについて記載します。</p>
 <p>ピーク時では数百HiveQL/秒を処理するこのシステムにおいて、どういった課題があり、そのために実施した対策やチューニングポイントについてまとめます。<br>主にHiveおよびYARNを中心にその取り組みについて記載していきます。</p>
@@ -257,13 +251,13 @@
 <br />
 
 <p>基本的には規約に基づくワーク分割の方針で問題なかったのですが、規約に厳密に則ったために、かえって不効率なワーク処理も見受けられました。<br>例えば、1つのクエリで結合できるテーブル数に上限(最大5としていました)を設けていたために、同一のワークテーブルに追記していくような処理も、クエリが分割されていました。<br>そのためさばくデータ量的にも一つのクエリとしてまとめあげて処理した方がIO効率が良さそうな処理も細かく割れてしまってました。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">//これまでは規約に則っていたので、以下のようにクエリが分割されてしまっているものもあった</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="comment">-- 処理名　　xxxxxx</span></span><br><span class="line"><span class="comment">-- 処理概要   xxxxxx</span></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">TABLE</span></span><br><span class="line">    WORK_TABLE</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line">,	COL3</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	TABLE02</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line"><span class="keyword">HAVING</span></span><br><span class="line">	<span class="keyword">MAX</span>(COL3)	!=	<span class="string">'some_value'</span></span><br><span class="line">;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="comment">-- 処理名　　xxxxxx</span></span><br><span class="line"><span class="comment">-- 処理概要   xxxxxx</span></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">TABLE</span></span><br><span class="line">    WORK_TABLE</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line">,	COL3</span><br><span class="line"><span class="keyword">FROM</span>	TABLE03</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span></span><br><span class="line">	TABLE04</span><br><span class="line"><span class="keyword">ON</span></span><br><span class="line">	TABLE03.COL1	=	TABLE04.COL1</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	TABLE03.COL2	=	<span class="string">'some_value'</span></span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">//これまでは規約に則っていたので、以下のようにクエリが分割されてしまっているものもあった</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="comment">-- 処理名　　xxxxxx</span></span><br><span class="line"><span class="comment">-- 処理概要   xxxxxx</span></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">TABLE</span></span><br><span class="line">    WORK_TABLE</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line">,	COL3</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	TABLE02</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line"><span class="keyword">HAVING</span></span><br><span class="line">	<span class="keyword">MAX</span>(COL3)	!=	<span class="string">&#x27;some_value&#x27;</span></span><br><span class="line">;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="comment">-- 処理名　　xxxxxx</span></span><br><span class="line"><span class="comment">-- 処理概要   xxxxxx</span></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">TABLE</span></span><br><span class="line">    WORK_TABLE</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line">,	COL3</span><br><span class="line"><span class="keyword">FROM</span>	TABLE03</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span></span><br><span class="line">	TABLE04</span><br><span class="line"><span class="keyword">ON</span></span><br><span class="line">	TABLE03.COL1	=	TABLE04.COL1</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	TABLE03.COL2	=	<span class="string">&#x27;some_value&#x27;</span></span><br><span class="line">;</span><br></pre></td></tr></table></figure>
 
 <p>こういった同一のワークテーブルへのSELECT INSERT処理のようなものはUNION(もしくはUNION ALL)などでまとめあげて1処理に集約していきました。</p>
 <p>UNION(もしくはUNION ALL)で繋ぐぶんには、コメントで区切るなどで極端なソースの可読性劣化もなかったので許容することにしました。<br>また、プランの可読性についても、UNION ALLでまとめていく分には、どこが処理の境目になっているかがわかりやすいので、依然として把握しやすい状態を保てていたため特段問題とはなりませんでした。</p>
 <br />
 
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">//同一ワークテーブルへの追記処理はまとめあげる</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">TABLE</span></span><br><span class="line">    WORK_TABLE</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line">,	COL3</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	TABLE02</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line"><span class="keyword">HAVING</span></span><br><span class="line">	<span class="keyword">MAX</span>(COL3)	!=	<span class="string">'some_value'</span></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="comment">-- 処理名　　xxxxxx</span></span><br><span class="line"><span class="comment">-- 処理概要   xxxxxx</span></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line">,	COL3</span><br><span class="line"><span class="keyword">FROM</span>	TABLE03</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span></span><br><span class="line">	TABLE04</span><br><span class="line"><span class="keyword">ON</span></span><br><span class="line">	TABLE03.COL1	=	TABLE04.COL1</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	TABLE03.COL2	=	<span class="string">'some_value'</span></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line">・・・・</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">//同一ワークテーブルへの追記処理はまとめあげる</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">TABLE</span></span><br><span class="line">    WORK_TABLE</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line">,	COL3</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	TABLE02</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line"><span class="keyword">HAVING</span></span><br><span class="line">	<span class="keyword">MAX</span>(COL3)	!=	<span class="string">&#x27;some_value&#x27;</span></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="comment">-- 処理名　　xxxxxx</span></span><br><span class="line"><span class="comment">-- 処理概要   xxxxxx</span></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line">,	COL3</span><br><span class="line"><span class="keyword">FROM</span>	TABLE03</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span></span><br><span class="line">	TABLE04</span><br><span class="line"><span class="keyword">ON</span></span><br><span class="line">	TABLE03.COL1	=	TABLE04.COL1</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	TABLE03.COL2	=	<span class="string">&#x27;some_value&#x27;</span></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line">・・・・</span><br></pre></td></tr></table></figure>
 
 <br />
 
@@ -365,7 +359,7 @@
 
 <p>なおコンテナサイズで指定したメモリの利用内訳については、下記を参考にしました。</p>
 <blockquote>
-<p><a href="https://community.hortonworks.com/articles/14309/demystify-tez-tuning-step-by-step.html" target="_blank" rel="noopener">Demystify Apache Tez Memory Tuning - Step by Step</a></p>
+<p><a target="_blank" rel="noopener" href="https://community.hortonworks.com/articles/14309/demystify-tez-tuning-step-by-step.html">Demystify Apache Tez Memory Tuning - Step by Step</a></p>
 </blockquote>
 <p>これはもう地道に様々なコンテナサイズで処理を回してみて、適切な値を出しました。<br>最終的にTezアプリケーションでのコンテナサイズは<strong>メモリ4GB・vCPU1コア/コンテナ</strong>が標準として落ち着きました。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-- コンテナサイズ</span><br><span class="line">SET hive.tez.container.size&#x3D;4096;</span><br><span class="line">SET hive.tez.java.opts&#x3D;-Xmx3200m;</span><br><span class="line">SET hive.tez.cpu.vcores&#x3D;1;</span><br></pre></td></tr></table></figure>
@@ -450,8 +444,6 @@
     
   
     
-      
-    
   
     
       
@@ -459,8 +451,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210309/">
-                  PubSubのメッセージスキーマを試してみる
+                <a href="https://future-architect.github.io/articles/20190713/">
+                  Goを学ぶときにつまずきやすいポイントFAQ
                 </a>
               </li>
             </ul>
@@ -475,230 +467,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210307/">
-                  GCP連載2021を始めます
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210304/">
-                  mxGraphで階層グラフを可視化する
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210212/">
-                  Go 1.16のsignal.NotifyContext()
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210207/">
-                  Go 1.16連載が始まります
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210205/">
-                  Good First Issue から OSS へコントリビュートしてみた
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201206/">
-                  AWSマネージドAirflow(MWAA)についてのFAQ
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201119/">
-                  PythonistaがGo言語に入門してみた
+                <a href="https://future-architect.github.io/articles/20200601/">
+                  春の入門祭り 🌸 #01 Goのテストに入門してみよう！
                 </a>
               </li>
             </ul>
@@ -722,21 +492,19 @@
     
   
     
-  
-    
-  
-    
-  
-    
       
-    
-  
-    
-  
-    
-  
-    
-  
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200530/">
+                  フューチャー技術ブログの運営で心がけていること
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
     
   
     
@@ -745,8 +513,50 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201028/">
-                  読書の秋に読みたい、オライリー謎書籍10選
+                <a href="https://future-architect.github.io/articles/20200311/">
+                  JavaプログラマーのためのGo言語入門
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210226/">
+                  アクセシビリティ情報を使った壊れにくいE2Eテスト
                 </a>
               </li>
             </ul>
@@ -758,73 +568,13 @@
     
   
     
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20200911/">
-                  いぶし銀なインフラ機能「テープバックアップ／リストア」を語る
+                <a href="https://future-architect.github.io/articles/20210201/">
+                  自宅仕事環境構築：指向性マイクの勧め
                 </a>
               </li>
             </ul>
@@ -843,180 +593,16 @@
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
         
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210107/">
+                  Electronの使い方 Web開発の技術でデスクトップアプリを作ろう
+                </a>
+              </li>
+            </ul>
+          </div>
         
       
     
@@ -1033,22 +619,6 @@
   
     
       
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -1057,36 +627,6 @@
   
     
   
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
     
   
     
@@ -1094,9 +634,139 @@
     
       
         
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20201020/">
+                  ProxyとDockerと新人社員と時々わたし
+                </a>
+              </li>
+            </ul>
+          </div>
+        
       
     
   
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200807/">
+                  GoとSuffixArray
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200501/">
+                  TypeScriptでReactをやるときは、小さいアプリでもReduxを最初から使ってもいいかもねというお話
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
     
   
     
@@ -1118,10 +788,6 @@
     
   
     
-      
-        
-      
-    
   
     
       
@@ -1134,79 +800,9 @@
     
   
     
-      
-    
-  
-    
   
     
       
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
     
   
     
@@ -1228,6 +824,98 @@
     
   
     
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
       
     
   
@@ -1239,6 +927,40 @@
   
     
       
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1264,26 +986,6 @@
     
   
     
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
   
     
   
@@ -1302,9 +1004,9 @@
     
   
     
-  
-    
-  
+      
+        
+      
     
   
     
@@ -1315,17 +1017,7 @@
   
     
       
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
+        
       
     
   
@@ -1333,10 +1025,6 @@
       
     
   
-    
-  
-    
-      
     
   
     
@@ -1370,14 +1058,6 @@
     
   
     
-      
-    
-  
-    
-  
-    
-  
-    
   
     
       
@@ -1386,13 +1066,15 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
       
-    
-  
-    
-  
-    
-  
     
   
     
@@ -1436,21 +1118,7 @@
     
   
     
-      
-        
-      
-    
   
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
     
   
     
@@ -1462,7 +1130,7 @@
     
   
     
-      
+  
     
   
     
@@ -1475,20 +1143,10 @@
   
     
       
-        
-      
     
   
     
   
-    
-      
-    
-  
-    
-      
-        
-      
     
   
     
@@ -1506,33 +1164,9 @@
     
   
     
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
   
     
   
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
     
   
     
@@ -1544,22 +1178,10 @@
     
   
     
-      
+  
     
   
     
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
       
     
   
@@ -1593,6 +1215,22 @@
   
     
   
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
     
   
     
@@ -1607,6 +1245,168 @@
   
     
       
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1627,6 +1427,206 @@
       
     
   
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
     
   
     
@@ -1684,23 +1684,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (105)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/DB/">DB (12)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Programming/">Programming (138)</a>
 	</li>
       
 	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (107)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
 	</li>
       
 	<li>
@@ -1877,19 +1877,15 @@
 
   
 <script src="/metronic/assets/plugins/jquery.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/corporate/scripts/layout.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script type="text/javascript">

@@ -41,30 +41,24 @@
   <!-- Global styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Global styles END -->
 
   <!-- Theme styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/css/theme-styles.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Theme styles END -->
 <meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
@@ -152,7 +146,7 @@
 <p>Go CloudにはPubSubを扱うパッケージ群があります。GCPのPubSub、AWSのSNS/SQS、Azure Service Busというクラウドベンダーのサービス以外に、RabbitMQ、NATS、Kafkaといったオンプレでも使えるミドルウェア（KafkaはAWSのサービスもありますが）もあります。</p>
 <p>アプリケーションのログの収集というと、最近はOpenTelemetryとかNew Relic APMのようなパフォーマンスモニタリングや大規模なマイクロサービスのサポートを目的とした分散トレースなどもありますが、ここで対応されているKafka以外にもFluentdをオンプレやクラウドなどで動かしているお客様も多いので、PubSubのバックエンドとして、Fluentdのpublisherを実装してみます。受け側（Subscription）はなく、サーバーへの送信（Publish）だけなので、fluentdpubという名前でApacheライセンスで公開しました。もとからあるKafkaも合わせれば、ログ収集基盤への送信にもGo Cloudが利用できるようになります。</p>
 <ul>
-<li><a href="https://github.com/future-architect/fluentdpub" target="_blank" rel="noopener">github.com/future-architect/fluentdpub</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/future-architect/fluentdpub">github.com/future-architect/fluentdpub</a></li>
 </ul>
 <p>実装は次の3ステップに分けて実装します。</p>
 <ul>
@@ -169,11 +163,11 @@
 </ul>
 <p>利用者は<code>gocloud.dev/pubsub</code>パッケージだけを知っていればいいが、実装者はそれに加えて<code>gocloud.dev/pubsub/driver</code>パッケージを実装するという区分けになっています。</p>
 <p>それでは実装していきます。PubSubのAPIとFluentdを比べると、Fluentdにはタグがあり、PubSubにはBodyがあるという違いがあります。 <code>OpenTopic()</code> にはこの違いを吸収するオプションを追加します。Bodyで設定されたコンテンツは<code>message</code>の値に設定し、逆に <code>tag</code> で設定された値は<code>tagPrefix</code>と組み合わせてタグとなる（<code>tagPrefix.tag</code>が最終的なタグになる）、というルールにします。このあたりのルールの違いを吸収する方法はここで検討が必要になります。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> TopicOptions <span class="keyword">struct</span> &#123;</span><br><span class="line">	BodyKey <span class="keyword">string</span></span><br><span class="line">	TagKey  <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">OpenTopic</span><span class="params">(f *fluent.Fluent, tagPrefix <span class="keyword">string</span>, opt TopicOptions)</span> <span class="params">(*pubsub.Topic, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> f == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, errors.New(<span class="string">"fluentdpub: fluent.Fluent is required"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> opt.BodyKey == <span class="string">""</span> &#123;</span><br><span class="line">		opt.BodyKey = <span class="string">"message"</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> opt.TagKey == <span class="string">""</span> &#123;</span><br><span class="line">		opt.TagKey = <span class="string">"tag"</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> pubsub.NewTopic(&amp;topic&#123;</span><br><span class="line">		f:         f,</span><br><span class="line">		tagPrefix: tagPrefix,</span><br><span class="line">		bodyKey:   opt.BodyKey,</span><br><span class="line">		tagKey:    opt.TagKey,</span><br><span class="line">	&#125;, <span class="literal">nil</span>), <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> TopicOptions <span class="keyword">struct</span> &#123;</span><br><span class="line">	BodyKey <span class="keyword">string</span></span><br><span class="line">	TagKey  <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">OpenTopic</span><span class="params">(f *fluent.Fluent, tagPrefix <span class="keyword">string</span>, opt TopicOptions)</span> <span class="params">(*pubsub.Topic, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> f == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, errors.New(<span class="string">&quot;fluentdpub: fluent.Fluent is required&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> opt.BodyKey == <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">		opt.BodyKey = <span class="string">&quot;message&quot;</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> opt.TagKey == <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">		opt.TagKey = <span class="string">&quot;tag&quot;</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> pubsub.NewTopic(&amp;topic&#123;</span><br><span class="line">		f:         f,</span><br><span class="line">		tagPrefix: tagPrefix,</span><br><span class="line">		bodyKey:   opt.BodyKey,</span><br><span class="line">		tagKey:    opt.TagKey,</span><br><span class="line">	&#125;, <span class="literal">nil</span>), <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>全メソッドの実装の紹介はしませんが、一番のコアとなる<code>SendBatch()</code>メソッドだけ紹介します。メッセージの配列が来るので、自分のモジュールが対象としているエクスポート先（ここではFluentd）に情報を流します。</p>
 <p>メタタグの一部をタグとして取り出して、構造体のフィールドのtagPrefixなどと組み合わせて、出力先のタグ名を決定します。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t topic)</span> <span class="title">SendBatch</span><span class="params">(ctx context.Context, ms []*driver.Message)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> _, msg := <span class="keyword">range</span> ms &#123;</span><br><span class="line">		<span class="keyword">var</span> fullTag <span class="keyword">string</span></span><br><span class="line">		tag, ok := msg.Metadata[t.tagKey]</span><br><span class="line">		<span class="keyword">if</span> ok &#123;</span><br><span class="line">			<span class="built_in">delete</span>(msg.Metadata, t.tagKey)</span><br><span class="line">			<span class="keyword">if</span> t.tagPrefix != <span class="string">""</span> &#123;</span><br><span class="line">				fullTag = t.tagPrefix + <span class="string">"."</span> + tag</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				fullTag = tag</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			fullTag = t.tagPrefix</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> fullTag == <span class="string">""</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> fmt.Errorf(<span class="string">"Message %v doesn't have tag"</span>, msg.AckID)</span><br><span class="line">		&#125;</span><br><span class="line">		msg.Metadata[t.bodyKey] = <span class="keyword">string</span>(msg.Body)</span><br><span class="line">		err := t.f.Post(fullTag, msg.Metadata)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t topic)</span> <span class="title">SendBatch</span><span class="params">(ctx context.Context, ms []*driver.Message)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> _, msg := <span class="keyword">range</span> ms &#123;</span><br><span class="line">		<span class="keyword">var</span> fullTag <span class="keyword">string</span></span><br><span class="line">		tag, ok := msg.Metadata[t.tagKey]</span><br><span class="line">		<span class="keyword">if</span> ok &#123;</span><br><span class="line">			<span class="built_in">delete</span>(msg.Metadata, t.tagKey)</span><br><span class="line">			<span class="keyword">if</span> t.tagPrefix != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">				fullTag = t.tagPrefix + <span class="string">&quot;.&quot;</span> + tag</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				fullTag = tag</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			fullTag = t.tagPrefix</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> fullTag == <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;Message %v doesn&#x27;t have tag&quot;</span>, msg.AckID)</span><br><span class="line">		&#125;</span><br><span class="line">		msg.Metadata[t.bodyKey] = <span class="keyword">string</span>(msg.Body)</span><br><span class="line">		err := t.f.Post(fullTag, msg.Metadata)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>この<code>OpenTopic</code>も、他のPubSub APIでは公開APIとなっていますし、かんたんですが、これだけでもすでに使えるようになっているはずです。これで、<code>fluentdpub</code>の背骨が出来上がりました。</p>
 <h1 id="fluentdpub-URLOpenerを実装する"><a href="#fluentdpub-URLOpenerを実装する" class="headerlink" title="fluentdpub.URLOpenerを実装する"></a><code>fluentdpub.URLOpener</code>を実装する</h1><p>次に、URLなどの文字列をパースしてFluentdに接続する部分を実装していきます。これはNATS向けのPubSubでも公開構造体・メソッドとして実装されていますが、ドキュメントには書かれていません。</p>
@@ -181,12 +175,12 @@
 <p>なお、NATS向けの実装では、オペレーターが気にするNATSサーバーの接続先は<code>NATS_SERVER_URL</code>で指定し、ソースコード中に登場しうるURLにはトピック名などの開発者向けの情報のみという使い分けがされています。これも、Go Cloudの設計思想に従った役割分担と言えます。<code>fluentdpub</code>も、<code>FLUENTD_UPSTREAM_URL</code>という環境変数に接続情報（プロトコル、ホスト、ポート）は任せて、URLはタグ名のみとします。それ以外の情報をここでは扱います。</p>
 <p>TagPrefixというのはFluentd全体でタグを先頭につけたい場合に使うものとします。というのも、PubとSubが対応した他のPubSubのコードの識別子と比べると、Fluentdの方が分析の方は分析に任せるものとして、なるべく詳細な情報をタグに載せようとする分、識別子は長くなります。prodとかdevみたいな文字列をオペレータ視点で入れたくなるかもしれませんので、これを追加できるようにしておきます。</p>
 <p>実装としては以下の通りです。先ほど作った<code>topic</code>構造体に対して<code>、TopicOptions</code>ではなく、URLをキーとして扱えるようにする機能がこれで実現されました。もう少しです。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> URLOpener <span class="keyword">struct</span> &#123;</span><br><span class="line">	Connection *fluent.Fluent</span><br><span class="line">	TagPrefix <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(o *URLOpener)</span> <span class="title">OpenTopicURL</span><span class="params">(ctx context.Context, u *url.URL)</span> <span class="params">(*pubsub.Topic, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> opt TopicOptions</span><br><span class="line">	key := u.Query().Get(<span class="string">"bodykey"</span>)</span><br><span class="line">	<span class="keyword">if</span> key != <span class="string">""</span> &#123;</span><br><span class="line">		opt.BodyKey = key</span><br><span class="line">		u.Query().Del(<span class="string">"bodykey"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	tagkey := u.Query().Get(<span class="string">"tagkey"</span>)</span><br><span class="line">	<span class="keyword">if</span> tagkey != <span class="string">""</span> &#123;</span><br><span class="line">		opt.TagKey = tagkey</span><br><span class="line">		u.Query().Del(<span class="string">"tagkey"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> param := <span class="keyword">range</span> u.Query() &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">"open topic %v: invalid query parameter %s"</span>, u, param)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">var</span> subject <span class="keyword">string</span></span><br><span class="line">	<span class="keyword">if</span> o.TagPrefix != <span class="string">""</span> &amp;&amp; u.Hostname() != <span class="string">""</span> &#123;</span><br><span class="line">		subject = o.TagPrefix + <span class="string">"."</span> + u.Hostname()</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		subject = o.TagPrefix + u.Hostname()</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> OpenTopic(o.Connection, subject, opt)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> URLOpener <span class="keyword">struct</span> &#123;</span><br><span class="line">	Connection *fluent.Fluent</span><br><span class="line">	TagPrefix <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(o *URLOpener)</span> <span class="title">OpenTopicURL</span><span class="params">(ctx context.Context, u *url.URL)</span> <span class="params">(*pubsub.Topic, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> opt TopicOptions</span><br><span class="line">	key := u.Query().Get(<span class="string">&quot;bodykey&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> key != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">		opt.BodyKey = key</span><br><span class="line">		u.Query().Del(<span class="string">&quot;bodykey&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	tagkey := u.Query().Get(<span class="string">&quot;tagkey&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> tagkey != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">		opt.TagKey = tagkey</span><br><span class="line">		u.Query().Del(<span class="string">&quot;tagkey&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> param := <span class="keyword">range</span> u.Query() &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;open topic %v: invalid query parameter %s&quot;</span>, u, param)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">var</span> subject <span class="keyword">string</span></span><br><span class="line">	<span class="keyword">if</span> o.TagPrefix != <span class="string">&quot;&quot;</span> &amp;&amp; u.Hostname() != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">		subject = o.TagPrefix + <span class="string">&quot;.&quot;</span> + u.Hostname()</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		subject = o.TagPrefix + u.Hostname()</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> OpenTopic(o.Connection, subject, opt)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h1 id="リゾルバーに登録"><a href="#リゾルバーに登録" class="headerlink" title="リゾルバーに登録"></a>リゾルバーに登録</h1><p>それでは最終段階に入ります。URLスキーマを登録することで、共通APIの<code>pubsub.OpenTopic()</code>などの関数からも使えるようになり、マルチクラウドに一歩近づきます。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Scheme = <span class="string">"fluentd"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	o := <span class="built_in">new</span>(defaultDialer)</span><br><span class="line">	pubsub.DefaultURLMux().RegisterTopic(Scheme, o)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> defaultDialer <span class="keyword">struct</span> &#123;</span><br><span class="line">	opener *URLOpener</span><br><span class="line">	err    error</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(d defaultDialer)</span> <span class="title">OpenTopicURL</span><span class="params">(ctx context.Context, u *url.URL)</span> <span class="params">(*pubsub.Topic, error)</span></span> &#123;</span><br><span class="line">	c, tag, err := parseEnvVar(os.Getenv(<span class="string">"FLUENTD_UPSTREAM_URL"</span>))</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	conn, err := fluent.New(*c)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	o := URLOpener&#123;</span><br><span class="line">		Connection: conn,</span><br><span class="line">		TagPrefix:  tag,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> o.OpenTopicURL(ctx, u)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Scheme = <span class="string">&quot;fluentd&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	o := <span class="built_in">new</span>(defaultDialer)</span><br><span class="line">	pubsub.DefaultURLMux().RegisterTopic(Scheme, o)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> defaultDialer <span class="keyword">struct</span> &#123;</span><br><span class="line">	opener *URLOpener</span><br><span class="line">	err    error</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(d defaultDialer)</span> <span class="title">OpenTopicURL</span><span class="params">(ctx context.Context, u *url.URL)</span> <span class="params">(*pubsub.Topic, error)</span></span> &#123;</span><br><span class="line">	c, tag, err := parseEnvVar(os.Getenv(<span class="string">&quot;FLUENTD_UPSTREAM_URL&quot;</span>))</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	conn, err := fluent.New(*c)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	o := URLOpener&#123;</span><br><span class="line">		Connection: conn,</span><br><span class="line">		TagPrefix:  tag,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> o.OpenTopicURL(ctx, u)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>最終的にはこの内部の先ほど実装した<code>URLOpener.OpenTopicURL()</code>メソッドを呼んでいます。一点異なるのは、環境変数のパース部分でしょう。URL形式で渡されたものを<a href="https://github.com/future-architect/fluentdpub/blob/master/init.go#L81" target="_blank" rel="noopener">パースしています</a>。</p>
+<p>最終的にはこの内部の先ほど実装した<code>URLOpener.OpenTopicURL()</code>メソッドを呼んでいます。一点異なるのは、環境変数のパース部分でしょう。URL形式で渡されたものを<a target="_blank" rel="noopener" href="https://github.com/future-architect/fluentdpub/blob/master/init.go#L81">パースしています</a>。</p>
 <h1 id="実装したものの整理"><a href="#実装したものの整理" class="headerlink" title="実装したものの整理"></a>実装したものの整理</h1><p>この記事ではストレートに一発でできたかのように書いていますが、実際作成中は何が何をするものか整理ができておらず、結構混乱して手戻りしつつ実装しました。整理をしてみると、コードが少ない薄い機能を先に実装し、徐々にロジックが多い文字列からの初期化に手を出していっていることがわかります。</p>
 <table>
 <thead>
@@ -227,10 +221,10 @@
 <figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">export</span> FLUENTD_UPSTREAM_URL=tcp://localhost:24224/first</span></span><br></pre></td></tr></table></figure>
 
 <p><code>pubsub.OpenTopic</code>にはURLを設定します。プリフィックスの次に設定されるタグも指定します（省略可能）。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">topic, err := pubsub.OpenTopic(context.Background(), <span class="string">"fluentd://second"</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">topic, err := pubsub.OpenTopic(context.Background(), <span class="string">&quot;fluentd://second&quot;</span>)</span><br></pre></td></tr></table></figure>
 
 <p>あとは送信だけですね。ここでもタグを設定しています（省略可能）。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">topic.Send(context.Background(), &amp;pubsub.Message&#123;</span><br><span class="line">	Body: []<span class="keyword">byte</span>(<span class="string">"Hello, World!\n"</span>),</span><br><span class="line">	Metadata: <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">string</span>&#123;</span><br><span class="line">		<span class="string">"tag"</span>:        <span class="string">"third"</span>,</span><br><span class="line">		<span class="string">"language"</span>:   <span class="string">"en"</span>,</span><br><span class="line">		<span class="string">"importance"</span>: <span class="string">"high"</span>,</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">topic.Send(context.Background(), &amp;pubsub.Message&#123;</span><br><span class="line">	Body: []<span class="keyword">byte</span>(<span class="string">&quot;Hello, World!\n&quot;</span>),</span><br><span class="line">	Metadata: <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">string</span>&#123;</span><br><span class="line">		<span class="string">&quot;tag&quot;</span>:        <span class="string">&quot;third&quot;</span>,</span><br><span class="line">		<span class="string">&quot;language&quot;</span>:   <span class="string">&quot;en&quot;</span>,</span><br><span class="line">		<span class="string">&quot;importance&quot;</span>: <span class="string">&quot;high&quot;</span>,</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
 
 <p>3か所でそれぞれタグを設定していますが、それらは結合されて、<code>first.second.third</code>というタグになるという実装にしています。実行してみると、Dockerで起動したFluentdのフォルダにファイルが生成されてログが出力されていることが確認できるでしょう。</p>
 <p>まだ全部のコードを読んだわけではないですが、だいたいはこのような階層構造になっているようです。テストもしやすいですし、もし、何かを実装したくなった場合もこのような手順で実装していくとスムーズでしょう。</p>
@@ -301,20 +295,6 @@
     
   
     
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
   
     
       
@@ -333,10 +313,28 @@
     
   
     
-  
+      
     
   
     
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200630/">
+                  go-swaggerを用いたWebアプリケーション開発Tips19選
+                </a>
+              </li>
+            </ul>
+          </div>
+        
       
     
   
@@ -350,8 +348,40 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210301/">
-                  【登壇しました】アレクサアプリを開発してみたら中々大変だった話
+                <a href="https://future-architect.github.io/articles/20200530/">
+                  フューチャー技術ブログの運営で心がけていること
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200311/">
+                  JavaプログラマーのためのGo言語入門
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20191107/">
+                  インフラ入門vol.3(ネットワーク冗長化構成)
                 </a>
               </li>
             </ul>
@@ -364,12 +394,16 @@
   
     
       
+    
+  
+    
+      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210303/">
-                  Vis Networkで階層グラフを可視化する
+                <a href="https://future-architect.github.io/articles/20161031/">
+                  SQL実行時のブルームフィルタ(Bloom Filter)アルゴリズム
                 </a>
               </li>
             </ul>
@@ -380,28 +414,18 @@
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210226/">
-                  アクセシビリティ情報を使った壊れにくいE2Eテスト
-                </a>
-              </li>
-            </ul>
-          </div>
-        
+    
+  
+    
       
     
   
     
-  
+      
     
   
     
-  
-    
-  
+      
     
   
     
@@ -412,42 +436,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210210/">
-                  Go1.16からのio/ioutilパッケージ
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210205/">
-                  Good First Issue から OSS へコントリビュートしてみた
+                <a href="https://future-architect.github.io/articles/20210201/">
+                  自宅仕事環境構築：指向性マイクの勧め
                 </a>
               </li>
             </ul>
@@ -463,33 +453,9 @@
     
   
     
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -498,26 +464,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210108/">
-                  自分の分身(3Dアバター)と自作ワールドを作ってみた
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210107/">
-                  Electronの使い方 Web開発の技術でデスクトップアプリを作ろう
+                <a href="https://future-architect.github.io/articles/20201223/">
+                  2021年版Pythonの型ヒントの書き方 (for Python 3.9)
                 </a>
               </li>
             </ul>
@@ -538,56 +486,12 @@
   
     
       
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201109/">
-                  GoのWebアプリ開発でフラットパッケージにした話
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201113/">
-                  LocalStackに向けてTerraformを実行する
+                <a href="https://future-architect.github.io/articles/20201107/">
+                  フューチャーOSS推進タスクフォース始めます
                 </a>
               </li>
             </ul>
@@ -609,6 +513,64 @@
     
   
     
+      
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200910/">
+                  「2020年代のコンテナ時代のPythonアーキテクチャ&デプロイ」というテーマでPyCon.jp 2020で発表してきました
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
   
     
   
@@ -635,114 +597,6 @@
     
   
     
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
       
     
   
@@ -756,228 +610,6 @@
       
         
       
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
     
   
     
@@ -1011,16 +643,6 @@
     
   
     
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
   
     
       
@@ -1034,12 +656,6 @@
   
     
       
-    
-  
-    
-  
-    
-  
     
   
     
@@ -1058,30 +674,8 @@
   
     
       
-        
-      
     
   
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-        
-      
     
   
     
@@ -1097,24 +691,6 @@
     
   
     
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
       
     
   
@@ -1133,6 +709,36 @@
     
   
     
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
       
     
   
@@ -1147,14 +753,8 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
+      
+        
       
     
   
@@ -1163,10 +763,18 @@
     
   
     
-  
+      
+        
+      
     
   
     
+      
+    
+  
+    
+      
+        
       
     
   
@@ -1180,6 +788,92 @@
       
         
       
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
     
   
     
@@ -1215,20 +909,6 @@
     
   
     
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
   
     
       
@@ -1238,6 +918,12 @@
   
     
   
+    
+  
+    
+  
+    
+      
     
   
     
@@ -1279,133 +965,9 @@
     
   
     
-      
-    
   
     
   
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
     
   
     
@@ -1437,19 +999,13 @@
     
   
     
-  
-    
-  
-    
       
     
   
     
-      
-    
   
     
-      
+  
     
   
     
@@ -1467,9 +1023,467 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
       
     
   
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -1527,23 +1541,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (105)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/DB/">DB (12)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Programming/">Programming (138)</a>
 	</li>
       
 	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (107)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
 	</li>
       
 	<li>
@@ -1720,19 +1734,15 @@
 
   
 <script src="/metronic/assets/plugins/jquery.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/corporate/scripts/layout.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script type="text/javascript">
@@ -1756,24 +1766,7 @@ ga('send', 'pageview');
 <!-- End Google Analytics -->
 
 
-<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({{ JSON.stringify(config) }});
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i=0; i < all.length; i += 1) {
-      all[i].SourceElement().parentNode.className += ' has-jax';
-    }
-  });
-</script>
-
-<script type="text/javascript" src="{{ src }}">
-</script>
-<!-- End: Injected MathJax -->
-<!-- hexo-inject:end -->
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 
 </body>
 </html>

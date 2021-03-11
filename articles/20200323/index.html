@@ -46,30 +46,24 @@
   <!-- Global styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Global styles END -->
 
   <!-- Theme styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/css/theme-styles.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Theme styles END -->
 <meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
@@ -163,7 +157,7 @@
 <li>API GatewayからLambdaの着火もテストした上でDynamoDBまで書き込ませたい</li>
 <li>なんならAPI Gaweway自体もLambdaで叩きたい</li>
 </ul>
-<p>となると、少々ハードルがあがります。この問題を解決してくれるのが、<a href="https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/what-is-sam.html" target="_blank" rel="noopener">AWS Serverless Application Model(AWS SAM)</a>です。SAMはローカルにLambda実行用のdockerを立ち上げ、<code>127.0.0.1:3000</code>を叩くと指定した実行ファイルをdocker上で動作させることができるツールです。今回はSAMを使って API Gateway + Lambda (Go) + DynamoDBのローカルテストをする手法を紹介します。</p>
+<p>となると、少々ハードルがあがります。この問題を解決してくれるのが、<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/what-is-sam.html">AWS Serverless Application Model(AWS SAM)</a>です。SAMはローカルにLambda実行用のdockerを立ち上げ、<code>127.0.0.1:3000</code>を叩くと指定した実行ファイルをdocker上で動作させることができるツールです。今回はSAMを使って API Gateway + Lambda (Go) + DynamoDBのローカルテストをする手法を紹介します。</p>
 <p>なお、今回ターゲットとする構成は、Lambda→AWS Gateway→Lambda→DynamoDBのような構成です。例えばKinesisやS3から非同期な入力をトリガーにLambdaを着火し、特定のAPIを叩くようなケースです。便宜上、API Gatewayを叩くのをLambda A、API Gatewayから呼び出されるのをLambda Bとします。</p>
 <img src="/images/20200323/photo_20200323_01.png" class="img-middle-size">
 
@@ -207,7 +201,7 @@
 </tr>
 </tbody></table>
 <p>WebAPIのリターンとして、下記を期待することにします。（ただし処理はベタ書きです）</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">"Company"</span>: <span class="string">"Future"</span>, <span class="attr">"Year"</span>: <span class="string">"1989"</span>&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">&quot;Company&quot;</span>: <span class="string">&quot;Future&quot;</span>, <span class="attr">&quot;Year&quot;</span>: <span class="string">&quot;1989&quot;</span>&#125; </span><br></pre></td></tr></table></figure>
 
 <h1 id="構築"><a href="#構築" class="headerlink" title="構築"></a>構築</h1><h2 id="ディレクトリ構成"><a href="#ディレクトリ構成" class="headerlink" title="ディレクトリ構成"></a>ディレクトリ構成</h2><p>次のような構成とします。最初に宣言したとおり、今回APIを叩くLambdaについては触れません。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">apigw  </span><br><span class="line">  ├─Makefile</span><br><span class="line">  ├─lambdab</span><br><span class="line">  |   ├─lambdab.go          <span class="comment"># APIから呼ばれるLambdaのコード</span></span><br><span class="line">  |   └─lambdab_test.go     <span class="comment"># テストコード</span></span><br><span class="line">  ├─template.yaml</span><br><span class="line">  └─testdata</span><br><span class="line">      └─db_table.json       <span class="comment"># DBテーブル作成用のコード</span></span><br></pre></td></tr></table></figure>
@@ -228,17 +222,17 @@
 <figure class="highlight plain"><figcaption><span>Makefile</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">PHONY: deps clean build</span><br><span class="line"></span><br><span class="line">deps:</span><br><span class="line">	go get -u .&#x2F;...</span><br><span class="line"></span><br><span class="line">clean: </span><br><span class="line">	rm -rf .&#x2F;lambdab&#x2F;lambdab # 変更</span><br><span class="line">	</span><br><span class="line">build:</span><br><span class="line">	GOOS&#x3D;linux GOARCH&#x3D;amd64 go build -o lambdab&#x2F;lambdab .&#x2F;lambdab&#x2F;main.go # 変更</span><br></pre></td></tr></table></figure>
 
 <p><code>template.yaml</code>への変更において、</p>
-<figure class="highlight yaml"><figcaption><span>template.yaml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">AWSTemplateFormatVersion:</span> <span class="string">'2010-09-09'</span></span><br><span class="line"><span class="attr">Transform:</span> <span class="string">AWS::Serverless-2016-10-31</span></span><br><span class="line"><span class="attr">Description:</span> <span class="string">&gt;</span></span><br><span class="line">  <span class="string">apigw</span></span><br><span class="line">  </span><br><span class="line">  <span class="string">Sample</span> <span class="string">SAM</span> <span class="string">Template</span> <span class="string">for</span> <span class="string">apigw</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst</span></span><br><span class="line"><span class="attr">Globals:</span></span><br><span class="line">  <span class="attr">Function:</span></span><br><span class="line">    <span class="attr">Timeout:</span> <span class="number">5</span></span><br><span class="line"></span><br><span class="line"><span class="attr">Resources:</span></span><br><span class="line">  <span class="attr">HelloWorldFunction:</span></span><br><span class="line">    <span class="attr">Type:</span> <span class="string">AWS::Serverless::Function</span> <span class="comment"># More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction</span></span><br><span class="line">    <span class="attr">Properties:</span></span><br><span class="line">      <span class="attr">CodeUri:</span> <span class="string">lambdab/</span> <span class="comment"># 変更</span></span><br><span class="line">      <span class="attr">Handler:</span> <span class="string">lambdab</span> <span class="comment"># 変更</span></span><br><span class="line">      <span class="attr">Runtime:</span> <span class="string">go1.x</span></span><br><span class="line">      <span class="attr">Tracing:</span> <span class="string">Active</span> <span class="comment"># https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html</span></span><br><span class="line">      <span class="attr">Events:</span></span><br><span class="line">        <span class="attr">CatchAll:</span></span><br><span class="line">          <span class="attr">Type:</span> <span class="string">Api</span> <span class="comment"># More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api</span></span><br><span class="line">          <span class="attr">Properties:</span></span><br><span class="line">            <span class="attr">Path:</span> <span class="string">/apigw</span> <span class="comment"># 変更</span></span><br><span class="line">            <span class="attr">Method:</span> <span class="string">GET</span></span><br><span class="line">      <span class="attr">Environment:</span> <span class="comment"># More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object</span></span><br><span class="line">        <span class="attr">Variables:</span></span><br><span class="line">          <span class="attr">PARAM1:</span> <span class="string">VALUE</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><figcaption><span>template.yaml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">AWSTemplateFormatVersion:</span> <span class="string">&#x27;2010-09-09&#x27;</span></span><br><span class="line"><span class="attr">Transform:</span> <span class="string">AWS::Serverless-2016-10-31</span></span><br><span class="line"><span class="attr">Description:</span> <span class="string">&gt;</span></span><br><span class="line">  <span class="string">apigw</span></span><br><span class="line">  </span><br><span class="line">  <span class="string">Sample</span> <span class="string">SAM</span> <span class="string">Template</span> <span class="string">for</span> <span class="string">apigw</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst</span></span><br><span class="line"><span class="attr">Globals:</span></span><br><span class="line">  <span class="attr">Function:</span></span><br><span class="line">    <span class="attr">Timeout:</span> <span class="number">5</span></span><br><span class="line"></span><br><span class="line"><span class="attr">Resources:</span></span><br><span class="line">  <span class="attr">HelloWorldFunction:</span></span><br><span class="line">    <span class="attr">Type:</span> <span class="string">AWS::Serverless::Function</span> <span class="comment"># More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction</span></span><br><span class="line">    <span class="attr">Properties:</span></span><br><span class="line">      <span class="attr">CodeUri:</span> <span class="string">lambdab/</span> <span class="comment"># 変更</span></span><br><span class="line">      <span class="attr">Handler:</span> <span class="string">lambdab</span> <span class="comment"># 変更</span></span><br><span class="line">      <span class="attr">Runtime:</span> <span class="string">go1.x</span></span><br><span class="line">      <span class="attr">Tracing:</span> <span class="string">Active</span> <span class="comment"># https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html</span></span><br><span class="line">      <span class="attr">Events:</span></span><br><span class="line">        <span class="attr">CatchAll:</span></span><br><span class="line">          <span class="attr">Type:</span> <span class="string">Api</span> <span class="comment"># More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api</span></span><br><span class="line">          <span class="attr">Properties:</span></span><br><span class="line">            <span class="attr">Path:</span> <span class="string">/apigw</span> <span class="comment"># 変更</span></span><br><span class="line">            <span class="attr">Method:</span> <span class="string">GET</span></span><br><span class="line">      <span class="attr">Environment:</span> <span class="comment"># More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object</span></span><br><span class="line">        <span class="attr">Variables:</span></span><br><span class="line">          <span class="attr">PARAM1:</span> <span class="string">VALUE</span></span><br></pre></td></tr></table></figure>
 
 <p><code>template.yaml</code>の内容について補足すると、これはCloudFormationの形式になっています。<br>このまま<code>sam</code>のみでdeployすることも可能ですが、今回はテストのみなので、注記がいれてある場所のみ変更しました。<br>この設定で <code>sam</code> を立ち上げると、 <code>http://127.0.0.1:3000/apigw</code> にGETすると、<code>./lambdab/lambdab</code> が実行されることを示しています。</p>
 <p>それでは<code>main.go</code> に変更を加えます。今回は、 <code>events.APIGatewayProxyResponse</code> のBodyと、それに応じて少しだけコードをいじっただけでほぼほぼ自動生成されたものになります。</p>
-<figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"encoding/json"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"github.com/aws/aws-lambda-go/events"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-lambda-go/lambda"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CompanyResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	Company <span class="keyword">string</span> <span class="string">`json:"company"`</span></span><br><span class="line">	Year    <span class="keyword">string</span> <span class="string">`json:"year"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handler</span><span class="params">(request events.APIGatewayProxyRequest)</span> <span class="params">(events.APIGatewayProxyResponse, error)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	response := CompanyResponse&#123;</span><br><span class="line">		Company: <span class="string">"Future"</span>,</span><br><span class="line">		Year:    <span class="string">"1989"</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	jsonBytes, _ := json.Marshal(response)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> events.APIGatewayProxyResponse&#123;</span><br><span class="line">		Body:       <span class="keyword">string</span>(jsonBytes),</span><br><span class="line">		StatusCode: <span class="number">200</span>,</span><br><span class="line">	&#125;, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(handler)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;encoding/json&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/events&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/lambda&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CompanyResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	Company <span class="keyword">string</span> <span class="string">`json:&quot;company&quot;`</span></span><br><span class="line">	Year    <span class="keyword">string</span> <span class="string">`json:&quot;year&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handler</span><span class="params">(request events.APIGatewayProxyRequest)</span> <span class="params">(events.APIGatewayProxyResponse, error)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	response := CompanyResponse&#123;</span><br><span class="line">		Company: <span class="string">&quot;Future&quot;</span>,</span><br><span class="line">		Year:    <span class="string">&quot;1989&quot;</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	jsonBytes, _ := json.Marshal(response)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> events.APIGatewayProxyResponse&#123;</span><br><span class="line">		Body:       <span class="keyword">string</span>(jsonBytes),</span><br><span class="line">		StatusCode: <span class="number">200</span>,</span><br><span class="line">	&#125;, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(handler)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="build"><a href="#build" class="headerlink" title="build"></a>build</h2><p>諸々設定ができたら、buildして準備は完了です。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ make build</span><br><span class="line">GOOS=linux GOARCH=amd64 go build -o lambdab/lambdab ./lambdab/main.go <span class="comment"># 変更</span></span><br><span class="line">$ ls lambdab/</span><br><span class="line">go.mod       go.sum       lambdab      main.go      main_test.go</span><br></pre></td></tr></table></figure>
 
 <h1 id="ローカルでAPIを動かしてテスト"><a href="#ローカルでAPIを動かしてテスト" class="headerlink" title="ローカルでAPIを動かしてテスト"></a>ローカルでAPIを動かしてテスト</h1><p>コマンドを叩けばOKです。動き出したAPI（今回の場合 <code>http://127.0.0.1:3000/apigw</code>）にアクセスすると、コンテナイメージが呼び出され、実行結果が帰ってきます。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ sam <span class="built_in">local</span> start-api</span><br><span class="line">Mounting HelloWorldFunction at http://127.0.0.1:3000/apigw [GET]</span><br><span class="line">You can now browse to the above endpoints to invoke your <span class="built_in">functions</span>. You <span class="keyword">do</span> not need to restart/reload SAM CLI <span class="keyword">while</span> working on your <span class="built_in">functions</span>, changes will be reflected instantly/automatically. You only need to restart SAM CLI <span class="keyword">if</span> you update your AWS SAM template</span><br><span class="line">2020-03-09 22:05:33  * Running on http://127.0.0.1:3000/ (Press CTRL+C to quit)</span><br><span class="line">Invoking lambdab (go1.x)</span><br><span class="line"></span><br><span class="line">Fetching lambci/lambda:go1.x Docker container image......</span><br><span class="line">Mounting /Users/kurita/[パス情報なので省略]/apigw/lambdab as /var/task:ro,delegated inside runtime container</span><br><span class="line">START RequestId: f2fd9e5a-f031-10c7-3340-25e3997c6dd1 Version: <span class="variable">$LATEST</span></span><br><span class="line">END RequestId: f2fd9e5a-f031-10c7-3340-25e3997c6dd1</span><br><span class="line">REPORT RequestId: f2fd9e5a-f031-10c7-3340-25e3997c6dd1  Init Duration: 131.05 ms        Duration: 4.07 ms       Billed Duration: 100 ms Memory Size: 128 MBMax Memory Used: 21 MB</span><br><span class="line">No Content-Type given. Defaulting to <span class="string">'application/json'</span>.</span><br><span class="line">2020-03-09 22:05:38 127.0.0.1 - - [09/Mar/2020 22:05:38] <span class="string">"GET /apigw HTTP/1.1"</span> 200 -</span><br><span class="line">2020-03-09 22:05:39 127.0.0.1 - - [09/Mar/2020 22:05:39] <span class="string">"GET /favicon.ico HTTP/1.1"</span> 403 -</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ sam <span class="built_in">local</span> start-api</span><br><span class="line">Mounting HelloWorldFunction at http://127.0.0.1:3000/apigw [GET]</span><br><span class="line">You can now browse to the above endpoints to invoke your <span class="built_in">functions</span>. You <span class="keyword">do</span> not need to restart/reload SAM CLI <span class="keyword">while</span> working on your <span class="built_in">functions</span>, changes will be reflected instantly/automatically. You only need to restart SAM CLI <span class="keyword">if</span> you update your AWS SAM template</span><br><span class="line">2020-03-09 22:05:33  * Running on http://127.0.0.1:3000/ (Press CTRL+C to quit)</span><br><span class="line">Invoking lambdab (go1.x)</span><br><span class="line"></span><br><span class="line">Fetching lambci/lambda:go1.x Docker container image......</span><br><span class="line">Mounting /Users/kurita/[パス情報なので省略]/apigw/lambdab as /var/task:ro,delegated inside runtime container</span><br><span class="line">START RequestId: f2fd9e5a-f031-10c7-3340-25e3997c6dd1 Version: <span class="variable">$LATEST</span></span><br><span class="line">END RequestId: f2fd9e5a-f031-10c7-3340-25e3997c6dd1</span><br><span class="line">REPORT RequestId: f2fd9e5a-f031-10c7-3340-25e3997c6dd1  Init Duration: 131.05 ms        Duration: 4.07 ms       Billed Duration: 100 ms Memory Size: 128 MBMax Memory Used: 21 MB</span><br><span class="line">No Content-Type given. Defaulting to <span class="string">&#x27;application/json&#x27;</span>.</span><br><span class="line">2020-03-09 22:05:38 127.0.0.1 - - [09/Mar/2020 22:05:38] <span class="string">&quot;GET /apigw HTTP/1.1&quot;</span> 200 -</span><br><span class="line">2020-03-09 22:05:39 127.0.0.1 - - [09/Mar/2020 22:05:39] <span class="string">&quot;GET /favicon.ico HTTP/1.1&quot;</span> 403 -</span><br></pre></td></tr></table></figure>
 
 <p>ブラウザでAPI叩くと、ちゃんと返ってきているのがわかります。</p>
 <img src="/images/20200323/photo_20200323_03.png" class="img-middle-size">
@@ -249,26 +243,26 @@
 <h2 id="DynamoDB-localの準備"><a href="#DynamoDB-localの準備" class="headerlink" title="DynamoDB localの準備"></a>DynamoDB localの準備</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># AWS profile(初回のみ)</span></span><br><span class="line"><span class="comment"># localのDynamoDB</span></span><br><span class="line">$ aws configure <span class="built_in">set</span> aws_access_key_id dummy     --profile <span class="built_in">local</span></span><br><span class="line">$ aws configure <span class="built_in">set</span> aws_secret_access_key dummy --profile <span class="built_in">local</span></span><br><span class="line">$ aws configure <span class="built_in">set</span> region ap-northeast-1       --profile <span class="built_in">local</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># DynamoDBに必要なテーブル作成(初回のみ)</span></span><br><span class="line">$ docker network create lambda-local-test</span><br><span class="line">$ docker run -d --network lambda-local-test --name dynamoTest -p 8000:8000 amazon/dynamodb-local:1.12.0 -jar DynamoDBLocal.jar -sharedDb</span><br><span class="line"></span><br><span class="line"><span class="comment"># 停止コマンド</span></span><br><span class="line"><span class="comment"># docker stop dynamoTest</span></span><br></pre></td></tr></table></figure>
 
 <p>これでテスト用のdynamoDBができました。ここにテスト用のテーブルを切ります。テーブルは<code>aws-cli</code>を使います。</p>
-<figure class="highlight json"><figcaption><span>testdata/db_local.json</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"TableName"</span>: <span class="string">"local_company_table"</span>,</span><br><span class="line">    <span class="attr">"KeySchema"</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"AttributeName"</span>: <span class="string">"company"</span>,</span><br><span class="line">        <span class="attr">"KeyType"</span>: <span class="string">"HASH"</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"AttributeName"</span>: <span class="string">"year"</span>,</span><br><span class="line">        <span class="attr">"KeyType"</span>: <span class="string">"RANGE"</span></span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"AttributeDefinitions"</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"AttributeName"</span>: <span class="string">"company"</span>,</span><br><span class="line">        <span class="attr">"AttributeType"</span>: <span class="string">"S"</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"AttributeName"</span>: <span class="string">"year"</span>,</span><br><span class="line">        <span class="attr">"AttributeType"</span>: <span class="string">"S"</span></span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"ProvisionedThroughput"</span>: &#123;</span><br><span class="line">      <span class="attr">"ReadCapacityUnits"</span>: <span class="number">2</span>,</span><br><span class="line">      <span class="attr">"WriteCapacityUnits"</span>: <span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><figcaption><span>testdata/db_local.json</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;TableName&quot;</span>: <span class="string">&quot;local_company_table&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;KeySchema&quot;</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">&quot;AttributeName&quot;</span>: <span class="string">&quot;company&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;KeyType&quot;</span>: <span class="string">&quot;HASH&quot;</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">&quot;AttributeName&quot;</span>: <span class="string">&quot;year&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;KeyType&quot;</span>: <span class="string">&quot;RANGE&quot;</span></span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">&quot;AttributeDefinitions&quot;</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">&quot;AttributeName&quot;</span>: <span class="string">&quot;company&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;AttributeType&quot;</span>: <span class="string">&quot;S&quot;</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">&quot;AttributeName&quot;</span>: <span class="string">&quot;year&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;AttributeType&quot;</span>: <span class="string">&quot;S&quot;</span></span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">&quot;ProvisionedThroughput&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;ReadCapacityUnits&quot;</span>: <span class="number">2</span>,</span><br><span class="line">      <span class="attr">&quot;WriteCapacityUnits&quot;</span>: <span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
 
 <p>テーブルを切ります。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ aws dynamodb --profile local --endpoint-url http:&#x2F;&#x2F;localhost:8000 create-table --cli-input-json file:&#x2F;&#x2F;.&#x2F;testdata&#x2F;db_local.json</span><br><span class="line">（出力略）</span><br></pre></td></tr></table></figure>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ aws dynamodb --profile local --endpoint-url http://localhost:8000 create-table --cli-input-json file://./testdata/db_local.json</span><br><span class="line">（出力略）</span><br></pre></td></tr></table></figure>
 
 <h2 id="Goのコード修正"><a href="#Goのコード修正" class="headerlink" title="Goのコード修正"></a>Goのコード修正</h2><p>先程はAPIアクセスに対してレスポンスを返すだけでしたが、今度は同じ内容をDynamoDBに書き込むように修正します。</p>
-<figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"context"</span></span><br><span class="line">	<span class="string">"encoding/json"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"github.com/aws/aws-lambda-go/events"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-lambda-go/lambda"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/aws/session"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/service/dynamodb"</span></span><br><span class="line">	<span class="string">"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> db *dynamodb.DynamoDB</span><br><span class="line"><span class="keyword">var</span> dbEndpoint = <span class="string">"http://dynamoTest:8000"</span></span><br><span class="line"><span class="keyword">var</span> region = <span class="string">"ap-northeast-1"</span></span><br><span class="line"><span class="keyword">var</span> testTable = <span class="string">"local_company_table"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CompanyResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	Company <span class="keyword">string</span> <span class="string">`json:"company"`</span></span><br><span class="line">	Year    <span class="keyword">string</span> <span class="string">`json:"year"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">write</span><span class="params">(ctx context.Context, tableName <span class="keyword">string</span>, v <span class="keyword">interface</span>&#123;&#125;)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	av, err := dynamodbattribute.MarshalMap(v)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">"dynamodb attribute marshalling map: %w"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	i := &amp;dynamodb.PutItemInput&#123;</span><br><span class="line">		Item:      av,</span><br><span class="line">		TableName: aws.String(tableName),</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> _, err = db.PutItemWithContext(ctx, i); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">"dynamodb put item: %w"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handler</span><span class="params">(ctx context.Context, request events.APIGatewayProxyRequest)</span> <span class="params">(events.APIGatewayProxyResponse, error)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	sess := session.Must(session.NewSession(&amp;aws.Config&#123;</span><br><span class="line">		Endpoint: aws.String(dbEndpoint),</span><br><span class="line">		Region:   aws.String(region),</span><br><span class="line">	&#125;))</span><br><span class="line">	db = dynamodb.New(sess)</span><br><span class="line"></span><br><span class="line">	response := CompanyResponse&#123;</span><br><span class="line">		Company: <span class="string">"Future"</span>,</span><br><span class="line">		Year:    <span class="string">"1989"</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	jsonBytes, _ := json.Marshal(response)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := write(ctx, testTable, response); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Print(<span class="string">"%s"</span>, err)</span><br><span class="line">		<span class="keyword">return</span> events.APIGatewayProxyResponse&#123;</span><br><span class="line">			Body:       <span class="keyword">string</span>(jsonBytes),</span><br><span class="line">			StatusCode: <span class="number">500</span>,</span><br><span class="line">		&#125;, <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> events.APIGatewayProxyResponse&#123;</span><br><span class="line">		Body:       <span class="keyword">string</span>(jsonBytes),</span><br><span class="line">		StatusCode: <span class="number">200</span>,</span><br><span class="line">	&#125;, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(handler)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;encoding/json&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/events&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/lambda&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws/session&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/service/dynamodb&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> db *dynamodb.DynamoDB</span><br><span class="line"><span class="keyword">var</span> dbEndpoint = <span class="string">&quot;http://dynamoTest:8000&quot;</span></span><br><span class="line"><span class="keyword">var</span> region = <span class="string">&quot;ap-northeast-1&quot;</span></span><br><span class="line"><span class="keyword">var</span> testTable = <span class="string">&quot;local_company_table&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CompanyResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	Company <span class="keyword">string</span> <span class="string">`json:&quot;company&quot;`</span></span><br><span class="line">	Year    <span class="keyword">string</span> <span class="string">`json:&quot;year&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">write</span><span class="params">(ctx context.Context, tableName <span class="keyword">string</span>, v <span class="keyword">interface</span>&#123;&#125;)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	av, err := dynamodbattribute.MarshalMap(v)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;dynamodb attribute marshalling map: %w&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	i := &amp;dynamodb.PutItemInput&#123;</span><br><span class="line">		Item:      av,</span><br><span class="line">		TableName: aws.String(tableName),</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> _, err = db.PutItemWithContext(ctx, i); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;dynamodb put item: %w&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handler</span><span class="params">(ctx context.Context, request events.APIGatewayProxyRequest)</span> <span class="params">(events.APIGatewayProxyResponse, error)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	sess := session.Must(session.NewSession(&amp;aws.Config&#123;</span><br><span class="line">		Endpoint: aws.String(dbEndpoint),</span><br><span class="line">		Region:   aws.String(region),</span><br><span class="line">	&#125;))</span><br><span class="line">	db = dynamodb.New(sess)</span><br><span class="line"></span><br><span class="line">	response := CompanyResponse&#123;</span><br><span class="line">		Company: <span class="string">&quot;Future&quot;</span>,</span><br><span class="line">		Year:    <span class="string">&quot;1989&quot;</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	jsonBytes, _ := json.Marshal(response)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := write(ctx, testTable, response); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Print(<span class="string">&quot;%s&quot;</span>, err)</span><br><span class="line">		<span class="keyword">return</span> events.APIGatewayProxyResponse&#123;</span><br><span class="line">			Body:       <span class="keyword">string</span>(jsonBytes),</span><br><span class="line">			StatusCode: <span class="number">500</span>,</span><br><span class="line">		&#125;, <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> events.APIGatewayProxyResponse&#123;</span><br><span class="line">		Body:       <span class="keyword">string</span>(jsonBytes),</span><br><span class="line">		StatusCode: <span class="number">200</span>,</span><br><span class="line">	&#125;, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(handler)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="SAMによるテスト"><a href="#SAMによるテスト" class="headerlink" title="SAMによるテスト"></a>SAMによるテスト</h2><p>SAMを実行するとき、docker-networkを指定します。これで、SAMで起動したdockerとDynamoDB localが同じネットワーク上に入ります。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ make build</span><br><span class="line">$ sam <span class="built_in">local</span> start-api --docker-network lambda-local-test</span><br></pre></td></tr></table></figure>
 
 <p>もう一つターミナルを立ち上げてコマンドを打ちます。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 先程作ったテーブルは未だ空です。これからここに書き込みます。</span></span><br><span class="line">$ aws dynamodb scan --table-name local_company_table --profile <span class="built_in">local</span> --endpoint-url http://localhost:8000</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"Items"</span>: [],</span><br><span class="line">    <span class="string">"Count"</span>: 0,</span><br><span class="line">    <span class="string">"ScannedCount"</span>: 0,</span><br><span class="line">    <span class="string">"ConsumedCapacity"</span>: null</span><br><span class="line">&#125;</span><br><span class="line">$ curl localhost:3000/apigw</span><br><span class="line">&#123;<span class="string">"Company"</span>:<span class="string">"Future"</span>,<span class="string">"Year"</span>:<span class="string">"1989"</span>&#125;</span><br><span class="line"><span class="comment"># 作ったテーブルに必要な項目が入っている</span></span><br><span class="line">$ aws dynamodb scan --table-name local_company_table --profile <span class="built_in">local</span> --endpoint-url http://localhost:8000</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"Items"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">"year"</span>: &#123;</span><br><span class="line">                <span class="string">"S"</span>: <span class="string">"1989"</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">"company"</span>: &#123;</span><br><span class="line">                <span class="string">"S"</span>: <span class="string">"Future"</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">"Count"</span>: 1,</span><br><span class="line">    <span class="string">"ScannedCount"</span>: 1,</span><br><span class="line">    <span class="string">"ConsumedCapacity"</span>: null</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 先程作ったテーブルは未だ空です。これからここに書き込みます。</span></span><br><span class="line">$ aws dynamodb scan --table-name local_company_table --profile <span class="built_in">local</span> --endpoint-url http://localhost:8000</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;Items&quot;</span>: [],</span><br><span class="line">    <span class="string">&quot;Count&quot;</span>: 0,</span><br><span class="line">    <span class="string">&quot;ScannedCount&quot;</span>: 0,</span><br><span class="line">    <span class="string">&quot;ConsumedCapacity&quot;</span>: null</span><br><span class="line">&#125;</span><br><span class="line">$ curl localhost:3000/apigw</span><br><span class="line">&#123;<span class="string">&quot;Company&quot;</span>:<span class="string">&quot;Future&quot;</span>,<span class="string">&quot;Year&quot;</span>:<span class="string">&quot;1989&quot;</span>&#125;</span><br><span class="line"><span class="comment"># 作ったテーブルに必要な項目が入っている</span></span><br><span class="line">$ aws dynamodb scan --table-name local_company_table --profile <span class="built_in">local</span> --endpoint-url http://localhost:8000</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;Items&quot;</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">&quot;year&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;S&quot;</span>: <span class="string">&quot;1989&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">&quot;company&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;S&quot;</span>: <span class="string">&quot;Future&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">&quot;Count&quot;</span>: 1,</span><br><span class="line">    <span class="string">&quot;ScannedCount&quot;</span>: 1,</span><br><span class="line">    <span class="string">&quot;ConsumedCapacity&quot;</span>: null</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>確かに、テーブルの中に値が格納されました。</p>
 <h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>今回SAMを使ったテストができました。あとは必要に応じてAPIを叩くLambdaを作ったり、あるいはAPI Gatewayから呼び出されるLambdaを適宜増やしていくことで、目的とするシステムの開発が行なえます。</p>
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
-<li><a href="https://dev.classmethod.jp/cloud/aws/aws-lambda-supports-go/" target="_blank" rel="noopener">AWS Lambda で Go が使えるようになったので試してみた</a></li>
-<li><a href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/go-programming-model-handler-types.html" target="_blank" rel="noopener">Go の AWS Lambda 関数ハンドラー</a></li>
-<li><a href="https://qiita.com/shunp/items/52ee20278e02e29ef3e8" target="_blank" rel="noopener">Go+Lambdaで最速サーバーレスチュートリアル</a> </li>
+<li><a target="_blank" rel="noopener" href="https://dev.classmethod.jp/cloud/aws/aws-lambda-supports-go/">AWS Lambda で Go が使えるようになったので試してみた</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/go-programming-model-handler-types.html">Go の AWS Lambda 関数ハンドラー</a></li>
+<li><a target="_blank" rel="noopener" href="https://qiita.com/shunp/items/52ee20278e02e29ef3e8">Go+Lambdaで最速サーバーレスチュートリアル</a> </li>
 </ul>
 <h2 id="関連リンク"><a href="#関連リンク" class="headerlink" title="関連リンク"></a>関連リンク</h2><p>Goに関連した連載企画があります。</p>
 <ul>
@@ -325,12 +319,52 @@
   
     
       
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210311/">
-                  PythonでCloud Operationsの機能を使ってみる
+                <a href="https://future-architect.github.io/articles/20200630/">
+                  go-swaggerを用いたWebアプリケーション開発Tips19選
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200530/">
+                  フューチャー技術ブログの運営で心がけていること
                 </a>
               </li>
             </ul>
@@ -348,18 +382,8 @@
     
   
     
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210307/">
-                  GCP連載2021を始めます
-                </a>
-              </li>
-            </ul>
-          </div>
-        
+  
+    
       
     
   
@@ -369,22 +393,6 @@
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20190713/">
-                  Goを学ぶときにつまずきやすいポイントFAQ
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
     
   
     
@@ -397,18 +405,18 @@
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210301/">
-                  【登壇しました】アレクサアプリを開発してみたら中々大変だった話
-                </a>
-              </li>
-            </ul>
-          </div>
-        
+    
+  
+    
+  
+    
       
+    
+  
+    
+  
+    
+  
     
   
     
@@ -428,50 +436,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210210/">
-                  Go1.16からのio/ioutilパッケージ
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210207/">
-                  Go 1.16連載が始まります
-                </a>
-              </li>
-            </ul>
-          </div>
-        
       
     
   
@@ -481,48 +445,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210208/">
-                  Go 1.16からリリースされたgo:embedとは
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210121/">
-                  DockerでRUNをまとめた方が良いとは限らない
+                <a href="https://future-architect.github.io/articles/20201107/">
+                  フューチャーOSS推進タスクフォース始めます
                 </a>
               </li>
             </ul>
@@ -538,7 +462,19 @@
     
   
     
-  
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20201020/">
+                  ProxyとDockerと新人社員と時々わたし
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
     
   
     
@@ -549,8 +485,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210108/">
-                  自分の分身(3Dアバター)と自作ワールドを作ってみた
+                <a href="https://future-architect.github.io/articles/20200930/">
+                  Policy as Code を実現する Open Policy Agent に憧れて。ポリシーコードでAPI仕様をLintする
                 </a>
               </li>
             </ul>
@@ -572,28 +508,28 @@
     
   
     
-      
-    
   
     
       
     
   
     
+  
+    
+  
+    
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200807/">
+                  GoとSuffixArray
+                </a>
+              </li>
+            </ul>
+          </div>
+        
       
     
   
@@ -605,8 +541,90 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201117/">
-                  Goのデバッグ環境 on VSCode
+                <a href="https://future-architect.github.io/articles/20200730/">
+                  Redux-Toolkitに学ぶ、TypeScriptの型推論とこれからのAPIデザイン
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200728/">
+                  DBスキーマを駆動にした開発のためのライブラリ調査
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200703/">
+                  スケーラブルデータベース ～クラウドにおける後悔しないデータベース選定～
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200512/">
+                  日本製HeadlessCMSのmicroCMSを触ってみた
                 </a>
               </li>
             </ul>
@@ -617,6 +635,54 @@
   
     
       
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
         
       
     
@@ -630,51 +696,15 @@
     
   
     
-  
-    
+      
+        
       
     
   
     
   
     
-  
-    
-  
-    
-  
-    
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -688,121 +718,13 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
     
   
     
   
     
-  
-    
-  
-    
-  
-    
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -822,6 +744,22 @@
     
   
     
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
       
     
   
@@ -832,8 +770,6 @@
     
   
     
-      
-    
   
     
   
@@ -841,102 +777,6 @@
   
     
   
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
     
   
     
@@ -964,6 +804,22 @@
     
   
     
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
   
     
       
@@ -974,63 +830,15 @@
     
   
     
-      
-        
-      
-    
   
     
-      
-    
   
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
     
   
     
   
     
-      
-    
   
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
     
   
     
@@ -1054,15 +862,9 @@
     
   
     
-      
-        
-      
-    
   
     
-      
-        
-      
+  
     
   
     
@@ -1075,52 +877,6 @@
   
     
   
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
     
   
     
@@ -1142,7 +898,11 @@
     
   
     
-      
+  
+    
+  
+    
+  
     
   
     
@@ -1153,6 +913,26 @@
   
     
       
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
     
   
     
@@ -1184,29 +964,13 @@
     
   
     
-      
-    
-  
-    
-      
-    
   
     
   
     
   
     
-      
-    
   
-    
-      
-    
-  
-    
-  
-    
-      
     
   
     
@@ -1222,14 +986,28 @@
     
   
     
-      
+  
+    
+  
     
   
     
   
     
-      
-        
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
       
     
   
@@ -1252,9 +1030,45 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
       
-        
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
       
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1286,93 +1100,11 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
     
   
     
       
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -1390,21 +1122,13 @@
     
   
     
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
       
     
   
     
   
+    
+      
     
   
     
@@ -1426,7 +1150,115 @@
     
   
     
+      
+    
   
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
     
   
     
@@ -1445,6 +1277,60 @@
   
     
       
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1464,6 +1350,90 @@
     
   
     
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
       
     
   
@@ -1480,13 +1450,45 @@
     
   
     
-      
+  
+    
+  
+    
+  
     
   
     
       
     
   
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
     
   
     
@@ -1544,23 +1546,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (105)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/DB/">DB (12)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Programming/">Programming (138)</a>
 	</li>
       
 	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (107)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
 	</li>
       
 	<li>
@@ -1737,19 +1739,15 @@
 
   
 <script src="/metronic/assets/plugins/jquery.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/corporate/scripts/layout.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script type="text/javascript">
@@ -1773,24 +1771,7 @@ ga('send', 'pageview');
 <!-- End Google Analytics -->
 
 
-<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({{ JSON.stringify(config) }});
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i=0; i < all.length; i += 1) {
-      all[i].SourceElement().parentNode.className += ' has-jax';
-    }
-  });
-</script>
-
-<script type="text/javascript" src="{{ src }}">
-</script>
-<!-- End: Injected MathJax -->
-<!-- hexo-inject:end -->
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 
 </body>
 </html>

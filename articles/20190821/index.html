@@ -38,30 +38,24 @@
   <!-- Global styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Global styles END -->
 
   <!-- Theme styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/css/theme-styles.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Theme styles END -->
 <meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
@@ -223,7 +217,7 @@
 </ul>
 </li>
 </ul>
-<p>AWSでは<strong>EngineCPUUtilization</strong>というメトリクスを使えば、上記を加味したCPU使用率が見れます。性能検証等で測定する際は<a href="https://aws.amazon.com/jp/about-aws/whats-new/2018/04/amazon-elastiCache-for-redis-introduces-new-cpu-utilization-metric-for-better-visibility-into-redis-workloads/" target="_blank" rel="noopener">こちらの指標</a>を使いましょう。</p>
+<p>AWSでは<strong>EngineCPUUtilization</strong>というメトリクスを使えば、上記を加味したCPU使用率が見れます。性能検証等で測定する際は<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/about-aws/whats-new/2018/04/amazon-elastiCache-for-redis-introduces-new-cpu-utilization-metric-for-better-visibility-into-redis-workloads/">こちらの指標</a>を使いましょう。</p>
 <h2 id="2-トランザクションの実現方法"><a href="#2-トランザクションの実現方法" class="headerlink" title="2. トランザクションの実現方法"></a>2. トランザクションの実現方法</h2><p>トランザクション中は、クエリをQueueに溜めます。</p>
 <ul>
 <li>RDBでいうCommitのタイミングでそのクエリを順に(FIFOで)実行します（<code>EXEC</code>）</li>
@@ -249,23 +243,23 @@
 <p>複数レコードを取得して表示しようとすると1件ずつループ処理で取得することになり、NWのオーバーヘッドでとたんに遅いという性能問題になりかねません<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>。</p>
 <h3 id="回避策"><a href="#回避策" class="headerlink" title="回避策"></a>回避策</h3><p>自分達もハマり、色々悩んだのでいくつか回避策を紹介します。</p>
 <h4 id="3-1-Hashを捨てる！"><a href="#3-1-Hashを捨てる！" class="headerlink" title="3-1. Hashを捨てる！"></a>3-1. Hashを捨てる！</h4><p>潔くHashを捨てます。以下のようにString型で持つことで複数キーを一括で取得する<code>MGET</code>が使えるようになります。Hashとして考えていたまとまりの概念はRedisにアクセスするEntityや、RedisのデータをGETするAPIが吸収すれば、大きな影響はないと思います。</p>
-<figure class="highlight json"><figcaption><span>Hashイメージ.json</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"key"</span>: <span class="string">"sales:111"</span>, </span><br><span class="line">  <span class="attr">"value"</span>: &#123;</span><br><span class="line">     <span class="attr">"name"</span>: <span class="string">"REDBULL"</span>,</span><br><span class="line">     <span class="attr">"amount"</span>: <span class="string">"200"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><figcaption><span>Hashイメージ.json</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;key&quot;</span>: <span class="string">&quot;sales:111&quot;</span>, </span><br><span class="line">  <span class="attr">&quot;value&quot;</span>: &#123;</span><br><span class="line">     <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;REDBULL&quot;</span>,</span><br><span class="line">     <span class="attr">&quot;amount&quot;</span>: <span class="string">&quot;200&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight json"><figcaption><span>Hashを捨てたイメージ.json</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;  <span class="attr">"key"</span>: <span class="string">"sales:111:name"</span>, <span class="attr">"value"</span>: <span class="string">"REDBULL"</span>&#125;</span><br><span class="line">&#123;  <span class="attr">"key"</span>: <span class="string">"sales:111:amount"</span>, <span class="attr">"value"</span>: <span class="string">"200"</span>&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><figcaption><span>Hashを捨てたイメージ.json</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;  <span class="attr">&quot;key&quot;</span>: <span class="string">&quot;sales:111:name&quot;</span>, <span class="attr">&quot;value&quot;</span>: <span class="string">&quot;REDBULL&quot;</span>&#125;</span><br><span class="line">&#123;  <span class="attr">&quot;key&quot;</span>: <span class="string">&quot;sales:111:amount&quot;</span>, <span class="attr">&quot;value&quot;</span>: <span class="string">&quot;200&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
 
 <h4 id="3-2-HashのMultiGetを実装する！"><a href="#3-2-HashのMultiGetを実装する！" class="headerlink" title="3-2. HashのMultiGetを実装する！"></a>3-2. HashのMultiGetを実装する！</h4><p>標準機能ではないようですが、以下2つの方法でHashの一括取得を実装できます。</p>
 <h5 id="実装方法1-Luaスクリプト"><a href="#実装方法1-Luaスクリプト" class="headerlink" title="実装方法1. Luaスクリプト"></a>実装方法1. Luaスクリプト</h5><p>RDBには、複数クエリ実行やIF文・ループ処理などの一連の手続きを一回のクエリでRDB上で実行できるストアドプロシージャやストアドファンクションというものがあります。Luaスクリプトを使えばRedisでもそれと同様のことができます。</p>
 <p>実際にHash型のKeyを一度に複数渡して処理できるスクリプトを作ってみました。試したところ、検証サーバでは1件7msかかってたHGETALLでしたが、10000件一括取得で400msぐらいでデータ取得できました。注意ですが、Luaスクリプトもクエリ処理用のスレッド（シングルスレッド）で動作するため、重い処理は避けるべきです。</p>
-<p>※Javaから実行する方法は<a href="https://blog.kakakikikeke.com/2015/01/javaluaredis.html" target="_blank" rel="noopener">こちら</a>を参考ください。</p>
+<p>※Javaから実行する方法は<a target="_blank" rel="noopener" href="https://blog.kakakikikeke.com/2015/01/javaluaredis.html">こちら</a>を参考ください。</p>
 <p>luaスクリプト</p>
-<figure class="highlight lua"><figcaption><span>hmgetall.lua</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- param1: hmgetallで取得したいkeyの数 param2~: 取得したいkey（半角スペース区切りで複数可能）</span></span><br><span class="line"><span class="keyword">local</span> result = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> i = <span class="number">1</span>, KEYS[<span class="number">1</span>] <span class="keyword">do</span></span><br><span class="line">  result[i] = &#123;<span class="string">'"key"'</span>, KEYS[i+<span class="number">1</span>] ,redis.call(<span class="string">'HGETALL'</span>, KEYS[i + <span class="number">1</span>])&#125;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> result</span><br></pre></td></tr></table></figure>
+<figure class="highlight lua"><figcaption><span>hmgetall.lua</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- param1: hmgetallで取得したいkeyの数 param2~: 取得したいkey（半角スペース区切りで複数可能）</span></span><br><span class="line"><span class="keyword">local</span> result = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> i = <span class="number">1</span>, KEYS[<span class="number">1</span>] <span class="keyword">do</span></span><br><span class="line">  result[i] = &#123;<span class="string">&#x27;&quot;key&quot;&#x27;</span>, KEYS[i+<span class="number">1</span>] ,redis.call(<span class="string">&#x27;HGETALL&#x27;</span>, KEYS[i + <span class="number">1</span>])&#125;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> result</span><br></pre></td></tr></table></figure>
 
 <p>使い方</p>
-<figure class="highlight shell"><figcaption><span>hmgetall.sh</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -h $&#123;REDIS_HOST&#125; -p $&#123;PORT&#125; --eval ./hmgetall.lua 2 sales:111 sales:222</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># Return　Data</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 1) 1) "\"key\""</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#    2) "sales:111"</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#    3)  1) "\"name\""</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#        2) "REDBULL"</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#        3) "\"amount\""</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#        4) "200"</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 2) 1) "\"key\""</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#    2) "sales:222"</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#    3)  1) "\"name\""</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#        2) "MILK"</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#        3) "\"amount\""</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#        4) "165"</span></span></span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><figcaption><span>hmgetall.sh</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -h $&#123;REDIS_HOST&#125; -p $&#123;PORT&#125; --eval ./hmgetall.lua 2 sales:111 sales:222</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># Return　Data</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 1) 1) &quot;\&quot;key\&quot;&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#    2) &quot;sales:111&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#    3)  1) &quot;\&quot;name\&quot;&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#        2) &quot;REDBULL&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#        3) &quot;\&quot;amount\&quot;&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#        4) &quot;200&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 2) 1) &quot;\&quot;key\&quot;&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#    2) &quot;sales:222&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#    3)  1) &quot;\&quot;name\&quot;&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#        2) &quot;MILK&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#        3) &quot;\&quot;amount\&quot;&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#        4) &quot;165&quot;</span></span></span><br></pre></td></tr></table></figure>
 
 <h5 id="実装方法2-syncAndReturnAll"><a href="#実装方法2-syncAndReturnAll" class="headerlink" title="実装方法2. syncAndReturnAll"></a>実装方法2. syncAndReturnAll</h5><p>Redisのライブラリによっては、1件ずつ同期的に処理するのではなく、<strong>「Queueに詰めて一括で実行して、その結果をまとめて取得する」ってことができるようです</strong>（JavaはJedisでできることを確認済）。使用する言語でいいライブラリがあればLuaスクリプトよりもこちらの方がよいと思います。</p>
-<p>Queueに詰めた実行順でレスポンスも返ってくるので、Keyとのマッピングもできます。keyがない場合も空のMapが返るのでマッピング順がずれることはないです。<br><a href="http://tool.oschina.net/uploads/apidocs/jedis-2.1.0/redis/clients/jedis/Pipeline.html#syncAndReturnAll%28%29" target="_blank" rel="noopener">http://tool.oschina.net/uploads/apidocs/jedis-2.1.0/redis/clients/jedis/Pipeline.html#syncAndReturnAll%28%29</a></p>
-<figure class="highlight java"><figcaption><span>hMGetAll.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">  Jedis jedis = <span class="keyword">new</span> Jedis (host, port );</span><br><span class="line">  Pipeline pipe = jedis.pipelined();</span><br><span class="line">  pipe.hgetAll(<span class="string">"sales:111"</span>);</span><br><span class="line">  pipe.hgetAll(<span class="string">"sales:222"</span>);</span><br><span class="line">  pipe.hgetAll(<span class="string">"sales:NotExist"</span>);</span><br><span class="line">  List&lt;Object&gt; result=  pipe.syncAndReturnAll();</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">結果</span></span><br><span class="line"><span class="comment">result= &#123;ArrayList@14772&#125;  size = 3</span></span><br><span class="line"><span class="comment"> 0 = &#123;HashMap@14777&#125;  size = 2</span></span><br><span class="line"><span class="comment">  ""name"" -&gt; "REDBULL"</span></span><br><span class="line"><span class="comment">  ""amount"" -&gt; "200"</span></span><br><span class="line"><span class="comment"> 1 = &#123;HashMap@14778&#125;  size = 2</span></span><br><span class="line"><span class="comment">  ""name"" -&gt; "MILK"</span></span><br><span class="line"><span class="comment">  ""amount"" -&gt; "165"</span></span><br><span class="line"><span class="comment"> 2 = &#123;HashMap@14779&#125;  size = 0</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>Queueに詰めた実行順でレスポンスも返ってくるので、Keyとのマッピングもできます。keyがない場合も空のMapが返るのでマッピング順がずれることはないです。<br><a target="_blank" rel="noopener" href="http://tool.oschina.net/uploads/apidocs/jedis-2.1.0/redis/clients/jedis/Pipeline.html#syncAndReturnAll%28%29">http://tool.oschina.net/uploads/apidocs/jedis-2.1.0/redis/clients/jedis/Pipeline.html#syncAndReturnAll%28%29</a></p>
+<figure class="highlight java"><figcaption><span>hMGetAll.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">  Jedis jedis = <span class="keyword">new</span> Jedis (host, port );</span><br><span class="line">  Pipeline pipe = jedis.pipelined();</span><br><span class="line">  pipe.hgetAll(<span class="string">&quot;sales:111&quot;</span>);</span><br><span class="line">  pipe.hgetAll(<span class="string">&quot;sales:222&quot;</span>);</span><br><span class="line">  pipe.hgetAll(<span class="string">&quot;sales:NotExist&quot;</span>);</span><br><span class="line">  List&lt;Object&gt; result=  pipe.syncAndReturnAll();</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">結果</span></span><br><span class="line"><span class="comment">result= &#123;ArrayList@14772&#125;  size = 3</span></span><br><span class="line"><span class="comment"> 0 = &#123;HashMap@14777&#125;  size = 2</span></span><br><span class="line"><span class="comment">  &quot;&quot;name&quot;&quot; -&gt; &quot;REDBULL&quot;</span></span><br><span class="line"><span class="comment">  &quot;&quot;amount&quot;&quot; -&gt; &quot;200&quot;</span></span><br><span class="line"><span class="comment"> 1 = &#123;HashMap@14778&#125;  size = 2</span></span><br><span class="line"><span class="comment">  &quot;&quot;name&quot;&quot; -&gt; &quot;MILK&quot;</span></span><br><span class="line"><span class="comment">  &quot;&quot;amount&quot;&quot; -&gt; &quot;165&quot;</span></span><br><span class="line"><span class="comment"> 2 = &#123;HashMap@14779&#125;  size = 0</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="4-KEYSは怖い"><a href="#4-KEYSは怖い" class="headerlink" title="4. KEYSは怖い"></a>4. KEYSは怖い</h2><p>ここで、Redisに登録されたKey一覧を取得する<code>KEYS</code>というコマンドをご紹介します。</p>
 <p>例えば <code>KEYS &quot;sales:*&quot;</code> と実行すれば正規表現（※）でkey検索できます。</p>
@@ -279,7 +273,7 @@
 </li>
 <li>その間のRedisはシングルスレッドでクエリ捌くため、他のリクエストを捌けません。ReadもWriteの両方ともさばけません。</li>
 </ul>
-<p>Jedis（Java用ライブラリ）だとデフォルトtimeoutが2秒なので、2，3人がkeysを2発ぐらい実行するとそれだけでtimeoutエラーが出たりします。公式でもWARNINGって書いてます。<a href="https://redis.io/commands/keys" target="_blank" rel="noopener">https://redis.io/commands/keys</a></p>
+<p>Jedis（Java用ライブラリ）だとデフォルトtimeoutが2秒なので、2，3人がkeysを2発ぐらい実行するとそれだけでtimeoutエラーが出たりします。公式でもWARNINGって書いてます。<a target="_blank" rel="noopener" href="https://redis.io/commands/keys">https://redis.io/commands/keys</a></p>
 <blockquote>
 <p>While the time complexity for this operation is O(N), the constant times are fairly low. For example, Redis running on an entry level laptop can scan a 1 million key database in 40 milliseconds.<br>Warning: consider KEYS as a command that should only be used in production environments with extreme care. It may ruin performance when it is executed against large databases. This command is intended for debugging and special operations, such as changing your keyspace layout. Don’t use KEYS in your regular application code. If you’re looking for a way to find keys in a subset of your keyspace, consider using SCAN or sets.</p>
 </blockquote>
@@ -328,11 +322,11 @@
 <h2 id="7-所感"><a href="#7-所感" class="headerlink" title="7. 所感"></a>7. 所感</h2><p>正直、RDBだとこんなの簡単にできるのにーと思うことが多々あり、最初はRedisを嫌いになりかけました。しかしRedisはKVSの中でもかなりRDBの人達に歩み寄ってくれてると感じます（Sets型やHash型はすごく好感持てます）。色々な可能性が見えてきて、今では気になる存在です。</p>
 <p>この記事を読んでRedisを気にする仲間が増えればめちゃ嬉しいですー。</p>
 <h2 id="8-ためになるサイト"><a href="#8-ためになるサイト" class="headerlink" title="8. ためになるサイト"></a>8. ためになるサイト</h2><ul>
-<li>データイメージがわかりやすいサイト：<a href="http://redisgate.jp/redis/command/commands.php" target="_blank" rel="noopener">http://redisgate.jp/redis/command/commands.php</a></li>
-<li>トランザクション：<a href="https://redis-documentasion-japanese.readthedocs.io/ja/latest/topics/transactions.html" target="_blank" rel="noopener">https://redis-documentasion-japanese.readthedocs.io/ja/latest/topics/transactions.html</a></li>
-<li>spring での設定系（記事古め）：<a href="http://fits.hatenablog.com/entry/2015/08/27/205539" target="_blank" rel="noopener">http://fits.hatenablog.com/entry/2015/08/27/205539</a></li>
-<li>RedisサーバのCPU負荷対策パターン：<a href="https://blog.yuuk.io/entry/redis-cpu-load" target="_blank" rel="noopener">https://blog.yuuk.io/entry/redis-cpu-load</a></li>
-<li>Luaスクリプトは書き方ここに載ってます：<a href="https://redis.io/commands/eval" target="_blank" rel="noopener">https://redis.io/commands/eval</a></li>
+<li>データイメージがわかりやすいサイト：<a target="_blank" rel="noopener" href="http://redisgate.jp/redis/command/commands.php">http://redisgate.jp/redis/command/commands.php</a></li>
+<li>トランザクション：<a target="_blank" rel="noopener" href="https://redis-documentasion-japanese.readthedocs.io/ja/latest/topics/transactions.html">https://redis-documentasion-japanese.readthedocs.io/ja/latest/topics/transactions.html</a></li>
+<li>spring での設定系（記事古め）：<a target="_blank" rel="noopener" href="http://fits.hatenablog.com/entry/2015/08/27/205539">http://fits.hatenablog.com/entry/2015/08/27/205539</a></li>
+<li>RedisサーバのCPU負荷対策パターン：<a target="_blank" rel="noopener" href="https://blog.yuuk.io/entry/redis-cpu-load">https://blog.yuuk.io/entry/redis-cpu-load</a></li>
+<li>Luaスクリプトは書き方ここに載ってます：<a target="_blank" rel="noopener" href="https://redis.io/commands/eval">https://redis.io/commands/eval</a></li>
 </ul>
 <hr>
 <p>関連記事：</p>
@@ -392,116 +386,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210311/">
-                  PythonでCloud Operationsの機能を使ってみる
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210310/">
-                  本番データが急に欲しくなったアナタに贈る、CloudSQLのサーバレスエクスポートを試してみた
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210307/">
-                  GCP連載2021を始めます
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210308/">
-                  Auth0 Rulesのユニットテストを書きたい
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210305/">
-                  インフラ入門ーインフラ要件定義編ー
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210304/">
-                  mxGraphで階層グラフを可視化する
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210301/">
-                  【登壇しました】アレクサアプリを開発してみたら中々大変だった話
+                <a href="https://future-architect.github.io/articles/20210313/">
+                  CloudNative Days Spring 2021 ONLINEに登壇しました
                 </a>
               </li>
             </ul>
@@ -523,33 +409,23 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210210/">
-                  Go1.16からのio/ioutilパッケージ
-                </a>
-              </li>
-            </ul>
-          </div>
-        
       
     
   
     
+      
+    
   
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -568,8 +444,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210208/">
-                  Go 1.16からリリースされたgo:embedとは
+                <a href="https://future-architect.github.io/articles/20161031/">
+                  SQL実行時のブルームフィルタ(Bloom Filter)アルゴリズム
                 </a>
               </li>
             </ul>
@@ -579,6 +455,186 @@
     
   
     
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210226/">
+                  アクセシビリティ情報を使った壊れにくいE2Eテスト
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200821/">
+                  エンジニアが最低限理解しておくべきOSSライセンスの基礎知識
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200730/">
+                  Redux-Toolkitに学ぶ、TypeScriptの型推論とこれからのAPIデザイン
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200528/">
+                  あなたのGoアプリ/ライブラリのパッケージ構成もっとシンプルでよくない？
+                </a>
+              </li>
+            </ul>
+          </div>
+        
       
     
   
@@ -594,8 +650,118 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210201/">
-                  自宅仕事環境構築：指向性マイクの勧め
+                <a href="https://future-architect.github.io/articles/20200512/">
+                  日本製HeadlessCMSのmicroCMSを触ってみた
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20190610/">
+                  ソースコードを綺麗にするためにまず心がけたい３点
                 </a>
               </li>
             </ul>
@@ -607,11 +773,21 @@
     
   
     
+      
+    
   
+    
+      
+    
+  
+    
+      
     
   
     
   
+    
+      
     
   
     
@@ -629,25 +805,41 @@
     
   
     
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210212/">
+                  Go 1.16のsignal.NotifyContext()
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
   
     
       
     
   
     
-  
-    
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210309/">
+                  PubSubのメッセージスキーマを試してみる
+                </a>
+              </li>
+            </ul>
+          </div>
         
       
     
@@ -663,14 +855,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
       
     
   
@@ -682,190 +866,6 @@
   
     
       
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -892,32 +892,6 @@
   
     
       
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -951,8 +925,6 @@
     
   
     
-      
-    
   
     
   
@@ -972,238 +944,6 @@
   
     
   
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
     
   
     
@@ -1216,164 +956,6 @@
       
         
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
     
   
     
@@ -1411,11 +993,73 @@
     
   
     
-      
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
       
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
     
   
     
@@ -1435,40 +1079,6 @@
     
   
     
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
   
     
   
@@ -1479,13 +1089,11 @@
     
   
     
-      
-        
-      
+  
     
   
     
-      
+  
     
   
     
@@ -1527,6 +1135,342 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
       
         
       
@@ -1541,11 +1485,53 @@
     
   
     
+      
+    
+  
+    
+      
+    
+  
+    
   
     
   
     
   
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
     
   
     
@@ -1556,8 +1542,6 @@
       
         
       
-    
-  
     
   
     
@@ -1615,23 +1599,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (105)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/DB/">DB (12)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Programming/">Programming (138)</a>
 	</li>
       
 	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (107)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
 	</li>
       
 	<li>
@@ -1808,19 +1792,15 @@
 
   
 <script src="/metronic/assets/plugins/jquery.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/corporate/scripts/layout.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script type="text/javascript">
@@ -1844,24 +1824,7 @@ ga('send', 'pageview');
 <!-- End Google Analytics -->
 
 
-<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({{ JSON.stringify(config) }});
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i=0; i < all.length; i += 1) {
-      all[i].SourceElement().parentNode.className += ' has-jax';
-    }
-  });
-</script>
-
-<script type="text/javascript" src="{{ src }}">
-</script>
-<!-- End: Injected MathJax -->
-<!-- hexo-inject:end -->
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 
 </body>
 </html>

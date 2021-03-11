@@ -46,30 +46,24 @@
   <!-- Global styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Global styles END -->
 
   <!-- Theme styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/css/theme-styles.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Theme styles END -->
 <meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
@@ -162,7 +156,7 @@
 
 <p>GCPだけではなく、多くのクラウド管理者が同じような悩みを抱えているかと思います。私もその一人です。各チームの開発者がクラウドインフラに熟知しているわけではありません。では、クラウド管理者がすべてソースコードをレビューすればよいか、いやいや、それも現実的ではない。</p>
 <p>IaCがアプリケーション開発やっと同じ土俵に立った今、同じく <strong>CI(継続的インテグレーション)</strong> の仕組みが必要になってくるのは、自然の流れかと思います。terraform fmtがされているか、planが通るか、等の簡単なチェックをやっている人は多いと思いますが、それよりも高度なチェックを行う仕組みがなく私も方法を探しておりました。</p>
-<h1 id="Terraform-Validator-とは"><a href="#Terraform-Validator-とは" class="headerlink" title="Terraform Validator とは"></a>Terraform Validator とは</h1><p>これを実現するのが、今回紹介する <strong>Terraform Validator</strong> です。Terraform Validatorは、 <strong>terraformがapplyされる前に、インフラのリソース設定が定義したポリシーに従っているかをチェックすることができるツール</strong>です。GCPのオープンソースとして公開されています。 <a href="https://github.com/GoogleCloudPlatform/terraform-validator" target="_blank" rel="noopener">GoogleCloudPlatform/terraform-validator</a></p>
+<h1 id="Terraform-Validator-とは"><a href="#Terraform-Validator-とは" class="headerlink" title="Terraform Validator とは"></a>Terraform Validator とは</h1><p>これを実現するのが、今回紹介する <strong>Terraform Validator</strong> です。Terraform Validatorは、 <strong>terraformがapplyされる前に、インフラのリソース設定が定義したポリシーに従っているかをチェックすることができるツール</strong>です。GCPのオープンソースとして公開されています。 <a target="_blank" rel="noopener" href="https://github.com/GoogleCloudPlatform/terraform-validator">GoogleCloudPlatform/terraform-validator</a></p>
 <p>以下が概要の図です。</p>
 <img src="/images/20200213/photo_20200213_02.png">
 
@@ -176,7 +170,7 @@
 <p>ポリシーに反したリソースがterraformで定義された場合、以下のように <code>Found Violations</code> と出力されます。 (以下のサンプルは、GCSのロケーションが許可されていないリージョンを利用している)</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Sample</span></span><br><span class="line">$ terraform-validator validate --policy-path=<span class="variable">$&#123;POLICY_PATH&#125;</span> ./terraform.tfplan.json</span><br><span class="line">Found Violations:</span><br><span class="line">Constraint allow_some_storage_location on resource //storage.googleapis.com/validator-trial: //storage.googleapis.com/validator-trial is <span class="keyword">in</span> a disallowed location.</span><br></pre></td></tr></table></figure>
 
-<h1 id="ハンズオン"><a href="#ハンズオン" class="headerlink" title="ハンズオン"></a>ハンズオン</h1><p>ではさっそく、実際に試してみます。<strong>“GCSのロケーションに制限をかける”</strong> シンプルなパターンで試してみます。以下のようにフォルダ構成を用意し、2つのファイルを作成しました。</p>
+<h1 id="ハンズオン"><a href="#ハンズオン" class="headerlink" title="ハンズオン"></a>ハンズオン</h1><p>ではさっそく、実際に試してみます。**”GCSのロケーションに制限をかける”** シンプルなパターンで試してみます。以下のようにフォルダ構成を用意し、2つのファイルを作成しました。</p>
 <ul>
 <li><code>storage_location.yaml</code> : (ポリシーを定義するコード)</li>
 <li><code>main.tf</code> : (terraformのコード)</li>
@@ -188,12 +182,12 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ gsutil ls -r gs://terraform-validator/releases</span><br><span class="line">$ gsutil cp gs://terraform-validator/releases/2020-01-23/terraform-validator-linux-amd64 .</span><br><span class="line">$ mv terraform-validator-linux-amd64 terraform-validator-linux-amd64</span><br><span class="line">$ chmod 755 terraform-validator</span><br></pre></td></tr></table></figure>
 
 <h2 id="Policyを定義"><a href="#Policyを定義" class="headerlink" title="Policyを定義"></a>Policyを定義</h2><p>PolicyをGit cloneし、<code>POLICY_PATH</code> を定義</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> https://github.com/forseti-security/policy-library.git</span><br><span class="line">$ <span class="built_in">export</span> POLICY_PATH=<span class="string">"/&lt;your_work_space&gt;/policy-library"</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> https://github.com/forseti-security/policy-library.git</span><br><span class="line">$ <span class="built_in">export</span> POLICY_PATH=<span class="string">&quot;/&lt;your_work_space&gt;/policy-library&quot;</span></span><br></pre></td></tr></table></figure>
 
 <p>Sampleからファイルをコピーし、ポリシーを定義します。policies/constraints 配下に配置したファイルが有効化されます。今回はGCSのLocationに制限をかけます (<strong>ap-northeast-1のみを許可する</strong>)</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> /&lt;your_work_space&gt;/policy-library/policies/constraints</span><br><span class="line">$ cp ../../samples/storage_location.yaml .</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">constraints.gatekeeper.sh/v1alpha1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">GCPStorageLocationConstraintV1</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">allow_some_storage_location</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">severity:</span> <span class="string">high</span></span><br><span class="line">  <span class="attr">match:</span></span><br><span class="line">    <span class="attr">target:</span> <span class="string">["organization/*"]</span></span><br><span class="line">  <span class="attr">parameters:</span></span><br><span class="line">    <span class="attr">mode:</span> <span class="string">"allowlist"</span></span><br><span class="line">    <span class="attr">locations:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">asia-northeast1</span></span><br><span class="line">    <span class="attr">exemptions:</span> <span class="string">[]</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">constraints.gatekeeper.sh/v1alpha1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">GCPStorageLocationConstraintV1</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">allow_some_storage_location</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">severity:</span> <span class="string">high</span></span><br><span class="line">  <span class="attr">match:</span></span><br><span class="line">    <span class="attr">target:</span> [<span class="string">&quot;organization/*&quot;</span>]</span><br><span class="line">  <span class="attr">parameters:</span></span><br><span class="line">    <span class="attr">mode:</span> <span class="string">&quot;allowlist&quot;</span></span><br><span class="line">    <span class="attr">locations:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">asia-northeast1</span></span><br><span class="line">    <span class="attr">exemptions:</span> []</span><br></pre></td></tr></table></figure>
 
 <h2 id="Terraform-planの実行"><a href="#Terraform-planの実行" class="headerlink" title="Terraform planの実行"></a>Terraform planの実行</h2><p>main.tfは以下のように定義されています。<code>location=&quot;us-central1-a&quot;</code> と設定しています<br>(その他 variable.tf, provider.tf等は省略)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">resource &quot;google_storage_bucket&quot; &quot;validator_trial&quot; &#123;</span><br><span class="line">      project       &#x3D; &lt;your project&gt;</span><br><span class="line">      name          &#x3D; &quot;validator-trial&quot;</span><br><span class="line">      force_destroy &#x3D; false</span><br><span class="line">      storage_class &#x3D; &quot;REGIONAL&quot;</span><br><span class="line">      location      &#x3D; &quot;us-central1-a&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -209,13 +203,13 @@
 
 <p>Validationによりポリシー違反を検知しました！🚫</p>
 <p>main.tf を修正して..</p>
-<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">resource "google_storage_bucket" "validator_trial" &#123;</span><br><span class="line">      project       = &lt;your project&gt;</span><br><span class="line">      name          = "validator-trial"</span><br><span class="line">      force_destroy = false</span><br><span class="line">      storage_class = "REGIONAL"</span><br><span class="line"><span class="deletion">-     location      = "us-central1-a"</span></span><br><span class="line"><span class="addition">+     location      = "asia-northeast1"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">resource &quot;google_storage_bucket&quot; &quot;validator_trial&quot; &#123;</span><br><span class="line">      project       = &lt;your project&gt;</span><br><span class="line">      name          = &quot;validator-trial&quot;</span><br><span class="line">      force_destroy = false</span><br><span class="line">      storage_class = &quot;REGIONAL&quot;</span><br><span class="line"><span class="deletion">-     location      = &quot;us-central1-a&quot;</span></span><br><span class="line"><span class="addition">+     location      = &quot;asia-northeast1&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>再度実行してみると..</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ terraform-validator validate --policy-path=<span class="variable">$&#123;POLICY_PATH&#125;</span> ./terraform.tfplan.json</span><br><span class="line">No violations found</span><br></pre></td></tr></table></figure>
 
 <p>今度はValidationが成功しました！✅ 期待通りの動きをしてくれました。</p>
-<h1 id="ポリシー定義-Policy-as-code"><a href="#ポリシー定義-Policy-as-code" class="headerlink" title="ポリシー定義 (Policy as code)"></a>ポリシー定義 (Policy as code)</h1><p>サンプルポリシーは、先ほど利用した <a href="https://github.com/forseti-security/policy-library/tree/master/samples" target="_blank" rel="noopener">forseti-security/policy-library</a> にあります。これらのyamlファイルを <code>POLICY_PATH</code> で定義した <code>/&lt;your_work_space&gt;/policy-library</code> の中の <code>policies/constraints/</code> 配下に配置すればOKです。Policy as codeが簡単に実現できます。<br>以下に、サンプルから一部をピックアップしてご紹介します。セキュリティポリシーを定義できるほかにも、リソースの命名規則の制限ができたりするのは地味に嬉しいですね。</p>
+<h1 id="ポリシー定義-Policy-as-code"><a href="#ポリシー定義-Policy-as-code" class="headerlink" title="ポリシー定義 (Policy as code)"></a>ポリシー定義 (Policy as code)</h1><p>サンプルポリシーは、先ほど利用した <a target="_blank" rel="noopener" href="https://github.com/forseti-security/policy-library/tree/master/samples">forseti-security/policy-library</a> にあります。これらのyamlファイルを <code>POLICY_PATH</code> で定義した <code>/&lt;your_work_space&gt;/policy-library</code> の中の <code>policies/constraints/</code> 配下に配置すればOKです。Policy as codeが簡単に実現できます。<br>以下に、サンプルから一部をピックアップしてご紹介します。セキュリティポリシーを定義できるほかにも、リソースの命名規則の制限ができたりするのは地味に嬉しいですね。</p>
 <h4 id="ポリシー定義のサンプル"><a href="#ポリシー定義のサンプル" class="headerlink" title="ポリシー定義のサンプル"></a>ポリシー定義のサンプル</h4><ul>
 <li>一般的な制限<ul>
 <li>リソースの命名規則(正規表現で指定)</li>
@@ -259,15 +253,15 @@
 </ul>
 </li>
 </ul>
-<p>どのような制限をかけることができるかイメージできたでしょうか。実はこちらに用意されていないものでも、Custom Policyとして自身でポリシールールを記述することもできます。詳細は<a href="https://github.com/forseti-security/policy-library/blob/master/docs/constraint_template_authoring.md" target="_blank" rel="noopener">こちら</a></p>
+<p>どのような制限をかけることができるかイメージできたでしょうか。実はこちらに用意されていないものでも、Custom Policyとして自身でポリシールールを記述することもできます。詳細は<a target="_blank" rel="noopener" href="https://github.com/forseti-security/policy-library/blob/master/docs/constraint_template_authoring.md">こちら</a></p>
 <h1 id="実際の運用"><a href="#実際の運用" class="headerlink" title="実際の運用"></a>実際の運用</h1><p>実行方法とポリシーの定義方法が分かったところで、実際の運用方法についてです。<br>以下のように、TerraformのソースコードのPRに対して、Terraform Validatorを実行し、結果をPRにフィードバックさせるようにするのが良いと思います。Githubと連携が可能であれば、CloudBuildで以下のようにCIを回すのが簡単でよいです。</p>
 <img src="/images/20200213/photo_20200213_04.png">
 
 <p>Cloud BuildのSteps イメージ</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">steps:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">gcr.io/config-validator/terraform-validator</span></span><br><span class="line">  <span class="attr">entrypoint:</span> <span class="string">terraform</span></span><br><span class="line">  <span class="attr">dir:</span> <span class="string">your-terraform-folder</span></span><br><span class="line">  <span class="attr">args:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">init</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">gcr.io/config-validator/terraform-validator</span></span><br><span class="line">  <span class="attr">dir:</span> <span class="string">your-terraform-folder</span></span><br><span class="line">  <span class="attr">entrypoint:</span> <span class="string">terraform</span></span><br><span class="line">  <span class="attr">args:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">plan</span> </span><br><span class="line">  <span class="bullet">-</span> <span class="string">-out=terraform.tfplan</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">gcr.io/config-validator/terraform-validator</span></span><br><span class="line">  <span class="attr">entrypoint:</span> <span class="string">"/bin/bash"</span></span><br><span class="line">  <span class="attr">args:</span> <span class="string">['-c',</span> <span class="string">'terraform show -json terraform.tfplan &gt; terraform.tfplan.json'</span><span class="string">]</span></span><br><span class="line">  <span class="attr">dir:</span> <span class="string">your-terraform-folder</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">gcr.io/config-validator/terraform-validator</span></span><br><span class="line">  <span class="attr">dir:</span> <span class="string">your-terraform-folder</span></span><br><span class="line">  <span class="attr">args:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">validate</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">--policy-path=/&lt;your_work_space&gt;/policy-library</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">your-terraform-folder/terraform.tfplan.json</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">steps:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">gcr.io/config-validator/terraform-validator</span></span><br><span class="line">  <span class="attr">entrypoint:</span> <span class="string">terraform</span></span><br><span class="line">  <span class="attr">dir:</span> <span class="string">your-terraform-folder</span></span><br><span class="line">  <span class="attr">args:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">init</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">gcr.io/config-validator/terraform-validator</span></span><br><span class="line">  <span class="attr">dir:</span> <span class="string">your-terraform-folder</span></span><br><span class="line">  <span class="attr">entrypoint:</span> <span class="string">terraform</span></span><br><span class="line">  <span class="attr">args:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">plan</span> </span><br><span class="line">  <span class="bullet">-</span> <span class="string">-out=terraform.tfplan</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">gcr.io/config-validator/terraform-validator</span></span><br><span class="line">  <span class="attr">entrypoint:</span> <span class="string">&quot;/bin/bash&quot;</span></span><br><span class="line">  <span class="attr">args:</span> [<span class="string">&#x27;-c&#x27;</span>, <span class="string">&#x27;terraform show -json terraform.tfplan &gt; terraform.tfplan.json&#x27;</span>]</span><br><span class="line">  <span class="attr">dir:</span> <span class="string">your-terraform-folder</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">gcr.io/config-validator/terraform-validator</span></span><br><span class="line">  <span class="attr">dir:</span> <span class="string">your-terraform-folder</span></span><br><span class="line">  <span class="attr">args:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">validate</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">--policy-path=/&lt;your_work_space&gt;/policy-library</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">your-terraform-folder/terraform.tfplan.json</span></span><br></pre></td></tr></table></figure>
 
 <p>PR上でのフィードバックのイメージ<br><img src="/images/20200213/photo_20200213_05.png"></p>
-<h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>本記事ではあまり触れませんでしたが、実は、<a href="https://forsetisecurity.org/" target="_blank" rel="noopener">Forseti</a>というツールを用いてOngoingでの監視も可能です。こちらもGCPが公開しているオープンソースのツールです。これを用いれば、一元管理されたポリシーでTerraform経由ではない手作業によるポリシー違反の発生も検知することができます。</p>
+<h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>本記事ではあまり触れませんでしたが、実は、<a target="_blank" rel="noopener" href="https://forsetisecurity.org/">Forseti</a>というツールを用いてOngoingでの監視も可能です。こちらもGCPが公開しているオープンソースのツールです。これを用いれば、一元管理されたポリシーでTerraform経由ではない手作業によるポリシー違反の発生も検知することができます。</p>
 <img src="/images/20200213/photo_20200213_06.png">
 
 
@@ -330,13 +324,25 @@
     
   
     
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
       
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210310/">
-                  本番データが急に欲しくなったアナタに贈る、CloudSQLのサーバレスエクスポートを試してみた
+                <a href="https://future-architect.github.io/articles/20200709/">
+                  GoでWebアプリ開発時にあるあるだったレビューコメント
                 </a>
               </li>
             </ul>
@@ -351,8 +357,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210309/">
-                  PubSubのメッセージスキーマを試してみる
+                <a href="https://future-architect.github.io/articles/20200630/">
+                  go-swaggerを用いたWebアプリケーション開発Tips19選
                 </a>
               </li>
             </ul>
@@ -367,8 +373,40 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210307/">
-                  GCP連載2021を始めます
+                <a href="https://future-architect.github.io/articles/20200609/">
+                  春の入門祭り🌸 #7 作って学ぶGraphQL。gqlgenを用いて鉄道データ検索API開発入門
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200530/">
+                  フューチャー技術ブログの運営で心がけていること
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200311/">
+                  JavaプログラマーのためのGo言語入門
                 </a>
               </li>
             </ul>
@@ -382,11 +420,17 @@
     
   
     
+  
+    
       
     
   
     
+      
+    
   
+    
+      
     
   
     
@@ -423,56 +467,12 @@
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210301/">
-                  【登壇しました】アレクサアプリを開発してみたら中々大変だった話
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
     
   
     
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210303/">
-                  Vis Networkで階層グラフを可視化する
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210226/">
-                  アクセシビリティ情報を使った壊れにくいE2Eテスト
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
     
   
     
@@ -488,11 +488,11 @@
     
   
     
-  
-    
-  
-    
       
+    
+  
+    
+  
     
   
     
@@ -503,24 +503,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210207/">
-                  Go 1.16連載が始まります
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210208/">
-                  Go 1.16からリリースされたgo:embedとは
+                <a href="https://future-architect.github.io/articles/20201109/">
+                  GoのWebアプリ開発でフラットパッケージにした話
                 </a>
               </li>
             </ul>
@@ -541,6 +525,128 @@
   
     
       
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200319/">
+                  今あえてTypeScriptのビルド＆バンドルツールを探してみる
+                </a>
+              </li>
+            </ul>
+          </div>
         
       
     
@@ -548,70 +654,10 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
       
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
       
     
   
@@ -627,142 +673,6 @@
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -772,27 +682,15 @@
     
       
         
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20191111/">
+                  Go Cloud#1 概要とBlobへの活用方法
+                </a>
+              </li>
+            </ul>
+          </div>
         
       
     
@@ -800,6 +698,22 @@
     
   
     
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
   
     
       
@@ -816,13 +730,7 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
+      
     
   
     
@@ -833,6 +741,12 @@
   
     
       
+    
+  
+    
+      
+    
+  
     
   
     
@@ -852,38 +766,6 @@
     
   
     
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
   
     
   
@@ -893,10 +775,20 @@
   
     
       
+        
+      
     
   
     
+      
+        
+      
+    
   
+    
+      
+        
+      
     
   
     
@@ -912,7 +804,41 @@
     
   
     
+      
+    
   
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -944,149 +870,11 @@
     
   
     
-      
-    
   
     
       
     
   
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
     
   
     
@@ -1104,30 +892,6 @@
     
   
     
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
   
     
   
@@ -1140,7 +904,11 @@
     
   
     
+  
+    
       
+    
+  
     
   
     
@@ -1148,15 +916,17 @@
     
   
     
-      
-        
-      
+  
+    
+  
     
   
     
   
     
       
+    
+  
     
   
     
@@ -1188,37 +958,9 @@
     
   
     
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
   
     
   
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-        
-      
     
   
     
@@ -1228,43 +970,7 @@
     
   
     
-      
-        
-      
-    
   
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
     
   
     
@@ -1298,26 +1004,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
       
     
   
@@ -1340,62 +1026,6 @@
     
   
     
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
   
     
   
@@ -1406,33 +1036,11 @@
     
   
     
-      
-    
-  
-    
-      
-        
-      
-    
   
     
   
     
   
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
     
   
     
@@ -1474,6 +1082,132 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
       
     
   
@@ -1501,8 +1235,256 @@
   
     
       
+        
+      
     
   
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -1560,23 +1542,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (105)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/DB/">DB (12)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Programming/">Programming (138)</a>
 	</li>
       
 	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (107)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
 	</li>
       
 	<li>
@@ -1753,19 +1735,15 @@
 
   
 <script src="/metronic/assets/plugins/jquery.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/corporate/scripts/layout.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script type="text/javascript">
@@ -1789,24 +1767,7 @@ ga('send', 'pageview');
 <!-- End Google Analytics -->
 
 
-<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({{ JSON.stringify(config) }});
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i=0; i < all.length; i += 1) {
-      all[i].SourceElement().parentNode.className += ' has-jax';
-    }
-  });
-</script>
-
-<script type="text/javascript" src="{{ src }}">
-</script>
-<!-- End: Injected MathJax -->
-<!-- hexo-inject:end -->
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 
 </body>
 </html>

@@ -41,30 +41,24 @@
   <!-- Global styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Global styles END -->
 
   <!-- Theme styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/css/theme-styles.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Theme styles END -->
 <meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
@@ -146,7 +140,7 @@
         <img src="/images/20200522/top.png">
 
 <h1 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h1><p>TIG DX所属の多賀です。最近は設計をしつつ Go も触れて引き続き楽しく仕事してます。</p>
-<p>今回は、<a href="https://pkg.go.dev/errors?tab=doc" target="_blank" rel="noopener">errors</a> package を一部利用して、エラーコードベースのエラーハンドリング処理を実装しました。また、morikuni/failure を利用した実装への書き換えも試してみています。</p>
+<p>今回は、<a target="_blank" rel="noopener" href="https://pkg.go.dev/errors?tab=doc">errors</a> package を一部利用して、エラーコードベースのエラーハンドリング処理を実装しました。また、morikuni/failure を利用した実装への書き換えも試してみています。</p>
 <h1 id="エラーコードベースの例外ハンドリングについて"><a href="#エラーコードベースの例外ハンドリングについて" class="headerlink" title="エラーコードベースの例外ハンドリングについて"></a>エラーコードベースの例外ハンドリングについて</h1><p>前提としてGoで書かれた HTTP APIサーバーに対してのエラーハンドリングについて記載します。</p>
 <p><strong>エラーコードベースの例外ハンドリング</strong>についてですが、アプリケーションで発生するエラーを事前にラベリングしてコード化し、コードをもとにエラーハンドリングを実施することとします。発生時の運用対応や影響について、事前に一覧で整理することで、運用負荷を下げる意味があると考えています。(補足: Futureではメッセージコードと呼称することが多いですが、一般的な命名であるエラーコードで統一します)</p>
 <p>以下のような形で整理しています。<br>実際は、エラーコード別に運用アクションも合わせて整理します。</p>
@@ -176,38 +170,38 @@
 <p>パッケージの構造としてはシンプルな以下のイメージです。</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── handler    <span class="comment"># httpリクエストをハンドリングする層</span></span><br><span class="line">├── service    <span class="comment"># ビジネスロジック層 </span></span><br><span class="line">└── infra      <span class="comment"># DBや外部API等の外部リソースへアクセスする層</span></span><br></pre></td></tr></table></figure>
 
-<h2 id="エラーコード別のエラーを定義"><a href="#エラーコード別のエラーを定義" class="headerlink" title="エラーコード別のエラーを定義"></a>エラーコード別のエラーを定義</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> apperror</span><br><span class="line"></span><br><span class="line"><span class="comment">// AppError はエラーコードが付与されたエラーのinterface</span></span><br><span class="line"><span class="keyword">type</span> AppError <span class="keyword">interface</span> &#123;</span><br><span class="line">	error</span><br><span class="line">	Code() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以下にエラーコード別にカスタムエラーを定義</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> ClientError <span class="keyword">struct</span> &#123;</span><br><span class="line">	Err error</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e ClientError)</span> <span class="title">Error</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="string">"client error"</span> + <span class="string">": "</span> + e.Err.Error()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e ClientError)</span> <span class="title">Code</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="string">"XXX0001"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e *ClientError)</span> <span class="title">Unwrap</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> e.Err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="エラーコード別のエラーを定義"><a href="#エラーコード別のエラーを定義" class="headerlink" title="エラーコード別のエラーを定義"></a>エラーコード別のエラーを定義</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> apperror</span><br><span class="line"></span><br><span class="line"><span class="comment">// AppError はエラーコードが付与されたエラーのinterface</span></span><br><span class="line"><span class="keyword">type</span> AppError <span class="keyword">interface</span> &#123;</span><br><span class="line">	error</span><br><span class="line">	Code() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 以下にエラーコード別にカスタムエラーを定義</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> ClientError <span class="keyword">struct</span> &#123;</span><br><span class="line">	Err error</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e ClientError)</span> <span class="title">Error</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="string">&quot;client error&quot;</span> + <span class="string">&quot;: &quot;</span> + e.Err.Error()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e ClientError)</span> <span class="title">Code</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="string">&quot;XXX0001&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e *ClientError)</span> <span class="title">Unwrap</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> e.Err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="handler-層に返却される-error-を必ずエラーコード対応Error型とする"><a href="#handler-層に返却される-error-を必ずエラーコード対応Error型とする" class="headerlink" title="handler 層に返却される error を必ずエラーコード対応Error型とする"></a>handler 層に返却される error を必ずエラーコード対応Error型とする</h2><p>各層のerror を wrappingして handler 層に返却します。ここは愚直にやらないといけないところです。(静的解析ツールを作ってチェックする機構を用意するほうがより良いですね。)</p>
 <p>関数の戻り値の第2引数自体を <code>AppError</code> 型にすることも考えられますが、標準 error インターフェイスを尊重したほうが良いとのノウハウがあるので対応しませんでした。</p>
-<p>参考: <a href="https://www.slideshare.net/yuichi1004/golangtokyo-6-in-japanese?ref=https://golangtokyo.connpass.com/event/57168/presentation/" target="_blank" rel="noopener">初めてGolangで大規模Microservicesを作り得た教訓</a></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> service</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(h User)</span> <span class="title">Search</span><span class="params">(id <span class="keyword">string</span>)</span> <span class="params">(<span class="keyword">string</span>, error)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 処理...</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// err を wrap してエラー情報を追加する</span></span><br><span class="line">		<span class="keyword">return</span> <span class="string">""</span>, apperror.ClientError&#123;Err: fmt.Errorf(<span class="string">"invalid id = %v: %w"</span>, id, err)&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>参考: <a target="_blank" rel="noopener" href="https://www.slideshare.net/yuichi1004/golangtokyo-6-in-japanese?ref=https://golangtokyo.connpass.com/event/57168/presentation/">初めてGolangで大規模Microservicesを作り得た教訓</a></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> service</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(h User)</span> <span class="title">Search</span><span class="params">(id <span class="keyword">string</span>)</span> <span class="params">(<span class="keyword">string</span>, error)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 処理...</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// err を wrap してエラー情報を追加する</span></span><br><span class="line">		<span class="keyword">return</span> <span class="string">&quot;&quot;</span>, apperror.ClientError&#123;Err: fmt.Errorf(<span class="string">&quot;invalid id = %v: %w&quot;</span>, id, err)&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="エラーログを出力する箇所を集約"><a href="#エラーログを出力する箇所を集約" class="headerlink" title="エラーログを出力する箇所を集約"></a>エラーログを出力する箇所を集約</h2><p>handler 層に集約させます。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> handler</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">UserHandleFunc</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">	app := service.User&#123;&#125;</span><br><span class="line">	h, err := app.Search(<span class="string">"id1"</span>)</span><br><span class="line">	<span class="comment">// err は 必ずエラーコード定義のエラー</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// エラーから共通のログを出力する関数を呼び出す</span></span><br><span class="line">		errorLog(err)</span><br><span class="line">		w.WriteHeader(<span class="number">500</span>)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">errorLog</span><span class="params">(err error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> e, ok := err.(apperror.AppError); ok &#123;</span><br><span class="line">		<span class="comment">// エラーコードとメッセージをログに出力</span></span><br><span class="line">		log.Printf(<span class="string">"[%v] %v\n"</span>, e.Code(), e.Error())</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="comment">// 予想外のエラー(実装ミス)</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> handler</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">UserHandleFunc</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">	app := service.User&#123;&#125;</span><br><span class="line">	h, err := app.Search(<span class="string">&quot;id1&quot;</span>)</span><br><span class="line">	<span class="comment">// err は 必ずエラーコード定義のエラー</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// エラーから共通のログを出力する関数を呼び出す</span></span><br><span class="line">		errorLog(err)</span><br><span class="line">		w.WriteHeader(<span class="number">500</span>)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">errorLog</span><span class="params">(err error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> e, ok := err.(apperror.AppError); ok &#123;</span><br><span class="line">		<span class="comment">// エラーコードとメッセージをログに出力</span></span><br><span class="line">		log.Printf(<span class="string">&quot;[%v] %v\n&quot;</span>, e.Code(), e.Error())</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="comment">// 予想外のエラー(実装ミス)</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>上記の通りに実装することで、エラーコードにエラーを集約すること自体はできました。</p>
 <p>ただ、独自エラーを定義して Wrapするところはもっと書きやすくできないか、検討の余地がありそうだと感じました。</p>
 <h1 id="morikuni-failure-を利用できないか"><a href="#morikuni-failure-を利用できないか" class="headerlink" title="morikuni/failure を利用できないか?"></a>morikuni/failure を利用できないか?</h1><p>morikuni/failure は morikuni さんが作成されたエラーハンドリング向けのライブラリです。errors package 存在前より開発されているライブラリです。</p>
-<p><a href="https://github.com/morikuni/failure" target="_blank" rel="noopener">https://github.com/morikuni/failure</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/morikuni/failure">https://github.com/morikuni/failure</a></p>
 <blockquote>
 <p>Package failure provides an error represented as error code and extensible error interface with wrappers.</p>
 </blockquote>
 <p>とのことなので、エラコードベースの利用にマッチしそうです。</p>
-<p>以前の <a href="https://speakerdeck.com/morikuni/designing-errors" target="_blank" rel="noopener">Go Conference 2019 Spring にて発表されている資料</a> にて、failure と errors (当時は xerrors) の使い分けについて明確に説明されています。とてもわかりやすくて、しっくりきたことを覚えています。</p>
+<p>以前の <a target="_blank" rel="noopener" href="https://speakerdeck.com/morikuni/designing-errors">Go Conference 2019 Spring にて発表されている資料</a> にて、failure と errors (当時は xerrors) の使い分けについて明確に説明されています。とてもわかりやすくて、しっくりきたことを覚えています。</p>
 <img src="/images/20200522/photo_20200522_01.png" style="border:solid 1px #000000">
 
-<p>参考: <a href="https://speakerdeck.com/morikuni/designing-errors?slide=33" target="_blank" rel="noopener">https://speakerdeck.com/morikuni/designing-errors?slide=33</a></p>
+<p>参考: <a target="_blank" rel="noopener" href="https://speakerdeck.com/morikuni/designing-errors?slide=33">https://speakerdeck.com/morikuni/designing-errors?slide=33</a></p>
 <h2 id="やってみた"><a href="#やってみた" class="headerlink" title="やってみた"></a>やってみた</h2><p>morikuni/failure を利用して上記のコードを書き換えてみました。</p>
 <h3 id="エラーコード別のエラーを定義-1"><a href="#エラーコード別のエラーを定義-1" class="headerlink" title="エラーコード別のエラーを定義"></a>エラーコード別のエラーを定義</h3><p>とてもシンプルですね。追加も簡単になりそうです。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> apperror</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"github.com/morikuni/failure"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	ClientError       failure.StringCode = <span class="string">"XXX0001"</span></span><br><span class="line">	DBConnectionError failure.StringCode = <span class="string">"XXX0002"</span></span><br><span class="line">	XXAPIRequestError failure.StringCode = <span class="string">"XXX0003"</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> apperror</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;github.com/morikuni/failure&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	ClientError       failure.StringCode = <span class="string">&quot;XXX0001&quot;</span></span><br><span class="line">	DBConnectionError failure.StringCode = <span class="string">&quot;XXX0002&quot;</span></span><br><span class="line">	XXAPIRequestError failure.StringCode = <span class="string">&quot;XXX0003&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
 
 <h3 id="handler-層に返却される-error-を必ずエラーコードに対応させた独自エラーとする"><a href="#handler-層に返却される-error-を必ずエラーコードに対応させた独自エラーとする" class="headerlink" title="handler 層に返却される error を必ずエラーコードに対応させた独自エラーとする"></a>handler 層に返却される error を必ずエラーコードに対応させた独自エラーとする</h3><p>morikuni/failure でも、エラーコードへの変換 ( <code>failure.Translate</code>  ) や エラーコードの Wrap ( <code>failure.Wrap</code> ) は可能です。<br>(ちなみに、failureで生成したエラーも errors package のインターフェイスを満たしています。)</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> service</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"errors"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"github.com/xxx/failure_sample/apperror"</span></span><br><span class="line">	<span class="string">"github.com/morikuni/failure"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(h User)</span> <span class="title">Search</span><span class="params">(id <span class="keyword">string</span>)</span> <span class="params">(<span class="keyword">string</span>, error)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 処理...</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// err を wrap してエラー情報を追加する</span></span><br><span class="line">		<span class="keyword">return</span> <span class="string">""</span>, failure.Translate(err, apperror.ClientError, failure.Messagef(<span class="string">"invalid id=%v"</span>, id))</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> service</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;errors&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/xxx/failure_sample/apperror&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/morikuni/failure&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(h User)</span> <span class="title">Search</span><span class="params">(id <span class="keyword">string</span>)</span> <span class="params">(<span class="keyword">string</span>, error)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 処理...</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// err を wrap してエラー情報を追加する</span></span><br><span class="line">		<span class="keyword">return</span> <span class="string">&quot;&quot;</span>, failure.Translate(err, apperror.ClientError, failure.Messagef(<span class="string">&quot;invalid id=%v&quot;</span>, id))</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 
 <h3 id="エラーログを出力する箇所を集約-1"><a href="#エラーログを出力する箇所を集約-1" class="headerlink" title="エラーログを出力する箇所を集約"></a>エラーログを出力する箇所を集約</h3><p>README の sample を参考にハンドリング処理を実装してみました。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> handler</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">	<span class="string">"net/http"</span></span><br><span class="line"></span><br><span class="line">	<span class="string">"github.com/xxx/failure_sample/apperror"</span></span><br><span class="line">	<span class="string">"github.com/xxx/failure_sample/service"</span></span><br><span class="line">	<span class="string">"github.com/morikuni/failure"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">UserHandleFunc</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">	app := service.User&#123;&#125;</span><br><span class="line">	_, err := app.Search(<span class="string">"id1"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		errorLog(err)</span><br><span class="line">		w.WriteHeader(httpStatus(err))</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	w.WriteHeader(http.StatusOK)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">errorLog</span><span class="params">(err error)</span></span> &#123;</span><br><span class="line">	code, ok := failure.CodeOf(err)</span><br><span class="line">	<span class="keyword">if</span> !ok &#123;</span><br><span class="line">		log.Printf(<span class="string">"unexpected error: %v\n"</span>, err)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	log.Printf(<span class="string">"[%v] %v\n"</span>, code, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">httpStatus</span><span class="params">(err error)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">switch</span> c, _ := failure.CodeOf(err); c &#123;</span><br><span class="line">	<span class="keyword">case</span> apperror.ClientError:</span><br><span class="line">		<span class="keyword">return</span> http.StatusBadRequest</span><br><span class="line">	<span class="keyword">default</span>:</span><br><span class="line">		<span class="keyword">return</span> http.StatusInternalServerError</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> handler</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;net/http&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/xxx/failure_sample/apperror&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/xxx/failure_sample/service&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/morikuni/failure&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">UserHandleFunc</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">	app := service.User&#123;&#125;</span><br><span class="line">	_, err := app.Search(<span class="string">&quot;id1&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		errorLog(err)</span><br><span class="line">		w.WriteHeader(httpStatus(err))</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	w.WriteHeader(http.StatusOK)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">errorLog</span><span class="params">(err error)</span></span> &#123;</span><br><span class="line">	code, ok := failure.CodeOf(err)</span><br><span class="line">	<span class="keyword">if</span> !ok &#123;</span><br><span class="line">		log.Printf(<span class="string">&quot;unexpected error: %v\n&quot;</span>, err)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	log.Printf(<span class="string">&quot;[%v] %v\n&quot;</span>, code, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">httpStatus</span><span class="params">(err error)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">switch</span> c, _ := failure.CodeOf(err); c &#123;</span><br><span class="line">	<span class="keyword">case</span> apperror.ClientError:</span><br><span class="line">		<span class="keyword">return</span> http.StatusBadRequest</span><br><span class="line">	<span class="keyword">default</span>:</span><br><span class="line">		<span class="keyword">return</span> http.StatusInternalServerError</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h1 id="感想"><a href="#感想" class="headerlink" title="感想"></a>感想</h1><p>エラーコードベースの例外ハンドリングのTipsについて記載しました。</p>
 <p>failure を利用したほうがよりシンプルに書けて良いのではないかと感じています。<br>また、他のメリットとしては以下がありそうです。</p>
@@ -217,9 +211,9 @@
 </ul>
 <p>failureは実戦で使えてないので、次回チャレンジしてみたいです。</p>
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
-<li><a href="https://blog.golang.org/go1.13-errors" target="_blank" rel="noopener">Working with Errors in Go 1.13 - The Go Blog</a></li>
-<li><a href="https://pkg.go.dev/github.com/morikuni/failure?tab=doc" target="_blank" rel="noopener">failure package · go.dev</a></li>
-<li><a href="https://speakerdeck.com/morikuni/designing-errors" target="_blank" rel="noopener">エラー設計について / Designing Errors - Speaker Deck</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.golang.org/go1.13-errors">Working with Errors in Go 1.13 - The Go Blog</a></li>
+<li><a target="_blank" rel="noopener" href="https://pkg.go.dev/github.com/morikuni/failure?tab=doc">failure package · go.dev</a></li>
+<li><a target="_blank" rel="noopener" href="https://speakerdeck.com/morikuni/designing-errors">エラー設計について / Designing Errors - Speaker Deck</a></li>
 </ul>
 <h2 id="関連記事"><a href="#関連記事" class="headerlink" title="関連記事"></a>関連記事</h2><p>Goに関連した他の連載企画です。</p>
 <ul>
@@ -279,8 +273,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210311/">
-                  PythonでCloud Operationsの機能を使ってみる
+                <a href="https://future-architect.github.io/articles/20210313/">
+                  CloudNative Days Spring 2021 ONLINEに登壇しました
                 </a>
               </li>
             </ul>
@@ -289,20 +283,6 @@
       
     
   
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
     
   
     
@@ -322,199 +302,13 @@
     
   
     
-  
-    
-  
-    
       
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210305/">
-                  インフラ入門ーインフラ要件定義編ー
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210303/">
-                  Vis Networkで階層グラフを可視化する
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210205/">
-                  Good First Issue から OSS へコントリビュートしてみた
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201206/">
-                  AWSマネージドAirflow(MWAA)についてのFAQ
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201119/">
-                  PythonistaがGo言語に入門してみた
+                <a href="https://future-architect.github.io/articles/20200601/">
+                  春の入門祭り 🌸 #01 Goのテストに入門してみよう！
                 </a>
               </li>
             </ul>
@@ -535,10 +329,80 @@
   
     
       
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200609/">
+                  春の入門祭り🌸 #7 作って学ぶGraphQL。gqlgenを用いて鉄道データ検索API開発入門
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
   
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210304/">
+                  mxGraphで階層グラフを可視化する
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210226/">
+                  アクセシビリティ情報を使った壊れにくいE2Eテスト
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
     
   
     
@@ -561,14 +425,100 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201028/">
-                  読書の秋に読みたい、オライリー謎書籍10選
+                <a href="https://future-architect.github.io/articles/20210107/">
+                  Electronの使い方 Web開発の技術でデスクトップアプリを作ろう
                 </a>
               </li>
             </ul>
           </div>
         
       
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200730/">
+                  Redux-Toolkitに学ぶ、TypeScriptの型推論とこれからのAPIデザイン
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
     
   
     
@@ -583,8 +533,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201020/">
-                  ProxyとDockerと新人社員と時々わたし
+                <a href="https://future-architect.github.io/articles/20200703/">
+                  スケーラブルデータベース ～クラウドにおける後悔しないデータベース選定～
                 </a>
               </li>
             </ul>
@@ -597,6 +547,36 @@
   
     
   
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -605,8 +585,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201013/">
-                  2020年秋にVue.jsのアプリケーションを作るなら、押さえておきたい5つのポイント
+                <a href="https://future-architect.github.io/articles/20200401/">
+                  Vue.js最初の難関、「props down, event up」を初心者にわかるように解説してみた
                 </a>
               </li>
             </ul>
@@ -616,226 +596,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
       
         
       
@@ -843,300 +603,6 @@
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
     
   
     
@@ -1156,163 +622,9 @@
     
   
     
-  
-    
-  
-    
-  
-    
       
         
       
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
     
   
     
@@ -1342,6 +654,120 @@
     
   
     
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
       
     
   
@@ -1356,6 +782,24 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
       
     
   
@@ -1364,7 +808,197 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
       
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1406,6 +1040,126 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
       
         
       
@@ -1419,6 +1173,88 @@
   
     
       
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
         
       
     
@@ -1438,11 +1274,167 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
       
         
       
     
   
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -1500,23 +1492,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (105)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/DB/">DB (12)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Programming/">Programming (138)</a>
 	</li>
       
 	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (107)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
 	</li>
       
 	<li>
@@ -1693,19 +1685,15 @@
 
   
 <script src="/metronic/assets/plugins/jquery.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/corporate/scripts/layout.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script type="text/javascript">
