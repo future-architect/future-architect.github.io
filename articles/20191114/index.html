@@ -21,9 +21,10 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20191114/go-cdk-logo-gopherblue.png">
 <meta property="article:published_time" content="2019-11-14T02:19:44.000Z">
-<meta property="article:modified_time" content="2021-03-05T01:20:57.465Z">
+<meta property="article:modified_time" content="2021-03-11T03:11:11.602Z">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="GoCDK">
+<meta property="article:tag" content="SQS">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://future-architect.github.io/images/20191114/go-cdk-logo-gopherblue.png">
   
@@ -122,7 +123,9 @@
   
     <a href="/tags/Go/" title="Go">Go</a>,
   
-    <a href="/tags/GoCDK/" title="GoCDK">GoCDK</a>
+    <a href="/tags/GoCDK/" title="GoCDK">GoCDK</a>,
+  
+    <a href="/tags/SQS/" title="SQS">SQS</a>
   
 
 
@@ -161,7 +164,7 @@
 <p>DocStoreでテーブルを10個使うアプリケーションがあり、データベース名までは同じだけど、コレクション名（≒RDBのテーブル）だけ置き換えたいみたいなケースでは、データベース名のところまでの1つだけを設定値として持ち、各テーブルのURLはプログラマブルに作りたいですよね？しかし、どこを書き換えればコレクション名が変わるかなど、細かいルールがバックエンドのドライバーごとに解釈が違うという難点があります。</p>
 <p>ということでGo Cloud用のURL正規化パッケージを作りました。</p>
 <ul>
-<li><a href="https://github.com/future-architect/gocloudurls" target="_blank" rel="noopener">github.com/future-architect/gocloudurls</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/future-architect/gocloudurls">github.com/future-architect/gocloudurls</a></li>
 </ul>
 <p>このパッケージには、ちょっと省略形で書いたURLをGo Cloudで解釈できるURLに補完したり、一部書き換えたりといった関数が含まれています。なお、どの関数も、正規表現やテンプレートのパッケージと同じく、<code>Must</code>が接頭辞についた関数も提供しております。</p>
 <h1 id="BlobのURLの正規化"><a href="#BlobのURLの正規化" class="headerlink" title="BlobのURLの正規化"></a>BlobのURLの正規化</h1><p><code>NormalizeBlobURL(srcUrl string) (string, error)</code>がBlobのURLの正規化の関数です。コマンドラインツールでユーザーが入力するフォルダ名を<code>file://folder</code>形式にするといったちょっとした修正をします。Go Cloud、Cloudだけで使うのはもったいなので、CLIでも使おうと思って追加しました。リージョン名は<code>AWS_REGION</code>という環境変数があればそこから補完します。</p>
@@ -176,23 +179,23 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Option <span class="keyword">struct</span> &#123;</span><br><span class="line">	KeyName      <span class="keyword">string</span> <span class="comment">// 主キー名(デフォルトは_id)</span></span><br><span class="line">	PartitionKey <span class="keyword">string</span> <span class="comment">// DynamoDBのパーティションキー（後述）</span></span><br><span class="line">	Collection   <span class="keyword">string</span> <span class="comment">// コレクション名を上書きしたい場合</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>例えば、memdocstoreバックエンドの場合は次のようなURLが生成されます。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">goclodurls.NormalizeDocStoreURL(<span class="string">"mem://"</span>, goclodurls.Option&#123;</span><br><span class="line">    Collection: <span class="string">"addresses"</span>,</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// "mem://addresses/_id"</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">goclodurls.NormalizeDocStoreURL(<span class="string">&quot;mem://&quot;</span>, goclodurls.Option&#123;</span><br><span class="line">    Collection: <span class="string">&quot;addresses&quot;</span>,</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// &quot;mem://addresses/_id&quot;</span></span><br></pre></td></tr></table></figure>
 
 <p>FireStoreの場合は、プロジェクト名/コレクションといった短い名前や、プロジェクト名/ドキュメント名/コレクション名といった短い名前を渡しても、Go Cloudが期待する名前（projectsやdatabasesやdocumentsというパスを挿入、データベース名のデフォルトは<code>(default)</code>を利用する）に書き換えます。最初からvalidな本来のURLを入れることも可能です。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">goclodurls.NormalizeDocStoreURL(<span class="string">"firestore://my-project"</span>, goclodurls.Option&#123;</span><br><span class="line">    Collection: <span class="string">"addresses"</span>,</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// "firestore://projects/my-project/databases/(default)/documents/addresses?name_field=_id"</span></span><br><span class="line">goclodurls.NormalizeDocStoreURL(<span class="string">"firestore://my-project/my-documents/addresses"</span>, goclodurls.Option&#123;&#125;)</span><br><span class="line"><span class="comment">// "firestore://projects/my-project/databases/my-documents/documents/addresses?name_field=_id"</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">goclodurls.NormalizeDocStoreURL(<span class="string">&quot;firestore://my-project&quot;</span>, goclodurls.Option&#123;</span><br><span class="line">    Collection: <span class="string">&quot;addresses&quot;</span>,</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// &quot;firestore://projects/my-project/databases/(default)/documents/addresses?name_field=_id&quot;</span></span><br><span class="line">goclodurls.NormalizeDocStoreURL(<span class="string">&quot;firestore://my-project/my-documents/addresses&quot;</span>, goclodurls.Option&#123;&#125;)</span><br><span class="line"><span class="comment">// &quot;firestore://projects/my-project/databases/my-documents/documents/addresses?name_field=_id&quot;</span></span><br></pre></td></tr></table></figure>
 
 <p>DynamoDBはパーティションキーだけの場合はパーティションキーが主キーになり、パーティションキーとソートキーがあると複合主キーのようになるという特性があります。本ライブラリでは、PartitionKeyが空文字列なら前者のモード(KeyName=パーティションキー)に、PartitionKeyが入っていれば後者のモード(KeyName=ソートキー、PartitionKey=パーティションキー)になるようにしています。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">goclodurls.NormalizeDocStoreURL(<span class="string">"dynamodb://"</span>, goclodurls.Option&#123;</span><br><span class="line">    Collection: <span class="string">"tasks"</span>,</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// "dynamodb://tasks?partition_key=_id"</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">goclodurls.NormalizeDocStoreURL(<span class="string">&quot;dynamodb://&quot;</span>, goclodurls.Option&#123;</span><br><span class="line">    Collection: <span class="string">&quot;tasks&quot;</span>,</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// &quot;dynamodb://tasks?partition_key=_id&quot;</span></span><br></pre></td></tr></table></figure>
 
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">goclodurls.NormalizeDocStoreURL(<span class="string">"dynamodb://"</span>, goclodurls.Option&#123;</span><br><span class="line">    Collection:   <span class="string">"tasks"</span>,</span><br><span class="line">    PartitionKey: <span class="string">"job_id"</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// "dynamodb://tasks?partition_key=job_id&amp;sort_key=_id"</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">goclodurls.NormalizeDocStoreURL(<span class="string">&quot;dynamodb://&quot;</span>, goclodurls.Option&#123;</span><br><span class="line">    Collection:   <span class="string">&quot;tasks&quot;</span>,</span><br><span class="line">    PartitionKey: <span class="string">&quot;job_id&quot;</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// &quot;dynamodb://tasks?partition_key=job_id&amp;sort_key=_id&quot;</span></span><br></pre></td></tr></table></figure>
 
 <h1 id="PubSubの正規化"><a href="#PubSubの正規化" class="headerlink" title="PubSubの正規化"></a>PubSubの正規化</h1><p><code>NormalizePubSubURL(srcUrl string) (string, error)</code>という関数を提供しています。これも今までのものとほぼ同じです。SNSはARNで書いても補完するし、SQSもhttpsのURLを書いても補完します。GCP PubSubはFirestoreと同様に固定のprojects/topicsを省略しても補完します。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">gocloudurls.NormalizePubSubURL(<span class="string">"arn:aws:sns:us-east-2:123456789012:mytopic"</span>)</span><br><span class="line"><span class="comment">// "awssns:///arn:aws:sns:us-east-2:123456789012:mytopic?region=us-east-2"</span></span><br><span class="line"></span><br><span class="line">gocloudurls.NormalizePubSubURL(<span class="string">"https://sqs.us-east-2.amazonaws.com/123456789012/myqueue"</span>)</span><br><span class="line"><span class="comment">// "awssqs://https://sqs.us-east-2.amazonaws.com/123456789012/myqueue?region=us-east-2"</span></span><br><span class="line"></span><br><span class="line">gocloudurls.NormalizePubSubURL(<span class="string">"gcppubsub://myproject/mytopic"</span>)</span><br><span class="line"><span class="comment">// "gcppubsub://projects/myproject/topics/mytopic"</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">gocloudurls.NormalizePubSubURL(<span class="string">&quot;arn:aws:sns:us-east-2:123456789012:mytopic&quot;</span>)</span><br><span class="line"><span class="comment">// &quot;awssns:///arn:aws:sns:us-east-2:123456789012:mytopic?region=us-east-2&quot;</span></span><br><span class="line"></span><br><span class="line">gocloudurls.NormalizePubSubURL(<span class="string">&quot;https://sqs.us-east-2.amazonaws.com/123456789012/myqueue&quot;</span>)</span><br><span class="line"><span class="comment">// &quot;awssqs://https://sqs.us-east-2.amazonaws.com/123456789012/myqueue?region=us-east-2&quot;</span></span><br><span class="line"></span><br><span class="line">gocloudurls.NormalizePubSubURL(<span class="string">&quot;gcppubsub://myproject/mytopic&quot;</span>)</span><br><span class="line"><span class="comment">// &quot;gcppubsub://projects/myproject/topics/mytopic&quot;</span></span><br></pre></td></tr></table></figure>
 
-<h1 id="おまけ"><a href="#おまけ" class="headerlink" title="おまけ"></a>おまけ</h1><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">   Name <span class="keyword">string</span> <span class="string">`docstore:"name"`</span></span><br><span class="line">   Age  <span class="keyword">int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="おまけ"><a href="#おまけ" class="headerlink" title="おまけ"></a>おまけ</h1><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">   Name <span class="keyword">string</span> <span class="string">`docstore:&quot;name&quot;`</span></span><br><span class="line">   Age  <span class="keyword">int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>このようなdocstoreをマッピングする構造体があったとすると次の関数で、テーブル定義のコマンドライン引数を生成します。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ds, err := gocloudurls.NewDynamoDBSchema(&amp;Person&#123;&#125;, </span><br><span class="line">    gocloudurls.MustMustNormalizeDocStoreURL(<span class="string">"dynamodb://persons"</span>))</span><br><span class="line"></span><br><span class="line">ds.CreateTableCommand()</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ds, err := gocloudurls.NewDynamoDBSchema(&amp;Person&#123;&#125;, </span><br><span class="line">    gocloudurls.MustMustNormalizeDocStoreURL(<span class="string">&quot;dynamodb://persons&quot;</span>))</span><br><span class="line"></span><br><span class="line">ds.CreateTableCommand()</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight console"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">aws dynamodb create-table --table-name persons \</span><br><span class="line">  --attribute-definitions AttributeName=name,AttributeType=S \</span><br><span class="line">  --key-schema AttributeName=name,KeyType=HASH \</span><br><span class="line">  --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5</span><br></pre></td></tr></table></figure>
 
@@ -286,33 +289,9 @@
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210307/">
-                  GCP連載2021を始めます
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
     
   
     
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210308/">
-                  Auth0 Rulesのユニットテストを書きたい
-                </a>
-              </li>
-            </ul>
-          </div>
-        
       
     
   
@@ -334,18 +313,6 @@
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210301/">
-                  【登壇しました】アレクサアプリを開発してみたら中々大変だった話
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
     
   
     
@@ -355,18 +322,6 @@
     
   
     
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210226/">
-                  アクセシビリティ情報を使った壊れにくいE2Eテスト
-                </a>
-              </li>
-            </ul>
-          </div>
-        
       
     
   
@@ -392,35 +347,11 @@
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210212/">
-                  Go 1.16のsignal.NotifyContext()
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
     
   
     
   
     
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210207/">
-                  Go 1.16連載が始まります
-                </a>
-              </li>
-            </ul>
-          </div>
-        
       
     
   
@@ -442,70 +373,12 @@
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210108/">
-                  自分の分身(3Dアバター)と自作ワールドを作ってみた
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210107/">
-                  Electronの使い方 Web開発の技術でデスクトップアプリを作ろう
+                <a href="https://future-architect.github.io/articles/20210205/">
+                  Good First Issue から OSS へコントリビュートしてみた
                 </a>
               </li>
             </ul>
@@ -525,136 +398,6 @@
     
   
     
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
   
     
   
@@ -687,15 +430,7 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
+      
     
   
     
@@ -710,16 +445,16 @@
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20201206/">
+                  AWSマネージドAirflow(MWAA)についてのFAQ
+                </a>
+              </li>
+            </ul>
+          </div>
         
       
     
@@ -733,27 +468,13 @@
     
   
     
+  
+    
+  
+    
+  
+    
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -761,17 +482,31 @@
     
       
         
-      
-    
-  
-    
-      
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20201117/">
+                  Goのデバッグ環境 on VSCode
+                </a>
+              </li>
+            </ul>
+          </div>
         
       
     
   
     
       
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20201109/">
+                  GoのWebアプリ開発でフラットパッケージにした話
+                </a>
+              </li>
+            </ul>
+          </div>
         
       
     
@@ -789,6 +524,62 @@
     
       
         
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20201107/">
+                  フューチャーOSS推進タスクフォース始めます
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
       
     
   
@@ -815,6 +606,92 @@
     
   
     
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200910/">
+                  「2020年代のコンテナ時代のPythonアーキテクチャ&デプロイ」というテーマでPyCon.jp 2020で発表してきました
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200807/">
+                  GoとSuffixArray
+                </a>
+              </li>
+            </ul>
+          </div>
+        
       
     
   
@@ -826,17 +703,17 @@
   
     
       
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200730/">
+                  Redux-Toolkitに学ぶ、TypeScriptの型推論とこれからのAPIデザイン
+                </a>
+              </li>
+            </ul>
+          </div>
+        
       
     
   
@@ -851,10 +728,6 @@
     
   
     
-  
-    
-      
-        
       
     
   
@@ -873,103 +746,11 @@
     
   
     
-      
-        
-      
-    
   
     
   
     
   
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
     
   
     
@@ -998,10 +779,28 @@
   
     
       
+        
+      
     
   
     
-      
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1039,6 +838,48 @@
     
   
     
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
       
     
   
@@ -1046,6 +887,452 @@
       
     
   
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
     
   
     
@@ -1071,50 +1358,6 @@
     
   
     
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
   
     
   
@@ -1130,286 +1373,6 @@
       
     
   
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
     
   
     
@@ -1427,6 +1390,28 @@
     
   
     
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
       
     
   
