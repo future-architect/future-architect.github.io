@@ -23,9 +23,9 @@
 <meta property="article:modified_time" content="2021-03-06T03:06:00.913Z">
 <meta property="article:tag" content="AWS">
 <meta property="article:tag" content="Go">
+<meta property="article:tag" content="DynamoDB×Go">
 <meta property="article:tag" content="KVS">
 <meta property="article:tag" content="DynamoDB">
-<meta property="article:tag" content="DynamoDB×Go">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
@@ -41,30 +41,24 @@
   <!-- Global styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Global styles END -->
 
   <!-- Theme styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/css/theme-styles.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Theme styles END -->
 <meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
@@ -125,11 +119,11 @@
   
     <a href="/tags/Go/" title="Go">Go</a>,
   
+    <a href="/tags/DynamoDB%C3%97Go/" title="DynamoDB×Go">DynamoDB×Go</a>,
+  
     <a href="/tags/KVS/" title="KVS">KVS</a>,
   
-    <a href="/tags/DynamoDB/" title="DynamoDB">DynamoDB</a>,
-  
-    <a href="/tags/DynamoDB%C3%97Go/" title="DynamoDB×Go">DynamoDB×Go</a>
+    <a href="/tags/DynamoDB/" title="DynamoDB">DynamoDB</a>
   
 
 
@@ -149,20 +143,20 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、村田です。Go言語でWebサーバを実装していた際にDynamoDBを扱うライブラリとしてGregさんの <a href="https://github.com/guregu/dynamo" target="_blank" rel="noopener">https://github.com/guregu/dynamo</a> を使っていました。（2年ほど稼働していますが、特に問題も出ていません）</p>
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、村田です。Go言語でWebサーバを実装していた際にDynamoDBを扱うライブラリとしてGregさんの <a target="_blank" rel="noopener" href="https://github.com/guregu/dynamo">https://github.com/guregu/dynamo</a> を使っていました。（2年ほど稼働していますが、特に問題も出ていません）</p>
 <p>当時Go初心者だった私は「go dynamo」とすぐさまGoogle先生に問い合わせ、「guregu/dynamoがオススメ」とのエントリーを多数発見しました。オブジェクトの取り回しが隠蔽化されていてとにかく実装が簡単だと記事にも書いてありましたし、私自身も実際そう感じました。</p>
 <p>すでにタイトルからお察しかと思いますが、本記事は連載第1回目です。時代の移ろいに合わせてDynamoDB×Go界隈の事情も刻一刻と変化しています。まずは私の利用していたSDK(guregu/dynamo)についてから本連載をスタートします。</p>
 <h1 id="SDK-guregu-dynamo-を使ってDynamoDBへアクセスする"><a href="#SDK-guregu-dynamo-を使ってDynamoDBへアクセスする" class="headerlink" title="SDK(guregu/dynamo)を使ってDynamoDBへアクセスする"></a>SDK(guregu/dynamo)を使ってDynamoDBへアクセスする</h1><h2 id="ローカルの検証環境を準備"><a href="#ローカルの検証環境を準備" class="headerlink" title="ローカルの検証環境を準備"></a>ローカルの検証環境を準備</h2><p>ソースコードに触る前にまずは環境の準備から。<br>DynamoDB LocalをDocker上で動かすのが楽なので今回はそちらを使います。</p>
 <figure class="highlight bash"><figcaption><span>DynamoDB-Localのインストール</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker pull amazon/dynamodb-local</span><br><span class="line">$ docker run -d --name dynamodb -p 8000:8000 amazon/dynamodb-local</span><br></pre></td></tr></table></figure>
 
 <p>DynamoDB Localへのアクセスはaws cliを利用するのでそちらも準備します。アクセス時はEndpointのURLを引数で指定してあげる必要があります。</p>
-<figure class="highlight bash"><figcaption><span>AWSCLIのテスト_失敗</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ aws dynamodb list-tables --endpoint-url http://localhost:8000 --region ap-northeast-1</span><br><span class="line">Unable to locate credentials. You can configure credentials by running <span class="string">"aws configure"</span>.</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><figcaption><span>AWSCLIのテスト_失敗</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ aws dynamodb list-tables --endpoint-url http://localhost:8000 --region ap-northeast-1</span><br><span class="line">Unable to locate credentials. You can configure credentials by running <span class="string">&quot;aws configure&quot;</span>.</span><br></pre></td></tr></table></figure>
 
 <p>怒られちゃいました…<br>FakeでもいいのでCredentialを指定しなければならないので <code>aws configure</code> を使って指定します。</p>
 <figure class="highlight bash"><figcaption><span>デフォルトのProfile作成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ aws configure</span><br><span class="line">AWS Access Key ID [None]: fake</span><br><span class="line">AWS Secret Access Key [None]: fake</span><br><span class="line">Default region name [None]: ap-northeast-1</span><br><span class="line">Default output format [None]: json</span><br></pre></td></tr></table></figure>
 
 <p>…ということで気を取り直して、</p>
-<figure class="highlight bash"><figcaption><span>AWSCLIのテスト_成功</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ aws dynamodb list-tables --endpoint-url http://localhost:8000</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"TableNames"</span>: []</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><figcaption><span>AWSCLIのテスト_成功</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ aws dynamodb list-tables --endpoint-url http://localhost:8000</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;TableNames&quot;</span>: []</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>OKそうですね。あとはテーブルを作成したら準備OKです。<br>今回は以下のようなスキーマでテーブルを作成します。</p>
 <ul>
@@ -179,32 +173,32 @@
 </ul>
 </li>
 </ul>
-<figure class="highlight bash"><figcaption><span>DynamoDBテーブル作成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">$ aws dynamodb create-table --endpoint-url http://localhost:8000 --table-name MyFirstTable --attribute-definitions AttributeName=MyHashKey,AttributeType=S AttributeName=MyRangeKey,AttributeType=N --key-schema AttributeName=MyHashKey,KeyType=HASH AttributeName=MyRangeKey,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"TableDescription"</span>: &#123;</span><br><span class="line">        <span class="string">"TableArn"</span>: <span class="string">"arn:aws:dynamodb:ddblocal:000000000000:table/MyFirstTable"</span>,</span><br><span class="line">        <span class="string">"AttributeDefinitions"</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">"AttributeName"</span>: <span class="string">"MyHashKey"</span>,</span><br><span class="line">                <span class="string">"AttributeType"</span>: <span class="string">"S"</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">"AttributeName"</span>: <span class="string">"MyRangeKey"</span>,</span><br><span class="line">                <span class="string">"AttributeType"</span>: <span class="string">"N"</span></span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">"ProvisionedThroughput"</span>: &#123;</span><br><span class="line">            <span class="string">"NumberOfDecreasesToday"</span>: 0,</span><br><span class="line">            <span class="string">"WriteCapacityUnits"</span>: 1,</span><br><span class="line">            <span class="string">"LastIncreaseDateTime"</span>: 0.0,</span><br><span class="line">            <span class="string">"ReadCapacityUnits"</span>: 1,</span><br><span class="line">            <span class="string">"LastDecreaseDateTime"</span>: 0.0</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"TableSizeBytes"</span>: 0,</span><br><span class="line">        <span class="string">"TableName"</span>: <span class="string">"MyFirstTable"</span>,</span><br><span class="line">        <span class="string">"TableStatus"</span>: <span class="string">"ACTIVE"</span>,</span><br><span class="line">        <span class="string">"KeySchema"</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">"KeyType"</span>: <span class="string">"HASH"</span>,</span><br><span class="line">                <span class="string">"AttributeName"</span>: <span class="string">"MyHashKey"</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">"KeyType"</span>: <span class="string">"RANGE"</span>,</span><br><span class="line">                <span class="string">"AttributeName"</span>: <span class="string">"MyRangeKey"</span></span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">"ItemCount"</span>: 0,</span><br><span class="line">        <span class="string">"CreationDateTime"</span>: xxxxx</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><figcaption><span>DynamoDBテーブル作成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">$ aws dynamodb create-table --endpoint-url http://localhost:8000 --table-name MyFirstTable --attribute-definitions AttributeName=MyHashKey,AttributeType=S AttributeName=MyRangeKey,AttributeType=N --key-schema AttributeName=MyHashKey,KeyType=HASH AttributeName=MyRangeKey,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;TableDescription&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;TableArn&quot;</span>: <span class="string">&quot;arn:aws:dynamodb:ddblocal:000000000000:table/MyFirstTable&quot;</span>,</span><br><span class="line">        <span class="string">&quot;AttributeDefinitions&quot;</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;AttributeName&quot;</span>: <span class="string">&quot;MyHashKey&quot;</span>,</span><br><span class="line">                <span class="string">&quot;AttributeType&quot;</span>: <span class="string">&quot;S&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;AttributeName&quot;</span>: <span class="string">&quot;MyRangeKey&quot;</span>,</span><br><span class="line">                <span class="string">&quot;AttributeType&quot;</span>: <span class="string">&quot;N&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">&quot;ProvisionedThroughput&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;NumberOfDecreasesToday&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;WriteCapacityUnits&quot;</span>: 1,</span><br><span class="line">            <span class="string">&quot;LastIncreaseDateTime&quot;</span>: 0.0,</span><br><span class="line">            <span class="string">&quot;ReadCapacityUnits&quot;</span>: 1,</span><br><span class="line">            <span class="string">&quot;LastDecreaseDateTime&quot;</span>: 0.0</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;TableSizeBytes&quot;</span>: 0,</span><br><span class="line">        <span class="string">&quot;TableName&quot;</span>: <span class="string">&quot;MyFirstTable&quot;</span>,</span><br><span class="line">        <span class="string">&quot;TableStatus&quot;</span>: <span class="string">&quot;ACTIVE&quot;</span>,</span><br><span class="line">        <span class="string">&quot;KeySchema&quot;</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;KeyType&quot;</span>: <span class="string">&quot;HASH&quot;</span>,</span><br><span class="line">                <span class="string">&quot;AttributeName&quot;</span>: <span class="string">&quot;MyHashKey&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;KeyType&quot;</span>: <span class="string">&quot;RANGE&quot;</span>,</span><br><span class="line">                <span class="string">&quot;AttributeName&quot;</span>: <span class="string">&quot;MyRangeKey&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">&quot;ItemCount&quot;</span>: 0,</span><br><span class="line">        <span class="string">&quot;CreationDateTime&quot;</span>: xxxxx</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>ちなみにですが、DynamoDB Localの場合は設定したCapacity Unitは考慮されないので適当な値を設定しても問題ありません。</p>
-<h2 id="ソースコード書いていきます"><a href="#ソースコード書いていきます" class="headerlink" title="ソースコード書いていきます"></a>ソースコード書いていきます</h2><p>※ソースは全て <a href="https://github.com/mura123yasu/go-guregu-dynamo" target="_blank" rel="noopener">https://github.com/mura123yasu/go-guregu-dynamo</a> にアップしているので適宜参考にしてください。</p>
+<h2 id="ソースコード書いていきます"><a href="#ソースコード書いていきます" class="headerlink" title="ソースコード書いていきます"></a>ソースコード書いていきます</h2><p>※ソースは全て <a target="_blank" rel="noopener" href="https://github.com/mura123yasu/go-guregu-dynamo">https://github.com/mura123yasu/go-guregu-dynamo</a> にアップしているので適宜参考にしてください。</p>
 <h3 id="クライアントを準備"><a href="#クライアントを準備" class="headerlink" title="クライアントを準備"></a>クライアントを準備</h3><p>環境変数から諸々の値を取得するようにしつつ、クライアントを生成します。<br>テーブル名は先程作成した <code>MyFirstTable</code> を設定します。</p>
-<figure class="highlight go"><figcaption><span>クライアント生成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// クライアントの設定</span></span><br><span class="line">	dynamoDbRegion := os.Getenv(<span class="string">"AWS_REGION"</span>)</span><br><span class="line">	disableSsl := <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// DynamoDB Localを利用する場合はEndpointのURLを設定する</span></span><br><span class="line">	dynamoDbEndpoint := os.Getenv(<span class="string">"DYNAMO_ENDPOINT"</span>)</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(dynamoDbEndpoint) != <span class="number">0</span> &#123;</span><br><span class="line">		disableSsl = <span class="literal">true</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// デフォルトでは東京リージョンを指定</span></span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(dynamoDbRegion) == <span class="number">0</span> &#123;</span><br><span class="line">		dynamoDbRegion = <span class="string">"ap-northeast-1"</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	db := dynamo.New(session.New(), &amp;aws.Config&#123;</span><br><span class="line">		Region:     aws.String(dynamoDbRegion),</span><br><span class="line">		Endpoint:   aws.String(dynamoDbEndpoint),</span><br><span class="line">		DisableSSL: aws.Bool(disableSsl),</span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	table := db.Table(<span class="string">"MyFirstTable"</span>)</span><br><span class="line">	<span class="comment">// (以下略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>クライアント生成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// クライアントの設定</span></span><br><span class="line">	dynamoDbRegion := os.Getenv(<span class="string">&quot;AWS_REGION&quot;</span>)</span><br><span class="line">	disableSsl := <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// DynamoDB Localを利用する場合はEndpointのURLを設定する</span></span><br><span class="line">	dynamoDbEndpoint := os.Getenv(<span class="string">&quot;DYNAMO_ENDPOINT&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(dynamoDbEndpoint) != <span class="number">0</span> &#123;</span><br><span class="line">		disableSsl = <span class="literal">true</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// デフォルトでは東京リージョンを指定</span></span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(dynamoDbRegion) == <span class="number">0</span> &#123;</span><br><span class="line">		dynamoDbRegion = <span class="string">&quot;ap-northeast-1&quot;</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	db := dynamo.New(session.New(), &amp;aws.Config&#123;</span><br><span class="line">		Region:     aws.String(dynamoDbRegion),</span><br><span class="line">		Endpoint:   aws.String(dynamoDbEndpoint),</span><br><span class="line">		DisableSSL: aws.Bool(disableSsl),</span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	table := db.Table(<span class="string">&quot;MyFirstTable&quot;</span>)</span><br><span class="line">	<span class="comment">// (以下略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h3 id="単純なCRUD"><a href="#単純なCRUD" class="headerlink" title="単純なCRUD"></a>単純なCRUD</h3><p>ここからはCRUD処理の実装を進めます。</p>
 <h4 id="Create"><a href="#Create" class="headerlink" title="Create"></a>Create</h4><p>Createで利用するメソッドは <code>Put</code> です。</p>
 <p>Put対象のitemを準備して渡すだけで簡単ですが1点注意事項があります。itemはPut先テーブルのKeyをすべて含むものでなければなりません。今回であれば <code>MyHashKey</code> と <code>MyRangeKey</code> です。</p>
-<figure class="highlight go"><figcaption><span>Create処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 単純なCRUD - Create</span></span><br><span class="line">	item := Item&#123;</span><br><span class="line">		MyHashKey:  <span class="string">"MyHash"</span>,</span><br><span class="line">		MyRangeKey: <span class="number">1</span>,</span><br><span class="line">		MyText:     <span class="string">"My First Text"</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := table.Put(item).Run(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">"Failed to put item[%v]\n"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>Create処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 単純なCRUD - Create</span></span><br><span class="line">	item := Item&#123;</span><br><span class="line">		MyHashKey:  <span class="string">&quot;MyHash&quot;</span>,</span><br><span class="line">		MyRangeKey: <span class="number">1</span>,</span><br><span class="line">		MyText:     <span class="string">&quot;My First Text&quot;</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := table.Put(item).Run(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;Failed to put item[%v]\n&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h4 id="Read"><a href="#Read" class="headerlink" title="Read"></a>Read</h4><p>Readで利用するメソッドは <code>Get</code> です。他にも <code>Scan</code> も使えるので用途に合わせて色々試してみて下さい。</p>
 <p>私達が実装したWebサーバでは、DynamoDBに対するアクセスはキーアクセスのみに限定していたため、Getの利用で事足りました。</p>
-<figure class="highlight go"><figcaption><span>Read処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 単純なCRUD - Read</span></span><br><span class="line">	<span class="keyword">var</span> readResult Item</span><br><span class="line">	err = table.Get(<span class="string">"MyHashKey"</span>, item.MyHashKey).Range(<span class="string">"MyRangeKey"</span>, dynamo.Equal, item.MyRangeKey).One(&amp;readResult)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">"Failed to get item[%v]\n"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>Read処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 単純なCRUD - Read</span></span><br><span class="line">	<span class="keyword">var</span> readResult Item</span><br><span class="line">	err = table.Get(<span class="string">&quot;MyHashKey&quot;</span>, item.MyHashKey).Range(<span class="string">&quot;MyRangeKey&quot;</span>, dynamo.Equal, item.MyRangeKey).One(&amp;readResult)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;Failed to get item[%v]\n&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h4 id="Update"><a href="#Update" class="headerlink" title="Update"></a>Update</h4><p>利用するメソッドは <code>Update</code> です。</p>
 <p>少し余談にはなるのですが、Webサーバ実装時はUpdateは使いませんでした。常にPut処理を行っており、全体シーケンスを検討する中で冪等性を保つためにそのような設計にしていました。</p>
-<figure class="highlight go"><figcaption><span>Update処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 単純なCRUD - Update</span></span><br><span class="line">	<span class="keyword">var</span> updateResult Item</span><br><span class="line">	err = table.Update(<span class="string">"MyHashKey"</span>, item.MyHashKey).Range(<span class="string">"MyRangeKey"</span>, item.MyRangeKey).Set(<span class="string">"MyText"</span>, <span class="string">"My Second Text"</span>).Value(&amp;updateResult)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">"Failed to update item[%v]\n"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>Update処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 単純なCRUD - Update</span></span><br><span class="line">	<span class="keyword">var</span> updateResult Item</span><br><span class="line">	err = table.Update(<span class="string">&quot;MyHashKey&quot;</span>, item.MyHashKey).Range(<span class="string">&quot;MyRangeKey&quot;</span>, item.MyRangeKey).Set(<span class="string">&quot;MyText&quot;</span>, <span class="string">&quot;My Second Text&quot;</span>).Value(&amp;updateResult)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;Failed to update item[%v]\n&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h4 id="Delete"><a href="#Delete" class="headerlink" title="Delete"></a>Delete</h4><p>利用するメソッドは <code>Delete</code> です。</p>
 <p>Keyさえ指定していれば問題ないのは他メソッドと変わりません。</p>
-<figure class="highlight go"><figcaption><span>Delete処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 単純なCRUD - Delete</span></span><br><span class="line">	err = table.Delete(<span class="string">"MyHashKey"</span>, item.MyHashKey).Range(<span class="string">"MyRangeKey"</span>, item.MyRangeKey).Run()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">"Failed to delete item[%v]\n"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>Delete処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 単純なCRUD - Delete</span></span><br><span class="line">	err = table.Delete(<span class="string">&quot;MyHashKey&quot;</span>, item.MyHashKey).Range(<span class="string">&quot;MyRangeKey&quot;</span>, item.MyRangeKey).Run()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;Failed to delete item[%v]\n&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h3 id="Conditional-Check"><a href="#Conditional-Check" class="headerlink" title="Conditional Check"></a>Conditional Check</h3><p>これはもうゴリゴリに使い倒しました。以下の例はとてもシンプルなものですが、実際には <code>If(&quot;MyText = ?&quot;, &quot;some word&quot;)</code> の部分に様々な条件を記載します。書き方は色々あるので必要に応じて確認してみてください。</p>
-<figure class="highlight go"><figcaption><span>ConditionalCheck処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Conditional Check</span></span><br><span class="line">	err = table.Delete(<span class="string">"MyHashKey"</span>, item.MyHashKey).Range(<span class="string">"MyRangeKey"</span>, item.MyRangeKey).If(<span class="string">"MyText = ?"</span>, <span class="string">"some word"</span>).Run()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">"Failed to delete item with conditional check[%v]\n"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>ConditionalCheck処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Conditional Check</span></span><br><span class="line">	err = table.Delete(<span class="string">&quot;MyHashKey&quot;</span>, item.MyHashKey).Range(<span class="string">&quot;MyRangeKey&quot;</span>, item.MyRangeKey).If(<span class="string">&quot;MyText = ?&quot;</span>, <span class="string">&quot;some word&quot;</span>).Run()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;Failed to delete item with conditional check[%v]\n&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>要件を満たすためにほぼほぼマストで必要だったConditional Checkですが、しっかり設計しておかないと一番泣きを見ることになる部分になります。</p>
 <p>例えば、開発当時ロックの機構をこのConditional Checkで実現しており、ロック取得者以外がレコードを更新できないようになど制御をかけていたのですが、一連のシーケンスの中で予期しない割り込みが発生すると永遠に更新できないレコードが登場し…もちろん設計ミスによるものですが、とても苦しみました。（原因究明の時間は非常に楽しかった記憶もありますが笑）</p>
@@ -270,60 +264,12 @@
   
     
       
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210307/">
-                  GCP連載2021を始めます
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210301/">
-                  【登壇しました】アレクサアプリを開発してみたら中々大変だった話
+                <a href="https://future-architect.github.io/articles/20210313/">
+                  CloudNative Days Spring 2021 ONLINEに登壇しました
                 </a>
               </li>
             </ul>
@@ -336,46 +282,12 @@
   
     
       
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210207/">
-                  Go 1.16連載が始まります
+                <a href="https://future-architect.github.io/articles/20190713/">
+                  Goを学ぶときにつまずきやすいポイントFAQ
                 </a>
               </li>
             </ul>
@@ -386,360 +298,18 @@
   
     
       
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201203/">
-                  GoがApple Siliconにネイティブ対応したのでベンチマークをとってみました
+                <a href="https://future-architect.github.io/articles/20200601/">
+                  春の入門祭り 🌸 #01 Goのテストに入門してみよう！
                 </a>
               </li>
             </ul>
           </div>
         
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201113/">
-                  LocalStackに向けてTerraformを実行する
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20200910/">
-                  「2020年代のコンテナ時代のPythonアーキテクチャ&デプロイ」というテーマでPyCon.jp 2020で発表してきました
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20200821/">
-                  エンジニアが最低限理解しておくべきOSSライセンスの基礎知識
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20200807/">
-                  GoとSuffixArray
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20200730/">
-                  Redux-Toolkitに学ぶ、TypeScriptの型推論とこれからのAPIデザイン
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -762,164 +332,20 @@
   
     
       
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
     
   
     
       
         
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200609/">
+                  春の入門祭り🌸 #7 作って学ぶGraphQL。gqlgenを用いて鉄道データ検索API開発入門
+                </a>
+              </li>
+            </ul>
+          </div>
         
       
     
@@ -927,10 +353,16 @@
     
       
         
-      
-    
-  
-    
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200530/">
+                  フューチャー技術ブログの運営で心がけていること
+                </a>
+              </li>
+            </ul>
+          </div>
+        
       
     
   
@@ -947,25 +379,15 @@
     
       
         
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20181031/">
+                  その問い合わせ、AIが解決します！～Redmineチケットレコメンドシステムのご紹介～
+                </a>
+              </li>
+            </ul>
+          </div>
         
       
     
@@ -977,6 +399,16 @@
     
       
         
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210312/">
+                  Text-to-Speechを試してみる
+                </a>
+              </li>
+            </ul>
+          </div>
+        
       
     
   
@@ -985,13 +417,37 @@
     
   
     
-  
-    
-  
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210304/">
+                  mxGraphで階層グラフを可視化する
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
     
   
     
       
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210226/">
+                  アクセシビリティ情報を使った壊れにくいE2Eテスト
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
     
   
     
@@ -1003,49 +459,9 @@
     
   
     
-      
-    
   
     
   
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
     
   
     
@@ -1066,80 +482,6 @@
       
         
       
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
     
   
     
@@ -1177,57 +519,9 @@
     
   
     
-      
-    
-  
-    
-  
-    
-  
-    
   
     
       
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -1239,8 +533,26 @@
     
   
     
+  
+    
       
-        
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
       
     
   
@@ -1261,15 +573,7 @@
     
   
     
-  
-    
-  
-    
       
-        
-      
-    
-  
     
   
     
@@ -1285,8 +589,32 @@
     
   
     
+      
+        
+      
+    
   
     
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
       
     
   
@@ -1298,12 +626,12 @@
   
     
       
+        
+      
     
   
     
-  
-    
-  
+      
     
   
     
@@ -1335,16 +663,6 @@
     
   
     
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
   
     
       
@@ -1352,14 +670,16 @@
   
     
       
-        
-      
+    
+  
+    
+  
     
   
     
       
-        
-      
+    
+  
     
   
     
@@ -1377,11 +697,27 @@
     
   
     
-  
+      
     
   
     
   
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
     
   
     
@@ -1415,6 +751,96 @@
     
   
     
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
   
     
   
@@ -1430,6 +856,604 @@
       
     
   
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
     
   
     
@@ -1487,23 +1511,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (105)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/DB/">DB (12)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Programming/">Programming (138)</a>
 	</li>
       
 	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (107)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
 	</li>
       
 	<li>
@@ -1680,19 +1704,15 @@
 
   
 <script src="/metronic/assets/plugins/jquery.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/corporate/scripts/layout.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script type="text/javascript">
@@ -1716,24 +1736,7 @@ ga('send', 'pageview');
 <!-- End Google Analytics -->
 
 
-<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({{ JSON.stringify(config) }});
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i=0; i < all.length; i += 1) {
-      all[i].SourceElement().parentNode.className += ' has-jax';
-    }
-  });
-</script>
-
-<script type="text/javascript" src="{{ src }}">
-</script>
-<!-- End: Injected MathJax -->
-<!-- hexo-inject:end -->
+<!-- END INTEGRATIONS --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 
 </body>
 </html>

@@ -24,8 +24,8 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20210309/image.png">
 <meta property="article:published_time" content="2021-03-08T15:00:00.000Z">
 <meta property="article:modified_time" content="2021-03-09T01:49:27.654Z">
-<meta property="article:tag" content="Go">
 <meta property="article:tag" content="GCP">
+<meta property="article:tag" content="Go">
 <meta property="article:tag" content="GCP連載">
 <meta property="article:tag" content="PubSub">
 <meta property="article:tag" content="スキーマ">
@@ -46,30 +46,24 @@
   <!-- Global styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Global styles END -->
 
   <!-- Theme styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/css/theme-styles.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Theme styles END -->
 <meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
@@ -126,9 +120,9 @@
     <li><i class="fa fa-tags"></i>
     
   
-    <a href="/tags/Go/" title="Go">Go</a>,
-  
     <a href="/tags/GCP/" title="GCP">GCP</a>,
+  
+    <a href="/tags/Go/" title="Go">Go</a>,
   
     <a href="/tags/GCP%E9%80%A3%E8%BC%89/" title="GCP連載">GCP連載</a>,
   
@@ -163,7 +157,7 @@
 <li><a target="_blank" rel="noopener" href="https://cloud.google.com/pubsub/docs/schemas">Creating and managing schemas</a></li>
 </ul>
 <p>なお、2021/03/07時点では<strong>プレビュー</strong>であるのでご注意ください。今後フィードバックにより挙動なり設定方法が変更される可能性があります。</p>
-<h1 id="Cloud-PubSubとは"><a href="#Cloud-PubSubとは" class="headerlink" title="Cloud PubSubとは"></a>Cloud PubSubとは</h1><p><img src="/images/20210309/cps_integration.png" alt=""></p>
+<h1 id="Cloud-PubSubとは"><a href="#Cloud-PubSubとは" class="headerlink" title="Cloud PubSubとは"></a>Cloud PubSubとは</h1><p><img src="/images/20210309/cps_integration.png"></p>
 <p>公式ドキュメントから引用します。</p>
 <blockquote>
 <p>Pub/Sub は、イベントを処理するサービスとイベントを生成するサービスを切り離す非同期メッセージング サービスです。メッセージング指向のミドルウェア（ストリーミング分析パイプラインにイベントの取り込みと配信を行う）として、Pub/Sub を使用できます。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/pubsub/docs/overview">https://cloud.google.com/pubsub/docs/overview</a></p>
@@ -183,7 +177,7 @@
 <figure class="highlight go"><figcaption><span>pubsubのサンプル.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">topic, err := pubsubClient.CreateTopic(context.Background(), <span class="string">&quot;&lt;トピック名&gt;&quot;</span>)</span><br><span class="line"></span><br><span class="line">res := topic.Publish(ctx, &amp;pubsub.Message&#123;Data: []<span class="keyword">byte</span>(<span class="string">&quot;&lt;任意のバイナリ&gt;&quot;</span>)&#125;)</span><br></pre></td></tr></table></figure>
 
 <p>なんでもとりあえずPublishできるので楽なのですが、Subscribe側では困ったことになりがちです。<br>例えば、Subscribe側でスキーマ付きのデータストア（BigQueryやCloudSQLなど）に永続化する場合に、登録が失敗するようなレイアウト違反のデータを扱う必要があります。具体的には、Dead Letter Queue（DLQ）に登録したり、エラーログを出してシステムリカバリ運用に乗せたりを検討する必要がありました。</p>
-<p><img src="/images/20210309/pubsub_schema.png" alt=""></p>
+<p><img src="/images/20210309/pubsub_schema.png"></p>
 <p>これがHTTPのAPIであれば、HTTPレスポンスでエラーメッセージを応答することで、クライアント（今回だとPublisher）側に通知することができましたが、PubSubを経由すると、Enterprise Integration Patternでいう<a target="_blank" rel="noopener" href="https://www.enterpriseintegrationpatterns.com/patterns/messaging/RequestReply.html">Request-Reply</a>を実装するのであれば別ですが、これはこれで両者がアプリケーションレベルで密結合になりますし、実装もそう簡単ではありません。</p>
 <p>今回のメッセージスキーマ機能を用いると、Publisher側が明らかに契約違反のメッセージを連携した場合に早期にNGを返すことができるので、今後はこの手の考慮事項を減らすことできます。嬉しいですね。</p>
 <h1 id="試してみる"><a href="#試してみる" class="headerlink" title="試してみる"></a>試してみる</h1><p>GCPプロジェクトは<a target="_blank" rel="noopener" href="https://cloud.google.com/resource-manager/docs/creating-managing-projects">こちら</a>の手順に従い作成します。また、gcloudコマンドも<a target="_blank" rel="noopener" href="https://cloud.google.com/sdk/docs/install">こちら</a>に従いインストールしておきます。</p>
@@ -199,7 +193,7 @@
 <figure class="highlight bash"><figcaption><span>avroスキーマ作成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gcloud beta pubsub schemas create avroschema1 \</span><br><span class="line">    --<span class="built_in">type</span>=AVRO \</span><br><span class="line">    --definition=&#123;<span class="string">&quot;type&quot;</span>:<span class="string">&quot;record&quot;</span>,<span class="string">&quot;name&quot;</span>:<span class="string">&quot;Avro&quot;</span>,<span class="string">&quot;fields&quot;</span>:[&#123;<span class="string">&quot;name&quot;</span>:<span class="string">&quot;StringField&quot;</span>,<span class="string">&quot;type&quot;</span>:<span class="string">&quot;string&quot;</span>&#125;,&#123;<span class="string">&quot;name&quot;</span>:<span class="string">&quot;FloatField&quot;</span>,<span class="string">&quot;type&quot;</span>:<span class="string">&quot;float&quot;</span>&#125;,&#123;<span class="string">&quot;name&quot;</span>:<span class="string">&quot;BooleanField&quot;</span>,<span class="string">&quot;type&quot;</span>:<span class="string">&quot;boolean&quot;</span>&#125;]&#125;</span><br></pre></td></tr></table></figure>
 
 <p>続いてトピックを作成します。管理コンソールからだと以下のように、<strong>スキーマを使用する</strong> のチェックボックスが増えていました。</p>
-<p><img src="/images/20210309/image.png" alt=""></p>
+<p><img src="/images/20210309/image.png"></p>
 <p>今回はgcloud経由で作成します。<a target="_blank" rel="noopener" href="https://cloud.google.com/pubsub/docs/admin#gcloud">こちら</a>の説明に従いオプションを追加します。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;gcloud beta pubsub topics create avrotopic \</span><br><span class="line">        --message-encoding=JSON \</span><br><span class="line">        --schema=avroschema1</span><br><span class="line">Created topic [projects/&lt;YOUR PROJECT ID&gt;/topics/avrotopic].</span><br></pre></td></tr></table></figure>
 
@@ -299,6 +293,66 @@
   
     
       
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210313/">
+                  CloudNative Days Spring 2021 ONLINEに登壇しました
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200601/">
+                  春の入門祭り 🌸 #01 Goのテストに入門してみよう！
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200630/">
+                  go-swaggerを用いたWebアプリケーション開発Tips19選
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
     
   
     
@@ -315,56 +369,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210307/">
-                  GCP連載2021を始めます
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210308/">
-                  Auth0 Rulesのユニットテストを書きたい
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210301/">
-                  【登壇しました】アレクサアプリを開発してみたら中々大変だった話
+                <a href="https://future-architect.github.io/articles/20191107/">
+                  インフラ入門vol.3(ネットワーク冗長化構成)
                 </a>
               </li>
             </ul>
@@ -381,132 +387,14 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210303/">
-                  Vis Networkで階層グラフを可視化する
+                <a href="https://future-architect.github.io/articles/20181031/">
+                  その問い合わせ、AIが解決します！～Redmineチケットレコメンドシステムのご紹介～
                 </a>
               </li>
             </ul>
           </div>
         
       
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210121/">
-                  DockerでRUNをまとめた方が良いとは限らない
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210108/">
-                  自分の分身(3Dアバター)と自作ワールドを作ってみた
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
     
   
     
@@ -523,8 +411,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201203/">
-                  GoがApple Siliconにネイティブ対応したのでベンチマークをとってみました
+                <a href="https://future-architect.github.io/articles/20210305/">
+                  インフラ入門ーインフラ要件定義編ー
                 </a>
               </li>
             </ul>
@@ -534,7 +422,59 @@
     
   
     
+      
+    
   
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210107/">
+                  Electronの使い方 Web開発の技術でデスクトップアプリを作ろう
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -555,28 +495,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201117/">
-                  Goのデバッグ環境 on VSCode
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201113/">
-                  LocalStackに向けてTerraformを実行する
+                <a href="https://future-architect.github.io/articles/20200930/">
+                  Policy as Code を実現する Open Policy Agent に憧れて。ポリシーコードでAPI仕様をLintする
                 </a>
               </li>
             </ul>
@@ -588,10 +508,6 @@
     
   
     
-  
-    
-  
-    
       
     
   
@@ -605,8 +521,6 @@
   
     
       
-    
-  
     
   
     
@@ -619,8 +533,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201020/">
-                  ProxyとDockerと新人社員と時々わたし
+                <a href="https://future-architect.github.io/articles/20200807/">
+                  GoとSuffixArray
                 </a>
               </li>
             </ul>
@@ -632,7 +546,207 @@
     
   
     
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200730/">
+                  Redux-Toolkitに学ぶ、TypeScriptの型推論とこれからのAPIデザイン
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
   
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
     
   
     
@@ -654,7 +768,41 @@
     
   
     
+      
+    
   
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -665,6 +813,24 @@
   
     
   
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
     
   
     
@@ -692,9 +858,97 @@
     
   
     
+      
+    
+  
+    
+  
+    
+  
+    
   
     
       
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -736,28 +990,16 @@
     
   
     
+  
+    
+  
+    
       
         
       
     
   
     
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
   
     
   
@@ -765,14 +1007,6 @@
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -796,9 +1030,11 @@
     
   
     
-      
-        
-      
+  
+    
+  
+    
+  
     
   
     
@@ -808,7 +1044,15 @@
     
   
     
-      
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -847,126 +1091,6 @@
   
     
       
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
     
   
     
@@ -989,14 +1113,8 @@
   
     
       
-        
-      
     
   
-    
-      
-        
-      
     
   
     
@@ -1028,80 +1146,6 @@
     
   
     
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
     
   
@@ -1117,28 +1161,14 @@
   
     
       
-    
-  
-    
-  
-    
+        
       
     
   
     
   
     
-  
-    
-  
-    
       
-    
-  
-    
-  
-    
-  
     
   
     
@@ -1159,8 +1189,14 @@
   
     
       
+        
+      
     
   
+    
+      
+        
+      
     
   
     
@@ -1173,6 +1209,24 @@
       
     
   
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -1195,62 +1249,6 @@
   
     
       
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -1296,6 +1294,80 @@
     
   
     
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
   
     
       
@@ -1320,26 +1392,6 @@
     
   
     
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
   
     
   
@@ -1356,11 +1408,15 @@
     
   
     
+  
+    
+      
+        
       
     
   
     
-  
+      
     
   
     
@@ -1382,49 +1438,33 @@
     
   
     
-      
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
       
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
       
         
       
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
     
   
     
@@ -1443,24 +1483,6 @@
       
         
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
     
   
     
@@ -1518,23 +1540,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (105)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/DB/">DB (12)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Programming/">Programming (138)</a>
 	</li>
       
 	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (107)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
 	</li>
       
 	<li>
@@ -1711,19 +1733,15 @@
 
   
 <script src="/metronic/assets/plugins/jquery.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/corporate/scripts/layout.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script type="text/javascript">

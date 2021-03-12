@@ -41,30 +41,24 @@
   <!-- Global styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Global styles END -->
 
   <!-- Theme styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/css/theme-styles.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Theme styles END -->
 <meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
@@ -152,18 +146,18 @@
 </blockquote>
 <p>記載通りですが、GKEクラスタを構築する際に、実際に設計した内容を元に制約や設計のポイントを紹介したいと思います。</p>
 <h1 id="GKEとは"><a href="#GKEとは" class="headerlink" title="GKEとは"></a>GKEとは</h1><blockquote>
-<p>コンテナ化されたアプリケーションをデプロイするための、本番稼働に対応したマネージド型環境です。<br><a href="https://cloud.google.com/kubernetes-engine/" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/</a></p>
+<p>コンテナ化されたアプリケーションをデプロイするための、本番稼働に対応したマネージド型環境です。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/">https://cloud.google.com/kubernetes-engine/</a></p>
 </blockquote>
 <h1 id="CIDRとは"><a href="#CIDRとは" class="headerlink" title="CIDRとは"></a>CIDRとは</h1><blockquote>
-<p>Classless Inter-Domain Routing（CIDR、サイダー）は、インターネット上のルーターにおけるルーティングテーブルの肥大化速度を低減させるための機構であり、ISPや組織にクラスA、B、Cを全部ではなく部分的に割り当てることでIPアドレスの浪費を防ぐ機構である。CIDR記法でアドレスを記述でき、アドレスの集約的表現が可能で、アドレスブロックの委譲も容易である。<br>「CIDR」の読みは「サイダー」とするのが一般的である<br><a href="https://ja.wikipedia.org/wiki/Classless_Inter-Domain_Routing" target="_blank" rel="noopener">https://ja.wikipedia.org/wiki/Classless_Inter-Domain_Routing</a></p>
+<p>Classless Inter-Domain Routing（CIDR、サイダー）は、インターネット上のルーターにおけるルーティングテーブルの肥大化速度を低減させるための機構であり、ISPや組織にクラスA、B、Cを全部ではなく部分的に割り当てることでIPアドレスの浪費を防ぐ機構である。CIDR記法でアドレスを記述でき、アドレスの集約的表現が可能で、アドレスブロックの委譲も容易である。<br>「CIDR」の読みは「サイダー」とするのが一般的である<br><a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/Classless_Inter-Domain_Routing">https://ja.wikipedia.org/wiki/Classless_Inter-Domain_Routing</a></p>
 </blockquote>
 <p>CIDR記法は <code>10.0.0.0/8</code>、<code>172.16.0.0/12</code>、 <code>192.168.0.0/16</code> といったIPアドレスとビット数を指定する方法です。</p>
 <p>詳細は次項で説明していきますが、ある条件でGKEクラスタを構築すると、このCIDR設計が必須になってきます</p>
 <h1 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h1><p>アーキテクチャ設計上の要件と、GKEクラスタの制約の2つが設計上の考慮事項となります。</p>
 <h2 id="アーキクチャ設計上の要件"><a href="#アーキクチャ設計上の要件" class="headerlink" title="アーキクチャ設計上の要件"></a>アーキクチャ設計上の要件</h2><p>今回GKEクラスタを構築する上で2つの前提がありました。</p>
 <ol>
-<li><a href="https://cloud.google.com/vpc/docs/shared-vpc" target="_blank" rel="noopener">共有VPC</a>を利用すること</li>
-<li>パブリックエンドポイントへのアクセスが制限された<a href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters" target="_blank" rel="noopener">限定公開クラスタ</a>にすること</li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/vpc/docs/shared-vpc">共有VPC</a>を利用すること</li>
+<li>パブリックエンドポイントへのアクセスが制限された<a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters">限定公開クラスタ</a>にすること</li>
 </ol>
 <p>※オンプレ環境とインターネットVPNで繋ぐため1つのVPCを複数環境で利用したかったのと、セキュリティポリシーから外部アクセス禁止となっていたためです。</p>
 <h3 id="共有VPCとは"><a href="#共有VPCとは" class="headerlink" title="共有VPCとは"></a>共有VPCとは</h3><p>共有VPCとは、あるホストとなるプロジェクトのVPCを、複数のGCPプロジェクトがリソースとして利用できるようになる機能です。これにより、サブネット、ルート、ファイアウォールなどのネットワーク リソースを集中管理しながら、インスタンスの作成や管理などの管理責任をサービス プロジェクト管理者に委任できます。</p>
@@ -172,23 +166,23 @@
 
 <p>VPC Peeringとの違いはいくつかありますが、ホストとなるプロジェクト側でファイアウォールルールなどを集中管理できる点などが異なります。（今回はこの点が重視し共有VPCを選択しました）</p>
 <h3 id="限定公開クラスタとは"><a href="#限定公開クラスタとは" class="headerlink" title="限定公開クラスタとは"></a>限定公開クラスタとは</h3><blockquote>
-<p>限定公開クラスタでは、ノードに RFC 1918 の内部 IP アドレスのみがあるため、ワークロードが公共のインターネットから隔離されるようになります。<br><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters</a></p>
+<p>限定公開クラスタでは、ノードに RFC 1918 の内部 IP アドレスのみがあるため、ワークロードが公共のインターネットから隔離されるようになります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters">https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters</a></p>
 </blockquote>
 <p>引用文そのままですが、限定公開クラスタの設定を行うと、各GKEノードにPublic IPを付与せずGKEクラスタを構築することができます。セキュリティ要件からこちらの設定が必須となりました。</p>
 <h2 id="GKEクラスタの制約"><a href="#GKEクラスタの制約" class="headerlink" title="GKEクラスタの制約"></a>GKEクラスタの制約</h2><ol>
-<li>共有VPC上にGKEクラスタ構築する制約<br>クラスタの<strong>ポッド</strong>と<strong>サービス</strong>に使用するサブネットとセカンダリCIDRを指定する必要があります。<br><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#verify_usable_subnets" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#verify_usable_subnets</a></li>
-<li>パブリックエンドポイントへのアクセスが制限された限定公開クラスタによる制約<br>クラスタ<strong>マスター</strong>が使用する /28 分の RFC 1918 アドレス範囲を指定する必要があります。<br><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#public_master" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#public_master</a></li>
-<li>セカンダリCIDRの上限によるクラスタ数の制約<br>ポッドとサービスに対して割り当てるセカンダリCIDRですが、1サブネット内に設定可能なセカンダリCIDR数に上限があり、この上限数/2が構築可能なクラスタ数になります。<br><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#notes_about_secondary_ranges" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#notes_about_secondary_ranges</a><br>私が構築した時点ではセカンダリCIDRの上限は5つだったためクラスタの上限は2つでしたが、現在はセカンダリCIDRの上限は30まで拡張されており15クラスタまで作成可能なのでさほど設計上の制約にはならないかもしれません。<br>※日本語ドキュメントはまだ5のままにですが英語では30になっています。（2019/10/17時点）</li>
+<li>共有VPC上にGKEクラスタ構築する制約<br>クラスタの<strong>ポッド</strong>と<strong>サービス</strong>に使用するサブネットとセカンダリCIDRを指定する必要があります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#verify_usable_subnets">https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#verify_usable_subnets</a></li>
+<li>パブリックエンドポイントへのアクセスが制限された限定公開クラスタによる制約<br>クラスタ<strong>マスター</strong>が使用する /28 分の RFC 1918 アドレス範囲を指定する必要があります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#public_master">https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#public_master</a></li>
+<li>セカンダリCIDRの上限によるクラスタ数の制約<br>ポッドとサービスに対して割り当てるセカンダリCIDRですが、1サブネット内に設定可能なセカンダリCIDR数に上限があり、この上限数/2が構築可能なクラスタ数になります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#notes_about_secondary_ranges">https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#notes_about_secondary_ranges</a><br>私が構築した時点ではセカンダリCIDRの上限は5つだったためクラスタの上限は2つでしたが、現在はセカンダリCIDRの上限は30まで拡張されており15クラスタまで作成可能なのでさほど設計上の制約にはならないかもしれません。<br>※日本語ドキュメントはまだ5のままにですが英語では30になっています。（2019/10/17時点）</li>
 </ol>
 <h1 id="実際に設計してみる"><a href="#実際に設計してみる" class="headerlink" title="実際に設計してみる"></a>実際に設計してみる</h1><p>本編です。</p>
 <p>前項の制約から1GKEクラスタに対して <strong>3つのCIDR(ポッド、サービス、マスター)を割り当てる必要</strong> が出てきました。またこれらは <strong>同一の共有VPC上に構築するため構築される全てのプロジェクトをまたいで全てのCIDRが被ってはいけない</strong> という制約もあります。</p>
 <p>この辺りに注意してCIDR設計したいと思います。</p>
 <h2 id="1-全体の設計方針"><a href="#1-全体の設計方針" class="headerlink" title="1. 全体の設計方針"></a>1. 全体の設計方針</h2><p>設定上はプロジェクトが異なればポッドやサービスのCIDRは全く異なる範囲や体系で設定可能です。<br>ですが、各プロジェクト（環境）毎に設計のポリシーを合わせるために全プロジェクトに対してポッド、サービス、マスタ別にCIDRを概念的に割り当て、そこから各プロジェクトごとに実際のCIDRを割り当てるといった設計方針をとりました。</p>
-<h2 id="2-ポッド＆サービスCIDR"><a href="#2-ポッド＆サービスCIDR" class="headerlink" title="2. ポッド＆サービスCIDR"></a>2. ポッド＆サービスCIDR</h2><h3 id="2-1-共有VPC上の全プロジェクトに対するCIDR"><a href="#2-1-共有VPC上の全プロジェクトに対するCIDR" class="headerlink" title="2.1. 共有VPC上の全プロジェクトに対するCIDR"></a>2.1. 共有VPC上の全プロジェクトに対するCIDR</h3><p>こちらは172.16.0.0/12（クラスB）を概念的に割り当てました。<br>GKEのポッド＆サービスに割り当て可能なCIDRはRFC 1918 ブロック（10.0.0.0/8、172.16.0.0/12、または 192.168.0.0/16）の制約があります。<br><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/routes-based-cluster#pod_address_range" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/docs/how-to/routes-based-cluster#pod_address_range</a></p>
+<h2 id="2-ポッド＆サービスCIDR"><a href="#2-ポッド＆サービスCIDR" class="headerlink" title="2. ポッド＆サービスCIDR"></a>2. ポッド＆サービスCIDR</h2><h3 id="2-1-共有VPC上の全プロジェクトに対するCIDR"><a href="#2-1-共有VPC上の全プロジェクトに対するCIDR" class="headerlink" title="2.1. 共有VPC上の全プロジェクトに対するCIDR"></a>2.1. 共有VPC上の全プロジェクトに対するCIDR</h3><p>こちらは172.16.0.0/12（クラスB）を概念的に割り当てました。<br>GKEのポッド＆サービスに割り当て可能なCIDRはRFC 1918 ブロック（10.0.0.0/8、172.16.0.0/12、または 192.168.0.0/16）の制約があります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/routes-based-cluster#pod_address_range">https://cloud.google.com/kubernetes-engine/docs/how-to/routes-based-cluster#pod_address_range</a></p>
 <p>10.0.0.0/8はGCP環境以外も含めたシステム全体で利用しているのと、192.168.0.0/16は後述のマスタのアドレス範囲に利用するためクラスB（172.16.0.0/12）を選択しました。</p>
 <p>なお基本的にはクラスBの範囲を使うことができますが、公式ドキュメントには<code>172.17.0.0/16</code>を利用することができない旨の記載があります。<br>該当範囲を指定してもクラスタ構築時にエラーとなるわけではないのでご注意下さい。</p>
 <blockquote>
-<p>Restrictions<br>Private clusters have the following restrictions:<br>You cannot use a cluster master, node, Pod, or Service IP range that overlaps with 172.17.0.0/16.<br><a href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#restrictions" target="_blank" rel="noopener">https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#restrictions</a></p>
+<p>Restrictions<br>Private clusters have the following restrictions:<br>You cannot use a cluster master, node, Pod, or Service IP range that overlaps with 172.17.0.0/16.<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#restrictions">https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#restrictions</a></p>
 </blockquote>
 <h3 id="2-2-各プロジェクトにおけるCIDR"><a href="#2-2-各プロジェクトにおけるCIDR" class="headerlink" title="2.2. 各プロジェクトにおけるCIDR"></a>2.2. 各プロジェクトにおけるCIDR</h3><p>こちらに対してはさらに3段階の概念でCIDRを設計しました。</p>
 <ul>
@@ -667,68 +661,6 @@
     
   
     
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210310/">
-                  本番データが急に欲しくなったアナタに贈る、CloudSQLのサーバレスエクスポートを試してみた
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210309/">
-                  PubSubのメッセージスキーマを試してみる
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210308/">
-                  Auth0 Rulesのユニットテストを書きたい
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
   
     
       
@@ -746,8 +678,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210303/">
-                  Vis Networkで階層グラフを可視化する
+                <a href="https://future-architect.github.io/articles/20200709/">
+                  GoでWebアプリ開発時にあるあるだったレビューコメント
                 </a>
               </li>
             </ul>
@@ -761,47 +693,11 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
       
     
   
     
       
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
     
   
     
@@ -810,8 +706,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210201/">
-                  自宅仕事環境構築：指向性マイクの勧め
+                <a href="https://future-architect.github.io/articles/20200311/">
+                  JavaプログラマーのためのGo言語入門
                 </a>
               </li>
             </ul>
@@ -821,13 +717,25 @@
     
   
     
-  
+      
     
   
     
   
     
+      
+    
   
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -836,8 +744,24 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210121/">
-                  DockerでRUNをまとめた方が良いとは限らない
+                <a href="https://future-architect.github.io/articles/20210304/">
+                  mxGraphで階層グラフを可視化する
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210226/">
+                  アクセシビリティ情報を使った壊れにくいE2Eテスト
                 </a>
               </li>
             </ul>
@@ -849,17 +773,13 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
+    
+  
+    
+  
+    
+  
     
   
     
@@ -881,49 +801,7 @@
     
   
     
-  
-    
-  
-    
-  
-    
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201223/">
-                  2021年版Pythonの型ヒントの書き方 (for Python 3.9)
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201203/">
-                  GoがApple Siliconにネイティブ対応したのでベンチマークをとってみました
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
     
   
     
@@ -938,8 +816,78 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201119/">
-                  PythonistaがGo言語に入門してみた
+                <a href="https://future-architect.github.io/articles/20201109/">
+                  GoのWebアプリ開発でフラットパッケージにした話
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20201107/">
+                  フューチャーOSS推進タスクフォース始めます
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200807/">
+                  GoとSuffixArray
                 </a>
               </li>
             </ul>
@@ -955,6 +903,144 @@
     
   
     
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200416/">
+                  ServiceNow+Terraform(+Go) によるインフラ構築自動化
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200401/">
+                  Vue.js最初の難関、「props down, event up」を初心者にわかるように解説してみた
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
       
     
   
@@ -964,6 +1050,10 @@
   
     
   
+    
+  
+    
+      
     
   
     
@@ -983,307 +1073,11 @@
     
   
     
-      
-    
-  
-    
-  
-    
-  
-    
   
     
       
     
   
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
     
   
     
@@ -1305,15 +1099,17 @@
     
   
     
-  
-    
-      
-        
       
     
   
     
-      
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1349,61 +1145,9 @@
     
   
     
-      
-        
-      
-    
   
     
       
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
     
   
     
@@ -1417,39 +1161,9 @@
     
   
     
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
   
     
   
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
     
   
     
@@ -1464,8 +1178,6 @@
   
     
       
-        
-      
     
   
     
@@ -1475,27 +1187,9 @@
     
   
     
-      
-        
-      
-    
   
     
-      
-        
-      
-    
   
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
     
   
     
@@ -1523,18 +1217,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
         
       
@@ -1542,28 +1224,8 @@
   
     
       
-        
-      
     
   
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
     
   
     
@@ -1597,69 +1259,11 @@
     
   
     
-      
-    
-  
-    
-  
-    
-  
-    
   
     
       
     
   
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
     
   
     
@@ -1683,8 +1287,6 @@
     
   
     
-      
-    
   
     
   
@@ -1695,25 +1297,11 @@
     
   
     
-      
-    
   
     
   
     
-      
-    
   
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
     
   
     
@@ -1729,11 +1317,7 @@
     
   
     
-      
-    
   
-    
-      
     
   
     
@@ -1741,17 +1325,15 @@
     
   
     
-      
+  
     
   
     
-      
+  
     
   
     
-      
-        
-      
+  
     
   
     
@@ -1763,11 +1345,39 @@
     
   
     
-      
+  
+    
+  
     
   
     
       
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1809,6 +1419,76 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
       
         
       
@@ -1822,6 +1502,214 @@
   
     
       
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
         
       
     
@@ -1839,9 +1727,95 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
       
     
   
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -1899,23 +1873,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (105)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/DB/">DB (12)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Programming/">Programming (138)</a>
 	</li>
       
 	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (107)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
 	</li>
       
 	<li>
@@ -2092,19 +2066,15 @@
 
   
 <script src="/metronic/assets/plugins/jquery.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/corporate/scripts/layout.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script type="text/javascript">

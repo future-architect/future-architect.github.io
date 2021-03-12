@@ -44,30 +44,24 @@
   <!-- Global styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Global styles END -->
 
   <!-- Theme styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/css/theme-styles.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Theme styles END -->
 <meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
@@ -154,14 +148,14 @@
 
 <p>なぜこのようなことになっているのか、仮に性能問題（SQLの遅延）が発生しているとき、どのような対処が考えられるか説明してきます。</p>
 <h2 id="PostgreSQL10での確認"><a href="#PostgreSQL10での確認" class="headerlink" title="PostgreSQL10での確認"></a>PostgreSQL10での確認</h2><p>以下のようにパーティションテーブルを用意しました。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--drop table tr_part;</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> tr_part(</span><br><span class="line">    part_date <span class="built_in">date</span></span><br><span class="line">,   <span class="keyword">key</span> <span class="built_in">numeric</span></span><br><span class="line">,   <span class="keyword">data</span> <span class="built_in">numeric</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">partition</span> <span class="keyword">by</span> <span class="keyword">range</span>(part_date);</span><br><span class="line"><span class="comment">--パーティション作成</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tr_part_p_1809_01 <span class="keyword">partition</span> <span class="keyword">of</span>      tr_part <span class="keyword">for</span> <span class="keyword">values</span> <span class="keyword">from</span> ( <span class="keyword">MINVALUE</span> ) <span class="keyword">to</span> (<span class="string">'20180902'</span>);</span><br><span class="line"><span class="keyword">alter</span>  <span class="keyword">table</span> tr_part_p_1809_01 <span class="keyword">add</span> <span class="keyword">constraint</span> pk_tr_part_p_1809_01 primary <span class="keyword">key</span>(ymd,<span class="keyword">key</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tr_part_p_1809_02 <span class="keyword">partition</span> <span class="keyword">of</span>      tr_part <span class="keyword">for</span> <span class="keyword">values</span> <span class="keyword">from</span> ( <span class="string">'20180902'</span> ) <span class="keyword">to</span> (<span class="string">'20180903'</span>);</span><br><span class="line"><span class="keyword">alter</span>  <span class="keyword">table</span> tr_part_p_1809_02 <span class="keyword">add</span> <span class="keyword">constraint</span> pk_tr_part_p_1809_02 primary <span class="keyword">key</span>(ymd,<span class="keyword">key</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tr_part_p_1809_03 <span class="keyword">partition</span> <span class="keyword">of</span>      tr_part <span class="keyword">for</span> <span class="keyword">values</span> <span class="keyword">from</span> ( <span class="string">'20180903'</span> ) <span class="keyword">to</span> (<span class="string">'20180904'</span>);</span><br><span class="line"><span class="keyword">alter</span>  <span class="keyword">table</span> tr_part_p_1809_03 <span class="keyword">add</span> <span class="keyword">constraint</span> pk_tr_part_p_1809_03 primary <span class="keyword">key</span>(ymd,<span class="keyword">key</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tr_part_p_9912_31 <span class="keyword">partition</span> <span class="keyword">of</span>      tr_part <span class="keyword">for</span> <span class="keyword">values</span> <span class="keyword">from</span> ( <span class="string">'20180904'</span> ) <span class="keyword">to</span> (<span class="string">'99991231'</span>);</span><br><span class="line"><span class="keyword">alter</span>  <span class="keyword">table</span> tr_part_p_9912_31 <span class="keyword">add</span> <span class="keyword">constraint</span> pk_tr_part_p_9912_31 primary <span class="keyword">key</span>(ymd,<span class="keyword">key</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> tr_part <span class="keyword">select</span> <span class="string">'20180901'</span>,generate_series,<span class="keyword">round</span>(generate_series * random() * <span class="number">100</span>) <span class="keyword">from</span> generate_series(<span class="number">1</span>,<span class="number">100000</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> tr_part <span class="keyword">select</span> <span class="string">'20180902'</span>,generate_series,<span class="keyword">round</span>(generate_series * random() * <span class="number">100</span>) <span class="keyword">from</span> generate_series(<span class="number">100001</span>,<span class="number">200000</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> tr_part <span class="keyword">select</span> <span class="string">'20180903'</span>,generate_series,<span class="keyword">round</span>(generate_series * random() * <span class="number">100</span>) <span class="keyword">from</span> generate_series(<span class="number">200001</span>,<span class="number">300000</span>);</span><br><span class="line"><span class="keyword">analyze</span> tr_part;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--drop table tr_part;</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> tr_part(</span><br><span class="line">    part_date <span class="built_in">date</span></span><br><span class="line">,   <span class="keyword">key</span> <span class="built_in">numeric</span></span><br><span class="line">,   <span class="keyword">data</span> <span class="built_in">numeric</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">partition</span> <span class="keyword">by</span> <span class="keyword">range</span>(part_date);</span><br><span class="line"><span class="comment">--パーティション作成</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tr_part_p_1809_01 <span class="keyword">partition</span> <span class="keyword">of</span>      tr_part <span class="keyword">for</span> <span class="keyword">values</span> <span class="keyword">from</span> ( <span class="keyword">MINVALUE</span> ) <span class="keyword">to</span> (<span class="string">&#x27;20180902&#x27;</span>);</span><br><span class="line"><span class="keyword">alter</span>  <span class="keyword">table</span> tr_part_p_1809_01 <span class="keyword">add</span> <span class="keyword">constraint</span> pk_tr_part_p_1809_01 primary <span class="keyword">key</span>(ymd,<span class="keyword">key</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tr_part_p_1809_02 <span class="keyword">partition</span> <span class="keyword">of</span>      tr_part <span class="keyword">for</span> <span class="keyword">values</span> <span class="keyword">from</span> ( <span class="string">&#x27;20180902&#x27;</span> ) <span class="keyword">to</span> (<span class="string">&#x27;20180903&#x27;</span>);</span><br><span class="line"><span class="keyword">alter</span>  <span class="keyword">table</span> tr_part_p_1809_02 <span class="keyword">add</span> <span class="keyword">constraint</span> pk_tr_part_p_1809_02 primary <span class="keyword">key</span>(ymd,<span class="keyword">key</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tr_part_p_1809_03 <span class="keyword">partition</span> <span class="keyword">of</span>      tr_part <span class="keyword">for</span> <span class="keyword">values</span> <span class="keyword">from</span> ( <span class="string">&#x27;20180903&#x27;</span> ) <span class="keyword">to</span> (<span class="string">&#x27;20180904&#x27;</span>);</span><br><span class="line"><span class="keyword">alter</span>  <span class="keyword">table</span> tr_part_p_1809_03 <span class="keyword">add</span> <span class="keyword">constraint</span> pk_tr_part_p_1809_03 primary <span class="keyword">key</span>(ymd,<span class="keyword">key</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tr_part_p_9912_31 <span class="keyword">partition</span> <span class="keyword">of</span>      tr_part <span class="keyword">for</span> <span class="keyword">values</span> <span class="keyword">from</span> ( <span class="string">&#x27;20180904&#x27;</span> ) <span class="keyword">to</span> (<span class="string">&#x27;99991231&#x27;</span>);</span><br><span class="line"><span class="keyword">alter</span>  <span class="keyword">table</span> tr_part_p_9912_31 <span class="keyword">add</span> <span class="keyword">constraint</span> pk_tr_part_p_9912_31 primary <span class="keyword">key</span>(ymd,<span class="keyword">key</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> tr_part <span class="keyword">select</span> <span class="string">&#x27;20180901&#x27;</span>,generate_series,<span class="keyword">round</span>(generate_series * random() * <span class="number">100</span>) <span class="keyword">from</span> generate_series(<span class="number">1</span>,<span class="number">100000</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> tr_part <span class="keyword">select</span> <span class="string">&#x27;20180902&#x27;</span>,generate_series,<span class="keyword">round</span>(generate_series * random() * <span class="number">100</span>) <span class="keyword">from</span> generate_series(<span class="number">100001</span>,<span class="number">200000</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> tr_part <span class="keyword">select</span> <span class="string">&#x27;20180903&#x27;</span>,generate_series,<span class="keyword">round</span>(generate_series * random() * <span class="number">100</span>) <span class="keyword">from</span> generate_series(<span class="number">200001</span>,<span class="number">300000</span>);</span><br><span class="line"><span class="keyword">analyze</span> tr_part;</span><br></pre></td></tr></table></figure>
 
 <p>データを投入した <code>p_1809_01</code>、 <code>p_1809_02</code>、 <code>p_1809_03</code> のパーティションに注目すると次のようなイメージです。 <code>part_date</code> の値によってレコードがパーティションに振り分けられて格納されています。</p>
 <img src="/images/20181019/1.png">
 
 
 <p>続いて以下のような小さなテーブルを用意します。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--drop table wk_input;</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> wk_input(</span><br><span class="line">	<span class="keyword">key</span> <span class="built_in">numeric</span></span><br><span class="line">,	related_key <span class="built_in">numeric</span></span><br><span class="line">,	target_date <span class="built_in">date</span></span><br><span class="line">)</span><br><span class="line">;</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> wk_input <span class="keyword">select</span> <span class="number">1</span>,<span class="number">1</span>     ,<span class="string">'20180901'</span>;</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> wk_input <span class="keyword">select</span> <span class="number">2</span>,<span class="number">100001</span>,<span class="string">'20180902'</span>;</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> wk_input <span class="keyword">select</span> <span class="number">3</span>,<span class="number">200001</span>,<span class="string">'20180903'</span>;</span><br><span class="line"><span class="keyword">analyze</span> wk_input;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--drop table wk_input;</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> wk_input(</span><br><span class="line">	<span class="keyword">key</span> <span class="built_in">numeric</span></span><br><span class="line">,	related_key <span class="built_in">numeric</span></span><br><span class="line">,	target_date <span class="built_in">date</span></span><br><span class="line">)</span><br><span class="line">;</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> wk_input <span class="keyword">select</span> <span class="number">1</span>,<span class="number">1</span>     ,<span class="string">&#x27;20180901&#x27;</span>;</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> wk_input <span class="keyword">select</span> <span class="number">2</span>,<span class="number">100001</span>,<span class="string">&#x27;20180902&#x27;</span>;</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> wk_input <span class="keyword">select</span> <span class="number">3</span>,<span class="number">200001</span>,<span class="string">&#x27;20180903&#x27;</span>;</span><br><span class="line"><span class="keyword">analyze</span> wk_input;</span><br></pre></td></tr></table></figure>
 
 <p>そして、以下のようなselectを実行するとどのような動作となるでしょうか。<br>ポイントはパーティションテーブルのパーティションキーに設定した<code>part_date</code>の列が結合条件としてのみ指定されていることです。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	*</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	wk_input a</span><br><span class="line">,	tr_part b</span><br><span class="line"><span class="keyword">where</span> <span class="number">1</span> = <span class="number">1</span></span><br><span class="line"><span class="keyword">and</span> a.related_key = b.key</span><br><span class="line"><span class="keyword">and</span> a.target_date = b.part_date</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
@@ -169,7 +163,7 @@
 <p>このとき期待するのは次図の赤線のような動作でしょう。<br><img src="/images/20181019/2.png"></p>
 <p>wk_input の target_date が <code>20180901</code> のレコードに対し、tr_partのpart_dateが <code>20180901</code> のパーティションにアクセスし、<br>wk_input の target_date が <code>20180902</code> のレコードに対し、tr_partのpart_dateが <code>20180902</code> のパーティションにアクセスし、<br>wk_input の target_date が <code>20180903</code> のレコードに対し、tr_partのpart_dateが <code>20180903</code> のパーティションにアクセスする。</p>
 <p>ORACLEの場合はまさにそのような動作になります。<br>実行計画でみると以下のようになります。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">STATEMENT</span></span><br><span class="line">    <span class="keyword">NESTED</span> LOOPS</span><br><span class="line">        <span class="keyword">TABLE</span> <span class="keyword">ACCESS</span> <span class="keyword">FULL</span> WK_INPUT</span><br><span class="line">        <span class="keyword">PARTITION</span> <span class="keyword">RANGE</span> ITERATOR</span><br><span class="line">            <span class="keyword">TABLE</span> <span class="keyword">ACCESS</span> <span class="keyword">BY</span> <span class="keyword">ROWID</span> TR_PART</span><br><span class="line">                <span class="keyword">INDEX</span> <span class="keyword">UNIQUE</span> <span class="keyword">SCAN</span> PK_TR_PART</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">STATEMENT</span></span><br><span class="line">    <span class="keyword">NESTED</span> LOOPS</span><br><span class="line">        <span class="keyword">TABLE</span> <span class="keyword">ACCESS</span> <span class="keyword">FULL</span> WK_INPUT</span><br><span class="line">        <span class="keyword">PARTITION</span> <span class="keyword">RANGE</span> ITERATOR</span><br><span class="line">            <span class="keyword">TABLE</span> <span class="keyword">ACCESS</span> <span class="keyword">BY</span> <span class="keyword">ROWID</span> TR_PART</span><br><span class="line">                <span class="keyword">INDEX</span> <span class="keyword">UNIQUE</span> <span class="keyword">SCAN</span> PK_TR_PART</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p><code>PARTITION RANGE ITERATOR</code>のところがまさに、WK_INPUTの各行に対応するパーティションへのアクセスを示しています。</p>
 <p>では、PostgreSQL10ではどのようになるかというと<code>explain analyze</code>で先のselect文を実行すると以下のような出力になりました。</p>
@@ -252,56 +246,12 @@
   
     
       
-    
-  
-    
-      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210310/">
-                  本番データが急に欲しくなったアナタに贈る、CloudSQLのサーバレスエクスポートを試してみた
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210308/">
-                  Auth0 Rulesのユニットテストを書きたい
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20190713/">
-                  Goを学ぶときにつまずきやすいポイントFAQ
+                <a href="https://future-architect.github.io/articles/20210313/">
+                  CloudNative Days Spring 2021 ONLINEに登壇しました
                 </a>
               </li>
             </ul>
@@ -313,47 +263,7 @@
     
   
     
-  
-    
       
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
     
   
     
@@ -368,86 +278,10 @@
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210208/">
-                  Go 1.16からリリースされたgo:embedとは
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
     
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210121/">
-                  DockerでRUNをまとめた方が良いとは限らない
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
     
   
     
@@ -464,8 +298,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201203/">
-                  GoがApple Siliconにネイティブ対応したのでベンチマークをとってみました
+                <a href="https://future-architect.github.io/articles/20191107/">
+                  インフラ入門vol.3(ネットワーク冗長化構成)
                 </a>
               </li>
             </ul>
@@ -477,36 +311,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201109/">
-                  GoのWebアプリ開発でフラットパッケージにした話
-                </a>
-              </li>
-            </ul>
-          </div>
-        
       
     
   
@@ -515,7 +319,19 @@
     
   
     
+      
+    
   
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -537,6 +353,10 @@
     
   
     
+      
+    
+  
+    
   
     
   
@@ -544,17 +364,9 @@
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201020/">
-                  ProxyとDockerと新人社員と時々わたし
-                </a>
-              </li>
-            </ul>
-          </div>
-        
+    
+  
+    
       
     
   
@@ -571,41 +383,7 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -631,59 +409,7 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20200807/">
-                  GoとSuffixArray
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
     
   
     
@@ -705,79 +431,9 @@
     
   
     
-      
-    
-  
-    
-  
-    
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -801,6 +457,46 @@
     
       
         
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200606/">
+                  フューチャー夏のインターン2020。リモート開催予定です
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200512/">
+                  日本製HeadlessCMSのmicroCMSを触ってみた
+                </a>
+              </li>
+            </ul>
+          </div>
+        
       
     
   
@@ -808,6 +504,174 @@
       
     
   
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200331/">
+                  Serverless連載5: CloudEventsのGo版SDKをいじってみる
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200327/">
+                  Serverless連載3: Goでサーバーレス用の検索エンジンwatertowerを作ってみました
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200323/">
+                  Serverless連載1: SAMを使ったローカルテスト（Go編）
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200205/">
+                  GCP連載#1 Stackdriver Loggingへ良い感じのログ出力方法を考える
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20190610/">
+                  ソースコードを綺麗にするためにまず心がけたい３点
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
     
   
     
@@ -829,127 +693,7 @@
     
   
     
-      
-    
   
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
     
   
     
@@ -974,108 +718,6 @@
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
         
       
     
@@ -1083,17 +725,17 @@
     
   
     
-  
-    
-  
-    
-      
-        
       
     
   
     
   
+    
+      
+    
+  
+    
+      
     
   
     
@@ -1123,20 +765,6 @@
     
   
     
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
       
     
   
@@ -1147,15 +775,9 @@
     
   
     
-      
-        
-      
-    
   
     
   
-    
-      
     
   
     
@@ -1181,8 +803,6 @@
     
   
     
-      
-        
       
     
   
@@ -1196,6 +816,48 @@
   
     
   
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
     
   
     
@@ -1239,6 +901,318 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
       
         
       
@@ -1277,7 +1251,21 @@
     
   
     
-      
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1287,7 +1275,39 @@
     
   
     
+  
+    
       
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1312,12 +1332,64 @@
   
     
       
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
         
       
     
   
     
       
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
     
   
     
@@ -1336,88 +1408,6 @@
       
         
       
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
     
   
     
@@ -1475,23 +1465,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (105)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/DB/">DB (12)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Programming/">Programming (138)</a>
 	</li>
       
 	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (107)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
 	</li>
       
 	<li>
@@ -1668,19 +1658,15 @@
 
   
 <script src="/metronic/assets/plugins/jquery.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/corporate/scripts/layout.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script type="text/javascript">

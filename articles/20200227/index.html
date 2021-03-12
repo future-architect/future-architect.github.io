@@ -23,9 +23,9 @@
 <meta property="article:modified_time" content="2020-07-17T01:50:25.359Z">
 <meta property="article:tag" content="AWS">
 <meta property="article:tag" content="Go">
+<meta property="article:tag" content="DynamoDB×Go">
 <meta property="article:tag" content="KVS">
 <meta property="article:tag" content="DynamoDB">
-<meta property="article:tag" content="DynamoDB×Go">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
@@ -41,30 +41,24 @@
   <!-- Global styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Global styles END -->
 
   <!-- Theme styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/css/theme-styles.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Theme styles END -->
 <meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
@@ -125,11 +119,11 @@
   
     <a href="/tags/Go/" title="Go">Go</a>,
   
+    <a href="/tags/DynamoDB%C3%97Go/" title="DynamoDB×Go">DynamoDB×Go</a>,
+  
     <a href="/tags/KVS/" title="KVS">KVS</a>,
   
-    <a href="/tags/DynamoDB/" title="DynamoDB">DynamoDB</a>,
-  
-    <a href="/tags/DynamoDB%C3%97Go/" title="DynamoDB×Go">DynamoDB×Go</a>
+    <a href="/tags/DynamoDB/" title="DynamoDB">DynamoDB</a>
   
 
 
@@ -150,39 +144,39 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>こんにちは。TIG DXユニット<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>の武田です。</p>
-<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p><a href="https://future-architect.github.io/tags/DynamoDB%C3%97Go/">DynamoDB×Go連載企画</a>第2弾の記事となります。<br><a href="https://future-architect.github.io/articles/20200225/">DynamoDB×Go連載#1 GoでDynamoDBでおなじみのguregu/dynamoを利用する</a> では <a href="https://github.com/guregu/dynamo" target="_blank" rel="noopener">guregu/dynamo</a> を利用したDynamoDBの基本操作をご紹介しました。</p>
-<p>本記事ではサードパーティ製のライブラリを利用せずaws-sdkを素で利用した場合のDynamoDBの基本操作について見ていきましょう。<br>なお、公式のドキュメントは下記になりますので、より詳細な情報はこちらを参照してください。<br><a href="https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/welcome.html" target="_blank" rel="noopener">https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/welcome.html</a></p>
+<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p><a href="https://future-architect.github.io/tags/DynamoDB%C3%97Go/">DynamoDB×Go連載企画</a>第2弾の記事となります。<br><a href="https://future-architect.github.io/articles/20200225/">DynamoDB×Go連載#1 GoでDynamoDBでおなじみのguregu/dynamoを利用する</a> では <a target="_blank" rel="noopener" href="https://github.com/guregu/dynamo">guregu/dynamo</a> を利用したDynamoDBの基本操作をご紹介しました。</p>
+<p>本記事ではサードパーティ製のライブラリを利用せずaws-sdkを素で利用した場合のDynamoDBの基本操作について見ていきましょう。<br>なお、公式のドキュメントは下記になりますので、より詳細な情報はこちらを参照してください。<br><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/welcome.html">https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/welcome.html</a></p>
 <h2 id="環境情報"><a href="#環境情報" class="headerlink" title="環境情報"></a>環境情報</h2><ul>
 <li>Go: 1.13.8</li>
 <li>aws-sdk-go: v1.29.10</li>
 </ul>
 <h2 id="検証環境の準備"><a href="#検証環境の準備" class="headerlink" title="検証環境の準備"></a>検証環境の準備</h2><p>第1回の記事同様 <code>DynamoDB Local</code> を利用してローカル環境を準備します。<br><a href="https://future-architect.github.io/articles/20200225/">https://future-architect.github.io/articles/20200225/</a></p>
 <h2 id="事前準備"><a href="#事前準備" class="headerlink" title="事前準備"></a>事前準備</h2><h3 id="SDKのセットアップ"><a href="#SDKのセットアップ" class="headerlink" title="SDKのセットアップ"></a>SDKのセットアップ</h3><p>セッション及びDynamoDBを操作するクライアントを作成します。</p>
-<figure class="highlight go"><figcaption><span>クライアントの生成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create session.</span></span><br><span class="line">sess := session.Must(session.NewSessionWithOptions(session.Options&#123;</span><br><span class="line">	SharedConfigState: session.SharedConfigEnable,</span><br><span class="line">&#125;))</span><br><span class="line"><span class="comment">// Create DynamoDB client.</span></span><br><span class="line">db := dynamodb.New(sess, &amp;aws.Config&#123;Endpoint: aws.String(<span class="string">"http://localhost:8000"</span>)&#125;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>クライアントの生成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create session.</span></span><br><span class="line">sess := session.Must(session.NewSessionWithOptions(session.Options&#123;</span><br><span class="line">	SharedConfigState: session.SharedConfigEnable,</span><br><span class="line">&#125;))</span><br><span class="line"><span class="comment">// Create DynamoDB client.</span></span><br><span class="line">db := dynamodb.New(sess, &amp;aws.Config&#123;Endpoint: aws.String(<span class="string">&quot;http://localhost:8000&quot;</span>)&#125;)</span><br></pre></td></tr></table></figure>
 
 <p>オプションの <code>SharedConfigState</code> に <code>SharedConfigEnable</code> を設定することで <code>~/.aws/config</code> 内を参照してくれるようになります。</p>
-<h3 id="レコードを表現する構造体の定義"><a href="#レコードを表現する構造体の定義" class="headerlink" title="レコードを表現する構造体の定義"></a>レコードを表現する構造体の定義</h3><figure class="highlight go"><figcaption><span>構造体定義</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Item <span class="keyword">struct</span> &#123;</span><br><span class="line">	MyHashKey  <span class="keyword">string</span> <span class="string">`dynamodbav:"MyHashKey"`</span></span><br><span class="line">	MyRangeKey <span class="keyword">int</span>    <span class="string">`dynamodbav:"MyRangeKey"`</span></span><br><span class="line">	MyText     <span class="keyword">string</span> <span class="string">`dynamodbav:"MyText"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="レコードを表現する構造体の定義"><a href="#レコードを表現する構造体の定義" class="headerlink" title="レコードを表現する構造体の定義"></a>レコードを表現する構造体の定義</h3><figure class="highlight go"><figcaption><span>構造体定義</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Item <span class="keyword">struct</span> &#123;</span><br><span class="line">	MyHashKey  <span class="keyword">string</span> <span class="string">`dynamodbav:&quot;MyHashKey&quot;`</span></span><br><span class="line">	MyRangeKey <span class="keyword">int</span>    <span class="string">`dynamodbav:&quot;MyRangeKey&quot;`</span></span><br><span class="line">	MyText     <span class="keyword">string</span> <span class="string">`dynamodbav:&quot;MyText&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><code>dynamodbav</code> というタグを利用することで、DynamoDBのキーを指定して構造体とマッピングすることができます。<br>省略した場合は構造体のキー名がそのまま利用されます。</p>
 <h2 id="基本的なCRUD"><a href="#基本的なCRUD" class="headerlink" title="基本的なCRUD"></a>基本的なCRUD</h2><h3 id="Create"><a href="#Create" class="headerlink" title="Create"></a>Create</h3><p>利用するメソッドは <code>PutItem</code> です。</p>
-<figure class="highlight go"><figcaption><span>Create処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">item := Item&#123;</span><br><span class="line">	MyHashKey:  <span class="string">"00001"</span>,</span><br><span class="line">	MyRangeKey: <span class="number">1</span>,</span><br><span class="line">	MyText:     <span class="string">"some text..."</span>,</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Convert item to dynamodb attribute.</span></span><br><span class="line">av, err := dynamodbattribute.MarshalMap(item)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Create an input.</span></span><br><span class="line">input := &amp;dynamodb.PutItemInput&#123;</span><br><span class="line">	TableName: aws.String(<span class="string">"MyFirstTable"</span>),</span><br><span class="line">	Item:      av,</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Execute.</span></span><br><span class="line">_, err = db.PutItem(input)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>Create処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">item := Item&#123;</span><br><span class="line">	MyHashKey:  <span class="string">&quot;00001&quot;</span>,</span><br><span class="line">	MyRangeKey: <span class="number">1</span>,</span><br><span class="line">	MyText:     <span class="string">&quot;some text...&quot;</span>,</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Convert item to dynamodb attribute.</span></span><br><span class="line">av, err := dynamodbattribute.MarshalMap(item)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Create an input.</span></span><br><span class="line">input := &amp;dynamodb.PutItemInput&#123;</span><br><span class="line">	TableName: aws.String(<span class="string">&quot;MyFirstTable&quot;</span>),</span><br><span class="line">	Item:      av,</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Execute.</span></span><br><span class="line">_, err = db.PutItem(input)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><code>dynamodbattribute.MarshalMap</code> を利用して構造体を <code>dynamodb attribute</code> に変換する必要がある点がポイントです。</p>
 <h3 id="Read"><a href="#Read" class="headerlink" title="Read"></a>Read</h3><p>利用するメソッドは <code>GetItem</code> です。</p>
-<figure class="highlight go"><figcaption><span>Read処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create an input.</span></span><br><span class="line">input := &amp;dynamodb.GetItemInput&#123;</span><br><span class="line">	TableName: aws.String(<span class="string">"MyFirstTable"</span>),</span><br><span class="line">	Key: <span class="keyword">map</span>[<span class="keyword">string</span>]*dynamodb.AttributeValue&#123;</span><br><span class="line">		<span class="string">"MyHashKey"</span>: &#123;</span><br><span class="line">			S: aws.String(<span class="string">"00001"</span>),</span><br><span class="line">		&#125;,</span><br><span class="line">		<span class="string">"MyRangeKey"</span>: &#123;</span><br><span class="line">			N: aws.String(<span class="string">"1"</span>),</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Execute.</span></span><br><span class="line">result, err := db.GetItem(input)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Convert the dynamodb result to a struct.</span></span><br><span class="line">item := Item&#123;&#125;</span><br><span class="line">err = dynamodbattribute.UnmarshalMap(result.Item, &amp;item)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line">fmt.Println(item) <span class="comment">// &#123;00001 1 some text...&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>Read処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create an input.</span></span><br><span class="line">input := &amp;dynamodb.GetItemInput&#123;</span><br><span class="line">	TableName: aws.String(<span class="string">&quot;MyFirstTable&quot;</span>),</span><br><span class="line">	Key: <span class="keyword">map</span>[<span class="keyword">string</span>]*dynamodb.AttributeValue&#123;</span><br><span class="line">		<span class="string">&quot;MyHashKey&quot;</span>: &#123;</span><br><span class="line">			S: aws.String(<span class="string">&quot;00001&quot;</span>),</span><br><span class="line">		&#125;,</span><br><span class="line">		<span class="string">&quot;MyRangeKey&quot;</span>: &#123;</span><br><span class="line">			N: aws.String(<span class="string">&quot;1&quot;</span>),</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Execute.</span></span><br><span class="line">result, err := db.GetItem(input)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Convert the dynamodb result to a struct.</span></span><br><span class="line">item := Item&#123;&#125;</span><br><span class="line">err = dynamodbattribute.UnmarshalMap(result.Item, &amp;item)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line">fmt.Println(item) <span class="comment">// &#123;00001 1 some text...&#125;</span></span><br></pre></td></tr></table></figure>
 
 <p><code>GetItemInput</code> を作成する際に、キー属性を指定する必要があります。<br>取得した結果は <code>dynamodbattribute.UnmarshalMap</code> を利用して任意の構造体にマッピングできます。</p>
 <h3 id="Update"><a href="#Update" class="headerlink" title="Update"></a>Update</h3><p>利用するメソッドは <code>UpdateItem</code> です。<br>どのキーをどの値に更新するかを指定する必要があるため、少しコードが複雑になります。 </p>
-<figure class="highlight go"><figcaption><span>Update処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create an expression for update.</span></span><br><span class="line">update := expression.UpdateBuilder&#123;&#125;.Set(expression.Name(<span class="string">"MyText"</span>), expression.Value(<span class="string">"updated text"</span>))</span><br><span class="line">expr, err := expression.NewBuilder().WithUpdate(update).Build()</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Create an input.</span></span><br><span class="line">input := &amp;dynamodb.UpdateItemInput&#123;</span><br><span class="line">	TableName: aws.String(<span class="string">"MyFirstTable"</span>),</span><br><span class="line">	Key: <span class="keyword">map</span>[<span class="keyword">string</span>]*dynamodb.AttributeValue&#123;</span><br><span class="line">		<span class="string">"MyHashKey"</span>: &#123;</span><br><span class="line">			S: aws.String(<span class="string">"00001"</span>),</span><br><span class="line">		&#125;,</span><br><span class="line">		<span class="string">"MyRangeKey"</span>: &#123;</span><br><span class="line">			N: aws.String(<span class="string">"1"</span>),</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">	ExpressionAttributeNames:  expr.Names(),</span><br><span class="line">	ExpressionAttributeValues: expr.Values(),</span><br><span class="line">	UpdateExpression:          expr.Update(),</span><br><span class="line">	ConditionExpression:       expr.Condition(),</span><br><span class="line">	ReturnValues:              aws.String(dynamodb.ReturnValueAllNew),</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Execute.</span></span><br><span class="line">_, err = db.UpdateItem(input)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>Update処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create an expression for update.</span></span><br><span class="line">update := expression.UpdateBuilder&#123;&#125;.Set(expression.Name(<span class="string">&quot;MyText&quot;</span>), expression.Value(<span class="string">&quot;updated text&quot;</span>))</span><br><span class="line">expr, err := expression.NewBuilder().WithUpdate(update).Build()</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Create an input.</span></span><br><span class="line">input := &amp;dynamodb.UpdateItemInput&#123;</span><br><span class="line">	TableName: aws.String(<span class="string">&quot;MyFirstTable&quot;</span>),</span><br><span class="line">	Key: <span class="keyword">map</span>[<span class="keyword">string</span>]*dynamodb.AttributeValue&#123;</span><br><span class="line">		<span class="string">&quot;MyHashKey&quot;</span>: &#123;</span><br><span class="line">			S: aws.String(<span class="string">&quot;00001&quot;</span>),</span><br><span class="line">		&#125;,</span><br><span class="line">		<span class="string">&quot;MyRangeKey&quot;</span>: &#123;</span><br><span class="line">			N: aws.String(<span class="string">&quot;1&quot;</span>),</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">	ExpressionAttributeNames:  expr.Names(),</span><br><span class="line">	ExpressionAttributeValues: expr.Values(),</span><br><span class="line">	UpdateExpression:          expr.Update(),</span><br><span class="line">	ConditionExpression:       expr.Condition(),</span><br><span class="line">	ReturnValues:              aws.String(dynamodb.ReturnValueAllNew),</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Execute.</span></span><br><span class="line">_, err = db.UpdateItem(input)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><code>UpdateBuilder</code>, <code>ExpressionBuilder</code> を利用して、更新式を作成します。<br><code>ConditionBuilder</code> を利用して更新条件を指定することもできます。</p>
 <h3 id="Delete"><a href="#Delete" class="headerlink" title="Delete"></a>Delete</h3><p>利用するメソッドは <code>UpdateItem</code> です。</p>
-<figure class="highlight go"><figcaption><span>Delete処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create an input.</span></span><br><span class="line">input := &amp;dynamodb.DeleteItemInput&#123;</span><br><span class="line">	TableName: aws.String(<span class="string">"MyFirstTable"</span>),</span><br><span class="line">	Key: <span class="keyword">map</span>[<span class="keyword">string</span>]*dynamodb.AttributeValue&#123;</span><br><span class="line">		<span class="string">"MyHashKey"</span>: &#123;</span><br><span class="line">			S: aws.String(<span class="string">"00001"</span>),</span><br><span class="line">		&#125;,</span><br><span class="line">		<span class="string">"MyRangeKey"</span>: &#123;</span><br><span class="line">			N: aws.String(<span class="string">"1"</span>),</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Execute.</span></span><br><span class="line">_, err := db.DeleteItem(input)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>Delete処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create an input.</span></span><br><span class="line">input := &amp;dynamodb.DeleteItemInput&#123;</span><br><span class="line">	TableName: aws.String(<span class="string">&quot;MyFirstTable&quot;</span>),</span><br><span class="line">	Key: <span class="keyword">map</span>[<span class="keyword">string</span>]*dynamodb.AttributeValue&#123;</span><br><span class="line">		<span class="string">&quot;MyHashKey&quot;</span>: &#123;</span><br><span class="line">			S: aws.String(<span class="string">&quot;00001&quot;</span>),</span><br><span class="line">		&#125;,</span><br><span class="line">		<span class="string">&quot;MyRangeKey&quot;</span>: &#123;</span><br><span class="line">			N: aws.String(<span class="string">&quot;1&quot;</span>),</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Execute.</span></span><br><span class="line">_, err := db.DeleteItem(input)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="guregu-dynamo-との比較"><a href="#guregu-dynamo-との比較" class="headerlink" title="guregu/dynamo との比較"></a>guregu/dynamo との比較</h2><p>コードを見てわかるとおり、aws-sdkを素で利用する方が筋力が必要になります。<br>ただし筆者はメンテナンス性を考慮し、極力サードパーティ性のライブラリには依存したくない（特にアプリのコアとなる部分は）という思いもあり、aws-sdkのみを利用する方針をとっています。</p>
 <p>とはいえ <code>attribute</code> や <code>expression</code> を極力書きたくない、書かせたくないという思いもあり、<br>汎用的な処理については共通メソッドを構えるようにしていました。</p>
 <p>例えばGETのイメージは下記の感じです。</p>
-<figure class="highlight go"><figcaption><span>共通的なメソッド</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(repo *BaseRepository)</span> <span class="title">get</span><span class="params">(req, res domain.Domain, consistent <span class="keyword">bool</span>)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	key, err := repo.KeyAttributes(req)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> errors.Wrap(err, <span class="string">"failed to get DynamoDB key attributes"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	input := &amp;dynamodb.GetItemInput&#123;</span><br><span class="line">		TableName:      repo.Table(),</span><br><span class="line">		Key:            key,</span><br><span class="line">		ConsistentRead: aws.Bool(consistent),</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Execute.</span></span><br><span class="line">	output, err := repo.DB.GetItem(input)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> errors.Wrapf(err, <span class="string">"failed to execute DynamoDB Get API to %s"</span>, *repo.Table())</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(output.Item) == <span class="number">0</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> exception.NewNotFoundError(<span class="string">""</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> err = dynamodbattribute.UnmarshalMap(output.Item, &amp;res); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> errors.Wrap(err, <span class="string">"failed to DynamoDB unmarshal"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// KeyAttributes returns a map of *dymanodb.AttributeValue that is dynamodb table key from the passed struct.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(repo *BaseRepository)</span> <span class="title">KeyAttributes</span><span class="params">(domain <span class="keyword">interface</span>&#123;&#125;)</span> <span class="params">(<span class="keyword">map</span>[<span class="keyword">string</span>]*dynamodb.AttributeValue, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> repo.attributes(domain, <span class="function"><span class="keyword">func</span><span class="params">(tag reflect.StructTag)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">		_, ok := tag.Lookup(<span class="string">"dynamodbkey"</span>)</span><br><span class="line">		<span class="keyword">return</span> ok</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(repo *BaseRepository)</span> <span class="title">attributes</span><span class="params">(domain <span class="keyword">interface</span>&#123;&#125;, condition <span class="keyword">func</span>(tag reflect.StructTag)</span> <span class="title">bool</span>) <span class="params">(<span class="keyword">map</span>[<span class="keyword">string</span>]*dynamodb.AttributeValue, error)</span></span> &#123;</span><br><span class="line">	rv := reflect.Indirect(reflect.ValueOf(domain))</span><br><span class="line">	<span class="keyword">if</span> rv.Kind() != reflect.Struct &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, errors.New(<span class="string">"domain must be a struct"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Create dynamodb attributes.</span></span><br><span class="line">	attr, err := dynamodbattribute.MarshalMap(rv.Interface())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Delete attributes by condition.</span></span><br><span class="line">	<span class="keyword">var</span> deleteAttr <span class="function"><span class="keyword">func</span><span class="params">(rv reflect.Value)</span></span></span><br><span class="line">	deleteAttr = <span class="function"><span class="keyword">func</span><span class="params">(rv reflect.Value)</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> i, rt := <span class="number">0</span>, rv.Type(); i &lt; rv.NumField(); i++ &#123;</span><br><span class="line">			<span class="keyword">if</span> rv.Field(i).Kind() == reflect.Struct &amp;&amp; rt.Field(i).Anonymous &#123;</span><br><span class="line">				deleteAttr(rv.Field(i))</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">			name, tag := rt.Field(i).Name, rt.Field(i).Tag</span><br><span class="line">			<span class="keyword">if</span> !condition(tag) &#123;</span><br><span class="line">				<span class="keyword">if</span> dynamodbav := tag.Get(<span class="string">"dynamodbav"</span>); dynamodbav != <span class="string">""</span> &#123;</span><br><span class="line">					<span class="built_in">delete</span>(attr, strings.Split(dynamodbav, <span class="string">","</span>)[<span class="number">0</span>])</span><br><span class="line">				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">					<span class="built_in">delete</span>(attr, name)</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	deleteAttr(rv)</span><br><span class="line">	<span class="keyword">return</span> attr, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><figcaption><span>共通的なメソッド</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(repo *BaseRepository)</span> <span class="title">get</span><span class="params">(req, res domain.Domain, consistent <span class="keyword">bool</span>)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	key, err := repo.KeyAttributes(req)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> errors.Wrap(err, <span class="string">&quot;failed to get DynamoDB key attributes&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	input := &amp;dynamodb.GetItemInput&#123;</span><br><span class="line">		TableName:      repo.Table(),</span><br><span class="line">		Key:            key,</span><br><span class="line">		ConsistentRead: aws.Bool(consistent),</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Execute.</span></span><br><span class="line">	output, err := repo.DB.GetItem(input)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> errors.Wrapf(err, <span class="string">&quot;failed to execute DynamoDB Get API to %s&quot;</span>, *repo.Table())</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(output.Item) == <span class="number">0</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> exception.NewNotFoundError(<span class="string">&quot;&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> err = dynamodbattribute.UnmarshalMap(output.Item, &amp;res); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> errors.Wrap(err, <span class="string">&quot;failed to DynamoDB unmarshal&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// KeyAttributes returns a map of *dymanodb.AttributeValue that is dynamodb table key from the passed struct.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(repo *BaseRepository)</span> <span class="title">KeyAttributes</span><span class="params">(domain <span class="keyword">interface</span>&#123;&#125;)</span> <span class="params">(<span class="keyword">map</span>[<span class="keyword">string</span>]*dynamodb.AttributeValue, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> repo.attributes(domain, <span class="function"><span class="keyword">func</span><span class="params">(tag reflect.StructTag)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">		_, ok := tag.Lookup(<span class="string">&quot;dynamodbkey&quot;</span>)</span><br><span class="line">		<span class="keyword">return</span> ok</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(repo *BaseRepository)</span> <span class="title">attributes</span><span class="params">(domain <span class="keyword">interface</span>&#123;&#125;, condition <span class="keyword">func</span>(tag reflect.StructTag)</span> <span class="title">bool</span>) <span class="params">(<span class="keyword">map</span>[<span class="keyword">string</span>]*dynamodb.AttributeValue, error)</span></span> &#123;</span><br><span class="line">	rv := reflect.Indirect(reflect.ValueOf(domain))</span><br><span class="line">	<span class="keyword">if</span> rv.Kind() != reflect.Struct &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, errors.New(<span class="string">&quot;domain must be a struct&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Create dynamodb attributes.</span></span><br><span class="line">	attr, err := dynamodbattribute.MarshalMap(rv.Interface())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Delete attributes by condition.</span></span><br><span class="line">	<span class="keyword">var</span> deleteAttr <span class="function"><span class="keyword">func</span><span class="params">(rv reflect.Value)</span></span></span><br><span class="line">	deleteAttr = <span class="function"><span class="keyword">func</span><span class="params">(rv reflect.Value)</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> i, rt := <span class="number">0</span>, rv.Type(); i &lt; rv.NumField(); i++ &#123;</span><br><span class="line">			<span class="keyword">if</span> rv.Field(i).Kind() == reflect.Struct &amp;&amp; rt.Field(i).Anonymous &#123;</span><br><span class="line">				deleteAttr(rv.Field(i))</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">			name, tag := rt.Field(i).Name, rt.Field(i).Tag</span><br><span class="line">			<span class="keyword">if</span> !condition(tag) &#123;</span><br><span class="line">				<span class="keyword">if</span> dynamodbav := tag.Get(<span class="string">&quot;dynamodbav&quot;</span>); dynamodbav != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">					<span class="built_in">delete</span>(attr, strings.Split(dynamodbav, <span class="string">&quot;,&quot;</span>)[<span class="number">0</span>])</span><br><span class="line">				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">					<span class="built_in">delete</span>(attr, name)</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	deleteAttr(rv)</span><br><span class="line">	<span class="keyword">return</span> attr, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>同様にUpdate, Create, Deleteも汎化することで、呼び出し元の実装は極めてシンプルにすることができてました。<br>もちろんより複雑なことをやろうとするとコードも煩雑になり、それこそ <code>dynamodb/guregu</code> 相当のものを再開発することになりかねません。<br>ある程度の制約を設けるなどしてDynamoDBの利用シーンをシンプルにできるのであるのであれば、筆者はaws-sdkのみの利用を推奨します。</p>
 <h2 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h2><p>第2段の記事はいかがだったでしょうか。<br>gureguなどサードパーティ製のライブラリの利用と迷っている方の参考になれば幸いです。</p>
@@ -240,12 +234,36 @@
   
     
       
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210311/">
-                  PythonでCloud Operationsの機能を使ってみる
+                <a href="https://future-architect.github.io/articles/20200609/">
+                  春の入門祭り🌸 #7 作って学ぶGraphQL。gqlgenを用いて鉄道データ検索API開発入門
                 </a>
               </li>
             </ul>
@@ -256,18 +274,6 @@
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210310/">
-                  本番データが急に欲しくなったアナタに贈る、CloudSQLのサーバレスエクスポートを試してみた
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
     
   
     
@@ -276,56 +282,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210309/">
-                  PubSubのメッセージスキーマを試してみる
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210305/">
-                  インフラ入門ーインフラ要件定義編ー
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210304/">
-                  mxGraphで階層グラフを可視化する
+                <a href="https://future-architect.github.io/articles/20200311/">
+                  JavaプログラマーのためのGo言語入門
                 </a>
               </li>
             </ul>
@@ -349,15 +307,7 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
+      
     
   
     
@@ -365,7 +315,7 @@
     
   
     
-  
+      
     
   
     
@@ -378,82 +328,6 @@
       
     
   
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210208/">
-                  Go 1.16からリリースされたgo:embedとは
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210121/">
-                  DockerでRUNをまとめた方が良いとは限らない
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
     
   
     
@@ -472,8 +346,168 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201206/">
-                  AWSマネージドAirflow(MWAA)についてのFAQ
+                <a href="https://future-architect.github.io/articles/20201223/">
+                  2021年版Pythonの型ヒントの書き方 (for Python 3.9)
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200910/">
+                  「2020年代のコンテナ時代のPythonアーキテクチャ&デプロイ」というテーマでPyCon.jp 2020で発表してきました
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200807/">
+                  GoとSuffixArray
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200331/">
+                  Serverless連載5: CloudEventsのGo版SDKをいじってみる
                 </a>
               </li>
             </ul>
@@ -488,8 +522,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201203/">
-                  GoがApple Siliconにネイティブ対応したのでベンチマークをとってみました
+                <a href="https://future-architect.github.io/articles/20200327/">
+                  Serverless連載3: Goでサーバーレス用の検索エンジンwatertowerを作ってみました
                 </a>
               </li>
             </ul>
@@ -499,9 +533,59 @@
     
   
     
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200323/">
+                  Serverless連載1: SAMを使ったローカルテスト（Go編）
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
   
     
   
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200203/">
+                  チームで機能設計するためのPlantUML標準化
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
     
   
     
@@ -520,8 +604,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201117/">
-                  Goのデバッグ環境 on VSCode
+                <a href="https://future-architect.github.io/articles/20191008/">
+                   本当に使ってよかったOpenAPI (Swagger) ツール
                 </a>
               </li>
             </ul>
@@ -532,6 +616,308 @@
   
     
       
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -557,6 +943,230 @@
     
   
     
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
       
     
   
@@ -573,13 +1183,53 @@
     
   
     
+      
+    
   
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
     
   
     
       
     
   
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
     
   
     
@@ -631,12 +1281,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
       
         
       
@@ -652,576 +1296,6 @@
   
     
   
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
     
   
     
@@ -1263,12 +1337,6 @@
     
   
     
-  
-    
-      
-    
-  
-    
       
     
   
@@ -1279,11 +1347,11 @@
     
   
     
-  
+      
     
   
     
-  
+      
     
   
     
@@ -1297,69 +1365,9 @@
     
   
     
-      
-        
-      
-    
   
     
   
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
     
   
     
@@ -1379,14 +1387,6 @@
     
   
     
-      
-    
-  
-    
-      
-    
-  
-    
   
     
   
@@ -1396,12 +1396,26 @@
   
     
       
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
     
   
     
       
     
   
+    
+      
     
   
     
@@ -1459,23 +1473,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (105)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/DB/">DB (12)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Programming/">Programming (138)</a>
 	</li>
       
 	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (107)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
 	</li>
       
 	<li>
@@ -1652,19 +1666,15 @@
 
   
 <script src="/metronic/assets/plugins/jquery.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/corporate/scripts/layout.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script type="text/javascript">

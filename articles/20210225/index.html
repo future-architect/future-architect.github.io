@@ -48,30 +48,24 @@
   <!-- Global styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Global styles END -->
 
   <!-- Theme styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/css/theme-styles.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Theme styles END -->
 <meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
@@ -152,7 +146,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="/images/20210225/title.png" alt=""></p>
+        <p><img src="/images/20210225/title.png"></p>
 <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIG DXユニット所属の村上です。<br>最近データ分析絡みでDynamoDBを触る機会が多く、DynamoDBが体の一部みたいになってきました。<br>本記事の結論はこれです。</p>
 <p><strong>大量に取得したいデータに共通して存在する値の属性をGSIとして設定しよう</strong></p>
 <p>予備知識から順に解説していきます。</p>
@@ -163,11 +157,11 @@
 </ul>
 <p>取得したいデータがDBに存在するほとんど全てのデータであれば、Scanで取得するのが効率的なのですが、必ずしもそのような状況であるとは限りません。Queryによって、特定の値を持つデータのみを取得したい場合もあると思います。</p>
 <p>今回は後者の場合を想定し、Queryによって特定の値を持つ大量のデータを効率的に取得する方法について解説します。</p>
-<h1 id="DynamoDBの制限"><a href="#DynamoDBの制限" class="headerlink" title="DynamoDBの制限"></a>DynamoDBの制限</h1><p>DynamoDBから効率的にデータを取得するにあたり、DynamoDBに存在する制限を知っておかなければなりません。今回対象とするQuery操作には、<code>1度のQuery操作での取得サイズ上限は1MB</code>という制限が存在します。詳しくは<a href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Query.html" target="_blank" rel="noopener">公式ドキュメント</a>をご覧ください。</p>
+<h1 id="DynamoDBの制限"><a href="#DynamoDBの制限" class="headerlink" title="DynamoDBの制限"></a>DynamoDBの制限</h1><p>DynamoDBから効率的にデータを取得するにあたり、DynamoDBに存在する制限を知っておかなければなりません。今回対象とするQuery操作には、<code>1度のQuery操作での取得サイズ上限は1MB</code>という制限が存在します。詳しくは<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Query.html">公式ドキュメント</a>をご覧ください。</p>
 <p>この制限を超えるサイズのデータを取得する場合、Query操作を繰り返し行うことによって全てのデータを取得することになります。従って、大量のデータを取得する場合は1回当たりのQueryで上限の1MBをしっかりと使い切ることが、効率的なデータの取得につながります。</p>
 <h1 id="GSI（グローバル・セカンダリ・インデックス）を工夫する"><a href="#GSI（グローバル・セカンダリ・インデックス）を工夫する" class="headerlink" title="GSI（グローバル・セカンダリ・インデックス）を工夫する"></a>GSI（グローバル・セカンダリ・インデックス）を工夫する</h1><p>DynamoDBから特定の条件を満たすデータを大量に取得する場合は、GSIを工夫することが重要となります。これについて順に解説していきます。</p>
 <h2 id="GSIの特徴"><a href="#GSIの特徴" class="headerlink" title="GSIの特徴"></a>GSIの特徴</h2><p>GSIには重複が許されるという特徴があります。実際にDBを操作しながら見ていきたいと思います。</p>
-<p>今回の実験では最近愛用している<code>NoSQL Workbench</code>というアプリを使います。これはクラウドやローカルのDynamoDBをGUIで操作、可視化できるツールで、AWS公式から配布されています。ダウンロードは<a href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/workbench.settingup.html" target="_blank" rel="noopener">こちら</a>。</p>
+<p>今回の実験では最近愛用している<code>NoSQL Workbench</code>というアプリを使います。これはクラウドやローカルのDynamoDBをGUIで操作、可視化できるツールで、AWS公式から配布されています。ダウンロードは<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/workbench.settingup.html">こちら</a>。</p>
 <h3 id="パーティションキーとソートキー"><a href="#パーティションキーとソートキー" class="headerlink" title="パーティションキーとソートキー"></a>パーティションキーとソートキー</h3><p>DynamoDBにはパーティションキーとソートキーという概念があります。GSIのパーティションキー、ソートキーと呼び方を区別するために、本記事ではプライマリパーティションキー、プライマリソートキーと呼ぶことにします。<br>基本的にはこれらの値の組み合わせが重複することは許されません。例えば以下のような設定と内容のテーブルに対してこれらが重複したデータを追加しようとしたらどうなるか試してみます。</p>
 <h4 id="テーブル設定"><a href="#テーブル設定" class="headerlink" title="テーブル設定"></a>テーブル設定</h4><table>
 <thead>
@@ -290,32 +284,6 @@
     
   
     
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210308/">
-                  Auth0 Rulesのユニットテストを書きたい
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
   
     
       
@@ -334,7 +302,95 @@
     
   
     
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200601/">
+                  春の入門祭り 🌸 #01 Goのテストに入門してみよう！
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
   
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200630/">
+                  go-swaggerを用いたWebアプリケーション開発Tips19選
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20181031/">
+                  その問い合わせ、AIが解決します！～Redmineチケットレコメンドシステムのご紹介～
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20161031/">
+                  SQL実行時のブルームフィルタ(Bloom Filter)アルゴリズム
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
     
   
     
@@ -355,98 +411,10 @@
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210304/">
-                  mxGraphで階層グラフを可視化する
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
     
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210301/">
-                  【登壇しました】アレクサアプリを開発してみたら中々大変だった話
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210210/">
-                  Go1.16からのio/ioutilパッケージ
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
     
   
     
@@ -476,37 +444,19 @@
     
   
     
-  
-    
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210107/">
+                  Electronの使い方 Web開発の技術でデスクトップアプリを作ろう
+                </a>
+              </li>
+            </ul>
+          </div>
+        
       
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
     
   
     
@@ -526,13 +476,23 @@
     
   
     
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
       
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201206/">
-                  AWSマネージドAirflow(MWAA)についてのFAQ
+                <a href="https://future-architect.github.io/articles/20201107/">
+                  フューチャーOSS推進タスクフォース始めます
                 </a>
               </li>
             </ul>
@@ -542,72 +502,6 @@
     
   
     
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201117/">
-                  Goのデバッグ環境 on VSCode
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
   
     
   
@@ -622,58 +516,14 @@
     
   
     
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
         
+      
+    
+  
+    
+  
+    
       
     
   
@@ -696,9 +546,15 @@
     
   
     
+      
+        
+      
+    
   
     
   
+    
+      
     
   
     
@@ -716,22 +572,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
       
     
   
@@ -739,10 +579,6 @@
   
     
   
-    
-  
-    
-      
     
   
     
@@ -757,98 +593,6 @@
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
         
       
     
@@ -857,86 +601,6 @@
   
     
   
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
     
   
     
@@ -963,61 +627,9 @@
   
     
       
-        
-      
     
   
     
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
       
     
   
@@ -1034,40 +646,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
       
     
   
@@ -1092,9 +670,11 @@
     
   
     
-  
-    
       
+        
+      
+    
+  
     
   
     
@@ -1108,7 +688,295 @@
     
   
     
+  
+    
+  
+    
       
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1144,84 +1012,6 @@
     
   
     
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
       
         
       
@@ -1233,156 +1023,6 @@
   
     
   
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
     
   
     
@@ -1424,11 +1064,229 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
       
     
   
     
       
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
     
   
     
@@ -1447,6 +1305,102 @@
   
     
       
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
         
       
     
@@ -1455,6 +1409,72 @@
       
     
   
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
     
   
     
@@ -1512,23 +1532,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (105)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/DB/">DB (12)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Programming/">Programming (138)</a>
 	</li>
       
 	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (107)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
 	</li>
       
 	<li>
@@ -1705,19 +1725,15 @@
 
   
 <script src="/metronic/assets/plugins/jquery.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/corporate/scripts/layout.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script type="text/javascript">

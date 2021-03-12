@@ -41,30 +41,24 @@
   <!-- Global styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Global styles END -->
 
   <!-- Theme styles START -->
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   
 <link rel="stylesheet" href="/css/theme-styles.css">
-<link rel="stylesheet" href="/.css" src="/.js">
 
   <!-- Theme styles END -->
 <meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
@@ -149,21 +143,21 @@
 <p>先日、Vue.js + Service Worker開発案件が終わりました。その振り返りとして、Service Worker開発で起きた不具合と対応方法を記載します。</p>
 <img src="/images/20210216/thumbnail.png" class="img-middle-size">
 
-<p><a href="https://pixabay.com/ja/users/templune-1493489/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=2044932" target="_blank" rel="noopener">Diego Velázquez</a>による<a href="https://pixabay.com/ja/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=2044932" target="_blank" rel="noopener">Pixabay</a>からの画像</p>
+<p><a target="_blank" rel="noopener" href="https://pixabay.com/ja/users/templune-1493489/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=2044932">Diego Velázquez</a>による<a target="_blank" rel="noopener" href="https://pixabay.com/ja/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=2044932">Pixabay</a>からの画像</p>
 <h1 id="Service-Workerとは"><a href="#Service-Workerとは" class="headerlink" title="Service Workerとは"></a>Service Workerとは</h1><p>Service Workerは、ブラウザがWebページとは別にバックグラウンドで実行するJavaScriptになります。</p>
 <h1 id="利用ブラウザ-バージョン情報など"><a href="#利用ブラウザ-バージョン情報など" class="headerlink" title="利用ブラウザ/バージョン情報など"></a>利用ブラウザ/バージョン情報など</h1><ul>
 <li>Chrome v88.0.4324.146</li>
 <li>Vue.js v2.6.11</li>
 </ul>
 <h1 id="起きた不具合その１"><a href="#起きた不具合その１" class="headerlink" title="起きた不具合その１"></a>起きた不具合その１</h1><h2 id="事象"><a href="#事象" class="headerlink" title="事象"></a>事象</h2><p>Service Worker上で、<code>setInterval</code>の処理を用意したところ、数分で止まるという報告が上がりました。<br><code>setInterval</code>は、バックグランド上で定期的にある処理をするために用意したものです。</p>
-<figure class="highlight js"><figcaption><span>service-worker.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> timer = setInterval(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 1秒ごとに処理を実行</span></span><br><span class="line">&#125;, <span class="number">1000</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><figcaption><span>service-worker.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> timer = <span class="built_in">setInterval</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 1秒ごとに処理を実行</span></span><br><span class="line">&#125;, <span class="number">1000</span>)</span><br></pre></td></tr></table></figure>
 
 <h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>調べてみるとService Workerの活動には制限があるようでした。</p>
 <p>またブラウザのDevToolを起動している場合は、Service Workerは常時活動中となり、<code>setInterval</code>の処理が止まることはありません。開発中はブラウザのDevToolを常時起動中であったため、本件不具合に気づかないという事態になりました…</p>
-<p><a href="https://w3c.github.io/ServiceWorker/#service-worker-lifetime" target="_blank" rel="noopener">参考：Service Worker Lifetime</a></p>
+<p><a target="_blank" rel="noopener" href="https://w3c.github.io/ServiceWorker/#service-worker-lifetime">参考：Service Worker Lifetime</a></p>
 <h2 id="対応"><a href="#対応" class="headerlink" title="対応"></a>対応</h2><p><code>setInterval</code>の処理をService WorkerからVue.js側（Webアプリ側）に移動しました。</p>
 <p>簡単な例ですが、下記のように実行したい画面のComponentに組み込みました。</p>
-<figure class="highlight html"><figcaption><span>sample1.vue</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 省略 --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="actionscript">  name: <span class="string">'sample1'</span>,</span></span><br><span class="line">  created () &#123;</span><br><span class="line"><span class="javascript">    <span class="keyword">const</span> timer = setInterval(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span></span><br><span class="line"><span class="actionscript">    <span class="comment">// 1秒ごとに処理を実行</span></span></span><br><span class="line">    &#125;, 1000)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><figcaption><span>sample1.vue</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 省略 --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="javascript">  name: <span class="string">&#x27;sample1&#x27;</span>,</span></span><br><span class="line">  created () &#123;</span><br><span class="line"><span class="javascript">    <span class="keyword">const</span> timer = <span class="built_in">setInterval</span>(<span class="function">() =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">    <span class="comment">// 1秒ごとに処理を実行</span></span></span><br><span class="line">    &#125;, 1000)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="補足"><a href="#補足" class="headerlink" title="補足"></a>補足</h2><p>本記事は、<code>setInterval</code>に焦点を当てましたが、Service Worker側に用意したWebSocket受信処理も止まってしまったため、WebSocket受信処理もVue.js側に移動する対応も実施しました。</p>
 <h1 id="起きた不具合その２"><a href="#起きた不具合その２" class="headerlink" title="起きた不具合その２"></a>起きた不具合その２</h1><h2 id="事象-1"><a href="#事象-1" class="headerlink" title="事象"></a>事象</h2><p>［Ctrl］＋［Shift］＋［R］キーでリロードすると、下記のエラーが出てVue.jsからService Workerへのメッセージ送信が失敗するという事象が起きました。</p>
@@ -172,18 +166,18 @@
 <h2 id="原因-1"><a href="#原因-1" class="headerlink" title="原因"></a>原因</h2><p>［Ctrl］＋［Shift］＋［R］キーでリロードすると、Service Workerが解除され、下記の<code>controller</code>が<code>null</code>になったことが原因でした。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">navigator.serviceWorker.controller.postMessage(&#123; msg &#125;)</span><br></pre></td></tr></table></figure>
 
-<p><a href="https://w3c.github.io/ServiceWorker/#dom-serviceworkercontainer-controller" target="_blank" rel="noopener">Service Worker Controller</a>を確認すると、</p>
+<p><a target="_blank" rel="noopener" href="https://w3c.github.io/ServiceWorker/#dom-serviceworkercontainer-controller">Service Worker Controller</a>を確認すると、</p>
 <blockquote>
 <p>navigator.serviceWorker.controller returns null if the request is a force refresh (shift+refresh).</p>
 </blockquote>
 <p>の記載があり、［Ctrl］＋［Shift］＋［R］キーでリロードしたときに<code>controller</code>が<code>null</code>になるのは仕様でした。</p>
 <h2 id="対応-1"><a href="#対応-1" class="headerlink" title="対応"></a>対応</h2><p>再度Service WorkerがWebアプリをコントロールする状態になるように下記を実施しました。<br>まずVue.js側に、Service Workerが<code>active</code>になったら、Service Worker側に<code>claim</code>するようにメッセージを送ります。</p>
-<figure class="highlight js"><figcaption><span>main.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="string">'serviceWorker'</span> <span class="keyword">in</span> navigator) &#123;</span><br><span class="line">  <span class="built_in">window</span>.onload = <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// Service Workerの登録</span></span><br><span class="line">    <span class="keyword">const</span> registration = <span class="keyword">await</span> navigator.serviceWorker.register(<span class="string">'/service-worker.js'</span>)</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Service Workerがactiveになったら、実行される</span></span><br><span class="line">    <span class="keyword">const</span> activeRegistration = <span class="keyword">await</span> navigator.serviceWorker.ready</span><br><span class="line">    <span class="comment">// この段階では、まだcontrollerはnullのため、active.postMessageでメッセージを送信</span></span><br><span class="line">    activeRegistration.active.postMessage(&#123; <span class="attr">action</span>: <span class="string">'claim'</span> &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><figcaption><span>main.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="string">&#x27;serviceWorker&#x27;</span> <span class="keyword">in</span> navigator) &#123;</span><br><span class="line">  <span class="built_in">window</span>.onload = <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// Service Workerの登録</span></span><br><span class="line">    <span class="keyword">const</span> registration = <span class="keyword">await</span> navigator.serviceWorker.register(<span class="string">&#x27;/service-worker.js&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Service Workerがactiveになったら、実行される</span></span><br><span class="line">    <span class="keyword">const</span> activeRegistration = <span class="keyword">await</span> navigator.serviceWorker.ready</span><br><span class="line">    <span class="comment">// この段階では、まだcontrollerはnullのため、active.postMessageでメッセージを送信</span></span><br><span class="line">    activeRegistration.active.postMessage(&#123; <span class="attr">action</span>: <span class="string">&#x27;claim&#x27;</span> &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>次にService Worker側で該当のメッセージを受け取ったら、<code>self.clients.claim()</code>を実施します。</p>
-<figure class="highlight js"><figcaption><span>service-worker.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">self.onmessage = <span class="function">(<span class="params">message</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (message.data.action === <span class="string">'claim'</span>) &#123;</span><br><span class="line">    self.clients.claim()</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><figcaption><span>service-worker.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">self.onmessage = <span class="function">(<span class="params">message</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (message.data.action === <span class="string">&#x27;claim&#x27;</span>) &#123;</span><br><span class="line">    self.clients.claim()</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>ここまで対応すると、Service WorkerがWebアプリをコントロールしている状態になります。<br>またService Workerがコントロールする状態になるまで、<code>navigator.serviceWorker.controller.postMessage</code>の処理は失敗します。<br>その失敗した処理のリカバリ方法として、下記のように画面をリロードして再実行するように対応しました。</p>
-<figure class="highlight js"><figcaption><span>main.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="string">'serviceWorker'</span> <span class="keyword">in</span> navigator) &#123;</span><br><span class="line">  <span class="built_in">window</span>.onload = <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// Service WorkerがWebアプリをコントロール開始</span></span><br><span class="line">    navigator.serviceWorker.oncontrollerchange = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">window</span>.location.reload()</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">const</span> registration = <span class="keyword">await</span> navigator.serviceWorker.register(<span class="string">'/service-worker.js'</span>)</span><br><span class="line">    </span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> activeRegistration = <span class="keyword">await</span> navigator.serviceWorker.ready</span><br><span class="line">    activeRegistration.active.postMessage(&#123; <span class="attr">action</span>: <span class="string">'claim'</span> &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><figcaption><span>main.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="string">&#x27;serviceWorker&#x27;</span> <span class="keyword">in</span> navigator) &#123;</span><br><span class="line">  <span class="built_in">window</span>.onload = <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// Service WorkerがWebアプリをコントロール開始</span></span><br><span class="line">    navigator.serviceWorker.oncontrollerchange = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">window</span>.location.reload()</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">const</span> registration = <span class="keyword">await</span> navigator.serviceWorker.register(<span class="string">&#x27;/service-worker.js&#x27;</span>)</span><br><span class="line">    </span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> activeRegistration = <span class="keyword">await</span> navigator.serviceWorker.ready</span><br><span class="line">    activeRegistration.active.postMessage(&#123; <span class="attr">action</span>: <span class="string">&#x27;claim&#x27;</span> &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h1 id="所感"><a href="#所感" class="headerlink" title="所感"></a>所感</h1><p>Service Worker開発で起きた不具合を２例紹介しました。</p>
 <p>なかなか解決策が見つからず辛いと感じることもありましたが、こうして考えた解決策を公開することができて、大変嬉しく思っています。</p>
@@ -238,20 +232,12 @@
   
     
       
-    
-  
-    
-      
-    
-  
-    
-      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210309/">
-                  PubSubのメッセージスキーマを試してみる
+                <a href="https://future-architect.github.io/articles/20210313/">
+                  CloudNative Days Spring 2021 ONLINEに登壇しました
                 </a>
               </li>
             </ul>
@@ -260,48 +246,6 @@
       
     
   
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210307/">
-                  GCP連載2021を始めます
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20190713/">
-                  Goを学ぶときにつまずきやすいポイントFAQ
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
     
   
     
@@ -320,8 +264,40 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210303/">
-                  Vis Networkで階層グラフを可視化する
+                <a href="https://future-architect.github.io/articles/20200709/">
+                  GoでWebアプリ開発時にあるあるだったレビューコメント
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200630/">
+                  go-swaggerを用いたWebアプリケーション開発Tips19選
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200609/">
+                  春の入門祭り🌸 #7 作って学ぶGraphQL。gqlgenを用いて鉄道データ検索API開発入門
                 </a>
               </li>
             </ul>
@@ -335,23 +311,7 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
-    
-  
-    
-  
     
   
     
@@ -366,6 +326,72 @@
   
     
       
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20161031/">
+                  SQL実行時のブルームフィルタ(Bloom Filter)アルゴリズム
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210305/">
+                  インフラ入門ーインフラ要件定義編ー
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210304/">
+                  mxGraphで階層グラフを可視化する
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210226/">
+                  アクセシビリティ情報を使った壊れにくいE2Eテスト
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
     
   
     
@@ -376,40 +402,6 @@
   
     
   
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
     
   
     
@@ -431,12 +423,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
       
         
           <div class="widget">
@@ -453,55 +439,9 @@
     
   
     
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201203/">
-                  GoがApple Siliconにネイティブ対応したのでベンチマークをとってみました
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
   
     
   
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201119/">
-                  PythonistaがGo言語に入門してみた
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-      
     
   
     
@@ -520,56 +460,6 @@
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201107/">
-                  フューチャーOSS推進タスクフォース始めます
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20201028/">
-                  読書の秋に読みたい、オライリー謎書籍10選
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
     
   
     
@@ -578,46 +468,6 @@
       
         
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -645,9 +495,7 @@
     
   
     
-  
-    
-  
+      
     
   
     
@@ -661,28 +509,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
       
     
   
@@ -692,60 +518,6 @@
   
     
   
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
     
   
     
@@ -769,81 +541,9 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
     
   
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
     
   
     
@@ -866,8 +566,6 @@
   
     
       
-        
-      
     
   
     
@@ -881,8 +579,48 @@
     
   
     
+      
+    
   
     
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
       
     
   
@@ -897,10 +635,82 @@
     
   
     
+  
+    
+  
+    
       
     
   
     
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
       
     
   
@@ -931,102 +741,6 @@
     
   
     
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
   
     
       
@@ -1040,320 +754,6 @@
   
     
   
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
     
   
     
@@ -1389,6 +789,244 @@
     
   
     
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
       
     
   
@@ -1398,6 +1036,386 @@
       
     
   
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
     
   
     
@@ -1455,23 +1473,23 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Management/">Management (8)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/Infrastructure/">Infrastructure (105)</a>
-	</li>
-      
-	<li>
-	  <a href="/categories/DB/">DB (12)</a>
-	</li>
-      
-	<li>
 	  <a href="/categories/Programming/">Programming (138)</a>
 	</li>
       
 	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (107)</a>
+	</li>
+      
+	<li>
 	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
 	</li>
       
 	<li>
@@ -1648,19 +1666,15 @@
 
   
 <script src="/metronic/assets/plugins/jquery.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script src="/metronic/assets/corporate/scripts/layout.js"></script>
-<script href="/.css" src="/.js"></script>
 
 
 <script type="text/javascript">
