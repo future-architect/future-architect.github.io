@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="はじめにこんにちは、TIGの齋場です。GCP連載2021の第11弾です。 本記事では、Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる手順を紹介します。Cloud Spannerを用いた開発を行う方、また興味あるから少し触ってみたいという方にもおすすめです。 Cloud Spannerとは簡単にCloud Spanner (以下「Spanner」と記載">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210323/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、TIGの齋場です。GCP連載2021の第11弾です。 本記事では、Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる手順を紹介します。Cloud Spannerを用いた開発を行う方、また興味あるから少し触ってみたいという方にもおすすめです。 Cloud Spannerとは簡単にCloud Spanner (以下「Spanner」と記載">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210323/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210323/image_2.png">
+<meta property="article:published_time" content="2021-03-22T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-03-22T16:10:00.944Z">
+<meta property="article:tag" content="GCP">
+<meta property="article:tag" content="GCP連載">
+<meta property="article:tag" content="Spanner">
+<meta property="article:tag" content="DockerCompose">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210323/image.png">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる | フューチャー技術ブログ" name="description">
+  <meta content="Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー技術ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+
+  <!-- Styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Styles END -->
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20210323/">Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20210323_Cloud_Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> <a href="/authors/%E9%BD%8B%E5%A0%B4%E4%BF%8A%E5%A4%AA%E6%9C%97">齋場俊太朗</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2021-03-22T15:00:00.000Z" itemprop="datePublished">2021/03/23</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/GCP/" title="GCP">GCP</a>,
+  
+    <a href="/tags/GCP%E9%80%A3%E8%BC%89/" title="GCP連載">GCP連載</a>,
+  
+    <a href="/tags/Spanner/" title="Spanner">Spanner</a>,
+  
+    <a href="/tags/DockerCompose/" title="DockerCompose">DockerCompose</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIGの齋場です。<a href="/articles/20210307/">GCP連載2021</a>の第11弾です。</p>
+<p>本記事では、Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる手順を紹介します。Cloud Spannerを用いた開発を行う方、また興味あるから少し触ってみたいという方にもおすすめです。</p>
+<h1 id="Cloud-Spannerとは"><a href="#Cloud-Spannerとは" class="headerlink" title="Cloud Spannerとは"></a>Cloud Spannerとは</h1><p>簡単にCloud Spanner (以下「Spanner」と記載)について紹介させていただきます。</p>
+<p>Spannerは、Google Cloudが提供する”強力な一貫性と水平方向の拡張性を兼ね備えた唯一のリレーショナルデータベースサービス” です。</p>
+<p>以下公式ドキュメントの抜粋です。</p>
+<blockquote>
+<p>・無制限のスケーリングによって、リレーショナル セマンティクスと SQL のすべてのメリットを享受<br>・任意のサイズで開始し、ニーズの拡大に応じて制限なしでスケーリング<br>・計画的ダウンタイムのない、オンラインでのスキーマ変更で高可用性を実現<br>・リージョンや大陸全体にわたる強整合性で高性能のトランザクションを提供<br>・自動シャーディングなどの機能により手動のタスクを排除し、イノベーションに注力</p>
+</blockquote>
+<p>夢のようなデータベースサービスですね。でも、となるとやっぱりお高そう..料金は以下ような感じです。</p>
+<h4 id="１ノードあたりの料金（すべてのレプリケーションを含む）"><a href="#１ノードあたりの料金（すべてのレプリケーションを含む）" class="headerlink" title="１ノードあたりの料金（すべてのレプリケーションを含む）"></a>１ノードあたりの料金（すべてのレプリケーションを含む）</h4><table>
+<thead>
+<tr>
+<th>構成</th>
+<th>リージョン</th>
+<th>$/時間</th>
+<th>$/月 (100%稼働)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>リージョン</td>
+<td>asia-northeast1 (東京)</td>
+<td>1.17</td>
+<td>842.4</td>
+</tr>
+<tr>
+<td>マルチリージョン</td>
+<td>asia1 (東京+大阪)</td>
+<td>3.9</td>
+<td>2808</td>
+</tr>
+</tbody></table>
+<p>最小構成のリージョン+1ノード構成でも、なかなかのコストが掛かりますね。</p>
+<h1 id="開発環境どうするか"><a href="#開発環境どうするか" class="headerlink" title="開発環境どうするか"></a>開発環境どうするか</h1><p>コストが高いので、開発環境用に気軽にインスタンスを立ち上げるのは難しそうです。<br>ということで、本記事ではGCPが公式で提供してくれている <a target="_blank" rel="noopener" href="https://cloud.google.com/spanner/docs/emulator?hl=ja">Spanner エミュレータ</a> を使って開発環境を立ち上げます！(エミューレータあってよかったありがとう!)</p>
+<p>gcloud CLIとdockerイメージでの提供がありますが、今回はdocker-composeで利用する例を紹介します。<br>サンプルコードはこちら: <a target="_blank" rel="noopener" href="https://github.com/tarosaiba/compose-spanner"><strong>tarosaiba/compose-spanner</strong></a></p>
+<p>以下2点工夫したポイントです。</p>
+<ul>
+<li>通常、Spannerエミュレータ起動後にインスタンスの作成手順(<code>gcloud spanner instances create</code>)が必要になりますが、docker-compose立ち上げ時に自動でインスタンス作成されるようにしています</li>
+<li>DBの初期化処理(テーブル作成&amp;データ投入)のために、事前に用意したDDL/DMLをdocker-compose立ち上げ時に自動で実行されるようにしています</li>
+</ul>
+<p>ということで早速手順を紹介します。</p>
+<h1 id="要件"><a href="#要件" class="headerlink" title="要件"></a>要件</h1><ul>
+<li>docker &gt;= 19.03.0+</li>
+<li>docker-compose &gt;= 1.27.0+</li>
+</ul>
+<h1 id="手順"><a href="#手順" class="headerlink" title="手順"></a>手順</h1><h2 id="クイックスタート"><a href="#クイックスタート" class="headerlink" title="クイックスタート"></a>クイックスタート</h2><ul>
+<li>リポジトリをクローン <a target="_blank" rel="noopener" href="https://github.com/tarosaiba/compose-spanner">https://github.com/tarosaiba/compose-spanner</a></li>
+<li>ディレクトリに移動  <code>cd compoose-spanner</code></li>
+<li>docker-compose起動 <code>docker-compose up -d</code></li>
+</ul>
+<p>手順は以上です!</p>
+<h2 id="spanner-cliによるSpanner接続方法"><a href="#spanner-cliによるSpanner接続方法" class="headerlink" title="spanner-cliによるSpanner接続方法"></a>spanner-cliによるSpanner接続方法</h2><p>さっそくcliで接続してみましょう。<br>※ インスタンス、データベースが作成されるまで十数秒待つ必要があります</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ docker-compose exec spanner-cli spanner-cli -p test-project -i test-instance -d test-database</span><br><span class="line">Connected.</span><br><span class="line">spanner&gt;</span><br></pre></td></tr></table></figure>
+
+<p>接続できました！では、テーブルを確認してみましょう。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">spanner&gt; show tables;</span><br><span class="line">+-------------------------+</span><br><span class="line">| Tables_in_test-database |</span><br><span class="line">+-------------------------+</span><br><span class="line">| Singers                 |</span><br><span class="line">| Albums                  |</span><br><span class="line">+-------------------------+</span><br><span class="line">2 rows <span class="keyword">in</span> <span class="built_in">set</span> (0.01 sec)</span><br><span class="line"></span><br><span class="line">spanner&gt; select * from Singers;</span><br><span class="line">+----------+------------+----------+------------+</span><br><span class="line">| SingerId | FirstName  | LastName | SingerInfo |</span><br><span class="line">+----------+------------+----------+------------+</span><br><span class="line">| 13       | Russell    | Morales  | NULL       |</span><br><span class="line">| 15       | Dylan      | Shaw     | NULL       |</span><br><span class="line">| 12       | Melissa    | Garcia   | NULL       |</span><br><span class="line">| 14       | Jacqueline | Long     | NULL       |</span><br><span class="line">+----------+------------+----------+------------+</span><br><span class="line">4 rows <span class="keyword">in</span> <span class="built_in">set</span> (800.4us)</span><br></pre></td></tr></table></figure>
+
+<p>テーブルとデータも確認することができました。</p>
+<h2 id="アプリケーションからの接続方法"><a href="#アプリケーションからの接続方法" class="headerlink" title="アプリケーションからの接続方法"></a>アプリケーションからの接続方法</h2><p>開発するアプリケーションで <code>SPANNER_EMULATOR_HOST=localhost:9010</code> 設定すればOKです。各クライアントライブラリごとのサンプルは<a target="_blank" rel="noopener" href="https://cloud.google.com/spanner/docs/emulator">こちらの公式ドキュメント</a>を参照してください。</p>
+<h2 id="エミュレータの制限事項と相違点"><a href="#エミュレータの制限事項と相違点" class="headerlink" title="エミュレータの制限事項と相違点"></a>エミュレータの制限事項と相違点</h2><p>ここで注意点ですが、<a target="_blank" rel="noopener" href="https://cloud.google.com/spanner/docs/emulator?hl=ja#limitations_and_differences">公式ドキュメント</a>にある通りエミュレータは以下のような制限事項および、相違点があります。以下を理解して利用しましょう。</p>
+<h4 id="制限事項"><a href="#制限事項" class="headerlink" title="制限事項"></a>制限事項</h4><blockquote>
+<ul>
+<li>TLS/HTTPS、認証、IAM、権限、ロール。</li>
+<li>PLAN または PROFILE クエリモード。 NORMAL のみがサポートされます。</li>
+<li>監査ログとモニタリング ツール。</li>
+</ul>
+</blockquote>
+<h4 id="相違点"><a href="#相違点" class="headerlink" title="相違点"></a>相違点</h4><blockquote>
+<ul>
+<li>エミュレータのパフォーマンスとスケーラビリティは、本番環境サービスと同等ではありません。</li>
+<li>読み取り/書き込みトランザクションとスキーマ変更は、完了するまでデータベース全体を排他的にのみアクセスできるようにロックします。</li>
+<li>パーティション化 DML とパーティション クエリはサポートされていますが、エミュレータはステートメントが分割可能かどうかは確認しません。つまり、パーティション化 DML またはパーティション クエリ ステートメントがエミュレータで実行される場合でも、本番環境ではパーティション化できないステートメント エラーにより失敗する可能性があります。</li>
+</ul>
+</blockquote>
+<h1 id="解説"><a href="#解説" class="headerlink" title="解説"></a>解説</h1><p>ざっくりサンプルコードの解説をさせていただきます</p>
+<h3 id="ファイル構成"><a href="#ファイル構成" class="headerlink" title="ファイル構成"></a>ファイル構成</h3><p><img src="/images/20210323/image.png"></p>
+<ul>
+<li><strong>docker-compose.yaml</strong> : docker-composeファイルです。これを立ち上げます</li>
+<li><strong>migrations</strong> : DB初期化時に適用するDDL&amp;DMLを配置します</li>
+</ul>
+<h3 id="利用しているDockerイメージ"><a href="#利用しているDockerイメージ" class="headerlink" title="利用しているDockerイメージ"></a>利用しているDockerイメージ</h3><table>
+<thead>
+<tr>
+<th>Docker Image</th>
+<th>説明</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>gcr.io/cloud-spanner-emulator/emulator</td>
+<td>GCP提供のSpannerエミュレータ<a target="_blank" rel="noopener" href="https://cloud.google.com/spanner/docs/emulator">公式ドキュメント</a></td>
+<td>・Spannerエミュレータ本体</td>
+</tr>
+<tr>
+<td>gcr.io/google.com/cloudsdktool/cloud-sdk:slim</td>
+<td>GCP利用のためのツールとライブラリ<a target="_blank" rel="noopener" href="https://cloud.google.com/sdk/docs/downloads-docker">公式ドキュメント</a></td>
+<td>・インスタンスの作成</td>
+</tr>
+<tr>
+<td>mercari/wrench</td>
+<td>SpannerのSchemaマネジメントツール <a target="_blank" rel="noopener" href="https://github.com/cloudspannerecosystem/wrench">Github</a></td>
+<td>・テーブル作成 ・データ投入</td>
+</tr>
+<tr>
+<td>sjdaws/spanner-cli</td>
+<td>SpannerのCLIツール <a target="_blank" rel="noopener" href="https://github.com/cloudspannerecosystem/spanner-cli">Github</a></td>
+<td>・CLIアクセス</td>
+</tr>
+</tbody></table>
+<p>※<code>wrench</code> および、<code>spanner-cli</code> は <a target="_blank" rel="noopener" href="https://github.com/cloudspannerecosystem">Cloud Spanner Ecosystem</a>で公開されています<br>※MercariさんはSpannerのツールや知見を惜しみなく公開してくれており、非常に感謝です..!!</p>
+<h3 id="コンテナ構成のイメージとdocker-compose-yamlの内容"><a href="#コンテナ構成のイメージとdocker-compose-yamlの内容" class="headerlink" title="コンテナ構成のイメージとdocker-compose.yamlの内容"></a>コンテナ構成のイメージとdocker-compose.yamlの内容</h3><p><img src="/images/20210323/image_2.png"></p>
+<p>Spannerエミュレータ本体<code>spanner</code>とCLIアクセス用の<code>spanner-cli</code>は常駐プロセスとして起動し続け、それ以外のコンテナはコマンド実行後に正常終了します</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3&#x27;</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Spanner</span></span><br><span class="line">    <span class="attr">spanner:</span></span><br><span class="line">     <span class="attr">image:</span> <span class="string">gcr.io/cloud-spanner-emulator/emulator</span></span><br><span class="line">     <span class="attr">ports:</span></span><br><span class="line">         <span class="bullet">-</span> <span class="string">&quot;9010:9010&quot;</span></span><br><span class="line">         <span class="bullet">-</span> <span class="string">&quot;9020:9020&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Init (Create Instance)</span></span><br><span class="line">    <span class="attr">gcloud-spanner-init:</span></span><br><span class="line">      <span class="attr">image:</span> <span class="string">gcr.io/google.com/cloudsdktool/cloud-sdk:slim</span></span><br><span class="line">      <span class="attr">command:</span> <span class="string">&gt;</span></span><br><span class="line">       <span class="string">bash</span> <span class="string">-c</span> <span class="string">&#x27;gcloud config configurations create emulator &amp;&amp;</span></span><br><span class="line"><span class="string">               gcloud config set auth/disable_credentials true &amp;&amp;</span></span><br><span class="line"><span class="string">               gcloud config set project $$&#123;PROJECT_ID&#125; &amp;&amp;</span></span><br><span class="line"><span class="string">               gcloud config set api_endpoint_overrides/spanner $$&#123;SPANNER_EMULATOR_URL&#125; &amp;&amp;</span></span><br><span class="line"><span class="string">               gcloud config set auth/disable_credentials true &amp;&amp;</span></span><br><span class="line"><span class="string">               gcloud spanner instances create $$&#123;INSTANCE_NAME&#125; --config=emulator-config --description=Emulator --nodes=1&#x27;</span></span><br><span class="line">      <span class="attr">environment:</span></span><br><span class="line">        <span class="attr">PROJECT_ID:</span> <span class="string">&quot;test-project&quot;</span></span><br><span class="line">        <span class="attr">SPANNER_EMULATOR_URL:</span> <span class="string">&quot;http://spanner:9020/&quot;</span></span><br><span class="line">        <span class="attr">INSTANCE_NAME:</span> <span class="string">&quot;test-instance&quot;</span></span><br><span class="line">        <span class="attr">DATABASE_NAME:</span> <span class="string">&quot;test-database&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># DB Migration (Create Table)</span></span><br><span class="line">    <span class="attr">wrench-crearte:</span></span><br><span class="line">      <span class="attr">image:</span> <span class="string">mercari/wrench</span></span><br><span class="line">      <span class="attr">command:</span> <span class="string">&quot;create --directory /ddl&quot;</span></span><br><span class="line">      <span class="attr">environment:</span></span><br><span class="line">        <span class="attr">SPANNER_PROJECT_ID:</span> <span class="string">&quot;test-project&quot;</span></span><br><span class="line">        <span class="attr">SPANNER_INSTANCE_ID:</span> <span class="string">&quot;test-instance&quot;</span></span><br><span class="line">        <span class="attr">SPANNER_DATABASE_ID:</span> <span class="string">&quot;test-database&quot;</span></span><br><span class="line">        <span class="attr">SPANNER_EMULATOR_HOST:</span> <span class="string">&quot;spanner:9010&quot;</span></span><br><span class="line">        <span class="attr">SPANNER_EMULATOR_URL:</span> <span class="string">&quot;http://spanner:9020/&quot;</span></span><br><span class="line">      <span class="attr">volumes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">./migrations/ddl:/ddl</span></span><br><span class="line">      <span class="attr">restart:</span> <span class="string">on-failure</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># DB Migration (Insert data)</span></span><br><span class="line">    <span class="attr">wrench-apply:</span></span><br><span class="line">      <span class="attr">image:</span> <span class="string">mercari/wrench</span></span><br><span class="line">      <span class="attr">command:</span> <span class="string">&quot;apply --dml /dml/dml.sql&quot;</span></span><br><span class="line">      <span class="attr">environment:</span></span><br><span class="line">        <span class="attr">SPANNER_PROJECT_ID:</span> <span class="string">&quot;test-project&quot;</span></span><br><span class="line">        <span class="attr">SPANNER_INSTANCE_ID:</span> <span class="string">&quot;test-instance&quot;</span></span><br><span class="line">        <span class="attr">SPANNER_DATABASE_ID:</span> <span class="string">&quot;test-database&quot;</span></span><br><span class="line">        <span class="attr">SPANNER_EMULATOR_HOST:</span> <span class="string">&quot;spanner:9010&quot;</span></span><br><span class="line">        <span class="attr">SPANNER_EMULATOR_URL:</span> <span class="string">&quot;http://spanner:9020/&quot;</span></span><br><span class="line">      <span class="attr">volumes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">./migrations/dml:/dml</span></span><br><span class="line">      <span class="attr">restart:</span> <span class="string">on-failure</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># CLI</span></span><br><span class="line">    <span class="attr">spanner-cli:</span></span><br><span class="line">      <span class="attr">image:</span> <span class="string">sjdaws/spanner-cli:latest</span></span><br><span class="line">      <span class="attr">environment:</span></span><br><span class="line">        <span class="attr">SPANNER_EMULATOR_HOST:</span> <span class="string">&quot;spanner:9010&quot;</span></span><br><span class="line">      <span class="attr">command:</span> [<span class="string">&#x27;sh&#x27;</span>, <span class="string">&#x27;-c&#x27;</span>, <span class="string">&#x27;echo this container keep running &amp;&amp; tail -f /dev/null&#x27;</span>]</span><br></pre></td></tr></table></figure>
+
+<p>以下、補足になります</p>
+<ul>
+<li>wrenchコンテナは<code>restart: on-failure</code>と設定しています<ul>
+<li>wrenchはSpannerインスタンス作成後に実行したいのですが、docker-composeの起動制御が複雑になるので、失敗→再起動→再実行 するようになっています</li>
+</ul>
+</li>
+<li>spanner-cliコンテナは、<code>tail -f /dev/null</code> でコンテナ起動状態を保つようにしています<ul>
+<li><code>docker-exec</code>でコマンドを実行するためです</li>
+<li>※spanner-cliは、go getでもローカルPCにインストール可能 (筆者はローカルにインストールするのが面倒だった)</li>
+</ul>
+</li>
+</ul>
+<h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>SpannerはNewSQLと称されるだけあり MySQLやPostgresと比較すると情報も乏しいですが、日本でも採用事例は増えてきていて今後増々期待できるデータベースサービスかと思います！</p>
+<p>今回は、Spannerのローカル開発環境を立ち上げる方法を紹介させていただきました。宣言的に定義することで、立ち上げの手順もシンプルにできていると思います。興味のある方はぜひ立ち上げて触ってみてください。</p>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+
+  <li class="twitter-btn">
+    <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210323/&via=future_techblog&related=twitterapi%2Ctwitter&text=Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる" alt="ツイート"
+      onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+      <i></i><span class="tw-btn-label">ツイート</span>
+    </a>
+  </li>
+
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20210323/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:155px; height:20px">
+       <a target="_blank" rel="noopener" href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20210323/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20210323/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200709/">
+                  GoでWebアプリ開発時にあるあるだったレビューコメント
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20161031/">
+                  SQL実行時のブルームフィルタ(Bloom Filter)アルゴリズム
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210312/">
+                  Text-to-Speechを試してみる
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210305/">
+                  インフラ入門ーインフラ要件定義編ー
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20201020/">
+                  ProxyとDockerと新人社員と時々わたし
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200807/">
+                  GoとSuffixArray
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200703/">
+                  スケーラブルデータベース ～クラウドにおける後悔しないデータベース選定～
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200416/">
+                  ServiceNow+Terraform(+Go) によるインフラ構築自動化
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200401/">
+                  Vue.js最初の難関、「props down, event up」を初心者にわかるように解説してみた
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200323/">
+                  Serverless連載1: SAMを使ったローカルテスト（Go編）
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (48)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (13)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (9)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (140)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (113)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (27)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="https://note.future.co.jp/" target="_blank">未来報</a>
+      </li>
+      <li>
+        <a href="https://future-fintech.github.io/" target="_blank">Future Fintech EYE</a>
+      </li>
+      <li>
+        <a href="https://future.connpass.com/" target="_blank">Conpass</a>
+      </ul>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2020/future" target="_blank">2020年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2019/future" target="_blank">2019年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2021 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      <li><a target="_blank" rel="noopener" href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+  
+      <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+  
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+    });
+</script>
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>
