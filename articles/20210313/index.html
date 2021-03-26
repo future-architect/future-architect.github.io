@@ -22,7 +22,7 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20210313/CNDO2021@2x.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20210313/CNDO_1.png">
 <meta property="article:published_time" content="2021-03-12T15:00:00.000Z">
-<meta property="article:modified_time" content="2021-03-14T02:43:06.937Z">
+<meta property="article:modified_time" content="2021-03-25T04:31:33.608Z">
 <meta property="article:tag" content="登壇資料">
 <meta property="article:tag" content="CNCF">
 <meta property="article:tag" content="CloudNative">
@@ -152,7 +152,7 @@
 <h3 id="OPAを実際に利用してみる"><a href="#OPAを実際に利用してみる" class="headerlink" title="OPAを実際に利用してみる"></a>OPAを実際に利用してみる</h3><p>今回はTerraformのリソース名を<code>-</code>区切りではなく<code>_</code>区切りで書くことを強制したいと思います。<br>利用するTerraformとRegoは以下になります。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">provider &quot;aws&quot; &#123;</span><br><span class="line">    region &#x3D; &quot;us-west-1&quot;</span><br><span class="line">&#125;</span><br><span class="line">resource &quot;aws_instance&quot; &quot;web_instance&quot; &#123;</span><br><span class="line">  instance_type &#x3D; &quot;t2.micro&quot;</span><br><span class="line">  ami &#x3D; &quot;ami-09b4b74c&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource &quot;aws_instance&quot; &quot;mail-instance&quot; &#123;</span><br><span class="line">  instance_type &#x3D; &quot;t2.micro&quot;</span><br><span class="line">  ami &#x3D; &quot;ami-09b4b74c&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test</span><br><span class="line">                              </span><br><span class="line">lint[msg] &#123;</span><br><span class="line">    resource := input.resource_changes[index]</span><br><span class="line">    resource.<span class="keyword">type</span> == <span class="string">&quot;aws_instance&quot;</span></span><br><span class="line">    </span><br><span class="line">    result := count(split(resource.name, <span class="string">&quot;-&quot;</span>)) == <span class="number">1</span></span><br><span class="line">    msg := sprintf(<span class="string">&quot;Test result of %v.%v is %v&quot;</span>, [resource.<span class="keyword">type</span>, resource.name, result])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test</span><br><span class="line"></span><br><span class="line">lint[msg] &#123;</span><br><span class="line">    resource := input.resource_changes[index]</span><br><span class="line">    resource.<span class="keyword">type</span> == <span class="string">&quot;aws_instance&quot;</span></span><br><span class="line"></span><br><span class="line">    result := count(split(resource.name, <span class="string">&quot;-&quot;</span>)) == <span class="number">1</span></span><br><span class="line">    msg := sprintf(<span class="string">&quot;Test result of %v.%v is %v&quot;</span>, [resource.<span class="keyword">type</span>, resource.name, result])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>Terraformの中身は単純なインスタンスを2台作成するもの、Regoの中身は、<code>-</code>が含まれる場合にはsplitして、その総計を数えるようにしています。総計が1（分かれていない状態）であればtrue、総計が2以上であればfalseを返します。<br>ここからは実際にコマンドを実行しながら確認します。</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Plan結果をバイナリに吐き出す</span></span><br><span class="line">$ tf plan -out tfplan.binary</span><br><span class="line"><span class="comment"># バイナリをJSONに吐き出して、jqコマンドで整形する</span></span><br><span class="line">$ tf show -json tfplan.binary | jq . &gt; tfplan.json</span><br><span class="line"><span class="comment"># Regoを使ってJSONを評価する</span></span><br><span class="line">$ opa <span class="built_in">eval</span> --format json --data test.rego --input tfplan.json <span class="string">&quot;data.test.lint&quot;</span></span><br></pre></td></tr></table></figure>
 <p>最後のコマンドの実行結果は以下になります。</p>
@@ -180,6 +180,7 @@
 <h2 id="関連記事"><a href="#関連記事" class="headerlink" title="関連記事"></a>関連記事</h2><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://future-architect.github.io/articles/20200930/index.html" data-iframely-url="//cdn.iframe.ly/api/iframe?url=https%3A%2F%2Ffuture-architect.github.io%2Farticles%2F20200930&amp;key=42622142e53a4cc5ab36703bcee5415f"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
 
 <div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://future-architect.github.io/articles/20200928/index.html" data-iframely-url="//cdn.iframe.ly/api/iframe?url=https%3A%2F%2Ffuture-architect.github.io%2Farticles%2F20200928&amp;key=42622142e53a4cc5ab36703bcee5415f"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+
       
     </div>
     <div class="social-area">
@@ -230,6 +231,10 @@
   
     
       
+    
+  
+    
+      
         
           <div class="widget">
             <ul class="nav">
@@ -272,18 +277,6 @@
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20200530/">
-                  フューチャー技術ブログの運営で心がけていること
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
     
   
     
@@ -297,15 +290,9 @@
     
   
     
-      
-    
   
     
-      
-    
   
-    
-      
     
   
     
@@ -324,18 +311,6 @@
   
     
       
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210201/">
-                  自宅仕事環境構築：指向性マイクの勧め
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
     
   
     
@@ -347,18 +322,6 @@
     
   
     
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210107/">
-                  Electronの使い方 Web開発の技術でデスクトップアプリを作ろう
-                </a>
-              </li>
-            </ul>
-          </div>
-        
       
     
   
@@ -444,53 +407,41 @@
   
     
       
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20200807/">
-                  GoとSuffixArray
+                <a href="https://future-architect.github.io/articles/20200703/">
+                  スケーラブルデータベース ～クラウドにおける後悔しないデータベース選定～
                 </a>
               </li>
             </ul>
           </div>
         
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20200728/">
-                  DBスキーマを駆動にした開発のためのライブラリ調査
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
     
   
@@ -530,6 +481,30 @@
   
     
       
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200512/">
+                  日本製HeadlessCMSのmicroCMSを触ってみた
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -538,8 +513,38 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20200501/">
-                  TypeScriptでReactをやるときは、小さいアプリでもReduxを最初から使ってもいいかもねというお話
+                <a href="https://future-architect.github.io/articles/20200331/">
+                  Serverless連載5: CloudEventsのGo版SDKをいじってみる
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200219/">
+                  GCP連載#10 Terraform ではなくCloud Deployment Manager を使ってみよう
                 </a>
               </li>
             </ul>
@@ -551,6 +556,22 @@
     
       
         
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200207/">
+                  GCP連載#3 Goでサーバーレスな管理画面アプリを作る
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
       
     
   
@@ -561,53 +582,15 @@
     
       
         
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200120/">
+                  工場をハックするための基本知識　後編
+                </a>
+              </li>
+            </ul>
+          </div>
         
       
     
@@ -624,14 +607,8 @@
   
     
       
-        
-      
     
   
-    
-  
-    
-      
     
   
     
@@ -641,16 +618,20 @@
     
   
     
-  
-    
-  
-    
       
+    
+  
+    
+  
     
   
     
       
         
+      
+    
+  
+    
       
     
   
@@ -710,14 +691,6 @@
   
     
       
-        
-      
-    
-  
-    
-      
-        
-      
     
   
     
@@ -725,35 +698,19 @@
     
   
     
-      
+  
     
   
     
-      
+  
     
   
     
-      
+  
     
   
     
-      
-    
   
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
     
   
     
@@ -765,12 +722,10 @@
     
   
     
-      
-        
-      
-    
   
     
+      
+        
       
     
   
@@ -808,8 +763,6 @@
   
     
       
-        
-      
     
   
     
@@ -826,16 +779,6 @@
   
     
   
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
     
   
     
@@ -861,6 +804,16 @@
     
   
     
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
       
     
   
@@ -885,6 +838,8 @@
     
   
     
+      
+        
       
     
   
@@ -990,66 +945,8 @@
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
+        
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -1073,152 +970,6 @@
     
   
     
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
   
     
   
@@ -1237,51 +988,7 @@
     
   
     
-      
-        
-      
-    
   
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
     
   
     
@@ -1321,9 +1028,57 @@
     
   
     
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
   
     
   
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -1337,7 +1092,23 @@
     
   
     
+      
+    
   
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
     
   
     
@@ -1346,6 +1117,116 @@
   
     
   
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
     
   
     
@@ -1381,51 +1262,27 @@
     
   
     
-      
-    
   
     
-      
-    
   
-    
-      
     
   
     
   
     
-      
+  
     
   
     
-      
-        
-      
+  
+    
+  
+    
+  
     
   
     
       
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
     
   
     
@@ -1445,6 +1302,102 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
       
     
   
@@ -1521,7 +1474,7 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Programming/">Programming (141)</a>
+	  <a href="/categories/Programming/">Programming (142)</a>
 	</li>
       
 	<li>
