@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  
+  <title>Go 1.16のgoembedとNext.jsの相性が悪い問題と戦う | フューチャー技術ブログ</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+  <meta name="description" content="前エントリーのGo 1.16のembedとchiとSingle Page Applicationでは、Vue.jsで生成したファイルをバンドルしました。Vue.jsや、Parcel V2でビルドしたコンテンツを配信するにはこれで問題ありません。しかし、React（Next.js）は要注意です。 フロントエンドの環境整備をどうやって行うかはいつも悩みの種ですが、そんな中、僕が3年ほど前から他の人">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 1.16のgoembedとNext.jsの相性が悪い問題と戦う">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210409/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="前エントリーのGo 1.16のembedとchiとSingle Page Applicationでは、Vue.jsで生成したファイルをバンドルしました。Vue.jsや、Parcel V2でビルドしたコンテンツを配信するにはこれで問題ありません。しかし、React（Next.js）は要注意です。 フロントエンドの環境整備をどうやって行うかはいつも悩みの種ですが、そんな中、僕が3年ほど前から他の人">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210409/nextjs_and_go_icon.svg">
+<meta property="article:published_time" content="2021-04-08T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-09T01:30:40.193Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Go1.16">
+<meta property="article:tag" content="Next.js">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210409/nextjs_and_go_icon.svg">
+  
+    <link rel="alternative" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <meta content="Go 1.16のgoembedとNext.jsの相性が悪い問題と戦う | フューチャー技術ブログ" name="description">
+  <meta content="Go 1.16のgoembedとNext.jsの相性が悪い問題と戦う,フューチャー技術ブログ,フューチャーアーキテクト,Future Architect,フューチャー技術ブログ" name="keywords">
+  <meta content="Future Architect Consultant" name="author">
+
+  <!-- Styles START -->
+  <link rel="stylesheet" href="/metronic/assets/plugins/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/metronic/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/style-responsive.css">
+  <link rel="stylesheet" href="/metronic/assets/corporate/css/themes/custom.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+  <!-- Styles END -->
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20210409/">Go 1.16のgoembedとNext.jsの相性が悪い問題と戦う</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20210409_Go_1.16のgoembedとNext.jsの相性が悪い問題と戦う" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-meta">
+  </div>
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+    <li><i class="fa fa-user"></i> <a href="/authors/%E6%BE%81%E5%B7%9D%E5%96%9C%E8%A6%8F">澁川喜規</li>
+    <li><i class="fa fa-calendar"></i>
+	  <time datetime="2021-04-08T15:00:00.000Z" itemprop="datePublished">2021/04/09</time>
+
+    </li>
+
+    <li><i class="fa fa-tags"></i>
+    
+  
+    <a href="/tags/Go/" title="Go">Go</a>,
+  
+    <a href="/tags/Go1-16/" title="Go1.16">Go1.16</a>,
+  
+    <a href="/tags/Next-js/" title="Next.js">Next.js</a>
+  
+
+
+    </li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category: 
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+  <br>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <img src="/images/20210409/nextjs_and_go_icon.svg" class="img-middle-size">
+
+<p>前エントリーの<a href="/articles/20210408/">Go 1.16のembedとchiとSingle Page Application</a>では、Vue.jsで生成したファイルをバンドルしました。Vue.jsや、Parcel V2でビルドしたコンテンツを配信するにはこれで問題ありません。しかし、React（Next.js）は要注意です。</p>
+<p>フロントエンドの環境整備をどうやって行うかはいつも悩みの種ですが、そんな中、僕が3年ほど前から他の人にお勧めしていたのがNext.jsでした。ほとんどの最低限必要なツール群は整備済みで、最近のバージョンであればTypeScriptを使うのも簡単。Linter(npm exec eslint –init)とFormatter(npm install prettierと環境整備)ぐらいでコードを書き始められます。</p>
+<p>しかし、環境構築が簡単なNext.js製のウェブアプリケーションのビルド済みのフロントエンドのファイル群をGoアプリにバンドルしようとしたらうまく動かず、それの追試をしました。</p>
+<h1 id="試した環境"><a href="#試した環境" class="headerlink" title="試した環境"></a>試した環境</h1><p>go:embedはフォルダ指定するときは現在地よりも親のフォルダは指定できません。ディレクトリトラバーサルの脆弱性を生み出さないための制約かと思われます。こんな感じのフォルダ構成にしてました。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">├── cmd</span><br><span class="line">│   └── single-go-web</span><br><span class="line">│       └── main.go</span><br><span class="line">├── embed.go              : go:embedディレクティブコメントを書いたファイル</span><br><span class="line">├── frontend              : npm exec create-next-appで生成</span><br><span class="line">│   ├── README.md</span><br><span class="line">│   ├── next-env.d.ts</span><br><span class="line">│   ├── out&#x2F;              : npm exec next exportが生成する成果物のフォルダ</span><br><span class="line">│   ├── package-lock.json</span><br><span class="line">│   ├── package.json</span><br><span class="line">│   ├── pages&#x2F;</span><br><span class="line">│   └── tsconfig.json</span><br><span class="line">├── go.mod</span><br><span class="line">├── go.sum</span><br><span class="line">├── handler.go</span><br><span class="line">└── notfound.go</span><br></pre></td></tr></table></figure>
+
+<p>embed.goはこんな感じです。</p>
+<figure class="highlight go"><figcaption><span>embed.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> goweb</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;embed&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">//go:embed frontend/out/*</span></span><br><span class="line"><span class="keyword">var</span> assets embed.FS</span><br></pre></td></tr></table></figure>
+
+<h1 id="何が起きたのか"><a href="#何が起きたのか" class="headerlink" title="何が起きたのか"></a>何が起きたのか</h1><p>作ったNext.jsのファイルを取り込んでウェブサーバーとして起動するコードを書いたのですが、トップページの静的なタグは表示されるものの、具体的にはファイルがいくつか取得できないようでうまく動きませんでした。こんな感じです。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">2021&#x2F;03&#x2F;17 08:52:23 not found &#x2F;_next&#x2F;static&#x2F;chunks&#x2F;pages&#x2F;_app-e86e439f5882a1d9aed3.js</span><br><span class="line">2021&#x2F;03&#x2F;17 08:52:23 not found &#x2F;_next&#x2F;static&#x2F;ZBndKz8ZARrIJBK8V3vpd&#x2F;_buildManifest.js</span><br><span class="line">2021&#x2F;03&#x2F;17 08:52:23 not found &#x2F;_next&#x2F;static&#x2F;ZBndKz8ZARrIJBK8V3vpd&#x2F;_ssgManifest.js</span><br></pre></td></tr></table></figure>
+
+<p>エラーになったファイル以外のindex.htmlとか他のファイルは読み込めていました。go embedの説明によると、ディレクトリを自動で探索する場合にアンダースコアとピリオドスタートのファイルは無視されるとのこと。ただし、明示的に指定すれば良いみたいです。</p>
+<blockquote>
+<p>If a pattern names a directory, all files in the subtree rooted at that directory are embedded (recursively), except that files with names beginning with ‘.’ or ‘_’ are excluded. So the variable in the above example is almost equivalent to:</p>
+</blockquote>
+<p>実験してみました。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">├── _test</span><br><span class="line">│   ├── a.txt</span><br><span class="line">│   ├── _b.txt</span><br><span class="line">│   └── dir</span><br><span class="line">│       ├── c.txt</span><br><span class="line">│       └── _d.txt</span><br><span class="line">├── embed-test</span><br><span class="line">├── go.mod</span><br><span class="line">├── main.go</span><br><span class="line">└── test</span><br><span class="line">    ├── _f.txt</span><br><span class="line">    └── e.txt</span><br></pre></td></tr></table></figure>
+
+<p>それぞれ、go:embedディレクティブに書いたセレクターと選択されるファイルの相関は次の通りです。</p>
+<table>
+<thead>
+<tr>
+<th align="center">ファイル</th>
+<th align="center"><code>_test</code>, <code>test</code></th>
+<th align="center"><code>_test/*</code>, <code>test/*</code></th>
+<th align="center"><code>_test/*</code>, <code>_test/*/*</code>, <code>test/*</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>_test/a.txt</code></td>
+<td align="center">✔︎</td>
+<td align="center">✔︎</td>
+<td align="center">✔︎</td>
+</tr>
+<tr>
+<td align="center"><code>_test/_b.txt</code></td>
+<td align="center"></td>
+<td align="center">✔︎</td>
+<td align="center">✔︎</td>
+</tr>
+<tr>
+<td align="center"><code>_test/dir/c.txt</code></td>
+<td align="center">✔︎</td>
+<td align="center">✔︎</td>
+<td align="center">✔︎</td>
+</tr>
+<tr>
+<td align="center"><code>_test/dir/_d.txt</code></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">✔︎</td>
+</tr>
+<tr>
+<td align="center"><code>test/e.txt</code></td>
+<td align="center">✔︎</td>
+<td align="center">✔︎</td>
+<td align="center">✔︎</td>
+</tr>
+<tr>
+<td align="center"><code>text/_f.txt</code></td>
+<td align="center"></td>
+<td align="center">✔︎</td>
+<td align="center">✔︎</td>
+</tr>
+</tbody></table>
+<p>深いフォルダでもアスタリスクを駆使すればなんとかなりそうです。 ということで、改めてNext.jsのファイルのバンドルに挑戦。</p>
+<h1 id="新たな敵、空フォルダ"><a href="#新たな敵、空フォルダ" class="headerlink" title="新たな敵、空フォルダ"></a>新たな敵、空フォルダ</h1><p>というわけでバシバシ追加していったのですが、次のようなエラーがビルド時に出るようになりました。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ go build</span><br><span class="line">../../embed.go:8:12: pattern frontend/out/*/*: cannot embed directory frontend/out/_next/qi68kQOpQjkJ0HbA6IoFl: contains no embeddable files</span><br></pre></td></tr></table></figure>
+
+<p>Next.jsがビルド時にこのフォルダを作るのですが、ファイルが一個もなく、それを処理できないようです。選択可能なファイルがない場合にエラーになるので、.keepみたいなファイルをおいてもダメです（選択がアスタリスクとアンダーバーは無視されるので）。一番簡単なのはこういうフォルダを削除しておくことです。空フォルダが絶対必要です、というシステムがあるとダメなので、その場合は別の方法が必要ですね。</p>
+<h1 id="完成"><a href="#完成" class="headerlink" title="完成"></a>完成</h1><p>最終的にアセットをバンドルするディレクティブコメントはこのようになりました。これで無事、実行に必要なファイルを全てバンドルできました。きちんとGo製のサーバーも動きました。</p>
+<p>少なくともNext.js 10.0.9ではこれで動きそうです。まあとてもシンプルな画面しか作っていないのでもっといろんな要素を入れていったり、Next.jsのバージョンが上がると動かなくなる可能性もありますが・・・</p>
+<figure class="highlight go"><figcaption><span>asset.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//go:embed frontend/out/*</span></span><br><span class="line"><span class="comment">//go:embed frontend/out/_next/static/*/*</span></span><br><span class="line"><span class="comment">//go:embed frontend/out/_next/static/chunks/pages/*.js</span></span><br><span class="line"><span class="comment">//go:embed frontend/out/_next/static/chunks/pages/next/dist/pages/*</span></span><br><span class="line"><span class="keyword">var</span> assets embed.FS</span><br></pre></td></tr></table></figure>
+
+<p>前回とちょっと違うところが1つあります。Next.jsの静的サイト生成の場合、<code>pages/page2.tsx</code>ファイルは<code>page2.html</code>ファイルとなります。しかし、他のページから遷移すると<code>/page2</code>というパスがアドレスバーに表示されます。ここでリロードしたりすると、最初に<code>/page2</code>という拡張子なしのファイルを読み込もうとしますが、それではうまく動作しません。<code>index.html</code>にフォールバックしてもダメでした。</p>
+<p>この場合は、<code>/page2</code>にリクエストがきたら、<code>/page2.html</code>を返してあげれば良いので、失敗時のフォールバックをもう一つ増やして、拡張子つきで再リトライしてみるようにしてあげる必要があります。</p>
+<figure class="highlight go"><figcaption><span>notfound.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NotFoundHandler</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">	<span class="comment">// まずはリクエストされた通りにファイルを探索</span></span><br><span class="line">	err := tryRead(assets, <span class="string">&quot;frontend/out&quot;</span>, r.URL.Path, w)</span><br><span class="line">	<span class="keyword">if</span> err == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// SSGでは.htmlファイルが生成されるが、リクエストされるページは拡張子なし</span></span><br><span class="line">	<span class="comment">// かもしれない</span></span><br><span class="line">	err = tryRead(assets, <span class="string">&quot;frontend/out&quot;</span>, r.URL.Path+<span class="string">&quot;.html&quot;</span>, w)</span><br><span class="line">	<span class="keyword">if</span> err == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 見つからなければindex.htmlを返す</span></span><br><span class="line">	err = tryRead(assets, <span class="string">&quot;frontend/out&quot;</span>, <span class="string">&quot;index.html&quot;</span>, w)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これでNext.jsで作った静的サイトも、Go 1.16にバンドルできるようになります。</p>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    
+    
+      
+      
+    
+
+  <li class="twitter-btn">
+    <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210409/&via=future_techblog&related=twitterapi%2Ctwitter&text=Go 1.16のgoembedとNext.jsの相性が悪い問題と戦う" alt="ツイート"
+      onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+      <i></i><span class="tw-btn-label">ツイート</span>
+    </a>
+  </li>
+
+    <!-- Facebookいいね -->
+    <li class="social-button-fb" style="width:120px; height:20px">
+     <div class="fb-like" data-href="https://future-architect.github.io/articles/20210409/" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+    </li>
+    
+    <!-- はてなブックマーク -->
+    <li class="social-button-hatebu" style="width:155px; height:20px">
+       <a target="_blank" rel="noopener" href="http://b.hatena.ne.jp/entry/https://future-architect.github.io/articles/20210409/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard-balloon" data-hatena-bookmark-lang="ja" title="はてなブックマークに追加">はてブする</a>
+    </li>
+    <!-- pocket -->
+    <li class="social-button-pocket">
+      <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en" data-save-url="https://future-architect.github.io/articles/20210409/"></a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210409/">
+                  Go 1.16のgoembedとNext.jsの相性が悪い問題と戦う
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210330/">
+                  CSVと親しくなるAWK術
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200530/">
+                  フューチャー技術ブログの運営で心がけていること
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210331/">
+                  今さらながらfindパイセンについてまとめてみた
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210305/">
+                  インフラ入門ーインフラ要件定義編ー
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200821/">
+                  エンジニアが最低限理解しておくべきOSSライセンスの基礎知識
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200703/">
+                  スケーラブルデータベース ～クラウドにおける後悔しないデータベース選定～
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200528/">
+                  あなたのGoアプリ/ライブラリのパッケージ構成もっとシンプルでよくない？
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200323/">
+                  Serverless連載1: SAMを使ったローカルテスト（Go編）
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200319/">
+                  今あえてTypeScriptのビルド＆バンドルツールを探してみる
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+<!-- CATEGORIES START -->
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+      
+	<li>
+	  <a href="/categories/Culture/">Culture (50)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/IoT/">IoT (14)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/VR/">VR (9)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Security/">Security (2)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Design/">Design (7)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Programming/">Programming (147)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Management/">Management (8)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/Infrastructure/">Infrastructure (122)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DB/">DB (12)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/DataScience/">DataScience (28)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/CI-CD/">CI/CD (3)</a>
+	</li>
+      
+	<li>
+	  <a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a>
+	</li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="https://note.future.co.jp/" target="_blank">未来報</a>
+      </li>
+      <li>
+        <a href="https://future-fintech.github.io/" target="_blank">Future Fintech EYE</a>
+      </li>
+      <li>
+        <a href="https://future.connpass.com/" target="_blank">Conpass</a>
+      </ul>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+
+
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li>
+        <a href="http://qiita.com/advent-calendar/2020/future" target="_blank">2020年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2019/future" target="_blank">2019年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2018/future" target="_blank">2018年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2017/future" target="_blank">2017年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2016/future" target="_blank">2016年</a>
+      </li>
+      <li>
+        <a href="http://qiita.com/advent-calendar/2015/future" target="_blank">2015年</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+    <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+
+  <!-- FacebookのShareボタン用. ページに1度初期化できればよいのでフッターに配備 -->
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+  <!-- Pocket Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+  <!-- Twitter Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+
+  <!-- はてぶ Shareボタン. ページ毎に1度初期化できれば良いのでフッターに配備 -->
+  <script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+
+	
+    <!-- BEGIN TWITTER BLOCK -->
+    <div class="col-md-4 col-sm-6 pre-footer-col">
+      <!-- Twitterフォローボタン -->
+      <a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" class="twitter-follow-button" data-show-count="false" data-lang="ja">/future_techblogさんをフォロー</a>
+      <!-- 組み込みTwitterウィジェット -->
+      <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+    </div>
+    <!-- END TWITTER BLOCK -->
+	
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+                  &copy; 2021 フューチャー技術ブログ<br>
+ <!-- <a href="javascript:;">Privacy Policy</a> | <a href="javascript:;">Terms of Service</a> -->
+          </div>
+          <!-- END COPYRIGHT -->
+	  <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+      <li><a target="_blank" rel="noopener" href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+  
+      <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+  
+      <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+  
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <script src="/metronic/assets/plugins/jquery.min.js"></script>
+<script src="/metronic/assets/plugins/jquery-migrate.min.js"></script>
+<script src="/metronic/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/metronic/assets/corporate/scripts/layout.js"></script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        Layout.init();
+    });
+</script>
+<!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>
