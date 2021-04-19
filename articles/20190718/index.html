@@ -21,11 +21,12 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20190718/photo_20190718_01.png">
 <meta property="article:published_time" content="2019-07-18T00:11:12.000Z">
-<meta property="article:modified_time" content="2021-04-11T08:20:19.715Z">
+<meta property="article:modified_time" content="2021-04-18T06:01:14.647Z">
 <meta property="article:tag" content="DB">
 <meta property="article:tag" content="KVS">
 <meta property="article:tag" content="DataModel">
 <meta property="article:tag" content="Cassandra">
+<meta property="article:tag" content="NoSQL">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://future-architect.github.io/images/20190718/photo_20190718_01.png">
   
@@ -98,7 +99,9 @@
   
     <a href="/tags/DataModel/" title="DataModel">DataModel</a>,
   
-    <a href="/tags/Cassandra/" title="Cassandra">Cassandra</a>
+    <a href="/tags/Cassandra/" title="Cassandra">Cassandra</a>,
+  
+    <a href="/tags/NoSQL/" title="NoSQL">NoSQL</a>
   
 
 
@@ -126,9 +129,9 @@
 <p>また、keyに対して複数のカラムを定義することが可能で、カラム型にはListやMapのようなコレクション型、いわゆるオブジェクト型のようなユーザ定義型（UDT:User Defined Type）の使用に対応しているため、JSONのような階層的なデータをスキーマ定義して柔軟に扱うことができるのが特徴です。</p>
 <p>その他、本稿では触れませんが下記のような特徴を持っており、スケーラビリティ・アベイラビリティに重きを置いたデータベースと言えます。</p>
 <ol>
-<li>データをクラスタ内の複数ノードで分散保持しているため、性能・容量のリニアにスケール可能  </li>
-<li>マスタレスアーキテクチャで、単一障害点がなくノード障害時のマスタ切り替え不要で可用性を厳格に保証  </li>
-<li>データセンターを跨ぐクロスリージョン構成を取ることができ、広域災害時の高いBCP要求を満たすことが可能  </li>
+<li>データをクラスタ内の複数ノードで分散保持しているため、性能・容量のリニアにスケール可能</li>
+<li>マスタレスアーキテクチャで、単一障害点がなくノード障害時のマスタ切り替え不要で可用性を厳格に保証</li>
+<li>データセンターを跨ぐクロスリージョン構成を取ることができ、広域災害時の高いBCP要求を満たすことが可能</li>
 </ol>
 <h1 id="Cassandraのデータモデルを理解する"><a href="#Cassandraのデータモデルを理解する" class="headerlink" title="Cassandraのデータモデルを理解する"></a>Cassandraのデータモデルを理解する</h1><p>Cassandraにおいてデータをどのように定義して扱うことができるのかということを説明していきます。<br>CassandraはCQLというSQLライクなクエリ言語を用いて記述できるためRDB脳でも直感的に扱えます。<br>なお、本項ではCassandraのバージョンは3.11.4を利用します。</p>
 <h2 id="テーブル作成"><a href="#テーブル作成" class="headerlink" title="テーブル作成"></a>テーブル作成</h2><p>CassandraではRDBと同様にデータをテーブルという単位で管理を行います。<br>KVSではデータの管理、アクセスはkeyに対して行うため、PRIMARY KEYとして定義する必要があります。<br>Valueに相当するカラムは複数定義可能で配列やMapなどのコレクション型もデータ型として定義することが可能です。</p>
@@ -148,7 +151,7 @@
 <h2 id="データアクセス-PARTITION-KEY"><a href="#データアクセス-PARTITION-KEY" class="headerlink" title="データアクセス(PARTITION KEY)"></a>データアクセス(PARTITION KEY)</h2><p>CassandraはKVSのため基本的には上記のPRIMARY KEYによるデータアクセスになりますが、もう一つの特徴としてPARTITION KEYによるデータアクセスが可能です。</p>
 <p>PARTITION KEYとはレコードをカラム単位で集約するキーのことを意味します。</p>
 <p>先ほど作成したtest_tableに対して日付単位で集約できるようにPARTITION KEYを追加してみましょう。</p>
-<h3 id="テーブル定義-1"><a href="#テーブル定義-1" class="headerlink" title="テーブル定義"></a>テーブル定義</h3><p>PRIMARY KEYの先頭項目がPARTITION KEYと認識されます。<br>下記の例ではPARTITION KEYがdate、PRIMARY KEYはdateとidの複合になります。  </p>
+<h3 id="テーブル定義-1"><a href="#テーブル定義-1" class="headerlink" title="テーブル定義"></a>テーブル定義</h3><p>PRIMARY KEYの先頭項目がPARTITION KEYと認識されます。<br>下記の例ではPARTITION KEYがdate、PRIMARY KEYはdateとidの複合になります。</p>
 <figure class="highlight sql"><figcaption><span>パーティションキー付きのテーブル定義</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_part_table (</span><br><span class="line">   <span class="built_in">date</span>    <span class="built_in">text</span></span><br><span class="line"> , <span class="keyword">id</span>      <span class="built_in">text</span></span><br><span class="line"> , <span class="keyword">body</span>    <span class="built_in">text</span></span><br><span class="line"> , tag     <span class="keyword">list</span>&lt;<span class="built_in">text</span>&gt;</span><br><span class="line"> , keyword <span class="keyword">map</span>&lt;<span class="built_in">text</span>, <span class="built_in">text</span>&gt;</span><br><span class="line"> , PRIMARY <span class="keyword">KEY</span>((<span class="built_in">date</span>), <span class="keyword">id</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
 
 <h3 id="レコード作成-1"><a href="#レコード作成-1" class="headerlink" title="レコード作成"></a>レコード作成</h3><figure class="highlight sql"><figcaption><span>レコード作成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_part_table (</span><br><span class="line">   <span class="built_in">date</span></span><br><span class="line"> , <span class="keyword">id</span></span><br><span class="line"> , <span class="keyword">body</span></span><br><span class="line"> , tag</span><br><span class="line"> , keyword</span><br><span class="line">) <span class="keyword">VALUES</span> (</span><br><span class="line">   <span class="string">&#x27;2019-07-01&#x27;</span></span><br><span class="line"> , <span class="string">&#x27;01&#x27;</span></span><br><span class="line"> , <span class="string">&#x27;パーティションキーテスト1&#x27;</span></span><br><span class="line"> , [<span class="string">&#x27;Future&#x27;</span>,<span class="string">&#x27;Tech Blog&#x27;</span>]</span><br><span class="line"> , &#123;<span class="string">&#x27;author&#x27;</span>: <span class="string">&#x27;Iwasaki&#x27;</span>, <span class="string">&#x27;nosql&#x27;</span>:<span class="string">&#x27;cassandra&#x27;</span>&#125;</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_part_table (</span><br><span class="line">   <span class="built_in">date</span></span><br><span class="line"> , <span class="keyword">id</span></span><br><span class="line"> , <span class="keyword">body</span></span><br><span class="line"> , tag</span><br><span class="line"> , keyword</span><br><span class="line">) <span class="keyword">VALUES</span> (</span><br><span class="line">   <span class="string">&#x27;2019-07-01&#x27;</span></span><br><span class="line"> , <span class="string">&#x27;02&#x27;</span></span><br><span class="line"> , <span class="string">&#x27;パーティションキーテスト2&#x27;</span></span><br><span class="line"> , [<span class="string">&#x27;Future&#x27;</span>,<span class="string">&#x27;Tech Blog&#x27;</span>]</span><br><span class="line"> , &#123;<span class="string">&#x27;author&#x27;</span>: <span class="string">&#x27;Iwasaki&#x27;</span>, <span class="string">&#x27;nosql&#x27;</span>:<span class="string">&#x27;cassandra&#x27;</span>&#125;</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_part_table (</span><br><span class="line">   <span class="built_in">date</span></span><br><span class="line"> , <span class="keyword">id</span></span><br><span class="line"> , <span class="keyword">body</span></span><br><span class="line"> , tag</span><br><span class="line"> , keyword</span><br><span class="line">) <span class="keyword">VALUES</span> (</span><br><span class="line">   <span class="string">&#x27;2019-07-02&#x27;</span></span><br><span class="line"> , <span class="string">&#x27;01&#x27;</span></span><br><span class="line"> , <span class="string">&#x27;パーティションキーテスト3&#x27;</span></span><br><span class="line"> , [<span class="string">&#x27;Future&#x27;</span>,<span class="string">&#x27;Tech Blog&#x27;</span>]</span><br><span class="line"> , &#123;<span class="string">&#x27;author&#x27;</span>: <span class="string">&#x27;Iwasaki&#x27;</span>, <span class="string">&#x27;nosql&#x27;</span>:<span class="string">&#x27;cassandra&#x27;</span>&#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
@@ -161,7 +164,7 @@
 <p>Cassandraは複数ノードでクラスタ構成を取ることが一般的ですが、同一PARTITION KEYのデータは、（複数の）特定ノード内に集約されてデータが格納されます。</p>
 <p>そのため、検索条件にPARTITION KEYを指定することで対象のキーのデータをどのノードが保持しているかということが分かるため、サーバーの並列数やデータ量が増えても高速にデータアクセスすることが可能になります。</p>
 <p>言い換えれば、PARTITION KEYが無いと全ノードの全レコードを舐めないと条件に一致するかを評価することができないので、KVSはキーアクセスしか行えないということになります。</p>
-<p>ちなみに複合PRIMARY KEYを定義する場合、特に指定がなければ先頭のキーがPARTITION KEYとなり、単一PRIMARY KEYの場合はPRIMARY KEY = PARTITION KEYとして認識されています。  </p>
+<p>ちなみに複合PRIMARY KEYを定義する場合、特に指定がなければ先頭のキーがPARTITION KEYとなり、単一PRIMARY KEYの場合はPRIMARY KEY = PARTITION KEYとして認識されています。</p>
 <p>また、PARTITION KEY以外のPRIMARY KEYはCLUSTERING KEYと呼ばれ、パーティション内のデータのソートキーとなっています。</p>
 <p>PARTITION KEYのみを指定してデータを取得する際の動作は、RDB脳にはなじみ深いB*TreeインデックスをRANGE SCANする動作と同様です。</p>
 <p>本記事のなかではあまりふれませんが、CLUSTERING KEYによるソート順に従って先頭の〇〇件を取得する、といったことも可能です。</p>
@@ -249,7 +252,7 @@
 <figure class="highlight"><figcaption><span>staticカラムの更新</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> static_test <span class="keyword">set</span> static_data = <span class="string">&#x27;static_test_1&#x27;</span> <span class="keyword">where</span> <span class="keyword">id</span> = <span class="string">&#x27;1&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> static_test;</span><br><span class="line"></span><br><span class="line"> id | no | static_data   | non_static_data</span><br><span class="line"><span class="comment">----+----+---------------+-----------------</span></span><br><span class="line">  1 |  1 | static_test_1 |    non_static_1</span><br><span class="line">  1 |  2 | static_test_1 |    non_static_1</span><br><span class="line">  2 |  1 |      static_2 |    non_static_2</span><br><span class="line">  2 |  2 |      static_2 |    non_static_2</span><br><span class="line"></span><br><span class="line">-&gt; PARTITION KEY = &#x27;01&#x27;に対する更新だが、同パーティション内のstatic_dataも更新される</span><br></pre></td></tr></table></figure>
 
 <p>staticで定義すると下記のように同一パーティション内のデータはstaticカラムを参照するようなデータ構造になるため、static項目を更新すると同一パーティション内のデータは全て更新されたように見えていたわけです。</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123; <span class="attr">&quot;id&quot;</span> : <span class="number">1</span>, <span class="attr">&quot;static_data&quot;</span> : <span class="string">&quot;static_test_1&quot;</span>  &#123; </span><br><span class="line">        <span class="attr">&quot;no&quot;</span> : <span class="number">1</span>  &#123; <span class="attr">&quot;non_static_data&quot;</span> : <span class="string">&quot;non_static_1&quot;</span>&#125;,</span><br><span class="line">        <span class="attr">&quot;no&quot;</span> : <span class="number">2</span>  &#123; <span class="attr">&quot;non_static_data&quot;</span> : <span class="string">&quot;non_static_1&quot;</span>&#125;</span><br><span class="line">        &#125;,</span><br><span class="line">&#125;,</span><br><span class="line">&#123; <span class="attr">&quot;id&quot;</span> : <span class="number">2</span>, <span class="attr">&quot;static_data&quot;</span> : <span class="string">&quot;static_2&quot;</span>  &#123; </span><br><span class="line">        <span class="attr">&quot;no&quot;</span> : <span class="number">1</span>  &#123; <span class="attr">&quot;non_static_data&quot;</span> : <span class="string">&quot;non_static_2&quot;</span>&#125;,</span><br><span class="line">        <span class="attr">&quot;no&quot;</span> : <span class="number">2</span>  &#123; <span class="attr">&quot;non_static_data&quot;</span> : <span class="string">&quot;non_static_2&quot;</span>&#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123; <span class="attr">&quot;id&quot;</span> : <span class="number">1</span>, <span class="attr">&quot;static_data&quot;</span> : <span class="string">&quot;static_test_1&quot;</span>  &#123;</span><br><span class="line">        <span class="attr">&quot;no&quot;</span> : <span class="number">1</span>  &#123; <span class="attr">&quot;non_static_data&quot;</span> : <span class="string">&quot;non_static_1&quot;</span>&#125;,</span><br><span class="line">        <span class="attr">&quot;no&quot;</span> : <span class="number">2</span>  &#123; <span class="attr">&quot;non_static_data&quot;</span> : <span class="string">&quot;non_static_1&quot;</span>&#125;</span><br><span class="line">        &#125;,</span><br><span class="line">&#125;,</span><br><span class="line">&#123; <span class="attr">&quot;id&quot;</span> : <span class="number">2</span>, <span class="attr">&quot;static_data&quot;</span> : <span class="string">&quot;static_2&quot;</span>  &#123;</span><br><span class="line">        <span class="attr">&quot;no&quot;</span> : <span class="number">1</span>  &#123; <span class="attr">&quot;non_static_data&quot;</span> : <span class="string">&quot;non_static_2&quot;</span>&#125;,</span><br><span class="line">        <span class="attr">&quot;no&quot;</span> : <span class="number">2</span>  &#123; <span class="attr">&quot;non_static_data&quot;</span> : <span class="string">&quot;non_static_2&quot;</span>&#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>このstaticカラムを利用することで同一パーティションキー間でテーブル結合することなく共有することができます。</p>
 <p>チャットとチャットルームにおける関係にも利用できそうです。</p>
@@ -326,6 +329,26 @@
   
     
       
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210416a/">
+                  リモートワーク連載：社用機と私用機に同じモニタ3台を使う話
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
     
   
     
@@ -346,52 +369,12 @@
   
     
       
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20200709/">
-                  GoでWebアプリ開発時にあるあるだったレビューコメント
+                <a href="https://future-architect.github.io/articles/20210414a/">
+                  春の入門連載2021を始めます
                 </a>
               </li>
             </ul>
@@ -401,6 +384,58 @@
     
   
     
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20200630/">
+                  go-swaggerを用いたWebアプリケーション開発Tips19選
+                </a>
+              </li>
+            </ul>
+          </div>
+        
       
     
   
@@ -426,84 +461,12 @@
   
     
       
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210324/">
-                  k6の使い方 シンプル&軽快な負荷試験ツールを試す
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210305/">
-                  インフラ入門ーインフラ要件定義編ー
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210304/">
-                  mxGraphで階層グラフを可視化する
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210226/">
-                  アクセシビリティ情報を使った壊れにくいE2Eテスト
+                <a href="https://future-architect.github.io/articles/20200311/">
+                  JavaプログラマーのためのGo言語入門
                 </a>
               </li>
             </ul>
@@ -519,6 +482,16 @@
     
   
     
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
   
     
   
@@ -531,6 +504,44 @@
     
   
     
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20201223/">
+                  2021年版Pythonの型ヒントの書き方 (for Python 3.9)
+                </a>
+              </li>
+            </ul>
+          </div>
+        
       
     
   
@@ -568,12 +579,44 @@
   
     
       
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20201020/">
-                  ProxyとDockerと新人社員と時々わたし
+                <a href="https://future-architect.github.io/articles/20200807/">
+                  GoとSuffixArray
                 </a>
               </li>
             </ul>
@@ -590,8 +633,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20200930/">
-                  Policy as Code を実現する Open Policy Agent に憧れて。ポリシーコードでAPI仕様をLintする
+                <a href="https://future-architect.github.io/articles/20200730/">
+                  Redux-Toolkitに学ぶ、TypeScriptの型推論とこれからのAPIデザイン
                 </a>
               </li>
             </ul>
@@ -604,24 +647,54 @@
   
     
       
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
         
       
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
       
     
   
     
-  
+      
     
   
     
@@ -631,52 +704,6 @@
     
   
     
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
     
   
@@ -690,21 +717,7 @@
   
     
       
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
+        
       
     
   
@@ -732,15 +745,15 @@
   
     
       
-    
-  
-    
-  
-    
-  
-    
-      
         
+      
+    
+  
+    
+  
+    
+  
+    
       
     
   
@@ -771,8 +784,6 @@
     
   
     
-      
-        
       
     
   
@@ -836,6 +847,60 @@
   
     
       
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -866,62 +931,6 @@
   
     
       
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
     
   
     
@@ -954,10 +963,30 @@
   
     
       
+        
+      
     
   
     
       
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
     
   
     
@@ -973,24 +1002,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
       
     
   
@@ -1122,8 +1133,6 @@
   
     
       
-        
-      
     
   
     
@@ -1144,272 +1153,6 @@
   
     
   
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
     
   
     
@@ -1453,6 +1196,22 @@
     
   
     
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
   
     
   
@@ -1467,6 +1226,260 @@
     
   
     
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
       
     
   
@@ -1506,22 +1519,6 @@
   
     
       
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
         
       
     
@@ -1529,38 +1526,6 @@
     
   
     
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
   
     
   
@@ -1571,19 +1536,7 @@
     
   
     
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
-    
-  
     
   
     
@@ -1599,6 +1552,66 @@
     
       
         
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
       
     
   
@@ -1645,7 +1658,7 @@
 	</li>
       
 	<li>
-	  <a href="/categories/VR/">VR (9)</a>
+	  <a href="/categories/VR/">VR (10)</a>
 	</li>
       
 	<li>
@@ -1669,7 +1682,7 @@
 	</li>
       
 	<li>
-	  <a href="/categories/DB/">DB (13)</a>
+	  <a href="/categories/DB/">DB (14)</a>
 	</li>
       
 	<li>
