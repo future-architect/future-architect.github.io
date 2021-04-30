@@ -24,7 +24,7 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20200528/photo_20200528_03.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20200528/photo_20200528_04.png">
 <meta property="article:published_time" content="2020-05-28T00:49:19.000Z">
-<meta property="article:modified_time" content="2021-04-11T08:20:21.937Z">
+<meta property="article:modified_time" content="2021-04-28T01:36:35.822Z">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="設計">
 <meta name="twitter:card" content="summary">
@@ -119,6 +119,10 @@
 <p>特に、プログラマーは、最初にみたプログラミング言語のフォルダ構成を親だと思う特性があり、Javaや.NETに影響されるとかなり細かくフォルダを切りたくなったり、package privateなど細かく可視性を制御しようとしたりして、なおかつ「privateのテストってどうすべきなんですか？」とか議論を始めたりもしますが、Go先生によれば<a target="_blank" rel="noopener" href="https://github.com/golang/go/tree/master/src/os">これぐらい</a>は1パッケージにファイルをぶっこんでもいいわけです。勇気を持ちましょう。</p>
 <p>本エントリーでは、小中規模のGoプロジェクト、あるいは小さいところから少しずつ育てていく上でのパッケージ構成について紹介します。すでにメンバーが慣れている構成があるならそれを維持したほうが良いです。</p>
 <p>あと、再利用という言葉の意味が同僚と話をしていて、人によって違いそうだなと思ったので「そのまま利用」「コピーして利用」というのは適宜追記しています。</p>
+<p>（2021/04/28追記）golang-standards/project-layoutに関してはRussが言及していますね！</p>
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">this is not a standard Go project layout #117 <a target="_blank" rel="noopener" href="https://t.co/uF8QblkJdF">https://t.co/uF8QblkJdF</a> <a target="_blank" rel="noopener" href="https://twitter.com/hashtag/reddit?src=hash&amp;ref_src=twsrc%5Etfw">#reddit</a></p>&mdash; Go News (@golang_news) <a target="_blank" rel="noopener" href="https://twitter.com/golang_news/status/1387144854979940356?ref_src=twsrc%5Etfw">April 27, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
 <h1 id="事前知識"><a href="#事前知識" class="headerlink" title="事前知識"></a>事前知識</h1><p>Goには処理系にハードコードされたいくつか特別なルールがあります。</p>
 <ul>
 <li>フォルダがパッケージ<ul>
@@ -157,7 +161,7 @@
 <p>ハードコーディングされていない推奨の考え方としてはパッケージ名は1つの単語で熟語にはしない、というのがありますが、たまに他のルールとぶつかるので、ここは柔軟に対応すればいいと思います。</p>
 <h1 id="最小構成"><a href="#最小構成" class="headerlink" title="最小構成"></a>最小構成</h1><p>一番Goらしさが溢れる最小構成はこれだと思います。実行ファイルは<code>cmd</code>フォルダ内にさらにアプリケーション名のフォルダを作ります。そこの内部は<code>main</code>パッケージにして、<code>main</code>関数が含まれる<code>main.go</code>を置きます。</p>
 <p>必要であれば、<code>/docs</code>（ドキュメント）、<code>/testdata</code>などを足しましょう。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;projectroot&gt; (projectrootパッケージ)</span><br><span class="line"> + cmd</span><br><span class="line"> | + &lt;application1&gt; (mainパッケージ)</span><br><span class="line"> | |  + main.go</span><br><span class="line"> | + &lt;application2&gt; (mainパッケージ) </span><br><span class="line"> |    + main.go</span><br><span class="line"> + project.go</span><br><span class="line">   : </span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;projectroot&gt; (projectrootパッケージ)</span><br><span class="line"> + cmd</span><br><span class="line"> | + &lt;application1&gt; (mainパッケージ)</span><br><span class="line"> | |  + main.go</span><br><span class="line"> | + &lt;application2&gt; (mainパッケージ)</span><br><span class="line"> |    + main.go</span><br><span class="line"> + project.go</span><br><span class="line">   :</span><br></pre></td></tr></table></figure>
 
 <p>cmdもなくして、全部をmainパッケージにしてしまうというさらにエクストリームな方法もありますが、起動部分とコアの部分を分けることは、再利用（そのまま呼ぶ）やテストのしやすさの観点では最低限守るべきラインかと思います。また、コードが育って大きくなったときに、mainの位置を変える、パッケージ名を変えるというのはコード全般に影響のある大きな変更になるので、仮に全部mainパッケージでおさまる程度の小さいコードであっても、大した手間ではないので、cmdフォルダを作ってその中でやる方が変更時の手間も削減できます。</p>
 <p>この構成の場合は、mainパッケージはなるべく薄くして、なるべくprojectのルートの方のmainではないパッケージにコードを寄せていく方が良いです。僕はコマンドライン引数のパースと起動時の条件確認ぐらいはmainパッケージでやりたいですが、<a target="_blank" rel="noopener" href="https://songmu.jp/riji/entry/2019-07-16-gocon-fukuoka.html">mainを究極まで薄くしたい派</a>の人もいますし、ここはお好みで。</p>
@@ -263,20 +267,12 @@
   
     
       
-    
-  
-    
-      
-    
-  
-    
-      
         
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210428b/">
-                  Cypress - 設定編
+                <a href="https://future-architect.github.io/articles/20210430b/">
+                  Goでバッチ登録するときのイディオム
                 </a>
               </li>
             </ul>
@@ -299,32 +295,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210427c/">
-                  GoにおけるAPIドキュメントベースのWeb API開発について登壇しました
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210426a/">
-                  AWS CLIで用いるMFAをちょっとだけ便利に扱えるツールを公開しました
+                <a href="https://future-architect.github.io/articles/20210428c/">
+                  保守・拡張をしやすいカプセル化したCypress
                 </a>
               </li>
             </ul>
@@ -343,13 +315,33 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210423a/">
-                  はじめてのリーダー論 ～もしも「明日からリーダーやって」と言われたら～
+                <a href="https://future-architect.github.io/articles/20210428a/">
+                  Cypress入門～初心者でも簡単にE2Eテストが作れる～
                 </a>
               </li>
             </ul>
           </div>
         
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
       
     
   
@@ -367,8 +359,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210421b/">
-                  The Apache Wayのお話
+                <a href="https://future-architect.github.io/articles/20210422b/">
+                  CircleCIでMarkdownのリンク切れを自動検知する
                 </a>
               </li>
             </ul>
@@ -378,8 +370,28 @@
     
   
     
+      
+    
   
     
+      
+    
+  
+    
+  
+    
+      
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20190713/">
+                  Goを学ぶときにつまずきやすいポイントFAQ
+                </a>
+              </li>
+            </ul>
+          </div>
+        
       
     
   
@@ -402,18 +414,6 @@
     
   
     
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210412a/">
-                  KVSと二年間向き合って得たナレッジを還元する時がきた
-                </a>
-              </li>
-            </ul>
-          </div>
-        
       
     
   
@@ -459,6 +459,18 @@
   
     
       
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210410/">
+                  OpenAPIからモックサーバを建てられるPrismを実際のプロジェクトに導入してみた
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
     
   
     
@@ -481,6 +493,54 @@
   
     
       
+        
+          <div class="widget">
+            <ul class="nav">
+              <li>
+                <a href="https://future-architect.github.io/articles/20210305/">
+                  インフラ入門ーインフラ要件定義編ー
+                </a>
+              </li>
+            </ul>
+          </div>
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
     
   
     
@@ -493,26 +553,8 @@
           <div class="widget">
             <ul class="nav">
               <li>
-                <a href="https://future-architect.github.io/articles/20210226/">
-                  アクセシビリティ情報を使った壊れにくいE2Eテスト
-                </a>
-              </li>
-            </ul>
-          </div>
-        
-      
-    
-  
-    
-  
-    
-      
-        
-          <div class="widget">
-            <ul class="nav">
-              <li>
-                <a href="https://future-architect.github.io/articles/20210201/">
-                  自宅仕事環境構築：指向性マイクの勧め
+                <a href="https://future-architect.github.io/articles/20201107/">
+                  フューチャーOSS推進タスクフォース始めます
                 </a>
               </li>
             </ul>
@@ -528,40 +570,6 @@
     
   
     
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
       
         
       
@@ -589,8 +597,16 @@
   
     
       
+        
+      
     
   
+    
+  
+    
+  
+    
+      
     
   
     
@@ -605,14 +621,6 @@
   
     
       
-        
-      
-    
-  
-    
-  
-    
-      
     
   
     
@@ -624,8 +632,6 @@
     
   
     
-      
-        
       
     
   
@@ -671,105 +677,7 @@
   
     
       
-    
-  
-    
-      
-    
-  
-    
-      
         
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
       
     
   
@@ -800,88 +708,6 @@
     
   
     
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-        
       
     
   
@@ -900,63 +726,11 @@
     
   
     
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
       
     
   
     
       
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
     
   
     
@@ -978,11 +752,23 @@
     
   
     
+      
+    
+  
+    
   
     
   
     
   
+    
+  
+    
+  
+    
+  
+    
+      
     
   
     
@@ -1003,7 +789,207 @@
   
     
       
+    
+  
+    
+  
+    
+      
         
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
       
     
   
@@ -1035,6 +1021,8 @@
   
     
       
+        
+      
     
   
     
@@ -1057,264 +1045,6 @@
   
     
       
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-      
-        
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
-      
         
       
     
@@ -1326,19 +1056,15 @@
     
   
     
-      
-    
   
     
   
     
-      
-        
-      
-    
   
     
       
+    
+  
     
   
     
@@ -1368,10 +1094,280 @@
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
       
     
   
     
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+      
+    
+  
+    
+      
+        
       
     
   
@@ -1401,12 +1397,6 @@
   
     
       
-        
-      
-    
-  
-    
-      
     
   
     
@@ -1416,43 +1406,9 @@
     
   
     
-  
-    
-  
-    
-  
-    
       
     
   
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
     
   
     
@@ -1482,6 +1438,48 @@
     
   
     
+  
+    
+  
+    
+      
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
       
     
   
@@ -1522,6 +1520,8 @@
     
   
     
+      
+        
       
     
   
@@ -1579,19 +1579,7 @@
   
     
       
-    
-  
-    
-  
-    
-      
-    
-  
-    
-      
-    
-  
-    
+        
       
     
   
@@ -1602,15 +1590,11 @@
     
   
     
-  
+      
     
   
     
-  
-    
-  
-    
-  
+      
     
   
     
@@ -1630,6 +1614,28 @@
     
   
     
+  
+    
+  
+    
+      
+        
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+        
       
     
   
@@ -1646,6 +1652,8 @@
     
   
     
+      
+        
       
     
   
@@ -1704,7 +1712,7 @@
 	</li>
       
 	<li>
-	  <a href="/categories/Programming/">Programming (161)</a>
+	  <a href="/categories/Programming/">Programming (163)</a>
 	</li>
       
 	<li>
