@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>オレのDynamoDB Streamsが再着火しないわけがない | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは、TIG DXユニット真野です。 タイトルのみで内容にあたりがつく、AWSお兄さんな方も多いかと思いますが、内容サマリです。  一度着火済みであるDynamoDB Streamsイベントを再着火させる公式機能は存在しない（管理コンソールでボタンポチではできないという意図です） 何かしらのスクリプトでGet（Scan） + Put（Update）して、再度データ編集する必要がある">
+<meta property="og:type" content="article">
+<meta property="og:title" content="オレのDynamoDB Streamsが再着火しないわけがない | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210122/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、TIG DXユニット真野です。 タイトルのみで内容にあたりがつく、AWSお兄さんな方も多いかと思いますが、内容サマリです。  一度着火済みであるDynamoDB Streamsイベントを再着火させる公式機能は存在しない（管理コンソールでボタンポチではできないという意図です） 何かしらのスクリプトでGet（Scan） + Put（Update）して、再度データ編集する必要がある">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210122/1_isSK76wQioKx8k3dXrDrZA.png">
+<meta property="article:published_time" content="2021-01-21T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-11T08:20:24.637Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="DynamoDB">
+<meta property="article:tag" content="DynamoDBStream">
+<meta property="article:tag" content="トラブルシュート">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210122/1_isSK76wQioKx8k3dXrDrZA.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="AWS,Go,DynamoDB,DynamoDBStream,トラブルシュート" name="keywords">
+  <meta content="真野隼記" name="author">
+
+  <link rel="stylesheet" href="/metronic/assets/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20210122/">オレのDynamoDB Streamsが再着火しないわけがない</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20210122_オレのDynamoDB_Streamsが再着火しないわけがない" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+      <li class="blog-info-item"><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98">真野隼記</a></li>
+      <li class="blog-info-item"><time datetime="2021-01-21T15:00:00.000Z" itemprop="datePublished">2021/01/22</time>
+</li>
+      <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/AWS/" title="AWS">AWS</a></li> 
+  
+    <li><a href="/tags/Go/" title="Go">Go</a></li> 
+  
+    <li><a href="/tags/DynamoDB/" title="DynamoDB">DynamoDB</a></li> 
+  
+    <li><a href="/tags/DynamoDBStream/" title="DynamoDBStream">DynamoDBStream</a></li> 
+  
+    <li><a href="/tags/%E3%83%88%E3%83%A9%E3%83%96%E3%83%AB%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%88/" title="トラブルシュート">トラブルシュート</a>
+  
+  </ul>
+
+</li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIG DXユニット真野です。</p>
+<p>タイトルのみで内容にあたりがつく、AWSお兄さんな方も多いかと思いますが、内容サマリです。</p>
+<ul>
+<li>一度着火済みであるDynamoDB Streamsイベントを再着火させる公式機能は存在しない（管理コンソールでボタンポチではできないという意図です）</li>
+<li>何かしらのスクリプトでGet（Scan） + Put（Update）して、再度データ編集する必要がある</li>
+<li>この時、Get（Scan）した内容をそのままPutしてもDynamoDB Streamsは起動せず、何かしらの項目変更や項目追加が必要</li>
+</ul>
+<p>..です。</p>
+<p>興味がある方向けに説明を続けます。</p>
+<h2 id="DynamoDB-Streamsとは"><a href="#DynamoDB-Streamsとは" class="headerlink" title="DynamoDB Streamsとは"></a>DynamoDB Streamsとは</h2><p><img src="/images/20210122/1_isSK76wQioKx8k3dXrDrZA.png"></p>
+<p>DynamoDB Streamsは、DynamoDBに対する項目の追加、変更、削除をイベントとして検出できる機能です。テーブルの項目が変更されるとすぐに、新しいレコードがテーブルのストリームに表示されます。AWS Lambda はストリームをポーリングし、新しいストリームレコードを検出すると、Lambda 関数を同期的に呼び出します。</p>
+<p>参考: <a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Streams.html">https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Streams.html</a></p>
+<p>この手のAWSサービスに珍しくAt Least Onceだったり、順序制御がされていたりと何かと助かるサービスです。ストリームレコードは 24 時間後に自動的に削除されるので、ストリームのコンシューマ側のアプリの処理が追いつかない場合はデータロストする可能性があるので注意すべき、ってところが見落としやすいポイントでしょうか。</p>
+<h2 id="DynamoDB-Streamsをリラン（再実行）したい時"><a href="#DynamoDB-Streamsをリラン（再実行）したい時" class="headerlink" title="DynamoDB Streamsをリラン（再実行）したい時"></a>DynamoDB Streamsをリラン（再実行）したい時</h2><p>DynamoDB StreamsはAWSのサービスだと珍しく <code>Exactly Once</code> <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> の実行保証で、通常は後続にLambdaを呼び出します。</p>
+<p>起動が保証されているとはいえ、アプリケーションが不具合を起こしたり、外部連携先のシステム都合でリランしてほしいという要望もあるかと思います（ありました）。</p>
+<p>DynamoDB StreamsはKinesis Data Streamsのように、ストリームの開始位置を水平トリムや日付指定で行なうことができず、有効・無効の切り替えのみ可能です。</p>
+<p>参考: <a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Streams.html#Streams.Enabling">https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Streams.html#Streams.Enabling</a></p>
+<p>そのため、ある日時から再度DynamoDB Streamsを再実行したい場合は、自前のスクリプトで対応する必要があります。</p>
+<h2 id="イベントが再着火しない"><a href="#イベントが再着火しない" class="headerlink" title="イベントが再着火しない"></a>イベントが再着火しない</h2><p>しかし、以下1~2のようなスクリプトを作っても上手くDynamoDB Streamsが起動せず、後続のLambdaが動いてくれませんでした😭</p>
+<ol>
+<li>ストリームを再読み取りさせたい、DynamoDBの項目をScan</li>
+<li>Scanして取得したItemをそのまま同じテーブルにPut</li>
+</ol>
+<p>ScanもPutも正しく成功しているのでなんでだろうって思ってましたが、ドキュメントを見返すと答えが出ていました。</p>
+<h2 id="解決策"><a href="#解決策" class="headerlink" title="解決策"></a>解決策</h2><p>原因はドキュメントに書いてあるとおり、そのままでした。</p>
+<blockquote>
+<p>DynamoDB Streamsは、DynamoDBに対する項目の追加、変更、削除をイベントとして検出できる機能です</p>
+</blockquote>
+<p>とある通りです。<strong>項目の追加、変更、削除を検出する機能</strong>と書いていますね。Scanした項目をそのままPutするだけでは、追加、編集、削除ではないのでDynamoDB Streamsは起動しないのです。</p>
+<p>何となくDynamoDB Streamsは、Put、Update、DeleteといったAPIアクションをキャプチャしてくれるイメージがありましたが、あくまで項目に対する書き換え操作が行われた場合のみに起動する機能が正しかったです。この仕様自体はOracleDBのCDC（チェンジデータキャプチャ）そのままなので違和感は無いので、そうだよね～って感じです。</p>
+<p>そのため、以下のようなコードに書き換えました。</p>
+<ol>
+<li>ストリームを再読み取りさせたい、DynamoDBの項目をScan</li>
+<li>ItemにRevisionといったフィールドを新規追加（存在すれば＋１する）</li>
+<li>書き換えたItemを同じテーブルにPut</li>
+</ol>
+<p>上記でDynamoDB Streamsを再度して無事後続のLambdaまでデータを渡して再着火させることに成功しました✨</p>
+<p>Goで書いたコードは以下のイメージです。簡易のため対象テーブルは指定されたハッシュキーでスキャン（正確にはクエリ）しています。</p>
+<figure class="highlight go"><figcaption><span>main.go(サンプルコード)</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws/session&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/service/dynamodb&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/rs/zerolog/log&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> (</span><br><span class="line">	db = dynamodb.New(session.Must(session.NewSessionWithOptions(session.Options&#123;</span><br><span class="line">		SharedConfigState: session.SharedConfigEnable,</span><br><span class="line">	&#125;)))</span><br><span class="line">	tableName    = os.Getenv(<span class="string">&quot;DynamoTable&quot;</span>)  <span class="comment">// リラン対象のテーブル</span></span><br><span class="line">	hashKeyName  = os.Getenv(<span class="string">&quot;HashKeyName&quot;</span>)  <span class="comment">// リラン対象のハッシュキー名</span></span><br><span class="line">	hashKeyValue = os.Getenv(<span class="string">&quot;HashKeyValue&quot;</span>) <span class="comment">// リラン対象のハッシュキー値</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> err := scanAndPut(context.Background()); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Error().Msgf(<span class="string">&quot;%v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(<span class="string">&quot;finished&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">scanAndPut</span><span class="params">(ctx context.Context)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> startKey <span class="keyword">map</span>[<span class="keyword">string</span>]*dynamodb.AttributeValue</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		resp, err := scan(ctx, startKey)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;failed to scan: %w&quot;</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">		log.Info().Msgf(<span class="string">&quot;scanCount: %v&quot;</span>, <span class="built_in">len</span>(resp.Items))</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> _, v := <span class="keyword">range</span> resp.Items &#123;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">var</span> revision <span class="keyword">int64</span></span><br><span class="line">			<span class="keyword">if</span> err := dynamodbattribute.Unmarshal(v[<span class="string">&quot;revision&quot;</span>], &amp;revision); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;unmarshal: %v&quot;</span>, err)</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			revision++</span><br><span class="line">			marshal, _ := dynamodbattribute.Marshal(revision)</span><br><span class="line">			v[<span class="string">&quot;revision&quot;</span>] = marshal</span><br><span class="line">			<span class="keyword">if</span> err := put(ctx, v); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;failed to put: %w&quot;</span>, err)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		startKey = resp.LastEvaluatedKey</span><br><span class="line">		<span class="keyword">if</span> <span class="built_in">len</span>(startKey) == <span class="number">0</span> &#123;</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">scan</span><span class="params">(ctx context.Context, startKey <span class="keyword">map</span>[<span class="keyword">string</span>]*dynamodb.AttributeValue)</span> <span class="params">(*dynamodb.QueryOutput, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> db.QueryWithContext(ctx, &amp;dynamodb.QueryInput&#123;</span><br><span class="line">		TableName:         aws.String(tableName),</span><br><span class="line">		ExclusiveStartKey: startKey,</span><br><span class="line">		ExpressionAttributeNames: <span class="keyword">map</span>[<span class="keyword">string</span>]*<span class="keyword">string</span>&#123;</span><br><span class="line">			<span class="string">&quot;#Hash&quot;</span>: aws.String(hashKeyName),</span><br><span class="line">		&#125;,</span><br><span class="line">		ExpressionAttributeValues: <span class="keyword">map</span>[<span class="keyword">string</span>]*dynamodb.AttributeValue&#123;</span><br><span class="line">			<span class="string">&quot;:hash&quot;</span>: &#123;</span><br><span class="line">				S: aws.String(hashKeyValue),</span><br><span class="line">			&#125;,</span><br><span class="line">		&#125;,</span><br><span class="line">		KeyConditionExpression: aws.String(<span class="string">&quot;#Hash = :hash&quot;</span>),</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">put</span><span class="params">(ctx context.Context, v <span class="keyword">map</span>[<span class="keyword">string</span>]*dynamodb.AttributeValue)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	_, err := db.PutItemWithContext(ctx, &amp;dynamodb.PutItemInput&#123;</span><br><span class="line">		TableName: aws.String(tableName),</span><br><span class="line">		Item:      v,</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>サンプルコードは、3つの環境変数を持ってます。<br>利用する場合には環境変数の設定を忘れないようにしてください。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> DynamoTable=&lt;Your Table Name&gt;</span><br><span class="line"><span class="built_in">export</span> HashKeyName=&lt;Hash Key Name fo Your Table&gt;</span><br><span class="line"><span class="built_in">export</span> DynamoTable=&lt;Hash Key Value fo Your Table&gt;</span><br><span class="line">go run main.go</span><br></pre></td></tr></table></figure>
+
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>DynamoDB StreamsからLambdaにわたす項目には、編集前の<code>OldImage</code>と 編集後の<code>NewImage</code> が存在します。</p>
+<p>今回のリラン方法だと、OldImageは初回実行時と差分が生じるので、OldImageを利用したLambdaのリランは上手く行えません。DynamoDB Streamsで渡される項目については、Goであれば <a target="_blank" rel="noopener" href="https://github.com/aws/aws-lambda-go/blob/master/events/dynamodb.go#L78">https://github.com/aws/aws-lambda-go/blob/master/events/dynamodb.go#L78</a> あたりを確認ください。</p>
+<h2 id="指定した日付のみをリランしたい場合のインデックス設計"><a href="#指定した日付のみをリランしたい場合のインデックス設計" class="headerlink" title="指定した日付のみをリランしたい場合のインデックス設計"></a>指定した日付のみをリランしたい場合のインデックス設計</h2><p>ある日付からといった指定がすでにハッシュキー・ソートキーの構造で可能であれば良いですが、そうでない限りはGSIでcreated_ymdといった日付を示す項目をもたせることが多いのではないでしょうか？</p>
+<p>このGSIをDynamoDBのScanで読み取り＋Putすれば、日付単位のストリームの再実行ができそうです。</p>
+<p>DynamoDB Streamsを利用したシステム設計を行う場合は、リランのしやすさも意識して、予めGSIを追加しておくのも良いかも知れません（費用とのトレードオフになりますが、いざという時に構えておくと良いかなと思います）</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><ul>
+<li>DynamoDB Streamsを同じデータで再実行させたい場合は、何かしらの項目を<strong>編集して</strong>再度Putする必要がある</li>
+<li>リランのしやすさも設計時に織り込んでおき、必要に応じてGSIに日付項目などを追加しておくと良い</li>
+<li>DynamoDB Streamsをイベントソースとして起動するLambdaが、OldImage（編集前の項目）を利用する設計になっていると、単純リランができなくなるので、別途考慮が必要</li>
+</ul>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html に Each stream record appears exactly once in the stream. とある</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li class="twitter-btn">
+      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210122/&via=future_techblog&related=twitterapi%2Ctwitter&text=%E3%82%AA%E3%83%AC%E3%81%AEDynamoDB%20Streams%E3%81%8C%E5%86%8D%E7%9D%80%E7%81%AB%E3%81%97%E3%81%AA%E3%81%84%E3%82%8F%E3%81%91%E3%81%8C%E3%81%AA%E3%81%84"
+        onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li class="fb-btn">
+      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210122/&t=%E3%82%AA%E3%83%AC%E3%81%AEDynamoDB%20Streams%E3%81%8C%E5%86%8D%E7%9D%80%E7%81%AB%E3%81%97%E3%81%AA%E3%81%84%E3%82%8F%E3%81%91%E3%81%8C%E3%81%AA%E3%81%84"
+        onclick="window.open(this.href, 'fbsharewindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li class="hatebu-btn">
+      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210122/"
+        onclick="window.open(this.href, 'hatebuwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="hatebu-btn-label">3</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li class="pocket-btn">
+      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210122/"
+        onclick="window.open(this.href, 'pocketwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="pocket-btn-label">8</span>
+      </a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+  </article>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav">
+      
+    <li>2021.05.11<a href="/articles/20210511b/" title="Dart/Flutter連載の2記事目です。はじめまして、TIGの宮崎将太です。突然ですがみなさん、Swagger使いたいですよね。">Flutter Swagger統合</a></li>
+
+    <li>2021.05.13<a href="/articles/20210513b/" title="Flutterでの画面レイアウトの入門的な内容です。Flutterを触ったことがない方にも「こんな感じで画面が作れるんだな」というイメージがつくようお伝えできればと思います。また、私がつまずいたWidgetのサイズ調整についても記載します。"">Flutterレイアウト入門</a></li>
+
+    <li>2021.04.22<a href="/articles/20210422a/" title="私は新卒でフューチャーへ入社しITの世界でのキャリアが始まりました。その後、一度フューチャーを離れIoTプラットフォーマーのソリューションアーキテクトとして多くのお客様へ自社サービスの導入支援やIoTシステムの設計や構築の支援をしておりました。そうしたソリューションアーキテクトとしてのロールを通じて、多くの経験や学びを得ることができたのですが、その中でも特にTechnical Credibilityというキーワードについて自分の経験を交えて本ブログにて書いてみたいと思います。">Technical Credibilityを築くということ</a></li>
+
+    <li>2021.04.06<a href="/articles/20210406/" title="シェルスクリプトで前提とするシェルは、大抵のコンピューターにインストールされていることが多いbashを選択することが多いと思います。当記事ではそのbashを対象に、意外と色々あるシェルの展開処理の概要をまとめました。">Bashのシェル展開</a></li>
+
+    <li>2020.11.09<a href="/articles/20201109/" title="1年弱ほどGo言語でWebAPIアプリケーション開発を行っていますが、かなり割り切った構成・テスト方針を採用しました。そろそろ1年弱になり機能開発も比較的落ち着き、保守運用フェーズの割合も徐々に増えてきた頃合いなので、やったこと・学び・反省といった振り返りを共有します。">GoのWebアプリ開発でフラットパッケージにした話</a></li>
+
+    <li>2020.07.30<a href="/articles/20200730/" title="TypeScriptは、JavaScriptのさまざまなフリーダムな書き方を受け入れ、漸進的な型付けを行えるようにするという~~狂った~~高難易度な目的のために作成されているのですが、そろそろ、TypeScriptファーストで、利用者にとって使いやすいAPIみたいな方向性で使われることも増えるのでは、という思いを強く持ちました。「">Redux-Toolkitに学ぶ、TypeScriptの型推論とこれからのAPIデザイン</a></li>
+
+    <li>2020.05.01<a href="/articles/20200501/" title="フロントエンド記事集中投稿ウィークの3本目です。">TypeScriptでReactをやるときは、小さいアプリでもReduxを最初から使ってもいいかもねというお話</a></li>
+
+    <li>2020.04.16<a href="/articles/20200416/" title="さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知でしょうか？Salesforceと非常によく似ておりますが、米国発の SaaS, aPaaS サービスです。米国では割とポピュラーなサービスとして位置づけられていますが、日本ではまだまだです。が、伸び率は今年度は4割近くと、利用ユーザがすごい勢いで伸びています。そんな中、お客様内でSNOWを利用していて、それと関連する領域をFutureが担当するケースも増えてくるかと思いますので、今回は本ブログでSNOWについて少しだけ紹介したいと思います。SNOW とは？の説明は、言葉だけだと概念過ぎてわかりづらいので、現状、私が直面している課題の解決案ベースで解説していきたいと思います。">ServiceNow+Terraform(+Go) によるインフラ構築自動化</a></li>
+
+    <li>2020.03.31<a href="/articles/20200331/" title="サーバレス連載企画の第5回はCloudEvents(https://cloudevents.io/)を取り上げたいと思います。CloudEventsとは様々存在するイベントを統一的に扱いたいとの思いから登場した統一仕様です。2019.10.24にCNCF(https://www.cncf.io/)のIncubatorプロジェクトに昇格したらしく、同時にv1.0のSpecificationがリリースされています。">Serverless連載5: CloudEventsのGo版SDKをいじってみる</a></li>
+
+    <li>2020.03.23<a href="/articles/20200323/" title="AWSのLambdaに代表されるサーバレスアプリは実行時のみ稼働するため、サーバー稼働によるあらゆるコストから解放され、システム開発の工数を減らすことができます。例えば何らかのAPIを提供する場合でも、API GatewayとLambdaを組み合わせることで提供可能です。">Serverless連載1: SAMを使ったローカルテスト（Go編）</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+<!-- CATEGORIES START -->
+<h3 class="margin-top-30">カテゴリー</h3>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+    <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+    <li><a href="/categories/IoT/">IoT (14)</a></li>
+    
+    <li><a href="/categories/VR/">VR (10)</a></li>
+    
+    <li><a href="/categories/Security/">Security (2)</a></li>
+    
+    <li><a href="/categories/Design/">Design (7)</a></li>
+    
+    <li><a href="/categories/Programming/">Programming (168)</a></li>
+    
+    <li><a href="/categories/Management/">Management (9)</a></li>
+    
+    <li><a href="/categories/Infrastructure/">Infrastructure (131)</a></li>
+    
+    <li><a href="/categories/DB/">DB (14)</a></li>
+    
+    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+    
+    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+          <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+          <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+              t._e.push(f);
+            };
+            return t;
+          }(document, "script", "twitter-wjs"));</script>
+          
+            <!-- BEGIN TWITTER BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <!-- Twitterフォローボタン -->
+              <li class="twitter-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                </a>
+              </li>
+              <!-- Twitterタイムライン -->
+              <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+            </div>
+            <!-- END TWITTER BLOCK -->
+          
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+            &copy; 2021 フューチャー技術ブログ<br>
+          </div>
+          <!-- END COPYRIGHT -->
+	        <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
+    
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
+    
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

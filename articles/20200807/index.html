@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>GoとSuffixArray | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="フューチャー夏休みの自由研究連載の5回目です。 はじめにTIG の辻です。 Go は標準ライブラリが充実しているとよく言われます。標準ライブラリだけで、HTTP サーバを作れたり、暗号化処理や、JSON や CSV といったデータ形式を扱うことができます。go list std | grep -v vendor | wc -l としてパッケージ数を見てみると、約 200 ものパッケージが存在す">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GoとSuffixArray | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200807/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="フューチャー夏休みの自由研究連載の5回目です。 はじめにTIG の辻です。 Go は標準ライブラリが充実しているとよく言われます。標準ライブラリだけで、HTTP サーバを作れたり、暗号化処理や、JSON や CSV といったデータ形式を扱うことができます。go list std | grep -v vendor | wc -l としてパッケージ数を見てみると、約 200 ものパッケージが存在す">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200807/suffixarray.png">
+<meta property="article:published_time" content="2020-08-06T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-11T08:20:22.969Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="夏休み自由研究">
+<meta property="article:tag" content="データ構造">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200807/suffixarray.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="Go,夏休み自由研究,データ構造" name="keywords">
+  <meta content="辻大志郎" name="author">
+
+  <link rel="stylesheet" href="/metronic/assets/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200807/">GoとSuffixArray</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200807_GoとSuffixArray" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+      <li class="blog-info-item"><a href="/authors/%E8%BE%BB%E5%A4%A7%E5%BF%97%E9%83%8E">辻大志郎</a></li>
+      <li class="blog-info-item"><time datetime="2020-08-06T15:00:00.000Z" itemprop="datePublished">2020/08/07</time>
+</li>
+      <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/Go/" title="Go">Go</a></li> 
+  
+    <li><a href="/tags/%E5%A4%8F%E4%BC%91%E3%81%BF%E8%87%AA%E7%94%B1%E7%A0%94%E7%A9%B6/" title="夏休み自由研究">夏休み自由研究</a></li> 
+  
+    <li><a href="/tags/%E3%83%87%E3%83%BC%E3%82%BF%E6%A7%8B%E9%80%A0/" title="データ構造">データ構造</a>
+  
+  </ul>
+
+</li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <img src="/images/20200807/suffixarray.png" class="img-small-size">
+
+<p><a href="https://future-architect.github.io/articles/20200726/">フューチャー夏休みの自由研究連載</a>の5回目です。</p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG の辻です。</p>
+<p>Go は標準ライブラリが充実しているとよく言われます。標準ライブラリだけで、HTTP サーバを作れたり、暗号化処理や、JSON や CSV といったデータ形式を扱うことができます。<code>go list std | grep -v vendor | wc -l</code> としてパッケージ数を見てみると、約 200 ものパッケージが存在することがわかります。本記事では、その多くの Go の標準ライブラリの中でも、個人的に面白いなと思ったライブラリを紹介したいと思います。<a target="_blank" rel="noopener" href="https://golang.org/pkg/index/suffixarray/">suffixarray</a> パッケージです。</p>
+<p><code>suffixarray</code> パッケージは Suffix Array を扱うライブラリです。<code>suffixarray</code> パッケージの魅力を感じるには、まず Suffix Array とは何か？を知る必要があるでしょう。</p>
+<h2 id="Suffix-Arrayとは"><a href="#Suffix-Arrayとは" class="headerlink" title="Suffix Arrayとは"></a>Suffix Arrayとは</h2><p>Suffix Array はデータ構造の 1 つです。1990 年に Udi Manber, Gene Myers によって考案されました。Suffix Array を用いると、検索したい任意の文字列から、漏れなく高速に文字列を検索できます。全文検索やデータ圧縮といった応用があります。</p>
+<p>Suffix Array は文字列のすべての suffix を辞書順でソートし、それぞれの suffix の元の文字列における開始位置を保持する配列です。長さが n である文字列 T の suffix とは 1 ≦ i ≦ n なる i について T の i 文字目から n 文字目までの部分文字列のことを指します。具体的に <code>banana</code> という文字列で考えてみます。<code>banana</code> のおける suffix は以下の 6 つです。</p>
+<ul>
+<li>banana</li>
+<li>anana</li>
+<li>nana</li>
+<li>ana</li>
+<li>na</li>
+<li>a</li>
+</ul>
+<p>各 suffix の開始位置をあわせて記載すると以下のようになります。</p>
+<table>
+<thead>
+<tr>
+<th align="left">開始位置</th>
+<th>suffix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1</td>
+<td>banana</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td>anana</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td>nana</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td>ana</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td>na</td>
+</tr>
+<tr>
+<td align="left">6</td>
+<td>a</td>
+</tr>
+</tbody></table>
+<p>これらの suffix を辞書順でソートすると以下のようになります。</p>
+<table>
+<thead>
+<tr>
+<th align="left">開始位置</th>
+<th>suffix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">6</td>
+<td>a</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td>ana</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td>anana</td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td>banana</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td>na</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td>nana</td>
+</tr>
+</tbody></table>
+<p>よって、<code>banana</code> の文字列における Suffix Array とは [6, 4, 2, 1, 5, 3] という配列になります。suffix の開始位置があれば元の suffix を構成することができ、開始位置から n 文字目までの部分文字列になります。<code>banana</code> における suffix の開始位置が 3 であれば元の suffix は 3 文字目から 6 文字目までの部分文字列であるため、<code>nana</code> という suffix であることがわかります。</p>
+<h3 id="文字列のパターンマッチング"><a href="#文字列のパターンマッチング" class="headerlink" title="文字列のパターンマッチング"></a>文字列のパターンマッチング</h3><p>Suffix Array がどのようなデータ構造であるか分かりました。次に Suffix Array を用いて、文字列をパターンマッチングすることを考えてみます。<code>banana</code> という文字列から <code>an</code> という文字列をパターンマッチングすることを考えてみます。b<font color="Red">an</font><font color="Blue">an</font>a ですから、赤文字である 2 文字目から 3 文字目の <code>an</code> と、青文字である 4 文字目から 5 文字目の <code>an</code> の 2 箇所でマッチします。文字列 T の任意の部分文字列は、その出現位置を開始位置とする T の suffix の prefix です。つまり <code>an</code> であれば suffix <code>ana</code> の prefix である <code>an</code> と suffix  <code>anana</code> の prefix である <code>an</code> です。このように文字列 P を prefix としてもつような、T の suffix を探索することによって、文字列のパターンマッチングができます。Suffix Array は文字列の suffix が辞書順でソートされた suffix の開始位置を保持しているため、二分探索を用いて、高速にパターンマッチングできます。</p>
+<p><code>banana</code> の Suffix Array が求められているとして、Go で探索する実装例を示します。実装上の Suffix Array は 0-indexed とします。</p>
+<ul>
+<li>Suffix Array を二分探索して、一致するすべての suffix を検索する実装例</li>
+</ul>
+<figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;sort&quot;</span></span><br><span class="line">	<span class="string">&quot;strings&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t := <span class="string">&quot;banana&quot;</span></span><br><span class="line">	p := <span class="string">&quot;an&quot;</span> <span class="comment">// マッチングしたい文字列</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// banana の Suffix Array (0-indexed)</span></span><br><span class="line">	sa := []<span class="keyword">int</span>&#123;<span class="number">5</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">2</span>&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// strings.Compare の戻り値が 0 よりも大きいうちの最小の index を探索</span></span><br><span class="line">	left := sort.Search(<span class="built_in">len</span>(sa), <span class="function"><span class="keyword">func</span><span class="params">(i <span class="keyword">int</span>)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">		<span class="keyword">return</span> strings.Compare(t[sa[i]:min(sa[i]+<span class="built_in">len</span>(p), <span class="built_in">len</span>(t))], p) &gt;= <span class="number">0</span></span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// strings.Compare の戻り値が 1 である最小の index を探索</span></span><br><span class="line">	right := sort.Search(<span class="built_in">len</span>(sa), <span class="function"><span class="keyword">func</span><span class="params">(i <span class="keyword">int</span>)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">		<span class="keyword">return</span> strings.Compare(t[sa[i]:min(sa[i]+<span class="built_in">len</span>(p), <span class="built_in">len</span>(t))], p) == <span class="number">1</span></span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> i := left; i &lt; right; i++ &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;suffix: %s, match: %s\n&quot;</span>, t[sa[i]:], t[sa[i]:sa[i]+<span class="built_in">len</span>(p)])</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">min</span><span class="params">(a, b <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> a &lt; b &#123;</span><br><span class="line">		<span class="keyword">return</span> a</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> b</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>出力結果</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">suffix: ana, match: an</span><br><span class="line">suffix: anana, match: an</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://play.golang.org/p/JFNugaoB26N">https://play.golang.org/p/JFNugaoB26N</a></p>
+<p>このパターンマッチングは元の文字列 T の長さを $n$ として、マッチングしたい文字列 P の長さを $m$ とすると $O(m \log n)$ 時間でマッチングできます。Go の <a target="_blank" rel="noopener" href="https://golang.org/pkg/sort/#Search">sort.Search</a> 関数はソートされた配列やスライスに対して条件を満たす最小の index を二分探索することができます。上記の実装では、suffix における prefix の先頭 <code>len(p)</code> 文字目までの部分文字列とマッチングしたい文字列 <code>p</code> を <a target="_blank" rel="noopener" href="https://golang.org/pkg/strings/#Compare">strings.Compare</a> で比較し、結果が 0 以上と 1 となる最小の index <sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>を探索しています。Suffix Array に対して二分探索を行うことによって、パターンマッチングするときは、元の文字列の長さに対して、対数時間でおさえることができます。</p>
+<h2 id="Suffix-Array-の構築"><a href="#Suffix-Array-の構築" class="headerlink" title="Suffix Array の構築"></a>Suffix Array の構築</h2><p>Suffix Array を構築することを考えてみます。ナイーブに考えると、長さ $O(n)$ の文字列 $n$ つをソートすることになります。クイックソートの 1 回あたりの平均計算量 $O(n \log n)$ とあわせて $O(n^2 \log n)$ 時間になります。いかにして効率よく Suffix Array を構築できるかどうかがアルゴリズムのポイントになります。</p>
+<ul>
+<li>ナイーブにソートして構築する実装例</li>
+</ul>
+<figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;sort&quot;</span></span><br><span class="line">	<span class="string">&quot;strings&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	text := <span class="string">&quot;banana&quot;</span></span><br><span class="line"></span><br><span class="line">	d := <span class="built_in">make</span>([]data, <span class="number">0</span>, <span class="built_in">len</span>(text))</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="built_in">len</span>(text); i++ &#123;</span><br><span class="line">		d = <span class="built_in">append</span>(d, data&#123;</span><br><span class="line">			Index:  i,</span><br><span class="line">			Suffix: text[i:],</span><br><span class="line">		&#125;)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	sort.Slice(d, <span class="function"><span class="keyword">func</span><span class="params">(i, j <span class="keyword">int</span>)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">		ret := strings.Compare(d[i].Suffix, d[j].Suffix)</span><br><span class="line">		<span class="keyword">if</span> ret &lt;= <span class="number">0</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, v := <span class="keyword">range</span> d &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;index: %d, suffix: %s\n&quot;</span>, v.Index, v.Suffix)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> data <span class="keyword">struct</span> &#123;</span><br><span class="line">	Index  <span class="keyword">int</span></span><br><span class="line">	Suffix <span class="keyword">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>出力結果</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">index: 5, suffix: a</span><br><span class="line">index: 3, suffix: ana</span><br><span class="line">index: 1, suffix: anana</span><br><span class="line">index: 0, suffix: banana</span><br><span class="line">index: 4, suffix: na</span><br><span class="line">index: 2, suffix: nana</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://play.golang.org/p/J97GtkfWBZp">https://play.golang.org/p/J97GtkfWBZp</a></p>
+<p>しかし、構築に $O(n^2 \log n)$ 時間かかるのでは、例えば 10 万文字程度の文字列の Suffix Array を構築するのにとても時間がかかるため、実用的ではありません。</p>
+<ul>
+<li>ManberとMyersのアルゴリズム</li>
+</ul>
+<p>そこで次は Manber と Myers によって示されたアルゴリズムを用いて構築することを考えてみます。基本的な着想はダブリングによるものです。つまり n 文字をソートするときに、まず 1 文字の部分文字列のみをソート、続いて 1 文字の部分文字列でソートした結果を用いて 2 文字の部分文字列をソート、、、と 2k 文字の部分文字列をソートするのに、k 文字の部分文字列でソートした結果を用います。詳しくは蟻本 <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> を参照ください。蟻本が手もとにない場合は <a target="_blank" rel="noopener" href="https://www.geeksforgeeks.org/suffix-array-set-2-a-nlognlogn-algorithm/">Suffix Array | Set 2 (nLogn Algorithm)</a> などのページでアルゴリズムを確認ください。本記事では Go による実装のみを示します。ダブリングにより比較回数は $O(\log n)$ 回で 1 回あたりのソートの平均計算量が $O(n \log n)$ ですから、全体では $O(n (\log n)^2)$ 時間のアルゴリズムです。</p>
+<ul>
+<li>蟻本ベースの Go による Suffix Array を構築する実装</li>
+</ul>
+<figure class="highlight go"><figcaption><span>suffixarray.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> suffixarray</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;sort&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> suffixArray <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">// length of input string</span></span><br><span class="line">	N <span class="keyword">int</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// input text (ASCII only)</span></span><br><span class="line">	Text <span class="keyword">string</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Suffix Array</span></span><br><span class="line">	Index []<span class="keyword">int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">New</span><span class="params">(text <span class="keyword">string</span>)</span> *<span class="title">suffixArray</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> k <span class="keyword">int</span></span><br><span class="line">	n := <span class="built_in">len</span>(text)</span><br><span class="line">	rank := <span class="built_in">make</span>([]<span class="keyword">int</span>, n+<span class="number">1</span>)</span><br><span class="line">	sa := <span class="built_in">make</span>([]<span class="keyword">int</span>, n+<span class="number">1</span>)</span><br><span class="line">	tmp := <span class="built_in">make</span>([]<span class="keyword">int</span>, n+<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt;= n; i++ &#123;</span><br><span class="line">		sa[i] = i</span><br><span class="line">		<span class="keyword">if</span> i &lt; n &#123;</span><br><span class="line">			rank[i] = <span class="keyword">int</span>(text[i])</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			rank[i] = <span class="number">-1</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	cmp := <span class="function"><span class="keyword">func</span><span class="params">(i, j <span class="keyword">int</span>)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">		<span class="keyword">if</span> rank[sa[i]] != rank[sa[j]] &#123;</span><br><span class="line">			<span class="keyword">return</span> rank[sa[i]] &lt; rank[sa[j]]</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			ri, rj := <span class="number">-1</span>, <span class="number">-1</span></span><br><span class="line">			<span class="keyword">if</span> sa[i]+k &lt;= n &#123;</span><br><span class="line">				ri = rank[sa[i]+k]</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> sa[j]+k &lt;= n &#123;</span><br><span class="line">				rj = rank[sa[j]+k]</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">return</span> ri &lt; rj</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// k 文字についてソートされているところから、2k 文字をソートする</span></span><br><span class="line">	<span class="keyword">for</span> k = <span class="number">1</span>; k &lt;= n; k *= <span class="number">2</span> &#123;</span><br><span class="line">		sort.Slice(sa, cmp)</span><br><span class="line">		tmp[sa[<span class="number">0</span>]] = <span class="number">0</span></span><br><span class="line">		<span class="keyword">for</span> i := <span class="number">1</span>; i &lt;= n; i++ &#123;</span><br><span class="line">			tmp[sa[i]] = tmp[sa[i<span class="number">-1</span>]]</span><br><span class="line">			<span class="keyword">if</span> cmp(i<span class="number">-1</span>, i) &#123;</span><br><span class="line">				tmp[sa[i]]++</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">for</span> i := <span class="number">0</span>; i &lt;= n; i++ &#123;</span><br><span class="line">			rank[i] = tmp[i]</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> &amp;suffixArray&#123;</span><br><span class="line">		N:     n,</span><br><span class="line">		Text:  text,</span><br><span class="line">		Index: sa,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>banana</code> の文字列で試しにテストしてみましょう。</p>
+<figure class="highlight go"><figcaption><span>suffixarray_test.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> suffixarray</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;testing&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/google/go-cmp/cmp&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestNew</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	tests := []<span class="keyword">struct</span> &#123;</span><br><span class="line">		name <span class="keyword">string</span></span><br><span class="line">		text <span class="keyword">string</span></span><br><span class="line">		want *suffixArray</span><br><span class="line">	&#125;&#123;</span><br><span class="line">		&#123;</span><br><span class="line">			name: <span class="string">&quot;normal&quot;</span>,</span><br><span class="line">			text: <span class="string">&quot;banana&quot;</span>,</span><br><span class="line">			want: &amp;suffixArray&#123;</span><br><span class="line">				N:     <span class="number">6</span>,</span><br><span class="line">				Text:  <span class="string">&quot;banana&quot;</span>,</span><br><span class="line">				Index: []<span class="keyword">int</span>&#123;<span class="number">6</span> <span class="comment">/* contain empty string */</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">2</span>&#125;,</span><br><span class="line">			&#125;,</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> _, tt := <span class="keyword">range</span> tests &#123;</span><br><span class="line">		t.Run(tt.name, <span class="function"><span class="keyword">func</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">			got := New(tt.text)</span><br><span class="line">			<span class="keyword">if</span> diff := cmp.Diff(got, tt.want); diff != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">				t.Errorf(<span class="string">&quot;New() differs: (-got +want)\n%s&quot;</span>, diff)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>テスト結果</li>
+</ul>
+<p>テストが Pass することを確認できました。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">=== RUN   TestNew</span><br><span class="line">=== RUN   TestNew/normal</span><br><span class="line">--- PASS: TestNew (0.00s)</span><br><span class="line">    --- PASS: TestNew/normal (0.00s)</span><br><span class="line">PASS</span><br></pre></td></tr></table></figure>
+
+<p>また Go で実装したライブラリは、国内のオンラインジャッジシステムの 1 つである <a target="_blank" rel="noopener" href="http://judge.u-aizu.ac.jp/onlinejudge/">Aizu Online Judge</a> の <a target="_blank" rel="noopener" href="http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_14_D">Multiple String Matching</a> という問題を用いて検証しました。<del><a target="_blank" rel="noopener" href="https://judgedat.u-aizu.ac.jp/testcases/ALDS1_14_D/17/in">05_maximum_00.in</a> (1 MB程度あるので注意)のテストケースでタイムリミット超過(TLE)していましたが…</del></p>
+<h3 id="suffixarray-パッケージによる-Suffix-Array-の構築"><a href="#suffixarray-パッケージによる-Suffix-Array-の構築" class="headerlink" title="suffixarray パッケージによる Suffix Array の構築"></a><code>suffixarray</code> パッケージによる Suffix Array の構築</h3><p>さて、メインである本家の <code>suffixarray</code> パッケージを見てみましょう。Suffix Array の構築は <a target="_blank" rel="noopener" href="https://golang.org/pkg/index/suffixarray/#New">New</a> 関数を用いることができます。</p>
+<p><code>New</code> 関数で Suffix Array を構築し、<a target="_blank" rel="noopener" href="https://golang.org/pkg/index/suffixarray/#Index.Lookup">Lookup</a> メソッドや <a target="_blank" rel="noopener" href="https://golang.org/pkg/index/suffixarray/#Index.FindAllIndex">FindAllIndex</a> メソッドなどを用いて Suffix Array から文字列のマッチングができます。<code>banana</code> の例であれば、以下のように結果を得ることができます。</p>
+<figure class="highlight go"><figcaption><span>main_test.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;index/suffixarray&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Example</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t := <span class="string">&quot;banana&quot;</span></span><br><span class="line">	p := <span class="string">&quot;an&quot;</span> <span class="comment">// マッチングしたい文字列</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Suffix Array の構築</span></span><br><span class="line">	sa := suffixarray.New([]<span class="keyword">byte</span>(t))</span><br><span class="line"></span><br><span class="line">	<span class="comment">// -1 でマッチングするすべての位置を取得。取得する index の順番はランダム</span></span><br><span class="line">	indexes := sa.Lookup([]<span class="keyword">byte</span>(p), <span class="number">-1</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, i := <span class="keyword">range</span> indexes &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;suffix: %s, match: %s\n&quot;</span>, t[i:], t[i:i+<span class="built_in">len</span>(p)])</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Unordered Output:</span></span><br><span class="line">	<span class="comment">// suffix: ana, match: an</span></span><br><span class="line">	<span class="comment">// suffix: anana, match: an</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="ベンチマーク"><a href="#ベンチマーク" class="headerlink" title="ベンチマーク"></a>ベンチマーク</h3><p><code>suffixarray</code> パッケージの使い方が分かったところで蟻本ベースの  Manber と Myers のアルゴリズムを用いて Suffix Array を構築する実装と、標準ライブラリを用いて構築する 2 つの方法でベンチマークを取得してみましょう。(なおベンチマークの結果はローカルの環境に依存します)</p>
+<p>Suffix Array を構築する対象のデータは <a target="_blank" rel="noopener" href="http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_14_D">Multiple String Matching</a> における <a target="_blank" rel="noopener" href="https://judgedat.u-aizu.ac.jp/testcases/ALDS1_14_D/17/in">05_maximum_00.in</a> のデータを用いました。100万文字あります。input データを読み込む時間はベンチマークからは除きます。</p>
+<ul>
+<li>ベンチマークテスト</li>
+</ul>
+<figure class="highlight go"><figcaption><span>suffixarray_test.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkLookupAll_my</span><span class="params">(b *testing.B)</span></span> &#123;</span><br><span class="line">	data, err := ioutil.ReadFile(<span class="string">&quot;testdata/05_maximum_01.in.data&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		b.Fatalf(<span class="string">&quot;read test data: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	b.ResetTimer()</span><br><span class="line"></span><br><span class="line">	New(<span class="keyword">string</span>(data))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkLookupAll_std</span><span class="params">(b *testing.B)</span></span> &#123;</span><br><span class="line">	data, err := ioutil.ReadFile(<span class="string">&quot;testdata/05_maximum_01.in.data&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		b.Fatalf(<span class="string">&quot;read test data: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	b.ResetTimer()</span><br><span class="line"></span><br><span class="line">	suffixarray.New(data)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>ベンチマーク結果</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">go <span class="built_in">test</span> -bench . -benchtime=1000000000x</span><br><span class="line">goos: windows</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: github.com/d-tsuji/go-sandbox</span><br><span class="line">BenchmarkLookupAll_my-8         1000000000               4.54 ns/op</span><br><span class="line">BenchmarkLookupAll_std-8        1000000000               0.0510 ns/op</span><br><span class="line">PASS</span><br><span class="line">ok      github.com/d-tsuji/go-sandbox      9.362s</span><br></pre></td></tr></table></figure>
+
+<p>ローカル環境でのベンチマークテストの結果によると、標準ライブラリは、私が実装した Manber と Myers のアルゴリズムに比べて、約 100 倍程度高速であることが分かります。</p>
+<p>実は標準ライブラリの Suffix Array の構築アルゴリズムは SAIS<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> という Ge Nong、Sen Zhang、Wai Hong Chen によって提案された高速なアルゴリズムを用いています。SAIS の計算量は $O(n)$ です。さらにいくつかのチューニングを施しており、詳しくは <a target="_blank" rel="noopener" href="https://golang.org/src/index/suffixarray/sais.go">index/suffixarray/sais.go</a> のドキュメントを確認ください。</p>
+<p>ベンチマークでは約 100 倍程度の処理時間の違いがありましたが、上記の Manber と Myers のアルゴリズムの計算量が $O(n (\log n)^2)$ で SAIS の計算量が $O(n)$ ですから、100 倍程度の差は自然です。SAIS を実装している Go の標準ライブラリが優秀であることが分かります。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>Go の標準ライブラリで私が面白いと思った <code>suffixarray</code> パッケージを紹介しました。<code>suffixarray</code> パッケージの構築アルゴリズムの計算量は $O(n)$ で非常に高速です。その他に Manber と Myers による計算量 $O(n (\log n)^2)$ の構築アルゴリズムを用いた Go による実装を紹介しました。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>岡野原大輔 (2012) 『高速文字列解析の世界』岩波書店</li>
+</ul>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">秋葉拓哉、岩田陽一、北川宜稔 (2012) 『プログラミングコンテストチャレンジブック [第2版]』 マイナビ出版</span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">2.</span><span style="display: inline-block; vertical-align: top;">Two Efficient Algorithms for Linear Time Suffix Array Construction (https://ieeexplore.ieee.org/document/5582081)</span><a href="#fnref:2" rev="footnote"> ↩</a></li><li id="fn:3"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">3.</span><span style="display: inline-block; vertical-align: top;">文字 a と b を <code>strings.Compare(a, b)</code> で辞書順で比較したときに a &lt; b であれば -1、a = b であれば 0、a &gt; b であれば +1 で返り値として取得できます。返り値が 0 以上の index を探索しているため a ≧ b である最小の index が取得できます。</span><a href="#fnref:3" rev="footnote"> ↩</a></li></ol></div></div>
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li class="twitter-btn">
+      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200807/&via=future_techblog&related=twitterapi%2Ctwitter&text=Go%E3%81%A8SuffixArray"
+        onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li class="fb-btn">
+      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200807/&t=Go%E3%81%A8SuffixArray"
+        onclick="window.open(this.href, 'fbsharewindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li class="hatebu-btn">
+      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200807/"
+        onclick="window.open(this.href, 'hatebuwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="hatebu-btn-label">40</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li class="pocket-btn">
+      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200807/"
+        onclick="window.open(this.href, 'pocketwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="pocket-btn-label">30</span>
+      </a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+  </article>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav">
+      
+    <li>2021.04.12<a href="/articles/20210412a/" title="テックブログにて記事を書くのは1年半ぶりです。あれからずっと設計～開発まで推進し、今年無事アプリリリースが完了しました。このタイミングで改めてKVS関連のナレッジを還元できたらと思い筆を執りました。">KVSと二年間向き合って得たナレッジを還元する時がきた</a></li>
+
+    <li>2020.03.11<a href="/articles/20200311/" title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li>
+
+    <li>2021.05.14<a href="/articles/20210514a/" title="FlutterでRSSを用いてフューチャー技術ブログリーダーを作ろうと思います。">Flutterで技術ブログRSSリーダー</a></li>
+
+    <li>2021.04.10<a href="/articles/20210410/" title="参加しているプロジェクトで、OpenAPI定義ファイルからモックサーバを建てることができるOSSツール「Prism」を導入することになりました。この記事では、Prism導入の手順や、躓いた点などを紹介します。">OpenAPIからモックサーバを建てられるPrismを実際のプロジェクトに導入してみた</a></li>
+
+    <li>2021.03.24<a href="/articles/20210324/" title="TIGの伊藤真彦です。業務で行っている開発がいよいよリリースを視野に入れたフェーズに入り、E2Eテストや各種性能試験を行いました。">k6の使い方 シンプル&軽快な負荷試験ツールを試す</a></li>
+
+    <li>2021.02.26<a href="/articles/20210226/" title="E2Eテストはみんなしていますか？正直言うと、僕はあんまり好きじゃなかったです。お仕事では他の人が入れてくれたものが回っていたりしますが。前職で、SikuliXを使って社内向けのデスクトップアプリケーションのE2Eテストにトライしたことがあるんですが、すぐに壊れて動かなくなるので、費用対効果が出せなくてあきらめました（一人プロジェクトだったのもあります）。* 絵でマッチングを行うのでボタン画像をいっぱいスクショをとっていく必要がある">アクセシビリティ情報を使った壊れにくいE2Eテスト</a></li>
+
+    <li>2020.08.21<a href="/articles/20200821/" title="システム開発にてオープンソースのライブラリやフレームワークを利用することは、もはや当たり前となっています。みなさんはOSSのライセンスについてどの程度理解していますでしょうか。OSSだから無条件に利用可能だと思っていませんか？">エンジニアが最低限理解しておくべきOSSライセンスの基礎知識</a></li>
+
+    <li>2020.07.28<a href="/articles/20200728/" title="Goでデータベースを扱う場合、[Gorm] といった ORM がよく使われます。多くの場合は構造体のフィールドとデータベースのカラム名のマッピングをするタグ付きの構造体を実装します。例えば Gorm を用いて users テーブルにアクセスする場合、以下のような構造体が一例として考えられます。">DBスキーマを駆動にした開発のためのライブラリ調査</a></li>
+
+    <li>2020.05.28<a href="/articles/20200528/" title="Goでプロジェクトのフォルダ構成どうしよう、とググると見つかるStandard Go Project Layout(https://github.com/golang-standards/project-layout)。とはいえ、これはかなりコード量を増やしてしまう恐れがありますので、導入する場合のデメリットも考えておく方が良いです。">あなたのGoアプリ/ライブラリのパッケージ構成もっとシンプルでよくない？</a></li>
+
+    <li>2020.05.01<a href="/articles/20200501/" title="フロントエンド記事集中投稿ウィークの3本目です。">TypeScriptでReactをやるときは、小さいアプリでもReduxを最初から使ってもいいかもねというお話</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+<!-- CATEGORIES START -->
+<h3 class="margin-top-30">カテゴリー</h3>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+    <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+    <li><a href="/categories/IoT/">IoT (14)</a></li>
+    
+    <li><a href="/categories/VR/">VR (10)</a></li>
+    
+    <li><a href="/categories/Security/">Security (2)</a></li>
+    
+    <li><a href="/categories/Design/">Design (7)</a></li>
+    
+    <li><a href="/categories/Programming/">Programming (168)</a></li>
+    
+    <li><a href="/categories/Management/">Management (9)</a></li>
+    
+    <li><a href="/categories/Infrastructure/">Infrastructure (131)</a></li>
+    
+    <li><a href="/categories/DB/">DB (14)</a></li>
+    
+    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+    
+    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+          <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+          <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+              t._e.push(f);
+            };
+            return t;
+          }(document, "script", "twitter-wjs"));</script>
+          
+            <!-- BEGIN TWITTER BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <!-- Twitterフォローボタン -->
+              <li class="twitter-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                </a>
+              </li>
+              <!-- Twitterタイムライン -->
+              <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+            </div>
+            <!-- END TWITTER BLOCK -->
+          
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+            &copy; 2021 フューチャー技術ブログ<br>
+          </div>
+          <!-- END COPYRIGHT -->
+	        <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
+    
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
+    
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

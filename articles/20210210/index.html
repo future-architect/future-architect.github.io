@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Go1.16からのio/ioutilパッケージ | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="こんにちは、TIGの辻です。Go 1.16連載の3記事目です。 Go1.16でアップデートがあった io&#x2F;ioutil パッケージが &quot;deprecated&quot; になる話題のまとめです。 サマリ Go1.16から io&#x2F;ioutil パッケージの機能が os と io パッケージに移行した これから新しく実装するコードは io や os パッケージの新しい関数を使うことが推奨され">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go1.16からのio&#x2F;ioutilパッケージ | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210210/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="こんにちは、TIGの辻です。Go 1.16連載の3記事目です。 Go1.16でアップデートがあった io&#x2F;ioutil パッケージが &quot;deprecated&quot; になる話題のまとめです。 サマリ Go1.16から io&#x2F;ioutil パッケージの機能が os と io パッケージに移行した これから新しく実装するコードは io や os パッケージの新しい関数を使うことが推奨され">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210210/package_dependency.svg">
+<meta property="article:published_time" content="2021-02-09T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-11T08:20:24.867Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Go1.16">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210210/package_dependency.svg">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="Go,Go1.16" name="keywords">
+  <meta content="辻大志郎" name="author">
+
+  <link rel="stylesheet" href="/metronic/assets/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20210210/">Go1.16からのio/ioutilパッケージ</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20210210_Go1.16からのio／ioutilパッケージ" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+      <li class="blog-info-item"><a href="/authors/%E8%BE%BB%E5%A4%A7%E5%BF%97%E9%83%8E">辻大志郎</a></li>
+      <li class="blog-info-item"><time datetime="2021-02-09T15:00:00.000Z" itemprop="datePublished">2021/02/10</time>
+</li>
+      <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/Go/" title="Go">Go</a></li> 
+  
+    <li><a href="/tags/Go1-16/" title="Go1.16">Go1.16</a>
+  
+  </ul>
+
+</li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>こんにちは、TIGの辻です。<a href="https://future-architect.github.io/articles/20210207/">Go 1.16連載</a>の3記事目です。</p>
+<p>Go1.16でアップデートがあった <code>io/ioutil</code> パッケージが <code>&quot;deprecated&quot;</code> になる話題のまとめです。</p>
+<h2 id="サマリ"><a href="#サマリ" class="headerlink" title="サマリ"></a>サマリ</h2><ul>
+<li>Go1.16から <code>io/ioutil</code> パッケージの機能が <code>os</code> と <code>io</code> パッケージに移行した</li>
+<li>これから新しく実装するコードは <code>io</code> や <code>os</code> パッケージの新しい関数を使うことが推奨される</li>
+<li><code>io/ioutil</code> パッケージが <code>&quot;deprecated&quot;</code> になるが <code>&quot;deprecated&quot;</code> といっても将来壊れる、ということではない<ul>
+<li>既存のコードは動作し続ける</li>
+</ul>
+</li>
+<li><code>go fix</code> コマンドは未対応</li>
+</ul>
+<h2 id="内容"><a href="#内容" class="headerlink" title="内容"></a>内容</h2><p>Go1.16から <code>io/ioutil</code> パッケージに含まれる関数が <code>&quot;deprecated&quot;</code> になります。関連するプロポーザルは <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/40025">#40025</a> と <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/42026">#42026</a> です。<a target="_blank" rel="noopener" href="https://blog.golang.org/package-names">Package names</a> で良くないパッケージ名として紹介されているように、一般的には <code>util</code> などというパッケージ名は、純粋にユーティリティを提供するパッケージではない限り避けるべき名前です。<code>io/ioutil</code> の命名に関しては <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/19660">#19660</a> にあるように以前から理解しにくいと言われていました。</p>
+<p><code>io/ioutil</code> パッケージは主にパッケージのインポートサイクルを回避するために存在します。<a target="_blank" rel="noopener" href="https://talks.golang.org/2016/refactor.article">Codebase Refactoring</a> にあるようにGoの <code>io</code> パッケージは <code>os</code> パッケージに依存することはできません。<code>io/ioutil</code> パッケージが直接/間接的に <code>os</code> パッケージと <code>io</code> パッケージを参照することで、インポートサイクルを回避したということです。</p>
+<img src="/images/20210210/package_dependency.svg" class="img-middle-size">
+
+<p>さて <code>io/ioutil</code> では以下の8つの型/関数がExportされています。</p>
+<ul>
+<li><code>Discard</code></li>
+<li><code>NopCloser</code></li>
+<li><code>ReadAll</code></li>
+<li><code>ReadDir</code></li>
+<li><code>ReadFile</code></li>
+<li><code>TempDir</code></li>
+<li><code>TempFile</code></li>
+<li><code>WriteFile</code></li>
+</ul>
+<p>これらのすべての型/関数が <code>&quot;deprecated&quot;</code> になり、<code>io</code> パッケージと <code>os</code> パッケージに機能が移動します。</p>
+<ul>
+<li><code>io</code> パッケージに移動する型/関数<ul>
+<li><code>Discard</code></li>
+<li><code>NopCloser</code></li>
+<li><code>ReadAll</code></li>
+</ul>
+</li>
+<li><code>os</code> パッケージに移動する関数<ul>
+<li><code>ReadDir</code></li>
+<li><code>ReadFile</code></li>
+<li><code>TempDir</code> -&gt; <code>MkdirTemp</code> (リネーム)</li>
+<li><code>TempFile</code> -&gt; <code>CreateTemp</code> (リネーム)</li>
+<li><code>WriteFile</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="io-パッケージに移動する型-関数"><a href="#io-パッケージに移動する型-関数" class="headerlink" title="io パッケージに移動する型/関数"></a><code>io</code> パッケージに移動する型/関数</h3><p><code>io</code> パッケージに移動する型/関数は以下の3つです。</p>
+<ul>
+<li><code>Discard</code></li>
+<li><code>NopCloser</code></li>
+<li><code>ReadAll</code></li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/40025">#40025</a> によると <code>Discard</code> と <code>NopCloser</code> はたまたま <code>io/ioutil</code> パッケージに含まれてしまった、とのことです。<code>ReadAll</code> も本来であれば <code>Reader</code> や <code>Writer</code> のヘルパー関数が <code>io</code> パッケージで提供されていることにならって <code>io</code> パッケージに含まれる機能でしたが、<code>bytes.Buffer</code> にアクセスする実装となっていており、<code>bytes</code> パッケージが <code>os</code> パッケージに依存する関係で <code>io/ioutil</code> パッケージに追いやられました。</p>
+<p>しかしながら <code>ReadAll</code> は <code>bytes.Buffer</code> を使う必要がないため、Go1.16の <code>ReadAll</code> の実装は <code>bytes</code> パッケージを使わない実装になっています。</p>
+<ul>
+<li>Go1.15の <code>ioutil.ReadAll</code> の実装(<a target="_blank" rel="noopener" href="https://github.com/golang/go/blob/release-branch.go1.15/src/io/ioutil/ioutil.go#L16-L46">io/ioutil/ioutil.go</a>)</li>
+</ul>
+<figure class="highlight go"><figcaption><span>io/ioutil/ioutil.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// readAll reads from r until an error or EOF and returns the data it read</span></span><br><span class="line"><span class="comment">// from the internal buffer allocated with a specified capacity.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">readAll</span><span class="params">(r io.Reader, capacity <span class="keyword">int64</span>)</span> <span class="params">(b []<span class="keyword">byte</span>, err error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> buf bytes.Buffer</span><br><span class="line">	<span class="comment">// If the buffer overflows, we will get bytes.ErrTooLarge.</span></span><br><span class="line">	<span class="comment">// Return that as an error. Any other panic remains.</span></span><br><span class="line">	<span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		e := <span class="built_in">recover</span>()</span><br><span class="line">		<span class="keyword">if</span> e == <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> panicErr, ok := e.(error); ok &amp;&amp; panicErr == bytes.ErrTooLarge &#123;</span><br><span class="line">			err = panicErr</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="built_in">panic</span>(e)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">int64</span>(<span class="keyword">int</span>(capacity)) == capacity &#123;</span><br><span class="line">		buf.Grow(<span class="keyword">int</span>(capacity))</span><br><span class="line">	&#125;</span><br><span class="line">	_, err = buf.ReadFrom(r)</span><br><span class="line">	<span class="keyword">return</span> buf.Bytes(), err</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ReadAll reads from r until an error or EOF and returns the data it read.</span></span><br><span class="line"><span class="comment">// A successful call returns err == nil, not err == EOF. Because ReadAll is</span></span><br><span class="line"><span class="comment">// defined to read from src until EOF, it does not treat an EOF from Read</span></span><br><span class="line"><span class="comment">// as an error to be reported.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ReadAll</span><span class="params">(r io.Reader)</span> <span class="params">([]<span class="keyword">byte</span>, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> readAll(r, bytes.MinRead)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Go1.16の <code>io.ReadAll</code> の実装(<a target="_blank" rel="noopener" href="https://github.com/golang/go/blob/release-branch.go1.16/src/io/io.go#L622-L642">io/io.go</a>)</li>
+</ul>
+<figure class="highlight go"><figcaption><span>io/io.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ReadAll reads from r until an error or EOF and returns the data it read.</span></span><br><span class="line"><span class="comment">// A successful call returns err == nil, not err == EOF. Because ReadAll is</span></span><br><span class="line"><span class="comment">// defined to read from src until EOF, it does not treat an EOF from Read</span></span><br><span class="line"><span class="comment">// as an error to be reported.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ReadAll</span><span class="params">(r Reader)</span> <span class="params">([]<span class="keyword">byte</span>, error)</span></span> &#123;</span><br><span class="line">	b := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">0</span>, <span class="number">512</span>)</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> <span class="built_in">len</span>(b) == <span class="built_in">cap</span>(b) &#123;</span><br><span class="line">			<span class="comment">// Add more capacity (let append pick how much).</span></span><br><span class="line">			b = <span class="built_in">append</span>(b, <span class="number">0</span>)[:<span class="built_in">len</span>(b)]</span><br><span class="line">		&#125;</span><br><span class="line">		n, err := r.Read(b[<span class="built_in">len</span>(b):<span class="built_in">cap</span>(b)])</span><br><span class="line">		b = b[:<span class="built_in">len</span>(b)+n]</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">if</span> err == EOF &#123;</span><br><span class="line">				err = <span class="literal">nil</span></span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">return</span> b, err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>バイトスライスの容量を拡張するときに一旦 <code>byte</code> 型のゼロ値0をバイトスライスにappendして容量を拡張し、長さは元のスライスの長さに戻すことでスライスの容量だけ予め拡張するオシャレな実装になっています。</p>
+<p><code>io/ioutil</code> パッケージからは <code>io.ReadAll</code> に委譲するように実装されています。</p>
+<ul>
+<li>Go1.16の <code>ioutil.ReadAll</code> の実装(<a target="_blank" rel="noopener" href="https://github.com/golang/go/blob/release-branch.go1.16/src/io/ioutil/ioutil.go#L20-L28">io/ioutil/ioutil.go</a>)</li>
+</ul>
+<figure class="highlight go"><figcaption><span>io/ioutil/ioutil.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ReadAll reads from r until an error or EOF and returns the data it read.</span></span><br><span class="line"><span class="comment">// A successful call returns err == nil, not err == EOF. Because ReadAll is</span></span><br><span class="line"><span class="comment">// defined to read from src until EOF, it does not treat an EOF from Read</span></span><br><span class="line"><span class="comment">// as an error to be reported.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// As of Go 1.16, this function simply calls io.ReadAll.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ReadAll</span><span class="params">(r io.Reader)</span> <span class="params">([]<span class="keyword">byte</span>, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> io.ReadAll(r)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="os-パッケージに移動する関数"><a href="#os-パッケージに移動する関数" class="headerlink" title="os パッケージに移動する関数"></a><code>os</code> パッケージに移動する関数</h3><p><code>os</code> パッケージに移行する関数は以下の5つです。<code>io/ioutil</code> パッケージに含まれていた下記の関数はOSファイルシステムのヘルパー関数です。</p>
+<ul>
+<li><code>ReadDir</code></li>
+<li><code>ReadFile</code></li>
+<li><code>TempDir</code> -&gt; <code>MkdirTemp</code> (リネーム)</li>
+<li><code>TempFile</code> -&gt; <code>CreateTemp</code> (リネーム)</li>
+<li><code>WriteFile</code></li>
+</ul>
+<h4 id="リネーム"><a href="#リネーム" class="headerlink" title="リネーム"></a>リネーム</h4><p><code>ioutil</code> の2つの関数がリネームになっています。<code>TempDir</code> 関数は既に <code>os</code> パッケージに存在します。<code>os.TempDir</code> 関数はOSのデフォルトの一時ディレクトリを返却するAPIです。<code>ioutil</code> パッケージの <code>TempFile</code> は今回移行した <code>os</code> パッケージでは <code>MkdirTemp</code> という関数になっています。また <code>MkdirTemp</code> との命名の整合をとるために <code>ioutil</code> パッケージに存在していた <code>TempFile</code> は <code>CreateTemp</code> という命名になっています。</p>
+<h4 id="シグネチャ"><a href="#シグネチャ" class="headerlink" title="シグネチャ"></a>シグネチャ</h4><p><code>ReadDir</code> は返却するシグネチャが更新されています。移行後の <code>ReadDir</code> は <code>fs.FileInfo</code> ではなく <code>os.DirEntry</code> を返却するようになっています。</p>
+<ul>
+<li>Go1.16の <code>os.ReadDir</code> の実装(<a target="_blank" rel="noopener" href="https://github.com/golang/go/blob/release-branch.go1.16/src/os/dir.go#L110-L125">os/dir.go</a>)</li>
+</ul>
+<figure class="highlight go"><figcaption><span>os/dir.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ReadDir reads the named directory,</span></span><br><span class="line"><span class="comment">// returning all its directory entries sorted by filename.</span></span><br><span class="line"><span class="comment">// If an error occurs reading the directory,</span></span><br><span class="line"><span class="comment">// ReadDir returns the entries it was able to read before the error,</span></span><br><span class="line"><span class="comment">// along with the error.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ReadDir</span><span class="params">(name <span class="keyword">string</span>)</span> <span class="params">([]DirEntry, error)</span></span> &#123;</span><br><span class="line">	f, err := Open(name)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> f.Close()</span><br><span class="line"></span><br><span class="line">	dirs, err := f.ReadDir(<span class="number">-1</span>)</span><br><span class="line">	sort.Slice(dirs, <span class="function"><span class="keyword">func</span><span class="params">(i, j <span class="keyword">int</span>)</span> <span class="title">bool</span></span> &#123; <span class="keyword">return</span> dirs[i].Name() &lt; dirs[j].Name() &#125;)</span><br><span class="line">	<span class="keyword">return</span> dirs, err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Go1.16の <code>ioutil.ReadDir</code> の実装(<a target="_blank" rel="noopener" href="https://github.com/golang/go/blob/release-branch.go1.16/src/io/ioutil/ioutil.go#L49-L70">io/ioutil/ioutil.go</a>)</li>
+</ul>
+<figure class="highlight go"><figcaption><span>io/ioutil/ioutil.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ReadDir reads the directory named by dirname and returns</span></span><br><span class="line"><span class="comment">// a list of fs.FileInfo for the directory&#x27;s contents,</span></span><br><span class="line"><span class="comment">// sorted by filename. If an error occurs reading the directory,</span></span><br><span class="line"><span class="comment">// ReadDir returns no directory entries along with the error.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// As of Go 1.16, os.ReadDir is a more efficient and correct choice:</span></span><br><span class="line"><span class="comment">// it returns a list of fs.DirEntry instead of fs.FileInfo,</span></span><br><span class="line"><span class="comment">// and it returns partial results in the case of an error</span></span><br><span class="line"><span class="comment">// midway through reading a directory.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ReadDir</span><span class="params">(dirname <span class="keyword">string</span>)</span> <span class="params">([]fs.FileInfo, error)</span></span> &#123;</span><br><span class="line">	f, err := os.Open(dirname)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	list, err := f.Readdir(<span class="number">-1</span>)</span><br><span class="line">	f.Close()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	sort.Slice(list, <span class="function"><span class="keyword">func</span><span class="params">(i, j <span class="keyword">int</span>)</span> <span class="title">bool</span></span> &#123; <span class="keyword">return</span> list[i].Name() &lt; list[j].Name() &#125;)</span><br><span class="line">	<span class="keyword">return</span> list, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="quot-deprecated-quot-とは"><a href="#quot-deprecated-quot-とは" class="headerlink" title="&quot;deprecated&quot; とは"></a><code>&quot;deprecated&quot;</code> とは</h3><p><code>&quot;deprecated&quot;</code> とあるため、将来的に <code>ioutil</code> パッケージを使っているプログラムが動作しなくなるのでは？と思う方もいるかもしれません。<code>&quot;deprecated&quot;</code> が何を意味するのか Russ Cox 氏がツイートしています。</p>
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Seeing discussion of io/ioutil deprecation in various places. <br><br>To be clear: in Go, “deprecated” means only “there is a better, preferred way.” It does not mean “will break in the future.”<br><br>Today’s programs using ioutil.ReadFile and friends will keep working forever. <a target="_blank" rel="noopener" href="https://twitter.com/hashtag/golang?src=hash&amp;ref_src=twsrc%5Etfw">#golang</a></p>&mdash; Russ Cox (@_rsc) <a target="_blank" rel="noopener" href="https://twitter.com/_rsc/status/1351676094664110082?ref_src=twsrc%5Etfw">January 19, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>すわなち「より良い、好ましい方法がある」という意味で「将来的に壊れる」という意味ではない、ということです。<a target="_blank" rel="noopener" href="https://golang.org/doc/go1compat">Go 1 and the Future of Go Programs</a> にもあるように、少なくともGo1の間はソースレベルの後方互換性が保たれます。</p>
+<p><code>ioutil</code> パッケージの関数はとても便利ですので、多くの実装で使用されていますが、<code>ioutil</code> パッケージを使っている既存の実装は引き続きそのまま動作します。新規に実装する場合は <code>os</code> パッケージや <code>io</code> パッケージに含まれる関数を利用するのが推奨されています。</p>
+<h3 id="quot-deprecated-quot-になったパッケージの移行"><a href="#quot-deprecated-quot-になったパッケージの移行" class="headerlink" title="&quot;deprecated&quot; になったパッケージの移行"></a><code>&quot;deprecated&quot;</code> になったパッケージの移行</h3><p><a target="_blank" rel="noopener" href="https://golang.org/cmd/fix/"><code>go fix</code></a> を使うと、古いAPIを使用しているGoのプログラムを検出し、新しいAPIに書き換えることができます。馴染みがあるAPIだと <code>context</code> パッケージがあげられます。もともとは <code>golang.org/x</code> リポジトリ配下の準標準ライブラリとして実装されていた <code>context</code> パッケージですが、Go1.7以降は標準ライブラリに移行しています。以下のファイルがあった場合に <code>go tool fix -diff main.go</code> とすると新しいAPIに書き換えることができます。</p>
+<ul>
+<li>main.go</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;golang.org/x/net/context&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	doSomething(ctx)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">doSomething</span><span class="params">(ctx context.Context)</span></span> &#123;</span><br><span class="line">	<span class="comment">// doing something</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Diffを確認できます。<code>-diff</code> オプションを除けば、ファイルを直接更新できます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ go tool fix -diff main.go</span><br><span class="line">main.go: fixed context</span><br><span class="line">diff main.go fixed/main.go</span><br><span class="line">--- /tmp/go-fix572668930        2021-02-06 08:48:06.046862800 +0900</span><br><span class="line">+++ /tmp/go-fix017905529        2021-02-06 08:48:06.048069100 +0900</span><br><span class="line">@@ -1,6 +1,6 @@</span><br><span class="line"> package main</span><br><span class="line"></span><br><span class="line">-import <span class="string">&quot;golang.org/x/net/context&quot;</span></span><br><span class="line">+import <span class="string">&quot;context&quot;</span></span><br><span class="line"></span><br><span class="line"> func <span class="function"><span class="title">main</span></span>() &#123;</span><br><span class="line">        ctx := context.Background()</span><br></pre></td></tr></table></figure>
+
+<p><code>ioutil</code> パッケージの <code>go fix</code> に関して <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/42026#issuecomment-749053679">#42026</a> で言及されています。残念ながら <strong><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/32816">#32816</a> のプロポーザルには含まれない</strong> だろう、とコメントしています。将来的に <code>go fix</code> コマンド一発で既存の <code>ioutil</code> パッケージを使っているAPIから <code>io</code> パッケージや <code>os</code> パッケージのAPIへ移行ができると嬉しいですね。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://tip.golang.org/doc/go1.16#ioutil">https://tip.golang.org/doc/go1.16#ioutil</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/40025">https://github.com/golang/go/issues/40025</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/42026">https://github.com/golang/go/issues/42026</a></li>
+</ul>
+<h1 id="関連記事"><a href="#関連記事" class="headerlink" title="関連記事"></a>関連記事</h1><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://future-architect.github.io/articles/20210207/index.html" data-iframely-url="//cdn.iframe.ly/QsgsKHg?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li class="twitter-btn">
+      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210210/&via=future_techblog&related=twitterapi%2Ctwitter&text=Go1.16%E3%81%8B%E3%82%89%E3%81%AEio/ioutil%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8"
+        onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li class="fb-btn">
+      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210210/&t=Go1.16%E3%81%8B%E3%82%89%E3%81%AEio/ioutil%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8"
+        onclick="window.open(this.href, 'fbsharewindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li class="hatebu-btn">
+      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210210/"
+        onclick="window.open(this.href, 'hatebuwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="hatebu-btn-label">44</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li class="pocket-btn">
+      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210210/"
+        onclick="window.open(this.href, 'pocketwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="pocket-btn-label">26</span>
+      </a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+  </article>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav">
+      
+    <li>2019.07.13<a href="/articles/20190713/" title="他の言語になれた人が、初めてGoを書いた時にわかりにくいな、と思った部分はどういうところがあるのか、難しいポイントはどこか、という情報を自分の経験や、会社の内外の人に聞いたりしてまとめてみました。">Goを学ぶときにつまずきやすいポイントFAQ</a></li>
+
+    <li>2020.06.30<a href="/articles/20200630/" title="業務でヘビーユーズしているgo-swaggerについての開発Tipsをまとめました。">go-swaggerを用いたWebアプリケーション開発Tips19選</a></li>
+
+    <li>2020.06.09<a href="/articles/20200609/" title="フューチャーではGraphQLの活用事例はまだ少なく、自分はまだお目にかかったことはないです。しかし、HeadlessCMS界隈を初めGraphQLのAPIを提供するサービスが増えてきました。今後もさらに需要が増えてきそうな予感がしたためGoとGraphQLを春の入門祭りのテーマにしました。学習する上でドキュメントを読み込むだけでは忘れがちです。手を動かしながらタイトルにある鉄道データ検索APIを開発していきましょう">春の入門祭り🌸 #7 作って学ぶGraphQL。gqlgenを用いて鉄道データ検索API開発入門</a></li>
+
+    <li>2021.04.22<a href="/articles/20210422a/" title="私は新卒でフューチャーへ入社しITの世界でのキャリアが始まりました。その後、一度フューチャーを離れIoTプラットフォーマーのソリューションアーキテクトとして多くのお客様へ自社サービスの導入支援やIoTシステムの設計や構築の支援をしておりました。そうしたソリューションアーキテクトとしてのロールを通じて、多くの経験や学びを得ることができたのですが、その中でも特にTechnical Credibilityというキーワードについて自分の経験を交えて本ブログにて書いてみたいと思います。">Technical Credibilityを築くということ</a></li>
+
+    <li>2021.04.10<a href="/articles/20210410/" title="参加しているプロジェクトで、OpenAPI定義ファイルからモックサーバを建てることができるOSSツール「Prism」を導入することになりました。この記事では、Prism導入の手順や、躓いた点などを紹介します。">OpenAPIからモックサーバを建てられるPrismを実際のプロジェクトに導入してみた</a></li>
+
+    <li>2021.04.06<a href="/articles/20210406/" title="シェルスクリプトで前提とするシェルは、大抵のコンピューターにインストールされていることが多いbashを選択することが多いと思います。当記事ではそのbashを対象に、意外と色々あるシェルの展開処理の概要をまとめました。">Bashのシェル展開</a></li>
+
+    <li>2021.03.04<a href="/articles/20210304/" title="前回の記事では、JavaScript製のグラフ可視化ライブラリについて概観しました。また、その1つであるVis Networkについて紹介し、階層グラフの可視化を行いました。Vis Networkはcanvasでの高速な描画が可能で、階層グラフをライトに表示・加工する場合は非常に有用ですが、大きな階層グラフを表示する場合にエッジの交差が多くなってしまうという課題があることを見てきました。">mxGraphで階層グラフを可視化する</a></li>
+
+    <li>2021.03.05<a href="/articles/20210305/" title="こんにちは。テクノロジーイノベーショングループ所属の長澤です。[インフラ入門]な連載記事を久々に書くべく、今回筆を取りました。これまでのインフラ入門記事は [インフラ概要と当社でのインフラエンジニア像]">インフラ入門ーインフラ要件定義編ー</a></li>
+
+    <li>2020.11.09<a href="/articles/20201109/" title="1年弱ほどGo言語でWebAPIアプリケーション開発を行っていますが、かなり割り切った構成・テスト方針を採用しました。そろそろ1年弱になり機能開発も比較的落ち着き、保守運用フェーズの割合も徐々に増えてきた頃合いなので、やったこと・学び・反省といった振り返りを共有します。">GoのWebアプリ開発でフラットパッケージにした話</a></li>
+
+    <li>2020.09.30<a href="/articles/20200930/" title="Open Policy Agent（OPA）は汎用的なポリシーエンジンで、[Rego] と呼ばれるポリシー言語で定義されたルールに従って、入力がポリシーに沿っているか否かの判定を移譲させることができます。Regoで宣言的にポリシーを実装し、Policy as Code を実現できます。コーディング規約も一種のポリシーとみなして、Open API Spec（Swagger）をLinter的にチェックするツールを題材に、OPAを用いて開発してみたいと思います。">Policy as Code を実現する Open Policy Agent に憧れて。ポリシーコードでAPI仕様をLintする</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+<!-- CATEGORIES START -->
+<h3 class="margin-top-30">カテゴリー</h3>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+    <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+    <li><a href="/categories/IoT/">IoT (14)</a></li>
+    
+    <li><a href="/categories/VR/">VR (10)</a></li>
+    
+    <li><a href="/categories/Security/">Security (2)</a></li>
+    
+    <li><a href="/categories/Design/">Design (7)</a></li>
+    
+    <li><a href="/categories/Programming/">Programming (168)</a></li>
+    
+    <li><a href="/categories/Management/">Management (9)</a></li>
+    
+    <li><a href="/categories/Infrastructure/">Infrastructure (131)</a></li>
+    
+    <li><a href="/categories/DB/">DB (14)</a></li>
+    
+    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+    
+    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+          <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+          <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+              t._e.push(f);
+            };
+            return t;
+          }(document, "script", "twitter-wjs"));</script>
+          
+            <!-- BEGIN TWITTER BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <!-- Twitterフォローボタン -->
+              <li class="twitter-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                </a>
+              </li>
+              <!-- Twitterタイムライン -->
+              <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+            </div>
+            <!-- END TWITTER BLOCK -->
+          
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+            &copy; 2021 フューチャー技術ブログ<br>
+          </div>
+          <!-- END COPYRIGHT -->
+	        <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
+    
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
+    
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

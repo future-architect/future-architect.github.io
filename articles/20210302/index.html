@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Auth0でADをユーザDBにし、SalesforceとのSSOを確認する | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="エンタープライズの領域ではAD認証が多く利用されており、また同時にCRMとしてSalesforceが導入されているケースが多くあります。この場合、社内システムにおける「統合認証」の要件として、これらを繋げてログインする必要が出てきます。 これらの要求に対応するため、以下2点を確認し、Active Directory（以降AD）を中心とした統合認証を試してみます。  Auth0のApplicatio">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Auth0でADをユーザDBにし、SalesforceとのSSOを確認する | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210302/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="エンタープライズの領域ではAD認証が多く利用されており、また同時にCRMとしてSalesforceが導入されているケースが多くあります。この場合、社内システムにおける「統合認証」の要件として、これらを繋げてログインする必要が出てきます。 これらの要求に対応するため、以下2点を確認し、Active Directory（以降AD）を中心とした統合認証を試してみます。  Auth0のApplicatio">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210222/top.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2021-02-24_10.03.37.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2021-02-24_10.06.35.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2020-09-11_17.49.51.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2020-09-11_9.36.28.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2021-02-22_18.59.51.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2020-09-11_15.33.11.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2020-09-11_17.59.05.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88_2020-09-11_15.38.32.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88_2020-09-11_15.38.48.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2021-02-22_19.33.57.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2021-02-22_18.59.24.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2021-02-22_18.59.45.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2021-02-22_18.59.51_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88_2021-02-22_19.09.12.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2021-02-22_19.44.06.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88_2020-09-14_12.52.42.png">
+<meta property="article:published_time" content="2021-03-01T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-05-12T01:16:41.781Z">
+<meta property="article:tag" content="Auth0">
+<meta property="article:tag" content="SSO">
+<meta property="article:tag" content="Salesforce">
+<meta property="article:tag" content="ActiveDirectory">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210222/top.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="Auth0,SSO,Salesforce,ActiveDirectory" name="keywords">
+  <meta content="山田勇一" name="author">
+
+  <link rel="stylesheet" href="/metronic/assets/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20210302/">Auth0でADをユーザDBにし、SalesforceとのSSOを確認する</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20210302_Auth0でADをユーザDBにし、SalesforceとのSSOを確認する" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+      <li class="blog-info-item"><a href="/authors/%E5%B1%B1%E7%94%B0%E5%8B%87%E4%B8%80">山田勇一</a></li>
+      <li class="blog-info-item"><time datetime="2021-03-01T15:00:00.000Z" itemprop="datePublished">2021/03/02</time>
+</li>
+      <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/Auth0/" title="Auth0">Auth0</a></li> 
+  
+    <li><a href="/tags/SSO/" title="SSO">SSO</a></li> 
+  
+    <li><a href="/tags/Salesforce/" title="Salesforce">Salesforce</a></li> 
+  
+    <li><a href="/tags/ActiveDirectory/" title="ActiveDirectory">ActiveDirectory</a>
+  
+  </ul>
+
+</li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可</a>
+  </div>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>エンタープライズの領域ではAD認証が多く利用されており、また同時にCRMとしてSalesforceが導入されているケースが多くあります。<br>この場合、社内システムにおける「統合認証」の要件として、これらを繋げてログインする必要が出てきます。</p>
+<p>これらの要求に対応するため、以下2点を確認し、Active Directory（以降AD）を中心とした統合認証を試してみます。</p>
+<ol>
+<li>Auth0のApplicationsでAD認証ができることを確認</li>
+<li>SalesforceのSSO機能を利用し、Auth0経由でAD認証かつSSOができることを確認</li>
+</ol>
+<h1 id="Auth0とは？"><a href="#Auth0とは？" class="headerlink" title="Auth0とは？"></a>Auth0とは？</h1><img src="/images/20210222/top.png" class="img-middle-size">
+
+<p><a href="https://future-architect.github.io/articles/20200122/">Auth0導入編</a>をぜひ参照ください。他にも<a href="https://future-architect.github.io/tags/Auth0/">Auth0関連</a>の記事があります。</p>
+<h1 id="Auth0に「Active-Directory-LDAP」Connectorを追加"><a href="#Auth0に「Active-Directory-LDAP」Connectorを追加" class="headerlink" title="Auth0に「Active Directory / LDAP」Connectorを追加"></a>Auth0に「Active Directory / LDAP」Connectorを追加</h1><h3 id="設定追加"><a href="#設定追加" class="headerlink" title="設定追加"></a>設定追加</h3><p><code>メニュー　-&gt; Connections -&gt; Enterprise -&gt; Active Directory / LDAP -&gt; CREATE CONNECTION</code><br>メニューからConnectorを追加し、今回は2つのオプションを有効にしています</p>
+<ul>
+<li>Use Windows Integrated Auth (Kerberos)<br>Auth0はWindows統合認証（Kerberos認証）に対応しており、WindowsでAD認証でログインしており、かつ <code>IP Ranges</code> のIPでログインすると認証をスキップできます。</li>
+<li>Sync user profile attributes at each login<br>こちらはシンプルに認証時に最新のプロファイルをADから取得できる設定となっています。</li>
+</ul>
+<img src="/images/20210302/スクリーンショット_2021-02-24_10.03.37.png"  style="border:solid 1px #000000">
+
+
+<h1 id="ADサーバーの設定"><a href="#ADサーバーの設定" class="headerlink" title="ADサーバーの設定"></a>ADサーバーの設定</h1><h3 id="Connector設定確認"><a href="#Connector設定確認" class="headerlink" title="Connector設定確認"></a>Connector設定確認</h3><p>追加済みのConnectorより、「Setup」タブを確認し <code>Ticket Url</code> を控えておきます。<br><strong>この<code>Ticket Url</code>がADサーバーの設定に必要となります。</strong></p>
+<img src="/images/20210302/スクリーンショット_2021-02-24_10.06.35.png"  style="border:solid 1px #000000">
+
+
+<h3 id="ADサーバーにAD-LDAP-Connectorをインストール"><a href="#ADサーバーにAD-LDAP-Connectorをインストール" class="headerlink" title="ADサーバーにAD LDAP Connectorをインストール"></a>ADサーバーにAD LDAP Connectorをインストール</h3><p><a target="_blank" rel="noopener" href="https://auth0.com/docs/extensions/ad-ldap-connector/install-configure-ad-ldap-connector">インストール手順</a>を参考に、ウィザードに従ってインストールしてください。<br>インストール時に前述の手順で控えた<code>Ticket Url</code>が必要になります。</p>
+<h3 id="AD-LDAP-Connectorの設定を変更"><a href="#AD-LDAP-Connectorの設定を変更" class="headerlink" title="AD LDAP Connectorの設定を変更"></a>AD LDAP Connectorの設定を変更</h3><p>Auht0らしく、AD LDAP Connectorの設定をスクリプトで変更できる部分があります。<br>ProfileMapper（ADのユーザプロファイルとAuth0のユーザプロファイルのマッピング）のタブが、スクリプトで記載できる設定になっており、今回は詰められる情報を最大まで詰めてみました。<br>ここで設定したプロファイルがログイン時にAuth0に送信される情報となります。</p>
+<img src="/images/20210302/スクリーンショット_2020-09-11_17.49.51.png"  style="border:solid 1px #000000">
+
+
+<h3 id="ADとAuth0が接続できていることを確認"><a href="#ADとAuth0が接続できていることを確認" class="headerlink" title="ADとAuth0が接続できていることを確認"></a>ADとAuth0が接続できていることを確認</h3><p>Auth0側の<code>Connections</code>の表示が、<code>Offline</code>から<code>Online</code>に変化します。</p>
+<img src="/images/20210302/スクリーンショット_2020-09-11_9.36.28.png"  style="border:solid 1px #000000">
+
+
+<h1 id="Applicationsでログイン確認"><a href="#Applicationsでログイン確認" class="headerlink" title="Applicationsでログイン確認"></a>Applicationsでログイン確認</h1><h3 id="Applicationsの設定変更"><a href="#Applicationsの設定変更" class="headerlink" title="Applicationsの設定変更"></a>Applicationsの設定変更</h3><h3 id="ApplicationsでConnectionsを有効化"><a href="#ApplicationsでConnectionsを有効化" class="headerlink" title="ApplicationsでConnectionsを有効化"></a>Applicationsで<code>Connections</code>を有効化</h3><p>Applicationsの設定で<code>Connections</code>タブを開き、設定済みのADを有効化します。</p>
+<img src="/images/20210302/スクリーンショット_2021-02-22_18.59.51.png"  style="border:solid 1px #000000">
+
+
+<h3 id="ログインを確認"><a href="#ログインを確認" class="headerlink" title="ログインを確認"></a>ログインを確認</h3><p>サンプルアプリケーションを利用し、ログイン後のプロファイルを確認します。<br>ここで、ADで設定済みのプロファイルが見えれば連携成功です。</p>
+<img src="/images/20210302/スクリーンショット_2020-09-11_15.33.11.png"  style="border:solid 1px #000000">
+
+<h3 id="プロファイルが取れるか確認"><a href="#プロファイルが取れるか確認" class="headerlink" title="プロファイルが取れるか確認"></a>プロファイルが取れるか確認</h3><p>Auth0のRulesでプロファイルの取得を入れ込み、結果を見ます。</p>
+<img src="/images/20210302/スクリーンショット_2020-09-11_17.59.05.png"  style="border:solid 1px #000000">
+
+
+<p>ADサーバーのAD LDAP Connectorで指定した情報が取れていることがわかります。<br>なお、ここまで確認できればAuth0上でユーザ情報を自由に扱えそうだと判断できます。<br>例えば、ログイン時にADからユーザ情報を透過的に移行するなどの対応も考えられます。</p>
+<p><img src="/images/20210302/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88_2020-09-11_15.38.32.png"></p>
+<p><img src="/images/20210302/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88_2020-09-11_15.38.48.png"></p>
+<h1 id="Salesforceの外部認証にAuth0を設定"><a href="#Salesforceの外部認証にAuth0を設定" class="headerlink" title="Salesforceの外部認証にAuth0を設定"></a>Salesforceの外部認証にAuth0を設定</h1><h3 id="Salesforceのアカウント準備"><a href="#Salesforceのアカウント準備" class="headerlink" title="Salesforceのアカウント準備"></a>Salesforceのアカウント準備</h3><p>SSOの前提として、Auth0のドメイン設定を行う必要があります。</p>
+<h3 id="Salesforce側にADとSSOさせたいユーザを作成"><a href="#Salesforce側にADとSSOさせたいユーザを作成" class="headerlink" title="Salesforce側にADとSSOさせたいユーザを作成"></a>Salesforce側にADとSSOさせたいユーザを作成</h3><p><strong>SalesforceのSSOでは、Salesforce側に事前にSSOしたユーザの登録が必要です。</strong><br>また、SSOさせる場合にSalesforceのユーザとADのユーザで、SSOに利用する属性情報を一致させる必要があります。<br>とはいえ、Auth0のログイン画面を使う場合、ADとSalesforceで一致させる属性はEmailが最善です。<br>今回はこの青枠ユーザをSSOで利用します。</p>
+<img src="/images/20210302/スクリーンショット_2021-02-22_19.33.57.png"  style="border:solid 1px #000000">
+
+
+
+<h3 id="Saleforceのドメイン設定"><a href="#Saleforceのドメイン設定" class="headerlink" title="Saleforceのドメイン設定"></a>Saleforceのドメイン設定</h3><p><a target="_blank" rel="noopener" href="https://help.salesforce.com/articleView?id=sf.domain_name_overview.htm&type=5">SSOにはドメイン設定が必要になるため、設定しておきます。</a><br>ここでAuth0に移ります。</p>
+<h3 id="auth0にSalesforce用のSSO設定を追加"><a href="#auth0にSalesforce用のSSO設定を追加" class="headerlink" title="auth0にSalesforce用のSSO設定を追加"></a>auth0にSalesforce用のSSO設定を追加</h3><p><code>SSO Integrations</code>から<code>CREATE SSO INTEGRATION</code>を選択し、SalesforceのSSO設定を追加します<br>Salesforce側のドメインが必要になるので、<a target="_blank" rel="noopener" href="https://auth0.com/docs/protocols/saml-configuration-options/configure-salesforce-as-saml-identity-provider">Auth0の設定ページ</a>を確認しつつSalesforceから情報を取得してください。</p>
+<img src="/images/20210302/スクリーンショット_2021-02-22_18.59.24.png"  style="border:solid 1px #000000">
+
+
+<p>Salesforceのドメインに<code>https://</code>をつけたものが<code>Entity ID</code>になります。</p>
+<img src="/images/20210302/スクリーンショット_2021-02-22_18.59.45.png"  style="border:solid 1px #000000">
+
+
+<p>追加設定として、認証先をADに変更します。</p>
+<img src="/images/20210302/スクリーンショット_2021-02-22_18.59.51_2.png"  style="border:solid 1px #000000">
+
+
+<p>ここで、Salesforceに移ります。</p>
+<h3 id="SaleforceのSSO設定追加"><a href="#SaleforceのSSO設定追加" class="headerlink" title="SaleforceのSSO設定追加"></a>SaleforceのSSO設定追加</h3><p>メニューの<code>ID-&gt;シングルサインオン設定</code>を選択し、<code>新規</code>から接続設定を作ります。</p>
+<p><img src="/images/20210302/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88_2021-02-22_19.09.12.png"></p>
+<p>Auth0のSalesforce設定ページにチュートリアルページあるので、手順に従い必須項目を埋めます。<br><code>IDはattribute要素にあります</code>を選択し、<code>email</code>を入力することを忘れないでください。<br>設定した<code>email</code>が、ADとSalesforceでSSOさせるユーザの一致属性となります。</p>
+<img src="/images/20210302/スクリーンショット_2021-02-22_19.44.06.png"  style="border:solid 1px #000000">
+
+<h3 id="SSOの確認"><a href="#SSOの確認" class="headerlink" title="SSOの確認"></a>SSOの確認</h3><p>これでようやく設定完了です。<br>追加したSSOのログインボタンが現れますので、自ドメインの認証画面からSSOユーザでログインしてください。</p>
+<p><img src="/images/20210302/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88_2020-09-14_12.52.42.png"></p>
+<p>ログインできれば成功です。<br>お疲れ様でした。</p>
+<h1 id="関連記事"><a href="#関連記事" class="headerlink" title="関連記事"></a>関連記事</h1><div class="iframely-embed"><div class="iframely-responsive" style="padding-bottom: 35.9551%; padding-top: 120px;"><a href="https://future-architect.github.io/articles/20210222/index.html" data-iframely-url="//cdn.iframe.ly/MKovoVl"></a></div></div>
+
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://future-architect.github.io/articles/20200123/index.html" data-iframely-url="//cdn.iframe.ly/6rr8LwH?iframe=card-small"></a></div></div>
+
+<script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li class="twitter-btn">
+      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210302/&via=future_techblog&related=twitterapi%2Ctwitter&text=Auth0%E3%81%A7AD%E3%82%92%E3%83%A6%E3%83%BC%E3%82%B6DB%E3%81%AB%E3%81%97%E3%80%81Salesforce%E3%81%A8%E3%81%AESSO%E3%82%92%E7%A2%BA%E8%AA%8D%E3%81%99%E3%82%8B"
+        onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li class="fb-btn">
+      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210302/&t=Auth0%E3%81%A7AD%E3%82%92%E3%83%A6%E3%83%BC%E3%82%B6DB%E3%81%AB%E3%81%97%E3%80%81Salesforce%E3%81%A8%E3%81%AESSO%E3%82%92%E7%A2%BA%E8%AA%8D%E3%81%99%E3%82%8B"
+        onclick="window.open(this.href, 'fbsharewindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li class="hatebu-btn">
+      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210302/"
+        onclick="window.open(this.href, 'hatebuwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="hatebu-btn-label">0</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li class="pocket-btn">
+      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210302/"
+        onclick="window.open(this.href, 'pocketwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="pocket-btn-label">1</span>
+      </a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+  </article>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav">
+      
+    <li>2020.07.09<a href="/articles/20200709/" title="最近Goで主にバックエンドのWebAPIや、AWS Lambdaで動くETLアプリ、たまにCLIツールを開発する時に、2回以上同じ指摘したコメントをまとめてます。Go言語特有ぽいところを中心にしています。レビュイーのスキルセットは..">GoでWebアプリ開発時にあるあるだったレビューコメント</a></li>
+
+    <li>2016.10.31<a href="/articles/20161031/" title="重要なアルゴリズムであるにもかかわらず、まとまった情報が少ないSQL実行時のブルームフィルタ(Bloom Filter)アルゴリズムについて紹介します。">SQL実行時のブルームフィルタ(Bloom Filter)アルゴリズム</a></li>
+
+    <li>2021.03.04<a href="/articles/20210304/" title="前回の記事では、JavaScript製のグラフ可視化ライブラリについて概観しました。また、その1つであるVis Networkについて紹介し、階層グラフの可視化を行いました。Vis Networkはcanvasでの高速な描画が可能で、階層グラフをライトに表示・加工する場合は非常に有用ですが、大きな階層グラフを表示する場合にエッジの交差が多くなってしまうという課題があることを見てきました。">mxGraphで階層グラフを可視化する</a></li>
+
+    <li>2020.11.07<a href="/articles/20201107/" title="フューチャーOSS推進タスクフォースを開始しました。実は7月に発足してから8月には活動の骨子が固まり、タスクフォース自体は始動していましたが、中身を作ってから告知した方が具体性があってブレも無くなり良いのでは？という話があり、少しタイミングをずらしてのご報告です。">フューチャーOSS推進タスクフォース始めます</a></li>
+
+    <li>2020.08.21<a href="/articles/20200821/" title="システム開発にてオープンソースのライブラリやフレームワークを利用することは、もはや当たり前となっています。みなさんはOSSのライセンスについてどの程度理解していますでしょうか。OSSだから無条件に利用可能だと思っていませんか？">エンジニアが最低限理解しておくべきOSSライセンスの基礎知識</a></li>
+
+    <li>2020.02.05<a href="/articles/20200205/" title="GCPをテーマにした連載企画を始めるということで、初回はStackdriver Loggingの活用方法をまとめます。
+1記事でまとめるには手が余るほど様々な機能があるため、初回はログの出力とビューア周りといったアプリケーション開発者視点での機能に絞って説明していきます。利用コードはGoで書かれていますが、汎用的な内容なので他の言語でもある程度通じる内容にしているつもりです。">GCP連載#1 Stackdriver Loggingへ良い感じのログ出力方法を考える</a></li>
+
+    <li>2020.01.20<a href="/articles/20200120/" title="前回は【工場をハックするための基礎知識　前編】として、制御系システムがどのような構成になっていて、ハードウェア的に何を気にしなければならないかについて述べました。後編では、制御系としてどのような機器がどのような仕組みで動いているか、それらの機器とどのようなやり取りをする必要があるか、さらにどのようなことに気を付けて実装していかなければならないかについて述べます。">工場をハックするための基本知識　後編</a></li>
+
+    <li>2019.10.02<a href="/articles/20191002/" title="定ファイルをどうするか問題はいろいろ悩ましい問題であります。そんな中、設定ファイル用言語という触れ込みのCUEがリリースされました。">CUEを試して見る</a></li>
+
+    <li>2019.06.10<a href="/articles/20190610/" title="若手中心の開発チームで1~2年ほど過ごしました。その時の経験を通して、こうすればもっとソースコードが綺麗になると感じたことを3点まとめます。">ソースコードを綺麗にするためにまず心がけたい３点</a></li>
+
+    <li>2018.10.31<a href="/articles/20181031/" title="社内問い合わせ窓口のRedmineに対して、AIコンシェルジュのあいちゃんがパワーアップしてチケットレコメンド業務をこなしてもらえるようにしました。">その問い合わせ、AIが解決します！～Redmineチケットレコメンドシステムのご紹介～</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+<!-- CATEGORIES START -->
+<h3 class="margin-top-30">カテゴリー</h3>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+    <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+    <li><a href="/categories/IoT/">IoT (14)</a></li>
+    
+    <li><a href="/categories/VR/">VR (10)</a></li>
+    
+    <li><a href="/categories/Security/">Security (2)</a></li>
+    
+    <li><a href="/categories/Design/">Design (7)</a></li>
+    
+    <li><a href="/categories/Programming/">Programming (168)</a></li>
+    
+    <li><a href="/categories/Management/">Management (9)</a></li>
+    
+    <li><a href="/categories/Infrastructure/">Infrastructure (131)</a></li>
+    
+    <li><a href="/categories/DB/">DB (14)</a></li>
+    
+    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+    
+    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+          <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+          <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+              t._e.push(f);
+            };
+            return t;
+          }(document, "script", "twitter-wjs"));</script>
+          
+            <!-- BEGIN TWITTER BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <!-- Twitterフォローボタン -->
+              <li class="twitter-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                </a>
+              </li>
+              <!-- Twitterタイムライン -->
+              <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+            </div>
+            <!-- END TWITTER BLOCK -->
+          
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+            &copy; 2021 フューチャー技術ブログ<br>
+          </div>
+          <!-- END COPYRIGHT -->
+	        <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
+    
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
+    
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

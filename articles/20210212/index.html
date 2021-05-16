@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Go 1.16のsignal.NotifyContext() | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="Go 1.16リリース記念連載の最終回はsignal.NotifyContext()です。 ご存知のように、Go 1.7でcontext.Contextが入ってから、少しずついろいろなAPIがContext対応になりました。  1.7 netのDialerがDialContext()メソッドを追加 net&#x2F;httpのhttp.RequestがContext()とWithContext()メソッドを">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 1.16のsignal.NotifyContext() | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210212/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="Go 1.16リリース記念連載の最終回はsignal.NotifyContext()です。 ご存知のように、Go 1.7でcontext.Contextが入ってから、少しずついろいろなAPIがContext対応になりました。  1.7 netのDialerがDialContext()メソッドを追加 net&#x2F;httpのhttp.RequestがContext()とWithContext()メソッドを">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210212/contxt-cancel.png">
+<meta property="article:published_time" content="2021-02-11T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-11T08:20:24.884Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Go1.16">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210212/contxt-cancel.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="Go,Go1.16" name="keywords">
+  <meta content="澁川喜規" name="author">
+
+  <link rel="stylesheet" href="/metronic/assets/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20210212/">Go 1.16のsignal.NotifyContext()</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20210212_Go_1.16のsignal.NotifyContext()" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+      <li class="blog-info-item"><a href="/authors/%E6%BE%81%E5%B7%9D%E5%96%9C%E8%A6%8F">澁川喜規</a></li>
+      <li class="blog-info-item"><time datetime="2021-02-11T15:00:00.000Z" itemprop="datePublished">2021/02/12</time>
+</li>
+      <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/Go/" title="Go">Go</a></li> 
+  
+    <li><a href="/tags/Go1-16/" title="Go1.16">Go1.16</a>
+  
+  </ul>
+
+</li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="https://future-architect.github.io/articles/20210207/">Go 1.16リリース記念連載</a>の最終回は<code>signal.NotifyContext()</code>です。</p>
+<p>ご存知のように、Go 1.7で<code>context.Context</code>が入ってから、少しずついろいろなAPIがContext対応になりました。</p>
+<ul>
+<li>1.7<ul>
+<li><code>net</code>の<code>Dialer</code>が<code>DialContext()</code>メソッドを追加</li>
+<li><code>net/http</code>の<code>http.Request</code>が<code>Context()</code>と<code>WithContext()</code>メソッドを追加。</li>
+<li><code>os/exec</code>が<code>CommandContext</code>を追加</li>
+</ul>
+</li>
+<li>1.8<ul>
+<li><code>database/sql</code>が大幅に<code>context.Context</code>対応を追加</li>
+<li><code>net/http</code>の<code>http.Server</code>が<code>Shutdown()</code>を追加</li>
+<li><code>net</code>に<code>context.Context</code>に対応したリゾルバーを追加</li>
+</ul>
+</li>
+<li>1.13<ul>
+<li> <code>net/http</code>の<code>NewRequestWithContext</code>と、<code>Request.Clone()</code>が追加</li>
+</ul>
+</li>
+</ul>
+<p>外部へのネットワークアクセスや、外部プロセス起動など、戻ってくる時間が未知数なものはContextを受け入れる口があります。</p>
+<p>もともと<code>net.Conn</code>にはタイムアウトがありましたが、Contextを受け入れるAPIは共通インタフェースでタイムアウトの設定をしたり、外部呼び出しをキャンセルできるようになります。また、複数のAPIアクセスを並行して行う場合にも同じContextを渡すことで一括でタイムアウト設定したり、キャンセルできるようになります。</p>
+<p>Goは例外処理（大域脱出による処理の中断と、それにともなうリソース開放）はありませんが、並行処理に対応した一括処理中断は、並行処理時代の例外処理と言えると思います。現代においては、外部API呼び出しやデータベースアクセス、外部プロセス起動を行うようなロジックを作成する場合、Contextを第一引数として取るように設計するのが紳士淑女の嗜みです。</p>
+<p>すべてのキャンセル処理をContextで統一すると一括処理中断がしやすくなるので、異常処理が中央集権的になって、見通しが良くなります。Doneというメソッド名で終了判断のselect等で利用できてコードがみやすくなるので、僕は実行フローに関係するような非同期の情報伝達は全部Context化していました。</p>
+<p>一方でユーザー主導のキャンセルのトリガーとなるシグナルはContextのAPIがなく、チャネルの提供でした。そのため、次のような関数を作ってContextに合わせるというのを1.15まではする必要がありました。</p>
+<figure class="highlight go"><figcaption><span>1.15まででシグナルをContext化</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">signalContext</span><span class="params">()</span> <span class="params">(context.Context, <span class="keyword">func</span>()</span>)</span> &#123;</span><br><span class="line">	ctx, cancel := context.WithCancel(context.Background())</span><br><span class="line">	c := <span class="built_in">make</span>(<span class="keyword">chan</span> os.Signal, <span class="number">1</span>)</span><br><span class="line">	signal.Notify(c, os.Interrupt, os.Kill)</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">select</span> &#123;</span><br><span class="line">		<span class="keyword">case</span> &lt;-c:</span><br><span class="line">			fmt.Fprintln(os.Stderr, <span class="string">&quot;signal received&quot;</span>)</span><br><span class="line">			cancel()</span><br><span class="line">		<span class="keyword">case</span> &lt;-ctx.Done():</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line">	<span class="keyword">return</span> ctx, <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		signal.Stop(c)</span><br><span class="line">		cancel()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>1.16では<code>signal.NotifyContext()</code>が入ったので、このような関数を手作りする必要がなくなりました。タイムアウトでもシグナルでも終了するような行儀の良いプログラムは次のように書けます。数値を変えてタイムアウトさせたり、正常終了させたり、シグナルを送ってみたり、いろいろ遊んでみてください。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;os/exec&quot;</span></span><br><span class="line">	<span class="string">&quot;os/signal&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)</span><br><span class="line">	<span class="keyword">defer</span> stop()</span><br><span class="line">	ctx, cancel := context.WithTimeout(ctx, time.Second*<span class="number">5</span>)</span><br><span class="line">	<span class="keyword">defer</span> cancel()</span><br><span class="line"></span><br><span class="line">	cmd := exec.CommandContext(ctx, <span class="string">&quot;sleep&quot;</span>, <span class="string">&quot;10&quot;</span>)</span><br><span class="line">	err := cmd.Run()</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> ctx.Err() != <span class="literal">nil</span> &#123;</span><br><span class="line">			fmt.Printf(<span class="string">&quot;error: %v\n&quot;</span>, ctx.Err())</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			fmt.Printf(<span class="string">&quot;error: %v\n&quot;</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">		os.Exit(<span class="number">1</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>err</code>の周りの処理がif文が増えています。<code>cmd.Run()</code>のエラーは、タイムアウトでも必ずsignal: killedとなってしまいます。これはexec.CommandContextがタイムアウト時にプロセスにシグナルを送ってkillするためです。そのシグナルの理由が本当にユーザーが子プロセスに向けてKILLを送ったのか、Goのランタイムが送ったものなのかを区別するにはContext側のエラーを見る必要があります。</p>
+<p><img src="/images/20210212/contxt-cancel.png"></p>
+<p>Goが良く使われるようなウェブサービスをシグナルでgracefulにシャットダウンするのはこんな感じになるでしょうか</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;net/http&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;os/signal&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)</span><br><span class="line">	<span class="keyword">defer</span> stop()</span><br><span class="line"></span><br><span class="line">	http.HandleFunc(<span class="string">&quot;/&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">		io.WriteString(w, <span class="string">&quot;hello world&quot;</span>)</span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	server := &amp;http.Server&#123;</span><br><span class="line">		Addr:    <span class="string">&quot;:8888&quot;</span>,</span><br><span class="line">		Handler: <span class="literal">nil</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		&lt;-ctx.Done()</span><br><span class="line">		ctx, cancel := context.WithTimeout(context.Background(), <span class="number">5</span>*time.Second)</span><br><span class="line">		<span class="keyword">defer</span> cancel()</span><br><span class="line">		server.Shutdown(ctx)</span><br><span class="line">	&#125;()</span><br><span class="line">	fmt.Println(<span class="string">&quot;start receiving at :8888&quot;</span>)</span><br><span class="line">	log.Fatal(server.ListenAndServe())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これまでシグナル処理をサボっていた人も、Contextはちょっと面倒と思っていた人も、ぜひ<code>signal.NotifyContext()</code>でぜひハッピーシグナルライフを送ってください。Goユーザーは行儀が良い、という評判をみんなで広めましょう。</p>
+<h1 id="関連記事"><a href="#関連記事" class="headerlink" title="関連記事"></a>関連記事</h1><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://future-architect.github.io/articles/20210207/index.html" data-iframely-url="//cdn.iframe.ly/QsgsKHg?iframe=card-small"></a></div></div><script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li class="twitter-btn">
+      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210212/&via=future_techblog&related=twitterapi%2Ctwitter&text=Go%201.16%E3%81%AEsignal.NotifyContext()"
+        onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li class="fb-btn">
+      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210212/&t=Go%201.16%E3%81%AEsignal.NotifyContext()"
+        onclick="window.open(this.href, 'fbsharewindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li class="hatebu-btn">
+      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210212/"
+        onclick="window.open(this.href, 'hatebuwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="hatebu-btn-label">46</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li class="pocket-btn">
+      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210212/"
+        onclick="window.open(this.href, 'pocketwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="pocket-btn-label">19</span>
+      </a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+  </article>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav">
+      
+    <li>2020.05.30<a href="/articles/20200530/" title="IT企業の技術ブログ運営は、ある一定の質をキープしながらも、投稿頻度を高め・それを継続することが求められ、周囲の期待値もあるので中々気を抜けない仕事だと思います。単発ならともかく、継続することは忍耐が必要なので特に大変です。運営していてこれはナレッジだなと感じたことをまとめていきます。">フューチャー技術ブログの運営で心がけていること</a></li>
+
+    <li>2020.08.07<a href="/articles/20200807/" title="Go は標準ライブラリが充実しているとよく言われます。標準ライブラリだけで、HTTP サーバを作れたり、暗号化処理や、JSON や CSV といったデータ形式を扱うことができます">GoとSuffixArray</a></li>
+
+    <li>2020.05.12<a href="/articles/20200512/" title="TIG DXチーム　アルバイターの三村です．今回はHeadlessCMSを利用したタスクをやることになりました．私自身HeadlessCMSどころかCMSを聞いたことすら無かったので，初めてCMS使ってみるにあたって感じたことを共有出来たらと思い本記事を作成させていただいております．">日本製HeadlessCMSのmicroCMSを触ってみた</a></li>
+
+    <li>2020.04.16<a href="/articles/20200416/" title="さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知でしょうか？Salesforceと非常によく似ておりますが、米国発の SaaS, aPaaS サービスです。米国では割とポピュラーなサービスとして位置づけられていますが、日本ではまだまだです。が、伸び率は今年度は4割近くと、利用ユーザがすごい勢いで伸びています。そんな中、お客様内でSNOWを利用していて、それと関連する領域をFutureが担当するケースも増えてくるかと思いますので、今回は本ブログでSNOWについて少しだけ紹介したいと思います。SNOW とは？の説明は、言葉だけだと概念過ぎてわかりづらいので、現状、私が直面している課題の解決案ベースで解説していきたいと思います。">ServiceNow+Terraform(+Go) によるインフラ構築自動化</a></li>
+
+    <li>2020.02.07<a href="/articles/20200207/" title="Go + Vue + Cloud Runでかんたんな管理画面を作ろうと思います。ストレージ側にもサーバーレスがあります。MySQLやPostgreSQLのクラウドサービス（Cloud SQLとかRDS）は、サーバーマシンを可動させて、その上にDBMSが稼働しますので、起動している時間だけお金がかかってしまします。一方、FirestoreやDynamoDBの場合は容量と通信（と、キャパシティユニット）にしかお金がかからないモデルになっており、サーバーレスです。今回はかんたん化のためにストレージは扱いません。">GCP連載#3 Goでサーバーレスな管理画面アプリを作る</a></li>
+
+    <li>2020.01.20<a href="/articles/20200120/" title="前回は【工場をハックするための基礎知識　前編】として、制御系システムがどのような構成になっていて、ハードウェア的に何を気にしなければならないかについて述べました。後編では、制御系としてどのような機器がどのような仕組みで動いているか、それらの機器とどのようなやり取りをする必要があるか、さらにどのようなことに気を付けて実装していかなければならないかについて述べます。">工場をハックするための基本知識　後編</a></li>
+
+    <li>2018.08.09<a href="/articles/20180809/" title="データベースマイグレーションツールの紹介と実際にシステムで稼働しているデータベース環境とアプリケーション（SQL）を使ってマイグレーションの評価をした例と、データベースマイグレーションを検討するための方針について説明します">データベースマイグレーション ～OracleからPostgreSQLへ～　−第２回ー</a></li>
+
+    <li>2017.05.26<a href="/articles/20170526/" title="AI(機械学習・Deep Learning等)を用いて、 **大量にある顔画像の中から同一人物をクラスタリングし、頻出する顔画像の抽出** を行い、常連さんの判定を行いたいと思います。">AIを使って顔画像から「常連さん」を判定しよう！</a></li>
+
+    <li>2021.04.22<a href="/articles/20210422b/" title="私のチームでは、「システムの設計情報」や「実装に関わる業務知識」などを、`README.md` に整理して GitHub 管理しています。設計資料や業務系のドキュメントが蓄積され、何度も更新され続けることに伴い、「あれ、この資料のリンクが切れてる。オリジナルのファイルはどこだっけ？」と探す機会が増えてきました。本来ならば PullRequest のレビュー時に気付くべきですが、ファイル名のちょっとしたスペルミスや資料パスの変更などだと、目視でのチェックには限界があります。">CircleCIでMarkdownのリンク切れを自動検知する</a></li>
+
+    <li>2021.04.21<a href="/articles/20210421b/" title="私が現在参加しているThe Apache Software Foundation（ASF）の基本理念の一つであるThe Apache Wayについて紹介します。The Apache Wayを通して、ASFのことを少しでも知ってもらえたらと思います。">The Apache Wayのお話</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+<!-- CATEGORIES START -->
+<h3 class="margin-top-30">カテゴリー</h3>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+    <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+    <li><a href="/categories/IoT/">IoT (14)</a></li>
+    
+    <li><a href="/categories/VR/">VR (10)</a></li>
+    
+    <li><a href="/categories/Security/">Security (2)</a></li>
+    
+    <li><a href="/categories/Design/">Design (7)</a></li>
+    
+    <li><a href="/categories/Programming/">Programming (168)</a></li>
+    
+    <li><a href="/categories/Management/">Management (9)</a></li>
+    
+    <li><a href="/categories/Infrastructure/">Infrastructure (131)</a></li>
+    
+    <li><a href="/categories/DB/">DB (14)</a></li>
+    
+    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+    
+    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+          <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+          <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+              t._e.push(f);
+            };
+            return t;
+          }(document, "script", "twitter-wjs"));</script>
+          
+            <!-- BEGIN TWITTER BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <!-- Twitterフォローボタン -->
+              <li class="twitter-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                </a>
+              </li>
+              <!-- Twitterタイムライン -->
+              <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+            </div>
+            <!-- END TWITTER BLOCK -->
+          
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+            &copy; 2021 フューチャー技術ブログ<br>
+          </div>
+          <!-- END COPYRIGHT -->
+	        <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
+    
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
+    
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

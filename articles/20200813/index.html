@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>GCPのRegion間レイテンシからサービスのRegion集約を考察する | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="フューチャー夏休み自由研究連載の9回目です。 はじめにこんにちは、TIG DXユニットの西田と申します。 業務では GCP のインフラの設計&#x2F;構築&#x2F;運用を担当しております。私は前職でネットワーク領域のキャリアが長かった事もあり、現職では GCP の中でも特にネットワークに関する部分を見ています。今回の自由研究もそれに関連する考察をしていきます。 記事についてクラウド上で、ワールドワイドのサービスを">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GCPのRegion間レイテンシからサービスのRegion集約を考察する | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200813/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="フューチャー夏休み自由研究連載の9回目です。 はじめにこんにちは、TIG DXユニットの西田と申します。 業務では GCP のインフラの設計&#x2F;構築&#x2F;運用を担当しております。私は前職でネットワーク領域のキャリアが長かった事もあり、現職では GCP の中でも特にネットワークに関する部分を見ています。今回の自由研究もそれに関連する考察をしていきます。 記事についてクラウド上で、ワールドワイドのサービスを">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200813/2020-08-02_233921.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200813/2020-08-02_231622.jpg">
+<meta property="article:published_time" content="2020-08-12T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-11T08:20:23.072Z">
+<meta property="article:tag" content="Network">
+<meta property="article:tag" content="GCP">
+<meta property="article:tag" content="Terraform">
+<meta property="article:tag" content="夏休み自由研究">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200813/2020-08-02_233921.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="Network,GCP,Terraform,夏休み自由研究" name="keywords">
+  <meta content="西田好孝" name="author">
+
+  <link rel="stylesheet" href="/metronic/assets/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200813/">GCPのRegion間レイテンシからサービスのRegion集約を考察する</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200813_GCPのRegion間レイテンシからサービスのRegion集約を考察する" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+      <li class="blog-info-item"><a href="/authors/%E8%A5%BF%E7%94%B0%E5%A5%BD%E5%AD%9D">西田好孝</a></li>
+      <li class="blog-info-item"><time datetime="2020-08-12T15:00:00.000Z" itemprop="datePublished">2020/08/13</time>
+</li>
+      <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/Network/" title="Network">Network</a></li> 
+  
+    <li><a href="/tags/GCP/" title="GCP">GCP</a></li> 
+  
+    <li><a href="/tags/Terraform/" title="Terraform">Terraform</a></li> 
+  
+    <li><a href="/tags/%E5%A4%8F%E4%BC%91%E3%81%BF%E8%87%AA%E7%94%B1%E7%A0%94%E7%A9%B6/" title="夏休み自由研究">夏休み自由研究</a>
+  
+  </ul>
+
+</li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="https://future-architect.github.io/articles/20200726/">フューチャー夏休み自由研究連載</a>の9回目です。</p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIG DXユニットの西田と申します。</p>
+<p>業務では <code>GCP</code> のインフラの設計/構築/運用を担当しております。私は前職でネットワーク領域のキャリアが長かった事もあり、現職では <code>GCP</code> の中でも特にネットワークに関する部分を見ています。今回の自由研究もそれに関連する考察をしていきます。</p>
+<h1 id="記事について"><a href="#記事について" class="headerlink" title="記事について"></a>記事について</h1><p>クラウド上で、ワールドワイドのサービスを作るとき、<strong>『どれくらいの密度でどの Region にサーバを立てればよいのか？』</strong>って、悩みませんか？インターネット向けのWebサービスだったら <code>CDN</code> で対処すれば基本的にはOKですが、イントラネットだけからアクセスさせたい社内サービス、Backend 系のサービス、Webサービスではないアプリケーションなどはインスタンスを用意する必要が出てきますよね。<br>選択肢としては以下です。</p>
+<ul>
+<li>全リージョンにサーバを構築する<ul>
+<li>日本の場合、東京、大阪にそれぞれ構築する</li>
+</ul>
+</li>
+<li>近傍の国を1つのリージョンにまとめる<ul>
+<li>日本の場合、東京だけに集約する</li>
+</ul>
+</li>
+</ul>
+<p>今回は、自由研究という事で、日頃業務で使っている <code>GCP</code> を題材にして、ネットワークの観点から考察してみようと思います。先に申し上げておきますと、一観点からの考察なので、実際のサービスが提供しているSLAにマッチするかどうかは別問題なので、そこはご容赦ください🙇‍♂️</p>
+<h1 id="自由研究で考察する観点"><a href="#自由研究で考察する観点" class="headerlink" title="自由研究で考察する観点"></a>自由研究で考察する観点</h1><p>ネットワークの観点と言っても、いくつかありますよね。</p>
+<ul>
+<li>スループット：<code>〇Gbps</code> などの帯域の話。『ギガがなくなった』とかのギガとは少し違います。</li>
+<li>レイテンシ：パケットの往復の時間</li>
+<li>ジッター：上記の時間の揺らぎ。早いときと遅いときのばらつき度合い</li>
+</ul>
+<p>今回は、この中でレイテンシだけに注目して考察します。<br>（データ量がそこそこあるサービスの場合はスループットも気にするべきですが、本記事ではレイテンシのみに注目）</p>
+<h1 id="GCP-のリージョンとは？"><a href="#GCP-のリージョンとは？" class="headerlink" title="GCP のリージョンとは？"></a>GCP のリージョンとは？</h1><p>こちらに世界地図とネットワークケーブルの概要が掲載されております。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/about/locations?hl=ja#network">https://cloud.google.com/about/locations?hl=ja#network</a><br>この線を通ってパケットがやり取りされるわけですが、近いところは早く応答が返ってくるし、遠いところは応答が遅いという事です。<br>では、サービス目線で言うと、どれくらい集約できるんでしょうかね？</p>
+<h1 id="集約する基準"><a href="#集約する基準" class="headerlink" title="集約する基準"></a>集約する基準</h1><p>まず、集約する基準を決めておきます。<br>かなり感覚論ですし、サービスの種類や作りにも当然依存しますが、大体私の経験上はこれくらいです。</p>
+<table>
+<thead>
+<tr>
+<th align="left">レイテンシ</th>
+<th align="left">日常使用で同程度なモノ</th>
+<th align="left">体感</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">20ms 以下</td>
+<td align="left">固定の光回線</td>
+<td align="left">とても速い。さくさく</td>
+</tr>
+<tr>
+<td align="left">60ms 以下</td>
+<td align="left">スマホ4Gくらい</td>
+<td align="left">まぁこれくらいは我慢出来る</td>
+</tr>
+<tr>
+<td align="left">それ以上</td>
+<td align="left">4Gで遅い時/3G利用など</td>
+<td align="left">これは遅い…使いたくない</td>
+</tr>
+</tbody></table>
+<p>なので、**<code>60ms</code> までは集約可能**と判断する事にします。<br>※重ねてになりますが、提供するサービスの種類/作りにこの基準は大きく依存します。音声系・映像系だと遅いと致命的な影響を受けますが、ファイルサーバの様なサービスだともう少し基準を下げられる、などはあり得ます。</p>
+<h1 id="GCP-の全-Region-間のレイテンシを計測する"><a href="#GCP-の全-Region-間のレイテンシを計測する" class="headerlink" title="GCP の全 Region 間のレイテンシを計測する"></a>GCP の全 Region 間のレイテンシを計測する</h1><h3 id="計測対象"><a href="#計測対象" class="headerlink" title="計測対象"></a>計測対象</h3><p>こちらの <a target="_blank" rel="noopener" href="https://cloud.google.com/compute/docs/regions-zones?hl=ja">Compute Engine リージョンとゾーン</a> に記載の全Region を対象にします。<br>※すいません、ムンバイだけ、QuotaがデフォルトでCPUS:0となっており、上げるリクエストを出したんですが、拒否されてしまいました。その関係で、ムンバイだけ計測が出来ませんでした🙇‍♂️<br><img src="/images/20200813/2020-08-02_233921.png"></p>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3><ul>
+<li>フルメッシュで計測</li>
+<li>Ping を 100ms 毎に 100 回打って、その返答の平均値</li>
+</ul>
+<p>※インスタンス構築のための <code>Terraform</code> コード、計測のためのスクリプトはAppendixに載せておきます。<br>　スクリプトは並列処理をするべきでした。そこはちょっと作り足りない感があります。</p>
+<h3 id="計測結果"><a href="#計測結果" class="headerlink" title="計測結果"></a>計測結果</h3><p>計測結果は以下です。</p>
+<ul>
+<li>青：20ms。サクサク</li>
+<li>黄：60ms。ギリギリ我慢できるレベル</li>
+<li>赤：それ以上。これはサービスとしてはよろしくない<br><img src="/images/20200813/2020-08-02_231622.jpg"></li>
+</ul>
+<h1 id="考察"><a href="#考察" class="headerlink" title="考察"></a>考察</h1><p>考察に当たっては、少しを前提を置きます。</p>
+<ul>
+<li>対象となる企業は、グローバル展開している日本企業（<code>Japanese Multinational Corporations</code>）であり、Japan に Global Headquarters(<code>GHQ</code>) が存在する。<ul>
+<li>人数的には、Japan が最も従業員/顧客が多い。</li>
+</ul>
+</li>
+<li>各国の支社/支部がイントラネットを通じて社内向けのサービスにアクセスする。</li>
+</ul>
+<p>割と現実的な前提ですよね。その前提を元に、考えると、以下の様になります。</p>
+<ul>
+<li>東京：日本/韓国/台湾/香港を集約（台湾/香港は、香港に別だしでも良い秒数）<ul>
+<li>GHQがあるので、まずはココを起点に考えます。</li>
+</ul>
+</li>
+<li>シンガポール：東南アジア地域をカバー</li>
+<li>オーストラリア：オセアニア地域。シンガポールまで結構遠いんですね。</li>
+<li>ドイツ：ヨーロッパ地域。（北欧だけは別だしでも良い秒数）</li>
+<li>米国アイオワ：北アメリカ地域。（東西で分けても良い秒数）</li>
+<li>ブラジル</li>
+</ul>
+<p>まぁ、なんていうか。。。『まぁそうだよね』感のある考察になりますね。。。<br>実際、これくらいをベースにリージョンを集約している事が多いんじゃないかと思います。そこに対して、レイテンシという観点での一つの裏付けにはなったかなと思います。</p>
+<h1 id="終わりに"><a href="#終わりに" class="headerlink" title="終わりに"></a>終わりに</h1><p>今回は『自由研究』という事で、日頃使っているツールに関して、少し深掘ってみました。<br>他にもルーティングに関する考察や、Peering, HA VPN の使い分けに関する考察も自分の中ではあるので、どこかで深堀りしていければと思います。</p>
+<h1 id="ついでに-GCPのスループットについて"><a href="#ついでに-GCPのスループットについて" class="headerlink" title="ついでに(GCPのスループットについて)"></a>ついでに(GCPのスループットについて)</h1><p>理論値というか、UDPベースではこの様になります。</p>
+<ul>
+<li>インスタンス間のスループットは、<code>2Gbps/CPU</code> となる。上限は 8CPU の <code>16Gbps</code><ul>
+<li>n1-standard-1 : <code>2 Gbps</code></li>
+<li>n1-standard-4 : <code>8 Gbps</code></li>
+<li>n1-standard-8 : <code>16 Gbps</code>（以降、CPUを増やしてもスループットは増えない）</li>
+</ul>
+</li>
+</ul>
+<p>※TCP ベースだと、TCPのフロー制御の関係で上記ほどの数値を出すためにはOSのパラメータの調整が必要になります。</p>
+<h1 id="Appendix"><a href="#Appendix" class="headerlink" title="Appendix"></a>Appendix</h1><h2 id="Terraform-コード"><a href="#Terraform-コード" class="headerlink" title="Terraform コード"></a>Terraform コード</h2><figure class="highlight sh"><figcaption><span>gce.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;google_compute_instance&quot;</span> <span class="string">&quot;GCE_instances&quot;</span> &#123;</span><br><span class="line">  count        = length(local.gce_instances_list)</span><br><span class="line">  name         = local.gce_instances_list[count.index].name</span><br><span class="line">  machine_type = <span class="string">&quot;f1-micro&quot;</span></span><br><span class="line">  zone         = local.gce_instances_list[count.index].zone</span><br><span class="line">  project      = local.project.id</span><br><span class="line"></span><br><span class="line">  boot_disk &#123;</span><br><span class="line">    auto_delete = <span class="literal">false</span></span><br><span class="line">    <span class="built_in">source</span>      = google_compute_disk.GCE_disks[count.index].self_link</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  network_interface &#123;</span><br><span class="line">    network = google_compute_network.test_network.name</span><br><span class="line">    access_config &#123;</span><br><span class="line">      // Ephemeral IP</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  service_account &#123;</span><br><span class="line">    email  = google_service_account.nw_tester.email</span><br><span class="line">    scopes = [<span class="string">&quot;cloud-platform&quot;</span>]</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  metadata = &#123;</span><br><span class="line">    enable-oslogin = <span class="string">&quot;true&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">&quot;google_compute_disk&quot;</span> <span class="string">&quot;GCE_disks&quot;</span> &#123;</span><br><span class="line">  count   = length(local.gce_instances_list)</span><br><span class="line">  name    = <span class="string">&quot;<span class="variable">$&#123;local.gce_instances_list[count.index].name&#125;</span>-disk&quot;</span></span><br><span class="line">  project = local.project.id</span><br><span class="line">  zone    = local.gce_instances_list[count.index].zone</span><br><span class="line">  <span class="built_in">type</span>    = <span class="string">&quot;pd-standard&quot;</span></span><br><span class="line">  size    = 20</span><br><span class="line">  image   = <span class="string">&quot;centos-cloud/centos-8&quot;</span></span><br><span class="line"></span><br><span class="line">  lifecycle &#123;</span><br><span class="line">    ignore_changes = [labels]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><figcaption><span>network.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;google_compute_network&quot;</span> <span class="string">&quot;test_network&quot;</span> &#123;</span><br><span class="line">  project                 = local.project.id</span><br><span class="line">  name                    = <span class="string">&quot;test-network&quot;</span></span><br><span class="line">  auto_create_subnetworks = <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">&quot;google_compute_firewall&quot;</span> <span class="string">&quot;ingress_test_network_iap&quot;</span> &#123;</span><br><span class="line">  project = local.project.id</span><br><span class="line">  name    = <span class="string">&quot;ingress-test-network-iap&quot;</span></span><br><span class="line">  network = google_compute_network.test_network.self_link</span><br><span class="line"></span><br><span class="line">  direction = <span class="string">&quot;INGRESS&quot;</span></span><br><span class="line">  priority  = 1000</span><br><span class="line"></span><br><span class="line">  allow &#123;</span><br><span class="line">    protocol = <span class="string">&quot;tcp&quot;</span></span><br><span class="line">    ports    = [<span class="string">&quot;22&quot;</span>]</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  source_ranges = [<span class="string">&quot;35.235.240.0/20&quot;</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">&quot;google_compute_firewall&quot;</span> <span class="string">&quot;ingress_test_network_internal&quot;</span> &#123;</span><br><span class="line">  project = local.project.id</span><br><span class="line">  name    = <span class="string">&quot;ingress-test-network-internal&quot;</span></span><br><span class="line">  network = google_compute_network.test_network.self_link</span><br><span class="line"></span><br><span class="line">  direction = <span class="string">&quot;INGRESS&quot;</span></span><br><span class="line">  priority  = 1000</span><br><span class="line"></span><br><span class="line">  allow &#123;</span><br><span class="line">    protocol = <span class="string">&quot;all&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  source_ranges = [<span class="string">&quot;10.0.0.0/8&quot;</span>, <span class="string">&quot;172.16.0.0/12&quot;</span>, <span class="string">&quot;192.168.0.0/16&quot;</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><figcaption><span>service_account.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;google_service_account&quot;</span> <span class="string">&quot;nw_tester&quot;</span> &#123;</span><br><span class="line">  project      = local.project.id</span><br><span class="line">  account_id   = <span class="string">&quot;nw-tester&quot;</span></span><br><span class="line">  display_name = <span class="string">&quot;nw-tester&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">&quot;google_project_iam_member&quot;</span> <span class="string">&quot;nw_tester&quot;</span> &#123;</span><br><span class="line">  project = local.project.id</span><br><span class="line">  member  = <span class="string">&quot;serviceAccount:<span class="variable">$&#123;google_service_account.nw_tester.email&#125;</span>&quot;</span></span><br><span class="line">  role    = <span class="string">&quot;roles/compute.viewer&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><figcaption><span>veriable.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">locals &#123;</span><br><span class="line">  project = &#123;</span><br><span class="line">    id = <span class="string">&quot;project_id&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  // GCE Instances</span><br><span class="line">  gce_instance_name = <span class="string">&quot;instance-test-nsd&quot;</span></span><br><span class="line">  gce_instances_list = [</span><br><span class="line">    &#123; region = <span class="string">&quot;asia-northeast1&quot;</span>, zone = <span class="string">&quot;asia-northeast1-a&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-asia-northeast1-a&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;asia-northeast1&quot;</span>, zone = <span class="string">&quot;asia-northeast1-b&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-asia-northeast1-b&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;asia-northeast1&quot;</span>, zone = <span class="string">&quot;asia-northeast1-c&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-asia-northeast1-c&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;asia-northeast2&quot;</span>, zone = <span class="string">&quot;asia-northeast2-a&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-asia-northeast2-a&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;asia-northeast3&quot;</span>, zone = <span class="string">&quot;asia-northeast3-a&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-asia-northeast3-a&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;asia-east1&quot;</span>, zone = <span class="string">&quot;asia-east1-b&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-asia-east1-b&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;asia-east2&quot;</span>, zone = <span class="string">&quot;asia-east2-a&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-asia-east2-a&quot;</span> &#125;,</span><br><span class="line">//    &#123; region = <span class="string">&quot;asia-south1&quot;</span>, zone = <span class="string">&quot;asia-south1-c&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-asia-south1-c&quot;</span> &#125;, </span><br><span class="line">    &#123; region = <span class="string">&quot;asia-southeast1&quot;</span>, zone = <span class="string">&quot;asia-southeast1-b&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-asia-southeast1-b&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;asia-southeast2&quot;</span>, zone = <span class="string">&quot;asia-southeast2-a&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-asia-southeast2-a&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;australia-southeast1&quot;</span>, zone = <span class="string">&quot;australia-southeast1-b&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-australia-southeast1-b&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;europe-north1&quot;</span>, zone = <span class="string">&quot;europe-north1-a&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-europe-north1-a&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;europe-west1&quot;</span>, zone = <span class="string">&quot;europe-west1-b&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-europe-west1-b&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;europe-west2&quot;</span>, zone = <span class="string">&quot;europe-west2-c&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-europe-west2-c&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;europe-west3&quot;</span>, zone = <span class="string">&quot;europe-west3-c&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-europe-west3-c&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;europe-west4&quot;</span>, zone = <span class="string">&quot;europe-west4-a&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-europe-west4-a&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;europe-west6&quot;</span>, zone = <span class="string">&quot;europe-west6-a&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-europe-west6-a&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;northamerica-northeast1&quot;</span>, zone = <span class="string">&quot;northamerica-northeast1-a&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-northamerica-northeast1-a&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;southamerica-east1&quot;</span>, zone = <span class="string">&quot;southamerica-east1-b&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-southamerica-east1-b&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;us-central1&quot;</span>, zone = <span class="string">&quot;us-central1-c&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-us-central1-c&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;us-east1&quot;</span>, zone = <span class="string">&quot;us-east1-b&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-us-east1-b&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;us-east4&quot;</span>, zone = <span class="string">&quot;us-east4-c&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-us-east4-c&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;us-west1&quot;</span>, zone = <span class="string">&quot;us-west1-b&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-us-west1-b&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;us-west2&quot;</span>, zone = <span class="string">&quot;us-west2-a&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-us-west2-a&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;us-west3&quot;</span>, zone = <span class="string">&quot;us-west3-a&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-us-west3-a&quot;</span> &#125;,</span><br><span class="line">    &#123; region = <span class="string">&quot;us-west4&quot;</span>, zone = <span class="string">&quot;us-west4-a&quot;</span>, name = <span class="string">&quot;<span class="variable">$&#123;local.gce_instance_name&#125;</span>-us-west4-a&quot;</span> &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><figcaption><span>versions.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">terraform &#123;</span><br><span class="line">  required_version = <span class="string">&quot;&gt;= 0.12&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">provider <span class="string">&quot;google&quot;</span> &#123;</span><br><span class="line">  version = <span class="string">&quot;~&gt; 3.30.0&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="各種script"><a href="#各種script" class="headerlink" title="各種script"></a>各種script</h2><figure class="highlight sh"><figcaption><span>ping-all-instances-in-VPC.sh</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">project_name=<span class="string">&quot;&quot;</span></span><br><span class="line">vpc_name=<span class="string">&quot;test-network&quot;</span></span><br><span class="line">ping_count=100</span><br><span class="line">src_host=`hostname`</span><br><span class="line">src_zone=`gcloud compute instances list --filter <span class="string">&quot;NAME=<span class="variable">$&#123;src_host&#125;</span>&quot;</span> --format=<span class="string">&quot;csv(ZONE)&quot;</span> | sed <span class="string">&#x27;1d&#x27;</span>`</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;src_host&#125;</span> at `date +<span class="string">&quot;%Y-%m-%d %H:%M:%S.%3N&quot;</span>`</span><br><span class="line"></span><br><span class="line">gce_list=`gcloud compute instances list --filter <span class="string">&quot;networkInterfaces[].network:<span class="variable">$&#123;vpc_name&#125;</span>&quot;</span> --format=<span class="string">&quot;csv(NAME,ZONE,INTERNAL_IP)&quot;</span> | sed <span class="string">&#x27;1d&#x27;</span>`</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> gce <span class="keyword">in</span> <span class="variable">$&#123;gce_list&#125;</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">  dst_host=`<span class="built_in">echo</span> <span class="variable">$&#123;gce&#125;</span> | cut -d <span class="string">&#x27;,&#x27;</span> -f 1` </span><br><span class="line">  dst_zone=`<span class="built_in">echo</span> <span class="variable">$&#123;gce&#125;</span> | cut -d <span class="string">&#x27;,&#x27;</span> -f 2`</span><br><span class="line">  dest_ip=`<span class="built_in">echo</span> <span class="variable">$&#123;gce&#125;</span> | cut -d <span class="string">&#x27;,&#x27;</span> -f 3`</span><br><span class="line">  rs_ping=`sudo ping -i0.1 <span class="variable">$&#123;dest_ip&#125;</span> -c <span class="variable">$&#123;ping_count&#125;</span> -q`</span><br><span class="line">  avg=`<span class="built_in">echo</span> <span class="variable">$&#123;rs_ping&#125;</span> | sed -r <span class="string">&#x27;s/.*rtt min\/avg\/max\/mdev = (.+?)\/(.+?)\/(.+?)\/(.+?)$/\2/&#x27;</span>`</span><br><span class="line"></span><br><span class="line">  <span class="built_in">echo</span> <span class="variable">$&#123;src_host&#125;</span>,<span class="variable">$&#123;src_zone&#125;</span>,<span class="variable">$&#123;dst_host&#125;</span>,<span class="variable">$&#123;dst_zone&#125;</span>,<span class="variable">$&#123;dest_ip&#125;</span>,<span class="variable">$&#123;avg&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><figcaption><span>sh-exec.sh</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> Started at `date +<span class="string">&quot;%Y-%m-%d %H:%M:%S.%3N&quot;</span>`</span><br><span class="line"></span><br><span class="line">project_name=<span class="string">&quot;&quot;</span></span><br><span class="line">vpc_name=<span class="string">&quot;test-network&quot;</span></span><br><span class="line">shell_file=<span class="string">&quot;ping-all-instances-in-VPC.sh&quot;</span></span><br><span class="line"></span><br><span class="line">format=<span class="string">&quot;csv(NAME,ZONE,INTERNAL_IP)&quot;</span></span><br><span class="line">gce_list=`gcloud compute instances list --filter <span class="string">&quot;networkInterfaces[].network:<span class="variable">$&#123;vpc_name&#125;</span>&quot;</span> --format=<span class="string">&quot;csv(NAME,ZONE)&quot;</span> | sed <span class="string">&#x27;1d&#x27;</span>`</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> gce <span class="keyword">in</span> <span class="variable">$&#123;gce_list&#125;</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">  host=`<span class="built_in">echo</span> <span class="variable">$&#123;gce&#125;</span> | cut -d <span class="string">&#x27;,&#x27;</span> -f 1` </span><br><span class="line">  zone=`<span class="built_in">echo</span> <span class="variable">$&#123;gce&#125;</span> | cut -d <span class="string">&#x27;,&#x27;</span> -f 2`</span><br><span class="line"></span><br><span class="line">  gcloud compute scp <span class="variable">$&#123;shell_file&#125;</span> <span class="variable">$&#123;host&#125;</span>:~/<span class="variable">$&#123;shell_file&#125;</span> --zone <span class="variable">$&#123;zone&#125;</span> --tunnel-through-iap</span><br><span class="line">  <span class="built_in">wait</span></span><br><span class="line">  gcloud compute ssh <span class="variable">$&#123;host&#125;</span> --<span class="built_in">command</span>=<span class="string">&quot;sh ~/<span class="variable">$&#123;shell_file&#125;</span>&quot;</span> --zone <span class="variable">$&#123;zone&#125;</span> --tunnel-through-iap</span><br><span class="line">  <span class="built_in">wait</span></span><br><span class="line">  gcloud compute ssh <span class="variable">$&#123;host&#125;</span> --<span class="built_in">command</span>=<span class="string">&quot;rm ~/<span class="variable">$&#123;shell_file&#125;</span>&quot;</span> --zone <span class="variable">$&#123;zone&#125;</span> --tunnel-through-iap</span><br><span class="line">  <span class="built_in">wait</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"><span class="built_in">echo</span> Finished at `date +<span class="string">&quot;%Y-%m-%d %H:%M:%S.%3N&quot;</span>`</span><br></pre></td></tr></table></figure>
+
+<h1 id="使い方"><a href="#使い方" class="headerlink" title="使い方"></a>使い方</h1><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh sh-exec.sh</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li class="twitter-btn">
+      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200813/&via=future_techblog&related=twitterapi%2Ctwitter&text=GCP%E3%81%AERegion%E9%96%93%E3%83%AC%E3%82%A4%E3%83%86%E3%83%B3%E3%82%B7%E3%81%8B%E3%82%89%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%AERegion%E9%9B%86%E7%B4%84%E3%82%92%E8%80%83%E5%AF%9F%E3%81%99%E3%82%8B"
+        onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li class="fb-btn">
+      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200813/&t=GCP%E3%81%AERegion%E9%96%93%E3%83%AC%E3%82%A4%E3%83%86%E3%83%B3%E3%82%B7%E3%81%8B%E3%82%89%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%AERegion%E9%9B%86%E7%B4%84%E3%82%92%E8%80%83%E5%AF%9F%E3%81%99%E3%82%8B"
+        onclick="window.open(this.href, 'fbsharewindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li class="hatebu-btn">
+      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200813/"
+        onclick="window.open(this.href, 'hatebuwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="hatebu-btn-label">5</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li class="pocket-btn">
+      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200813/"
+        onclick="window.open(this.href, 'pocketwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="pocket-btn-label">6</span>
+      </a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+  </article>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav">
+      
+    <li>2021.05.11<a href="/articles/20210511b/" title="Dart/Flutter連載の2記事目です。はじめまして、TIGの宮崎将太です。突然ですがみなさん、Swagger使いたいですよね。">Flutter Swagger統合</a></li>
+
+    <li>2021.05.13<a href="/articles/20210513b/" title="Flutterでの画面レイアウトの入門的な内容です。Flutterを触ったことがない方にも「こんな感じで画面が作れるんだな」というイメージがつくようお伝えできればと思います。また、私がつまずいたWidgetのサイズ調整についても記載します。"">Flutterレイアウト入門</a></li>
+
+    <li>2021.05.14<a href="/articles/20210514a/" title="FlutterでRSSを用いてフューチャー技術ブログリーダーを作ろうと思います。">Flutterで技術ブログRSSリーダー</a></li>
+
+    <li>2020.12.23<a href="/articles/20201223/" title="Pythonに型ヒントが入ってからしばらく経ちます。型ヒントの立ち位置も、なんでもできるアノテーションとして導入されましたが、型ヒント以外の用途はあまり育たず、型ヒントが中心になり、PEPや仕様もそれに合わせて変化したり、より書きやすいように機能が追加されてきました。本エントリーでは、Python 3.9時点での最新情報を元に、現在サポート中のPythonバージョン（3.6以上）との互換性の情報も織り交ぜながら、最新の型ヒントの書き方を紹介します。">2021年版Pythonの型ヒントの書き方 (for Python 3.9)</a></li>
+
+    <li>2020.10.20<a href="/articles/20201020/" title="学生から社会人になると様々な環境の変化が起きてそれに適応していくのが大変なのが世の常ではありますが、現代社会の仕事において切っては切れないPC周りの設定も変わってきます。特に会社ではあらゆる驚異から大切な情報を守るために、家庭用PCとはまた異なるセキュリティが組まれていることが往々にしてあり、ITを生業とする会社であっても設定周りで苦労することがあります。そこで、会社に入って設定される用語とその機能関係、そしてそれによって影響を受ける開発環境（特にDocker）について、簡単にまとめます。ここでのキーワードは以下のとおりです。">ProxyとDockerと新人社員と時々わたし</a></li>
+
+    <li>2020.09.30<a href="/articles/20200930/" title="Open Policy Agent（OPA）は汎用的なポリシーエンジンで、[Rego] と呼ばれるポリシー言語で定義されたルールに従って、入力がポリシーに沿っているか否かの判定を移譲させることができます。Regoで宣言的にポリシーを実装し、Policy as Code を実現できます。コーディング規約も一種のポリシーとみなして、Open API Spec（Swagger）をLinter的にチェックするツールを題材に、OPAを用いて開発してみたいと思います。">Policy as Code を実現する Open Policy Agent に憧れて。ポリシーコードでAPI仕様をLintする</a></li>
+
+    <li>2020.08.07<a href="/articles/20200807/" title="Go は標準ライブラリが充実しているとよく言われます。標準ライブラリだけで、HTTP サーバを作れたり、暗号化処理や、JSON や CSV といったデータ形式を扱うことができます">GoとSuffixArray</a></li>
+
+    <li>2020.02.07<a href="/articles/20200207/" title="Go + Vue + Cloud Runでかんたんな管理画面を作ろうと思います。ストレージ側にもサーバーレスがあります。MySQLやPostgreSQLのクラウドサービス（Cloud SQLとかRDS）は、サーバーマシンを可動させて、その上にDBMSが稼働しますので、起動している時間だけお金がかかってしまします。一方、FirestoreやDynamoDBの場合は容量と通信（と、キャパシティユニット）にしかお金がかからないモデルになっており、サーバーレスです。今回はかんたん化のためにストレージは扱いません。">GCP連載#3 Goでサーバーレスな管理画面アプリを作る</a></li>
+
+    <li>2018.08.09<a href="/articles/20180809/" title="データベースマイグレーションツールの紹介と実際にシステムで稼働しているデータベース環境とアプリケーション（SQL）を使ってマイグレーションの評価をした例と、データベースマイグレーションを検討するための方針について説明します">データベースマイグレーション ～OracleからPostgreSQLへ～　−第２回ー</a></li>
+
+    <li>2021.04.15<a href="/articles/20210415b/" title="こんにちは。TIG（テクノロジーイノベーショングループ）の久保です。採用活動などの社外イベントなどでは #技術も好きだけど業務の方が好き と掲げているTIGでは珍しいITコンサルタントです。`注：弊社はITコンサルタント集団なので、IT面でも業務面でもプロのコンサルタント集団ですが「どちらかといえば」業務の方が好きという話です。`本題ですが、2020年、コロナの影響によりリモートワークが推奨され、弊社も第一回目の緊急事態宣言前には完全リモートワークとなっていました。同じように完全リモートワーク。あるいは週の半分以上はリモートワークの方も多いのではないでしょうか。">Web会議で意識したい「コミュニケーション環境」をリモート環境アップデートで向上させた話</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+<!-- CATEGORIES START -->
+<h3 class="margin-top-30">カテゴリー</h3>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+    <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+    <li><a href="/categories/IoT/">IoT (14)</a></li>
+    
+    <li><a href="/categories/VR/">VR (10)</a></li>
+    
+    <li><a href="/categories/Security/">Security (2)</a></li>
+    
+    <li><a href="/categories/Design/">Design (7)</a></li>
+    
+    <li><a href="/categories/Programming/">Programming (168)</a></li>
+    
+    <li><a href="/categories/Management/">Management (9)</a></li>
+    
+    <li><a href="/categories/Infrastructure/">Infrastructure (131)</a></li>
+    
+    <li><a href="/categories/DB/">DB (14)</a></li>
+    
+    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+    
+    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+          <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+          <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+              t._e.push(f);
+            };
+            return t;
+          }(document, "script", "twitter-wjs"));</script>
+          
+            <!-- BEGIN TWITTER BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <!-- Twitterフォローボタン -->
+              <li class="twitter-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                </a>
+              </li>
+              <!-- Twitterタイムライン -->
+              <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+            </div>
+            <!-- END TWITTER BLOCK -->
+          
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+            &copy; 2021 フューチャー技術ブログ<br>
+          </div>
+          <!-- END COPYRIGHT -->
+	        <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
+    
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
+    
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

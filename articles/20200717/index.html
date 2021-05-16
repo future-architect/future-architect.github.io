@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>CORSのプリフライトリクエスト（OPTIONメソッド）はAPI Keyの認証なしでOKにしておかないと失敗する話 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは、TIG DXユニットの真野です。この技術ブログの運営や、ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。本エントリーのネタを書くキッカケになったのは、GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみるの記事を書いたり、最近はアイコン作成にまで手を伸ばしている多芸な加部さん">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CORSのプリフライトリクエスト（OPTIONメソッド）はAPI Keyの認証なしでOKにしておかないと失敗する話 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200717/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、TIG DXユニットの真野です。この技術ブログの運営や、ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。本エントリーのネタを書くキッカケになったのは、GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみるの記事を書いたり、最近はアイコン作成にまで手を伸ばしている多芸な加部さん">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200717/thumbnail.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200717/preflight_correct.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200717/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200717/CORS%E3%81%A8WAF%E3%83%96%E3%83%AD%E3%82%B0%E7%94%A8.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200717/cors_sequence.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200717/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200717/68747470733a2f2.png">
+<meta property="article:published_time" content="2020-07-16T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-11T08:20:22.691Z">
+<meta property="article:tag" content="Web">
+<meta property="article:tag" content="HTTP">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="CORS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200717/thumbnail.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="Web,HTTP,Go,CORS" name="keywords">
+  <meta content="真野隼記" name="author">
+
+  <link rel="stylesheet" href="/metronic/assets/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200717/">CORSのプリフライトリクエスト（OPTIONメソッド）はAPI Keyの認証なしでOKにしておかないと失敗する話</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200717_CORSのプリフライトリクエスト（OPTIONメソッド）はAPI_Keyの認証なしでOKにしておかないと失敗する話" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+      <li class="blog-info-item"><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98">真野隼記</a></li>
+      <li class="blog-info-item"><time datetime="2020-07-16T15:00:00.000Z" itemprop="datePublished">2020/07/17</time>
+</li>
+      <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/Web/" title="Web">Web</a></li> 
+  
+    <li><a href="/tags/HTTP/" title="HTTP">HTTP</a></li> 
+  
+    <li><a href="/tags/Go/" title="Go">Go</a></li> 
+  
+    <li><a href="/tags/CORS/" title="CORS">CORS</a>
+  
+  </ul>
+
+</li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIG DXユニットの真野です。この技術ブログの運営や、ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。本エントリーのネタを書くキッカケになったのは、<a href="https://future-architect.github.io/articles/20200214/">GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる</a>の記事を書いたり、最近は<a href="https://future-architect.github.io/articles/20200204/">アイコン作成にまで手を伸ばしている</a>多芸な加部さんと某IoTな案件のバックエンドの接続テストをしているときに気がついたネタです。</p>
+<h1 id="記事の概要"><a href="#記事の概要" class="headerlink" title="記事の概要"></a>記事の概要</h1><p>記事の内容ですが、<a href="https://future-architect.github.io/articles/20200421/">Real World HTTP 第2版はなぜ1.5倍になったのか | Future Tech Blog</a> で触れられている、以下のCORS周りについて書いていきます。</p>
+<blockquote>
+<p><strong>会社のチャットで、CORSのプリフライトリクエスト（OPTIONメソッド）は認証なしでOKにしておかないとCORSのやりとりが失敗する</strong> というのを見て、なるほどぉ、と思ったりもあります。</p>
+</blockquote>
+<p>上記でフンフンそうだよね、って理解された方は本記事の対象レベルを超えているので、生暖かく続きを御覧ください。これだけだとちょっとどういうことがわからいよ！って人向けに説明していきます。</p>
+<h1 id="CORSとは"><a href="#CORSとは" class="headerlink" title="CORSとは"></a>CORSとは</h1><p>CORSとは <strong>オリジン間リソース共有</strong>（Cross-Origin Resource Sharing）の略で、HTTP ヘッダーを使用して、あるオリジンで動作しているウェブアプリケーションに、異なるオリジンにある選択されたリソースへのアクセス権を与えるようブラウザーに指示するための仕組みです。</p>
+<ul>
+<li>(参考)<a target="_blank" rel="noopener" href="https://developer.mozilla.org/ja/docs/Web/HTTP/CORS">https://developer.mozilla.org/ja/docs/Web/HTTP/CORS</a></li>
+</ul>
+<p>最近はSPAな画面をブラウザで構築することが当たり前になってきていて、バックエンドの通信はJSON形式のWebAPI経由で通信することが多いと思いますが、最初のページを取得した <strong>オリジン</strong>  (≒ドメイン＋プロトコル＋ポート番号) と、WebAPIのオリジンが異なると、適切な設定なしでは以下のようなエラーメッセージがブラウザに表示されて上手く通信できません。</p>
+<p><code>&#39;Access-Control-Allo-Origin&#39; header is present on the requested resource.</code> といったメッセージをブラウザのデベロッパーツールのコンソールで一度は見かけた人も多いのではないでしょうか？</p>
+<p><img src="/images/20200717/thumbnail.png"></p>
+<h1 id="CORSのプリフライトリクエストについて"><a href="#CORSのプリフライトリクエストについて" class="headerlink" title="CORSのプリフライトリクエストについて"></a>CORSのプリフライトリクエストについて</h1><p>もし、WebAPIのリクエストに <code>x-api-key</code> のようなフィールドを用いて認証を行っている場合は、CORSの仕様では実際のHTTPリクエストを行う前に、 <strong>プリフライトリクエスト</strong> という、 <strong>OPTIONS</strong> メソッドでサーバに要求が行われます。</p>
+<p><img src="/images/20200717/preflight_correct.png"></p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/ja/docs/Web/HTTP/CORS#Preflighted_requests">オリジン間リソース共有 (CORS)</a> から引用</p>
+<p>上図ですが、OPTIONSメソッドには、<code>Origin</code>、<code>Access-Control-Request-Method</code>、<code>Access-Control-Request-Headers</code> のリクエストヘッダが含まれ（1番上の矢印）、それに対してサーバ側が<code>Access-Control-Allow-Origin</code>にリクエストされたオリジンの値、<code>Access-Control-Allow-Methods</code>に先ほどのメソッドを含めた値、<code>Access-Control-Allow-Headers</code>に先ほど要求が合ったヘッダの名称を含めてレスポンスする必要があります（2番目の矢印）。上記の条件を満たせば、ブラウザは通常のメインのリクエストをサーバに要求します。（3,4番目の矢印）</p>
+<p>CORSに対しては、上記のmozillaの記事や、tomoyukilabsさんのQiitaにある<a target="_blank" rel="noopener" href="https://qiita.com/tomoyukilabs/items/81698edd5812ff6acb34">CORSまとめ</a>も網羅的でオススメです。CORSは必ずプリフライトリクエストが飛ぶのではなく、条件によっては「単純リクエスト」と呼ばれる簡易的な認証を行う場合もあるなど細かい仕様は学びがあります。そもそもなんでCORSという決まり事があるかというと、<a target="_blank" rel="noopener" href="https://developer.mozilla.org/ja/docs/Web/Security/Same-origin_policy">同一オリジンポリシー</a>があって、なぜ同一オリジンポリシーが存在するかというと、ユーザーの情報を他サイトに漏れてしまわないようにといったセキュリティ上の理由が上げられます。</p>
+<h1 id="GoでのCORS設定例"><a href="#GoでのCORS設定例" class="headerlink" title="GoでのCORS設定例"></a>GoでのCORS設定例</h1><p>GoでCORSの設定をする際は、自前で上記のリクエストヘッダに対応した、レスポンスヘッダを設定すれば良く、net/httpのミドルウェア実装できそうです。というかすでにそういったライブラリが存在します。</p>
+<ul>
+<li>echoだと公式ドキュメントから<a target="_blank" rel="noopener" href="https://echo.labstack.com/middleware/cors">リンク</a>があります</li>
+<li>go-swaggerだと<a target="_blank" rel="noopener" href="https://github.com/go-swagger/go-swagger/blob/master/docs/faq/faq_documenting.md#how-to-use-swagger-ui-cors">FAQ</a> に記載があり、<a target="_blank" rel="noopener" href="https://github.com/rs/cors">rs/cors</a> のライブラリを使った例が記載されてします</li>
+</ul>
+<figure class="highlight go"><figcaption><span>go-swaggerの実装例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;github.com/rs/cors&quot;</span></span><br><span class="line">	<span class="string">&quot;net/http&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// go-swaggerの生成先次第だが、configure_xxx.goに実装するならこんな感じ</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">setupGlobalMiddleware</span><span class="params">(h http.Handler)</span> <span class="title">http</span>.<span class="title">Handler</span></span> &#123;</span><br><span class="line">	myCORS := cors.AllowAll() <span class="comment">// 実装例として全OKにしています</span></span><br><span class="line">	<span class="keyword">return</span> myCORS.Handler(h)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>cors.AllowAll()</code> で、全オリジンを許可、全メソッドを許可、全ヘッダを許可、クレデンシャルはNGになります。今回は社内LAN内で利用されるシステムですが、それでもオリジン、利用するメソッドなど絞り込めるのあれば設定した方が固いとは思います。</p>
+<p>さて、これでCORSに関してのサーバサイドの設定はオシマイ、後はフロントエンドからの接続を待つだけ。</p>
+<p>…</p>
+<p>…</p>
+<p>…<strong>🔥🔥そう思っていましたが、上手く動かないという報告😱が上がりました🔥🔥🔥</strong></p>
+<h1 id="🔥状況"><a href="#🔥状況" class="headerlink" title="🔥状況"></a>🔥状況</h1><p>ブラウザを見ると、確かに<code>&#39;Access-Control-Allo-Origin&#39; header is present on the requested resource.</code>のエラーメッセージが表示されていました。明らかにCORS周りが原因です。プリフライトリクエストに対してサーバサイドが想定したレスポンスをしていないと思われます。一方で、ローカルや開発環境でのテストでは問題なくブラウザと疎通が取れている。curlコマンドでも動いてもいました。</p>
+<figure class="highlight bash"><figcaption><span>curlでも疎通確認した例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># curlで確認した例。OriginヘッダやAccess-Control-Request-Methodヘッダ付きで想定通りか確認</span></span><br><span class="line">curl -H <span class="string">&quot;Origin:http://example.com&quot;</span> -H <span class="string">&quot;Access-Control-Request-Method:GET&quot;</span> -X OPTIONS -k --dump-header - https://&lt;dev.api.example.com&gt;/v1/health</span><br><span class="line">HTTP/1.1 200 Connection Established</span><br><span class="line">Proxy-Agent: IWSS</span><br><span class="line">Date: Wed, 12 Feb 2020 03:01:20 GMT</span><br><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Date: Wed, 12 Feb 2020 03:01:21 GMT</span><br><span class="line">Content-Length: 0</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Access-Control-Allow-Methods: GET</span><br><span class="line">Access-Control-Allow-Origin: *</span><br><span class="line">Vary: Origin</span><br><span class="line">Vary: Access-Control-Request-Method</span><br><span class="line">Vary: Access-Control-Request-Headers</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="切り分け"><a href="#切り分け" class="headerlink" title="切り分け"></a>切り分け</h1><p>Chromeブラウザだけかもしれませんが、プリフライトリクエストはデベロッパーツール上からは省略されていて分かりにくいです。これは <code>chrome://flags/#out-of-blink-cors</code> で<code>Out of blink CORS</code> を Disableにすれば表示することができます。 </p>
+<p><img src="/images/20200717/image.png"></p>
+<p>また、脳内でブラウザの気持ちになることができるのであれば、先ほどのcurlで適切なリクエストヘッダを付与することでサーバサイドが想定通りか確認することができます。</p>
+<h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><p>上記で色々切り分けていくと、原因はアプリケーションコード側ではなく、<strong>WAF</strong>(ウェブアプリケーションファイアウォール)側にありました。今回の構成は以下のように、連携先のフロントエンド側ごとにAPI Keyを発行して、それをWAFで認証する仕組みでした。私が確認したのは開発環境であり、プロダクションやステージングとは環境差異があったようです。</p>
+<p><img src="/images/20200717/CORS%E3%81%A8WAF%E3%83%96%E3%83%AD%E3%82%B0%E7%94%A8.png"></p>
+<p>APIキーは <code>x-api-key:aZ12kXCqGrZ9QTnqDtid1P6j2J7luB3v</code>のようなイメージでリクエストヘッダに付与するルールで、これが付与されていないとWAF側でブロックします（403 Forbiddenを返します）。</p>
+<p><img src="/images/20200717/cors_sequence.png"></p>
+<p>プリフライトリクエストをWAFがブロックすのは想定外で、考慮が漏れていました。分かったときは「なるほど！」とちょっと大きな声を上げました。WAFの設定はどちらかと言えばインフラ側のメンバーが設定したのでお互いの考慮が漏れやすいポイントでもあった気がします。</p>
+<h1 id="解決策"><a href="#解決策" class="headerlink" title="解決策"></a>解決策</h1><p>①WAF側のルールを変えるか、②ブラウザ側でプリフライトリクエスト時にAPI Keyを渡すように設定変更するかを考えました。しかし②ですが、XMLHttpRequestでプリフライトするときに任意のリクエストヘッダが追加できるか調べたところ、以下の回答にある通り仕様として不可でした。そのため、①のWAF側のルールを変更することになります。</p>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/58547499/is-it-possible-to-add-a-request-header-to-a-cors-preflight-request">https://stackoverflow.com/questions/58547499/is-it-possible-to-add-a-request-header-to-a-cors-preflight-request</a></p>
+<h2 id="WAFのルール変更"><a href="#WAFのルール変更" class="headerlink" title="WAFのルール変更"></a>WAFのルール変更</h2><p>以下のようにプリフライトリクエストに対応するため、OPTIONSメソッド<strong>も</strong>許可するようにします。</p>
+<p>WAFの変更後のルール：</p>
+<ol>
+<li>Request Heaerに x-api-key が指定の文字列から開始している</li>
+<li>OPTIONメソッドである</li>
+<li>1または2を満たす場合に許可する</li>
+</ol>
+<p>今回、WAFはAWS WAFを利用していたので、2のプリフライトリクエストかどうかのチェックは <code>String and regex match conditions</code>のフィルターで、HTTP Methodを選択できるため、<code>Match type</code>を <code>Exactly matches</code>を選択し、Value to matchに <code>OPTIONS</code> を設定します。</p>
+<p><img src="/images/20200717/image.png"></p>
+<p>あとは、web ACLに先ほど作成したPreflight-request-checkのルールをAPI Keyのルールに追加し、<code>Default action</code>に<code>Block all requests that don&#39;t match any rules</code> を選択すれば、API Key認証を残しつつ、しかしプリフライトリクエストを受け付けることができます。</p>
+<p>この対応で無事WebAPIをブラウザが利用することができました！</p>
+<p><img src="/images/20200717/68747470733a2f2.png"></p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>最後までお付き合いいただき、ありがとうございます。ちょっとしたネタでしたが、少しでもReal World HTTPなドタバタが伝わったら幸いです。</p>
+<ul>
+<li>もしCORS周りで問題が起こったら、ブラウザの設定でプリフライトリクエストも表示すると調査が捗る</li>
+<li>リクエストヘッダを利用したAPI Key認証を行う場合、全てのHTTPメソッドを対象にするのではなく、OPTIONSは通しておく</li>
+<li>WAFで上記の認証を行う場合は、そういった除外設定ができるか確認しておく</li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li class="twitter-btn">
+      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200717/&via=future_techblog&related=twitterapi%2Ctwitter&text=CORS%E3%81%AE%E3%83%97%E3%83%AA%E3%83%95%E3%83%A9%E3%82%A4%E3%83%88%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%EF%BC%88OPTION%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89%EF%BC%89%E3%81%AFAPI%20Key%E3%81%AE%E8%AA%8D%E8%A8%BC%E3%81%AA%E3%81%97%E3%81%A7OK%E3%81%AB%E3%81%97%E3%81%A6%E3%81%8A%E3%81%8B%E3%81%AA%E3%81%84%E3%81%A8%E5%A4%B1%E6%95%97%E3%81%99%E3%82%8B%E8%A9%B1"
+        onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li class="fb-btn">
+      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200717/&t=CORS%E3%81%AE%E3%83%97%E3%83%AA%E3%83%95%E3%83%A9%E3%82%A4%E3%83%88%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%EF%BC%88OPTION%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89%EF%BC%89%E3%81%AFAPI%20Key%E3%81%AE%E8%AA%8D%E8%A8%BC%E3%81%AA%E3%81%97%E3%81%A7OK%E3%81%AB%E3%81%97%E3%81%A6%E3%81%8A%E3%81%8B%E3%81%AA%E3%81%84%E3%81%A8%E5%A4%B1%E6%95%97%E3%81%99%E3%82%8B%E8%A9%B1"
+        onclick="window.open(this.href, 'fbsharewindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li class="hatebu-btn">
+      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200717/"
+        onclick="window.open(this.href, 'hatebuwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="hatebu-btn-label">2</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li class="pocket-btn">
+      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200717/"
+        onclick="window.open(this.href, 'pocketwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="pocket-btn-label">12</span>
+      </a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+  </article>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav">
+      
+    <li>2019.07.13<a href="/articles/20190713/" title="他の言語になれた人が、初めてGoを書いた時にわかりにくいな、と思った部分はどういうところがあるのか、難しいポイントはどこか、という情報を自分の経験や、会社の内外の人に聞いたりしてまとめてみました。">Goを学ぶときにつまずきやすいポイントFAQ</a></li>
+
+    <li>2021.05.11<a href="/articles/20210511b/" title="Dart/Flutter連載の2記事目です。はじめまして、TIGの宮崎将太です。突然ですがみなさん、Swagger使いたいですよね。">Flutter Swagger統合</a></li>
+
+    <li>2021.05.13<a href="/articles/20210513b/" title="Flutterでの画面レイアウトの入門的な内容です。Flutterを触ったことがない方にも「こんな感じで画面が作れるんだな」というイメージがつくようお伝えできればと思います。また、私がつまずいたWidgetのサイズ調整についても記載します。"">Flutterレイアウト入門</a></li>
+
+    <li>2021.05.14<a href="/articles/20210514a/" title="FlutterでRSSを用いてフューチャー技術ブログリーダーを作ろうと思います。">Flutterで技術ブログRSSリーダー</a></li>
+
+    <li>2021.03.24<a href="/articles/20210324/" title="TIGの伊藤真彦です。業務で行っている開発がいよいよリリースを視野に入れたフェーズに入り、E2Eテストや各種性能試験を行いました。">k6の使い方 シンプル&軽快な負荷試験ツールを試す</a></li>
+
+    <li>2020.12.23<a href="/articles/20201223/" title="Pythonに型ヒントが入ってからしばらく経ちます。型ヒントの立ち位置も、なんでもできるアノテーションとして導入されましたが、型ヒント以外の用途はあまり育たず、型ヒントが中心になり、PEPや仕様もそれに合わせて変化したり、より書きやすいように機能が追加されてきました。本エントリーでは、Python 3.9時点での最新情報を元に、現在サポート中のPythonバージョン（3.6以上）との互換性の情報も織り交ぜながら、最新の型ヒントの書き方を紹介します。">2021年版Pythonの型ヒントの書き方 (for Python 3.9)</a></li>
+
+    <li>2020.11.09<a href="/articles/20201109/" title="1年弱ほどGo言語でWebAPIアプリケーション開発を行っていますが、かなり割り切った構成・テスト方針を採用しました。そろそろ1年弱になり機能開発も比較的落ち着き、保守運用フェーズの割合も徐々に増えてきた頃合いなので、やったこと・学び・反省といった振り返りを共有します。">GoのWebアプリ開発でフラットパッケージにした話</a></li>
+
+    <li>2020.09.10<a href="/articles/20200910/" title="初のオンライン＆Python 2サポートが終了したあとのPyCon.jpという節目のイベントで発表してきました。![IMG_0039.PNG]発表資料はこちらになります。">「2020年代のコンテナ時代のPythonアーキテクチャ&デプロイ」というテーマでPyCon.jp 2020で発表してきました</a></li>
+
+    <li>2020.08.07<a href="/articles/20200807/" title="Go は標準ライブラリが充実しているとよく言われます。標準ライブラリだけで、HTTP サーバを作れたり、暗号化処理や、JSON や CSV といったデータ形式を扱うことができます">GoとSuffixArray</a></li>
+
+    <li>2020.02.03<a href="/articles/20200203/" title="現在所属しているプロジェクトではWebAPIやバッチ処理の設計の一環としてPlantUMLを利用しています。効率よく品質高くアウトプットを出すためには、プログラミング言語に対してコーディング規約があるように、UMLに対してもチームで設計するにあたり一定のルールを決める必要があります。そこでプロジェクト内のPlantUMLを使用するうえでのガイドラインやルールをまとめる機会があり、せっかくなのでそれを記事化します。">チームで機能設計するためのPlantUML標準化</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+<!-- CATEGORIES START -->
+<h3 class="margin-top-30">カテゴリー</h3>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+    <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+    <li><a href="/categories/IoT/">IoT (14)</a></li>
+    
+    <li><a href="/categories/VR/">VR (10)</a></li>
+    
+    <li><a href="/categories/Security/">Security (2)</a></li>
+    
+    <li><a href="/categories/Design/">Design (7)</a></li>
+    
+    <li><a href="/categories/Programming/">Programming (168)</a></li>
+    
+    <li><a href="/categories/Management/">Management (9)</a></li>
+    
+    <li><a href="/categories/Infrastructure/">Infrastructure (131)</a></li>
+    
+    <li><a href="/categories/DB/">DB (14)</a></li>
+    
+    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+    
+    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+          <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+          <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+              t._e.push(f);
+            };
+            return t;
+          }(document, "script", "twitter-wjs"));</script>
+          
+            <!-- BEGIN TWITTER BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <!-- Twitterフォローボタン -->
+              <li class="twitter-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                </a>
+              </li>
+              <!-- Twitterタイムライン -->
+              <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+            </div>
+            <!-- END TWITTER BLOCK -->
+          
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+            &copy; 2021 フューチャー技術ブログ<br>
+          </div>
+          <!-- END COPYRIGHT -->
+	        <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
+    
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
+    
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>
