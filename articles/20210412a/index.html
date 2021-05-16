@@ -40,19 +40,19 @@
 <meta property="og:site_name" content="フューチャー技術ブログ">
 <meta property="og:description" content="はじめにこんにちは、Technology Innovation Group所属 DBチームの岩崎です。 テックブログにて記事を書くのは1年半ぶりです。(反省)あれからずっと設計～開発まで推進し、無事アプリリリースが完了しました。  — 脱RDB脳 — Cassandraのデータモデルについて考えてみる  このタイミングで改めてKVS関連のナレッジを還元できたらと思い筆を執りました。 1. データモ">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:image" content="https://future-architect.github.io/images/20210412/datastore_api.png.jpg">
-<meta property="og:image" content="https://future-architect.github.io/images/20210412/001_refresh_flush.png">
-<meta property="og:image" content="https://future-architect.github.io/images/20210412/bcp.png.jpg">
-<meta property="og:image" content="https://future-architect.github.io/images/20210412/gid.png.jpg">
-<meta property="og:image" content="https://future-architect.github.io/images/20210412/nodesync_partition.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210412aa/datastore_api.png.jpg">
+<meta property="og:image" content="https://future-architect.github.io/images/20210412a/001_refresh_flush.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210412a/bcp.png.jpg">
+<meta property="og:image" content="https://future-architect.github.io/images/20210412a/gid.png.jpg">
+<meta property="og:image" content="https://future-architect.github.io/images/20210412a/nodesync_partition.png">
 <meta property="article:published_time" content="2021-04-11T15:00:00.000Z">
-<meta property="article:modified_time" content="2021-04-18T06:00:57.761Z">
+<meta property="article:modified_time" content="2021-05-15T16:00:42.596Z">
 <meta property="article:tag" content="KVS">
 <meta property="article:tag" content="Cassandra">
 <meta property="article:tag" content="NoSQL">
 <meta property="article:tag" content="Database">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://future-architect.github.io/images/20210412/datastore_api.png.jpg">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210412aa/datastore_api.png.jpg">
   
   <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
   
@@ -99,19 +99,21 @@
     
     <header class="article-header">
     <ul class="blog-info">
-      <li><a href="/authors/%E5%B2%A9%E5%B4%8E%E7%A5%90%E5%A4%AA">岩崎祐太</a></li>
-      <li><time datetime="2021-04-11T15:00:00.000Z" itemprop="datePublished">2021/04/12</time>
+      <li class="blog-info-item"><a href="/authors/%E5%B2%A9%E5%B4%8E%E7%A5%90%E5%A4%AA">岩崎祐太</a></li>
+      <li class="blog-info-item"><time datetime="2021-04-11T15:00:00.000Z" itemprop="datePublished">2021/04/12</time>
 </li>
-      <li>
+      <li class="blog-info-item">
+  <ul>
   
-    <a href="/tags/KVS/" title="KVS">KVS</a> 
+    <li><a href="/tags/KVS/" title="KVS">KVS</a></li> 
   
-    <a href="/tags/Cassandra/" title="Cassandra">Cassandra</a> 
+    <li><a href="/tags/Cassandra/" title="Cassandra">Cassandra</a></li> 
   
-    <a href="/tags/NoSQL/" title="NoSQL">NoSQL</a> 
+    <li><a href="/tags/NoSQL/" title="NoSQL">NoSQL</a></li> 
   
-    <a href="/tags/Database/" title="Database">Database</a>
+    <li><a href="/tags/Database/" title="Database">Database</a>
   
+  </ul>
 
 </li>
     </ul>
@@ -301,7 +303,7 @@
 <p>基本的にはメリットが多く、バッチ処理をうまく利用することでデータ整合性を保証しつつ性能面の向上も見込めるためおすすめです。</p>
 <h2 id="3-アプリケーション開発の勘所"><a href="#3-アプリケーション開発の勘所" class="headerlink" title="3. アプリケーション開発の勘所"></a>3. アプリケーション開発の勘所</h2><p>私のPJではデータストアとして業務データを管理するdatastax(KVS)、全文検索機能としてElasticsearch、オンプレ構成だったのでアーカイブ用にDynamoDBを採用しており、複数のデータストアが混在していました。</p>
 <p>アプリ開発者にデータストア層を意識させるのは非常に困難かつ、データ整合性を担保できないと考え、<strong>業務ロジックを実装するHandlerとデータの整合性を保証したCRUD機能を提供するPersister層</strong>に分離しました。</p>
-<p><img src="/images/20210412/datastore_api.png.jpg"></p>
+<p><img src="/images/20210412aa/datastore_api.png.jpg" alt="datastore_api"></p>
 <p>APIコールすると紐づくHandler(業務ロジック)が呼び出され、Handler内で発生するデータストアへのCRUDは全てPersisterクラスの共通メソッドを呼び出すことでデータストア層を隠蔽化しています。</p>
 <h3 id="3-1-gRPCモデルを利用したCRUD機能を提供"><a href="#3-1-gRPCモデルを利用したCRUD機能を提供" class="headerlink" title="3-1. gRPCモデルを利用したCRUD機能を提供"></a>3-1. gRPCモデルを利用したCRUD機能を提供</h3><p>]<br>クライアント/サーバー間のAPI連携にはgRPCを採用しました。datastaxはCassandraベースの製品でデータアクセスはCassandraと同じCQLを利用します。</p>
 <p>CQLはSQLライクで、従来のRDBアプリ開発者にも直感的に記述できるインターフェースです。とはいえ、コレクション型(Map,Set)の更新や軽量トランザクション(CAS)やバッチクエリなどCassandra特有のクエリもあり、少なからず学習コストがあります。</p>
@@ -346,7 +348,7 @@
 <p>Elasticsearch上のデータは主管データではなく、あくまで検索補完の位置づけなので更新フローは<strong>「KVS-&gt;Elasticsearch」として必ずKVS側から更新する</strong>ようにしました。KVSを更新せずにインデックスのみ更新するフローも原則禁止としています。更新順序に依存関係を持たせることでKVSの更新エラー時に検索インデックスだけ更新されてKVSにはデータがないのに検索はヒットするといった不整合を防ぐことができます。</p>
 <p>また、KVSは1レコードサイズが肥大化しがちなので<strong>KVS更新時に検索項目が含まれている時のみElasticsearchへのインデックス同期すること</strong>を推奨します。こうすることでインデックスサイズの削減、同期不要時の処理性能向上が見込めます。更新順序制御や更新時のインデックス同期判定を業務ロジック上で判断させるのは困難なためPersisterのKVS更新メソッドの引数に渡すgRPCモデルのフィールドオプションにインデックス化する項目に対してカスタムオプション定義をしておき更新制御を行いました。</p>
 <p>KVSからElasticsearchのデータ連携は基本的に同期処理で行っているのですが、Elasticsearchはインデクシングまでは同期処理で、連携されたデータを即時に検索できるようにするか、非同期で準リアルタイム(といっても数百msの世界)で検索できるようにするかをrefreshと呼ばれるオプションで制御することができます。</p>
-<p><img src="/images/20210412/001_refresh_flush.png"></p>
+<p><img src="/images/20210412a/001_refresh_flush.png" alt="refresh_flush"></p>
 <p>検索可能なSegment領域へのrefreshは基本的に非同期(false)を推奨します。</p>
 <p><strong>refreshを同期的(true)に行うと、KVSへの連射更新時やSegmentのmerge処理が走るとパフォーマンスに大きな影響を与えかねません。</strong></p>
 <p>Elasticsearchの公式ドキュメントでもrefresh同期は性能影響を与えると言及しています。refresh_intervalと呼ばれるパラメータでrefreshが定期実行されるのでそれに任せます。ただし、業務ロジック上でインデックス更新直後に即座に検索クエリを投げて対象の更新データを取得して後続処理を行うようなケースがある場合はrefresh_intervalで検索可能なインデックスへの書き出しが間に合わず検索にヒットしない、というケースが稀にあります。<br>そのため、refresh同期反映が必要な場合はPersisterから更新時にrefreshオプションを渡せるようにも工夫しました。</p>
@@ -356,7 +358,7 @@
 <p>BCP要件上アクティブスタンバイ構成でリアルタイム同期の必要はなかったため、<strong>KVS側に更新管理テーブルを作成してスタンバイ側からPULL型の定期実行で同期対象の特定および対象レコードを抽出してElasticsearchに連携する仕組み</strong>を作りました。</p>
 <p>更新管理テーブルはKVSにデータ登録・更新時に業務テーブルに書き込む前に対象レコードのPK、更新日付、BCP同期ステータスなどをまず更新管理テーブルに記録します。更新管理テーブルへの更新が完了したら、業務テーブル更新とインデックス同期を行います。</p>
 <p>KVS上のデータはDRサイト側にもデータベースの機能で同期が図られているのでDRサイト側で定期的に更新管理テーブルをチェックしてBCP同期対象のPKを取得します。</p>
-<p>更新管理テーブルはあくまでPKだけ管理しているので、仮にKVS側で更新管理テーブルの書き込みは成功して、業務テーブルへの書き込みが失敗していたとしても常に業務テーブルの最新データを取得してインデックスに連携するためデータ不整合は発生しません。<br><img src="/images/20210412/bcp.png.jpg"></p>
+<p>更新管理テーブルはあくまでPKだけ管理しているので、仮にKVS側で更新管理テーブルの書き込みは成功して、業務テーブルへの書き込みが失敗していたとしても常に業務テーブルの最新データを取得してインデックスに連携するためデータ不整合は発生しません。<br><img src="/images/20210412a/bcp.png.jpg" alt="bcp"></p>
 <h3 id="3-5-エラーハンドリング"><a href="#3-5-エラーハンドリング" class="headerlink" title="3-5. エラーハンドリング"></a>3-5. エラーハンドリング</h3><p>基本的にエラー時はアプリケーション上でリトライさせず、ユーザー画面にエラー通知を返して画面操作のリトライを促しました。</p>
 <p>一部、軽量トランザクションを利用したロック制御を実装しており、ロックフラグをみてステータス更新をかけるような排他制御がありました。</p>
 <p>この処理はロック取得の軽量トランザクションで更新がかけられない時はwaitを挟み、アプリケーション上でリトライをかけるように制御しました。また、DatastaxのDriver上でリトライポリシーを設定することが可能なためReadTimeoutException、WriteTimeoutExceptionに関してはリトライポリシーに従ってリトライをかけていました。リトライポリシー設定例は下記参照ください。</p>
@@ -387,7 +389,7 @@
 <h3 id="4-3-kibanaを利用して処理全体の性能監視の仕組みを作る"><a href="#4-3-kibanaを利用して処理全体の性能監視の仕組みを作る" class="headerlink" title="4-3. kibanaを利用して処理全体の性能監視の仕組みを作る"></a>4-3. kibanaを利用して処理全体の性能監視の仕組みを作る</h3><p>nodetoolコマンドなどでKVSレイヤーの統計情報を取得することができますが、KVSではRDBのように複雑なSQLが実行されるようなことがないため単一クエリの性能は基本的に問題ないというケースが多いです。</p>
 <p>そのためKVSレイヤーのみに絞って性能監視してもボトルネックが掴めない場合が多いです。アプリ全体でどこがボトルネックになっているかを追えるようなロギングが重要になります。</p>
 <p>私のPJではフロントでグローバルトランザクションIDを払い出してそれを取りまわしていたのでグローバルトランザクションID起点で性能監視が追えるように各レイヤーでロギングしました。各レイヤーのアプリログをElasticsearchに取り込み、kibanaでグローバルトランザクションIDで横断検索しボトルネック箇所を特定できるダッシュボードを作成してチューニングを実施しました。</p>
-<p><img src="/images/20210412/gid.png.jpg"></p>
+<p><img src="/images/20210412a/gid.png.jpg" alt="gid"></p>
 <p>業務ロジック上で時間がかかっているのか、データストアへのCRUDで時間がかかっているのかを切り分けることで、チューニング対象の特定がグッとしやすくなります。</p>
 <h3 id="4-4-1パーティションサイズが100MB以上にならないようにする"><a href="#4-4-1パーティションサイズが100MB以上にならないようにする" class="headerlink" title="4-4. 1パーティションサイズが100MB以上にならないようにする"></a>4-4. 1パーティションサイズが100MB以上にならないようにする</h3><p>Cassandraはデータ書き込み時にCONCISTENCY LEVELに応じてノードの書き込み完了を保証します。</p>
 <p>CONCISTENCY LEVELがALLでなければクラスタ内のノードがすべて書き込みが成功しているという保証ができないため、定期的にクラスタ内のノード間でデータの整合性を合わせるためにバリデーションとデータ同期が行われています。この仕組みを”nodetool repair”と呼びます。nodetool repairによる同期が完了しないと全ノードが同じデータを持つことが保証されませんがLOCAL_QUORUMで読み書きを行っていれば、仮に3ノード中1ノードが古いデータを持っていたとしてもデータ不整合は発生しないのでアプリケーション側に影響はありません。</p>
@@ -397,7 +399,7 @@
 <p>Datastaxではgc_grace_secondsで設定した値の期間内に同期が完了するようにrepaireタスクをスケジューリングして自動実行してくれる”nodesync”とよばれるサービスが動いています。</p>
 <p>運用ではnodesyncによって10日以内にデータ同期が完了しているかを監視することが大切です。nodesyncによる同期状況はDatastaxが提供する専用のダッシュボードがあるのでそれを利用します。このnodesyncは自動でスケジュールしてくれるので非常に便利な機能ですが、データを積んでテストしていく中である日突然CPUが一定間隔で高騰し続ける事象が発生しました。その原因がパーティションサイズに大きく関係していたのです。</p>
 <p>nodesyncの実行単位は200MBのセグメントと呼ばれる領域にパーティションデータを乗せてバリデーションを行うのですが<strong>1パーティションが1GBなど200MBを超えている場合はパーティション内のデータを分割できず、1GBそのままセグメント領域に展開してしまう</strong>ため1コアあたりの占有時間が顕著に長くなり、1GBを超えるような巨大パーティションが複数存在するとCPUリソースを全体を食いつぶすというのが原因でした。</p>
-<p><img src="/images/20210412/nodesync_partition.png"></p>
+<p><img src="/images/20210412a/nodesync_partition.png" alt="nodesync_partition"></p>
 <p>そのためパーティションサイズが1GBを超えるテーブルは100MBに収まるよう設計を見直しました。サイズが肥大化しがちなパーテイションの主は日付をキーにしている場合が多いです。定常業務の更新量では1GBを超えなくても、移行などでイレギュラー要素で想定以上の更新量が発生する可能性もあるため、月や日などの単位ではなく日時分などでパーティションの粒度を細かくするもしくは、日付＋分散キーにしてコンポジット化するなど検討しました。</p>
 <p><strong>テーブル作成後のパーティションキー変更は出来ないのでデータモデル設計時には1パーティションサイズが100MBを越さないようなキー設計になっているかを意識してください。</strong>また、運用開始後もパーティションが想定外に肥大化していないかなどを監視すると事前に事故を防げる可能性が高くなるので重要です。</p>
 <h2 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h2><p>KVSと二年間設計から開発まで携わる中で一番苦労したのは「情報収集」でした。</p>
@@ -454,25 +456,25 @@
   <div class="widget">
     <ul class="nav">
       
-    <li>2019.07.13<a href="/articles/20190713/" title="他の言語になれた人が、初めてGoを書いた時にわかりにくいな、と思った部分はどういうところがあるのか、難しいポイントはどこか、という情報を自分の経験や、会社の内外の人に聞いたりしてまとめてみました。">Goを学ぶときにつまずきやすいポイントFAQ</a></li>
+    <li>2020.05.30<a href="/articles/20200530/" title="IT企業の技術ブログ運営は、ある一定の質をキープしながらも、投稿頻度を高め・それを継続することが求められ、周囲の期待値もあるので中々気を抜けない仕事だと思います。単発ならともかく、継続することは忍耐が必要なので特に大変です。運営していてこれはナレッジだなと感じたことをまとめていきます。">フューチャー技術ブログの運営で心がけていること</a></li>
 
-    <li>2021.05.11<a href="/articles/20210511b/" title="Dart/Flutter連載の2記事目です。はじめまして、TIGの宮崎将太です。突然ですがみなさん、Swagger使いたいですよね。">Flutter Swagger統合</a></li>
+    <li>2021.05.10<a href="/articles/20210510b/" title="この記事はDart/Flutter連載の1記事目です。TIGの伊藤真彦です。Dart/Flutter入門に参加します、DartといえばFlutterの話が必ずついてくるものですが、今回は連載1記事目として、敢えてプログラミング言語としてのDartに焦点を絞った記事にします。">Dart入門</a></li>
 
-    <li>2020.07.09<a href="/articles/20200709/" title="最近Goで主にバックエンドのWebAPIや、AWS Lambdaで動くETLアプリ、たまにCLIツールを開発する時に、2回以上同じ指摘したコメントをまとめてます。Go言語特有ぽいところを中心にしています。レビュイーのスキルセットは..">GoでWebアプリ開発時にあるあるだったレビューコメント</a></li>
-
-    <li>2021.05.14<a href="/articles/20210514a/" title="FlutterでRSSを用いてフューチャー技術ブログリーダーを作ろうと思います。">Flutterで技術ブログRSSリーダー</a></li>
+    <li>2021.03.04<a href="/articles/20210304/" title="前回の記事では、JavaScript製のグラフ可視化ライブラリについて概観しました。また、その1つであるVis Networkについて紹介し、階層グラフの可視化を行いました。Vis Networkはcanvasでの高速な描画が可能で、階層グラフをライトに表示・加工する場合は非常に有用ですが、大きな階層グラフを表示する場合にエッジの交差が多くなってしまうという課題があることを見てきました。">mxGraphで階層グラフを可視化する</a></li>
 
     <li>2021.03.05<a href="/articles/20210305/" title="こんにちは。テクノロジーイノベーショングループ所属の長澤です。[インフラ入門]な連載記事を久々に書くべく、今回筆を取りました。これまでのインフラ入門記事は [インフラ概要と当社でのインフラエンジニア像]">インフラ入門ーインフラ要件定義編ー</a></li>
 
-    <li>2021.02.01<a href="/articles/20210201/" title="もともと、お仕事的には2019年にはリモートではあったのですが（仕事のカウンターが海外で、自社に出社しても、客先の日本のオフィスに行っても、テレビ会議とチャットで仕事していた）、2020年の3月からは自宅で仕事をすることになり、いろいろ整備しました。">自宅仕事環境構築：指向性マイクの勧め</a></li>
+    <li>2020.03.23<a href="/articles/20200323/" title="AWSのLambdaに代表されるサーバレスアプリは実行時のみ稼働するため、サーバー稼働によるあらゆるコストから解放され、システム開発の工数を減らすことができます。例えば何らかのAPIを提供する場合でも、API GatewayとLambdaを組み合わせることで提供可能です。">Serverless連載1: SAMを使ったローカルテスト（Go編）</a></li>
 
-    <li>2020.12.23<a href="/articles/20201223/" title="Pythonに型ヒントが入ってからしばらく経ちます。型ヒントの立ち位置も、なんでもできるアノテーションとして導入されましたが、型ヒント以外の用途はあまり育たず、型ヒントが中心になり、PEPや仕様もそれに合わせて変化したり、より書きやすいように機能が追加されてきました。本エントリーでは、Python 3.9時点での最新情報を元に、現在サポート中のPythonバージョン（3.6以上）との互換性の情報も織り交ぜながら、最新の型ヒントの書き方を紹介します。">2021年版Pythonの型ヒントの書き方 (for Python 3.9)</a></li>
+    <li>2020.03.19<a href="/articles/20200319/" title="ちょっとしたフロントエンドの開発で、TypeScriptに最初から対応していて、簡単に使えるものは何かないかな、と調べてみたメモです。React/Vue/Angularの場合はそれぞれの初期化コマンドで何から何まで用意してくれます。Next.js、Nuxt.js、Gatsbyなども、これらのビルドのステップを簡略化するコマンドを提供しています。基本的にこれらのウェブフロントエンドを開発するときには、小規模・中規模ぐらいならあんまり気にしなくておまかせでもいいと思います。今回は、それらのフレームワーク固有のビルドツールとは別に環境を作りたい人で、TypeScriptの環境が欲しい、ウェブの開発がしたい、という前提でいろいろ探してみました。">今あえてTypeScriptのビルド＆バンドルツールを探してみる</a></li>
 
-    <li>2020.05.28<a href="/articles/20200528/" title="Goでプロジェクトのフォルダ構成どうしよう、とググると見つかるStandard Go Project Layout(https://github.com/golang-standards/project-layout)。とはいえ、これはかなりコード量を増やしてしまう恐れがありますので、導入する場合のデメリットも考えておく方が良いです。">あなたのGoアプリ/ライブラリのパッケージ構成もっとシンプルでよくない？</a></li>
+    <li>2018.08.28<a href="/articles/20180828/" title="業務で用いたAWS Glueの概要・開発Tips・ハマったところについて共有します">5TB/日 のデータをAWS Glueでさばくためにやったこと（概要編</a></li>
 
-    <li>2020.05.12<a href="/articles/20200512/" title="TIG DXチーム　アルバイターの三村です．今回はHeadlessCMSを利用したタスクをやることになりました．私自身HeadlessCMSどころかCMSを聞いたことすら無かったので，初めてCMS使ってみるにあたって感じたことを共有出来たらと思い本記事を作成させていただいております．">日本製HeadlessCMSのmicroCMSを触ってみた</a></li>
+    <li>2021.04.09<a href="/articles/20210409/" title="前エントリーのGo 1.16のembedとchiとSingle Page Applicationでは、Vue.jsで生成したファイルをバンドルしました。Vue.jsや、Parcel V2でビルドしたコンテンツを配信するにはこれで問題ありません。しかし、React（Next.js）は要注意です。フロントエンドの環境整備をどうやって行うかはいつも悩みの種ですが、そんな中、僕が3年ほど前から他の人にお勧めしていたのがNext.jsでした">Go 1.16のgo:embedとNext.jsの相性が悪い問題と戦う</a></li>
 
-    <li>2020.03.31<a href="/articles/20200331/" title="サーバレス連載企画の第5回はCloudEvents(https://cloudevents.io/)を取り上げたいと思います。CloudEventsとは様々存在するイベントを統一的に扱いたいとの思いから登場した統一仕様です。2019.10.24にCNCF(https://www.cncf.io/)のIncubatorプロジェクトに昇格したらしく、同時にv1.0のSpecificationがリリースされています。">Serverless連載5: CloudEventsのGo版SDKをいじってみる</a></li>
+    <li>2021.01.08<a href="/articles/20210108/" title="はじめまして！Unity初心者の阿保です。このご時世でフューチャーも完全リモートワークとなり、便利になったことや不便になったことがあります。">自分の分身(3Dアバター)と自作ワールドを作ってみた</a></li>
+
+    <li>2021.03.21<a href="/articles/20210321/" title="タイトル通り、シェルスクリプトとLinuxコマンドをテーマにした連載を初めます。">シェルスクリプトとLinuxコマンド連載を初めます</a></li>
     </ul>
   </div>
   
@@ -620,11 +622,11 @@
 <div class="col-md-6 col-sm-6">
   <ul class="social-footer list-unstyled list-inline pull-right">
     
-    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect"><i class="fa fa-github"></i></a></li>
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
     
-    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog"><i class="fa fa-twitter"></i></a></li>
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
     
-    <li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li>
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
     
   </ul>
 </div>
