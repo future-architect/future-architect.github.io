@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>GCPで構築するサーバーレスデータレイク① | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="GCPで構築するサーバーレスデータレイク①はじめにこんにちは、TIG中神です。 GCPで構築するサーバーレスデータレイクの連載第1弾の記事となります。GCPでデータレイクを構築する場合のポイントについて連載形式でご紹介していければと思います。 データレイクとはまずはデータレイクがどのようなものなのか整理していきましょう。 データレイクとは？そもそもデータレイクとはどのような定義になるでしょうか。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GCPで構築するサーバーレスデータレイク① | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210224/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="GCPで構築するサーバーレスデータレイク①はじめにこんにちは、TIG中神です。 GCPで構築するサーバーレスデータレイクの連載第1弾の記事となります。GCPでデータレイクを構築する場合のポイントについて連載形式でご紹介していければと思います。 データレイクとはまずはデータレイクがどのようなものなのか整理していきましょう。 データレイクとは？そもそもデータレイクとはどのような定義になるでしょうか。">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210224/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210224/image_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210224/image_3.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210224/image_4.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210224/image_5.png">
+<meta property="article:published_time" content="2021-02-23T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-11T08:20:25.044Z">
+<meta property="article:tag" content="GCP">
+<meta property="article:tag" content="データレイク">
+<meta property="article:tag" content="要件定義">
+<meta property="article:tag" content="設計">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210224/image.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="GCP,データレイク,要件定義,設計" name="keywords">
+  <meta content="中神孝士" name="author">
+
+  <link rel="stylesheet" href="/metronic/assets/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20210224/">GCPで構築するサーバーレスデータレイク①</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20210224_GCPで構築するサーバーレスデータレイク①" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+      <li class="blog-info-item"><a href="/authors/%E4%B8%AD%E7%A5%9E%E5%AD%9D%E5%A3%AB">中神孝士</a></li>
+      <li class="blog-info-item"><time datetime="2021-02-23T15:00:00.000Z" itemprop="datePublished">2021/02/24</time>
+</li>
+      <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/GCP/" title="GCP">GCP</a></li> 
+  
+    <li><a href="/tags/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%AC%E3%82%A4%E3%82%AF/" title="データレイク">データレイク</a></li> 
+  
+    <li><a href="/tags/%E8%A6%81%E4%BB%B6%E5%AE%9A%E7%BE%A9/" title="要件定義">要件定義</a></li> 
+  
+    <li><a href="/tags/%E8%A8%AD%E8%A8%88/" title="設計">設計</a>
+  
+  </ul>
+
+</li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="GCPで構築するサーバーレスデータレイク①"><a href="#GCPで構築するサーバーレスデータレイク①" class="headerlink" title="GCPで構築するサーバーレスデータレイク①"></a>GCPで構築するサーバーレスデータレイク①</h1><h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは、TIG中神です。</p>
+<p>GCPで構築するサーバーレスデータレイクの連載第1弾の記事となります。GCPでデータレイクを構築する場合のポイントについて連載形式でご紹介していければと思います。</p>
+<h2 id="データレイクとは"><a href="#データレイクとは" class="headerlink" title="データレイクとは"></a>データレイクとは</h2><p>まずはデータレイクがどのようなものなのか整理していきましょう。</p>
+<h3 id="データレイクとは？"><a href="#データレイクとは？" class="headerlink" title="データレイクとは？"></a>データレイクとは？</h3><p>そもそもデータレイクとはどのような定義になるでしょうか。</p>
+<p>Wikipediaでは<a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%AC%E3%82%A4%E3%82%AF">データレイク</a>は以下のように定義されていますね。</p>
+<blockquote>
+<p>データレイク (Data lake) は構造化/非構造化データやバイナリ等のファイル含めたデータを一元的に格納するデータリポジトリ。<br>一般的に、データレイクはレポート、可視化、分析、機械学習に利用されるエンタープライズのデータのコピーや返還後のデータを一カ所に集約する。<br>データレイクはリレーショナルデータベースの構造化データ（列と行）や、半構造化データ（CSV、ログ、XML、JSON）、非構造化データ（Eメール、ドキュメント、PDF）、バイナリデータ（画像、音声、映像）を含めることができる。<br>適切に管理されておらず、ユーザが意図するデータへのアクセシビリティが低く、小さな価値しか提供できない低品質のデータレイクはデータの沼と表現される。</p>
+</blockquote>
+<p>その他、主要なクラウドベンダーも以下のように定義しています。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/solutions/data-lake?hl=ja">(GCP) データレイクのモダナイゼーション</a><br><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/big-data/datalakes-and-analytics/what-is-a-data-lake/">(AWS) データレイクとは - Amazon Web Services (AWS)</a><br><a target="_blank" rel="noopener" href="https://azure.microsoft.com/ja-jp/solutions/data-lake/">(Azure) Data Lake | Microsoft Azure</a></p>
+<p>各引用元の内容を要約すると以下のような特徴が浮かび上がってきます。<br>これらの条件を満たすものをデータレイクとして位置づけることが出来ると思います。</p>
+<ul>
+<li>構造化データ、半構造化データ、非構造化データなどデータのフォーマットに関わらず一元的にデータを保存する。</li>
+<li>保存したデータは分析、機械学習など様々な用途で利用される。</li>
+<li>データマートやデータウェアハウスとはアプローチが異なる。</li>
+</ul>
+<h4 id="データレイクで管理されるデータ群"><a href="#データレイクで管理されるデータ群" class="headerlink" title="データレイクで管理されるデータ群"></a>データレイクで管理されるデータ群</h4><table>
+<thead>
+<tr>
+<th align="left">データ種別</th>
+<th align="left">例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">構造化データ</td>
+<td align="left">RDBMS、CSVなどの行列データ</td>
+</tr>
+<tr>
+<td align="left">半構造化データ</td>
+<td align="left">XML、JSONなど</td>
+</tr>
+<tr>
+<td align="left">非構造化データ</td>
+<td align="left">画像、音声、映像やPDFデータなど</td>
+</tr>
+</tbody></table>
+<h3 id="データレイクアプローチ"><a href="#データレイクアプローチ" class="headerlink" title="データレイクアプローチ"></a>データレイクアプローチ</h3><p>データレイクの特徴の一つに「データマートやデータウェアハウスとはアプローチが異なる」というものがありましたが具体的にはどのような事なのか記載します。</p>
+<p>データレイクの検討を進めるにあたり大きな考え方として、トップダウン的な考え方とボトムアップ的な考え方の2種類があるのでご紹介します。</p>
+<p><img src="/images/20210224/image.png"></p>
+<h4 id="それぞれのアプローチによる違い"><a href="#それぞれのアプローチによる違い" class="headerlink" title="それぞれのアプローチによる違い"></a>それぞれのアプローチによる違い</h4><ul>
+<li>トップダウン的なアプローチの特徴<ul>
+<li>企画時点で利用目的がはっきりしており、要件や目的に基づいて具体化していく。</li>
+<li>半面、用途がはっきりしている分アドホックな作りになり拡張性が損なわれやすいリスクもあり。</li>
+<li>企画時点で第3者に導入効果を説明しやすい。</li>
+<li>要件や目的に基づいて具体化するため導入効果が早めに出やすい。</li>
+</ul>
+</li>
+<li>ボトムアップ的なアプローチの特徴<ul>
+<li>企画時点でどのようにデータ活用するか明確ではないため、まずはデータ収集して観察や仮説に基づき具体化していく。</li>
+<li>半面、検討に正解がないため品質や利用価値の低いデータレイク（泥沼化）となるリスクもある。</li>
+<li>企画時点で第3者に導入効果を説明しにくい。</li>
+<li>運用の中でPoCや拡張を継続的に行って検証していく必要があるため導入効果が出るまで時間がかかる。</li>
+</ul>
+</li>
+</ul>
+<h4 id="どちらかのアプローチが望ましいのか？"><a href="#どちらかのアプローチが望ましいのか？" class="headerlink" title="どちらかのアプローチが望ましいのか？"></a>どちらかのアプローチが望ましいのか？</h4><p>アプローチとしてはどちらも正しいと言えます。ただし、企画時点の状況や最終的な目標をどこに置くのかによって柔軟にアプローチを変化させる必要があると考えます。<br>例えば、特定の利用に限定したDWHやデータマートで十分なのであればアドホックなシステムとしてトップダウンアプローチで検討していけばいいと思いますし、幅広いデータを保存するデータレイクを検討したいのであればボトムアップアプローチで検討を進めていければいいと思います。</p>
+<p>ただ、現実的には下記で言う真ん中のパターン（ハイブリッド）が多いと思いますので、それぞのアプローチの特性や、将来像などを加味してバランスを取りながら検討を進めていく事が重要であると考えます。</p>
+<ul>
+<li>トップダウン的なアプローチが適している<ul>
+<li>特定の利用に限定したDWHやデータマートで十分</li>
+</ul>
+</li>
+<li>トップダウンとボトムアップアプローチのハイブリッドが適している<ul>
+<li>企画時点では特定の利用限定で大丈夫だが最終的にはデータレイクとして拡張していきたい</li>
+</ul>
+</li>
+<li>ボトムアップ的なアプローチが適している<ul>
+<li>幅広いデータを保存するデータレイクを検討したい</li>
+</ul>
+</li>
+</ul>
+<h2 id="データレイクのシステム化"><a href="#データレイクのシステム化" class="headerlink" title="データレイクのシステム化"></a>データレイクのシステム化</h2><p>前置きが長くなりましたが、上記のような検討を経て、実際にどのようにシステム化するかというところですがデータレイクの特性上、どの程度のデータ量を扱うのか？どの程度のクエリが実行されるのか？あらかじめ定義することが難しいので拡張性の高いクラウドプラットフォームを活用していく事が基本的な方針になるかと思います。</p>
+<p>その中でもGoogle Cloud Platform（以下、GCP）を使うと、比較的容易にさらにサーバーレスでデータレイクを構築することができるため小規模・低コストで進めて徐々に規模を拡大していきたいような要望の場合は特に適しているのではないかと思います。</p>
+<h3 id="データレイクのサービスレベル"><a href="#データレイクのサービスレベル" class="headerlink" title="データレイクのサービスレベル"></a>データレイクのサービスレベル</h3><p>また、サーバーレスでデータレイクを構築していくにおいても、通常のシステムと同じようにどの程度のサービスレベルで提供するかという検討が非常に重要になります。内容はいわゆる非機能の定義とほぼ同じですが、データレイクで特に重要なポイントとしては以下のようなところがあげられます。</p>
+<ul>
+<li>可用性<ul>
+<li>システムの重要度（データレイク停止による業務影響など）、サービス継続性、メンテンナス時間の確保</li>
+<li>BCP対策の有無、バックアップなど</li>
+</ul>
+</li>
+<li>性能/拡張性<ul>
+<li>可能な限りオートスケール構成とする</li>
+<li>おおよその処理量やデータ量の見込みをたてる（処理量やデータ量を明確に定義することは難しいが可能な範囲で）</li>
+<li>利用するプロダクトの制約・制限の把握など</li>
+</ul>
+</li>
+<li>セキュリティ<ul>
+<li>企業や業界で準拠すべき規約やルール、個人情報の取り扱い有無、インターネットアクセスなど</li>
+</ul>
+</li>
+<li>運用性<ul>
+<li>監視、認証など既存のシステムとの連携</li>
+<li>データレイク導入後のデータ追加や利用者追加などの運用作業項目や運用体制の確立</li>
+<li>運用作業は極力汎化してシンプルなものにしておくなど（特定業務向けの作業や人依存になるような運用は避ける）</li>
+</ul>
+</li>
+</ul>
+<h3 id="データレイクの構成要素"><a href="#データレイクの構成要素" class="headerlink" title="データレイクの構成要素"></a>データレイクの構成要素</h3><p>それでは次にデータレイクを構成するためにどのような要素が必要なのか見ていきましょう。</p>
+<p>以下はGoogleの<a target="_blank" rel="noopener" href="https://services.google.com/fh/files/misc/principles_best_practices_for_data-governance.pdf?hl=ja">Principles and best practices for data governance in the world</a>でも使用されている概念でGartner社により定義されたデータガバナンスのフレームワーク（Gartner, Applying Effective Data Governance to Secure Your Data Lake, Sanjeev Mohan, April 17, 2018）です。</p>
+<p><img src="/images/20210224/image_2.png"></p>
+<p>それぞれの要素で必要になる機能は概ね以下のようなところでしょうか。<br>これらをGCPのプロダクトを使って構成していく事になります。</p>
+<table>
+<thead>
+<tr>
+<th align="left">構成要素</th>
+<th align="left">機能群</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Ingestion</td>
+<td align="left">取り込み</td>
+</tr>
+<tr>
+<td align="left">Data Discovery and Curation</td>
+<td align="left">収集、分類、履歴、準備、品質管理</td>
+</tr>
+<tr>
+<td align="left">Data Management</td>
+<td align="left">データ管理、メタデータ管理、カタログ管理、マスタデータ管理、アーカイブ管理、品質管理</td>
+</tr>
+<tr>
+<td align="left">Data Privacy, Security and Access Management</td>
+<td align="left">データセキュリティ、物理的セキュリティ、暗号化、アクセス管理、監査</td>
+</tr>
+<tr>
+<td align="left">Consumption</td>
+<td align="left">利用</td>
+</tr>
+</tbody></table>
+<h3 id="GCPを用いたデータレイク"><a href="#GCPを用いたデータレイク" class="headerlink" title="GCPを用いたデータレイク"></a>GCPを用いたデータレイク</h3><p>これらのことを踏まえてGCPでデータレイクを構築する場合、以下のようなプロダクトの組み合わせで実現可能です。<br>特殊な要件がない限りはサーバーレスで実現可能ですので、インフラもコード化による構成管理がしやすい状態を保てると思います。<br>また、データマートやデータ分析はGCP以外の場所で行うといったようにマルチクラウドな構成に柔軟に発展させることも可能です。<br>※特殊な機能やカスタマイズが必要な場合は仮想サーバーやコンテナが必要になることもあります。</p>
+<p>以下は、<a target="_blank" rel="noopener" href="https://cloud.google.com/solutions/smart-analytics?hl=ja">Google Cloud スマート アナリティクス ソリューション</a>で定義されているGCPのデータ分析関連のプロダクトになります。<br><img src="/images/20210224/image_3.png"></p>
+<p>プロダクトの選択肢はいろいろありますが、データレイク関連で特に注目したいプロダクトの概要やポイントを以下に記載します。<br>※一部、上記の図に記載されていないプロダクトもあります。</p>
+<ul>
+<li><strong><a target="_blank" rel="noopener" href="https://cloud.google.com/data-catalog?hl=ja">Data Catalog</a></strong><ul>
+<li>フルマネージドでスケーラビリティの高いデータ検出およびメタデータ管理サービス</li>
+<li>構造化データ、半構造化データ、非構造化データに対するメタデータ（テクニカル、ビジネスメタデータ）の管理やタグ付けが可能</li>
+<li>DLPとの連携で個人情報に対するタグ付けも可能</li>
+</ul>
+</li>
+<li><strong><a target="_blank" rel="noopener" href="https://cloud.google.com/data-fusion?hl=ja">Cloud Data Fusion</a></strong><ul>
+<li>フルマネージドでクラウドネイティブなデータをあらゆる規模で統合可能</li>
+<li>GUIでETL/ELTパイプラインの作成およびデプロイが可能</li>
+<li>OSSのCDAPがベースであり互換性がある</li>
+<li>事前構成されたライブラリ群を利用してGUIでパイプラインを作成可能</li>
+<li>パイプラインはDataprocで実行される</li>
+<li>パイプラインの中でGCS、BigQueryはもちろん、AWS、Azure、Snowflakeなど外部サービスと連携する事も可能</li>
+</ul>
+</li>
+<li><strong><a target="_blank" rel="noopener" href="https://dataform.co/">Dataform</a></strong><ul>
+<li>DWH内のSQLベースの変換処理の順次実行定義が可能</li>
+<li>Googleのプロダクト以外にもAWS Redshift、Snowflake、Azure SQL Data Warehouseなどに対しても利用することが可能</li>
+</ul>
+</li>
+<li><strong><a target="_blank" rel="noopener" href="https://cloud.google.com/dlp?hl=ja">Cloud Data Loss Prevention</a></strong><ul>
+<li>機密性の高いデータを検出、分類、保護するためのフルマネージドサービス</li>
+<li>個人情報を含むデータを自動検出してマスクすることも可能</li>
+<li>Cloud KMSなどと組み合わせて柔軟な鍵管理を行う事も可能</li>
+</ul>
+</li>
+<li><strong><a target="_blank" rel="noopener" href="https://cloud.google.com/storage?hl=ja">Cloud Storage</a></strong><ul>
+<li>高耐久でスケーラブルなオブジェクトストレージ</li>
+<li>バケット単位でクラス、ライフサイクル、アクセス権限を設定することができ、データを層で管理したい場合に有用</li>
+</ul>
+</li>
+<li><strong><a target="_blank" rel="noopener" href="https://cloud.google.com/bigquery?hl=ja">BigQuery</a></strong><ul>
+<li>サーバーレスでスケーラビリティと費用対効果に優れたマルチクラウド データウェアハウス</li>
+<li>ANSI SQL を使用してペタバイト規模のデータを極めて高速に分析可能</li>
+<li>柔軟性の高いマルチクラウド分析ソリューションで、AWSなどクラウドをまたいだデータによる分析が可能</li>
+<li>また、カラム単位でアクセス制御など細かい単位でアクセス制御を行うことが可能</li>
+</ul>
+</li>
+<li><strong><a target="_blank" rel="noopener" href="https://cloud.google.com/looker?hl=ja">Looker</a></strong><ul>
+<li>ビジネス インテリジェンス、データ アプリケーション、組み込み型アナリティクス向けのエンタープライズプラットフォーム</li>
+<li>データへのアクセスポイントを一元化することで保存データ利用におけるガバナンスを利かせることが可能</li>
+<li>Google Cloud、AWS、Azure、オンプレミスのデータベースなど分散されたデータを統合的に管理することも可能</li>
+</ul>
+</li>
+</ul>
+<h3 id="リファレンスアーキテクチャ（ミニマム構成）と構成ポイント"><a href="#リファレンスアーキテクチャ（ミニマム構成）と構成ポイント" class="headerlink" title="リファレンスアーキテクチャ（ミニマム構成）と構成ポイント"></a>リファレンスアーキテクチャ（ミニマム構成）と構成ポイント</h3><p>これらのGCPプロダクトを用いたリファレンスアーキテクチャを以下に記載します。</p>
+<p>記載するアーキテクチャはミニマム構成となりますので、必要に応じてカスタマイズする事を前提とした構成になります。また、構成のパターンとしては大きくETLモデルとELTモデルに分かれますので状況に応じて使い分けることを想定しています。</p>
+<h4 id="ETLモデル"><a href="#ETLモデル" class="headerlink" title="ETLモデル"></a>ETLモデル</h4><p>Extract（抽出） Transform（変換） Load（書き出し）を行うモデル。</p>
+<p>データ収集後に、各種変換を行ってからデータベースに格納するモデル。<br>半構造化や非構造化データがある場合に適したモデル。</p>
+<p><img src="/images/20210224/image_4.png"></p>
+<h4 id="ELTモデル"><a href="#ELTモデル" class="headerlink" title="ELTモデル"></a>ELTモデル</h4><p>Extract（抽出） Load（書き出し）Transform（変換）を行うモデル。<br>データ収集後に、データベースに格納しデータベース上で各種変換等を行うモデル。<br>構造化データのみ扱う場合やSQLのみで加工や変換が完結する場合に適したモデル。</p>
+<p><img src="/images/20210224/image_5.png"></p>
+<h2 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h2><p>いかがでしたでしょうか？</p>
+<p>GCPを用いると比較的容易にデータレイクの構築ができるので、本来の目的であるデータ活用に重きを置いた検討が出来るのではと思います。今後もデータレイクの構成要素（データ収集、データ管理、データセキュリティ、データ利用）毎に、より詳細な部分を記事化していければと考えています。（不定期）</p>
+<p>特にボトムアップ的なアプローチとなる場合は、泥沼化させずにどうデータを運用管理していくか？といった部分が非常に重要になってきますのでそのようなポイントに触れるような感じで記事化できればと思っています。</p>
+<h2 id="参考資料"><a href="#参考資料" class="headerlink" title="参考資料"></a>参考資料</h2><p><strong>[Google資料]</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/solutions/data-lake?hl=ja">データレイクのモダナイゼーション</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/solutions/build-a-data-lake-on-gcp/?hl=ja">データレイクとしてのCloud Storage</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/solutions/smart-analytics?hl=ja">Google Cloud スマート アナリティクス ソリューションでイノベーションを促進する</a></li>
+<li><a target="_blank" rel="noopener" href="https://services.google.com/fh/files/misc/principles_best_practices_for_data-governance.pdf?hl=ja">Principles and best practices for data governance in the world</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/storage?hl=ja">Cloud Storage</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/data-catalog?hl=ja">Data Catalog</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/data-fusion?hl=ja">Cloud Data Fusion</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/dlp?hl=ja">Cloud Data Loss Prevention</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/bigquery?hl=ja">BigQuery</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/looker?hl=ja">Looker</a></li>
+<li><a target="_blank" rel="noopener" href="https://dataform.co/">Dataform</a></li>
+</ul>
+<p>以下は参照するためにユーザー登録が必要なります。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://cloudonair.withgoogle.com/events/solution-data-analytics?talk=analytics-session1-2">Google Cloud Smart Analytics ソリューションの方向性と最新アップデート情報</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloudonair.withgoogle.com/events/solution-data-analytics?talk=analytics-session2-2">GCP のデータパイプライン サービスの紹介と選び方</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.withgoogle.com/next/sf/sessions?gate=true&session=DA100-JP#data-analytics">Google Cloudでデータレイクを構築</a></li>
+</ul>
+<p><strong>[その他資料]</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%AC%E3%82%A4%E3%82%AF">データレイク - Wikipedia</a></li>
+<li><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/big-data/datalakes-and-analytics/what-is-a-data-lake/">(AWS) データレイクとは - Amazon Web Services (AWS)</a></li>
+<li><a target="_blank" rel="noopener" href="https://azure.microsoft.com/ja-jp/solutions/data-lake/">(Azure) Data Lake | Microsoft Azure</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li class="twitter-btn">
+      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210224/&via=future_techblog&related=twitterapi%2Ctwitter&text=GCP%E3%81%A7%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B%E3%82%B5%E3%83%BC%E3%83%90%E3%83%BC%E3%83%AC%E3%82%B9%E3%83%87%E3%83%BC%E3%82%BF%E3%83%AC%E3%82%A4%E3%82%AF%E2%91%A0"
+        onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li class="fb-btn">
+      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210224/&t=GCP%E3%81%A7%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B%E3%82%B5%E3%83%BC%E3%83%90%E3%83%BC%E3%83%AC%E3%82%B9%E3%83%87%E3%83%BC%E3%82%BF%E3%83%AC%E3%82%A4%E3%82%AF%E2%91%A0"
+        onclick="window.open(this.href, 'fbsharewindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li class="hatebu-btn">
+      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210224/"
+        onclick="window.open(this.href, 'hatebuwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="hatebu-btn-label">0</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li class="pocket-btn">
+      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210224/"
+        onclick="window.open(this.href, 'pocketwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="pocket-btn-label">3</span>
+      </a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+  </article>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav">
+      
+    <li>2021.05.11<a href="/articles/20210511b/" title="Dart/Flutter連載の2記事目です。はじめまして、TIGの宮崎将太です。突然ですがみなさん、Swagger使いたいですよね。">Flutter Swagger統合</a></li>
+
+    <li>2020.06.30<a href="/articles/20200630/" title="業務でヘビーユーズしているgo-swaggerについての開発Tipsをまとめました。">go-swaggerを用いたWebアプリケーション開発Tips19選</a></li>
+
+    <li>2020.05.30<a href="/articles/20200530/" title="IT企業の技術ブログ運営は、ある一定の質をキープしながらも、投稿頻度を高め・それを継続することが求められ、周囲の期待値もあるので中々気を抜けない仕事だと思います。単発ならともかく、継続することは忍耐が必要なので特に大変です。運営していてこれはナレッジだなと感じたことをまとめていきます。">フューチャー技術ブログの運営で心がけていること</a></li>
+
+    <li>2021.04.10<a href="/articles/20210410/" title="参加しているプロジェクトで、OpenAPI定義ファイルからモックサーバを建てることができるOSSツール「Prism」を導入することになりました。この記事では、Prism導入の手順や、躓いた点などを紹介します。">OpenAPIからモックサーバを建てられるPrismを実際のプロジェクトに導入してみた</a></li>
+
+    <li>2020.11.07<a href="/articles/20201107/" title="フューチャーOSS推進タスクフォースを開始しました。実は7月に発足してから8月には活動の骨子が固まり、タスクフォース自体は始動していましたが、中身を作ってから告知した方が具体性があってブレも無くなり良いのでは？という話があり、少しタイミングをずらしてのご報告です。">フューチャーOSS推進タスクフォース始めます</a></li>
+
+    <li>2020.09.30<a href="/articles/20200930/" title="Open Policy Agent（OPA）は汎用的なポリシーエンジンで、[Rego] と呼ばれるポリシー言語で定義されたルールに従って、入力がポリシーに沿っているか否かの判定を移譲させることができます。Regoで宣言的にポリシーを実装し、Policy as Code を実現できます。コーディング規約も一種のポリシーとみなして、Open API Spec（Swagger）をLinter的にチェックするツールを題材に、OPAを用いて開発してみたいと思います。">Policy as Code を実現する Open Policy Agent に憧れて。ポリシーコードでAPI仕様をLintする</a></li>
+
+    <li>2020.08.07<a href="/articles/20200807/" title="Go は標準ライブラリが充実しているとよく言われます。標準ライブラリだけで、HTTP サーバを作れたり、暗号化処理や、JSON や CSV といったデータ形式を扱うことができます">GoとSuffixArray</a></li>
+
+    <li>2020.07.03<a href="/articles/20200703/" title="エンタープライズでのミッションクリティカル領域においてもクラウド利用が普通になってきています。その過程において今までできないことを指向する試みも行われてきています。その代表的なものがクラウドの備えるリソースの高い拡張性と弾力性を利用したシステム展開です。例えば「より多くのデータを扱う」「同業他社に向けたサービス展開をする（マルチテナンシー）」といったものがあります。その際のアーキテクチャ選定では将来の利用を想定した選択を行う必要がありますが、データベースのスケールというのは非常に難しく簡単ではありません。">スケーラブルデータベース ～クラウドにおける後悔しないデータベース選定～</a></li>
+
+    <li>2020.02.19<a href="/articles/20200219/" title="普段は、Terraform を使っているのですが、ふとCloud Deployment Manager を使ったことないことに気づきました。そこで、Cloud Deployment Manager について紹介したいと思います。">GCP連載#10 Terraform ではなくCloud Deployment Manager を使ってみよう</a></li>
+
+    <li>2021.04.30<a href="/articles/20210430a/" title="こんにちは、辻です。先日開催されました [Go Conference 2021 spring] にTIGから渋川、辻の計2名が登壇しました。Go Conference'20 in Autumnではオンラインとオフラインのハイブリッドな構成でしたが、今回はGo Conference史上初となるフルオンラインでの開催となりました。">Go Conference 2021 Springに登壇しました</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+<!-- CATEGORIES START -->
+<h3 class="margin-top-30">カテゴリー</h3>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+    <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+    <li><a href="/categories/IoT/">IoT (14)</a></li>
+    
+    <li><a href="/categories/VR/">VR (10)</a></li>
+    
+    <li><a href="/categories/Security/">Security (2)</a></li>
+    
+    <li><a href="/categories/Design/">Design (7)</a></li>
+    
+    <li><a href="/categories/Programming/">Programming (168)</a></li>
+    
+    <li><a href="/categories/Management/">Management (9)</a></li>
+    
+    <li><a href="/categories/Infrastructure/">Infrastructure (131)</a></li>
+    
+    <li><a href="/categories/DB/">DB (14)</a></li>
+    
+    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+    
+    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+          <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+          <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+              t._e.push(f);
+            };
+            return t;
+          }(document, "script", "twitter-wjs"));</script>
+          
+            <!-- BEGIN TWITTER BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <!-- Twitterフォローボタン -->
+              <li class="twitter-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                </a>
+              </li>
+              <!-- Twitterタイムライン -->
+              <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+            </div>
+            <!-- END TWITTER BLOCK -->
+          
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+            &copy; 2021 フューチャー技術ブログ<br>
+          </div>
+          <!-- END COPYRIGHT -->
+	        <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
+    
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
+    
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

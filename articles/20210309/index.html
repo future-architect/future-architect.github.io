@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>PubSubのメッセージスキーマを試してみる | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTIG DXユニット真野です。 GCP連載2021の1日目です。2020年のGCP連載でもCloud Loggingネタでトップバッター、2021年も先陣を切ることができて光栄です。 本記事では2021年3月に発表されたCloud PubSubのメッセージスキーマを試します。  Creating and managing schemas  なお、2021&#x2F;03&#x2F;07時点ではプレビューである">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PubSubのメッセージスキーマを試してみる | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210309/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIG DXユニット真野です。 GCP連載2021の1日目です。2020年のGCP連載でもCloud Loggingネタでトップバッター、2021年も先陣を切ることができて光栄です。 本記事では2021年3月に発表されたCloud PubSubのメッセージスキーマを試します。  Creating and managing schemas  なお、2021&#x2F;03&#x2F;07時点ではプレビューである">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210309/cps_integration.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210309/pubsub_schema.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210309/image.png">
+<meta property="article:published_time" content="2021-03-08T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-11T08:20:25.304Z">
+<meta property="article:tag" content="GCP">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="GCP連載">
+<meta property="article:tag" content="PubSub">
+<meta property="article:tag" content="スキーマ">
+<meta property="article:tag" content="Avro">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210309/cps_integration.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="GCP,Go,GCP連載,PubSub,スキーマ,Avro" name="keywords">
+  <meta content="真野隼記" name="author">
+
+  <link rel="stylesheet" href="/metronic/assets/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20210309/">PubSubのメッセージスキーマを試してみる</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20210309_PubSubのメッセージスキーマを試してみる" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+      <li class="blog-info-item"><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98">真野隼記</a></li>
+      <li class="blog-info-item"><time datetime="2021-03-08T15:00:00.000Z" itemprop="datePublished">2021/03/09</time>
+</li>
+      <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/GCP/" title="GCP">GCP</a></li> 
+  
+    <li><a href="/tags/Go/" title="Go">Go</a></li> 
+  
+    <li><a href="/tags/GCP%E9%80%A3%E8%BC%89/" title="GCP連載">GCP連載</a></li> 
+  
+    <li><a href="/tags/PubSub/" title="PubSub">PubSub</a></li> 
+  
+    <li><a href="/tags/%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E/" title="スキーマ">スキーマ</a></li> 
+  
+    <li><a href="/tags/Avro/" title="Avro">Avro</a>
+  
+  </ul>
+
+</li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG DXユニット真野です。</p>
+<p><a href="/articles/20210307/">GCP連載2021</a>の1日目です。2020年のGCP連載でも<a href="https://future-architect.github.io/articles/20200205/">Cloud Loggingネタでトップバッター</a>、2021年も先陣を切ることができて光栄です。</p>
+<p>本記事では2021年3月に発表されたCloud PubSubのメッセージスキーマを試します。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/pubsub/docs/schemas">Creating and managing schemas</a></li>
+</ul>
+<p>なお、2021/03/07時点では<strong>プレビュー</strong>であるのでご注意ください。今後フィードバックにより挙動なり設定方法が変更される可能性があります。</p>
+<h1 id="Cloud-PubSubとは"><a href="#Cloud-PubSubとは" class="headerlink" title="Cloud PubSubとは"></a>Cloud PubSubとは</h1><p><img src="/images/20210309/cps_integration.png"></p>
+<p>公式ドキュメントから引用します。</p>
+<blockquote>
+<p>Pub/Sub は、イベントを処理するサービスとイベントを生成するサービスを切り離す非同期メッセージング サービスです。メッセージング指向のミドルウェア（ストリーミング分析パイプラインにイベントの取り込みと配信を行う）として、Pub/Sub を使用できます。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/pubsub/docs/overview">https://cloud.google.com/pubsub/docs/overview</a></p>
+</blockquote>
+<p>メッセージングということで、当然1:N（ファンアウト）、N:1（ファンイン）、N:Nなどの通信が可能です。書き込み側をPublisher、読み込み側をSubscriberと呼びます。あとはAt-Least-Onceな配信（つまりSubscriber側が重複したメッセージを受け取ってしまうことがある）であるといったことが重要事項でしょうか。</p>
+<p>この技術ブログでは、<a href="https://future-architect.github.io/articles/20191112/">Go Cloud#2 Pub/Subの概要紹介</a>や、<a href="https://future-architect.github.io/articles/20191128/">Go Cloud#7 PubSubドライバー(pubだけ)を実装してみる
+</a> といった関連記事があります。</p>
+<h1 id="PubSubのメッセージスキーマ機能とは"><a href="#PubSubのメッセージスキーマ機能とは" class="headerlink" title="PubSubのメッセージスキーマ機能とは"></a>PubSubのメッセージスキーマ機能とは</h1><p>PubSubのあるトピックに対してスキーマを紐付け、Publishする時に検証を行うことができるようになりました。（待望の機能ですね！）</p>
+<p>今のところは、以下のスキーマが利用できるとのこと。</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://avro.apache.org/docs/current/spec.html#schemas">Apache Avro</a></li>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/protocol-buffers/docs/overview">Protocol Buffer</a></li>
+</ol>
+<p>個人的には、JSON Schemaが欲しかったところですが、エンコーディングをJSONにすれば、JSONの検証も可能です。今後の拡張に期待しましょう。</p>
+<p>Apache AvroはConfluent Schema Registryを意識しているからでしょうか。Kakfaユーザも乗り換えがしやすいかもしれませんね。Protocol Bufferでの検証が可能ということですが、PubSubはgRPCインターフェースでのPublishが可能です。つまり指定されたProtocol Bufferのスキーマで検証しつつ、gRPCでのやり取りもできそうです。凄い。</p>
+<h1 id="スキーマで嬉しいこと"><a href="#スキーマで嬉しいこと" class="headerlink" title="スキーマで嬉しいこと"></a>スキーマで嬉しいこと</h1><p>従来のPubSubは（AWS Kinesis DataStreamsなどでも）以下のようにどんなメッセージでもバイナリ形式で登録可能でした。</p>
+<figure class="highlight go"><figcaption><span>pubsubのサンプル.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">topic, err := pubsubClient.CreateTopic(context.Background(), <span class="string">&quot;&lt;トピック名&gt;&quot;</span>)</span><br><span class="line"></span><br><span class="line">res := topic.Publish(ctx, &amp;pubsub.Message&#123;Data: []<span class="keyword">byte</span>(<span class="string">&quot;&lt;任意のバイナリ&gt;&quot;</span>)&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>なんでもとりあえずPublishできるので楽なのですが、Subscribe側では困ったことになりがちです。<br>例えば、Subscribe側でスキーマ付きのデータストア（BigQueryやCloudSQLなど）に永続化する場合に、登録が失敗するようなレイアウト違反のデータを扱う必要があります。具体的には、Dead Letter Queue（DLQ）に登録したり、エラーログを出してシステムリカバリ運用に乗せたりを検討する必要がありました。</p>
+<p><img src="/images/20210309/pubsub_schema.png"></p>
+<p>これがHTTPのAPIであれば、HTTPレスポンスでエラーメッセージを応答することで、クライアント（今回だとPublisher）側に通知することができましたが、PubSubを経由すると、Enterprise Integration Patternでいう<a target="_blank" rel="noopener" href="https://www.enterpriseintegrationpatterns.com/patterns/messaging/RequestReply.html">Request-Reply</a>を実装するのであれば別ですが、これはこれで両者がアプリケーションレベルで密結合になりますし、実装もそう簡単ではありません。</p>
+<p>今回のメッセージスキーマ機能を用いると、Publisher側が明らかに契約違反のメッセージを連携した場合に早期にNGを返すことができるので、今後はこの手の考慮事項を減らすことできます。嬉しいですね。</p>
+<h1 id="試してみる"><a href="#試してみる" class="headerlink" title="試してみる"></a>試してみる</h1><p>GCPプロジェクトは<a target="_blank" rel="noopener" href="https://cloud.google.com/resource-manager/docs/creating-managing-projects">こちら</a>の手順に従い作成します。また、gcloudコマンドも<a target="_blank" rel="noopener" href="https://cloud.google.com/sdk/docs/install">こちら</a>に従いインストールしておきます。</p>
+<p>今回はAvroスキーマを利用します。コードは<a target="_blank" rel="noopener" href="https://github.com/ma91n/pubsubschema">こちら</a>に上げています。</p>
+<h2 id="①スキーマ付きトピックの作成"><a href="#①スキーマ付きトピックの作成" class="headerlink" title="①スキーマ付きトピックの作成"></a>①スキーマ付きトピックの作成</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://console.cloud.google.com/iam-admin/serviceaccounts">IAMと管理</a>からPubSubの管理者権限を付与したサービスアカウントを作成し、鍵（JSONファイル）をダウロードします</li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/docs/authentication/getting-started">ここ</a>の手順に従い、取得した鍵のパスに環境変数を通します<ul>
+<li><code>export GOOGLE_APPLICATION_CREDENTIALS=&lt;ダウンロードパス&gt;.json</code></li>
+</ul>
+</li>
+<li>gcloudコマンドからトピックと、スキーマを作成します</li>
+</ol>
+<figure class="highlight bash"><figcaption><span>avroスキーマ作成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gcloud beta pubsub schemas create avroschema1 \</span><br><span class="line">    --<span class="built_in">type</span>=AVRO \</span><br><span class="line">    --definition=&#123;<span class="string">&quot;type&quot;</span>:<span class="string">&quot;record&quot;</span>,<span class="string">&quot;name&quot;</span>:<span class="string">&quot;Avro&quot;</span>,<span class="string">&quot;fields&quot;</span>:[&#123;<span class="string">&quot;name&quot;</span>:<span class="string">&quot;StringField&quot;</span>,<span class="string">&quot;type&quot;</span>:<span class="string">&quot;string&quot;</span>&#125;,&#123;<span class="string">&quot;name&quot;</span>:<span class="string">&quot;FloatField&quot;</span>,<span class="string">&quot;type&quot;</span>:<span class="string">&quot;float&quot;</span>&#125;,&#123;<span class="string">&quot;name&quot;</span>:<span class="string">&quot;BooleanField&quot;</span>,<span class="string">&quot;type&quot;</span>:<span class="string">&quot;boolean&quot;</span>&#125;]&#125;</span><br></pre></td></tr></table></figure>
+
+<p>続いてトピックを作成します。管理コンソールからだと以下のように、<strong>スキーマを使用する</strong> のチェックボックスが増えていました。</p>
+<p><img src="/images/20210309/image.png"></p>
+<p>今回はgcloud経由で作成します。<a target="_blank" rel="noopener" href="https://cloud.google.com/pubsub/docs/admin#gcloud">こちら</a>の説明に従いオプションを追加します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;gcloud beta pubsub topics create avrotopic \</span><br><span class="line">        --message-encoding=JSON \</span><br><span class="line">        --schema=avroschema1</span><br><span class="line">Created topic [projects/&lt;YOUR PROJECT ID&gt;/topics/avrotopic].</span><br></pre></td></tr></table></figure>
+
+<p>登録内容をgcloud経由で確認すると、以下の用に設定されています。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># トピックの情報</span></span><br><span class="line">$ gcloud pubsub topics describe avrotopic</span><br><span class="line">name: projects/&lt;YOUR PROJECT ID&gt;/topics/avrotopic</span><br><span class="line">schemaSettings:</span><br><span class="line">  encoding: JSON</span><br><span class="line">  schema: projects/&lt;YOUR PROJECT ID&gt;/schemas/avroschema1</span><br><span class="line"></span><br><span class="line"><span class="comment"># スキーマの状態</span></span><br><span class="line">&gt;gcloud beta pubsub schemas describe avroschema1</span><br><span class="line">definition: <span class="string">&#x27;&#123;&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;Avro&quot;,&quot;fields&quot;:[&#123;&quot;name&quot;:&quot;StringField&quot;,&quot;type&quot;:&quot;string&quot;&#125;,&#123;&quot;name&quot;:&quot;FloatField&quot;,&quot;type&quot;:&quot;float&quot;&#125;,&#123;&quot;name&quot;:&quot;BooleanField&quot;,&quot;type&quot;:&quot;boolean&quot;&#125;]&#125;&#x27;</span></span><br><span class="line">name: projects/&lt;YOUR PROJECT ID&gt;/schemas/avroschema1</span><br><span class="line"><span class="built_in">type</span>: AVRO</span><br></pre></td></tr></table></figure>
+
+<h2 id="②Publishしてみる"><a href="#②Publishしてみる" class="headerlink" title="②Publishしてみる"></a>②Publishしてみる</h2><p>Go SDK経由でPublishしてみます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;cloud.google.com/go/pubsub&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line"></span><br><span class="line">	c, err := pubsub.NewClient(ctx, <span class="string">&quot;&lt;YOUR PROJECT ID&gt;&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">	topic := c.Topic(<span class="string">&quot;avrotopic&quot;</span>) <span class="comment">// 今回作成したトピック名</span></span><br><span class="line"></span><br><span class="line">	data := []<span class="keyword">string</span>&#123;</span><br><span class="line">		<span class="string">`&#123;&quot;StringField&quot;:&quot;hello&quot;, &quot;FloatField&quot;:123.45, &quot;BooleanField&quot;:true&#125;`</span>,</span><br><span class="line">		<span class="string">`&#123;&quot;StringField&quot;:&quot;world&quot;, &quot;FloatField&quot;:0, &quot;BooleanField&quot;:false&#125;`</span>,</span><br><span class="line">		<span class="string">`&#123;&quot;NGField&quot;:&quot;dummy&quot;&#125;`</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, v := <span class="keyword">range</span> data &#123;</span><br><span class="line">		res := topic.Publish(ctx, &amp;pubsub.Message&#123;</span><br><span class="line">			Data: []<span class="keyword">byte</span>(v),</span><br><span class="line">		&#125;)</span><br><span class="line">		<span class="keyword">if</span> _, err := res.Get(ctx); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Fatal(err)</span><br><span class="line">		&#125;</span><br><span class="line">		fmt.Println(<span class="string">&quot;success publish&quot;</span>, v)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>動かしてみると、登録したAvroスキーマ違反な3番目の入力をPublishする時にエラーになります。まだ、go-sdk側にメッセージスキーマのエラーハンドリンクが組み込まれていないのか、色気がない内容ですね。</p>
+<figure class="highlight bash"><figcaption><span>実行結果</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;go run main.go</span><br><span class="line">success publish &#123;<span class="string">&quot;StringField&quot;</span>:<span class="string">&quot;hello&quot;</span>, <span class="string">&quot;FloatField&quot;</span>:123.45, <span class="string">&quot;BooleanField&quot;</span>:<span class="literal">true</span>&#125;</span><br><span class="line">success publish &#123;<span class="string">&quot;StringField&quot;</span>:<span class="string">&quot;world&quot;</span>, <span class="string">&quot;FloatField&quot;</span>:0, <span class="string">&quot;BooleanField&quot;</span>:<span class="literal">false</span>&#125;</span><br><span class="line">2021/03/07 16:20:20 rpc error: code = InvalidArgument desc = Request contains an invalid argument.</span><br></pre></td></tr></table></figure>
+
+<p>エラーメッセージの表示内容はさておき、メッセージスキーマによってPublisher側が良からぬメッセージを連携してしまうことは防ぐことができました。</p>
+<h1 id="Avroスキーマの検証"><a href="#Avroスキーマの検証" class="headerlink" title="Avroスキーマの検証"></a>Avroスキーマの検証</h1><p>Avroスキーマの動作検証ですが、gcloudコマンドの<code>pubsub schemas validate-message</code>で検証することができます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 正常なケース</span></span><br><span class="line">&gt; gcloud beta pubsub schemas validate-message \</span><br><span class="line">        --message-encoding=json \</span><br><span class="line">        --message=&#123;<span class="string">&quot;StringField&quot;</span>:<span class="string">&quot;hello&quot;</span>,<span class="string">&quot;FloatField&quot;</span>:123.45,<span class="string">&quot;BooleanField&quot;</span>:<span class="literal">true</span>&#125; ^</span><br><span class="line">        --schema-name=avroschema1</span><br><span class="line">&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 明らかにNGなケース</span></span><br><span class="line">&gt; gcloud beta pubsub schemas validate-message \</span><br><span class="line">        --message-encoding=json \</span><br><span class="line">        --message=&#123;<span class="string">&quot;NGField&quot;</span>:<span class="string">&quot;dummy&quot;</span>&#125; \</span><br><span class="line">        --schema-name=avroschema1</span><br><span class="line">ERROR: (gcloud.beta.pubsub.schemas.validate-message) INVALID_ARGUMENT: Request contains an invalid argument.</span><br></pre></td></tr></table></figure>
+
+<p>こちらもエラーメッセージに優しさは無いので、今後の拡張に期待です。</p>
+<p>どの程度ちゃんとスキーマを検証してくれるかもう少し細かく突っ込んでみます。<code>BooleanField</code>を文字列<code>xxx</code>を入れてみます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;gcloud beta pubsub schemas validate-message \</span><br><span class="line">     --message-encoding=json \</span><br><span class="line">     --message=&#123;<span class="string">&quot;StringField&quot;</span>:<span class="string">&quot;hello&quot;</span>,<span class="string">&quot;FloatField&quot;</span>:123.45,<span class="string">&quot;BooleanField&quot;</span>:<span class="string">&quot;xxx&quot;</span>&#125; \</span><br><span class="line">     --schema-name=avroschema1</span><br><span class="line">ERROR: (gcloud.beta.pubsub.schemas.validate-message) INVALID_ARGUMENT: Request contains an invalid argument.</span><br></pre></td></tr></table></figure>
+
+<p>無事エラーになりました。同様に<code>FloatField</code>に数値以外の文字列を入れてもエラー担ってくれました。</p>
+<p>スキーママイグレーションの前方互換性で重要そうな、スキーマに存在しないフィールド<code>extra</code>を追加してみます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;gcloud beta pubsub schemas validate-message \</span><br><span class="line">        --message-encoding=json \</span><br><span class="line">        --message=&#123;<span class="string">&quot;StringField&quot;</span>:<span class="string">&quot;hello&quot;</span>,<span class="string">&quot;FloatField&quot;</span>:123.45,<span class="string">&quot;BooleanField&quot;</span>:<span class="literal">true</span>,<span class="string">&quot;extra&quot;</span>:<span class="string">&quot;aaa&quot;</span>&#125; \</span><br><span class="line">        --schema-name=avroschema1</span><br><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これは実行結果が<code>&#123;&#125;</code>なので問題ないようです。</p>
+<h2 id="エンコードにバイナリを指定する"><a href="#エンコードにバイナリを指定する" class="headerlink" title="エンコードにバイナリを指定する"></a>エンコードにバイナリを指定する</h2><p>続いて、スキーマのエンコードに<code>バイナリ</code>を指定します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;gcloud beta pubsub topics create avrotopic2 \</span><br><span class="line">        --message-encoding=BINARY \</span><br><span class="line">        --schema=avroschema1</span><br><span class="line">Created topic [projects/&lt;YOUR PROJECT ID&gt;/topics/avrotopic2].</span><br></pre></td></tr></table></figure>
+
+<p>GoでAvroを利用するために、<code>github.com/linkedin/goavro/v2</code> を利用します</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="comment">// 略</span></span><br><span class="line">	<span class="string">&quot;github.com/linkedin/goavro/v2&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Goのデータ構造をAvro形式に変換するコーデック</span></span><br><span class="line"><span class="keyword">var</span> codec, _ = goavro.NewCodec(<span class="string">`</span></span><br><span class="line"><span class="string">   &#123;</span></span><br><span class="line"><span class="string">	 &quot;type&quot; : &quot;record&quot;,</span></span><br><span class="line"><span class="string">	 &quot;name&quot; : &quot;Avro&quot;,</span></span><br><span class="line"><span class="string">	 &quot;fields&quot; : [</span></span><br><span class="line"><span class="string">	   &#123;&quot;name&quot; : &quot;StringField&quot;, &quot;type&quot; : &quot;string&quot;&#125;,</span></span><br><span class="line"><span class="string">	   &#123;&quot;name&quot; : &quot;FloatField&quot;, &quot;type&quot; : &quot;float&quot;&#125;,</span></span><br><span class="line"><span class="string">	   &#123;&quot;name&quot; : &quot;BooleanField&quot;, &quot;type&quot; : &quot;boolean&quot;&#125;</span></span><br><span class="line"><span class="string">	 ]</span></span><br><span class="line"><span class="string">	&#125;</span></span><br><span class="line"><span class="string">`</span>)</span><br></pre></td></tr></table></figure>
+
+<p>これを用いて実行します。登録は <code>map[string]interface&#123;&#125;</code> を先程作成した<code>codec</code>で変換して登録します。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	c, err := pubsub.NewClient(ctx, <span class="string">&quot;&lt;YOUR PROJECT ID&gt;&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">	topic := c.Topic(<span class="string">&quot;avrotopic2&quot;</span>) <span class="comment">// 先程作成したトピック</span></span><br><span class="line"></span><br><span class="line">	data := []<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">interface</span>&#123;&#125;&#123;</span><br><span class="line">		&#123;<span class="string">&quot;StringField&quot;</span>: <span class="string">&quot;hello&quot;</span>, <span class="string">&quot;FloatField&quot;</span>: <span class="number">123.45</span>, <span class="string">&quot;BooleanField&quot;</span>: <span class="literal">true</span>&#125;,</span><br><span class="line">		&#123;<span class="string">&quot;NGField&quot;</span>: <span class="string">&quot;dummy&quot;</span>&#125;,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, v := <span class="keyword">range</span> data &#123;</span><br><span class="line">		binary, err := codec.BinaryFromNative(<span class="literal">nil</span>, v)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Fatal(<span class="string">&quot;codec.BinaryFromNative&quot;</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		res := topic.Publish(ctx, &amp;pubsub.Message&#123;</span><br><span class="line">			Data: binary,</span><br><span class="line">		&#125;)</span><br><span class="line">		<span class="keyword">if</span> _, err := res.Get(ctx); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Fatal(err)</span><br><span class="line">		&#125;</span><br><span class="line">		fmt.Println(<span class="string">&quot;success publish&quot;</span>, v)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>事項すると、1つ目の入力はOK、2つ目はクライアント側のAvro形式への変換でエラーで落ちました。クライアントサイドで落ちた方がエラーメッセージは切り分けしやすいですね。</p>
+<figure class="highlight bash"><figcaption><span>実行結果</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;go run main.go</span><br><span class="line">success publish map[BooleanField:<span class="literal">true</span> FloatField:123.45 StringField:hello]</span><br><span class="line">2021/03/07 16:48:41 codec.BinaryFromNativecannot encode binary record <span class="string">&quot;Avro&quot;</span> field <span class="string">&quot;StringField&quot;</span>: schema does not specify default value and no value provided</span><br></pre></td></tr></table></figure>
+
+<p>念の為、不正なバイナリ値を送信してみます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	c, err := pubsub.NewClient(ctx, <span class="string">&quot;&lt;YOUR PROJECT ID&gt;&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	res := c.Topic(<span class="string">&quot;avrotopic2&quot;</span>).Publish(ctx, &amp;pubsub.Message&#123;</span><br><span class="line">		Data: []<span class="keyword">byte</span>(<span class="string">&quot;dummy payload&quot;</span>),</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">if</span> _, err := res.Get(ctx); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(<span class="string">&quot;success publish&quot;</span>)</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><figcaption><span>実行結果</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;go run main.go</span><br><span class="line">2021/03/07 16:55:04 rpc error: code = InvalidArgument desc = Request contains an invalid argument.</span><br></pre></td></tr></table></figure>
+
+<p>こちらもシンプルな例外メッセージですが、メッセージスキーマで不正なPublishを防ぐことに成功しています。</p>
+<h1 id="スキーママイグレーションについて"><a href="#スキーママイグレーションについて" class="headerlink" title="スキーママイグレーションについて"></a>スキーママイグレーションについて</h1><p>メッセージスキーマを付与した後に、アプリケーション要件の変化に併せてスキーマもアップデートしたいものです。2021/03/07時点では、一度作成したスキーマを変更する機能も、トピックに紐づくスキーマを変更する機能も存在しないようです。このあたりの機能追加や利用者側のナレッジも蓄積できると良いですね。</p>
+<p>また、現状はスキーマをPub/Subの設定に紐付けるような形式なようです。スキーマはPublish/Subscribeのどちらにも公開されるべきものなので、Schema Registryのマネージドサービスが待ち遠しいですね。現状はGCSにもスキーマファイルを配備するなど、一工夫の設計余地がありそうだなと思いました。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>Cloud Pub/SubでメッセージスキーマでPublish時のペイロードの検証ができるようになりました。今の所、AvroとProtocol Buffersで定義可能で、エンコードJSONにすれば、テキストJSONも検証できます。</p>
+<p>スキーマファイルは今の所GCSなどの連携ができず、Pub/Sub側に直接定義するようです。</p>
+<p>まだまだ発展途上な機能だと思いますが、不正なデータがPub/Subトピックに混入されることを防ぐことができるのは画期的だと思いますので、ぜひ利用を検討したいと思います。</p>
+<p>明日は市川さんの<a href="/articles/20210310/">20210310_本番データが急に欲しいアナタに贈る、CloudSQLのサーバレスエクスポートを試してみた</a>です。</p>
+<h1 id="関連記事"><a href="#関連記事" class="headerlink" title="関連記事"></a>関連記事</h1><ul>
+<li><a href="/articles/20210307/">GCP連載2021</a></li>
+<li><a href="/articles/20200205/">GCP連載2020</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li class="twitter-btn">
+      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210309/&via=future_techblog&related=twitterapi%2Ctwitter&text=PubSub%E3%81%AE%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%82%92%E8%A9%A6%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"
+        onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li class="fb-btn">
+      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210309/&t=PubSub%E3%81%AE%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%82%92%E8%A9%A6%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"
+        onclick="window.open(this.href, 'fbsharewindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li class="hatebu-btn">
+      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210309/"
+        onclick="window.open(this.href, 'hatebuwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="hatebu-btn-label">4</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li class="pocket-btn">
+      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210309/"
+        onclick="window.open(this.href, 'pocketwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="pocket-btn-label">12</span>
+      </a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+  </article>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav">
+      
+    <li>2020.07.09<a href="/articles/20200709/" title="最近Goで主にバックエンドのWebAPIや、AWS Lambdaで動くETLアプリ、たまにCLIツールを開発する時に、2回以上同じ指摘したコメントをまとめてます。Go言語特有ぽいところを中心にしています。レビュイーのスキルセットは..">GoでWebアプリ開発時にあるあるだったレビューコメント</a></li>
+
+    <li>2020.03.11<a href="/articles/20200311/" title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li>
+
+    <li>2021.03.24<a href="/articles/20210324/" title="TIGの伊藤真彦です。業務で行っている開発がいよいよリリースを視野に入れたフェーズに入り、E2Eテストや各種性能試験を行いました。">k6の使い方 シンプル&軽快な負荷試験ツールを試す</a></li>
+
+    <li>2020.11.07<a href="/articles/20201107/" title="フューチャーOSS推進タスクフォースを開始しました。実は7月に発足してから8月には活動の骨子が固まり、タスクフォース自体は始動していましたが、中身を作ってから告知した方が具体性があってブレも無くなり良いのでは？という話があり、少しタイミングをずらしてのご報告です。">フューチャーOSS推進タスクフォース始めます</a></li>
+
+    <li>2020.08.21<a href="/articles/20200821/" title="システム開発にてオープンソースのライブラリやフレームワークを利用することは、もはや当たり前となっています。みなさんはOSSのライセンスについてどの程度理解していますでしょうか。OSSだから無条件に利用可能だと思っていませんか？">エンジニアが最低限理解しておくべきOSSライセンスの基礎知識</a></li>
+
+    <li>2020.05.12<a href="/articles/20200512/" title="TIG DXチーム　アルバイターの三村です．今回はHeadlessCMSを利用したタスクをやることになりました．私自身HeadlessCMSどころかCMSを聞いたことすら無かったので，初めてCMS使ってみるにあたって感じたことを共有出来たらと思い本記事を作成させていただいております．">日本製HeadlessCMSのmicroCMSを触ってみた</a></li>
+
+    <li>2020.04.01<a href="/articles/20200401/" title="今回はVue.jsの最初の難関（だと思っている）「props down, event up」について、初心者が読んでもわかるような資料を用意してみようと思います。 プロジェクトで独自のコンポーネントを作ったり、会社として用意しているコンポーネントの利用、改良ができるようになってもらいたいという思いから、その導入を解説しようということです。">Vue.js最初の難関、「props down, event up」を初心者にわかるように解説してみた</a></li>
+
+    <li>2020.03.19<a href="/articles/20200319/" title="ちょっとしたフロントエンドの開発で、TypeScriptに最初から対応していて、簡単に使えるものは何かないかな、と調べてみたメモです。React/Vue/Angularの場合はそれぞれの初期化コマンドで何から何まで用意してくれます。Next.js、Nuxt.js、Gatsbyなども、これらのビルドのステップを簡略化するコマンドを提供しています。基本的にこれらのウェブフロントエンドを開発するときには、小規模・中規模ぐらいならあんまり気にしなくておまかせでもいいと思います。今回は、それらのフレームワーク固有のビルドツールとは別に環境を作りたい人で、TypeScriptの環境が欲しい、ウェブの開発がしたい、という前提でいろいろ探してみました。">今あえてTypeScriptのビルド＆バンドルツールを探してみる</a></li>
+
+    <li>2020.02.07<a href="/articles/20200207/" title="Go + Vue + Cloud Runでかんたんな管理画面を作ろうと思います。ストレージ側にもサーバーレスがあります。MySQLやPostgreSQLのクラウドサービス（Cloud SQLとかRDS）は、サーバーマシンを可動させて、その上にDBMSが稼働しますので、起動している時間だけお金がかかってしまします。一方、FirestoreやDynamoDBの場合は容量と通信（と、キャパシティユニット）にしかお金がかからないモデルになっており、サーバーレスです。今回はかんたん化のためにストレージは扱いません。">GCP連載#3 Goでサーバーレスな管理画面アプリを作る</a></li>
+
+    <li>2020.02.03<a href="/articles/20200203/" title="現在所属しているプロジェクトではWebAPIやバッチ処理の設計の一環としてPlantUMLを利用しています。効率よく品質高くアウトプットを出すためには、プログラミング言語に対してコーディング規約があるように、UMLに対してもチームで設計するにあたり一定のルールを決める必要があります。そこでプロジェクト内のPlantUMLを使用するうえでのガイドラインやルールをまとめる機会があり、せっかくなのでそれを記事化します。">チームで機能設計するためのPlantUML標準化</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+<!-- CATEGORIES START -->
+<h3 class="margin-top-30">カテゴリー</h3>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+    <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+    <li><a href="/categories/IoT/">IoT (14)</a></li>
+    
+    <li><a href="/categories/VR/">VR (10)</a></li>
+    
+    <li><a href="/categories/Security/">Security (2)</a></li>
+    
+    <li><a href="/categories/Design/">Design (7)</a></li>
+    
+    <li><a href="/categories/Programming/">Programming (168)</a></li>
+    
+    <li><a href="/categories/Management/">Management (9)</a></li>
+    
+    <li><a href="/categories/Infrastructure/">Infrastructure (131)</a></li>
+    
+    <li><a href="/categories/DB/">DB (14)</a></li>
+    
+    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+    
+    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+          <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+          <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+              t._e.push(f);
+            };
+            return t;
+          }(document, "script", "twitter-wjs"));</script>
+          
+            <!-- BEGIN TWITTER BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <!-- Twitterフォローボタン -->
+              <li class="twitter-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                </a>
+              </li>
+              <!-- Twitterタイムライン -->
+              <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+            </div>
+            <!-- END TWITTER BLOCK -->
+          
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+            &copy; 2021 フューチャー技術ブログ<br>
+          </div>
+          <!-- END COPYRIGHT -->
+	        <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
+    
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
+    
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

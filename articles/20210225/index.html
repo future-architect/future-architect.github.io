@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>DynamoDBから効率的に大量のデータを取得する方法 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは。TIG DXユニット所属の村上です。最近データ分析絡みでDynamoDBを触る機会が多く、DynamoDBが体の一部みたいになってきました。本記事の結論はこれです。 大量に取得したいデータに共通して存在する値の属性をGSIとして設定しよう 予備知識から順に解説していきます。 ScanとQueryDynamoDBにはScanとQueryという操作が存在します。それぞれ簡単に説明">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DynamoDBから効率的に大量のデータを取得する方法 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210225/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは。TIG DXユニット所属の村上です。最近データ分析絡みでDynamoDBを触る機会が多く、DynamoDBが体の一部みたいになってきました。本記事の結論はこれです。 大量に取得したいデータに共通して存在する値の属性をGSIとして設定しよう 予備知識から順に解説していきます。 ScanとQueryDynamoDBにはScanとQueryという操作が存在します。それぞれ簡単に説明">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210225/title.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210225/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210225/image_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210225/スクリーンショット_2021-02-14_173302.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210225/スクリーンショット_2021-02-14_174037.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210225/image_3.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210225/image_4.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210225/image_5.png">
+<meta property="article:published_time" content="2021-02-24T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-11T08:20:25.070Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="データ分析">
+<meta property="article:tag" content="DynamoDB">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210225/title.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="AWS,データ分析,DynamoDB" name="keywords">
+  <meta content="村上知優" name="author">
+
+  <link rel="stylesheet" href="/metronic/assets/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20210225/">DynamoDBから効率的に大量のデータを取得する方法</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20210225_DynamoDBから効率的に大量のデータを取得する方法" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+      <li class="blog-info-item"><a href="/authors/%E6%9D%91%E4%B8%8A%E7%9F%A5%E5%84%AA">村上知優</a></li>
+      <li class="blog-info-item"><time datetime="2021-02-24T15:00:00.000Z" itemprop="datePublished">2021/02/25</time>
+</li>
+      <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/AWS/" title="AWS">AWS</a></li> 
+  
+    <li><a href="/tags/%E3%83%87%E3%83%BC%E3%82%BF%E5%88%86%E6%9E%90/" title="データ分析">データ分析</a></li> 
+  
+    <li><a href="/tags/DynamoDB/" title="DynamoDB">DynamoDB</a>
+  
+  </ul>
+
+</li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/images/20210225/title.png"></p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIG DXユニット所属の村上です。<br>最近データ分析絡みでDynamoDBを触る機会が多く、DynamoDBが体の一部みたいになってきました。<br>本記事の結論はこれです。</p>
+<p><strong>大量に取得したいデータに共通して存在する値の属性をGSIとして設定しよう</strong></p>
+<p>予備知識から順に解説していきます。</p>
+<h1 id="ScanとQuery"><a href="#ScanとQuery" class="headerlink" title="ScanとQuery"></a>ScanとQuery</h1><p>DynamoDBにはScanとQueryという操作が存在します。それぞれ簡単に説明すると、以下のようになります。</p>
+<ul>
+<li>Scan：DB全体を取得する操作</li>
+<li>Query：指定した属性に指定した値を持つデータのみを抽出して取得する操作</li>
+</ul>
+<p>取得したいデータがDBに存在するほとんど全てのデータであれば、Scanで取得するのが効率的なのですが、必ずしもそのような状況であるとは限りません。Queryによって、特定の値を持つデータのみを取得したい場合もあると思います。</p>
+<p>今回は後者の場合を想定し、Queryによって特定の値を持つ大量のデータを効率的に取得する方法について解説します。</p>
+<h1 id="DynamoDBの制限"><a href="#DynamoDBの制限" class="headerlink" title="DynamoDBの制限"></a>DynamoDBの制限</h1><p>DynamoDBから効率的にデータを取得するにあたり、DynamoDBに存在する制限を知っておかなければなりません。今回対象とするQuery操作には、<code>1度のQuery操作での取得サイズ上限は1MB</code>という制限が存在します。詳しくは<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Query.html">公式ドキュメント</a>をご覧ください。</p>
+<p>この制限を超えるサイズのデータを取得する場合、Query操作を繰り返し行うことによって全てのデータを取得することになります。従って、大量のデータを取得する場合は1回当たりのQueryで上限の1MBをしっかりと使い切ることが、効率的なデータの取得につながります。</p>
+<h1 id="GSI（グローバル・セカンダリ・インデックス）を工夫する"><a href="#GSI（グローバル・セカンダリ・インデックス）を工夫する" class="headerlink" title="GSI（グローバル・セカンダリ・インデックス）を工夫する"></a>GSI（グローバル・セカンダリ・インデックス）を工夫する</h1><p>DynamoDBから特定の条件を満たすデータを大量に取得する場合は、GSIを工夫することが重要となります。これについて順に解説していきます。</p>
+<h2 id="GSIの特徴"><a href="#GSIの特徴" class="headerlink" title="GSIの特徴"></a>GSIの特徴</h2><p>GSIには重複が許されるという特徴があります。実際にDBを操作しながら見ていきたいと思います。</p>
+<p>今回の実験では最近愛用している<code>NoSQL Workbench</code>というアプリを使います。これはクラウドやローカルのDynamoDBをGUIで操作、可視化できるツールで、AWS公式から配布されています。ダウンロードは<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/workbench.settingup.html">こちら</a>。</p>
+<h3 id="パーティションキーとソートキー"><a href="#パーティションキーとソートキー" class="headerlink" title="パーティションキーとソートキー"></a>パーティションキーとソートキー</h3><p>DynamoDBにはパーティションキーとソートキーという概念があります。GSIのパーティションキー、ソートキーと呼び方を区別するために、本記事ではプライマリパーティションキー、プライマリソートキーと呼ぶことにします。<br>基本的にはこれらの値の組み合わせが重複することは許されません。例えば以下のような設定と内容のテーブルに対してこれらが重複したデータを追加しようとしたらどうなるか試してみます。</p>
+<h4 id="テーブル設定"><a href="#テーブル設定" class="headerlink" title="テーブル設定"></a>テーブル設定</h4><table>
+<thead>
+<tr>
+<th align="center">データ項目</th>
+<th align="center">キー</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">id</td>
+<td align="center">PK</td>
+</tr>
+<tr>
+<td align="center">name</td>
+<td align="center">SK</td>
+</tr>
+<tr>
+<td align="center">brand</td>
+<td align="center">GSI PK</td>
+</tr>
+<tr>
+<td align="center">process</td>
+<td align="center">GSI SK</td>
+</tr>
+</tbody></table>
+<p>※PK：パーティションキー、SK：ソートキー</p>
+<h4 id="テーブル内容"><a href="#テーブル内容" class="headerlink" title="テーブル内容"></a>テーブル内容</h4><img src="/images/20210225/image.png" style="border:solid 1px #000000">
+
+
+<h4 id="実験"><a href="#実験" class="headerlink" title="実験"></a>実験</h4><p>既存のデータと同じキー値</p>
+<ul>
+<li>id：003</li>
+<li>name：3800X</li>
+</ul>
+<p>に対して、brandだけ違う値にしてPutItem操作を実行してみます。</p>
+<img src="/images/20210225/image_2.png" style="border:solid 1px #000000">
+
+
+<p>PutItem操作実行後のテーブルの様子です。データ数は変わらず、同じキー値を持つデータが<code>上書き</code>されています。</p>
+<img src="/images/20210225/スクリーンショット_2021-02-14_173302.png" style="border:solid 1px #000000">
+
+
+<p>このように、プライマリパーティションキーとプライマリソートキーの同じ組み合わせに対する重複は許されておらず、同じキー値でデータを追加しようとすると、そのデータが<code>上書き</code>されます。</p>
+<h3 id="GSIのパーティションキーとソートキー"><a href="#GSIのパーティションキーとソートキー" class="headerlink" title="GSIのパーティションキーとソートキー"></a>GSIのパーティションキーとソートキー</h3><p>一方GSIのパーティションキーとソートキーの組み合わせに対しては、重複が許されています。従って、先ほどのテーブルで1行目と2行目のデータのbrandとprocessは全く同じですが、brand、processをそれぞれGSIのパーティションキー、ソートキーに設定しても、片方のデータが消えることはありません。テーブル設定に記載の通り、すでにこれらのGSI設定は適用済みです。</p>
+<p>ここにさらにbrandとprocessが重複するデータを追加してみたいと思います。</p>
+<img src="/images/20210225/スクリーンショット_2021-02-14_174037.png" style="border:solid 1px #000000">
+
+<p>PutItem操作実行後のテーブルの様子です。データが<code>上書き</code>されることなく、<code>追加</code>されている様子が確認できると思います。</p>
+<img src="/images/20210225/image_3.png" style="border:solid 1px #000000">
+
+
+<h2 id="GSIの大量データ取得への応用"><a href="#GSIの大量データ取得への応用" class="headerlink" title="GSIの大量データ取得への応用"></a>GSIの大量データ取得への応用</h2><p>以上の実験により、以下のことがわかりました。</p>
+<ul>
+<li>プライマリパーティションキー、プライマリソートキーの組み合わせの重複は許されない</li>
+<li>GSIパーティションキー、GSIソートキーの組み合わせの重複は許される</li>
+</ul>
+<p>これらの性質より、<strong>大量に取得したいデータに共通して存在する値の属性をGSIとして設定する</strong>ことで、欲しいデータをごっそり取得することが可能となります。<br>実際にこの性質を利用してQueryしてみたいと思います。<br>GSIパーティションキーである<code>brand</code>に<code>Intel</code>、GSIソートキーである<code>process</code>に<code>14nm</code>を指定します。</p>
+<img src="/images/20210225/image_4.png" style="border:solid 1px #000000">
+
+
+<p>Query操作の実行結果です。</p>
+<img src="/images/20210225/image_5.png" style="border:solid 1px #000000">
+
+<p>指定した値を持つデータを1発で全て取得することができました。</p>
+<p>今回の例ではそもそものデータ数が少ないため、1度のQueryで目的のデータを全て取得できましたが、実際には大量のデータを取得することを想定していますので、冒頭で説明したQueryの1MB制限に引っ掛かることが前提となります。よって、Queryを繰り返し行って目的のデータを全て取得することになります。この時、1MB制限を上限いっぱいまで使うことができるため、効率的であると言えます。</p>
+<h2 id="備考"><a href="#備考" class="headerlink" title="備考"></a>備考</h2><p>そもそもプライマリパーティションキー、プライマリソートキー自体が「大量に取得したいデータに共通して存在する値の属性」であれば問題ないのですが、一般的にDynamoDBでプライマリパーティションキーとプライマリソートキーをこのような観点から設計することはあまりないと思います。また、GSIは後から追加することができるという拡張性の高さからも、GSIの工夫が重要となります。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>今回はDynamoDBから特定のデータを効率的に大量に取得する方法について解説しました。</p>
+<p>他にも「こんな方法があるよ」などのご意見ありましたら是非教えていただけると嬉しいです！</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a href="https://future-architect.github.io/articles/20201130/">DynamoDBのページング</a></li>
+<li><a href="https://future-architect.github.io/articles/20200818/">【入門】私を苦しめたDynamoDB</a></li>
+</ul>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li class="twitter-btn">
+      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210225/&via=future_techblog&related=twitterapi%2Ctwitter&text=DynamoDB%E3%81%8B%E3%82%89%E5%8A%B9%E7%8E%87%E7%9A%84%E3%81%AB%E5%A4%A7%E9%87%8F%E3%81%AE%E3%83%87%E3%83%BC%E3%82%BF%E3%82%92%E5%8F%96%E5%BE%97%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95"
+        onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li class="fb-btn">
+      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210225/&t=DynamoDB%E3%81%8B%E3%82%89%E5%8A%B9%E7%8E%87%E7%9A%84%E3%81%AB%E5%A4%A7%E9%87%8F%E3%81%AE%E3%83%87%E3%83%BC%E3%82%BF%E3%82%92%E5%8F%96%E5%BE%97%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95"
+        onclick="window.open(this.href, 'fbsharewindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li class="hatebu-btn">
+      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210225/"
+        onclick="window.open(this.href, 'hatebuwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="hatebu-btn-label">1</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li class="pocket-btn">
+      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210225/"
+        onclick="window.open(this.href, 'pocketwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="pocket-btn-label">7</span>
+      </a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+  </article>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav">
+      
+    <li>2020.07.09<a href="/articles/20200709/" title="最近Goで主にバックエンドのWebAPIや、AWS Lambdaで動くETLアプリ、たまにCLIツールを開発する時に、2回以上同じ指摘したコメントをまとめてます。Go言語特有ぽいところを中心にしています。レビュイーのスキルセットは..">GoでWebアプリ開発時にあるあるだったレビューコメント</a></li>
+
+    <li>2021.05.13<a href="/articles/20210513b/" title="Flutterでの画面レイアウトの入門的な内容です。Flutterを触ったことがない方にも「こんな感じで画面が作れるんだな」というイメージがつくようお伝えできればと思います。また、私がつまずいたWidgetのサイズ調整についても記載します。"">Flutterレイアウト入門</a></li>
+
+    <li>2021.05.10<a href="/articles/20210510b/" title="この記事はDart/Flutter連載の1記事目です。TIGの伊藤真彦です。Dart/Flutter入門に参加します、DartといえばFlutterの話が必ずついてくるものですが、今回は連載1記事目として、敢えてプログラミング言語としてのDartに焦点を絞った記事にします。">Dart入門</a></li>
+
+    <li>2021.03.05<a href="/articles/20210305/" title="こんにちは。テクノロジーイノベーショングループ所属の長澤です。[インフラ入門]な連載記事を久々に書くべく、今回筆を取りました。これまでのインフラ入門記事は [インフラ概要と当社でのインフラエンジニア像]">インフラ入門ーインフラ要件定義編ー</a></li>
+
+    <li>2020.09.30<a href="/articles/20200930/" title="Open Policy Agent（OPA）は汎用的なポリシーエンジンで、[Rego] と呼ばれるポリシー言語で定義されたルールに従って、入力がポリシーに沿っているか否かの判定を移譲させることができます。Regoで宣言的にポリシーを実装し、Policy as Code を実現できます。コーディング規約も一種のポリシーとみなして、Open API Spec（Swagger）をLinter的にチェックするツールを題材に、OPAを用いて開発してみたいと思います。">Policy as Code を実現する Open Policy Agent に憧れて。ポリシーコードでAPI仕様をLintする</a></li>
+
+    <li>2020.08.21<a href="/articles/20200821/" title="システム開発にてオープンソースのライブラリやフレームワークを利用することは、もはや当たり前となっています。みなさんはOSSのライセンスについてどの程度理解していますでしょうか。OSSだから無条件に利用可能だと思っていませんか？">エンジニアが最低限理解しておくべきOSSライセンスの基礎知識</a></li>
+
+    <li>2020.07.03<a href="/articles/20200703/" title="エンタープライズでのミッションクリティカル領域においてもクラウド利用が普通になってきています。その過程において今までできないことを指向する試みも行われてきています。その代表的なものがクラウドの備えるリソースの高い拡張性と弾力性を利用したシステム展開です。例えば「より多くのデータを扱う」「同業他社に向けたサービス展開をする（マルチテナンシー）」といったものがあります。その際のアーキテクチャ選定では将来の利用を想定した選択を行う必要がありますが、データベースのスケールというのは非常に難しく簡単ではありません。">スケーラブルデータベース ～クラウドにおける後悔しないデータベース選定～</a></li>
+
+    <li>2020.05.28<a href="/articles/20200528/" title="Goでプロジェクトのフォルダ構成どうしよう、とググると見つかるStandard Go Project Layout(https://github.com/golang-standards/project-layout)。とはいえ、これはかなりコード量を増やしてしまう恐れがありますので、導入する場合のデメリットも考えておく方が良いです。">あなたのGoアプリ/ライブラリのパッケージ構成もっとシンプルでよくない？</a></li>
+
+    <li>2020.03.27<a href="/articles/20200327/" title="クラウドサービスが充実してくるにつれて、サーバーレスではいろいろなことができるようになっています。HTTPサーバーは動きますし、RDBやNoSQLなストレージも使えますし、PubSubみたいなサービスも利用できます。これらを駆使するとそこそこ複雑な処理も記述できます。一方で、上から下までサーバーレスにしようとするとできないものもいくつかあります。例えば、RDBも使えるといっても制約があり、LambdaやCloud ...">Serverless連載3: Goでサーバーレス用の検索エンジンwatertowerを作ってみました</a></li>
+
+    <li>2020.02.05<a href="/articles/20200205/" title="GCPをテーマにした連載企画を始めるということで、初回はStackdriver Loggingの活用方法をまとめます。
+1記事でまとめるには手が余るほど様々な機能があるため、初回はログの出力とビューア周りといったアプリケーション開発者視点での機能に絞って説明していきます。利用コードはGoで書かれていますが、汎用的な内容なので他の言語でもある程度通じる内容にしているつもりです。">GCP連載#1 Stackdriver Loggingへ良い感じのログ出力方法を考える</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+<!-- CATEGORIES START -->
+<h3 class="margin-top-30">カテゴリー</h3>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+    <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+    <li><a href="/categories/IoT/">IoT (14)</a></li>
+    
+    <li><a href="/categories/VR/">VR (10)</a></li>
+    
+    <li><a href="/categories/Security/">Security (2)</a></li>
+    
+    <li><a href="/categories/Design/">Design (7)</a></li>
+    
+    <li><a href="/categories/Programming/">Programming (168)</a></li>
+    
+    <li><a href="/categories/Management/">Management (9)</a></li>
+    
+    <li><a href="/categories/Infrastructure/">Infrastructure (131)</a></li>
+    
+    <li><a href="/categories/DB/">DB (14)</a></li>
+    
+    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+    
+    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+          <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+          <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+              t._e.push(f);
+            };
+            return t;
+          }(document, "script", "twitter-wjs"));</script>
+          
+            <!-- BEGIN TWITTER BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <!-- Twitterフォローボタン -->
+              <li class="twitter-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                </a>
+              </li>
+              <!-- Twitterタイムライン -->
+              <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+            </div>
+            <!-- END TWITTER BLOCK -->
+          
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+            &copy; 2021 フューチャー技術ブログ<br>
+          </div>
+          <!-- END COPYRIGHT -->
+	        <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
+    
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
+    
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

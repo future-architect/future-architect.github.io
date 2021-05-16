@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Cypress - 書きやすいテストの秘密と独自コマンドの実装 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="@testing-library&#x2F;cypressの存在を知らずに、それっぽいものを作ろうとしたときにいろいろ調査した記録です。Cypressにはテストコードが縦と横に短くなる工夫がされており、そのメカニズムにしたがった独自コマンドを実装するにはコツが必要です。 実装は次のところにありますが、@testing-library&#x2F;cypressの方がメンテされているので、こちらは実際には使わないのをお勧">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cypress - 書きやすいテストの秘密と独自コマンドの実装 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210428d/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="@testing-library&#x2F;cypressの存在を知らずに、それっぽいものを作ろうとしたときにいろいろ調査した記録です。Cypressにはテストコードが縦と横に短くなる工夫がされており、そのメカニズムにしたがった独自コマンドを実装するにはコツが必要です。 実装は次のところにありますが、@testing-library&#x2F;cypressの方がメンテされているので、こちらは実際には使わないのをお勧">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210428d/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88_2021-04-24_8.14.01.png">
+<meta property="article:published_time" content="2021-04-27T15:00:04.000Z">
+<meta property="article:modified_time" content="2021-05-15T15:32:49.721Z">
+<meta property="article:tag" content="登壇レポート">
+<meta property="article:tag" content="Cypress">
+<meta property="article:tag" content="E2Eテスト">
+<meta property="article:tag" content="TechNight">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210428d/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88_2021-04-24_8.14.01.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="登壇レポート,Cypress,E2Eテスト,TechNight" name="keywords">
+  <meta content="澁川喜規" name="author">
+
+  <link rel="stylesheet" href="/metronic/assets/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20210428d/">Cypress - 書きやすいテストの秘密と独自コマンドの実装</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20210428d_Cypress_-_書きやすいテストの秘密と独自コマンドの実装" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+      <li class="blog-info-item"><a href="/authors/%E6%BE%81%E5%B7%9D%E5%96%9C%E8%A6%8F">澁川喜規</a></li>
+      <li class="blog-info-item"><time datetime="2021-04-27T15:00:04.000Z" itemprop="datePublished">2021/04/28</time>
+</li>
+      <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/%E7%99%BB%E5%A3%87%E3%83%AC%E3%83%9D%E3%83%BC%E3%83%88/" title="登壇レポート">登壇レポート</a></li> 
+  
+    <li><a href="/tags/Cypress/" title="Cypress">Cypress</a></li> 
+  
+    <li><a href="/tags/E2E%E3%83%86%E3%82%B9%E3%83%88/" title="E2Eテスト">E2Eテスト</a></li> 
+  
+    <li><a href="/tags/TechNight/" title="TechNight">TechNight</a>
+  
+  </ul>
+
+</li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>@testing-library/cypressの存在を知らずに、それっぽいものを作ろうとしたときにいろいろ調査した記録です。Cypressにはテストコードが縦と横に短くなる工夫がされており、そのメカニズムにしたがった独自コマンドを実装するにはコツが必要です。</p>
+<p>実装は次のところにありますが、@testing-library/cypressの方がメンテされているので、こちらは実際には使わないのをお勧めします。</p>
+<p><a target="_blank" rel="noopener" href="https://gitlab.com/osaki-lab/cypress-aria">https://gitlab.com/osaki-lab/cypress-aria</a></p>
+<h1 id="Cypressのテストが縦横に短く書けるわけ"><a href="#Cypressのテストが縦横に短く書けるわけ" class="headerlink" title="Cypressのテストが縦横に短く書けるわけ"></a>Cypressのテストが縦横に短く書けるわけ</h1><p>CypressはWebDriver系(Selenium)やChrome DevTool Protocol系（Puppeteer)のツールとAPIの粒度が異なります。Seleniumはそもそもウェブサイトのタイトルに「Browser Automation Tool」とありますし、PuppeteerのAPIもそれに近いです。ソースコードに書かれているコードと、ブラウザ上で動作する挙動に違いはありません。</p>
+<p>Cypressは一言で要素探索のAPI呼び出しといっても、検索とパターンマッチを裏で高速に繰り返します。デフォルトのタイムアウトは4秒で、その間、100mS間隔ぐらいでリクエストを繰り返します。これの何がよいかというと、最近のReactやVueやAngularといった仮想DOMやIncremental DOMなソリューションと相性が良い点です。</p>
+<p>これらのフロントエンドでは、何かしらのボタン操作やその結果のAPIアクセスの結果で、非同期で画面が更新されます。いつ画面の更新処理が終わったのか通知が来るわけではありません。例えば、ウェブサーバーに問い合わせをして、その結果を受けて画面表示する場合、WebDriverやCDP系ツールでは自分でウェイトを置いて、0.1秒待つ、といったことをします。</p>
+<p>Cypressは次のようなメソッドチェーンの命令になっており、<code>should(&quot;exist&quot;)</code>が成功するまでタイムアウト時間（デフォルト4秒）までの間、100mSぐらいことに<code>find(&quot;button.ok&quot;)</code>を繰り返します。<code>find()</code>の関数の呼び出し結果にこのDOM要素が入ってくるわけではなく、これらのAPIの裏で複雑な動きをします。そもそもJSなのに<code>await</code>を使わないで済むのはこれが実際の命令と一対一に対応していないからです。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cy.find(<span class="string">&quot;button.ok&quot;</span>).should(<span class="string">&quot;exist&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/20210428d/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88_2021-04-24_8.14.01.png" alt="Cypressがawaitを使わなくて済むことの説明図"></p>
+<p>明示的なwaitを書かずに済むことで、処理時間と成功率のトレードオフを考えなくても済むというメリットがあります。</p>
+<p>まず、逐次処理のパターンではテストが失敗しないためには余裕を持った大きめの待ち時間をテストコードに書く必要があります。テストの時間を短くしようとして50パーセンタイルな時間を書けば50%は失敗するということです。そして、たいてい99パーセンタイルは50パーセンタイルよりも遥かに大きな値であることが往々にしてあります。</p>
+<p>Cypressでは成功次第次の処理が実行されるため、毎回待ち時間の最大値で待つのに比べて、実行時間が短縮されますし、待ち時間が足りなくてテストがランダムに壊れるのを防ぐためにウェイトを調整するといった不毛な作業が減ります。また、待ち時間を忘れてテストが失敗するというわかりにくい不具合も減ります。</p>
+<p>また、ウェイトを自分で入れる必要性があまりないのでコードが縦に短くなります。表示を待つだけならNightwatchでもSeleniumできますが、待つための余計なコードを書く必要がなく、クリックなどもすべてリトライしてくれるところがCypressの良いところです。また、逐次処理ではなく、期待する状態の宣言なので、<code>await</code>などがいらないので横も短くなります。</p>
+<p>ただし、waitが100%不要になるかというと、部分的には必要です。例えばレビューの星の数を設定して数が変化するテストを書こうとしているとします。星の数が設定されて更新されるまでにタイムラグがあるとすると、find()は変更前の状態で早々にマッチしてしまうため、処理が先に進んでしまいます。この場合はエラーになってしまうので処理の完了を待つ<code>cy.wait()</code>が必要となります。</p>
+<p>それ以外に、E2Eテストとして信頼できるテストが書けるための機能としては、きちんと人が操作できるかどうかをCSSや属性も見てチェックしてくれる点もポイントです。ブラウザの見た目の完全なシミュレートではないのですが、テストが成功したのに手動でテストしたらバグっている、みたいなことが減ります。</p>
+<ul>
+<li>要素がvisibleなのか？</li>
+<li>disabledな要素を操作しようとしていないか？</li>
+<li>readonlyがついているのにタイプしようとしてないか？　</li>
+<li>親要素のスクロールとかoverflowとかで隠れていないか？</li>
+<li>他の要素に隠されていないか？</li>
+</ul>
+<h1 id="Cypressのリトライポリシーに従ったコマンドの作り方"><a href="#Cypressのリトライポリシーに従ったコマンドの作り方" class="headerlink" title="Cypressのリトライポリシーに従ったコマンドの作り方"></a>Cypressのリトライポリシーに従ったコマンドの作り方</h1><p>同じ複雑なセレクターを何度も繰り返し書くのを楽にしてあげるだけであれば、コマンドを作って、その中で<code>cy.get()</code>や<code>cy.find()</code>を使ってあげればOKです。</p>
+<p>しかし、AまたBを取得、みたいなケースではうまく書かないと、Aの取得でタイムアウト、Bの取得でもタイムアウトと2倍時間がかかって、リトライの挙動が他のコマンドと違う動きになってしまいます。リトライポリシーに準拠するには、Cypressの作法に従って書く必要があります。</p>
+<p>公式ドキュメントにはここを参上にするように、と書かれていますがピンポイントで参考にするのはちょっと難しい実装でした。これだけ見ても実装方法がよくわからなかったのでこれを読み解いた＆モダンなTypeScriptの書き方を紹介していきます。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/cypress-io/cypress-xpath/pull/12/files">https://github.com/cypress-io/cypress-xpath/pull/12/files</a></p>
+<p>ここで紹介する以外にもボタンなどさまざまな要素取得を実装したのがこちらのパッケージです。</p>
+<p><a target="_blank" rel="noopener" href="https://gitlab.com/osaki-lab/cypress-aria">https://gitlab.com/osaki-lab/cypress-aria</a></p>
+<p>ただ、@testing-library/cypressというもっと前から開発されているパッケージがあるので、これを使う必要はありませんので、参考実装としてみていただければと思います。</p>
+<h2 id="これから作るコマンドの要件"><a href="#これから作るコマンドの要件" class="headerlink" title="これから作るコマンドの要件"></a>これから作るコマンドの要件</h2><p>aria属性に従って要素取得を実装したときは、「aria-labelがあればそれを名前とする、aria-labelledbyがあれば、参照先のDOMのテキストを名前とする、親が<code>&lt;label&gt;</code>で<code>for=</code>で自分の要素のIDがついていたらそちらを名前とする、みたいなOR条件で要素を取得します。</p>
+<p>まずはコマンドの枠組みです。ここに追加していきます。</p>
+<figure class="highlight ts"><figcaption><span>index.ts</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// &lt;reference types=&quot;cypress&quot; /&gt;</span></span><br><span class="line"></span><br><span class="line">Cypress.Commands.add( <span class="comment">// ポイント1: コマンド登録</span></span><br><span class="line">    <span class="string">&#x27;ariaLink&#x27;</span>,</span><br><span class="line">    &#123; <span class="attr">prevSubject</span>: [<span class="string">&#x27;optional&#x27;</span>, <span class="string">&#x27;element&#x27;</span>, <span class="string">&#x27;document&#x27;</span>] &#125;,</span><br><span class="line">    aria</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// ポイント2: asyncな関数</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">async</span> <span class="title">ariaLink</span>(<span class="params">subject, selector, options = &#123;&#125;</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> resolveValue = <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> value = なんらかの処理();</span><br><span class="line">        <span class="keyword">return</span> cy.verifyUpcomingAssertions(value, options, &#123;</span><br><span class="line">            onRetry: resolveValue, <span class="comment">// ポイント3: 自分自身をretry対象にしつつassetする関数を定義</span></span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">return</span> resolveValue()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ポイントはコード中に書いた3箇所です。</p>
+<h2 id="コマンドのコンテキスト"><a href="#コマンドのコンテキスト" class="headerlink" title="コマンドのコンテキスト"></a>コマンドのコンテキスト</h2><p>Cypress.Commands.addを呼び出すところはすでに紹介しました。名前と実際に呼び出される関数以外に実行コンテキストのオプションがあります。</p>
+<p>prevSubjectはcy.の直後に呼ばれるべきか、他のコマンドで絞り込んだあとに呼ぶのか、どちらを想定しているのかという指定です。trueなら他のコマンドの後限定、falseなら先頭限定、’optional’なら両方です。また、element/document/windowで、他のコマンドの結果としてもらえる要素を設定できます。</p>
+<p><code>cy.get</code>は<code>&#123;prevSubject: false&#125;</code>, <code>cy.find</code>は<code>&#123;prevSubject: true&#125;</code>ですね。</p>
+<figure class="highlight js"><figcaption><span>src/index.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Cypress.Commands.add(</span><br><span class="line">    <span class="string">&#x27;mycommand&#x27;</span>,</span><br><span class="line">    &#123; <span class="attr">prevSubject</span>: [<span class="string">&#x27;optional&#x27;</span>, <span class="string">&#x27;element&#x27;</span>, <span class="string">&#x27;document&#x27;</span>] &#125;,</span><br><span class="line">    mycommand</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="コンテキストの取得"><a href="#コンテキストの取得" class="headerlink" title="コンテキストの取得"></a>コンテキストの取得</h2><p>コマンドは次の形式をしています。前述のコンテキストの元になるのがsubjectです。selectorは1つの文字列です。追加のオプションはオブジェクトの形式で渡します。</p>
+<figure class="highlight js"><figcaption><span>src/index.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">mycommand</span>(<span class="params">subject, selector, options = &#123;&#125;</span>) </span>&#123;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>前の設定でprevSubjectに”element”を渡したり、trueを設定した場合はsubjectからコンテキストを取り出します。コマンドの関数の先頭でcontextNodeを初期化します。要素探索を実装する場合はこのcontextNodeの中から探すようにしていけばOKです。</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// コンテキストの取得</span></span><br><span class="line"><span class="keyword">let</span> contextNode;</span><br><span class="line"><span class="keyword">let</span> withinSubject = cy.state(<span class="string">&#x27;withinSubject&#x27;</span>);</span><br><span class="line"><span class="keyword">if</span> (Cypress.dom.isElement(subject)) &#123;</span><br><span class="line">    contextNode = subject[<span class="number">0</span>];</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (Cypress.dom.isDocument(subject)) &#123;</span><br><span class="line">    contextNode = subject;</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (withinSubject) &#123;</span><br><span class="line">    contextNode = withinSubject[<span class="number">0</span>];</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    contextNode = cy.state(<span class="string">&#x27;window&#x27;</span>).document;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>コンテキストに対応しない（常にグローバルからの取得）であればここは書かなくても良いです。</p>
+<h2 id="要素の取得"><a href="#要素の取得" class="headerlink" title="要素の取得"></a>要素の取得</h2><p>実際の要素の取得の処理はjQueryを使います。cy.find()やcy.get()は非同期なリトライ付きの取得でしたが、プリミティブな同期的な要素の取得はjQueryです。jQueryは動的なウェブサイトの作成ではいろいろネガティブな話も出てきていますが、DOMを変化させない、要素の取得に限定すればまだまだ便利です。</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> value = Cypress.$(<span class="string">&#x27;a, *[role=&quot;link&quot;]&#x27;</span>, contextNode);</span><br><span class="line"><span class="keyword">if</span> (selector) &#123;</span><br><span class="line">    value = value.filter(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">const</span> self = Cypress.$(<span class="built_in">this</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// aria-label属性で検索</span></span><br><span class="line">        <span class="keyword">if</span> (self.attr(<span class="string">&#x27;aria-label&#x27;</span>) === selector) &#123; <span class="keyword">return</span> <span class="literal">true</span>; &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// aria-labelledby属性で検索</span></span><br><span class="line">        <span class="keyword">const</span> labelledBy = self.attr(<span class="string">&#x27;aria-labelledby&#x27;</span>);</span><br><span class="line">        <span class="keyword">if</span> (labelledBy &amp;&amp; Cypress.$(<span class="string">`#<span class="subst">$&#123;labelledBy&#125;</span>`</span>).text() === selector) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// テキストを見て検索</span></span><br><span class="line">        <span class="keyword">if</span> (self.text().trim() === selector) &#123; <span class="keyword">return</span> <span class="literal">true</span>; &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 画像のalt属性を見て検索</span></span><br><span class="line">        <span class="keyword">const</span> images = self.find(<span class="string">`img[alt=&quot;<span class="subst">$&#123;selector&#125;</span>&quot;]`</span>);</span><br><span class="line">        <span class="keyword">return</span> images.length &gt; <span class="number">0</span>;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ここでは、4パターンの検索を実行して返す実装になっています。一つのセレクターの一筆書きで書けないような複雑な検索処理が行えます。</p>
+<p>上記のresolveValue()の中身は最終的にはこうなります。</p>
+<figure class="highlight ts"><figcaption><span>resolveValue</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// コンテキストの取得</span></span><br><span class="line"><span class="keyword">let</span> contextNode;</span><br><span class="line"><span class="keyword">let</span> withinSubject = cy.state(<span class="string">&#x27;withinSubject&#x27;</span>);</span><br><span class="line"><span class="keyword">if</span> (Cypress.dom.isElement(subject)) &#123;</span><br><span class="line">    contextNode = subject[<span class="number">0</span>];</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (Cypress.dom.isDocument(subject)) &#123;</span><br><span class="line">    contextNode = subject;</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (withinSubject) &#123;</span><br><span class="line">    contextNode = withinSubject[<span class="number">0</span>];</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    contextNode = cy.state(<span class="string">&#x27;window&#x27;</span>).document;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// jQueryを使って要素を取得</span></span><br><span class="line"><span class="keyword">let</span> value = Cypress.$(<span class="string">&#x27;a, *[role=&quot;link&quot;]&#x27;</span>, contextNode);</span><br><span class="line"><span class="keyword">if</span> (selector) &#123;</span><br><span class="line">    value = value.filter(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> self = Cypress.$(<span class="built_in">this</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// aria-label属性で検索</span></span><br><span class="line">        <span class="keyword">if</span> (self.attr(<span class="string">&#x27;aria-label&#x27;</span>) === selector) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// aria-labelledby属性で検索</span></span><br><span class="line">        <span class="keyword">const</span> labelledBy = self.attr(<span class="string">&#x27;aria-labelledby&#x27;</span>);</span><br><span class="line">        <span class="keyword">if</span> (labelledBy &amp;&amp; Cypress.$(<span class="string">`#<span class="subst">$&#123;labelledBy&#125;</span>`</span>).text() === selector) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// テキストを見て検索</span></span><br><span class="line">        <span class="keyword">if</span> (self.text().trim() === selector) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 画像のalt属性を見て検索</span></span><br><span class="line">        <span class="keyword">const</span> images = self.find(<span class="string">`img[alt=&quot;<span class="subst">$&#123;selector&#125;</span>&quot;]`</span>);</span><br><span class="line">        <span class="keyword">return</span> images.length &gt; <span class="number">0</span>;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> cy.verifyUpcomingAssertions(value, options, &#123;</span><br><span class="line">    onRetry: resolveValue,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="ログ出力"><a href="#ログ出力" class="headerlink" title="ログ出力"></a>ログ出力</h2><p>最後ですが、必要に応じて探索中の情報のログを出しておくと、TestRunnerで問題追跡がしやすくなりますなぜ見つからなかったのか、途中経過はマッチしていたが、この情報でマッチしなくなったとか。宣言的な書き方は、失敗した時のフィードバックが弱いのでこの手のログを出してあげるのは良いと思います。</p>
+<p>ログの出力はCypress.logで行います。</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 成功したらログを出す</span></span><br><span class="line"><span class="keyword">const</span> result = <span class="keyword">await</span> resolveValue()</span><br><span class="line"><span class="keyword">if</span> (options.log !== <span class="literal">false</span>) &#123;</span><br><span class="line">    Cypress.log(&#123;</span><br><span class="line">        name: <span class="string">&#x27;aria&#x27;</span>,</span><br><span class="line">        message: selector,</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> result;</span><br></pre></td></tr></table></figure>
+
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>Cypressの中身で、書きやすく効率の良いテストを実現する重要な要素であるリトライポリシーについて紹介し、そのリトライポリシーに従ったプラグインの書き方も紹介しました。</p>
+<ul>
+<li>逐次処理なら通常のAPIを列挙すればOK</li>
+<li>取得のロジックはasyncな関数に納める</li>
+<li>jQueryを使って要素を取得</li>
+<li>cy.verifyUpcomingAssertions()にとってきた要素を渡して後段のアサーションを実行</li>
+<li>cy.verifyUpcomingAssertions()にはこの関数自身をonRetryに渡す<br>リトライは繰り返し行われるが、ループを自分で書くのではなく、CypressのAPIにonRetryに渡すことで再起的にループが行われる</li>
+<li>要素の探索する場所（コンテキスト）の処理をしたり、ログを出せば完璧</li>
+</ul>
+<h1 id="補足"><a href="#補足" class="headerlink" title="補足"></a>補足</h1><p>本記事は、<a target="_blank" rel="noopener" href="https://future.connpass.com/event/208056/presentation/">Future Tech Night #8</a>というイベントでお話した内容を記事化したものです。<br>同イベントの他の発表も記事として投稿されてますので、ぜひご覧ください！</p>
+<ul>
+<li><a href="/articles/20210428a/">Cypress入門～初心者でも簡単にE2Eテストが作れる～</a></li>
+<li><a href="/articles/20210428b/">Cypress - 設定編</a></li>
+<li><a href="/articles/20210428c/">保守・拡張をしやすいカプセル化したCypress</a></li>
+<li>Cypress - 書きやすいテストの秘密と独自コマンドの実装（この記事です）</li>
+</ul>
+<h1 id="関連記事"><a href="#関連記事" class="headerlink" title="関連記事"></a>関連記事</h1><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://future-architect.github.io/articles/20210226/index.html" data-iframely-url="//cdn.iframe.ly/ZMlnZ2M?iframe=card-small"></a></div></div>
+
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://future-architect.github.io/articles/20200115/index.html" data-iframely-url="//cdn.iframe.ly/uGST3JI?iframe=card-small"></a></div></div>
+
+<script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li class="twitter-btn">
+      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210428d/&via=future_techblog&related=twitterapi%2Ctwitter&text=Cypress%20-%20%E6%9B%B8%E3%81%8D%E3%82%84%E3%81%99%E3%81%84%E3%83%86%E3%82%B9%E3%83%88%E3%81%AE%E7%A7%98%E5%AF%86%E3%81%A8%E7%8B%AC%E8%87%AA%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%81%AE%E5%AE%9F%E8%A3%85"
+        onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li class="fb-btn">
+      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210428d/&t=Cypress%20-%20%E6%9B%B8%E3%81%8D%E3%82%84%E3%81%99%E3%81%84%E3%83%86%E3%82%B9%E3%83%88%E3%81%AE%E7%A7%98%E5%AF%86%E3%81%A8%E7%8B%AC%E8%87%AA%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%81%AE%E5%AE%9F%E8%A3%85"
+        onclick="window.open(this.href, 'fbsharewindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li class="hatebu-btn">
+      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210428d/"
+        onclick="window.open(this.href, 'hatebuwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="hatebu-btn-label">1</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li class="pocket-btn">
+      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210428d/"
+        onclick="window.open(this.href, 'pocketwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="pocket-btn-label">4</span>
+      </a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+  </article>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav">
+      
+    <li>2019.07.13<a href="/articles/20190713/" title="他の言語になれた人が、初めてGoを書いた時にわかりにくいな、と思った部分はどういうところがあるのか、難しいポイントはどこか、という情報を自分の経験や、会社の内外の人に聞いたりしてまとめてみました。">Goを学ぶときにつまずきやすいポイントFAQ</a></li>
+
+    <li>2020.11.07<a href="/articles/20201107/" title="フューチャーOSS推進タスクフォースを開始しました。実は7月に発足してから8月には活動の骨子が固まり、タスクフォース自体は始動していましたが、中身を作ってから告知した方が具体性があってブレも無くなり良いのでは？という話があり、少しタイミングをずらしてのご報告です。">フューチャーOSS推進タスクフォース始めます</a></li>
+
+    <li>2020.10.20<a href="/articles/20201020/" title="学生から社会人になると様々な環境の変化が起きてそれに適応していくのが大変なのが世の常ではありますが、現代社会の仕事において切っては切れないPC周りの設定も変わってきます。特に会社ではあらゆる驚異から大切な情報を守るために、家庭用PCとはまた異なるセキュリティが組まれていることが往々にしてあり、ITを生業とする会社であっても設定周りで苦労することがあります。そこで、会社に入って設定される用語とその機能関係、そしてそれによって影響を受ける開発環境（特にDocker）について、簡単にまとめます。ここでのキーワードは以下のとおりです。">ProxyとDockerと新人社員と時々わたし</a></li>
+
+    <li>2020.09.30<a href="/articles/20200930/" title="Open Policy Agent（OPA）は汎用的なポリシーエンジンで、[Rego] と呼ばれるポリシー言語で定義されたルールに従って、入力がポリシーに沿っているか否かの判定を移譲させることができます。Regoで宣言的にポリシーを実装し、Policy as Code を実現できます。コーディング規約も一種のポリシーとみなして、Open API Spec（Swagger）をLinter的にチェックするツールを題材に、OPAを用いて開発してみたいと思います。">Policy as Code を実現する Open Policy Agent に憧れて。ポリシーコードでAPI仕様をLintする</a></li>
+
+    <li>2020.08.21<a href="/articles/20200821/" title="システム開発にてオープンソースのライブラリやフレームワークを利用することは、もはや当たり前となっています。みなさんはOSSのライセンスについてどの程度理解していますでしょうか。OSSだから無条件に利用可能だと思っていませんか？">エンジニアが最低限理解しておくべきOSSライセンスの基礎知識</a></li>
+
+    <li>2020.07.03<a href="/articles/20200703/" title="エンタープライズでのミッションクリティカル領域においてもクラウド利用が普通になってきています。その過程において今までできないことを指向する試みも行われてきています。その代表的なものがクラウドの備えるリソースの高い拡張性と弾力性を利用したシステム展開です。例えば「より多くのデータを扱う」「同業他社に向けたサービス展開をする（マルチテナンシー）」といったものがあります。その際のアーキテクチャ選定では将来の利用を想定した選択を行う必要がありますが、データベースのスケールというのは非常に難しく簡単ではありません。">スケーラブルデータベース ～クラウドにおける後悔しないデータベース選定～</a></li>
+
+    <li>2020.05.01<a href="/articles/20200501/" title="フロントエンド記事集中投稿ウィークの3本目です。">TypeScriptでReactをやるときは、小さいアプリでもReduxを最初から使ってもいいかもねというお話</a></li>
+
+    <li>2020.04.16<a href="/articles/20200416/" title="さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知でしょうか？Salesforceと非常によく似ておりますが、米国発の SaaS, aPaaS サービスです。米国では割とポピュラーなサービスとして位置づけられていますが、日本ではまだまだです。が、伸び率は今年度は4割近くと、利用ユーザがすごい勢いで伸びています。そんな中、お客様内でSNOWを利用していて、それと関連する領域をFutureが担当するケースも増えてくるかと思いますので、今回は本ブログでSNOWについて少しだけ紹介したいと思います。SNOW とは？の説明は、言葉だけだと概念過ぎてわかりづらいので、現状、私が直面している課題の解決案ベースで解説していきたいと思います。">ServiceNow+Terraform(+Go) によるインフラ構築自動化</a></li>
+
+    <li>2020.03.31<a href="/articles/20200331/" title="サーバレス連載企画の第5回はCloudEvents(https://cloudevents.io/)を取り上げたいと思います。CloudEventsとは様々存在するイベントを統一的に扱いたいとの思いから登場した統一仕様です。2019.10.24にCNCF(https://www.cncf.io/)のIncubatorプロジェクトに昇格したらしく、同時にv1.0のSpecificationがリリースされています。">Serverless連載5: CloudEventsのGo版SDKをいじってみる</a></li>
+
+    <li>2018.10.31<a href="/articles/20181031/" title="社内問い合わせ窓口のRedmineに対して、AIコンシェルジュのあいちゃんがパワーアップしてチケットレコメンド業務をこなしてもらえるようにしました。">その問い合わせ、AIが解決します！～Redmineチケットレコメンドシステムのご紹介～</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+<!-- CATEGORIES START -->
+<h3 class="margin-top-30">カテゴリー</h3>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+    <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+    <li><a href="/categories/IoT/">IoT (14)</a></li>
+    
+    <li><a href="/categories/VR/">VR (10)</a></li>
+    
+    <li><a href="/categories/Security/">Security (2)</a></li>
+    
+    <li><a href="/categories/Design/">Design (7)</a></li>
+    
+    <li><a href="/categories/Programming/">Programming (168)</a></li>
+    
+    <li><a href="/categories/Management/">Management (9)</a></li>
+    
+    <li><a href="/categories/Infrastructure/">Infrastructure (131)</a></li>
+    
+    <li><a href="/categories/DB/">DB (14)</a></li>
+    
+    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+    
+    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+          <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+          <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+              t._e.push(f);
+            };
+            return t;
+          }(document, "script", "twitter-wjs"));</script>
+          
+            <!-- BEGIN TWITTER BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <!-- Twitterフォローボタン -->
+              <li class="twitter-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                </a>
+              </li>
+              <!-- Twitterタイムライン -->
+              <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+            </div>
+            <!-- END TWITTER BLOCK -->
+          
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+            &copy; 2021 フューチャー技術ブログ<br>
+          </div>
+          <!-- END COPYRIGHT -->
+	        <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
+    
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
+    
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

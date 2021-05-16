@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>AWS SDK for Goのリトライアルゴリズムを差し替える方法 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめに本記事ではAWS SDK for Goを使ってAWSのAPIをコールする場合のリトライアルゴリズムを差し替える方法を紹介します。 AWS SDK for Go のリトライ  AWS SDK for Go のバージョンは v1.37.6 です。 まず AWS SDK for Go を使ってAPIをコールする場合は、デフォルトでリトライするようになっています1。そのため AWS SDK for">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS SDK for Goのリトライアルゴリズムを差し替える方法 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210218/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめに本記事ではAWS SDK for Goを使ってAWSのAPIをコールする場合のリトライアルゴリズムを差し替える方法を紹介します。 AWS SDK for Go のリトライ  AWS SDK for Go のバージョンは v1.37.6 です。 まず AWS SDK for Go を使ってAPIをコールする場合は、デフォルトでリトライするようになっています1。そのため AWS SDK for">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210218/awsgo.png">
+<meta property="article:published_time" content="2021-02-17T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-05-12T01:15:35.923Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="リトライ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210218/awsgo.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="AWS,Go,リトライ" name="keywords">
+  <meta content="辻大志郎" name="author">
+
+  <link rel="stylesheet" href="/metronic/assets/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20210218/">AWS SDK for Goのリトライアルゴリズムを差し替える方法</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20210218_AWS_SDK_for_Goのリトライアルゴリズムを差し替える方法" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+      <li class="blog-info-item"><a href="/authors/%E8%BE%BB%E5%A4%A7%E5%BF%97%E9%83%8E">辻大志郎</a></li>
+      <li class="blog-info-item"><time datetime="2021-02-17T15:00:00.000Z" itemprop="datePublished">2021/02/18</time>
+</li>
+      <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/AWS/" title="AWS">AWS</a></li> 
+  
+    <li><a href="/tags/Go/" title="Go">Go</a></li> 
+  
+    <li><a href="/tags/%E3%83%AA%E3%83%88%E3%83%A9%E3%82%A4/" title="リトライ">リトライ</a>
+  
+  </ul>
+
+</li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>本記事では<a target="_blank" rel="noopener" href="https://github.com/aws/aws-sdk-go">AWS SDK for Go</a>を使ってAWSのAPIをコールする場合のリトライアルゴリズムを差し替える方法を紹介します。</p>
+<h1 id="AWS-SDK-for-Go-のリトライ"><a href="#AWS-SDK-for-Go-のリトライ" class="headerlink" title="AWS SDK for Go のリトライ"></a><code>AWS SDK for Go</code> のリトライ</h1><img src="/images/20210218/awsgo.png" class="img-middle-size">
+
+<p><code>AWS SDK for Go</code> のバージョンは <a target="_blank" rel="noopener" href="https://github.com/aws/aws-sdk-go/releases/tag/v1.37.6"><code>v1.37.6</code></a> です。</p>
+<p>まず <code>AWS SDK for Go</code> を使ってAPIをコールする場合は、デフォルトでリトライするようになっています<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>。そのため <code>AWS SDK for Go</code> を使うアプリケーション側でリトライを実装する必要はありません。<code>AWS SDK for Go</code> 上の実装は <a target="_blank" rel="noopener" href="https://github.com/aws/aws-sdk-go/blob/v1.37.6/aws/client/default_retryer.go#L12-L36"><code>client.DefaultRetryer</code></a> がリトライを実施します。リトライ時の待ち時間である <code>time.Duration</code> を計算するアルゴリズムは <code>RetryRules</code> メソッドとして実装されています。</p>
+<p>待ち時間を計算するアルゴリズムはExponential Backoff And Jitter<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>です。</p>
+<ul>
+<li>リトライの再試行の待ち時間を計算する <code>RetryRules</code> メソッド</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// RetryRules returns the delay duration before retrying this request again</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(d DefaultRetryer)</span> <span class="title">RetryRules</span><span class="params">(r *request.Request)</span> <span class="title">time</span>.<span class="title">Duration</span></span> &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">// if number of max retries is zero, no retries will be performed.</span></span><br><span class="line">	<span class="keyword">if</span> d.NumMaxRetries == <span class="number">0</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Sets default value for retryer members</span></span><br><span class="line">	d.setRetryerDefaults()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">// minDelay is the minimum retryer delay</span></span><br><span class="line">	minDelay := d.MinRetryDelay</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> initialDelay time.Duration</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	isThrottle := r.IsErrorThrottle()</span><br><span class="line">	<span class="keyword">if</span> isThrottle &#123;</span><br><span class="line">		<span class="keyword">if</span> delay, ok := getRetryAfterDelay(r); ok &#123;</span><br><span class="line">			initialDelay = delay</span><br><span class="line">		&#125;</span><br><span class="line">		minDelay = d.MinThrottleDelay</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	retryCount := r.RetryCount</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">// maxDelay the maximum retryer delay</span></span><br><span class="line">	maxDelay := d.MaxRetryDelay</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> isThrottle &#123;</span><br><span class="line">		maxDelay = d.MaxThrottleDelay</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> delay time.Duration</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Logic to cap the retry count based on the minDelay provided</span></span><br><span class="line">	actualRetryCount := <span class="keyword">int</span>(math.Log2(<span class="keyword">float64</span>(minDelay))) + <span class="number">1</span></span><br><span class="line">	<span class="keyword">if</span> actualRetryCount &lt; <span class="number">63</span>-retryCount &#123;</span><br><span class="line">		delay = time.Duration(<span class="number">1</span>&lt;&lt;<span class="keyword">uint64</span>(retryCount)) * getJitterDelay(minDelay)</span><br><span class="line">		<span class="keyword">if</span> delay &gt; maxDelay &#123;</span><br><span class="line">			delay = getJitterDelay(maxDelay / <span class="number">2</span>)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		delay = getJitterDelay(maxDelay / <span class="number">2</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> delay + initialDelay</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://github.com/aws/aws-sdk-go/blob/d8a5a9febe5602f134648c18e9f83546284cda35/aws/client/default_retryer.go#L77-L123">https://github.com/aws/aws-sdk-go/blob/d8a5a9febe5602f134648c18e9f83546284cda35/aws/client/default_retryer.go#L77-L123</a></p>
+<h3 id="デフォルトの設定"><a href="#デフォルトの設定" class="headerlink" title="デフォルトの設定"></a>デフォルトの設定</h3><p>デフォルトのリトライの設定は以下のようになっています。</p>
+<table>
+<thead>
+<tr>
+<th align="center">No</th>
+<th>項目</th>
+<th>説明</th>
+<th>デフォルト値(単位)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td><code>NumMaxRetries</code></td>
+<td>最大リトライ回数</td>
+<td>3 (回)</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td><code>MinRetryDelay</code></td>
+<td>リトライ時の最小の待ち時間</td>
+<td>30 (ミリ秒)</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td><code>MinThrottleDelay</code></td>
+<td>リトライスロットリング<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>時の最小の待ち時間</td>
+<td>300 (ミリ秒)</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td><code>MaxRetryDelay</code></td>
+<td>リトライ時の最大の待ち時間</td>
+<td>300 (秒)</td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td><code>MaxThrottleDelay</code></td>
+<td>リトライスロットリング時の最大の待ち時間</td>
+<td>300 (秒)</td>
+</tr>
+</tbody></table>
+<h1 id="RetryRules-を差し替える"><a href="#RetryRules-を差し替える" class="headerlink" title="RetryRules を差し替える"></a><code>RetryRules</code> を差し替える</h1><p>基本的にはSDKが提供するデフォルトのリトライを実施することで問題ないでしょう。差し替えたくなるケースの一つは、リトライ回数を増やしてリトライエラーを発生させたくないケースです。(ただし、リトライ回数を増やすことでリトライエラーを速やかに解消できる場合に限ります。)リトライ回数が増えると待ち時間が大きくなり、デフォルトの設定の場合最大で300秒です。特定のケースではなるべく早くリトライを試行したい場合があるでしょう。このような場合にリトライアルゴリズムを差し替える方法が役に立ちます。</p>
+<h2 id="差し替える方法"><a href="#差し替える方法" class="headerlink" title="差し替える方法"></a>差し替える方法</h2><p><code>Config</code> の <code>Retryer</code> フィールドに値をセットすることで差し替えることができます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Config <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">	<span class="comment">// Retryer guides how HTTP requests should be retried in case of</span></span><br><span class="line">	<span class="comment">// recoverable failures.</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">	<span class="comment">// When nil or the value does not implement the request.Retryer interface,</span></span><br><span class="line">	<span class="comment">// the client.DefaultRetryer will be used.</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">	<span class="comment">// When both Retryer and MaxRetries are non-nil, the former is used and</span></span><br><span class="line">	<span class="comment">// the latter ignored.</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">	<span class="comment">// To set the Retryer field in a type-safe manner and with chaining, use</span></span><br><span class="line">	<span class="comment">// the request.WithRetryer helper function:</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">	<span class="comment">//   cfg := request.WithRetryer(aws.NewConfig(), myRetryer)</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">	Retryer RequestRetryer</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://github.com/aws/aws-sdk-go/blob/d8a5a9febe5602f134648c18e9f83546284cda35/aws/config.go#L94-L108">https://github.com/aws/aws-sdk-go/blob/d8a5a9febe5602f134648c18e9f83546284cda35/aws/config.go#L94-L108</a></p>
+<p><code>Retryer</code> は <code>request.Retryer</code> を満たす型です。<code>Retryer</code> の実装上は <code>RequestRetryer</code> 型で <code>interface&#123;&#125;</code> 型へのDefined typeになっていますが、<code>request.Retryer</code> を満たしていない場合は <code>DefaultRetryer</code> が使われます。</p>
+<p><code>client.DefaultRetryer</code> 構造体を埋め込んで <code>RetryRules</code> メソッドを実装する方法がおすすめです。構造体の埋め込みを利用して、委譲したいメソッドだけを実装する手法はGoではよく使われます。リトライするかどうかの判断基準 (<code>ShouldRetry</code>) はデフォルトの実装のままで、リトライの待ち時間の計算アルゴリズムのみを差し替えることができます。以下の実装は <a target="_blank" rel="noopener" href="https://github.com/jpillora/backoff"><code>jpillora/backoff</code></a> のシンプルな上限付きExponential Backoff And Jitterを使った実装です。</p>
+<ul>
+<li>retryer.go</li>
+</ul>
+<figure class="highlight go"><figcaption><span>retryer.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> sample</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws/client&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws/request&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/jpillora/backoff&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> customRetryer <span class="keyword">struct</span> &#123;</span><br><span class="line">	*backoff.Backoff</span><br><span class="line">	client.DefaultRetryer</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewCustomRetryer</span><span class="params">(cfg *backoff.Backoff, numRetries <span class="keyword">int</span>)</span> *<span class="title">customRetryer</span></span> &#123;</span><br><span class="line">	r := &amp;customRetryer&#123;Backoff: cfg&#125;</span><br><span class="line">	r.NumMaxRetries = numRetries</span><br><span class="line">	<span class="keyword">return</span> r</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(cr customRetryer)</span> <span class="title">RetryRules</span><span class="params">(req *request.Request)</span> <span class="title">time</span>.<span class="title">Duration</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> cr.Backoff.Duration()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> _ request.Retryer = &amp;customRetryer&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>main.go</li>
+</ul>
+<figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws/endpoints&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws/session&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/service/lambda&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/d-tsuji/go-sandbox/customretry/sample&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/jpillora/backoff&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> (</span><br><span class="line">	lmd         *lambda.Lambda</span><br><span class="line">	maxRetryNum = <span class="number">10</span> <span class="comment">// リトライ上限回数は環境変数などから取得</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lmd = lambda.New(session.Must(session.NewSession(&amp;aws.Config&#123;</span><br><span class="line">		Region:     aws.String(endpoints.ApNortheast1RegionID),</span><br><span class="line">		MaxRetries: aws.Int(maxRetryNum),</span><br><span class="line">		Retryer: sample.NewCustomRetryer(&amp;backoff.Backoff&#123;</span><br><span class="line">			Min:    <span class="number">10</span> * time.Millisecond,</span><br><span class="line">			Max:    <span class="number">300</span> * time.Millisecond,</span><br><span class="line">			Factor: <span class="number">2</span>,</span><br><span class="line">			Jitter: <span class="literal">true</span>,</span><br><span class="line">		&#125;, maxRetryNum),</span><br><span class="line">	&#125;)))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上記のようにリトライアルゴリズムを差し替えることができます。もちろん <code>client.DefaultRetryer</code> を使って、リトライの設定(<code>client.DefaultRetryer</code> の <code>MaxRetryDelay</code> など)を変えることによってリトライの待ち時間の計算に影響を及ぼすこともできます。<code>AWS SDK for Go</code> が提供するデフォルトのリトライアルゴリズム・設定ではパフォーマンス上の問題があるケースなど、リトライのアルゴリズムや設定を差し替えたい場合に本記事が参考になれば幸いです。</p>
+<h1 id="関連記事"><a href="#関連記事" class="headerlink" title="関連記事"></a>関連記事</h1><div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://future-architect.github.io/articles/20200121/index.html" data-iframely-url="//cdn.iframe.ly/raMwXJI?iframe=card-small"></a></div></div>
+
+<div class="iframely-embed"><div class="iframely-responsive" style="height: 140px; padding-bottom: 0;"><a href="https://future-architect.github.io/articles/20201112/index.html" data-iframely-url="//cdn.iframe.ly/l2eSPH0?iframe=card-small"></a></div></div>
+
+<script async src="//cdn.iframe.ly/embed.js" charset="utf-8"></script>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">https://docs.aws.amazon.com/ja_jp/general/latest/gr/api-retries.html</span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">2.</span><span style="display: inline-block; vertical-align: top;">https://aws.amazon.com/jp/blogs/architecture/exponential-backoff-and-jitter/</span><a href="#fnref:2" rev="footnote"> ↩</a></li><li id="fn:3"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">3.</span><span style="display: inline-block; vertical-align: top;">リトライスロットリングが何かという説明は<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/blogs/developer/introducing-retry-throttling/">Introducing Retry Throttling</a>や<a href="https://future-architect.github.io/articles/20200121/">スロットリングとの付き合い方</a>を参照</span><a href="#fnref:3" rev="footnote"> ↩</a></li></ol></div></div>
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li class="twitter-btn">
+      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210218/&via=future_techblog&related=twitterapi%2Ctwitter&text=AWS%20SDK%20for%20Go%E3%81%AE%E3%83%AA%E3%83%88%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0%E3%82%92%E5%B7%AE%E3%81%97%E6%9B%BF%E3%81%88%E3%82%8B%E6%96%B9%E6%B3%95"
+        onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li class="fb-btn">
+      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210218/&t=AWS%20SDK%20for%20Go%E3%81%AE%E3%83%AA%E3%83%88%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0%E3%82%92%E5%B7%AE%E3%81%97%E6%9B%BF%E3%81%88%E3%82%8B%E6%96%B9%E6%B3%95"
+        onclick="window.open(this.href, 'fbsharewindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li class="hatebu-btn">
+      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210218/"
+        onclick="window.open(this.href, 'hatebuwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="hatebu-btn-label">3</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li class="pocket-btn">
+      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210218/"
+        onclick="window.open(this.href, 'pocketwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="pocket-btn-label">8</span>
+      </a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+  </article>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav">
+      
+    <li>2021.05.10<a href="/articles/20210510b/" title="この記事はDart/Flutter連載の1記事目です。TIGの伊藤真彦です。Dart/Flutter入門に参加します、DartといえばFlutterの話が必ずついてくるものですが、今回は連載1記事目として、敢えてプログラミング言語としてのDartに焦点を絞った記事にします。">Dart入門</a></li>
+
+    <li>2021.04.28<a href="/articles/20210428b/" title="Cypressの設定周りについて紹介します。何も手を加えないデフォルトでも動作はする">Cypress - 設定編</a></li>
+
+    <li>2021.04.10<a href="/articles/20210410/" title="参加しているプロジェクトで、OpenAPI定義ファイルからモックサーバを建てることができるOSSツール「Prism」を導入することになりました。この記事では、Prism導入の手順や、躓いた点などを紹介します。">OpenAPIからモックサーバを建てられるPrismを実際のプロジェクトに導入してみた</a></li>
+
+    <li>2021.02.01<a href="/articles/20210201/" title="もともと、お仕事的には2019年にはリモートではあったのですが（仕事のカウンターが海外で、自社に出社しても、客先の日本のオフィスに行っても、テレビ会議とチャットで仕事していた）、2020年の3月からは自宅で仕事をすることになり、いろいろ整備しました。">自宅仕事環境構築：指向性マイクの勧め</a></li>
+
+    <li>2021.01.07<a href="/articles/20210107/" title="Electronは、GitHubが開発したオープンソースのソフトウェアフレームワークです。ChromiumとNode.jsをコアとして採用する事で、Web開発と同じようにHTML,CSS,JavaScriptを用いて開発したものを..">Electronの使い方 Web開発の技術でデスクトップアプリを作ろう</a></li>
+
+    <li>2020.09.10<a href="/articles/20200910/" title="初のオンライン＆Python 2サポートが終了したあとのPyCon.jpという節目のイベントで発表してきました。![IMG_0039.PNG]発表資料はこちらになります。">「2020年代のコンテナ時代のPythonアーキテクチャ&デプロイ」というテーマでPyCon.jp 2020で発表してきました</a></li>
+
+    <li>2020.08.07<a href="/articles/20200807/" title="Go は標準ライブラリが充実しているとよく言われます。標準ライブラリだけで、HTTP サーバを作れたり、暗号化処理や、JSON や CSV といったデータ形式を扱うことができます">GoとSuffixArray</a></li>
+
+    <li>2020.05.28<a href="/articles/20200528/" title="Goでプロジェクトのフォルダ構成どうしよう、とググると見つかるStandard Go Project Layout(https://github.com/golang-standards/project-layout)。とはいえ、これはかなりコード量を増やしてしまう恐れがありますので、導入する場合のデメリットも考えておく方が良いです。">あなたのGoアプリ/ライブラリのパッケージ構成もっとシンプルでよくない？</a></li>
+
+    <li>2020.05.01<a href="/articles/20200501/" title="フロントエンド記事集中投稿ウィークの3本目です。">TypeScriptでReactをやるときは、小さいアプリでもReduxを最初から使ってもいいかもねというお話</a></li>
+
+    <li>2020.04.16<a href="/articles/20200416/" title="さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知でしょうか？Salesforceと非常によく似ておりますが、米国発の SaaS, aPaaS サービスです。米国では割とポピュラーなサービスとして位置づけられていますが、日本ではまだまだです。が、伸び率は今年度は4割近くと、利用ユーザがすごい勢いで伸びています。そんな中、お客様内でSNOWを利用していて、それと関連する領域をFutureが担当するケースも増えてくるかと思いますので、今回は本ブログでSNOWについて少しだけ紹介したいと思います。SNOW とは？の説明は、言葉だけだと概念過ぎてわかりづらいので、現状、私が直面している課題の解決案ベースで解説していきたいと思います。">ServiceNow+Terraform(+Go) によるインフラ構築自動化</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+<!-- CATEGORIES START -->
+<h3 class="margin-top-30">カテゴリー</h3>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+    <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+    <li><a href="/categories/IoT/">IoT (14)</a></li>
+    
+    <li><a href="/categories/VR/">VR (10)</a></li>
+    
+    <li><a href="/categories/Security/">Security (2)</a></li>
+    
+    <li><a href="/categories/Design/">Design (7)</a></li>
+    
+    <li><a href="/categories/Programming/">Programming (168)</a></li>
+    
+    <li><a href="/categories/Management/">Management (9)</a></li>
+    
+    <li><a href="/categories/Infrastructure/">Infrastructure (131)</a></li>
+    
+    <li><a href="/categories/DB/">DB (14)</a></li>
+    
+    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+    
+    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+          <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+          <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+              t._e.push(f);
+            };
+            return t;
+          }(document, "script", "twitter-wjs"));</script>
+          
+            <!-- BEGIN TWITTER BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <!-- Twitterフォローボタン -->
+              <li class="twitter-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                </a>
+              </li>
+              <!-- Twitterタイムライン -->
+              <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+            </div>
+            <!-- END TWITTER BLOCK -->
+          
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+            &copy; 2021 フューチャー技術ブログ<br>
+          </div>
+          <!-- END COPYRIGHT -->
+	        <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
+    
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
+    
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

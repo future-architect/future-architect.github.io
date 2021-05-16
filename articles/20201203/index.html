@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>GoがApple Siliconにネイティブ対応したのでベンチマークをとってみました | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="Goアドベントカレンダーその5です。 ARMなMacが出るとWWDCで発表されてから首を長くしてまっていて、発表と同時にMacBook Proを買って、アプリケーションのARMネイティブ対応がされているかいろいろインストールして試してみたりしています。まだ発売されて2週間足らずですが（といっても、みんな開発キットをつかって以前から準備したようですが）、動作しているアプリケーションは多いです。発売後">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GoがApple Siliconにネイティブ対応したのでベンチマークをとってみました | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20201203/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="Goアドベントカレンダーその5です。 ARMなMacが出るとWWDCで発表されてから首を長くしてまっていて、発表と同時にMacBook Proを買って、アプリケーションのARMネイティブ対応がされているかいろいろインストールして試してみたりしています。まだ発売されて2週間足らずですが（といっても、みんな開発キットをつかって以前から準備したようですが）、動作しているアプリケーションは多いです。発売後">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20201203/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88_2020-12-03_13.06.21.png">
+<meta property="article:published_time" content="2020-12-02T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-11T08:20:24.383Z">
+<meta property="article:tag" content="Go">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20201203/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88_2020-12-03_13.06.21.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="Go" name="keywords">
+  <meta content="澁川喜規" name="author">
+
+  <link rel="stylesheet" href="/metronic/assets/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20201203/">GoがApple Siliconにネイティブ対応したのでベンチマークをとってみました</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20201203_GoがApple_Siliconにネイティブ対応したのでベンチマークをとってみました" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+      <li class="blog-info-item"><a href="/authors/%E6%BE%81%E5%B7%9D%E5%96%9C%E8%A6%8F">澁川喜規</a></li>
+      <li class="blog-info-item"><time datetime="2020-12-02T15:00:00.000Z" itemprop="datePublished">2020/12/03</time>
+</li>
+      <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/Go/" title="Go">Go</a>
+  
+  </ul>
+
+</li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a target="_blank" rel="noopener" href="https://qiita.com/advent-calendar/2020/go5">Goアドベントカレンダーその5</a>です。</p>
+<p>ARMなMacが出るとWWDCで発表されてから首を長くしてまっていて、発表と同時にMacBook Proを買って、<a target="_blank" rel="noopener" href="https://qiita.com/shibukawa/items/797b7cbb7e530842e6f7">アプリケーションのARMネイティブ対応</a>がされているかいろいろインストールして試してみたりしています。まだ発売されて2週間足らずですが（といっても、みんな開発キットをつかって以前から準備したようですが）、動作しているアプリケーションは多いです。発売後にも、Erlang、Node.jsあたりはmasterブランチにパッチが入りました。Goも、<a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/38485">昨日パッチがマージ</a>されました。</p>
+<p>業務利用が多い言語のうちの一つということで、手元のPCで軽くベンチマークをとってみました。使った機種は3つです。</p>
+<ul>
+<li>2020モデルのM1のMacBook Pro</li>
+<li>2020モデルの10th Gen Core i5のMacBook Air</li>
+<li>Ryzen 9 4900HSのASUSのZephyrus G14</li>
+</ul>
+<p>前2つがTDP 10Wクラスの中、RyzenだけTDP 35Wでだいぶ上のクラスではあります。ベンチマークは<a target="_blank" rel="noopener" href="https://github.com/SimonWaldherr/golang-benchmarks">github.com/SimonWaldherr/golang-benchmarks</a>を利用しています。Goはmasterの<a target="_blank" rel="noopener" href="https://github.com/golang/go/commit/0433845ad18a355413033bb3495ba3195f4c69ec">0433845</a>をとってきて、Intel Mac上から、bootstrap.bashでarm64/darwin、amd64/darwin、amd64/windowsの3セット作って使いました。コア数はそれぞれ8(低速4+高速4)、8(物理4、論理8)、16(物理8、論理16)と構成に違いはあるものの、特にマルチスレッド性能を測るテストはなく、-cpuオプションを設定しても結果は違いがなかったので、デフォルト値で実行しています。</p>
+<p>ベンチマークの数値の結果は<a target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1hzwyeWSNknyV3AhAnOJOifoR1f8UxQP_N9jMJv26Deg/edit?usp=sharing">こちら</a>です。Goのベンチマークはタスクごとの経過時間で出てくるので、MacBook Airの結果を100として相対値をとってグラフにしたのが以下の図です（項目が多くてラベルが半分非表示になっていますが）。グラフは短いほど高速です。</p>
+<p><img src="/images/20201203/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88_2020-12-03_13.06.21.png"></p>
+<p>たまにハッシュ計算とかでかなり遅いものがありますが、おそらくCPUの命令を駆使して高速化、みたいなのがまだきちんと行われていない領域だと思うので、そこはコミットチャンスかと思います。あと、Boolのパースがなぜか遅い。といっても1.5nsと0.3nsとかなので割合でみるとすごい遅く見えますが、実際には影響は少ないかと。</p>
+<p>大雑把にみると、MacBook AirのCore i5に比べて概ね1.5〜2倍ぐらい高速ですね。Ryzenに対してもかなり高速。この2機種とも、今年の頭のモデルで比較的新しくてそこまで遅くないのですけどね。ただ、Ryzen機が暖かいので（GeForceのGPUのおかげかもしれませんが）、寒い冬にはとても優しいので、個人的にはRyzen優勝にしたいと思います。</p>
+<p>詳細な結果は以下の通り。単位はnsで、数字が小さいほど高速です。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>M1</th>
+<th>M1(rosetta)</th>
+<th>Core i5-1030G7</th>
+<th>Ryzen 9 4900HS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>BenchmarkBase64decode-8</td>
+<td>75.52</td>
+<td>124</td>
+<td>113.6</td>
+<td>112.8</td>
+</tr>
+<tr>
+<td>BenchmarkBase64regex-8</td>
+<td>13271</td>
+<td>18101</td>
+<td>22755</td>
+<td>24957</td>
+</tr>
+<tr>
+<td>BenchmarkNumberRegEx-8</td>
+<td>8616</td>
+<td>11622</td>
+<td>15494</td>
+<td>17492</td>
+</tr>
+<tr>
+<td>BenchmarkFulltextRegEx-8</td>
+<td>7098</td>
+<td>9619</td>
+<td>12552</td>
+<td>13851</td>
+</tr>
+<tr>
+<td>BenchmarkNumberParse-8</td>
+<td>54.91</td>
+<td>63.28</td>
+<td>69.32</td>
+<td>70.62</td>
+</tr>
+<tr>
+<td>BenchmarkFulltextParse-8</td>
+<td>783.4</td>
+<td>949.1</td>
+<td>1020</td>
+<td>955.1</td>
+</tr>
+<tr>
+<td>BenchmarkConcatString-8</td>
+<td>23788</td>
+<td>40679</td>
+<td>48756</td>
+<td>70460</td>
+</tr>
+<tr>
+<td>BenchmarkConcatBuffer-8</td>
+<td>4.792</td>
+<td>7.568</td>
+<td>8.636</td>
+<td>6.425</td>
+</tr>
+<tr>
+<td>BenchmarkConcatBuilder-8</td>
+<td>2.662</td>
+<td>3.659</td>
+<td>4.594</td>
+<td>2.595</td>
+</tr>
+<tr>
+<td>BenchmarkContains-8</td>
+<td>5.465</td>
+<td>9.55</td>
+<td>10.23</td>
+<td>7.279</td>
+</tr>
+<tr>
+<td>BenchmarkContainsNot-8</td>
+<td>6.993</td>
+<td>10.45</td>
+<td>11.29</td>
+<td>7.489</td>
+</tr>
+<tr>
+<td>BenchmarkContainsBytes-8</td>
+<td>6.198</td>
+<td>10.21</td>
+<td>11.55</td>
+<td>8.718</td>
+</tr>
+<tr>
+<td>BenchmarkContainsBytesNot-8</td>
+<td>7.74</td>
+<td>11.2</td>
+<td>13.31</td>
+<td>8.996</td>
+</tr>
+<tr>
+<td>BenchmarkCompileMatch-8</td>
+<td>80.4</td>
+<td>121.3</td>
+<td>111.1</td>
+<td>111.1</td>
+</tr>
+<tr>
+<td>BenchmarkCompileMatchNot-8</td>
+<td>35.95</td>
+<td>65.89</td>
+<td>55.98</td>
+<td>55.14</td>
+</tr>
+<tr>
+<td>BenchmarkMatch-8</td>
+<td>870.8</td>
+<td>1261</td>
+<td>1969</td>
+<td>1745</td>
+</tr>
+<tr>
+<td>BenchmarkMatchNot-8</td>
+<td>837.3</td>
+<td>1237</td>
+<td>1875</td>
+<td>1697</td>
+</tr>
+<tr>
+<td>BenchmarkForMap-8</td>
+<td>20.56</td>
+<td>22.97</td>
+<td>29.94</td>
+<td>23.39</td>
+</tr>
+<tr>
+<td>BenchmarkRangeMap-8</td>
+<td>55.31</td>
+<td>58.52</td>
+<td>88.86</td>
+<td>69.77</td>
+</tr>
+<tr>
+<td>BenchmarkRangeSlice-8</td>
+<td>3.8</td>
+<td>3.865</td>
+<td>3.758</td>
+<td>2.619</td>
+</tr>
+<tr>
+<td>BenchmarkRangeSliceKey-8</td>
+<td>4.528</td>
+<td>4.545</td>
+<td>5.23</td>
+<td>3.617</td>
+</tr>
+<tr>
+<td>BenchmarkAdler32-8</td>
+<td>764.9</td>
+<td>830.3</td>
+<td>1007</td>
+<td>714.6</td>
+</tr>
+<tr>
+<td>BenchmarkBlake2b256-8</td>
+<td>2612</td>
+<td>4930</td>
+<td>2561</td>
+<td>2105</td>
+</tr>
+<tr>
+<td>BenchmarkBlake2b512-8</td>
+<td>2626</td>
+<td>4958</td>
+<td>2580</td>
+<td>2167</td>
+</tr>
+<tr>
+<td>BenchmarkBlake3256-8</td>
+<td>6339</td>
+<td>エラー</td>
+<td>3460</td>
+<td>2782</td>
+</tr>
+<tr>
+<td>BenchmarkMMH3-8</td>
+<td>413.4</td>
+<td>468.5</td>
+<td>431</td>
+<td>345</td>
+</tr>
+<tr>
+<td>BenchmarkCRC32-8</td>
+<td>1098</td>
+<td>139.2</td>
+<td>140.5</td>
+<td>163.7</td>
+</tr>
+<tr>
+<td>BenchmarkFnv128-8</td>
+<td>4924</td>
+<td>7617</td>
+<td>3448</td>
+<td>6084</td>
+</tr>
+<tr>
+<td>BenchmarkMD5-8</td>
+<td>3566</td>
+<td>4345</td>
+<td>3283</td>
+<td>2635</td>
+</tr>
+<tr>
+<td>BenchmarkSHA1-8</td>
+<td>5789</td>
+<td>4247</td>
+<td>2924</td>
+<td>2041</td>
+</tr>
+<tr>
+<td>BenchmarkSHA256-8</td>
+<td>10865</td>
+<td>7832</td>
+<td>6361</td>
+<td>4346</td>
+</tr>
+<tr>
+<td>BenchmarkSHA512-8</td>
+<td>7801</td>
+<td>3987</td>
+<td>4685</td>
+<td>2939</td>
+</tr>
+<tr>
+<td>BenchmarkSHA3256-8</td>
+<td>4575</td>
+<td>6080</td>
+<td>8312</td>
+<td>9898</td>
+</tr>
+<tr>
+<td>BenchmarkSHA3512-8</td>
+<td>7929</td>
+<td>10540</td>
+<td>14666</td>
+<td>17115</td>
+</tr>
+<tr>
+<td>BenchmarkWhirlpool-8</td>
+<td>35819</td>
+<td>44605</td>
+<td>59697</td>
+<td>41050</td>
+</tr>
+<tr>
+<td>BenchmarkMapStringKeys-8</td>
+<td>82.45</td>
+<td>104.4</td>
+<td>107.5</td>
+<td>132.5</td>
+</tr>
+<tr>
+<td>BenchmarkMapIntKeys-8</td>
+<td>49.72</td>
+<td>73.35</td>
+<td>74.43</td>
+<td>87.11</td>
+</tr>
+<tr>
+<td>BenchmarkJsonMarshal-8</td>
+<td>1422</td>
+<td>1981</td>
+<td>3076</td>
+<td>1907</td>
+</tr>
+<tr>
+<td>BenchmarkJsonUnmarshal-8</td>
+<td>5496</td>
+<td>7963</td>
+<td>10694</td>
+<td>8788</td>
+</tr>
+<tr>
+<td>BenchmarkMathInt8-8</td>
+<td>0.3465</td>
+<td>0.3442</td>
+<td>0.342</td>
+<td>0.2602</td>
+</tr>
+<tr>
+<td>BenchmarkMathInt32-8</td>
+<td>0.3505</td>
+<td>0.3478</td>
+<td>0.3656</td>
+<td>0.29</td>
+</tr>
+<tr>
+<td>BenchmarkMathInt64-8</td>
+<td>0.3558</td>
+<td>0.3552</td>
+<td>0.3588</td>
+<td>0.26</td>
+</tr>
+<tr>
+<td>BenchmarkMathAtomicInt32-8</td>
+<td>7.132</td>
+<td>7.864</td>
+<td>6.562</td>
+<td>4.258</td>
+</tr>
+<tr>
+<td>BenchmarkMathAtomicInt64-8</td>
+<td>7.07</td>
+<td>7.758</td>
+<td>7.079</td>
+<td>4.231</td>
+</tr>
+<tr>
+<td>BenchmarkMathMutexInt-8</td>
+<td>12.45</td>
+<td>15.07</td>
+<td>18.69</td>
+<td>8.776</td>
+</tr>
+<tr>
+<td>BenchmarkMathFloat32-8</td>
+<td>0.3594</td>
+<td>0.3636</td>
+<td>0.377</td>
+<td>0.3438</td>
+</tr>
+<tr>
+<td>BenchmarkMathFloat64-8</td>
+<td>0.3551</td>
+<td>0.348</td>
+<td>0.3946</td>
+<td>0.2866</td>
+</tr>
+<tr>
+<td>BenchmarkParseBool-8</td>
+<td>1.598</td>
+<td>0.3529</td>
+<td>0.3532</td>
+<td>0.3208</td>
+</tr>
+<tr>
+<td>BenchmarkParseInt-8</td>
+<td>12.31</td>
+<td>13.28</td>
+<td>20.09</td>
+<td>14.93</td>
+</tr>
+<tr>
+<td>BenchmarkParseFloat-8</td>
+<td>72.39</td>
+<td>80.48</td>
+<td>137.3</td>
+<td>101.6</td>
+</tr>
+<tr>
+<td>BenchmarkMathRand-8</td>
+<td>12.82</td>
+<td>15.15</td>
+<td>24.15</td>
+<td>18.27</td>
+</tr>
+<tr>
+<td>BenchmarkCryptoRand-8</td>
+<td>109.9</td>
+<td>147.7</td>
+<td>202</td>
+<td>285.2</td>
+</tr>
+<tr>
+<td>BenchmarkCryptoRandString-8</td>
+<td>119.1</td>
+<td>146.1</td>
+<td>202.5</td>
+<td>175.8</td>
+</tr>
+<tr>
+<td>BenchmarkMatchString-8</td>
+<td>5371</td>
+<td>7498</td>
+<td>9923</td>
+<td>10558</td>
+</tr>
+<tr>
+<td>BenchmarkMatchStringCompiled-8</td>
+<td>529.2</td>
+<td>551.9</td>
+<td>670.8</td>
+<td>538.3</td>
+</tr>
+<tr>
+<td>BenchmarkMatchStringGolibs-8</td>
+<td>523.5</td>
+<td>559.2</td>
+<td>659.5</td>
+<td>538.2</td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li class="twitter-btn">
+      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20201203/&via=future_techblog&related=twitterapi%2Ctwitter&text=Go%E3%81%8CApple%20Silicon%E3%81%AB%E3%83%8D%E3%82%A4%E3%83%86%E3%82%A3%E3%83%96%E5%AF%BE%E5%BF%9C%E3%81%97%E3%81%9F%E3%81%AE%E3%81%A7%E3%83%99%E3%83%B3%E3%83%81%E3%83%9E%E3%83%BC%E3%82%AF%E3%82%92%E3%81%A8%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%BE%E3%81%97%E3%81%9F"
+        onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li class="fb-btn">
+      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20201203/&t=Go%E3%81%8CApple%20Silicon%E3%81%AB%E3%83%8D%E3%82%A4%E3%83%86%E3%82%A3%E3%83%96%E5%AF%BE%E5%BF%9C%E3%81%97%E3%81%9F%E3%81%AE%E3%81%A7%E3%83%99%E3%83%B3%E3%83%81%E3%83%9E%E3%83%BC%E3%82%AF%E3%82%92%E3%81%A8%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%BE%E3%81%97%E3%81%9F"
+        onclick="window.open(this.href, 'fbsharewindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li class="hatebu-btn">
+      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20201203/"
+        onclick="window.open(this.href, 'hatebuwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="hatebu-btn-label">54</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li class="pocket-btn">
+      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20201203/"
+        onclick="window.open(this.href, 'pocketwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="pocket-btn-label">24</span>
+      </a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+  </article>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav">
+      
+    <li>2020.06.09<a href="/articles/20200609/" title="フューチャーではGraphQLの活用事例はまだ少なく、自分はまだお目にかかったことはないです。しかし、HeadlessCMS界隈を初めGraphQLのAPIを提供するサービスが増えてきました。今後もさらに需要が増えてきそうな予感がしたためGoとGraphQLを春の入門祭りのテーマにしました。学習する上でドキュメントを読み込むだけでは忘れがちです。手を動かしながらタイトルにある鉄道データ検索APIを開発していきましょう">春の入門祭り🌸 #7 作って学ぶGraphQL。gqlgenを用いて鉄道データ検索API開発入門</a></li>
+
+    <li>2021.05.13<a href="/articles/20210513b/" title="Flutterでの画面レイアウトの入門的な内容です。Flutterを触ったことがない方にも「こんな感じで画面が作れるんだな」というイメージがつくようお伝えできればと思います。また、私がつまずいたWidgetのサイズ調整についても記載します。"">Flutterレイアウト入門</a></li>
+
+    <li>2016.10.31<a href="/articles/20161031/" title="重要なアルゴリズムであるにもかかわらず、まとまった情報が少ないSQL実行時のブルームフィルタ(Bloom Filter)アルゴリズムについて紹介します。">SQL実行時のブルームフィルタ(Bloom Filter)アルゴリズム</a></li>
+
+    <li>2021.04.10<a href="/articles/20210410/" title="参加しているプロジェクトで、OpenAPI定義ファイルからモックサーバを建てることができるOSSツール「Prism」を導入することになりました。この記事では、Prism導入の手順や、躓いた点などを紹介します。">OpenAPIからモックサーバを建てられるPrismを実際のプロジェクトに導入してみた</a></li>
+
+    <li>2020.09.30<a href="/articles/20200930/" title="Open Policy Agent（OPA）は汎用的なポリシーエンジンで、[Rego] と呼ばれるポリシー言語で定義されたルールに従って、入力がポリシーに沿っているか否かの判定を移譲させることができます。Regoで宣言的にポリシーを実装し、Policy as Code を実現できます。コーディング規約も一種のポリシーとみなして、Open API Spec（Swagger）をLinter的にチェックするツールを題材に、OPAを用いて開発してみたいと思います。">Policy as Code を実現する Open Policy Agent に憧れて。ポリシーコードでAPI仕様をLintする</a></li>
+
+    <li>2020.05.28<a href="/articles/20200528/" title="Goでプロジェクトのフォルダ構成どうしよう、とググると見つかるStandard Go Project Layout(https://github.com/golang-standards/project-layout)。とはいえ、これはかなりコード量を増やしてしまう恐れがありますので、導入する場合のデメリットも考えておく方が良いです。">あなたのGoアプリ/ライブラリのパッケージ構成もっとシンプルでよくない？</a></li>
+
+    <li>2020.03.27<a href="/articles/20200327/" title="クラウドサービスが充実してくるにつれて、サーバーレスではいろいろなことができるようになっています。HTTPサーバーは動きますし、RDBやNoSQLなストレージも使えますし、PubSubみたいなサービスも利用できます。これらを駆使するとそこそこ複雑な処理も記述できます。一方で、上から下までサーバーレスにしようとするとできないものもいくつかあります。例えば、RDBも使えるといっても制約があり、LambdaやCloud ...">Serverless連載3: Goでサーバーレス用の検索エンジンwatertowerを作ってみました</a></li>
+
+    <li>2020.03.19<a href="/articles/20200319/" title="ちょっとしたフロントエンドの開発で、TypeScriptに最初から対応していて、簡単に使えるものは何かないかな、と調べてみたメモです。React/Vue/Angularの場合はそれぞれの初期化コマンドで何から何まで用意してくれます。Next.js、Nuxt.js、Gatsbyなども、これらのビルドのステップを簡略化するコマンドを提供しています。基本的にこれらのウェブフロントエンドを開発するときには、小規模・中規模ぐらいならあんまり気にしなくておまかせでもいいと思います。今回は、それらのフレームワーク固有のビルドツールとは別に環境を作りたい人で、TypeScriptの環境が欲しい、ウェブの開発がしたい、という前提でいろいろ探してみました。">今あえてTypeScriptのビルド＆バンドルツールを探してみる</a></li>
+
+    <li>2020.01.20<a href="/articles/20200120/" title="前回は【工場をハックするための基礎知識　前編】として、制御系システムがどのような構成になっていて、ハードウェア的に何を気にしなければならないかについて述べました。後編では、制御系としてどのような機器がどのような仕組みで動いているか、それらの機器とどのようなやり取りをする必要があるか、さらにどのようなことに気を付けて実装していかなければならないかについて述べます。">工場をハックするための基本知識　後編</a></li>
+
+    <li>2019.10.08<a href="/articles/20191008/" title="みなさんSwagger使ってますか？弊社でもREST APIを構築するに当たってSwaggerを導入する機会が増えています。本記事ではSwaggerを導入するに当たって、合わせて利用して便利だったツールを紹介したいと思います。">本当に使ってよかったOpenAPI (Swagger) ツール</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+<!-- CATEGORIES START -->
+<h3 class="margin-top-30">カテゴリー</h3>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+    <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+    <li><a href="/categories/IoT/">IoT (14)</a></li>
+    
+    <li><a href="/categories/VR/">VR (10)</a></li>
+    
+    <li><a href="/categories/Security/">Security (2)</a></li>
+    
+    <li><a href="/categories/Design/">Design (7)</a></li>
+    
+    <li><a href="/categories/Programming/">Programming (168)</a></li>
+    
+    <li><a href="/categories/Management/">Management (9)</a></li>
+    
+    <li><a href="/categories/Infrastructure/">Infrastructure (131)</a></li>
+    
+    <li><a href="/categories/DB/">DB (14)</a></li>
+    
+    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+    
+    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+          <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+          <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+              t._e.push(f);
+            };
+            return t;
+          }(document, "script", "twitter-wjs"));</script>
+          
+            <!-- BEGIN TWITTER BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <!-- Twitterフォローボタン -->
+              <li class="twitter-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                </a>
+              </li>
+              <!-- Twitterタイムライン -->
+              <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+            </div>
+            <!-- END TWITTER BLOCK -->
+          
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+            &copy; 2021 フューチャー技術ブログ<br>
+          </div>
+          <!-- END COPYRIGHT -->
+	        <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
+    
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
+    
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>

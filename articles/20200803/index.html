@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>産業用機器向けフィールドネットワークModbusで温湿度センシング | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="フューチャー夏休みの自由研究連載の1回目です。 はじめにTIG DXユニット真野です。三菱系のPLCと通信するMCプロトコルはちょっと飛び道具的な持ちネタの1つですが、同様にメジャーな規格であるModbusについて自由研究という名の調査をしました。 工場、倉庫、プラントなどのIoT化を行うと、Web周りに無い技術も触れて楽しいなって最近思ってます。 Modbusとは ModbusはModicon社">
+<meta property="og:type" content="article">
+<meta property="og:title" content="産業用機器向けフィールドネットワークModbusで温湿度センシング | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200803/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="フューチャー夏休みの自由研究連載の1回目です。 はじめにTIG DXユニット真野です。三菱系のPLCと通信するMCプロトコルはちょっと飛び道具的な持ちネタの1つですが、同様にメジャーな規格であるModbusについて自由研究という名の調査をしました。 工場、倉庫、プラントなどのIoT化を行うと、Web周りに無い技術も触れて楽しいなって最近思ってます。 Modbusとは ModbusはModicon社">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200803/modbus-worker-manager.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200803/ascc_message_frame.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200803/IMG_20200803_011731.jpg">
+<meta property="og:image" content="https://future-architect.github.io/images/20200803/ModbusToolForDebus.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200803/image.png">
+<meta property="article:published_time" content="2020-08-02T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-11T08:20:22.907Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Future電子工作部">
+<meta property="article:tag" content="電子工作">
+<meta property="article:tag" content="PLC">
+<meta property="article:tag" content="夏休み自由研究">
+<meta property="article:tag" content="Modbus">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200803/modbus-worker-manager.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="Go,Future電子工作部,電子工作,PLC,夏休み自由研究,Modbus" name="keywords">
+  <meta content="真野隼記" name="author">
+
+  <link rel="stylesheet" href="/metronic/assets/bootstrap.min.css">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body class="corporate">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<div class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</div>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+    <h2 itemprop="name">
+      <a class="article-title" href="/articles/20200803/">産業用機器向けフィールドネットワークModbusで温湿度センシング</a>
+    </h2>
+
+
+    <div class="row">
+<div class="col-md-9 col-sm-9 blog-posts">
+<article id="post-20200803_産業用機器向けフィールドネットワークModbusで温湿度センシング" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <header class="article-header">
+    <ul class="blog-info">
+      <li class="blog-info-item"><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98">真野隼記</a></li>
+      <li class="blog-info-item"><time datetime="2020-08-02T15:00:00.000Z" itemprop="datePublished">2020/08/03</time>
+</li>
+      <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/Go/" title="Go">Go</a></li> 
+  
+    <li><a href="/tags/Future%E9%9B%BB%E5%AD%90%E5%B7%A5%E4%BD%9C%E9%83%A8/" title="Future電子工作部">Future電子工作部</a></li> 
+  
+    <li><a href="/tags/%E9%9B%BB%E5%AD%90%E5%B7%A5%E4%BD%9C/" title="電子工作">電子工作</a></li> 
+  
+    <li><a href="/tags/PLC/" title="PLC">PLC</a></li> 
+  
+    <li><a href="/tags/%E5%A4%8F%E4%BC%91%E3%81%BF%E8%87%AA%E7%94%B1%E7%A0%94%E7%A9%B6/" title="夏休み自由研究">夏休み自由研究</a></li> 
+  
+    <li><a href="/tags/Modbus/" title="Modbus">Modbus</a>
+  
+  </ul>
+
+</li>
+    </ul>
+    
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/IoT/">IoT</a>
+  </div>
+
+
+    </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>フューチャー<a href="https://future-architect.github.io/articles/20200726/">夏休みの自由研究</a>連載の1回目です。</p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG DXユニット真野です。三菱系のPLCと通信する<a target="_blank" rel="noopener" href="http://fa-dic.mitsubishielectric.co.jp/faq/show/15797?category_id=865">MCプロトコル</a>はちょっと飛び道具的な<a target="_blank" rel="noopener" href="https://speakerdeck.com/laqiiz/go-plc">持ちネタ</a>の1つですが、同様にメジャーな規格であるModbusについて自由研究という名の調査をしました。</p>
+<p>工場、倉庫、プラントなどのIoT化を行うと、Web周りに無い技術も触れて楽しいなって最近思ってます。</p>
+<h1 id="Modbusとは"><a href="#Modbusとは" class="headerlink" title="Modbusとは"></a>Modbusとは</h1><blockquote>
+<p>ModbusはModicon社が1979年、同社のプログラマブルロジックコントローラ (PLC) 向けに策定したシリアル通信プロトコルである。産業界におけるデ・ファクト標準の通信プロトコルとなり、現在では産業用電子機器を接続する最も一般的手段となっている。<br><a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/Modbus">https://ja.wikipedia.org/wiki/Modbus</a> - WikipediaのModbusページ</p>
+</blockquote>
+<p>Wikipediaの説明が分かりやすいので引用しました。</p>
+<p>書いてあるようにModbus（モドバス）とは通信プロトコルです。由来はModicon社から来ているのでしょう。通信プロトコルとあるように、WebでいうHTTPのようなものです。サーバ・クライアントモデルで、Modbusでセンサーモジュールにリクエストを投げると、温度・湿度がレスポンスで取得できるようなものです（後述します）。</p>
+<p><a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9E%E3%83%96%E3%83%AB%E3%83%AD%E3%82%B8%E3%83%83%E3%82%AF%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%A9">PLC</a>というのは工場の生産設備で用いる機器のことです。製造現場のFA（ファクトリーオートメーション）に使われる<a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%BC%E3%82%B1%E3%83%B3%E3%82%B9%E5%88%B6%E5%BE%A1">シーケンス制御</a>を行う装置です。</p>
+<p>シリアル接続はWeb系のエンジニアには馴染みが薄い気がします。簡単に言う１本だけの通信線を使い、1/0の電圧レベルを連続的(=シリアル)に変化させて、意味のあるデータを送信/受信する通信方式です。USBとか、自作PCをする人にとってはシリアルATAが有名でしょうか。工場系の人にとっては、RS-232CとかRS485が有名な気がします。</p>
+<h1 id="Modbusの使い所"><a href="#Modbusの使い所" class="headerlink" title="Modbusの使い所"></a>Modbusの使い所</h1><p>利用用途がPLC接続だけだとすると「オレには関係無いな」ってなりそうですが、Modbusはもう少し広く利用されています。掲題の温湿度センサーや、カメラモジュール、産業用ロボットの制御などでも利用されています。</p>
+<p>いやいや、今どきはラズベリーパイなどのシングルボードで完結させることが増えているよってIoT界隈のエンジニアに言われそうですが、倉庫や工場などで導入すると、高い可用性が求められる（5年10年は故障しないとか）ため、こういった産業用の機器の選定を行うこともあると思います。そうすると必然、Modbusのような通信規格を抑える必要がでてきます。ラズパイにセンサーモジュール接続で完結できるならそっちが良いと僕もそう思います。</p>
+<p>MCプロトコルの違いですが、MCプロトコルも<a target="_blank" rel="noopener" href="https://www.cc-link.org/ja/cclink/slmp/index.html">SLMP (Seamless Message Protocol)</a>という形で標準化されているのですが、Modbusはそれより古くからあり、仕様もシンプルなため、センサーやカメラやロボットなどのセンサー・アクチュエータにも搭載されていることが一つの差かなと思います。</p>
+<p>（最近だとOPC-UAですかね。まだ私は触ったことがないです。個人ユースで1万円以下で手に入るOPC-UA機器がありましたらどなたか教えて下さい）</p>
+<h1 id="Modbusプロトコル"><a href="#Modbusプロトコル" class="headerlink" title="Modbusプロトコル"></a>Modbusプロトコル</h1><p>Modbusはサーバ・クライアントモデルです。</p>
+<p>そのためクライアント側がセンサー値の取得やアクチュエータの操作を行います。クライアントが処理の管理役なため、クライアント側をModbusのマスター、サーバ側をModbusのスレーブとも呼びます。Modbusの親玉に複数の子機をぶら下げて一連の制御をするイメージがよく出てくる気がします。この記事ではマスターをマネージャ、スレーブをワーカと呼び替えて記載します。</p>
+<img src="/images/20200803/modbus-worker-manager.png" class="img-middle-size">
+
+
+<p>Modbusには大きく分けて3つの通信方式があります。先ほどシリアル接続のプロトコルだよって言いましたが、TCP/IP対応しているバージョンもあります。</p>
+<ol>
+<li><strong>Modbus RTU</strong>: シリアル接続で、バイナリ表現</li>
+<li><strong>Modbus ASCII</strong>: シリアル接続で、ASCIIフォーマット。RTUに比べてデータサイズが増えるが、人間に読みやすい</li>
+<li><strong>Modbus/TCP</strong>: TCP/IPを用いる</li>
+</ol>
+<p>状況次第かと思いますが、Modbusワーカーそのものを開発している方はともかく、対応機器を利用する分にはシリアル接続の場合は性能上の理由から ModbusRTUを選ぶことが多いと思います。</p>
+<h1 id="メッセージフレーム"><a href="#メッセージフレーム" class="headerlink" title="メッセージフレーム"></a>メッセージフレーム</h1><p>Modbus ASCIIのメッセージフレーム（HTTPでいうと、HTTPリクエストのペイロード）は以下のような属性を持ちます。Modbus RTUはバイナリフレームのため詳細はここでは割愛しますが、ブロックの構造は同じです。</p>
+<p><img src="/images/20200803/ascc_message_frame.png"><br>※PI–MBUS–300 Rev. Jより</p>
+<p>START移行の、利用可能な文字は 0-9, A-Fからの文字列のみです。最後はCRLFで終わります。</p>
+<ul>
+<li><strong>START</strong>: 1文字で<code>:（0x3A）</code></li>
+<li><strong>ADDRESS</strong>: 2文字。マネージャが要求するワーカーアドレス（1~247）。0 はブロードキャスト。</li>
+<li><strong>FUNCTION</strong>: 2文字。要求の種類を示します。下記に示します。1~255が設定可能。どのファンクションコードがが有効化はワーカデバイスに依存</li>
+<li><strong>DATA</strong>: N文字で可変。ファンクションごとにデータフォーマットが決まります。</li>
+<li><strong>LRC CHECK</strong>: 2文字。水平パリティチェック（Longitudinal Redundancy ChecK）のこと。転送時にノイズによるビットが反転していないかを受信側がチェックできるようにするもの</li>
+<li><strong>改行</strong>: CRLF</li>
+</ul>
+<h2 id="ファンクションコード"><a href="#ファンクションコード" class="headerlink" title="ファンクションコード"></a>ファンクションコード</h2><p><code>PI–MBUS–300 Rev. J</code>に記載されていたコードは全部で24つありました。コードを上から3つ抜粋します。</p>
+<table>
+<thead>
+<tr>
+<th align="left">CODE</th>
+<th align="left">NAME</th>
+<th align="center">Note</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">01</td>
+<td align="left">Read Coil Status</td>
+<td align="center">ワーカのDO（Discrete Output）のON/OFFステータス読み取り</td>
+</tr>
+<tr>
+<td align="left">02</td>
+<td align="left">Read Input Status</td>
+<td align="center">ワーカのDI（Discrete Input）のON/OFFステータス読み取り</td>
+</tr>
+<tr>
+<td align="left">03</td>
+<td align="left">Read Holding Registers</td>
+<td align="center">ワーカの保持レジスタの内容を読み取り</td>
+</tr>
+<tr>
+<td align="left">以下省略。</td>
+<td align="left"></td>
+<td align="center"></td>
+</tr>
+</tbody></table>
+<p>DATA部について03の例で説明します。</p>
+<p><code>Read Holding Registers</code> の<code>DATA</code> は保持レジスタの開始アドレスと保持レジスタの数を指定します。</p>
+<ul>
+<li>START: 1文字</li>
+<li>FUNCTION: 2文字。<code>Read Holding Registers</code> は <code>03</code>になる</li>
+<li><strong>DATA</strong>: 03の場合は以下4つを指定<ul>
+<li><strong>開始アドレス（Hi）</strong>:  Hi+Loなので、201を指す場合は Hiに00、LoにC8を指定。開始アドレスは1少ない</li>
+<li><strong>開始アドレス（Lo）</strong>: 省略</li>
+<li><strong>取得数（Hi）</strong>: Hi+Loなので、3点取得する場合は、Hiを00, Loに03を指定</li>
+<li><strong>取得数（Lo）</strong>: 省略</li>
+</ul>
+</li>
+<li>LRC CHECK: 2文字</li>
+<li>改行</li>
+</ul>
+<p>まとめると、Modbusワーカ番号1にRead Holding Registersで、レジスタ201から3点取得する場合は、<br><code>:0300C8003</code>とLRCチェックとCRLFで1要求になります。</p>
+<p>応答もほぼ似たような形式で、以下の用に指定されたレジスタ値が取得できます。</p>
+<ul>
+<li>START: 1文字</li>
+<li>FUNCTION: 2文字。<code>Read Holding Registers</code> は <code>03</code>になる</li>
+<li><strong>Byte Count</strong>: バイト数</li>
+<li><strong>DATA1</strong>: 取得データ1</li>
+<li><strong>DATA2</strong>: 取得データ2</li>
+<li><strong>DATA3</strong>: 取得データ3</li>
+<li>LRC CHECK: 2文字</li>
+<li>改行</li>
+</ul>
+<h1 id="実機を触ってみる"><a href="#実機を触ってみる" class="headerlink" title="実機を触ってみる"></a>実機を触ってみる</h1><p>Amazonで探した中で一番安く買えたModbus-RTUセンサー <code>KKmoonRS485温度湿度 トランスミッタ</code> です。商品名がModbus-TRUってなっていますがtypoなので安心ください。先ほどまではModbus-Asciiで説明していましたが、ここからはModbus-RTUでバイナリ表現になります。</p>
+<p><a target="_blank" rel="noopener" href="https://www.amazon.co.jp/dp/B07KS3WJRM">https://www.amazon.co.jp/dp/B07KS3WJRM</a></p>
+<p>この真ん中で光っているのがセンサーです。</p>
+<p><img src="/images/20200803/IMG_20200803_011731.jpg"></p>
+<p>今回はシリアル接続にチャレンジしたかったので、RS485からUSBに変換する<a target="_blank" rel="noopener" href="https://www.amazon.co.jp/dp/B00GWEGZOI/">このあたりの変換アダプタ</a>を追加で購入して、Win機からUSBでこのセンサーに接続しています。</p>
+<p>あと、電源ですが範囲がDC8V〜48Vということで、USBからだと給電できないので<a target="_blank" rel="noopener" href="http://akizukidenshi.com/catalog/g/gM-06642/">ACアダプター</a>と<a target="_blank" rel="noopener" href="http://akizukidenshi.com/catalog/g/gK-05148/">DCジャックのDIP化キット</a> を買って、キットの方をハンダ付けして、ブレッドボードで通電させています。ブレッドボード以外はジャンパー線とドライバーがあれば後はどうにかなるともいます。（抵抗とか不要）。この辺の機材調達は弊社の電子工作部の方に色々教えてもらいました。</p>
+<p>KKmoonRS485センサーの接続情報ですが仕様書などが入っていなく、<a target="_blank" rel="noopener" href="https://www.amazon.co.jp/gp/customer-reviews/R36LHIYIFV23QG">こちらのレビュー</a>が正直一番参考になりました。</p>
+<p>まずは既存のツールを使ってセンサー値を取得してみましょう。</p>
+<p>色々な種類があるようですが、以下のツールが一番使い勝手が良かったです。<br><a target="_blank" rel="noopener" href="https://www.fa.hdl.co.jp/jp/html/app/Modbus_Tool/index.html">https://www.fa.hdl.co.jp/jp/html/app/Modbus_Tool/index.html</a></p>
+<p>レビューコメント通りに設定していきます。</p>
+<ul>
+<li>伝送モード: RTU</li>
+<li>通信速度 9600bps</li>
+<li>送信クエリ: <code>01 03 00 00 00 02</code> になります<ul>
+<li>MobusワーカID=1（ケース内のスイッチで切り替えられるらしい）</li>
+<li><code>Read Holding Registers(0x03)</code></li>
+<li>開始アドレス: 0x0000</li>
+<li>データサイズ: 0x0002</li>
+</ul>
+</li>
+</ul>
+<p>「接続設定」でLANかUSBを選択できるので、ポート選択でUSBのCOMポート割当を確認しましょう。通電できていればプルダウンで選択肢にセンサーモジュールが出てくるとお見ます。（私の環境ではCOM3に割り当てられていました）</p>
+<p>リクエストのTx（要求）を送信して、結果が成功するとRx（応答）の緑の行が表示されます。</p>
+<p><img src="/images/20200803/ModbusToolForDebus.png"></p>
+<p>Modbusはワーカのシミュレータがいくつかありますが、やはり実機から値が取得できると気持ち良いです。シミュレータを最初に利用しても訳が分からないと思いますので、このセンサーの購入は本当にオススメです。</p>
+<h1 id="応答について"><a href="#応答について" class="headerlink" title="応答について"></a>応答について</h1><p><code>01 03 04 00 FA 03 28 DA EC</code> が応答でした。</p>
+<p>それぞれの意味です。</p>
+<ul>
+<li><code>01</code>: ModbusワーカID（送信したのと同じ）</li>
+<li><code>03</code>: ファンクションコード（送ったのと同じ）</li>
+<li><code>04</code>: データ部のByte数</li>
+<li><code>00FA</code>: 湿度のデータ</li>
+<li><code>0328</code>: 温度のデータ</li>
+<li><code>DAFC</code>: LRCチェックの値</li>
+</ul>
+<p><code>00FA</code>も<code>0328</code>も、どこの国の温湿度ですか？って言いたくなりますが、符号付き整数（16進数）でかつ10倍した値（温度も湿度も小数点以下まで取れるようにということだと思われます）ということです。お手軽に値を見るには、<a target="_blank" rel="noopener" href="https://note.cman.jp/convert/bit/">このあたり</a>のWebツールを利用して変換すると、00FAは10進数で<code>250</code>、0328は<code>808</code>でした。前者は湿度25%でいいとして、後者は80.8℃？この部屋、サウナかな？って思いましたが、どうも華氏表記（°F）のようです。</p>
+<p><code>華氏 摂氏</code> でググると、Googleで変換できるんですね。室温が27℃だということがわかりました。（エアコンの設定は25℃なのに解せぬという知見が得られました。）</p>
+<p><img src="/images/20200803/image.png"></p>
+<h1 id="Goからアクセスする"><a href="#Goからアクセスする" class="headerlink" title="Goからアクセスする"></a>Goからアクセスする</h1><p>Modbusで温湿度センサーにアクセスして値を取得することはできました。これをGo言語で行ってみます。Modbusは流石に広く使われているだけあって、Goでもライブラリ実装があります。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/goburrow/modbus">goburrow/modbus</a></li>
+</ul>
+<p>Modbusでリクエストを出しレスポンスを受け取るところまで、ほぼサンプル通りで実行できるため特に難しくありません。</p>
+<p>コードの全文は<a target="_blank" rel="noopener" href="https://github.com/laqiiz/modbus-learning">こちら</a>にあげておきました。</p>
+<figure class="highlight go"><figcaption><span>GoでKKmoonRS485温度湿度センサにアクセスするサンプル</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;encoding/binary&quot;</span></span><br><span class="line">	<span class="string">&quot;encoding/hex&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/goburrow/modbus&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	h := modbus.NewRTUClientHandler(<span class="string">&quot;COM3&quot;</span>) <span class="comment">// RTU, COM3ポート</span></span><br><span class="line">	h.BaudRate = <span class="number">9600</span>                       <span class="comment">// Bit/秒</span></span><br><span class="line">	h.DataBits = <span class="number">8</span>                          <span class="comment">// データビット</span></span><br><span class="line">	h.Parity = <span class="string">&quot;N&quot;</span>                          <span class="comment">// パリティ</span></span><br><span class="line">	h.StopBits = <span class="number">1</span>                          <span class="comment">// トップビット</span></span><br><span class="line">	h.SlaveId = <span class="number">1</span>                           <span class="comment">// スレーブID</span></span><br><span class="line">	h.Timeout = <span class="number">5</span> * time.Second</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := h.Connect(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// ポートの指定間違いや、他のプロセスがポートを開いている場合</span></span><br><span class="line">		log.Fatal(<span class="string">&quot;connect: &quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> h.Close()</span><br><span class="line"></span><br><span class="line">	mc := modbus.NewClient(h)</span><br><span class="line">	results, err := mc.ReadHoldingRegisters(<span class="number">0</span>, <span class="number">2</span>) <span class="comment">// アドレス0x00、データサイズ2</span></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(<span class="string">&quot;mc.ReadHoldingRegisters&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	humidity := results[<span class="number">0</span>:<span class="number">2</span>]</span><br><span class="line">	temperature := results[<span class="number">2</span>:<span class="number">4</span>]</span><br><span class="line"></span><br><span class="line">	fmt.Println(hex.EncodeToString(humidity), hex.EncodeToString(temperature))</span><br><span class="line"></span><br><span class="line">	humidityNum := <span class="keyword">float32</span>(<span class="keyword">int16</span>(binary.BigEndian.Uint16(humidity))) * <span class="number">1</span> / <span class="number">10</span></span><br><span class="line">	temperatureFNum := <span class="keyword">float32</span>(<span class="keyword">int16</span>(binary.BigEndian.Uint16(temperature))) * <span class="number">1</span> / <span class="number">10</span></span><br><span class="line">	temperatureCNum := (temperatureFNum - <span class="number">32</span>) * <span class="number">5</span> / <span class="number">9</span></span><br><span class="line"></span><br><span class="line">	fmt.Println(humidityNum, temperatureCNum)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>さきほどのModbusToolで行ったのと同じ要領で設定していきます。関数が<code>ReadHoldingRegisters</code>などそのままの名前で準備されているため、Modbusで何を行いたいかがわかれば、利用することは難しくないと思います。</p>
+<p>1点実行前の注意として、先ほどのModbusToolでコネクションをOPENにしたままにしておくと、上記コード実行時に <code>connect: Access is denied.</code> が発生してしまいます。Modbus RTUでは同時接続はできませんのでご注意ください。</p>
+<p>また、データを取得してからは多少厄介です。 <code>binary.BigEndian.Uint16(humidity)</code> とあるように、2byte(16bit)をBigEndian形式（数値の上位桁がメモリーの下位にある）でUnit16で読み取って、float32に変換しています。</p>
+<p>ここからはセンサーの仕様で、値を1/10にし、温度のみ華氏→摂氏変換を行っています。</p>
+<p>実行すると以下のように出力されます。（暑かったのでエアコンの温度を下げたら急に冷えました）</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;go run main.go</span><br><span class="line">湿度 温度</span><br><span class="line">00fb 02e2</span><br><span class="line">25.1 23.222223</span><br></pre></td></tr></table></figure>
+
+<p>後はこの情報を定期間隔で実行し、データをクラウドに上げておけば可視化も自由自在だと思います。</p>
+<h1 id="エラー時の挙動"><a href="#エラー時の挙動" class="headerlink" title="エラー時の挙動"></a>エラー時の挙動</h1><p>いくつか設定を間違ってみてアクセスして見て結果を確認します。</p>
+<ul>
+<li>SlaveIDを異なる値（例えば2にした場合）<ul>
+<li>結果: * <code>mc.ReadHoldingRegistersserial: timeout</code></li>
+</ul>
+</li>
+<li>ReadHoldingRegistersserialの代わりにReadCoilsを利用<ul>
+<li>結果: * <code>mc.ReadHoldingRegistersserial: timeout</code></li>
+</ul>
+</li>
+<li>ReadHoldingRegistersのAddressを仕様上にない値（例えば1）に変更<ul>
+<li>結果: * <code>mc.ReadHoldingRegistersserial: timeout</code></li>
+</ul>
+</li>
+<li>ReadHoldingRegistersのデータサイズを仕様上にない値（例えば5）に変更<ul>
+<li>結果: * <code>mc.ReadHoldingRegistersserial: timeout</code></li>
+</ul>
+</li>
+</ul>
+<p>全て結果は <code>timeout</code> でした。これでわかるのは、Modbus RTUの仕様にはエラーレスポンスということは存在しないということです。<br>そのため、機器が正常か異常かといった判定は、定期的に値を確認し想定通り内の応答が返ってくるかどうかといったことでのチェックになると思います。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>「Modbusでシリアル接続」を最初見た時は馴染みがないだけに、凄く難しいことではないか？と思いましたが、Web系の技術に比べ情報が少ないのはありそうですが、データを取得することだけでだとそこまで難しくもありません。</p>
+<p>実際の工場で、ライン制御を直接Goなどから行うことはほぼないと思います。しかしセンサー類から情報をもらい、何かしらのアルゴリズムや機械学習の推論結果を、フィールド制御側にフィードバックすることは今後のFA/IoT化の流れから増えてくると思います。</p>
+<p>その場合の通信プロトコルがModbusであれば上記の知識と、<code>goburrow/modbus</code>のようなライブラリを活用すれば、データ連携を行うこと自体はそこまで大きな障壁ではないと思います。</p>
+<p>また、Modbusを学ぶ上で特にワーカーの扱いに関しては、シミュレータだけで行うのではなく実機を用いるととてもイメージが湧きます。もし、なるべくお安く済ませたい場合は、AliExpressでの購入もおすすめです。リードタイムが30日ほどかかることもありますが、格安で手に入ること間違いないです。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a target="_blank" rel="noopener" href="http://web.eecs.umich.edu/~modbus/documents/PI_MBUS_300.pdf">Modicon Modbus ProtocolReference Guide PI–MBUS–300 Rev. J</a><ul>
+<li>プロトコル仕様書</li>
+</ul>
+</li>
+<li><a target="_blank" rel="noopener" href="https://www.m-system.co.jp/mssjapanese/kaisetsu/nmmodbus.pdf">Modbus プロトコル概説書 - M-System</a></li>
+</ul>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。その中でもDXチームは特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+      
+    </div>
+    <div class="social-area">
+    <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li class="twitter-btn">
+      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200803/&via=future_techblog&related=twitterapi%2Ctwitter&text=%E7%94%A3%E6%A5%AD%E7%94%A8%E6%A9%9F%E5%99%A8%E5%90%91%E3%81%91%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AFModbus%E3%81%A7%E6%B8%A9%E6%B9%BF%E5%BA%A6%E3%82%BB%E3%83%B3%E3%82%B7%E3%83%B3%E3%82%B0"
+        onclick="window.open(this.href, 'tweetwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li class="fb-btn">
+      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200803/&t=%E7%94%A3%E6%A5%AD%E7%94%A8%E6%A9%9F%E5%99%A8%E5%90%91%E3%81%91%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AFModbus%E3%81%A7%E6%B8%A9%E6%B9%BF%E5%BA%A6%E3%82%BB%E3%83%B3%E3%82%B7%E3%83%B3%E3%82%B0"
+        onclick="window.open(this.href, 'fbsharewindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li class="hatebu-btn">
+      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200803/"
+        onclick="window.open(this.href, 'hatebuwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="hatebu-btn-label">1</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li class="pocket-btn">
+      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200803/"
+        onclick="window.open(this.href, 'pocketwindow', 'width=650, height=470, personalbar=0, toolbar=0, scrollbars=1, sizable=1'); return false;" rel="nofollow noopener">
+        <i></i><span class="pocket-btn-label">0</span>
+      </a>
+    </li>
+  </ul>
+<!-- シェアボタン END -->
+
+    </div>
+  </div>
+  </article>
+</div>
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  <!-- BEGIN FEATURED POSTS -->
+<h3>注目の記事</h3>
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav">
+      
+    <li>2020.07.09<a href="/articles/20200709/" title="最近Goで主にバックエンドのWebAPIや、AWS Lambdaで動くETLアプリ、たまにCLIツールを開発する時に、2回以上同じ指摘したコメントをまとめてます。Go言語特有ぽいところを中心にしています。レビュイーのスキルセットは..">GoでWebアプリ開発時にあるあるだったレビューコメント</a></li>
+
+    <li>2020.05.30<a href="/articles/20200530/" title="IT企業の技術ブログ運営は、ある一定の質をキープしながらも、投稿頻度を高め・それを継続することが求められ、周囲の期待値もあるので中々気を抜けない仕事だと思います。単発ならともかく、継続することは忍耐が必要なので特に大変です。運営していてこれはナレッジだなと感じたことをまとめていきます。">フューチャー技術ブログの運営で心がけていること</a></li>
+
+    <li>2021.05.10<a href="/articles/20210510b/" title="この記事はDart/Flutter連載の1記事目です。TIGの伊藤真彦です。Dart/Flutter入門に参加します、DartといえばFlutterの話が必ずついてくるものですが、今回は連載1記事目として、敢えてプログラミング言語としてのDartに焦点を絞った記事にします。">Dart入門</a></li>
+
+    <li>2020.11.09<a href="/articles/20201109/" title="1年弱ほどGo言語でWebAPIアプリケーション開発を行っていますが、かなり割り切った構成・テスト方針を採用しました。そろそろ1年弱になり機能開発も比較的落ち着き、保守運用フェーズの割合も徐々に増えてきた頃合いなので、やったこと・学び・反省といった振り返りを共有します。">GoのWebアプリ開発でフラットパッケージにした話</a></li>
+
+    <li>2020.09.30<a href="/articles/20200930/" title="Open Policy Agent（OPA）は汎用的なポリシーエンジンで、[Rego] と呼ばれるポリシー言語で定義されたルールに従って、入力がポリシーに沿っているか否かの判定を移譲させることができます。Regoで宣言的にポリシーを実装し、Policy as Code を実現できます。コーディング規約も一種のポリシーとみなして、Open API Spec（Swagger）をLinter的にチェックするツールを題材に、OPAを用いて開発してみたいと思います。">Policy as Code を実現する Open Policy Agent に憧れて。ポリシーコードでAPI仕様をLintする</a></li>
+
+    <li>2020.02.03<a href="/articles/20200203/" title="現在所属しているプロジェクトではWebAPIやバッチ処理の設計の一環としてPlantUMLを利用しています。効率よく品質高くアウトプットを出すためには、プログラミング言語に対してコーディング規約があるように、UMLに対してもチームで設計するにあたり一定のルールを決める必要があります。そこでプロジェクト内のPlantUMLを使用するうえでのガイドラインやルールをまとめる機会があり、せっかくなのでそれを記事化します。">チームで機能設計するためのPlantUML標準化</a></li>
+
+    <li>2019.10.08<a href="/articles/20191008/" title="みなさんSwagger使ってますか？弊社でもREST APIを構築するに当たってSwaggerを導入する機会が増えています。本記事ではSwaggerを導入するに当たって、合わせて利用して便利だったツールを紹介したいと思います。">本当に使ってよかったOpenAPI (Swagger) ツール</a></li>
+
+    <li>2019.10.02<a href="/articles/20191002/" title="定ファイルをどうするか問題はいろいろ悩ましい問題であります。そんな中、設定ファイル用言語という触れ込みのCUEがリリースされました。">CUEを試して見る</a></li>
+
+    <li>2019.08.26<a href="/articles/20190826/" title="獣害問題と言っても都会の方にはあまり馴染みのない話かもしれません。イノシシやシカを見かけるのはジビエ料理店くらいでしょうか。この地方特有の課題を技術で解決しようとしている話をさせていただきます。">ソフトとハードの垣根を越えろ - IoTハードウェアの開発をソフト屋視点で解説します</a></li>
+
+    <li>2021.04.23<a href="/articles/20210423a/" title="技術ブログの中でも異色（！？）の「リーダー論」について、私の具体的なエピソードを交えつつお話したいと思います。">はじめてのリーダー論 ～もしも「明日からリーダーやって」と言われたら～</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+<!-- CATEGORIES START -->
+<h3 class="margin-top-30">カテゴリー</h3>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+    <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+    <li><a href="/categories/IoT/">IoT (14)</a></li>
+    
+    <li><a href="/categories/VR/">VR (10)</a></li>
+    
+    <li><a href="/categories/Security/">Security (2)</a></li>
+    
+    <li><a href="/categories/Design/">Design (7)</a></li>
+    
+    <li><a href="/categories/Programming/">Programming (168)</a></li>
+    
+    <li><a href="/categories/Management/">Management (9)</a></li>
+    
+    <li><a href="/categories/Infrastructure/">Infrastructure (131)</a></li>
+    
+    <li><a href="/categories/DB/">DB (14)</a></li>
+    
+    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+    
+    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<!-- CATEGORIES END -->
+<!-- START Blog -->
+<div class="margin-bottom-20">
+  <h3>リンク</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END Blog -->
+<!-- START ADVENT CALENDAR -->
+<div class="margin-bottom-20">
+  <h3>アドベントカレンダー</h3>
+  <div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+<!-- END ADVENT CALENDAR -->
+
+</div>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <div class="pre-footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN BOTTOM ABOUT BLOCK -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>About Us</h2>
+            <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+          </div>
+          <!-- END BOTTOM ABOUT BLOCK -->
+          <!-- BEGIN BOTTOM CONTACTS -->
+          <div class="col-md-4 col-sm-6 pre-footer-col">
+            <h2>Contact</h2>
+            <address class="margin-bottom-40">
+              東京都品川区大崎1-2-2<br>
+              アートヴィレッジ大崎セントラルタワー<br><br>
+              Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+            </address>
+          </div>
+          <!-- END BOTTOM CONTACTS -->
+          <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+          <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+            t._e = [];
+            t.ready = function(f) {
+              t._e.push(f);
+            };
+            return t;
+          }(document, "script", "twitter-wjs"));</script>
+          
+            <!-- BEGIN TWITTER BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <!-- Twitterフォローボタン -->
+              <li class="twitter-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                </a>
+              </li>
+              <!-- Twitterタイムライン -->
+              <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+            </div>
+            <!-- END TWITTER BLOCK -->
+          
+        </div>
+      </div>
+    </div>
+    <!-- END PRE-FOOTER -->
+    <!-- BEGIN FOOTER -->
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <!-- BEGIN COPYRIGHT -->
+          <div class="col-md-6 col-sm-6 padding-top-10">
+            &copy; 2021 フューチャー技術ブログ<br>
+          </div>
+          <!-- END COPYRIGHT -->
+	        <!-- BEGIN SOCIAL -->
+<div class="col-md-6 col-sm-6">
+  <ul class="social-footer list-unstyled list-inline pull-right">
+    
+    <li><a target="_blank" rel="noopener" href="https://github.com/future-architect" alt="githubリンク"><i class="fa fa-github"></i></a></li>
+    
+    <li><a target="_blank" rel="noopener" href="https://twitter.com/future_techblog" alt="twitterリンク"><i class="fa fa-twitter"></i></a></li>
+    
+    <li><a href="/atom.xml" alt="rssリンク"><i class="fa fa-rss"></i></a></li>
+    
+  </ul>
+</div>
+<!-- END SOCIAL -->
+
+        </div>
+      </div>
+    </div>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</body>
+</html>
