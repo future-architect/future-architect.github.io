@@ -85,22 +85,22 @@
   </ul>
   <section id="main">
     
-    <h2 itemprop="name">
-      <a class="article-title" href="/articles/20181019/">PostgreSQLパーティションプルーニングの動作を確認する</a>
-    </h2>
+  <h2 itemprop="name">
+    <a class="article-title" href="/articles/20181019/">PostgreSQLパーティションプルーニングの動作を確認する</a>
+  </h2>
 
 
     <div class="row">
-<div class="col-md-9 col-sm-9 blog-posts">
-<article id="post-20181019-postgresql10" class="article article-type-post blog-item" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <header class="article-header">
-    <ul class="blog-info">
-      <li class="blog-info-item"><a href="/authors/%E6%9D%89%E5%B1%B1%E9%87%8F%E5%BD%A6">杉山量彦</a></li>
-      <li class="blog-info-item"><time datetime="2018-10-19T07:00:00.000Z" itemprop="datePublished">2018/10/19</time>
+  <div class="col-md-9 col-sm-9 blog-posts">
+    <article id="post-20181019-postgresql10" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/authors/%E6%9D%89%E5%B1%B1%E9%87%8F%E5%BD%A6">杉山量彦</a></li>
+            <li class="blog-info-item"><time datetime="2018-10-19T07:00:00.000Z" itemprop="datePublished">2018/10/19</time>
 </li>
-      <li class="blog-info-item">
+            <li class="blog-info-item">
   <ul>
   
     <li><a href="/tags/DB/" title="DB">DB</a></li> 
@@ -110,8 +110,8 @@
   </ul>
 
 </li>
-    </ul>
-    
+          </ul>
+          
   <div class="article-category">
     
     Category:
@@ -120,11 +120,11 @@
   </div>
 
 
-    </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>PostgreSQL10までのパーティション機能を利用したプロジェクトにおいて、遅延SQLの調査をするなかで以下のような長い長い実行計画を目にすることがありました。</p>
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p>PostgreSQL10までのパーティション機能を利用したプロジェクトにおいて、遅延SQLの調査をするなかで以下のような長い長い実行計画を目にすることがありました。</p>
 <details><summary>こちらはサンプルテーブルでそれを再現したものです。長いので畳みました。</summary>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">Update on tr_part tgt  (cost&#x3D;0.83..115.84 rows&#x3D;4 width&#x3D;44)</span><br><span class="line">  Update on tr_part_p_1809_01 tgt_1</span><br><span class="line">  Update on tr_part_p_1809_02 tgt_2</span><br><span class="line">  Update on tr_part_p_1809_03 tgt_3</span><br><span class="line">  Update on tr_part_p_9912_31 tgt_4</span><br><span class="line">  -&gt;  Nested Loop  (cost&#x3D;0.83..28.01 rows&#x3D;1 width&#x3D;38)</span><br><span class="line">        Join Filter: ((a.related_key &#x3D; b.key) AND (a.target_date &#x3D; b.part_date))</span><br><span class="line">        -&gt;  Nested Loop  (cost&#x3D;0.42..26.34 rows&#x3D;1 width&#x3D;32)</span><br><span class="line">              -&gt;  Seq Scan on wk_input a  (cost&#x3D;0.00..1.03 rows&#x3D;3 width&#x3D;16)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 tgt_1  (cost&#x3D;0.42..8.44 rows&#x3D;1 width&#x3D;16)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; a.target_date) AND (key &#x3D; a.related_key))</span><br><span class="line">        -&gt;  Append  (cost&#x3D;0.42..1.61 rows&#x3D;4 width&#x3D;26)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 b  (cost&#x3D;0.42..0.48 rows&#x3D;1 width&#x3D;26)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_1.part_date) AND (key &#x3D; tgt_1.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 b_1  (cost&#x3D;0.42..0.48 rows&#x3D;1 width&#x3D;26)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_1.part_date) AND (key &#x3D; tgt_1.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 b_2  (cost&#x3D;0.42..0.48 rows&#x3D;1 width&#x3D;26)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_1.part_date) AND (key &#x3D; tgt_1.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 b_3  (cost&#x3D;0.15..0.17 rows&#x3D;1 width&#x3D;78)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_1.part_date) AND (key &#x3D; tgt_1.key))</span><br><span class="line">  -&gt;  Nested Loop  (cost&#x3D;0.83..28.01 rows&#x3D;1 width&#x3D;38)</span><br><span class="line">        Join Filter: ((a.related_key &#x3D; b.key) AND (a.target_date &#x3D; b.part_date))</span><br><span class="line">        -&gt;  Nested Loop  (cost&#x3D;0.42..26.34 rows&#x3D;1 width&#x3D;32)</span><br><span class="line">              -&gt;  Seq Scan on wk_input a  (cost&#x3D;0.00..1.03 rows&#x3D;3 width&#x3D;16)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 tgt_2  (cost&#x3D;0.42..8.44 rows&#x3D;1 width&#x3D;16)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; a.target_date) AND (key &#x3D; a.related_key))</span><br><span class="line">        -&gt;  Append  (cost&#x3D;0.42..1.61 rows&#x3D;4 width&#x3D;26)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 b  (cost&#x3D;0.42..0.48 rows&#x3D;1 width&#x3D;26)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_2.part_date) AND (key &#x3D; tgt_2.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 b_1  (cost&#x3D;0.42..0.48 rows&#x3D;1 width&#x3D;26)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_2.part_date) AND (key &#x3D; tgt_2.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 b_2  (cost&#x3D;0.42..0.48 rows&#x3D;1 width&#x3D;26)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_2.part_date) AND (key &#x3D; tgt_2.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 b_3  (cost&#x3D;0.15..0.17 rows&#x3D;1 width&#x3D;78)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_2.part_date) AND (key &#x3D; tgt_2.key))</span><br><span class="line">  -&gt;  Nested Loop  (cost&#x3D;0.83..28.01 rows&#x3D;1 width&#x3D;38)</span><br><span class="line">        Join Filter: ((a.related_key &#x3D; b.key) AND (a.target_date &#x3D; b.part_date))</span><br><span class="line">        -&gt;  Nested Loop  (cost&#x3D;0.42..26.34 rows&#x3D;1 width&#x3D;32)</span><br><span class="line">              -&gt;  Seq Scan on wk_input a  (cost&#x3D;0.00..1.03 rows&#x3D;3 width&#x3D;16)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 tgt_3  (cost&#x3D;0.42..8.44 rows&#x3D;1 width&#x3D;16)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; a.target_date) AND (key &#x3D; a.related_key))</span><br><span class="line">        -&gt;  Append  (cost&#x3D;0.42..1.61 rows&#x3D;4 width&#x3D;26)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 b  (cost&#x3D;0.42..0.48 rows&#x3D;1 width&#x3D;26)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_3.part_date) AND (key &#x3D; tgt_3.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 b_1  (cost&#x3D;0.42..0.48 rows&#x3D;1 width&#x3D;26)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_3.part_date) AND (key &#x3D; tgt_3.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 b_2  (cost&#x3D;0.42..0.48 rows&#x3D;1 width&#x3D;26)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_3.part_date) AND (key &#x3D; tgt_3.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 b_3  (cost&#x3D;0.15..0.17 rows&#x3D;1 width&#x3D;78)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_3.part_date) AND (key &#x3D; tgt_3.key))</span><br><span class="line">  -&gt;  Nested Loop  (cost&#x3D;0.57..31.81 rows&#x3D;1 width&#x3D;64)</span><br><span class="line">        Join Filter: ((a.related_key &#x3D; b.key) AND (a.target_date &#x3D; b.part_date))</span><br><span class="line">        -&gt;  Nested Loop  (cost&#x3D;0.15..17.55 rows&#x3D;1 width&#x3D;58)</span><br><span class="line">              -&gt;  Seq Scan on wk_input a  (cost&#x3D;0.00..1.03 rows&#x3D;3 width&#x3D;16)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 tgt_4  (cost&#x3D;0.15..5.50 rows&#x3D;1 width&#x3D;42)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; a.target_date) AND (key &#x3D; a.related_key))</span><br><span class="line">        -&gt;  Append  (cost&#x3D;0.42..14.20 rows&#x3D;4 width&#x3D;26)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 b  (cost&#x3D;0.42..4.65 rows&#x3D;1 width&#x3D;26)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_4.part_date) AND (key &#x3D; tgt_4.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 b_1  (cost&#x3D;0.42..4.66 rows&#x3D;1 width&#x3D;26)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_4.part_date) AND (key &#x3D; tgt_4.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 b_2  (cost&#x3D;0.42..4.66 rows&#x3D;1 width&#x3D;26)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_4.part_date) AND (key &#x3D; tgt_4.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 b_3  (cost&#x3D;0.15..0.22 rows&#x3D;1 width&#x3D;78)</span><br><span class="line">                    Index Cond: ((part_date &#x3D; tgt_4.part_date) AND (key &#x3D; tgt_4.key))</span><br></pre></td></tr></table></figure>
 </details> 
@@ -184,10 +184,10 @@
 <p>これに対して、15行目移行の▲で目印をした <code>p_1809_02</code>、 <code>p_1809_03</code>、 <code>p_9912_31</code> のパーティションに対しては、▼部分（never executedと書いていますね）で実際の実行がスキップされていることが確認できます。<br>PostgreSQLがバージョン11になって、パーティション <code>p_1809_02</code>、 <code>p_1809_03</code>、 <code>p_9912_31</code> の結合を試みても仕方のないものとしてスキップを判断できるようになっています。</p>
 <p>長年ORACLEを使い倒してきて、ふとPostgreSQLを使うと、こんなこともできないのか、と思うことがあります。<br>しかし、日々成長してきていることも感じられ、愛おしくも思えてくるのがPostgreSQLのいいところですね。</p>
 
-      
-    </div>
-    <div class="social-area">
-    <!-- シェアボタン START -->
+          
+        </div>
+        <div class="social-area">
+        <!-- シェアボタン START -->
   <ul class="social-button">
     
     <!-- Twitter -->
@@ -221,37 +221,37 @@
   </ul>
 <!-- シェアボタン END -->
 
-    </div>
+        </div>
+      </div>
+    </article>
   </div>
-  </article>
-</div>
-<div class="col-md-3 col-sm-3 blog-sidebar">
-  <!-- BEGIN FEATURED POSTS -->
+  <div class="col-md-3 col-sm-3 blog-sidebar">
+    <!-- BEGIN FEATURED POSTS -->
 <h3>注目の記事</h3>
 <div class="widget-wrap">
   
   <div class="widget">
     <ul class="nav">
       
-    <li>2021.05.17<a href="/articles/20210517a/" title="MONETマーケットプレイスで購入したAPIとFlutterを使って簡単なスマホアプリを作ってみます。">FlutterでMONETマーケットプレイスAPIを使ってみた</a></li>
+    <li>2020.05.30<a href="/articles/20200530/" title="IT企業の技術ブログ運営は、ある一定の質をキープしながらも、投稿頻度を高め・それを継続することが求められ、周囲の期待値もあるので中々気を抜けない仕事だと思います。単発ならともかく、継続することは忍耐が必要なので特に大変です。運営していてこれはナレッジだなと感じたことをまとめていきます。">フューチャー技術ブログの運営で心がけていること</a></li>
 
-    <li>2019.07.13<a href="/articles/20190713/" title="他の言語になれた人が、初めてGoを書いた時にわかりにくいな、と思った部分はどういうところがあるのか、難しいポイントはどこか、という情報を自分の経験や、会社の内外の人に聞いたりしてまとめてみました。">Goを学ぶときにつまずきやすいポイントFAQ</a></li>
+    <li>2020.03.11<a href="/articles/20200311/" title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li>
 
-    <li>2016.10.31<a href="/articles/20161031/" title="重要なアルゴリズムであるにもかかわらず、まとまった情報が少ないSQL実行時のブルームフィルタ(Bloom Filter)アルゴリズムについて紹介します。">SQL実行時のブルームフィルタ(Bloom Filter)アルゴリズム</a></li>
+    <li>2021.04.28<a href="/articles/20210428b/" title="Cypressの設定周りについて紹介します。何も手を加えないデフォルトでも動作はする">Cypress - 設定編</a></li>
 
-    <li>2021.05.12<a href="/articles/20210512a/" title="Flutter連載の3本目はFlutter Webを紹介します。Flutter 2になって、Web向けに出力する機能もStableになりました。Flutter for Webは標準のHTMLにするHTMLレンダラーと、CanvasKitレンダラーと2種類あります。後者はSkiaという2DグラフィックスのライブラリをWebAssembly化したものを使います。Skiaは...">Goのサーバーの管理画面をFlutter Webで作ってみるための調査</a></li>
+    <li>2021.03.05<a href="/articles/20210305/" title="こんにちは。テクノロジーイノベーショングループ所属の長澤です。[インフラ入門]な連載記事を久々に書くべく、今回筆を取りました。これまでのインフラ入門記事は [インフラ概要と当社でのインフラエンジニア像]">インフラ入門ーインフラ要件定義編ー</a></li>
 
-    <li>2021.03.04<a href="/articles/20210304/" title="前回の記事では、JavaScript製のグラフ可視化ライブラリについて概観しました。また、その1つであるVis Networkについて紹介し、階層グラフの可視化を行いました。Vis Networkはcanvasでの高速な描画が可能で、階層グラフをライトに表示・加工する場合は非常に有用ですが、大きな階層グラフを表示する場合にエッジの交差が多くなってしまうという課題があることを見てきました。">mxGraphで階層グラフを可視化する</a></li>
+    <li>2021.02.01<a href="/articles/20210201/" title="もともと、お仕事的には2019年にはリモートではあったのですが（仕事のカウンターが海外で、自社に出社しても、客先の日本のオフィスに行っても、テレビ会議とチャットで仕事していた）、2020年の3月からは自宅で仕事をすることになり、いろいろ整備しました。">自宅仕事環境構築：指向性マイクの勧め</a></li>
 
-    <li>2020.12.23<a href="/articles/20201223/" title="Pythonに型ヒントが入ってからしばらく経ちます。型ヒントの立ち位置も、なんでもできるアノテーションとして導入されましたが、型ヒント以外の用途はあまり育たず、型ヒントが中心になり、PEPや仕様もそれに合わせて変化したり、より書きやすいように機能が追加されてきました。本エントリーでは、Python 3.9時点での最新情報を元に、現在サポート中のPythonバージョン（3.6以上）との互換性の情報も織り交ぜながら、最新の型ヒントの書き方を紹介します。">2021年版Pythonの型ヒントの書き方 (for Python 3.9)</a></li>
+    <li>2020.09.30<a href="/articles/20200930/" title="Open Policy Agent（OPA）は汎用的なポリシーエンジンで、[Rego] と呼ばれるポリシー言語で定義されたルールに従って、入力がポリシーに沿っているか否かの判定を移譲させることができます。Regoで宣言的にポリシーを実装し、Policy as Code を実現できます。コーディング規約も一種のポリシーとみなして、Open API Spec（Swagger）をLinter的にチェックするツールを題材に、OPAを用いて開発してみたいと思います。">Policy as Code を実現する Open Policy Agent に憧れて。ポリシーコードでAPI仕様をLintする</a></li>
 
-    <li>2020.10.20<a href="/articles/20201020/" title="学生から社会人になると様々な環境の変化が起きてそれに適応していくのが大変なのが世の常ではありますが、現代社会の仕事において切っては切れないPC周りの設定も変わってきます。特に会社ではあらゆる驚異から大切な情報を守るために、家庭用PCとはまた異なるセキュリティが組まれていることが往々にしてあり、ITを生業とする会社であっても設定周りで苦労することがあります。そこで、会社に入って設定される用語とその機能関係、そしてそれによって影響を受ける開発環境（特にDocker）について、簡単にまとめます。ここでのキーワードは以下のとおりです。">ProxyとDockerと新人社員と時々わたし</a></li>
+    <li>2020.08.07<a href="/articles/20200807/" title="Go は標準ライブラリが充実しているとよく言われます。標準ライブラリだけで、HTTP サーバを作れたり、暗号化処理や、JSON や CSV といったデータ形式を扱うことができます">GoとSuffixArray</a></li>
 
-    <li>2020.05.12<a href="/articles/20200512/" title="TIG DXチーム　アルバイターの三村です．今回はHeadlessCMSを利用したタスクをやることになりました．私自身HeadlessCMSどころかCMSを聞いたことすら無かったので，初めてCMS使ってみるにあたって感じたことを共有出来たらと思い本記事を作成させていただいております．">日本製HeadlessCMSのmicroCMSを触ってみた</a></li>
+    <li>2020.07.03<a href="/articles/20200703/" title="エンタープライズでのミッションクリティカル領域においてもクラウド利用が普通になってきています。その過程において今までできないことを指向する試みも行われてきています。その代表的なものがクラウドの備えるリソースの高い拡張性と弾力性を利用したシステム展開です。例えば「より多くのデータを扱う」「同業他社に向けたサービス展開をする（マルチテナンシー）」といったものがあります。その際のアーキテクチャ選定では将来の利用を想定した選択を行う必要がありますが、データベースのスケールというのは非常に難しく簡単ではありません。">スケーラブルデータベース ～クラウドにおける後悔しないデータベース選定～</a></li>
 
     <li>2020.02.19<a href="/articles/20200219/" title="普段は、Terraform を使っているのですが、ふとCloud Deployment Manager を使ったことないことに気づきました。そこで、Cloud Deployment Manager について紹介したいと思います。">GCP連載#10 Terraform ではなくCloud Deployment Manager を使ってみよう</a></li>
 
-    <li>2019.11.11<a href="/articles/20191111/" title="TIG DX Unit所属の多賀です。今回は、Go Cloudシリーズとしていくつか Go Cloudに関する記事をリレー形式で書いていきたいと思います。 第一弾としては、Go Cloud についての概要と、案件でも活用した Blob を利用したサンプルについて解説します。また、認証系の情報の扱いについても記載します。">Go Cloud#1 概要とBlobへの活用方法</a></li>
+    <li>2020.02.07<a href="/articles/20200207/" title="Go + Vue + Cloud Runでかんたんな管理画面を作ろうと思います。ストレージ側にもサーバーレスがあります。MySQLやPostgreSQLのクラウドサービス（Cloud SQLとかRDS）は、サーバーマシンを可動させて、その上にDBMSが稼働しますので、起動している時間だけお金がかかってしまします。一方、FirestoreやDynamoDBの場合は容量と通信（と、キャパシティユニット）にしかお金がかからないモデルになっており、サーバーレスです。今回はかんたん化のためにストレージは扱いません。">GCP連載#3 Goでサーバーレスな管理画面アプリを作る</a></li>
     </ul>
   </div>
   
@@ -264,29 +264,29 @@
   <div class="widget">
     <ul class="nav sidebar-categories margin-bottom-40">
     
-    <li><a href="/categories/Culture/">Culture (52)</a></li>
+      <li><a href="/categories/Culture/">Culture (52)</a></li>
     
-    <li><a href="/categories/IoT/">IoT (14)</a></li>
+      <li><a href="/categories/IoT/">IoT (14)</a></li>
     
-    <li><a href="/categories/VR/">VR (10)</a></li>
+      <li><a href="/categories/VR/">VR (10)</a></li>
     
-    <li><a href="/categories/Security/">Security (2)</a></li>
+      <li><a href="/categories/Security/">Security (2)</a></li>
     
-    <li><a href="/categories/Design/">Design (7)</a></li>
+      <li><a href="/categories/Design/">Design (7)</a></li>
     
-    <li><a href="/categories/Programming/">Programming (169)</a></li>
+      <li><a href="/categories/Programming/">Programming (170)</a></li>
     
-    <li><a href="/categories/Management/">Management (9)</a></li>
+      <li><a href="/categories/Management/">Management (9)</a></li>
     
-    <li><a href="/categories/Infrastructure/">Infrastructure (132)</a></li>
+      <li><a href="/categories/Infrastructure/">Infrastructure (132)</a></li>
     
-    <li><a href="/categories/DB/">DB (14)</a></li>
+      <li><a href="/categories/DB/">DB (14)</a></li>
     
-    <li><a href="/categories/DataScience/">DataScience (30)</a></li>
+      <li><a href="/categories/DataScience/">DataScience (30)</a></li>
     
-    <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+      <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
     
-    <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+      <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
     
     </ul>
   </div>
@@ -329,7 +329,7 @@
 </div>
 <!-- END ADVENT CALENDAR -->
 
-</div>
+  </div>
 </div>
 
   </section>
@@ -416,6 +416,6 @@ ga('send', 'pageview');
 
 <!-- END INTEGRATIONS -->
 
-</div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </body>
 </html>
