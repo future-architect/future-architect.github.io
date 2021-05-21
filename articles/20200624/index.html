@@ -49,11 +49,12 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20200624/photo_20200624_04.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20200624/tf_cloud4.png">
 <meta property="article:published_time" content="2020-06-24T02:44:35.000Z">
-<meta property="article:modified_time" content="2021-04-11T08:20:22.415Z">
+<meta property="article:modified_time" content="2021-05-21T16:47:56.969Z">
 <meta property="article:tag" content="GCP">
 <meta property="article:tag" content="Terraform">
 <meta property="article:tag" content="初心者向け">
 <meta property="article:tag" content="Ansible">
+<meta property="article:tag" content="IaC">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://future-architect.github.io/images/20200624/photo_20200624_01.png">
   
@@ -62,7 +63,7 @@
   
   <link rel="icon" href="/favicon.ico">
   
-  <meta content="GCP,Terraform,初心者向け,Ansible" name="keywords">
+  <meta content="GCP,Terraform,初心者向け,Ansible,IaC" name="keywords">
   <meta content="伊藤太斉" name="author">
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha384-pdapHxIh7EYuwy6K7iE41uXVxGCXY0sAjBzaElYGJUrzwodck3Lx6IE2lA0rFREo" crossorigin="anonymous">
@@ -114,7 +115,9 @@
   
     <li><a href="/tags/%E5%88%9D%E5%BF%83%E8%80%85%E5%90%91%E3%81%91/" title="初心者向け">初心者向け</a></li> 
   
-    <li><a href="/tags/Ansible/" title="Ansible">Ansible</a>
+    <li><a href="/tags/Ansible/" title="Ansible">Ansible</a></li> 
+  
+    <li><a href="/tags/IaC/" title="IaC">IaC</a>
   
   </ul>
 
@@ -137,7 +140,7 @@
 
 <p>こんにちは。TIG/DXユニットの伊藤です。本記事は<a href="https://future-architect.github.io/articles/20200529/">春の入門祭り</a>の第18弾になります。</p>
 <p>今回はタイトルの通り、Terraformの入門記事です。Infrastructure as Code(IaC)のツールとしてはAWSからはCloudFormation、GCPからはDeployment Managerが出ています。Terraformは単一ツールで複数クラウドのリソースをコードで管理することができる、ということが大きなメリットであることは世に出ている他の記事でも言われています。</p>
-<p>本記事では以前私がこの入門記事連載で上げた「<a href="https://future-architect.github.io/articles/20200602/">春の入門祭り 🌸 #02 Google Cloud Platform 101</a>」の内容を扱います。なので、今回はGCP+Terraformの組み合わせでリソースを実際にコード化するところが基本編、Terraform Cloudの導入をを応用編として書いていきます。長くなるかもですが、お付き合いください。</p>
+<p>本記事では以前私がこの入門記事連載で上げた「<a href="/articles/20200602/">春の入門祭り 🌸 #02 Google Cloud Platform 101</a>」の内容を扱います。なので、今回はGCP+Terraformの組み合わせでリソースを実際にコード化するところが基本編、Terraform Cloudの導入をを応用編として書いていきます。長くなるかもですが、お付き合いください。</p>
 <h1 id="Terraformについて"><a href="#Terraformについて" class="headerlink" title="Terraformについて"></a>Terraformについて</h1><p>はじめはTerraformの簡単な説明をしていきます。Terraformは、HashiCorp社が開発したInfrastructure as Code(IaC)のためのツールになります。<br>コード化していく中で以下の働きを理解しながら進めるとどんな風にTerraformが動いているかわかると思います。</p>
 <ul>
 <li>resource<ul>
@@ -271,7 +274,7 @@
 <figure class="highlight sh"><figcaption><span>~/.terraformrc</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">credentials <span class="string">&quot;app.terraform.io&quot;</span> &#123;</span><br><span class="line">  token = <span class="string">&quot;xxxxxxxxxxxxx&quot;</span> <span class="comment"># Tokenを入力</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="backendの設定を有効化する"><a href="#backendの設定を有効化する" class="headerlink" title="backendの設定を有効化する"></a>backendの設定を有効化する</h2><p><code>backend.tf</code>を以下に書き換えて、stateを見に行く場所をGCSからTerraform Cloudに変えます。</p>
-<figure class="highlight sh"><figcaption><span>backend.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">terraform &#123;</span><br><span class="line">  backend <span class="string">&quot;remote&quot;</span> &#123;</span><br><span class="line">    hostname = <span class="string">&quot;app.terraform.io&quot;</span></span><br><span class="line">    organization = <span class="string">&quot;kaedemalu&quot;</span> <span class="comment"># 現在のOrganizantion Name</span></span><br><span class="line"> </span><br><span class="line">    workspaces &#123;</span><br><span class="line">      name = <span class="string">&quot;terraform_101&quot;</span> <span class="comment"># 使っているWorkspaceの名前</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><figcaption><span>backend.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">terraform &#123;</span><br><span class="line">  backend <span class="string">&quot;remote&quot;</span> &#123;</span><br><span class="line">    hostname = <span class="string">&quot;app.terraform.io&quot;</span></span><br><span class="line">    organization = <span class="string">&quot;kaedemalu&quot;</span> <span class="comment"># 現在のOrganizantion Name</span></span><br><span class="line"></span><br><span class="line">    workspaces &#123;</span><br><span class="line">      name = <span class="string">&quot;terraform_101&quot;</span> <span class="comment"># 使っているWorkspaceの名前</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>これで再び<code>terraform init</code>コマンドを実行しましょう。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> terraform init</span></span><br><span class="line">Initializing the backend...</span><br><span class="line">Acquiring state lock. This may take a few moments...</span><br><span class="line">Do you want to copy existing state to the new backend?</span><br><span class="line">  Pre-existing state was found while migrating the previous &quot;local&quot; backend to the</span><br><span class="line">  newly configured &quot;remote&quot; backend. No existing state was found in the newly</span><br><span class="line">  configured &quot;remote&quot; backend. Do you want to copy this state to the new &quot;remote&quot;</span><br><span class="line">  backend? Enter &quot;yes&quot; to copy and &quot;no&quot; to start with an empty state.</span><br><span class="line"></span><br><span class="line">  Enter a value: yes # ここでyesと入力する</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Successfully configured the backend &quot;remote&quot;! Terraform will automatically</span><br><span class="line">use this backend unless the backend configuration changes.</span><br><span class="line"></span><br><span class="line">Initializing provider plugins...</span><br><span class="line"></span><br><span class="line">The following providers do not have any version constraints in configuration,</span><br><span class="line">so the latest version was installed.</span><br><span class="line"></span><br><span class="line">To prevent automatic upgrades to new major versions that may contain breaking</span><br><span class="line">changes, it is recommended to add version = &quot;...&quot; constraints to the</span><br><span class="line">corresponding provider blocks in configuration, with the constraint strings</span><br><span class="line">suggested below.</span><br><span class="line"></span><br><span class="line">* provider.google: version = &quot;~&gt; 3.26&quot;</span><br><span class="line"></span><br><span class="line">Terraform has been successfully initialized!</span><br><span class="line"></span><br><span class="line">You may now begin working with Terraform. Try running &quot;terraform plan&quot; to see</span><br><span class="line">any changes that are required for your infrastructure. All Terraform commands</span><br><span class="line">should now work.</span><br><span class="line"></span><br><span class="line">If you ever set or change modules or backend configuration for Terraform,</span><br><span class="line">rerun this command to reinitialize your working directory. If you forget, other</span><br><span class="line">commands will detect it and remind you to do so if necessary.</span><br></pre></td></tr></table></figure>
 
@@ -337,15 +340,15 @@
   <div class="widget">
     <ul class="nav featured-post-link">
       
-    <li><span>2021.04.12</span><span class="snscount">&#9825;11</span> <a href="/articles/20210412a/" title="テックブログにて記事を書くのは1年半ぶりです。あれからずっと設計～開発まで推進し、今年無事アプリリリースが完了しました。このタイミングで改めてKVS関連のナレッジを還元できたらと思い筆を執りました。">KVSと二年間向き合って得たナレッジを還元する時がきた</a></li>
+    <li><span>2021.05.18</span><span class="snscount">&#9825;364</span> <a href="/articles/20210518a/" title="RESTfullとかRESTishな方針でWebAPIの横断検索を設計する際にチーム内で方針について議論したやり取りの備忘記事です。">HTTP検索条件、GETにするか？POSTにするか？</a></li>
 
-    <li><span>2020.06.30</span><span class="snscount">&#9825;123</span> <a href="/articles/20200630/" title="業務でヘビーユーズしているgo-swaggerについての開発Tipsをまとめました。">go-swaggerを用いたWebアプリケーション開発Tips19選</a></li>
+    <li><span>2020.06.01</span><span class="snscount">&#9825;132</span> <a href="/articles/20200601/" title="Go のテストに入門してみよう！という記事です。書いた背景ですが Go の標準ライブラリのコードリーディング会で testing パッケージにチャレンジしてみましたが、難しすぎてわからん。そもそも Go のテストって何ができるんだっけ？という話になり、基本的な内容をなるべく具体例をまじえながらまとめました。">春の入門祭り 🌸 #01 Goのテストに入門してみよう！</a></li>
 
-    <li><span>2021.03.24</span><span class="snscount">&#9825;15</span> <a href="/articles/20210324/" title="TIGの伊藤真彦です。業務で行っている開発がいよいよリリースを視野に入れたフェーズに入り、E2Eテストや各種性能試験を行いました。">k6の使い方 シンプル&軽快な負荷試験ツールを試す</a></li>
+    <li><span>2021.04.22</span><span class="snscount">&#9825;3</span> <a href="/articles/20210422a/" title="私は新卒でフューチャーへ入社しITの世界でのキャリアが始まりました。その後、一度フューチャーを離れIoTプラットフォーマーのソリューションアーキテクトとして多くのお客様へ自社サービスの導入支援やIoTシステムの設計や構築の支援をしておりました。そうしたソリューションアーキテクトとしてのロールを通じて、多くの経験や学びを得ることができたのですが、その中でも特にTechnical Credibilityというキーワードについて自分の経験を交えて本ブログにて書いてみたいと思います。">Technical Credibilityを築くということ</a></li>
 
-    <li><span>2020.08.07</span><span class="snscount">&#9825;70</span> <a href="/articles/20200807/" title="Go は標準ライブラリが充実しているとよく言われます。標準ライブラリだけで、HTTP サーバを作れたり、暗号化処理や、JSON や CSV といったデータ形式を扱うことができます">GoとSuffixArray</a></li>
+    <li><span>2020.09.10</span><span class="snscount">&#9825;76</span> <a href="/articles/20200910/" title="初のオンライン＆Python 2サポートが終了したあとのPyCon.jpという節目のイベントで発表してきました。![IMG_0039.PNG]発表資料はこちらになります。">「2020年代のコンテナ時代のPythonアーキテクチャ&デプロイ」というテーマでPyCon.jp 2020で発表してきました</a></li>
 
-    <li><span>2020.03.27</span><span class="snscount">&#9825;172</span> <a href="/articles/20200327/" title="クラウドサービスが充実してくるにつれて、サーバーレスではいろいろなことができるようになっています。HTTPサーバーは動きますし、RDBやNoSQLなストレージも使えますし、PubSubみたいなサービスも利用できます。これらを駆使するとそこそこ複雑な処理も記述できます。一方で、上から下までサーバーレスにしようとするとできないものもいくつかあります。例えば、RDBも使えるといっても制約があり、LambdaやCloud ...">Serverless連載3: Goでサーバーレス用の検索エンジンwatertowerを作ってみました</a></li>
+    <li><span>2020.03.31</span><span class="snscount">&#9825;17</span> <a href="/articles/20200331/" title="サーバレス連載企画の第5回はCloudEvents(https://cloudevents.io/)を取り上げたいと思います。CloudEventsとは様々存在するイベントを統一的に扱いたいとの思いから登場した統一仕様です。2019.10.24にCNCF(https://www.cncf.io/)のIncubatorプロジェクトに昇格したらしく、同時にv1.0のSpecificationがリリースされています。">Serverless連載5: CloudEventsのGo版SDKをいじってみる</a></li>
     </ul>
   </div>
   
@@ -365,7 +368,7 @@
   <div class="widget">
     <ul class="nav sidebar-categories margin-bottom-40">
     
-      <li><a href="/categories/Culture/">Culture (53)</a></li>
+      <li><a href="/categories/Culture/">Culture (54)</a></li>
     
       <li><a href="/categories/IoT/">IoT (14)</a></li>
     
@@ -375,7 +378,7 @@
     
       <li><a href="/categories/Design/">Design (7)</a></li>
     
-      <li><a href="/categories/Programming/">Programming (169)</a></li>
+      <li><a href="/categories/Programming/">Programming (168)</a></li>
     
       <li><a href="/categories/Management/">Management (9)</a></li>
     
