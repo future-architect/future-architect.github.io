@@ -5,7 +5,7 @@
 <html lang="ja">
 <!--<![endif]-->
 <head>
-  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <meta charset="utf-8">
   <!--
     ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
     ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
@@ -46,7 +46,7 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20210412a/gid.png.jpg">
 <meta property="og:image" content="https://future-architect.github.io/images/20210412a/nodesync_partition.png">
 <meta property="article:published_time" content="2021-04-11T15:00:00.000Z">
-<meta property="article:modified_time" content="2021-05-15T16:00:42.596Z">
+<meta property="article:modified_time" content="2021-05-23T02:57:28.636Z">
 <meta property="article:tag" content="KVS">
 <meta property="article:tag" content="Cassandra">
 <meta property="article:tag" content="NoSQL">
@@ -65,10 +65,10 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha384-pdapHxIh7EYuwy6K7iE41uXVxGCXY0sAjBzaElYGJUrzwodck3Lx6IE2lA0rFREo" crossorigin="anonymous">
   <link rel="stylesheet" href="/metronic/assets/style.css">
   <link rel="stylesheet" href="/css/theme-styles.css">
-<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 5.4.0"></head>
 
 <body class="corporate">
-  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
   <!-- BEGIN HEADER -->
 <header class="header">
 	<div class="header-overlay">
@@ -303,7 +303,8 @@
 <p>基本的にはメリットが多く、バッチ処理をうまく利用することでデータ整合性を保証しつつ性能面の向上も見込めるためおすすめです。</p>
 <h2 id="3-アプリケーション開発の勘所"><a href="#3-アプリケーション開発の勘所" class="headerlink" title="3. アプリケーション開発の勘所"></a>3. アプリケーション開発の勘所</h2><p>私のPJではデータストアとして業務データを管理するdatastax(KVS)、全文検索機能としてElasticsearch、オンプレ構成だったのでアーカイブ用にDynamoDBを採用しており、複数のデータストアが混在していました。</p>
 <p>アプリ開発者にデータストア層を意識させるのは非常に困難かつ、データ整合性を担保できないと考え、<strong>業務ロジックを実装するHandlerとデータの整合性を保証したCRUD機能を提供するPersister層</strong>に分離しました。</p>
-<p><img src="/images/20210412aa/datastore_api.png.jpg" alt="datastore_api"></p>
+<img src="/images/20210412aa/datastore_api.png.jpg" alt="datastore_api" loading="lazy">
+
 <p>APIコールすると紐づくHandler(業務ロジック)が呼び出され、Handler内で発生するデータストアへのCRUDは全てPersisterクラスの共通メソッドを呼び出すことでデータストア層を隠蔽化しています。</p>
 <h3 id="3-1-gRPCモデルを利用したCRUD機能を提供"><a href="#3-1-gRPCモデルを利用したCRUD機能を提供" class="headerlink" title="3-1. gRPCモデルを利用したCRUD機能を提供"></a>3-1. gRPCモデルを利用したCRUD機能を提供</h3><p>]<br>クライアント/サーバー間のAPI連携にはgRPCを採用しました。datastaxはCassandraベースの製品でデータアクセスはCassandraと同じCQLを利用します。</p>
 <p>CQLはSQLライクで、従来のRDBアプリ開発者にも直感的に記述できるインターフェースです。とはいえ、コレクション型(Map,Set)の更新や軽量トランザクション(CAS)やバッチクエリなどCassandra特有のクエリもあり、少なからず学習コストがあります。</p>
@@ -348,7 +349,8 @@
 <p>Elasticsearch上のデータは主管データではなく、あくまで検索補完の位置づけなので更新フローは<strong>「KVS-&gt;Elasticsearch」として必ずKVS側から更新する</strong>ようにしました。KVSを更新せずにインデックスのみ更新するフローも原則禁止としています。更新順序に依存関係を持たせることでKVSの更新エラー時に検索インデックスだけ更新されてKVSにはデータがないのに検索はヒットするといった不整合を防ぐことができます。</p>
 <p>また、KVSは1レコードサイズが肥大化しがちなので<strong>KVS更新時に検索項目が含まれている時のみElasticsearchへのインデックス同期すること</strong>を推奨します。こうすることでインデックスサイズの削減、同期不要時の処理性能向上が見込めます。更新順序制御や更新時のインデックス同期判定を業務ロジック上で判断させるのは困難なためPersisterのKVS更新メソッドの引数に渡すgRPCモデルのフィールドオプションにインデックス化する項目に対してカスタムオプション定義をしておき更新制御を行いました。</p>
 <p>KVSからElasticsearchのデータ連携は基本的に同期処理で行っているのですが、Elasticsearchはインデクシングまでは同期処理で、連携されたデータを即時に検索できるようにするか、非同期で準リアルタイム(といっても数百msの世界)で検索できるようにするかをrefreshと呼ばれるオプションで制御することができます。</p>
-<p><img src="/images/20210412a/001_refresh_flush.png" alt="refresh_flush"></p>
+<img src="/images/20210412a/001_refresh_flush.png" alt="refresh_flush" loading="lazy">
+
 <p>検索可能なSegment領域へのrefreshは基本的に非同期(false)を推奨します。</p>
 <p><strong>refreshを同期的(true)に行うと、KVSへの連射更新時やSegmentのmerge処理が走るとパフォーマンスに大きな影響を与えかねません。</strong></p>
 <p>Elasticsearchの公式ドキュメントでもrefresh同期は性能影響を与えると言及しています。refresh_intervalと呼ばれるパラメータでrefreshが定期実行されるのでそれに任せます。ただし、業務ロジック上でインデックス更新直後に即座に検索クエリを投げて対象の更新データを取得して後続処理を行うようなケースがある場合はrefresh_intervalで検索可能なインデックスへの書き出しが間に合わず検索にヒットしない、というケースが稀にあります。<br>そのため、refresh同期反映が必要な場合はPersisterから更新時にrefreshオプションを渡せるようにも工夫しました。</p>
@@ -358,7 +360,7 @@
 <p>BCP要件上アクティブスタンバイ構成でリアルタイム同期の必要はなかったため、<strong>KVS側に更新管理テーブルを作成してスタンバイ側からPULL型の定期実行で同期対象の特定および対象レコードを抽出してElasticsearchに連携する仕組み</strong>を作りました。</p>
 <p>更新管理テーブルはKVSにデータ登録・更新時に業務テーブルに書き込む前に対象レコードのPK、更新日付、BCP同期ステータスなどをまず更新管理テーブルに記録します。更新管理テーブルへの更新が完了したら、業務テーブル更新とインデックス同期を行います。</p>
 <p>KVS上のデータはDRサイト側にもデータベースの機能で同期が図られているのでDRサイト側で定期的に更新管理テーブルをチェックしてBCP同期対象のPKを取得します。</p>
-<p>更新管理テーブルはあくまでPKだけ管理しているので、仮にKVS側で更新管理テーブルの書き込みは成功して、業務テーブルへの書き込みが失敗していたとしても常に業務テーブルの最新データを取得してインデックスに連携するためデータ不整合は発生しません。<br><img src="/images/20210412a/bcp.png.jpg" alt="bcp"></p>
+<p>更新管理テーブルはあくまでPKだけ管理しているので、仮にKVS側で更新管理テーブルの書き込みは成功して、業務テーブルへの書き込みが失敗していたとしても常に業務テーブルの最新データを取得してインデックスに連携するためデータ不整合は発生しません。<br><img src="/images/20210412a/bcp.png.jpg" alt="bcp" loading="lazy"></p>
 <h3 id="3-5-エラーハンドリング"><a href="#3-5-エラーハンドリング" class="headerlink" title="3-5. エラーハンドリング"></a>3-5. エラーハンドリング</h3><p>基本的にエラー時はアプリケーション上でリトライさせず、ユーザー画面にエラー通知を返して画面操作のリトライを促しました。</p>
 <p>一部、軽量トランザクションを利用したロック制御を実装しており、ロックフラグをみてステータス更新をかけるような排他制御がありました。</p>
 <p>この処理はロック取得の軽量トランザクションで更新がかけられない時はwaitを挟み、アプリケーション上でリトライをかけるように制御しました。また、DatastaxのDriver上でリトライポリシーを設定することが可能なためReadTimeoutException、WriteTimeoutExceptionに関してはリトライポリシーに従ってリトライをかけていました。リトライポリシー設定例は下記参照ください。</p>
@@ -389,7 +391,8 @@
 <h3 id="4-3-kibanaを利用して処理全体の性能監視の仕組みを作る"><a href="#4-3-kibanaを利用して処理全体の性能監視の仕組みを作る" class="headerlink" title="4-3. kibanaを利用して処理全体の性能監視の仕組みを作る"></a>4-3. kibanaを利用して処理全体の性能監視の仕組みを作る</h3><p>nodetoolコマンドなどでKVSレイヤーの統計情報を取得することができますが、KVSではRDBのように複雑なSQLが実行されるようなことがないため単一クエリの性能は基本的に問題ないというケースが多いです。</p>
 <p>そのためKVSレイヤーのみに絞って性能監視してもボトルネックが掴めない場合が多いです。アプリ全体でどこがボトルネックになっているかを追えるようなロギングが重要になります。</p>
 <p>私のPJではフロントでグローバルトランザクションIDを払い出してそれを取りまわしていたのでグローバルトランザクションID起点で性能監視が追えるように各レイヤーでロギングしました。各レイヤーのアプリログをElasticsearchに取り込み、kibanaでグローバルトランザクションIDで横断検索しボトルネック箇所を特定できるダッシュボードを作成してチューニングを実施しました。</p>
-<p><img src="/images/20210412a/gid.png.jpg" alt="gid"></p>
+<img src="/images/20210412a/gid.png.jpg" alt="gid" loading="lazy">
+
 <p>業務ロジック上で時間がかかっているのか、データストアへのCRUDで時間がかかっているのかを切り分けることで、チューニング対象の特定がグッとしやすくなります。</p>
 <h3 id="4-4-1パーティションサイズが100MB以上にならないようにする"><a href="#4-4-1パーティションサイズが100MB以上にならないようにする" class="headerlink" title="4-4. 1パーティションサイズが100MB以上にならないようにする"></a>4-4. 1パーティションサイズが100MB以上にならないようにする</h3><p>Cassandraはデータ書き込み時にCONCISTENCY LEVELに応じてノードの書き込み完了を保証します。</p>
 <p>CONCISTENCY LEVELがALLでなければクラスタ内のノードがすべて書き込みが成功しているという保証ができないため、定期的にクラスタ内のノード間でデータの整合性を合わせるためにバリデーションとデータ同期が行われています。この仕組みを”nodetool repair”と呼びます。nodetool repairによる同期が完了しないと全ノードが同じデータを持つことが保証されませんがLOCAL_QUORUMで読み書きを行っていれば、仮に3ノード中1ノードが古いデータを持っていたとしてもデータ不整合は発生しないのでアプリケーション側に影響はありません。</p>
@@ -399,7 +402,8 @@
 <p>Datastaxではgc_grace_secondsで設定した値の期間内に同期が完了するようにrepaireタスクをスケジューリングして自動実行してくれる”nodesync”とよばれるサービスが動いています。</p>
 <p>運用ではnodesyncによって10日以内にデータ同期が完了しているかを監視することが大切です。nodesyncによる同期状況はDatastaxが提供する専用のダッシュボードがあるのでそれを利用します。このnodesyncは自動でスケジュールしてくれるので非常に便利な機能ですが、データを積んでテストしていく中である日突然CPUが一定間隔で高騰し続ける事象が発生しました。その原因がパーティションサイズに大きく関係していたのです。</p>
 <p>nodesyncの実行単位は200MBのセグメントと呼ばれる領域にパーティションデータを乗せてバリデーションを行うのですが<strong>1パーティションが1GBなど200MBを超えている場合はパーティション内のデータを分割できず、1GBそのままセグメント領域に展開してしまう</strong>ため1コアあたりの占有時間が顕著に長くなり、1GBを超えるような巨大パーティションが複数存在するとCPUリソースを全体を食いつぶすというのが原因でした。</p>
-<p><img src="/images/20210412a/nodesync_partition.png" alt="nodesync_partition"></p>
+<img src="/images/20210412a/nodesync_partition.png" alt="nodesync_partition" loading="lazy">
+
 <p>そのためパーティションサイズが1GBを超えるテーブルは100MBに収まるよう設計を見直しました。サイズが肥大化しがちなパーテイションの主は日付をキーにしている場合が多いです。定常業務の更新量では1GBを超えなくても、移行などでイレギュラー要素で想定以上の更新量が発生する可能性もあるため、月や日などの単位ではなく日時分などでパーティションの粒度を細かくするもしくは、日付＋分散キーにしてコンポジット化するなど検討しました。</p>
 <p><strong>テーブル作成後のパーティションキー変更は出来ないのでデータモデル設計時には1パーティションサイズが100MBを越さないようなキー設計になっているかを意識してください。</strong>また、運用開始後もパーティションが想定外に肥大化していないかなどを監視すると事前に事故を防げる可能性が高くなるので重要です。</p>
 <h2 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h2><p>KVSと二年間設計から開発まで携わる中で一番苦労したのは「情報収集」でした。</p>
@@ -464,9 +468,9 @@
 
     <li><span>2020.05.30</span><span class="snscount">&#9825;159</span> <a href="/articles/20200530/" title="IT企業の技術ブログ運営は、ある一定の質をキープしながらも、投稿頻度を高め・それを継続することが求められ、周囲の期待値もあるので中々気を抜けない仕事だと思います。単発ならともかく、継続することは忍耐が必要なので特に大変です。運営していてこれはナレッジだなと感じたことをまとめていきます。">フューチャー技術ブログの運営で心がけていること</a></li>
 
-    <li><span>2021.03.04</span><span class="snscount">&#9825;1</span> <a href="/articles/20210304/" title="前回の記事では、JavaScript製のグラフ可視化ライブラリについて概観しました。また、その1つであるVis Networkについて紹介し、階層グラフの可視化を行いました。Vis Networkはcanvasでの高速な描画が可能で、階層グラフをライトに表示・加工する場合は非常に有用ですが、大きな階層グラフを表示する場合にエッジの交差が多くなってしまうという課題があることを見てきました。">mxGraphで階層グラフを可視化する</a></li>
+    <li><span>2021.02.26</span><span class="snscount">&#9825;43</span> <a href="/articles/20210226/" title="E2Eテストはみんなしていますか？正直言うと、僕はあんまり好きじゃなかったです。お仕事では他の人が入れてくれたものが回っていたりしますが。前職で、SikuliXを使って社内向けのデスクトップアプリケーションのE2Eテストにトライしたことがあるんですが、すぐに壊れて動かなくなるので、費用対効果が出せなくてあきらめました（一人プロジェクトだったのもあります）。* 絵でマッチングを行うのでボタン画像をいっぱいスクショをとっていく必要がある">アクセシビリティ情報を使った壊れにくいE2Eテスト</a></li>
 
-    <li><span>2020.12.23</span><span class="snscount">&#9825;99</span> <a href="/articles/20201223/" title="Pythonに型ヒントが入ってからしばらく経ちます。型ヒントの立ち位置も、なんでもできるアノテーションとして導入されましたが、型ヒント以外の用途はあまり育たず、型ヒントが中心になり、PEPや仕様もそれに合わせて変化したり、より書きやすいように機能が追加されてきました。本エントリーでは、Python 3.9時点での最新情報を元に、現在サポート中のPythonバージョン（3.6以上）との互換性の情報も織り交ぜながら、最新の型ヒントの書き方を紹介します。">2021年版Pythonの型ヒントの書き方 (for Python 3.9)</a></li>
+    <li><span>2020.11.09</span><span class="snscount">&#9825;157</span> <a href="/articles/20201109/" title="1年弱ほどGo言語でWebAPIアプリケーション開発を行っていますが、かなり割り切った構成・テスト方針を採用しました。そろそろ1年弱になり機能開発も比較的落ち着き、保守運用フェーズの割合も徐々に増えてきた頃合いなので、やったこと・学び・反省といった振り返りを共有します。">GoのWebアプリ開発でフラットパッケージにした話</a></li>
     </ul>
   </div>
   
@@ -636,6 +640,6 @@ ga('send', 'pageview');
 
 <!-- END INTEGRATIONS -->
 
-  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  </div>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <html lang="ja">
 <!--<![endif]-->
 <head>
-  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <meta charset="utf-8">
   <!--
     ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
     ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
@@ -40,10 +40,10 @@
 <meta property="og:site_name" content="フューチャー技術ブログ">
 <meta property="og:description" content="はじめにTIGの辻です。サーバーレスなアプリケーションを開発するときにAWS LambdaやCloud RunといったFaaSはとても重宝します。デプロイする関数のコードは1つの関数がモノリシックな大きな関数にならないように、小さな関数を組み合わせて実装するのが基本です。いくつかのユースケースでAWS LambdaからAWS Lambdaを同期的に呼び出したいケースがあったのですが、開発者が意識し">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:image" content="https://future-architect.github.io/images/20201112/Lambda%E3%81%8B%E3%82%89Lambda.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201112/LambdaからLambda.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20201112/image.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20201112/image_2.png">
-<meta property="og:image" content="https://future-architect.github.io/images/20201112/Lambda%E3%81%8B%E3%82%89Lambda-VPCLambda.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201112/LambdaからLambda-VPCLambda.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20201112/image_3.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20201112/image_4.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20201112/image_5.png">
@@ -51,12 +51,12 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20201112/image_7.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20201112/image_8.png">
 <meta property="article:published_time" content="2020-11-11T15:00:00.000Z">
-<meta property="article:modified_time" content="2021-04-11T08:20:24.186Z">
+<meta property="article:modified_time" content="2021-05-23T02:50:41.597Z">
 <meta property="article:tag" content="AWS">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="Lambda">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://future-architect.github.io/images/20201112/Lambda%E3%81%8B%E3%82%89Lambda.png">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20201112/LambdaからLambda.png">
   
   <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
   
@@ -69,10 +69,10 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha384-pdapHxIh7EYuwy6K7iE41uXVxGCXY0sAjBzaElYGJUrzwodck3Lx6IE2lA0rFREo" crossorigin="anonymous">
   <link rel="stylesheet" href="/metronic/assets/style.css">
   <link rel="stylesheet" href="/css/theme-styles.css">
-<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 5.4.0"></head>
 
 <body class="corporate">
-  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
   <!-- BEGIN HEADER -->
 <header class="header">
 	<div class="header-overlay">
@@ -134,7 +134,8 @@
           
             <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIGの辻です。サーバーレスなアプリケーションを開発するときにAWS LambdaやCloud RunといったFaaSはとても重宝します。デプロイする関数のコードは1つの関数がモノリシックな大きな関数にならないように、小さな関数を組み合わせて実装するのが基本です。いくつかのユースケースでAWS LambdaからAWS Lambdaを同期的に呼び出したいケースがあったのですが、開発者が意識しておいたほうがいいようなハマりどころがいくつかありました。</p>
 <p>本記事ではGoで<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/invocation-sync.html">AWS LambdaからAWS Lambdaを同期的に呼び出すとき</a>のハマりどころやTipsを紹介します。以下のような構成です。</p>
-<p><img src="/images/20201112/Lambda%E3%81%8B%E3%82%89Lambda.png"></p>
+<img src="/images/20201112/LambdaからLambda.png" loading="lazy">
+
 <ul>
 <li>ライブラリのバージョン</li>
 </ul>
@@ -166,12 +167,14 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Lambda関数呼び出し</span></span><br><span class="line">resp, err := lmd.InvokeWithContext(ctx, input)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 正常にLambda関数が呼び出せた場合は常にnilになります</span></span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;invoke lambda, function name = %s: %w&quot;</span>, functionName, err)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>呼び出し先のLambda関数でエラーが発生していても、呼び出し元の処理は正常終了しています。</p>
-<p><img src="/images/20201112/image.png"></p>
+<img src="/images/20201112/image.png" loading="lazy">
+
 <h3 id="修正例"><a href="#修正例" class="headerlink" title="修正例"></a>修正例</h3><p><strong><code>InvokeOutput</code> の <code>FunctionError</code> が <code>nil</code> かどうかで呼び出し先のLambda関数でエラーが発生したかチェックする</strong></p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Lambda関数呼び出し</span></span><br><span class="line">resp, err := lmd.InvokeWithContext(ctx, input)</span><br><span class="line">log.Printf(<span class="string">&quot;invoke err: %v\n&quot;</span>, err)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;invoke lambda, function name = %s: %w&quot;</span>, functionName, err)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// resp変数のFunctionErrorがnilかどうかで呼び出し先のLambda関数でエラーが発生したかチェックします</span></span><br><span class="line"><span class="keyword">if</span> resp.FunctionError != <span class="literal">nil</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;invoke lambda response error, detail: %v: %v&quot;</span>, <span class="keyword">string</span>(resp.Payload), aws.StringValue(resp.FunctionError))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><code>resp.FunctionError</code> を使ってエラーをチェックすれば、呼び出し先のLambda関数で発生したエラーをハンドリングできます。エラーの詳細は <code>resp.Payload</code> にJSONとして表現されています。今回の場合、呼び出し先のLambda関数で <code>errorString</code> のエラーが発生し、エラーの文字列として <code>&quot;invoked err&quot;</code> となっていることがわかります。</p>
-<p><img src="/images/20201112/image_2.png"></p>
+<img src="/images/20201112/image_2.png" loading="lazy">
+
 <h2 id="2-Contextでは値を伝播できない"><a href="#2-Contextでは値を伝播できない" class="headerlink" title="2. Contextでは値を伝播できない"></a>2. Contextでは値を伝播できない</h2><p>GoではContextという、APIやプロセス間で、処理のデッドラインを設定やリクエストスコープ内に閉じた値を伝播する機能があります。Contextを用いて値を伝播するときは<a target="_blank" rel="noopener" href="https://golang.org/pkg/context/#WithValue">context.WithValue</a>を使って、キーとバリューのセットでコンテキストに値を格納します。</p>
 <details><summary>WithContextを利用する実装例</summary><div>
 
@@ -228,9 +231,11 @@
 
 <h2 id="3-VPC-LambdaからVPC-LambdaはInternalな通信では呼び出せない"><a href="#3-VPC-LambdaからVPC-LambdaはInternalな通信では呼び出せない" class="headerlink" title="3. VPC LambdaからVPC LambdaはInternalな通信では呼び出せない"></a>3. VPC LambdaからVPC LambdaはInternalな通信では呼び出せない</h2><p>Transit Gatewayなどを使ってオンプレとクラウドを接続する場合など、いくつかのユースケースでLambda関数をVPC Lambdaとして配置したい場合があります。VPC内にあるLambda関数から(VPC Lambda・非VPC Lambda問わず)別のLambda関数を呼び出す場合には<del>Internalの通信で呼び出せないことに注意が必要です。(2020/10/13現在)</del> VPC Endpointを使ってInternalな通信で呼び出せるようになりました。</p>
 <p>以下のようにLambda関数をVPC内に配置する場合です。サブネットはプライベートサブネットとします。(なお通常VPC Lambda関数は可用性の観点から複数のサブネットに配置します)</p>
-<p><img src="/images/20201112/Lambda%E3%81%8B%E3%82%89Lambda-VPCLambda.png"></p>
+<img src="/images/20201112/LambdaからLambda-VPCLambda.png" loading="lazy">
+
 <h3 id="VPCエンドポイントがなかった従来の場合"><a href="#VPCエンドポイントがなかった従来の場合" class="headerlink" title="VPCエンドポイントがなかった従来の場合"></a>VPCエンドポイントがなかった従来の場合</h3><p>同じVPCに含まれるLambda関数であるため、インターネットを経由せずにInternalな通信でLambda関数からLambda関数を呼び出せることを期待しますが、できません。<code>InvokeWithContext</code> で呼び出すと以下のようになります。</p>
-<p><img src="/images/20201112/image_3.png"></p>
+<img src="/images/20201112/image_3.png" loading="lazy">
+
 <p>ログには以下のように出力されており、Lambda関数自体の呼び出しに失敗しています。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[DEBUG] 2020/10/11 12:21:35 hello <span class="built_in">caller</span> lambda!</span><br><span class="line">[DEBUG] 2020/10/11 12:23:35 invoke err: RequestError: send request failed</span><br><span class="line">caused by: Post <span class="string">&quot;https://lambda.ap-northeast-1.amazonaws.com/2015-03-31/functions/invoked/invocations&quot;</span>: dial tcp 3.112.8.132:443: i/o timeout</span><br><span class="line">invoke lambda, <span class="keyword">function</span> name = invoked: RequestError: send request failed</span><br><span class="line">caused by: Post <span class="string">&quot;https://lambda.ap-northeast-1.amazonaws.com/2015-03-31/functions/invoked/invocations&quot;</span>: dial tcp 3.112.8.132:443: i/o timeout: wrapError</span><br></pre></td></tr></table></figure>
 
@@ -241,14 +246,17 @@
 <li>構築手順</li>
 </ul>
 <p>VPCエンドポイントを作成します。</p>
-<p><img src="/images/20201112/image_4.png"></p>
+<img src="/images/20201112/image_4.png" loading="lazy">
+
 <p>VPCエンドポイントの作成が完了すると、DNS名が払い出されます。払い出されたDNS名に対してリクエストするように実装します。</p>
-<p><img src="/images/20201112/image_5.png"></p>
+<img src="/images/20201112/image_5.png" loading="lazy">
+
 <p>以下のようにLambda関数を呼び出すためのクライアントのConfigにエンドポイントをVPCエンドポイントから払い出されたDNS名を指定します。</p>
 <figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">func init() &#123;</span><br><span class="line">	lmd = lambda.New(session.Must(session.NewSession(&amp;aws.Config&#123;</span><br><span class="line"><span class="addition">+		Endpoint: aws.String(&quot;vpce-08dbf550d5e0a2b01-bcnnllkp.lambda.ap-northeast-1.vpce.amazonaws.com&quot;),</span></span><br><span class="line">	&#125;)))</span><br><span class="line">	log.SetPrefix(&quot;[DEBUG] &quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>再度ビルドしてLambda関数をデプロイします。Lambda関数を実行すると、Lambda関数呼び出しが成功するようになりました。</p>
-<p><img src="/images/20201112/image_6.png"></p>
+<img src="/images/20201112/image_6.png" loading="lazy">
+
 <p>従来は以下の解決策に記載しているような</p>
 <ul>
 <li>NAT Gatewayを構築してインターネットへのアウトバウントの経路を確保する</li>
@@ -265,7 +273,8 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">functionName := <span class="string">&quot;invoked&quot;</span></span><br><span class="line">input := &amp;lambda.InvokeInput&#123;</span><br><span class="line">	FunctionName:   aws.String(functionName),</span><br><span class="line">	<span class="comment">// 非同期型として呼び出すためにInvocationTypeにEventを設定します。</span></span><br><span class="line">	InvocationType: aws.String(lambda.InvocationTypeEvent),</span><br><span class="line">	Payload:        b,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="5-呼び出し先のLambdaの同時実行数以上の同期呼び出しは即座にエラーが返る"><a href="#5-呼び出し先のLambdaの同時実行数以上の同期呼び出しは即座にエラーが返る" class="headerlink" title="5. 呼び出し先のLambdaの同時実行数以上の同期呼び出しは即座にエラーが返る"></a>5. 呼び出し先のLambdaの同時実行数以上の同期呼び出しは即座にエラーが返る</h2><p>Lambda関数は「<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/configuration-concurrency.html">同時実行数</a>」という設定を使って、同時に実行できるLambda関数に制約を付与することができます。非同期型の呼び出しの場合は、呼び出し元には成功のステータスが返されます。Lambda関数はキューイング後、遅延して実行されます。しかし、同期型として呼び出す場合、同時実行数以上の数を呼び出した場合は即座に呼び出し元に <a target="_blank" rel="noopener" href="https://pkg.go.dev/github.com/aws/aws-sdk-go@v1.35.7/service/lambda#TooManyRequestsException"><code>TooManyRequestsException</code></a> のエラーが返ってきます。</p>
-<p><img src="/images/20201112/image_7.png"></p>
+<img src="/images/20201112/image_7.png" loading="lazy">
+
 <p>ログには以下のように出力されます。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[DEBUG] 2020/10/11 13:01:21 hello <span class="built_in">caller</span> lambda!</span><br><span class="line">[DEBUG] 2020/10/11 13:01:27 invoke err: TooManyRequestsException: Rate Exceeded.</span><br><span class="line">&#123;</span><br><span class="line">  RespMetadata: &#123;</span><br><span class="line">    StatusCode: 429,</span><br><span class="line">    RequestID: <span class="string">&quot;11b45c8e-3e59-4ab7-8acb-80e1bfa5931f&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  Message_: <span class="string">&quot;Rate Exceeded.&quot;</span>,</span><br><span class="line">  Reason: <span class="string">&quot;ReservedFunctionConcurrentInvocationLimitExceeded&quot;</span>,</span><br><span class="line">  Type: <span class="string">&quot;User&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">invoke lambda, <span class="keyword">function</span> name = invoked: TooManyRequestsException: Rate Exceeded.</span><br><span class="line">&#123;</span><br><span class="line">  RespMetadata: &#123;</span><br><span class="line">    StatusCode: 429,</span><br><span class="line">    RequestID: <span class="string">&quot;11b45c8e-3e59-4ab7-8acb-80e1bfa5931f&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  Message_: <span class="string">&quot;Rate Exceeded.&quot;</span>,</span><br><span class="line">  Reason: <span class="string">&quot;ReservedFunctionConcurrentInvocationLimitExceeded&quot;</span>,</span><br><span class="line">  Type: <span class="string">&quot;User&quot;</span></span><br><span class="line">&#125;: wrapError</span><br><span class="line">null</span><br></pre></td></tr></table></figure>
 
@@ -275,7 +284,8 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Handler</span><span class="params">(ctx context.Context)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	log.Println(<span class="string">&quot;hello invoked lambda!&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// InvokeWithContextで呼び出された場合でも環境変数はセットされる</span></span><br><span class="line">	logLevel := os.Getenv(<span class="string">&quot;LOG_LEVEL&quot;</span>)</span><br><span class="line">	log.Printf(<span class="string">&quot;logLevel: %s\n&quot;</span>, logLevel)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>またLambda関数に以下のように環境変数 <code>LOG_LEVEL</code> を設定しておきます。</p>
-<p><img src="/images/20201112/image_8.png"></p>
+<img src="/images/20201112/image_8.png" loading="lazy">
+
 <p><code>InvokeWithContext</code> を使って呼び出し元のLambda関数から呼び出し先の関数を呼び出したときのログ出力は以下です。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[DEBUG] 2020/10/11 13:28:08 hello invoked lambda!</span><br><span class="line">[DEBUG] 2020/10/11 13:28:08 logLevel: INFO</span><br></pre></td></tr></table></figure>
 
@@ -335,13 +345,13 @@
       
     <li><span>2020.06.09</span><span class="snscount">&#9825;136</span> <a href="/articles/20200609/" title="フューチャーではGraphQLの活用事例はまだ少なく、自分はまだお目にかかったことはないです。しかし、HeadlessCMS界隈を初めGraphQLのAPIを提供するサービスが増えてきました。今後もさらに需要が増えてきそうな予感がしたためGoとGraphQLを春の入門祭りのテーマにしました。学習する上でドキュメントを読み込むだけでは忘れがちです。手を動かしながらタイトルにある鉄道データ検索APIを開発していきましょう">作って学ぶGraphQL。gqlgenを用いて鉄道データ検索API開発入門</a></li>
 
-    <li><span>2021.03.04</span><span class="snscount">&#9825;1</span> <a href="/articles/20210304/" title="前回の記事では、JavaScript製のグラフ可視化ライブラリについて概観しました。また、その1つであるVis Networkについて紹介し、階層グラフの可視化を行いました。Vis Networkはcanvasでの高速な描画が可能で、階層グラフをライトに表示・加工する場合は非常に有用ですが、大きな階層グラフを表示する場合にエッジの交差が多くなってしまうという課題があることを見てきました。">mxGraphで階層グラフを可視化する</a></li>
+    <li><span>2021.02.26</span><span class="snscount">&#9825;43</span> <a href="/articles/20210226/" title="E2Eテストはみんなしていますか？正直言うと、僕はあんまり好きじゃなかったです。お仕事では他の人が入れてくれたものが回っていたりしますが。前職で、SikuliXを使って社内向けのデスクトップアプリケーションのE2Eテストにトライしたことがあるんですが、すぐに壊れて動かなくなるので、費用対効果が出せなくてあきらめました（一人プロジェクトだったのもあります）。* 絵でマッチングを行うのでボタン画像をいっぱいスクショをとっていく必要がある">アクセシビリティ情報を使った壊れにくいE2Eテスト</a></li>
 
-    <li><span>2020.07.28</span><span class="snscount">&#9825;33</span> <a href="/articles/20200728/" title="Goでデータベースを扱う場合、[Gorm] といった ORM がよく使われます。多くの場合は構造体のフィールドとデータベースのカラム名のマッピングをするタグ付きの構造体を実装します。例えば Gorm を用いて users テーブルにアクセスする場合、以下のような構造体が一例として考えられます。">DBスキーマを駆動にした開発のためのライブラリ調査</a></li>
+    <li><span>2020.07.03</span><span class="snscount">&#9825;126</span> <a href="/articles/20200703/" title="エンタープライズでのミッションクリティカル領域においてもクラウド利用が普通になってきています。その過程において今までできないことを指向する試みも行われてきています。その代表的なものがクラウドの備えるリソースの高い拡張性と弾力性を利用したシステム展開です。例えば「より多くのデータを扱う」「同業他社に向けたサービス展開をする（マルチテナンシー）」といったものがあります。その際のアーキテクチャ選定では将来の利用を想定した選択を行う必要がありますが、データベースのスケールというのは非常に難しく簡単ではありません。">スケーラブルデータベース ～クラウドにおける後悔しないデータベース選定～</a></li>
 
-    <li><span>2020.02.03</span><span class="snscount">&#9825;602</span> <a href="/articles/20200203/" title="現在所属しているプロジェクトではWebAPIやバッチ処理の設計の一環としてPlantUMLを利用しています。効率よく品質高くアウトプットを出すためには、プログラミング言語に対してコーディング規約があるように、UMLに対してもチームで設計するにあたり一定のルールを決める必要があります。そこでプロジェクト内のPlantUMLを使用するうえでのガイドラインやルールをまとめる機会があり、せっかくなのでそれを記事化します。">チームで機能設計するためのPlantUML標準化</a></li>
+    <li><span>2020.01.20</span><span class="snscount">&#9825;5</span> <a href="/articles/20200120/" title="前回は【工場をハックするための基礎知識　前編】として、制御系システムがどのような構成になっていて、ハードウェア的に何を気にしなければならないかについて述べました。後編では、制御系としてどのような機器がどのような仕組みで動いているか、それらの機器とどのようなやり取りをする必要があるか、さらにどのようなことに気を付けて実装していかなければならないかについて述べます。">工場をハックするための基本知識　後編</a></li>
 
-    <li><span>2018.02.09</span><span class="snscount">&#9825;74</span> <a href="/articles/20180209/" title="エンプラ&オンプレでもAnsible導入成功したのでユーザー会で発表してきた">エンプラ&オンプレでもAnsible導入成功したのでユーザー会で発表してきた</a></li>
+    <li><span>2017.05.26</span><span class="snscount">&#9825;143</span> <a href="/articles/20170526/" title="AI(機械学習・Deep Learning等)を用いて、 **大量にある顔画像の中から同一人物をクラスタリングし、頻出する顔画像の抽出** を行い、常連さんの判定を行いたいと思います。">AIを使って顔画像から「常連さん」を判定しよう！</a></li>
     </ul>
   </div>
   
@@ -511,6 +521,6 @@ ga('send', 'pageview');
 
 <!-- END INTEGRATIONS -->
 
-  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  </div>
 </body>
 </html>

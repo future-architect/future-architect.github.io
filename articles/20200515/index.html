@@ -5,7 +5,7 @@
 <html lang="ja">
 <!--<![endif]-->
 <head>
-  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <meta charset="utf-8">
   <!--
     ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
     ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
@@ -47,7 +47,7 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20200515/photo_20200515_05.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20200515/photo_20200515_06.png">
 <meta property="article:published_time" content="2020-05-15T13:25:58.000Z">
-<meta property="article:modified_time" content="2021-05-22T02:26:17.597Z">
+<meta property="article:modified_time" content="2021-05-23T03:23:25.615Z">
 <meta property="article:tag" content="AWS">
 <meta property="article:tag" content="DynamoDB">
 <meta property="article:tag" content="Serverless">
@@ -67,10 +67,10 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha384-pdapHxIh7EYuwy6K7iE41uXVxGCXY0sAjBzaElYGJUrzwodck3Lx6IE2lA0rFREo" crossorigin="anonymous">
   <link rel="stylesheet" href="/metronic/assets/style.css">
   <link rel="stylesheet" href="/css/theme-styles.css">
-<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 5.4.0"></head>
 
 <body class="corporate">
-  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
   <!-- BEGIN HEADER -->
 <header class="header">
 	<div class="header-overlay">
@@ -164,7 +164,7 @@
 <li>Lambdaの実行時間をアプリ上で計測し、シンデレラタイムが近づきそうであれば自分で処理を中断、オフセットを引数にSQSに投げるか、非同期で次のLambdaをInvokeして処理を継続する(下図のLambda延命イメージ)</li>
 <li>入力データを一定の大きさでパーティション化して、1と同じくSQSやLambdaをInvokeして後続の複数のLambdaで処理を行う（下図のLambda入力パーティションイメージ）</li>
 </ol>
-<img src="/images/20200515/photo_20200515_01.png">
+<img src="/images/20200515/photo_20200515_01.png" loading="lazy">
 
 <p>入力データを上手く分割実行できないものに関しては1でシーケンシャルに行う必要がありますが、そうでない場合は2のアプローチのほうが、後々並列実行したい場合にも転用できるので便利だと思いますので、2の方針で進めます。</p>
 <h1 id="コードについて"><a href="#コードについて" class="headerlink" title="コードについて"></a>コードについて</h1><p>次からGoのコードをまじえながら進めていきます。記載するサンプルコードはimport文などを省略しています。全文は以下のリポジトリを参照ください。</p>
@@ -175,7 +175,7 @@
 <li><strong>Query</strong>: HashKeyを指定してSortKeyに対して条件で絞る</li>
 </ol>
 <p>1のフルスキャンですがアプリケーション側でPartitionKeyのようなものを持たせること無く、DynamoDBの機能として下図のように <a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Scan.html#Scan.ParallelScan">並列スキャン</a>が可能です。</p>
-<img src="/images/20200515/photo_20200515_02.png">
+<img src="/images/20200515/photo_20200515_02.png" loading="lazy">
 
 <p>AWSのドキュメントから引っ張って来ましたが、 <code>TotalSegments</code> と <code>Segment</code> をリクエストに指定することで、DynamoDB側がデータを論理的にTotalSegmentsの数に分割してくれます。アプリケーション側では以下のように指定するだけでOKです。</p>
 <p>例としてTotalSegments、Segmentを指定した場合のDynamoDB ScanのGo実装の例です。TotalSegmentsを<code>4</code>にする場合は、total=4にし、segに0,1,2,3指定した実行すれば排他的にデータを取得できます。何かしらのPartitionKeyとSortKeyを設定してGSIで上手くデータを分割すると言った考慮なしに利用できるため非常に便利だと思います。</p>
@@ -222,21 +222,21 @@
 <h2 id="S3-Selectを使う上での注意"><a href="#S3-Selectを使う上での注意" class="headerlink" title="S3 Selectを使う上での注意"></a>S3 Selectを使う上での注意</h2><p>バッチ処理に限らずですが、2020/04月時点ではAthenaのようにS3 Selectは外部スキーマを参照できないようなので、Structへのマッピングで数値項目が来た場合は、SQL側でCASTするのが手間でした。真面目にプロダクションで運用することを考えると、AWS Athenaを利用するほうが Schema on READ になるもの型の恩恵を受けられ良いかもしれません。</p>
 <h1 id="Step-Functions"><a href="#Step-Functions" class="headerlink" title="Step Functions"></a>Step Functions</h1><p><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/step-functions/">AWS Step Functions</a> はAWS の複数のサービスに対してワークフローを組むことができるサービスです。ワークフローはステートマシンとして表現することでLambdaの実行管理を任せることができます。</p>
 <p>ワークフローをJSONベースの構造化言語である<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html">Amazon States Language</a>で記載するという点がツラミとして挙げられることが大きもしますが、定義したワークフローは即座にプレビューで可視化されますしそれをSVGなどでExportもできるので、JSON力を鍛えながら開発することができます。</p>
-<img src="/images/20200515/photo_20200515_03.png">
+<img src="/images/20200515/photo_20200515_03.png" loading="lazy">
 
 <p>※HelloWorldのStep Functionsの開発イメージ</p>
 <h2 id="Step-Functions-×-Lambda"><a href="#Step-Functions-×-Lambda" class="headerlink" title="Step Functions × Lambda"></a>Step Functions × Lambda</h2><p>Lambdaの実行時間制約をStep Functionsで突破しようという試みです。実際には以下のようなイメージです。前提として、処理件数が事前にある程度分かっている場合においては、単純にN個にタスクを分割してStep FunctionsからLambdaを呼び出せば良いです。この分散したLambdaそれぞれでDynamoDBのあるSegmentだけを担当させるイメージです。</p>
 <p>DynamoDBやLambdaの場合はスケールアウトさせやすいサービスのため、固定であればParallelステートを利用して並列実行することができます。</p>
-<img src="/images/20200515/photo_20200515_04.png">
+<img src="/images/20200515/photo_20200515_04.png" loading="lazy">
 
 <p>ただ、Parallelステートだと分散するタスク自体をJSONで定義する必要があり、同時実行数を増やすたびにStepFunctionsの定義を更新する必要があり手間です。次の動的並列の機能を今回は利用したいと思います。</p>
 <h2 id="動的並列する場合"><a href="#動的並列する場合" class="headerlink" title="動的並列する場合"></a>動的並列する場合</h2><p>Step Functionsは <a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/blogs/news/new-step-functions-support-for-dynamic-parallelism/">Amazon Web Services ブログ - 新機能 – Step Functions が動的並列処理をサポート</a> で紹介されているMap 状態を用い、ワークフローでスキャッターギャザーメッセージングパターン（分散して集約するようなパターン）を行うことができます。</p>
 <p>今回はこちらを採用して、最初にScatterLambdaというタスクで、分散情報を動的に生成し、TaskLambdaでDynamoDBをScanし、最後にGatherLambdaで実行件数をカウントするというフローを組むことにします（下図）。</p>
-<img src="/images/20200515/photo_20200515_05.png">
+<img src="/images/20200515/photo_20200515_05.png" loading="lazy">
 
 <p>※水色のオブジェクトが重なっているところが並列実行されるタスクです。この各LambdaでDynamoDBのあるSegment数だけ担当させるイメージです。</p>
 <h2 id="Lambdaの-In-Out-設計"><a href="#Lambdaの-In-Out-設計" class="headerlink" title="Lambdaの In/Out 設計"></a>Lambdaの In/Out 設計</h2><p>3つのLambdaを利用しますが、概念的にそれぞれの入力・出力を示します。</p>
-<img src="/images/20200515/photo_20200515_06.png">
+<img src="/images/20200515/photo_20200515_06.png" loading="lazy">
 
 
 <h2 id="実装について"><a href="#実装について" class="headerlink" title="実装について"></a>実装について</h2><p>上図のような状態遷移図は、下記のJSONで表現できます。<code>ProcessAllSegments</code> の <code>Type: Map</code>と <code>Iterator</code> の部分がミソで、これによって動的に <code>tasklambda</code> 並列実行できます。</p>
@@ -371,9 +371,9 @@
 
     <li><span>2021.05.20</span><span class="snscount">&#9825;102</span> <a href="/articles/20210520b/" title="過去にフューチャー発OSSのVuls開発を手伝っていましたが、現在はフューチャーで働いているわけでもなく完全に部外者です。今回は社員の澁川さんの推薦もあり、ブログの寄稿をさせて頂くことになりました。その理由の前に少し背景を説明しますが、自分はTrivyというOSSの脆弱性スキャナーのメンテナをやっていまして先日Goバイナリの脆弱性検知をする機能をリリースしました。">コンテナイメージ内の実行ファイルをupxで圧縮するべきか</a></li>
 
-    <li><span>2021.03.04</span><span class="snscount">&#9825;1</span> <a href="/articles/20210304/" title="前回の記事では、JavaScript製のグラフ可視化ライブラリについて概観しました。また、その1つであるVis Networkについて紹介し、階層グラフの可視化を行いました。Vis Networkはcanvasでの高速な描画が可能で、階層グラフをライトに表示・加工する場合は非常に有用ですが、大きな階層グラフを表示する場合にエッジの交差が多くなってしまうという課題があることを見てきました。">mxGraphで階層グラフを可視化する</a></li>
+    <li><span>2021.02.26</span><span class="snscount">&#9825;43</span> <a href="/articles/20210226/" title="E2Eテストはみんなしていますか？正直言うと、僕はあんまり好きじゃなかったです。お仕事では他の人が入れてくれたものが回っていたりしますが。前職で、SikuliXを使って社内向けのデスクトップアプリケーションのE2Eテストにトライしたことがあるんですが、すぐに壊れて動かなくなるので、費用対効果が出せなくてあきらめました（一人プロジェクトだったのもあります）。* 絵でマッチングを行うのでボタン画像をいっぱいスクショをとっていく必要がある">アクセシビリティ情報を使った壊れにくいE2Eテスト</a></li>
 
-    <li><span>2021.02.01</span><span class="snscount">&#9825;8</span> <a href="/articles/20210201/" title="もともと、お仕事的には2019年にはリモートではあったのですが（仕事のカウンターが海外で、自社に出社しても、客先の日本のオフィスに行っても、テレビ会議とチャットで仕事していた）、2020年の3月からは自宅で仕事をすることになり、いろいろ整備しました。">自宅仕事環境構築：指向性マイクの勧め</a></li>
+    <li><span>2021.01.07</span><span class="snscount">&#9825;28</span> <a href="/articles/20210107/" title="Electronは、GitHubが開発したオープンソースのソフトウェアフレームワークです。ChromiumとNode.jsをコアとして採用する事で、Web開発と同じようにHTML,CSS,JavaScriptを用いて開発したものを..">Electronの使い方 Web開発の技術でデスクトップアプリを作ろう</a></li>
     </ul>
   </div>
   
@@ -543,6 +543,6 @@ ga('send', 'pageview');
 
 <!-- END INTEGRATIONS -->
 
-  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  </div>
 </body>
 </html>
