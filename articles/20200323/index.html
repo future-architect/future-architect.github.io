@@ -5,7 +5,7 @@
 <html lang="ja">
 <!--<![endif]-->
 <head>
-  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <meta charset="utf-8">
   <!--
     ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
     ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
@@ -44,7 +44,7 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20200323/photo_20200323_02.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20200323/photo_20200323_03.png">
 <meta property="article:published_time" content="2020-03-23T00:56:50.000Z">
-<meta property="article:modified_time" content="2021-05-22T10:23:00.198Z">
+<meta property="article:modified_time" content="2021-05-23T03:23:25.606Z">
 <meta property="article:tag" content="AWS">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="DynamoDB">
@@ -66,10 +66,10 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha384-pdapHxIh7EYuwy6K7iE41uXVxGCXY0sAjBzaElYGJUrzwodck3Lx6IE2lA0rFREo" crossorigin="anonymous">
   <link rel="stylesheet" href="/metronic/assets/style.css">
   <link rel="stylesheet" href="/css/theme-styles.css">
-<meta name="generator" content="Hexo 5.4.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+<meta name="generator" content="Hexo 5.4.0"></head>
 
 <body class="corporate">
-  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
   <!-- BEGIN HEADER -->
 <header class="header">
 	<div class="header-overlay">
@@ -146,10 +146,10 @@
 </ul>
 <p>となると、少々ハードルがあがります。この問題を解決してくれるのが、<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/what-is-sam.html">AWS Serverless Application Model(AWS SAM)</a>です。SAMはローカルにLambda実行用のdockerを立ち上げ、<code>127.0.0.1:3000</code>を叩くと指定した実行ファイルをdocker上で動作させることができるツールです。今回はSAMを使って API Gateway + Lambda (Go) + DynamoDBのローカルテストをする手法を紹介します。</p>
 <p>なお、今回ターゲットとする構成は、Lambda→AWS Gateway→Lambda→DynamoDBのような構成です。例えばKinesisやS3から非同期な入力をトリガーにLambdaを着火し、特定のAPIを叩くようなケースです。便宜上、API Gatewayを叩くのをLambda A、API Gatewayから呼び出されるのをLambda Bとします。</p>
-<img src="/images/20200323/photo_20200323_01.png" class="img-middle-size">
+<img src="/images/20200323/photo_20200323_01.png" class="img-middle-size" loading="lazy">
 
 <p>これをSAMとDynamoDB localを使ってテストしますが、想定する最終的なテスト環境としては以下のような形になります。青で示した<code>lambda_b.go</code>から127.0.0.1:8000を叩くのが、前述した<a href="https://future-architect.github.io/tags/DynamoDB%C3%97Go/">先の連載</a>の手法です。<code>lambda_a.go</code>から<code>127.0.0.1:3000</code>を叩くのもGoから特定のAPIを叩く処理になるので、ここでは割愛します。つまり、今回記述するのは<code>127.0.0.1:3000</code>を叩いたらLambdaが着火し、DynamoDBに書き込むまでの部分になります。</p>
-<img src="/images/20200323/photo_20200323_02.png" class="img-middle-size">
+<img src="/images/20200323/photo_20200323_02.png" class="img-middle-size" loading="lazy">
 
 
 <h1 id="環境とターゲット"><a href="#環境とターゲット" class="headerlink" title="環境とターゲット"></a>環境とターゲット</h1><p>今回は、下記の環境で動かしました。</p>
@@ -222,7 +222,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ sam <span class="built_in">local</span> start-api</span><br><span class="line">Mounting HelloWorldFunction at http://127.0.0.1:3000/apigw [GET]</span><br><span class="line">You can now browse to the above endpoints to invoke your <span class="built_in">functions</span>. You <span class="keyword">do</span> not need to restart/reload SAM CLI <span class="keyword">while</span> working on your <span class="built_in">functions</span>, changes will be reflected instantly/automatically. You only need to restart SAM CLI <span class="keyword">if</span> you update your AWS SAM template</span><br><span class="line">2020-03-09 22:05:33  * Running on http://127.0.0.1:3000/ (Press CTRL+C to quit)</span><br><span class="line">Invoking lambdab (go1.x)</span><br><span class="line"></span><br><span class="line">Fetching lambci/lambda:go1.x Docker container image......</span><br><span class="line">Mounting /Users/kurita/[パス情報なので省略]/apigw/lambdab as /var/task:ro,delegated inside runtime container</span><br><span class="line">START RequestId: f2fd9e5a-f031-10c7-3340-25e3997c6dd1 Version: <span class="variable">$LATEST</span></span><br><span class="line">END RequestId: f2fd9e5a-f031-10c7-3340-25e3997c6dd1</span><br><span class="line">REPORT RequestId: f2fd9e5a-f031-10c7-3340-25e3997c6dd1  Init Duration: 131.05 ms        Duration: 4.07 ms       Billed Duration: 100 ms Memory Size: 128 MBMax Memory Used: 21 MB</span><br><span class="line">No Content-Type given. Defaulting to <span class="string">&#x27;application/json&#x27;</span>.</span><br><span class="line">2020-03-09 22:05:38 127.0.0.1 - - [09/Mar/2020 22:05:38] <span class="string">&quot;GET /apigw HTTP/1.1&quot;</span> 200 -</span><br><span class="line">2020-03-09 22:05:39 127.0.0.1 - - [09/Mar/2020 22:05:39] <span class="string">&quot;GET /favicon.ico HTTP/1.1&quot;</span> 403 -</span><br></pre></td></tr></table></figure>
 
 <p>ブラウザでAPI叩くと、ちゃんと返ってきているのがわかります。</p>
-<img src="/images/20200323/photo_20200323_03.png" class="img-middle-size">
+<img src="/images/20200323/photo_20200323_03.png" class="img-middle-size" loading="lazy">
 
 
 <p>AWS SAMを利用することで、ローカルでもAPI Gatewayを意識したLambda を動作させることができました。数が少ないなら一つずつ試しても良いですし、APIを適宜叩くツールを用意すれば、自動にテストを行うこともできます。</p>
@@ -306,13 +306,13 @@
       
     <li><span>2016.10.31</span><span class="snscount">&#9825;149</span> <a href="/articles/20161031/" title="重要なアルゴリズムであるにもかかわらず、まとまった情報が少ないSQL実行時のブルームフィルタ(Bloom Filter)アルゴリズムについて紹介します。">SQL実行時のブルームフィルタ(Bloom Filter)アルゴリズム</a></li>
 
-    <li><span>2020.11.09</span><span class="snscount">&#9825;157</span> <a href="/articles/20201109/" title="1年弱ほどGo言語でWebAPIアプリケーション開発を行っていますが、かなり割り切った構成・テスト方針を採用しました。そろそろ1年弱になり機能開発も比較的落ち着き、保守運用フェーズの割合も徐々に増えてきた頃合いなので、やったこと・学び・反省といった振り返りを共有します。">GoのWebアプリ開発でフラットパッケージにした話</a></li>
+    <li><span>2020.11.07</span><span class="snscount">&#9825;49</span> <a href="/articles/20201107/" title="フューチャーOSS推進タスクフォースを開始しました。実は7月に発足してから8月には活動の骨子が固まり、タスクフォース自体は始動していましたが、中身を作ってから告知した方が具体性があってブレも無くなり良いのでは？という話があり、少しタイミングをずらしてのご報告です。">フューチャーOSS推進タスクフォース始めます</a></li>
 
-    <li><span>2020.07.28</span><span class="snscount">&#9825;33</span> <a href="/articles/20200728/" title="Goでデータベースを扱う場合、[Gorm] といった ORM がよく使われます。多くの場合は構造体のフィールドとデータベースのカラム名のマッピングをするタグ付きの構造体を実装します。例えば Gorm を用いて users テーブルにアクセスする場合、以下のような構造体が一例として考えられます。">DBスキーマを駆動にした開発のためのライブラリ調査</a></li>
+    <li><span>2020.07.03</span><span class="snscount">&#9825;126</span> <a href="/articles/20200703/" title="エンタープライズでのミッションクリティカル領域においてもクラウド利用が普通になってきています。その過程において今までできないことを指向する試みも行われてきています。その代表的なものがクラウドの備えるリソースの高い拡張性と弾力性を利用したシステム展開です。例えば「より多くのデータを扱う」「同業他社に向けたサービス展開をする（マルチテナンシー）」といったものがあります。その際のアーキテクチャ選定では将来の利用を想定した選択を行う必要がありますが、データベースのスケールというのは非常に難しく簡単ではありません。">スケーラブルデータベース ～クラウドにおける後悔しないデータベース選定～</a></li>
 
-    <li><span>2020.05.28</span><span class="snscount">&#9825;384</span> <a href="/articles/20200528/" title="Goでプロジェクトのフォルダ構成どうしよう、とググると見つかるStandard Go Project Layout(https://github.com/golang-standards/project-layout)。とはいえ、これはかなりコード量を増やしてしまう恐れがありますので、導入する場合のデメリットも考えておく方が良いです。">あなたのGoアプリ/ライブラリのパッケージ構成もっとシンプルでよくない？</a></li>
+    <li><span>2020.05.12</span><span class="snscount">&#9825;10</span> <a href="/articles/20200512/" title="TIG DXチーム　アルバイターの三村です．今回はHeadlessCMSを利用したタスクをやることになりました．私自身HeadlessCMSどころかCMSを聞いたことすら無かったので，初めてCMS使ってみるにあたって感じたことを共有出来たらと思い本記事を作成させていただいております．">日本製HeadlessCMSのmicroCMSを触ってみた</a></li>
 
-    <li><span>2020.03.27</span><span class="snscount">&#9825;172</span> <a href="/articles/20200327/" title="クラウドサービスが充実してくるにつれて、サーバーレスではいろいろなことができるようになっています。HTTPサーバーは動きますし、RDBやNoSQLなストレージも使えますし、PubSubみたいなサービスも利用できます。これらを駆使するとそこそこ複雑な処理も記述できます。一方で、上から下までサーバーレスにしようとするとできないものもいくつかあります。例えば、RDBも使えるといっても制約があり、LambdaやCloud ...">Serverless連載3: Goでサーバーレス用の検索エンジンwatertowerを作ってみました</a></li>
+    <li><span>2020.03.19</span><span class="snscount">&#9825;100</span> <a href="/articles/20200319/" title="ちょっとしたフロントエンドの開発で、TypeScriptに最初から対応していて、簡単に使えるものは何かないかな、と調べてみたメモです。React/Vue/Angularの場合はそれぞれの初期化コマンドで何から何まで用意してくれます。Next.js、Nuxt.js、Gatsbyなども、これらのビルドのステップを簡略化するコマンドを提供しています。基本的にこれらのウェブフロントエンドを開発するときには、小規模・中規模ぐらいならあんまり気にしなくておまかせでもいいと思います。今回は、それらのフレームワーク固有のビルドツールとは別に環境を作りたい人で、TypeScriptの環境が欲しい、ウェブの開発がしたい、という前提でいろいろ探してみました。">今あえてTypeScriptのビルド＆バンドルツールを探してみる</a></li>
     </ul>
   </div>
   
@@ -482,6 +482,6 @@ ga('send', 'pageview');
 
 <!-- END INTEGRATIONS -->
 
-  </div><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  </div>
 </body>
 </html>
