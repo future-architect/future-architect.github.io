@@ -47,11 +47,10 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20200515/photo_20200515_05.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20200515/photo_20200515_06.png">
 <meta property="article:published_time" content="2020-05-15T13:25:58.000Z">
-<meta property="article:modified_time" content="2021-05-23T03:23:25.615Z">
+<meta property="article:modified_time" content="2021-05-26T13:07:38.745Z">
 <meta property="article:tag" content="AWS">
 <meta property="article:tag" content="DynamoDB">
 <meta property="article:tag" content="Serverless">
-<meta property="article:tag" content="Serverless連載">
 <meta property="article:tag" content="StepFunctions">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://future-architect.github.io/images/20200515/photo_20200515_01.png">
@@ -61,7 +60,7 @@
   
   <link rel="icon" href="/favicon.ico">
   
-  <meta content="AWS,DynamoDB,Serverless,Serverless連載,StepFunctions" name="keywords">
+  <meta content="AWS,DynamoDB,Serverless,StepFunctions" name="keywords">
   <meta content="真野隼記" name="author">
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha384-pdapHxIh7EYuwy6K7iE41uXVxGCXY0sAjBzaElYGJUrzwodck3Lx6IE2lA0rFREo" crossorigin="anonymous">
@@ -113,8 +112,6 @@
   
     <li><a href="/tags/Serverless/" title="Serverless">Serverless</a></li> 
   
-    <li><a href="/tags/Serverless%E9%80%A3%E8%BC%89/" title="Serverless連載">Serverless連載</a></li> 
-  
     <li><a href="/tags/StepFunctions/" title="StepFunctions">StepFunctions</a>
   
   </ul>
@@ -134,9 +131,9 @@
         
         <div class="article-entry" itemprop="articleBody">
           
-            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>AWS StepFunctionsとLambdaを活用してバッチ処理を行う記事です。<a href="https://future-architect.github.io/tags/Serverless%E9%80%A3%E8%BC%89/">サーバレス連載企画</a>の6回目です。</p>
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>AWS StepFunctionsとLambdaを活用してバッチ処理を行う記事です。<a href="/articles/20200322/">サーバレス連載企画</a>の6回目です。</p>
 <p>2020年はServerlessアーキテクチャが当たり前のように採用される時代になってきていると実感します。フロントエンドからアクセスされるBackendのAPIはAWS環境だと、AppsyncやAPI Gateway+Lambaの利用、IoTなどイベントドリブンなメッセージに対してはAWS IoT、その後続はKinesisを使い、さらにその後続でLambdaやKinesis AnalyticsでETL処理を行い、データストアとしてDynamoDBやS3に格納するといった一連の流れ全てフルマネージドなサービスに寄せて構築することも当たり前ですし、そういった事例も珍しく無くなってきました。</p>
-<h1 id="サーバレスのバッチ処理"><a href="#サーバレスのバッチ処理" class="headerlink" title="サーバレスのバッチ処理"></a>サーバレスのバッチ処理</h1><p>そんな中で、バッチ処理（定時起動やユーザの非同期イベントで処理を行うジョブ）に関してはLambdaではなくECSなどを採用することが多いと思います。理由としてはやはり <a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/blogs/news/aws-lambda-timeout-15min/">LambdaのTimeout時間が最大で15分</a> <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> であるためです。また、ECSも非同期タスク起動ではなく常駐にしてHTTPリクエストなどでイベントを待ち受けるタイプに関しては、<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout">ALBであれば4000秒（約66分）</a> <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>なため、1h超えの処理時間になりうる機能は採用できないでしょう。ALBではなくNLBを採用するとこの制約からは逃げられるので、SecurityGroupなどの考えがややALBと異なりますがこちらを採用するチームもいらっしゃると思います。もしくは次の <a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/cli/latest/reference/ecs/run-task.html">ecs-run-task</a> で非同期にECSコンテナを呼び出している、という方式をとることも多いのでは無いでしょうか？ 定期実行であれば、ECS Scheduled Tasksを利用することもできるので便利ですよね。</p>
+<h1 id="サーバレスのバッチ処理"><a href="#サーバレスのバッチ処理" class="headerlink" title="サーバレスのバッチ処理"></a>サーバレスのバッチ処理</h1><p>そんな中で、バッチ処理（定時起動やユーザの非同期イベントで処理を行うジョブ）に関してはLambdaではなくECSなどを採用することが多いと思います。理由としてはやはり <a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/blogs/news/aws-lambda-timeout-15min/">LambdaのTimeout時間が最大で15分</a>  <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> であるためです。また、ECSも非同期タスク起動ではなく常駐にしてHTTPリクエストなどでイベントを待ち受けるタイプに関しては、<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout">ALBであれば4000秒（約66分）</a>  <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>なため、1h超えの処理時間になりうる機能は採用できないでしょう。ALBではなくNLBを採用するとこの制約からは逃げられるので、SecurityGroupなどの考えがややALBと異なりますがこちらを採用するチームもいらっしゃると思います。もしくは次の <a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/cli/latest/reference/ecs/run-task.html">ecs-run-task</a> で非同期にECSコンテナを呼び出している、という方式をとることも多いのでは無いでしょうか？ 定期実行であれば、ECS Scheduled Tasksを利用することもできるので便利ですよね。</p>
 <h1 id="ECS-Run-Taskについて"><a href="#ECS-Run-Taskについて" class="headerlink" title="ECS Run Taskについて"></a>ECS Run Taskについて</h1><p>ecs-run-taskで非同期（または定期的）にECSを呼び出す方法を取るメリットは多く、、</p>
 <ul>
 <li>Timeoutなどの各種制約を無視して実行できる</li>
@@ -312,8 +309,8 @@
 <li>S3が入力だとしてもS3 Selectで入力を分割する設計で対応できる</li>
 <li>StepFunctionsの動的並列実行を利用することでLambdaの実行時間制約に引っかからないように、事前で入力を分割しそれぞれのLambdaに渡す仕組みが作れる</li>
 </ul>
-<p> <a href="/tags/Serverless%E9%80%A3%E8%BC%89/">サーバレス連載</a>の6本目でした。次は加部さんの<a href="/articles/20200722/">AWSサービストリガによるLambda起動</a>です。</p>
-<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">2020/04/26時点の話です。将来的に伸びる可能性が高いとは思っています。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+<p> <a href="/articles/20200322/">サーバレス連載</a>の6本目でした。次は加部さんの<a href="/articles/20200722/">AWSサービストリガによるLambda起動</a>です。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">2020/04/26時点の話です。将来的に伸びる可能性が高いとは思っています。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
           
         </div>
         <footer>
@@ -322,26 +319,26 @@
   <ul class="social-button">
     
     <!-- Twitter -->
-    <li class="twitter-btn">
-      <a target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200515/&via=future_techblog&related=twitterapi%2Ctwitter&text=Serverless%E9%80%A3%E8%BC%896:%20AWS%E3%81%AEStep%20Functions%E3%81%A8Lambda%E3%81%A7Serveless%E3%81%AABatch%E5%87%A6%E7%90%86%E3%82%92%E5%AE%9F%E7%8F%BE%E3%81%99%E3%82%8B" rel="nofollow noopener">
+    <li>
+      <a class="twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200515/&via=future_techblog&related=twitterapi%2Ctwitter&text=Serverless%E9%80%A3%E8%BC%896:%20AWS%E3%81%AEStep%20Functions%E3%81%A8Lambda%E3%81%A7Serveless%E3%81%AABatch%E5%87%A6%E7%90%86%E3%82%92%E5%AE%9F%E7%8F%BE%E3%81%99%E3%82%8B" rel="nofollow noopener">
         <i></i><span class="tw-btn-label">ツイート</span>
       </a>
     </li>
     <!-- Facebook -->
-    <li class="fb-btn">
-      <a target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200515/&t=Serverless%E9%80%A3%E8%BC%896:%20AWS%E3%81%AEStep%20Functions%E3%81%A8Lambda%E3%81%A7Serveless%E3%81%AABatch%E5%87%A6%E7%90%86%E3%82%92%E5%AE%9F%E7%8F%BE%E3%81%99%E3%82%8B" rel="nofollow noopener">
+    <li>
+      <a class="fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200515/&t=Serverless%E9%80%A3%E8%BC%896:%20AWS%E3%81%AEStep%20Functions%E3%81%A8Lambda%E3%81%A7Serveless%E3%81%AABatch%E5%87%A6%E7%90%86%E3%82%92%E5%AE%9F%E7%8F%BE%E3%81%99%E3%82%8B" rel="nofollow noopener">
         <i></i><span class="fb-btn-label">シェア</span>
       </a>
     </li>
     <!-- hatebu -->
-    <li class="hatebu-btn">
-      <a target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200515/" rel="nofollow noopener">
+    <li>
+      <a class="hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200515/" rel="nofollow noopener">
         <i></i><span class="hatebu-btn-label">10</span>
       </a>
     </li>
     <!-- pocket -->
-    <li class="pocket-btn">
-      <a target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200515/" rel="nofollow noopener">
+    <li>
+      <a class="pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200515/" rel="nofollow noopener">
         <i></i><span class="pocket-btn-label">11</span>
       </a>
     </li>
@@ -354,7 +351,7 @@
               <h2>関連記事</h2>
               
   <div class="widget">
-    <ul class="nav related-posts"><li class="related-posts-item"><span>2020.07.27</span><a class="related-posts-link" href=/articles/20200727/>GoからAWS KinesisのAggregationFormatを利用する</a></li><li class="related-posts-item"><span>2020.07.22</span><a class="related-posts-link" href=/articles/20200722/>AWSサービストリガによるLambda起動</a></li><li class="related-posts-item"><span>2020.03.27</span><a class="related-posts-link" href=/articles/20200327/>Serverless連載3: Goでサーバーレス用の検索エンジンwatertowerを作ってみました</a></li><li class="related-posts-item"><span>2020.03.26</span><a class="related-posts-link" href=/articles/20200326/>Serverless連載2: AWS Lambda×Goの開発Tips</a></li></ul>
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2021.01.22</span><a class="related-posts-link" href=/articles/20210122/ title="DynamoDB Streamsは、DynamoDBに対する項目の追加、変更、削除をイベントとして検出できる機能です。テーブルの項目が変更されるとすぐに、新しいレコードがテーブルのストリームに表示されます">オレのDynamoDB Streamsが再着火しないわけがない</a></li><li class="related-posts-item"><span>2020.07.27</span><a class="related-posts-link" href=/articles/20200727/ title="[サーバレス連載企画]の8回目です。TIG DXユニットの真野です。ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。[工場をハックするための基本知識] の記事を書いた棚井さんと同じチームに所属しています。[サーバレス連載企画] の第8弾目として、Serverlessの代表格であるAWS LambdaでGoを用いてKinesisに対するKPL/KCL相当の処理についてまとめていきます。">GoからAWS KinesisのAggregationFormatを利用する</a></li><li class="related-posts-item"><span>2020.07.22</span><a class="related-posts-link" href=/articles/20200722/ title="昨今様々なシステムで利用さているAWSのLambdaですが、サーバレスということもあり何かのイベントをトリガに関数を起動させる方法が一般的かと思います。LambdaはAWSの様々なサービスをトリガとして起動することが可能で、自分たちの利用しているAWSサービスと組み合わせて実装するることでその真価を発揮します。AWSに少し詳しい人であればLambdaをAWSのサービストリガで起動させる事ができることは知っていると思いますが、いざ実装するとなると具体的にどういった手順で、なんの設定が必要かというところがわからないという人もいるのではないでしょうか。">AWSサービストリガによるLambda起動</a></li><li class="related-posts-item"><span>2020.03.27</span><a class="related-posts-link" href=/articles/20200327/ title="クラウドサービスが充実してくるにつれて、サーバーレスではいろいろなことができるようになっています。HTTPサーバーは動きますし、RDBやNoSQLなストレージも使えますし、PubSubみたいなサービスも利用できます。これらを駆使するとそこそこ複雑な処理も記述できます。一方で、上から下までサーバーレスにしようとするとできないものもいくつかあります。例えば、RDBも使えるといっても制約があり、LambdaやCloud ...">Serverless連載3: Goでサーバーレス用の検索エンジンwatertowerを作ってみました</a></li></ul>
   </div>
             </section>
             <section class="featured-post margin-bottom-20 nav">
@@ -365,11 +362,11 @@
   <div class="widget">
     <ul class="nav featured-post-link">
       
-    <li><span>2020.07.09</span><span class="snscount">&#9825;649</span> <a href="/articles/20200709/" title="最近Goで主にバックエンドのWebAPIや、AWS Lambdaで動くETLアプリ、たまにCLIツールを開発する時に、2回以上同じ指摘したコメントをまとめてます。Go言語特有ぽいところを中心にしています。レビュイーのスキルセットは..">GoでWebアプリ開発時にあるあるだったレビューコメント</a></li>
-
     <li><span>2020.06.30</span><span class="snscount">&#9825;123</span> <a href="/articles/20200630/" title="業務でヘビーユーズしているgo-swaggerについての開発Tipsをまとめました。">go-swaggerを用いたWebアプリケーション開発Tips19選</a></li>
 
-    <li><span>2016.10.31</span><span class="snscount">&#9825;149</span> <a href="/articles/20161031/" title="重要なアルゴリズムであるにもかかわらず、まとまった情報が少ないSQL実行時のブルームフィルタ(Bloom Filter)アルゴリズムについて紹介します。">SQL実行時のブルームフィルタ(Bloom Filter)アルゴリズム</a></li>
+    <li><span>2020.06.09</span><span class="snscount">&#9825;136</span> <a href="/articles/20200609/" title="フューチャーではGraphQLの活用事例はまだ少なく、自分はまだお目にかかったことはないです。しかし、HeadlessCMS界隈を初めGraphQLのAPIを提供するサービスが増えてきました。今後もさらに需要が増えてきそうな予感がしたためGoとGraphQLを春の入門祭りのテーマにしました。学習する上でドキュメントを読み込むだけでは忘れがちです。手を動かしながらタイトルにある鉄道データ検索APIを開発していきましょう">作って学ぶGraphQL。gqlgenを用いて鉄道データ検索API開発入門</a></li>
+
+    <li><span>2021.05.20</span><span class="snscount">&#9825;102</span> <a href="/articles/20210520b/" title="過去にフューチャー発OSSのVuls開発を手伝っていましたが、現在はフューチャーで働いているわけでもなく完全に部外者です。今回は社員の澁川さんの推薦もあり、ブログの寄稿をさせて頂くことになりました。その理由の前に少し背景を説明しますが、自分はTrivyというOSSの脆弱性スキャナーのメンテナをやっていまして先日Goバイナリの脆弱性検知をする機能をリリースしました。">コンテナイメージ内の実行ファイルをupxで圧縮するべきか</a></li>
 
     <li><span>2020.12.23</span><span class="snscount">&#9825;99</span> <a href="/articles/20201223/" title="Pythonに型ヒントが入ってからしばらく経ちます。型ヒントの立ち位置も、なんでもできるアノテーションとして導入されましたが、型ヒント以外の用途はあまり育たず、型ヒントが中心になり、PEPや仕様もそれに合わせて変化したり、より書きやすいように機能が追加されてきました。本エントリーでは、Python 3.9時点での最新情報を元に、現在サポート中のPythonバージョン（3.6以上）との互換性の情報も織り交ぜながら、最新の型ヒントの書き方を紹介します。">2021年版Pythonの型ヒントの書き方 (for Python 3.9)</a></li>
     </ul>
@@ -386,6 +383,8 @@
   </main>
   <aside class="col-md-3 col-sm-3 blog-sidebar">
     <!-- START SIDEBAR  -->
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%B5%E3%83%BC%E3%83%90%E3%83%AC%E3%82%B9%E3%81%AE%E3%83%90%E3%83%83%E3%83%81%E5%87%A6%E7%90%86"><span class="toc-text">サーバレスのバッチ処理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ECS-Run-Task%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">ECS Run Taskについて</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Lambda%E3%81%A7%E3%83%90%E3%83%83%E3%83%81%E5%87%A6%E7%90%86%E3%82%92%E3%82%AC%E3%83%B3%E3%83%90%E3%83%AB"><span class="toc-text">Lambdaでバッチ処理をガンバル</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">コードについて</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%A5%E5%8A%9B%E3%81%8CDynmaoDB%E3%81%AE%E5%A0%B4%E5%90%88"><span class="toc-text">入力がDynmaoDBの場合</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#DynamoDB%E3%82%92%E3%83%90%E3%83%83%E3%83%81%E5%87%A6%E7%90%86%E3%81%A7%E6%89%B1%E3%81%86%E3%81%A8%E3%81%8D%E3%81%AE%E6%B3%A8%E6%84%8F"><span class="toc-text">DynamoDBをバッチ処理で扱うときの注意</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%9A%E3%83%BC%E3%82%B8%E3%83%B3%E3%82%B0%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">ページングについて</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%98%E4%B8%80%E3%83%97%E3%83%AD%E3%82%BB%E3%82%B9%E3%81%A7%E3%81%AE%E5%88%86%E6%95%A3%E5%AE%9F%E8%A1%8C"><span class="toc-text">単一プロセスでの分散実行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%BA%E5%8A%9B%E5%85%88%E3%82%92DynamoDB%E3%81%AB%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88%E3%81%AE%E3%82%B9%E3%83%AD%E3%83%83%E3%83%88%E3%83%AA%E3%83%B3%E3%82%B0%E5%AF%BE%E7%AD%96"><span class="toc-text">出力先をDynamoDBにする場合のスロットリング対策</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%A5%E5%8A%9B%E3%81%8CS3%E3%81%AE%E5%A0%B4%E5%90%88"><span class="toc-text">入力がS3の場合</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#S3-Select%E3%82%92%E4%BD%BF%E3%81%86%E4%B8%8A%E3%81%A7%E3%81%AE%E6%B3%A8%E6%84%8F"><span class="toc-text">S3 Selectを使う上での注意</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Step-Functions"><span class="toc-text">Step Functions</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Step-Functions-%C3%97-Lambda"><span class="toc-text">Step Functions × Lambda</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8B%95%E7%9A%84%E4%B8%A6%E5%88%97%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88"><span class="toc-text">動的並列する場合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Lambda%E3%81%AE-In-Out-%E8%A8%AD%E8%A8%88"><span class="toc-text">Lambdaの In&#x2F;Out 設計</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9F%E8%A3%85%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">実装について</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Scatter%E9%83%A8%E5%88%86"><span class="toc-text">Scatter部分</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#TaskLambad"><span class="toc-text">TaskLambad</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GatherLambda"><span class="toc-text">GatherLambda</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Deploy"><span class="toc-text">Deploy</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E6%A4%9C%E8%A8%BC"><span class="toc-text">性能検証</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9F%E8%A1%8C%E7%B5%90%E6%9E%9C"><span class="toc-text">実行結果</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+
 <h2 class="margin-top-30">カテゴリー</h2>
 
 <div class="widget-wrap">
@@ -402,7 +401,7 @@
     
       <li><a href="/categories/Design/">Design (8)</a></li>
     
-      <li><a href="/categories/Programming/">Programming (169)</a></li>
+      <li><a href="/categories/Programming/">Programming (170)</a></li>
     
       <li><a href="/categories/Management/">Management (9)</a></li>
     
@@ -410,7 +409,7 @@
     
       <li><a href="/categories/DB/">DB (14)</a></li>
     
-      <li><a href="/categories/DataScience/">DataScience (32)</a></li>
+      <li><a href="/categories/DataScience/">DataScience (33)</a></li>
     
       <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
     
