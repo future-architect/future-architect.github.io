@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Kinesis+Lambda構成での、処理遅延を監視する | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにフューチャー棚井龍之介です。 本ブログでは、サーバレス連載の第1日目として、「Kinesis+Lambda構成」でのメトリクス監視について取り上げます。 データ流入量が徐々に増加する見込みのとき、各リソースのどのメトリクスを重点チェックすべきか。また、メトリクスがリソースの制限にぶつかった場合やアラート検知された場合にどのような対応アクションを取るべきか。KinesisやLambdaのリソ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kinesis+Lambda構成での、処理遅延を監視する | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210531b/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにフューチャー棚井龍之介です。 本ブログでは、サーバレス連載の第1日目として、「Kinesis+Lambda構成」でのメトリクス監視について取り上げます。 データ流入量が徐々に増加する見込みのとき、各リソースのどのメトリクスを重点チェックすべきか。また、メトリクスがリソースの制限にぶつかった場合やアラート検知された場合にどのような対応アクションを取るべきか。KinesisやLambdaのリソ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210531b/Pattern-Streaming.7b2876deed217d21f4e4e326fe1535be25cb9603.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210531b/Pattern-Streaming.7b2876deed217d21f4e4e326fe1535be25cb9603.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210531b/CW-Overview.png">
+<meta property="article:published_time" content="2021-05-30T15:00:01.000Z">
+<meta property="article:modified_time" content="2021-05-31T01:48:41.015Z">
+<meta property="article:tag" content="保守運用">
+<meta property="article:tag" content="Serverless">
+<meta property="article:tag" content="Lambda">
+<meta property="article:tag" content="Kinesis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210531b/Pattern-Streaming.7b2876deed217d21f4e4e326fe1535be25cb9603.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="保守運用,Serverless,Lambda,Kinesis" name="keywords">
+  <meta content="棚井龍之介" name="author">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha384-pdapHxIh7EYuwy6K7iE41uXVxGCXY0sAjBzaElYGJUrzwodck3Lx6IE2lA0rFREo" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+  <h2 itemprop="name">
+    <a class="article-title" href="/articles/20210531b/">Kinesis+Lambda構成での、処理遅延を監視する</a>
+  </h2>
+
+
+    <div class="row">
+  <main class="col-md-9 col-sm-9 blog-posts">
+    <article id="post-20210531b_Kinesis+Lambda構成での、処理遅延を監視する" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E6%A3%9A%E4%BA%95%E9%BE%8D%E4%B9%8B%E4%BB%8B">棚井龍之介</a></li></li>
+            <li class="blog-info-item"><time datetime="2021-05-30T15:00:01.000Z" itemprop="datePublished">2021.05.31</time>
+</li>
+            <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/%E4%BF%9D%E5%AE%88%E9%81%8B%E7%94%A8/" title="保守運用">保守運用</a></li> 
+  
+    <li><a href="/tags/Serverless/" title="Serverless">Serverless</a></li> 
+  
+    <li><a href="/tags/Lambda/" title="Lambda">Lambda</a></li> 
+  
+    <li><a href="/tags/Kinesis/" title="Kinesis">Kinesis</a>
+  
+  </ul>
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>フューチャー棚井龍之介です。</p>
+<p>本ブログでは、<a href="/articles/20210531a/">サーバレス連載</a>の第1日目として、「Kinesis+Lambda構成」でのメトリクス監視について取り上げます。</p>
+<p><strong>データ流入量が徐々に増加する見込み</strong>のとき、各リソースのどのメトリクスを重点チェックすべきか。また、メトリクスがリソースの制限にぶつかった場合やアラート検知された場合にどのような対応アクションを取るべきか。KinesisやLambdaのリソース監視設定から得た知見を、本ブログに整理しました。</p>
+<p>そもそもの「サーバレスって、何が便利なんだっけ？」から整理したい方は、<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/builders-flash/202003/awsgeek-serverless/?awsf.filter-name=*all">AWS公式のグラレコ解説記事</a>をご覧ください。</p>
+<h1 id="今回のサーバレス構成"><a href="#今回のサーバレス構成" class="headerlink" title="今回のサーバレス構成"></a>今回のサーバレス構成</h1><p>「Amazon Kinesis Data Streamでデータを受け、AWS Lambdaがコンシュームする構成」を本ブログで想定する環境とします。</p>
+<p>AWS本家の<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/serverless/patterns/serverless-pattern/">形で考えるサーバレス設計</a>でも「流入データの連続処理」として取り上げられおり、サーバレスという用語に馴染みのないエンジニアにもよく知られたデータフロー構成ではないでしょうか。</p>
+<p><img src="/images/20210531b/Pattern-Streaming.7b2876deed217d21f4e4e326fe1535be25cb9603.png"></p>
+<img src="/images/20210531b/Pattern-Streaming.7b2876deed217d21f4e4e326fe1535be25cb9603.png" alt="Kinesisで受けてLambdaからS3へ書き込む図" width="832" height="218" loading="lazy">
+
+<p>大量データの受信にはKinesisを使い、受信データのコンピュートはLambdaでやりくりする。この構成はシンプルで分かりやすく、かつ、各リソースをスケールしやすいため、データ連携やデータ保存などのあらゆるケースに応用が効く、ベーシックなインフラ構成だと思います。</p>
+<p>どちらもフルマネージドサービスなため、管理運用コストはほとんとかからないのですが、こと「データ流入量がどんどん増える場合」にはその限りではありません。後続で説明するCloudWatchのメトリクス監視を設定し、通知やアラートを受けた場合にはリソースの拡張・スケーリング対応が必要となります。</p>
+<h1 id="リソース監視の基本"><a href="#リソース監視の基本" class="headerlink" title="リソース監視の基本"></a>リソース監視の基本</h1><p>AWSリソースの監視には、<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonCloudWatch/latest/monitoring/cloudwatch_architecture.html">CloudWatch</a>を活用します。</p>
+<p>Amazon CloudWatchを利用することにより、AWSリソースサービスの利用状況や、各サービスの出力する情報を<a target="_blank" rel="noopener" href="https://wa3.i-3-i.info/word17778.html">モニタリング</a>できます。</p>
+<p>各リソースの出力する情報は「メトリクス(Metrics)」としてAWSサービス内に集約されています。CloudWatchに追加設定を入れることで「このメトリクスが急上昇した場合には、社員にメールで通知して」や「あのメトリクスが80%を上回ったら、自動でリソースを増強して」などを登録し、緊急時のシステム対応に備えることができます。</p>
+<img src="/images/20210531b/CW-Overview.png" alt="CloudWatchサービスの概念図" width="604" height="385" loading="lazy">
+
+<p>EC2やRDSの運用経験があれば、メトリクス監視は「当たり前に実施すべき」と言われても違和感は無いと思います。<br>しかし、システムの運用経験が「エンジニアになってこのかた、サーバレスのみ」だと、「フルマネージドサービスなのだから、メトリクスの監視設定はいらないよね。エラー監視は当然だとしても、リソース増強は全て自動でしょ」と勘違いしてしまうケースが見受けられます。</p>
+<p>サーバレス構成だとしてもメトリクス監視は必須であり、それを怠ってしまうと「知らないうちに、システムの動きがおかしくなっている」状況になります。</p>
+<p>筆者自身の経験では、Lambdaの代表的なメトリクス <strong>IteratorAge</strong> の監視が漏れたことにより「リアルタイム処理と謳っているが、実際のデータ連携には〇〇時間要する」というケースがありました。サービスの非機能要件を担保するためにも、メトリクス監視は徹底すべきです。</p>
+<h1 id="監視メトリクス"><a href="#監視メトリクス" class="headerlink" title="監視メトリクス"></a>監視メトリクス</h1><p>Kinesis+Lambda構成の場合、<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/serverless-applications-lens/welcome.html">最低でも以下のメトリクス</a>には監視・アラート通知設定を入れましょう。</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>AWSサービス名</th>
+<th>メトリクス名</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>AWS Lambda</td>
+<td>Errors</td>
+<td>関数エラーが発生した呼び出しの数</td>
+</tr>
+<tr>
+<td>2</td>
+<td>AWS Lambda</td>
+<td>Throttling</td>
+<td>スロットリングされた呼び出しのリクエスト数</td>
+</tr>
+<tr>
+<td>3</td>
+<td>AWS Lambda</td>
+<td>Duration</td>
+<td>関数コードがイベントの処理に費やす時間</td>
+</tr>
+<tr>
+<td>4</td>
+<td>AWS Lambda</td>
+<td>ConcurrentExecutions</td>
+<td>イベントを処理している関数インスタンスの数</td>
+</tr>
+<tr>
+<td>5</td>
+<td>AWS Lambda</td>
+<td>IteratorAge</td>
+<td>あるデータをKinesisが受信してから、そのデータをLambdaに送信するまでの時間</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Amazon Kinesis Date Stream</td>
+<td>ReadProvisionedThroughputExceeded</td>
+<td>データ取得要求が、Kinesisのスループット上限に達して調整が行われた</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Amazon Kinesis Date Stream</td>
+<td>WriteProvisionedThroughputExceeded</td>
+<td>データ書き込みが、Kinesisのスループット上限に達して失敗した</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Amazon Kinesis Date Stream</td>
+<td>GetRecords.IteratorAgeMilliseconds</td>
+<td>Kinesisにレコードが滞在した時間</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Amazon Kinesis Date Stream</td>
+<td>GetRecords.Success</td>
+<td>Kinesisから正しく取得されたレコードの数</td>
+</tr>
+</tbody></table>
+<p>これらのメトリクス監視を入れることで、Kinesis, Lambdaサーバレスリソースの「フルマネージドではない部分」までにも目が行き届くようになります。</p>
+<h2 id="アラート通知が届いたら"><a href="#アラート通知が届いたら" class="headerlink" title="アラート通知が届いたら"></a>アラート通知が届いたら</h2><p>メトリクス監視を入れることで、リソースの負荷上昇をアラートで検知できるようになります。<br>基本的には「ボトルネックの特定 → 解決/緩和アクションの実施 → 継続監視 → アラートの未再発を確認し対応クローズ or 原因の再調査」の対応フローとなります。</p>
+<p>エラーが発生した場合や、データが全く届かないケースであれば、原因の切り分けは容易だと思います。<br>しかし、「処理遅延」のような処理時間が徐々に長くなっているケースでは、関数内部ロジックの修正やリソースの増強が必要になります。</p>
+<p>代表的なアクションとしては</p>
+<ul>
+<li>Lambda<ul>
+<li>アプリケーションの内部ロジックを見直す<ul>
+<li>別リソースとの接続時間を調べる</li>
+<li>詳細調査のためにログ出力を追加する</li>
+</ul>
+</li>
+<li>メモリを増強する</li>
+<li>同時実行数の上限緩和を申請する</li>
+<li>並列化系数を増やす</li>
+</ul>
+</li>
+<li>Kinesis<ul>
+<li>シャード数を増やす</li>
+<li>データ保存期間を延長する</li>
+</ul>
+</li>
+</ul>
+<p>などが考えられます。</p>
+<p>いずれにしても「<strong>ボトルネックの特定</strong>」が最優先であり、原因に対してピンポイントで対処すべきです。<br>アラート通知時に慌てないためにも、CloudWatchのコンソール画面に日頃から慣れておくことも大事です。</p>
+<h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>サーバレス構成でのメトリクス監視について、入門的な内容として、Kinesis+Lambda構成にフォーカスして説明しました。フルマネージドサービスは基本的に「ほったらかし」でも大きな問題は発生しませんが、徐々に負荷が高まるケースでは「気づいたら、大変なことになっていた」という笑えない状況が発生しがちです。</p>
+<p>面倒な作業はAWS側に任せられるとしても、最終的なサービス稼働監視は「利用者側の責務」と意識して、メトリクスの監視設定は必ず入れるようにしましょう。</p>
+<p><a href="/articles/20210531a/">サーバレス連載</a>の第1日目でした。次は真野さんの「15分の壁を超えるLambda分散実行術」です</p>
+<h2 id="参照記事"><a href="#参照記事" class="headerlink" title="参照記事"></a>参照記事</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/builders-flash/202003/awsgeek-serverless/?awsf.filter-name=*all">サーバーレスって何が便利なの ? AWS でサーバーレスを構築するためのサービスをグラレコで解説</a></li>
+<li><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/serverless/patterns/serverless-pattern/">形で考えるサーバーレス設計</a></li>
+<li><a target="_blank" rel="noopener" href="https://wa3.i-3-i.info/word17778.html">モニタリング (monitoring)</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonCloudWatch/latest/monitoring/cloudwatch_architecture.html">Amazon CloudWatch の仕組み</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/serverless-applications-lens/wellarchitected-serverless-applications-lens.pdf">サーバーレスアプリケーションレンズ - AWS Well-Architected フレームワーク</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/monitoring-metrics.html">AWS Lambda 関数メトリクスの使用</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/streams/latest/dev/monitoring-with-cloudwatch.html">Amazon CloudWatch を使用した Amazon Kinesis Data Streams サービスのモニタリング</a></li>
+<li><a target="_blank" rel="noopener" href="https://kashionki38.hatenablog.com/entry/2020/04/19/010009">Kinesis, Lambdaのボトルネック解析時の考慮点</a></li>
+<li><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/premiumsupport/knowledge-center/kinesis-data-streams-iteratorage-metric/">Kinesis Data Streams で IteratorAgeMilliseconds の値が増え続けるのはなぜですか?</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210531b/&via=future_techblog&related=twitterapi%2Ctwitter&text=Kinesis+Lambda%E6%A7%8B%E6%88%90%E3%81%A7%E3%81%AE%E3%80%81%E5%87%A6%E7%90%86%E9%81%85%E5%BB%B6%E3%82%92%E7%9B%A3%E8%A6%96%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210531b/&t=Kinesis+Lambda%E6%A7%8B%E6%88%90%E3%81%A7%E3%81%AE%E3%80%81%E5%87%A6%E7%90%86%E9%81%85%E5%BB%B6%E3%82%92%E7%9B%A3%E8%A6%96%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210531b/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label hatebu-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210531b/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label pocket-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2021.04.13</span><span class="snscount">&#9825;4</span><a class="related-posts-link" href=/articles/20210413a/ title="認証情報を Lambda の環境変数に渡す要件が発生したため認証情報を KMS で暗号化して、リポジトリには暗号化した値を登録し、Lambda 内で復号化する構成を取りました。">KMSで暗号化してLambdaで復号化する</a></li><li class="related-posts-item"><span>2020.07.27</span><span class="snscount">&#9825;9</span><a class="related-posts-link" href=/articles/20200727/ title="[サーバレス連載企画]の8回目です。TIG DXユニットの真野です。ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。[工場をハックするための基本知識] の記事を書いた棚井さんと同じチームに所属しています。[サーバレス連載企画] の第8弾目として、Serverlessの代表格であるAWS LambdaでGoを用いてKinesisに対するKPL/KCL相当の処理についてまとめていきます。">GoからAWS KinesisのAggregationFormatを利用する</a></li><li class="related-posts-item"><span>2020.07.22</span><span class="snscount">&#9825;7</span><a class="related-posts-link" href=/articles/20200722/ title="昨今様々なシステムで利用さているAWSのLambdaですが、サーバレスということもあり何かのイベントをトリガに関数を起動させる方法が一般的かと思います。LambdaはAWSの様々なサービスをトリガとして起動することが可能で、自分たちの利用しているAWSサービスと組み合わせて実装するることでその真価を発揮します。AWSに少し詳しい人であればLambdaをAWSのサービストリガで起動させる事ができることは知っていると思いますが、いざ実装するとなると具体的にどういった手順で、なんの設定が必要かというところがわからないという人もいるのではないでしょうか。">AWSサービストリガによるLambda起動</a></li><li class="related-posts-item"><span>2020.03.26</span><span class="snscount">&#9825;7</span><a class="related-posts-link" href=/articles/20200326/ title="サーバレス連載の第2弾はLambdaアプリをGoで開発する中で調べた内容や、Tipsを紹介します。">Serverless連載2: AWS Lambda×Goの開発Tips</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.04.22</span><span class="snscount">&#9825;5</span> <a href="/articles/20210422a/" title="私は新卒でフューチャーへ入社しITの世界でのキャリアが始まりました。その後、一度フューチャーを離れIoTプラットフォーマーのソリューションアーキテクトとして多くのお客様へ自社サービスの導入支援やIoTシステムの設計や構築の支援をしておりました。そうしたソリューションアーキテクトとしてのロールを通じて、多くの経験や学びを得ることができたのですが、その中でも特にTechnical Credibilityというキーワードについて自分の経験を交えて本ブログにて書いてみたいと思います。">Technical Credibilityを築くということ</a></li>
+
+    <li><span>2021.01.07</span><span class="snscount">&#9825;28</span> <a href="/articles/20210107/" title="Electronは、GitHubが開発したオープンソースのソフトウェアフレームワークです。ChromiumとNode.jsをコアとして採用する事で、Web開発と同じようにHTML,CSS,JavaScriptを用いて開発したものを..">Electronの使い方 Web開発の技術でデスクトップアプリを作ろう</a></li>
+
+    <li><span>2020.11.09</span><span class="snscount">&#9825;157</span> <a href="/articles/20201109/" title="1年弱ほどGo言語でWebAPIアプリケーション開発を行っていますが、かなり割り切った構成・テスト方針を採用しました。そろそろ1年弱になり機能開発も比較的落ち着き、保守運用フェーズの割合も徐々に増えてきた頃合いなので、やったこと・学び・反省といった振り返りを共有します。">GoのWebアプリ開発でフラットパッケージにした話</a></li>
+
+    <li><span>2020.11.07</span><span class="snscount">&#9825;49</span> <a href="/articles/20201107/" title="フューチャーOSS推進タスクフォースを開始しました。実は7月に発足してから8月には活動の骨子が固まり、タスクフォース自体は始動していましたが、中身を作ってから告知した方が具体性があってブレも無くなり良いのでは？という話があり、少しタイミングをずらしてのご報告です。">フューチャーOSS推進タスクフォース始めます</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 col-sm-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+<section class="toc-section">
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%8A%E5%9B%9E%E3%81%AE%E3%82%B5%E3%83%BC%E3%83%90%E3%83%AC%E3%82%B9%E6%A7%8B%E6%88%90"><span class="toc-text">今回のサーバレス構成</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E7%9B%A3%E8%A6%96%E3%81%AE%E5%9F%BA%E6%9C%AC"><span class="toc-text">リソース監視の基本</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%9B%A3%E8%A6%96%E3%83%A1%E3%83%88%E3%83%AA%E3%82%AF%E3%82%B9"><span class="toc-text">監視メトリクス</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%A2%E3%83%A9%E3%83%BC%E3%83%88%E9%80%9A%E7%9F%A5%E3%81%8C%E5%B1%8A%E3%81%84%E3%81%9F%E3%82%89"><span class="toc-text">アラート通知が届いたら</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E7%85%A7%E8%A8%98%E4%BA%8B"><span class="toc-text">参照記事</span></a></li></ol></li></ol>
+</section>
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+      <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+      <li><a href="/categories/IoT/">IoT (15)</a></li>
+    
+      <li><a href="/categories/VR/">VR (10)</a></li>
+    
+      <li><a href="/categories/Security/">Security (2)</a></li>
+    
+      <li><a href="/categories/Design/">Design (8)</a></li>
+    
+      <li><a href="/categories/Management/">Management (9)</a></li>
+    
+      <li><a href="/categories/Programming/">Programming (171)</a></li>
+    
+      <li><a href="/categories/Infrastructure/">Infrastructure (136)</a></li>
+    
+      <li><a href="/categories/DB/">DB (14)</a></li>
+    
+      <li><a href="/categories/DataScience/">DataScience (33)</a></li>
+    
+      <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+      <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+      <li><a href="/categories/Business/">Business (4)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://anchor.fm/futuretechcast" title="フューチャーグループの技術について深堀りするPodcastです" target="_blank" rel="noopener">ポッドキャスト</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+      <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+            <!-- END BOTTOM CONTACTS -->
+            <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+            <script>window.twttr = (function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+              if (d.getElementById(id)) return t;
+              js = d.createElement(s);
+              js.id = id;
+              js.src = "https://platform.twitter.com/widgets.js";
+              fjs.parentNode.insertBefore(js, fjs);
+              t._e = [];
+              t.ready = function(f) {
+                t._e.push(f);
+              };
+              return t;
+            }(document, "script", "twitter-wjs"));</script>
+            
+              <!-- BEGIN TWITTER BLOCK -->
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+                <!-- Twitterタイムライン -->
+                <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+              </div>
+              <!-- END TWITTER BLOCK -->
+            
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>
