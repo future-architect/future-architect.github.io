@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="ja" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="ja" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="ja">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>静的解析によるInvalidなAWS Lambda関数シグネチャの検知 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="TIGの辻 (@d_tutuz)です。 本記事ではAWS Lambdaの関数シグネチャを静的解析することで、より安全にAWS Lambdaを実装する方法を紹介します。 はじめに早速ですがAWS LambdaのアプリケーションをGoのSDKを用いて開発するときに、関数のハンドラは以下のシグネチャでなくてはなりません。 12345678func ()func () errorfunc (TIn)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="静的解析によるInvalidなAWS Lambda関数シグネチャの検知 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210603a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="TIGの辻 (@d_tutuz)です。 本記事ではAWS Lambdaの関数シグネチャを静的解析することで、より安全にAWS Lambdaを実装する方法を紹介します。 はじめに早速ですがAWS LambdaのアプリケーションをGoのSDKを用いて開発するときに、関数のハンドラは以下のシグネチャでなくてはなりません。 12345678func ()func () errorfunc (TIn)">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210603a/business-4576778_640.jpg">
+<meta property="og:image" content="https://future-architect.github.io/images/20210603a/image.png">
+<meta property="og:image" content="https://github-link-card.s3.ap-northeast-1.amazonaws.com/d-tsuji/awslambdahandler.png">
+<meta property="article:published_time" content="2021-06-02T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-06-03T02:02:47.567Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Lambda">
+<meta property="article:tag" content="Linter">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210603a/business-4576778_640.jpg">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  
+  <link rel="icon" href="/favicon.ico">
+  
+  <meta content="Go,Lambda,Linter" name="keywords">
+  <meta content="辻大志郎" name="author">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha384-pdapHxIh7EYuwy6K7iE41uXVxGCXY0sAjBzaElYGJUrzwodck3Lx6IE2lA0rFREo" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main">
+    
+  <h2 itemprop="name">
+    <a class="article-title" href="/articles/20210603a/">静的解析によるInvalidなAWS Lambda関数シグネチャの検知</a>
+  </h2>
+
+
+    <div class="row">
+  <main class="col-md-9 col-sm-9 blog-posts">
+    <article id="post-20210603a_静的解析によるInvalidなAWS_Lambda関数シグネチャの検知" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E8%BE%BB%E5%A4%A7%E5%BF%97%E9%83%8E">辻大志郎</a></li></li>
+            <li class="blog-info-item"><time datetime="2021-06-02T15:00:00.000Z" itemprop="datePublished">2021.06.03</time>
+</li>
+            <li class="blog-info-item">
+  <ul>
+  
+    <li><a href="/tags/Go/" title="Go">Go</a></li> 
+  
+    <li><a href="/tags/Lambda/" title="Lambda">Lambda</a></li> 
+  
+    <li><a href="/tags/Linter/" title="Linter">Linter</a>
+  
+  </ul>
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20210603a/business-4576778_640.jpg" alt="640" width="412" height="">
+
+<p>TIGの辻 (<a target="_blank" rel="noopener" href="https://twitter.com/d_tutuz">@d_tutuz</a>)です。</p>
+<p>本記事では<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/lambda/">AWS Lambda</a>の関数シグネチャを静的解析することで、より安全にAWS Lambdaを実装する方法を紹介します。</p>
+<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>早速ですがAWS LambdaのアプリケーションをGoの<a target="_blank" rel="noopener" href="https://github.com/aws/aws-lambda-go/tree/v1.23.0">SDK</a>を用いて開発するときに、関数のハンドラは以下のシグネチャでなくてはなりません。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">()</span> <span class="title">error</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(TIn)</span> <span class="title">error</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">()</span> <span class="params">(TOut, error)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(context.Context)</span> <span class="title">error</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(context.Context, TIn)</span> <span class="title">error</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(context.Context)</span> <span class="params">(TOut, error)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(context.Context, TIn)</span> <span class="params">(TOut, error)</span></span></span><br></pre></td></tr></table></figure>
+
+<p>関数を実行するときは <a target="_blank" rel="noopener" href="https://pkg.go.dev/github.com/aws/aws-lambda-go@v1.23.0/lambda#Start"><code>lambda.Start</code></a> や <a target="_blank" rel="noopener" href="https://pkg.go.dev/github.com/aws/aws-lambda-go@v1.23.0/lambda#StartHandlerWithContext"><code>lambda.StartWithContext</code></a> の引数として関数ハンドラを渡すことで、開発者が実装した関数ハンドラが実行されます。</p>
+<p>以下はAWS LambdaをGoで実装するときの <code>main</code> パッケージの実装例です。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/lambda&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(Handle)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Handle</span><span class="params">(ctx context.Context)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">	<span class="comment">// アプリケーションのロジックなど</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="interface-型であるハンドラ"><a href="#interface-型であるハンドラ" class="headerlink" title="interface{} 型であるハンドラ"></a><code>interface&#123;&#125;</code> 型であるハンドラ</h3><p>ところで <code>lambda.Start</code> 関数の引数であるハンドラは <code>interface&#123;&#125;</code> 型 <sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> です。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Start</span><span class="params">(handler <span class="keyword">interface</span>&#123;&#125;)</span></span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>interface&#123;&#125;</code> 型として扱うため、以下の <code>HandleInvalid</code> のようにハンドラの関数シグネチャが、うっかり有効でないシグネチャになっていたとしてもビルド自体は成功します。有効でない関数シグネチャを引数に渡して実行するとどうなるのでしょうか？</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/lambda&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(HandleInvalid)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ⚠️戻り値が int であるのは無効なシグネチャ⚠️</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HandleInvalid</span><span class="params">(ctx context.Context)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>答えは “実行時エラー” になります。AWSのコンソールから実行すると以下のようなエラーメッセージが出力されます。</p>
+<p><img src="/images/20210603a/image.png"></p>
+<h2 id="静的解析による関数シグネチャチェック"><a href="#静的解析による関数シグネチャチェック" class="headerlink" title="静的解析による関数シグネチャチェック"></a>静的解析による関数シグネチャチェック</h2><p>できることなら、有効でない関数シグネチャを早い段階で検知して、実行時エラーを防止したいですよね。</p>
+<p>「静的解析」とはプログラムを実行せずにソースコードを解析することです。Goは静的解析のエコシステムが充実しており、静的解析でコードを検査して、不具合につながりそうなソースコードを検知することは一般的です。Go言語自体に備わっている <code>go vet</code> コマンドがありますし <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>、サードパーティによるツールですとGoの典型的なエラー処理のミスを検知する <a target="_blank" rel="noopener" href="https://github.com/kisielk/errcheck"><code>errcheck</code></a> や静的解析のツールセットである <a target="_blank" rel="noopener" href="https://staticcheck.io/"><code>staticcheck</code></a> などがあります。</p>
+<h3 id="unmarshal-モジュールによる静的解析"><a href="#unmarshal-モジュールによる静的解析" class="headerlink" title="unmarshal モジュールによる静的解析"></a><code>unmarshal</code> モジュールによる静的解析</h3><p>静的解析の例として <code>go vet</code> コマンドを用いてJSONをGoの型にマッピングするときの実装ミスを静的解析でチェックしてみましょう。Go公式のツールである <code>go vet</code> コマンドを実行したときに呼び出される <code>unmarshal</code> モジュールを使って検知できます。<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> GoでJSONを型にマッピングするときは <code>json.Unmarshal</code> (あるいは <code>(Decoder).Decode</code>)を使います。<code>json.Unmarshal</code> に渡す第2引数はポインタである必要がありますが、ポインタになっていない場合に <code>go vet</code> コマンドを使うと、ポインタになっていないことを検知できます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;encoding/json&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> jsonStr = <span class="string">`&#123;&quot;name&quot;:&quot;gopher&quot;&#125;`</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name <span class="keyword">string</span> <span class="string">`json:&quot;name&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> u User</span><br><span class="line">	<span class="comment">// u はポインタ型 &amp;u として渡す必要がある！</span></span><br><span class="line">	<span class="keyword">if</span> err := json.Unmarshal([]<span class="keyword">byte</span>(jsonStr), u); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>このとき <code>$ go vet ./...</code> とすると以下のように出力されます。第2引数がポインタではないことを教えてくれます。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\main.go:17:26: call of Unmarshal passes non-pointer as second argument</span><br></pre></td></tr></table></figure>
+
+<p>このように静的解析を行うことで、コードを実行せずに不具合につながるコードを早期に検知でき、品質向上に寄与します。</p>
+<h3 id="自作ツールでAWS-Lambdaの関数シグネチャを静的解析"><a href="#自作ツールでAWS-Lambdaの関数シグネチャを静的解析" class="headerlink" title="自作ツールでAWS Lambdaの関数シグネチャを静的解析"></a>自作ツールでAWS Lambdaの関数シグネチャを静的解析</h3><p>JSONのマッピングの実装ミスを静的解析で検知した要領で、AWS Lambdaにおけるハンドラの関数シグネチャも静的解析を行い、有効でない関数シグネチャを検知することを試みます。筆者が調べたところ、既存のツールとして公開されているものはなかったため自作しました。</p>
+<ul>
+<li>静的解析ツールの自作</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://github.com/gostaticanalysis/skeleton"><code>gostaticanalysis/skeleton</code></a> を使うことで静的解析の雛形を生成でき、便利に静的解析ツールを作り始めることができます。また <a target="_blank" rel="noopener" href="https://pkg.go.dev/golang.org/x/tools/go/analysis"><code>golang.org/x/tools/go/analysis</code></a> モジュールなどを用いて、構文解析の解析結果である抽象構文木やソースコードの型の情報など、静的解析に必要な情報を扱うことができ、静的解析したい独自のロジックを実装できます。</p>
+<p>自作したAWS Lambdaの関数シグネチャを静的解析ツールは以下です。</p>
+<a target="_blank" rel="noopener" href="https://github.com/d-tsuji/awslambdahandler">
+<img src="https://github-link-card.s3.ap-northeast-1.amazonaws.com/d-tsuji/awslambdahandler.png" width="460px">
+</a>
+
+<p><code>d-tsuji/awslambdahandler</code> を使うと <code>Start</code> や <code>StartWithContext</code> の引数に渡す関数のシグネチャが正しくないコードを発見してくれます。</p>
+<p>冒頭に紹介した、AWS Lambdaが実行時エラーになる以下のコードに対して、<code>awslambdahandler</code> で静的解析をしてみます。</p>
+<figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/lambda&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(HandleInvalid)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ⚠️戻り値が int であるのは無効なシグネチャ⚠️</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HandleInvalid</span><span class="params">(ctx context.Context)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>静的解析の実施</li>
+</ul>
+<p><code>awslambdahandler</code> を実行すると、以下のように有効でない関数シグネチャとして検知できます。AWS Lambdaにデプロイして実行せずとも、実行時にエラーになる関数シグネチャを静的解析で検知できました。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ go vet -vettool=`<span class="built_in">which</span> awslambdahandler` main.go</span><br><span class="line"><span class="comment"># command-line-arguments</span></span><br><span class="line">./main.go:10:14: lambda handler of <span class="string">&quot;HandleInvalid&quot;</span> is invalid lambda signature, see https://pkg.go.dev/github.com/aws/aws-lambda-go/lambda<span class="comment">#Start</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>awslambdahandler</code> のインストール</li>
+</ul>
+<p>インストールは</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go install github.com/d-tsuji/awslambdahandler/cmd/awslambdahandler@latest</span><br></pre></td></tr></table></figure>
+
+<p>などとして簡単にできます。CI環境に組み込めば、日々のチーム開発でより安全にAWS Lambdaを実装できます。ぜひ使ってみてください。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>静的解析を実施することでバグにつながるコードを早い段階で検知できます。<a target="_blank" rel="noopener" href="https://github.com/gostaticanalysis/skeleton"><code>gostaticanalysis/skeleton</code></a> や <a target="_blank" rel="noopener" href="https://pkg.go.dev/golang.org/x/tools/go/analysis"><code>golang.org/x/tools/go/analysis</code></a> を用いることで便利に静的解析ツールを自作できます。<code>awslambdahandler</code> を用いることでAWS Lambdaの関数シグネチャを静的解析でき、より安全にAWS Lambdaを実装できるようになりました。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;"><code>go vet</code> コマンドを知らなかったという方も、実は <code>go test</code> のときに <code>go vet</code> に含まれる一部の静的解析が実行されています。<a target="_blank" rel="noopener" href="https://golang.org/pkg/cmd/go/internal/test/">https://golang.org/pkg/cmd/go/internal/test/</a></span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="vertical-align: top; padding-right: 10px;">2.</span><span style="vertical-align: top;"><a target="_blank" rel="noopener" href="https://golang.org/cmd/vet/">https://golang.org/cmd/vet/</a> に含まれている <code>unmarshal</code> です。</span><a href="#fnref:2" rev="footnote"> ↩</a></li><li id="fn:3"><span style="vertical-align: top; padding-right: 10px;">3.</span><span style="vertical-align: top;">Go1.18から導入予定の<a target="_blank" rel="noopener" href="https://go.googlesource.com/proposal/+/refs/heads/master/design/43651-type-parameters.md">型パラメータを使ったジェネリクス</a>が浸透すれば、今後引数の型の扱いは変わっていく可能性はあるでしょう。</span><a href="#fnref:3" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210603a/&via=future_techblog&related=twitterapi%2Ctwitter&text=%E9%9D%99%E7%9A%84%E8%A7%A3%E6%9E%90%E3%81%AB%E3%82%88%E3%82%8BInvalid%E3%81%AAAWS%20Lambda%E9%96%A2%E6%95%B0%E3%82%B7%E3%82%B0%E3%83%8D%E3%83%81%E3%83%A3%E3%81%AE%E6%A4%9C%E7%9F%A5" rel="nofollow noopener">
+        <i></i><span class="social-btn-label tw-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210603a/&t=%E9%9D%99%E7%9A%84%E8%A7%A3%E6%9E%90%E3%81%AB%E3%82%88%E3%82%8BInvalid%E3%81%AAAWS%20Lambda%E9%96%A2%E6%95%B0%E3%82%B7%E3%82%B0%E3%83%8D%E3%83%81%E3%83%A3%E3%81%AE%E6%A4%9C%E7%9F%A5" rel="nofollow noopener">
+        <i></i><span class="social-btn-label fb-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210603a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label hatebu-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210603a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label pocket-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2020.11.12</span><span class="snscount">&#9825;7</span><a class="related-posts-link" href=/articles/20201112/ title="TIGの辻です。サーバーレスなアプリケーションを開発するときにAWS LambdaやCloud RunといったFaaSはとても重宝します。デプロイする関数のコードは1つの関数がモノリシックな大きな関数にならないように、小さな関数を組み合わせて実装するのが基本です。いくつかのユースケースでAWS LambdaからAWS Lambdaを同期的に呼び出したいケースがあったのですが、開発者が意識しておいたほうがいいようなハマりどころがいくつかありました。本記事ではGoで[AWS LambdaからAWS Lambdaを同期的に呼び出すとき]のハマりどころやTipsを紹介します。以下のような構成です">GoでLambdaからLambdaを呼び出すときに気をつけたいポイント6選</a></li><li class="related-posts-item"><span>2021.04.30</span><span class="snscount">&#9825;6</span><a class="related-posts-link" href=/articles/20210430a/ title="こんにちは、辻です。先日開催されました [Go Conference 2021 spring] にTIGから渋川、辻の計2名が登壇しました。Go Conference'20 in Autumnではオンラインとオフラインのハイブリッドな構成でしたが、今回はGo Conference史上初となるフルオンラインでの開催となりました。">Go Conference 2021 Springに登壇しました</a></li><li class="related-posts-item"><span>2021.04.26</span><span class="snscount">&#9825;3</span><a class="related-posts-link" href=/articles/20210426a/ title="AWSのIAMユーザのセキュリティ上、IAMユーザにMFAを導入するケースがあります。MFAを有効にしているIAMユーザでGUI経由でログインする場合は、ログイン時に認証情報が求められて、MFAデバイスが出力するトークンを入力することでログインできます。一方AWS CLIを用いてリソースにアクセス場合はコマンド発行時に認証情報は求められません。代わりに以下のような記事にかかれているような...">AWS CLIで用いるMFAをちょっとだけ便利に扱えるツールを公開しました</a></li><li class="related-posts-item"><span>2021.03.29</span><span class="snscount">&#9825;12</span><a class="related-posts-link" href=/articles/20210329/ title="シェルスクリプト連載の第一弾です。シェルスクリプトは強力かつ便利で、いろいろなところで使われています。ただ、自由度が高い一方で、ちょっとしたミスを犯しやすく、かつミスに気づきにくい、ということも多いです。また、ミスに気づいたときには大きな影響が及んでいる、ということもあるでしょう。">ShellCheckでシェルスクリプトの品質を高めよう</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.05.31</span><span class="snscount">&#9825;5</span> <a href="/articles/20210531b/" title="「Kinesis+Lambda構成」でのメトリクス監視について取り上げます。データ流入量が徐々に増加する見込みのとき、各リソースのどのメトリクスを重点チェックすべきか。また、メトリクスがリソースの制限にぶつかった場合やアラート検知された場合にどのような対応アクションを取るべきか。KinesisやLambdaのリソース監視設定から得た知見を、本ブログに整理しました。そもそもの「サーバレスって、何が便利なんだっけ？」から整理したい勉強熱心なエンジニアは、[AWS公式のグラレコ解説記事]をご覧ください。">Kinesis+Lambda構成での、処理遅延を監視する</a></li>
+
+    <li><span>2021.01.07</span><span class="snscount">&#9825;28</span> <a href="/articles/20210107/" title="Electronは、GitHubが開発したオープンソースのソフトウェアフレームワークです。ChromiumとNode.jsをコアとして採用する事で、Web開発と同じようにHTML,CSS,JavaScriptを用いて開発したものを..">Electronの使い方 Web開発の技術でデスクトップアプリを作ろう</a></li>
+
+    <li><span>2020.08.07</span><span class="snscount">&#9825;70</span> <a href="/articles/20200807/" title="Go は標準ライブラリが充実しているとよく言われます。標準ライブラリだけで、HTTP サーバを作れたり、暗号化処理や、JSON や CSV といったデータ形式を扱うことができます">GoとSuffixArray</a></li>
+
+    <li><span>2020.05.28</span><span class="snscount">&#9825;384</span> <a href="/articles/20200528/" title="Goでプロジェクトのフォルダ構成どうしよう、とググると見つかるStandard Go Project Layout(https://github.com/golang-standards/project-layout)。とはいえ、これはかなりコード量を増やしてしまう恐れがありますので、導入する場合のデメリットも考えておく方が良いです。">あなたのGoアプリ/ライブラリのパッケージ構成もっとシンプルでよくない？</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 col-sm-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+<section class="toc-section">
+<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#interface-%E5%9E%8B%E3%81%A7%E3%81%82%E3%82%8B%E3%83%8F%E3%83%B3%E3%83%89%E3%83%A9"><span class="toc-text">interface&amp;#123;&amp;#125; 型であるハンドラ</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%99%E7%9A%84%E8%A7%A3%E6%9E%90%E3%81%AB%E3%82%88%E3%82%8B%E9%96%A2%E6%95%B0%E3%82%B7%E3%82%B0%E3%83%8D%E3%83%81%E3%83%A3%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF"><span class="toc-text">静的解析による関数シグネチャチェック</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#unmarshal-%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB%E3%81%AB%E3%82%88%E3%82%8B%E9%9D%99%E7%9A%84%E8%A7%A3%E6%9E%90"><span class="toc-text">unmarshal モジュールによる静的解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%87%AA%E4%BD%9C%E3%83%84%E3%83%BC%E3%83%AB%E3%81%A7AWS-Lambda%E3%81%AE%E9%96%A2%E6%95%B0%E3%82%B7%E3%82%B0%E3%83%8D%E3%83%81%E3%83%A3%E3%82%92%E9%9D%99%E7%9A%84%E8%A7%A3%E6%9E%90"><span class="toc-text">自作ツールでAWS Lambdaの関数シグネチャを静的解析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav sidebar-categories margin-bottom-40">
+    
+      <li><a href="/categories/Culture/">Culture (52)</a></li>
+    
+      <li><a href="/categories/IoT/">IoT (15)</a></li>
+    
+      <li><a href="/categories/VR/">VR (10)</a></li>
+    
+      <li><a href="/categories/Security/">Security (2)</a></li>
+    
+      <li><a href="/categories/Design/">Design (8)</a></li>
+    
+      <li><a href="/categories/Management/">Management (9)</a></li>
+    
+      <li><a href="/categories/Programming/">Programming (174)</a></li>
+    
+      <li><a href="/categories/Infrastructure/">Infrastructure (136)</a></li>
+    
+      <li><a href="/categories/DB/">DB (14)</a></li>
+    
+      <li><a href="/categories/DataScience/">DataScience (33)</a></li>
+    
+      <li><a href="/categories/CI-CD/">CI/CD (4)</a></li>
+    
+      <li><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (6)</a></li>
+    
+      <li><a href="/categories/Business/">Business (4)</a></li>
+    
+    </ul>
+  </div>
+</div>
+
+
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="https://anchor.fm/futuretechcast" title="フューチャーグループの技術について深堀りするPodcastです" target="_blank" rel="noopener">ポッドキャスト</a></li>
+      <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">勉強会Connpass</a></li>
+      <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+      <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+      <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+      <li><a href="https://future-fintech.github.io/" title="Future Fintech EyE - 金融の未来を語るブログ" target="_blank" rel="noopener">Future Fintech EYE</a></li>
+    </ul>
+  </div>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget-wrap">
+  <div class="widget">
+    <ul class="nav">
+      <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+      <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+    </ul>
+  </div>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+            <!-- END BOTTOM CONTACTS -->
+            <!-- Twitter Share. ページ毎に1度初期化できれば良い -->
+            <script>window.twttr = (function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0], t = window.twttr || {};
+              if (d.getElementById(id)) return t;
+              js = d.createElement(s);
+              js.id = id;
+              js.src = "https://platform.twitter.com/widgets.js";
+              fjs.parentNode.insertBefore(js, fjs);
+              t._e = [];
+              t.ready = function(f) {
+                t._e.push(f);
+              };
+              return t;
+            }(document, "script", "twitter-wjs"));</script>
+            
+              <!-- BEGIN TWITTER BLOCK -->
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+                <!-- Twitterタイムライン -->
+                <a data-tweet-limit="1" class="twitter-timeline" target="_blank" rel="noopener" href="https://twitter.com/future_techblog?ref_src=twsrc%5Etfw" data-lang="ja" data-dnt="true">Tweets by @future_techblog</a>
+              </div>
+              <!-- END TWITTER BLOCK -->
+            
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>
