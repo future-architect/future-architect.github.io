@@ -217,8 +217,8 @@
 <td align="center"></td>
 <td align="center">5GB以上は分割アップロードでめんどい</td>
 </tr>
-</tbody></table>
-</div><p>大きくは外部ストレージサービス利用と、アプリケーションにバンドルしてしまう方式と2つにわかれます。バンドルはデータだけ更新ができないデメリットはありますが、お手軽です。Lambdaはレイヤーを使えば実行プログラムに対して後から追加とかできますが、容量制限が厳しめです。</p>
+</tbody></table></div>
+<p>大きくは外部ストレージサービス利用と、アプリケーションにバンドルしてしまう方式と2つにわかれます。バンドルはデータだけ更新ができないデメリットはありますが、お手軽です。Lambdaはレイヤーを使えば実行プログラムに対して後から追加とかできますが、容量制限が厳しめです。</p>
 <p>オブジェクトストレージは比較的お手軽ですが、読み込みしたいライブラリがローカルのファイルシステム前提の場合は使えません。サーバーレスの方式によっては、一度ローカルのファイルシステムに書き出してから利用とかも可能ではありますが、Cloud Runでは8GB（ただし、おそらくtmpfsで書けば書くほどメモリを消費)、Lambdaでは500MBと容量に制限があります。</p>
 <p>より巨大な学習済みデータを扱う場合はマネージドNFSサービス系のものを使うのが最終形でしょう。ファイルのサイズ制限もほぼ限界値ですし、ローカルファイルになるのでどんなランタイムでもファイルが利用できます。Cloud Run大好きなのでGKEのKnative + Persistent Volumeを試そうかと思ったのですが、期待の簡易起動のAutopilotではCloud Run相当（Knative)が使えず、いろいろ面倒そう。がんばって試しても良かったのですが、こんな面倒なのはそのうち簡略化されると期待して、強い意志を持ってスルーすることにしました。Dockerのボリュームなみに簡単になって欲しい。</p>
 <p>とりあえず手元のケースでは10GBを超えるようなものはいまのところなかったので、　Lambdaコンテナの10GB制限で十分そうです。ということで、本エントリーではお手軽なLambdaのコンテナランタイムを試してみようと思います。</p>
@@ -254,8 +254,8 @@
 <td align="center">Ruby</td>
 <td align="center"><a target="_blank" rel="noopener" href="https://gallery.ecr.aws/lambda/ruby">ECR</a>, <a target="_blank" rel="noopener" href="https://hub.docker.com/r/amazon/aws-lambda-ruby">DockerHub</a></td>
 </tr>
-</tbody></table>
-</div><p>コンテナになったとはいえ、コードはLambdaの流儀で作る必要があります。GCP Cloud RunやAWS AppRunnerのようにポータブルなどこでも動かせるウェブアプリケーションを実装するのを期待する人がいるかもしれませんが（僕です！）、残念ながらそうではなく、Lambda用のハンドラを定義してあげる必要があります。こんな形です。詳しくは当ブログの<a href="https://future-architect.github.io/articles/20200326/#Lambda%E3%81%AE%E9%96%A2%E6%95%B0%E3%82%BF%E3%82%A4%E3%83%97">Serverless連載2: AWS Lambda×Goの開発TipsのLambdaの関数タイプ</a>を参照ください。</p>
+</tbody></table></div>
+<p>コンテナになったとはいえ、コードはLambdaの流儀で作る必要があります。GCP Cloud RunやAWS AppRunnerのようにポータブルなどこでも動かせるウェブアプリケーションを実装するのを期待する人がいるかもしれませんが（僕です！）、残念ながらそうではなく、Lambda用のハンドラを定義してあげる必要があります。こんな形です。詳しくは当ブログの<a href="https://future-architect.github.io/articles/20200326/#Lambda%E3%81%AE%E9%96%A2%E6%95%B0%E3%82%BF%E3%82%A4%E3%83%97">Serverless連載2: AWS Lambda×Goの開発TipsのLambdaの関数タイプ</a>を参照ください。</p>
 <p>ミニマムなのはこんな形です。</p>
 <figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/events&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/lambda&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Handler</span><span class="params">(request events.APIGatewayProxyRequest)</span> <span class="params">(events.APIGatewayProxyResponse, error)</span></span> &#123;</span><br><span class="line">	log.Println(request.Path, request.PathParameters, request.Headers, request.HTTPMethod)</span><br><span class="line">	<span class="keyword">return</span> events.APIGatewayProxyResponse&#123;Body: <span class="string">`&#123;&quot;hello&quot;: &quot;world&quot;&#125;`</span>, StatusCode: <span class="number">200</span>&#125;, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(Handler)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
