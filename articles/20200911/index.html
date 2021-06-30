@@ -218,7 +218,7 @@
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">valoc failed <span class="keyword">for</span> hp_save_area_errno(12) (cannot allocate memory)</span><br></pre></td></tr></table></figure>
 
 <p>どうやらリストアを開始するに差し当たって、最初にメモリを確保してから、リストア作業を開始するようなので、ファイル容量が10GB程度のものでも試行してみましたが、こちらもダメ。オンプレミス環境でメモリ増強対応も不可能であったため、メモリを食わずに本エラーを解消する手段がないか確認するためサポートへ問合せしたところ、サポートからの回答は、</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">リストア時のメモリ確保に失敗したと推察されます。</span><br><span class="line">メーカナレッジを確認した所、Linux環境にて同様にメモリ確保に失敗する以下のバグが確認されています。</span><br><span class="line">BUG REPORT: During some restores on Linux clients using VERITAS NetBackup (tm) 6.5 or 6.5.1, a memory leak can occur, causing the restore to fail.</span><br><span class="line"></span><br><span class="line">お客様ご利用のバージョンは6.5GA(パッチ無し)となっておりましたので、上記でご案内したBugに該当していると考えられます。</span><br><span class="line"></span><br><span class="line">回避方法は、パッチ適用かバージョンアップ以外には確認できませんでしたが、6.5はかなり古いバージョンのため、メーカサイト上には見つけられず、パッチの入手が困難となっております。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">リストア時のメモリ確保に失敗したと推察されます。</span><br><span class="line">メーカナレッジを確認した所、Linux環境にて同様にメモリ確保に失敗する以下のバグが確認されています。</span><br><span class="line">BUG REPORT: During some restores on Linux clients using VERITAS NetBackup (tm) 6.5 or 6.5.1, a memory leak can occur, causing the restore to fail.</span><br><span class="line"></span><br><span class="line">お客様ご利用のバージョンは6.5GA(パッチ無し)となっておりましたので、上記でご案内したBugに該当していると考えられます。</span><br><span class="line"></span><br><span class="line">回避方法は、パッチ適用かバージョンアップ以外には確認できませんでしたが、6.5はかなり古いバージョンのため、メーカサイト上には見つけられず、パッチの入手が困難となっております。</span><br></pre></td></tr></table></figure>
 
 <p>とのこと。既存バグで回避はパッチ適用のみだが、利用バージョンが古くパッチが入手不可という結果に。。<br>結果的にギリギリエラーが出ない2～3GB程度に分割されたdmpファイルが偶然見つかったので、そちらでなんとかリストアは出来ましたが、一時はどうなることやらとかなり肝を冷やしました。。<br>※コマンド実行からメモリ不足エラーが出るまで、1時間から長くて5時間程度要してしまうのも悩みの種でした。。</p>
 <blockquote>
@@ -226,7 +226,7 @@
 </blockquote>
 <h2 id="複数テープを連続的にリストアしようとすると、「Restore-Started」のメッセージ出力されて以降、処理が開始されないことがある。"><a href="#複数テープを連続的にリストアしようとすると、「Restore-Started」のメッセージ出力されて以降、処理が開始されないことがある。" class="headerlink" title="複数テープを連続的にリストアしようとすると、「Restore Started」のメッセージ出力されて以降、処理が開始されないことがある。"></a>複数テープを連続的にリストアしようとすると、「<code>Restore Started</code>」のメッセージ出力されて以降、処理が開始されないことがある。</h2><p>複数テープのリストアを続けて実行しようとしたところ、1本目では「<code>Restore Started</code>」のメッセージ後即座にリストアが開始されたのですが、2本目になると「<code>Restore Started</code>」後、後続処理が開始されず、リストアjobの状態も「<code>Queued</code>」から変化なし。</p>
 <p>何度か様々なパターンで試行しましたが、2本目で本事象が高頻度で発生するため、サポートに問い合わせをしました。<br>サポートからの回答は、</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">リストアジョブがアクティブになるまでにかかる時間は、主に復元されるファイルの数によって異なります。リストアするファイルの数が多いほど、ジョブがQueued状態に留まる時間が長くなります。</span><br><span class="line"></span><br><span class="line">リストアジョブのStateが「Queued」は、マスターサーバー（CPU、メモリ、およびイメージカタログを保持するディスク）の仕様と、ファイルのリストを作成している間にリストアジョブで使用できるリソース量にも依存します。</span><br><span class="line">マスターサーバーが頻繁にスワップしている場合や、マスターサーバーで他の多くのジョブが実行されている場合は、ジョブがQueued状態に留まる時間が大幅に増加します。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">リストアジョブがアクティブになるまでにかかる時間は、主に復元されるファイルの数によって異なります。リストアするファイルの数が多いほど、ジョブがQueued状態に留まる時間が長くなります。</span><br><span class="line"></span><br><span class="line">リストアジョブのStateが「Queued」は、マスターサーバー（CPU、メモリ、およびイメージカタログを保持するディスク）の仕様と、ファイルのリストを作成している間にリストアジョブで使用できるリソース量にも依存します。</span><br><span class="line">マスターサーバーが頻繁にスワップしている場合や、マスターサーバーで他の多くのジョブが実行されている場合は、ジョブがQueued状態に留まる時間が大幅に増加します。</span><br></pre></td></tr></table></figure>
 
 <p>・・・。<br>釈然としない回答でしたが、時間を空けてコマンド再実行を行うと事象としては解消されました。<br>複数テープの連続的リストアを行うためにシェルスクリプト等で自動化を図る場合には、別途策を講じる必要がありそうです。</p>
 <p>以上、私がテープリストア時にハマったポイントでした。</p>
@@ -287,11 +287,11 @@
       
     <li><span>2020.03.11</span><span class="snscount">&#9825;530</span> <a href="/articles/20200311/" title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li>
 
+    <li><span>2021.06.28</span><span class="snscount">&#9825;3</span> <a href="/articles/20210628b/" title="今回はアルゴリズムをテーマとして、faissを題材にソートされたTopKを取得するために使われているソートアルゴリズムについて紹介したいと思います。">近傍探索で用いられるtopKのソートアルゴリズム</a></li>
+
     <li><span>2021.06.25</span><span class="snscount">&#9825;3</span> <a href="/articles/20210625a/" title="初めまして。TIG所属の鈴木です。今回GCP認定資格のAssociate Cloud Engineerという資格を取得したので、その体験をブログにします。私は2020年10月に新卒入社し、GCPを使用した案件に携わってます。プログラミングなどIT経験はあったのですが、GCPをはじめとしたクラウド技術やインフラにあまり馴染みがなく、体系的に知識を習得する目的でこの資格を取得しました。">GCP Associate Cloud Engineer 合格記</a></li>
 
     <li><span>2021.06.22</span><span class="snscount">&#9825;123</span> <a href="/articles/20210622a/" title="今年のゴールデンウィーク（STAY HOME週間）に最近話題のSvelteに入門したので紹介を書きます。Svelteは主にブラウザ上で動作するユーザーインタフェースを作るフレームワークで、ReactやVue.jsの対抗馬的な存在です。">Svelteに入門した</a></li>
-
-    <li><span>2021.06.21</span><span class="snscount">&#9825;18575</span> <a href="/articles/20210621a/" title="HTML5が2021年の1月に廃止されました。Webエンジニアとしてバリバリ活躍されてる方やエグゼクティブテックリードのような肩書きを持つ方にとっては「何をいまさら」という話題かと思います。しかしながら、今年も新人さん入ってきてくださったので、プログラミングを学習中にHTML5という文字列に悩まされないように...">どうしてHTML5が廃止されたのか</a></li>
     </ul>
   </div>
   
@@ -329,7 +329,7 @@
     
       <li class=""><a href="/categories/Design/">Design (8)</a></li>
     
-      <li class=""><a href="/categories/Programming/">Programming (188)</a></li>
+      <li class=""><a href="/categories/Programming/">Programming (189)</a></li>
     
       <li class=""><a href="/categories/Management/">Management (9)</a></li>
     
