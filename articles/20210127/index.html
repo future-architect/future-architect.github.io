@@ -123,10 +123,10 @@
           
             <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>はじめまして、TIGの加藤剛です。2013年キャリア入社で、現在はTIG内に複数あるチームの1つのリーダをしています。テクノロジー領域としてはインフラやデータベースが明るめの分野です。先日 納期間近の作業中に社用PC端末で少々トラブルがあり復帰対応を行ったのですが、今回はその際の話について、関連する技術要素を織り交ぜながら取り上げてみたいと思います。</p>
 <h1 id="問題の概要"><a href="#問題の概要" class="headerlink" title="問題の概要"></a>問題の概要</h1><p>社用PCのパッチ自動適用後、一時期から音声・ディスプレイ周辺の動作不良が続いていました。デバイスドライバーを当て直したいところなのですが、調査の中でPC構成情報を見ようとsysteminfoコマンドを実行すると、そこで見慣れないエラー。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c:\ systeminfo</span><br><span class="line">オペレーティング システム情報を読み込んでいます...                    エラー: 無効なクラスです</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c:\ systeminfo</span><br><span class="line">オペレーティング システム情報を読み込んでいます...                    エラー: 無効なクラスです</span><br></pre></td></tr></table></figure>
 
 <p>WindowsのApplicationイベントログにはWMIエラーが数回。**Microsoft-Windows-WMIプロバイダーで イベントID 10 (Error: 0x80041010)**、<code>//./root/CIMV2</code>の名前空間へのクエリが失敗していることがわかります。無視してドライバーをインストールしようとしても、同様のエラーでインストーラが止まり、ここから進めない状態です。納期が迫る中で立ち往生、ということでWMIの構成を修復していきました。</p>
-<figure class="highlight text"><figcaption><span>Windows-Eventlog（Application）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">  + System</span><br><span class="line">  - Provider</span><br><span class="line">   [ Name]  Microsoft-Windows-WMI</span><br><span class="line">(中略)</span><br><span class="line">   EventID 10</span><br><span class="line">   Version 2</span><br><span class="line">   Level 2</span><br><span class="line">   Task 0</span><br><span class="line">   Opcode 0</span><br><span class="line">   Keywords 0x8000000000000000</span><br><span class="line">  - TimeCreated</span><br><span class="line">(中略)</span><br><span class="line">- UserData</span><br><span class="line">  - data_0x8000003F</span><br><span class="line">   Query //./root/CIMV2</span><br><span class="line">   Namespace SELECT TargetInstance FROM __InstanceCreationEvent WITHIN 10 WHERE TargetInstance ISA &#x27;Win32_Process&#x27; AND TargetInstance.Name = &#x27;lync.exe&#x27;</span><br><span class="line">   Error 0x80041010</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><figcaption><span>Windows-Eventlog（Application）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">  + System</span><br><span class="line">  - Provider</span><br><span class="line">   [ Name]  Microsoft-Windows-WMI</span><br><span class="line">(中略)</span><br><span class="line">   EventID 10</span><br><span class="line">   Version 2</span><br><span class="line">   Level 2</span><br><span class="line">   Task 0</span><br><span class="line">   Opcode 0</span><br><span class="line">   Keywords 0x8000000000000000</span><br><span class="line">  - TimeCreated</span><br><span class="line">(中略)</span><br><span class="line">- UserData</span><br><span class="line">  - data_0x8000003F</span><br><span class="line">   Query //./root/CIMV2</span><br><span class="line">   Namespace SELECT TargetInstance FROM __InstanceCreationEvent WITHIN 10 WHERE TargetInstance ISA &#x27;Win32_Process&#x27; AND TargetInstance.Name = &#x27;lync.exe&#x27;</span><br><span class="line">   Error 0x80041010</span><br></pre></td></tr></table></figure>
 
 
 <h2 id="原因はWMIリポジトリ破損"><a href="#原因はWMIリポジトリ破損" class="headerlink" title="原因はWMIリポジトリ破損"></a>原因はWMIリポジトリ破損</h2><p>パッチ自動適用の影響なのか真因は不明ながら、ある時点から<strong>WMIのリポジトリが破損</strong>していました。</p>
@@ -212,7 +212,7 @@
 <h2 id="補足：WQL-WMI-Query-Language）について"><a href="#補足：WQL-WMI-Query-Language）について" class="headerlink" title="補足：WQL (WMI Query Language）について"></a>補足：WQL (WMI Query Language）について</h2><p>最後に、WQLについて補足しておきます。</p>
 <p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/wmisdk/querying-with-wql">WQL(WMI Query Language)</a>は「SQL for WMI」と記載されることある、WMI特有の拡張機能を複数持つ構造化照会言語 (SQL) の単純化されたサブセットです。 WMIの情報を取得するには、WMIクラスのインスタンスを取得し、取得したWMIクラスの各インスタンスのプロパティから情報を取得するという流れで作業します。この操作をWQLと呼ばれるSQL文を使い取得することが可能です。<strong>SQL文の場合、通常はデータベースやテーブルを操作しますが、WQLではWMIクラスが対象</strong>となります。</p>
 <p>冒頭に出てきたイベントログでも、以下のようになっていましたね。</p>
-<figure class="highlight text"><figcaption><span>Windows-EventLog（抜粋で再掲）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Query //./root/CIMV2</span><br><span class="line">   Namespace SELECT TargetInstance FROM __InstanceCreationEvent WITHIN 10 WHERE TargetInstance ISA &#x27;Win32_Process&#x27; AND TargetInstance.Name = &#x27;lync.exe&#x27;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><figcaption><span>Windows-EventLog（抜粋で再掲）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Query //./root/CIMV2</span><br><span class="line">   Namespace SELECT TargetInstance FROM __InstanceCreationEvent WITHIN 10 WHERE TargetInstance ISA &#x27;Win32_Process&#x27; AND TargetInstance.Name = &#x27;lync.exe&#x27;</span><br></pre></td></tr></table></figure>
 
 
 <h1 id="発生していた問題への対処"><a href="#発生していた問題への対処" class="headerlink" title="発生していた問題への対処"></a>発生していた問題への対処</h1><p>ではここまでの内容を頭に置きつつ、以降は話を戻し、不調な我がPCを復帰させていきます。</p>
@@ -314,13 +314,13 @@
   <div class="widget">
     <ul class="nav featured-post-link">
       
-    <li><span>2021.06.21</span><span class="snscount">&#9825;18575</span> <a href="/articles/20210621a/" title="HTML5が2021年の1月に廃止されました。Webエンジニアとしてバリバリ活躍されてる方やエグゼクティブテックリードのような肩書きを持つ方にとっては「何をいまさら」という話題かと思います。しかしながら、今年も新人さん入ってきてくださったので、プログラミングを学習中にHTML5という文字列に悩まされないように...">どうしてHTML5が廃止されたのか</a></li>
+    <li><span>2021.06.22</span><span class="snscount">&#9825;123</span> <a href="/articles/20210622a/" title="今年のゴールデンウィーク（STAY HOME週間）に最近話題のSvelteに入門したので紹介を書きます。Svelteは主にブラウザ上で動作するユーザーインタフェースを作るフレームワークで、ReactやVue.jsの対抗馬的な存在です。">Svelteに入門した</a></li>
 
-    <li><span>2020.06.01</span><span class="snscount">&#9825;149</span> <a href="/articles/20200601/" title="Go のテストに入門してみよう！という記事です。書いた背景ですが Go の標準ライブラリのコードリーディング会で testing パッケージにチャレンジしてみましたが、難しすぎてわからん。そもそも Go のテストって何ができるんだっけ？という話になり、基本的な内容をなるべく具体例をまじえながらまとめました。">Goのテストに入門してみよう！</a></li>
+    <li><span>2021.06.18</span><span class="snscount">&#9825;454</span> <a href="/articles/20210618a/" title="AWS内の通信においてインターネットを経由しないことが最近になって公式ドキュメントに明記されたことを受け、改めてVPC Endpointの必要性について調べてみました。">AWS内の通信がインターネットを経由しない今、VPC Endpointを利用する意味はあるのか？</a></li>
 
-    <li><span>2020.06.09</span><span class="snscount">&#9825;139</span> <a href="/articles/20200609/" title="フューチャーではGraphQLの活用事例はまだ少なく、自分はまだお目にかかったことはないです。しかし、HeadlessCMS界隈を初めGraphQLのAPIを提供するサービスが増えてきました。今後もさらに需要が増えてきそうな予感がしたためGoとGraphQLを春の入門祭りのテーマにしました。学習する上でドキュメントを読み込むだけでは忘れがちです。手を動かしながらタイトルにある鉄道データ検索APIを開発していきましょう">作って学ぶGraphQL。gqlgenを用いて鉄道データ検索API開発入門</a></li>
+    <li><span>2021.06.14</span><span class="snscount">&#9825;13</span> <a href="/articles/20210614b/" title="フロントエンド記事連載の1記事目です。Vue Testing LibraryはVue.js公式のライブラリであるvue-test-utilをベースとする、DOM Testing LibraryのVue.js用拡張です。Vue Testing Libraryを用いると、Vue.js公式ライブラリであるvue-test-utilと比較して内部構造を意識せずにテストを作成できます。">Jest + TypeScript + Vue 3環境で Vue Testing Library(@testing-library／vue) を動かす</a></li>
 
-    <li><span>2021.05.20</span><span class="snscount">&#9825;103</span> <a href="/articles/20210520b/" title="過去にフューチャー発OSSのVuls開発を手伝っていましたが、現在はフューチャーで働いているわけでもなく完全に部外者です。今回は社員の澁川さんの推薦もあり、ブログの寄稿をさせて頂くことになりました。その理由の前に少し背景を説明しますが、自分はTrivyというOSSの脆弱性スキャナーのメンテナをやっていまして先日Goバイナリの脆弱性検知をする機能をリリースしました。">コンテナイメージ内の実行ファイルをupxで圧縮するべきか</a></li>
+    <li><span>2021.06.07</span><span class="snscount">&#9825;30</span> <a href="/articles/20210607a/" title="TIGの伊藤真彦です。先日AWS Certified Solutions Architect - Professionalを受験し合格できました。合格までの学習方法を共有します。">AWS Certified Solutions Architect - Professional合格体験記</a></li>
     </ul>
   </div>
   
@@ -358,7 +358,7 @@
     
       <li class=""><a href="/categories/Design/">Design (8)</a></li>
     
-      <li class=""><a href="/categories/Programming/">Programming (188)</a></li>
+      <li class=""><a href="/categories/Programming/">Programming (189)</a></li>
     
       <li class=""><a href="/categories/Management/">Management (9)</a></li>
     
