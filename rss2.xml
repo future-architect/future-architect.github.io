@@ -15,8 +15,41 @@
     <atom:link href="https://future-architect.github.io/rss2.xml" rel="self" type="application/rss+xml"/>
     
     <description>フューチャーの開発者による公式技術ブログです。業務で利用している技術を幅広く紹介します。</description>
-    <pubDate>Thu, 23 Sep 2021 06:50:17 GMT</pubDate>
+    <pubDate>Fri, 24 Sep 2021 05:55:38 GMT</pubDate>
     <generator>http://hexo.io/</generator>
+    
+    <item>
+      <title>VPC内のAmazon API Gatewayをインターネットオーバーで疎通確認する</title>
+      <link>https://future-architect.github.io/articles/20210924a/</link>
+      <guid>https://future-architect.github.io/articles/20210924a/</guid>
+      <pubDate>Thu, 23 Sep 2021 15:00:00 GMT</pubDate>
+      
+        
+        
+          
+          
+      <description>&lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h1&gt;&lt;p&gt;TIG DXユニットの真野です。AWSのAPI Gateway+Lambda</description>
+          
+        
+      
+      
+      
+      <content:encoded><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG DXユニットの真野です。AWSのAPI Gateway+Lambda という構成でWebAPI開発を行う際、ちょっと便利に使える疎通方法をまとめます。</p><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>API GatewayですがPublicなエンドポイントがあれば <code>curl</code>コマンドや<code>Postman</code>を用いての動作検証も容易だと思います。</p><p>一方でVPCエンドポイントを利用してプライベート APIとして構築されている場合は少し厄介です。そのセグメントにVPCなどで属することができればよいのですが、そのためだけに接続するのは煩わしい場面があります。踏み台サーバを作ってAWS Systems Manager(ssmコマンド）でログインするのも、開発環境でそこまでするのかという感覚がありました。また、AWS WAFなどで接続が絞られている時にはその条件を思い出す必要があり（覚えておけよって感じですが）、疎通確認すらちょっと面倒な場面があります。</p><h2 id="aws-apigateway-test-invoke-methodコマンドが便利"><a href="#aws-apigateway-test-invoke-methodコマンドが便利" class="headerlink" title="aws apigateway test-invoke-methodコマンドが便利"></a>aws apigateway test-invoke-methodコマンドが便利</h2><p>API Gatewayのマネジメントコンソールには動作確認用の<a href="https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/how-to-test-method.html">テスト呼び出し機能</a>が存在します。</p><img src="/images/20210924a/image.png" alt="マネジメントコンソールのテスト呼び出し" width="1200" height="601" loading="lazy"><p>こちらと同等の機能がawscliにも提供されています。<a href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/apigateway/test-invoke-method.html">api gateway test-invoke-method</a>コマンドです。これを利用することでマネジメントコンソール上と同等のリクエストをコマンドラインから確認できます。</p><p>つまりプライベートに構築されたAPI Gatewayに対しても、適切な権限があれば疎通確認ができるということです。</p><p>実行例を載せます。レスポンスは少し大きなJSONだったので、<code>jq</code>コマンドでフィールドを、ステータスコード・応答ヘッダ・応答ボディに絞っています。profileやrest-api-id, resoruce-idは適時読み替えてください。</p><figure class="highlight sh"><figcaption><span>test-invoke-methodの実行例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">aws apigateway --profile &lt;my_profile&gt; test-invoke-method --rest-api-id &lt;1234123412&gt; --resource-id &lt;3gapai&gt; \</span><br><span class="line">  --http-method PGET --path-with-query-string /v1/health |  jq <span class="string">&#x27;.status, .headers, .body&#x27;</span></span><br><span class="line">200</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;Content-Type&quot;</span>: <span class="string">&quot;application/json&quot;</span>,</span><br><span class="line">  <span class="string">&quot;Vary&quot;</span>: <span class="string">&quot;Accept-Encoding&quot;</span>,</span><br><span class="line">  <span class="string">&quot;X-Amzn-Trace-Id&quot;</span>: <span class="string">&quot;Root=1-67891233-abcdef012345678912345678;Sampled=0&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="string">&quot;&#123;\&quot;message\&quot;:\&quot;OK\&quot;&#125;\n&quot;</span></span><br></pre></td></tr></table></figure><p>–rest-api-id と –resource-idの取得方法は<a href="https://stackoverflow.com/questions/52446929/what-is-the-rest-api-id-and-resource-id-and-where-do-i-find-them">Stackoverflowの回答</a>がシンプルでした。こちらを参考に取得すると良いかなと思います。</p><h2 id="API-GatewayにLambdaオーソライザーが設定されている場合"><a href="#API-GatewayにLambdaオーソライザーが設定されている場合" class="headerlink" title="API GatewayにLambdaオーソライザーが設定されている場合"></a>API GatewayにLambdaオーソライザーが設定されている場合</h2><p>API GatewayでLambdaオーソライザーが設定されている構成の場合があります。オーソライザー側についてはこのブログにも<a href="https://future-architect.github.io/articles/20210610a/">AWS APIGateway Custom Authorizer入門</a>という記事がありますのでぜひ参照ください。</p><img src="/images/20210924a/オーソライザー.png" alt="API Gatewayのカスタムオーソライザーの構成図" width="575" height="251" loading="lazy"><p><a href="https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html">https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html</a></p><p>このときに、オーソライザー側で認可する場合に、後続に追加パラメータを設定する仕様で設計されていると少し考慮が必要です。というのも<code>aws apigateway test-invoke-method</code>はオーソライザー経由で実行するのではなく、直接API Gatewayにトリガーされたリソースを呼び出すからです。この場合は<code>aws apigateway test-invoke-method</code>に後続のLambdaなどが必要とする、必要なパラメータを<code>--headers</code>などで追加して呼び出すするようにしましょう。</p><p>ちなみおに、オーソライザー自体のテストもマネジメントコンソールから可能ですし、AWS CLIからも <code>apigateway test-invoke-authorizer</code>コマンドで可能です。</p><ul><li><a href="https://docs.aws.amazon.com/cli/latest/reference/apigateway/test-invoke-authorizer.html">https://docs.aws.amazon.com/cli/latest/reference/apigateway/test-invoke-authorizer.html</a></li></ul><p>私が利用したことがないため、今回は説明を割愛します。</p><h2 id="AWS-SDK-for-Goからテスト要求を呼び出してみる。"><a href="#AWS-SDK-for-Goからテスト要求を呼び出してみる。" class="headerlink" title="AWS SDK for Goからテスト要求を呼び出してみる。"></a>AWS SDK for Goからテスト要求を呼び出してみる。</h2><p>AWS SDK for Goを利用すればTest Invokeの呼び出しができます。</p><ul><li><a href="https://docs.aws.amazon.com/sdk-for-go/api/service/apigateway/#APIGateway.TestInvokeMethod">https://docs.aws.amazon.com/sdk-for-go/api/service/apigateway/#APIGateway.TestInvokeMethod</a></li></ul><p>実装例を簡単に記載します。</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line"><span class="string">&quot;fmt&quot;</span></span><br><span class="line"><span class="string">&quot;github.com/aws/aws-sdk-go/aws&quot;</span></span><br><span class="line"><span class="string">&quot;github.com/aws/aws-sdk-go/aws/session&quot;</span></span><br><span class="line"><span class="string">&quot;github.com/aws/aws-sdk-go/service/apigateway&quot;</span></span><br><span class="line"><span class="string">&quot;log&quot;</span></span><br><span class="line"><span class="string">&quot;net/http&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> apigw = apigateway.New(session.Must(session.NewSessionWithOptions(session.Options&#123;</span><br><span class="line">Profile:           <span class="string">&quot;my_profile&quot;</span>, <span class="comment">// TODO 書き換え</span></span><br><span class="line">SharedConfigState: session.SharedConfigEnable,</span><br><span class="line">&#125;,</span><br><span class="line">)))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">params := &amp;apigateway.TestInvokeMethodInput&#123;</span><br><span class="line">RestApiId:           aws.String(<span class="string">&quot;1234123412&quot;</span>), <span class="comment">// TODO 書き換え</span></span><br><span class="line">ResourceId:          aws.String(<span class="string">&quot;3gapai&quot;</span>),     <span class="comment">// TODO 書き換え</span></span><br><span class="line">HttpMethod:          aws.String(http.MethodGet),</span><br><span class="line">PathWithQueryString: aws.String(<span class="string">&quot;/v1/health&quot;</span>),</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">req, resp := apigw.TestInvokeMethodRequest(params)</span><br><span class="line"><span class="keyword">if</span> err := req.Send(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">log.Fatalf(<span class="string">&quot;test invoke: %v&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line">fmt.Printf(<span class="string">&quot;%d\n%v\n%v\n&quot;</span>, *resp.Status, aws.StringValueMap(resp.Headers), *resp.Body)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>これを実行すると、awscliコマンドで実行した結果と同等の応答を得られます。</p><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;go run sample.go</span><br><span class="line">200</span><br><span class="line">map[Content-Type:application/json Vary:Accept-Encoding X-Amzn-Trace-Id:Root=1-67891233-abcdef012345678912345678;Sampled=0]</span><br><span class="line">&#123;<span class="string">&quot;message&quot;</span>:<span class="string">&quot;OK&quot;</span>&#125;</span><br></pre></td></tr></table></figure><p>awscli側のapigateway test-invoke-methodに慣れておけば、インターフェースで悩むことはほぼ無いと思います。<br>取得結果のステータスコードや応答ボディなどは <em>int64や</em>string でポインタなので一瞬戸惑うくらいでしょうか。</p><h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>プライベートなAPI Gatewayだと開発環境の疎通レベルでも検証が面倒だと思ったときには、<code>test-invoke-method</code>コマンドを利用する選択もあるよという記事でした。</p><p>当然、AWS SDKからも呼ぶことができますので、ちょっとした疎通テストを自動化するときにも利用できるかと思います。</p>]]></content:encoded>
+      
+      
+      <category domain="https://future-architect.github.io/categories/Programming/">Programming</category>
+      
+      
+      <category domain="https://future-architect.github.io/tags/AWS/">AWS</category>
+      
+      <category domain="https://future-architect.github.io/tags/Go/">Go</category>
+      
+      <category domain="https://future-architect.github.io/tags/APIGateway/">APIGateway</category>
+      
+      
+      <comments>https://future-architect.github.io/articles/20210924a/#disqus_thread</comments>
+      
+    </item>
     
     <item>
       <title>Future Engineer Camp 2021に参加しました！</title>
@@ -664,39 +697,6 @@
       
       
       <comments>https://future-architect.github.io/articles/20210825b/#disqus_thread</comments>
-      
-    </item>
-    
-    <item>
-      <title>AWS Certified DevOps Engineer - Professional合格体験記</title>
-      <link>https://future-architect.github.io/articles/20210825a/</link>
-      <guid>https://future-architect.github.io/articles/20210825a/</guid>
-      <pubDate>Tue, 24 Aug 2021 15:00:00 GMT</pubDate>
-      
-        
-        
-          
-          
-      <description>&lt;p&gt;TIGの伊藤真彦です。&lt;/p&gt;
-&lt;p&gt;先日AWS Certified DevOps Engineer – Professionalを受験し合格できました。&lt;/p&gt;
-&lt;p&gt;これにて専門知識以外はコンプリートしました、&lt;a</description>
-          
-        
-      
-      
-      
-      <content:encoded><![CDATA[<p>TIGの伊藤真彦です。</p><p>先日AWS Certified DevOps Engineer – Professionalを受験し合格できました。</p><p>これにて専門知識以外はコンプリートしました、<a href="/articles/20200729/">Machine learning specialtyも合格している</a>ので7冠です。</p><img src="/images/20210825a/image.png" alt="合格バッチ" width="450" height="450" loading="lazy"><h1 id="AWS-Certified-DevOps-Engineer-–-Professionalとは"><a href="#AWS-Certified-DevOps-Engineer-–-Professionalとは" class="headerlink" title="AWS Certified DevOps Engineer – Professionalとは"></a>AWS Certified DevOps Engineer – Professionalとは</h1><p>その名の通りDevOpsに特化したテストで、Solutions Architect - Professionalと双璧をなすような存在です。下位資格にSysOps Administrator – AssociateとDeveloper – Associateが存在します。</p><p>ここでのAssociateはおそらく準学士のようなニュアンスだと思いますが、Professionalと名のつく資格を持つと一人前のような気持ちになるので嬉しいですね。</p><p>試験の内容自体は下記のようなテーマが問われます。</p><ul><li>運用の自動化、CI/CD</li><li>ダウンタイムやコストを考慮したデプロイ戦略</li><li>セキュリティコンプライアンス</li><li>スケーリングのベストプラクティス</li><li>モニタリング、ログ記録</li></ul><p>具体的にはAWS CloudFormation、AWS OpsWorks、AWS Elastic Beanstalkなどデプロイ、構成管理を行うサービス群や、Amazon CloudWatch、 Amazon Inspectorなど監視、運用に役立つサービスのベストプラクティスを軸に、DevOpsについて比較的難易度の高い問題が出題されます。</p><p>可用性、スケーリングに関する問題も出題され、一部はSolutions Architect - Professionalで解いた覚えのある問題も出てきました。</p><p>余談ですがデプロイ戦略としてBlue/Greenデプロイがとても推されている印象を感じました。</p><h1 id="勉強方法"><a href="#勉強方法" class="headerlink" title="勉強方法"></a>勉強方法</h1><p>今回はSAPでとても役に立った実績を信じ、<a href="https://aws.koiwaclub.com/">aws.koiwaclub.com</a>一発で臨みました。</p><p>全体的に質の高い模擬意見の内容で、５問以上はほぼそのままの問題が出てくる文句なしのクオリティでした。合格ライン750点に対し837点という安心感のある点数を取る事ができました。</p><p>Solutions Architect – Professionalと比較すると試験の難易度はやや低いものの、教材のコンテンツ量はどのサービスでも目減りしているので、事前に他の試験に合格していない人が0から合格するという観点では逆に難しいかもしれません。実際Solutions Architect – Professionalに合格しているお陰で解けた問題は多いです。</p><p>各種下位資格、Solutions Architect - Professionalを修めてから仕上げに受験するパターンで山を登っていくのが安全な印象です。</p><h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>実はDeveloper – AssociateはSolutions Architect - Professionalの後に一気に取得したのですが記事のネタにし損ねました。</p><p>先日<a href="/articles/20210818b/">AWS Certified Solutions Architect - Associate 合格体験記</a>を書いた市川さんに期待して温存しておきたいなと思います。</p><p>引き続き全冠目指して頑張ります。</p>]]></content:encoded>
-      
-      
-      <category domain="https://future-architect.github.io/categories/Infrastructure/">Infrastructure</category>
-      
-      
-      <category domain="https://future-architect.github.io/tags/AWS/">AWS</category>
-      
-      <category domain="https://future-architect.github.io/tags/%E5%90%88%E6%A0%BC%E8%A8%98/">合格記</category>
-      
-      
-      <comments>https://future-architect.github.io/articles/20210825a/#disqus_thread</comments>
       
     </item>
     
