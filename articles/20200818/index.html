@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>【入門】私を苦しめたDynamoDB | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="フューチャー夏休み自由研究連載12本目の記事です。 はじめにはじめまして。TIG DXユニットの富山です。2020年4月新卒入社です。 夏休み自由研究連載の11本目の記事で公開されたSlack×GASの日報テンプレBOTを実務に導入してみたの執筆者である仁木さんと同期です。 私が参画しているプロジェクトでは、データベースにDynamoDBを採用しています。私は、RDBMSしか使用した経験がなか">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【入門】私を苦しめたDynamoDB | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200818/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="フューチャー夏休み自由研究連載12本目の記事です。 はじめにはじめまして。TIG DXユニットの富山です。2020年4月新卒入社です。 夏休み自由研究連載の11本目の記事で公開されたSlack×GASの日報テンプレBOTを実務に導入してみたの執筆者である仁木さんと同期です。 私が参画しているプロジェクトでは、データベースにDynamoDBを採用しています。私は、RDBMSしか使用した経験がなか">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200818/top.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200818/Screen_Shot_2020-08-17_at_0.30.30.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200818/Screen_Shot_2020-08-17_at_1.45.33.png">
+<meta property="article:published_time" content="2020-08-17T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:57:18.346Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="データモデル">
+<meta property="article:tag" content="入門">
+<meta property="article:tag" content="DynamoDB">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200818/top.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20200818/">
+  <meta content="AWS,データモデル,入門,DynamoDB" name="keywords">
+  <meta content="富山龍之介" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">【入門】私を苦しめたDynamoDB
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20200818_【入門】私を苦しめたDynamoDB.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20200818_【入門】私を苦しめたDynamoDB" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E5%AF%8C%E5%B1%B1%E9%BE%8D%E4%B9%8B%E4%BB%8B">富山龍之介</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2020/"><time datetime="2020-08-17T15:00:00.000Z" itemprop="datePublished">2020.08.18</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ">AWS</a>
+  
+    
+    <a href="/tags/データモデル/" title="データモデルタグの記事へ">データモデル</a>
+  
+    
+    <a href="/tags/入門/" title="入門タグの記事へ">入門</a>
+  
+    
+    <a href="/tags/DynamoDB/" title="DynamoDBタグの記事へ">DynamoDB</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20200818/top.png" alt="" class="img-middle-size" loading="lazy">
+
+<p><a href="/articles/20200726/">フューチャー夏休み自由研究連載</a>12本目の記事です。</p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>はじめまして。TIG DXユニットの富山です。2020年4月新卒入社です。</p>
+<p>夏休み自由研究連載の11本目の記事で公開された<a href="/articles/20200817/">Slack×GASの日報テンプレBOTを実務に導入してみた</a>の執筆者である仁木さんと同期です。</p>
+<p>私が参画しているプロジェクトでは、データベースにDynamoDBを採用しています。私は、RDBMSしか使用した経験がなかったので、NoSQLであるDynamoDBの理解にとても苦しみました。そこで今回の夏休み自由研究では理解した内容をまとめてみたいと思います！</p>
+<h1 id="つまったポイントサマリ―"><a href="#つまったポイントサマリ―" class="headerlink" title="つまったポイントサマリ―"></a>つまったポイントサマリ―</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- DB = RDBMSという固定概念を取り除くこと</span><br><span class="line">- KVS(NoSQL)の概念の理解</span><br><span class="line">- CRUD操作（特にR）</span><br></pre></td></tr></table></figure>
+
+<p>これらが理解できるような記事を目指します。</p>
+<h1 id="DynamoDBとは"><a href="#DynamoDBとは" class="headerlink" title="DynamoDBとは"></a>DynamoDBとは</h1><p><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/dynamodb/">公式ドキュメント</a>によると、</p>
+<blockquote>
+<p>Amazon DynamoDB は、規模に関係なく数ミリ秒台のパフォーマンスを実現する、key-value およびドキュメントデータベースです。完全マネージド型マルチリージョン、マルチマスターで耐久性があるデータベースで、セキュリティ、バックアップおよび復元と、インターネット規模のアプリケーション用のメモリ内キャッシュが組み込まれています。DynamoDB は、1 日に 10 兆件以上のリクエストを処理することができ、毎秒 2,000 万件を超えるリクエストをサポートします。</p>
+</blockquote>
+<p>とのことです。とりあえずすごいと言うことはわかりました。<br>ざっくりと、AWSが提供するkey-value型のハイパフォーマンスNoSQLフルマネージドサービスです。</p>
+<h1 id="NoSQLとは"><a href="#NoSQLとは" class="headerlink" title="NoSQLとは"></a>NoSQLとは</h1><p>そもそもNoSQLとは何者でしょうか。次世代的な響きがしてカッコいいですよね。<br>わたしはDynamoDBを触り始める以前、Yes/NoのNoSQLだと思っていましたが、 <code>Not Only SQL</code> の略称です。NoSQLについてWikipediaから冒頭の説明文を引用してみましょう。</p>
+<blockquote>
+<p>NoSQL（一般に “Not only SQL” と解釈される）とは、関係データベース管理システム (RDBMS) 以外のデータベース管理システムを指すおおまかな分類語である。関係データベースを杓子定規に適用してきた長い歴史を打破し、それ以外の構造のデータベースの利用・発展を促進させようとする運動の標語としての意味合いを持つ。</p>
+</blockquote>
+<p>つまり、RDBMS以外のDBシステムを指す大まかな定義の単語のようです。<br>一口にNoSQLといってもデータ形式の格納方式の違いで様々なタイプのNoSQLが存在します。大きくは下記3つに分類されます。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. KVS (Key-Value-Store)</span><br><span class="line">2. ドキュメントDB</span><br><span class="line">3. グラフDB</span><br></pre></td></tr></table></figure>
+
+<p>DynamoDBは<code>KVS</code>のNoSQLに該当します。</p>
+<h1 id="RDBMSとの志向の違い"><a href="#RDBMSとの志向の違い" class="headerlink" title="RDBMSとの志向の違い"></a>RDBMSとの志向の違い</h1><p>RDBMSとNoSQLは異なる志向を持ちます。RDBMSはACID（Atomicity、Consistency、Isolation、Durability）という特性で語られます。ざっくりと、トランザクションにおいて持つべき4つの特性（原子性/一貫性/独立性/永続性）を表現したものです。</p>
+<p>それに対して、NoSQLはBASE（Basically Available、Soft-State、Eventual Consistency）特性という特徴で語られます。<br>ざっくりと、<strong>「基本的には常に利用可能で、常に整合性を保っている必要はなく、一時的に一貫性のない状態を許容して、結果的には整合性が取れている状態に至る」</strong> というものです。ACIDとは対照的に、可用性や性能を重視した分散システムの特性です。</p>
+<p>ということは、「DynamoDBでトランザクション制御はできないの？」とお考えの方もいらっしゃると思います。後述します。</p>
+<p>余談ですが、ACID(酸）に対して、BASE(塩基）とはめちゃくちゃイケてるネーミングですね。</p>
+<h1 id="DynamoDBの特徴"><a href="#DynamoDBの特徴" class="headerlink" title="DynamoDBの特徴"></a>DynamoDBの特徴</h1><h3 id="高可用性"><a href="#高可用性" class="headerlink" title="高可用性"></a>高可用性</h3><p>DynamoDBでは高可用性を重視しています。具体的には3つのAZ(Availability Zone)でレプリケーションを持っています。そのためAZに問題が起きても、他のAZが機能するため耐久性・信頼性が担保されています。</p>
+<h3 id="フルマネージド"><a href="#フルマネージド" class="headerlink" title="フルマネージド"></a>フルマネージド</h3><p>データ容量の増加に応じたディスクやノードの増設作業をはじめ、メンテナンスが不要です。テーブルを自動的にスケールアップ/ダウンして容量を調整し、パフォーマンスを維持してくれます。</p>
+<h3 id="SQLクエリを直接はサポートしていない"><a href="#SQLクエリを直接はサポートしていない" class="headerlink" title="SQLクエリを直接はサポートしていない"></a>SQLクエリを直接はサポートしていない</h3><p>NoSQLとだけあってSQLを直接サポートされていません。そのためテーブルの結合も行えません。（<a target="_blank" rel="noopener" href="https://qiita.com/hieki/items/8899378dd76f97697100">DQLなど、SQLライクに書けるラッパー</a>は存在します。）<br>シンプルなCRUDに対しては非常に有効ですが、複雑なものが不得意なのかもしれません。</p>
+<h1 id="DynamoDBを触る上で抑えておくべきポイント"><a href="#DynamoDBを触る上で抑えておくべきポイント" class="headerlink" title="DynamoDBを触る上で抑えておくべきポイント"></a>DynamoDBを触る上で抑えておくべきポイント</h1><p>下記のテーブル構造を例に説明していきます。ペットショップのペット管理用DBです。（笑）<br><img src="/images/20200818/Screen_Shot_2020-08-17_at_0.30.30.png" alt="テーブル表" loading="lazy"></p>
+<h2 id="主要概念"><a href="#主要概念" class="headerlink" title="主要概念"></a>主要概念</h2><p>DynamoDBには、いくつかの独自概念が登場します。<br>イメージ的に、RDBMSの既存概念と似ているものがあるので表にしてみました。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>DynamoDB</th>
+<th>RDBMS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Table</td>
+<td>Table</td>
+</tr>
+<tr>
+<td>Item</td>
+<td>Row</td>
+</tr>
+<tr>
+<td>Attributes</td>
+<td>Column</td>
+</tr>
+<tr>
+<td>Partition Key</td>
+<td>Primary Key</td>
+</tr>
+<tr>
+<td>Sort Key</td>
+<td>指定する場合はPrimary Keyを構成する一部になる</td>
+</tr>
+</tbody></table></div>
+<p>今回の例だと、このようになります。<br><img src="/images/20200818/Screen_Shot_2020-08-17_at_1.45.33.png" alt="キーの概念図" loading="lazy"></p>
+<p>ポイントとして、Itemは正規化の必要が無い点です。つまり異なるItemで同名のAttributeを持つ必要はありません。また、 <code>detail</code> のようにAttributeにネストしたデータ構造を持たせることも可能です。</p>
+<p>Table、Item、Attributeに関してはある程度理解が出来ると思います。</p>
+<h3 id="パーティションキーとソートキー"><a href="#パーティションキーとソートキー" class="headerlink" title="パーティションキーとソートキー"></a>パーティションキーとソートキー</h3><p>DynamoDBを触る上で絶対に抑えて置かなければならない概念に、パーティションキー（別称：ハッシュキー）とソートキー（別称：レンジキー）が挙げられます。<br>パーティションーキー、もしくはパーティションキーとソートキーによってユニークなItemを表現します。<br>DynamoDBでは、Itemを内部的にパーティションごとに分散して保持しています。パーティションキーは内部的にハッシュ関数が実行され、ハッシュ文字列が生成されます。生成されたハッシュ文字列をもとに、Itemの格納場所が決まります。そのためパーティションキーは必須です。<br>ソートキーでは範囲指定やソートが可能です。（ <code>shop_id</code> をソートキーにするべきかは見逃してください）そのため、ソートキー以外のAttributeでのOrder byは不可能です。ソートキーの設定は必須ではありません。</p>
+<h3 id="Secondary-Index"><a href="#Secondary-Index" class="headerlink" title="Secondary Index"></a>Secondary Index</h3><p>先程パーティションキーとソートキーについて説明をしましたが、Secondary Indexはプライマリキー以外の属性を使用する際に登場する概念です。<br>Secondary Indexには、<code>LSI</code>と<code>GSI</code>という2つの概念が存在します。</p>
+<h4 id="LSI"><a href="#LSI" class="headerlink" title="LSI"></a>LSI</h4><p><code>Local Secondary Index</code> の頭文字を取っています。LSIは、ソートキー以外での絞り込みを行うキーを設定できるものです。<br>例でいうと、<code>birth</code> をLSIに設定した場合、 <code>pet_id</code> + <code>birth</code> のような検索ができるようになります。<br>注意点として、LSIは既存のテーブルに追加・削除はできません。テーブル作成時に定義するようにしましょう。</p>
+<h4 id="GSI"><a href="#GSI" class="headerlink" title="GSI"></a>GSI</h4><p><code>Grobal Secondary Index</code> の頭文字を取っています。GSIは、パーティションキーを別途設定できるものです。<br>例でいうと、<code>kind</code>でdogのItemを取得したい際に、 <code>kind</code>をGSIに設定することで検索が容易にできるようになります。<br>LSIと異なり、既存のテーブルに追加・削除できます。<br>しかし、GSIを1つ定義すると、テーブルが1つ増えるのと同等のコスト増しになります。</p>
+<h2 id="DynamoDBでトランザクション制御は可能なのか"><a href="#DynamoDBでトランザクション制御は可能なのか" class="headerlink" title="DynamoDBでトランザクション制御は可能なのか"></a>DynamoDBでトランザクション制御は可能なのか</h2><p>可能です。詳細については<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/transaction-apis.html">公式Docs</a>をご参照ください。<br>単一のAWSアカウントおよび領域内の複数のテーブルにわたって、ACIDを提供しています。<br>ここではDynamoDBにおけるトランザクション制御の特徴を挙げます。</p>
+<h4 id="DynamoDBにおけるトランザクション制御についての特徴"><a href="#DynamoDBにおけるトランザクション制御についての特徴" class="headerlink" title="DynamoDBにおけるトランザクション制御についての特徴"></a>DynamoDBにおけるトランザクション制御についての特徴</h4><ul>
+<li>複数テーブルに対して制御できる</li>
+<li>トランザクションに含められるのは25件まで(記事執筆時点(2020/08/17))</li>
+<li>テーブルのロックはされない<ul>
+<li>もし、トランザクション中に他操作が入った場合、トランザクションは中止されて例外が返ってきます。</li>
+</ul>
+</li>
+<li>同一Itemに対して操作はできない</li>
+<li>全ての商用リージョンで利用可能</li>
+</ul>
+<h2 id="プログラムからどのように触るのか"><a href="#プログラムからどのように触るのか" class="headerlink" title="プログラムからどのように触るのか"></a>プログラムからどのように触るのか</h2><p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/CodeSamples.html">aws-sdk</a>が公開されています。主要なサーバサイドの言語はサポートされているのではないでしょうか。</p>
+<p>FutureのDXユニットではGoを積極的に使う文化があります。私もGopherの仲間入りを果たしました。<br>もちろん<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/sdk-for-go/">Goのsdk</a>も公開されています。また、ラッパーされたライブラリもいくつかあります。<br>詳しくは私の先輩方の最高に分かりやすい記事をご覧いただければと思います。CRUD操作のサンプルコードが書かれており、大変参考になります。<br><a href="/articles/20200225/">DynamoDB×Go連載#1 GoでDynamoDBでおなじみのguregu/dynamoを利用する</a><br><a href="/articles/20200227/">DynamoDB×Go連載#2 AWS SDKによるDynamoDBの基本操作</a></p>
+<h2 id="よく触るItem操作まとめ"><a href="#よく触るItem操作まとめ" class="headerlink" title="よく触るItem操作まとめ"></a>よく触るItem操作まとめ</h2><p>私的によく触るItemの操作APIをまとめます。<br>様々な操作APIが存在するので、どのAPIを使用すると何が出来るのかを把握するのに苦戦しました。</p>
+<h4 id="読み込み"><a href="#読み込み" class="headerlink" title="読み込み"></a>読み込み</h4><div class="scroll"><table>
+<thead>
+<tr>
+<th>API</th>
+<th>できること</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GetItem</td>
+<td>ユニークキーを指定してデータが１つ取得</td>
+</tr>
+<tr>
+<td>TransactGetItems</td>
+<td>トランザクションにて最大25件取得</td>
+</tr>
+<tr>
+<td>BatchGetItem</td>
+<td>最大100アイテム (ただし、16MBを超えないアイテム数) を並列で取得</td>
+</tr>
+<tr>
+<td>Query</td>
+<td>特定のパーティションキーがあるすべての項目を取得</td>
+</tr>
+<tr>
+<td>Scan</td>
+<td>すべての項目(1度の操作で最大1MB。それを超えたらLastEvaluatedKeyを指定して再読み取りが必要)のデータを取得。（<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Scan.html">filter式あり</a>）</td>
+</tr>
+</tbody></table></div>
+<h4 id="書き込み"><a href="#書き込み" class="headerlink" title="書き込み"></a>書き込み</h4><div class="scroll"><table>
+<thead>
+<tr>
+<th>API</th>
+<th>できること</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PutItem</td>
+<td>Itemの登録</td>
+</tr>
+<tr>
+<td>Update</td>
+<td>Itemの更新</td>
+</tr>
+<tr>
+<td>TransactWriteItems</td>
+<td>トランザクションにてCreate, Update, Delete制御</td>
+</tr>
+<tr>
+<td>BatchWriteItem</td>
+<td>最大25件のバッチ処理(入力/削除)。(最大1MB)</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td>Itemの削除</td>
+</tr>
+</tbody></table></div>
+<h2 id="DynamoDBを触るうえでの注意点"><a href="#DynamoDBを触るうえでの注意点" class="headerlink" title="DynamoDBを触るうえでの注意点"></a>DynamoDBを触るうえでの注意点</h2><p>最後に、実際に触ってみて「独特だなぁ」と感じた部分について記載します。</p>
+<ul>
+<li>パーティションキーやソートキーに空文字は入れられない</li>
+<li>タイムスタンプの概念が存在しないので、文字列での登録が必要（日付型自体はサポートされています。ソートキーとして定義した場合、日付のソート等は可能です。詳しいデータ型に関しては<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/DynamoDBMapper.DataTypes.html">こちら</a>をご参照ください。）</li>
+<li>テーブルの結合ができない</li>
+<li>基本的にAPI経由で触る</li>
+<li>AWSのクレデンシャル情報で認証</li>
+</ul>
+<h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>今回は自由研究ということで、DynamoDB未経験だった私が詰まったポイントを踏まえ入門編としてまとめてみました。<br>個人的な感想として、DynamoDBはキー設計がとても重要だと感じました。今後、もっと踏み込んだ記事も執筆していけたらと思います！</p>
+<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/dynamodb/">AWS DynamoDB公式Docs</a><br><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=16RYHfe89WY">Amazon DynamoDB Deep Dive | AWS Summit Tokyo 2019</a><br><a target="_blank" rel="noopener" href="https://www.slideshare.net/AmazonWebServicesJapan/20150805-aws-blackbeltdynamodb?next_slideshow=1">AWS Black Belt Tech シリーズ 2015 - Amazon DynamoDB</a><br><a target="_blank" rel="noopener" href="https://masawan-guitar.hatenablog.com/entry/2016/08/14/163447">「RDBMS」と「NoSQL」の比較</a><br><a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/NoSQL">NoSQL wikipedia</a><br><a target="_blank" rel="noopener" href="https://dev.classmethod.jp/articles/amazon-dynamodb-comparison-with-rds/">コンセプトから学ぶAmazon DynamoDB【Amazon RDSとの比較篇】</a></p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200818/&via=future_techblog&related=twitterapi%2Ctwitter&text=%E3%80%90%E5%85%A5%E9%96%80%E3%80%91%E7%A7%81%E3%82%92%E8%8B%A6%E3%81%97%E3%82%81%E3%81%9FDynamoDB" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200818/&t=%E3%80%90%E5%85%A5%E9%96%80%E3%80%91%E7%A7%81%E3%82%92%E8%8B%A6%E3%81%97%E3%82%81%E3%81%9FDynamoDB" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200818/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">9</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200818/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">27</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;541</span><a class="related-posts-link" href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2021.04.03</span><span class="snscount">&#9825;7</span><a class="related-posts-link" href=/articles/20210403/ title="DynamoDBを頻繁に利用しており、連日DynamoDBコンソール画面と睨めっこをしています。DynamoDBのコンソール画面は特定のデータをピンポイントで探すには優秀ですが、データ集計には全く向いていません。">DynamoDBをS3へExportして、Glue+AthenaでSQLを実行する</a></li><li class="related-posts-item"><span>2021.02.25</span><span class="snscount">&#9825;9</span><a class="related-posts-link" href=/articles/20210225/ title="こんにちは。TIG DXユニット所属の村上です。最近データ分析絡みでDynamoDBを触る機会が多く、DynamoDBが体の一部みたいになってきました。本記事の結論はこれです。">DynamoDBから効率的に大量のデータを取得する方法</a></li><li class="related-posts-item"><span>2021.02.15</span><span class="snscount">&#9825;16</span><a class="related-posts-link" href=/articles/20210215/ title="私はプロジェクトでシステムテスト、場合によっては本番稼働で起きる性能問題についてSQLチューニングを行ってきました。皆さんの中で、SQLチューニングは「専門的な知識」が必要とか「高レベルなスキル」を要求されると思っている方が居るかも？っと思い、このネタを扱いました。">登が教えるSQL基礎</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.05.25</span><span class="snscount">&#9825;185</span> <a href="/articles/20210525a/" title="Goで構造体を設計する場合、オブジェクト指向的な「型ごとの責務の分担」以外に、「どのように使われるものか」を考える必要があります。 ポインタで扱うのか？値として扱うのか？両方許可するのか？値として扱える場合にimmutable（変更不可能）なオブジェクトとするのか...">Goの構造体の使われ方の設計</a></li>
+
+    <li><span>2021.05.18</span><span class="snscount">&#9825;469</span> <a href="/articles/20210518a/" title="RESTfullとかRESTishな方針でWebAPIの横断検索を設計する際にチーム内で方針について議論したやり取りの備忘記事です。">HTTP検索条件、GETにするか？POSTにするか？</a></li>
+
+    <li><span>2021.05.12</span><span class="snscount">&#9825;100</span> <a href="/articles/20210512a/" title="Flutter連載の3本目はFlutter Webを紹介します。Flutter 2になって、Web向けに出力する機能もStableになりました。Flutter for Webは標準のHTMLにするHTMLレンダラーと、CanvasKitレンダラーと2種類あります。後者はSkiaという2DグラフィックスのライブラリをWebAssembly化したものを使います。Skiaは...">Goのサーバーの管理画面をFlutter Webで作ってみるための調査</a></li>
+
+    <li><span>2021.05.11</span><span class="snscount">&#9825;78</span> <a href="/articles/20210511a/" title="TIGの玉木です。去年の12月までは主に機械学習エンジニアとして機械学習案件を任されていましたが、今年の1月からはITコンサルタントとして業務の幅が広くなりいろいろやっています。先月技育祭と呼ばれるイベントの勉強会という枠で、同僚の上野さんと一緒に「初心者必見！機械学習エンジニアがあれこれ話します。〜基礎から実社会応用まで〜」というタイトルで発表しました。">技育祭登壇しました。これから機械学習を学びたい方向けへの自分の経験談とおすすめの本、サイトの紹介もします</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%A4%E3%81%BE%E3%81%A3%E3%81%9F%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88%E3%82%B5%E3%83%9E%E3%83%AA%E2%80%95"><span class="toc-text">つまったポイントサマリ―</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#DynamoDB%E3%81%A8%E3%81%AF"><span class="toc-text">DynamoDBとは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#NoSQL%E3%81%A8%E3%81%AF"><span class="toc-text">NoSQLとは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#RDBMS%E3%81%A8%E3%81%AE%E5%BF%97%E5%90%91%E3%81%AE%E9%81%95%E3%81%84"><span class="toc-text">RDBMSとの志向の違い</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#DynamoDB%E3%81%AE%E7%89%B9%E5%BE%B4"><span class="toc-text">DynamoDBの特徴</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AB%98%E5%8F%AF%E7%94%A8%E6%80%A7"><span class="toc-text">高可用性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%95%E3%83%AB%E3%83%9E%E3%83%8D%E3%83%BC%E3%82%B8%E3%83%89"><span class="toc-text">フルマネージド</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SQL%E3%82%AF%E3%82%A8%E3%83%AA%E3%82%92%E7%9B%B4%E6%8E%A5%E3%81%AF%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%E3%81%97%E3%81%A6%E3%81%84%E3%81%AA%E3%81%84"><span class="toc-text">SQLクエリを直接はサポートしていない</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#DynamoDB%E3%82%92%E8%A7%A6%E3%82%8B%E4%B8%8A%E3%81%A7%E6%8A%91%E3%81%88%E3%81%A6%E3%81%8A%E3%81%8F%E3%81%B9%E3%81%8D%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88"><span class="toc-text">DynamoDBを触る上で抑えておくべきポイント</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E6%A6%82%E5%BF%B5"><span class="toc-text">主要概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%91%E3%83%BC%E3%83%86%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%AD%E3%83%BC%E3%81%A8%E3%82%BD%E3%83%BC%E3%83%88%E3%82%AD%E3%83%BC"><span class="toc-text">パーティションキーとソートキー</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Secondary-Index"><span class="toc-text">Secondary Index</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#LSI"><span class="toc-text">LSI</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#GSI"><span class="toc-text">GSI</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DynamoDB%E3%81%A7%E3%83%88%E3%83%A9%E3%83%B3%E3%82%B6%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E5%88%B6%E5%BE%A1%E3%81%AF%E5%8F%AF%E8%83%BD%E3%81%AA%E3%81%AE%E3%81%8B"><span class="toc-text">DynamoDBでトランザクション制御は可能なのか</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#DynamoDB%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E3%83%88%E3%83%A9%E3%83%B3%E3%82%B6%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E5%88%B6%E5%BE%A1%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%E3%81%AE%E7%89%B9%E5%BE%B4"><span class="toc-text">DynamoDBにおけるトランザクション制御についての特徴</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0%E3%81%8B%E3%82%89%E3%81%A9%E3%81%AE%E3%82%88%E3%81%86%E3%81%AB%E8%A7%A6%E3%82%8B%E3%81%AE%E3%81%8B"><span class="toc-text">プログラムからどのように触るのか</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%88%E3%81%8F%E8%A7%A6%E3%82%8BItem%E6%93%8D%E4%BD%9C%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">よく触るItem操作まとめ</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AA%AD%E3%81%BF%E8%BE%BC%E3%81%BF"><span class="toc-text">読み込み</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9B%B8%E3%81%8D%E8%BE%BC%E3%81%BF"><span class="toc-text">書き込み</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DynamoDB%E3%82%92%E8%A7%A6%E3%82%8B%E3%81%86%E3%81%88%E3%81%A7%E3%81%AE%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="toc-text">DynamoDBを触るうえでの注意点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="toc-text">参考文献</span></a></li></ol></li></ol></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>

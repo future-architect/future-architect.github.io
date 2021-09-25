@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Serverless連載1: SAMを使ったローカルテスト（Go編） | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="サーバレス連載 の第1弾です。 はじめにこんにちは、TIG&#x2F;DXチームの栗田です。AWSのLambdaに代表されるサーバレスアプリは実行時のみ稼働するため、サーバー稼働によるあらゆるコストから解放され、システム開発の工数を減らすことができます。例えば何らかのAPIを提供する場合でも、API GatewayとLambdaを組み合わせることで提供可能です。 一方で、サーバーレスアプリを開発するとき、ロ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Serverless連載1: SAMを使ったローカルテスト（Go編） | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200323/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="サーバレス連載 の第1弾です。 はじめにこんにちは、TIG&#x2F;DXチームの栗田です。AWSのLambdaに代表されるサーバレスアプリは実行時のみ稼働するため、サーバー稼働によるあらゆるコストから解放され、システム開発の工数を減らすことができます。例えば何らかのAPIを提供する場合でも、API GatewayとLambdaを組み合わせることで提供可能です。 一方で、サーバーレスアプリを開発するとき、ロ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200323/photo_20200323_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200323/photo_20200323_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200323/photo_20200323_03.png">
+<meta property="article:published_time" content="2020-03-23T00:56:50.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:53:55.711Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="DynamoDB">
+<meta property="article:tag" content="Serverless">
+<meta property="article:tag" content="Lambda">
+<meta property="article:tag" content="SAM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200323/photo_20200323_01.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20200323/">
+  <meta content="AWS,Go,DynamoDB,Serverless,Lambda,SAM" name="keywords">
+  <meta content="栗田真" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">Serverless連載1: SAMを使ったローカルテスト（Go編）
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20200323-aws-sam.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20200323-aws-sam" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E6%A0%97%E7%94%B0%E7%9C%9F">栗田真</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2020/"><time datetime="2020-03-23T00:56:50.000Z" itemprop="datePublished">2020.03.23</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ">AWS</a>
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ">Go言語</a>
+  
+    
+    <a href="/tags/DynamoDB/" title="DynamoDBタグの記事へ">DynamoDB</a>
+  
+    
+    <a href="/tags/Serverless/" title="Serverlessタグの記事へ">Serverless</a>
+  
+    
+    <a href="/tags/Lambda/" title="Lambdaタグの記事へ">Lambda</a>
+  
+    
+    <a href="/tags/SAM/" title="SAMタグの記事へ">SAM</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p><a href="/articles/20200322/">サーバレス連載</a> の第1弾です。</p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIG/DXチームの栗田です。AWSのLambdaに代表されるサーバレスアプリは実行時のみ稼働するため、サーバー稼働によるあらゆるコストから解放され、システム開発の工数を減らすことができます。例えば何らかのAPIを提供する場合でも、API GatewayとLambdaを組み合わせることで提供可能です。</p>
+<p>一方で、サーバーレスアプリを開発するとき、ローカルでのテストが課題となります。例えばLambda + DynamoDBであれば、<a href="/tags/DynamoDB%C3%97Go/">先の連載</a>の手法を参考に、テストコードを書くことで解決します。一方で…</p>
+<ul>
+<li>API GatewayからLambdaの着火もテストした上でDynamoDBまで書き込ませたい</li>
+<li>なんならAPI Gaweway自体もLambdaで叩きたい</li>
+</ul>
+<p>となると、少々ハードルがあがります。この問題を解決してくれるのが、<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/what-is-sam.html">AWS Serverless Application Model(AWS SAM)</a>です。SAMはローカルにLambda実行用のdockerを立ち上げ、<code>127.0.0.1:3000</code>を叩くと指定した実行ファイルをdocker上で動作させることができるツールです。今回はSAMを使って API Gateway + Lambda (Go) + DynamoDBのローカルテストをする手法を紹介します。</p>
+<p>なお、今回ターゲットとする構成は、Lambda→AWS Gateway→Lambda→DynamoDBのような構成です。例えばKinesisやS3から非同期な入力をトリガーにLambdaを着火し、特定のAPIを叩くようなケースです。便宜上、API Gatewayを叩くのをLambda A、API Gatewayから呼び出されるのをLambda Bとします。</p>
+<img src="/images/20200323/photo_20200323_01.png" class="img-middle-size" loading="lazy">
+
+<p>これをSAMとDynamoDB localを使ってテストしますが、想定する最終的なテスト環境としては以下のような形になります。青で示した<code>lambda_b.go</code>から127.0.0.1:8000を叩くのが、前述した<a href="/tags/DynamoDB%C3%97Go/">先の連載</a>の手法です。<code>lambda_a.go</code>から<code>127.0.0.1:3000</code>を叩くのもGoから特定のAPIを叩く処理になるので、ここでは割愛します。つまり、今回記述するのは<code>127.0.0.1:3000</code>を叩いたらLambdaが着火し、DynamoDBに書き込むまでの部分になります。</p>
+<img src="/images/20200323/photo_20200323_02.png" class="img-middle-size" loading="lazy">
+
+
+<h1 id="環境とターゲット"><a href="#環境とターゲット" class="headerlink" title="環境とターゲット"></a>環境とターゲット</h1><p>今回は、下記の環境で動かしました。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="left">項目</th>
+<th align="left">バージョン等</th>
+<th align="left">入手方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">OS</td>
+<td align="left">macOS Mojave 10.15.5</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">awscli</td>
+<td align="left">1.16.209</td>
+<td align="left"><code>$ pip install awscli</code>。テストだけなら無くても動くかも。</td>
+</tr>
+<tr>
+<td align="left">aws-sam-cli</td>
+<td align="left">0.43.0</td>
+<td align="left"><code>$ pip install aws-sam-cli</code></td>
+</tr>
+<tr>
+<td align="left">Docker</td>
+<td align="left">19.03.5 build 633a0ea</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">go</td>
+<td align="left">1.13.5</td>
+<td align="left"></td>
+</tr>
+</tbody></table></div>
+<p>WebAPIのリターンとして、下記を期待することにします。（ただし処理はベタ書きです）</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">&quot;Company&quot;</span>: <span class="string">&quot;Future&quot;</span>, <span class="attr">&quot;Year&quot;</span>: <span class="string">&quot;1989&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="構築"><a href="#構築" class="headerlink" title="構築"></a>構築</h1><h2 id="ディレクトリ構成"><a href="#ディレクトリ構成" class="headerlink" title="ディレクトリ構成"></a>ディレクトリ構成</h2><p>次のような構成とします。最初に宣言したとおり、今回APIを叩くLambdaについては触れません。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">apigw</span><br><span class="line">  ├─Makefile</span><br><span class="line">  ├─lambdab</span><br><span class="line">  |   ├─lambdab.go          <span class="comment"># APIから呼ばれるLambdaのコード</span></span><br><span class="line">  |   └─lambdab_test.go     <span class="comment"># テストコード</span></span><br><span class="line">  ├─template.yaml</span><br><span class="line">  └─testdata</span><br><span class="line">      └─db_table.json       <span class="comment"># DBテーブル作成用のコード</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="AWS-SAMプロジェクトの用意"><a href="#AWS-SAMプロジェクトの用意" class="headerlink" title="AWS SAMプロジェクトの用意"></a>AWS SAMプロジェクトの用意</h2><p>SAMのコマンドを使用して、Templatesを用意します。独自のテンプレートを用意してくることも可能ですが、今回は簡単かつシンプルにということでAWS Quick Start Templatesを使用します。<br>先の構成のディレクトリ内で、作業を進めます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">$ sam init --runtime go1.x --name apigw</span><br><span class="line">Which template <span class="built_in">source</span> would you like to use?</span><br><span class="line">        1 - AWS Quick Start Templates</span><br><span class="line">        2 - Custom Template Location</span><br><span class="line">Choice: 1</span><br><span class="line"></span><br><span class="line">Cloning app templates from https://github.com/awslabs/aws-sam-cli-app-templates.git</span><br><span class="line"></span><br><span class="line">-----------------------</span><br><span class="line">Generating application:</span><br><span class="line">-----------------------</span><br><span class="line">Name: apigw</span><br><span class="line">Runtime: go1.x</span><br><span class="line">Dependency Manager: mod</span><br><span class="line">Application Template: hello-world</span><br><span class="line">Output Directory: .</span><br><span class="line"></span><br><span class="line">Next steps can be found <span class="keyword">in</span> the README file at ./apigw/README.md</span><br><span class="line">$ ls</span><br><span class="line">apigw</span><br><span class="line">$ ls apigw/</span><br><span class="line">Makefile      README.md     hello-world   template.yaml</span><br><span class="line">$ ls apigw/hello-world/</span><br><span class="line">go.mod       main.go      main_test.go</span><br></pre></td></tr></table></figure>
+
+<p>色々とできましたが、同梱されているREADME.mdに必要なことは記載してあります。そこから抜粋しますが、例えばファイル構造は以下のようになっています。</p>
+<figure class="highlight bash"><figcaption><span>README.md（抜粋）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">（前略）</span><br><span class="line">.</span><br><span class="line">├── Makefile                    <span class="comment"># &lt;-- Make to automate build</span></span><br><span class="line">├── README.md                   <span class="comment"># &lt;-- This instructions file</span></span><br><span class="line">├── hello-world                 <span class="comment"># &lt;-- Source code for a lambda function</span></span><br><span class="line">│   ├── main.go                 <span class="comment"># &lt;-- Lambda function code</span></span><br><span class="line">│   └── main_test.go            <span class="comment"># &lt;-- Unit tests</span></span><br><span class="line">└── template.yaml</span><br><span class="line">（以下略）</span><br></pre></td></tr></table></figure>
+
+<h2 id="Lambda（Go）の記述"><a href="#Lambda（Go）の記述" class="headerlink" title="Lambda（Go）の記述"></a>Lambda（Go）の記述</h2><p>最初に必要なパッケージをインストールします。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ go get -u github.com/aws/aws-lambda-go/lambda</span><br><span class="line">$ go get -u github.com/aws/aws-lambda-go/events</span><br></pre></td></tr></table></figure>
+
+<p>続いて、必要なパス構成にしていきます。<br><code>sam init</code>で自動生成された実行ファイルは<code>hello-world</code>以下に入っています。<br>せっかくなので、これをオリジナルな名前にします。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> apigw</span><br><span class="line">$ mv hello-world lambdab</span><br></pre></td></tr></table></figure>
+
+<p>パス構造が変わったので、<code>Makefile</code>と<code>template.yaml</code>に変更を加えます。</p>
+<figure class="highlight plaintext"><figcaption><span>Makefile</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">PHONY: deps clean build</span><br><span class="line"></span><br><span class="line">deps:</span><br><span class="line">	go get -u ./...</span><br><span class="line"></span><br><span class="line">clean:</span><br><span class="line">	rm -rf ./lambdab/lambdab # 変更</span><br><span class="line"></span><br><span class="line">build:</span><br><span class="line">	GOOS=linux GOARCH=amd64 go build -o lambdab/lambdab ./lambdab/main.go # 変更</span><br></pre></td></tr></table></figure>
+
+<p><code>template.yaml</code>への変更において、</p>
+<figure class="highlight yaml"><figcaption><span>template.yaml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">AWSTemplateFormatVersion:</span> <span class="string">&#x27;2010-09-09&#x27;</span></span><br><span class="line"><span class="attr">Transform:</span> <span class="string">AWS::Serverless-2016-10-31</span></span><br><span class="line"><span class="attr">Description:</span> <span class="string">&gt;</span></span><br><span class="line"><span class="string">  apigw</span></span><br><span class="line"><span class="string"></span></span><br><span class="line">  <span class="string">Sample</span> <span class="string">SAM</span> <span class="string">Template</span> <span class="string">for</span> <span class="string">apigw</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst</span></span><br><span class="line"><span class="attr">Globals:</span></span><br><span class="line">  <span class="attr">Function:</span></span><br><span class="line">    <span class="attr">Timeout:</span> <span class="number">5</span></span><br><span class="line"></span><br><span class="line"><span class="attr">Resources:</span></span><br><span class="line">  <span class="attr">HelloWorldFunction:</span></span><br><span class="line">    <span class="attr">Type:</span> <span class="string">AWS::Serverless::Function</span> <span class="comment"># More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction</span></span><br><span class="line">    <span class="attr">Properties:</span></span><br><span class="line">      <span class="attr">CodeUri:</span> <span class="string">lambdab/</span> <span class="comment"># 変更</span></span><br><span class="line">      <span class="attr">Handler:</span> <span class="string">lambdab</span> <span class="comment"># 変更</span></span><br><span class="line">      <span class="attr">Runtime:</span> <span class="string">go1.x</span></span><br><span class="line">      <span class="attr">Tracing:</span> <span class="string">Active</span> <span class="comment"># https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html</span></span><br><span class="line">      <span class="attr">Events:</span></span><br><span class="line">        <span class="attr">CatchAll:</span></span><br><span class="line">          <span class="attr">Type:</span> <span class="string">Api</span> <span class="comment"># More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api</span></span><br><span class="line">          <span class="attr">Properties:</span></span><br><span class="line">            <span class="attr">Path:</span> <span class="string">/apigw</span> <span class="comment"># 変更</span></span><br><span class="line">            <span class="attr">Method:</span> <span class="string">GET</span></span><br><span class="line">      <span class="attr">Environment:</span> <span class="comment"># More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object</span></span><br><span class="line">        <span class="attr">Variables:</span></span><br><span class="line">          <span class="attr">PARAM1:</span> <span class="string">VALUE</span></span><br></pre></td></tr></table></figure>
+
+<p><code>template.yaml</code>の内容について補足すると、これはCloudFormationの形式になっています。<br>このまま<code>sam</code>のみでdeployすることも可能ですが、今回はテストのみなので、注記がいれてある場所のみ変更しました。<br>この設定で <code>sam</code> を立ち上げると、 <code>http://127.0.0.1:3000/apigw</code> にGETすると、<code>./lambdab/lambdab</code> が実行されることを示しています。</p>
+<p>それでは<code>main.go</code> に変更を加えます。今回は、 <code>events.APIGatewayProxyResponse</code> のBodyと、それに応じて少しだけコードをいじっただけでほぼほぼ自動生成されたものになります。</p>
+<figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;encoding/json&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/events&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/lambda&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CompanyResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	Company <span class="keyword">string</span> <span class="string">`json:&quot;company&quot;`</span></span><br><span class="line">	Year    <span class="keyword">string</span> <span class="string">`json:&quot;year&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handler</span><span class="params">(request events.APIGatewayProxyRequest)</span> <span class="params">(events.APIGatewayProxyResponse, error)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	response := CompanyResponse&#123;</span><br><span class="line">		Company: <span class="string">&quot;Future&quot;</span>,</span><br><span class="line">		Year:    <span class="string">&quot;1989&quot;</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	jsonBytes, _ := json.Marshal(response)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> events.APIGatewayProxyResponse&#123;</span><br><span class="line">		Body:       <span class="keyword">string</span>(jsonBytes),</span><br><span class="line">		StatusCode: <span class="number">200</span>,</span><br><span class="line">	&#125;, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(handler)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="build"><a href="#build" class="headerlink" title="build"></a>build</h2><p>諸々設定ができたら、buildして準備は完了です。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ make build</span><br><span class="line">GOOS=linux GOARCH=amd64 go build -o lambdab/lambdab ./lambdab/main.go <span class="comment"># 変更</span></span><br><span class="line">$ ls lambdab/</span><br><span class="line">go.mod       go.sum       lambdab      main.go      main_test.go</span><br></pre></td></tr></table></figure>
+
+<h1 id="ローカルでAPIを動かしてテスト"><a href="#ローカルでAPIを動かしてテスト" class="headerlink" title="ローカルでAPIを動かしてテスト"></a>ローカルでAPIを動かしてテスト</h1><p>コマンドを叩けばOKです。動き出したAPI（今回の場合 <code>http://127.0.0.1:3000/apigw</code>）にアクセスすると、コンテナイメージが呼び出され、実行結果が帰ってきます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ sam <span class="built_in">local</span> start-api</span><br><span class="line">Mounting HelloWorldFunction at http://127.0.0.1:3000/apigw [GET]</span><br><span class="line">You can now browse to the above endpoints to invoke your <span class="built_in">functions</span>. You <span class="keyword">do</span> not need to restart/reload SAM CLI <span class="keyword">while</span> working on your <span class="built_in">functions</span>, changes will be reflected instantly/automatically. You only need to restart SAM CLI <span class="keyword">if</span> you update your AWS SAM template</span><br><span class="line">2020-03-09 22:05:33  * Running on http://127.0.0.1:3000/ (Press CTRL+C to quit)</span><br><span class="line">Invoking lambdab (go1.x)</span><br><span class="line"></span><br><span class="line">Fetching lambci/lambda:go1.x Docker container image......</span><br><span class="line">Mounting /Users/kurita/[パス情報なので省略]/apigw/lambdab as /var/task:ro,delegated inside runtime container</span><br><span class="line">START RequestId: f2fd9e5a-f031-10c7-3340-25e3997c6dd1 Version: <span class="variable">$LATEST</span></span><br><span class="line">END RequestId: f2fd9e5a-f031-10c7-3340-25e3997c6dd1</span><br><span class="line">REPORT RequestId: f2fd9e5a-f031-10c7-3340-25e3997c6dd1  Init Duration: 131.05 ms        Duration: 4.07 ms       Billed Duration: 100 ms Memory Size: 128 MBMax Memory Used: 21 MB</span><br><span class="line">No Content-Type given. Defaulting to <span class="string">&#x27;application/json&#x27;</span>.</span><br><span class="line">2020-03-09 22:05:38 127.0.0.1 - - [09/Mar/2020 22:05:38] <span class="string">&quot;GET /apigw HTTP/1.1&quot;</span> 200 -</span><br><span class="line">2020-03-09 22:05:39 127.0.0.1 - - [09/Mar/2020 22:05:39] <span class="string">&quot;GET /favicon.ico HTTP/1.1&quot;</span> 403 -</span><br></pre></td></tr></table></figure>
+
+<p>ブラウザでAPI叩くと、ちゃんと返ってきているのがわかります。</p>
+<img src="/images/20200323/photo_20200323_03.png" class="img-middle-size" loading="lazy">
+
+
+<p>AWS SAMを利用することで、ローカルでもAPI Gatewayを意識したLambda を動作させることができました。数が少ないなら一つずつ試しても良いですし、APIを適宜叩くツールを用意すれば、自動にテストを行うこともできます。</p>
+<h1 id="DynamoDB-localとの連携"><a href="#DynamoDB-localとの連携" class="headerlink" title="DynamoDB localとの連携"></a>DynamoDB localとの連携</h1><p>続いて、SAM上で動かすLambdaからDynamoDB localにアクセスします。<br>注意事項として、DynamoDB localはdocker上で動くので、SAMとDynamoDB localを同じdocker-networkにする必要があります。</p>
+<h2 id="DynamoDB-localの準備"><a href="#DynamoDB-localの準備" class="headerlink" title="DynamoDB localの準備"></a>DynamoDB localの準備</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># AWS profile(初回のみ)</span></span><br><span class="line"><span class="comment"># localのDynamoDB</span></span><br><span class="line">$ aws configure <span class="built_in">set</span> aws_access_key_id dummy     --profile <span class="built_in">local</span></span><br><span class="line">$ aws configure <span class="built_in">set</span> aws_secret_access_key dummy --profile <span class="built_in">local</span></span><br><span class="line">$ aws configure <span class="built_in">set</span> region ap-northeast-1       --profile <span class="built_in">local</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># DynamoDBに必要なテーブル作成(初回のみ)</span></span><br><span class="line">$ docker network create lambda-local-test</span><br><span class="line">$ docker run -d --network lambda-local-test --name dynamoTest -p 8000:8000 amazon/dynamodb-local:1.12.0 -jar DynamoDBLocal.jar -sharedDb</span><br><span class="line"></span><br><span class="line"><span class="comment"># 停止コマンド</span></span><br><span class="line"><span class="comment"># docker stop dynamoTest</span></span><br></pre></td></tr></table></figure>
+
+<p>これでテスト用のdynamoDBができました。ここにテスト用のテーブルを切ります。テーブルは<code>aws-cli</code>を使います。</p>
+<figure class="highlight json"><figcaption><span>testdata/db_local.json</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;TableName&quot;</span>: <span class="string">&quot;local_company_table&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;KeySchema&quot;</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">&quot;AttributeName&quot;</span>: <span class="string">&quot;company&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;KeyType&quot;</span>: <span class="string">&quot;HASH&quot;</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">&quot;AttributeName&quot;</span>: <span class="string">&quot;year&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;KeyType&quot;</span>: <span class="string">&quot;RANGE&quot;</span></span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">&quot;AttributeDefinitions&quot;</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">&quot;AttributeName&quot;</span>: <span class="string">&quot;company&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;AttributeType&quot;</span>: <span class="string">&quot;S&quot;</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">&quot;AttributeName&quot;</span>: <span class="string">&quot;year&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;AttributeType&quot;</span>: <span class="string">&quot;S&quot;</span></span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">&quot;ProvisionedThroughput&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;ReadCapacityUnits&quot;</span>: <span class="number">2</span>,</span><br><span class="line">      <span class="attr">&quot;WriteCapacityUnits&quot;</span>: <span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>テーブルを切ります。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ aws dynamodb --profile local --endpoint-url http://localhost:8000 create-table --cli-input-json file://./testdata/db_local.json</span><br><span class="line">（出力略）</span><br></pre></td></tr></table></figure>
+
+<h2 id="Goのコード修正"><a href="#Goのコード修正" class="headerlink" title="Goのコード修正"></a>Goのコード修正</h2><p>先程はAPIアクセスに対してレスポンスを返すだけでしたが、今度は同じ内容をDynamoDBに書き込むように修正します。</p>
+<figure class="highlight go"><figcaption><span>main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;encoding/json&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/events&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/lambda&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws/session&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/service/dynamodb&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> db *dynamodb.DynamoDB</span><br><span class="line"><span class="keyword">var</span> dbEndpoint = <span class="string">&quot;http://dynamoTest:8000&quot;</span></span><br><span class="line"><span class="keyword">var</span> region = <span class="string">&quot;ap-northeast-1&quot;</span></span><br><span class="line"><span class="keyword">var</span> testTable = <span class="string">&quot;local_company_table&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> CompanyResponse <span class="keyword">struct</span> &#123;</span><br><span class="line">	Company <span class="keyword">string</span> <span class="string">`json:&quot;company&quot;`</span></span><br><span class="line">	Year    <span class="keyword">string</span> <span class="string">`json:&quot;year&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">write</span><span class="params">(ctx context.Context, tableName <span class="keyword">string</span>, v <span class="keyword">interface</span>&#123;&#125;)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	av, err := dynamodbattribute.MarshalMap(v)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;dynamodb attribute marshalling map: %w&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	i := &amp;dynamodb.PutItemInput&#123;</span><br><span class="line">		Item:      av,</span><br><span class="line">		TableName: aws.String(tableName),</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> _, err = db.PutItemWithContext(ctx, i); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;dynamodb put item: %w&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handler</span><span class="params">(ctx context.Context, request events.APIGatewayProxyRequest)</span> <span class="params">(events.APIGatewayProxyResponse, error)</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	sess := session.Must(session.NewSession(&amp;aws.Config&#123;</span><br><span class="line">		Endpoint: aws.String(dbEndpoint),</span><br><span class="line">		Region:   aws.String(region),</span><br><span class="line">	&#125;))</span><br><span class="line">	db = dynamodb.New(sess)</span><br><span class="line"></span><br><span class="line">	response := CompanyResponse&#123;</span><br><span class="line">		Company: <span class="string">&quot;Future&quot;</span>,</span><br><span class="line">		Year:    <span class="string">&quot;1989&quot;</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	jsonBytes, _ := json.Marshal(response)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := write(ctx, testTable, response); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Print(<span class="string">&quot;%s&quot;</span>, err)</span><br><span class="line">		<span class="keyword">return</span> events.APIGatewayProxyResponse&#123;</span><br><span class="line">			Body:       <span class="keyword">string</span>(jsonBytes),</span><br><span class="line">			StatusCode: <span class="number">500</span>,</span><br><span class="line">		&#125;, <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> events.APIGatewayProxyResponse&#123;</span><br><span class="line">		Body:       <span class="keyword">string</span>(jsonBytes),</span><br><span class="line">		StatusCode: <span class="number">200</span>,</span><br><span class="line">	&#125;, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(handler)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="SAMによるテスト"><a href="#SAMによるテスト" class="headerlink" title="SAMによるテスト"></a>SAMによるテスト</h2><p>SAMを実行するとき、docker-networkを指定します。これで、SAMで起動したdockerとDynamoDB localが同じネットワーク上に入ります。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ make build</span><br><span class="line">$ sam <span class="built_in">local</span> start-api --docker-network lambda-local-test</span><br></pre></td></tr></table></figure>
+
+<p>もう一つターミナルを立ち上げてコマンドを打ちます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 先程作ったテーブルは未だ空です。これからここに書き込みます。</span></span><br><span class="line">$ aws dynamodb scan --table-name local_company_table --profile <span class="built_in">local</span> --endpoint-url http://localhost:8000</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;Items&quot;</span>: [],</span><br><span class="line">    <span class="string">&quot;Count&quot;</span>: 0,</span><br><span class="line">    <span class="string">&quot;ScannedCount&quot;</span>: 0,</span><br><span class="line">    <span class="string">&quot;ConsumedCapacity&quot;</span>: null</span><br><span class="line">&#125;</span><br><span class="line">$ curl localhost:3000/apigw</span><br><span class="line">&#123;<span class="string">&quot;Company&quot;</span>:<span class="string">&quot;Future&quot;</span>,<span class="string">&quot;Year&quot;</span>:<span class="string">&quot;1989&quot;</span>&#125;</span><br><span class="line"><span class="comment"># 作ったテーブルに必要な項目が入っている</span></span><br><span class="line">$ aws dynamodb scan --table-name local_company_table --profile <span class="built_in">local</span> --endpoint-url http://localhost:8000</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;Items&quot;</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">&quot;year&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;S&quot;</span>: <span class="string">&quot;1989&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">&quot;company&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;S&quot;</span>: <span class="string">&quot;Future&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">&quot;Count&quot;</span>: 1,</span><br><span class="line">    <span class="string">&quot;ScannedCount&quot;</span>: 1,</span><br><span class="line">    <span class="string">&quot;ConsumedCapacity&quot;</span>: null</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>確かに、テーブルの中に値が格納されました。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>今回SAMを使ったテストができました。あとは必要に応じてAPIを叩くLambdaを作ったり、あるいはAPI Gatewayから呼び出されるLambdaを適宜増やしていくことで、目的とするシステムの開発が行なえます。</p>
+<p>関連した記事に<a href="/articles/20200322/">サーバレス連載</a>や<a href="/tags/GoCDK/">Go Cloud 連載</a>がありますので、オススメです。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://dev.classmethod.jp/cloud/aws/aws-lambda-supports-go/">AWS Lambda で Go が使えるようになったので試してみた</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/go-programming-model-handler-types.html">Go の AWS Lambda 関数ハンドラー</a></li>
+<li><a target="_blank" rel="noopener" href="https://qiita.com/shunp/items/52ee20278e02e29ef3e8">Go+Lambdaで最速サーバーレスチュートリアル</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200323/&via=future_techblog&related=twitterapi%2Ctwitter&text=Serverless%E9%80%A3%E8%BC%891:%20SAM%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%9F%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E3%83%86%E3%82%B9%E3%83%88%EF%BC%88Go%E7%B7%A8%EF%BC%89" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200323/&t=Serverless%E9%80%A3%E8%BC%891:%20SAM%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%9F%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E3%83%86%E3%82%B9%E3%83%88%EF%BC%88Go%E7%B7%A8%EF%BC%89" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200323/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">8</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200323/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">17</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2020.07.22</span><span class="snscount">&#9825;8</span><a class="related-posts-link" href=/articles/20200722/ title="昨今様々なシステムで利用さているAWSのLambdaですが、サーバレスということもあり何かのイベントをトリガに関数を起動させる方法が一般的かと思います。LambdaはAWSの様々なサービスをトリガとして起動することが可能で、自分たちの利用しているAWSサービスと組み合わせて実装するることでその真価を発揮します。AWSに少し詳しい人であればLambdaをAWSのサービストリガで起動させる事ができることは知っていると思いますが、いざ実装するとなると具体的にどういった手順で、なんの設定が必要かというところがわからないという人もいるのではないでしょうか。">AWSサービストリガによるLambda起動</a></li><li class="related-posts-item"><span>2020.07.27</span><span class="snscount">&#9825;9</span><a class="related-posts-link" href=/articles/20200727/ title="[サーバレス連載企画]の8回目です。TIG DXユニットの真野です。ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。[工場をハックするための基本知識] の記事を書いた棚井さんと同じチームに所属しています。[サーバレス連載企画] の第8弾目として、Serverlessの代表格であるAWS LambdaでGoを用いてKinesisに対するKPL/KCL相当の処理についてまとめていきます。">GoからAWS KinesisのAggregationFormatを利用する</a></li><li class="related-posts-item"><span>2020.03.27</span><span class="snscount">&#9825;174</span><a class="related-posts-link" href=/articles/20200327/ title="クラウドサービスが充実してくるにつれて、サーバーレスではいろいろなことができるようになっています。HTTPサーバーは動きますし、RDBやNoSQLなストレージも使えますし、PubSubみたいなサービスも利用できます。これらを駆使するとそこそこ複雑な処理も記述できます。一方で、上から下までサーバーレスにしようとするとできないものもいくつかあります。例えば、RDBも使えるといっても制約があり、LambdaやCloud ...">Serverless連載3: Goでサーバーレス用の検索エンジンwatertowerを作ってみました</a></li><li class="related-posts-item"><span>2020.03.26</span><span class="snscount">&#9825;7</span><a class="related-posts-link" href=/articles/20200326/ title="サーバレス連載の第2弾はLambdaアプリをGoで開発する中で調べた内容や、Tipsを紹介します。">Serverless連載2: AWS Lambda×Goの開発Tips</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.06.17</span><span class="snscount">&#9825;89</span> <a href="/articles/20210617a/" title="少し前にES2021にて変更される新機能が発表されました。JavaScriptを扱う上では知っとくべき！と意気込んだもののECMAScriptが何者なのかすら曖昧な理解だったので、この機会に学んだことをまとめてみようと思います。* ECMAScriptがJavaScriptにとってどのような役割を持つのかを知る">ES2021／ES2022を知ろう</a></li>
+
+    <li><span>2021.04.08</span><span class="snscount">&#9825;43</span> <a href="/articles/20210408/" title="シングルページアプリケーションは、一つのHTMLファイルであらゆるページを表現します。history APIを使ってそのようなページが実際にあるかのように振る舞います。一方で、画面がリロードされたとき、メールでSNSでシェアされたときにその該当ページをきちんと再現するためには、サーバー側でハンドリングを行う必要があります。">Go 1.16のembedとchiとSingle Page Application</a></li>
+
+    <li><span>2021.03.03</span><span class="snscount">&#9825;1</span> <a href="/articles/20210303/" title="業務で階層グラフを可視化する機会があったので、階層グラフの可視化について共有させていただこうと思います。グラフとは関係を抽象化したもので、線グラフや棒グラフなどのチャートとは異なる概念です。">Vis Networkで階層グラフを可視化する</a></li>
+
+    <li><span>2021.02.15</span><span class="snscount">&#9825;16</span> <a href="/articles/20210215/" title="私はプロジェクトでシステムテスト、場合によっては本番稼働で起きる性能問題についてSQLチューニングを行ってきました。皆さんの中で、SQLチューニングは「専門的な知識」が必要とか「高レベルなスキル」を要求されると思っている方が居るかも？っと思い、このネタを扱いました。">登が教えるSQL基礎</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%92%B0%E5%A2%83%E3%81%A8%E3%82%BF%E3%83%BC%E3%82%B2%E3%83%83%E3%83%88"><span class="toc-text">環境とターゲット</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A7%8B%E7%AF%89"><span class="toc-text">構築</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%87%E3%82%A3%E3%83%AC%E3%82%AF%E3%83%88%E3%83%AA%E6%A7%8B%E6%88%90"><span class="toc-text">ディレクトリ構成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AWS-SAM%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%81%AE%E7%94%A8%E6%84%8F"><span class="toc-text">AWS SAMプロジェクトの用意</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Lambda%EF%BC%88Go%EF%BC%89%E3%81%AE%E8%A8%98%E8%BF%B0"><span class="toc-text">Lambda（Go）の記述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#build"><span class="toc-text">build</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E3%81%A7API%E3%82%92%E5%8B%95%E3%81%8B%E3%81%97%E3%81%A6%E3%83%86%E3%82%B9%E3%83%88"><span class="toc-text">ローカルでAPIを動かしてテスト</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#DynamoDB-local%E3%81%A8%E3%81%AE%E9%80%A3%E6%90%BA"><span class="toc-text">DynamoDB localとの連携</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#DynamoDB-local%E3%81%AE%E6%BA%96%E5%82%99"><span class="toc-text">DynamoDB localの準備</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Go%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%89%E4%BF%AE%E6%AD%A3"><span class="toc-text">Goのコード修正</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SAM%E3%81%AB%E3%82%88%E3%82%8B%E3%83%86%E3%82%B9%E3%83%88"><span class="toc-text">SAMによるテスト</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-text">参考</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>「基幹業務もHadoopで!!」のその後　〜性能編〜 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="こんにちは、須田です。 今年の初めに「基幹業務もHadoopで!! -ローソンにおける店舗発注業務へのHadoop + Hive導入と その取り組みについて-」と題しまして、Hadoop &#x2F; Spark Conference Japan 2016にて発表させて頂きました。 カンファレンスでの発表時は絶賛開発中だったこともあり、いかに業務要件を設計&#x2F;実装に落としていったかという話を中心に行いまし">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「基幹業務もHadoopで!!」のその後　〜性能編〜 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20161005/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="こんにちは、須田です。 今年の初めに「基幹業務もHadoopで!! -ローソンにおける店舗発注業務へのHadoop + Hive導入と その取り組みについて-」と題しまして、Hadoop &#x2F; Spark Conference Japan 2016にて発表させて頂きました。 カンファレンスでの発表時は絶賛開発中だったこともあり、いかに業務要件を設計&#x2F;実装に落としていったかという話を中心に行いまし">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20161005/photo_20161005_00.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20161005/photo_20161005_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20161005/photo_20161005_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20161005/photo_20161005_03.png">
+<meta property="article:published_time" content="2016-10-05T04:34:31.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:53:49.352Z">
+<meta property="article:tag" content="Hadoop">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="hcj">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20161005/photo_20161005_00.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20161005/">
+  <meta content="Hadoop,AWS,hcj" name="keywords">
+  <meta content="須田桂伍" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">「基幹業務もHadoopで!!」のその後　〜性能編〜
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20161005-hadoop-md.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20161005-hadoop-md" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E9%A0%88%E7%94%B0%E6%A1%82%E4%BC%8D">須田桂伍</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2016/"><time datetime="2016-10-05T04:34:31.000Z" itemprop="datePublished">2016.10.05</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Hadoop/" title="Hadoopタグの記事へ">Hadoop</a>
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ">AWS</a>
+  
+    
+    <a href="/tags/hcj/" title="hcjタグの記事へ">hcj</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20161005/photo_20161005_00.png" loading="lazy">
+
+<p>こんにちは、須田です。</p>
+<p>今年の初めに<strong>「基幹業務もHadoopで!! -ローソンにおける店舗発注業務へのHadoop + Hive導入と その取り組みについて-」</strong>と題しまして、<a target="_blank" rel="noopener" href="http://hadoop.apache.jp/hcj2016-program/">Hadoop / Spark Conference Japan 2016</a>にて発表させて頂きました。</p>
+<p>カンファレンスでの発表時は絶賛開発中だったこともあり、いかに業務要件を設計/実装に落としていったかという話を中心に行いました。</p>
+<p>本エントリでは、<strong>「カンファレンスのその後」</strong>と題しまして、開発後の性能テストを通じて、いかにプロダクト環境に耐えられる品質にまで高めていったのかについて記載します。</p>
+<p>ピーク時では数百HiveQL/秒を処理するこのシステムにおいて、どういった課題があり、そのために実施した対策やチューニングポイントについてまとめます。<br>主にHiveおよびYARNを中心にその取り組みについて記載していきます。</p>
+<p>ぜひ本エントリを読み進めて頂く前に、カンファレンス時の資料を一読して頂ければと思います。</p>
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/deltaDtgJAnbpQ" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/keigosuda/hadoop-hadoop-hive" title="基幹業務もHadoopで!! -ローソンにおける店舗発注業務へのHadoop + Hive導入と その取り組みについて-" target="_blank">基幹業務もHadoopで!! -ローソンにおける店舗発注業務へのHadoop + Hive導入と その取り組みについて-</a> </strong> from <strong><a target="_blank" href="//www.slideshare.net/keigosuda">Keigo Suda</a></strong> </div>
+
+
+<br />
+
+<h2 id="対応内容-ざっと整理"><a href="#対応内容-ざっと整理" class="headerlink" title="対応内容(ざっと整理)"></a><strong>対応内容(ざっと整理)</strong></h2><p>チューニングの一環として検討・確認を行った項目は以下の通りです。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>対象</th>
+<th>対応内容</th>
+<th>対応詳細</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hive</td>
+<td>クエリチューニング</td>
+<td>・パーティショニング <br />・作成ワーク数の削減</td>
+</tr>
+<tr>
+<td>Hive</td>
+<td>ファイルフォーマットの変更</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Hive</td>
+<td>データ圧縮</td>
+<td>・圧縮アルゴリズムの選択 <br />・中間データの圧縮 <br />・転送データの圧縮</td>
+</tr>
+<tr>
+<td>Hive</td>
+<td>アクセスプランの効率化</td>
+<td>・Vectrizationの有効化 <br />・CBO有効化</td>
+</tr>
+<tr>
+<td>Hive</td>
+<td>処理プロセス(スレッド数)の効率化</td>
+<td>・Reducer数の調整 <br />・Shuffleコネクション数の調整</td>
+</tr>
+<tr>
+<td>Hive</td>
+<td>結合処理の最適化</td>
+<td>・バケットの利用 <br />・MapJoinの利用</td>
+</tr>
+<tr>
+<td>Hive</td>
+<td>リソース利用の最適化</td>
+<td>・JVMヒープサイズの変更 <br />・Tezコンテナの再利用</td>
+</tr>
+<tr>
+<td>YARN</td>
+<td>コンテナ配布の最適化</td>
+<td>・割当コンテナサイズの範囲調整 <br />・コンテナサイズの変更</td>
+</tr>
+<tr>
+<td>YARN</td>
+<td>スケジューラ調整</td>
+<td>・スケジューラの変更 <br />・処理用キューの設定</td>
+</tr>
+<tr>
+<td>HDFS</td>
+<td>NameNode関連</td>
+<td>・NameNode処理スレッド数調整</td>
+</tr>
+<tr>
+<td>その他</td>
+<td>システム構成変更</td>
+<td>タスクインスタンスグループの追加</td>
+</tr>
+</tbody></table></div>
+<p>上記に記した項目は一通り性能数値を取得し比較検討を行ったものです。<br>中にはそもそも採用に至らなかったものもあります。</p>
+<p>今回は上記の中でも特に効果のあったものや、本システムで特徴的だったもののみをピックアップして取り扱います。<br>以下のパートに分けてこの後対応内容の詳細について記載します。</p>
+<ul>
+<li><strong>1. Hive編</strong></li>
+<li><strong>2. YARN編</strong></li>
+</ul>
+<br />
+
+<h1 id="1-Hive編"><a href="#1-Hive編" class="headerlink" title="1. Hive編"></a><strong>1. Hive編</strong></h1><p>まずはHiveに関連するチューニング対応の内容について記載します。<br>対応内容としては大きく以下の2つです。</p>
+<ul>
+<li><strong>1-1. HiveQLチューニング</strong></li>
+<li><strong>1-2. Hiveパラメータチューニング</strong></li>
+</ul>
+<p>対応した内容の中でも効果が大きかったもの、本システムに特徴的なものを中心に取り上げていきます。</p>
+<h2 id="1-1-HiveQLチューニング"><a href="#1-1-HiveQLチューニング" class="headerlink" title="1-1. HiveQLチューニング"></a><strong>1-1. HiveQLチューニング</strong></h2><p>HiveQLのチューニングは正攻法で行っています。</p>
+<p>開発に入る前にHiveQLのコーディング規約を整備しておいたおかげで、処理負荷が特定ノードに寄ってしまうような処理(ソート処理など)は最低限に留めることができていました。<br>そのため、チューニングの観点としては以下にHiveにとって効率的に処理ができるようにワーク作成処理を組み替えていくか、作りかえていくかというものでした。</p>
+<p>主に実施したHiveQLチューニングは以下の通りです。</p>
+<ul>
+<li><strong>a) 作成ワーク数の削減</strong></li>
+<li><strong>b) パーティション作成の廃止</strong></li>
+</ul>
+<br />
+
+<h3 id="a-作成ワーク数の削減"><a href="#a-作成ワーク数の削減" class="headerlink" title="a) 作成ワーク数の削減"></a><strong>a) 作成ワーク数の削減</strong></h3><p>ソースコードおよびHive実行プランの可読性を上げる(効率の悪い書き方をしているクエリがないかといったレビュー観点でも見通しが良くなる)ために小さい単位でワーク作成処理を行うことを大方針としていました。<br>そのため、HiveQLの開発規約の中ではワークテーブルの作成基準を明確にしていました。<br>例えば以下のような感じです。</p>
+<ul>
+<li><strong>１ワーク処理の中での結合数に上限を設け、その上限を超えるようであればワークを分割する</strong></li>
+<li><strong>インラインビューが2段階以上になる場合はワークを分割する  etc</strong></li>
+</ul>
+<br />
+
+<p>基本的には規約に基づくワーク分割の方針で問題なかったのですが、規約に厳密に則ったために、かえって不効率なワーク処理も見受けられました。<br>例えば、1つのクエリで結合できるテーブル数に上限(最大5としていました)を設けていたために、同一のワークテーブルに追記していくような処理も、クエリが分割されていました。<br>そのためさばくデータ量的にも一つのクエリとしてまとめあげて処理した方がIO効率が良さそうな処理も細かく割れてしまってました。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator">/</span><span class="operator">/</span>これまでは規約に則っていたので、以下のようにクエリが分割されてしまっているものもあった</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="comment">-- 処理名　　xxxxxx</span></span><br><span class="line"><span class="comment">-- 処理概要   xxxxxx</span></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">TABLE</span></span><br><span class="line">    WORK_TABLE</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line">,	COL3</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	TABLE02</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line"><span class="keyword">HAVING</span></span><br><span class="line">	<span class="built_in">MAX</span>(COL3)	<span class="operator">!=</span>	<span class="string">&#x27;some_value&#x27;</span></span><br><span class="line">;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="comment">-- 処理名　　xxxxxx</span></span><br><span class="line"><span class="comment">-- 処理概要   xxxxxx</span></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">TABLE</span></span><br><span class="line">    WORK_TABLE</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line">,	COL3</span><br><span class="line"><span class="keyword">FROM</span>	TABLE03</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span></span><br><span class="line">	TABLE04</span><br><span class="line"><span class="keyword">ON</span></span><br><span class="line">	TABLE03.COL1	<span class="operator">=</span>	TABLE04.COL1</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	TABLE03.COL2	<span class="operator">=</span>	<span class="string">&#x27;some_value&#x27;</span></span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+
+<p>こういった同一のワークテーブルへのSELECT INSERT処理のようなものはUNION(もしくはUNION ALL)などでまとめあげて1処理に集約していきました。</p>
+<p>UNION(もしくはUNION ALL)で繋ぐぶんには、コメントで区切るなどで極端なソースの可読性劣化もなかったので許容することにしました。<br>また、プランの可読性についても、UNION ALLでまとめていく分には、どこが処理の境目になっているかがわかりやすいので、依然として把握しやすい状態を保てていたため特段問題とはなりませんでした。</p>
+<br />
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator">/</span><span class="operator">/</span>同一ワークテーブルへの追記処理はまとめあげる</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">TABLE</span></span><br><span class="line">    WORK_TABLE</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line">,	COL3</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	TABLE02</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line"><span class="keyword">HAVING</span></span><br><span class="line">	<span class="built_in">MAX</span>(COL3)	<span class="operator">!=</span>	<span class="string">&#x27;some_value&#x27;</span></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="comment">-- 処理名　　xxxxxx</span></span><br><span class="line"><span class="comment">-- 処理概要   xxxxxx</span></span><br><span class="line"><span class="comment">-- *****************************************************************************</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	COL1</span><br><span class="line">,	COL2</span><br><span class="line">,	COL3</span><br><span class="line"><span class="keyword">FROM</span>	TABLE03</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span></span><br><span class="line">	TABLE04</span><br><span class="line"><span class="keyword">ON</span></span><br><span class="line">	TABLE03.COL1	<span class="operator">=</span>	TABLE04.COL1</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	TABLE03.COL2	<span class="operator">=</span>	<span class="string">&#x27;some_value&#x27;</span></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line">・・・・</span><br></pre></td></tr></table></figure>
+
+<br />
+
+<h3 id="b-パーティション作成の廃止"><a href="#b-パーティション作成の廃止" class="headerlink" title="b) パーティション作成の廃止"></a><strong>b) パーティション作成の廃止</strong></h3><p>パーティション作成はいわゆるHiveにおける王道チューニングかもしれませんが、本システムでは利用していません。<br>当初は全マスタデータ作成処理の結合時に利用される共通キー(店舗コード)をもとにdynamic partitionによる動的パーティショニングを実施していました。<br>実際に本番相当の各種データを準備してみると、全部が全部巨大なデータサイズではなかったこともあり、逆に無理にパーティショニングすることで以下の弊害がありました。</p>
+<ul>
+<li><strong>パーティション後のファイルサイズが小さくなりがちで、結果IO効率が悪くなっていった</strong></li>
+<li><strong>パーティション作成処理のオーバーヘッドの積み重ねが処理時間のウェイトを占めるようになっていた</strong></li>
+</ul>
+<br />
+
+<p>本システムで主に扱うのがマスタデータということもあり、その性質上トランザクション系のデータに比べてボリュームがそれほど大きくないということから、パーティションは作成せずパワーでやりきる方が全体としてパフォーマンスが良い結果となりました。</p>
+<br />
+
+<h2 id="1-2-Hiveパラメータチューニング"><a href="#1-2-Hiveパラメータチューニング" class="headerlink" title="1-2. Hiveパラメータチューニング"></a><strong>1-2. Hiveパラメータチューニング</strong></h2><p>特に効果があった対応としては以下のものでした。</p>
+<ul>
+<li><strong>a) Hive on Tezへの変更</strong></li>
+<li><strong>b) MapJoinの積極的活用</strong></li>
+<li><strong>c) Reducer数の変更</strong></li>
+<li><strong>d) 圧縮とファイルフォーマット</strong></li>
+</ul>
+<br />
+
+<h3 id="a-Hive-on-Tezへの変更"><a href="#a-Hive-on-Tezへの変更" class="headerlink" title="a) Hive on Tezへの変更"></a><strong>a) Hive on Tezへの変更</strong></h3><p>発表当時は以下の理由によりHiveエンジンの実行エンジンMapReduceを利用していました。</p>
+<ul>
+<li><strong>当時のEMRの公開バージョンではTezが正式サポートされていなかった</strong></li>
+<li><strong>巨大なデータの結合を繰り返す処理が多く、オンメモリでの扱いに慎重だった</strong></li>
+</ul>
+<br />
+
+<p>前者については、EMRの起動時にインストールアプリケーションとして標準で提供されていなかったことをさしています。<br>EMRへのTezインストールスクリプトは提供されていたため、ステップ処理でインストール処理を記述すればインストール自体は可能だったため、事前検証は上記提供スクリプトを利用していました。</p>
+<p>また、後者ですが確実にクエリが流れ切るということを重視し、必ずディスクを介するMapReduceでの処理する方が安心感がありました。</p>
+<p>しかし、開発後の性能テストにて本番相当のデータ量を用いてテストを実施すると、どうしてもMapReduce特有のオーバーヘッドやディスクIOによるIOネックが顕著になってしまい、思っていた以上に処理性能が出ませんでした。</p>
+<p>特に本システムの開発においては、ソースコードおよびHiveQL実行プランの可読性を重視するため、なるべくワークテーブルは小さく保ち、小さいワークテーブルを経ながら処理を実施する方針としていたために、上記のオーバーヘッドがチリツモで大きくなっていました。</p>
+<p>そんな矢先、EMRバージョン4.7にて正式にTezサポートされたこともあり、Hiveの実行エンジンをMapReduceからTezへ切り替えることにしました。<br>その結果、Tezへの切り替えのみで処理時間をおよそ<strong>1/3</strong>にまで減らすことができました。</p>
+<p>以下はデータノードのHDFSへのデータ読み取り・書き込み時のブロック操作数ですが、かなり顕著に差が出ていました。</p>
+<img src="/images/20161005/photo_20161005_01.png" loading="lazy">
+
+<img src="/images/20161005/photo_20161005_02.png" loading="lazy">
+
+
+<p>しかし、メモリ関連のパラメータチューニングは必須で、そのためメモリ関連のパラメータ、特にYARNでのTezコンテナサイズの調整をメインに対応していきました。<br>この詳細については後半の<strong>YARN編</strong>にて記載します。</p>
+<br />
+
+<h3 id="b-MapJoinの積極的活用"><a href="#b-MapJoinの積極的活用" class="headerlink" title="b) MapJoinの積極的活用"></a><strong>b) MapJoinの積極的活用</strong></h3><p>本システムでは実行されるクエリ数も多く、各クエリを見極めてヒント句でMapJoinに縛るのが難しかったこともあり、以下パラメータにより自動的にMapJoinへ誘導する運用としました。</p>
+<ul>
+<li><strong>hive.auto.convert.join</strong></li>
+<li><strong>hive.auto.convert.join.noconditionaltask.size</strong></li>
+</ul>
+<p><strong>hive.auto.convert.join.noconditionaltask.size</strong>の値ですが、これは性能テストの中で本番相当のデータ量をもとに実行サイズを調整していきました。</p>
+<br />
+
+<h3 id="c-Reducer数の変更"><a href="#c-Reducer数の変更" class="headerlink" title="c) Reducer数の変更"></a><strong>c) Reducer数の変更</strong></h3><p>Tezの変更により、中間データのディスクIOは減らせたものの、最終的にできあがるマスタデータのうち、データサイズが大きなものは依然として最後のHDFSへのファイル書き込みがボトルネックとなってしまっていました。</p>
+<p>そこで以下パラメータにより起動するReducer数を調整していきました。</p>
+<ul>
+<li><strong>hive.exec.reducers.bytes.per.reducer</strong></li>
+</ul>
+<br />
+
+<p>最後の書き込み処理だけを考慮してReducer数を起動しすぎてしまうと、ワーク処理の過程にも影響がでてしまう(プロセスが起動しすぎてしまう)のもあり、これは性能テストの中で調整をしていきました。<br>現状は<strong>一律64MB</strong>としています。</p>
+<p>Reducer数を上げすぎてしまうと、ファイルが小さくなりすぎてIO効率が悪くなってしまうのではないかと思われるかもしれません。<br>本システムにおいては、最終的にできあがったマスタデータはRDSへエクスポートして利用されます。<br>そのため、できあがったマスタデータが細かくファイルが割れてしまったとしても、直接EMRに対して検索クエリを実行するわけではなかったので、このような対応としました。</p>
+<br />
+
+<h3 id="d-圧縮とファイルフォーマット"><a href="#d-圧縮とファイルフォーマット" class="headerlink" title="d) 圧縮とファイルフォーマット"></a><strong>d) 圧縮とファイルフォーマット</strong></h3><p>これもまたまた王道チューニングですね。<br>圧縮オプションとファイルフォーマットの組み合わせは、ファイル分割が可能な組み合わせとなるよう考慮し、性能テストの中で最も性能がよかった以下の組み合わせを採用しています。</p>
+<ul>
+<li>ファイルフォーマット：SequeanceFile</li>
+<li>圧縮オプション: Snappy</li>
+</ul>
+<br />
+
+<p>実現可能な組み合わせのパターンは一通り試したのですが、本システムでは結合をメインとしたワーク処理を積み重ねていく処理のためか、ORCなどのカラムなファイルフォーマットだと処理性能が出ず、Sequence Fileを採用することになりました。</p>
+<br />
+
+<h1 id="2-YARN編"><a href="#2-YARN編" class="headerlink" title="2. YARN編"></a><strong>2. YARN編</strong></h1><p>本システムで一番肝となったのがYARN関連の対応でした。<br>具体的には以下の対応を中心に実施しました。</p>
+<ul>
+<li><strong>2-1. コンテナサイズの調整</strong></li>
+<li><strong>2-2. 処理特性に応じたキュー設定</strong></li>
+</ul>
+<p>なおYARNの基本的な仕組みについての説明は省略いたしますのでご了承ください。</p>
+<br />
+
+<h2 id="2-1-コンテナサイズの調整"><a href="#2-1-コンテナサイズの調整" class="headerlink" title="2-1. コンテナサイズの調整"></a><strong>2-1. コンテナサイズの調整</strong></h2><p>今回YARNのリソースコントロール配下におかれるアプリケーションは以下でした。</p>
+<ul>
+<li><strong>a) MRアプリケーション(Apache Sqoopで利用)</strong></li>
+<li><strong>b) Tezアプリケーション</strong></li>
+</ul>
+<p>アプリケーションごとに基準となるコンテナサイズ(主にメモリサイズ)を変えています。</p>
+<br />
+
+
+<h3 id="a-MRアプリケーション"><a href="#a-MRアプリケーション" class="headerlink" title="a) MRアプリケーション"></a><strong>a) MRアプリケーション</strong></h3><p>MRアプリケーションについて、SqoopによるRDSからのインポート/エクスポート処理はsqoopコマンド実行時にmap数の指定が可能です。<br>そのため、消費コンテナ数を調整可能なので、パフォーマンスは落とさず1コンテナあたりのメモリサイズをどこまで減らすことができるかという観点でメモリサイズの調整行っていきました。</p>
+<br />
+
+<h3 id="b-Tezアプリケーション"><a href="#b-Tezアプリケーション" class="headerlink" title="b) Tezアプリケーション"></a><strong>b) Tezアプリケーション</strong></h3><p>Tezアプリケーションの場合、Sqoopのような利用コンテナ数の調整は難しいため、性能テストの中でコンテナサイズを調整していきました。<br>主に以下の観点でコンテナサイズの調整を実施しました。</p>
+<ul>
+<li><strong>MapJoinを行えるだけのメモリ確保が可能か(同時にhive.auto.convert.join.noconditionaltask.sizeの調整も実施)</strong></li>
+<li><strong>同時実行されるジョブ数に割り当てられるだけのコンテナサイズの確保が可能か</strong></li>
+</ul>
+<br />
+
+<p>なおコンテナサイズで指定したメモリの利用内訳については、下記を参考にしました。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://community.hortonworks.com/articles/14309/demystify-tez-tuning-step-by-step.html">Demystify Apache Tez Memory Tuning - Step by Step</a></p>
+</blockquote>
+<p>これはもう地道に様々なコンテナサイズで処理を回してみて、適切な値を出しました。<br>最終的にTezアプリケーションでのコンテナサイズは<strong>メモリ4GB・vCPU1コア/コンテナ</strong>が標準として落ち着きました。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-- コンテナサイズ</span><br><span class="line">SET hive.tez.container.size=4096;</span><br><span class="line">SET hive.tez.java.opts=-Xmx3200m;</span><br><span class="line">SET hive.tez.cpu.vcores=1;</span><br></pre></td></tr></table></figure>
+
+<p>ただし、Hive編で記載した通り、MapJoinに処理をよせるにあたり、作成するマスタデータによってはコンテナあたりのメモリサイズを大きくする必要がありました。<br>そういったマスタデータ作成処理のみ例外的にコンテナのメモリサイズを大きくするといった対応を実施しています。</p>
+<p>なお、処理ピーク時に同時稼働ジョブがかなり多くこともあり、なるべくクラスタトータルでメモリの使用を抑えたかったこともあり、TezアプリケーションもMRアプリケーションも起動するApplication Master用のコンテナサイズをデフォルトから小さくしています。</p>
+<br />
+
+<h2 id="2-2-処理特性に応じたキュー設定"><a href="#2-2-処理特性に応じたキュー設定" class="headerlink" title="2-2. 処理特性に応じたキュー設定"></a><strong>2-2. 処理特性に応じたキュー設定</strong></h2><p>本システムではピーク時では常に数百のクエリを処理し続けるといったかなりハードワークです。<br>また作成するマスタデータごとに処理の複雑度合や利用するテーブルのデータサイズなどかなりまちまちです。<br>そのため、作成するマスタデータの業務優先度やそのワークロードに応じたリソース配分が必要となりました。</p>
+<p>そのために以下の対応を実施しました。</p>
+<ul>
+<li><strong>a) YARNのスケジューラの変更</strong></li>
+<li><strong>b) 業務優先度や処理特性に応じたキュー設定とリソース制御</strong></li>
+</ul>
+<br />
+
+<h3 id="a-YARNのスケジューラ変更"><a href="#a-YARNのスケジューラ変更" class="headerlink" title="a) YARNのスケジューラ変更"></a><strong>a) YARNのスケジューラ変更</strong></h3><p>YARNのデフォルトのスケジューラはFIFO(First in First Out)であるため、最初に実行されたジョブに利用可能なコンテナをほとんど持って行かれてしまい、同時に複数ジョブを投入してもペンディングが多発していました。<br>そのためジョブの実行多重度をあげるために他のスケジューリングアルゴリズムを採用することにしました。</p>
+<p>YARNでは他にFair Scheduler、Capacity Schedulerといったスケジューリングアルゴリズムを選択可能なのですが、今回はFair Schedulerを採用することにしました。</p>
+<p>Capacity Schedulerでは、利用リソース量に基づいたスケジューリングが可能なのです。</p>
+<p>ただFair Shcedulerでもキュー単位でリソース使用量や重み付けが可能であったのと、Capacity Schedulerの場合、キュー間ではリソース利用に応じて細かな制御は可能なのですが、同一キューに投入されたジョブはFIFOで処理されていたため、今回の要件には少し不足気味だったため採用を見送りました。(もしかしたら挙動を変える方法があった・・・？)</p>
+<br />
+
+<h3 id="b-業務優先度や処理特性に応じたキュー設定とリソース制御"><a href="#b-業務優先度や処理特性に応じたキュー設定とリソース制御" class="headerlink" title="b) 業務優先度や処理特性に応じたキュー設定とリソース制御"></a><strong>b) 業務優先度や処理特性に応じたキュー設定とリソース制御</strong></h3><p>クラスタ上で複数のジョブが同時に走るようになったものの、FairSchedulerでは特に設定をしない限りはクラスタに投入されたジョブはみな等しくリソースが按分されて処理が行われます。</p>
+<p>そのため、それほどリソースを利用しなくても処理が十分回るもの、そうでないものも全て同じくリソースが按分されることになります。</p>
+<p>今回のバッチ処理の特性としては、実行多重度がかなり高く、ひとつひとつの作成処理量の重さもばらつきがあります。</p>
+<p>そのため、同時に処理する量が増えてくるほど一向に処理が完了しないマスタ作成処理もでてきてしまうといった事態が発生していました。</p>
+<p>そこで必要となるリソース量や業務的な優先度を鑑みて、ジョブを投入するキューを分けることにしました。<br>キュー見直し後の構成は以下のようになりました。</p>
+<img src="/images/20161005/photo_20161005_03.png" loading="lazy">
+
+
+<p>キュー単位に指定している利用可能なリソースウェイトですが、これは最大ピーク時の多重度を考慮した割合としています。<br>実際に性能数値を確認しながら最も全体として短い時間で終わるような重み付けを探っていった具体です。<br>そのため、ピーク時間帯以外で他キューに空きがあればその分のリソースを他キューからも利用できるようにしています。</p>
+<p>キュー単位でのリソース制御ですが、リソースを絶対量で指定もできますが、割合による重み付けを利用しています。<br>理由としては、今後クラスタサイズが変更になりトータルのリソース量が変わってしまった際に都度細かな数値を見直さなくても大丈夫なようにするためです。</p>
+<h2 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a><strong>最後に</strong></h2><p>ざっとですが、これまでの取り組みについて記載しました。<br>実はもう一つ大きな戦いがあって、EMRで作成したマスタデータをAPI参照のためにRDS(MySQL)へSqoopでエクスポートする処理がなかなか性能がでず、ごりごりMySQLチューニングを実施した話とか、その頑張りをあっさりAmazon Auroraに追いつかれてしまった話などまだまだ話は尽きないのですが、それはまた別の機会に。</p>
+<p>お付き合い頂きありがとうございました。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20161005/&via=future_techblog&related=twitterapi%2Ctwitter&text=%E3%80%8C%E5%9F%BA%E5%B9%B9%E6%A5%AD%E5%8B%99%E3%82%82Hadoop%E3%81%A7!!%E3%80%8D%E3%81%AE%E3%81%9D%E3%81%AE%E5%BE%8C%E3%80%80%E3%80%9C%E6%80%A7%E8%83%BD%E7%B7%A8%E3%80%9C" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20161005/&t=%E3%80%8C%E5%9F%BA%E5%B9%B9%E6%A5%AD%E5%8B%99%E3%82%82Hadoop%E3%81%A7!!%E3%80%8D%E3%81%AE%E3%81%9D%E3%81%AE%E5%BE%8C%E3%80%80%E3%80%9C%E6%80%A7%E8%83%BD%E7%B7%A8%E3%80%9C" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">37</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20161005/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">10</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20161005/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">4</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2016.11.09</span><span class="snscount">&#9825;27</span><a class="related-posts-link" href=/articles/20161109/ title="アカリクTechTalk（vol.4：ビッグデータ）にて、株式会社プレイドさんのデータサイエンティストと弊社のインフラエンジニア@keigosudaが対談しました">ビッグデータ対談でニコ生登壇しました</a></li><li class="related-posts-item"><span>2021.09.24</span><span class="snscount">&#9825;7</span><a class="related-posts-link" href=/articles/20210924a/ title=" Gateway+Lambda という構成でWebAPI開発を行う際、ちょっと便利に使える疎通方法をまとめます。API GatewayですがPublicなエンドポイントがあれば `curl`コマンドや`Postman`を用いての動作検証も容易だと思います。">VPC内のAmazon API Gatewayをインターネットオーバーで疎通確認する</a></li><li class="related-posts-item"><span>2021.09.21</span><span class="snscount">&#9825;1</span><a class="related-posts-link" href=/articles/20210921a/ title="TIGの伊藤真彦です。先日AWS Certified Security - Specialtyに合格しました。今回も合格体験記を残しておきます。">AWS Certified Security - Specialty合格体験記</a></li><li class="related-posts-item"><span>2021.09.14</span><span class="snscount">&#9825;20</span><a class="related-posts-link" href=/articles/20210914a/ title="普段からAWS Lambdaにはお世話になっているのですが、初めてカスタムランタイムを動かす仕事が舞い込んできました。AWS Lambdaでは下記のランタイムがサポートされています。">LambdaをカスタムDockerランタイムで開発する方法</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.04.26</span><span class="snscount">&#9825;58</span> <a href="/articles/20210426b/" title="Go 1.16のembedとchiとSingle Page Application、Go 1.16のgo:embedとNext.jsの相性が悪い問題と戦うに近い感じの研究記事です。">Go 1.16のembedとgo-swaggerを組み合わせてフルスタック自動生成フレームワークを作る</a></li>
+
+    <li><span>2021.04.20</span><span class="snscount">&#9825;15</span> <a href="/articles/20210420b/" title="Gitを使っての開発で、指定のツールや好みのGitクライアントを使っていると思います。ターミナルの黒画面でGitコマンドを使うのはちょっと不安、GUI画面から画面を確認しながらGitを操作したい方向けの記事です。GitのBranch作成やCheckout, Commit, Pushまで使えた方向けに、次の段階としてRebase, Cherry Pickなどの実行方法を説明します。">GUI GitツールのRebase, Cherry pick</a></li>
+
+    <li><span>2021.03.29</span><span class="snscount">&#9825;14</span> <a href="/articles/20210329/" title="シェルスクリプト連載の第一弾です。シェルスクリプトは強力かつ便利で、いろいろなところで使われています。ただ、自由度が高い一方で、ちょっとしたミスを犯しやすく、かつミスに気づきにくい、ということも多いです。また、ミスに気づいたときには大きな影響が及んでいる、ということもあるでしょう。">ShellCheckでシェルスクリプトの品質を高めよう</a></li>
+
+    <li><span>2020.12.23</span><span class="snscount">&#9825;146</span> <a href="/articles/20201223/" title="Pythonに型ヒントが入ってからしばらく経ちます。型ヒントの立ち位置も、なんでもできるアノテーションとして導入されましたが、型ヒント以外の用途はあまり育たず、型ヒントが中心になり、PEPや仕様もそれに合わせて変化したり、より書きやすいように機能が追加されてきました。本エントリーでは、Python 3.9時点での最新情報を元に、現在サポート中のPythonバージョン（3.6以上）との互換性の情報も織り交ぜながら、最新の型ヒントの書き方を紹介します。">2021年版Pythonの型ヒントの書き方 (for Python 3.9)</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C%E5%86%85%E5%AE%B9-%E3%81%96%E3%81%A3%E3%81%A8%E6%95%B4%E7%90%86"><span class="toc-text">対応内容(ざっと整理)</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-Hive%E7%B7%A8"><span class="toc-text">1. Hive編</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-HiveQL%E3%83%81%E3%83%A5%E3%83%BC%E3%83%8B%E3%83%B3%E3%82%B0"><span class="toc-text">1-1. HiveQLチューニング</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#a-%E4%BD%9C%E6%88%90%E3%83%AF%E3%83%BC%E3%82%AF%E6%95%B0%E3%81%AE%E5%89%8A%E6%B8%9B"><span class="toc-text">a) 作成ワーク数の削減</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#b-%E3%83%91%E3%83%BC%E3%83%86%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%B3%E4%BD%9C%E6%88%90%E3%81%AE%E5%BB%83%E6%AD%A2"><span class="toc-text">b) パーティション作成の廃止</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-Hive%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF%E3%83%81%E3%83%A5%E3%83%BC%E3%83%8B%E3%83%B3%E3%82%B0"><span class="toc-text">1-2. Hiveパラメータチューニング</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#a-Hive-on-Tez%E3%81%B8%E3%81%AE%E5%A4%89%E6%9B%B4"><span class="toc-text">a) Hive on Tezへの変更</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#b-MapJoin%E3%81%AE%E7%A9%8D%E6%A5%B5%E7%9A%84%E6%B4%BB%E7%94%A8"><span class="toc-text">b) MapJoinの積極的活用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#c-Reducer%E6%95%B0%E3%81%AE%E5%A4%89%E6%9B%B4"><span class="toc-text">c) Reducer数の変更</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#d-%E5%9C%A7%E7%B8%AE%E3%81%A8%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88"><span class="toc-text">d) 圧縮とファイルフォーマット</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-YARN%E7%B7%A8"><span class="toc-text">2. YARN編</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%B5%E3%82%A4%E3%82%BA%E3%81%AE%E8%AA%BF%E6%95%B4"><span class="toc-text">2-1. コンテナサイズの調整</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#a-MR%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3"><span class="toc-text">a) MRアプリケーション</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#b-Tez%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3"><span class="toc-text">b) Tezアプリケーション</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E5%87%A6%E7%90%86%E7%89%B9%E6%80%A7%E3%81%AB%E5%BF%9C%E3%81%98%E3%81%9F%E3%82%AD%E3%83%A5%E3%83%BC%E8%A8%AD%E5%AE%9A"><span class="toc-text">2-2. 処理特性に応じたキュー設定</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#a-YARN%E3%81%AE%E3%82%B9%E3%82%B1%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%A9%E5%A4%89%E6%9B%B4"><span class="toc-text">a) YARNのスケジューラ変更</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#b-%E6%A5%AD%E5%8B%99%E5%84%AA%E5%85%88%E5%BA%A6%E3%82%84%E5%87%A6%E7%90%86%E7%89%B9%E6%80%A7%E3%81%AB%E5%BF%9C%E3%81%98%E3%81%9F%E3%82%AD%E3%83%A5%E3%83%BC%E8%A8%AD%E5%AE%9A%E3%81%A8%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E5%88%B6%E5%BE%A1"><span class="toc-text">b) 業務優先度や処理特性に応じたキュー設定とリソース制御</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%BE%8C%E3%81%AB"><span class="toc-text">最後に</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>

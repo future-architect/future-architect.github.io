@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>AWS APIGateway Custom Authorizer入門 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="こんにちは。TIG&#x2F;DXユニットのLEEです。フューチャーではここ数年、主に認証認可関係の設計や開発などを担当しております。 今回は流行りの認証プロトコルであるOpenID ConnectとOAuth2.0におけるAuthorizerについて話そうと思います。 Authorizerとは  AuthorizerとはAWS APIGatewayにある機能の一つで、外からAPIサーバに送られてくるリクエ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS APIGateway Custom Authorizer入門 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210610a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="こんにちは。TIG&#x2F;DXユニットのLEEです。フューチャーではここ数年、主に認証認可関係の設計や開発などを担当しております。 今回は流行りの認証プロトコルであるOpenID ConnectとOAuth2.0におけるAuthorizerについて話そうと思います。 Authorizerとは  AuthorizerとはAWS APIGatewayにある機能の一つで、外からAPIサーバに送られてくるリクエ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210610a/custom-auth-workflow.png">
+<meta property="article:published_time" content="2021-06-09T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:54:08.492Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Lambda">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210610a/custom-auth-workflow.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210610a/">
+  <meta content="AWS,Lambda" name="keywords">
+  <meta content="李光焄" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">AWS APIGateway Custom Authorizer入門
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210610a_AWS_APIGateway_Custom_Authorizer.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210610a_AWS_APIGateway_Custom_Authorizer" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E6%9D%8E%E5%85%89%E7%84%84">李光焄</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2021/"><time datetime="2021-06-09T15:00:00.000Z" itemprop="datePublished">2021.06.10</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ">AWS</a>
+  
+    
+    <a href="/tags/Lambda/" title="Lambdaタグの記事へ">Lambda</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p>こんにちは。TIG/DXユニットのLEEです。フューチャーではここ数年、主に認証認可関係の設計や開発などを担当しております。</p>
+<p>今回は流行りの認証プロトコルであるOpenID ConnectとOAuth2.0におけるAuthorizerについて話そうと思います。</p>
+<h1 id="Authorizerとは"><a href="#Authorizerとは" class="headerlink" title="Authorizerとは"></a>Authorizerとは</h1><img alt="カスタムオーソライザの動作フロー" src="/images/20210610a/custom-auth-workflow.png" loading="lazy">
+
+<p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html">Authorizer</a>とはAWS APIGatewayにある機能の一つで、外からAPIサーバに送られてくるリクエストを検証することにより、アクセスを制御する機能です。OAuth2.0のプロトコルにおいては、AuthorizerはJWTなどTokenを検証することで、APIサーバ、つまり <code>ResourceServer</code> を保護する役割を持っています。</p>
+<p>OSSのAPIGatewayであるKongを触ったことがある方ならば、<a target="_blank" rel="noopener" href="https://docs.konghq.com/hub/kong-inc/jwt/">JWT Plugin</a>とほぼ同じ立ち位置のものと思って構いません。</p>
+<h1 id="なぜ使うのか"><a href="#なぜ使うのか" class="headerlink" title="なぜ使うのか"></a>なぜ使うのか</h1><p>SinglePageApplicationやモバイルアプリなど、ClientになるFront-endがサーバと分離されたシステム構成の場合、<code>Client (RelyingParty)</code> と <code>APIサーバ (ResourceServer)</code> を両方セキュアにする必要があります。</p>
+<p><code>RelyingParty</code> の場合、KeycloakやAuth0など認証基盤が提供するライブラリや、OIDCに準拠したライブラリを使えば割と簡単にセキュアにすることが可能です。</p>
+<p>一方、<code>ResourceServer</code> にはAuthorizerを実装する必要があります。Authorizerはサーバの内部のMiddleware層などに実装することも可能ですが、複数のAPIサーバが存在してて、一つのAPIGatewayでEndpointを集中管理する場合にAuthorizerをLambdaとして一本実装することにより、開発やデプロイなどにメリットをもたらすことができます。</p>
+<p>この度はそのAuthorizerを実装するにあたって、いくつか考慮すべきポイントについて触れて行こうと思います。</p>
+<h1 id="Authorizer設定"><a href="#Authorizer設定" class="headerlink" title="Authorizer設定"></a>Authorizer設定</h1><h2 id="タイプ"><a href="#タイプ" class="headerlink" title="タイプ"></a>タイプ</h2><p>今回はCognitoではなく、KeycloakやAuth0など外部の認証基盤を想定しています。<br>AuthorizerをLambda関数で実装することにより、認証認可制御をもっと自由にカスタムすることができます。</p>
+<h2 id="Lambdaイベントペイロード"><a href="#Lambdaイベントペイロード" class="headerlink" title="Lambdaイベントペイロード"></a>Lambdaイベントペイロード</h2><p>Lambda関数の引数となるEventの入力値には2パターン存在します。</p>
+<ul>
+<li><strong>Tokenタイプ</strong>は簡単にTokenとmethodArnのみが取得可能で、Tokenを検証しその(JWTならば)PayloadとmethodArnのパスを対照するなどで認可を制御することが可能になります。</li>
+<li><strong>Requestタイプ</strong>はAPIGatewayのプロキシ統合のリクエストと同じものを引数として受けられます。TokenとmethodArnはもちろん、他のHeaderやQueryString、Bodyなどすべてのリクエストの中身が取得できるため、もう少し自由な認可要件が必要なときに使うこともできます。</li>
+</ul>
+<h2 id="トークンの検証"><a href="#トークンの検証" class="headerlink" title="トークンの検証"></a>トークンの検証</h2><p>Tokenの中身を検証する前に正規表現により簡単にチェックすることができます。一般的にTokenとしてJWTを使う場合は<code>^Bearer [-_0-9a-zA-Z.]+$</code>のように設定します。<br>この正規表現にマッチしない場合、AuthorizerはLambdaまでリクエストを送らず401を返します。</p>
+<h2 id="認可のキャッシュ"><a href="#認可のキャッシュ" class="headerlink" title="認可のキャッシュ"></a>認可のキャッシュ</h2><p>AuthorizerはAPIリクエストが送られるとき毎回必ずTokenを検証するので、その負荷を減らすためにキャッシングも可能です。<br>しかし、この機能には大きな問題があり、キャシングの単位がTokenそのものではなく、Tokenのソースであるヘッダー名(<code>Authorization</code>など)になっています。あるユーザが一度認可したあとならば、他のユーザがそのキャッシュを使い回すことができてしまうため、基本無効にするしかないと思います。</p>
+<h1 id="Lambdaの実装"><a href="#Lambdaの実装" class="headerlink" title="Lambdaの実装"></a>Lambdaの実装</h1><p>Lambda実装の流れは大きく分けて</p>
+<ol>
+<li>まず、Tokenを検証し<strong>認証</strong>する</li>
+<li>検証したTokenのPayloadとアクセスしようとするリソースの情報(methodArnなど)を対照し<strong>認可</strong>する</li>
+</ol>
+<p>の2つの段階になるかと思います。</p>
+<h2 id="入出力"><a href="#入出力" class="headerlink" title="入出力"></a>入出力</h2><p>Goで実装する場合メインハンドラー関数は以下のような形になります。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Handle</span><span class="params">(e events.APIGatewayCustomAuthorizerRequest)</span> <span class="params">(*events.APIGatewayCustomAuthorizerResponse, error)</span></span> &#123;</span><br><span class="line">    <span class="comment">// Tokenタイプイベントペイロード</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Handle</span><span class="params">(e events.APIGatewayCustomAuthorizerRequestTypeRequest)</span> <span class="params">(*events.APIGatewayCustomAuthorizerResponse, error)</span></span> &#123;</span><br><span class="line">    <span class="comment">// Requestタイプイベントペイロード</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://github.com/aws/aws-lambda-go">aws-lambda-go</a>には、すでにCustomAuthorizerのための入出力構造体が用意されているため大変便利です。<br>出力の戻り値としてはAWS IAMのようなAWSPolicyDocumentを使い返します(詳細後述)。</p>
+<h3 id="出力パターン"><a href="#出力パターン" class="headerlink" title="出力パターン"></a>出力パターン</h3><p>Lambda関数の出力(戻り値)により、以下のようにAPIに送られてきたリクエストを制御することができます。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>出力パターン</th>
+<th>動作</th>
+<th>HTTP Status</th>
+<th>Response Body</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Policy：Allow</td>
+<td>アクセス許可</td>
+<td>後続のAPIレスポンスによる</td>
+<td>後続のAPIレスポンスによる</td>
+</tr>
+<tr>
+<td>Policy：Deny</td>
+<td>認可失敗</td>
+<td>403 Forbidden</td>
+<td><code>&#123;&quot;message&quot;: &quot;User is not authorized to access this resource with an explicit deny&quot;&#125;</code></td>
+</tr>
+<tr>
+<td>Error：Unauthorized</td>
+<td>認証失敗</td>
+<td>401 Unauthorized</td>
+<td><code>&#123;&quot;message&quot;: &quot;Unauthorized&quot;&#125;</code></td>
+</tr>
+<tr>
+<td>その他のError</td>
+<td>エラー</td>
+<td>500 Internal Server Error</td>
+<td><code>&#123;&quot;message&quot;: &quot;Internal Server Error&quot;&#125;</code></td>
+</tr>
+</tbody></table></div>
+<p><em>特記事項として、エラーを返すにしてもエラーメッセージを<code>Unauthorized</code> (大文字<code>U</code>に注意)にすることにより401を返すことができます。</em></p>
+<h2 id="Authentication"><a href="#Authentication" class="headerlink" title="Authentication"></a>Authentication</h2><p>認可制御のために前提として、まずは認証が必要になります。一般的にはJWTを検証することになり、JWTのライブラリを使えば簡単ですが、検証のための<strong>公開鍵取得方法</strong>には2パターンがあるかと思われます。</p>
+<h3 id="静的に公開鍵を保持する"><a href="#静的に公開鍵を保持する" class="headerlink" title="静的に公開鍵を保持する"></a>静的に公開鍵を保持する</h3><p>公開鍵をLambdaの環境変数やDynamoDB、S3などを使い静的に保持する方法です。<br>実装は簡単で構造もシンプルですが、鍵のローテションをどうするか考える必要が将来的に出てきます。</p>
+<h3 id="公開鍵を動的に取得する"><a href="#公開鍵を動的に取得する" class="headerlink" title="公開鍵を動的に取得する"></a>公開鍵を動的に取得する</h3><p>認証基盤が公開している公開鍵エンドポイントから鍵を取得する方法です。<br>公開鍵エンドポイントは一般的に認証基盤側が<a target="_blank" rel="noopener" href="https://openid-foundation-japan.github.io/rfc7517.ja.html">JSON Web Key(JWK)</a>により定義し、以下のような形で公開しています。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://keycloak-documentation.openstandia.jp/master/ja_JP/securing_apps/index.html#_certificate_endpoint">Keycloak証明書エンドポイント</a></li>
+<li><a target="_blank" rel="noopener" href="https://auth0.com/docs/tokens/json-web-tokens/json-web-key-sets">Auth0 JSON Web Key Sets</a></li>
+</ul>
+<p>この方法は鍵のローテションを気にせずに済みますが、APIリクエストのたびに認証基盤への外部リクエストが発生するので、遅延・負荷を軽減するための効率的なキャッシング戦略を立てる必要があります。</p>
+<h2 id="Authorization"><a href="#Authorization" class="headerlink" title="Authorization"></a>Authorization</h2><p>APIリクエストのToken検証が完了し認証ができたら、次はそのユーザーがリクエストしたエンドポイントにアクセス可能かをチェックする認可処理が必要になります。</p>
+<p>認可、アクセスコントロールはJWTのClaimsの値に入っているユーザの属性やロールとAPIエンドポイントのパスなどを対照することにより制御することが可能です。</p>
+<p>ロジックについては認証基盤の設定やそのシステムの固有の考え方などによりRole-BasedAccessControl、Attribute-BasedAccessControlなど、様々なやり方があります。こういったロジックは自由度の高い領域なのでここでは参考程度にKeycloakやAuth0などで想定しているアクセスコントロールについてのリンクだけを貼っておきます。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://keycloak-documentation.openstandia.jp/master/ja_JP/authorization_services/">Keycloak Authorization Services Guide</a></li>
+<li><a target="_blank" rel="noopener" href="https://auth0.com/docs/authorization">Auth0 Authorization</a></li>
+</ul>
+<h3 id="認可の出力"><a href="#認可の出力" class="headerlink" title="認可の出力"></a>認可の出力</h3><p>認可ロジックによりユーザのアクセス可否が決まったら、Authorizerは以下のようなJSONで認可処理が完了したことをAPIGatewayに返します。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;principalId&quot;</span>: <span class="string">&quot;yyyyyyyy&quot;</span>, <span class="comment">// The principal user identification associated with the token sent by the client.</span></span><br><span class="line">  <span class="attr">&quot;policyDocument&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;Version&quot;</span>: <span class="string">&quot;2012-10-17&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;Statement&quot;</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">&quot;Action&quot;</span>: <span class="string">&quot;execute-api:Invoke&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;Effect&quot;</span>: <span class="string">&quot;Allow|Deny&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;Resource&quot;</span>: <span class="string">&quot;arn:aws:execute-api:&#123;regionId&#125;:&#123;accountId&#125;:&#123;apiId&#125;/&#123;stage&#125;/&#123;httpVerb&#125;/[&#123;resource&#125;/[&#123;child-resources&#125;]]&quot;</span></span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;context&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;stringKey&quot;</span>: <span class="string">&quot;value&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;numberKey&quot;</span>: <span class="string">&quot;1&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;booleanKey&quot;</span>: <span class="string">&quot;true&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;usageIdentifierKey&quot;</span>: <span class="string">&quot;&#123;api-key&#125;&quot;</span> <span class="comment">// Optional</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Policy-Document"><a href="#Policy-Document" class="headerlink" title="Policy Document"></a>Policy Document</h4><p>IAMのものと同じ形式で、アクセスを許可するか拒否するかを明示的に表現します。</p>
+<p>AuthorizerはAPIGateway上で動くものなので<code>&quot;Action&quot;: &quot;execute-api:Invoke&quot;</code>は固定になります。<br><code>Resource</code>はLambda関数の引数で受けた<code>methodArn</code>をそのまま返すで問題ありません。</p>
+<h4 id="Principal-ID"><a href="#Principal-ID" class="headerlink" title="Principal ID"></a>Principal ID</h4><p>APIリクエストしたユーザが誰なのかを表現します。リクエストしたユーザを一意に識別するための値であり、実際のAPIロジックを決める後続のLambda関数などに渡すことができ、ユーザによるレスポンスの出し分けなどを可能にします。</p>
+<p>一般的にはJWTの<a target="_blank" rel="noopener" href="https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.2"><code>sub</code> (Subject) Claim</a>をそのまま使うことになります。</p>
+<h4 id="Authorizer-Context"><a href="#Authorizer-Context" class="headerlink" title="Authorizer Context"></a>Authorizer Context</h4><p>Principal IDと同じように後続のLambda関数などに渡すことができる任意の値です(Principal IDもContextの一部)。APIのレスポンスを出し分けするために必要な任意の情報をKey-Value形式でセットすることが可能です。一見Mapオブジェクトにも見えますが、ValueとしてはNumber・String・BooleanのみでObjectやArrayなどの入れ子構造は使えません。</p>
+<h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>Authorizerの実装、最初はわからないことだらけで難しく感じるかもしれませんが、単機能の関数であるため、一度実装してしまったらテンプレートのように様々なAPIに使い回すことも可能かと思います。</p>
+<p>以下は自分が実装の際に一番参考になったサンプルコードのリンクを置いて締めたいと思います。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/awslabs/aws-apigateway-lambda-authorizer-blueprints">Amazon API Gateway - Custom Authorizer Blueprints for AWS Lambda</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/aws/aws-lambda-go/blob/master/events/README_ApiGatewayCustomAuthorizer.md">AWS Lambda for Go - Authorizer Sample Function</a></li>
+<li><a target="_blank" rel="noopener" href="https://auth0.com/docs/quickstart/backend/golang/01-authorization">Auth0 Backend/API Go: Authorization</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210610a/&via=future_techblog&related=twitterapi%2Ctwitter&text=AWS%20APIGateway%20Custom%20Authorizer%E5%85%A5%E9%96%80" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">4</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210610a/&t=AWS%20APIGateway%20Custom%20Authorizer%E5%85%A5%E9%96%80" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210610a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210610a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2021.09.14</span><span class="snscount">&#9825;20</span><a class="related-posts-link" href=/articles/20210914a/ title="普段からAWS Lambdaにはお世話になっているのですが、初めてカスタムランタイムを動かす仕事が舞い込んできました。AWS Lambdaでは下記のランタイムがサポートされています。">LambdaをカスタムDockerランタイムで開発する方法</a></li><li class="related-posts-item"><span>2021.04.13</span><span class="snscount">&#9825;4</span><a class="related-posts-link" href=/articles/20210413a/ title="認証情報を Lambda の環境変数に渡す要件が発生したため認証情報を KMS で暗号化して、リポジトリには暗号化した値を登録し、Lambda 内で復号化する構成を取りました。">KMSで暗号化してLambdaで復号化する</a></li><li class="related-posts-item"><span>2020.11.12</span><span class="snscount">&#9825;8</span><a class="related-posts-link" href=/articles/20201112/ title="TIGの辻です。サーバーレスなアプリケーションを開発するときにAWS LambdaやCloud RunといったFaaSはとても重宝します。デプロイする関数のコードは1つの関数がモノリシックな大きな関数にならないように、小さな関数を組み合わせて実装するのが基本です。いくつかのユースケースでAWS LambdaからAWS Lambdaを同期的に呼び出したいケースがあったのですが、開発者が意識しておいたほうがいいようなハマりどころがいくつかありました。本記事ではGoで[AWS LambdaからAWS Lambdaを同期的に呼び出すとき]のハマりどころやTipsを紹介します。以下のような構成です">GoでLambdaからLambdaを呼び出すときに気をつけたいポイント6選</a></li><li class="related-posts-item"><span>2020.10.22</span><span class="snscount">&#9825;7</span><a class="related-posts-link" href=/articles/20201022/ title="筒井です。GoとAWS LambdaのためのMakefileを整理しました。Lambda Functionの増加と同時に増えていくターゲットにはオサラバです。">GoとAWS LambdaのためのMakefile</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.07.14</span><span class="snscount">&#9825;504</span> <a href="/articles/20210714a/" title="僕としてはGoのおすすめのフレームワークを聞かれたら、標準ライブラリのnet/httpと答えるようにしています。というよりも、Goの他のフレームワークと呼ばれているものは、このnet/httpのラッパーでしかないからです。Goでアプリケーションを作成する場合のイメージは次の通り。">Goのおすすめのフレームワークはnet/http</a></li>
+
+    <li><span>2021.06.21</span><span class="snscount">&#9825;18866</span> <a href="/articles/20210621a/" title="HTML5が2021年の1月に廃止されました。Webエンジニアとしてバリバリ活躍されてる方やエグゼクティブテックリードのような肩書きを持つ方にとっては「何をいまさら」という話題かと思います。しかしながら、今年も新人さん入ってきてくださったので、プログラミングを学習中にHTML5という文字列に悩まされないように...">どうしてHTML5が廃止されたのか</a></li>
+
+    <li><span>2021.06.17</span><span class="snscount">&#9825;89</span> <a href="/articles/20210617a/" title="少し前にES2021にて変更される新機能が発表されました。JavaScriptを扱う上では知っとくべき！と意気込んだもののECMAScriptが何者なのかすら曖昧な理解だったので、この機会に学んだことをまとめてみようと思います。* ECMAScriptがJavaScriptにとってどのような役割を持つのかを知る">ES2021／ES2022を知ろう</a></li>
+
+    <li><span>2021.05.18</span><span class="snscount">&#9825;469</span> <a href="/articles/20210518a/" title="RESTfullとかRESTishな方針でWebAPIの横断検索を設計する際にチーム内で方針について議論したやり取りの備忘記事です。">HTTP検索条件、GETにするか？POSTにするか？</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Authorizer%E3%81%A8%E3%81%AF"><span class="toc-text">Authorizerとは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AA%E3%81%9C%E4%BD%BF%E3%81%86%E3%81%AE%E3%81%8B"><span class="toc-text">なぜ使うのか</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Authorizer%E8%A8%AD%E5%AE%9A"><span class="toc-text">Authorizer設定</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%BF%E3%82%A4%E3%83%97"><span class="toc-text">タイプ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Lambda%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E3%83%9A%E3%82%A4%E3%83%AD%E3%83%BC%E3%83%89"><span class="toc-text">Lambdaイベントペイロード</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%88%E3%83%BC%E3%82%AF%E3%83%B3%E3%81%AE%E6%A4%9C%E8%A8%BC"><span class="toc-text">トークンの検証</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AA%8D%E5%8F%AF%E3%81%AE%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B7%E3%83%A5"><span class="toc-text">認可のキャッシュ</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Lambda%E3%81%AE%E5%AE%9F%E8%A3%85"><span class="toc-text">Lambdaの実装</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%A5%E5%87%BA%E5%8A%9B"><span class="toc-text">入出力</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%BA%E5%8A%9B%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3"><span class="toc-text">出力パターン</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Authentication"><span class="toc-text">Authentication</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%99%E7%9A%84%E3%81%AB%E5%85%AC%E9%96%8B%E9%8D%B5%E3%82%92%E4%BF%9D%E6%8C%81%E3%81%99%E3%82%8B"><span class="toc-text">静的に公開鍵を保持する</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AC%E9%96%8B%E9%8D%B5%E3%82%92%E5%8B%95%E7%9A%84%E3%81%AB%E5%8F%96%E5%BE%97%E3%81%99%E3%82%8B"><span class="toc-text">公開鍵を動的に取得する</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Authorization"><span class="toc-text">Authorization</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AA%8D%E5%8F%AF%E3%81%AE%E5%87%BA%E5%8A%9B"><span class="toc-text">認可の出力</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Policy-Document"><span class="toc-text">Policy Document</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Principal-ID"><span class="toc-text">Principal ID</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Authorizer-Context"><span class="toc-text">Authorizer Context</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%80%E5%BE%8C%E3%81%AB"><span class="toc-text">最後に</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>

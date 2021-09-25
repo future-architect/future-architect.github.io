@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Firebaseで取得したログをBigQueryに連携してユーザー操作をトラッキングする | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにGCP連載2021も折り返しの6本目です！ 陽光麗らかなある春の日、ITコンサルタントのあなたの元に、ユーザーからの問い合わせが入りました。 「すみません、モバイルアプリの調子が悪いので確認してもらえませんか。」「承知しました。起きている問題と、何時頃どのような操作をされたか教えていただけますか。」「問題は~~で、いつもと同じ操作をしていたのですが…。」「なるほど…。」 こんな時、特定ユー">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Firebaseで取得したログをBigQueryに連携してユーザー操作をトラッキングする | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210316/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにGCP連載2021も折り返しの6本目です！ 陽光麗らかなある春の日、ITコンサルタントのあなたの元に、ユーザーからの問い合わせが入りました。 「すみません、モバイルアプリの調子が悪いので確認してもらえませんか。」「承知しました。起きている問題と、何時頃どのような操作をされたか教えていただけますか。」「問題は~~で、いつもと同じ操作をしていたのですが…。」「なるほど…。」 こんな時、特定ユー">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210316/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210316/image_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210316/image_3.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210316/image_4.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210316/image_5.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210316/image_6.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210316/image_7.png">
+<meta property="article:published_time" content="2021-03-15T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:54:05.215Z">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="GCP">
+<meta property="article:tag" content="BigQuery">
+<meta property="article:tag" content="Firebase">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="GoogleAnalytics">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210316/image.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210316/">
+  <meta content="Java,GCP,BigQuery,Firebase,Android,GoogleAnalytics" name="keywords">
+  <meta content="松井宇宙" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">Firebaseで取得したログをBigQueryに連携してユーザー操作をトラッキングする
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210316_Firebaseで取得したログをBigQueryに連携してユーザー操作をトラッキングする.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210316_Firebaseで取得したログをBigQueryに連携してユーザー操作をトラッキングする" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E6%9D%BE%E4%BA%95%E5%AE%87%E5%AE%99">松井宇宙</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2021/"><time datetime="2021-03-15T15:00:00.000Z" itemprop="datePublished">2021.03.16</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Java/" title="Javaタグの記事へ">Java</a>
+  
+    
+    <a href="/tags/GCP/" title="GCPタグの記事へ">GCP</a>
+  
+    
+    <a href="/tags/BigQuery/" title="BigQueryタグの記事へ">BigQuery</a>
+  
+    
+    <a href="/tags/Firebase/" title="Firebaseタグの記事へ">Firebase</a>
+  
+    
+    <a href="/tags/Android/" title="Androidタグの記事へ">Android</a>
+  
+    
+    <a href="/tags/GoogleAnalytics/" title="GoogleAnalyticsタグの記事へ">GoogleAnalytics</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p><a href="/articles/20210307/">GCP連載2021</a>も折り返しの6本目です！</p>
+<p>陽光麗らかなある春の日、ITコンサルタントのあなたの元に、ユーザーからの問い合わせが入りました。</p>
+<p>「すみません、モバイルアプリの調子が悪いので確認してもらえませんか。」<br>「承知しました。起きている問題と、何時頃どのような操作をされたか教えていただけますか。」<br>「問題は~~で、いつもと同じ操作をしていたのですが…。」<br>「なるほど…。」</p>
+<p>こんな時、特定ユーザーのアプリ操作をトラッキングできれば…と思うかもしれません。</p>
+<p>今回は、そんな悩みをFirebaseとBigQueryの合わせ技で解決していきます。</p>
+<h1 id="Firebaseとは"><a href="#Firebaseとは" class="headerlink" title="Firebaseとは"></a>Firebaseとは</h1><p><strong>mBaaS (mobile Backend as a Service)</strong> を提供するGCPサービスのひとつです。<br>より一般的なBaaSのモバイルアプリ向けのイメージで、開発者はログ送信やDBアクセスなどのインフラ設定を気にする必要なく、アプリのコアな機能の開発に専念できます。</p>
+<p>一口にFirebaseと言っても様々な機能の集合体で構成されており、NoSQL DBを提供するCloud Firestore、クライアントアプリへのメッセージ送信機能であるFirebase Cloud Messagingなどプロダクトの数は18に及んでいます(2021.03.12現在)。<br>本ブログでもFirebaseのサービスの一つであるCrashlyticsを紹介していました。</p>
+<ul>
+<li><a href="/articles/20200330/">Serverless連載4: Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する</a></li>
+</ul>
+<p>各機能はFirebase Consoleを介してGUIで閲覧、操作することが可能です。<br>今回はその中の<code>Google Analytics for Firebase</code>を用いてAndroidアプリの操作ログを取得していきます。</p>
+<h1 id="Google-Analytics-for-Firebaseとは"><a href="#Google-Analytics-for-Firebaseとは" class="headerlink" title="Google Analytics for Firebaseとは"></a>Google Analytics for Firebaseとは</h1><img src="/images/20210316/image.png" loading="lazy">
+
+<p>実態はGoogleのサービス<code>Google Analytics</code> (GA)をFirebaseで利用できるようにしたものです。<br><a target="_blank" rel="noopener" href="https://firebase.google.com/docs/analytics/get-started?hl=ja&platform=android">公式ドキュメント</a>では以下のように紹介されています。</p>
+<blockquote>
+<p>Google アナリティクスは、ウェブ、iOS アプリ、Android アプリがどのように使用されているかを把握するのに役立ちます。<br>この SDK は主に次の 2 種類の情報を記録します。</p>
+</blockquote>
+<ul>
+<li>イベント: ユーザーの操作、システム イベント、エラーなど、アプリで起こっていること。</li>
+<li>ユーザー プロパティ: 言語や地域など、ユーザー層を示す属性。自由に定義できます。</li>
+</ul>
+<p>任意の情報をカスタム設定して取得できますが、<strong>一部の値は特にコードの記述なく<a target="_blank" rel="noopener" href="https://support.google.com/firebase/answer/9234069">自動的に収集されます。</a></strong><br>位置情報やアプリを使用しているデバイス情報などサクッと取れるのは非常に便利です。</p>
+<p>取得した情報はログとしてFirebase Console上で閲覧できます。<br>その際、ユーザー操作のトラッキングの観点で以下の課題が生じます。</p>
+<ul>
+<li>取得したログが<strong>サマリーされて</strong>表示されてしまう。</li>
+<li>時系列のトラッキング機能も過去<strong>1時間分ほどしかない、かつ抜粋された状態</strong>で表示される。</li>
+</ul>
+<p>これらが課題となるのは、今回がメジャーな利用方法からややずれる使い方のためかもしれません。<br>王道のマーケティング利用する場合はおそらくFirebase Consoleで抜群の使いやすさを発揮してくれるのだと思います。<br>サマリー前の全てのログはFirebaseが持っているため、今回はそのデータをBigQueryへ連携させて、<strong>抜け漏れなくログを追いかける</strong>ことを目指します。</p>
+<p>BigQueryの他にも、Crashlytics, FCM, Firebase Remote ConfigなどとGAを連携させることができます。<br>ちなみに、BigQueryへのデータ連携は昨年のGCP連載でも話題になっていましたね。</p>
+<ul>
+<li><a href="/articles/20200210/">GCP連載#4 Cloud Life Sciencesを見てみた</a></li>
+<li><a href="/articles/20200214/">GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる</a></li>
+</ul>
+<h1 id="試してみる"><a href="#試してみる" class="headerlink" title="試してみる"></a>試してみる</h1><p>以下の手順を踏んで実際に手を動かしながら、Androidアプリにおけるユーザー操作のトラッキングを実現していきます。</p>
+<ol>
+<li>Firebaseでログを取得する</li>
+<li>BigQueryへログを連携する</li>
+<li>BigQueryでクエリを実行する</li>
+</ol>
+<p>※そもそもの、アプリへのFirebaseの追加は<a target="_blank" rel="noopener" href="https://firebase.google.com/docs/android/setup?hl=en">公式ドキュメント</a>を参照いただければと思います。</p>
+<h2 id="1-Firebaseでログを取得する"><a href="#1-Firebaseでログを取得する" class="headerlink" title="1. Firebaseでログを取得する"></a>1. Firebaseでログを取得する</h2><p>Androidアプリのソースに必要なコードを追記していきます。<br>まず、Activityごとの下準備は以下の2点です。</p>
+<ul>
+<li><code>FirebaseAnalytics</code>のオブジェクトを宣言</li>
+<li><code>onCreate</code>メソッド内で初期化</li>
+</ul>
+<figure class="highlight java"><figcaption><span>test_activity.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//...(省略)...</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.google.firebase.analytics.FirebaseAnalytics;  <span class="comment">// 1. まずFirebaseAnalyticsクラスをimport</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//...(省略)...</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> FirebaseAnalytics mFirebaseAnalytics;   <span class="comment">// 1. FirebaseAnalyticsのオブジェクトを宣言</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//...(省略)...</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//...(省略)...</span></span><br><span class="line"></span><br><span class="line">        mFirebaseAnalytics = FirebaseAnalytics.getInstance(<span class="keyword">this</span>);  <span class="comment">// 2. onCreateメソッド内で初期化</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>ここまでで、Firebaseが自動的に収集するログはすでに取得できるようになっています。<br>続いて、以下の記述を入れることで、ソースコード上の任意の位置でのログを取得できるようになります。</p>
+<figure class="highlight java"><figcaption><span>test_activity.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ログを取得したい任意の箇所で</span></span><br><span class="line">Bundle bundle = <span class="keyword">new</span> Bundle();</span><br><span class="line">bundle.putString(param1, value1);</span><br><span class="line">bundle.putString(param2, value2);</span><br><span class="line">mFirebaseAnalytics.logEvent(event_name, bundle);</span><br></pre></td></tr></table></figure>
+
+<p><code>bundle</code> で送りたいログの型を作り、Firebaseの<code>logEvent</code>メソッドでログを送信しています。<br>Firebaseで扱うログはオブジェクト形式をしており、上記ログを送信すると以下のようなイメージのJSONが送られます。</p>
+<figure class="highlight json"><figcaption><span>送信されるログのイメージ</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;event_name&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;param1&quot;</span>: <span class="string">&quot;value1&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;param2&quot;</span>: <span class="string">&quot;value2&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>※実際にはデフォルトのパラメータも含まれるため、paramの数はもっと多いです。またevent_nameと並列で、timestampなど諸々の値もデフォルトで送信されます。</p>
+<p>paramやevent_nameは任意に指定することもできますし、Firebaseが用意している定数クラスを用いることもできます。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://firebase.google.com/docs/reference/android/com/google/firebase/analytics/FirebaseAnalytics.Param?hl=ja">Paramの一覧</a></li>
+<li><a target="_blank" rel="noopener" href="https://firebase.google.com/docs/reference/android/com/google/firebase/analytics/FirebaseAnalytics.Event?hl=ja">Eventの一覧</a></li>
+</ul>
+<p>また、bundleに対しても <code>putXxx</code>のメソッドを利用することで、String型以外にも様々な型のvalueを指定可能です。<br>非常に自由度高くログの送信ができるとわかりましたが、**使用できるeventの数や値の長さには<a target="_blank" rel="noopener" href="https://support.google.com/firebase/answer/9237506?hl=en">上限がある</a>**ため、注意が必要です。</p>
+<p>ここまでで、アプリのログはFirebase Console上で閲覧できるようになっています。<br>サマリー情報で十分な場合はこれで十分強さを発揮するでしょう。。<br>今回のようにFirebaseログの生データにアクセスしたい場合はさらにBigQueryとの連携を進めます。</p>
+<p>以下は、Firebase Consoleの一例です。使用状況をグラフ化して確認できたり(上)、event_nameごとの発生回数がサマリ表示されていたりします(下)。<br><img src="/images/20210316/image_2.png" loading="lazy"><br><img src="/images/20210316/image_3.png" loading="lazy"></p>
+<h2 id="2-BigQueryへログを連携する"><a href="#2-BigQueryへログを連携する" class="headerlink" title="2. BigQueryへログを連携する"></a>2. BigQueryへログを連携する</h2><p><a target="_blank" rel="noopener" href="https://support.google.com/firebase/answer/6318765?hl=en">こちらのドキュメント</a>を参照しつつ、設定します。<br>全てFirebase Consoleからの操作で可能です。</p>
+<p>Firebase Consoleの設定画面から、<code>Integrations</code>タブを選択します。<br>そこで表示される、各種連携可能なカードから、<code>BigQuery</code>を選択します。<br>※参考画像ではすでに連携済みのため「Manage」となっていますが、初回設定の場合は「Link」と表示されます。<br><img src="/images/20210316/image_4.png" loading="lazy"></p>
+<p>Linkが開始されると、「どのサービスのデータをBigQueryに連携するか」を選択できるようになります。<br>今回は<code>Google Analytics</code>にチェックを入れます。<br>他にも、CrashlyticsやCloud Messagingなどのデータも連携できるようです。<br><img src="/images/20210316/image_5.png" loading="lazy"></p>
+<p>ここまでの設定で、BigQueryへFirebaseのデータが連携されます。<br>GCP Consoleから確認してみると、プロジェクトフォルダの配下に、<code>analytics_XXXX</code>というフォルダ名でFirebaseからのデータが連携されています。(XXXXはGAのProperty ID です)<br>当日のデータは<code>events_intraday_YYYYMMDD</code>というテーブル名称で格納されています。翌日になると <code>events_YYYYMMDD</code>の名称に変化します。<br><img src="/images/20210316/image_6.png" loading="lazy"></p>
+<p>「プレビュー」タブを参照すると、1つの<code>event_name</code>に紐付く<code>params</code>のkey/valueペアの形でデータが格納されていることが確認できます。<br>ただしこのままではFirebaseデフォルトのログと入り混じって見にくい、かつ複数のユーザーのログが混じっている、のでクエリを作成して可読性を上げます。</p>
+<h2 id="3-BigQueryでクエリを実行する"><a href="#3-BigQueryでクエリを実行する" class="headerlink" title="3. BigQueryでクエリを実行する"></a>3. BigQueryでクエリを実行する</h2><p>可読性を向上させてトラッキングを実現するため、クエリを作成します。</p>
+<p>純粋なRDBではないBigQueryでは、ネストされたparamsをそのままWHERE句に指定することができません。</p>
+<p>そこで、<code>UNNEST</code>でネスト構造を解除してWHERE句でフィルタリングしたのちに<code>ARRAY</code>で再びネスト構造に戻す、という手順を踏んでいます。この処理は全てSELECT句の中で実施しています。<br>今回は、ネストされた<code>event_params.key</code>と<code>event_params.value</code>、<code>user_properties</code>に対して、不要なパラメータを除外しています。</p>
+<p>また、WHERE句にトラッキングしたいユーザーIDを設定して、特定ユーザーの操作のみ出力させます。<br><code>event_name: user_engagement</code> はFirebaseデフォルトのevent_nameで、今回は不要のため除外しています。</p>
+<p>以下に作成したクエリを記載しています。<br>※洗練されたクエリではないですが、ユーザー操作のトラッキングが目的のため、ご容赦いただきたいです。</p>
+<figure class="highlight sql"><figcaption><span>実行するクエリ</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WITH</span> tracking_operation <span class="keyword">AS</span> (</span><br><span class="line">      <span class="keyword">SELECT</span></span><br><span class="line">            event_timestamp,</span><br><span class="line">            FORMAT_TIMESTAMP(<span class="string">&#x27;%Y-%m-%d %H:%M:%S&#x27;</span>, TIMESTAMP_SECONDS(<span class="built_in">cast</span>(<span class="built_in">floor</span>(event_timestamp<span class="operator">/</span><span class="number">1000000</span>) <span class="keyword">as</span> int64)), <span class="string">&#x27;Asia/Tokyo&#x27;</span>) <span class="keyword">as</span> event_date,</span><br><span class="line">            event_name,</span><br><span class="line">            <span class="keyword">ARRAY</span>(</span><br><span class="line">                  <span class="keyword">SELECT</span></span><br><span class="line">                        ep.key <span class="keyword">as</span> key</span><br><span class="line">                  <span class="keyword">FROM</span></span><br><span class="line">                        <span class="built_in">UNNEST</span>(event_params) <span class="keyword">as</span> ep</span><br><span class="line">                  <span class="keyword">WHERE</span></span><br><span class="line">                        ep.key <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">&#x27;ga_session_id&#x27;</span>, <span class="string">&#x27;ga_session_number&#x27;</span>, <span class="string">&#x27;timestamp&#x27;</span>, <span class="string">&#x27;firebase_event_origin&#x27;</span>, <span class="string">&#x27;session_engaged&#x27;</span>,<span class="string">&#x27;engaged_session_event&#x27;</span>, <span class="string">&#x27;firebase_screen_id&#x27;</span>, <span class="string">&#x27;firebase_previous_id&#x27;</span>, <span class="string">&#x27;entrances&#x27;</span>, <span class="string">&#x27;engaged_session_event&#x27;</span>, <span class="string">&#x27;engagement_time_msec&#x27;</span>)</span><br><span class="line">            ) <span class="keyword">as</span> event_params_key,</span><br><span class="line">            <span class="keyword">ARRAY</span>(</span><br><span class="line">                  <span class="keyword">SELECT</span></span><br><span class="line">                        ep.value.string_value <span class="keyword">as</span> <span class="keyword">value</span></span><br><span class="line">                  <span class="keyword">FROM</span></span><br><span class="line">                        <span class="built_in">UNNEST</span>(event_params) <span class="keyword">as</span> ep</span><br><span class="line">                  <span class="keyword">WHERE</span></span><br><span class="line">                        ep.key <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">&#x27;ga_session_id&#x27;</span>, <span class="string">&#x27;ga_session_number&#x27;</span>, <span class="string">&#x27;timestamp&#x27;</span>, <span class="string">&#x27;firebase_event_origin&#x27;</span>, <span class="string">&#x27;session_engaged&#x27;</span>,<span class="string">&#x27;engaged_session_event&#x27;</span>, <span class="string">&#x27;firebase_screen_id&#x27;</span>, <span class="string">&#x27;firebase_previous_id&#x27;</span>, <span class="string">&#x27;entrances&#x27;</span>, <span class="string">&#x27;engaged_session_event&#x27;</span>, <span class="string">&#x27;engagement_time_msec&#x27;</span>) <span class="keyword">and</span> ep.value.string_value <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">null</span></span><br><span class="line">            ) <span class="keyword">as</span> event_params_value,</span><br><span class="line">            (</span><br><span class="line">                  <span class="keyword">SELECT</span></span><br><span class="line">                        up.value.string_value <span class="keyword">as</span> user_id</span><br><span class="line">                  <span class="keyword">FROM</span></span><br><span class="line">                        <span class="built_in">UNNEST</span>(user_properties) <span class="keyword">as</span> up</span><br><span class="line">                  <span class="keyword">WHERE</span> up.key <span class="operator">=</span> <span class="string">&#x27;user_id&#x27;</span></span><br><span class="line">            ) <span class="keyword">as</span> user_id,</span><br><span class="line">            device.mobile_os_hardware_model <span class="keyword">as</span> mobile_os_hardware_model,</span><br><span class="line">            device.operating_system <span class="keyword">as</span> operating_system,</span><br><span class="line">            device.operating_system_version <span class="keyword">as</span> operating_system_version,</span><br><span class="line">            geo.country <span class="keyword">as</span> country,</span><br><span class="line">            geo.region <span class="keyword">as</span> region,</span><br><span class="line">            geo.city <span class="keyword">as</span> city,</span><br><span class="line">            app_info.version <span class="keyword">as</span> app_version</span><br><span class="line">      <span class="keyword">FROM</span></span><br><span class="line">            `analytics_XXXX.events_202004<span class="operator">*</span>`</span><br><span class="line">)</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">      <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">      tracking_operation</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">      event_name <span class="operator">!=</span> <span class="string">&#x27;user_engagement&#x27;</span> <span class="keyword">and</span> user_id <span class="operator">=</span> <span class="string">&#x27;トラッキングしたいユーザーIDを入力&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span></span><br><span class="line">      event_timestamp</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>このクエリを実行すると、特定のuser_idをもつユーザーの2020年4月の操作ログを時系列で確認できます．</p>
+<p>その結果が以下の写真です。不要なeventやparamsを除外したので、可読性もだいぶ向上しました。WHERE句にevent_timestampの条件を加えることで、さらに細かく時刻で絞り込むことも可能です。</p>
+<p>ちなみに、<code>screen_view</code>は自動的に取得されるevent_nameで、その他は1.の手順でカスタムで設定しています。</p>
+<p>この<code>screen_view</code>は自動で遷移前後の画面名を取得してくれるので、非常に便利です。</p>
+<p>端末の戻るボタンが押されて遷移した場合も検知してくれます。<br><img src="/images/20210316/image_7.png" loading="lazy"></p>
+<h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>FirebaseとBigQueryの合わせ技で、モバイルアプリのユーザー操作のトラッキングを実現しました。<br>これで障害やユーザー問い合わせにも安心して対応できます。<br>もちろん、トラッキング対象を別のパラメータ(例えば特定の商品データなど)に変えて応用もできるかと思います。</p>
+<p>最終的に<a target="_blank" rel="noopener" href="https://datastudio.google.com/overview">DataStudio</a>など連携させればGUIで綺麗に表示させることができそうです。<br>複数のサービスを組み合わせれば痒いところにも手が届く、それがGCPの魅力のひとつかもしれません。</p>
+<p>明日はTechBlogの編集もされている伊藤さんの<a href="/articles/20210317/">Google Cloud BuildpacksとCloud Runで簡単コンテナアプリ開発</a>です。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210316/&via=future_techblog&related=twitterapi%2Ctwitter&text=Firebase%E3%81%A7%E5%8F%96%E5%BE%97%E3%81%97%E3%81%9F%E3%83%AD%E3%82%B0%E3%82%92BigQuery%E3%81%AB%E9%80%A3%E6%90%BA%E3%81%97%E3%81%A6%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E6%93%8D%E4%BD%9C%E3%82%92%E3%83%88%E3%83%A9%E3%83%83%E3%82%AD%E3%83%B3%E3%82%B0%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210316/&t=Firebase%E3%81%A7%E5%8F%96%E5%BE%97%E3%81%97%E3%81%9F%E3%83%AD%E3%82%B0%E3%82%92BigQuery%E3%81%AB%E9%80%A3%E6%90%BA%E3%81%97%E3%81%A6%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E6%93%8D%E4%BD%9C%E3%82%92%E3%83%88%E3%83%A9%E3%83%83%E3%82%AD%E3%83%B3%E3%82%B0%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210316/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210316/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2020.03.30</span><span class="snscount">&#9825;3</span><a class="related-posts-link" href=/articles/20200330/ title="こんにちは、Android Developerの佐藤です。モバイルアプリ品質強化の強い味方となってくれるFirebase Crashlyticsを紹介したいと思います！Firebaseとは、AndroidやiOSなどのモバイルアプリのバックエンド機能を提供してくれるサービスです。提供されているサービスは...">Serverless連載4: Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する</a></li><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;541</span><a class="related-posts-link" href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2021.01.20</span><span class="snscount">&#9825;7</span><a class="related-posts-link" href=/articles/20210120/ title="昨今のコロナ事情の中、「なかなか外出できない...。そうだ、Androidアプリを作ろう。」となるエンジニアの方は多いのではないでしょうか？アプリを作っていると、ソースコードを分けるまではいかなくとも、微妙なバージョンの違いを表現したい場面に度々出くわします。例えば...">Androidのビルドバリアントをイチから理解する</a></li><li class="related-posts-item"><span>2020.04.24</span><span class="snscount">&#9825;309</span><a class="related-posts-link" href=/articles/20200424/ title="TIG/DXチームの伊藤です。この技術ブログでGCPネタをよく発信していますが、今回もGCPネタです。好きです、GCP。フューチャーの社内では定期的に勉強会を開催している部門があり、全社的に登壇者を募って発表しています。今回は私自身社内にGCPを広めたいという思いがあり登壇の機会をいただきました。今回はその時のまとめや一部改善した内容になります。また、リモートでの勉強会ということもあり、個人的に気をつけた点も簡単にまとめたので、その辺も参考になればと思います。">社内勉強会で発表したGCP資料を公開します</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2020.03.11</span><span class="snscount">&#9825;541</span> <a href="/articles/20200311/" title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li>
+
+    <li><span>2021.07.26</span><span class="snscount">&#9825;92</span> <a href="/articles/20210726a/" title="7/26（月）～8/3（水）の平日にかけて、GoでRDBに対してアクセスライブラリ（ORMとクエリビルダー）をテーマにした連載を始めます。">GoのORマッパー連載を始めます</a></li>
+
+    <li><span>2021.05.25</span><span class="snscount">&#9825;185</span> <a href="/articles/20210525a/" title="Goで構造体を設計する場合、オブジェクト指向的な「型ごとの責務の分担」以外に、「どのように使われるものか」を考える必要があります。 ポインタで扱うのか？値として扱うのか？両方許可するのか？値として扱える場合にimmutable（変更不可能）なオブジェクトとするのか...">Goの構造体の使われ方の設計</a></li>
+
+    <li><span>2021.05.18</span><span class="snscount">&#9825;469</span> <a href="/articles/20210518a/" title="RESTfullとかRESTishな方針でWebAPIの横断検索を設計する際にチーム内で方針について議論したやり取りの備忘記事です。">HTTP検索条件、GETにするか？POSTにするか？</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Firebase%E3%81%A8%E3%81%AF"><span class="toc-text">Firebaseとは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Google-Analytics-for-Firebase%E3%81%A8%E3%81%AF"><span class="toc-text">Google Analytics for Firebaseとは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A9%A6%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">試してみる</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Firebase%E3%81%A7%E3%83%AD%E3%82%B0%E3%82%92%E5%8F%96%E5%BE%97%E3%81%99%E3%82%8B"><span class="toc-text">1. Firebaseでログを取得する</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-BigQuery%E3%81%B8%E3%83%AD%E3%82%B0%E3%82%92%E9%80%A3%E6%90%BA%E3%81%99%E3%82%8B"><span class="toc-text">2. BigQueryへログを連携する</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-BigQuery%E3%81%A7%E3%82%AF%E3%82%A8%E3%83%AA%E3%82%92%E5%AE%9F%E8%A1%8C%E3%81%99%E3%82%8B"><span class="toc-text">3. BigQueryでクエリを実行する</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>

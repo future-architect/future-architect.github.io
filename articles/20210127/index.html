@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>不調PCを介抱しつつWMIに思いを馳せる | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにはじめまして、TIGの加藤剛です。2013年キャリア入社で、現在はTIG内に複数あるチームの1つのリーダをしています。テクノロジー領域としてはインフラやデータベースが明るめの分野です。先日 納期間近の作業中に社用PC端末で少々トラブルがあり復帰対応を行ったのですが、今回はその際の話について、関連する技術要素を織り交ぜながら取り上げてみたいと思います。 問題の概要社用PCのパッチ自動適用後、">
+<meta property="og:type" content="article">
+<meta property="og:title" content="不調PCを介抱しつつWMIに思いを馳せる | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210127/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにはじめまして、TIGの加藤剛です。2013年キャリア入社で、現在はTIG内に複数あるチームの1つのリーダをしています。テクノロジー領域としてはインフラやデータベースが明るめの分野です。先日 納期間近の作業中に社用PC端末で少々トラブルがあり復帰対応を行ったのですが、今回はその際の話について、関連する技術要素を織り交ぜながら取り上げてみたいと思います。 問題の概要社用PCのパッチ自動適用後、">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210127/wmi-architecture.png">
+<meta property="article:published_time" content="2021-01-26T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:54:03.699Z">
+<meta property="article:tag" content="トラブルシュート">
+<meta property="article:tag" content="Windows">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210127/wmi-architecture.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210127/">
+  <meta content="トラブルシュート,Windows" name="keywords">
+  <meta content="加藤剛" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">不調PCを介抱しつつWMIに思いを馳せる
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210127_不調PCを介抱しつつWMIに思いを馳せる.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210127_不調PCを介抱しつつWMIに思いを馳せる" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E5%8A%A0%E8%97%A4%E5%89%9B">加藤剛</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2021/"><time datetime="2021-01-26T15:00:00.000Z" itemprop="datePublished">2021.01.27</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/トラブルシュート/" title="トラブルシュートタグの記事へ">トラブルシュート</a>
+  
+    
+    <a href="/tags/Windows/" title="Windowsタグの記事へ">Windows</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>はじめまして、TIGの加藤剛です。2013年キャリア入社で、現在はTIG内に複数あるチームの1つのリーダをしています。テクノロジー領域としてはインフラやデータベースが明るめの分野です。先日 納期間近の作業中に社用PC端末で少々トラブルがあり復帰対応を行ったのですが、今回はその際の話について、関連する技術要素を織り交ぜながら取り上げてみたいと思います。</p>
+<h1 id="問題の概要"><a href="#問題の概要" class="headerlink" title="問題の概要"></a>問題の概要</h1><p>社用PCのパッチ自動適用後、一時期から音声・ディスプレイ周辺の動作不良が続いていました。デバイスドライバーを当て直したいところなのですが、調査の中でPC構成情報を見ようとsysteminfoコマンドを実行すると、そこで見慣れないエラー。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c:\ systeminfo</span><br><span class="line">オペレーティング システム情報を読み込んでいます...                    エラー: 無効なクラスです</span><br></pre></td></tr></table></figure>
+
+<p>WindowsのApplicationイベントログにはWMIエラーが数回。**Microsoft-Windows-WMIプロバイダーで イベントID 10 (Error: 0x80041010)**、<code>//./root/CIMV2</code>の名前空間へのクエリが失敗していることがわかります。無視してドライバーをインストールしようとしても、同様のエラーでインストーラが止まり、ここから進めない状態です。納期が迫る中で立ち往生、ということでWMIの構成を修復していきました。</p>
+<figure class="highlight plaintext"><figcaption><span>Windows-Eventlog（Application）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">  + System</span><br><span class="line">  - Provider</span><br><span class="line">   [ Name]  Microsoft-Windows-WMI</span><br><span class="line">(中略)</span><br><span class="line">   EventID 10</span><br><span class="line">   Version 2</span><br><span class="line">   Level 2</span><br><span class="line">   Task 0</span><br><span class="line">   Opcode 0</span><br><span class="line">   Keywords 0x8000000000000000</span><br><span class="line">  - TimeCreated</span><br><span class="line">(中略)</span><br><span class="line">- UserData</span><br><span class="line">  - data_0x8000003F</span><br><span class="line">   Query //./root/CIMV2</span><br><span class="line">   Namespace SELECT TargetInstance FROM __InstanceCreationEvent WITHIN 10 WHERE TargetInstance ISA &#x27;Win32_Process&#x27; AND TargetInstance.Name = &#x27;lync.exe&#x27;</span><br><span class="line">   Error 0x80041010</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="原因はWMIリポジトリ破損"><a href="#原因はWMIリポジトリ破損" class="headerlink" title="原因はWMIリポジトリ破損"></a>原因はWMIリポジトリ破損</h2><p>パッチ自動適用の影響なのか真因は不明ながら、ある時点から<strong>WMIのリポジトリが破損</strong>していました。</p>
+<p>尚これが原因で、前述のsysteminfo以外にもWMIベースでの実装されている情報収集機能系の機能は他も軒並みNGという状況でした。例えばmsinfo32のようなコマンド群や、ハードウェアメーカー製のアップデート管理ツールなど。</p>
+<h1 id="WMI（Windows-Management-Instrumentation）とは"><a href="#WMI（Windows-Management-Instrumentation）とは" class="headerlink" title="WMI（Windows Management Instrumentation）とは"></a>WMI（Windows Management Instrumentation）とは</h1><p>そもそもWMIとは何でしょうか。超ざっくり要約すると<strong>Windows関連コンポーネントを管理するための汎用メカニズム</strong>です。<a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/Windows_Management_Instrumentation">Wikipedia</a>ではこのように説明されています。</p>
+<blockquote>
+<p>Windows Management Instrumentation (WMI) は、Windows Driver Modelへの拡張の一種で、システムの構成要素について情報収集と通知を行うオペレーティングシステム (OS) のインターフェースを提供する。WMI はDistributed Management Task Force (DMTF) の定めた Web-Based Enterprise Management (WBEM) と Common Information Model (CIM) 標準のマイクロソフトによる実装である。<br>WMI により、Windowsを搭載したパーソナルコンピュータやサーバをVBScriptやPowerShellのようなスクリプト言語で（ローカルでもリモートでも）管理できるようになる。WMIはWindows Vista、Windows Server 2003、Windows XP、Windows Me、Windows 2000に最初から実装されている。Windows 95およびWindows 98向けのWMIはダウンロード可能である[1]。<br>また、マイクロソフトはWMIのキャラクタユーザインターフェースとして Windows Management Instrumentation Command-line (WMIC) を提供している[2]。</p>
+<p>^ [1] <a target="_blank" rel="noopener" href="http://www.microsoft.com/downloads/details.aspx?familyid=98a4c5ba-337b-4e92-8c18-a63847760ea5&displaylang=en">WMI Redistributable for Windows 95 and Windows 98</a><br>^ [2] <a target="_blank" rel="noopener" href="http://support.microsoft.com/kb/290216">Description of WMIC</a></p>
+</blockquote>
+<p>WMI (Windows Management Instrumentation) の Instrumentationという単語は「計器」や「計器による測定」を意味します。自動車の計器類がエンジンに関する情報を示すように、<strong>WMIはコンピュータシステムの内部状態に関する情報を示します</strong>。WMIでは、Windowsシステム内に検出されたディスクやプロセスなどのオブジェクトをモデリングすることにより、計器情報を提供します。</p>
+<p>WMIによるシステムオブジェクトのモデリングには、<code>Win32_LogicalDisk</code> や <code>Win32_Process</code> などのクラスが使用されます。クラス名から推察できるように、<code>Win32_LogicalDisk</code> はコンピュータ上の論理ディスクをモデリングするクラス、<code>Win32_Process</code> はコンピュータ上で現在稼動している任意のプロセスをモデリングするクラスです。クラスは、Common Information Model (CIM) と呼ばれる拡張可能スキーマに基づいています。CIM スキーマは、<a target="_blank" rel="noopener" href="http://www.dmtf.org/">Distributed Management Task Force</a> の公開規格です。</p>
+<p>WMIには、上記のほか、イベント処理、リモート処理、クエリ処理、ビュー、スキーマのユーザー拡張、情報取得などの機能もあります。汎用メカニカズムですので、これに準拠することで<strong>全てのメーカーのハードウェアやソフトウェアで統一的に使える</strong>ようになります。</p>
+<h2 id="WMIのアーキテクチャ"><a href="#WMIのアーキテクチャ" class="headerlink" title="WMIのアーキテクチャ"></a>WMIのアーキテクチャ</h2><p>続いて、WMIのアーキテクチャについて紐解いていきます。詳細はマイクロソフトの <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/wmisdk/wmi-architecture">WMI Architecture</a> に纏まっています。</p>
+<p>WMIはコンピュータ、ネットワーク、ローカルまたはリモートのアプリケーションやスクリプトに対して、統一インターフェースを提供するわけですが、ポイントは<strong>WMIクライアントアプリケーションとスクリプトが多数のOS-APIを呼び出す必要がないように設計</strong>された点でしょう。 WMI以外の多くのAPIは、スクリプトやVBアプリケーションなどのオートメーションクライアントから呼び出すことはできず、リモートコンピュータも呼び出しません。WMIからデータを取得するには、WMIクラスにアクセスするクライアントスクリプトまたはアプリケーションを作成するか、WMIプロバイダーを作成してWMIにデータを提供します。</p>
+<ul>
+<li>WMIアーキテクチャ構成図の概略と各層の役割を以下に示します。</li>
+</ul>
+<img src="/images/20210127/wmi-architecture.png" loading="lazy">
+
+
+<h3 id="1-WMI-providers-and-managed-objects"><a href="#1-WMI-providers-and-managed-objects" class="headerlink" title="1.WMI providers and managed objects"></a>1.WMI providers and managed objects</h3><ul>
+<li>WMIプロバイダー<ul>
+<li>1つ以上の<strong>管理対象オブジェクトのWMIを監視するCOMオブジェクト</strong>です。</li>
+<li>ドライバー同様に、プロバイダーはWMIに管理対象オブジェクトからのデータを提供し、WMIから管理対象オブジェクトへのメッセージを処理します。 DLLファイルと、プロバイダーがデータを返し、操作を実行するクラスを定義する管理対象オブジェクト形式（<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us//windows/win32/wmisdk/managed-object-format--mof-">MOF</a>）ファイルで構成され、WMI C++アプリケーションなどのプロバイダーは、WMI用のCOMAPIを使用します。</li>
+</ul>
+</li>
+<li>管理対象オブジェクト<ul>
+<li>ハードディスクドライブ、ネットワークアダプター、データベースシステム、オペレーティングシステム、プロセス、サービスなどの<strong>論理的または物理的なエンタープライズコンポーネント</strong>です。</li>
+<li>プロバイダーの例は、システムレジストリ内のデータにアクセスするプリインストールされたレジストリプロバイダーなどがあります。<br>プロバイダーによって、1クラス内のメソッドとプロパティの数的関係性は絶対のルールはなくマチマチです。</li>
+</ul>
+</li>
+<li>物理構造体の特徴<ul>
+<li>WMI MOFおよびDLLファイルは、Winmgmt.exeやMofcomp.exeなどのWMIコマンドラインツールとともに<code>%WINDIR%\System32\Wbem</code> に置かれます。<code>Win32_LogicalDisk</code> などのプロバイダークラスはMOFファイルで定義され、<strong>システムの起動時にWMIリポジトリにコンパイル</strong>されます。</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-WMI-infrastructure"><a href="#2-WMI-infrastructure" class="headerlink" title="2. WMI infrastructure"></a>2. WMI infrastructure</h3><ul>
+<li>WMIインフラストラクチャは<strong>WMIサービス（winmgmt）として知られるWindows OSコンポーネント</strong>で、 WMIリポジトリとWMIコアの2つのコンポーネントがあります。</li>
+<li>WMIリポジトリ<ul>
+<li><strong>WMI名前空間によって編成されます。名前空間はWMIサービスによってシステムの起動時に作成</strong>され、Win32クラス、WMIシステムクラスなどのクラス定義の既定のセットをプレインストールします。</li>
+<li>システム起動時に作成される名前空間には、<code>root\default</code>、<code>root\cimv2</code>、<code>root\Subscription</code>などがあります。システムにある残りの名前空間は、オペレーティングシステムまたは製品の他の部分のプロバイダーによって作成されます。</li>
+</ul>
+</li>
+<li>WMIコア<ul>
+<li><strong>プロバイダー、管理アプリケーション、およびWMIリポジトリ間の仲介役</strong>として機能します。プロバイダーによって定義されたクラスなど、オブジェクトに関する静的データのみがリポジトリに保存されます。 WMIはクライアントが要求したときにプロバイダーからほとんどのデータを動的に取得します。</li>
+<li>ちなみに上記は、マイクロソフトの説明原文（<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/wmisdk/wmi-architecture">WMI Architecture</a> ）では以下のようにWMIコアではなく「WMI service」の説明として記載されていますが、内容の整合性を踏まえるとWMIコアの役割に関する説明と読み取るのが妥当なのではと思われます。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>The WMI service acts</strong> as an intermediary between the providers, management applications, and the WMI repository. Only static data about objects is stored in the repository, such as the classes defined by providers. WMI obtains most data dynamically from the provider when a client requests it. You also can set up subscriptions to receive event notifications from a provider. For more information, see Monitoring Events.</p>
+</blockquote>
+<h3 id="3-WMI-consumers-management-applications"><a href="#3-WMI-consumers-management-applications" class="headerlink" title="3. WMI consumers (management applications)"></a>3. WMI consumers (management applications)</h3><ul>
+<li>WMIインフラストラクチャと対話する<strong>管理アプリケーションあるいはスクリプト</strong>です。</li>
+<li>管理アプリケーションは、WMI用のCOMAPIまたはWMI用のScriptingAPIのいずれかを呼び出すことにより、クエリ、データの列挙、プロバイダーメソッドの実行、またはイベントのサブスクライブを行うことができます。ディスクドライブやサービスなどの管理対象オブジェクトで使用できるデータまたはアクションは、プロバイダーが提供するものだけとなります。</li>
+</ul>
+<h2 id="WMIを扱うためのWindows標準ツール"><a href="#WMIを扱うためのWindows標準ツール" class="headerlink" title="WMIを扱うためのWindows標準ツール"></a>WMIを扱うためのWindows標準ツール</h2><p>WMIによる情報取得や管理操作を行うのに利用できるWindows標準ツールには、以下のような方法があります。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center">No</th>
+<th align="left">ツール名</th>
+<th align="left">概要説明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td align="left">WMICコマンド (<a target="_blank" rel="noopener" href="https://docs.microsoft.com/ja-jp/windows-server/administration/windows-commands/wmic">wmic</a>)</td>
+<td align="left">Windows標準のCUIベースの情報走査ツール。コマンドラインからWMIにアクセスできる。データアクセスはWQLベースではない。外部記事によるコマンド具体例は<a target="_blank" rel="noopener" href="https://qiita.com/Yorcna/items/119abffc89d01f67c111">こちら</a>。アーキテクチャ階層の「WMI consumers」にあたる。</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="left">WMIテスト (<a target="_blank" rel="noopener" href="https://docs.microsoft.com/ja-jp/mem/configmgr/develop/core/understand/introduction-to-wbemtest">wbemtest</a>)</td>
+<td align="left">Windows標準ツールのGUIベースの情報走査ツール。WQLエディターに相当。WMI名前空間への接続、クラス定義の確認、そしてクラスのメソッド実行をテストすることができる。また、MOFCOMPでCIMレポジトリに登録された情報を削除することも可能。アーキテクチャ階層の「WMI consumers」にあたる。</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="left">WMIコントロール (<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/wmisdk/winmgmt">wmimgmt.msc</a>)</td>
+<td align="left">Windows標準のGUI管理ツール。WMIの構成と制御を行うツールで、WMIデータベースのバックアップと復元、WMIサービスに対するアクセスのセキュリティ設定を行うことができる。ただし、WMIデータにアクセスする機能はない。アーキテクチャ階層の「WMI infrastructure」にあたる。</td>
+</tr>
+</tbody></table></div>
+<p>上記以外だと、以前はマイクロソフトのサイトで「WMI Administrative Tools」というWQLツールも配布されていたようですが、現在ではDLできないようになっています。WQLベースのツールとしては前述の表No.2の「wbemtest」と、軽量・簡易なフリーソフトとして、<a target="_blank" rel="noopener" href="http://www.vector.co.jp/soft/winnt/util/se477357.html">WMI Query</a>というものが知られています。</p>
+<h2 id="補足：WQL-WMI-Query-Language）について"><a href="#補足：WQL-WMI-Query-Language）について" class="headerlink" title="補足：WQL (WMI Query Language）について"></a>補足：WQL (WMI Query Language）について</h2><p>最後に、WQLについて補足しておきます。</p>
+<p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/wmisdk/querying-with-wql">WQL(WMI Query Language)</a>は「SQL for WMI」と記載されることある、WMI特有の拡張機能を複数持つ構造化照会言語 (SQL) の単純化されたサブセットです。 WMIの情報を取得するには、WMIクラスのインスタンスを取得し、取得したWMIクラスの各インスタンスのプロパティから情報を取得するという流れで作業します。この操作をWQLと呼ばれるSQL文を使い取得することが可能です。<strong>SQL文の場合、通常はデータベースやテーブルを操作しますが、WQLではWMIクラスが対象</strong>となります。</p>
+<p>冒頭に出てきたイベントログでも、以下のようになっていましたね。</p>
+<figure class="highlight plaintext"><figcaption><span>Windows-EventLog（抜粋で再掲）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Query //./root/CIMV2</span><br><span class="line">   Namespace SELECT TargetInstance FROM __InstanceCreationEvent WITHIN 10 WHERE TargetInstance ISA &#x27;Win32_Process&#x27; AND TargetInstance.Name = &#x27;lync.exe&#x27;</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="発生していた問題への対処"><a href="#発生していた問題への対処" class="headerlink" title="発生していた問題への対処"></a>発生していた問題への対処</h1><p>ではここまでの内容を頭に置きつつ、以降は話を戻し、不調な我がPCを復帰させていきます。</p>
+<p>結論から言うと、最終的にWMIを再構成することで解決しました。</p>
+<p>手順は至ってシンプルで、<strong>WMIサービスを止めて、リポジトリを再作成するのみ</strong>です。今回は <del>ディスプレイ制御がおかしく仕方なく</del> カッコよく？GUIを使わずコマンドでやってみようということで、PowerShellのコマンドレットをベースに操作していきます。詳細は割愛しますがWindows標準コマンドのsc（sc.exe）も高機能でよく使うコマンドですので、もう忘れたという方は是非思い出してあげてください（というか、scでは簡単にできることでもPowerShellだと大変なことも割とあります）。</p>
+<h2 id="WMIサービス状態と構成の確認"><a href="#WMIサービス状態と構成の確認" class="headerlink" title="WMIサービス状態と構成の確認"></a>WMIサービス状態と構成の確認</h2><p>まずはサービスの状態、設定を確認していきます。ここでは主にWMI（<code>Windows Management Instrumentation</code>サービス）の起動状態とサービス実名を確認しています。なお以降PowerShellは基本的に 「管理者として実行」 しています。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\windows\system32&gt;  <span class="built_in">Get-Service</span> | <span class="built_in">Where-Object</span> &#123; <span class="variable">$_</span>.displayname <span class="operator">-eq</span> <span class="string">&quot;Windows Management Instrumentation&quot;</span>&#125;|<span class="built_in">select-object</span> status, starttype, name, displayname</span><br><span class="line"></span><br><span class="line"> Status StartType Name    DisplayName</span><br><span class="line"> ------ --------- ----    -----------</span><br><span class="line">Running Automatic Winmgmt Windows Management Instrumentation</span><br></pre></td></tr></table></figure>
+
+<p>続いて依存関係も併せて確認していきます。コマンドレットのオプションの意味合いが少しわかりにくいのですが、意味は以下の通りです。</p>
+<ul>
+<li>-DependentServices：WinMgmt「に」依存しているサービス</li>
+<li>-RequiredServices：WinMgmt「が」依存しているサービス</li>
+</ul>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\Windows\system32&gt; <span class="built_in">Get-Service</span> <span class="literal">-DependentServices</span> Winmgmt</span><br><span class="line">Status   Name               DisplayName</span><br><span class="line">------   ----               -----------</span><br><span class="line">Stopped  NcaSvc             Network Connectivity Assistant</span><br><span class="line">Running  iphlpsvc           IP Helper</span><br><span class="line"></span><br><span class="line"><span class="built_in">PS</span> C:\Windows\system32&gt; <span class="built_in">Get-Service</span>  <span class="literal">-RequiredServices</span> Winmgmt</span><br><span class="line">Status   Name               DisplayName</span><br><span class="line">------   ----               -----------</span><br><span class="line">Running  RPCSS              Remote Procedure Call (RPC)</span><br></pre></td></tr></table></figure>
+
+<p>小技ですが、上記は横着するとこんな感じで一度に取得することも可能です。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\Windows\System32&gt; <span class="built_in">Get-Service</span> <span class="literal">-Name</span> WinMgmt | <span class="built_in">Where-Object</span> &#123;<span class="variable">$_</span>.RequiredServices <span class="operator">-or</span> <span class="variable">$_</span>.DependentServices&#125; |</span><br><span class="line">  <span class="built_in">Format-Table</span> <span class="literal">-Property</span> Status, Name, RequiredServices, DependentServices <span class="literal">-auto</span></span><br><span class="line"></span><br><span class="line"> Status Name    RequiredServices DependentServices</span><br><span class="line"> ------ ----    ---------------- -----------------</span><br><span class="line">Running WinMgmt &#123;RPCSS&#125;          &#123;NcaSvc, iphlpsvc&#125;</span><br></pre></td></tr></table></figure>
+
+<p>実はこの後のWMIリポジトリ再作成時に少しだけハマった部分なのですが、当該サービス、Windowsサービスの回復設定で停止検知後（正確にはエラー検知）に自動で再度立ち上がってくる設定になっていることがわかります。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\Windows\System32&gt; C:\Windows\System32\sc.exe qfailure Winmgmt</span><br><span class="line">[<span class="type">SC</span>] QueryServiceConfig2 SUCCESS</span><br><span class="line"></span><br><span class="line">SERVICE_NAME: Winmgmt</span><br><span class="line">        RESET_PERIOD (<span class="keyword">in</span> seconds)    : <span class="number">86400</span></span><br><span class="line">        REBOOT_MESSAGE               :</span><br><span class="line">        COMMAND_LINE                 :</span><br><span class="line">        FAILURE_ACTIONS              : RESTART -- 遅延 = <span class="number">120000</span> ミリ秒です。</span><br><span class="line">                                       RESTART -- 遅延 = <span class="number">300000</span> ミリ秒です。</span><br></pre></td></tr></table></figure>
+<p>なお、PowerShellで <code>sc qfailure</code> 相当の自動回復設定の確認方法がパッとわからなかったため、ここでは少しズル？をして<code>sc</code>コマンドをコールしています。<code>sc.exe</code>をフルパスで呼んでいるのは、試したこのある方はニヤッとされるかもしれませんが、Powershellのコマンドレットである <code>sc (Set-Content)</code>のエイリアスと<code>sc.exe</code> の名前が重複して、<code>Set-Content</code> が優先されるためです。</p>
+<h2 id="WMIサービスを停止"><a href="#WMIサービスを停止" class="headerlink" title="WMIサービスを停止"></a>WMIサービスを停止</h2><p>前述の手順で確認した通り、WMIサービスには依存関係のあるサービスがありますので<code>-Force</code>で強制停止します。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\Windows\System32&gt; <span class="built_in">Stop-Service</span> <span class="literal">-Name</span> WinMgmt</span><br><span class="line"><span class="built_in">Stop-Service</span> : サービス <span class="string">&#x27;Windows Management Instrumentation (WinMgmt)&#x27;</span> には依存サービスが存在するため、停止できません。このサービスを停止できるのは、Force フラグが設定されている場合のみです。</span><br><span class="line">発生場所 行:<span class="number">1</span> 文字:<span class="number">1</span></span><br><span class="line">+ <span class="built_in">Stop-Service</span> <span class="literal">-Name</span> WinMgmt</span><br><span class="line">+ ~~~~~~~~~~~~~~~~~~~~~~~~~~</span><br><span class="line">    + CategoryInfo          : InvalidOperation: (System.ServiceProcess.ServiceController:ServiceController) [<span class="built_in">Stop-Service</span>]、ServiceCommandException</span><br><span class="line">    + FullyQualifiedErrorId : ServiceHasDependentServices,Microsoft.PowerShell.Commands.StopServiceCommand</span><br><span class="line"></span><br><span class="line"><span class="built_in">PS</span> C:\Windows\System32&gt; <span class="built_in">Stop-Service</span> <span class="literal">-Force</span> <span class="literal">-Name</span> WinMgmt</span><br></pre></td></tr></table></figure>
+
+<h2 id="リポジトリ情報フォルダをリネーム"><a href="#リポジトリ情報フォルダをリネーム" class="headerlink" title="リポジトリ情報フォルダをリネーム"></a>リポジトリ情報フォルダをリネーム</h2><p>リポジトリの実体は <code>%windir%\system32\repository</code> 配下にあり、以下のようなファイルが格納されます。今回はこれらをリネームし、WMIサービスを改めて起動することでリポジトリを再作成（＝プロバイダークラスをリコンパイル）していきます。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\windows\system32&gt; <span class="built_in">Set-Location</span> .\wbem\</span><br><span class="line"><span class="built_in">PS</span> C:\windows\system32\wbem&gt; <span class="built_in">Get-ChildItem</span> C:\Windows\system32\wbem\repository\</span><br><span class="line"></span><br><span class="line">    ディレクトリ: C:\Windows\system32\wbem\repository</span><br><span class="line"></span><br><span class="line">Mode                LastWriteTime         Length Name</span><br><span class="line">----                -------------         ------ ----</span><br><span class="line"><span class="literal">-a</span>----       <span class="number">2021</span>/<span class="number">01</span>/<span class="number">18</span>     <span class="number">15</span>:<span class="number">36</span>        <span class="number">5562368</span> INDEX.BTR</span><br><span class="line"><span class="literal">-a</span>----       <span class="number">2021</span>/<span class="number">01</span>/<span class="number">18</span>     <span class="number">15</span>:<span class="number">36</span>          <span class="number">89108</span> MAPPING1.MAP</span><br><span class="line"><span class="literal">-a</span>----       <span class="number">2021</span>/<span class="number">01</span>/<span class="number">18</span>     <span class="number">15</span>:<span class="number">31</span>          <span class="number">88800</span> MAPPING2.MAP</span><br><span class="line"><span class="literal">-a</span>----       <span class="number">2021</span>/<span class="number">01</span>/<span class="number">18</span>     <span class="number">15</span>:<span class="number">31</span>          <span class="number">88892</span> MAPPING3.MAP</span><br><span class="line"><span class="literal">-a</span>----       <span class="number">2021</span>/<span class="number">01</span>/<span class="number">18</span>     <span class="number">15</span>:<span class="number">36</span>       <span class="number">26796032</span> OBJECTS.DATA</span><br></pre></td></tr></table></figure>
+
+<p>モタモタしているとWMIサービスが自動起動で起き上がってきてリネームが失敗するので、クイックに。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\windows\system32\wbem&gt; <span class="built_in">Move-Item</span> <span class="literal">-Path</span> <span class="string">&quot;.\repository\&quot;</span> .\repository.bk20210118A\</span><br></pre></td></tr></table></figure>
+
+<p>既にWMIサービスが自動起動されている場合にはアクセス拒否が返されます。この場合は、前述のWMIサービス停止をもう一度行ってからすぐにリネームしましょう。正常に実行できると画面上は応答メッセージなしとなります。</p>
+<h2 id="WMIサービス再起動、そして動作確認"><a href="#WMIサービス再起動、そして動作確認" class="headerlink" title="WMIサービス再起動、そして動作確認"></a>WMIサービス再起動、そして動作確認</h2><p>あとは手動でサービスを起動すれば終わりです。サービスが起動してくると、<code>%windir%\system32\wbem</code> 配下に新たにrepositoryフォルダが作成され、再構成が完了します。サービス回復による自動起動が働くため、タイミング次第では以下にように既に起動中といったことになりますが、<code>%windir%\system32\repository</code>フォルダが新たに作成されていることが確認できれば問題ありません。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\Windows\System32&gt; <span class="built_in">Start-Service</span>  <span class="literal">-Name</span> WinMgmt</span><br><span class="line"><span class="built_in">PS</span> C:\windows\system32&gt; <span class="built_in">Get-Service</span> <span class="literal">-Name</span> WInMgmt</span><br><span class="line"></span><br><span class="line">Status   Name               DisplayName</span><br><span class="line">------   ----               -----------</span><br><span class="line">Running  WInMgmt            Windows Management Instrumentation</span><br></pre></td></tr></table></figure>
+
+<p>これで解決です。この後、本来やりたかったデバイスドライバーを再適用をしてハードウェア制御が正常に戻りました（よかった）。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\windows\system32&gt; systeminfo</span><br><span class="line"></span><br><span class="line">ホスト名:               **********</span><br><span class="line">OS 名:                  Microsoft Windows <span class="number">10</span> Pro</span><br><span class="line">OS バージョン:          <span class="number">10.0</span>.<span class="number">18363</span> N/A ビルド <span class="number">18363</span></span><br><span class="line">OS 製造元:              Microsoft Corporation</span><br><span class="line">OS 構成:                メンバー ワークステーション</span><br><span class="line">OS ビルドの種類:        Multiprocessor Free</span><br><span class="line">登録されている所有者:   Windows ユーザー</span><br><span class="line">(後略)</span><br></pre></td></tr></table></figure>
+
+<h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>今回は、普段よく扱っているサーバサイドではなく自分のPC端末でのトラブルを契機に、WMIについて取り上げてみました。自分のメインPCがおかしくなるのは、ある意味 サーバトラブルとはまた一味違った焦りがあるものですね。クラウド上のサーバと違って、壊れたらすぐに替えがきかない機器ということで、少し緊張感の高い作業でした。折角の機会なので久方ぶりのWindowsのコマンド操作の復習をしつつ、WMIのアーキテクチャ面の基礎を改めて整理をしてみましたので、どこかで誰かのご参考になればと思います。</p>
+<p>ところで、普段動いているのが当たり前の機能やサービスが、何か想定外トラブルでダウンしてしまうことってそれなりにありますよね。私のメインの守備範囲の1つはインフラですが、インフラでいうとどこかのクラウドサービスがまた別のクラウドサービスをバックボーンに動いていて、大元のサービスが障害になった時に「あ、こういう関係性で動いていたんだ…」とその時になって気付くことがあります。また、こうしたケースでは依存先のサービスが公称されていないことが大半で、その影響は事前になかなかわからないものです。</p>
+<p>今回のPC上でのトラブル程度でもいざ起こってみると案外色々な機能に影響が出て混乱しましたが、エンタープライズ領域のシステムにおける影響は、ある端末で起きたWMIエラーのようなかわいいものではすみません。普段のシステムデザインにおける考慮事項として、こういった可能性は常に頭において考えていきたいものですね。</p>
+<p>ではまた！</p>
+<h1 id="参考情報"><a href="#参考情報" class="headerlink" title="参考情報"></a>参考情報</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/wmisdk/wmi-architecture">https://docs.microsoft.com/en-us/windows/win32/wmisdk/wmi-architecture</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.microsoft.com/ja-jp/powershell/scripting/samples/managing-services?view=powershell-7.1">https://docs.microsoft.com/ja-jp/powershell/scripting/samples/managing-services?view=powershell-7.1</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.microsoft.com/ja-jp/windows-hardware/drivers/kernel/implementing-wmi">https://docs.microsoft.com/ja-jp/windows-hardware/drivers/kernel/implementing-wmi</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.manageengine.jp/products/OpManager/how-to-rebuild-wmi.html">https://www.manageengine.jp/products/OpManager/how-to-rebuild-wmi.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://websetnet.net/ja/how-to-repair-or-rebuild-the-wmi-repository-on-windows-10/">https://websetnet.net/ja/how-to-repair-or-rebuild-the-wmi-repository-on-windows-10/</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210127/&via=future_techblog&related=twitterapi%2Ctwitter&text=%E4%B8%8D%E8%AA%BFPC%E3%82%92%E4%BB%8B%E6%8A%B1%E3%81%97%E3%81%A4%E3%81%A4WMI%E3%81%AB%E6%80%9D%E3%81%84%E3%82%92%E9%A6%B3%E3%81%9B%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210127/&t=%E4%B8%8D%E8%AA%BFPC%E3%82%92%E4%BB%8B%E6%8A%B1%E3%81%97%E3%81%A4%E3%81%A4WMI%E3%81%AB%E6%80%9D%E3%81%84%E3%82%92%E9%A6%B3%E3%81%9B%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210127/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210127/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2021.01.22</span><span class="snscount">&#9825;11</span><a class="related-posts-link" href=/articles/20210122/ title="DynamoDB Streamsは、DynamoDBに対する項目の追加、変更、削除をイベントとして検出できる機能です。テーブルの項目が変更されるとすぐに、新しいレコードがテーブルのストリームに表示されます">オレのDynamoDB Streamsが再着火しないわけがない</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.06.22</span><span class="snscount">&#9825;133</span> <a href="/articles/20210622a/" title="今年のゴールデンウィーク（STAY HOME週間）に最近話題のSvelteに入門したので紹介を書きます。Svelteは主にブラウザ上で動作するユーザーインタフェースを作るフレームワークで、ReactやVue.jsの対抗馬的な存在です。">Svelteに入門した</a></li>
+
+    <li><span>2021.06.18</span><span class="snscount">&#9825;472</span> <a href="/articles/20210618a/" title="AWS内の通信においてインターネットを経由しないことが最近になって公式ドキュメントに明記されたことを受け、改めてVPC Endpointの必要性について調べてみました。">AWS内の通信がインターネットを経由しない今、VPC Endpointを利用する意味はあるのか？</a></li>
+
+    <li><span>2021.06.04</span><span class="snscount">&#9825;165</span> <a href="/articles/20210604a/" title="巨大な学習済みの機械学習モデルとか、検索用インデックスをデプロイする場合に、どうやってデプロイするか、というのは色々選択肢があります。以前、ちょびっとだけ「どうやってデプロイしましょうかね」というのを悩んだ時期があったのですが、今回、こんな方式が考えられるんじゃないか、というのを改めて調べてリストアップしてみました。">続・サーバーレス検索エンジン：巨大な静的ファイルを扱うケースについて考える</a></li>
+
+    <li><span>2021.04.20</span><span class="snscount">&#9825;15</span> <a href="/articles/20210420b/" title="Gitを使っての開発で、指定のツールや好みのGitクライアントを使っていると思います。ターミナルの黒画面でGitコマンドを使うのはちょっと不安、GUI画面から画面を確認しながらGitを操作したい方向けの記事です。GitのBranch作成やCheckout, Commit, Pushまで使えた方向けに、次の段階としてRebase, Cherry Pickなどの実行方法を説明します。">GUI GitツールのRebase, Cherry pick</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%95%8F%E9%A1%8C%E3%81%AE%E6%A6%82%E8%A6%81"><span class="toc-text">問題の概要</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0%E3%81%AFWMI%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA%E7%A0%B4%E6%90%8D"><span class="toc-text">原因はWMIリポジトリ破損</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#WMI%EF%BC%88Windows-Management-Instrumentation%EF%BC%89%E3%81%A8%E3%81%AF"><span class="toc-text">WMI（Windows Management Instrumentation）とは</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#WMI%E3%81%AE%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3"><span class="toc-text">WMIのアーキテクチャ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-WMI-providers-and-managed-objects"><span class="toc-text">1.WMI providers and managed objects</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-WMI-infrastructure"><span class="toc-text">2. WMI infrastructure</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-WMI-consumers-management-applications"><span class="toc-text">3. WMI consumers (management applications)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WMI%E3%82%92%E6%89%B1%E3%81%86%E3%81%9F%E3%82%81%E3%81%AEWindows%E6%A8%99%E6%BA%96%E3%83%84%E3%83%BC%E3%83%AB"><span class="toc-text">WMIを扱うためのWindows標準ツール</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A3%9C%E8%B6%B3%EF%BC%9AWQL-WMI-Query-Language%EF%BC%89%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">補足：WQL (WMI Query Language）について</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%99%BA%E7%94%9F%E3%81%97%E3%81%A6%E3%81%84%E3%81%9F%E5%95%8F%E9%A1%8C%E3%81%B8%E3%81%AE%E5%AF%BE%E5%87%A6"><span class="toc-text">発生していた問題への対処</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#WMI%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E7%8A%B6%E6%85%8B%E3%81%A8%E6%A7%8B%E6%88%90%E3%81%AE%E7%A2%BA%E8%AA%8D"><span class="toc-text">WMIサービス状態と構成の確認</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WMI%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%82%92%E5%81%9C%E6%AD%A2"><span class="toc-text">WMIサービスを停止</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA%E6%83%85%E5%A0%B1%E3%83%95%E3%82%A9%E3%83%AB%E3%83%80%E3%82%92%E3%83%AA%E3%83%8D%E3%83%BC%E3%83%A0"><span class="toc-text">リポジトリ情報フォルダをリネーム</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WMI%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E5%86%8D%E8%B5%B7%E5%8B%95%E3%80%81%E3%81%9D%E3%81%97%E3%81%A6%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D"><span class="toc-text">WMIサービス再起動、そして動作確認</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%80%E5%BE%8C%E3%81%AB"><span class="toc-text">最後に</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%83%85%E5%A0%B1"><span class="toc-text">参考情報</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Go Tips連載6: Error wrappingされた各クラウドSDKの独自型エラーを扱う | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="Go Tips連載の第6弾です。 はじめにTIG DXユニットの真野です。先週のこの記事ぶりの投稿になります。 フューチャー社内には「Go相談室」というチャットルームがあり、そこでGoに関連する疑問を投げたら、大体1日くらいで強い人が解決してくれるという神対応が行われています。そこでAWSやGCPの独自エラーをError warppingされた時にどうやってハンドリングすればよいの？と聞いた">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go Tips連載6: Error wrappingされた各クラウドSDKの独自型エラーを扱う | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200523/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="Go Tips連載の第6弾です。 はじめにTIG DXユニットの真野です。先週のこの記事ぶりの投稿になります。 フューチャー社内には「Go相談室」というチャットルームがあり、そこでGoに関連する疑問を投げたら、大体1日くらいで強い人が解決してくれるという神対応が行われています。そこでAWSやGCPの独自エラーをError warppingされた時にどうやってハンドリングすればよいの？と聞いた">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200523/top.png">
+<meta property="article:published_time" content="2020-05-23T02:12:30.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:53:57.005Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="GoTips連載">
+<meta property="article:tag" content="エラーハンドリング">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200523/top.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20200523/">
+  <meta content="Go,GoTips連載,エラーハンドリング" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">Go Tips連載6: Error wrappingされた各クラウドSDKの独自型エラーを扱う
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20200524-go-tips-6-errwrap.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20200524-go-tips-6-errwrap" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98">真野隼記</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2020/"><time datetime="2020-05-23T02:12:30.000Z" itemprop="datePublished">2020.05.23</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ">Go言語</a>
+  
+    
+    <a href="/tags/GoTips連載/" title="GoTips連載タグの記事へ">GoTips連載</a>
+  
+    
+    <a href="/tags/エラーハンドリング/" title="エラーハンドリングタグの記事へ">エラーハンドリング</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20200523/top.png" loading="lazy">
+
+
+<p><a href="/tags/GoTips%E9%80%A3%E8%BC%89/">Go Tips連載</a>の第6弾です。</p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG DXユニットの真野です。先週の<a href="/articles/20200519/">この記事</a>ぶりの投稿になります。</p>
+<p>フューチャー社内には「Go相談室」というチャットルームがあり、そこでGoに関連する疑問を投げたら、大体1日くらいで強い人が解決してくれるという神対応が行われています。そこでAWSやGCPの独自エラーをError warppingされた時にどうやってハンドリングすればよいの？と聞いた時にやり取りした内容をまとめました。</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>Go1.13から<code>fmt.Errorf</code> 関数に <code>%w</code>という<a target="_blank" rel="noopener" href="https://blog.golang.org/go1.13-errors">新しい構文が追加サポート</a>されたことは、ご存知の方が多いと思います。</p>
+<p>利用方法は、<code>%w</code> (pkg/errorsの時と異なりコロンは不要だし末尾じゃなくてもOK) と一緒に <code>fmt.Errorf</code> を用いることで、コンテキストに合わせた情報をメッセージに追加できます。</p>
+<figure class="highlight go"><figcaption><span>%wを使った例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> err := AnyFunc(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="comment">// 2009/11/10 23:00:00 main process: any func: strconv.Atoi: parsing &quot;ABC&quot;: invalid syntax</span></span><br><span class="line">        log.Fatalf(<span class="string">&quot;main process: %v&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">AnyFunc</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">    <span class="comment">// 何かしらの処理</span></span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;any func: %w&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>[Go Playground] <a target="_blank" rel="noopener" href="https://play.golang.org/p/C__gN90iyt7">https://play.golang.org/p/C__gN90iyt7</a></li>
+</ul>
+<p>また、error種別ごとに処理を分けたい場合で、Sentinel errorを判定する場合は、 errorsパッケージに追加された <code>errors.Is</code> でWrapの判定できます。逆に言うとWrapされている場合、今まで通りの <code>if err == ErrNotFound &#123;</code> といった構文では判定できなくなるので、既存コードへの導入時は呼び出し元と合わせてリライトが必要です。</p>
+<figure class="highlight go"><figcaption><span>SentinelErrorをWrapしたときのハンドリング</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> ErrNotFound = errors.New(<span class="string">&quot;not found&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> err := AnyFunc(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> errors.Is(err, ErrNotFound) &#123;</span><br><span class="line">            <span class="comment">// ErrorNotFound時のエラーハンドリング</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// その他の場合のエラーハンドリング</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">AnyFunc</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">    <span class="comment">// 何かしらの処理</span></span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;any func: %w&quot;</span>, ErrNotFound) <span class="comment">// Wrap</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>[Go Playground] <a target="_blank" rel="noopener" href="https://play.golang.org/p/R4KzOPVd_SA">https://play.golang.org/p/R4KzOPVd_SA</a></li>
+</ul>
+<p>この場合はシンプルで良いのですが、AWS SDK for GoなどのerrorをWrapした時に呼び出し側で判定をしたい時、どうすればよいのかが直接的な内容が見当たらなかったのでここにまとめておきたいと思います。</p>
+<h1 id="Handling-Errors-in-the-AWS-SDK-for-Go"><a href="#Handling-Errors-in-the-AWS-SDK-for-Go" class="headerlink" title="Handling Errors in the AWS SDK for Go"></a>Handling Errors in the AWS SDK for Go</h1><p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/handling-errors.html">ドキュメント</a>を読むと例えば、AWSのErorrハンドリングは以下のように、<code>awserr.Error</code> というインターフェースで表現されており、一度errを型アサーションしてから内部的なエラーコードに応じてハンドリングすることになっています。</p>
+<figure class="highlight go"><figcaption><span>AWS-SDKの通常版エラーハンドリング</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> aerr, ok := err.(awserr.Error); ok &#123;</span><br><span class="line">        <span class="keyword">switch</span> aerr.Code() &#123;</span><br><span class="line">        <span class="keyword">case</span> dynamodb.ErrCodeConditionalCheckFailedException:</span><br><span class="line">            <span class="comment">// エラーハンドリング</span></span><br><span class="line">        <span class="keyword">case</span> dynamodb.ErrCodeProvisionedThroughputExceededException:</span><br><span class="line">            <span class="comment">// エラーハンドリング</span></span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="comment">// エラーハンドリング</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// エラーハンドリング</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これをWrapされたときは、呼び出し元で単純に型アサーションを行ってもうまく判定できません。</p>
+<figure class="highlight go"><figcaption><span>NGなケース</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">AnyFunc</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">    <span class="comment">// 何かしらのAWS SDKを利用したコード</span></span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;aws operation: %w&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> err := AnyFunc(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> aerr, ok := err.(awserr.Error); ok &#123; <span class="comment">// 🆖型アサーションでは判定できない</span></span><br><span class="line">            <span class="comment">// AWS操作エラー特有のエラーハンドリング</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// その他のエラーハンドリング</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>※Go Playgroundでサンプルを載せようと思いましたが、importでTimeoutになったので諦めました</p>
+<h1 id="対応方法"><a href="#対応方法" class="headerlink" title="対応方法"></a>対応方法</h1><p>この <code>awserr.Error</code> を満たすerrorをWrapしたときはどうすべきかというと、 <code>errors.As</code> を用います。<code>errors.As</code> を代入用の変数とともに利用するとうまくいきます。</p>
+<figure class="highlight go"><figcaption><span>OKなコード</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err := AnyFunc(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> aerr awserr.Error</span><br><span class="line">    <span class="keyword">if</span> ok := errors.As(err, &amp;aerr); ok &#123;</span><br><span class="line">        <span class="keyword">switch</span> aerr.Code() &#123;</span><br><span class="line">        <span class="keyword">case</span> dynamodb.ErrCodeConditionalCheckFailedException:</span><br><span class="line">            <span class="comment">// 何かしらのエラーハンドリング</span></span><br><span class="line">        <span class="keyword">case</span> dynamodb.ErrCodeProvisionedThroughputExceededException:</span><br><span class="line">            <span class="comment">// 何かしらのエラーハンドリング</span></span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="comment">// エラーハンドリング</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// その他のエラーハンドリング</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>例として愚直にif分岐をすべて網羅するように書きましたが、早期returnを活用すると、よりネストが浅く見通しが良いコードにできると思います。</p>
+<h2 id="GCP-SDKの場合"><a href="#GCP-SDKの場合" class="headerlink" title="GCP SDKの場合"></a>GCP SDKの場合</h2><p>しばしば<a target="_blank" rel="noopener" href="https://godoc.org/cloud.google.com/go/bigquery#hdr-Errors">以下のエラーを返すことが多い</a>とのことです。</p>
+<p><a target="_blank" rel="noopener" href="https://godoc.org/google.golang.org/api/googleapi#Error">https://godoc.org/google.golang.org/api/googleapi#Error</a></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> e, ok := err.(*googleapi.Error); ok &#123;</span><br><span class="line">    <span class="keyword">if</span> e.Code == <span class="number">409</span> &#123; ... &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>もしこれらのerrorをWrapする場合は、同様に <code>errors.As</code> で判定します。（実際は後述する各サービスごとに宣言されているSentinel errorで判断することが多いと思います）</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err := AnyFunc(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> gerr *googleapi.Error</span><br><span class="line">    <span class="keyword">if</span> ok := errors.As(err, &amp;gerr); ok &#123;</span><br><span class="line">        <span class="keyword">switch</span> gerr.Code() &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">409</span>:</span><br><span class="line">            <span class="comment">// 何かしらのエラーハンドリング</span></span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="comment">// 何かしらのエラーハンドリング</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// その他のエラーハンドリング</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一方で、<a target="_blank" rel="noopener" href="https://godoc.org/cloud.google.com/go/storage#pkg-variables">StorageなどはSentinel error</a>を返します。</p>
+<figure class="highlight go"><figcaption><span>StorageのSentinelError</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> (</span><br><span class="line">    <span class="comment">// ErrBucketNotExist indicates that the bucket does not exist.</span></span><br><span class="line">    ErrBucketNotExist = errors.New(<span class="string">&quot;storage: bucket doesn&#x27;t exist&quot;</span>)</span><br><span class="line">    <span class="comment">// ErrObjectNotExist indicates that the object does not exist.</span></span><br><span class="line">    ErrObjectNotExist = errors.New(<span class="string">&quot;storage: object doesn&#x27;t exist&quot;</span>)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>errorを返すAPIを利用してWrapした場合は <code>errors.Is</code> で判定します。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Storageに対して何かしらアクセスする処理</span></span><br><span class="line"><span class="keyword">if</span> err := AnyFunc(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> ok := errors.Is(err, storage.ErrObjectNotExist); ok &#123;</span><br><span class="line">        <span class="comment">// 何かしらのエラーハンドリング</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// その他のエラーハンドリング</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>どのAPIがどういったerrorを返しうるかは、各<a target="_blank" rel="noopener" href="https://godoc.org/cloud.google.com/go">GoDoc</a>に書いてありますので、個別のハンドリングが必要な場合は確認することになると思います。</p>
+<h1 id="Stacktraceの出力について"><a href="#Stacktraceの出力について" class="headerlink" title="Stacktraceの出力について"></a>Stacktraceの出力について</h1><p><a target="_blank" rel="noopener" href="https://play.golang.org/p/NAYR7XySCdW">https://play.golang.org/p/NAYR7XySCdW</a> にサンプルコードを載せましたが、 <code>%w</code>構文を用いた<code>fmt</code>パッケージではStacktraceが出力されません。もし、Stacktraceが必要な場合は <code>fmt.Errorf</code>ではなく <code>xerrors.Errorf</code> を用いてWrapします。</p>
+<p>シビアに性能が求められない、例えばBackendのWebAPIをGoで実装する場合は、 <a target="_blank" rel="noopener" href="https://godoc.org/golang.org/x/xerrors">xerrorsパッケージ</a>を利用した方が、2020/01/26 時点では良さそうです。</p>
+<ul>
+<li>xerrorsについては、そな太さんの <a target="_blank" rel="noopener" href="https://qiita.com/sonatard/items/9c9faf79ac03c20f4ae1">Goの新しいerrors パッケージ xerrors
+</a> の記事がとても参考になりました</li>
+</ul>
+<figure class="highlight go"><figcaption><span>xerrorsを使った例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;golang.org/x/xerrors&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> err := Func(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;stacktrace: %+v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Func</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> err := FuncInternal(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> xerrors.Errorf(<span class="string">&quot;anyFunc %w - internal failed&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">FuncInternal</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> xerrors.Errorf(<span class="string">&quot;any error&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>[Go Playground] <a target="_blank" rel="noopener" href="https://play.golang.org/p/4xcqP7Ukt0H">https://play.golang.org/p/4xcqP7Ukt0H</a></li>
+</ul>
+<p>これを実行するとStacktraceが出力されました。</p>
+<figure class="highlight console"><figcaption><span>Stacktrace出力例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">stacktrace: anyFunc any error - internal failed:</span><br><span class="line">    main.Func</span><br><span class="line">        /tmp/sandbox921242282/prog.go:16</span><br><span class="line">  - any error:</span><br><span class="line">    main.FuncInternal</span><br><span class="line">        /tmp/sandbox921242282/prog.go:22</span><br></pre></td></tr></table></figure>
+
+
+<p>ちなみに、xerrorsでWrapされたエラーでも、errors.Is, errors.Asで判定できました。（混在すると少し気持ち悪いですが）</p>
+<ul>
+<li>[Go Playground] <a target="_blank" rel="noopener" href="https://play.golang.org/p/nfu_JXo6N_e">https://play.golang.org/p/nfu_JXo6N_e</a></li>
+</ul>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><ul>
+<li>Sentinel errorの場合は、<code>errors.Is</code> で、独自Error型を宣言している場合は、 <code>errors.As</code> を利用してハンドリングする</li>
+<li>Stacktrace情報が必要な場合は、xerrorsパッケージを利用する</li>
+<li>xerrorsでWrapしても <code>errors.Is</code>, <code>errors.As</code> で扱える</li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200523/&via=future_techblog&related=twitterapi%2Ctwitter&text=Go%20Tips%E9%80%A3%E8%BC%896:%20Error%20wrapping%E3%81%95%E3%82%8C%E3%81%9F%E5%90%84%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89SDK%E3%81%AE%E7%8B%AC%E8%87%AA%E5%9E%8B%E3%82%A8%E3%83%A9%E3%83%BC%E3%82%92%E6%89%B1%E3%81%86" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200523/&t=Go%20Tips%E9%80%A3%E8%BC%896:%20Error%20wrapping%E3%81%95%E3%82%8C%E3%81%9F%E5%90%84%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89SDK%E3%81%AE%E7%8B%AC%E8%87%AA%E5%9E%8B%E3%82%A8%E3%83%A9%E3%83%BC%E3%82%92%E6%89%B1%E3%81%86" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200523/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200523/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">7</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2020.05.22</span><span class="snscount">&#9825;77</span><a class="related-posts-link" href=/articles/20200522/ title="今回は、errors package を一部利用して、エラーコードベースのエラーハンドリング処理を実装しました。また、morikuni/failure を利用した実装への書き換えも試してみています。">Go Tips 連載5: エラーコードベースの例外ハンドリングの実装＋morikuni/failureサンプル</a></li><li class="related-posts-item"><span>2020.05.19</span><span class="snscount">&#9825;1</span><a class="related-posts-link" href=/articles/20200519/ title="今回はGoでアプリ開発するときにお世話になっている人が多い、GolandのTipsを紹介します。">Go Tips連載2: Golandで環境変数をさっと貼る方法 </a></li><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;541</span><a class="related-posts-link" href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2021.09.24</span><span class="snscount">&#9825;7</span><a class="related-posts-link" href=/articles/20210924a/ title=" Gateway+Lambda という構成でWebAPI開発を行う際、ちょっと便利に使える疎通方法をまとめます。API GatewayですがPublicなエンドポイントがあれば `curl`コマンドや`Postman`を用いての動作検証も容易だと思います。">VPC内のAmazon API Gatewayをインターネットオーバーで疎通確認する</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.06.18</span><span class="snscount">&#9825;472</span> <a href="/articles/20210618a/" title="AWS内の通信においてインターネットを経由しないことが最近になって公式ドキュメントに明記されたことを受け、改めてVPC Endpointの必要性について調べてみました。">AWS内の通信がインターネットを経由しない今、VPC Endpointを利用する意味はあるのか？</a></li>
+
+    <li><span>2021.06.17</span><span class="snscount">&#9825;89</span> <a href="/articles/20210617a/" title="少し前にES2021にて変更される新機能が発表されました。JavaScriptを扱う上では知っとくべき！と意気込んだもののECMAScriptが何者なのかすら曖昧な理解だったので、この機会に学んだことをまとめてみようと思います。* ECMAScriptがJavaScriptにとってどのような役割を持つのかを知る">ES2021／ES2022を知ろう</a></li>
+
+    <li><span>2021.05.18</span><span class="snscount">&#9825;469</span> <a href="/articles/20210518a/" title="RESTfullとかRESTishな方針でWebAPIの横断検索を設計する際にチーム内で方針について議論したやり取りの備忘記事です。">HTTP検索条件、GETにするか？POSTにするか？</a></li>
+
+    <li><span>2021.04.02</span><span class="snscount">&#9825;29</span> <a href="/articles/20210402/" title="僕が大学に入ったときに買ったパソコンは、Celeron 300AMHzというやつで、300MHzのパッケージ違いの2モデル目みたいな今見ると変なモデル名のやつでした。ちょっといじると450MHzで動くいいやつでした。BeOS 4.0が付属しているショップブランドの自作PCでした。BeOSはPOSIX対応のOSではあるものの、カーネルからGUIから大部分がオリジナルで楽しいOSでした。いくつか独自コマンドがインストールされていて、その中にダイアログを出すコマンドがありました。">シェルスクリプトでもGUI</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Handling-Errors-in-the-AWS-SDK-for-Go"><span class="toc-text">Handling Errors in the AWS SDK for Go</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C%E6%96%B9%E6%B3%95"><span class="toc-text">対応方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#GCP-SDK%E3%81%AE%E5%A0%B4%E5%90%88"><span class="toc-text">GCP SDKの場合</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Stacktrace%E3%81%AE%E5%87%BA%E5%8A%9B%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">Stacktraceの出力について</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>GCP連載#6 Terraform Validatorを使って、GCPのセキュリティポリシーの自動チェックを行う | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="GCP連載の6回目です。今回はTerraform Validatorを使って、組織のセキュリティポリシーの自動チェックを継続的に行う方法を紹介します。併せて、ポリシーをコードとして管理する方法も紹介します。Policy as code です。もちろんセキュリティポリシーのみだけではなく、命名規則やリージョン制限なども扱えます。 Infrastructure as code 理想と現実Infrast">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GCP連載#6 Terraform Validatorを使って、GCPのセキュリティポリシーの自動チェックを行う | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200213/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="GCP連載の6回目です。今回はTerraform Validatorを使って、組織のセキュリティポリシーの自動チェックを継続的に行う方法を紹介します。併せて、ポリシーをコードとして管理する方法も紹介します。Policy as code です。もちろんセキュリティポリシーのみだけではなく、命名規則やリージョン制限なども扱えます。 Infrastructure as code 理想と現実Infrast">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200213/photo_20200213_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200213/photo_20200213_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200213/photo_20200213_03.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200213/photo_20200213_04.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200213/photo_20200213_05.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200213/photo_20200213_06.png">
+<meta property="article:published_time" content="2020-02-13T01:26:28.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:53:55.039Z">
+<meta property="article:tag" content="GCP">
+<meta property="article:tag" content="Terraform">
+<meta property="article:tag" content="Policy-as-Code">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200213/photo_20200213_01.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20200213/">
+  <meta content="GCP,Terraform,Policy-as-Code" name="keywords">
+  <meta content="齋場俊太朗" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">GCP連載#6 Terraform Validatorを使って、GCPのセキュリティポリシーの自動チェックを行う
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20200213-terraform-validator.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20200213-terraform-validator" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E9%BD%8B%E5%A0%B4%E4%BF%8A%E5%A4%AA%E6%9C%97">齋場俊太朗</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2020/"><time datetime="2020-02-13T01:26:28.000Z" itemprop="datePublished">2020.02.13</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/GCP/" title="GCPタグの記事へ">GCP</a>
+  
+    
+    <a href="/tags/Terraform/" title="Terraformタグの記事へ">Terraform</a>
+  
+    
+    <a href="/tags/Policy-as-Code/" title="Policy-as-Codeタグの記事へ">Policy-as-Code</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p><a href="/articles/20200202/">GCP連載</a>の6回目です。今回は<strong>Terraform Validatorを使って、組織のセキュリティポリシーの自動チェックを継続的に行う</strong>方法を紹介します。併せて、ポリシーをコードとして管理する方法も紹介します。<strong>Policy as code</strong> です。もちろんセキュリティポリシーのみだけではなく、命名規則やリージョン制限なども扱えます。</p>
+<h1 id="Infrastructure-as-code-理想と現実"><a href="#Infrastructure-as-code-理想と現実" class="headerlink" title="Infrastructure as code 理想と現実"></a>Infrastructure as code 理想と現実</h1><p>Infrastructure as code (以下 IaC)、ここ最近大分一般的になってきました。弊社でも大半のプロジェクトは導入しています。3年前とかに導入するために一苦労していた時代が懐かしい..<br>IaCが当たり前になった今、インフラの構成管理はもう問題ないかというとそうではありません。<strong>特にプロジェクト数がスケールする場合</strong>、以下のような問題が発生してしまっているのではないでしょうか。</p>
+<ul>
+<li>各チームに権限を委譲しインフラを管理してもらうが、組織のポリシーに反したリソースが作成されてしまう</li>
+<li>そもそも組織のポリシーが定義・明文化できていない</li>
+<li>できていても周知できない、周知できていても、守ってもらえない</li>
+</ul>
+<p>例えば、”GCSのバケットを全世界に公開してしまっている” という誤った設定も本番環境にデプロイされてしまうかもしれません。</p>
+<img src="/images/20200213/photo_20200213_01.png" loading="lazy">
+
+<p>GCPだけではなく、多くのクラウド管理者が同じような悩みを抱えているかと思います。私もその一人です。各チームの開発者がクラウドインフラに熟知しているわけではありません。では、クラウド管理者がすべてソースコードをレビューすればよいか、いやいや、それも現実的ではない。</p>
+<p>IaCがアプリケーション開発やっと同じ土俵に立った今、同じく <strong>CI(継続的インテグレーション)</strong> の仕組みが必要になってくるのは、自然の流れかと思います。terraform fmtがされているか、planが通るか、等の簡単なチェックをやっている人は多いと思いますが、それよりも高度なチェックを行う仕組みがなく私も方法を探しておりました。</p>
+<h1 id="Terraform-Validator-とは"><a href="#Terraform-Validator-とは" class="headerlink" title="Terraform Validator とは"></a>Terraform Validator とは</h1><p>これを実現するのが、今回紹介する <strong>Terraform Validator</strong> です。Terraform Validatorは、 <strong>terraformがapplyされる前に、インフラのリソース設定が定義したポリシーに従っているかをチェックすることができるツール</strong>です。GCPのオープンソースとして公開されています。 <a target="_blank" rel="noopener" href="https://github.com/GoogleCloudPlatform/terraform-validator">GoogleCloudPlatform/terraform-validator</a></p>
+<p>以下が概要の図です。</p>
+<img src="/images/20200213/photo_20200213_02.png" loading="lazy">
+
+
+<p>仕組みはごく単純です</p>
+<ul>
+<li>Policy をソースコード(yaml)として定義</li>
+<li>Terraformのplanの結果(json)を生成</li>
+<li>Terraform Validatorに読み込みさせ、チェック結果を出力</li>
+</ul>
+<p>ポリシーに反したリソースがterraformで定義された場合、以下のように <code>Found Violations</code> と出力されます。 (以下のサンプルは、GCSのロケーションが許可されていないリージョンを利用している)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Sample</span></span><br><span class="line">$ terraform-validator validate --policy-path=<span class="variable">$&#123;POLICY_PATH&#125;</span> ./terraform.tfplan.json</span><br><span class="line">Found Violations:</span><br><span class="line">Constraint allow_some_storage_location on resource //storage.googleapis.com/validator-trial: //storage.googleapis.com/validator-trial is <span class="keyword">in</span> a disallowed location.</span><br></pre></td></tr></table></figure>
+
+<h1 id="ハンズオン"><a href="#ハンズオン" class="headerlink" title="ハンズオン"></a>ハンズオン</h1><p>ではさっそく、実際に試してみます。**”GCSのロケーションに制限をかける”** シンプルなパターンで試してみます。以下のようにフォルダ構成を用意し、2つのファイルを作成しました。</p>
+<ul>
+<li><code>storage_location.yaml</code> : (ポリシーを定義するコード)</li>
+<li><code>main.tf</code> : (terraformのコード)</li>
+</ul>
+<img src="/images/20200213/photo_20200213_03.png" loading="lazy">
+
+
+<h2 id="Terraform-Validator-インストール"><a href="#Terraform-Validator-インストール" class="headerlink" title="Terraform Validator インストール"></a>Terraform Validator インストール</h2><p>バイナリファイルがGCSで公開されているので、最新版をダウンロードし適当なパスに配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ gsutil ls -r gs://terraform-validator/releases</span><br><span class="line">$ gsutil cp gs://terraform-validator/releases/2020-01-23/terraform-validator-linux-amd64 .</span><br><span class="line">$ mv terraform-validator-linux-amd64 terraform-validator-linux-amd64</span><br><span class="line">$ chmod 755 terraform-validator</span><br></pre></td></tr></table></figure>
+
+<h2 id="Policyを定義"><a href="#Policyを定義" class="headerlink" title="Policyを定義"></a>Policyを定義</h2><p>PolicyをGit cloneし、<code>POLICY_PATH</code> を定義</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> https://github.com/forseti-security/policy-library.git</span><br><span class="line">$ <span class="built_in">export</span> POLICY_PATH=<span class="string">&quot;/&lt;your_work_space&gt;/policy-library&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>Sampleからファイルをコピーし、ポリシーを定義します。policies/constraints 配下に配置したファイルが有効化されます。今回はGCSのLocationに制限をかけます (<strong>ap-northeast-1のみを許可する</strong>)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> /&lt;your_work_space&gt;/policy-library/policies/constraints</span><br><span class="line">$ cp ../../samples/storage_location.yaml .</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">constraints.gatekeeper.sh/v1alpha1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">GCPStorageLocationConstraintV1</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">allow_some_storage_location</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">severity:</span> <span class="string">high</span></span><br><span class="line">  <span class="attr">match:</span></span><br><span class="line">    <span class="attr">target:</span> [<span class="string">&quot;organization/*&quot;</span>]</span><br><span class="line">  <span class="attr">parameters:</span></span><br><span class="line">    <span class="attr">mode:</span> <span class="string">&quot;allowlist&quot;</span></span><br><span class="line">    <span class="attr">locations:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">asia-northeast1</span></span><br><span class="line">    <span class="attr">exemptions:</span> []</span><br></pre></td></tr></table></figure>
+
+<h2 id="Terraform-planの実行"><a href="#Terraform-planの実行" class="headerlink" title="Terraform planの実行"></a>Terraform planの実行</h2><p>main.tfは以下のように定義されています。<code>location=&quot;us-central1-a&quot;</code> と設定しています<br>(その他 variable.tf, provider.tf等は省略)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">resource &quot;google_storage_bucket&quot; &quot;validator_trial&quot; &#123;</span><br><span class="line">      project       = &lt;your project&gt;</span><br><span class="line">      name          = &quot;validator-trial&quot;</span><br><span class="line">      force_destroy = false</span><br><span class="line">      storage_class = &quot;REGIONAL&quot;</span><br><span class="line">      location      = &quot;us-central1-a&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>planを実行 <code>--out=</code> optionを利用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ terraform plan --out=terraform.tfplan</span><br></pre></td></tr></table></figure>
+
+<p>terraform.tfplanのバイナリをjsonへ変換</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ terraform show -json ./terraform.tfplan &gt; ./terraform.tfplan.json</span><br></pre></td></tr></table></figure>
+
+<h2 id="Terraform-Validatorの実行"><a href="#Terraform-Validatorの実行" class="headerlink" title="Terraform Validatorの実行"></a>Terraform Validatorの実行</h2><p>これで準備は整いました。Terraform Validatorの実行を行います。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ terraform-validator validate --policy-path=<span class="variable">$&#123;POLICY_PATH&#125;</span> ./terraform.tfplan.json</span><br><span class="line">Found Violations:</span><br><span class="line">Constraint allow_some_storage_location on resource //storage.googleapis.com/validator-trial: //storage.googleapis.com/validator-trial is <span class="keyword">in</span> a disallowed location.</span><br></pre></td></tr></table></figure>
+
+<p>Validationによりポリシー違反を検知しました！🚫</p>
+<p>main.tf を修正して..</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">resource &quot;google_storage_bucket&quot; &quot;validator_trial&quot; &#123;</span><br><span class="line">      project       = &lt;your project&gt;</span><br><span class="line">      name          = &quot;validator-trial&quot;</span><br><span class="line">      force_destroy = false</span><br><span class="line">      storage_class = &quot;REGIONAL&quot;</span><br><span class="line"><span class="deletion">-     location      = &quot;us-central1-a&quot;</span></span><br><span class="line"><span class="addition">+     location      = &quot;asia-northeast1&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再度実行してみると..</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ terraform-validator validate --policy-path=<span class="variable">$&#123;POLICY_PATH&#125;</span> ./terraform.tfplan.json</span><br><span class="line">No violations found</span><br></pre></td></tr></table></figure>
+
+<p>今度はValidationが成功しました！✅ 期待通りの動きをしてくれました。</p>
+<h1 id="ポリシー定義-Policy-as-code"><a href="#ポリシー定義-Policy-as-code" class="headerlink" title="ポリシー定義 (Policy as code)"></a>ポリシー定義 (Policy as code)</h1><p>サンプルポリシーは、先ほど利用した <a target="_blank" rel="noopener" href="https://github.com/forseti-security/policy-library/tree/master/samples">forseti-security/policy-library</a> にあります。これらのyamlファイルを <code>POLICY_PATH</code> で定義した <code>/&lt;your_work_space&gt;/policy-library</code> の中の <code>policies/constraints/</code> 配下に配置すればOKです。Policy as codeが簡単に実現できます。<br>以下に、サンプルから一部をピックアップしてご紹介します。セキュリティポリシーを定義できるほかにも、リソースの命名規則の制限ができたりするのは地味に嬉しいですね。</p>
+<h4 id="ポリシー定義のサンプル"><a href="#ポリシー定義のサンプル" class="headerlink" title="ポリシー定義のサンプル"></a>ポリシー定義のサンプル</h4><ul>
+<li>一般的な制限<ul>
+<li>リソースの命名規則(正規表現で指定)</li>
+<li>Labelのアタッチの強制</li>
+<li>リソースタイプの制限</li>
+</ul>
+</li>
+<li>GCE<ul>
+<li>Public IPの無効化</li>
+<li>NWのWhitelist指定</li>
+</ul>
+</li>
+<li>Cloud SQL<ul>
+<li>Public IPの無効化</li>
+<li>Maintenance Windownの制限</li>
+<li>SSLの強制</li>
+</ul>
+</li>
+<li>GKE<ul>
+<li>Private Clusterの強制</li>
+<li>Dashboardの無効化</li>
+<li>Node poolのAuto upgradeの強制</li>
+<li>Node OSの指定</li>
+</ul>
+</li>
+<li>BigQuery<ul>
+<li>Datasetのパブリック公開制限</li>
+</ul>
+</li>
+<li>IAM<ul>
+<li>Service Accountへ付与するRoleの制限</li>
+<li>Audit loggingの強制</li>
+</ul>
+</li>
+<li>Network<ul>
+<li>Firewall ssh,rdp rule パブリック公開の禁止</li>
+</ul>
+</li>
+<li>VPC Service Control<ul>
+<li>有効化プロジェクトの指定</li>
+</ul>
+</li>
+</ul>
+<p>どのような制限をかけることができるかイメージできたでしょうか。実はこちらに用意されていないものでも、Custom Policyとして自身でポリシールールを記述することもできます。詳細は<a target="_blank" rel="noopener" href="https://github.com/forseti-security/policy-library/blob/master/docs/constraint_template_authoring.md">こちら</a></p>
+<h1 id="実際の運用"><a href="#実際の運用" class="headerlink" title="実際の運用"></a>実際の運用</h1><p>実行方法とポリシーの定義方法が分かったところで、実際の運用方法についてです。<br>以下のように、TerraformのソースコードのPRに対して、Terraform Validatorを実行し、結果をPRにフィードバックさせるようにするのが良いと思います。Githubと連携が可能であれば、CloudBuildで以下のようにCIを回すのが簡単でよいです。</p>
+<img src="/images/20200213/photo_20200213_04.png" loading="lazy">
+
+<p>Cloud BuildのSteps イメージ</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">steps:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">gcr.io/config-validator/terraform-validator</span></span><br><span class="line">  <span class="attr">entrypoint:</span> <span class="string">terraform</span></span><br><span class="line">  <span class="attr">dir:</span> <span class="string">your-terraform-folder</span></span><br><span class="line">  <span class="attr">args:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">init</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">gcr.io/config-validator/terraform-validator</span></span><br><span class="line">  <span class="attr">dir:</span> <span class="string">your-terraform-folder</span></span><br><span class="line">  <span class="attr">entrypoint:</span> <span class="string">terraform</span></span><br><span class="line">  <span class="attr">args:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">plan</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">-out=terraform.tfplan</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">gcr.io/config-validator/terraform-validator</span></span><br><span class="line">  <span class="attr">entrypoint:</span> <span class="string">&quot;/bin/bash&quot;</span></span><br><span class="line">  <span class="attr">args:</span> [<span class="string">&#x27;-c&#x27;</span>, <span class="string">&#x27;terraform show -json terraform.tfplan &gt; terraform.tfplan.json&#x27;</span>]</span><br><span class="line">  <span class="attr">dir:</span> <span class="string">your-terraform-folder</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">gcr.io/config-validator/terraform-validator</span></span><br><span class="line">  <span class="attr">dir:</span> <span class="string">your-terraform-folder</span></span><br><span class="line">  <span class="attr">args:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">validate</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">--policy-path=/&lt;your_work_space&gt;/policy-library</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">your-terraform-folder/terraform.tfplan.json</span></span><br></pre></td></tr></table></figure>
+
+<p>PR上でのフィードバックのイメージ<br><img src="/images/20200213/photo_20200213_05.png" loading="lazy"></p>
+<h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>本記事ではあまり触れませんでしたが、実は、<a target="_blank" rel="noopener" href="https://forsetisecurity.org/">Forseti</a>というツールを用いてOngoingでの監視も可能です。こちらもGCPが公開しているオープンソースのツールです。これを用いれば、一元管理されたポリシーでTerraform経由ではない手作業によるポリシー違反の発生も検知することができます。</p>
+<img src="/images/20200213/photo_20200213_06.png" loading="lazy">
+
+
+<p>GCPのプロジェクト数がスケールする際に必ずぶち当たるであろうこの課題、私たちもTerraform Validatorを用いて解決しようと現在、試行錯誤中です。導入自体はシンプルにできるため、まずは簡単なポリシーのチェックから始めてみてはいかがでしょうか。</p>
+<p><a href="/articles/20200202/">GCP連載</a>の6回目でした。次は加部さんの<a href="/articles/20200214/">GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる</a>です。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200213/&via=future_techblog&related=twitterapi%2Ctwitter&text=GCP%E9%80%A3%E8%BC%89#6%20Terraform%20Validator%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E3%80%81GCP%E3%81%AE%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%81%AE%E8%87%AA%E5%8B%95%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%92%E8%A1%8C%E3%81%86" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200213/&t=GCP%E9%80%A3%E8%BC%89#6%20Terraform%20Validator%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E3%80%81GCP%E3%81%AE%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%81%AE%E8%87%AA%E5%8B%95%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%92%E8%A1%8C%E3%81%86" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200213/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">15</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200213/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">18</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2021.03.23</span><span class="snscount">&#9825;55</span><a class="related-posts-link" href=/articles/20210323/ title="Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる手順を紹介します。Cloud Spannerを用いた開発を行う方、また興味あるから少し触ってみたいという方にもおすすめです。簡単にCloud Spanner について紹介させていただきます。">Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる</a></li><li class="related-posts-item"><span>2020.08.13</span><span class="snscount">&#9825;11</span><a class="related-posts-link" href=/articles/20200813/ title="フューチャー夏休みの自由研究連載の9回目です。こんにちは、TIG DXユニットの西田と申します。業務では `GCP` のインフラの設計/構築/運用を担当しております。私は前職でネットワーク領域のキャリアが長かった事もあり、現職では `GCP` の中でも特にネットワークに関する部分を見ています。今回の自由研究もそれに関連する考察をしていきます。クラウド上で、ワールドワイドのサービスを作るとき、『どれくらいの密度でどの Region にサーバを立てればよいのか？』って、悩みませんか？インターネット向けのWebサービスだったら `CDN` で対処すれば基本的にはOKですが、イントラネットだけからアクセスさせたい社内サービス、Backend 系のサービス、Webサービスではないアプリケーションなどはインスタンスを用意する必要が出てきますよね。">GCPのRegion間レイテンシからサービスのRegion集約を考察する</a></li><li class="related-posts-item"><span>2020.08.05</span><span class="snscount">&#9825;7</span><a class="related-posts-link" href=/articles/20200805/ title="TIG/DX所属のインフラエンジニア兼カメラマンの[伊藤太斉]です。今回のアイキャッチは私が昨年撮ったひまわり畑にしました。Infrastructure as Codeでキャッチアップやインフラのリリースができることに越したことはありません。この記事では、Terraformの数多くの機能を使って他のIaCツールと可能な限り代用したり、Terraformの世界でリソース作成を完結させるために使い方を改めて突き詰めた内容になります">Terraformで楽をしたい</a></li><li class="related-posts-item"><span>2020.07.10</span><span class="snscount">&#9825;5</span><a class="related-posts-link" href=/articles/20200710/ title="本記事の内容はHashiTalks: Japanに登壇したのでその時に話したことを書いていきます。大きめなイベントには初の登壇だったのでなかなかドキドキしましたが、なんとかやりきりました。">HashiTalks: Japanに登壇しました</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2020.03.11</span><span class="snscount">&#9825;541</span> <a href="/articles/20200311/" title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li>
+
+    <li><span>2021.06.17</span><span class="snscount">&#9825;89</span> <a href="/articles/20210617a/" title="少し前にES2021にて変更される新機能が発表されました。JavaScriptを扱う上では知っとくべき！と意気込んだもののECMAScriptが何者なのかすら曖昧な理解だったので、この機会に学んだことをまとめてみようと思います。* ECMAScriptがJavaScriptにとってどのような役割を持つのかを知る">ES2021／ES2022を知ろう</a></li>
+
+    <li><span>2021.05.25</span><span class="snscount">&#9825;185</span> <a href="/articles/20210525a/" title="Goで構造体を設計する場合、オブジェクト指向的な「型ごとの責務の分担」以外に、「どのように使われるものか」を考える必要があります。 ポインタで扱うのか？値として扱うのか？両方許可するのか？値として扱える場合にimmutable（変更不可能）なオブジェクトとするのか...">Goの構造体の使われ方の設計</a></li>
+
+    <li><span>2021.04.08</span><span class="snscount">&#9825;43</span> <a href="/articles/20210408/" title="シングルページアプリケーションは、一つのHTMLファイルであらゆるページを表現します。history APIを使ってそのようなページが実際にあるかのように振る舞います。一方で、画面がリロードされたとき、メールでSNSでシェアされたときにその該当ページをきちんと再現するためには、サーバー側でハンドリングを行う必要があります。">Go 1.16のembedとchiとSingle Page Application</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Infrastructure-as-code-%E7%90%86%E6%83%B3%E3%81%A8%E7%8F%BE%E5%AE%9F"><span class="toc-text">Infrastructure as code 理想と現実</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Terraform-Validator-%E3%81%A8%E3%81%AF"><span class="toc-text">Terraform Validator とは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3"><span class="toc-text">ハンズオン</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Terraform-Validator-%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB"><span class="toc-text">Terraform Validator インストール</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Policy%E3%82%92%E5%AE%9A%E7%BE%A9"><span class="toc-text">Policyを定義</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Terraform-plan%E3%81%AE%E5%AE%9F%E8%A1%8C"><span class="toc-text">Terraform planの実行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Terraform-Validator%E3%81%AE%E5%AE%9F%E8%A1%8C"><span class="toc-text">Terraform Validatorの実行</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E5%AE%9A%E7%BE%A9-Policy-as-code"><span class="toc-text">ポリシー定義 (Policy as code)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E5%AE%9A%E7%BE%A9%E3%81%AE%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB"><span class="toc-text">ポリシー定義のサンプル</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9F%E9%9A%9B%E3%81%AE%E9%81%8B%E7%94%A8"><span class="toc-text">実際の運用</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%80%E5%BE%8C%E3%81%AB"><span class="toc-text">最後に</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは、TIG所属DXユニット 1の市川燿と申します。 現在は、プロジェクト内で利用しているGoogle Cloud Platform(以下GCP)の環境構築と、Go言語でバックエンドアプリの開発などをしています。 今回は、GCPのKubernetesサービスであるGoogle Kubernetes Engine(以下GKE)を利用している際にハマった事象について共有します。 本記事に">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20190827/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、TIG所属DXユニット 1の市川燿と申します。 現在は、プロジェクト内で利用しているGoogle Cloud Platform(以下GCP)の環境構築と、Go言語でバックエンドアプリの開発などをしています。 今回は、GCPのKubernetesサービスであるGoogle Kubernetes Engine(以下GKE)を利用している際にハマった事象について共有します。 本記事に">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20190828/photo_20190828_01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190828/photo_20190828_02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190828/photo_20190828_03.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20190828/photo_20190828_04.png">
+<meta property="article:published_time" content="2019-08-27T14:39:01.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:53:52.536Z">
+<meta property="article:tag" content="Network">
+<meta property="article:tag" content="GCP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20190828/photo_20190828_01.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20190827/">
+  <meta content="Network,GCP" name="keywords">
+  <meta content="市川燿" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20190828-gcp-ip.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20190828-gcp-ip" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E5%B8%82%E5%B7%9D%E7%87%BF">市川燿</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2019/"><time datetime="2019-08-27T14:39:01.000Z" itemprop="datePublished">2019.08.27</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Network/" title="Networkタグの記事へ">Network</a>
+  
+    
+    <a href="/tags/GCP/" title="GCPタグの記事へ">GCP</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは、TIG所属DXユニット <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>の市川燿と申します。</p>
+<p>現在は、プロジェクト内で利用しているGoogle Cloud Platform(以下GCP)の環境構築と、Go言語でバックエンドアプリの開発などをしています。</p>
+<p>今回は、GCPのKubernetesサービスである<a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/">Google Kubernetes Engine</a>(以下GKE)を利用している際にハマった事象について共有します。</p>
+<h2 id="本記事について"><a href="#本記事について" class="headerlink" title="本記事について"></a>本記事について</h2><p>(2019/09/02) GKEのクラスタがルートベースである旨を追記<br>(2019/09/02) Export設定について追記</p>
+<h2 id="GKEとは"><a href="#GKEとは" class="headerlink" title="GKEとは"></a>GKEとは</h2><blockquote>
+<p>コンテナ化されたアプリケーションをデプロイするための、本番稼働に対応したマネージド型環境です。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/?hl=ja">https://cloud.google.com/kubernetes-engine/?hl=ja</a></p>
+</blockquote>
+<h2 id="ハマった事象"><a href="#ハマった事象" class="headerlink" title="ハマった事象"></a>ハマった事象</h2><p><strong>GKE内のPodから他のGCPプロジェクトのプライベートIPアドレスに対し接続できない</strong>ことです。<br>もちろんFirewall Ruleの設定上は接続できる状態です。</p>
+<img src="/images/20190828/photo_20190828_01.png" loading="lazy">
+
+<p>具体的には、CurlによるHTTPやTelnetはもちろん、pingによるICMPも接続ができません。不思議なことにGKEを構成するGCEノードにssh接続し、そこから外部のプライベートIPアドレスを持つリソースに対しては”接続が可能”でした。</p>
+<p>実はパブリックIPが付与されていた、といったオチもありません。全てプライベートIPのみを持っているインスタンスです。</p>
+<h2 id="システム構成前提"><a href="#システム構成前提" class="headerlink" title="システム構成前提"></a>システム構成前提</h2><p>今回の環境は以下の設定を使用しています。</p>
+<ul>
+<li><p>VPC</p>
+<ul>
+<li>専有VPCを利用</li>
+</ul>
+</li>
+<li><p>GKE</p>
+<ul>
+<li>バージョン: v1.12.7-gke.10</li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/vpc/docs/legacy">レガシーネットワーク</a>を利用</li>
+<li>クラスタのネットワークは<a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/routes-based-cluster">ルートベース</a></li>
+</ul>
+</li>
+<li><p>他GCPプロジェクトとの接続</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/vpc/docs/vpc-peering">VPCネットワークピアリング</a>を設定済み</li>
+</ul>
+</li>
+</ul>
+<p>各サービスは以下のCIDRが設定してある前提で説明します。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>サービス</th>
+<th>CIDR</th>
+<th>レンジ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>接続元プロジェクト</td>
+<td>10.1.0.0/16</td>
+<td>10.1.0.0～10.1.255.254</td>
+</tr>
+<tr>
+<td>接続先プロジェクト</td>
+<td>10.2.0.0/16</td>
+<td>10.2.0.0～10.2.255.254</td>
+</tr>
+<tr>
+<td>接続元のGKE</td>
+<td>172.16.0.0/16</td>
+<td>172.16.0.0～172.16.255.254</td>
+</tr>
+</tbody></table></div>
+<h2 id="設定・接続状況"><a href="#設定・接続状況" class="headerlink" title="設定・接続状況"></a>設定・接続状況</h2><p>設定や接続確認し情報を整理したところ以下のことが分かっています。</p>
+<img src="/images/20190828/photo_20190828_02.png" loading="lazy">
+
+<ul>
+<li>GKE内Podから他プロジェクト内GCEへの接続は不可能 <strong>(<em>a</em>)</strong></li>
+<li>GKE内Pod(my-pod)から自プロジェクト内GCE(test-gce-01)への接続は可能 <strong>(<em>b</em>)</strong></li>
+<li>自プロジェクトと接続先のプロジェクトとのVPC Peeringは設定済み</li>
+<li>自プロジェクトのGCE上(test-gce-01)から他プロジェクトGCE(target-gce-01)へ接続は可能 <strong>(<em>c</em>)</strong></li>
+<li>GKE内Podが稼働している物理Node(gke-node-02)から他プロジェクトGCEへの接続も可能</li>
+</ul>
+<p>GKE内Podとプロジェクト内GCE、テスト用GCEと他プロジェクトGCEはそれぞれきちんと繋がるのに、GKE内Podと他プロジェクトGCEは繋がらないので、そんなことありうるのかと当時とても焦りました。</p>
+<h2 id="Pod-gt-他Project-IPへの接続がうまくいかない原因"><a href="#Pod-gt-他Project-IPへの接続がうまくいかない原因" class="headerlink" title="Pod=&gt;他Project IPへの接続がうまくいかない原因"></a>Pod=&gt;他Project IPへの接続がうまくいかない原因</h2><p>GKE用のCIDRが接続先PJのCloud Routerに上手く連携されていないため、戻りのルーティング失敗していると思われます(未確認)。</p>
+<p>「Pod=&gt;同一Project IP」への接続については、GKEクラスタを作成した際に以下のようなルートがGKE物理ノードごとに自動作成されます。<br>そのため、同一PJの同一VPC内のPod通信は問題有りませんでした。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>名前</th>
+<th>説明</th>
+<th>送信先 IP 範囲</th>
+<th>優先度</th>
+<th>インスタンス タグ</th>
+<th>ネクストホップ</th>
+<th>ネットワーク</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>my-gke-default-pool-xxx</td>
+<td>k8s-node-route</td>
+<td>172.25.0.0/24</td>
+<td>1000</td>
+<td>なし</td>
+<td>インスタンス my-gke-default-pool-xxx（ゾーン asia-northeast1-a）</td>
+<td>my-network</td>
+</tr>
+</tbody></table></div>
+<h2 id="試した方法その1-プロキシサーバ経由でアクセス"><a href="#試した方法その1-プロキシサーバ経由でアクセス" class="headerlink" title="試した方法その1: プロキシサーバ経由でアクセス"></a>試した方法その1: プロキシサーバ経由でアクセス</h2><p>解決手段としてまず思いついたのは手軽にnginxなどをプロキシサーバ代わりにして方法です。</p>
+<ul>
+<li>通信経路<br>GKE内Pod =&gt; nginxなどのプロキシサーバ =&gt; 他プロジェクトGCE</li>
+</ul>
+<p>しかし、GKE内Podとしてnginxを作ってしまうとnginxと他プロジェクトGCE間での通信ができず目的が達成できません。</p>
+<p>nginxをGCE上にインストールしてインストールする必要があります。</p>
+<img src="/images/20190828/photo_20190828_03.png" loading="lazy">
+
+<figure class="highlight nginx"><figcaption><span>nginx.conf(設定サンプル)</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">worker_processes</span>  <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="section">events</span> &#123;</span><br><span class="line">  <span class="attribute">worker_connections</span>  <span class="number">1024</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">stream</span> &#123;</span><br><span class="line">  <span class="section">server</span> &#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">proxy_pass</span> <span class="number">10.2.0.1:80</span>; <span class="comment"># target-gce-01</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>この方法で不格好ですが、無事にGKE内Podから他プロジェクトGCEにアクセスすることができました。<br>GCE上にプロキシサーバをインストールしているため、冗長性やオートヒーリングとしてKubernetesの機能が利用できず<br>別の方法で担保する必要があります。</p>
+<h2 id="試した方法その2-IPマスカレードエージェントを利用してアクセス-本題"><a href="#試した方法その2-IPマスカレードエージェントを利用してアクセス-本題" class="headerlink" title="試した方法その2: IPマスカレードエージェントを利用してアクセス (本題)"></a>試した方法その2: IPマスカレードエージェントを利用してアクセス (本題)</h2><p>やっと本題です。</p>
+<p>もう少し調べてみるとkubernetes-incubator配下にIPマスカレードエージェント(ip-masq-agent)というプロダクトがあり今回のケースに使えそうなことが分かりました。</p>
+<p>IPマスカレードエージェントを利用することで、PodのアドレスからPodが稼働している物理Nodeのアドレスへとアドレスの変換を行い、物理Nodeのアドレスとして接続GKE外部のアドレスに接続しに行きます。</p>
+<img src="/images/20190828/photo_20190828_04.png" loading="lazy">
+
+<p>GKEでもバージョン1.7以上で<a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/ip-masquerade-agent#how_ipmasq_works">一定条件を満たすと</a>デフォルトで有効になっており、追加インストール作業が不要で利用できます。</p>
+<p>IPマスカレードエージェントの使い方はとても簡単で、kubernetesのconfig mapを登録だけで適用されます。</p>
+<p>GKE内部のネットワーク(172.16.0.0/16)と自プロジェクトネットワーク(10.1.0.0/16)のみIPマスカレードエージェントの<strong>対象外</strong>としたい場合には、以下のようにファイルを編集し<strong>config</strong>のファイル名で保存した後、</p>
+<figure class="highlight yaml"><figcaption><span>config</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">nonMasqueradeCIDRs:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="number">172.16</span><span class="number">.0</span><span class="number">.0</span><span class="string">/16</span> <span class="comment"># my-gke-cluster CIDR</span></span><br><span class="line">  <span class="bullet">-</span> <span class="number">10.1</span><span class="number">.0</span><span class="number">.0</span><span class="string">/16</span>   <span class="comment"># my-project CIDR</span></span><br><span class="line"><span class="attr">resyncInterval:</span> <span class="string">60s</span></span><br></pre></td></tr></table></figure>
+
+<p>以下のコマンドを実行することで適用されます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create configmap ip-masq-agent --from-file config --namespace kube-system</span><br></pre></td></tr></table></figure>
+
+<p>※<strong>config</strong>以外の名前でファイルを保存すると上手く適用されないため注意</p>
+<p>私の環境ではkubectlコマンド実行から1分ほどで、設定が適用されアクセスできるようになりました。</p>
+<figure class="highlight bash"><figcaption><span>GKE内Podから他プロジェクトIPへの確認コマンド</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl <span class="built_in">exec</span> my-pod -- curl http://10.2.0.1/health</span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+
+<p>この方法であれば、GKE内で完結し、コマンドも1コマンドだけなので、とてもスマートに実現できます。</p>
+<h2 id="2019-09-02-追記-カスタムルートのimport-export"><a href="#2019-09-02-追記-カスタムルートのimport-export" class="headerlink" title="(2019/09/02 追記) カスタムルートのimport/export"></a>(2019/09/02 追記) カスタムルートのimport/export</h2><p><code>--import-custom-routes</code>, <code>--export-custom-route</code>の設定を追加してVPC Peeringの構築をすれば、異なるGCP PJのVPC間でもGKEのルートが上手くExport/Importされるようです。</p>
+<blockquote>
+<p>If you have GKE clusters without VPC native addressing, you might have multiple static routes to direct traffic to VM instances that are hosting your containers. You can export these static routes so that the containers are reachable from peered networks.<br><a target="_blank" rel="noopener" href="https://cloud.google.com/vpc/docs/vpc-peering#benefits_of_exchanging_custom_routes">https://cloud.google.com/vpc/docs/vpc-peering#benefits_of_exchanging_custom_routes</a></p>
+</blockquote>
+<p>今回のように、 172.16.0.0/16のようなGKEのPODに割り当てるCIDRが、接続先のGCP PJで重複していない前提であればこちらの手法のほうが良いかもしれません。</p>
+<h2 id="その他"><a href="#その他" class="headerlink" title="その他"></a>その他</h2><p>今回は試しませんでしたが、紹介した2の方法以外にも以下の方法も検討していました。<br>ケースによっては検討するのも有りだと思います。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/alias-ips">Nativeクラスタ</a>を利用</li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/vpc/docs/shared-vpc">共有VPC</a>を利用</li>
+<li>Publicなネットワーク経由での利用</li>
+</ul>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>GKE内Podから他プロジェクトのIPへの接続する方法について紹介しました。本記事ではGCPの別PJでしたが、AWSへのVPC Peeringであったり、オンプレミスに対するVPN接続でも同じ事象が発生しうると思います。</p>
+<p>IPマスカレードエージェントを利用することで、プロキシサーバなど余分なサーバを作る必要なくアクセスできます。</p>
+<p>本記事を通して、皆さまのGCP・GKEライフが少しでも快適になれば幸いです。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。その中でもDXチームは特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20190827/&via=future_techblog&related=twitterapi%2Ctwitter&text=GKE%E3%81%AEPod%E3%81%8B%E3%82%89%E7%95%B0%E3%81%AA%E3%82%8B%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%81%AEIP%E3%82%A2%E3%83%89%E3%83%AC%E3%82%B9%E3%81%B8%E6%8E%A5%E7%B6%9A%E3%81%A7%E3%81%8D%E3%81%9A%E3%83%8F%E3%83%9E%E3%81%A3%E3%81%9F%E8%A9%B1" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20190827/&t=GKE%E3%81%AEPod%E3%81%8B%E3%82%89%E7%95%B0%E3%81%AA%E3%82%8B%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%81%AEIP%E3%82%A2%E3%83%89%E3%83%AC%E3%82%B9%E3%81%B8%E6%8E%A5%E7%B6%9A%E3%81%A7%E3%81%8D%E3%81%9A%E3%83%8F%E3%83%9E%E3%81%A3%E3%81%9F%E8%A9%B1" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20190827/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20190827/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2020.09.02</span><span class="snscount">&#9825;4</span><a class="related-posts-link" href=/articles/20200902/ title="今回、GCP の `Professional Cloud Network Engineer` という資格に合格したので、その際の体験を記載しておきます。">GCP Professional Cloud Network Engineer に合格しました</a></li><li class="related-posts-item"><span>2020.08.13</span><span class="snscount">&#9825;11</span><a class="related-posts-link" href=/articles/20200813/ title="フューチャー夏休みの自由研究連載の9回目です。こんにちは、TIG DXユニットの西田と申します。業務では `GCP` のインフラの設計/構築/運用を担当しております。私は前職でネットワーク領域のキャリアが長かった事もあり、現職では `GCP` の中でも特にネットワークに関する部分を見ています。今回の自由研究もそれに関連する考察をしていきます。クラウド上で、ワールドワイドのサービスを作るとき、『どれくらいの密度でどの Region にサーバを立てればよいのか？』って、悩みませんか？インターネット向けのWebサービスだったら `CDN` で対処すれば基本的にはOKですが、イントラネットだけからアクセスさせたい社内サービス、Backend 系のサービス、Webサービスではないアプリケーションなどはインスタンスを用意する必要が出てきますよね。">GCPのRegion間レイテンシからサービスのRegion集約を考察する</a></li><li class="related-posts-item"><span>2019.10.17</span><span class="snscount">&#9825;19</span><a class="related-posts-link" href=/articles/20191017/ title="「初めてのGCPで環境構築してハマったこと」記事にトピックにあったGKEクラスタのCIDR設計について、深堀りした記事になります。">GKEクラスタに割り当てるCIDRを設計する</a></li><li class="related-posts-item"><span>2019.08.20</span><span class="snscount">&#9825;136</span><a class="related-posts-link" href=/articles/20190820/ title="お仕事でGCP使って環境を構築することがあったのですが、色々とハマることが多かったので供養を兼ねて共有したいと思います。">初めてのGCPで環境構築してハマったこと</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2020.03.11</span><span class="snscount">&#9825;541</span> <a href="/articles/20200311/" title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li>
+
+    <li><span>2020.03.11</span><span class="snscount">&#9825;541</span> <a href="/articles/20200311/" title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li>
+
+    <li><span>2021.05.11</span><span class="snscount">&#9825;78</span> <a href="/articles/20210511a/" title="TIGの玉木です。去年の12月までは主に機械学習エンジニアとして機械学習案件を任されていましたが、今年の1月からはITコンサルタントとして業務の幅が広くなりいろいろやっています。先月技育祭と呼ばれるイベントの勉強会という枠で、同僚の上野さんと一緒に「初心者必見！機械学習エンジニアがあれこれ話します。〜基礎から実社会応用まで〜」というタイトルで発表しました。">技育祭登壇しました。これから機械学習を学びたい方向けへの自分の経験談とおすすめの本、サイトの紹介もします</a></li>
+
+    <li><span>2021.04.21</span><span class="snscount">&#9825;10</span> <a href="/articles/20210421b/" title="私が現在参加しているThe Apache Software Foundation（ASF）の基本理念の一つであるThe Apache Wayについて紹介します。The Apache Wayを通して、ASFのことを少しでも知ってもらえたらと思います。">The Apache Wayのお話</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AC%E8%A8%98%E4%BA%8B%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">本記事について</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GKE%E3%81%A8%E3%81%AF"><span class="toc-text">GKEとは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%8F%E3%83%9E%E3%81%A3%E3%81%9F%E4%BA%8B%E8%B1%A1"><span class="toc-text">ハマった事象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E6%A7%8B%E6%88%90%E5%89%8D%E6%8F%90"><span class="toc-text">システム構成前提</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A8%AD%E5%AE%9A%E3%83%BB%E6%8E%A5%E7%B6%9A%E7%8A%B6%E6%B3%81"><span class="toc-text">設定・接続状況</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Pod-gt-%E4%BB%96Project-IP%E3%81%B8%E3%81%AE%E6%8E%A5%E7%B6%9A%E3%81%8C%E3%81%86%E3%81%BE%E3%81%8F%E3%81%84%E3%81%8B%E3%81%AA%E3%81%84%E5%8E%9F%E5%9B%A0"><span class="toc-text">Pod&#x3D;&gt;他Project IPへの接続がうまくいかない原因</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A9%A6%E3%81%97%E3%81%9F%E6%96%B9%E6%B3%95%E3%81%9D%E3%81%AE1-%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7%E3%82%B5%E3%83%BC%E3%83%90%E7%B5%8C%E7%94%B1%E3%81%A7%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9"><span class="toc-text">試した方法その1: プロキシサーバ経由でアクセス</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A9%A6%E3%81%97%E3%81%9F%E6%96%B9%E6%B3%95%E3%81%9D%E3%81%AE2-IP%E3%83%9E%E3%82%B9%E3%82%AB%E3%83%AC%E3%83%BC%E3%83%89%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E3%82%92%E5%88%A9%E7%94%A8%E3%81%97%E3%81%A6%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9-%E6%9C%AC%E9%A1%8C"><span class="toc-text">試した方法その2: IPマスカレードエージェントを利用してアクセス (本題)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2019-09-02-%E8%BF%BD%E8%A8%98-%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0%E3%83%AB%E3%83%BC%E3%83%88%E3%81%AEimport-export"><span class="toc-text">(2019&#x2F;09&#x2F;02 追記) カスタムルートのimport&#x2F;export</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%9D%E3%81%AE%E4%BB%96"><span class="toc-text">その他</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>

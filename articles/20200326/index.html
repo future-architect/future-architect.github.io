@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Serverless連載2: AWS Lambda×Goの開発Tips | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは、TIG&#x2F;DXユニットの真野です。 サーバレス連載の第2弾は、典型的なAWSサービスであるLambdaアプリをGoで開発する中で調べた内容や、Tipsを紹介します。 Lambdaの利用コア数は？結論⇨ 全ての場合で”2”でした。 (2021&#x2F;05&#x2F;22追記) アップデートがあり、最大6vCPUまで上限が上がりました。  AWS News Blog: New for AWS Lam">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Serverless連載2: AWS Lambda×Goの開発Tips | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200326/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、TIG&#x2F;DXユニットの真野です。 サーバレス連載の第2弾は、典型的なAWSサービスであるLambdaアプリをGoで開発する中で調べた内容や、Tipsを紹介します。 Lambdaの利用コア数は？結論⇨ 全ての場合で”2”でした。 (2021&#x2F;05&#x2F;22追記) アップデートがあり、最大6vCPUまで上限が上がりました。  AWS News Blog: New for AWS Lam">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/ogp_techblog.jpg">
+<meta property="article:published_time" content="2020-03-26T05:24:00.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:53:55.793Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Serverless">
+<meta property="article:tag" content="Lambda">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/ogp_techblog.jpg">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20200326/">
+  <meta content="AWS,Go,Serverless,Lambda" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">Serverless連載2: AWS Lambda×Goの開発Tips
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20200326-lambda-go-tips.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20200326-lambda-go-tips" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98">真野隼記</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2020/"><time datetime="2020-03-26T05:24:00.000Z" itemprop="datePublished">2020.03.26</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ">AWS</a>
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ">Go言語</a>
+  
+    
+    <a href="/tags/Serverless/" title="Serverlessタグの記事へ">Serverless</a>
+  
+    
+    <a href="/tags/Lambda/" title="Lambdaタグの記事へ">Lambda</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIG/DXユニットの真野です。</p>
+<p><a href="/articles/20200322/">サーバレス連載</a>の第2弾は、典型的なAWSサービスであるLambdaアプリをGoで開発する中で調べた内容や、Tipsを紹介します。</p>
+<h2 id="Lambdaの利用コア数は？"><a href="#Lambdaの利用コア数は？" class="headerlink" title="Lambdaの利用コア数は？"></a>Lambdaの利用コア数は？</h2><p>結論⇨ <del>全ての場合で”2”でした。</del></p>
+<p>(<strong>2021/05/22追記</strong>) アップデートがあり、最大6vCPUまで上限が上がりました。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/blogs/aws/new-for-aws-lambda-functions-with-up-to-10-gb-of-memory-and-6-vcpus/">AWS News Blog: New for AWS Lambda – Functions with Up to 10 GB of Memory and 6 vCPUs</a></li>
+</ul>
+<p><strong>以下は2020.03時点の調査結果です。</strong></p>
+<p>Goで開発する場合、少しでも性能を稼ぐためgoroutineを使う場面も多いと思います。特にバックエンドのデータストアがDynamoDBである場合は負荷を気にする必要がほぼ無いため、わたしはデータの書き込み部分を良く並列化することが多いです。</p>
+<p>そういった場面で概算でどれくらい性能上がるのかな？と推測ができるよう、Lambda上で利用できるgoroutineの個数を調べました。メモリを128MB~3008MBを調整することで、裏のCPUやNW幅も増減する話も聞いたので、メモリサイズを変えて調べました。</p>
+<p>Goで利用コア数を調べるには <a target="_blank" rel="noopener" href="https://golang.org/pkg/runtime/#NumCPU">NumCPU</a> を利用するそうです。これをLambdaのお作法に組み込みます。</p>
+<p>Goにおける<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/golang-handler.html">Lambda関数の規約</a>から、最も短いシグネチャは <code>func()</code> ということで、単に標準出力するだけのものを作成します。</p>
+<figure class="highlight go"><figcaption><span>検証コード</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/lambda&quot;</span></span><br><span class="line">	<span class="string">&quot;runtime&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(<span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; fmt.Println(runtime.NumCPU()) &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これを<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/golang-package.html">公式の手順を参考に</a>にデプロイします。</p>
+<p>起動トリガーは何でも良いですが、今回はKinesis Data Streamをマッピングさせ、AWS CLIで <code>aws kinesis --profile=my_lambda_test put-record --stream-name dev-test-lambda --partition-key 123456789 --data MTIzNDU=</code> など適当なデータを投入し実行します。</p>
+<p>例えば、メモリを1024MB与えて、実際に起動すると以下のようなログがCloudWatchLogsに出力されます。メモリなど設定を変更するたびに、LogStreamが変わるのでご注意ください。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">2020-03-26T03:10:39.194+09:00 START RequestId: 65078a85-9db0-45b0-bbf2-81a4eb19a08a Version: $LATEST</span><br><span class="line">2020-03-26T03:10:39.195+09:00 2</span><br><span class="line">2020-03-26T03:10:39.195+09:00 END RequestId: 65078a85-9db0-45b0-bbf2-81a4eb19a08a</span><br><span class="line">2020-03-26T03:10:39.195+09:00 REPORT RequestId: 65078a85-9db0-45b0-bbf2-81a4eb19a08a Duration: 0.67 ms Billed Duration: 100 ms Memory Size: 1024 MB Max Memory Used: 34 MB Init Duration: 74.46 ms</span><br></pre></td></tr></table></figure>
+
+<p>実際に128MB, 512MB, 1024MB, 3008MBでLambdaを動かし、<code>runtime.NumCPU()</code> の値を取得すると以下の結果でした。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Memory[MB]</th>
+<th>NumCPU</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>128</td>
+<td>2</td>
+</tr>
+<tr>
+<td>512</td>
+<td>2</td>
+</tr>
+<tr>
+<td>1024</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3008</td>
+<td>2</td>
+</tr>
+</tbody></table></div>
+<p>…全部2ですね。</p>
+<p>もちろん、利用可能なCPU利用時間はメモリサイズによって変動すると思いますので、Concurrentにgoroutineを動かす場合は、メモリサイズを上げることは有効な対策になると思いますので、ユースケースに合わせてパラメータを検討しようと思います。</p>
+<p>ちなみに、隣に座っている同僚が、つい最近メモリサイズごとの処理性能を計測していましたので大体どのくらいメモリを与えるとよいかの指標は近いうちに公開したいと思います。</p>
+<h2 id="Lambdaの初期処理のポイント"><a href="#Lambdaの初期処理のポイント" class="headerlink" title="Lambdaの初期処理のポイント"></a>Lambdaの初期処理のポイント</h2><p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/golang-handler.html#golang-handler-state">ドキュメント</a> に記載している通り、Lambda関数外に変数を宣言できますし、init関数を用いる事もできます。Lambda関数は同時に1つしか動かないのでスレッドセーフを気にせずフィールドにおけるそうです。</p>
+<p>init関数も良いですが、普通にmain関数内に初期処理を書いています。</p>
+<figure class="highlight go"><figcaption><span>main関数内でフィールドに初期化するコード</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> kc *kinesis.Kinesis</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handle</span><span class="params">(ctx context.Context, e events.KinesisEvent)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="comment">// kcを使った何かしらのロジック</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	kc = kinesis.New(<span class="comment">/* 色々な初期化処理 */</span>),</span><br><span class="line">	lambda.Start(handle)</span><br></pre></td></tr></table></figure>
+
+<p>こうすると、Lambdaの実行時間を削減につながる≒課金額を減らせる可能性があるため、初期処理に寄せられるものはドンドン寄せたほうが良い使い方になります。</p>
+<h2 id="Lambdaの関数タイプ"><a href="#Lambdaの関数タイプ" class="headerlink" title="Lambdaの関数タイプ"></a>Lambdaの関数タイプ</h2><p>Lambdaの関数として以下の8パターンが利用できます。<code>TIn</code>, <code>TOut</code> はencoding/json 標準ライブラリと互換性のある（≒Marshal, Unmarshalができるの意だと思います）必要があります。</p>
+<ol>
+<li><code>func ()</code></li>
+<li><code>func () error</code></li>
+<li><code>func (TIn), error</code></li>
+<li><code>func () (TOut, error)</code></li>
+<li><code>func (context.Context) error</code></li>
+<li><code>func (context.Context, TIn) error</code></li>
+<li><code>func (context.Context) (TOut, error)</code></li>
+<li><code>func (context.Context, TIn) (TOut, error)</code></li>
+</ol>
+<p>このとき、ApiGatewayEventであれば <code>TIn</code>や<code>TOut</code> があるのもわかりますが、KinesisEventの場合は<code>TIn</code>は意味がわかるものの、戻り値 <code>TOut</code>は何にも使われないはずなので、使ったらどうなるのか気になりました。仮にKinesisEventで<code>TOut</code> を用いるとエラーになるのでしょうか？</p>
+<p>結論⇨ KinesisEventでも <code>TOut</code>はあってもなくても良い。</p>
+<p>4の形式でLambdaを作成し起動してみます。<code>TOut</code>は何でも良いということで、適当にResponseというStructを作成します。main関数では引数なし・Responseの固定値を返します。</p>
+<figure class="highlight go"><figcaption><span>4の形式のLambda</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Response <span class="keyword">struct</span> &#123;</span><br><span class="line">	Payload <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(<span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="params">(Response, error)</span></span> &#123;</span><br><span class="line">		<span class="keyword">return</span> Response&#123;Payload: <span class="string">&quot;future&quot;</span>&#125;, <span class="literal">nil</span></span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同じようにKinesisトリガーにし実行すると以下のようなログが出力されました。<br>特にResponseの内容は出力されませんし、エラーにもなっていませんでした。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">2020-03-26T03:52:06.697+09:00 START RequestId: 27bc00f8-d7de-48d1-8c05-1f69c2c3ab07 Version: $LATEST</span><br><span class="line">2020-03-26T03:52:06.698+09:00 END RequestId: 27bc00f8-d7de-48d1-8c05-1f69c2c3ab07</span><br><span class="line">2020-03-26T03:52:06.698+09:00 REPORT RequestId: 27bc00f8-d7de-48d1-8c05-1f69c2c3ab07 Duration: 0.77 ms Billed Duration: 100 ms Memory Size: 3008 MB Max Memory U</span><br></pre></td></tr></table></figure>
+
+<p>ということで、Lambdaの起動トリガーとなるEvent種別とマッチしないような関数シグネチャを使っても問題ないということがわかりました。Responseが後続連携のSNSなどにうまく渡せると面白いかなと思いましたが、それは未検証です（パット見、Responseをどう取得できるか分からなかったため）</p>
+<p>個人的な考えですが、LambdaのHandler関数をテストする時に、戻り値があると色々と検証が捗るため、Kinesis Triggerであっても戻り値 <code>TOut</code>は指定するようにしています。</p>
+<h2 id="errorとLogging"><a href="#errorとLogging" class="headerlink" title="errorとLogging"></a>errorとLogging</h2><p>これはLambdaに限らないかもですが、LambdaのHandler関数の中で、以下のようにログ出力とerror をreturnするコードがあり、重複してて嫌だなと思いつつ、気持ちを込めてダブルメンテしていました。そのまま errorをreturnするだけでLambdaサービス側でerrorの内容を出力してくれるのですが、 <code>ERROR</code> といった文字列などカスタマイズしたい場合は2度手間せざるおえなかったです。</p>
+<p>↓の例では一箇所ですが、こういったハンドリングが複数あると見落としも怖いと思うこともありました。</p>
+<figure class="highlight go"><figcaption><span>よくあるerrorのreturnとlog出力</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err := Hoge(ctx, hogeInput); err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Error().Msgf(<span class="string">&quot;put dynamoDB: %v %+v&quot;</span>, err, models)</span><br><span class="line">	<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;put dynamoDB: %w %+v&quot;</span>, err, models)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これの対応としてhttpのMiddlewareのような関数を宣言すると良いかもしれません。<br><code>func (context.Context, TIn) error</code> パターンで作ってみています。</p>
+<figure class="highlight go"><figcaption><span>Middlewareライクな関数</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> lambdaHandlerFunc <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, ke events.KinesisEvent)</span> <span class="title">error</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">errLog</span><span class="params">(fn lambdaHandlerFunc)</span> <span class="title">lambdaHandlerFunc</span></span>  &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, ke events.KinesisEvent)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">		<span class="keyword">if</span> err := fn(ctx, ke); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="comment">// ログなど横断的な処理を加える</span></span><br><span class="line">			log.Error().Msgf(<span class="string">&quot;lambda err: %v&quot;</span>, err)</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上記のようなerrLogという関数を、ロジックが実装された <code>handle</code> をWrapすると事前・事後の処理をうまくWrapすることができます。</p>
+<figure class="highlight go"><figcaption><span>呼び出す場合</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lambda.Start(errLog(handle))</span><br></pre></td></tr></table></figure>
+
+<p>この辺はガンバりすぎると一種のアプリケーションフレームワークのように進化を遂げて、いろいろな功罪を生みそうですが、機能をシンプルに保てる体制の見通しがあれば導入しても良いかなと最近考えています。</p>
+<h2 id="return-errorした場合の-errorString-null対応"><a href="#return-errorした場合の-errorString-null対応" class="headerlink" title="return errorした場合の errorString null対応"></a>return errorした場合の errorString null対応</h2><p>以下のように任意のerrorをreturnしたときのCloudWatchLogs側のログ出力ですが…</p>
+<figure class="highlight go"><figcaption><span>エラー出力時</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(<span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">		<span class="keyword">return</span> errors.New(<span class="string">&quot;BAD REQUEST&quot;</span>)</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以下のように、 <code>BAD REQUEST</code> の後に <code>errorString null</code> というのが出力されます。</p>
+<p>問題ないといえば無いですが、 <code>null</code> といわれると少し気持ち悪い気持ちがありました。</p>
+<figure class="highlight plaintext"><figcaption><span>Lambdaの実行ログ</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">2020-03-26T10:02:58.888+09:00 START RequestId: 8f41435e-5caa-4feb-a1ea-d1f1d6d56811 Version: $LATEST</span><br><span class="line">2020-03-26T10:02:58.888+09:00 BAD REQUEST: errorString null</span><br><span class="line">2020-03-26T10:02:58.889+09:00 END RequestId: 8f41435e-5caa-4feb-a1ea-d1f1d6d56811</span><br><span class="line">2020-03-26T10:02:58.889+09:00 REPORT RequestId: 8f41435e-5caa-4feb-a1ea-d1f1d6d56811 Duration: 1.03 ms Billed Duration: 100 ms Memory Size: 1024 MB Max Memory ...</span><br></pre></td></tr></table></figure>
+
+<p>この <code>null</code> の部分ですが、ドキュメントで探せなかったですが、内部のErrorを示すStructが持つフィールドを見たところ正体はStackTraceのようです。</p>
+<p>設定の方法は、<a target="_blank" rel="noopener" href="https://github.com/aws/aws-lambda-go/blob/master/lambda/function.go#L33">コードを読んだ限り</a>通常の error を returnする形では設定できないようで（間違えていればご指摘ください）、panicを発生させると設定されるようです。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(<span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="title">error</span></span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(<span class="string">&quot;BAD_REQUEST with panic&quot;</span>)</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上記のLambdaを実行すると、以下のようなログが出力されます</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">2020-03-26T10:15:05.546+09:00 START RequestId: 8f41435e-5caa-4feb-a1ea-d1f1d6d56811 Version: $LATEST</span><br><span class="line">2020-03-26T10:15:05.547+09:00 BAD_REQUEST with panic: string</span><br><span class="line">[</span><br><span class="line">   &#123;&quot;path&quot;: &quot;github.com/aws/aws-lambda-go@v1.15.0/lambda/function.go&quot;, &quot;line&quot;: 36, label&quot;: &quot;(*Function).Invoke.func1&quot;&#125;,</span><br><span class="line">   &#123;&quot;path&quot;: &quot;runtime/panic.go&quot;, &quot;line&quot;: 679,  &quot;label&quot;: &quot;gopanic&quot;&#125;,</span><br><span class="line">   &#123;&quot;path&quot;: &quot;MyApplication/lambda.go&quot;, &quot;line&quot;: 10, &quot;label&quot;: &quot;main.func1&quot;&#125;,</span><br><span class="line">   // 省略</span><br><span class="line">]</span><br><span class="line">2020-03-26T10:15:05.583+09:00 END RequestId: 8f41435e-5caa-4feb-a1ea-d1f1d6d56811</span><br><span class="line">2020-03-26T10:15:05.583+09:00 REPORT RequestId: 8f41435e-5caa-4feb-a1ea-d1f1d6d56811	Duration: 36.24 ms	Billed Duration: 100 ms	Memory Size: 1024 MB	Max Memory Used: 34 MB	Init Duration: 66.10 ms</span><br><span class="line">2020-03-26T10:15:05.583+09:00 BAD_REQUEST with panic string</span><br></pre></td></tr></table></figure>
+
+<p>panicということで予期せぬエラーの場合にはStackTraceを出してくれるのは助かりますね。</p>
+<p>アプリケーションとしてpanicでエラーハンドリングすると、少々Lambda関数のUnitTestが難しくなりそうなので、なかなか導入する気にはなれないですが、どうしてもStackTraceを出したい場合などは検討してみても良いかもしれません。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><ul>
+<li>LambdaのGoから見た論理コア数⇨2固定</li>
+<li>Lambdaのコードは初期処理に寄せる</li>
+<li>関数タイプは開発/テスト観点など好きなものを使って良い</li>
+<li>Lambda関数のパターンは決まっているのでmiddlewareを用意しても良いかも</li>
+<li><code>errorString null</code>の<code>null</code>はStackTrace項目で、通常は <code>null</code> が入るで問題なし</li>
+</ul>
+<p><a href="/articles/20200322/">サーバレス連載</a>の2本目でした。次は澁川さんの<a href="/articles/20200327/">Goでサーバーレス用の検索エンジンwatertowerを作ってみました
+</a>でした。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200326/&via=future_techblog&related=twitterapi%2Ctwitter&text=Serverless%E9%80%A3%E8%BC%892:%20AWS%20Lambda%C3%97Go%E3%81%AE%E9%96%8B%E7%99%BATips" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200326/&t=Serverless%E9%80%A3%E8%BC%892:%20AWS%20Lambda%C3%97Go%E3%81%AE%E9%96%8B%E7%99%BATips" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200326/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200326/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">5</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2020.07.27</span><span class="snscount">&#9825;9</span><a class="related-posts-link" href=/articles/20200727/ title="[サーバレス連載企画]の8回目です。TIG DXユニットの真野です。ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。[工場をハックするための基本知識] の記事を書いた棚井さんと同じチームに所属しています。[サーバレス連載企画] の第8弾目として、Serverlessの代表格であるAWS LambdaでGoを用いてKinesisに対するKPL/KCL相当の処理についてまとめていきます。">GoからAWS KinesisのAggregationFormatを利用する</a></li><li class="related-posts-item"><span>2020.07.22</span><span class="snscount">&#9825;8</span><a class="related-posts-link" href=/articles/20200722/ title="昨今様々なシステムで利用さているAWSのLambdaですが、サーバレスということもあり何かのイベントをトリガに関数を起動させる方法が一般的かと思います。LambdaはAWSの様々なサービスをトリガとして起動することが可能で、自分たちの利用しているAWSサービスと組み合わせて実装するることでその真価を発揮します。AWSに少し詳しい人であればLambdaをAWSのサービストリガで起動させる事ができることは知っていると思いますが、いざ実装するとなると具体的にどういった手順で、なんの設定が必要かというところがわからないという人もいるのではないでしょうか。">AWSサービストリガによるLambda起動</a></li><li class="related-posts-item"><span>2020.03.23</span><span class="snscount">&#9825;27</span><a class="related-posts-link" href=/articles/20200323/ title="AWSのLambdaに代表されるサーバレスアプリは実行時のみ稼働するため、サーバー稼働によるあらゆるコストから解放され、システム開発の工数を減らすことができます。例えば何らかのAPIを提供する場合でも、API GatewayとLambdaを組み合わせることで提供可能です。">Serverless連載1: SAMを使ったローカルテスト（Go編）</a></li><li class="related-posts-item"><span>2021.09.24</span><span class="snscount">&#9825;7</span><a class="related-posts-link" href=/articles/20210924a/ title=" Gateway+Lambda という構成でWebAPI開発を行う際、ちょっと便利に使える疎通方法をまとめます。API GatewayですがPublicなエンドポイントがあれば `curl`コマンドや`Postman`を用いての動作検証も容易だと思います。">VPC内のAmazon API Gatewayをインターネットオーバーで疎通確認する</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.08.12</span><span class="snscount">&#9825;159</span> <a href="/articles/20210812a/" title="TIGの伊藤真彦です。この記事はGo1.17連載の3記事目です。[Go1.17のリリースノート]にこのような記載があります。">Go 1.17のtesting新機能</a></li>
+
+    <li><span>2021.07.26</span><span class="snscount">&#9825;92</span> <a href="/articles/20210726a/" title="7/26（月）～8/3（水）の平日にかけて、GoでRDBに対してアクセスライブラリ（ORMとクエリビルダー）をテーマにした連載を始めます。">GoのORマッパー連載を始めます</a></li>
+
+    <li><span>2021.03.29</span><span class="snscount">&#9825;14</span> <a href="/articles/20210329/" title="シェルスクリプト連載の第一弾です。シェルスクリプトは強力かつ便利で、いろいろなところで使われています。ただ、自由度が高い一方で、ちょっとしたミスを犯しやすく、かつミスに気づきにくい、ということも多いです。また、ミスに気づいたときには大きな影響が及んでいる、ということもあるでしょう。">ShellCheckでシェルスクリプトの品質を高めよう</a></li>
+
+    <li><span>2021.02.26</span><span class="snscount">&#9825;44</span> <a href="/articles/20210226/" title="E2Eテストはみんなしていますか？正直言うと、僕はあんまり好きじゃなかったです。お仕事では他の人が入れてくれたものが回っていたりしますが。前職で、SikuliXを使って社内向けのデスクトップアプリケーションのE2Eテストにトライしたことがあるんですが、すぐに壊れて動かなくなるので、費用対効果が出せなくてあきらめました（一人プロジェクトだったのもあります）。* 絵でマッチングを行うのでボタン画像をいっぱいスクショをとっていく必要がある">アクセシビリティ情報を使った壊れにくいE2Eテスト</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Lambda%E3%81%AE%E5%88%A9%E7%94%A8%E3%82%B3%E3%82%A2%E6%95%B0%E3%81%AF%EF%BC%9F"><span class="toc-text">Lambdaの利用コア数は？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Lambda%E3%81%AE%E5%88%9D%E6%9C%9F%E5%87%A6%E7%90%86%E3%81%AE%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88"><span class="toc-text">Lambdaの初期処理のポイント</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Lambda%E3%81%AE%E9%96%A2%E6%95%B0%E3%82%BF%E3%82%A4%E3%83%97"><span class="toc-text">Lambdaの関数タイプ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#error%E3%81%A8Logging"><span class="toc-text">errorとLogging</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#return-error%E3%81%97%E3%81%9F%E5%A0%B4%E5%90%88%E3%81%AE-errorString-null%E5%AF%BE%E5%BF%9C"><span class="toc-text">return errorした場合の errorString null対応</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>

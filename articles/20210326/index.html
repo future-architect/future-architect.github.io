@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Terraform + Auth0 を調査してみる | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="TIG DXユニット 1 アルバイトの小林です。 案件で認証プラットフォームであるAuth0を利用しています。 Auth0がHashiCorpとのパートナーシップを結び、TerraformでAuth0リソースの管理が可能となりました。 https:&#x2F;&#x2F;auth0.com&#x2F;blog&#x2F;partners-with-hashicorp-terraform&#x2F; 今回はTerraformで既存のAuth0リソー">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Terraform + Auth0 を調査してみる | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210326/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="TIG DXユニット 1 アルバイトの小林です。 案件で認証プラットフォームであるAuth0を利用しています。 Auth0がHashiCorpとのパートナーシップを結び、TerraformでAuth0リソースの管理が可能となりました。 https:&#x2F;&#x2F;auth0.com&#x2F;blog&#x2F;partners-with-hashicorp-terraform&#x2F; 今回はTerraformで既存のAuth0リソー">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210326/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210326/image_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210326/kobayashi.jpg">
+<meta property="article:published_time" content="2021-03-25T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:54:05.713Z">
+<meta property="article:tag" content="Terraform">
+<meta property="article:tag" content="Auth0">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210326/image.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210326/">
+  <meta content="Terraform,Auth0" name="keywords">
+  <meta content="小林澪司" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">Terraform + Auth0 を調査してみる
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210326_Terraform_+_Auth0_を調査してみる.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210326_Terraform_+_Auth0_を調査してみる" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E5%B0%8F%E6%9E%97%E6%BE%AA%E5%8F%B8">小林澪司</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2021/"><time datetime="2021-03-25T15:00:00.000Z" itemprop="datePublished">2021.03.26</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Terraform/" title="Terraformタグの記事へ">Terraform</a>
+  
+    
+    <a href="/tags/Auth0/" title="Auth0タグの記事へ">Auth0</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p>TIG DXユニット <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> アルバイトの小林です。</p>
+<p>案件で認証プラットフォームである<a target="_blank" rel="noopener" href="https://auth0.com/jp/">Auth0</a>を利用しています。</p>
+<p>Auth0がHashiCorpとのパートナーシップを結び、TerraformでAuth0リソースの管理が可能となりました。</p>
+<p><a target="_blank" rel="noopener" href="https://auth0.com/blog/partners-with-hashicorp-terraform/">https://auth0.com/blog/partners-with-hashicorp-terraform/</a></p>
+<p>今回はTerraformで既存のAuth0リソースを移行するという観点で調査を行いました。</p>
+<h2 id="Auth0とは"><a href="#Auth0とは" class="headerlink" title="Auth0とは"></a>Auth0とは</h2><img src="/images/20210326/image.png" loading="lazy">
+
+<p>Auth0の概要については<a href="/articles/20200122/">Auth0導入編</a>をご参照ください。他にも技術ブログには<a href="/tags/Auth0/">Auth0関連の記事</a>が沢山あります。</p>
+<h2 id="Terraformとは"><a href="#Terraformとは" class="headerlink" title="Terraformとは"></a>Terraformとは</h2><img src="/images/20210326/image_2.png" loading="lazy">
+
+<p>TerraformとはHashiCorpによって開発されたオープンソースのクラウド管理ツールです。</p>
+<p>クラウド環境のインフラの構成をコードに落とし込むことで、Git管理が可能になり、さらに状態を定義することが可能になるため、状態との差分からクラウド環境のリソース変更部分の表示が可能になるため、設定ミスのリスクを低減が見込めます。</p>
+<p>技術ブログでは<a href="/tags/Terraform/">Terrafom関連の記事</a>が沢山あるためそちらも合わせてご参照ください。</p>
+<p>また、Terraform以外でAuth0のクラウドリソースをコードに落とし込むツールには<code>auth0-deploy-cli</code>が上げられます。</p>
+<h2 id="Auth0-Deploy-CLI"><a href="#Auth0-Deploy-CLI" class="headerlink" title="Auth0 Deploy CLI"></a>Auth0 Deploy CLI</h2><p><a target="_blank" rel="noopener" href="https://github.com/auth0/auth0-deploy-cli">https://github.com/auth0/auth0-deploy-cli</a></p>
+<p>Auth0が出しているツールで、テナント構成をyamlに落とし込んだり、yamlに書かれたテナント構成を反映するなど、CI/CDを可能にします。</p>
+<p>Auth0 Deploy CLIについては、TIG市川さんの<a href="/articles/20200702/">Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える</a>をご参照ください。</p>
+<p>Auth0 Deploy CLIには、<code>dry-run</code>がサポートされておらず <sup id="fnref:8"><a href="#fn:8" rel="footnote">8</a></sup>、<strong>実際に実行してみるまでテナント構成がどうなるのか分からない</strong>、さらに<strong>意図していない変更を検出出来ない</strong>といった課題があります。</p>
+<h2 id="Auth0-Deploy-CLI-vs-Terraform"><a href="#Auth0-Deploy-CLI-vs-Terraform" class="headerlink" title="Auth0 Deploy CLI vs Terraform"></a>Auth0 Deploy CLI vs Terraform</h2><p>Auth0環境の構成をAuth0 Deploy CLIで行う場合とTerraformで行う場合について、それぞれの強みと弱みについて調査しました。</p>
+<h4 id="Auth0-Deploy-CLIの強み"><a href="#Auth0-Deploy-CLIの強み" class="headerlink" title="Auth0 Deploy CLIの強み"></a>Auth0 Deploy CLIの強み</h4><ul>
+<li>テナントの構成をまるっとエクスポートすることが出来ます。<ul>
+<li>rules,hooksもディレクトリに区切ってファイルを作成してくれるなど、親切です。</li>
+</ul>
+</li>
+<li>mappingが公式サポートされています。<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/auth0/auth0-deploy-cli/blob/master/examples/yaml/README.md#environment-variables-and-auth0_keyword_replace_mappings">auth0-deploy-cli/README.md:AUTH0_KEYWORD_REPLACE_MAPPINGS· auth0/auth0-deploy-cli</a></li>
+<li>そのため単一のyamlファイルを複数の環境に転用させて、検証環境と本番環境の設定の同一化が比較的容易に実現出来ます。</li>
+</ul>
+</li>
+</ul>
+<h4 id="Auth0-Deploy-CLIの弱み"><a href="#Auth0-Deploy-CLIの弱み" class="headerlink" title="Auth0 Deploy CLIの弱み"></a>Auth0 Deploy CLIの弱み</h4><ul>
+<li>Auth0専用のツールなのでこのツールの操作方法を独自で覚える必要があります。</li>
+<li><code>dry-run</code>機能が無いため<strong>意図していない設定変更が生じうる</strong>可能性があります <sup id="fnref:9"><a href="#fn:9" rel="footnote">9</a></sup>。</li>
+</ul>
+<h4 id="Terraformの強み"><a href="#Terraformの強み" class="headerlink" title="Terraformの強み"></a>Terraformの強み</h4><ul>
+<li>独自ツール無しでTerraformだけで済むため、いままでAWSなどでTerraformを使っている場合、学習コストほぼ0で利用出来ます。</li>
+<li>Terraformには<code>plan</code>と呼ばれる現在の状態と変更後の状態の差分を表示させる、<code>dry-run</code>に該当する機能があります。</li>
+<li>Terraform workspaceを利用することで同一のリソースブロックを複数環境で利用することが可能になります。これにより検証環境と本番環境の設定の同一化が比較的容易に実現出来ます。</li>
+</ul>
+<h4 id="Terraformの弱み"><a href="#Terraformの弱み" class="headerlink" title="Terraformの弱み"></a>Terraformの弱み</h4><ul>
+<li>一括で全リソースをインポートする手段が無いためテナント設定が膨大の場合、Terraformで管理出来る状態に持っていくまでが大変です。<ul>
+<li>terraformのimportをAuth0プロパイダで利用する際、IDの特定方法が複雑(<a href="#%E6%97%A2%E5%AD%98%E3%81%AEauth0%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%92terraform%E3%81%AB%E7%A7%BB%E8%A1%8C%E3%81%99%E3%82%8B%E9%9A%9B%E3%81%AE%E6%B5%81%E3%82%8C"><strong>後述</strong></a>)です。</li>
+</ul>
+</li>
+</ul>
+<p>今回、私の所属しているプロジェクトでは、<strong>他のクラウドリソースをTerraformで管理している</strong>こと、<br>Auth0の構成が複雑になっていることから、<code>plan</code>が非常に強力であり、<strong>作業ミスのリスクを大幅に減少出来る見込み</strong>のため、Terraformを採用することにしました。</p>
+<h2 id="Terraformで管理すると"><a href="#Terraformで管理すると" class="headerlink" title="Terraformで管理すると"></a>Terraformで管理すると</h2><p>Terraformで管理出来る様になると以下の点で便利になります。</p>
+<ul>
+<li>環境毎の設定差異の検出が簡単に出来る。</li>
+<li>Auth0のリソース更新時にdry-runが可能になり、意図していないリソースの変更や、リソースの更新忘れのリスクを軽減できる。</li>
+<li>環境全体がコードに落ちるためGitなどのバージョン管理ツールで管理が出来る様になる。</li>
+</ul>
+<p>この記事では以下の2点について扱います。</p>
+<ul>
+<li>terraform importを利用して既存のAuth0リソースをTerraformに移行できるか</li>
+<li>複数環境で設定を統一化出来るか</li>
+</ul>
+<h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><ul>
+<li>terraformのバージョンはv0.14.6を利用します。</li>
+<li>プロパイダは<a target="_blank" rel="noopener" href="https://github.com/alexkappa/terraform-provider-auth0">alexkappa/auth0</a>を利用します。<ul>
+<li>バージョンはv0.17.1です。</li>
+</ul>
+</li>
+<li>事前にAuth0のテナントのダッシュボードから、Management APIが利用可能なM2Mのアプリケーションを作成しておき、ClientIDとClientSecretを取得しておく必要があります。</li>
+</ul>
+<h3 id="準備手順"><a href="#準備手順" class="headerlink" title="準備手順"></a>準備手順</h3><p>作業ディレクトリにmain.tfを作成して以下の様に記載します。</p>
+<figure class="highlight sh"><figcaption><span>main.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">terraform &#123;</span><br><span class="line">  required_providers &#123;</span><br><span class="line">    auth0 = &#123;</span><br><span class="line">      <span class="built_in">source</span>  = <span class="string">&quot;alexkappa/auth0&quot;</span></span><br><span class="line">      version = <span class="string">&quot;0.17.1&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">provider <span class="string">&quot;auth0&quot;</span> &#123;</span><br><span class="line">  domain        = <span class="string">&quot;Auth0テナントのドメイン&quot;</span></span><br><span class="line">  client_id     = <span class="string">&quot;事前に作成したM2MアプリケーションのClientID&quot;</span></span><br><span class="line">  client_secret = <span class="string">&quot;事前に作成したM2MアプリケーションのClientSecret&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>その後、<code>terraform init</code>をします。</p>
+<p>以上で準備完了です。</p>
+<h2 id="terraform-importを利用して既存のAuth0リソースをTerraformに移行できるか"><a href="#terraform-importを利用して既存のAuth0リソースをTerraformに移行できるか" class="headerlink" title="terraform importを利用して既存のAuth0リソースをTerraformに移行できるか"></a>terraform importを利用して既存のAuth0リソースをTerraformに移行できるか</h2><h3 id="TL-DR"><a href="#TL-DR" class="headerlink" title="TL;DR"></a>TL;DR</h3><p>一つだけtfstateを弄る必要があるが、<strong>可能</strong>です。</p>
+<h3 id="既存のAuth0リソースをTerraformに移行する際の流れ"><a href="#既存のAuth0リソースをTerraformに移行する際の流れ" class="headerlink" title="既存のAuth0リソースをTerraformに移行する際の流れ"></a>既存のAuth0リソースをTerraformに移行する際の流れ</h3><p>まずは移行手順の全体像について記載します。</p>
+<ul>
+<li>空のリソース定義を作成する。</li>
+<li>terraform import で既存のリソースをstateに取り込む</li>
+<li><code>terraform state show</code>でstateに取り込んだ既存リソースのパラメータを確認し、先程作成した空のリソース定義に追加していく。</li>
+<li><code>terraform plan</code>して差分が無くなればそのリソースの移行完了</li>
+</ul>
+<p>この手順を<strong>Auth0で管理出来る全リソースについて実行します</strong>。</p>
+<p>Terraformで管理出来るリソースの一覧(リソースタイプ)は↓で定義されています。</p>
+<p><a target="_blank" rel="noopener" href="https://registry.terraform.io/providers/alexkappa/auth0/latest/docs">Docs overview | alexkappa/auth0 | Terraform Registry</a></p>
+<p>かなりの作業量になるため何らかのツールがあるだろうと探してみたのですが、見つけられませんでした。 <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+<p>加えてこの手順でAuth0のリソースをインポートするに当たって、ある事象でハマってしまいました。</p>
+<h3 id="ハマったポイント-IDが無いリソースタイプがいくつかある。"><a href="#ハマったポイント-IDが無いリソースタイプがいくつかある。" class="headerlink" title="ハマったポイント: IDが無いリソースタイプがいくつかある。"></a>ハマったポイント: IDが無いリソースタイプがいくつかある。</h3><p>Terraformで定義されているimportコマンドの書式はこのようになっています。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ terraform import [options] ADDRESS ID</span><br></pre></td></tr></table></figure>
+
+<details><summary>ADDRESSとは▼</summary><div>
+
+<p><code>ADDRESS</code> はリソースアドレスの事であり、<code>&lt;given type&gt;.&lt;local name&gt;</code> の形式で表します。</p>
+<p>例えば、</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;auth0_custom_domain&quot;</span> <span class="string">&quot;main_domain&quot;</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>の様なリソースブロックにおいて、</p>
+<p><code>ADDRESS</code>は<code>auth0_custom_domain.main_domain</code>です。</p>
+</div></details>
+
+<br>
+
+<p><code>ID</code>はそのリソースをインポートするための識別子です。例えば、Auth0 Custom Dmainのドメイン設定は<code>cd_&lt;random string&gt;</code>の形で割り振られています。</p>
+<p>この<code>ID</code>ですが、<strong>リソースタイプによっては存在しません</strong>。例えば、テナント設定である、<a target="_blank" rel="noopener" href="https://registry.terraform.io/providers/alexkappa/auth0/latest/docs/resources/tenant">auth0_tenant</a>にはIDが存在しません。この場合、どうすれば設定のインポートが出来るのか、悩んでいました。</p>
+<p>結論としては、<strong>IDを適当に自分で決めればインポート出来ました</strong>。</p>
+<h3 id="なぜ適当なIDで通るのか"><a href="#なぜ適当なIDで通るのか" class="headerlink" title="なぜ適当なIDで通るのか"></a>なぜ適当なIDで通るのか</h3><p><code>ID</code>は識別子です。Auth0 のテナント設定に着目すると、<strong>IDが無くとも設定が判別できます</strong>。</p>
+<p>IDが振られているリソースタイプである、<code>auth0_role</code>のプロパイダのソースコード <sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>とTerraform公式のimportの説明 <sup id="fnref:7"><a href="#fn:7" rel="footnote">7</a></sup>を読むと、CLIから受け取ったIDが<code>d.ID()</code>に入っている事が分かります。</p>
+<p>同様にIDが不明なリソースタイプである、<code>auth_tenant</code>のプロパイダのソースコード <sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>を読むと、<code>auth0_role</code>では使われていた、<code>d.ID()</code>が使われていない事が分かります。そのため、こちらで適当なIDを入れても問題無いことが分かります。</p>
+<h3 id="リソースタイプとIDの対応表"><a href="#リソースタイプとIDの対応表" class="headerlink" title="リソースタイプとIDの対応表"></a>リソースタイプとIDの対応表</h3><p>執筆当時プロパイダのドキュメントに、<strong>どのパラメータを使えばimportが出来るかの情報がほとんど載っていません</strong>。issueにはちらちら書かれていますが、テナント設定のimport方法について書いている人は見つけられませんでした。</p>
+<p>そのためリソースタイプとID対応関係について表にまとめてみたので参考にお使い下さい。執筆当時で、この中の全リソースタイプについてimportが出来ている事を確認しています。 <sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup></p>
+<p>また、<code>ID</code>の確認が必要なリソースタイプについては、IDが確認しやすい様にManagement APIのAPI Explorerの該当APIのURLを載せています。</p>
+<p>IDの欄に<code>&quot;id&quot;</code>と書かれていた場合は<strong>APIを叩いた時のJSONレスポンスのキーが”id”の値</strong>を指します。<br><strong>自由</strong>と書かれていた場合は先述の理由により、自由に設定出来ます。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Resource Type</th>
+<th>ID</th>
+<th>URL</th>
+<th>備考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>auth0_client</td>
+<td>“client_id”</td>
+<td><a target="_blank" rel="noopener" href="https://auth0.com/docs/api/management/v2#!/Clients/get_clients">https://auth0.com/docs/api/management/v2#!/Clients/get_clients</a></td>
+<td></td>
+</tr>
+<tr>
+<td>auth0_client_grant</td>
+<td>“id”</td>
+<td><a target="_blank" rel="noopener" href="https://auth0.com/docs/api/management/v2#!/Client_Grants/get_client_grants">https://auth0.com/docs/api/management/v2#!/Client_Grants/get_client_grants</a></td>
+<td></td>
+</tr>
+<tr>
+<td>auth0_connection</td>
+<td>“id”</td>
+<td><a target="_blank" rel="noopener" href="https://auth0.com/docs/api/management/v2#!/Connections/get_connections">https://auth0.com/docs/api/management/v2#!/Connections/get_connections</a></td>
+<td></td>
+</tr>
+<tr>
+<td>auth0_custom_domain</td>
+<td>“custom_domain_id”</td>
+<td><a target="_blank" rel="noopener" href="https://auth0.com/docs/api/management/v2#!/Custom_Domains/get_custom_domains">https://auth0.com/docs/api/management/v2#!/Custom_Domains/get_custom_domains</a></td>
+<td>tfstateの修正が必要 <sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup></td>
+</tr>
+<tr>
+<td>auth0_email</td>
+<td>自由</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>auth0_email_template</td>
+<td>[verify_email,<br>verify_email_by_code,<br>reset_email,<br>welcome_email,<br>blocked_account,<br>stolen_credentials,<br>enrollment_email,<br>mfa_oob_code,<br>user_invitation] のどれか一つ</td>
+<td></td>
+<td>IDによって、インポートされる項目が異なる、<br>例えば`verify_email`ならば認証メールがインポートされる。</td>
+</tr>
+<tr>
+<td>auth0_hook</td>
+<td>“id”</td>
+<td><a target="_blank" rel="noopener" href="https://auth0.com/docs/api/management/v2#!/Hooks/get_hooks">https://auth0.com/docs/api/management/v2#!/Hooks/get_hooks</a></td>
+<td></td>
+</tr>
+<tr>
+<td>auth0_prompt</td>
+<td>自由</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>auth0_resource_server</td>
+<td>“id”</td>
+<td><a target="_blank" rel="noopener" href="https://auth0.com/docs/api/management/v2#!/Resource_Servers/get_resource_servers">https://auth0.com/docs/api/management/v2#!/Resource_Servers/get_resource_servers</a></td>
+<td></td>
+</tr>
+<tr>
+<td>auth0_role</td>
+<td>“id”</td>
+<td><a target="_blank" rel="noopener" href="https://auth0.com/docs/api/management/v2#!/Roles/get_roles">https://auth0.com/docs/api/management/v2#!/Roles/get_roles</a></td>
+<td></td>
+</tr>
+<tr>
+<td>auth0_rule</td>
+<td>“id”</td>
+<td><a target="_blank" rel="noopener" href="https://auth0.com/docs/api/management/v2#!/Rules/get_rules">https://auth0.com/docs/api/management/v2#!/Rules/get_rules</a></td>
+<td></td>
+</tr>
+<tr>
+<td>auth0_rule_config</td>
+<td>“key”</td>
+<td><a target="_blank" rel="noopener" href="https://auth0.com/docs/api/management/v2#!/Rules_Configs/get_rules_configs">https://auth0.com/docs/api/management/v2#!/Rules_Configs/get_rules_configs</a></td>
+<td></td>
+</tr>
+<tr>
+<td>auth0_tenant</td>
+<td>自由</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>auth0_user</td>
+<td>“user_id”</td>
+<td><a target="_blank" rel="noopener" href="https://auth0.com/docs/api/management/v2#!/Users/get_users">https://auth0.com/docs/api/management/v2#!/Users/get_users</a></td>
+<td></td>
+</tr>
+</tbody></table></div>
+<h2 id="複数環境で設定を統一化出来るか"><a href="#複数環境で設定を統一化出来るか" class="headerlink" title="複数環境で設定を統一化出来るか"></a>複数環境で設定を統一化出来るか</h2><p>複数テナントが推奨されているAuth0において、テナントの設定を統一化したいケースがあると思います。<br>その際は<code>terraform workspace</code>と呼ばれる機能を用いて一つのリソースブロックを複数の環境で共有することが可能になります。</p>
+<p>dev環境とtest環境があったとして、この二つの環境で同一の設定にさせたい場合について考えます。</p>
+<p>先程のmain.tfと同階層にvariables.tfを置きます。</p>
+<figure class="highlight sh"><figcaption><span>variables.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">locals &#123;</span><br><span class="line">  environments = &#123;</span><br><span class="line">    dev = &#123;</span><br><span class="line">      auth0_domain        = <span class="string">&quot;dev-example.auth0.com&quot;</span>,</span><br><span class="line">      auth0_client_id     = <span class="string">&quot;dev環境のM2MアプリケーションのClientID&quot;</span>,</span><br><span class="line">      auth0_client_secret = <span class="string">&quot;dev環境のM2MアプリケーションのClientSecret&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">test</span> = &#123;</span><br><span class="line">      auth0_domain        = <span class="string">&quot;test-example.auth0.com&quot;</span>,</span><br><span class="line">      auth0_client_id     = <span class="string">&quot;test環境のM2MアプリケーションのClientID&quot;</span>,</span><br><span class="line">      auth0_client_secret = <span class="string">&quot;test環境のM2MアプリケーションのClientSecret&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>main.tfのプロパイダ設定を以下の様に変えます。</p>
+<figure class="highlight sh"><figcaption><span>main.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">provider <span class="string">&quot;auth0&quot;</span> &#123;</span><br><span class="line">  domain        = local.environments[terraform.workspace][<span class="string">&quot;auth0_domain&quot;</span>]</span><br><span class="line">  client_id     = local.environments[terraform.workspace][<span class="string">&quot;auth0_client_id&quot;</span>]</span><br><span class="line">  client_secret = local.environments[terraform.workspace][<span class="string">&quot;auth0_client_secret&quot;</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Terraformのworkspaceを追加しましょう。main.tfで以下のコマンドを実行します。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ terraform workspace new dev</span><br><span class="line">$ terraform workspace new <span class="built_in">test</span></span><br></pre></td></tr></table></figure>
+
+<p>以下の様に表示されます(現在いるworkspaceに*が付きます。)</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ terraform workspace list</span><br><span class="line">  default</span><br><span class="line">  dev</span><br><span class="line">* <span class="built_in">test</span></span><br></pre></td></tr></table></figure>
+
+<p>今自分が入っているworkspaceは<code>terraform workspace list</code>で確認します。</p>
+<p>移動したい場合は<code>terraform workspace [移動先のworkspace名]</code>です。</p>
+<p>dev環境を正としたい場合は先程のリソースのimport手順をworkspaceがdevの状態で進めます。その後、workspaceをtestに変更してからリソースブロックを変更せずに<code>terraform import</code>を全リソースに対して行います。</p>
+<p>最後に、<code>terraform plan</code>でdev環境とtest環境の設定の差分が表示されます。</p>
+<h3 id="一部だけ設定を変えたい"><a href="#一部だけ設定を変えたい" class="headerlink" title="一部だけ設定を変えたい"></a>一部だけ設定を変えたい</h3><p>test環境の時だけ空のルールである<code>empty-rule.js</code>、その他の環境の時は<code>some-rule.js</code>を動かしたいケースについて考えてみます。</p>
+<p>HCLの組み込み関数<code>file</code>と三項演算子により実現出来ます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;auth0_rule&quot;</span> <span class="string">&quot;some_rule&quot;</span> &#123;</span><br><span class="line">  name   = <span class="string">&quot;some_rule&quot;</span></span><br><span class="line">  script = terraform.workspace == <span class="string">&quot;test&quot;</span> ? file(<span class="string">&quot;./empty-rule.js&quot;</span>) : file(<span class="string">&quot;./some-rule.js&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Terraformの組み込み関数<code>replace</code>を使えば、同一のファイルを参照しつつ振る舞いを返る事が可能になります。</p>
+<p>テナント環境毎に挙動が変わるRuleをTerraformで管理してみます。</p>
+<p>初めに以下の様なスクリプトを保存し、</p>
+<figure class="highlight js"><figcaption><span>set-env.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">function</span> <span class="title">setEnv</span>(<span class="params">user, context, callback</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> idTokenClaims = context.idToken || &#123;&#125;;</span><br><span class="line">    idTokenClaims[<span class="string">&quot;http://example.com/env&quot;</span>] = <span class="string">&quot;###AUTH0_TENANT###&quot;</span>;</span><br><span class="line"></span><br><span class="line">    context.idToken = idTokenClaims;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> callback(<span class="literal">null</span>, user, context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以下の様にリソース定義を行います。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;auth0_rule&quot;</span> <span class="string">&quot;set_env&quot;</span> &#123;</span><br><span class="line">  name   = <span class="string">&quot;set_env&quot;</span></span><br><span class="line">  script = replace(file(<span class="string">&quot;./set-env.js&quot;</span>),<span class="string">&quot;###AUTH0_TENANT###&quot;</span>,terraform.workspace)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>このように書く事でdev環境では</p>
+<figure class="highlight js"><figcaption><span>set-env.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">function</span> <span class="title">setEnv</span>(<span class="params">user, context, callback</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> idTokenClaims = context.idToken || &#123;&#125;;</span><br><span class="line">    idTokenClaims[<span class="string">&quot;http://example.com/env&quot;</span>] = <span class="string">&quot;dev&quot;</span>;</span><br><span class="line"></span><br><span class="line">    context.idToken = idTokenClaims;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> callback(<span class="literal">null</span>, user, context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>として、test環境では</p>
+<figure class="highlight js"><figcaption><span>set-env.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">function</span> <span class="title">setEnv</span>(<span class="params">user, context, callback</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> idTokenClaims = context.idToken || &#123;&#125;;</span><br><span class="line">    idTokenClaims[<span class="string">&quot;http://example.com/env&quot;</span>] = <span class="string">&quot;test&quot;</span>;</span><br><span class="line"></span><br><span class="line">    context.idToken = idTokenClaims;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> callback(<span class="literal">null</span>, user, context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>として環境毎に振る舞いを変える事が出来ました。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>今回はTerraform + Auth0の環境構築について、既存のAuth0環境の移行を観点として調査を行いました。</p>
+<p>調査結果をまとめると、</p>
+<ul>
+<li>importの手順に一癖あるが、一応全リソースを移行出来る。</li>
+<li>workspaceを用いて複数のテナントで環境を同一にしつつ、一部だけ環境毎に振る舞いを変えることが出来る。</li>
+</ul>
+<p>ことが分かりました。</p>
+<p>既存のAuth0環境をTerraformに移行したい場合の考慮材料にして頂ければ幸いです。</p>
+<p>ここまで読んで頂きありがとうございました。</p>
+<h2 id="終わりに"><a href="#終わりに" class="headerlink" title="終わりに"></a>終わりに</h2><p>私事で恐縮ですが、2019年の2月からアルバイトとして働いてきたFutureを今日で退職します。</p>
+<p>この2年を通してFutureで沢山の技術を学び、自身のスキルを大幅に向上させることが出来ました。</p>
+<p>2年間本当にお世話になりました。ありがとうございました！</p>
+<img src="/images/20210326/kobayashi.jpg" loading="lazy">
+
+
+ 
+
+ 
+
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">TIG: Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。DXユニット: TIGの中にありデジタルトランスフォーメーションに関わる仕事を推進していくチームです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="vertical-align: top; padding-right: 10px;">2.</span><span style="vertical-align: top;">執筆中に<a target="_blank" rel="noopener" href="https://github.com/GoogleCloudPlatform/terraformer">terraformer</a>と呼ばれる既存のインフラリソースをリソース定義(.tf)や状態(.tfstate)に落とし込むCLIツールは見つけたのですが、執筆当時はまだ対応リストに記載されていません。</span><a href="#fnref:2" rev="footnote"> ↩</a></li><li id="fn:3"><span style="vertical-align: top; padding-right: 10px;">3.</span><span style="vertical-align: top;"><a target="_blank" rel="noopener" href="https://github.com/alexkappa/terraform-provider-auth0/blob/master/auth0/resource_auth0_role.go#L86">https://github.com/alexkappa/terraform-provider-auth0/blob/master/auth0/resource_auth0_role.go#L86</a></span><a href="#fnref:3" rev="footnote"> ↩</a></li><li id="fn:4"><span style="vertical-align: top; padding-right: 10px;">4.</span><span style="vertical-align: top;"><a target="_blank" rel="noopener" href="https://github.com/alexkappa/terraform-provider-auth0/blob/master/auth0/resource_auth0_tenant.go#L256">https://github.com/alexkappa/terraform-provider-auth0/blob/master/auth0/resource_auth0_tenant.go#L256</a></span><a href="#fnref:4" rev="footnote"> ↩</a></li><li id="fn:5"><span style="vertical-align: top; padding-right: 10px;">5.</span><span style="vertical-align: top;">あくまで全リソースタイプについて確認しているため、リソースタイプのauth0_email_templateのIDは<code>verify_email</code>と<code>reset_email</code>のみ確認済みです。</span><a href="#fnref:5" rev="footnote"> ↩</a></li><li id="fn:6"><span style="vertical-align: top; padding-right: 10px;">6.</span><span style="vertical-align: top;">このリソースタイプはどうリソースブロックを編集しても<code>terraform plan</code>で差分を無くす事が出来ません。<code>verification_method</code>がManagement APIの仕様上importされないため、tfstate側がnullと設定されてしまうからです。スキーマ定義を見ると、<code>Required</code>と<code>ForceNew</code>が付いているためこのままではリソースの再生成が走ってしまいます。そのため、<code>.tfstate</code>,<code>.tf</code>の両方について<code>verification_method = &quot;txt&quot;</code>に強制的に変更することで<code>terraform plan</code>で差分を表示させない様に設定出来ます。この問題はプロパイダのリポジトリのissueでも言及されていました。 <a target="_blank" rel="noopener" href="https://github.com/alexkappa/terraform-provider-auth0/issues/294">Importing auth0_custom_domain resource forces recreation · Issue #294 · alexkappa/terraform-provider-auth0</a></span><a href="#fnref:6" rev="footnote"> ↩</a></li><li id="fn:7"><span style="vertical-align: top; padding-right: 10px;">7.</span><span style="vertical-align: top;"><a target="_blank" rel="noopener" href="https://www.terraform.io/docs/extend/resources/import.html#importer-state-function">Resources - Import - Terraform by HashiCorp</a></span><a href="#fnref:7" rev="footnote"> ↩</a></li><li id="fn:8"><span style="vertical-align: top; padding-right: 10px;">8.</span><span style="vertical-align: top;"><a target="_blank" rel="noopener" href="https://github.com/auth0/auth0-deploy-cli/issues/70">Support Test Mode · Issue #70 · auth0/auth0-deploy-cli</a>issue自体は記載されています。</span><a href="#fnref:8" rev="footnote"> ↩</a></li><li id="fn:9"><span style="vertical-align: top; padding-right: 10px;">9.</span><span style="vertical-align: top;">一応Auth0 Deploy CLIでは、意図していないリソースの破壊を防ぐために<code>AUTH0_ALLOW_DELETE</code>フラグが設定可能です。<a target="_blank" rel="noopener" href="https://github.com/auth0/auth0-deploy-cli/blob/master/examples/yaml/README.md#config">https://github.com/auth0/auth0-deploy-cli/blob/master/examples/yaml/README.md#config</a></span><a href="#fnref:9" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210326/&via=future_techblog&related=twitterapi%2Ctwitter&text=Terraform%20+%20Auth0%20%E3%82%92%E8%AA%BF%E6%9F%BB%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210326/&t=Terraform%20+%20Auth0%20%E3%82%92%E8%AA%BF%E6%9F%BB%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210326/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210326/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">4</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2021.03.08</span><span class="snscount">&#9825;4</span><a class="related-posts-link" href=/articles/20210308/ title="案件で認証プラットフォームである[Auth0]を利用していますが、Auth0の機能の中でもRulesと呼ばれるユーザ認証時にJavaScriptの関数を走らせる事が出来る機能は非常に強力で様々なニーズに対応することが可能になります。その中でJavaScriptの関数で書けるRulesに対して、ユニットテストを書く事が出来れば、Ruleの質も担保出来ます。">Auth0 Rulesのユニットテストを書きたい</a></li><li class="related-posts-item"><span>2021.08.12</span><span class="snscount">&#9825;10</span><a class="related-posts-link" href=/articles/20210812b/ title="2021年7月21日にFuture Tech Night #14～認証認可（IDaaS）勉強会～で発表させてもらいました。元々は、Rails Devise+cancancan、Cognito User Pools（5年前）、Auth0の開発経験があり、改めてOSSも加えて学んでみたかったのが、テーマを決めた背景になります。">Future Tech Night #14〜IDaaS/OSS/Managed比較〜</a></li><li class="related-posts-item"><span>2021.08.11</span><span class="snscount">&#9825;5</span><a class="related-posts-link" href=/articles/20210811b/ title="2021年7月21日にFuture Tech Night #14～認証認可（IDaaS）勉強会～を開催し、「生体認証・デバイス認証を活用するパスワードレスな認証規格「WebAuthn」を体験！」というテーマで登壇させていただきました。">Future Tech Night #14「生体認証・デバイス認証を活用するパスワードレスな認証規格「WebAuthn」を体験！」</a></li><li class="related-posts-item"><span>2021.04.13</span><span class="snscount">&#9825;4</span><a class="related-posts-link" href=/articles/20210413a/ title="認証情報を Lambda の環境変数に渡す要件が発生したため認証情報を KMS で暗号化して、リポジトリには暗号化した値を登録し、Lambda 内で復号化する構成を取りました。">KMSで暗号化してLambdaで復号化する</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.05.18</span><span class="snscount">&#9825;469</span> <a href="/articles/20210518a/" title="RESTfullとかRESTishな方針でWebAPIの横断検索を設計する際にチーム内で方針について議論したやり取りの備忘記事です。">HTTP検索条件、GETにするか？POSTにするか？</a></li>
+
+    <li><span>2021.04.26</span><span class="snscount">&#9825;58</span> <a href="/articles/20210426b/" title="Go 1.16のembedとchiとSingle Page Application、Go 1.16のgo:embedとNext.jsの相性が悪い問題と戦うに近い感じの研究記事です。">Go 1.16のembedとgo-swaggerを組み合わせてフルスタック自動生成フレームワークを作る</a></li>
+
+    <li><span>2020.11.19</span><span class="snscount">&#9825;33</span> <a href="/articles/20201119/" title="私の所属しているプロジェクトでは、Go言語を使ってWeb APIを構築しています。私は元々Pythonを主に書いていましたが、Go言語を書くのは初めてでした。そんな私がPythonからGo言語へ入門する際に、苦労した経験や発見を共有したいと思います！">PythonistaがGo言語に入門してみた</a></li>
+
+    <li><span>2020.08.01</span><span class="snscount">&#9825;6</span> <a href="/articles/20200801/" title="こんにちは。SAIG所属の農見と申します。この度、研究で用いた[B細胞エピトープ予測用データセット]を公開したので、その解説をします。簡単に言うと、B細胞エピトープが分かればワクチン作成の大きな助けになる、だからCOVID-19の原因ウイルスであるSARS-CoV-2が持つタンパク質のB細胞エピトープを予測して...">Kaggleにワクチン開発用のデータを公開しました & コード解説</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Auth0%E3%81%A8%E3%81%AF"><span class="toc-text">Auth0とは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Terraform%E3%81%A8%E3%81%AF"><span class="toc-text">Terraformとは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Auth0-Deploy-CLI"><span class="toc-text">Auth0 Deploy CLI</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Auth0-Deploy-CLI-vs-Terraform"><span class="toc-text">Auth0 Deploy CLI vs Terraform</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Auth0-Deploy-CLI%E3%81%AE%E5%BC%B7%E3%81%BF"><span class="toc-text">Auth0 Deploy CLIの強み</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Auth0-Deploy-CLI%E3%81%AE%E5%BC%B1%E3%81%BF"><span class="toc-text">Auth0 Deploy CLIの弱み</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Terraform%E3%81%AE%E5%BC%B7%E3%81%BF"><span class="toc-text">Terraformの強み</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Terraform%E3%81%AE%E5%BC%B1%E3%81%BF"><span class="toc-text">Terraformの弱み</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Terraform%E3%81%A7%E7%AE%A1%E7%90%86%E3%81%99%E3%82%8B%E3%81%A8"><span class="toc-text">Terraformで管理すると</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E6%8F%90"><span class="toc-text">前提</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%96%E5%82%99%E6%89%8B%E9%A0%86"><span class="toc-text">準備手順</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#terraform-import%E3%82%92%E5%88%A9%E7%94%A8%E3%81%97%E3%81%A6%E6%97%A2%E5%AD%98%E3%81%AEAuth0%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%92Terraform%E3%81%AB%E7%A7%BB%E8%A1%8C%E3%81%A7%E3%81%8D%E3%82%8B%E3%81%8B"><span class="toc-text">terraform importを利用して既存のAuth0リソースをTerraformに移行できるか</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#TL-DR"><span class="toc-text">TL;DR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A2%E5%AD%98%E3%81%AEAuth0%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%92Terraform%E3%81%AB%E7%A7%BB%E8%A1%8C%E3%81%99%E3%82%8B%E9%9A%9B%E3%81%AE%E6%B5%81%E3%82%8C"><span class="toc-text">既存のAuth0リソースをTerraformに移行する際の流れ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%8F%E3%83%9E%E3%81%A3%E3%81%9F%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88-ID%E3%81%8C%E7%84%A1%E3%81%84%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%97%E3%81%8C%E3%81%84%E3%81%8F%E3%81%A4%E3%81%8B%E3%81%82%E3%82%8B%E3%80%82"><span class="toc-text">ハマったポイント: IDが無いリソースタイプがいくつかある。</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%81%AA%E3%81%9C%E9%81%A9%E5%BD%93%E3%81%AAID%E3%81%A7%E9%80%9A%E3%82%8B%E3%81%AE%E3%81%8B"><span class="toc-text">なぜ適当なIDで通るのか</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%97%E3%81%A8ID%E3%81%AE%E5%AF%BE%E5%BF%9C%E8%A1%A8"><span class="toc-text">リソースタイプとIDの対応表</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A4%87%E6%95%B0%E7%92%B0%E5%A2%83%E3%81%A7%E8%A8%AD%E5%AE%9A%E3%82%92%E7%B5%B1%E4%B8%80%E5%8C%96%E5%87%BA%E6%9D%A5%E3%82%8B%E3%81%8B"><span class="toc-text">複数環境で設定を統一化出来るか</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E9%83%A8%E3%81%A0%E3%81%91%E8%A8%AD%E5%AE%9A%E3%82%92%E5%A4%89%E3%81%88%E3%81%9F%E3%81%84"><span class="toc-text">一部だけ設定を変えたい</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%82%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">終わりに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>

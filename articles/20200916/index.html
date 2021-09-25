@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>素材受信インターフェースにSQSを活用してみた ～標準キュー vs FIFOキュー～ | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="GlyphFeeds連載企画3つ目の記事です。 はじめにはじめまして、2017年新卒入社、TIG所属の出口です。 今回は、GlyphFeedsの素材受信インターフェース構築を介してAmazon Simple Queue Service (SQS) の検証について紹介します。 素材受信インターフェースとは今回紹介する素材受信インターフェースについて簡易ですが説明します。 役割GlyphFeedsにお">
+<meta property="og:type" content="article">
+<meta property="og:title" content="素材受信インターフェースにSQSを活用してみた ～標準キュー vs FIFOキュー～ | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200916/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="GlyphFeeds連載企画3つ目の記事です。 はじめにはじめまして、2017年新卒入社、TIG所属の出口です。 今回は、GlyphFeedsの素材受信インターフェース構築を介してAmazon Simple Queue Service (SQS) の検証について紹介します。 素材受信インターフェースとは今回紹介する素材受信インターフェースについて簡易ですが説明します。 役割GlyphFeedsにお">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200916/図1.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200916/図2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200916/図3.png">
+<meta property="article:published_time" content="2020-09-15T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:54:01.011Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="SQS">
+<meta property="article:tag" content="GlyphFeeds">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200916/図1.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20200916/">
+  <meta content="AWS,SQS,GlyphFeeds" name="keywords">
+  <meta content="出口豊" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">素材受信インターフェースにSQSを活用してみた ～標準キュー vs FIFOキュー～
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20200916_素材受信インターフェースにSQSを活用してみた_～標準キュー_vs_FIFOキュー～.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20200916_素材受信インターフェースにSQSを活用してみた_～標準キュー_vs_FIFOキュー～" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E5%87%BA%E5%8F%A3%E8%B1%8A">出口豊</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2020/"><time datetime="2020-09-15T15:00:00.000Z" itemprop="datePublished">2020.09.16</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ">AWS</a>
+  
+    
+    <a href="/tags/SQS/" title="SQSタグの記事へ">SQS</a>
+  
+    
+    <a href="/tags/GlyphFeeds/" title="GlyphFeedsタグの記事へ">GlyphFeeds</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p><a href="/articles/20200914/">GlyphFeeds連載企画</a>3つ目の記事です。</p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>はじめまして、2017年新卒入社、TIG所属の出口です。</p>
+<p>今回は、GlyphFeedsの素材受信インターフェース構築を介してAmazon Simple Queue Service (SQS) の検証について紹介します。</p>
+<h1 id="素材受信インターフェースとは"><a href="#素材受信インターフェースとは" class="headerlink" title="素材受信インターフェースとは"></a>素材受信インターフェースとは</h1><p>今回紹介する素材受信インターフェースについて簡易ですが説明します。</p>
+<h2 id="役割"><a href="#役割" class="headerlink" title="役割"></a>役割</h2><p>GlyphFeedsにおいて、素材受信インターフェースは、外部システムから受信した素材をコンテンツマネジメントシステム (CMS)に連携する役割を担います。</p>
+<p>ここで言う素材とは、主に以下の2種類です。</p>
+<ul>
+<li>記事素材：タイトル、本文、その他様々な情報 (Jsonファイル)</li>
+<li>画像素材：画像、キャプション、その他様々な情報 (Jsonファイル＋画像ファイル)</li>
+</ul>
+<p>新聞業界、メディア業界では、日夜大量の素材が生み出されています。</p>
+<p>そのため、受信インターフェースは分間数百件の素材を受信するような状況を想定する必要があります。</p>
+<p>SQSを使用することで、素材を一度キューイングした後でCMSに連携する形をとることができます。</p>
+<h2 id="構成概要"><a href="#構成概要" class="headerlink" title="構成概要"></a>構成概要</h2><p>今回構成した素材受信インターフェースの構成概要図は以下になります。<br><img src="/images/20200916/図1.png" loading="lazy"></p>
+<p>大まかな流れとしては、</p>
+<ol>
+<li>外部システムからSFTP経由でS3バケットに素材が送られる</li>
+<li>S3からSQSに連携し、素材を示すメッセージがキューに積まれる</li>
+<li>定期実行LambdaがSQSからメッセージを取得し、CMSの素材受信用APIを叩く</li>
+</ol>
+<h1 id="比較検証：標準キュー-vs-FIFOキュー"><a href="#比較検証：標準キュー-vs-FIFOキュー" class="headerlink" title="比較検証：標準キュー vs FIFOキュー"></a>比較検証：標準キュー vs FIFOキュー</h1><p>SQSは標準キューとFIFOキューの2種類あります。<br>今回、素材受信インターフェースを構築するにあたり、標準キューとFIFOキューのどちらが適しているか検証を行っています。</p>
+<h2 id="各キューの特徴"><a href="#各キューの特徴" class="headerlink" title="各キューの特徴"></a>各キューの特徴</h2><p>今回の素材受信インターフェースの実装に関連のある、各キューの特徴は以下になります。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th></th>
+<th>標準キュー</th>
+<th>FIFOキュー</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>順序</td>
+<td>順序保証なし</td>
+<td>First In First Out</td>
+</tr>
+<tr>
+<td>S3イベント連携</td>
+<td>あり</td>
+<td>なし</td>
+</tr>
+</tbody></table></div>
+<p>FIFOキューは名前の通り、最初に入ったメッセージが最初に取り出されるように順序保証されます。</p>
+<p>素材受信で更新が発生する場合を考慮すると、順序保証によって巻き戻りが起こらないので、順序においてはFIFOキューが本ケースに関しては優位です。</p>
+<p>ただし、<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/dev/NotificationHowTo.html">FIFOキューを使用する場合は、S3から直接SQSに連携できない</a>ので一工夫必要です。</p>
+<h2 id="FIFOキューでS3～SQS連携する工夫"><a href="#FIFOキューでS3～SQS連携する工夫" class="headerlink" title="FIFOキューでS3～SQS連携する工夫"></a>FIFOキューでS3～SQS連携する工夫</h2><p>素材受信インターフェース構築当時は、S3イベント通知の送信先として、SQSの標準キューは選択できましたが、FIFOキューは選択できませんでした。そのため、FIFOキューではSQSに連携するのに一工夫いるため、標準キューかFIFOキューかによって、S3～SQS間の構成は下図のように異なります。<br><img src="/images/20200916/図2.png" loading="lazy"></p>
+<p>FIFOキューの場合は、S3オブジェクトputをトリガーにLambdaを実行し、その処理でFIFOキューにメッセージを積んでいきます。</p>
+<h2 id="検証概要：ロスト率の比較"><a href="#検証概要：ロスト率の比較" class="headerlink" title="検証概要：ロスト率の比較"></a>検証概要：ロスト率の比較</h2><p>PoCでは、素材が取り込まれるまでの時間や、短時間で大量に受信した場合の性能等、様々な観点でテストを行いました。</p>
+<p>今回は標準キューとFIFOキューのどちらを採用するかの決め手となった、S3オブジェクトputされた数に対して、SQSに連携されなかった数の割合：ロスト率のテスト結果を紹介します。</p>
+<p>テストの概要としては、</p>
+<ul>
+<li>S3バケットに素材をputする頻度（受信頻度）を変えて何通りか試行</li>
+<li>各施行において、S3オブジェクトputした数、SQSに連携された数を記録</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/premiumsupport/knowledge-center/s3-verify-event-notification/">AWS公式情報</a>で、「ごくまれに、イベントが失われることもあります。」とあります。<br>実際にどの程度ロストするのか、S3を監視して自動リカバリする機能を用意すれば補える程度に少ないか等、確認する必要がありました。</p>
+<h2 id="ロスト率の差異"><a href="#ロスト率の差異" class="headerlink" title="ロスト率の差異"></a>ロスト率の差異</h2><p>標準キューとFIFOキューそれぞれを使用した場合のロスト率を確認したところ、想定以上に明確な差異が見られました。</p>
+<img src="/images/20200916/図3.png" loading="lazy">
+
+<p>(※FIFOキューでは常にロスト率0%だったのでグラフは省きます。)</p>
+<p>今回のケースでは標準キューを使用した構成と相性が悪かったのか、受信頻度が高いとロスト率が十%を超える結果に…</p>
+<p>一方でFIFOキューでは受信頻度が高くても、常にロスト率0%という結果になりました。</p>
+<p>これが決め手となり、FIFOキューを採用することになりました。</p>
+<p>補足すると、「構成によりS3イベントの伝播率に差が出る可能性がある」ということが言いたいことで、S3イベントをロストゼロにすることが目的ではないです。「S3イベントがロスト発生する前提でポーリング処理など組み込んでおく必要がある」というのが大事なポイントかなと思います。（単純にアプリケーションの実装ミスで取り込みに失敗したときに、検知するようなある種の冗長性が必要な箇所もシステム上あり得ると思います）</p>
+<p>今回のFIFOキューを採用しましたが、ヒューマンエラー含め堅牢なシステムI/Fを作成したかったため、S3のポーリング処理も私達は行っています。</p>
+<h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>GlyphFeedsの素材受信インターフェースの構築を例にSQSの標準キュー、FIFOキューの比較検証の話を紹介させていただきました。</p>
+<p>個人的には、”ごくまれに”が検証するとケース次第で数十%にもなることが意外でした。今回の話を通じて、実際に検証することの重要さを感じていただければと思います。</p>
+<p>FIFOキューではS3イベント連携できないからと、標準キューのみに候補を絞らず、手の届いていない連携箇所を上手く解消してFIFOキューを候補に残したからこそ、今回の意外な結果が得られました。</p>
+<p>サービスをただ使うのではなく、手の届かない箇所は解消方法を考えて活用することで、より適したサービスを用いた、良いシステムの実現に繋がるのではないかと思いました。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200916/&via=future_techblog&related=twitterapi%2Ctwitter&text=%E7%B4%A0%E6%9D%90%E5%8F%97%E4%BF%A1%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%95%E3%82%A7%E3%83%BC%E3%82%B9%E3%81%ABSQS%E3%82%92%E6%B4%BB%E7%94%A8%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F%20%EF%BD%9E%E6%A8%99%E6%BA%96%E3%82%AD%E3%83%A5%E3%83%BC%20vs%20FIFO%E3%82%AD%E3%83%A5%E3%83%BC%EF%BD%9E" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200916/&t=%E7%B4%A0%E6%9D%90%E5%8F%97%E4%BF%A1%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%95%E3%82%A7%E3%83%BC%E3%82%B9%E3%81%ABSQS%E3%82%92%E6%B4%BB%E7%94%A8%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F%20%EF%BD%9E%E6%A8%99%E6%BA%96%E3%82%AD%E3%83%A5%E3%83%BC%20vs%20FIFO%E3%82%AD%E3%83%A5%E3%83%BC%EF%BD%9E" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200916/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200916/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2020.09.15</span><span class="snscount">&#9825;5</span><a class="related-posts-link" href=/articles/20200915/ title="[GlyphFeeds]連載企画第2弾の記事となります。はじめまして、TIG中神です。メディア向けCMSクラウドサービス（以下、GlyphFeedsサービス）のインフラを設計・構築を行いました。メディアならではの特性や構成における重要なポイントについていくつかご紹介します。">メディア向けCMSサービスのインフラ構成のポイント</a></li><li class="related-posts-item"><span>2020.09.14</span><span class="snscount">&#9825;22</span><a class="related-posts-link" href=/articles/20200914/ title="はじめまして。2012年新卒入社の山上です。TIGメディアユニットのリーダーを務めています。AWSをフル活用したコンテンツマネジメントシステム（以下、CMS）を中核に持つクラウドサービス「GlyphFeeds」を開発し、様々なクライアントへの導入をリードしています。今回の連載では、GlyphFeedsの技術について紹介していきます。">GlyphFeeds連載を始めます！</a></li><li class="related-posts-item"><span>2021.09.24</span><span class="snscount">&#9825;7</span><a class="related-posts-link" href=/articles/20210924a/ title=" Gateway+Lambda という構成でWebAPI開発を行う際、ちょっと便利に使える疎通方法をまとめます。API GatewayですがPublicなエンドポイントがあれば `curl`コマンドや`Postman`を用いての動作検証も容易だと思います。">VPC内のAmazon API Gatewayをインターネットオーバーで疎通確認する</a></li><li class="related-posts-item"><span>2021.09.21</span><span class="snscount">&#9825;1</span><a class="related-posts-link" href=/articles/20210921a/ title="TIGの伊藤真彦です。先日AWS Certified Security - Specialtyに合格しました。今回も合格体験記を残しておきます。">AWS Certified Security - Specialty合格体験記</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.06.22</span><span class="snscount">&#9825;133</span> <a href="/articles/20210622a/" title="今年のゴールデンウィーク（STAY HOME週間）に最近話題のSvelteに入門したので紹介を書きます。Svelteは主にブラウザ上で動作するユーザーインタフェースを作るフレームワークで、ReactやVue.jsの対抗馬的な存在です。">Svelteに入門した</a></li>
+
+    <li><span>2021.06.21</span><span class="snscount">&#9825;18866</span> <a href="/articles/20210621a/" title="HTML5が2021年の1月に廃止されました。Webエンジニアとしてバリバリ活躍されてる方やエグゼクティブテックリードのような肩書きを持つ方にとっては「何をいまさら」という話題かと思います。しかしながら、今年も新人さん入ってきてくださったので、プログラミングを学習中にHTML5という文字列に悩まされないように...">どうしてHTML5が廃止されたのか</a></li>
+
+    <li><span>2021.06.11</span><span class="snscount">&#9825;552</span> <a href="/articles/20210611a/" title="Pythonでお仕事する前提で、現在のところで自分が最適と考えるチーム開発のための環境整備についてまとめてみました。今までももろもろ散発的に記事に書いたりしていたのですが、Poetryで環境を作ってみたのと、過去のもろもろの情報がまとまったものが個人的にも欲しかったのでまとめました。">サーバーアプリ開発環境(Python／FastAPI)</a></li>
+
+    <li><span>2021.04.21</span><span class="snscount">&#9825;10</span> <a href="/articles/20210421b/" title="私が現在参加しているThe Apache Software Foundation（ASF）の基本理念の一つであるThe Apache Wayについて紹介します。The Apache Wayを通して、ASFのことを少しでも知ってもらえたらと思います。">The Apache Wayのお話</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B4%A0%E6%9D%90%E5%8F%97%E4%BF%A1%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%95%E3%82%A7%E3%83%BC%E3%82%B9%E3%81%A8%E3%81%AF"><span class="toc-text">素材受信インターフェースとは</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%B9%E5%89%B2"><span class="toc-text">役割</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A7%8B%E6%88%90%E6%A6%82%E8%A6%81"><span class="toc-text">構成概要</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AF%94%E8%BC%83%E6%A4%9C%E8%A8%BC%EF%BC%9A%E6%A8%99%E6%BA%96%E3%82%AD%E3%83%A5%E3%83%BC-vs-FIFO%E3%82%AD%E3%83%A5%E3%83%BC"><span class="toc-text">比較検証：標準キュー vs FIFOキュー</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%84%E3%82%AD%E3%83%A5%E3%83%BC%E3%81%AE%E7%89%B9%E5%BE%B4"><span class="toc-text">各キューの特徴</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FIFO%E3%82%AD%E3%83%A5%E3%83%BC%E3%81%A7S3%EF%BD%9ESQS%E9%80%A3%E6%90%BA%E3%81%99%E3%82%8B%E5%B7%A5%E5%A4%AB"><span class="toc-text">FIFOキューでS3～SQS連携する工夫</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC%E6%A6%82%E8%A6%81%EF%BC%9A%E3%83%AD%E3%82%B9%E3%83%88%E7%8E%87%E3%81%AE%E6%AF%94%E8%BC%83"><span class="toc-text">検証概要：ロスト率の比較</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%AD%E3%82%B9%E3%83%88%E7%8E%87%E3%81%AE%E5%B7%AE%E7%95%B0"><span class="toc-text">ロスト率の差異</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%80%E5%BE%8C%E3%81%AB"><span class="toc-text">最後に</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>5TB/日 のデータをAWS Glueでさばくためにやったこと（性能編） | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="フューチャー Advent Calendar 2018 Qiita 5日目の記事です。 みなさん、こんにちは。本記事は、AWS Glueについてのサービス概要や開発Tipsを紹介する5TB&#x2F;日 のデータをAWS Glueでさばくためにやったこと（概要編）の続編で、Glueの性能検証した内容を共有していきます。 検証についてGlueの性能がテーマですが、Glueそのものには設定できるパラメータが少な">
+<meta property="og:type" content="article">
+<meta property="og:title" content="5TB&#x2F;日 のデータをAWS Glueでさばくためにやったこと（性能編） | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20181205/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="フューチャー Advent Calendar 2018 Qiita 5日目の記事です。 みなさん、こんにちは。本記事は、AWS Glueについてのサービス概要や開発Tipsを紹介する5TB&#x2F;日 のデータをAWS Glueでさばくためにやったこと（概要編）の続編で、Glueの性能検証した内容を共有していきます。 検証についてGlueの性能がテーマですが、Glueそのものには設定できるパラメータが少な">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/ogp_techblog.jpg">
+<meta property="article:published_time" content="2018-12-05T14:18:17.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:53:51.048Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Glue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/ogp_techblog.jpg">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20181205/">
+  <meta content="AWS,Glue" name="keywords">
+  <meta content="千葉駿" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">5TB/日 のデータをAWS Glueでさばくためにやったこと（性能編）
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20181205-glue-performance.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20181205-glue-performance" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E5%8D%83%E8%91%89%E9%A7%BF">千葉駿</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2018/"><time datetime="2018-12-05T14:18:17.000Z" itemprop="datePublished">2018.12.05</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ">AWS</a>
+  
+    
+    <a href="/tags/Glue/" title="Glueタグの記事へ">Glue</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p><a target="_blank" rel="noopener" href="https://qiita.com/advent-calendar/2018/future">フューチャー Advent Calendar 2018 Qiita</a> 5日目の記事です。</p>
+<p>みなさん、こんにちは。<br>本記事は、AWS Glueについてのサービス概要や開発Tipsを紹介する<a href="/articles/20180828">5TB/日 のデータをAWS Glueでさばくためにやったこと（概要編）</a>の続編で、Glueの性能検証した内容を共有していきます。</p>
+<h2 id="検証について"><a href="#検証について" class="headerlink" title="検証について"></a>検証について</h2><p>Glueの性能がテーマですが、Glueそのものには設定できるパラメータが少ないためチューニングの余地が比較的小さいです。</p>
+<p>その中で、Glueの機能に着目すると以下の1~4が挙げられると思います。</p>
+<ol>
+<li>DPU数</li>
+</ol>
+<ul>
+<li>ジョブに使用されるDPU(Data Processing Unit)の数、Sparkで言うところのworker nodeの数に該当</li>
+<li>1DPUは4vCPU、16GBのメモリを持ち、これ以外を選択することは不可</li>
+<li>ジョブ実行に使用できるDPU数は最低2つ、最大で100まで設定可能</li>
+</ul>
+<ol start="2">
+<li>データカタログの使用有無</li>
+</ol>
+<ul>
+<li>Glueは、クローリングによりデータカタログというメタデータを自動生成できる</li>
+<li>データを読み込む際は、このデータカタログを利用することも、利用しないこともできる</li>
+</ul>
+<ol start="3">
+<li>ファイル形式</li>
+</ol>
+<ul>
+<li>Glueではデータの入出力にGlueContextを使用します</li>
+<li>様々な形式のファイルに対応していますが、ファイルの形式別にリードライトに性能差がある</li>
+<li>以下のファイルフォーマットは入力・出力の両方に対応<ul>
+<li>avro</li>
+<li>csv</li>
+<li>json</li>
+<li>orc</li>
+<li>parquet</li>
+</ul>
+</li>
+<li>以下のファイルフォーマットは入力のみに対応<ul>
+<li>ion</li>
+<li>grokLog</li>
+<li>xml</li>
+</ul>
+</li>
+</ul>
+<ol start="4">
+<li>ファイルパーティション</li>
+</ol>
+<ul>
+<li>GlueContextを使用してS3へファイルを出力する際に、特定の項目でパーティション分割することが可能</li>
+<li>これにより読み込む際に必要なファイルのみを読み込むことが可能</li>
+</ul>
+<p>今回は、「1.DPU」を除いた、2~4を検証していきます。</p>
+<p>※Glueの内部で利用されているSparkそのものの性能についてはスコープ外としてますのでご了承ください。</p>
+<h2 id="検証用データ"><a href="#検証用データ" class="headerlink" title="検証用データ"></a>検証用データ</h2><p>検証用ダミーデータには以下のものを使用しました。</p>
+<ul>
+<li>件数 : 2000万レコード</li>
+<li>カラム数 : 4パターンの連番を持つ4カラム</li>
+<li>データ　: 1 ~ 1000000までの値</li>
+</ul>
+<p>データイメージ</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>No</th>
+<th>column1</th>
+<th>column2</th>
+<th>column3</th>
+<th>column4</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>…</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>19</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>20</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>21</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>22</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>…</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1999</td>
+<td>100</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2000</td>
+<td>100</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2001</td>
+<td>101</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2002</td>
+<td>101</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>…</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>199999</td>
+<td>10000</td>
+<td>100</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>200000</td>
+<td>10000</td>
+<td>100</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>200001</td>
+<td>10001</td>
+<td>101</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr>
+<td>200002</td>
+<td>10001</td>
+<td>101</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr>
+<td>…</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>19999999</td>
+<td>1000000</td>
+<td>10000</td>
+<td>100</td>
+<td>1</td>
+</tr>
+<tr>
+<td>20000000</td>
+<td>1000000</td>
+<td>10000</td>
+<td>100</td>
+<td>1</td>
+</tr>
+</tbody></table></div>
+<p>またデータの形式は以下のものを用意しました。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>拡張子</th>
+<th>ファイルサイズ</th>
+<th>備考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>csv</td>
+<td>334.0MB</td>
+<td></td>
+</tr>
+<tr>
+<td>avro</td>
+<td>414.1MB</td>
+<td></td>
+</tr>
+<tr>
+<td>json.gz</td>
+<td>58.5MB</td>
+<td>jsonをgzipで圧縮。Glueで対応しており、未解凍で読み込み可能</td>
+</tr>
+<tr>
+<td>json</td>
+<td>1.65GB</td>
+<td></td>
+</tr>
+<tr>
+<td>snappy.orc</td>
+<td>83.5MB</td>
+<td>圧縮方式にsnappyを選択したorcバイナリファイル</td>
+</tr>
+<tr>
+<td>snappy.parquet</td>
+<td>86.8MB</td>
+<td>圧縮方式にsnappyを選択したparquetバイナリファイル</td>
+</tr>
+</tbody></table></div>
+<p>Glueは数百GB、数億カラムレベルのデータサイズも対応可能ですが、今回はこのデータで検証を行います。(データを作るのが大変だったため…)</p>
+<h2 id="検証結果"><a href="#検証結果" class="headerlink" title="検証結果"></a>検証結果</h2><p>先に説明したダミーデータを用いて検証します。<br>環境はGlue、S3ともに東京リージョンを利用しています。特に明記しない場合は、ファイル形式はCSVを利用し、検証結果は10回計測した平均値を記載しています。<br><br></p>
+<h3 id="検証①-DPU数"><a href="#検証①-DPU数" class="headerlink" title="検証① DPU数"></a>検証① DPU数</h3><p>DPU数を増やすと時間がかかるタスクも高速化が期待できますが、今回の検証からは割愛します。<br><br></p>
+<h3 id="検証②-データカタログの使用有無"><a href="#検証②-データカタログの使用有無" class="headerlink" title="検証② データカタログの使用有無"></a>検証② データカタログの使用有無</h3><p>データカタログの利用する、しないで検証しました。<br>しないケースはさらに、2種類のAPIで比較して検証しました。</p>
+<ul>
+<li>検証結果</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>読み込み時間[s]</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>データカタログ利用</td>
+<td>0.3019</td>
+</tr>
+<tr>
+<td>GlueContextのfrom_option利用</td>
+<td>0.2461</td>
+</tr>
+<tr>
+<td>Sparkのread.csvを利用</td>
+<td>0.7811</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>コメント<ul>
+<li>結果にあまり差が出なかったため、実装方式に合わせて任意のものを選択するで良いと思います</li>
+</ul>
+</li>
+</ul>
+<br>
+
+
+<h3 id="検証③-ファイル形式"><a href="#検証③-ファイル形式" class="headerlink" title="検証③ ファイル形式"></a>検証③ ファイル形式</h3><p>パーティションを切らず、いくつかのファイル形式でS3から読込/書出 を行い検証しました。</p>
+<ul>
+<li>読込結果</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>拡張子</th>
+<th>読み込み時間[s]</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>csv</td>
+<td>0.1305</td>
+</tr>
+<tr>
+<td>avro</td>
+<td>0.1144</td>
+</tr>
+<tr>
+<td>json.gz</td>
+<td>0.1211</td>
+</tr>
+<tr>
+<td>json</td>
+<td>0.3420</td>
+</tr>
+<tr>
+<td>snappy.orc</td>
+<td>0.4451</td>
+</tr>
+<tr>
+<td>snappy.parquet</td>
+<td>0.3794</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>書出結果</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>拡張子</th>
+<th>書き出し時間[s]</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>csv</td>
+<td>6.9508</td>
+</tr>
+<tr>
+<td>avro</td>
+<td>12.8020</td>
+</tr>
+<tr>
+<td>json</td>
+<td>15.1127</td>
+</tr>
+<tr>
+<td>snappy.orc</td>
+<td>13.9531</td>
+</tr>
+<tr>
+<td>snappy.parquet</td>
+<td>11.6287</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>コメント<ul>
+<li>読込に関してはほとんど差が見受けられませんでした。10回実施した際の各回にもばらつきがあるため、誤差の範囲内かと思われます</li>
+<li>書出には明確な差が出ました<ul>
+<li>特にjsonは遅く、変換に時間がかかったものと推測</li>
+<li>CSVが一番早いですが、ファイルサイズが大きくなってしまうのがネック</li>
+</ul>
+</li>
+<li>性能やファイルサイズを考えると、avroやparquetといった、バイナリファイルの選択が有力ではないでしょうか<ul>
+<li>今回のわたしの在籍していたPJではparquetを採用しました</li>
+<li>バイナリファイルは、内容の確認やデータ作成に一手間かかるため、開発時にはCSVを使い、テストや本運用の時のみparquetを利用するという手法が良いかと思います</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="検証④-ファイルパーティション"><a href="#検証④-ファイルパーティション" class="headerlink" title="検証④ ファイルパーティション"></a>検証④ ファイルパーティション</h2><p>パーティション数を変化させてS3から読込/書出 を実施しました。</p>
+<ul>
+<li>読込結果（5回計測、その平均値）</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>拡張子</th>
+<th>読み込み時間[s]</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>0.0793</td>
+</tr>
+<tr>
+<td>100</td>
+<td>0.1565</td>
+</tr>
+<tr>
+<td>10000</td>
+<td>0.1986</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>書出結果（5回計測、その平均値）</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>拡張子</th>
+<th>書き出し時間[s]</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>70.1816</td>
+</tr>
+<tr>
+<td>100</td>
+<td>58.3604</td>
+</tr>
+<tr>
+<td>10000</td>
+<td>410.1765</td>
+</tr>
+<tr>
+<td>1000000</td>
+<td>6時間待っても終了しなかったので中断</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>コメント<ul>
+<li>読込はあまり差が出ませんでした。（実は読み込まれていないのでは？と不安に思い、別の手段でも確かめましたが同じ結果でした）</li>
+<li>書出はパーティション数を増やした場合に著しく性能が落ちました</li>
+<li>開発時は細かくパーティションを切った方が目的のファイルにたどり着きやすく、デバッグしやすかったです</li>
+<li>パーティション設計はGlue利用時の肝ですが、実アプリへ適用したパーティション設計は、後続処理の内容やサービスに依存するため一言では言い難いです<ul>
+<li>例1: 後続がGlueの場合、時間課金ですので出力時にはパーティションは大きくは切らず、短時間で出力し切った方がコストを削減できます。</li>
+<li>例2: 後続がAthenaの場合、読み取ったデータサイズに対して課金されますのでパーティションを細かく切り、余計なデータは読まないようにした方がコストは削減できます</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="その他"><a href="#その他" class="headerlink" title="その他"></a>その他</h2><p>ここまで処理時間について検証しましたが、見逃しやすくもネックになりやすいのはGlueのクラスタ構築にかかる時間です。</p>
+<p>Glue jobを実行する場合は、必ずクラスタの構築が開始されますが、このクラスタ構築が曲者で、構築に必要なDPUの確保に数分の時間がかかる場合があります。</p>
+<p>もちろんjobが数時間レベルのものであれば、数分間は誤差かもしれません。</p>
+<p>しかし最悪の場合、時間がかかるだけでなくそもそもDPUの確保に失敗し、job自体が動かないという事象が発生します。</p>
+<p>クラスタ構築時間、job失敗率は要求するDPUの数に応じて大きくなります。DPU確保失敗時には設定回数を上限としたリトライも可能ですが、それでも100%実行できるという保証はありません。</p>
+<p>残念ながらGlueにはリザーブドの考え方は存在しないため、DPU確保に関する問題を回避する方法は現在のところ存在しません。</p>
+<p>2018年11月時点での東京リージョンで触ってみた感覚では、以下のような感じです。</p>
+<ul>
+<li>10(デフォルト):クラスタ構築に5~10分前後ほどかかる。DPU確保失敗はほぼ起こらない</li>
+<li>20:クラスタ構築に15分ほどかかる。DPU確保失敗する割合は五分五分程度</li>
+<li>30:DPU確保にほぼ失敗する</li>
+</ul>
+<p>ただし実行する時間帯も関係するようで、朝5時など利用者が少ないような時間だとDPUの確保できる成功率が高くなるようです。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><ul>
+<li>データの読込は、ファイルの形式やパーティションの切り方に関わらず高速</li>
+<li>データの書出は、parquetなどの圧縮形式が高速で、サイズも小さい。またパーティション数が多いほど時間がかかる</li>
+<li>ミニサイズのジョブにおいて、性能面で最も考慮すべきはGlueのDPU確保の不安定さ。DPU確保にかかる時間は要注意。最悪、確保できずに実行失敗する。今後のサービスの成熟に期待</li>
+</ul>
+<h2 id="あとがき"><a href="#あとがき" class="headerlink" title="あとがき"></a>あとがき</h2><p>いかがだったでしょうか？性能編と言っておきながら最後はサービスとしてまだ発展途上という終わり方になってしまいましたが、AWSのサービスの成熟スピードはとても早いため、きっと近い将来に改善されているのではと思います。</p>
+<p>実際、Glueを日々使っている中で新しい機能がどんどん追加されていき、便利に使いやすくなっていきました。</p>
+<p>開発をしながら機能追加に驚き、裏の改善を行なっているであろうAWSのエンジニアさんのことを想い、一緒に仕事ができているようで尊敬やら激励やらの念を抱いていた当時のことを、記事を書きながら思い出しました。</p>
+<p>私も彼らに負けないよう、のっぴきならない人生を乗り越えていくために、さらに切磋琢磨していきたいと想います。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20181205/&via=future_techblog&related=twitterapi%2Ctwitter&text=5TB/%E6%97%A5%20%E3%81%AE%E3%83%87%E3%83%BC%E3%82%BF%E3%82%92AWS%20Glue%E3%81%A7%E3%81%95%E3%81%B0%E3%81%8F%E3%81%9F%E3%82%81%E3%81%AB%E3%82%84%E3%81%A3%E3%81%9F%E3%81%93%E3%81%A8%EF%BC%88%E6%80%A7%E8%83%BD%E7%B7%A8%EF%BC%89" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20181205/&t=5TB/%E6%97%A5%20%E3%81%AE%E3%83%87%E3%83%BC%E3%82%BF%E3%82%92AWS%20Glue%E3%81%A7%E3%81%95%E3%81%B0%E3%81%8F%E3%81%9F%E3%82%81%E3%81%AB%E3%82%84%E3%81%A3%E3%81%9F%E3%81%93%E3%81%A8%EF%BC%88%E6%80%A7%E8%83%BD%E7%B7%A8%EF%BC%89" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20181205/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">7</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20181205/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">8</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2021.05.21</span><span class="snscount">&#9825;13</span><a class="related-posts-link" href=/articles/20210521a/ title="Glueの環境構築は以前の記事（[AWS Glueの単体テスト環境の構築手順、AWS Glueの開発エンドポイントがそこそこお高いのでローカル開発環境を用意しました）にあるのですが、公式のDocker imageが案内されているので改めて、構築してみます。なお、Glueの公式イメージでもJupyter Notebookは利用できるのですが、使い勝手を考慮し、Jupyterlabに差し替えています。">AWS Glueの開発環境の構築(2021)</a></li><li class="related-posts-item"><span>2021.04.03</span><span class="snscount">&#9825;7</span><a class="related-posts-link" href=/articles/20210403/ title="DynamoDBを頻繁に利用しており、連日DynamoDBコンソール画面と睨めっこをしています。DynamoDBのコンソール画面は特定のデータをピンポイントで探すには優秀ですが、データ集計には全く向いていません。">DynamoDBをS3へExportして、Glue+AthenaでSQLを実行する</a></li><li class="related-posts-item"><span>2019.12.06</span><span class="snscount">&#9825;9</span><a class="related-posts-link" href=/articles/20191206/ title="当記事では、AWS Glue をローカル環境で単体テストするための環境構築方法についてまとめました。">AWS Glueの単体テスト環境の構築手順</a></li><li class="related-posts-item"><span>2019.11.01</span><span class="snscount">&#9825;15</span><a class="related-posts-link" href=/articles/20191101/ title="AWS Glue利用していますか？ETL処理をする上で大変便利ですよね。しかしながら開発に必要不可欠な開発エンドポイントが少々お高く、もう少し安価に利用できればなーと思っていたところ、さすがAWSさん素敵なリリースをしてくれました。">AWS Glueの開発エンドポイントがそこそこお高いのでローカル開発環境を用意しました</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.06.18</span><span class="snscount">&#9825;472</span> <a href="/articles/20210618a/" title="AWS内の通信においてインターネットを経由しないことが最近になって公式ドキュメントに明記されたことを受け、改めてVPC Endpointの必要性について調べてみました。">AWS内の通信がインターネットを経由しない今、VPC Endpointを利用する意味はあるのか？</a></li>
+
+    <li><span>2021.06.11</span><span class="snscount">&#9825;552</span> <a href="/articles/20210611a/" title="Pythonでお仕事する前提で、現在のところで自分が最適と考えるチーム開発のための環境整備についてまとめてみました。今までももろもろ散発的に記事に書いたりしていたのですが、Poetryで環境を作ってみたのと、過去のもろもろの情報がまとまったものが個人的にも欲しかったのでまとめました。">サーバーアプリ開発環境(Python／FastAPI)</a></li>
+
+    <li><span>2021.06.04</span><span class="snscount">&#9825;165</span> <a href="/articles/20210604a/" title="巨大な学習済みの機械学習モデルとか、検索用インデックスをデプロイする場合に、どうやってデプロイするか、というのは色々選択肢があります。以前、ちょびっとだけ「どうやってデプロイしましょうかね」というのを悩んだ時期があったのですが、今回、こんな方式が考えられるんじゃないか、というのを改めて調べてリストアップしてみました。">続・サーバーレス検索エンジン：巨大な静的ファイルを扱うケースについて考える</a></li>
+
+    <li><span>2021.05.11</span><span class="snscount">&#9825;78</span> <a href="/articles/20210511a/" title="TIGの玉木です。去年の12月までは主に機械学習エンジニアとして機械学習案件を任されていましたが、今年の1月からはITコンサルタントとして業務の幅が広くなりいろいろやっています。先月技育祭と呼ばれるイベントの勉強会という枠で、同僚の上野さんと一緒に「初心者必見！機械学習エンジニアがあれこれ話します。〜基礎から実社会応用まで〜」というタイトルで発表しました。">技育祭登壇しました。これから機械学習を学びたい方向けへの自分の経験談とおすすめの本、サイトの紹介もします</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">検証について</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC%E7%94%A8%E3%83%87%E3%83%BC%E3%82%BF"><span class="toc-text">検証用データ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC%E7%B5%90%E6%9E%9C"><span class="toc-text">検証結果</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC%E2%91%A0-DPU%E6%95%B0"><span class="toc-text">検証① DPU数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC%E2%91%A1-%E3%83%87%E3%83%BC%E3%82%BF%E3%82%AB%E3%82%BF%E3%83%AD%E3%82%B0%E3%81%AE%E4%BD%BF%E7%94%A8%E6%9C%89%E7%84%A1"><span class="toc-text">検証② データカタログの使用有無</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC%E2%91%A2-%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%BD%A2%E5%BC%8F"><span class="toc-text">検証③ ファイル形式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC%E2%91%A3-%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%83%91%E3%83%BC%E3%83%86%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%B3"><span class="toc-text">検証④ ファイルパーティション</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%9D%E3%81%AE%E4%BB%96"><span class="toc-text">その他</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%82%E3%81%A8%E3%81%8C%E3%81%8D"><span class="toc-text">あとがき</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>

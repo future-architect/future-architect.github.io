@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>仕事でPythonコンテナをデプロイする人向けのDockerfile (1): オールマイティ編 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="Pythonで書かれたアプリケーションをDockerイメージにする堅い方法の紹介です。イメージサイズを少しでも削ろう！とかではなくて実用性重視の方向です。今回は第一弾ということで、Debianベースのイメージを使う方法を紹介します。  続編も公開されました。 https:&#x2F;&#x2F;future-architect.github.io&#x2F;articles&#x2F;20200514&#x2F;    Pythonのベースイメー">
+<meta property="og:type" content="article">
+<meta property="og:title" content="仕事でPythonコンテナをデプロイする人向けのDockerfile (1): オールマイティ編 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200513/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="Pythonで書かれたアプリケーションをDockerイメージにする堅い方法の紹介です。イメージサイズを少しでも削ろう！とかではなくて実用性重視の方向です。今回は第一弾ということで、Debianベースのイメージを使う方法を紹介します。  続編も公開されました。 https:&#x2F;&#x2F;future-architect.github.io&#x2F;articles&#x2F;20200514&#x2F;    Pythonのベースイメー">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200513/1.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200513/2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20200513/3.png">
+<meta property="article:published_time" content="2020-05-12T23:56:40.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:57:18.345Z">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Docker">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200513/1.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20200513/">
+  <meta content="Python,Docker" name="keywords">
+  <meta content="澁川喜規" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">仕事でPythonコンテナをデプロイする人向けのDockerfile (1): オールマイティ編
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20200513-python-container1.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20200513-python-container1" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E6%BE%81%E5%B7%9D%E5%96%9C%E8%A6%8F">澁川喜規</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2020/"><time datetime="2020-05-12T23:56:40.000Z" itemprop="datePublished">2020.05.13</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Python/" title="Pythonタグの記事へ">Python</a>
+  
+    
+    <a href="/tags/Docker/" title="Dockerタグの記事へ">Docker</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructure</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p>Pythonで書かれたアプリケーションをDockerイメージにする堅い方法の紹介です。イメージサイズを少しでも削ろう！とかではなくて実用性重視の方向です。今回は第一弾ということで、Debianベースのイメージを使う方法を紹介します。</p>
+<ul>
+<li>続編も公開されました。<ul>
+<li><a href="https://future-architect.github.io/articles/20200514/">https://future-architect.github.io/articles/20200514/</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="Pythonのベースイメージ選び"><a href="#Pythonのベースイメージ選び" class="headerlink" title="Pythonのベースイメージ選び"></a>Pythonのベースイメージ選び</h1><p>イメージ作成にはベースイメージ選びからですが、基本的には次の2つかなと思います。Pythonバージョンは機械学習だと3.7がよく使われていると思いますが、5/8にTensorflowが3.8向けのwheelとセットで新バージョンを出したので、そろそろ3.8になっていきますかね。本記事も3.8にしますが、3.7でも動作します。</p>
+<ul>
+<li>python:3.x-buster</li>
+<li>python:3.x-slim-buster</li>
+</ul>
+<p>イメージのOSには以下のような種類があります。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center">名前</th>
+<th align="center">どんなもの？</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">buster</td>
+<td align="center">Debian 10で処理系とかいっぱいインストール済み</td>
+</tr>
+<tr>
+<td align="center">buster-slim</td>
+<td align="center">Debian 10で処理系なしの実行環境用</td>
+</tr>
+<tr>
+<td align="center">stretch</td>
+<td align="center">Debian 9で処理系入り</td>
+</tr>
+<tr>
+<td align="center">stretch-slim</td>
+<td align="center">Debian 9で処理系なしの実行環境用</td>
+</tr>
+<tr>
+<td align="center">alpine</td>
+<td align="center">元はフロッピーで起動するファイルサイズ重視のディストリビューション</td>
+</tr>
+<tr>
+<td align="center">windowsservercore</td>
+<td align="center">Windows。LinuxやmacOS上では動作しない</td>
+</tr>
+</tbody></table></div>
+<p>BusterとかStretchという名前が見慣れない方もいるかもしれませんが、これはLinuxディストリビューションとしてシェアの大きな<a target="_blank" rel="noopener" href="https://www.debian.org/releases/index.en.html">Debianのコードネーム</a>です。</p>
+<p>Debianバージョンが少し古いStretchの方がちょびっとサイズが小さかったりはしますが、まあ実用的にはサポートが長い方がいいですよね。slimを使ってGCCとかのコンパイラを自前でダウンロードしている記事とかもたまに見かける気がしますが、マルチステージビルドであれば、そんなにケチケチしなくていいのと、パッケージダウンロードは逐次処理なので遅く、処理系が入ったイメージのダウンロードの方が高速です。並列で処理されるし、一度イメージをダウンロードしてしまえば、なんどもビルドして試すときに効率が良いです。また、多くのケースでネイティブのライブラリも最初から入っており、ビルドでトラブルに遭遇することはかなり減るでしょう。</p>
+<p>Pythonユーザーは基本的にAlpineを選んではいけません。いろいろネガが大きいからです。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://superuser.com/questions/1219609/why-is-the-alpine-docker-image-over-50-slower-than-the-ubuntu-image">AlpineはUbuntuよりも50%以上遅い</a></li>
+<li><a target="_blank" rel="noopener" href="https://pythonspeed.com/articles/alpine-docker-python/">Alpineにするとビルド時間が50倍になる</a></li>
+</ul>
+<p>最初の項目。なぜ遅いかというと、Alpineのアプリが使うlibc(musl)のメモリ周りアロケートの実装が、性能よりもライブラリのサイズ重視のシンプルでPythonの使い方と合わなくて速度が出ないとのこと。これはアプリケーションの実装次第なのでjemallocを使っているRubyとかの人は関係ないでしょうし、PostgreSQLとかNginxはAlpine版でも速度は変わらないようです。性能が2倍違うということは、クラウドでアプリケーションを動かすときはメモリさえ許せば一つ下のインスタンスでいいわけで、お金にも利いてきますよね。</p>
+<p>後者の速度の問題ですが、PyPIはLinux向けにはmanylinux1という形式でバイナリを提供しており、DebianでもRedHatでも高速にインストールできます。しかし、この形式はAlpineには対応していないため、C拡張を使うライブラリを使うと、Dockerイメージのビルド時間が伸びまくってしますわけです。</p>
+<p>それでも、どうしても、PurePythonで処理速度はどうでも良い/お金がたくさんある、あるいはC拡張を使う場合でも人生を犠牲にしてでも、イメージサイズをどうしても減らしたいみたいな選ばれし者はAlpineを使う感じでしょうかね。</p>
+<h1 id="Pythonのマルチステージビルド"><a href="#Pythonのマルチステージビルド" class="headerlink" title="Pythonのマルチステージビルド"></a>Pythonのマルチステージビルド</h1><p>マルチステージビルドで環境を作っていきます。</p>
+<p>アプリケーションはDjangoのチュートリアルの最初の1ステップだけ作ったものをuwsgiを使ってデプロイすることを想定します。フォルダ＆ファイル構成はこんな感じ。</p>
+<img src="/images/20200513/1.png" alt="フォルダ＆ファイル構成" width="794" height="1178" loading="lazy" class="img-middle-size">
+
+
+<p>依存パッケージは今回はこれだけです。ただこのファイルは開発環境を設定するときに書くぐらいですね。あまり重要ではないです。</p>
+<figure class="highlight plaintext"><figcaption><span>requirements.txt</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">django</span><br><span class="line">uwsgi</span><br></pre></td></tr></table></figure>
+
+<p>実際にDockerの中で使うファイルはこちら。<code>pip install -r requirements.txt</code>で依存ライブラリと一緒にインストールした後に<code>pip freeze &gt; requirements.lock</code>で作成します。あらかじめvenvで環境を分けて置くと、ノイズが混ざらないので良いです。</p>
+<figure class="highlight plaintext"><figcaption><span>requirements.lock</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">asgiref==3.2.7</span><br><span class="line">Django==3.0.5</span><br><span class="line">pytz==2020.1</span><br><span class="line">sqlparse==0.3.1</span><br><span class="line">uWSGI==2.0.18</span><br></pre></td></tr></table></figure>
+
+<p>uwsgi用の設定はこちら。プロセス数とかスレッド数は適当に。</p>
+<figure class="highlight ini"><figcaption><span>deploy/uwsgi.ini</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[uwsgi]</span></span><br><span class="line"><span class="attr">http</span> = <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">8000</span></span><br><span class="line"><span class="attr">chdir</span> = /opt/app/mysite</span><br><span class="line"><span class="attr">wsgi-file</span> = mysite/wsgi.py</span><br><span class="line"><span class="attr">master</span> = <span class="literal">True</span></span><br><span class="line"><span class="attr">processes</span> = <span class="number">2</span></span><br><span class="line"><span class="attr">threads</span> = <span class="number">2</span></span><br><span class="line"><span class="attr">stats</span> = <span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">9191</span></span><br><span class="line"><span class="attr">uid</span> = uwsgiusr</span><br><span class="line"><span class="attr">gid</span> = uwsgiusr</span><br></pre></td></tr></table></figure>
+
+<p>Dockerfileはこうなりました。slimの方にはlibxml2などがないので追加します。PostgreSQLのライブラリのlibpq5はまあおまけです。大抵ウェブアプリケーション作るときはPostgreSQLかMySQLは使うでしょうし。もし、使うライブラリがpure python、もしくはC拡張でもwheelによるバイナリ配布をしているパッケージのみであれば、ビルド用イメージも3.8-slim-busterにできます。slimを使っていても、もしライブラリを追加した瞬間にGCCが必要になっても、イメージを3.8-busterに変えるだけなので、このマルチステージビルドの構成は崩さない方が良いでしょう。お仕事であれば問題回避の速度が大事ですからね。</p>
+<figure class="highlight dockerfile"><figcaption><span>Dockerfile</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ここはビルド用のコンテナ</span></span><br><span class="line"><span class="keyword">FROM</span> python:<span class="number">3.8</span>-buster as builder</span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /opt/app</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> requirements.lock /opt/app</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip3 install -r requirements.lock</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ここからは実行用コンテナの準備</span></span><br><span class="line"><span class="keyword">FROM</span> python:<span class="number">3.8</span>-slim-buster as runner</span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> --from=builder /usr/<span class="built_in">local</span>/lib/python3.8/site-packages /usr/<span class="built_in">local</span>/lib/python3.8/site-packages</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> --from=builder /usr/<span class="built_in">local</span>/bin/uwsgi /usr/<span class="built_in">local</span>/bin/uwsgi</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt update \</span></span><br><span class="line"><span class="bash">  &amp;&amp; apt install -y libpq5 libxml2 \</span></span><br><span class="line"><span class="bash">  &amp;&amp; apt-get clean \</span></span><br><span class="line"><span class="bash">  &amp;&amp; rm -rf /var/lib/apt/lists/*</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> useradd -r -s /bin/<span class="literal">false</span> uwsgiusr</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> mkdir -p /opt/app/src/logs/app_logs</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> touch /opt/app/src/logs/server.log</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> chown -R uwsgiusr /opt/app/src/logs</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> deploy/uwsgi.ini /opt/app</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> mysite /opt/app/mysite</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">USER</span> uwsgiusr</span><br><span class="line"></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">8000</span></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> [<span class="string">&quot;uwsgi&quot;</span>, <span class="string">&quot;--ini&quot;</span>, <span class="string">&quot;/opt/app/uwsgi.ini&quot;</span>]</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker build -t pytest .</span><br><span class="line">$ docker run -it --rm -p <span class="string">&quot;8000:8000&quot;</span> pytest</span><br></pre></td></tr></table></figure>
+
+<p>ブラウザでアクセスするとうまくいきました。</p>
+<img src="/images/20200513/2.png" alt="HelloWorldと表示されたブラウザ画面" width="1580" height="974" loading="lazy">
+
+
+<h2 id="Pythonでどうやってマルチステージビルドを実現するのか"><a href="#Pythonでどうやってマルチステージビルドを実現するのか" class="headerlink" title="Pythonでどうやってマルチステージビルドを実現するのか"></a>Pythonでどうやってマルチステージビルドを実現するのか</h2><p>ポイントとしては、pip installしてできたライブラリを一式コピーして実行用のコンテナに写してます。uwsgiは別の場所にインストールされるので、それも個別にコピーします。</p>
+<figure class="highlight dockerfile"><figcaption><span>今回使ったのはこちらの方法</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">COPY</span><span class="bash"> --from=builder /usr/<span class="built_in">local</span>/lib/python3.8/site-packages /usr/<span class="built_in">local</span>/lib/python3.8/site-packages</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> --from=builder /usr/<span class="built_in">local</span>/bin/uwsgi /usr/<span class="built_in">local</span>/bin/uwsgi</span></span><br></pre></td></tr></table></figure>
+
+<p>実はこの書き方を紹介している記事等はほとんどありません。ネットでよく見るPythonのマルチステージビルドの方法は次の方法です。</p>
+<figure class="highlight dockerfile"><figcaption><span>こっちの方がよく見る</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">COPY</span><span class="bash"> --from=builder /root/.cache /root/.cache</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> /build/requirements.txt /opt/app</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> pip3 install -r requirements.txt</span></span><br></pre></td></tr></table></figure>
+
+<p>この方法であれば、uwsgiのような別の場所に入る実行ファイルも自動で処理されるのできれいにうまくいくのですが、最終的なイメージに/root/.cacheのレイヤーが残ってしまいます。RUNによるレイヤーなら&amp;&amp;を駆使して削除できるのですが、これはCOPYで作られるレイヤーなので、今のDockerだけだとこの無駄は削除できないのですよね。</p>
+<p>機械学習ライブラリもりもりなイメージだと、これだけで200MBぐらいの容量になったり（全体も1.2GBとかになりますが）。今のところsite-packages全部コピーの方法で問題はなさそうです。</p>
+<h1 id="実行時に必要なライブラリがないと言われたら"><a href="#実行時に必要なライブラリがないと言われたら" class="headerlink" title="実行時に必要なライブラリがないと言われたら"></a>実行時に必要なライブラリがないと言われたら</h1><p>フルセットのbusterには開発者向けのライブラリ類も含めていろいろ入っているのでビルドが成功するも、slim側にライブラリがなくて実行時エラーになる可能性があります。実行時にライブラリがロードできないというエラーが出たら、<a target="_blank" rel="noopener" href="https://packages.debian.org/search?lang=ja&arch=amd64&mode=filename&searchon=contents&keywords=libxml2.so.2">こちらのサイト</a>にライブラリ名を入れて、それをインストールするのに必要なパッケージを探し、apt installの項目に追加してください。</p>
+<img src="/images/20200513/3.png" alt="Debianのパッケージ検索画面" width="2586" height="1610" loading="lazy">
+
+<p>Pythonだと関数の中でimportできます。名前空間を汚さないので、こちらの方が良いのかな、と思って僕も以前やっていましたが、ファイルのグローバルなところだけにimportがあると、ちょっとした実行すると必要なモジュールを全部読み込んでくれて、この手のロードエラーはすぐにわかります。関数内importはなるべく避けた方が良いでしょう（先日もそれで問題を見つけきれなかった）。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>Pythonを仕事で使う人のための堅いイメージ作成について紹介しました。Alpineのような性能のネガもなく、イメージの作成の実行時間も少なく、残業時間が減らせる方法を選びました。次回は条件によっては使えないかもしれないのですが、使えたら効果抜群なdistroless/python3について紹介します。</p>
+<p><strong>公開しました(2020/05/14)</strong></p>
+<p><a href="https://future-architect.github.io/articles/20200514/">https://future-architect.github.io/articles/20200514/</a></p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200513/&via=future_techblog&related=twitterapi%2Ctwitter&text=%E4%BB%95%E4%BA%8B%E3%81%A7Python%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E3%83%87%E3%83%97%E3%83%AD%E3%82%A4%E3%81%99%E3%82%8B%E4%BA%BA%E5%90%91%E3%81%91%E3%81%AEDockerfile%20(1):%20%E3%82%AA%E3%83%BC%E3%83%AB%E3%83%9E%E3%82%A4%E3%83%86%E3%82%A3%E7%B7%A8" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">10</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200513/&t=%E4%BB%95%E4%BA%8B%E3%81%A7Python%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E3%83%87%E3%83%97%E3%83%AD%E3%82%A4%E3%81%99%E3%82%8B%E4%BA%BA%E5%90%91%E3%81%91%E3%81%AEDockerfile%20(1):%20%E3%82%AA%E3%83%BC%E3%83%AB%E3%83%9E%E3%82%A4%E3%83%86%E3%82%A3%E7%B7%A8" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200513/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">141</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200513/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">161</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2021.06.11</span><span class="snscount">&#9825;552</span><a class="related-posts-link" href=/articles/20210611a/ title="Pythonでお仕事する前提で、現在のところで自分が最適と考えるチーム開発のための環境整備についてまとめてみました。今までももろもろ散発的に記事に書いたりしていたのですが、Poetryで環境を作ってみたのと、過去のもろもろの情報がまとまったものが個人的にも欲しかったのでまとめました。">サーバーアプリ開発環境(Python／FastAPI)</a></li><li class="related-posts-item"><span>2020.10.02</span><span class="snscount">&#9825;47</span><a class="related-posts-link" href=/articles/20201002/ title="TIGの渋川です。[CNCF連載]の第4回は、CNCFのSandboxプロジェクトのBuildpacksについて紹介します。* https://buildpacks.io">Buildpacksのビルダーをスクラッチから作ってみる</a></li><li class="related-posts-item"><span>2020.09.10</span><span class="snscount">&#9825;79</span><a class="related-posts-link" href=/articles/20200910/ title="初のオンライン＆Python 2サポートが終了したあとのPyCon.jpという節目のイベントで発表してきました。発表資料はこちらになります。">「2020年代のコンテナ時代のPythonアーキテクチャ&デプロイ」というテーマでPyCon.jp 2020で発表してきました</a></li><li class="related-posts-item"><span>2020.05.14</span><span class="snscount">&#9825;140</span><a class="related-posts-link" href=/articles/20200514/ title="Goではそこそこ実績も増えつつある気がするdistroless。シェルが入っていないくて、ログインされることもなく安全というGoogle製のDockerイメージです。Python3はまだexperimentalですが、実は小さいと言われるalpine版よりも、イメージサイズが半分ぐらいだったりもします。distrolessでは3.7しかないので、3.7のイメージ同士の比較です。">仕事でPythonコンテナをデプロイする人向けのDockerfile (2): distroless編</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2020.03.11</span><span class="snscount">&#9825;541</span> <a href="/articles/20200311/" title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li>
+
+    <li><span>2021.07.26</span><span class="snscount">&#9825;92</span> <a href="/articles/20210726a/" title="7/26（月）～8/3（水）の平日にかけて、GoでRDBに対してアクセスライブラリ（ORMとクエリビルダー）をテーマにした連載を始めます。">GoのORマッパー連載を始めます</a></li>
+
+    <li><span>2021.06.21</span><span class="snscount">&#9825;18866</span> <a href="/articles/20210621a/" title="HTML5が2021年の1月に廃止されました。Webエンジニアとしてバリバリ活躍されてる方やエグゼクティブテックリードのような肩書きを持つ方にとっては「何をいまさら」という話題かと思います。しかしながら、今年も新人さん入ってきてくださったので、プログラミングを学習中にHTML5という文字列に悩まされないように...">どうしてHTML5が廃止されたのか</a></li>
+
+    <li><span>2021.05.11</span><span class="snscount">&#9825;78</span> <a href="/articles/20210511a/" title="TIGの玉木です。去年の12月までは主に機械学習エンジニアとして機械学習案件を任されていましたが、今年の1月からはITコンサルタントとして業務の幅が広くなりいろいろやっています。先月技育祭と呼ばれるイベントの勉強会という枠で、同僚の上野さんと一緒に「初心者必見！機械学習エンジニアがあれこれ話します。〜基礎から実社会応用まで〜」というタイトルで発表しました。">技育祭登壇しました。これから機械学習を学びたい方向けへの自分の経験談とおすすめの本、サイトの紹介もします</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Python%E3%81%AE%E3%83%99%E3%83%BC%E3%82%B9%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B8%E9%81%B8%E3%81%B3"><span class="toc-text">Pythonのベースイメージ選び</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Python%E3%81%AE%E3%83%9E%E3%83%AB%E3%83%81%E3%82%B9%E3%83%86%E3%83%BC%E3%82%B8%E3%83%93%E3%83%AB%E3%83%89"><span class="toc-text">Pythonのマルチステージビルド</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Python%E3%81%A7%E3%81%A9%E3%81%86%E3%82%84%E3%81%A3%E3%81%A6%E3%83%9E%E3%83%AB%E3%83%81%E3%82%B9%E3%83%86%E3%83%BC%E3%82%B8%E3%83%93%E3%83%AB%E3%83%89%E3%82%92%E5%AE%9F%E7%8F%BE%E3%81%99%E3%82%8B%E3%81%AE%E3%81%8B"><span class="toc-text">Pythonでどうやってマルチステージビルドを実現するのか</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9F%E8%A1%8C%E6%99%82%E3%81%AB%E5%BF%85%E8%A6%81%E3%81%AA%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%81%8C%E3%81%AA%E3%81%84%E3%81%A8%E8%A8%80%E3%82%8F%E3%82%8C%E3%81%9F%E3%82%89"><span class="toc-text">実行時に必要なライブラリがないと言われたら</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>

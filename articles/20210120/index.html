@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Androidのビルドバリアントをイチから理解する | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは、フューチャー2年目の松井です。 昨今のコロナ事情の中、「なかなか外出できない…。そうだ、Androidアプリを作ろう。」となるエンジニアの方は多いのではないでしょうか？アプリを作っていると、ソースコードを分けるまではいかなくとも、微妙なバージョンの違いを表現したい場面に度々出くわします。例えば、無料版と有料版を管理したい、テスト環境用のアプリを分離したい、などです。 今回はそん">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Androidのビルドバリアントをイチから理解する | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210120/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、フューチャー2年目の松井です。 昨今のコロナ事情の中、「なかなか外出できない…。そうだ、Androidアプリを作ろう。」となるエンジニアの方は多いのではないでしょうか？アプリを作っていると、ソースコードを分けるまではいかなくとも、微妙なバージョンの違いを表現したい場面に度々出くわします。例えば、無料版と有料版を管理したい、テスト環境用のアプリを分離したい、などです。 今回はそん">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210120/Androidのビルドの流れ.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210120/Androidプロジェクトのディレクトリ構成.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210120/Screenshot_19700101-100351.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210120/①ビルドバリアントは2つ.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210120/mainのディレクトリ構成.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210120/debugのディレクトリ構成.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210120/debugでビルド.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210120/releaseでビルド.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210120/②ビルドバリアントは4つ.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210120/freeのディレクトリ構成.png">
+<meta property="article:published_time" content="2021-01-19T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-23T13:54:03.556Z">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="モバイルアプリ">
+<meta property="article:tag" content="Gradle">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210120/Androidのビルドの流れ.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210120/">
+  <meta content="Android,モバイルアプリ,Gradle" name="keywords">
+  <meta content="松井宇宙" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">Androidのビルドバリアントをイチから理解する
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210120_Androidのビルドバリアントをイチから理解する.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210120_Androidのビルドバリアントをイチから理解する" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E6%9D%BE%E4%BA%95%E5%AE%87%E5%AE%99">松井宇宙</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2021/"><time datetime="2021-01-19T15:00:00.000Z" itemprop="datePublished">2021.01.20</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Android/" title="Androidタグの記事へ">Android</a>
+  
+    
+    <a href="/tags/モバイルアプリ/" title="モバイルアプリタグの記事へ">モバイルアプリ</a>
+  
+    
+    <a href="/tags/Gradle/" title="Gradleタグの記事へ">Gradle</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、フューチャー2年目の松井です。</p>
+<p>昨今のコロナ事情の中、「なかなか外出できない…。そうだ、Androidアプリを作ろう。」となるエンジニアの方は多いのではないでしょうか？アプリを作っていると、ソースコードを分けるまではいかなくとも、微妙なバージョンの違いを表現したい場面に度々出くわします。例えば、無料版と有料版を管理したい、テスト環境用のアプリを分離したい、などです。</p>
+<p>今回はそんな場面での強い味方、ビルドバリアントについて具体的なコードを交えて解説していきます！</p>
+<p>お時間があれば、過去のAndroidに関する記事(<a href="/articles/20200330/">Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する</a>)もぜひご覧ください。</p>
+<h1 id="使用した環境"><a href="#使用した環境" class="headerlink" title="使用した環境"></a>使用した環境</h1><ul>
+<li>Android Studio 3.6</li>
+<li>Android端末 (HUAWEI P9 lite)</li>
+<li>Androidバージョン 7.0</li>
+<li>gradle plugin 3.5.3</li>
+</ul>
+<h1 id="そもそものビルドの仕組み"><a href="#そもそものビルドの仕組み" class="headerlink" title="そもそものビルドの仕組み"></a>そもそものビルドの仕組み</h1><p>Androidアプリを実行するには、リソースとソースコードをコンパイルしてAPKと呼ばれるパッケージを作成します。</p>
+<p>その際にGradleを用いることでビルドプロセスの自動化、および柔軟なカスタムビルド設定ができるようになっています。<br>※以下の図は<a target="_blank" rel="noopener" href="https://developer.android.com/studio/build?hl=ja">公式ドキュメント</a>からの引用です。一連のソース群からAPKが作られるフローを示しています。</p>
+<img src="/images/20210120/Androidのビルドの流れ.png" loading="lazy">
+
+<p>ビルド設定用のGradleファイル <code>build.gradle</code> はプロジェクトレベル、モジュールレベルで2種類存在しています。</p>
+<p><strong>プロジェクトレベル</strong>では、プロジェクト配下の全てのモジュールに適用される、アプリのビルドに必要なリポジトリや依存関係を定義します。<strong>モジュールレベル</strong>では、<code>build.gradle</code>の所属するモジュールに適用される依存関係や、カスタムビルドの設定を記述します。今回の主役であるビルドバリアントの設定もこちらで実施します。</p>
+<p>複数モジュールにプロジェクトを分割するマルチモジュール構成の場合、水平方向・垂直方向の2通りの分割が考えられますが、軽く調べたところ、機能やレイヤーで分ける垂直方向の分割の実例が多いようです。</p>
+<p>各モジュールがビルドファイルを持つことでモジュールごとのビルドやテストが可能なため、マルチモジュール構成では開発チームで役割分担しやすいなどのメリットがあります。</p>
+<p>今回はシングルモジュール構成で話を進めます。<br>※以下の図は<a target="_blank" rel="noopener" href="https://developer.android.com/studio/build?hl=ja">公式ドキュメント</a>からの引用です。プロジェクトレベル、モジュールレベルごとに<code>build.gradle</code>が存在することがわかります。</p>
+<img src="/images/20210120/Androidプロジェクトのディレクトリ構成.png" class="img-middle-size" loading="lazy">
+
+
+<h1 id="ビルドバリアントとは"><a href="#ビルドバリアントとは" class="headerlink" title="ビルドバリアントとは"></a>ビルドバリアントとは</h1><p><a target="_blank" rel="noopener" href="https://developer.android.com/studio/build/build-variants?hl=ja">公式ドキュメント</a>を読むと以下のように書かれています。</p>
+<blockquote>
+<p>各ビルド バリアントは、ビルド可能なさまざまなバージョンのアプリを表しています。</p>
+</blockquote>
+<p>ビルドバリアントを指定すると、ソースコードに変更を加えることなく１つのモジュールから無料版/有料版、本番環境用/開発環境用などを切り替えてアプリをビルドできるようになります。一般的なウェブアプリケーションでいう環境変数に近いかもしれません。この存在がなければ、いちいち別のソースを書き換えてビルドしなければならず、開発やテストに不都合となることが想像できます。</p>
+<p>このビルドバリアントはさらに<strong>ビルドタイプ</strong>と<strong>プロダクトフレーバー</strong>の組み合わせで定義されています。</p>
+<p><strong>ビルドタイプ</strong>は、本番用or開発用など、開発のライフサイクルに応じてバージョンを切り替えるために設定します。Android Studioで新規モジュールを作成する際は、releaseとdebugのビルドタイプが自動で作成されます。さらに独自のビルドタイプを設定して管理することも可能です。ビルド時には最低一つのビルドタイプを指定する必要があります。</p>
+<p><strong>プロダクトフレーバー</strong>は、ビルドタイプに加えてオプションでさらに柔軟なバージョン管理が必要な場合に使用します。</p>
+<p>有料版or無料版の制御などに加え、公式ドキュメントでは、クライアントのAndroidSDKの最低バージョンに応じてプロダクトフレーバーを切り替える、というサンプルも記載されています。基本的な記述はビルドタイプと同様ですが、<code>flavorDimensions</code>を指定する必要があります。後述しますが、この<code>flavorDimensions</code>を用いることでさらに細かなバージョン管理を実現できます。最初に述べましたが、ビルドバリアントはビルドタイプとプロダクトフレーバーの組み合わせです。</p>
+<p>releaseとdebugの2ビルドタイプ、有料版と無料版の2プロダクトフレーバーをもつモジュールでは、2×2の計4通りのビルドバリアントを利用できることを意味します。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center">ビルドバリアント</th>
+<th align="center">ビルドタイプ</th>
+<th align="center">プロダクトフレーバー</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">#1</td>
+<td align="center">release</td>
+<td align="center">有料版</td>
+</tr>
+<tr>
+<td align="center">#2</td>
+<td align="center">release</td>
+<td align="center">無料版</td>
+</tr>
+<tr>
+<td align="center">#3</td>
+<td align="center">debug</td>
+<td align="center">有料版</td>
+</tr>
+<tr>
+<td align="center">#4</td>
+<td align="center">debug</td>
+<td align="center">無料版</td>
+</tr>
+</tbody></table></div>
+<p>具体的な使い方とアプリの挙動は、実際にソースを追いAndroid Studioからビルドして確認していきます。</p>
+<h1 id="実際にビルドしてみる"><a href="#実際にビルドしてみる" class="headerlink" title="実際にビルドしてみる"></a>実際にビルドしてみる</h1><p>さて、実際にコードとアプリの挙動を見ながらビルドバリアントへの理解を深めていきます。</p>
+<p>今回は、新規作成した<code>testApp</code>というモジュール配下に、メイン画面にヘッダーとテキストを表示するだけのシンプルなアプリを作成し、以下の3パターンについて確認していきます。<br><strong><a href="#-%E3%83%93%E3%83%AB%E3%83%89%E3%82%BF%E3%82%A4%E3%83%972%E9%80%9A%E3%82%8A">① ビルドタイプ2通り</a></strong><br><strong><a href="#-%E3%83%93%E3%83%AB%E3%83%89%E3%82%BF%E3%82%A4%E3%83%972%E9%80%9A%E3%82%8A%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%83%95%E3%83%AC%E3%83%BC%E3%83%90%E3%83%BC2%E9%80%9A%E3%82%8Aflavordimensionsa-2%E9%80%9A%E3%82%8A">② ビルドタイプ2通り、プロダクトフレーバー2通り(flavorDimensionsA: 2通り)</a>)</strong><br><strong><a href="#-%E3%83%93%E3%83%AB%E3%83%89%E3%82%BF%E3%82%A4%E3%83%972%E9%80%9A%E3%82%8A%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%83%95%E3%83%AC%E3%83%BC%E3%83%90%E3%83%BC5%E9%80%9A%E3%82%8Aflavordimensionsa-2%E9%80%9A%E3%82%8Aflavordimensionsb-3%E9%80%9A%E3%82%8A">③ ビルドタイプ2通り、プロダクトフレーバー5通り(flavorDimensionsA: 2通り、flavorDimensionsB: 3通り)</a>)</strong></p>
+<p>アプリの初期画面は以下のようになっています。<br><img src="/images/20210120/Screenshot_19700101-100351.png" class="img-small-size" loading="lazy"></p>
+<h2 id="①-ビルドタイプ2通り"><a href="#①-ビルドタイプ2通り" class="headerlink" title="① ビルドタイプ2通り"></a>① ビルドタイプ2通り</h2><p>一番シンプルなパターンです。</p>
+<p>releaseとdebugの2通りのビルドタイプを設定します。モジュール配下の<code>build.gradle</code>ファイルは抜粋すると以下のようになっています。</p>
+<figure class="highlight gradle"><figcaption><span>testApp/build.gradle</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: <span class="string">&#x27;com.android.application&#x27;</span></span><br><span class="line"></span><br><span class="line">android &#123;</span><br><span class="line">    <span class="comment">// 省略...</span></span><br><span class="line"></span><br><span class="line">    buildTypes &#123;</span><br><span class="line">        release &#123;</span><br><span class="line">            minifyEnabled <span class="keyword">false</span></span><br><span class="line">            proguardFiles getDefaultProguardFile(<span class="string">&#x27;proguard-android-optimize.txt&#x27;</span>), <span class="string">&#x27;proguard-rules.pro&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">        debug &#123;</span><br><span class="line">            applicationIdSuffix <span class="string">&quot;.debug&quot;</span></span><br><span class="line">            debuggable <span class="keyword">true</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 省略...</span></span><br></pre></td></tr></table></figure>
+
+<p><code>applicationIdSuffix</code>は、applicationIDの末尾に指定した文字列を追加してくれるパラメータです。</p>
+<p>AndroidはapplicationIDによって端末上でアプリが同一かどうかを識別しています。releaseとdebugでapplicationIDを変えることで、1つの端末上で2つのバージョンのアプリを共存させることができます。同一のapplcationIDであれば上書きされます。ユーザーの目には触れない点ですが、開発者側からするといちいちビルドしなくても端末上の操作だけで両方のバージョンを確認できるので、大切な設定になってきます。</p>
+<p>そのほかのパラメータは、apkの軽量化、難読化、署名に関わるものですが、今回のスコープではないので割愛します。</p>
+<p>さて、この設定でAndroid Studioでビルドしてみると、無事2つのビルドバリアント (release, debug) が作成されていことがわかります。プロダクトフレーバーは作成していないので、<strong>ビルドバリアント = ビルドタイプ</strong> となっています。</p>
+<img src="/images/20210120/①ビルドバリアントは2つ.png" loading="lazy">
+
+<p>しかしこのままアプリを立ち上げてもなんら違いはありません。debugかreleaseかに応じてアプリの内容を切り替えるには、もう一手間必要になってきます。<br>結論から言うと、<strong>ビルドタイプの名称をもつディレクトリを作成し、mainディレクトリと構成の齟齬が無いように差分のファイルを配置する</strong>ことが必要です。</p>
+<p>文章で書いてもよくわからないので、具体的に見ていきます。</p>
+<p>まず、こちらが現在のモジュール<code>testApp</code>のディレクトリ構成です。直下には先ほど編集したモジュールレベルの<code>build.gradle</code>がいます。</p>
+<img src="/images/20210120/mainのディレクトリ構成.png" class="img-middle-size" loading="lazy">
+
+<p>アプリのソースコードはsrc/main配下に格納されています。Main画面を表示する<code>MainActivity.java</code>はJava配下へ、画面のレイアウトを定義する<code>activity_main.xml</code>はres配下へ格納されています。</p>
+<p>このsrc配下に、mainと同じ階層で、ビルドタイプの名前をもつディレクトリを作成し、ファイルを配置します。そうすることで、ビルドタイプのディレクトリ配下にmainと同じファイルが存在すれば、そちらが優先して実行されるようになります。</p>
+<p>以下がビルドタイプdebugのディレクトリ配下に作成された<code>activity_main.xml</code>です。mainと同じ階層に配置されていることが確認できます。あとは、この新規作成したactivity_main.xmlを編集し、表示内容を変更します。</p>
+<img src="/images/20210120/debugのディレクトリ構成.png" class="img-middle-size" loading="lazy">
+
+<figure class="highlight xml"><figcaption><span>main/layout/activity_main.xml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">androidx.constraintlayout.widget.ConstraintLayout</span></span></span><br><span class="line"><span class="tag">    // 省略<span class="attr">...</span></span></span><br><span class="line"><span class="tag"></span></span><br><span class="line"><span class="tag">    &lt;<span class="attr">TextView</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">&quot;wrap_content&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">&quot;wrap_content&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:text</span>=<span class="string">&quot;Hello World!&quot;</span>  // ここを書き換える</span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintBottom_toBottomOf</span>=<span class="string">&quot;parent&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintLeft_toLeftOf</span>=<span class="string">&quot;parent&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintRight_toRightOf</span>=<span class="string">&quot;parent&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintTop_toTopOf</span>=<span class="string">&quot;parent&quot;</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">androidx.constraintlayout.widget.ConstraintLayout</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight xml"><figcaption><span>debug/layout/activity_main.xml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">androidx.constraintlayout.widget.ConstraintLayout</span></span></span><br><span class="line"><span class="tag">    // 省略<span class="attr">...</span></span></span><br><span class="line"><span class="tag"></span></span><br><span class="line"><span class="tag">    &lt;<span class="attr">TextView</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">&quot;wrap_content&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">&quot;wrap_content&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:text</span>=<span class="string">&quot;This is debug!&quot;</span>  // ここを書き換えた</span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintBottom_toBottomOf</span>=<span class="string">&quot;parent&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintLeft_toLeftOf</span>=<span class="string">&quot;parent&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintRight_toRightOf</span>=<span class="string">&quot;parent&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintTop_toTopOf</span>=<span class="string">&quot;parent&quot;</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">androidx.constraintlayout.widget.ConstraintLayout</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>すると、ビルドバリアント(=ビルドタイプ)debugでビルドした際に、表示内容が変化したことが確認できます。 releaseは対応するディレクトリとソースを作成していないので、main配下の<code>activity_main.xml</code>が呼び出されます。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th><img src="/images/20210120/debugでビルド.png" alt="debugでビルド" loading="lazy"></th>
+<th><img src="/images/20210120/releaseでビルド.png" alt="releaseでビルド" loading="lazy"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>debugでビルド</td>
+<td>releaseでビルド</td>
+</tr>
+</tbody></table></div>
+<p>ここまでのまとめです。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center">ビルドバリアント</th>
+<th align="center">ビルドタイプ</th>
+<th align="center">プロダクトフレーバー</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">debug</td>
+<td align="center">debug</td>
+<td align="center">-</td>
+</tr>
+<tr>
+<td align="center">release</td>
+<td align="center">release</td>
+<td align="center">-</td>
+</tr>
+</tbody></table></div>
+<h2 id="②-ビルドタイプ2通り、プロダクトフレーバー2通り-flavorDimensionsA-2通り"><a href="#②-ビルドタイプ2通り、プロダクトフレーバー2通り-flavorDimensionsA-2通り" class="headerlink" title="② ビルドタイプ2通り、プロダクトフレーバー2通り(flavorDimensionsA: 2通り)"></a>② ビルドタイプ2通り、プロダクトフレーバー2通り(flavorDimensionsA: 2通り)</h2><p>次は、プロダクトフレーバーも組み合わせてビルドバリアントを構成してみます。<br>有料版と無料版でバージョンを切り替えられるようプロダクトフレーバーを設定してみましょう。<br><code>build.gradle</code>は抜粋すると以下のようになっています。</p>
+<figure class="highlight gradle"><figcaption><span>build.gradle</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: <span class="string">&#x27;com.android.application&#x27;</span></span><br><span class="line"></span><br><span class="line">android &#123;</span><br><span class="line">    <span class="comment">// 省略...</span></span><br><span class="line"></span><br><span class="line">    buildTypes &#123;</span><br><span class="line">        release &#123;</span><br><span class="line">            minifyEnabled <span class="keyword">false</span></span><br><span class="line">            proguardFiles getDefaultProguardFile(<span class="string">&#x27;proguard-android-optimize.txt&#x27;</span>), <span class="string">&#x27;proguard-rules.pro&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">        debug &#123;</span><br><span class="line">            applicationIdSuffix <span class="string">&quot;.debug&quot;</span></span><br><span class="line">            debuggable <span class="keyword">true</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    flavorDimensions <span class="string">&quot;plan&quot;</span></span><br><span class="line">    productFlavors &#123;</span><br><span class="line">        paid &#123;</span><br><span class="line">            dimension <span class="string">&quot;plan&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">        free &#123;</span><br><span class="line">            dimension <span class="string">&quot;plan&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 省略...</span></span><br></pre></td></tr></table></figure>
+
+<p>基本形はビルドタイプと同様ですが、<code>flavorDimensions</code>が定義されているのが異なる点です。さらに各プロダクトフレーバーの要素がどの<code>flavorDimensions</code>に属しているのかを、<code>dimension</code>パラメータを用いて明示してやります。</p>
+<p><code>flavorDimensions</code>はその名の通りプロダクトフレーバーの次元を管理するもので、同一次元の要素から一つずつ選択して、全体のプロダクトフレーバーを構成する、という使い方をします。<br>これは③の実例をみるともう少しわかりやすくなると思います。</p>
+<p>このファイルをビルドすると、以下のようにビルドタイプ × プロダクトフレーバーの組み合わせで4パターンのビルドバリアントが作成されていることが確認できます。</p>
+<p>ビルドバリアントの命名規則は、キャメルケースで<strong>プロダクトフレーバー + ビルドタイプ</strong>となります。</p>
+<img src="/images/20210120/②ビルドバリアントは4つ.png" loading="lazy">
+
+<p>プロダクトフレーバーにおいても、ビルドタイプと同様に、<strong>プロダクトフレーバーの名称をもつディレクトリを作成し、mainディレクトリと構成の齟齬が無いように差分のファイルを配置する</strong>ことでソースとビルドバリアントを連携させることが可能です。</p>
+<p>さて、先ほどと同様に、ディレクトリを切ってプロダクトフレーバー特有のソースを格納します。無料版のみヘッダータイトルに「free」と入るよう実装してみましょう。<code>free/value/strings.xml</code>を作成し、タイトルの末尾に「free」を追記します。</p>
+<img src="/images/20210120/freeのディレクトリ構成.png" class="img-middle-size" loading="lazy">
+
+
+<figure class="highlight xml"><figcaption><span>main/value/strings.xml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span> <span class="attr">name</span>=<span class="string">&quot;app_name&quot;</span>&gt;</span>test<span class="tag">&lt;/<span class="name">string</span>&gt;</span>   //ここを書き換える</span><br><span class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><figcaption><span>free/value/strings.xml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span> <span class="attr">name</span>=<span class="string">&quot;app_name&quot;</span>&gt;</span>test[free]<span class="tag">&lt;/<span class="name">string</span>&gt;</span>   //ここを書き換えた</span><br><span class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>freeDebugおよびfreeReleaseでビルドすると、タイトルに「free」がくっついていることが確認できました。<br>一方、paid側のビルドバリアントはディレクトリを切っていないため、main配下のリソースが呼ばれています。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th><img src="/images/20210120/freeDebugでビルド.png" alt="freeDebugでビルド" loading="lazy"></th>
+<th><img src="/images/20210120/paidDebugでビルド.png" alt="paidDebugでビルド" loading="lazy"></th>
+<th><img src="/images/20210120/freeReleaseでビルド.png" alt="paidDebugでビルド" loading="lazy"></th>
+<th><img src="/images/20210120/paidReleaseビルド.png" alt="paidReleaseビルド" loading="lazy"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>freeDebugでビルド</td>
+<td>freeReleaseでビルド</td>
+<td>paidDebugでビルド</td>
+<td>paidReleaseビルド</td>
+</tr>
+</tbody></table></div>
+<p>ここで、こんな疑問が生じるかもしれません。</p>
+<p><strong>ビルドタイプ、プロダクトフレーバーで同一のファイルを編集したらどのように表示されるのか？</strong></p>
+<p>検証してみましょう。<br>freeディレクトリ配下でも、<code>activity_main.xml</code>を作成して編集します。これは先ほどdebug配下でも編集していたファイルです。<br><img src="/images/20210120/スクリーンショット_2021-01-16_21.04.12.png" loading="lazy"></p>
+<figure class="highlight xml"><figcaption><span>free/layout/activity_main.xml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">androidx.constraintlayout.widget.ConstraintLayout</span></span></span><br><span class="line"><span class="tag">    // 省略<span class="attr">...</span></span></span><br><span class="line"><span class="tag"></span></span><br><span class="line"><span class="tag">    &lt;<span class="attr">TextView</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">&quot;wrap_content&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">&quot;wrap_content&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:text</span>=<span class="string">&quot;This is free!&quot;</span>  // ここを書き換えた</span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintBottom_toBottomOf</span>=<span class="string">&quot;parent&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintLeft_toLeftOf</span>=<span class="string">&quot;parent&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintRight_toRightOf</span>=<span class="string">&quot;parent&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">app:layout_constraintTop_toTopOf</span>=<span class="string">&quot;parent&quot;</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">androidx.constraintlayout.widget.ConstraintLayout</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>そしてfreeDebugのビルドバリアントでビルドすると…</p>
+<img src="/images/20210120/freeDebugでビルド2.png" class="img-small-size" loading="lazy">
+
+<p>「This is debug!」つまりビルドタイプ配下のファイルが優先されました。</p>
+<p>実は同じソースについての優先度は<a target="_blank" rel="noopener" href="https://developer.android.com/studio/build/build-variants?hl=ja#sourceset-build">Androidで定義されており</a>、<strong>ビルドタイプ -&gt; プロダクトフレーバー -&gt; main</strong> のディレクトリ順でファイルが優先されます。</p>
+<p>なるほど、ビルドタイプが優先されることはわかった、ただ、どうしても <strong>freeかつdebugの時には「This is free!」と表示させたい</strong>。そんな需要もあるかもしれません。<br>そんな場合は、freeDebugという<strong>ビルドバリアント名称のディレクトリを作成することで、ビルドタイプに優先させることができます。</strong><br>試しに先ほどのfree配下の<code>activity_main.xml</code>ファイルをfreeDebugディレクトリ配下に移動してみましょう。ディレクトリ構成はこのようになります。</p>
+<img src="/images/20210120/freeDebugのディレクトリ構成.png" loading="lazy">
+
+<p>そして改めてfreeDebugでビルドすると…<br>無事に「This is free!」と表示され、ビルドタイプに優先することが確認できました。</p>
+<img src="/images/20210120/freeDebugでビルド3.png" class="img-small-size" loading="lazy">
+
+<p>改めてソースの優先順位は、<br><strong>ビルドバリアント -&gt; ビルドタイプ -&gt; プロダクトフレーバー -&gt; main</strong><br>のディレクトリ順となります。</p>
+<p>ここまでのまとめです。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center">ビルドバリアント</th>
+<th align="center">ビルドタイプ</th>
+<th align="center">プロダクトフレーバー</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">freeDebug</td>
+<td align="center">debug</td>
+<td align="center">free</td>
+</tr>
+<tr>
+<td align="center">freeRelease</td>
+<td align="center">release</td>
+<td align="center">free</td>
+</tr>
+<tr>
+<td align="center">paidDebug</td>
+<td align="center">debug</td>
+<td align="center">paid</td>
+</tr>
+<tr>
+<td align="center">paidRelease</td>
+<td align="center">release</td>
+<td align="center">paid</td>
+</tr>
+</tbody></table></div>
+<h2 id="③-ビルドタイプ2通り、プロダクトフレーバー5通り-flavorDimensionsA-2通り、flavorDimensionsB-3通り"><a href="#③-ビルドタイプ2通り、プロダクトフレーバー5通り-flavorDimensionsA-2通り、flavorDimensionsB-3通り" class="headerlink" title="③ ビルドタイプ2通り、プロダクトフレーバー5通り(flavorDimensionsA: 2通り、flavorDimensionsB: 3通り)"></a>③ ビルドタイプ2通り、プロダクトフレーバー5通り(flavorDimensionsA: 2通り、flavorDimensionsB: 3通り)</h2><p>最後のパターン、プロダクトフレーバーのdimensionが複数ある場合です。<br>そんな複雑な構成は実務で生じるのか、と疑問に思うかもしれませんが、今回この記事を書くに至った理由が、実際のプロジェクトの現場でこの構成のビルドが必要になったためでした。</p>
+<p>当該のプロジェクトではプロダクトフレーバーを用いて開発、ステージング、本番環境ごとのアプリを作成していました。<br>そこに、アプリで扱う商品のブランドごとにバージョン管理したいと言う要件が生じたため、さらにブランドのdimensionを追加してバージョン管理していました。</p>
+<p>今回の検証では、<code>color</code> dimensionを追加して、色ごとにバージョン管理できるように設定してみます。<br>build.gradleファイルは抜粋すると以下のようになっています。</p>
+<figure class="highlight gradle"><figcaption><span>testApp/build.gradle</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: <span class="string">&#x27;com.android.application&#x27;</span></span><br><span class="line"></span><br><span class="line">android &#123;</span><br><span class="line">    <span class="comment">//省略...</span></span><br><span class="line"></span><br><span class="line">    buildTypes &#123;</span><br><span class="line">        release &#123;</span><br><span class="line">            minifyEnabled <span class="keyword">false</span></span><br><span class="line">            proguardFiles getDefaultProguardFile(<span class="string">&#x27;proguard-android-optimize.txt&#x27;</span>), <span class="string">&#x27;proguard-rules.pro&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">        debug &#123;</span><br><span class="line">            applicationIdSuffix <span class="string">&quot;.debug&quot;</span></span><br><span class="line">            debuggable <span class="keyword">true</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    flavorDimensions <span class="string">&quot;plan&quot;</span>, <span class="string">&quot;color&quot;</span></span><br><span class="line">    productFlavors &#123;</span><br><span class="line">        paid &#123;</span><br><span class="line">            dimension <span class="string">&quot;plan&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">        free &#123;</span><br><span class="line">            dimension <span class="string">&quot;plan&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">        purple &#123;</span><br><span class="line">            dimension <span class="string">&quot;color&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">        green &#123;</span><br><span class="line">            dimension <span class="string">&quot;color&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">        red &#123;</span><br><span class="line">            dimension <span class="string">&quot;color&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 省略...</span></span><br></pre></td></tr></table></figure>
+<p>このように<code>flavorDimensions</code>はカンマで区切ることで複数定義できます。<br>さて、これをビルドすると… だんだん複雑になってきましたが、ビルドタイプ × プロダクトフレーバー(plan) × プロダクトフレーバー(color) の組み合わせで12通りのビルドバリアントが作成されました。</p>
+<img src="/images/20210120/③ビルドバリアント12通り.png" loading="lazy">
+
+<p>ここまでくると、<code>flavorDimensions</code>のいう次元の意味が見えてきたのではないかと思います。各dimensionから組み合わせで1つずつ選択して、プロダクトフレーバーが構成されています。</p>
+<p>ビルドバリアントの名称は、キャメルケースで<strong>プロダクトフレーバー(dimensionA) + プロダクトフレーバー(dimensionB) + ビルドタイプ</strong> となっています。</p>
+<p>では早速プロダクトフレーバーごとのディレクトリを作成していきましょう。 今回はgreen, redのバージョンの<code>res/values/color.xml</code>を編集して、ヘッダーの色を変更します。</p>
+<p>ディレクトリ構成はこのようになっています。</p>
+<img src="/images/20210120/greenredのディレクトリ構成.png" class="img-middle-size" loading="lazy">
+
+<figure class="highlight xml"><figcaption><span>main/value/colors.xml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">&quot;colorPrimary&quot;</span>&gt;</span>#6200EE<span class="tag">&lt;/<span class="name">color</span>&gt;</span>  //ここを書き換える</span><br><span class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">&quot;colorPrimaryDark&quot;</span>&gt;</span>#3700B3<span class="tag">&lt;/<span class="name">color</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">&quot;colorAccent&quot;</span>&gt;</span>#03DAC5<span class="tag">&lt;/<span class="name">color</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight xml"><figcaption><span>green/value/colors.xml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">&quot;colorPrimary&quot;</span>&gt;</span>#4CAF50<span class="tag">&lt;/<span class="name">color</span>&gt;</span>  //ここを書き換えた to Green</span><br><span class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">&quot;colorPrimaryDark&quot;</span>&gt;</span>#3700B3<span class="tag">&lt;/<span class="name">color</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">&quot;colorAccent&quot;</span>&gt;</span>#03DAC5<span class="tag">&lt;/<span class="name">color</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight xml"><figcaption><span>red/value/colors.xml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">&quot;colorPrimary&quot;</span>&gt;</span>#F44336<span class="tag">&lt;/<span class="name">color</span>&gt;</span>  //ここを書き換えた to Red</span><br><span class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">&quot;colorPrimaryDark&quot;</span>&gt;</span>#3700B3<span class="tag">&lt;/<span class="name">color</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">color</span> <span class="attr">name</span>=<span class="string">&quot;colorAccent&quot;</span>&gt;</span>#03DAC5<span class="tag">&lt;/<span class="name">color</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>freeGreenDebug、freeRedDebug、paidGreenDebug、paidRedDebug、でビルドすることで、元の紫色のヘッダーがそれぞれ緑、赤になることが確認できました。<br>purpleについては、ディレクトリを作成していないためにmainのソースが呼ばれており、ヘッダーは元の色のままです。<br>※Releaseも同様のため割愛します。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th><img src="/images/20210120/freeGreenDebugでビルド.png" alt="freeGreenDebugでビルド" loading="lazy"></th>
+<th><img src="/images/20210120/freeRedDebugでビルド.png" alt="freeRedDebugでビルド" loading="lazy"></th>
+<th><img src="/images/20210120/freePurpleDebugでビルド.png"></th>
+<th><img src="/images/20210120/paidGreenDebugでビルド.png" alt="paidGreenDebugでビルド" loading="lazy"></th>
+<th><img src="/images/20210120/paidRedDebugでビルド.png" alt="freeRedDebugでビルド" loading="lazy"></th>
+<th><img src="/images/20210120/paidPurpleDebugでビルド.png" alt="paidPurpleDebugでビルド" loading="lazy"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>freeGreenDebugでビルド</td>
+<td>freeRedDebugでビルド</td>
+<td>freePurpleDebugでビルド</td>
+<td>paidGreenDebugでビルド</td>
+<td>paidRedDebugでビルド</td>
+<td>paidPurpleDebugでビルド</td>
+</tr>
+</tbody></table></div>
+<p>さて、ここでも先ほどと同様の疑問が生じます。</p>
+<p><strong>異なるflavorDimensionsで同一のファイルを編集したらどのように表示されるのか？</strong></p>
+<p>先ほどからの類推で何となく検討はつきますが、検証していきましょう。<br><code>color</code>dimensionのプロダクトフレーバーであるgreenディレクトリ配下で、<code>strings.xml</code>を編集します。<br>これは先ほど<code>plan</code>dimensionのプロダクトフレーバーであるfreeディレクトリ配下でも編集していた、ヘッダータイトルを決めていたファイルです。</p>
+<img src="/images/20210120/greenのディレクトリ構成2.png" loading="lazy">
+
+<figure class="highlight xml"><figcaption><span>green/value/strings.xml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span> <span class="attr">name</span>=<span class="string">&quot;app_name&quot;</span>&gt;</span>test[green]<span class="tag">&lt;/<span class="name">string</span>&gt;</span>   //ここを書き換えた</span><br><span class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+<p>そしてfreeGreenDebugのビルドバリアントでビルドすると…</p>
+<img src="/images/20210120/Screenshot_19700101-115109.png" class="img-small-size" loading="lazy">
+
+<p>「test[free]」つまりfree (1つ目のdimension)ディレクトリ配下のファイルが優先されました。</p>
+<p>プロダクトフレーバーでは、<strong>記述したdimensionの順でディレクトリの優先度が決まる</strong>ことが確認できました。仮に<code>flavorDimensions &quot;color&quot;, &quot;plan&quot;</code> のように記載するdimensionの順序を逆転させれば、colorディレクトリ配下のファイルが優先されるようになります。先ほどと繰り返しになるので検証は割愛しますが、プロダクトフレーバー全体のディレクトリfreeGreenなどを作成することで、各dimensionのディレクトリに優先させることができます。</p>
+<p>改めてリソースの優先順位は、<br><strong>ビルドバリアント -&gt; ビルドタイプ -&gt; プロダクトフレーバー(全体) -&gt; プロダクトフレーバー(個々のdimension) -&gt; main</strong><br>のディレクトリ順となります。</p>
+<p>ここまでのまとめです。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center">ビルドバリアント</th>
+<th align="center">ビルドタイプ</th>
+<th align="center">プロダクトフレーバー</th>
+<th align="center">dimensionA(plan)</th>
+<th align="center">dimensionB(color)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">freeGreenDebug</td>
+<td align="center">debug</td>
+<td align="center">freeGreen</td>
+<td align="center">free</td>
+<td align="center">green</td>
+</tr>
+<tr>
+<td align="center">freeGreenRelease</td>
+<td align="center">release</td>
+<td align="center">freeGreen</td>
+<td align="center">free</td>
+<td align="center">green</td>
+</tr>
+<tr>
+<td align="center">freeRedDebug</td>
+<td align="center">debug</td>
+<td align="center">freeRed</td>
+<td align="center">free</td>
+<td align="center">red</td>
+</tr>
+<tr>
+<td align="center">freeRedRelease</td>
+<td align="center">release</td>
+<td align="center">freeRed</td>
+<td align="center">free</td>
+<td align="center">red</td>
+</tr>
+<tr>
+<td align="center">freePurpleDebug</td>
+<td align="center">debug</td>
+<td align="center">freePurple</td>
+<td align="center">free</td>
+<td align="center">purple</td>
+</tr>
+<tr>
+<td align="center">freePurpleRelease</td>
+<td align="center">release</td>
+<td align="center">freePurple</td>
+<td align="center">free</td>
+<td align="center">purple</td>
+</tr>
+<tr>
+<td align="center">paidGreenDebug</td>
+<td align="center">debug</td>
+<td align="center">paidGreen</td>
+<td align="center">paid</td>
+<td align="center">green</td>
+</tr>
+<tr>
+<td align="center">paidGreenRelease</td>
+<td align="center">release</td>
+<td align="center">paidGreen</td>
+<td align="center">paid</td>
+<td align="center">green</td>
+</tr>
+<tr>
+<td align="center">paidRedDebug</td>
+<td align="center">debug</td>
+<td align="center">paidRed</td>
+<td align="center">paid</td>
+<td align="center">red</td>
+</tr>
+<tr>
+<td align="center">paidRedRelease</td>
+<td align="center">release</td>
+<td align="center">paidRed</td>
+<td align="center">paid</td>
+<td align="center">red</td>
+</tr>
+<tr>
+<td align="center">paidPurpleDebug</td>
+<td align="center">debug</td>
+<td align="center">paidPurple</td>
+<td align="center">paid</td>
+<td align="center">purple</td>
+</tr>
+<tr>
+<td align="center">paidPurpleRelease</td>
+<td align="center">release</td>
+<td align="center">paidPurple</td>
+<td align="center">paid</td>
+<td align="center">purple</td>
+</tr>
+</tbody></table></div>
+<h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>今回はAndroidのビルドバリアントについて実コードを交えながら解説しました。<br>ビルドバリアントの有用性、使い方について理解を深めていただけたなら幸いです。<br>最後に、参考として今回作成したtestAppモジュール配下の<code>build.gradle</code>の全体を載せておきます。</p>
+<figure class="highlight gradle"><figcaption><span>testApp/build.gradle</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: <span class="string">&#x27;com.android.application&#x27;</span></span><br><span class="line"></span><br><span class="line">android &#123;</span><br><span class="line">    compileSdkVersion <span class="number">29</span></span><br><span class="line">    buildToolsVersion <span class="string">&quot;29.0.3&quot;</span></span><br><span class="line"></span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        applicationId <span class="string">&quot;com.example.test&quot;</span></span><br><span class="line">        minSdkVersion <span class="number">24</span></span><br><span class="line">        targetSdkVersion <span class="number">29</span></span><br><span class="line">        versionCode <span class="number">1</span></span><br><span class="line">        versionName <span class="string">&quot;1.0&quot;</span></span><br><span class="line"></span><br><span class="line">        testInstrumentationRunner <span class="string">&quot;androidx.test.runner.AndroidJUnitRunner&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    buildTypes &#123;</span><br><span class="line">        release &#123;</span><br><span class="line">            minifyEnabled <span class="keyword">false</span></span><br><span class="line">            proguardFiles getDefaultProguardFile(<span class="string">&#x27;proguard-android-optimize.txt&#x27;</span>), <span class="string">&#x27;proguard-rules.pro&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">        debug &#123;</span><br><span class="line">            applicationIdSuffix <span class="string">&quot;.debug&quot;</span></span><br><span class="line">            debuggable <span class="keyword">true</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    flavorDimensions <span class="string">&quot;plan&quot;</span>, <span class="string">&quot;color&quot;</span></span><br><span class="line">    productFlavors &#123;</span><br><span class="line">        paid &#123;</span><br><span class="line">            dimension <span class="string">&quot;plan&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">        free &#123;</span><br><span class="line">            dimension <span class="string">&quot;plan&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">        purple &#123;</span><br><span class="line">            dimension <span class="string">&quot;color&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">        green &#123;</span><br><span class="line">            dimension <span class="string">&quot;color&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">        red &#123;</span><br><span class="line">            dimension <span class="string">&quot;color&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    implementation <span class="keyword">fileTree</span>(dir: <span class="string">&#x27;libs&#x27;</span>, <span class="keyword">include</span>: [<span class="string">&#x27;*.jar&#x27;</span>])</span><br><span class="line"></span><br><span class="line">    implementation <span class="string">&#x27;androidx.appcompat:appcompat:1.2.0&#x27;</span></span><br><span class="line">    implementation <span class="string">&#x27;androidx.constraintlayout:constraintlayout:1.1.3&#x27;</span></span><br><span class="line">    testImplementation <span class="string">&#x27;junit:junit:4.12&#x27;</span></span><br><span class="line">    androidTestImplementation <span class="string">&#x27;androidx.test.ext:junit:1.1.2&#x27;</span></span><br><span class="line">    androidTestImplementation <span class="string">&#x27;androidx.test.espresso:espresso-core:3.3.0&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>それではみなさま、良きAndroidライフを！</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.android.com/studio/build?hl=ja">https://developer.android.com/studio/build?hl=ja</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.android.com/studio/build/build-variants?hl=ja">https://developer.android.com/studio/build/build-variants?hl=ja</a></li>
+<li><a target="_blank" rel="noopener" href="https://iti.hatenablog.jp/entry/2015/06/22/084303">https://iti.hatenablog.jp/entry/2015/06/22/084303</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210120/&via=future_techblog&related=twitterapi%2Ctwitter&text=Android%E3%81%AE%E3%83%93%E3%83%AB%E3%83%89%E3%83%90%E3%83%AA%E3%82%A2%E3%83%B3%E3%83%88%E3%82%92%E3%82%A4%E3%83%81%E3%81%8B%E3%82%89%E7%90%86%E8%A7%A3%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">5</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210120/&t=Android%E3%81%AE%E3%83%93%E3%83%AB%E3%83%89%E3%83%90%E3%83%AA%E3%82%A2%E3%83%B3%E3%83%88%E3%82%92%E3%82%A4%E3%83%81%E3%81%8B%E3%82%89%E7%90%86%E8%A7%A3%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210120/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210120/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2021.03.16</span><span class="snscount">&#9825;4</span><a class="related-posts-link" href=/articles/20210316/ title="[CP連載2021も折り返しの6本目です！陽光麗らかなある春の日、ITコンサルタントのあなたの元に、ユーザーからの問い合わせが入りました。「すみません、モバイルアプリの調子が悪いので確認してもらえませんか。」">Firebaseで取得したログをBigQueryに連携してユーザー操作をトラッキングする</a></li><li class="related-posts-item"><span>2020.03.30</span><span class="snscount">&#9825;3</span><a class="related-posts-link" href=/articles/20200330/ title="こんにちは、Android Developerの佐藤です。モバイルアプリ品質強化の強い味方となってくれるFirebase Crashlyticsを紹介したいと思います！Firebaseとは、AndroidやiOSなどのモバイルアプリのバックエンド機能を提供してくれるサービスです。提供されているサービスは...">Serverless連載4: Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する</a></li><li class="related-posts-item"><span>2021.05.17</span><span class="snscount">&#9825;2</span><a class="related-posts-link" href=/articles/20210517a/ title="MONETマーケットプレイスで購入したAPIとFlutterを使って簡単なスマホアプリを作ってみます。">FlutterでMONETマーケットプレイスAPIを使ってみた</a></li><li class="related-posts-item"><span>2021.05.13</span><span class="snscount">&#9825;10</span><a class="related-posts-link" href=/articles/20210513b/ title="Flutterでの画面レイアウトの入門的な内容です。Flutterを触ったことがない方にも「こんな感じで画面が作れるんだな」というイメージがつくようお伝えできればと思います。また、私がつまずいたWidgetのサイズ調整についても記載します。"">Flutterレイアウト入門</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2020.03.11</span><span class="snscount">&#9825;541</span> <a href="/articles/20200311/" title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li>
+
+    <li><span>2021.08.12</span><span class="snscount">&#9825;159</span> <a href="/articles/20210812a/" title="TIGの伊藤真彦です。この記事はGo1.17連載の3記事目です。[Go1.17のリリースノート]にこのような記載があります。">Go 1.17のtesting新機能</a></li>
+
+    <li><span>2021.07.26</span><span class="snscount">&#9825;92</span> <a href="/articles/20210726a/" title="7/26（月）～8/3（水）の平日にかけて、GoでRDBに対してアクセスライブラリ（ORMとクエリビルダー）をテーマにした連載を始めます。">GoのORマッパー連載を始めます</a></li>
+
+    <li><span>2021.06.11</span><span class="snscount">&#9825;552</span> <a href="/articles/20210611a/" title="Pythonでお仕事する前提で、現在のところで自分が最適と考えるチーム開発のための環境整備についてまとめてみました。今までももろもろ散発的に記事に書いたりしていたのですが、Poetryで環境を作ってみたのと、過去のもろもろの情報がまとまったものが個人的にも欲しかったのでまとめました。">サーバーアプリ開発環境(Python／FastAPI)</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%9F%E7%92%B0%E5%A2%83"><span class="toc-text">使用した環境</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%9D%E3%82%82%E3%81%9D%E3%82%82%E3%81%AE%E3%83%93%E3%83%AB%E3%83%89%E3%81%AE%E4%BB%95%E7%B5%84%E3%81%BF"><span class="toc-text">そもそものビルドの仕組み</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%93%E3%83%AB%E3%83%89%E3%83%90%E3%83%AA%E3%82%A2%E3%83%B3%E3%83%88%E3%81%A8%E3%81%AF"><span class="toc-text">ビルドバリアントとは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9F%E9%9A%9B%E3%81%AB%E3%83%93%E3%83%AB%E3%83%89%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">実際にビルドしてみる</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%91%A0-%E3%83%93%E3%83%AB%E3%83%89%E3%82%BF%E3%82%A4%E3%83%972%E9%80%9A%E3%82%8A"><span class="toc-text">① ビルドタイプ2通り</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%91%A1-%E3%83%93%E3%83%AB%E3%83%89%E3%82%BF%E3%82%A4%E3%83%972%E9%80%9A%E3%82%8A%E3%80%81%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%83%95%E3%83%AC%E3%83%BC%E3%83%90%E3%83%BC2%E9%80%9A%E3%82%8A-flavorDimensionsA-2%E9%80%9A%E3%82%8A"><span class="toc-text">② ビルドタイプ2通り、プロダクトフレーバー2通り(flavorDimensionsA: 2通り)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%91%A2-%E3%83%93%E3%83%AB%E3%83%89%E3%82%BF%E3%82%A4%E3%83%972%E9%80%9A%E3%82%8A%E3%80%81%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%83%95%E3%83%AC%E3%83%BC%E3%83%90%E3%83%BC5%E9%80%9A%E3%82%8A-flavorDimensionsA-2%E9%80%9A%E3%82%8A%E3%80%81flavorDimensionsB-3%E9%80%9A%E3%82%8A"><span class="toc-text">③ ビルドタイプ2通り、プロダクトフレーバー5通り(flavorDimensionsA: 2通り、flavorDimensionsB: 3通り)</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-text">参考</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+    <li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+  
+    <li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+  
+    <li class=""><a href="/categories/VR/">VR (10)</a></li>
+  
+    <li class=""><a href="/categories/Security/">Security (2)</a></li>
+  
+    <li class=""><a href="/categories/Programming/">Programming (230)</a></li>
+  
+    <li class=""><a href="/categories/Design/">Design (9)</a></li>
+  
+    <li class=""><a href="/categories/Management/">Management (10)</a></li>
+  
+    <li class=""><a href="/categories/Infrastructure/">Infrastructure (151)</a></li>
+  
+    <li class=""><a href="/categories/DB/">DB (14)</a></li>
+  
+    <li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+  
+    <li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+  
+    <li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+  
+    <li class=""><a href="/categories/Business/">Business (4)</a></li>
+  
+  </ul>
+</div>
+
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>
