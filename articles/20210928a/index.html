@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>SQLのデータリネージツール、SQLLineageを試してみる | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTIG DXユニット真野です。Python連載の2本目です。普段はPython触らないのですが、データリネージという概念に興味をもったのと、それをサポートするためのPytnon製ツールがあったので触ってみます。 データリネージとは   DWHのようなデータ基盤を整える上で必要になってくる概念で、保持するデータの発生源や、どのシステムがどう加工して保存されたかと言った流れを追跡できるようにす">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SQLのデータリネージツール、SQLLineageを試してみる | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210928a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIG DXユニット真野です。Python連載の2本目です。普段はPython触らないのですが、データリネージという概念に興味をもったのと、それをサポートするためのPytnon製ツールがあったので触ってみます。 データリネージとは   DWHのようなデータ基盤を整える上で必要になってくる概念で、保持するデータの発生源や、どのシステムがどう加工して保存されたかと言った流れを追跡できるようにす">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210928a/データリネージ概念.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210928a/sqllineageのサンプル実行結果.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210928a/内部結合SQLのグラフ表示.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210928a/Oracle記法の結合も表示されている図.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210928a/複数SQLの表示結果.png">
+<meta property="article:published_time" content="2021-09-27T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-28T01:01:34.736Z">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="データリネージュ">
+<meta property="article:tag" content="データガバナンス">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210928a/データリネージ概念.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210928a/">
+  <meta content="Python,データリネージュ,データガバナンス" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    <h2 itemprop="name" class="article-title">SQLのデータリネージツール、SQLLineageを試してみる
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210928a_SQLのデータリネージツール、SQLLineageを試してみる.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210928a_SQLのデータリネージツール、SQLLineageを試してみる" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98">真野隼記</a></li></li>
+            <li class="blog-info-item"><a href="/articles/2021/"><time datetime="2021-09-27T15:00:00.000Z" itemprop="datePublished">2021.09.28</time></a>
+</li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Python/" title="Pythonタグの記事へ">Python</a>
+  
+    
+    <a href="/tags/データリネージュ/" title="データリネージュタグの記事へ">データリネージュ</a>
+  
+    
+    <a href="/tags/データガバナンス/" title="データガバナンスタグの記事へ">データガバナンス</a>
+  
+
+</li>
+          </ul>
+          
+  <div class="article-category">
+    
+    Category:
+    
+    <a class="article-category-link" href="/categories/Programming/">Programming</a>
+  </div>
+
+
+        </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>TIG DXユニット真野です。<a href="/articles/20210927b/">Python連載</a>の2本目です。普段はPython触らないのですが、データリネージという概念に興味をもったのと、それをサポートするためのPytnon製ツールがあったので触ってみます。</p>
+<h2 id="データリネージとは"><a href="#データリネージとは" class="headerlink" title="データリネージとは"></a>データリネージとは</h2><img src="/images/20210928a/データリネージ概念.png" alt="データリネージ概念.png" width="1200" height="503" loading="lazy">
+
+
+<p>DWHのようなデータ基盤を整える上で必要になってくる概念で、保持するデータの発生源や、どのシステムがどう加工して保存されたかと言った流れを追跡できるようにすることです。データのトレーサビリティとも言うかなと思います。追跡可能にすることで、異常データの追跡（要はどこのETL処理で考慮漏れがでたりバグっちゃったのか）や依存関係などを捉えることができます。何かしらの分析にそのデータを利用すべきかどうかの重要な材料になるのは間違いないでしょう。システム開発においての影響度調査などにも便利かもしれませんね。</p>
+<p>以下のページなどが参考になるかと思います</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/architecture/architecture-concept-data-lineage-systems-in-a-data-warehouse?hl=ja">データ ウェアハウス用のデータリネージ システム - Google Cloud</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/blog/ja/products/data-analytics/architecting-a-data-lineage-system-for-bigquery">BigQuery 向けにデータリネージ システムを構築 - Google Cloud</a></li>
+</ul>
+<p>メタデータ管理というとベンダーごとに規格が乱立しそうですがオープンリネージという取り組みもあるようです。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/OpenLineage/OpenLineage">https://github.com/OpenLineage/OpenLineage</a></li>
+</ul>
+<p>ちなみに、リネージという単語を自分は聞き覚えがありませんでしたが、以下のような出自とか血統を指すようです。</p>
+<blockquote>
+<p>リネージは、始祖を含む成員の構成が具体的にたどれる出自集団（＝多くは父系か母系だが現在ではその両方あ るいは任意の親族集団）のことをさします。出自（しゅつじ）とは「自分はなになに一族、なになに家の出身だ」という、親族の出身の出所を示す用語です。<br><a target="_blank" rel="noopener" href="https://www.cscd.osaka-u.ac.jp/user/rosaldo/121110lineage_clan.html">https://www.cscd.osaka-u.ac.jp/user/rosaldo/121110lineage_clan.html</a></p>
+</blockquote>
+<p>積極的に使っていこうと思います。</p>
+<h2 id="データリネージの分類"><a href="#データリネージの分類" class="headerlink" title="データリネージの分類"></a>データリネージの分類</h2><p>データリネージを構成するシステムは、アクティブかパッシブかで分類できるそうです。</p>
+<ul>
+<li><strong>アクティブ</strong>: データパイプライン側がソース情報と変換情報をリネージ側に明示的に提供</li>
+<li><strong>パッシブ</strong>: SQLの実行ログを解析しリネージ情報を登録する。それによりデータリネージの更新呼び出しをパイプラインに追加するなどの手間を削減する。</li>
+</ul>
+<p>またデータの追跡と言っても、粒度で複数のレベルが定義されています。</p>
+<ul>
+<li>エンティティ（テーブル）レベル</li>
+<li>列レベル</li>
+<li>行レベル</li>
+</ul>
+<p>このうち最も簡易的だと思う（それでも実践的です）テーブルレベルのデータリネージを行えそうなSQLLineageを触ってみます。</p>
+<h2 id="SQLLineage"><a href="#SQLLineage" class="headerlink" title="SQLLineage"></a>SQLLineage</h2><p>SQLLineageはデータリネージの中でも、SQLに特化したツールです。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/reata/sqllineage">https://github.com/reata/sqllineage</a></li>
+</ul>
+<p>READMEにも記載されている通り、pipでインストールできます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># インストール</span></span><br><span class="line">$ pip install sqllineage</span><br></pre></td></tr></table></figure>
+
+<h3 id="サンプル実行"><a href="#サンプル実行" class="headerlink" title="サンプル実行"></a>サンプル実行</h3><p>実行は簡単です。<code>-g</code>オプションでグラフ表示されます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># サンプルの実行</span></span><br><span class="line">$ sqllineage -g -e <span class="string">&quot;insert into db1.table1 select * from db2.table2&quot;</span></span><br><span class="line"> * SQLLineage Running on http://localhost:5000/?e=insert+into+db1.table1+select+%2A+from+db2.table2</span><br></pre></td></tr></table></figure>
+
+<p>コンソールに出力されたURLを開くと、次のような <code>db2.table2</code> から <code>db1.table1</code> にデータが流れていることが表示されます。素敵そう！</p>
+<img src="/images/20210928a/sqllineageのサンプル実行結果.png" alt="sqllineageのサンプル実行結果.png" width="1200" height="367" loading="lazy">
+
+<h3 id="内部結合SQL"><a href="#内部結合SQL" class="headerlink" title="内部結合SQL"></a>内部結合SQL</h3><p>次に内部結合したSQLでどうなるか試してみます。</p>
+<figure class="highlight sql"><figcaption><span>join.sql</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> table1 (name, text)</span><br><span class="line">  <span class="keyword">SELECT</span> </span><br><span class="line">   <span class="string">&#x27;test&#x27;</span>       <span class="keyword">AS</span> name,</span><br><span class="line">    t3.text     <span class="keyword">AS</span> text  </span><br><span class="line">  <span class="keyword">FROM</span> </span><br><span class="line">   table2 t2</span><br><span class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> table3 t3 <span class="keyword">ON</span> t2.id <span class="operator">=</span> t3.id</span><br></pre></td></tr></table></figure>
+
+<p><code>-f</code>オプションでファイルを指定できます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sqllineage -g -f join.sql</span><br><span class="line">* SQLLineage Running on http://localhost:5000/?f=join.sql</span><br></pre></td></tr></table></figure>
+
+<img src="/images/20210928a/内部結合SQLのグラフ表示.png" alt="内部結合SQLのグラフ表示.png" width="1200" height="359" loading="lazy">
+
+<p>table2, table3がtable1の入力になっていることがわかります。</p>
+<h3 id="JOINを用いない結合SQL"><a href="#JOINを用いない結合SQL" class="headerlink" title="JOINを用いない結合SQL"></a>JOINを用いない結合SQL</h3><p>私が最初に触ったRDBはOracleだったので、せっかくなのでOracleのJOINを利用しないSQLを試してみます。</p>
+<figure class="highlight sql"><figcaption><span>oracle.sql</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> destination (emp_id, dept_id, dept_name)</span><br><span class="line"><span class="keyword">select</span></span><br><span class="line">  a.emp_id,b.dept_id,b.dept_name</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">  emp a,dept b</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">  a.dept_id <span class="operator">=</span> b.dept_id</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sqllineage -g -f oracle.sql</span><br><span class="line"> * SQLLineage Running on http://localhost:5000/?f=oracle.sql</span><br></pre></td></tr></table></figure>
+
+<p>この記法でも認識してくれるようです。凄い。</p>
+<img src="/images/20210928a/Oracle記法の結合も表示されている図.png" alt="Oracle記法の結合も表示されている図.png" width="1200" height="517" loading="lazy">
+
+
+<p>sqllineageは内部的には<a target="_blank" rel="noopener" href="https://github.com/andialbrecht/sqlparse">andialbrecht/sqlparse</a>を利用しているので、対応具合はそちらを見るのが良さそうです。例えば、<a target="_blank" rel="noopener" href="https://github.com/andialbrecht/sqlparse/issues/311">Oracle 11gのPivot/Unpivot</a>は2021.09.28時点だとまだ対応して無さそうなのがわかります。</p>
+<h3 id="1処理で複数のSQLが登場する場合"><a href="#1処理で複数のSQLが登場する場合" class="headerlink" title="1処理で複数のSQLが登場する場合"></a>1処理で複数のSQLが登場する場合</h3><p>ここで個人的に気になったのは、1つのETLで複数のSQLが呼ばれる、多段になっているケースです。これはREADMEをちゃんと読めばちゃんと書かれています。<code>;</code>区切りで複数のSQLを記載すれば良いとのこと。</p>
+<p>例えば、あるプログラムで2つのSQLが呼ばれているとします。その場合はカンマ区切りでSQLログを集約すれば良いです。</p>
+<figure class="highlight sql"><figcaption><span>multiple.sql</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> tbl3 (name, text)</span><br><span class="line">  <span class="keyword">SELECT</span> </span><br><span class="line">   <span class="string">&#x27;test&#x27;</span>       <span class="keyword">AS</span> name,</span><br><span class="line">    t1.text     <span class="keyword">AS</span> text  </span><br><span class="line">  <span class="keyword">FROM</span> </span><br><span class="line">   tbl1 t1</span><br><span class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> tbl2 t2 <span class="keyword">ON</span> t1.id <span class="operator">=</span> t2.id</span><br><span class="line">;</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> tbl5 (name, text)</span><br><span class="line">  <span class="keyword">SELECT</span> </span><br><span class="line">   <span class="string">&#x27;test&#x27;</span>       <span class="keyword">AS</span> name,</span><br><span class="line">    t3.text     <span class="keyword">AS</span> text  </span><br><span class="line">  <span class="keyword">FROM</span> </span><br><span class="line">   tbl3 t3</span><br><span class="line">  <span class="keyword">INNER</span> <span class="keyword">JOIN</span> tbl4 t4 <span class="keyword">ON</span> t3.id <span class="operator">=</span> t4.id</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+
+<p>これをsqllineageの入力とします。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;sqllineage -g -f multiple.sql</span><br><span class="line"> * SQLLineage Running on http://localhost:5000/?f=multiple.sql</span><br></pre></td></tr></table></figure>
+
+<p>結果は次のように、<code>;</code>で区切られた複数のSQLのフローをまとめて表示してくれます。</p>
+<img src="/images/20210928a/複数SQLの表示結果.png" alt="複数SQLの表示結果.png" width="1200" height="517" loading="lazy">
+
+<p>解析したい単位でSQLをまとめると、分析部分はsqllineageに頼れるということです。良い棲み分けだなと感じました。</p>
+<h2 id="SQL結果セットをアプリ側で読み込み、インサートする場合"><a href="#SQL結果セットをアプリ側で読み込み、インサートする場合" class="headerlink" title="SQL結果セットをアプリ側で読み込み、インサートする場合"></a>SQL結果セットをアプリ側で読み込み、インサートする場合</h2><p>Webアプリケーションだとよくありそうな処理方式ですが、この場合の解析はSQLLineageでは難しそうです（調べきれませんでした）。</p>
+<p>おそらくSQLLineageのスコープ外だと思われるので、別のツール(<a target="_blank" rel="noopener" href="https://marquezproject.github.io/marquez/">Marquez</a>など)の検討を考えたほうが良いかなと思います。</p>
+<h2 id="列（カラム）レベルのデータリネージ"><a href="#列（カラム）レベルのデータリネージ" class="headerlink" title="列（カラム）レベルのデータリネージ"></a>列（カラム）レベルのデータリネージ</h2><p>今の所、sqllineageは列レベルのデータリネージサポートは行わない方針のようです。理由は全てのSQLシステムに対応したメタデータサービスが存在しないためだそうです。実際のDBサーバにアクセスしないポリシーに感じられます。どういうことかと言うと、 <code>select *</code> とされるとこのSQLクエリだけ見てもカラムレベルのトレースが無理になるからです。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://sqllineage.readthedocs.io/en/latest/behind_the_scene/dos_and_donts.html">https://sqllineage.readthedocs.io/en/latest/behind_the_scene/dos_and_donts.html</a></li>
+</ul>
+<p><code>select *</code> には対応しないけど、ちゃんとSQLに項目を書く前提で、カラムレベルも将来のバージョンでは考えているようなことも記載されていました。期待したいですね。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>データリネージのパッシブなデータ収集に、SQLログを解析するという手法があります。SQLLineageを用いると簡単に解析結果を確認・可視化できるためオススメです。</p>
+<p>データ基盤といったプラットフォーム開発者以外にも、複雑なSQLの構造を可視化したい人にも使えるかと思います。</p>
+<p>SQLユーザの皆様のお役にたてば幸いです。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210928a/&via=future_techblog&related=twitterapi%2Ctwitter&text=SQL%E3%81%AE%E3%83%87%E3%83%BC%E3%82%BF%E3%83%AA%E3%83%8D%E3%83%BC%E3%82%B8%E3%83%84%E3%83%BC%E3%83%AB%E3%80%81SQLLineage%E3%82%92%E8%A9%A6%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210928a/&t=SQL%E3%81%AE%E3%83%87%E3%83%BC%E3%82%BF%E3%83%AA%E3%83%8D%E3%83%BC%E3%82%B8%E3%83%84%E3%83%BC%E3%83%AB%E3%80%81SQLLineage%E3%82%92%E8%A9%A6%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210928a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210928a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2021.09.27</span><span class="snscount">&#9825;2</span><a class="related-posts-link" href=/articles/20210927b/ title="最近社内でも使う人が徐々に増えている？Pythonの連載記事を開始しようと思います。本エントリーではPythonドキュメントの日本語訳プロジェクトに参加してみた話を紹介します。">Python連載始まります＆Python翻訳プロジェクト</a></li><li class="related-posts-item"><span>2021.09.24</span><span class="snscount">&#9825;9</span><a class="related-posts-link" href=/articles/20210924a/ title=" Gateway+Lambda という構成でWebAPI開発を行う際、ちょっと便利に使える疎通方法をまとめます。API GatewayですがPublicなエンドポイントがあれば `curl`コマンドや`Postman`を用いての動作検証も容易だと思います。">VPC内のAmazon API Gatewayをインターネットオーバーで疎通確認する</a></li><li class="related-posts-item"><span>2021.09.01</span><span class="snscount">&#9825;68</span><a class="related-posts-link" href=/articles/20210901a/ title="こんにちは！Strategic AI Groupの金子です。夏の自由研究ブログ連載2021として医薬品副作用データベースにWord2Vecを適用し性能を評価、医薬品-原疾患-有害事象の可視化を行いました。本記事で作成したプログラムは医薬品の情報を扱っていますが、医療機器には該当せず人の疾病の診断、治療、予防を目的としておりません。本記事の内容に基づいて医学的判断は行わないようお願いします。">医薬品副作用データベースから医薬品同士の関係を学習・評価・可視化する</a></li><li class="related-posts-item"><span>2021.08.26</span><span class="snscount">&#9825;11</span><a class="related-posts-link" href=/articles/20210826b/ title="この記事では個人的に大好きなフォワードプロキシの概要と、Goでの既存のOSSライブラリを利用した実装例をまとめました。このテーマに決めた理由は以下です。">ローカルフォワードプロキシでHTTP要求時に機能横断な処理を差し込み</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.07.26</span><span class="snscount">&#9825;92</span> <a href="/articles/20210726a/" title="7/26（月）～8/3（水）の平日にかけて、GoでRDBに対してアクセスライブラリ（ORMとクエリビルダー）をテーマにした連載を始めます。">GoのORマッパー連載を始めます</a></li>
+
+    <li><span>2021.06.21</span><span class="snscount">&#9825;18866</span> <a href="/articles/20210621a/" title="HTML5が2021年の1月に廃止されました。Webエンジニアとしてバリバリ活躍されてる方やエグゼクティブテックリードのような肩書きを持つ方にとっては「何をいまさら」という話題かと思います。しかしながら、今年も新人さん入ってきてくださったので、プログラミングを学習中にHTML5という文字列に悩まされないように...">どうしてHTML5が廃止されたのか</a></li>
+
+    <li><span>2021.06.04</span><span class="snscount">&#9825;165</span> <a href="/articles/20210604a/" title="巨大な学習済みの機械学習モデルとか、検索用インデックスをデプロイする場合に、どうやってデプロイするか、というのは色々選択肢があります。以前、ちょびっとだけ「どうやってデプロイしましょうかね」というのを悩んだ時期があったのですが、今回、こんな方式が考えられるんじゃないか、というのを改めて調べてリストアップしてみました。">続・サーバーレス検索エンジン：巨大な静的ファイルを扱うケースについて考える</a></li>
+
+    <li><span>2021.03.25</span><span class="snscount">&#9825;13</span> <a href="/articles/20210325/" title="自然言語処理でよく使われるWord2VecやTransformerをログデータやテーブルデータの予測・分析に活用するためのオレオレベースラインの紹介を行います。対象読者は既にWord2VecやTransformerについて知識があり、その上自身で改造を行いたい人や...">Transformerを用いた表現学習・推薦の実装</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%87%E3%83%BC%E3%82%BF%E3%83%AA%E3%83%8D%E3%83%BC%E3%82%B8%E3%81%A8%E3%81%AF"><span class="toc-text">データリネージとは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%87%E3%83%BC%E3%82%BF%E3%83%AA%E3%83%8D%E3%83%BC%E3%82%B8%E3%81%AE%E5%88%86%E9%A1%9E"><span class="toc-text">データリネージの分類</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SQLLineage"><span class="toc-text">SQLLineage</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB%E5%AE%9F%E8%A1%8C"><span class="toc-text">サンプル実行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E9%83%A8%E7%B5%90%E5%90%88SQL"><span class="toc-text">内部結合SQL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JOIN%E3%82%92%E7%94%A8%E3%81%84%E3%81%AA%E3%81%84%E7%B5%90%E5%90%88SQL"><span class="toc-text">JOINを用いない結合SQL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E5%87%A6%E7%90%86%E3%81%A7%E8%A4%87%E6%95%B0%E3%81%AESQL%E3%81%8C%E7%99%BB%E5%A0%B4%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88"><span class="toc-text">1処理で複数のSQLが登場する場合</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SQL%E7%B5%90%E6%9E%9C%E3%82%BB%E3%83%83%E3%83%88%E3%82%92%E3%82%A2%E3%83%97%E3%83%AA%E5%81%B4%E3%81%A7%E8%AA%AD%E3%81%BF%E8%BE%BC%E3%81%BF%E3%80%81%E3%82%A4%E3%83%B3%E3%82%B5%E3%83%BC%E3%83%88%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88"><span class="toc-text">SQL結果セットをアプリ側で読み込み、インサートする場合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%97%EF%BC%88%E3%82%AB%E3%83%A9%E3%83%A0%EF%BC%89%E3%83%AC%E3%83%99%E3%83%AB%E3%81%AE%E3%83%87%E3%83%BC%E3%82%BF%E3%83%AA%E3%83%8D%E3%83%BC%E3%82%B8"><span class="toc-text">列（カラム）レベルのデータリネージ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (232)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (152)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (57)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (35)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (16)</a></li>
+<li class=""><a href="/categories/DB/">DB (14)</a></li>
+<li class=""><a href="/categories/VR/">VR (10)</a></li>
+<li class=""><a href="/categories/Management/">Management (10)</a></li>
+<li class=""><a href="/categories/Design/">Design (9)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+<li class=""><a href="/categories/Business/">Business (4)</a></li>
+<li class=""><a href="/categories/Security/">Security (2)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/9-IoT-e15lvqp" title="フューチャーがお届けするポッドキャストです。#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと" target="_blank" rel="noopener">#9 ファクトリーIoT案件のリードエンジニアとして心がけていたこと</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="other-blog-link">
+<h2 class="margin-top-30">リンク</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">Connpass</a></li>
+    <li><a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a></li>
+    <li><a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a></li>
+    <li><a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a></li>
+  </ul>
+</div>
+
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN BOTTOM ABOUT BLOCK -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。記事についてのお問い合わせはTwitterのDMで連絡いただけると幸いです。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <p>新卒・キャリア採用は<a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">こちら</a>です。
+              ブログ記事以外のお問い合わせについては<a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">こちらのフォーム</a>からご依頼ください。</p>
+              </p>
+              <p>ソーシャルメディアポリシーは<a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">こちら</a>です。</p>
+            </div>
+            <!-- END BOTTOM ABOUT BLOCK -->
+            <!-- BEGIN BOTTOM CONTACTS -->
+            <div class="col-md-4 col-sm-6 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                東京都品川区大崎1-2-2<br>
+                アートヴィレッジ大崎セントラルタワー<br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a><br>
+              </address>
+            </div>
+              <div class="col-md-4 col-sm-6 pre-footer-col">
+                <!-- Twitterフォローボタン -->
+                <div class="social-btn twitter-btn twitter-follow-btn">
+                  <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                    <i></i><span class="tw-btn-label">@future_techblogさんをフォロー</span>
+                  </a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <!-- END PRE-FOOTER -->
+      <!-- BEGIN FOOTER -->
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <!-- BEGIN COPYRIGHT -->
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>
