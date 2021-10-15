@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>AWS利用料金をSlackに円グラフ付きで投稿する | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは、フューチャーにアルバイトとして参加中の中山です。 今日はアルバイトで参加しているプロジェクト内でAWSの利用料金をSlackに通知する仕組みを作成したので共有したいと思います。 私が参加しているプロジェクトでは、毎月AWSにいくらかかっているのか、加えてそれぞれのサービスは全体のコストの内どのぐらいの割合を占めているのか知りたいという話があり、今回AWSから利用額を取得しSla">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS利用料金をSlackに円グラフ付きで投稿する | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20211015a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、フューチャーにアルバイトとして参加中の中山です。 今日はアルバイトで参加しているプロジェクト内でAWSの利用料金をSlackに通知する仕組みを作成したので共有したいと思います。 私が参加しているプロジェクトでは、毎月AWSにいくらかかっているのか、加えてそれぞれのサービスは全体のコストの内どのぐらいの割合を占めているのか知りたいという話があり、今回AWSから利用額を取得しSla">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20211015a/cost-explorer.drawio.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20211015a/output.png">
+<meta property="article:published_time" content="2021-10-14T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-10-14T09:19:03.467Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Slack">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20211015a/cost-explorer.drawio.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20211015a/">
+  <meta content="AWS,Go,Slack" name="keywords">
+  <meta content="中山楓太" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">AWS利用料金をSlackに円グラフ付きで投稿する
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20211015a_AWS利用料金をSlackに円グラフ付きで投稿する.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20211015a_AWS利用料金をSlackに円グラフ付きで投稿する" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-10-14T15:00:00.000Z" itemprop="datePublished">2021.10.15</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E4%B8%AD%E5%B1%B1%E6%A5%93%E5%A4%AA" title="中山楓太さんの記事一覧へ" class="post-author">中山楓太</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/Slack/" title="Slackタグの記事へ" class="tag-list-link">Slack</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、フューチャーにアルバイトとして参加中の中山です。</p>
+<p>今日はアルバイトで参加しているプロジェクト内でAWSの利用料金をSlackに通知する仕組みを作成したので共有したいと思います。</p>
+<p>私が参加しているプロジェクトでは、毎月AWSにいくらかかっているのか、加えてそれぞれのサービスは全体のコストの内どのぐらいの割合を占めているのか知りたいという話があり、今回AWSから利用額を取得しSlackに通知する仕組みを作る流れとなりました。</p>
+<p>今回の記事では、実際に採用したAPIやサービスに加え、採用を検討したが実際には利用しなかったサービスなども交え、似たような仕組みを作ってみたいと思っている方に少しでも情報提供できればと考えています。</p>
+<p>参考：<a target="_blank" rel="noopener" href="https://github.com/furiko/aws-cost-notify-to-slack">今回のソースコード</a></p>
+<h1 id="システム概要"><a href="#システム概要" class="headerlink" title="システム概要"></a>システム概要</h1><p>それでは実際にどのような仕組みで動いているか説明します。</p>
+<p>図のように、</p>
+<ol>
+<li>CloudWatchにより定時起動でLambdaを呼び出す</li>
+<li>GetCostAndUsageAPIを用いて先月分の利用料金を取得し、<a target="_blank" rel="noopener" href="https://github.com/wcharczuk/go-chart">go-chart</a>を用いて円グラフ化</li>
+<li>SlackにWebhookとfiles.uploadを用いて通知</li>
+</ol>
+<p>という仕組みになっています。Cloudwatchでは毎月1日にLambdaが起動するように設定しています。所属しているプロジェクトではGo言語を採用しているため、go-chartを採用してグラフを作成しています。</p>
+<p>Webhookは、各サービスの利用料金を箇条書きで通知するために利用しており、files.uploadは円グラフをアップロードするために利用しています。</p>
+<img src="/images/20211015a/cost-explorer.drawio.png" alt="cost-explorer.drawio.png" width="570" height="352" loading="lazy">
+
+<h2 id="投稿例"><a href="#投稿例" class="headerlink" title="投稿例"></a>投稿例</h2><p>Slackに実際に投稿されるものは、各サービスの利用料金を箇条書きにしたものとデータを元に作成された円グラフの2点です。以下に例を示します。<br>箇条書きの方は都合上、Othersという項目を追加していますが、実際にはAPIから返ってきた値を全てそのまま載せています。</p>
+<h3 id="AWS利用料金箇条書き"><a href="#AWS利用料金箇条書き" class="headerlink" title="AWS利用料金箇条書き"></a>AWS利用料金箇条書き</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Monthly Report</span><br><span class="line">AWS Account: 111111111111</span><br><span class="line">Start: 2021-08-01, End: 2021-08-31</span><br><span class="line">Total Cost: $1000</span><br><span class="line">Amazon DynamoDB: 500.00(50)%</span><br><span class="line">AWS Lambda: 200.00(20)%</span><br><span class="line">Amazon Kinesis: 150.00(15)%</span><br><span class="line">Others: 100.00(10)%</span><br><span class="line">Tax: 50.00(5)%</span><br></pre></td></tr></table></figure>
+
+<h3 id="利用料金円グラフ"><a href="#利用料金円グラフ" class="headerlink" title="利用料金円グラフ"></a>利用料金円グラフ</h3><img src="/images/20211015a/output.png" alt="output.png" width="512" height="512" loading="lazy">
+
+<h2 id="GetCostAndUsage-API"><a href="#GetCostAndUsage-API" class="headerlink" title="GetCostAndUsage API"></a>GetCostAndUsage API</h2><p><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/aws-cost-management/aws-cost-explorer/">AWS Cost Explorer</a>が提供するAPIで、指定した期間のアカウントに紐づくAWSの利用料金を取得することができます。パラメータの指定方法など詳細は、<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/aws-cost-management/latest/APIReference/API_GetCostAndUsage.html">ドキュメント</a>を参照ください。</p>
+<p>ここでは、1ヶ月分のAWS各サービスの利用料金を取得する場合のGo言語の場合のサンプルを載せておきます。<br>注意点として、このAPIは<code>us-east-1</code>でのみ提供されるのでLambdaを<code>ap-northeast-1</code>などにデプロイしている場合でもAPIを呼び出す際には必ず<code>us-east-1</code>を指定する必要があります。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">granularity := <span class="string">&quot;MONTHLY&quot;</span></span><br><span class="line">metrics := []<span class="keyword">string</span>&#123;<span class="string">&quot;BlendedCost&quot;</span>&#125;</span><br><span class="line"></span><br><span class="line">svc := costexplorer.New(session.Must(session.NewSession(&amp;aws.Config&#123;</span><br><span class="line">    Region: aws.String(<span class="string">&quot;us-east-1&quot;</span>), <span class="comment">// GetCostAndUsageAPIはus-east-1のみで提供</span></span><br><span class="line">&#125;)))</span><br><span class="line"></span><br><span class="line">result, err := svc.GetCostAndUsage(&amp;costexplorer.GetCostAndUsageInput&#123;</span><br><span class="line">    TimePeriod: &amp;costexplorer.DateInterval&#123; <span class="comment">// 取得したい期間を指定</span></span><br><span class="line">        Start: aws.String(start),</span><br><span class="line">        End:   aws.String(end),</span><br><span class="line">    &#125;,</span><br><span class="line">    Granularity: aws.String(granularity),</span><br><span class="line">    GroupBy: []*costexplorer.GroupDefinition&#123;</span><br><span class="line">        &#123;</span><br><span class="line">            Type: aws.String(<span class="string">&quot;DIMENSION&quot;</span>),</span><br><span class="line">            Key:  aws.String(<span class="string">&quot;SERVICE&quot;</span>),</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">    Metrics: aws.StringSlice(metrics),</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>GoSDKの<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/sdk-for-go/api/service/costexplorer/">ドキュメント</a>も必要な場合は参照ください。</p>
+<h2 id="円グラフ作成"><a href="#円グラフ作成" class="headerlink" title="円グラフ作成"></a>円グラフ作成</h2><p>GetCostAndUsageAPIで取得できたAWS各サービスごとの利用料金を用いて円グラフを作成します。今回はGo言語で実装したいという条件があったので、<a target="_blank" rel="noopener" href="https://github.com/wcharczuk/go-chart">go-chart</a>を用いて作成しました。基本的には<a target="_blank" rel="noopener" href="https://github.com/wcharczuk/go-chart/blob/master/examples/pie_chart/main.go">サンプル</a>のコード参考にし、全体に占める割合が少ないサービスはOthersとしてまとめました。また、今回はLambda上で画像を生成し、Slackに送信している関係上、一度pngファイルに書き出すなどせず、バッファに画像データを書き込んで送信する形をとりました。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> values []chart.Value</span><br><span class="line">others := chart.Value&#123;</span><br><span class="line">    Label: <span class="string">&quot;Others&quot;</span>,</span><br><span class="line">    Value: <span class="number">0.0</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// グラフデータの作成</span></span><br><span class="line"><span class="keyword">for</span> _, v := <span class="keyword">range</span> results &#123;</span><br><span class="line">    <span class="comment">// 全体に占める割合が1.0%未満のサービスはOthersにまとめる</span></span><br><span class="line">    <span class="keyword">if</span> v.Ratio &lt; <span class="number">1.0</span> &#123;</span><br><span class="line">        others.Value += v.Cost</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    &#125;</span><br><span class="line">    values = <span class="built_in">append</span>(values, chart.Value&#123;</span><br><span class="line">        Value: v.Cost,</span><br><span class="line">        Label: v.Name,</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line">values = <span class="built_in">append</span>(values, others)</span><br><span class="line"></span><br><span class="line"><span class="comment">// グラフの作成</span></span><br><span class="line">pie := chart.PieChart&#123;</span><br><span class="line">    Width:  <span class="number">512</span>,</span><br><span class="line">    Height: <span class="number">512</span>,</span><br><span class="line">    Values: values,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// バッファに画像データを書き込む</span></span><br><span class="line">buffer := bytes.NewBuffer([]<span class="keyword">byte</span>&#123;&#125;)</span><br><span class="line">err := pie.Render(chart.PNG, buffer)</span><br></pre></td></tr></table></figure>
+
+<h3 id="GetMetricsWidgetImage-API"><a href="#GetMetricsWidgetImage-API" class="headerlink" title="GetMetricsWidgetImage API"></a>GetMetricsWidgetImage API</h3><p>はじめ、円グラフを作成しようと探していた際に<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonCloudWatch/latest/APIReference/API_GetMetricWidgetImage.html">GetMetricsWidgetImage</a>というAPIを知りました。このAPIを利用して前日との利用料の差額を出している記事なども見つけましたが、このAPIは利用料金の円グラフ化はできるのですが、<strong>対象となるデータはCloudWatchで監視できるリソースのみ</strong>であり、GetCostAndUsageAPIで取得できる全てのデータを対象とすることはできなかったため採用を見送りました。</p>
+<p>私自身、初めはグラフ作成に必要なデータを送れば円グラフを作成して返してくれるAPIだと思っていたのですが、上述の通り、Cloudwatchの監視メトリクスをグラフ化するためのAPIであり、汎用的にグラフ作成に用いるAPIではありませんでした。</p>
+<h2 id="Slack連携"><a href="#Slack連携" class="headerlink" title="Slack連携"></a>Slack連携</h2><p>次に、上記で取得した各サービスの利用料金と円グラフをSlackに連携する方法について紹介します。<br>開発当初Webhookを用いてテキストのみをSlack連携していたところに円グラフを後から追加したため、今回のサービスではWebhookとfiles.uploadの両方を用いていますが、Bot Tokenに適切なScopeの設定をすることで自作のSlackApp1つで、テキストの投稿・円グラフのアップロードの両方を実現可能かと思います。</p>
+<h3 id="Webhook"><a href="#Webhook" class="headerlink" title="Webhook"></a>Webhook</h3><p>Slackに対して通知する代表的な手段として<a target="_blank" rel="noopener" href="https://slack.com/intl/ja-jp/help/articles/115005265063-Slack-%E3%81%A7%E3%81%AE-Incoming-Webhook-%E3%81%AE%E5%88%A9%E7%94%A8">Incoming Webhook</a>があります。今回のシステムではこちらを利用して、各サービスごとの使用量を箇条書きで通知しています。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">endpoint := SLACKENDPOINT</span><br><span class="line"></span><br><span class="line">body := <span class="keyword">struct</span> &#123;</span><br><span class="line">    Text <span class="keyword">string</span> <span class="string">`json:&quot;text&quot;`</span></span><br><span class="line">&#125;&#123;</span><br><span class="line">    Text: fmt.Sprintf(<span class="string">&quot;*Monthly Report*\n %v&quot;</span>, cost),</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">jsonString, err := json.Marshal(body)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">req, err := http.NewRequest(http.MethodPost, endpoint, bytes.NewBuffer(jsonString))</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br><span class="line">req.Header.Set(<span class="string">&quot;Content-Type&quot;</span>, <span class="string">&quot;application/json&quot;</span>)</span><br><span class="line"></span><br><span class="line">_, err = http.DefaultClient.Do(req)</span><br></pre></td></tr></table></figure>
+
+<h3 id="files-upload"><a href="#files-upload" class="headerlink" title="files.upload"></a>files.upload</h3><p>Webhookではファイル自体のアップロードはできないため、files.uploadを用いてLambda内で生成した円グラフの画像をSlackにアップロードしています。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">api := slack.New(SLACKAPITOKEN)</span><br><span class="line"></span><br><span class="line">_, err := api.UploadFile(</span><br><span class="line">    slack.FileUploadParameters&#123;</span><br><span class="line">        Reader:   b,</span><br><span class="line">        Filename: <span class="string">&quot;output.png&quot;</span>,</span><br><span class="line">        Channels: []<span class="keyword">string</span>&#123;SLACKCHANNEL&#125;,</span><br><span class="line">    &#125;)</span><br></pre></td></tr></table></figure>
+
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>AWSのAPIを用いて月々の使用量を取得し、Slackに通知する仕組みの紹介をしてきました。</p>
+<p>円グラフを作成して各サービスの割合を出し、各サービスのコスト比重を見返すことは今後のAWS利用の効率化などの考察の一助となると思いますので、興味がある方はぜひこの機会にSlackでAWS利用料金をチェックする仕組みを組んでみてください。</p>
+<p>最後に今回のサービスで利用しているコードの全文を載せておきます。最後まで読んでいただきありがとうございました。</p>
+<h2 id="コード全文"><a href="#コード全文" class="headerlink" title="コード全文"></a>コード全文</h2><p>全文：<a target="_blank" rel="noopener" href="https://github.com/furiko/aws-cost-notify-to-slack">今回のソースコード</a></p>
+<p><strong>環境変数</strong> について<br>４つ利用しています。実行前に事前に準備をお願いします。</p>
+<ul>
+<li>SLACK_ENDPOINT: Webhookの投稿先URLです</li>
+<li>SLACK_API_TOKEN: files.uploadで用いるToken文字列です</li>
+<li>SLACK_CHANNEL: Slackの投稿先チャンネルです</li>
+<li>AWS_ACCOUNT: Slackに投稿される箇条書き文字列の冒頭にある<code>AWS Account:</code>に付与する値です</li>
+</ul>
+<p>Lambdaで実行する場合は各自事前にLambdaの準備とコードのデプロイをお願いします。</p>
+<p>Lambdaではなくローカル環境で実行する場合は、main関数内の<code>lambda.Start(Handle)</code>を<code>Handle(context.Background())</code>に書き換えて実行してください。また、<code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code>は各自設定をお願いします。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20211015a/&via=future_techblog&related=twitterapi%2Ctwitter&text=AWS%E5%88%A9%E7%94%A8%E6%96%99%E9%87%91%E3%82%92Slack%E3%81%AB%E5%86%86%E3%82%B0%E3%83%A9%E3%83%95%E4%BB%98%E3%81%8D%E3%81%A7%E6%8A%95%E7%A8%BF%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20211015a/&t=AWS%E5%88%A9%E7%94%A8%E6%96%99%E9%87%91%E3%82%92Slack%E3%81%AB%E5%86%86%E3%82%B0%E3%83%A9%E3%83%95%E4%BB%98%E3%81%8D%E3%81%A7%E6%8A%95%E7%A8%BF%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20211015a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20211015a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;541</span><a class="related-posts-link" href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2021.09.24</span><span class="snscount">&#9825;12</span><a class="related-posts-link" href=/articles/20210924a/ title=" Gateway+Lambda という構成でWebAPI開発を行う際、ちょっと便利に使える疎通方法をまとめます。API GatewayですがPublicなエンドポイントがあれば `curl`コマンドや`Postman`を用いての動作検証も容易だと思います。">VPC内のAmazon API Gatewayをインターネットオーバーで疎通確認する</a></li><li class="related-posts-item"><span>2021.09.14</span><span class="snscount">&#9825;20</span><a class="related-posts-link" href=/articles/20210914a/ title="普段からAWS Lambdaにはお世話になっているのですが、初めてカスタムランタイムを動かす仕事が舞い込んできました。AWS Lambdaでは下記のランタイムがサポートされています。">LambdaをカスタムDockerランタイムで開発する方法</a></li><li class="related-posts-item"><span>2021.08.06</span><span class="snscount">&#9825;21</span><a class="related-posts-link" href=/articles/20210806b/ title="私のチームではタスク管理でバックログを使っています。タスクのカテゴリ、マイルストーンやそれらを組み合わせた検索機能が充実している事や、タスクを入力するとバーンダウンチャートが自動で出来上がるところなど素晴らしいツールだと思っています。チケット消化に貢献すると褒めてくれるのも良いですね。">BacklogとSlackを連携するツールをGoで作りました</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.10.11</span><span class="snscount">&#9825;6</span> <a href="/articles/20211011a/" title="PySparkを使用したGlueジョブ開発のお話をします。ETLツールとして使用されるAWS Glueですが、業務バッチで行うような複雑な処理も実行できます。また、処理はGlueジョブとして、Apache Spark分散・並列処理のジョブフローに簡単に乗せることができます！">AWS Glueで複雑な処理を開発するときのTips</a></li>
+
+    <li><span>2021.06.21</span><span class="snscount">&#9825;18877</span> <a href="/articles/20210621a/" title="HTML5が2021年の1月に廃止されました。Webエンジニアとしてバリバリ活躍されてる方やエグゼクティブテックリードのような肩書きを持つ方にとっては「何をいまさら」という話題かと思います。しかしながら、今年も新人さん入ってきてくださったので、プログラミングを学習中にHTML5という文字列に悩まされないように...">どうしてHTML5が廃止されたのか</a></li>
+
+    <li><span>2021.05.11</span><span class="snscount">&#9825;78</span> <a href="/articles/20210511a/" title="TIGの玉木です。去年の12月までは主に機械学習エンジニアとして機械学習案件を任されていましたが、今年の1月からはITコンサルタントとして業務の幅が広くなりいろいろやっています。先月技育祭と呼ばれるイベントの勉強会という枠で、同僚の上野さんと一緒に「初心者必見！機械学習エンジニアがあれこれ話します。〜基礎から実社会応用まで〜」というタイトルで発表しました。">技育祭登壇しました。これから機械学習を学びたい方向けへの自分の経験談とおすすめの本、サイトの紹介もします</a></li>
+
+    <li><span>2021.04.08</span><span class="snscount">&#9825;43</span> <a href="/articles/20210408/" title="シングルページアプリケーションは、一つのHTMLファイルであらゆるページを表現します。history APIを使ってそのようなページが実際にあるかのように振る舞います。一方で、画面がリロードされたとき、メールでSNSでシェアされたときにその該当ページをきちんと再現するためには、サーバー側でハンドリングを行う必要があります。">Go 1.16のembedとchiとSingle Page Application</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E6%A6%82%E8%A6%81"><span class="toc-text">システム概要</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8A%95%E7%A8%BF%E4%BE%8B"><span class="toc-text">投稿例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AWS%E5%88%A9%E7%94%A8%E6%96%99%E9%87%91%E7%AE%87%E6%9D%A1%E6%9B%B8%E3%81%8D"><span class="toc-text">AWS利用料金箇条書き</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E6%96%99%E9%87%91%E5%86%86%E3%82%B0%E3%83%A9%E3%83%95"><span class="toc-text">利用料金円グラフ</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GetCostAndUsage-API"><span class="toc-text">GetCostAndUsage API</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%86%E3%82%B0%E3%83%A9%E3%83%95%E4%BD%9C%E6%88%90"><span class="toc-text">円グラフ作成</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GetMetricsWidgetImage-API"><span class="toc-text">GetMetricsWidgetImage API</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Slack%E9%80%A3%E6%90%BA"><span class="toc-text">Slack連携</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Webhook"><span class="toc-text">Webhook</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#files-upload"><span class="toc-text">files.upload</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%B3%E3%83%BC%E3%83%89%E5%85%A8%E6%96%87"><span class="toc-text">コード全文</span></a></li></ol></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (236)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (160)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (58)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (36)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (19)</a></li>
+<li class=""><a href="/categories/DB/">DB (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (10)</a></li>
+<li class=""><a href="/categories/Management/">Management (10)</a></li>
+<li class=""><a href="/categories/Design/">Design (9)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+<li class=""><a href="/categories/Business/">Business (4)</a></li>
+<li class=""><a href="/categories/Security/">Security (2)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/12-FutureVuls-e18ihsn" title="フューチャーがお届けするポッドキャストです。#12 FutureVulsでフロントエンドスペシャリストとして活躍する枇榔晃裕さんに聞いてみた" target="_blank" rel="noopener">#12 FutureVulsでフロントエンドスペシャリストとして活躍する枇榔晃裕さんに聞いてみた</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/10-e16j2qo" title="フューチャーがお届けするポッドキャストです。#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました" target="_blank" rel="noopener">#10 セキュリティスペシャリスト井上圭さんに業務内容をガッツリ聞きました</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-3 col-sm-6 col-12 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6 col-12 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">新卒・キャリア採用</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">ソーシャルメディアポリシー</a><br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-md-3 col-sm-6 col-6 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-md-3 col-sm-6 col-6 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>
