@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>OpenTelemetryとgo-chiを繋げてみる | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="OpenTelemetryのGoのTraceがstableになり、1.0がリリースされました。最初の1.0宣言からはだいぶ時間がかかりましたが、Go&#x2F;Javaなどさまざまな言語の開発が同時進行で、共通のプロトコルも決めて、なおかつさまざまな拡張のAPIを提供して、さらにその拡張も現時点で300以上も提供されているあたり、かなり巨大な風呂敷をどかーんと広げたような感じがします。    日時 できごと">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenTelemetryとgo-chiを繋げてみる | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20211020a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="OpenTelemetryのGoのTraceがstableになり、1.0がリリースされました。最初の1.0宣言からはだいぶ時間がかかりましたが、Go&#x2F;Javaなどさまざまな言語の開発が同時進行で、共通のプロトコルも決めて、なおかつさまざまな拡張のAPIを提供して、さらにその拡張も現時点で300以上も提供されているあたり、かなり巨大な風呂敷をどかーんと広げたような感じがします。    日時 できごと">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20211020a/スクリーンショット_2021-10-02_11.52.04.png">
+<meta property="article:published_time" content="2021-10-19T15:00:00.000Z">
+<meta property="article:modified_time" content="2021-10-19T14:56:16.214Z">
+<meta property="article:tag" content="opentelemetry">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20211020a/スクリーンショット_2021-10-02_11.52.04.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20211020a/">
+  <meta content="opentelemetry" name="keywords">
+  <meta content="澁川喜規" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">OpenTelemetryとgo-chiを繋げてみる
+  
+  <span class="github-edit">
+    <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20211020a_OpenTelemetryとgo-chiを繋げてみる.md" title="Suggest Edits"><i class="github-edit-icon"></i></a>
+  </span>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20211020a_OpenTelemetryとgo-chiを繋げてみる" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-10-19T15:00:00.000Z" itemprop="datePublished">2021.10.20</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%BE%81%E5%B7%9D%E5%96%9C%E8%A6%8F" title="澁川喜規さんの記事一覧へ" class="post-author">澁川喜規</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/opentelemetry/" title="opentelemetryタグの記事へ" class="tag-list-link">opentelemetry</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p>OpenTelemetryのGoのTraceがstableになり、1.0がリリースされました。最初の1.0宣言からはだいぶ時間がかかりましたが、Go/Javaなどさまざまな言語の開発が同時進行で、共通のプロトコルも決めて、なおかつさまざまな拡張のAPIを提供して、さらに<a target="_blank" rel="noopener" href="https://opentelemetry.io/registry/">その拡張も現時点で300以上も提供されている</a>あたり、かなり巨大な風呂敷をどかーんと広げたような感じがします。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center">日時</th>
+<th align="left">できごと</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">2021/02/17</td>
+<td align="left"><a target="_blank" rel="noopener" href="https://medium.com/opentelemetry/opentelemetry-specification-v1-0-0-tracing-edition-72dd08936978">OpenTelemetryのTracingの仕様が1.0に</a></td>
+</tr>
+<tr>
+<td align="center">2021/02/26</td>
+<td align="left"><a target="_blank" rel="noopener" href="https://medium.com/opentelemetry/opentelemetry-net-reaches-v1-0-e7c5e975fd44">.NET実装が1.0に</a></td>
+</tr>
+<tr>
+<td align="center">2021/03/06</td>
+<td align="left"><a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.0.0">Java実装が1.0に</a></td>
+</tr>
+<tr>
+<td align="center">2021/03/27</td>
+<td align="left"><a target="_blank" rel="noopener" href="https://medium.com/opentelemetry/announcing-opentelemetry-python-1-0-4e097562b8e0">Python実装が1.0に</a></td>
+</tr>
+<tr>
+<td align="center">2021/09/20</td>
+<td align="left"><a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-cpp/releases/tag/v1.0.0">C++実装が1.0に</a></td>
+</tr>
+<tr>
+<td align="center">2021/09/21</td>
+<td align="left"><a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-go/releases/tag/v1.0.0">Go実装が1.0に</a></td>
+</tr>
+<tr>
+<td align="center">2021/09/27</td>
+<td align="left"><a target="_blank" rel="noopener" href="https://medium.com/opentelemetry/opentelemetry-collector-achieves-tracing-stability-milestone-80e34cadbbf5">OpenTelemetry CollectorがGA</a></td>
+</tr>
+<tr>
+<td align="center">2021/10/01</td>
+<td align="left"><a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-js/releases/tag/stable%2Fv1.0.0">JavaScript実装が1.0に</a></td>
+</tr>
+<tr>
+<td align="center">2021/10/01</td>
+<td align="left"><a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-ruby/releases/tag/opentelemetry-sdk%2Fv1.0.0">Ruby実装が1.0に</a></td>
+</tr>
+</tbody></table></div>
+<p>PHP/Rust/Swift/Erlangあたりはコミットチャンス？</p>
+<h1 id="2年前からアップデートされていると感じたポイント"><a href="#2年前からアップデートされていると感じたポイント" class="headerlink" title="2年前からアップデートされていると感じたポイント"></a>2年前からアップデートされていると感じたポイント</h1><p>OpenTelemtryと、その前身のOpenCensusについてはこのブログでも取り上げました。</p>
+<ul>
+<li><a href="/articles/20190604/">OpenCensus(OpenTelemetry)とは | フューチャー技術ブログ</a></li>
+</ul>
+<p>基本的な考え方は前回紹介したものと変わっていませんが、2年前からいくつか変わったかも？と思ったところをピックアップするとこんなところですかね。</p>
+<ul>
+<li>OpenTelemetryはOpenTelemetry専用のエージェント（ログ中継サービス）の活用も最初から視野に入っており、エージェント向けのエクスポーターも提供されている（OpenCensusにもあったがバージョンが最終版でも0.1.11で安定版ではなかった）。</li>
+<li>stdoutロガーが一級市民扱い？</li>
+<li>トレース、メトリックスという2種類の機能のほかに、Fluentdのようなアプリケーションのログ機能も開発中</li>
+</ul>
+<p>今までは、エクスポーターを明示的にアプリケーションが設定する使い方がメインでした。エージェントを使うということは、アプリケーションは最終的なログ収集基盤について知る必要がなくなり、システムを疎結合にできます。</p>
+<p>stdoutは地味でデバッグ用途っぽさが前のOpenCensusにはありましたが、stdoutロガーはコンテナとの相性が抜群です。ログを受けとって流す先をカスタマイズできるようにするために、コンテナ内部にエージェントの接続先設定を変更するロジックを仕込む必要はありません。コンテナの外から色々できます。認証とかを気にする必要もありません。クラウドサービスだと、ログドライバーの選択だけで良くなりますね。</p>
+<p>で、stdoutに出すとなると、トレース以外の情報とかと混ざってしまいがちなので、アプリケーションログ出力とかも一緒に出せる仕組みが整備されるといいな、というところでアプリケーションログ機能もOpenTelemetryが備えるのはうれしいですね。ただ出すだけではなくて、<a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#trace-context-fields">トレースとリンクできるようにトレースIDを持つ</a>ことが検討されてるようですね。実装は<a target="_blank" rel="noopener" href="https://github.com/observIQ/stanza">Go製のFluentd的なStanza</a>をベースにするとかなんとか。</p>
+<h1 id="OpenTelemetryは分散しない人にも注目"><a href="#OpenTelemetryは分散しない人にも注目" class="headerlink" title="OpenTelemetryは分散しない人にも注目"></a>OpenTelemetryは分散しない人にも注目</h1><p>OpenTelemtryはその名の通り「テレメトリー」のためのソフトウェア群です。テレメトリーは一般用語です。次の解説がわかりやすいです。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://tenbou.nies.go.jp/science/description/detail.php?id=87">環境技術解説: テレメトリー（環境展望台)</a></li>
+</ul>
+<p>分散システムのすべてにsshしてログファイルをtailするとかはナンセンスですし、野生動物のトラッキング的に遠隔で情報収集する仕組みですが、そうじゃない人にも、何の情報をどう出すか、の指標にまで踏み込もうとしている点は個人的に注目ポイントです。</p>
+<p>例えば、ウェブサービスのエンドポイントやデータベース接続でどんな情報を出すのか、といった情報がまとまっています。小規模のアプリケーションを作る人にも参考になるでしょう。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions">トレースのログ出力内容</a></li>
+</ul>
+<p>ログのエラーレベルについても<a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#severity-fields">ガイドライン</a>が作られています。まだまだログの実装自体は行われていませんが、このあたり、言語やロギングライブラリによっても指標はバラバラでした。エラーレベル自体はそこまでブレることはないですが（CRITICALとかがあったりなかったりはあるが）、どういうキーですか？（LEVEL？SEVERITY？)とかも違っていました。そのため、ログ収集基盤を作った時に何をエラーとして通知するかは毎回手作りしていたと思いますが、指標が決まってくるとデフォルトでいい感じに動くようになってくるでしょう。ということで、各言語の次世代ロギングライブラリを作ってOSS界隈で名前を売りたい会社は今がチャンスと言えます。</p>
+<p>以前、<a href="https://future-architect.github.io/articles/20210427b/">Future Tech Nightでローカルで動くログビューア</a>を試しに作って発表しました。これも構造化ロギングを前提としたものですが、アプリケーションログ出力が平準化されるなら、少ない設定でいい感じに動くビューアーとかも開発しやすくなりますね。</p>
+<h1 id="OpenTelemetryの始め方"><a href="#OpenTelemetryの始め方" class="headerlink" title="OpenTelemetryの始め方"></a>OpenTelemetryの始め方</h1><p>アプリケーションに組み込む方法を紹介します。スタートするにはまずOpenTelemetryのサイトのRegisteryを見ると良さそうです。生のAPIを叩いてもいいのですが、アプリケーションの特定のミドルウェアやフレームワークとのインタフェースがinstrumentationとして提供されています。アプリケーション側のトレース情報を取り出す便利ライブラリがいくつもあります。</p>
+<img src="/images/20211020a/スクリーンショット_2021-10-02_11.52.04.png" alt="スクリーンショット_2021-10-02_11.52.04.png" width="1200" height="725" loading="lazy">
+
+<p>ここに対応したいプラグインが登録されていれば、そのサンプルコードを参考にするのが簡単です。例えば、gorilla/muxを使っていれば、<a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-go-contrib/tree/main/instrumentation/github.com/gorilla/mux">gorilla/mux用のinstrumentation</a>があるので<a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/github.com/gorilla/mux/otelmux/example/server.go#L44">このサンプルの通り</a>にアプリケーションに組み込めばいいので簡単ですね。gorilla/muxのミドルウェアとして実装されています。初期設定はありますが、実質一行です。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">r.Use(otelmux.Middleware(<span class="string">&quot;my-server&quot;</span>))</span><br></pre></td></tr></table></figure>
+
+<p>ただ、これでは１つのスパンが作られるだけなので、内部でスパンを作ったりしたい場合は<code>context.Context</code>の内部に格納された情報をもとに新しいスパンを作るAPIがあるのでそれを使います。<a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/github.com/gorilla/mux/otelmux/example/server.go#L71-L72">サンプルの中にもあります</a>ね。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">_, span := tracer.Start(ctx, <span class="string">&quot;getUser&quot;</span>, oteltrace.WithAttributes(attribute.String(<span class="string">&quot;id&quot;</span>, id)))</span><br><span class="line"><span class="keyword">defer</span> span.End()</span><br></pre></td></tr></table></figure>
+
+<p>このサンプルもstdoutエクスポーターがが最初から設定されているので、まずはこの状態で動かしてみて、欲しい情報が出ているか確認します。確認できたら、エクスポーター側も変更して、実際の出力先へのインタフェースを追加していきます。GCPとか、OSSのJaegerとかZipkinとかもありますし、SaaSのSplunkとかNew Relicとかありますね。</p>
+<p>AWSはコレクター向けのものがあるので、アプリのエクスポーターとしてはコレクターを選択してコレクターの設定をするとX-Rayに出せるようです。</p>
+<h1 id="go-chiと繋ぐ"><a href="#go-chiと繋ぐ" class="headerlink" title="go-chiと繋ぐ"></a>go-chiと繋ぐ</h1><p>で、ここを見るとお気に入りのgo-chiがありません。go-chiに繋いでみます。gorilla/muxもgo-chiも、ミドルウェアとしては言語標準的なインタフェースを共有しているため、gorilla/muxが使えないか試してみましたが、スパン名がUnknownとなってしまいます。</p>
+<p>というのも、インタフェースは同じであっても、<a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/github.com/gorilla/mux/otelmux/mux.go#L120-L130">gorilla/mux</a>のエクスポーターは、contextに入っているgorilla/mux専用のデータにアクセスしてパス情報をとってきているからです。</p>
+<p>では標準ライブラリの<a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-go-contrib/tree/main/instrumentation/net/http">net/http向けのエクスポータ</a>が使えるかというと、これもそのままでは使えません。net/httpのエクスポータはスパン名をミドルウェア作成時に固定値（ここでは<code>&quot;Hello&quot;</code>)で渡す必要があります。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">otelHandler := otelhttp.NewHandler(http.HandlerFunc(helloHandler), <span class="string">&quot;Hello&quot;</span>)</span><br><span class="line"></span><br><span class="line">http.Handle(<span class="string">&quot;/hello&quot;</span>, otelHandler)</span><br></pre></td></tr></table></figure>
+
+<p>エンドポイントごとに別の名前を設定したい場合は、これをベースにchiのミドルウェアを作るとしたら（net/httpのexporterラッパー)次のようにエンドポイントごとに設定が必要ですし、URLのパスとスパン名と同じような名前を二度書かないといけないのはクールじゃないですね。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// net/httpを使うとイマイチ</span></span><br><span class="line">r := chi.NewRouter()</span><br><span class="line">r.With(otel(<span class="string">&quot;hello&quot;</span>).Get(<span class="string">&quot;/hello&quot;</span>, helloHandler)</span><br><span class="line">r.With(otel(<span class="string">&quot;bye&quot;</span>).Get(<span class="string">&quot;/bye&quot;</span>, byeHandler)</span><br><span class="line">:</span><br></pre></td></tr></table></figure>
+
+<p>高機能なRouterと繋ぐには新しいinstrumentationを実装する必要があることがわかりました。ただ、インタフェースも含めてgorilla/muxのものがほぼ近いのでこれを改造すれば良さそうです。gorilla/muxから情報をもらってくるところを書き換えれば良さそうです。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 変更前</span></span><br><span class="line">route := mux.CurrentRoute(r)</span><br><span class="line"><span class="keyword">if</span> route != <span class="literal">nil</span> &#123;</span><br><span class="line">	<span class="keyword">var</span> err error</span><br><span class="line">	spanName, err = route.GetPathTemplate()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		spanName, err = route.GetPathRegexp()</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			spanName = <span class="string">&quot;&quot;</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">routeStr := spanName</span><br><span class="line"></span><br><span class="line"><span class="comment">// 変更後</span></span><br><span class="line">c := chi.RouteContext(r.Context())</span><br><span class="line">spanName := c.RoutePattern()</span><br></pre></td></tr></table></figure>
+
+<p>これで完璧じゃん、と思ったが、spanNameが空文字にしかなりません。30分ぐらい悩んだところ、ミドルウェアから次のhttp.Hanlderの処理が終わった後にしか<a target="_blank" rel="noopener" href="https://github.com/go-chi/chi/issues/270">正しい情報が返ってこないというissue</a>を発見。gorilla/muxのinstrumentationのミドルウェアの実装は、スパン作成時にattributeを設定していますが、APIを見るとあとからも設定できそうです。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 本ロジックを処理</span></span><br><span class="line">tw.handler.ServeHTTP(rrw.writer, r2)</span><br><span class="line"><span class="comment">// 終わってからchiのAPIを使っていろいろ情報を収集してspanの名前とか属性を変更</span></span><br><span class="line">c := chi.RouteContext(r.Context())</span><br><span class="line">spanName := c.RoutePattern()</span><br><span class="line">span.SetName(spanName)</span><br><span class="line">span.SetAttributes(semconv.HTTPServerAttributesFromHTTPRequest(tw.service, spanName, r)...)</span><br></pre></td></tr></table></figure>
+
+<p>これでchiでもOpenTelemetryと繋がりました！ gorilla/muxのと同じように、1行<code>Use</code>を書くだけで全部のロジックにトレース出力が差し込めます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1行で全エンドポイントにパスをスパン名としたトレースログ出力ができるように</span></span><br><span class="line">r.Use(otelchi.Middleware(<span class="string">&quot;hello-world&quot;</span>))</span><br></pre></td></tr></table></figure>
+
+<p>動く実装は次のところに置いておきます。</p>
+<p><a target="_blank" rel="noopener" href="https://gitlab.com/osaki-lab/otelchi">https://gitlab.com/osaki-lab/otelchi</a></p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>OpenTelemetryの概要と、個人的に気になっているアップデートの方向性、実際にアプリに組み込む方法、go-chiに繋いでみる方法などを紹介しました。</p>
+<p>OpenTelemetryは単に便利なライブラリというだけでなく新しいエコシステムを作る土台となるものです。いろいろ作りたくなりますね。</p>
+<p>本記事を書くにあたって<a target="_blank" rel="noopener" href="https://twitter.com/ymotongpoo">@ymotongpoo氏</a>と<a target="_blank" rel="noopener" href="https://twitter.com/katzchang">@katzchang</a>氏にアドバイスをいただきました。ありがとうございました。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://opentelemetry.io/">OpenTelemetry公式サイト</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-specification">OpenTelemetry仕様リポジトリ</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/open-telemetry/docs-ja">OpenTelemetryドキュメント日本語化プロジェクト</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20211020a/&via=future_techblog&related=twitterapi%2Ctwitter&text=OpenTelemetry%E3%81%A8go-chi%E3%82%92%E7%B9%8B%E3%81%92%E3%81%A6%E3%81%BF%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20211020a/&t=OpenTelemetry%E3%81%A8go-chi%E3%82%92%E7%B9%8B%E3%81%92%E3%81%A6%E3%81%BF%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20211020a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20211020a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-20 nav">
+              <h2>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-posts"><li class="related-posts-item"><span>2021.09.27</span><span class="snscount">&#9825;7</span><a class="related-posts-link" href=/articles/20210927b/ title="最近社内でも使う人が徐々に増えている？Pythonの連載記事を開始しようと思います。本エントリーではPythonドキュメントの日本語訳プロジェクトに参加してみた話を紹介します。">Python連載始まります＆Python翻訳プロジェクト</a></li><li class="related-posts-item"><span>2021.09.15</span><span class="snscount">&#9825;29</span><a class="related-posts-link" href=/articles/20210915a/ title="モバイル開発をする場合、デザインはAdobe XDかFigmaか何かしらのワイヤフレームツールを使うと思います。本エントリーではそれらをもとにアプリケーションを作成したときのTipsを紹介します。なお、デザインする人はステークホルダーの人に共有したりすると思うので有料版のXDの方が良いと思いますが、Flutter開発する人はXDファイルを持っている or 共有してもらえたら、スターター版で大丈夫です。">Adobe XDからFlutterに変換する</a></li><li class="related-posts-item"><span>2021.08.19</span><span class="snscount">&#9825;94</span><a class="related-posts-link" href=/articles/20210819a/ title="TIGの渋川です。エキスパートPythonプログラミング改訂3版が出版されました。ますます厚みを増し、買ってくれた知人からは、学者専用武器なのでは、とか銃弾止められそうとか感想をいただいております。詳しくは共訳の清水川さんがすでに記事にしています。">エキスパートPythonプログラミング改訂3版が出版されました</a></li><li class="related-posts-item"><span>2021.08.10</span><span class="snscount">&#9825;247</span><a class="related-posts-link" href=/articles/20210810a/ title="Go 1.17の集中連載を行います。Go 1.17のリリースの足音が聞こえてきました。1.16のgo:embedのような「うぉっ」と声が出るような大きな新機能はなく、APIが変わらずに勝手に改善されるようなものと、小粒なAPIの追加が多い感じです">Go 1.17連載が始まります: コンパイラとgo mod</a></li></ul>
+  </div>
+            </section>
+            <section class="featured-post margin-bottom-20 nav">
+              <h2>注目の記事</h2>
+              <!-- BEGIN FEATURED POSTS -->
+<div class="widget-wrap">
+  
+  <div class="widget">
+    <ul class="nav featured-post-link">
+      
+    <li><span>2021.10.12</span><span class="snscount">&#9825;5</span> <a href="/articles/20211012a/" title="Amazon S3を利用したファイル連携を行う際、アカウント内に閉じた利用であれば特段問題ない場合でも、システム間連携となるとクロスアカウントが発生し、目的とした操作をするためには然るべき設定が必要になることがあります。自アカウント（アカウントA）のS3バケットに対して他アカウント（アカウントB）から書き込みを行い、アカウントAから当該ファイルを参照する際に注意する設定について紹介していきます。">S3でクロスアカウントアクセスする時に気をつけるポイント</a></li>
+
+    <li><span>2021.10.11</span><span class="snscount">&#9825;6</span> <a href="/articles/20211011a/" title="PySparkを使用したGlueジョブ開発のお話をします。ETLツールとして使用されるAWS Glueですが、業務バッチで行うような複雑な処理も実行できます。また、処理はGlueジョブとして、Apache Spark分散・並列処理のジョブフローに簡単に乗せることができます！">AWS Glueで複雑な処理を開発するときのTips</a></li>
+
+    <li><span>2021.10.05</span><span class="snscount">&#9825;8</span> <a href="/articles/20211005b/" title="今回の投稿は、先日TIG」の登壇後記です。以前に実施した社内勉強会のコンテンツを外部発信向けに整理したものとなります。私は元の資料の作成に関わっていなかったため、整理に際して一から目を通しました。">Future Tech Night #16 ～クラウド時代のDWH～</a></li>
+
+    <li><span>2021.04.21</span><span class="snscount">&#9825;10</span> <a href="/articles/20210421b/" title="私が現在参加しているThe Apache Software Foundation（ASF）の基本理念の一つであるThe Apache Wayについて紹介します。The Apache Wayを通して、ASFのことを少しでも知ってもらえたらと思います。">The Apache Wayのお話</a></li>
+    </ul>
+  </div>
+  
+</div>
+<!-- END FEATURED POSTS -->
+
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#2%E5%B9%B4%E5%89%8D%E3%81%8B%E3%82%89%E3%82%A2%E3%83%83%E3%83%97%E3%83%87%E3%83%BC%E3%83%88%E3%81%95%E3%82%8C%E3%81%A6%E3%81%84%E3%82%8B%E3%81%A8%E6%84%9F%E3%81%98%E3%81%9F%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88"><span class="toc-text">2年前からアップデートされていると感じたポイント</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#OpenTelemetry%E3%81%AF%E5%88%86%E6%95%A3%E3%81%97%E3%81%AA%E3%81%84%E4%BA%BA%E3%81%AB%E3%82%82%E6%B3%A8%E7%9B%AE"><span class="toc-text">OpenTelemetryは分散しない人にも注目</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#OpenTelemetry%E3%81%AE%E5%A7%8B%E3%82%81%E6%96%B9"><span class="toc-text">OpenTelemetryの始め方</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#go-chi%E3%81%A8%E7%B9%8B%E3%81%90"><span class="toc-text">go-chiと繋ぐ</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-text">参考</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (239)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (160)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (58)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (36)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (19)</a></li>
+<li class=""><a href="/categories/DB/">DB (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (10)</a></li>
+<li class=""><a href="/categories/Management/">Management (10)</a></li>
+<li class=""><a href="/categories/Design/">Design (9)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (9)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (4)</a></li>
+<li class=""><a href="/categories/Business/">Business (4)</a></li>
+<li class=""><a href="/categories/Security/">Security (2)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/13-RDAR-e18ti2i" title="フューチャーがお届けするポッドキャストです。#13 ライブリッツのR&DでARアプリを開発している阿保さんと話しました" target="_blank" rel="noopener">#13 ライブリッツのR&DでARアプリを開発している阿保さんと話しました</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/12-FutureVuls-e18ihsn" title="フューチャーがお届けするポッドキャストです。#12 FutureVulsでフロントエンドスペシャリストとして活躍する枇榔晃裕さんに聞いてみた" target="_blank" rel="noopener">#12 FutureVulsでフロントエンドスペシャリストとして活躍する枇榔晃裕さんに聞いてみた</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/11-IT-e17jvka" title="フューチャーがお届けするポッドキャストです。#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました" target="_blank" rel="noopener">#11 ギター職人からITコンサルタントへ。高火力エンジニア伊藤真彦さんに聞いてみました</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-3 col-sm-6 col-12 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6 col-12 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/recruite" title="採用ページ" target="_blank" rel="noopener">新卒・キャリア採用</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="メディアポリシー" target="_blank" rel="noopener">ソーシャルメディアポリシー</a><br><br>
+                Email: <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-md-3 col-sm-6 col-6 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-md-3 col-sm-6 col-6 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2021 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- START INTEGRATIONS -->
+
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-74047147-1', 'auto');
+ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<!-- END INTEGRATIONS -->
+
+  </div>
+</body>
+</html>
