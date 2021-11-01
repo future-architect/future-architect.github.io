@@ -6,10 +6,42 @@
   <link href="https://future-architect.github.io/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2021-10-29T05:16:04.949Z</updated>
+  <updated>2021-11-01T01:16:50.030Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>キーパッドを、基板から自作してみた</title>
+    <link href="https://future-architect.github.io/articles/20211101a/"/>
+    <id>https://future-architect.github.io/articles/20211101a/</id>
+    <published>2021-10-31T15:00:00.000Z</published>
+    <updated>2021-11-01T01:16:50.030Z</updated>
+    
+    <content type="html"><![CDATA[<p>こんにちは。CSIGの井上です。</p><p>本ブログでは何度か自作キーボードの記事を書いていますが、基本的には「誰かが設計したものを組み立てる」物でした。最近まではある程度満足して使っていたのですが、もう少しこうだと（私は）使いやすいかもしれない、という点が色々出てきたので、キーボードを基板から作ろうと思い始めました。</p><ul><li>市販の自作キーボードは、キーアサインの変更は可能です</li><li>しかしながら、物理的な配置等も変えたい場合は、自作するしかないです</li></ul><p>ですが、最初からキーボードを作るのは難度が高いので、まずは機能確認のキーパッドを作りました。これについて記事を書きました。</p><p>あと、<strong>普段はサイバーセキュリティの話をしていますが、今回は一切しません…</strong></p><h1 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h1><h2 id="この記事について"><a href="#この記事について" class="headerlink" title="この記事について"></a>この記事について</h2><p>この記事は、仕組みを知ることの楽しさを知ってもらう、という事を目的に書きました。</p><p>今回は、自作の第一歩として以下を含む基板を作ります。<br>（何かを始めてやるときは、実装テストを小規模で行う、のがセオリーですね。）</p><ul><li>4つのキー</li><li>1つのロータリーエンコーダー</li><li>1つのカラーシリアルLEDテープ</li></ul><img src="/images/20211101a/image.png" alt="image.png" width="694" height="501" loading="lazy"><h2 id="最終的に作りたいもの"><a href="#最終的に作りたいもの" class="headerlink" title="最終的に作りたいもの"></a>最終的に作りたいもの</h2><p>本記事で書いたキーパッド設計により、設計プロセスや注意点を、おおよそ理解しました。<br>今後は、日本語キーボード（70キー程度）を作るつもりです。機会があればこちらに投稿するかもしれません。</p><ul><li>会社支給PCは日本語キーボードのノートパソコンであるが、キータッチは個人的にはあまり好きではない</li><li>リモートワーク環境であり、自宅では某自作日本語キーボードを利用している</li><li>出社または自宅外でリモートワークする時に上記のキーボードを持ち出すと、破損する恐れがある</li><li>持ち出しても破損しづらい、好みのキーボードが欲しい！作りたい！</li></ul><p>それでは、キーパッドを設計していきます。</p><h1 id="キーパッドを作る"><a href="#キーパッドを作る" class="headerlink" title="キーパッドを作る"></a>キーパッドを作る</h1><h2 id="構成と利用ソフトウェア"><a href="#構成と利用ソフトウェア" class="headerlink" title="構成と利用ソフトウェア"></a>構成と利用ソフトウェア</h2><h3 id="構成"><a href="#構成" class="headerlink" title="構成"></a>構成</h3><p>自作キーボードは、一般的に以下の構成となっています。</p><ul><li>ProMicroと呼ばれるマイコン（Arduino互換機）に、各種スイッチ類やLEDなどを接続する</li><li>ProMicroのUSBポート経由でPCと接続し、キーボードとして使う</li><li>ProMicroのファームウェアは、QMK Firmwareというもので作成ができ、それをQMK ToolBoxで書き込むことが可能<ul><li>ファームウェアを書き換えることで、キーアサインなどを変更できる</li></ul></li></ul><img src="/images/20211101a/image_2.png" alt="image.png" width="823" height="591" loading="lazy"><h3 id="利用するソフトウェア"><a href="#利用するソフトウェア" class="headerlink" title="利用するソフトウェア"></a>利用するソフトウェア</h3><p>今回は、以下のアプリケーションを使います。</p><ul><li>KiCAD<ul><li><a href="https://www.kicad.org/">https://www.kicad.org/</a></li><li><code>A Cross Platform and Open Source Electronics Design Automation Suite</code></li><li>回路の設計と、基板の設計ができるアプリケーションです。Ubuntuだとaptで導入もできました。</li><li>KiCADには、Eeschema（回路図エディター）/Pcbnew（プリント基板用ソフトウェア）/GrebView（ガーバー/ドリル ファイルビューア）などが含まれています。</li></ul></li><li>Freerouting<ul><li><a href="https://freerouting.mihosoft.eu/">https://freerouting.mihosoft.eu/</a></li><li><code>PCB Autorouter</code></li><li>KiCADでは自動で配線はできないようなので、このアプリケーションにより配線をしてもらいます。</li></ul></li><li>QMK Firmware<ul><li><a href="https://github.com/qmk/qmk_firmware">https://github.com/qmk/qmk_firmware</a></li><li>キーボードの制御でよく使われるProMicroに入れるファームウェアとして使われます。</li><li>githubプロジェクトに登録済みのキーボードであれば、<a href="https://config.qmk.fm/">QMK Configurator</a> という、WEB上でキーアサインを変更してファームウェアを作るものが利用できます。</li></ul></li><li>QMK ToolBox<ul><li><a href="https://github.com/qmk/qmk_toolbox">https://github.com/qmk/qmk_toolbox</a></li><li>QMK Firmwareで用意したファームウェアを、USB経由でキーボード上のProMicroに書き込みます。</li></ul></li></ul><h2 id="何を作りたいかを決める"><a href="#何を作りたいかを決める" class="headerlink" title="何を作りたいかを決める"></a>何を作りたいかを決める</h2><p>自作プロセスの検証作業に近い内容なので、欲しい機能を盛り込みます。</p><ul><li>キーは必要<ul><li>最終的にはキーボードを作るつもりなので、複数のキーを扱う練習をしたい</li></ul></li><li>ロータリーエンコーダーも使ってみる<ul><li>マウス代わりとして使う可能性もあるので、実装してみたい</li></ul></li><li>シリアルカラーLEDテープ<ul><li>自作キーボード=光る、これは定番</li></ul></li></ul><p>キーは内部的にマトリックスとして扱うので、最低限の 2x2 で 4キーとしました。<br>ロータリーエンコーダーとLEDテープは、実装テストなので数は不要として、1つとしました。</p><p>実装するものが決まったので、これ以外に必要なパーツなども含めて配置を考えます。</p><img src="/images/20211101a/image_3.png" alt="image.png" width="518" height="427" loading="lazy"><h2 id="回路を設計する"><a href="#回路を設計する" class="headerlink" title="回路を設計する"></a>回路を設計する</h2><p>KiCADは設計用の複数の画面を持っていますが、今回はKiCADのEeschemaで部品を配置、配線します。<br>詳細は割愛しますが、キーボードのコントローラーとなるProMicroを中心に、回路を検討します。</p><img src="/images/20211101a/image_4.png" alt="image.png" width="1085" height="455" loading="lazy"><ul><li>キーはマトリックス配置とします。<ul><li>ProMicroの2Pinを「行」、同2Pinを「列」に割り当て、ダイオードで逆流を防止すると、4キーを認識できる</li><li>ProMicroは最大18Pinをこの用途で利用できるので、9行x9列=81キーを単体で判別できる。</li><li>キーのマトリックスを作り、各Pinにアサインします。</li></ul></li><li>ロータリーエンコーダーは、2Pinを消費します。<ul><li>現状のQMK Firmwawreは、ロータリーエンコーダーはマトリックスに組込めない仕様です。</li><li>そのため、ProMicroに直接Pinアサインします。</li></ul></li><li>ファームウェア書き換えの簡略化の為、リセットスイッチも付けます。<ul><li>RST PinをGNDに短絡するように、スイッチを配線します。</li></ul></li><li>分割キーボードとする際に必要なTRRSジャックも一応つけておきます。<ul><li>キーボードを左右に分割した場合、シリアル通信若しくはI2C通信で同期させる必要があります。今回はシリアル通信要として1Pinを設定します。</li><li>I2Cの場合は GND/VCC/SDA/SCLの4線が必要で、市販のステレオジャック（3極）では無く、TRRSジャック（4極）を使います。</li><li>シリアル通信だと GND/VCC/Dataで済みますが、汎用化の為にTRRSジャックを使います。</li></ul></li><li>シリアルLEDテープは、1Pin消費します。<ul><li>GND/VCC/Din なので、制御用のDinをProMicroに接続します。</li></ul></li></ul><p>この段階で、論理的な部品と配線が完了しました。<br>次に進む前に、ネットリストの出力や、フットプリントを割り当てておきます。</p><h2 id="PCBを設計する"><a href="#PCBを設計する" class="headerlink" title="PCBを設計する"></a>PCBを設計する</h2><p>基板自体の設計に進みます。これは、KiCADのpcbnewを使います。</p><p>まずは部品の実際の配置を考えて整理します。</p><ul><li>使い勝手により位置が決まるもの（TRRSジャックは基板の端オードは同じ向きで固めて配置したい）等で位置決めをします。</li><li>その後、基板上での配線を書いていくのですが、KiCADでは自動配線をしてくれません。手動で配線する必要があります。<ul><li>そこでFreeRoutingを使い、自動配線します。</li></ul></li></ul><p>配線後は、下図このようになります。</p><ul><li>3Dモデルを表示することもできるので、仕上がりを確認することもできます。</li></ul><img src="/images/20211101a/image_5.png" alt="image.png" width="950" height="500" loading="lazy"><p>これで基板は完成したので、発注を行います。</p><h2 id="PCBを発注する"><a href="#PCBを発注する" class="headerlink" title="PCBを発注する"></a>PCBを発注する</h2><p>KiCADで作成したデータを基に、業者に発注します。<br>各業者により特徴はありますが、基本的には同じです。</p><ul><li>個人で利用する場合、条件により費用が変わりやすいです。<ul><li>最低5枚から、特定のサイズ内であれば安く仕上がる、などの条件があります。</li><li>これに合わせるように基板を設計したほうが良いかもしれません。</li></ul></li><li>中国の工場で作成され、郵送されることが多いです。<ul><li>私が頼んだ業者は、深圳から送ってきました。特定のサイズ以下であれば、5枚で2000円以下、程度でした。</li><li>納期は3週間で、2週間目まで製造は全くされていませんでした。3周目頭で製造が始まり、DHLを使い、予定通り3週間中に送られてきました。　</li></ul></li></ul><p>発注後暫く待つと、基板が届くはずです。</p><img src="/images/20211101a/image_6.png" alt="image.png" width="884" height="478" loading="lazy"><h2 id="組み立てる"><a href="#組み立てる" class="headerlink" title="組み立てる"></a>組み立てる</h2><p>基板が届いたら、まずは部品を組みつけてみます。</p><ul><li>パーツ自体は一般的な物なので、関東であれば秋葉原のパーツ屋や台東区にある自作キーボード専門店で入手できます。</li></ul><img src="/images/20211101a/image_7.png" alt="image.png" width="958" height="487" loading="lazy"><ul><li>場合により、「取付向きが逆になる（フットプリントを逆に配置してしまった）」とかが発生することがあります。<ul><li>無理やり空中配線で対応したり、表裏を変えたりして対処できれば良いですが、無理な時はあきらめるしかありません…</li></ul></li></ul><p>部品が付いたことで、「見た目」は完成品になりました。<br>まだファームウェアを書いていないので、PCに接続しても何も起きません。<br>ファームウェアを用意します。</p><img src="/images/20211101a/image_8.png" alt="image.png" width="988" height="469" loading="lazy"><h2 id="ファームウェアを作成する"><a href="#ファームウェアを作成する" class="headerlink" title="ファームウェアを作成する"></a>ファームウェアを作成する</h2><p>QMK Firmwareを利用して作成します。</p><p>Ubuntuのパッケージを利用して導入しましたが、GitHubのものよりバージョンが古いかもしれません。しかしながら、特段問題は出ないのでそのまま使いました。<br>QMK Firmwareは開発が頻繁に行われており、1週間程度ごとにはバージョンが上がっているようです。</p><ul><li>KiCADも含めて、PCにそのまま入れると環境が汚れるので、仮想マシン上で動かすのが良いかもしれません。<ul><li>今回はKiCAD, QMK FirmwareのビルドなどはUbuntuで行っています。</li></ul></li><li>開発の速さに伴いインターネット上の情報が古くなりやすいです。やはり公式のドキュメントを参照するのが一番良いようですが、なかなか複雑です。</li><li>Ubuntuでapt導入した場合は、<code>~/qmk_firmware/</code>以下に環境が用意されます。</li></ul><p>詳細は省略しますが、新規でゼロから作る場合は以下のようにします。</p><ul><li>テンプレートを作る<ul><li><code>$ ./util/new_keyboard.sh</code><ul><li>キーボード名や作成者名を入れると、テンプレートが <code>./keyboards/&lt;キーボード名&gt;</code>に作られる</li></ul></li></ul></li><li>編集を行う<ul><li>キーの数やアサイン、LEDシートやロータリーエンコーダーなどの設定をする<ul><li><code>config.h</code>, <code>&lt;キーボード名&gt;.h</code>, <code>keymap.c</code>等を書き換える</li><li>何を書き換えるかは…ネットで調べる方が良いかもしれない<ul><li>機能を<code>enable = ture</code>にする、ProMicroの割当Pin番号を記載していく、等</li></ul></li></ul></li></ul></li><li>コンパイルする<ul><li><code>$ qmk compile --keyboard &lt;キーボード名&gt; --keymap default</code></li></ul></li></ul><p>ファームウェアをビルドすると<code>~/.build</code>以下に<code>*.hex</code>ファイルとして配置されるので、これをQMK ToolBoxでProMicroに書き込みます。</p><p>先人のキーボード設計を流用する場合は、keymapだけ書き換えることになると思います。<br>新規の場合、流用をすると色々エラーが起こったりすることが多いので、<code>new_keyboard.sh</code>した方が早いように感じました。</p><h2 id="ファームウェアを適用する"><a href="#ファームウェアを適用する" class="headerlink" title="ファームウェアを適用する"></a>ファームウェアを適用する</h2><p>ProMicroへの書き込みですが、Windowsだと<code>QMK Toolbox.exe</code>で、GUIで操作ができます。</p><ul><li>（VM上のファームウェアを、ホストのWindowsから見えるところに移動させる）</li><li><code>QMK Toolbox.exe</code>を起動し、準備をする<ul><li>ファームウェアファイルを指定、<code>Auto-Flash</code>の有効化のチェックボックスを有効化</li></ul></li><li>キーボードをUSBで接続する<ul><li>リセットスイッチを押すと自動でファームウェアが書き込まれる</li></ul></li></ul><img src="/images/20211101a/image_9.png" alt="image.png" width="802" height="645" loading="lazy"><p>これでキーボードとして動作が可能な状態になりました。完成です。</p><p>ここまでできれば、一通りの機能実装ができたことになります。おそらく、ロータリーエンコーダーやLEDテープなどが無ければ、簡単に実装できます。<br>最初の実装としては問題なくできたので、次は日本語キーボードを作ろうと思います。</p><h2 id="（大半をWEBで済ます方法もある）"><a href="#（大半をWEBで済ます方法もある）" class="headerlink" title="（大半をWEBで済ます方法もある）"></a>（大半をWEBで済ます方法もある）</h2><p>最近は、各種WEBサービスを駆使することで、ほぼWEB上でキーボードが作れそうです。</p><ul><li>キーボードをデザインする<ul><li><a href="http://www.keyboard-layout-editor.com/">keyboard-layout-editor</a> でキーボードをデザインする</li></ul></li><li>KiCADで基板を作る<ul><li>ここは流石にWEBではできないか。</li></ul></li><li>PCB発注<ul><li>WEBで事業者に発注。一応、WEBサービスですね。</li></ul></li><li>ファームウェアの作成<ul><li><a href="https://kbfirmware.com/">Keyboard Firmware Builder</a>でファームウェアを作る</li><li>keyboard-layout-editorのJSONを張り付けることで、オリジナルのキーボードでも作れる</li><li>但し、ロータリーエンコーダーは書けない<ul><li>ファームウェアをダウンロードしてみるとQMK Firmwareのようだけれども、それを改造してcompileするのは難しいみたい。</li></ul></li></ul></li><li>ファームウェアの書き込み<ul><li>QMK Tool boxを使うので、WEBサービスじゃないですね…</li></ul></li></ul><img src="/images/20211101a/image_10.png" alt="image.png" width="756" height="458" loading="lazy"><h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>キーボード自作のおおよそのフローは理解いただけたと思います。<br>自作キーボードに興味のない方には雑学としての知識を、興味のある方には自作の後押しをできていれば幸いです。</p>]]></content>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;こんにちは。CSIGの井上です。&lt;/p&gt;
+&lt;p&gt;本ブログでは何度か自作キーボードの記事を書いていますが、基本的には「誰かが設計したものを組み立てる」物でした。最近まではある程度満足して使っていたのですが、もう少しこうだと（私は）使いやすいかもしれない、という点が色々出てきた</summary>
+        
+      
+    
+    
+    
+    <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
+    
+    
+    <category term="電子工作" scheme="https://future-architect.github.io/tags/%E9%9B%BB%E5%AD%90%E5%B7%A5%E4%BD%9C/"/>
+    
+    <category term="自作キーボード" scheme="https://future-architect.github.io/tags/%E8%87%AA%E4%BD%9C%E3%82%AD%E3%83%BC%E3%83%9C%E3%83%BC%E3%83%89/"/>
+    
+    <category term="KiCAD" scheme="https://future-architect.github.io/tags/KiCAD/"/>
+    
+  </entry>
   
   <entry>
     <title>Terraformerとしてコードを書いて思うこと</title>
@@ -653,42 +685,6 @@
     <category term="PySpark" scheme="https://future-architect.github.io/tags/PySpark/"/>
     
     <category term="SparkSQL" scheme="https://future-architect.github.io/tags/SparkSQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Microsoft Learnを使用したスキル向上チャレンジ</title>
-    <link href="https://future-architect.github.io/articles/20211008b/"/>
-    <id>https://future-architect.github.io/articles/20211008b/</id>
-    <published>2021-10-07T15:00:01.000Z</published>
-    <updated>2021-10-09T15:38:22.671Z</updated>
-    
-    <content type="html"><![CDATA[<p>TIGの川村英之です。</p><p>みなさん、Azureの勉強をどうやっていますか？<br>本を買う、Webで情報収集、有料のセミナーなど様々な方法がありますが、<a href="https://docs.microsoft.com/ja-jp/learn/">Microsoft Learn</a>はご存じでしょうか？</p><p>私事ですが、このサイトを利用することでAzureの知識を身につけ、資格取得にもつなげることができました。</p><p>当ドキュメントはそんなMicrosoft Learn（以下MS Learn）の概要と利用方法、サイトを活用したイベント開催などをご紹介しようと思います。</p><h1 id="MS-Learnとは"><a href="#MS-Learnとは" class="headerlink" title="MS Learnとは"></a>MS Learnとは</h1><p>Microsoft LearnはMicrosoftが提供する、無料で利用できる学習用Webサイトです。ただドキュメントを参照するだけでなく、時限的なサンドボックス環境も提供され実際のAzure環境を操作しながら学ぶこともできます。元々はMicrosoftの社内用教育ドキュメントだったというもので、これを一般に公開したそうです。また、この手のサイトにある英語を機械翻訳したままの読みづらいサイトではなく、日本語ローカライズにも力が入っておりドキュメントの読みやすさも一定のレベルを誇っています。</p><p>＜MS Learnトップページ＞<br><img src="/images/20211008b/mslearn01.jpg" alt="MS Learnトップページ" width="1200" height="1205" loading="lazy"></p><p>Azure以外にもMicrosoft365、GitHUB、.Net、Office365などのMirosoft製品について学ぶこともでき、各モジュール（学習コンテンツ）を連携させたラーニングパスを使用することで、体系だった学習を行うこともできます。（例：資格取得向けのラーニングパスを使用し受験前の学習を行う）</p><p>＜ラーニングパスの例＞<br><img src="/images/20211008b/mslearn02.jpg" alt="ラーニングパスの画面" width="1200" height="1204" loading="lazy"></p><p>各モジュールを実施すると経験値がたまり、経験値が一定の数値に達するとレベルアップするというゲーム的要素もあります。こちらは後述するクラウドスキルチャレンジでも利用します。</p><h1 id="使用例"><a href="#使用例" class="headerlink" title="使用例"></a>使用例</h1><p>アカウントを作りMS Learnにログインしたら<a href="https://docs.microsoft.com/ja-jp/learn/browse/">ドキュメントの検索ページ</a>に行きます。そこから、学習したいコンテンツを検索し学習を行う形になります。学習したいポイントがピンポイントかつ明確な場合はモジュール単位、一つのテーマを体系だてて学びたい時はラーニングパス単位で学習を行うのが良いと思います。</p><p>＜AZ-104での検索例＞<br><img src="/images/20211008b/mslearn03.jpg" alt="AZ-104の検索結果" width="1200" height="805" loading="lazy"></p><p>演習の中でサンドボックスを使用する場合は、サンドボックスを有効化した上でAzure Portalにアクセスし仮想マシンを作成したり、学習ページからAzure CLIを実行してWebサーバを構築したりと実際のAzureを操作しながら学習を進めることができます。</p><p>＜サンドボックスを使用したドキュメント例＞<br><img src="/images/20211008b/mslearn04.jpg" alt="サンドボックスを使用したドキュメント例" width="999" height="1494" loading="lazy"></p><p>各ページのコンテンツを学習して、次ページに遷移すると経験値が加算されます。ラーニングパスを全て学習し終えるとボーナスポイントも加算されてレベルアップが早くなります。</p><h1 id="クラウドスキルチャレンジ"><a href="#クラウドスキルチャレンジ" class="headerlink" title="クラウドスキルチャレンジ"></a>クラウドスキルチャレンジ</h1><p>フューチャーでは定期的にMS Learnを利用したクラウドスキルチャレンジというイベントを開催し、イベント期間で積み上げた経験値を使って勝敗を競い合うイベントを行っています。</p><p>このイベントは申請を行えばどなたでも開催できるイベントで、会社内、会社間でもイベント開催が可能となっております。状況により一部制約はありますが、「期間中に積み上げた経験値で競う方式」、「事前に定義された特定のカリキュラムのクリア数を競う方式」の２つの方式にそれぞれ個人戦、チーム戦といったルールを組み合わせての開催が可能です。</p><p>＜クラウドスキルチャレンジ（画像のイベントは経験値＆チーム戦）＞<br><img src="/images/20211008b/mslearn06.jpg" alt="クラウドスキルチャレンジ 2021秋のトップページ" width="1200" height="1123" loading="lazy"></p><p>クラウドスキルチャレンジを開催したい、開催に興味がある方はMicrosoftの事務局（<a href="mailto:&#109;&#115;&#x6a;&#x70;&#99;&#115;&#99;&#64;&#x6d;&#105;&#99;&#x72;&#111;&#115;&#111;&#x66;&#x74;&#x2e;&#99;&#111;&#109;">&#109;&#115;&#x6a;&#x70;&#99;&#115;&#99;&#64;&#x6d;&#105;&#99;&#x72;&#111;&#115;&#111;&#x66;&#x74;&#x2e;&#99;&#111;&#109;</a>）にコンタクトをとることで、イベントについての説明を聞いたり、開催についての調整を行うことができます。</p><h1 id="終わりに"><a href="#終わりに" class="headerlink" title="終わりに"></a>終わりに</h1><p>誰でも無料で利用でき、サンドボックス環境で実際の環境を操作することもでき、経験値・レベル制によって自分の学習状況積み上げができるMS Learn。</p><p>クラウドスキルチャレンジと組み合わせることで、楽しみながら学習も行える素晴らしいサービスですので皆様も活用してはいかがでしょうか。</p>]]></content>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;p&gt;TIGの川村英之です。&lt;/p&gt;
-&lt;p&gt;みなさん、Azureの勉強をどうやっていますか？&lt;br&gt;本を買う、Webで情報収集、有料のセミナーなど様々な方法がありますが、&lt;a</summary>
-        
-      
-    
-    
-    
-    <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
-    
-    
-    <category term="Azure" scheme="https://future-architect.github.io/tags/Azure/"/>
-    
-    <category term="Microsoft" scheme="https://future-architect.github.io/tags/Microsoft/"/>
-    
-    <category term="MicrosoftLearn" scheme="https://future-architect.github.io/tags/MicrosoftLearn/"/>
-    
-    <category term="スキルアップ" scheme="https://future-architect.github.io/tags/%E3%82%B9%E3%82%AD%E3%83%AB%E3%82%A2%E3%83%83%E3%83%97/"/>
-    
-    <category term="クラウドスキルチャレンジ" scheme="https://future-architect.github.io/tags/%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E3%82%B9%E3%82%AD%E3%83%AB%E3%83%81%E3%83%A3%E3%83%AC%E3%83%B3%E3%82%B8/"/>
     
   </entry>
   
