@@ -6,10 +6,42 @@
   <link href="https://future-architect.github.io/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2021-12-02T12:49:32.250Z</updated>
+  <updated>2021-12-02T13:18:23.994Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Redmine_single_mailプラグインを開発しました！</title>
+    <link href="https://future-architect.github.io/articles/20211203a/"/>
+    <id>https://future-architect.github.io/articles/20211203a/</id>
+    <published>2021-12-02T15:00:00.000Z</published>
+    <updated>2021-12-02T13:18:23.994Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="目次"><a href="#目次" class="headerlink" title="目次"></a>目次</h2><ul><li><a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">はじめに</a></li><li><a href="#%E4%B8%BB%E3%81%AA%E4%BB%95%E6%A7%98">主な仕様</a></li><li><a href="#%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E3%81%A8%E8%A8%AD%E5%AE%9A">インストールと設定</a></li><li><a href="#%E5%AE%9F%E8%A3%85%E3%81%AE%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88">実装のポイント</a></li><li><a href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB">おわりに</a></li></ul><h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは、TIGコアテクノロジーユニットの高橋・小松です。</p><p>最近はRedmine3系から4系へのバージョンアップ検証を進めています。<br>その中でRedmine4系からメール送信仕様が変わっていることが判明しました。</p><div class="scroll"><table><thead><tr><th>バージョン</th><th>メール送信仕様</th></tr></thead><tbody><tr><td>Redmine3系</td><td>チケット作成/更新時に<strong>全ての関係者を宛先にした単一メールを送信</strong></td></tr><tr><td>Redmine4系</td><td>チケット作成/更新時に<strong>全ての関係者「ごと」にそれぞれメールを送信</strong></td></tr></tbody></table></div><p>4系の仕様はセキュリティに配慮してのことかと考えられますが弊社環境では以下のような問題が懸念されます。</p><ul><li>特定アカウントのメールアドレスにメーリングリストを設定することでメール数を減らしている場合、メーリングリストと個人宛のメールを2重に受け取ることになってしまう</li><li>メールが今までよりも多く送信されることになりメールサーバへの負荷が増大する</li><li><a href="https://support.google.com/a/topic/28609?hl=ja&ref_topic=9202">Gmailの送受信上限</a>に達しやすくなる</li></ul><p>そこで3系と同等のメール送信方式となるような<a href="https://github.com/future-architect/redmine_single_mail">Redmine_single_mailプラグイン</a>を開発しましたので紹介させていただきます。</p><p><a href="https://github.com/future-architect/redmine_single_mail">https://github.com/future-architect/redmine_single_mail</a></p><p>なお、以下のチケットでも話し合いが行われており参考にさせていただきました。<br><a href="https://redmine.tokyo/issues/1083">https://redmine.tokyo/issues/1083</a></p><h2 id="主な仕様"><a href="#主な仕様" class="headerlink" title="主な仕様"></a>主な仕様</h2><p>メールサーバへの負荷が懸念されることからユーザごとの設定ではなくRedmine全体で宛先をまとめて設定した単一メールが送信されるようにしました。</p><p>チケットの作成/更新時は3系同様ウォッチャーにもccでメールを送信するようにしています。</p><h2 id="インストールと設定"><a href="#インストールと設定" class="headerlink" title="インストールと設定"></a>インストールと設定</h2><p>インストール方法については特殊な部分はありませんのでプラグインのReadmeを参照ください。</p><p>プラグインのインストール後に設定画面で以下のようにチェックを入れることで設定できます。</p><img src="/images/20211203a/インストール設定画面.png" alt="インストール設定画面.png" width="633" height="288" loading="lazy"><h2 id="実装のポイント"><a href="#実装のポイント" class="headerlink" title="実装のポイント"></a>実装のポイント</h2><p>Redmine4系のメール通知送信処理では、クラスメソッドdeliver_XXX(機能)_YYY(操作)とインスタンスメソッドXXX(機能)_YYY(操作)のセットでメール通知を行っています。</p><p>例えば、チケット作成のメール通知処理は、クラスメソッドdeliver_issue_addとインスタンスメソッドissue_addで構成されています。</p><p>クラスメソッドdeliver_issue_addは、メール通知対象ユーザの分だけループする役割を担当しています。そしてインスタンスメソッドissue_addは、実際のメール作成とメール送信の役割を担当しています。</p><figure class="highlight php"><figcaption><span>Redmineソースからの抜粋</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Notifies users about a new issue.</span></span><br><span class="line">def <span class="built_in">self</span>.deliver_issue_add(issue)</span><br><span class="line">    users = issue.notified_users | issue.notified_watchers</span><br><span class="line">    users.each <span class="keyword">do</span> |user|</span><br><span class="line">        issue_add(user, issue).deliver_later</span><br><span class="line">    end</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line"><span class="comment"># Builds a mail for notifying user about a new issue</span></span><br><span class="line">def issue_add(user, issue)</span><br><span class="line">    redmine_headers <span class="string">&#x27;Project&#x27;</span> =&gt; issue.project.identifier,</span><br><span class="line">                    <span class="string">&#x27;Issue-Tracker&#x27;</span> =&gt; issue.tracker.name,</span><br><span class="line">                    <span class="string">&#x27;Issue-Id&#x27;</span> =&gt; issue.id,</span><br><span class="line">                    <span class="string">&#x27;Issue-Author&#x27;</span> =&gt; issue.author.login</span><br><span class="line">    redmine_headers <span class="string">&#x27;Issue-Assignee&#x27;</span> =&gt; issue.assigned_to.login <span class="keyword">if</span> issue.assigned_to</span><br><span class="line">    message_id issue</span><br><span class="line">    references issue</span><br><span class="line">    @author = issue.author</span><br><span class="line">    @issue = issue</span><br><span class="line">    @user = user</span><br><span class="line">    @issue_url = url_for(:controller =&gt; <span class="string">&#x27;issues&#x27;</span>, :action =&gt; <span class="string">&#x27;show&#x27;</span>, :id =&gt; issue)</span><br><span class="line">    subject = <span class="string">&quot;[#&#123;issue.project.name&#125; - #&#123;issue.tracker.name&#125; ##&#123;issue.id&#125;]&quot;</span></span><br><span class="line">    subject += <span class="string">&quot; (#&#123;issue.status.name&#125;)&quot;</span> <span class="keyword">if</span> Setting.show_status_changes_in_mail_subject?</span><br><span class="line">    subject += <span class="string">&quot; #&#123;issue.subject&#125;&quot;</span></span><br><span class="line">    mail :to =&gt; user,</span><br><span class="line">    :subject =&gt; subject</span><br><span class="line">end</span><br></pre></td></tr></table></figure><p>一方Redmine_single_mailプラグインでは、クラスメソッドdeliver_issue_addで通知対象ユーザをループせずに、直接メール送信メソッドissue_addに処理させます。<br>そしてインスタンスメソッドissue_addで、toの関連ユーザとccのウォッチャーユーザをそれぞれ設定し、単一メールで送信を行います。</p><figure class="highlight php"><figcaption><span>Redmine_single_mailプラグインソースの抜粋</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Notifies users about a new issue.</span></span><br><span class="line">def deliver_issue_add(issue)</span><br><span class="line">    <span class="keyword">if</span> !!Setting.plugin_redmine_single_mail[:single_mail]</span><br><span class="line">        issue_add(User.current, issue).deliver_later</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        super(issue)</span><br><span class="line">    end</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line"><span class="comment"># Builds a mail for notifying user about a new issue</span></span><br><span class="line">def issue_add(user, issue)</span><br><span class="line">    msg = super(user, issue)</span><br><span class="line">    <span class="keyword">if</span> !!Setting.plugin_redmine_single_mail[:single_mail]</span><br><span class="line">        to_users = issue.notified_users</span><br><span class="line">        cc_users = issue.notified_watchers - issue.notified_users</span><br><span class="line">        mail :to =&gt; to_users, :cc =&gt; cc_users, :subject =&gt; msg.subject</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        msg</span><br><span class="line">    end</span><br><span class="line">end</span><br></pre></td></tr></table></figure><p>例えばチケットの更新、ニュースの追加、Wikiページの追加等の操作も上記であげたチケット作成と同様の実装で対応できます。</p><h2 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h2><p>Redmineのバージョンアップによるメール送信仕様変更は日本の企業ユースでは中々許容しにくいものに感じました。</p><p>もし似たようなお悩みを抱えている方がいらっしゃいましたら<a href="https://github.com/future-architect/redmine_single_mail">Github</a>からダウンロード可能ですのでぜひお試しください。Pull Requestもお待ちしております。</p><p>今回開発したプラグインがどなたかのお役に立てば幸いです。</p><hr><p><strong>TIGコアテクノロジーユニット</strong></p><p>TIGコアテクノロジーユニットでは、現在チームメンバーを募集しています。私たちと一緒にテクノロジーで設計、開発、テストの高品質・高生産性を実現する仕組みづくりをしませんか？</p><p>興味がある方はお気軽に技術ブログTwitterや会社採用HPへ、連絡をお待ちしております。<br><a href="https://www.future.co.jp/recruit/">https://www.future.co.jp/recruit/</a></p>]]></content>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;目次&quot;&gt;&lt;a href=&quot;#目次&quot; class=&quot;headerlink&quot; title=&quot;目次&quot;&gt;&lt;/a&gt;目次&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
+    
+    
+    <category term="Redmine" scheme="https://future-architect.github.io/tags/Redmine/"/>
+    
+    <category term="OSS" scheme="https://future-architect.github.io/tags/OSS/"/>
+    
+    <category term="コアテク" scheme="https://future-architect.github.io/tags/%E3%82%B3%E3%82%A2%E3%83%86%E3%82%AF/"/>
+    
+  </entry>
   
   <entry>
     <title>AB Open社と提携してRISC-V PCを開発しました</title>
@@ -648,39 +680,6 @@
     <category term="PlantUML" scheme="https://future-architect.github.io/tags/PlantUML/"/>
     
     <category term="設計" scheme="https://future-architect.github.io/tags/%E8%A8%AD%E8%A8%88/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>極小LinuxマシンでSwiftを動かそうとしてみた</title>
-    <link href="https://future-architect.github.io/articles/20211105a/"/>
-    <id>https://future-architect.github.io/articles/20211105a/</id>
-    <published>2021-11-04T15:00:00.000Z</published>
-    <updated>2021-11-05T01:25:12.315Z</updated>
-    
-    <content type="html"><![CDATA[<img src="/images/20211105a/Image_20211102_160635.jpeg" alt="" width="1108" height="663" loading="lazy"><p><a href="/articles/20211027a/">秋のブログ週間</a>連載の7本目です。</p><h2 id="初めに"><a href="#初めに" class="headerlink" title="初めに"></a>初めに</h2><p>今回ターゲットとした極小Linuxマシンは、<a href="https://www.switch-science.com/catalog/7160/">M5Stack UnitV2</a>になります。</p><p>こちらのマシンは、ARM Cortex-A7デュアルコア1.2GHz、128MBメモリ、512MB内蔵フラッシュ、microSDスロット、Full HDカメラ、Wi-Fi、冷却ファンを搭載し、OSはLinuxがプリインストールされていますが、非常にコンパクトで1万円弱で購入することができます。</p><p><a href="https://docs.m5stack.com/en/quick_start/unitv2/jupyter_notebook">Python、Jupyter Notebookはプリインストールされている</a>ので、あえて、他の手段を試す必然性は全くないのですが、Swiftのインストールを試してみました。</p><h2 id="Swiftのインストール手順"><a href="#Swiftのインストール手順" class="headerlink" title="Swiftのインストール手順"></a>Swiftのインストール手順</h2><p>まずは、<a href="https://github.com/uraimo/buildSwiftOnARM">buildSwiftOn ARM</a>を見つけたのですが、swiftコマンドのサイズがほぼメインメモリの容量と同じ、かつ、導入時のサイズが約650MBのため、microSDをマウントしたり色々ファイルシステムをいじらないといけないので断念。</p><p>そこで、ターゲット上でビルド環境を整えるのは諦め、クロスコンパイル環境を探すことに。<br><a href="https://github.com/CSCIX65G/SwiftCrossCompilers">Swift Cross Compilation Toolchains</a>を見つけるも、<a href="https://github.com/CSCIX65G/SwiftCrossCompilers/releases/tag/5.3.3">5.3.3</a>からはARM32のサポートがなくなると。。</p><p>そもそも、Swiftは困難なようなので代わりにRustの環境を調べてみる方針へ変更。</p><p>手順は、まず、rustupを開発環境であるMacへ導入。</p><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">brew install rustup</span><br><span class="line">brew install arm-linux-gnueabihf-binutils</span><br></pre></td></tr></table></figure><p>ビルド時にターゲットとしてarmv7-unknown-linux-gnueabihfを指定するも、エラーでうまくいかず、<a href="https://sigmaris.info/blog/2019/02/cross-compiling-rust-on-mac-os-for-an-arm-linux-router/">ここの記述</a>を参考に、ターゲットをarmv7-unknown-linux-musleabihfへ変更することでようやくビルドがエラーなく実行できるようになりました。</p><figure class="highlight sh"><figcaption><span>.cargo/config</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[target.armv7-unknown-linux-musleabihf]</span><br><span class="line">linker = <span class="string">&quot;arm-linux-gnueabihf-ld&quot;</span></span><br></pre></td></tr></table></figure><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rustup target add armv7-unknown-linux-musleabihf</span><br><span class="line">cargo init</span><br><span class="line">cargo build --target armv7-unknown-linux-musleabihf</span><br></pre></td></tr></table></figure><p>環境は出来上がったので次回はRustでカメラを使ったアプリを組みたいと思います。</p><p><a href="/articles/20211027a/">秋のブログ週間</a>連載の7本目でした。</p>]]></content>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;img src=&quot;/images/20211105a/Image_20211102_160635.jpeg&quot; alt=&quot;&quot; width=&quot;1108&quot; height=&quot;663&quot; loading=&quot;lazy&quot;&gt;
-
-&lt;p&gt;&lt;a</summary>
-        
-      
-    
-    
-    
-    <category term="IoT" scheme="https://future-architect.github.io/categories/IoT/"/>
-    
-    
-    <category term="Rust" scheme="https://future-architect.github.io/tags/Rust/"/>
-    
-    <category term="UnitV2" scheme="https://future-architect.github.io/tags/UnitV2/"/>
-    
-    <category term="M5stack" scheme="https://future-architect.github.io/tags/M5stack/"/>
     
   </entry>
   
