@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Mypy と Pyright の解析手法と型情報の比較 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにMypy や Pyright は Python の静的解析ツールとして有名ですが、これら二つに解析情報でどのような違いがあるのかわからなかったので、実験することにしました。Pyright は Mypy に比べて後発のプロジェクトですが、性能面で優れているなどとして徐々に注目を集めています。  https:&#x2F;&#x2F;github.com&#x2F;python&#x2F;mypy https:&#x2F;&#x2F;github.c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mypy と Pyright の解析手法と型情報の比較 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20220301a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにMypy や Pyright は Python の静的解析ツールとして有名ですが、これら二つに解析情報でどのような違いがあるのかわからなかったので、実験することにしました。Pyright は Mypy に比べて後発のプロジェクトですが、性能面で優れているなどとして徐々に注目を集めています。  https:&#x2F;&#x2F;github.com&#x2F;python&#x2F;mypy https:&#x2F;&#x2F;github.c">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20220301a/mypy.png">
+<meta property="article:published_time" content="2022-02-28T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-01T00:57:03.280Z">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="コアテク">
+<meta property="article:tag" content="構文解析">
+<meta property="article:tag" content="Mypy">
+<meta property="article:tag" content="Pyright">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20220301a/mypy.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20220301a/">
+  <meta content="Python,コアテク,構文解析,Mypy,Pyright" name="keywords">
+  <meta content="空閑康太" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Mypy と Pyright の解析手法と型情報の比較
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20220301a_Mypy_と_Pyright_の解析手法と型情報の比較.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20220301a_Mypy_と_Pyright_の解析手法と型情報の比較" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-02-28T15:00:00.000Z" itemprop="datePublished">2022.03.01</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%A9%BA%E9%96%91%E5%BA%B7%E5%A4%AA" title="空閑康太さんの記事一覧へ" class="post-author">空閑康太</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Python/" title="Pythonタグの記事へ" class="tag-list-link">Python</a>
+  
+    
+    <a href="/tags/コアテク/" title="コアテクタグの記事へ" class="tag-list-link">コアテク</a>
+  
+    
+    <a href="/tags/構文解析/" title="構文解析タグの記事へ" class="tag-list-link">構文解析</a>
+  
+    
+    <a href="/tags/Mypy/" title="Mypyタグの記事へ" class="tag-list-link">Mypy</a>
+  
+    
+    <a href="/tags/Pyright/" title="Pyrightタグの記事へ" class="tag-list-link">Pyright</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20220301a/mypy.png" alt="" width="600" weihgt="376">
+
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>Mypy や Pyright は Python の静的解析ツールとして有名ですが、これら二つに解析情報でどのような違いがあるのかわからなかったので、実験することにしました。Pyright は Mypy に比べて後発のプロジェクトですが、性能面で優れているなどとして徐々に注目を集めています。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/python/mypy">https://github.com/python/mypy</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright">https://github.com/microsoft/pyright</a></li>
+</ul>
+<p>解析以外での比較はこちらが参考になります。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://qiita.com/simonritchie/items/7492d1c1a3c13b2f27aa#%E4%BA%8B%E5%89%8D%E3%81%AEpyright%E3%81%AE%E8%BF%BD%E5%8A%A0">https://qiita.com/simonritchie/items/7492d1c1a3c13b2f27aa#%E4%BA%8B%E5%89%8D%E3%81%AEpyright%E3%81%AE%E8%BF%BD%E5%8A%A0</a></li>
+</ul>
+<h1 id="実験概要"><a href="#実験概要" class="headerlink" title="実験概要"></a>実験概要</h1><p>Mypy、Pyright はともに <code>reveal_type(expr)</code> という機能があります。これを解析対象のコードに挿入すると、実行時点での <code>expr</code> の型情報を表示することができます。Mypy、Pyright の両者で同一コードに解析を行いその結果を比較します。以下、コード中ではコメントで <code>reveal_type</code> の結果を記録し、<code>reveal_type</code> 自体の記述は省略します。</p>
+<h2 id="実験-1-再代入"><a href="#実験-1-再代入" class="headerlink" title="実験 1: 再代入"></a>実験 1: 再代入</h2><figure class="highlight py"><figcaption><span>Mypy</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="number">10</span>     <span class="comment"># Revealed type is &quot;builtins.int&quot;</span></span><br><span class="line">a = <span class="string">&#x27;str&#x27;</span>  <span class="comment"># error: Incompatible types in assignment (expression has type &quot;str&quot;, variable has type &quot;int&quot;)</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight py"><figcaption><span>Pyright</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="number">10</span>     <span class="comment"># Type of &quot;a&quot; is &quot;Literal[10]&quot;</span></span><br><span class="line">a = <span class="string">&#x27;str&#x27;</span>  <span class="comment"># Type of &quot;a&quot; is &quot;Literal[&#x27;str&#x27;]&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>a</code> に型の違う値を再代入しています。</p>
+<ul>
+<li>Mypy は 1 行目の代入によって <code>a</code> の型を <code>builtins.int</code> に確定させるため、2 行目の代入は型の違いで失敗します。これは Python 本来の挙動とは異なりますが、暗黙の変換がないため型チェックの観点からは安全です。</li>
+<li>Pyright はリテラルを別の型に変換せず、リテラルのままで表現しています。また、代入によって型が変わっても、特別問題視はしないようです。</li>
+</ul>
+<h2 id="実験-2-オーバーライド"><a href="#実験-2-オーバーライド" class="headerlink" title="実験 2: オーバーライド"></a>実験 2: オーバーライド</h2><figure class="highlight py"><figcaption><span>Mypy</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Parent</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">hello</span>(<span class="params">self</span>) -&gt; <span class="built_in">int</span>:</span>     <span class="comment"># Revealed type is &quot;def () -&gt; builtins.int&quot;</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">override</span>(<span class="params">self</span>) -&gt; <span class="built_in">int</span>:</span>  <span class="comment"># Revealed type is &quot;def () -&gt; builtins.int&quot;</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span>(<span class="params">Parent</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">override</span>(<span class="params">self</span>) -&gt; <span class="built_in">str</span>:</span>  <span class="comment"># error: Return type &quot;str&quot; of &quot;override&quot; incompatible with return type &quot;int&quot; in supertype &quot;Parent&quot;</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;override&quot;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight py"><figcaption><span>Pyright</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Parent</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">hello</span>(<span class="params">self</span>) -&gt; <span class="built_in">int</span>:</span>     <span class="comment"># Type of &quot;Parent().hello&quot; is &quot;() -&gt; int&quot;</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">override</span>(<span class="params">self</span>) -&gt; <span class="built_in">int</span>:</span>  <span class="comment"># Type of &quot;Parent().override&quot; is &quot;() -&gt; int&quot;</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Child</span>(<span class="params">Parent</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">override</span>(<span class="params">self</span>) -&gt; <span class="built_in">str</span>:</span>  <span class="comment"># Type of &quot;Child().override&quot; is &quot;() -&gt; str&quot;</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;override&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>戻り値型の異なるメソッドをオーバーライドしています。Java などのオーバーライドはシグネチャの一致が求められますが、Python ではこのようなオーバーライドが可能です。Mypy では、<code>Child.override</code> はエラーになりますが、Pyright ではエラーになりません。</p>
+<h2 id="実験-3-戻り値の型推論"><a href="#実験-3-戻り値の型推論" class="headerlink" title="実験 3: 戻り値の型推論"></a>実験 3: 戻り値の型推論</h2><figure class="highlight py"><figcaption><span>Mypy</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">a: <span class="built_in">int</span></span>):</span>  <span class="comment"># Revealed type is &quot;def (a: builtins.int) -&gt; Any&quot;</span></span><br><span class="line">    <span class="keyword">return</span> a       <span class="comment"># Revealed type is &quot;builtins.int&quot;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight py"><figcaption><span>Pyright</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">a: <span class="built_in">int</span></span>):</span>  <span class="comment"># Type of &quot;func&quot; is &quot;(a: int) -&gt; int&quot;</span></span><br><span class="line">    <span class="keyword">return</span> a       <span class="comment"># Type of &quot;a&quot; is &quot;int&quot;</span></span><br></pre></td></tr></table></figure>
+<p>引数の型から推論をすれば <code>func</code> は明らかに <code>(int) -&gt; int</code> となりますが、Mypy は推論を行わないようになっており、戻り値の型が <code>Any</code> になります。</p>
+<h2 id="実験-4-戻り値の型チェック"><a href="#実験-4-戻り値の型チェック" class="headerlink" title="実験 4: 戻り値の型チェック"></a>実験 4: 戻り値の型チェック</h2><figure class="highlight py"><figcaption><span>Mypy</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">a: <span class="built_in">int</span></span>) -&gt; <span class="built_in">str</span>:</span>  <span class="comment"># Revealed type is &quot;def (a: builtins.int) -&gt; builtins.str&quot;</span></span><br><span class="line">    <span class="keyword">return</span> a              <span class="comment"># error: Incompatible return value type (got &quot;int&quot;, expected &quot;str&quot;)</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight py"><figcaption><span>Pyright</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">a: <span class="built_in">int</span></span>) -&gt; <span class="built_in">str</span>:</span>  <span class="comment"># Type of &quot;func&quot; is &quot;(a: int) -&gt; str&quot;</span></span><br><span class="line">    <span class="keyword">return</span> a              <span class="comment"># error: Expression of type &quot;int&quot; cannot be assigned to return type &quot;str&quot; &quot;int&quot; is incompatible with &quot;str&quot; (reportGeneralTypeIssues)</span></span><br></pre></td></tr></table></figure>
+
+<p>実験 3 の関数に戻り値の型をヒントとして与えています。すると先ほどとは違い、両者ともエラーを出すようになりました。Mypy もヒントがある場合には推論して整合性のチェックを行うようです。</p>
+<h2 id="実験-5-タイプナローイング"><a href="#実験-5-タイプナローイング" class="headerlink" title="実験 5: タイプナローイング"></a>実験 5: タイプナローイング</h2><figure class="highlight py"><figcaption><span>Mypy</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">flg: <span class="built_in">bool</span>, i: <span class="built_in">int</span>, j: <span class="built_in">str</span></span>):</span>  <span class="comment"># Revealed type is &quot;def (flg: builtins.bool, i: builtins.int, j: builtins.str) -&gt; Any&quot;</span></span><br><span class="line">    <span class="keyword">if</span> flg:</span><br><span class="line">        a = i  <span class="comment"># Revealed type is &quot;builtins.int&quot;</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        a = j  <span class="comment"># error: Incompatible types in assignment (expression has type &quot;str&quot;, variable has type &quot;int&quot;)</span></span><br><span class="line">    <span class="keyword">return</span> a   <span class="comment"># Revealed type is &quot;builtins.int&quot;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight py"><figcaption><span>Pyright</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">flg: <span class="built_in">bool</span>, i: <span class="built_in">int</span>, j: <span class="built_in">str</span></span>):</span>  <span class="comment"># Type of &quot;func&quot; is &quot;(flg: bool, i: int, j: str) -&gt; (int | str)&quot;</span></span><br><span class="line">    <span class="keyword">if</span> flg:</span><br><span class="line">        a = i  <span class="comment"># Type of &quot;a&quot; is &quot;int&quot;</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        a = j  <span class="comment"># Type of &quot;a&quot; is &quot;str&quot;</span></span><br><span class="line">    <span class="keyword">return</span> a   <span class="comment"># Type of &quot;a&quot; is &quot;int | str&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>if 文の分岐によって <code>a</code> の型が変わる例です。</p>
+<ul>
+<li>Mypy は 5 行目でエラーが出ました。実験 1 と同様に 3 行目で <code>a</code> の型が <code>builtins.int</code> に確定しているためです。</li>
+<li>Pyright はエラーが出ません。分岐ごとに <code>a</code> の型を独立に判断し、戻り値の段階ではこれらの和を取っています。このような技術は Pyright のドキュメント内で <a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright/blob/main/docs/type-concepts.md#type-narrowing">Type Narrowing</a> として紹介されています。</li>
+</ul>
+<h2 id="実験-6-タイプナローイング（到達不能な分岐がある場合）"><a href="#実験-6-タイプナローイング（到達不能な分岐がある場合）" class="headerlink" title="実験 6: タイプナローイング（到達不能な分岐がある場合）"></a>実験 6: タイプナローイング（到達不能な分岐がある場合）</h2><figure class="highlight py"><figcaption><span>Mypy</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">flg: <span class="built_in">bool</span>, i: <span class="built_in">int</span>, j: <span class="built_in">str</span></span>):</span>  <span class="comment"># Revealed type is &quot;def (flg: builtins.bool, i: builtins.int, j: builtins.str) -&gt; Any&quot;</span></span><br><span class="line">    <span class="keyword">if</span> flg:             <span class="comment"># Revealed type is &quot;builtins.bool&quot;</span></span><br><span class="line">        a = i           <span class="comment"># Revealed type is &quot;builtins.int&quot;</span></span><br><span class="line">    <span class="keyword">elif</span> <span class="keyword">not</span> flg:       <span class="comment"># Revealed type is &quot;builtins.bool&quot;</span></span><br><span class="line">        a = j           <span class="comment"># error: Incompatible types in assignment (expression has type &quot;str&quot;, variable has type &quot;int&quot;)</span></span><br><span class="line">    <span class="keyword">else</span>:               <span class="comment"># Revealed type is &quot;builtins.bool&quot;</span></span><br><span class="line">        reveal_type(a)  <span class="comment"># Revealed type is &quot;builtins.int&quot;</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="keyword">return</span> a            <span class="comment"># Revealed type is &quot;builtins.int&quot;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight py"><figcaption><span>Pyright</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">flg: <span class="built_in">bool</span>, i: <span class="built_in">int</span>, j: <span class="built_in">str</span></span>):</span>  <span class="comment"># Type of &quot;func&quot; is &quot;(flg: bool, i: int, j: str) -&gt; (int | str)&quot;</span></span><br><span class="line">    <span class="keyword">if</span> flg:             <span class="comment"># Type of &quot;flg&quot; is &quot;Literal[True]&quot;</span></span><br><span class="line">        a = i           <span class="comment"># Type of &quot;a&quot; is &quot;int&quot;</span></span><br><span class="line">    <span class="keyword">elif</span> <span class="keyword">not</span> flg:       <span class="comment"># Type of &quot;flg&quot; is &quot;Literal[False]&quot;</span></span><br><span class="line">        a = j           <span class="comment"># Type of &quot;a&quot; is &quot;str&quot;</span></span><br><span class="line">    <span class="keyword">else</span>:               <span class="comment"># Type of &quot;flg&quot; is &quot;Never&quot;</span></span><br><span class="line">        reveal_type(a)  <span class="comment"># error: &quot;a&quot; is possibly unbound (reportUnboundVariable)</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="keyword">return</span> a            <span class="comment"># Type of &quot;a&quot; is &quot;int | str | Unbound&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>実験 5 の if 文に到達しない分岐 (<code>else</code>) を追加します。</p>
+<ul>
+<li>Pyright では 6 行目で <code>flg</code> の型を <code>Never</code> としています。<code>bool</code> は <code>True</code> と <code>False</code> の 2 値しかないため、上 2 つの分岐で消費し、<code>else</code> 内に到達する <code>flg</code> は存在しないことを表しています。こちらも Pyright のドキュメント内で <a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright/blob/main/docs/internals.md#type-checking-concepts">Type Checking Concepts</a> として紹介されています。</li>
+</ul>
+<h1 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h1><p>Mypy と Pyright では型情報の用途が違う印象を受けます。Pyright は Python の挙動を極力トレースした上で、入力補完など利便性を高める機能に必要な情報を、型ヒントや型推論を用いて特定しているように見えます。対照的に、Mypy はヒントなしでの型の異なる代入を禁止するなど、Python とは異なる型システムを導入し、その中で厳密なコーディングを求めるような設計になっていそうです。個人的には、両者に優劣があるわけではなく、ユースケースによって使い分けが存在するという言い方がしっくりきています。</p>
+<h1 id="参考リンク"><a href="#参考リンク" class="headerlink" title="参考リンク"></a>参考リンク</h1><p><a target="_blank" rel="noopener" href="https://blog.abarabakuhatsu.com/changed_python_type_checking_tool_from_mypy">https://blog.abarabakuhatsu.com/changed_python_type_checking_tool_from_mypy</a></p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20220301a/&related=twitterapi%2Ctwitter&text=Mypy%20%E3%81%A8%20Pyright%20%E3%81%AE%E8%A7%A3%E6%9E%90%E6%89%8B%E6%B3%95%E3%81%A8%E5%9E%8B%E6%83%85%E5%A0%B1%E3%81%AE%E6%AF%94%E8%BC%83%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20220301a/&t=Mypy%20%E3%81%A8%20Pyright%20%E3%81%AE%E8%A7%A3%E6%9E%90%E6%89%8B%E6%B3%95%E3%81%A8%E5%9E%8B%E6%83%85%E5%A0%B1%E3%81%AE%E6%AF%94%E8%BC%83" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20220301a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20220301a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2021.10.19</span><span class="snscount">&#9825;12</span><a href=/articles/20211019a/ title="こんにちは、Future のインターン Engineer Camp に参加した空閑です。今回のインターンではソースコード静的解析システムの開発に取り組みました。そこで本記事では、開発内容の一部である、Python の AST モジュールを使ったクラス構造の可視化について紹介します。Python の環境構築については以下を参考にしました。[サーバーアプリ開発環境"> Engineer Camp2021: Python の AST モジュールを使ってクラス構造を可視化する</a></li><li class="related-posts-item"><span>2020.09.19</span><span class="snscount">&#9825;8</span><a href=/articles/20200919/ title="はじめまして。フューチャーのインターンEngineer Campに参加した中村と申します。この記事では、今回のインターンで私が取り組んだ内容を紹介します。今回のインターンで私は、SQLフォーマッタの作成に取り組みました。"> Engineer Camp2020でSQLフォーマッタを開発しました</a></li><li class="related-posts-item"><span>2020.09.03</span><span class="snscount">&#9825;17</span><a href=/articles/20200903/ title="皆さんは[ANTLR]をご存知でしょうか？ANTLRとはparser(構文解析器)を生成するためのツール(パーサジェネレータ)で、以下のような特徴があります。"> ANTLRを業務で活用した話</a></li><li class="related-posts-item"><span>2022.02.04</span><span class="snscount">&#9825;15</span><a href=/articles/20220204a/ title="AWS Step Functionsの動的並列処理をローカルで実行する方法をハンズオン形式でまとめました。"><span class="newitem">NEW</span> Step Functionsの動的並列処理をローカルで実行する</a></li><li class="related-posts-item"><span>2021.12.03</span><span class="snscount">&#9825;10</span><a href=/articles/20211203a/ title="Redmine4系からメール送信仕様が変わっていることが判明しました。そこで3系と同等のメール送信方式となるようなRedmine_single_mailプラグインを開発しましたので紹介させていただきます。"> Redmine_single_mailプラグインを開発しました！</a></li><li class="related-posts-item"><span>2021.10.11</span><span class="snscount">&#9825;10</span><a href=/articles/20211011a/ title="PySparkを使用したGlueジョブ開発のお話をします。ETLツールとして使用されるAWS Glueですが、業務バッチで行うような複雑な処理も実行できます。また、処理はGlueジョブとして、Apache Spark分散・並列処理のジョブフローに簡単に乗せることができます！"> AWS Glueで複雑な処理を開発するときのTips</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9F%E9%A8%93%E6%A6%82%E8%A6%81"><span class="toc-text">実験概要</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9F%E9%A8%93-1-%E5%86%8D%E4%BB%A3%E5%85%A5"><span class="toc-text">実験 1: 再代入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9F%E9%A8%93-2-%E3%82%AA%E3%83%BC%E3%83%90%E3%83%BC%E3%83%A9%E3%82%A4%E3%83%89"><span class="toc-text">実験 2: オーバーライド</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9F%E9%A8%93-3-%E6%88%BB%E3%82%8A%E5%80%A4%E3%81%AE%E5%9E%8B%E6%8E%A8%E8%AB%96"><span class="toc-text">実験 3: 戻り値の型推論</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9F%E9%A8%93-4-%E6%88%BB%E3%82%8A%E5%80%A4%E3%81%AE%E5%9E%8B%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF"><span class="toc-text">実験 4: 戻り値の型チェック</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9F%E9%A8%93-5-%E3%82%BF%E3%82%A4%E3%83%97%E3%83%8A%E3%83%AD%E3%83%BC%E3%82%A4%E3%83%B3%E3%82%B0"><span class="toc-text">実験 5: タイプナローイング</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9F%E9%A8%93-6-%E3%82%BF%E3%82%A4%E3%83%97%E3%83%8A%E3%83%AD%E3%83%BC%E3%82%A4%E3%83%B3%E3%82%B0%EF%BC%88%E5%88%B0%E9%81%94%E4%B8%8D%E8%83%BD%E3%81%AA%E5%88%86%E5%B2%90%E3%81%8C%E3%81%82%E3%82%8B%E5%A0%B4%E5%90%88%EF%BC%89"><span class="toc-text">実験 6: タイプナローイング（到達不能な分岐がある場合）</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B5%90%E8%AB%96"><span class="toc-text">結論</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E3%83%AA%E3%83%B3%E3%82%AF"><span class="toc-text">参考リンク</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (274)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (172)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (70)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (38)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (22)</a></li>
+<li class=""><a href="/categories/DB/">DB (16)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (10)</a></li>
+<li class=""><a href="/categories/Design/">Design (10)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (10)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (7)</a></li>
+<li class=""><a href="/categories/Business/">Business (4)</a></li>
+<li class=""><a href="/categories/Security/">Security (3)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/19-FutureVuls2-e1ds937" title="フューチャーがお届けするポッドキャストです。#19 FutureVulsでフロントエンドスペシャリストとして活躍する枇榔晃裕さんに聞いてみたその2" target="_blank" rel="noopener"> #19 FutureVulsでフロントエンドスペシャリストとして活躍する枇榔晃裕さんに聞いてみたその2</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/18-Apache-Tomcat3-e1d11g0" title="フューチャーがお届けするポッドキャストです。#18 Apache Tomcatコミッターの藤野圭一さんをさらに深堀りする会その3" target="_blank" rel="noopener"> #18 Apache Tomcatコミッターの藤野圭一さんをさらに深堀りする会その3</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/17-Real-World-HTTP2-e1bamm7" title="フューチャーがお届けするポッドキャストです。#17 Real World HTTP著者の澁川さんと語り尽くす会その2" target="_blank" rel="noopener"> #17 Real World HTTP著者の澁川さんと語り尽くす会その2</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-74047147-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-74047147-1');
+</script>
+
+  </div>
+</body>
+</html>
