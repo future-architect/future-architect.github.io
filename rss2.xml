@@ -15,8 +15,45 @@
     <atom:link href="https://future-architect.github.io/rss2.xml" rel="self" type="application/rss+xml"/>
     
     <description>フューチャーの開発者による公式技術ブログです。業務で利用している技術を幅広く紹介します。</description>
-    <pubDate>Tue, 01 Mar 2022 00:57:03 GMT</pubDate>
+    <pubDate>Wed, 02 Mar 2022 01:31:03 GMT</pubDate>
     <generator>http://hexo.io/</generator>
+    
+    <item>
+      <title>Pyright を LSP サーバとした自作 LSP クライアント（調査編）</title>
+      <link>https://future-architect.github.io/articles/20220302a/</link>
+      <guid>https://future-architect.github.io/articles/20220302a/</guid>
+      <pubDate>Tue, 01 Mar 2022 15:00:00 GMT</pubDate>
+      
+        
+        
+          
+          
+      <description>&lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h1&gt;&lt;p&gt;Language Server Protocol の理解として、Pyright を LSP</description>
+          
+        
+      
+      
+      
+      <content:encoded><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>Language Server Protocol の理解として、Pyright を LSP サーバとした自作クライアントの作成を行いました（<a href="/articles/20220301a/">Pyright を LSP サーバとした自作 LSP クライアント（実装編）</a>）。その際、Pyright に解析を行わせるための初期化方法がドキュメントには書かれていなかったので、VSCode 拡張用のクライアントをトレースして調査することにしました。</p><h1 id="調査方法"><a href="#調査方法" class="headerlink" title="調査方法"></a>調査方法</h1><p>Pyright のリポジトリには言語サーバ（<a href="https://github.com/microsoft/pyright/tree/main/packages/pyright"><code>packages/pyright</code></a>）だけでなく、VSCode 拡張用のクライアント（<a href="https://github.com/microsoft/pyright/tree/main/packages/vscode-pyright"><code>packages/vscode-pyright</code></a>）が存在します。今回はこの二つをデバッガで実行して調査します。</p><p><a href="https://github.com/microsoft/pyright">https://github.com/microsoft/pyright</a></p><h2 id="1-インストール"><a href="#1-インストール" class="headerlink" title="1. インストール"></a>1. インストール</h2><p><a href="https://github.com/microsoft/pyright/blob/main/docs/build-debug.md">https://github.com/microsoft/pyright/blob/main/docs/build-debug.md</a></p><p>ます、上の記事にしたがって Pyright をローカルでビルドします。</p><ol><li>Node.js のインストール</li><li><code>git clone https://github.com/microsoft/pyright.git &amp;&amp; cd pyright</code></li><li><code>npm install</code></li></ol><p>また、拡張機能として Pyright および Pylance を導入している場合には無効にします。</p><h2 id="2-デバッグ実行"><a href="#2-デバッグ実行" class="headerlink" title="2. デバッグ実行"></a>2. デバッグ実行</h2><p>Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイドバーから「実行とデバッグ」を選択し、プルダウンメニューから “Pyright extension” を選択、実行します。なお、実行時のオプションについてはプルダウンメニュー横の歯車、あるいは <a href="https://github.com/microsoft/pyright/blob/main/.vscode/launch.json"><code>.vscode/launch.json</code></a> から確認できます。</p><img src="/images/20220302a/s.png" alt="VS Codeデバッグ実行" width="1200" height="656" loading="lazy"><p>実行すると、VSCode がもう一つ別のウィンドウで立ち上がります。上部に [拡張機能開発ホスト] と書かれていることを確認します。このウィンドウは現在実行している拡張機能が反映された VSCode になっています。<br><img src="/images/20220302a/ss.png" alt="VSCode がもう一つ別のウィンドウ" width="1200" height="84" loading="lazy"></p><p>ブレークポイントが動作することを確認します。<a href="https://github.com/microsoft/pyright/blob/06e9f626f4388bc9b894daf4239a9e4a8e3ffb11/packages/vscode-pyright/src/extension.ts#L206"><code>packages/vscode-pyright/src/extension.ts:206</code></a> にはクライアントからサーバへ再起動を要求するメッセージ送信が実装されているので、ここにブレークポイントを置いてみます。[拡張機能開発ホスト] のウィンドウでコマンドパレットを開き、”Pyright: Restart Server” を実行すると、プログラムが一時停止しておりブレークポイントが機能していることを確認できます。</p><img src="/images/20220302a/スクリーンショット_(8).png" alt="コマンドパレット" width="924" height="229" loading="lazy"><img src="/images/20220302a/スクリーンショット_(10).png" alt="ブレークポイントが機能している" width="1200" height="499" loading="lazy"><h2 id="3-デバッガのアタッチ"><a href="#3-デバッガのアタッチ" class="headerlink" title="3. デバッガのアタッチ"></a>3. デバッガのアタッチ</h2><p>2 までの手順では、クライアントのみがデバッガで実行されます。しかし、メッセージを受信した後の処理はサーバ側で行われるため、調査のためにはこちらもデバッガで実行したくなります。<a href="https://github.com/microsoft/pyright/blob/06e9f626f4388bc9b894daf4239a9e4a8e3ffb11/packages/vscode-pyright/src/extension.ts#L66"><code>extension.ts:66</code></a> では、サーバがポート 6600 で建てられているので、ここにデバッガをアタッチします。<br><img src="/images/20220302a/スクリーンショット_(12).png" alt="スクリーンショット_(12).png" width="1074" height="367" loading="lazy"></p><p>「実行とデバッグ」のプルダウンメニューに “Pyright attach server” があるのでこれを “Pyright extension” 実行後に実行すればよいです。<a href="https://github.com/microsoft/pyright/blob/main/.vscode/launch.json"><code>.vscode/launch.json</code></a> の <code>&quot;port&quot;: 6600</code> が先ほど確認したポートと一致することに注意します。<br><img src="/images/20220302a/スクリーンショット_(11).png" alt="スクリーンショット_(11).png" width="1200" height="546" loading="lazy"></p><p><a href="https://github.com/microsoft/pyright/blob/06e9f626f4388bc9b894daf4239a9e4a8e3ffb11/packages/pyright-internal/src/commands/restartServer.ts#L18"><code>pyright-internal/src/commands/restartServer.ts</code></a> がサーバ側で再起動コマンドを扱う部分です。ブレークポイントを打って同様にメッセージを送信すると、一時停止することが確認できます。<br><img src="/images/20220302a/スクリーンショット_(13).png" alt="デバッガをアタッチ" width="1200" height="586" loading="lazy"></p><p>アタッチできていない場合には、下の画像のように Unbound breakpoint となり一時停止しません。<br><img src="/images/20220302a/スクリーンショット_(14).png" alt=".vscode/launch.json" width="909" height="224" loading="lazy"></p><h1 id="調査内容"><a href="#調査内容" class="headerlink" title="調査内容"></a>調査内容</h1><h2 id="1-Initialize-Request"><a href="#1-Initialize-Request" class="headerlink" title="1. Initialize Request"></a>1. Initialize Request</h2><p><a href="https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialize">初期化関連の仕様</a>を見ると、メソッド <code>initialize</code> は送信する必要がありそうです。そこでまず次の二つを順に送信してみます。</p><blockquote><ol><li><code>initialize</code> メソッド：サーバの初期化を要求</li><li>適当な解析メソッド</li></ol></blockquote><p>すると、<a href="https://github.com/microsoft/pyright/blob/844f7cb98987955dc617cd97b1372325e76a4530/packages/pyright-internal/src/languageServerBase.ts#L415"><code>pyright-internal/src/commands/languageServerBase.ts:417</code></a> で停止してしまいました。<code>workspace.isInitialized</code> が <code>true</code> とならないことが原因です。</p><img src="/images/20220302a/スクリーンショット_(15).png" alt="workspace.isInitialized" width="923" height="131" loading="lazy"><p>したがって、<code>initialize</code> メソッドの後に何か他のメソッドを送信する必要がありそうです。</p><blockquote><ol><li><code>initialize</code> メソッド：サーバの初期化を要求</li><li>???：ワークスペースを初期化</li><li>適当な解析メソッド</li></ol></blockquote><h2 id="2-DidChangeWorkspaceFolders-Notification"><a href="#2-DidChangeWorkspaceFolders-Notification" class="headerlink" title="2. DidChangeWorkspaceFolders Notification"></a>2. DidChangeWorkspaceFolders Notification</h2><p>調べると、<code>workspace.isInitialized</code> はメソッド <a href="https://github.com/microsoft/pyright/blob/844f7cb98987955dc617cd97b1372325e76a4530/packages/pyright-internal/src/languageServerBase.ts#L1265"><code>updateSettingsForWorkspace</code></a> が実行されて <code>true</code> となります。</p><img src="/images/20220302a/スクリーンショット_(16).png" alt="DidChangeWorkspaceFolders Notification" width="967" height="384" loading="lazy"><p>このメソッドは <a href="https://github.com/microsoft/pyright/blob/844f7cb98987955dc617cd97b1372325e76a4530/packages/pyright-internal/src/languageServerBase.ts#L581"><code>onDidChangeWorkspaceFolders</code></a> で管理されているので、<code>workspace/didChangeWorkspaceFolders</code> を送信することで呼ばれます。</p><img src="/images/20220302a/スクリーンショット_(18).png" alt="workspace/didChangeWorkspaceFolders" width="742" height="269" loading="lazy"><p>つまり、手順としては次のようになります。</p><blockquote><ol><li><code>initialize</code> メソッド：サーバの初期化を要求</li><li><code>workspace/didChangeWorkspaceFolders</code> メソッド：ワークスペースフォルダを変更</li><li>適当な解析メソッド</li></ol></blockquote><p>ただし、<code>onDidChangeWorkspaceFolders</code> は特定の条件で有効化されることに注意します。</p><h2 id="3-Initialized-Notification"><a href="#3-Initialized-Notification" class="headerlink" title="3. Initialized Notification"></a>3. Initialized Notification</h2><p><a href="https://github.com/microsoft/pyright/blob/844f7cb98987955dc617cd97b1372325e76a4530/packages/pyright-internal/src/languageServerBase.ts#L579"><code>onDidChangeWorkspaceFolders</code>の前後</a> を確認すると、有効化には以下の二つの条件を満たす必要があります。</p><ol><li><code>initialized</code> メソッドの送信</li><li><code>this.client.hasWorkspaceFoldersCapability = true</code></li></ol><p>1 は明らかに送信するだけです。<a href="https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialized"><code>initialized</code> メソッド</a> は サーバからの InitializeResult に対応するものなので、タイミングは InitializeResult を受け取った後、<code>workspace/didChangeWorkspaceFolders</code> メソッドを送信する前になります。2 はわかりにくいですが、<a href="https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialize"><code>initialize</code>メソッド</a> のオプションに <code>capabilities</code> があるのでここで登録します。つまり、初期化方法は全体で次のようになることがわかりました。</p><blockquote><ol><li><code>initialize</code> メソッド：サーバの初期化を要求<br>a. <code>capabilities.workspace.workspaceFolders = true</code>：ワークスペースフォルダ機能を有効化</li><li><code>initialized</code> メソッド：クライアント側の初期化が完了したことを通知</li><li><code>workspace/didChangeWorkspaceFolders</code> メソッド：ワークスペースフォルダの変更を通知</li><li>適当な解析メソッド</li></ol></blockquote><h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>以上から、Pyright の初期化は下図のようにして行われることがわかりました。実際の実装は <a href="https://qiita.com/kkuga/private/8d6d0a27ea1ca8c36d13">TODO: Pyright を LSP サーバとした自作 LSP クライアント（実装編）</a>で扱っていますので、合わせて読んでいただければと思います。</p><img src="/images/20220302a/スクリーンショット_(19).PNG" alt="シーケンス図" width="807" height="529" loading="lazy">]]></content:encoded>
+      
+      
+      <category domain="https://future-architect.github.io/categories/Programming/">Programming</category>
+      
+      
+      <category domain="https://future-architect.github.io/tags/Python/">Python</category>
+      
+      <category domain="https://future-architect.github.io/tags/%E3%82%B3%E3%82%A2%E3%83%86%E3%82%AF/">コアテク</category>
+      
+      <category domain="https://future-architect.github.io/tags/%E6%A7%8B%E6%96%87%E8%A7%A3%E6%9E%90/">構文解析</category>
+      
+      <category domain="https://future-architect.github.io/tags/Pyright/">Pyright</category>
+      
+      <category domain="https://future-architect.github.io/tags/LSP/">LSP</category>
+      
+      
+      <comments>https://future-architect.github.io/articles/20220302a/#disqus_thread</comments>
+      
+    </item>
     
     <item>
       <title>Mypy と Pyright の解析手法と型情報の比較</title>
@@ -702,41 +739,6 @@
       
       
       <comments>https://future-architect.github.io/articles/20220128a/#disqus_thread</comments>
-      
-    </item>
-    
-    <item>
-      <title>CHAdeMO vs コンボ EV充電規格を比較する</title>
-      <link>https://future-architect.github.io/articles/20220127a/</link>
-      <guid>https://future-architect.github.io/articles/20220127a/</guid>
-      <pubDate>Wed, 26 Jan 2022 15:00:00 GMT</pubDate>
-      
-        
-        
-          
-          
-      <description>&lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h1&gt;&lt;p&gt;こんにちは。TIG</description>
-          
-        
-      
-      
-      
-      <content:encoded><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIG DXユニットの村上です。</p><p>大手自動車メーカーが続々とEVを発表したり、EUでは2035年にガソリン車の新車販売が禁止になったりと、近年電気自動車業界が盛り上がりを見せています。</p><p>EVといえば充電しなければならないのが特徴です。充電ステーションにはスマホのLightningやUSBなどのように、充電するための対応規格が存在します。今回はEVの充電規格について解説したいと思います。</p><h1 id="充電ステーションの通信規格"><a href="#充電ステーションの通信規格" class="headerlink" title="充電ステーションの通信規格"></a>充電ステーションの通信規格</h1><p>充電ステーションとEVの通信規格は多数存在し、シェア争いが過熱しています。主要な規格をまとめると、以下のようになります。</p><div class="scroll"><table><thead><tr><th>項目</th><th>CHAdeMO</th><th>GB/T</th><th>テスラ</th><th>CCS1</th><th>CCS2</th></tr></thead><tbody><tr><td>規格制定国</td><td>日本</td><td>中国</td><td>アメリカ</td><td>アメリカ</td><td>ドイツ</td></tr><tr><td>デジタル通信規格</td><td>CAN</td><td>CAN</td><td>CAN</td><td>PLC</td><td>PLC</td></tr></tbody></table></div><p>CCS1とCCS2は通称<strong>コンボ</strong>と呼ばれています。<br>テスラは独自規格を採用していますが、専用の変換アダプタを使うことによってCHAdeMOで充電することができます。</p><h2 id="CHAdeMO"><a href="#CHAdeMO" class="headerlink" title="CHAdeMO"></a>CHAdeMO</h2><p>上記で示したように、充電規格は多数存在しますが、現在はCHAdeMOへの統一化の動きがあります。</p><p>実際に2020年にCHAdeMO、GB/T、コンボに互換性のあるCHAdeMO3.0が完成しました。</p><img src="/images/20220127a/image.png" alt="チャデモ3.0" width="1200" height="620" loading="lazy"><p>参考：<a href="https://www.chademo.com/ja/chademo3-0/">https://www.chademo.com/ja/chademo3-0/</a></p><p>現在CHAdeMOの充電ステーションは欧州を中心に全世界で35600台以上普及しており、世界最大のカバレッジを誇っています。規格上の最大出力は900kWです。</p><h3 id="CHAdeMOの充電シーケンス"><a href="#CHAdeMOの充電シーケンス" class="headerlink" title="CHAdeMOの充電シーケンス"></a>CHAdeMOの充電シーケンス</h3><p>CHAdeMOではEVとCANによってデジタル通信を行いながら充電を進めます。</p><p>充電の手続きをざっくりとまとめると以下のようになります。</p><ol><li>EVと充電ステーションを接続</li><li>EVと充電ステーションの互換性を確認し、問題なければEVが準備完了状態に移行</li><li>車両コネクタロック</li><li>充電ステーションから給電開始</li><li>EVから充電停止命令を送ることで充電終了</li><li>車両コネクタロック解除</li><li>充電ステーションで支払い手続きを行う</li></ol><p>車両コネクタロックとは、充電コネクタがEVのプラグから離れないようにするための物理的なロックです。</p><p>安全面でのロックであることはもちろんですが、充電自体にしばらく時間がかかるため、充電を開始してからその場を離れることがあります。その際に風などで自然に外れたり、他人が勝手に外したりすることを防ぐ目的もあります。</p><p>また、このロックが解除された瞬間にEVとのデジタル通信が切断されます。</p><p>さらに給電が行われている最中は充電ステーションとEV間で以下のデータがやりとりされています。</p><div class="scroll"><table><thead><tr><th>充電ステーションから送信</th><th>EVから送信</th></tr></thead><tbody><tr><td>充電シーケンス管理番号</td><td>充電シーケンス管理番号</td></tr><tr><td>出力可能電圧値</td><td>電池総容量</td></tr><tr><td>出力可能電流値</td><td>電池耐久上限値</td></tr><tr><td>電池不適合</td><td>最大充電時間</td></tr><tr><td>車両コネクタロック</td><td>充電電圧上限値</td></tr><tr><td>充電システム異常</td><td>車両充電可能</td></tr><tr><td>充電器状態</td><td>充電電流指令値</td></tr><tr><td>現在出力電圧値</td><td>充電システム異常</td></tr><tr><td>現在充電電流値</td><td>車両シフト位置</td></tr><tr><td>残り充電時間</td><td></td></tr><tr><td>充電器異常</td><td></td></tr><tr><td>充電システム故障</td><td></td></tr></tbody></table></div><p>参考：<a href="https://kikakurui.com/d6/D61851-24-2014-01.html">https://kikakurui.com/d6/D61851-24-2014-01.html</a></p><p>これらのデータを用いてリアルタイムで充電状態を監視し、異常が発生した場合は安全にかつ素早く停止するようになっています。</p><p>CHAdeMOは物理的な安全面への配慮が徹底している規格です。</p><h2 id="コンボ"><a href="#コンボ" class="headerlink" title="コンボ"></a>コンボ</h2><p>コンボは欧州で生まれた規格で、デジタル通信はPLCを用いて行われます。</p><p><a href="https://en.wikipedia.org/wiki/Combined_Charging_System">Wikipediaによると</a>規格上の最大出力は350kWになることがアナウンスされています。</p><p>また、コンボは料金の支払い方法に大きな違いがあります。</p><h2 id="コンボの充電シーケンス"><a href="#コンボの充電シーケンス" class="headerlink" title="コンボの充電シーケンス"></a>コンボの充電シーケンス</h2><p>コンボでは支払方法を予め設定しておくことができます。</p><p>支払方法によって充電手順が若干変わってきますが、以下で一例を示します。</p><ol><li>EVに支払方法や契約情報をセットしておく<ul><li>充電ステーションへの直接支払い</li><li>EVへの自動課金</li></ul></li><li>EVと充電ステーションを接続</li><li>EVから指定の支払方法を送信（ここではEVへの自動課金を選択したと仮定）</li><li>充電ステーションで支払い契約情報の承認</li><li>EVから充電許可信号を送信</li><li>充電ステーションから給電開始</li><li>充電終了</li><li>充電ステーションから課金額をEVに送信</li></ol><p>このように、コンボではユーザの認証情報が充電コネクタを通して行われるケースがあるため、情報セキュリティ的な観点で安全性が高い設計となっています。</p><h2 id="CHAdeMOとコンボの比較"><a href="#CHAdeMOとコンボの比較" class="headerlink" title="CHAdeMOとコンボの比較"></a>CHAdeMOとコンボの比較</h2><p>CHAdeMOとコンボを比較した表が以下になります。</p><div class="scroll"><table><thead><tr><th>項目</th><th>CHAdeMO</th><th>コンボ</th></tr></thead><tbody><tr><td>普及地域</td><td>世界中</td><td>欧州</td></tr><tr><td>最大出力</td><td>900kW</td><td>350kW</td></tr><tr><td>認証情報の通信</td><td>なし</td><td>あり</td></tr><tr><td>規格の設計思想</td><td>物理的な安全性重視</td><td>データのセキュリティ重視</td></tr></tbody></table></div><p>スペックを比較すると現状はCHAdeMOが優勢と言えそうです。<br>しかしEV市場は今後さらに盛り上がっていくと思われるので、今後どうなっていくか注目していきたいですね。</p><h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>最後まで読んでいただいてありがとうございました！</p><p>2021年末にはトヨタがEVを大量に発表するなど、国内でもEVに対する盛り上がりが本格的になってきました。将来的には日本でもガソリン車に対する課税や販売制限などが設けられたりするのでしょうか？</p><p>EV市場の今後の動向には目が離せませんね。</p><h1 id="参考資料"><a href="#参考資料" class="headerlink" title="参考資料"></a>参考資料</h1><ul><li><a href="https://monoist.itmedia.co.jp/mn/articles/1409/03/news003_2.html">https://monoist.itmedia.co.jp/mn/articles/1409/03/news003_2.html</a></li><li><a href="https://car.watch.impress.co.jp/docs/series/tech/554577.html">https://car.watch.impress.co.jp/docs/series/tech/554577.html</a></li><li><a href="https://www.chademo.com/wp/pdf/QCtebikiRev32.pdf">https://www.chademo.com/wp/pdf/QCtebikiRev32.pdf</a></li><li><a href="https://monoist.itmedia.co.jp/mn/articles/1407/02/news014_2.html">https://monoist.itmedia.co.jp/mn/articles/1407/02/news014_2.html</a></li><li><a href="https://www.chademo.com/ja/">https://www.chademo.com/ja/</a></li><li><a href="https://www.chademo.com/ja/chademo3-0/">https://www.chademo.com/ja/chademo3-0/</a></li><li><a href="https://en.wikipedia.org/wiki/Combined_Charging_System">https://en.wikipedia.org/wiki/Combined_Charging_System</a></li><li><a href="https://kikakurui.com/d6/D61851-23-2014-01.html">https://kikakurui.com/d6/D61851-23-2014-01.html</a></li><li><a href="https://kikakurui.com/d6/D61851-24-2014-01.html">https://kikakurui.com/d6/D61851-24-2014-01.html</a></li></ul>]]></content:encoded>
-      
-      
-      <category domain="https://future-architect.github.io/categories/IoT/">IoT</category>
-      
-      
-      <category domain="https://future-architect.github.io/tags/%E9%9B%BB%E6%B0%97%E8%87%AA%E5%8B%95%E8%BB%8A/">電気自動車</category>
-      
-      <category domain="https://future-architect.github.io/tags/%E9%80%9A%E4%BF%A1%E8%A6%8F%E6%A0%BC/">通信規格</category>
-      
-      <category domain="https://future-architect.github.io/tags/CHAdeMO/">CHAdeMO</category>
-      
-      <category domain="https://future-architect.github.io/tags/%E3%82%B3%E3%83%B3%E3%83%9D/">コンポ</category>
-      
-      
-      <comments>https://future-architect.github.io/articles/20220127a/#disqus_thread</comments>
       
     </item>
     
