@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Lambda×Go並列処理で100万回APIを呼び出す | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは。TIG DXチームの後藤です。2021年7月に新卒でフューチャーに入社しました。 業務でAPIを通して数万～100万のデータのバッチ処理を行うLambdaの開発を行ったので、学びを共有したいと思います。 　　 システム構成参画しているプロジェクトでCSVデータをデータベースに登録する必要がありLambdaの開発を行いました。ちなみに所属しているチームではGo言語を採用しているの">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lambda×Go並列処理で100万回APIを呼び出す | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20220516a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは。TIG DXチームの後藤です。2021年7月に新卒でフューチャーに入社しました。 業務でAPIを通して数万～100万のデータのバッチ処理を行うLambdaの開発を行ったので、学びを共有したいと思います。 　　 システム構成参画しているプロジェクトでCSVデータをデータベースに登録する必要がありLambdaの開発を行いました。ちなみに所属しているチームではGo言語を採用しているの">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20220516a/Image_from_iOS.jpg">
+<meta property="article:published_time" content="2022-05-15T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-05-16T03:08:28.112Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="性能検証">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Lambda">
+<meta property="article:tag" content="並列処理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20220516a/Image_from_iOS.jpg">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20220516a/">
+  <meta content="AWS,性能検証,Go,Lambda,並列処理" name="keywords">
+  <meta content="後藤玲雄" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Lambda×Go並列処理で100万回APIを呼び出す
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20220516a_Lambda×Go並行処理で100万回APIを呼び出す.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20220516a_Lambda×Go並行処理で100万回APIを呼び出す" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-05-15T15:00:00.000Z" itemprop="datePublished">2022.05.16</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%BE%8C%E8%97%A4%E7%8E%B2%E9%9B%84" title="後藤玲雄さんの記事一覧へ" class="post-author">後藤玲雄</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/性能検証/" title="性能検証タグの記事へ" class="tag-list-link">性能検証</a>
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/Lambda/" title="Lambdaタグの記事へ" class="tag-list-link">Lambda</a>
+  
+    
+    <a href="/tags/並列処理/" title="並列処理タグの記事へ" class="tag-list-link">並列処理</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIG DXチームの後藤です。2021年7月に新卒でフューチャーに入社しました。</p>
+<p>業務でAPIを通して数万～100万のデータのバッチ処理を行うLambdaの開発を行ったので、学びを共有したいと思います。
+　　</p>
+<h1 id="システム構成"><a href="#システム構成" class="headerlink" title="システム構成"></a>システム構成</h1><p>参画しているプロジェクトでCSVデータをデータベースに登録する必要がありLambdaの開発を行いました。ちなみに所属しているチームではGo言語を採用しているので、Go言語で開発を行いました。データを登録するためのAPI(API Gateway + proxy統合Lambda)を活用してバッチ処理を行います。データの件数は数百件から数十万件と幅が広く、「数十万件ものリクエストをLambdaの実行時間制限である15分以内に処理しきれるのか？」というところから開発を始めました。</p>
+<img src="/images/20220516a/Image_from_iOS.jpg" alt="構成図" width="852" height="362" loading="lazy">
+
+<p>ちなみに、1Web API呼び出し大体30ms~80msほどかかります。</p>
+<h1 id="AWS-Lambda"><a href="#AWS-Lambda" class="headerlink" title="AWS Lambda"></a>AWS Lambda</h1><p>AWS Lambdaはマネージドサービスでありサーバーの運用管理が必要なく、プログラムが実行された時間に対してのみ課金がされるので、開発コスト、運用コスト、金銭面を考えると非常に使い勝手がいいサービスです。実際に私の所属しているチームではLambdaを積極的に活用しています。そんな便利なLambdaですが、実行時間に制約があり最大で15分までの処理しか行うことができず、15分以上の時間がかかる処理を行う場合にはEC2などの別の環境を用意する必要があります。</p>
+<h1 id="試してみた結果"><a href="#試してみた結果" class="headerlink" title="試してみた結果"></a>試してみた結果</h1><p> まずは非同期処理を使わず同期処理でデータの登録を実行してみました。<br> CSVファイルから読み込んだデータを登録するプログラムを書きLambdaのメモリサイズを512MBに設定ました。サンプルデータとして2万行のCSVファイルの処理を実行してみました。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> _, line := <span class="keyword">range</span> lines &#123;</span><br><span class="line">    <span class="keyword">if</span> err := postRequest(ctx, line); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Printf(<span class="string">&quot;post request error: %v&quot;</span>, err)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>結果としては、約1万4千件のデータを登録し終えたところで15分の実行時間制限を超えてしまいました。通常の方法では数十万件のデータの処理は難しい事がわかりました。</p>
+<p>　　</p>
+<h1 id="並行処理"><a href="#並行処理" class="headerlink" title="並行処理"></a>並行処理</h1><p>実際にプログラムを動かして、数十万件のデータを登録することが難しいとわかったので、他の方法を考えることにしました。1つ目の方法はStep Functionsを使いCSVデータを分割し処理する方法、2つ目はgoroutineで並行処理を行う方法です。Step Functionsを使う場合には追加でインフラの設定が必要になりますが、ソースコードは並行処理を行う場合よりもわかりやすくなるというメリットがあります。goroutineで並行処理を行う場合には、ソースコードは少し複雑になりますが、インフラのリソースを追加する必要がなく1つのLambdaでバッチ処理が完結します。今回はインフラ管理などの保守の容易さからgoroutineを実装することにしました。1つのLambdaで処理が完結している場合の方がログの確認も容易かと思います。再度メモリサイズを512MBに設定しサンプルデータ2万行のCSVファイルの処理を実行しました。　　</p>
+<p>※エラーハンドリングを行う場合には<code>sync.ErrGroup</code>を使用する方がよさそうです。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> wg sync.WaitGroup</span><br><span class="line"><span class="keyword">for</span> _, line := <span class="keyword">range</span> lines &#123;</span><br><span class="line">    wg.Add(<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(wg *sync.WaitGroup, line CsvLine)</span></span> &#123;</span><br><span class="line">        <span class="keyword">defer</span> wg.Done()</span><br><span class="line">        <span class="keyword">if</span> err := postRequest(ctx, line); err != <span class="literal">nil</span> &#123;</span><br><span class="line">            log.Printf(<span class="string">&quot;post request error: %v&quot;</span>, err)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;(&amp;wg, line)</span><br><span class="line">&#125;</span><br><span class="line">wg.Wait()</span><br></pre></td></tr></table></figure>
+
+<p>結果は、20秒かからずに終了！</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Duration: 19927.45 ms   Billed Duration: 19928 ms   Memory Size: 512 MB Max Memory Used: 206</span><br></pre></td></tr></table></figure>
+<p>と喜んでいましたが、ログをよく見ると</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dial tcp xxx.xxx.xxx.xxx:443: socket: too many open files</span><br></pre></td></tr></table></figure>
+
+<p>というエラーが大量に出力されていました。</p>
+<p>これはgoroutineで大量のコネクションを同時に作成してしまっているために起こるエラーです。</p>
+<p>ということで、goroutineの同時実行数を500に制限することにしました。東京リージョンでのLambdaの同時実行数の上限は1000件であるためその半分である500に設定しました。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> wg sync.WaitGroup</span><br><span class="line">semaphore := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;, <span class="number">500</span>)</span><br><span class="line"><span class="keyword">for</span> _, line := <span class="keyword">range</span> lines &#123;</span><br><span class="line">    semaphore &lt;- <span class="keyword">struct</span>&#123;&#125;&#123;&#125;</span><br><span class="line">    wg.Add(<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(wg *sync.WaitGroup, line CsvLine)</span></span> &#123;</span><br><span class="line">        <span class="keyword">defer</span> wg.Done()</span><br><span class="line">        <span class="keyword">if</span> err := postRequest(ctx, line); err != <span class="literal">nil</span> &#123;</span><br><span class="line">            log.Printf(<span class="string">&quot;post request error: %v&quot;</span>, err)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;(&amp;wg, line)</span><br><span class="line">&#125;</span><br><span class="line">wg.Wait()</span><br></pre></td></tr></table></figure>
+
+<p>実行してみると無事にエラーなく処理が終了しました。2万件の処理が約20秒で終了することがわかりました。並行処理を使うとかなり高速に処理が行えました。</p>
+<h1 id="同時実行数と実行時間"><a href="#同時実行数と実行時間" class="headerlink" title="同時実行数と実行時間"></a>同時実行数と実行時間</h1><p>無事に処理が実行できたところで次に気になるのが、同時実行数と実行時間の関係性です。行数を20万、メモリを1024MBに固定し同時実行数を100,300,500と変えて関係性を調査してみました。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>同時実行数</th>
+<th>APIの最大同時実行数</th>
+<th>メモリ(MB)</th>
+<th>実行時間(秒)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>100</td>
+<td>98</td>
+<td>1024</td>
+<td>246</td>
+</tr>
+<tr>
+<td>300</td>
+<td>304</td>
+<td>1024</td>
+<td>218</td>
+</tr>
+<tr>
+<td>500</td>
+<td>469</td>
+<td>1024</td>
+<td>227</td>
+</tr>
+</tbody></table></div>
+<p>それぞれ一度ずつしか実行していませんが、API（Lambda）の最大同時実行数は概ね設定した上限値に近い値になっています。Lambdaの最大同時実行が304になっている理由はよくわかりませんが、他のリーソースからAPIが呼ばれたか、実行後のLambdaが完全に停止する前に新しくgoroutineが実行されたのだと思います。実行するたびに結果は違うとは思いますが、表の結果から同時実行数を300あたりに制限するのが良さそうです。</p>
+<h1 id="メモリサイズと実行時間"><a href="#メモリサイズと実行時間" class="headerlink" title="メモリサイズと実行時間"></a>メモリサイズと実行時間</h1><p>同時実行数と実行時間の関係性がわかり、その次に気になるのが、メモリサイズと実行時間の関係性です。同時実行数を500、行数を10万に固定してメモリサイズを変え実行時間との関係性を調査しました。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>同時実行数</th>
+<th>APIの最大同時実行数</th>
+<th>メモリ(MB)</th>
+<th>実行時間(秒)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>500</td>
+<td>488</td>
+<td>1024</td>
+<td>199</td>
+</tr>
+<tr>
+<td>500</td>
+<td>320</td>
+<td>2048</td>
+<td>110</td>
+</tr>
+<tr>
+<td>500</td>
+<td>460</td>
+<td>4096</td>
+<td>46</td>
+</tr>
+<tr>
+<td>500</td>
+<td>502</td>
+<td>6144</td>
+<td>39</td>
+</tr>
+<tr>
+<td>500</td>
+<td>475</td>
+<td>8192</td>
+<td>27</td>
+</tr>
+</tbody></table></div>
+<p>メモリサイズが大きいほど、実行時間が短くなっています。それぞれの最大メモリ使用量は200MB～280MBに収まっていたので、CPUの性能の違いで処理が高速化した可能性が高いです。</p>
+<h1 id="APIを100万回呼び出す"><a href="#APIを100万回呼び出す" class="headerlink" title="APIを100万回呼び出す"></a>APIを100万回呼び出す</h1><p>最後に8GBのメモリで100万行の処理を実行してみました。</p>
+<p>処理時間はなんと<strong>258秒</strong>でした！</p>
+<p>多少上振れするとしても、Lambda関数の実行時間の限界である900秒以内に200万件は余裕で登録出来そうです！</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><p><a target="_blank" rel="noopener" href="https://qiita.com/jerfareza/items/314401bb3fa55a82f8c0">Writing Large Data to CSV File in Go</a><br><a target="_blank" rel="noopener" href="https://selfnote.work/20210311/programming/must-consider-use-goroutine-in-loop/">[Golang]ループ処理内でgoroutineを使う時に考慮しておくべきこと</a><br><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-scaling.html#concurrent-execution-safety-limit">Lambda function scaling</a><br><a target="_blank" rel="noopener" href="https://pkg.go.dev/golang.org/x/sync/errgroup">pkg.go.dev/golang.org/x/sync/errgroup</a></p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20220516a/&related=twitterapi%2Ctwitter&text=Lambda%C3%97Go%E4%B8%A6%E5%88%97%E5%87%A6%E7%90%86%E3%81%A7100%E4%B8%87%E5%9B%9EAPI%E3%82%92%E5%91%BC%E3%81%B3%E5%87%BA%E3%81%99%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20220516a/&t=Lambda%C3%97Go%E4%B8%A6%E5%88%97%E5%87%A6%E7%90%86%E3%81%A7100%E4%B8%87%E5%9B%9EAPI%E3%82%92%E5%91%BC%E3%81%B3%E5%87%BA%E3%81%99" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20220516a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20220516a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2021.09.14</span><span class="snscount">&#9825;33</span><a href=/articles/20210914a/ title="普段からAWS Lambdaにはお世話になっているのですが、初めてカスタムランタイムを動かす仕事が舞い込んできました。AWS Lambdaでは下記のランタイムがサポートされています。"> LambdaをカスタムDockerランタイムで開発する方法</a></li><li class="related-posts-item"><span>2020.11.12</span><span class="snscount">&#9825;10</span><a href=/articles/20201112/ title="TIGの辻です。サーバーレスなアプリケーションを開発するときにAWS LambdaやCloud RunといったFaaSはとても重宝します。デプロイする関数のコードは1つの関数がモノリシックな大きな関数にならないように、小さな関数を組み合わせて実装するのが基本です。いくつかのユースケースでAWS LambdaからAWS Lambdaを同期的に呼び出したいケースがあったのですが、開発者が意識しておいたほうがいいようなハマりどころがいくつかありました。本記事ではGoで[AWS LambdaからAWS Lambdaを同期的に呼び出すとき]のハマりどころやTipsを紹介します。以下のような構成です"> GoでLambdaからLambdaを呼び出すときに気をつけたいポイント6選</a></li><li class="related-posts-item"><span>2020.10.22</span><span class="snscount">&#9825;8</span><a href=/articles/20201022/ title="筒井です。GoとAWS LambdaのためのMakefileを整理しました。Lambda Functionの増加と同時に増えていくターゲットにはオサラバです。"> GoとAWS LambdaのためのMakefile</a></li><li class="related-posts-item"><span>2020.07.27</span><span class="snscount">&#9825;9</span><a href=/articles/20200727/ title="[サーバレス連載企画]の8回目です。TIG DXユニットの真野です。ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。[工場をハックするための基本知識] の記事を書いた棚井さんと同じチームに所属しています。[サーバレス連載企画] の第8弾目として、Serverlessの代表格であるAWS LambdaでGoを用いてKinesisに対するKPL/KCL相当の処理についてまとめていきます。"> GoからAWS KinesisのAggregationFormatを利用する</a></li><li class="related-posts-item"><span>2020.07.22</span><span class="snscount">&#9825;8</span><a href=/articles/20200722/ title="昨今様々なシステムで利用さているAWSのLambdaですが、サーバレスということもあり何かのイベントをトリガに関数を起動させる方法が一般的かと思います。LambdaはAWSの様々なサービスをトリガとして起動することが可能で、自分たちの利用しているAWSサービスと組み合わせて実装するることでその真価を発揮します。AWSに少し詳しい人であればLambdaをAWSのサービストリガで起動させる事ができることは知っていると思いますが、いざ実装するとなると具体的にどういった手順で、なんの設定が必要かというところがわからないという人もいるのではないでしょうか。"> AWSサービストリガによるLambda起動</a></li><li class="related-posts-item"><span>2020.03.26</span><span class="snscount">&#9825;7</span><a href=/articles/20200326/ title="サーバレス連載の第2弾はLambdaアプリをGoで開発する中で調べた内容や、Tipsを紹介します。"> Serverless連載2: AWS Lambda×Goの開発Tips</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E6%A7%8B%E6%88%90"><span class="toc-text">システム構成</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#AWS-Lambda"><span class="toc-text">AWS Lambda</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A9%A6%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F%E7%B5%90%E6%9E%9C"><span class="toc-text">試してみた結果</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%A6%E8%A1%8C%E5%87%A6%E7%90%86"><span class="toc-text">並行処理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%90%8C%E6%99%82%E5%AE%9F%E8%A1%8C%E6%95%B0%E3%81%A8%E5%AE%9F%E8%A1%8C%E6%99%82%E9%96%93"><span class="toc-text">同時実行数と実行時間</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%A1%E3%83%A2%E3%83%AA%E3%82%B5%E3%82%A4%E3%82%BA%E3%81%A8%E5%AE%9F%E8%A1%8C%E6%99%82%E9%96%93"><span class="toc-text">メモリサイズと実行時間</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#API%E3%82%92100%E4%B8%87%E5%9B%9E%E5%91%BC%E3%81%B3%E5%87%BA%E3%81%99"><span class="toc-text">APIを100万回呼び出す</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="toc-text">参考文献</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (292)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (180)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (73)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (39)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (29)</a></li>
+<li class=""><a href="/categories/DB/">DB (16)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/VR/">VR (10)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (10)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (10)</a></li>
+<li class=""><a href="/categories/Security/">Security (5)</a></li>
+<li class=""><a href="/categories/Business/">Business (4)</a></li>
+<li class=""><a href="/categories/InfrasDataSciencetructure/">InfrasDataSciencetructure (1)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/22-XIGTIGTIG---e1iap0h" title="フューチャーがお届けするポッドキャストです。#22 【XIGリーダー】TIGリーダーの柴田健一さんにTIGの生い立ちと大切にしているカルチャーについて聞いてみた - 前編" target="_blank" rel="noopener"><span class="newitem">NEW</span> #22 【XIGリーダー】TIGリーダーの柴田健一さんにTIGの生い立ちと大切にしているカルチャーについて聞いてみた - 前編</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/21-GlyphFeeds---e1hpp5v" title="フューチャーがお届けするポッドキャストです。#21 グリフィード（GlyphFeeds）のプロダクトマネージャーである山上燦さんに聞いてみました - 後編" target="_blank" rel="noopener"><span class="newitem">NEW</span> #21 グリフィード（GlyphFeeds）のプロダクトマネージャーである山上燦さんに聞いてみました - 後編</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/20--GlyphFeeds---e1hj2nu" title="フューチャーがお届けするポッドキャストです。#20  グリフィード（GlyphFeeds）のプロダクトマネージャーである山上燦さんに聞いてみました - 前編" target="_blank" rel="noopener"> #20  グリフィード（GlyphFeeds）のプロダクトマネージャーである山上燦さんに聞いてみました - 前編</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-74047147-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-74047147-1');
+</script>
+
+  </div>
+</body>
+</html>
