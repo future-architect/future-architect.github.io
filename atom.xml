@@ -6,10 +6,70 @@
   <link href="https://future-architect.github.io/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2022-05-31T05:34:11.999Z</updated>
+  <updated>2022-06-01T05:23:13.727Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>GoとDynamoDBを用いた開発で反省していること</title>
+    <link href="https://future-architect.github.io/articles/20220601b/"/>
+    <id>https://future-architect.github.io/articles/20220601b/</id>
+    <published>2022-05-31T15:00:00.000Z</published>
+    <updated>2022-06-01T05:23:13.727Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG真野です。<a href="/articles/20220601a/">失敗談をテーマにした連載</a>で、ちょうどプロダクト開発的に良い区切りのタイミングでもあるため、振り返りがてら、DynamoDB,Go,AWS Lambdaの技術要素について自分自身の理解・見込みの甘さについて反省します。</p><h2 id="DynamoDBのシステム項目created-atとかupdated-atのタイムゾーンはJSTにすれば良かった"><a href="#DynamoDBのシステム項目created-atとかupdated-atのタイムゾーンはJSTにすれば良かった" class="headerlink" title="DynamoDBのシステム項目created_atとかupdated_atのタイムゾーンはJSTにすれば良かった"></a>DynamoDBのシステム項目created_atとかupdated_atのタイムゾーンはJSTにすれば良かった</h2><p>DynamoDBは日付型を直接サポートしておらず、文字列型で保存することになります。</p><ul><li><a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes.String">https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes.String</a></li></ul><p>データサイズや諸々の理由で<a href="https://docs.aws.amazon.com/sdk-for-go/api/service/dynamodb/dynamodbattribute/#UnixTime">UnixTime</a> 勢力もあるかもしれませんが、アプリケーションから直接参照されず、トレースその他を運用時の利用を目的にしたシステム項目は、可読性が大事なのでRFC3339ナノ秒で保管していました。RFC3339ナノ秒は <code>2022-06-01T03:31:14.6300415Z</code> と言った形式です。</p><p>ここまでは良かったのですがタイムゾーンはUTCに統一する方針を取っていたので、JSTではないです。変換するときは常に+9時間することになり激しく反省をしています。少なくてもクライアントのタイムゾーンがJSTであれば、JSTで保存したほうが良かったと考えています。JSTですと次のような形式を想定しています。</p><ul><li><code>2022-06-01T12:31:14.6300415+09:00</code></li></ul><p>ちなみに、AWS SDK for Goを用いると、time.Time型はデフォルトではRFC3339で保存されます。</p><blockquote><p><code>time.Time</code> is marshaled as RFC3339 format.<br><a href="https://docs.aws.amazon.com/sdk-for-go/api/service/dynamodb/dynamodbattribute/#:~:text=%60time.Time%60%20is%20marshaled%20as%20RFC3339%20format">https://docs.aws.amazon.com/sdk-for-go/api/service/dynamodb/dynamodbattribute/#:~:text=%60time.Time%60%20is%20marshaled%20as%20RFC3339%20format</a>.</p></blockquote><p>ちなみに、システム項目に限っていますが、時系列データのソートキーなどもJSTタイムゾーンで保存するほうが日本ユーザーが大半のケースにおいてはベターだと思います。</p><h2 id="時系列DBをDynamoDBに貯めるのは良かったけど、分析用のデータストアを最初から分けるべきだった"><a href="#時系列DBをDynamoDBに貯めるのは良かったけど、分析用のデータストアを最初から分けるべきだった" class="headerlink" title="時系列DBをDynamoDBに貯めるのは良かったけど、分析用のデータストアを最初から分けるべきだった"></a>時系列DBをDynamoDBに貯めるのは良かったけど、分析用のデータストアを最初から分けるべきだった</h2><p>今回のユースケースとしては、温湿度や移動情報（緯度経度）をそれなりの量と頻度（つまり時系列）で受信するようなタイプです。基本的には全データを利用するというよりは、ときより発生する異常値をトリガーに通知をしたり、ある断面のセンサー値を別システムに連携します。発生するデータ量の将来換算が読みきれずDynamoDBをメインのデータストアに採用したのは良かったのですが、データが蓄積するとちょっとした調査・集計をかなり頻繁に行いたくなりました。</p><p>最初はちょっとした集計ですし、簡易なスクリプトを開発していましたが、気づけばチーム全員がちょっとしたスクリプトを開発するのがうまくなっていました。これはこれで悪くないスキルセットかもしれませんが、すこし方向性が異なります。</p><p><a href="/articles/20210403/">S3 Export + Athenaで集計しよう</a>という方法も部分的に行いましたが、やはり特定の業務キー＋年月日でパーティショングしたいということもあり、これについては早期にデータ基盤を整えるべきであったと反省しています。</p><img src="/images/20220601b/失敗談技術ブログ.drawio.png" alt="失敗談技術ブログ.drawio.png" width="1200" height="698" loading="lazy"><h2 id="参照Viewを構築するためのDynamoDB-Streamsの処理はWeb-API側の同期処理に寄せて良かったのでは"><a href="#参照Viewを構築するためのDynamoDB-Streamsの処理はWeb-API側の同期処理に寄せて良かったのでは" class="headerlink" title="参照Viewを構築するためのDynamoDB Streamsの処理はWeb API側の同期処理に寄せて良かったのでは"></a>参照Viewを構築するためのDynamoDB Streamsの処理はWeb API側の同期処理に寄せて良かったのでは</h2><p>逆に、DynamoDB Streamsを使わないほうが良かったという話です。どうしてもアプリケーション管理画面からの参照要件が耐えられず、メインのテーブルの更新トリガーでLambdaを着火させ、参照のビューテーブルを作成する処理を追加しました。管理画面を作る処理は後々の追加要件であったため、すでに稼働済みのシステムに手をいれることを避け、疎結合に追加したという動きです。</p><p>アプリ上は疎結合となりましたが、アプリケーションの構成要素を増やすと後々面倒だなという思いが募ってきました。インフラの監視、運用、リリース。日機能的な性能、障害テストなども手間です。もちろん許容範囲内なので、この件に関してはメインテーブルに書き込みを担当するWeb APIのロジックに追加して良かったのかなと考えています。</p><h3 id="元の構成"><a href="#元の構成" class="headerlink" title="元の構成"></a>元の構成</h3><img src="/images/20220601b/失敗談技術ブログ-ページ2.drawio.png" alt="失敗談技術ブログ-ページ2.drawio.png" width="1200" height="771" loading="lazy"><h3 id="こうすればよかった"><a href="#こうすればよかった" class="headerlink" title="こうすればよかった"></a>こうすればよかった</h3><p>元も思想的には悪くない（DynamoDB Streams部分だけの改修で済むケースもあり影響範囲が限定的だった）ですが、終わってみればやや重厚だった気がします（ローカルの環境で再現するのが面倒で、単体テスト品質が上がりにくいにもあり）。</p><img src="/images/20220601b/失敗談技術ブログ-ページ3.drawio.png" alt="失敗談技術ブログ-ページ3.drawio.png" width="1200" height="771" loading="lazy"><h2 id="DynamoDBアクセスにAWS-SDK-for-Goを生で使う必要はなかったのでは"><a href="#DynamoDBアクセスにAWS-SDK-for-Goを生で使う必要はなかったのでは" class="headerlink" title="DynamoDBアクセスにAWS SDK for Goを生で使う必要はなかったのでは"></a>DynamoDBアクセスにAWS SDK for Goを生で使う必要はなかったのでは</h2><p>GoからDynamoDBアクセスをするためのパッケージは大体3つあるかなと思います。<a href="/tags/DynamoDB%C3%97Go/">DynamoDB×Go連載</a>を行ったことすらありました。</p><ol><li><a href="https://aws.amazon.com/jp/sdk-for-go/">AWS SDK for Go</a><ul><li>v1, v2がある</li></ul></li><li><a href="https://github.com/guregu/dynamo">guregu/dynamo</a></li><li><a href="https://gocloud.dev/">Go CDK</a></li></ol><p>AWS SDK for Goですが、記載がやや冗長になりがちでした。条件式も<a href="/articles/20211025a/">ヘルパーパッケージがあるよという記事</a>を書きましたが、やっぱり冗長です。公式提供だけに使えない機能は存在しない安心感はありましたが、guregu/dynamo が優秀すぎるので逆に生でわざわざ使う理由はないかなという印象です。</p><p>ちなみに、Go CDKは<a href="/articles/20200228/">DynamoDBアクセスもけっこういけるんじゃないか？</a>で1本記事を書きましたが、結局導入に至っていないです。別の機会があればこれはこれでチャレンジしたいと考えています。</p><h2 id="AWS-Lambdaのバッチ処理はStep-Functionsで必ずラップするルールにすれば良かった"><a href="#AWS-Lambdaのバッチ処理はStep-Functionsで必ずラップするルールにすれば良かった" class="headerlink" title="AWS Lambdaのバッチ処理はStep Functionsで必ずラップするルールにすれば良かった"></a>AWS Lambdaのバッチ処理はStep Functionsで必ずラップするルールにすれば良かった</h2><p>データ量が少ないため、ちょっとしたシステムI/Fでの受信/送信処理は生のLambdaで軽く書いていました。ご存知の通り最大実行時間は2022.6.1時点で15分です。今回の要件では問題なかったのですが、隣のチームに構成を移植された場合にはデータ量が多くなるケースがありタイムアウトが発生。いっそすべてStep Functionsでラップして統一するルールにしても良かったのかなと今では少し思っています。もちろん、ここだけECSやApp Runnerにする形式も面白いと思います。</p><h3 id="少し反省している構成"><a href="#少し反省している構成" class="headerlink" title="少し反省している構成"></a>少し反省している構成</h3><p>初期移行、リラン、連携先の不具合などで予期せぬデータ量に達した場合は、タイムアウトになりがち。</p><img src="/images/20220601b/失敗談技術ブログ-ページ4.drawio.png" alt="失敗談技術ブログ-ページ4.drawio.png" width="962" height="470" loading="lazy"><h3 id="横展開するのであれば最初から固く作っておいても良かったと思っている構成"><a href="#横展開するのであれば最初から固く作っておいても良かったと思っている構成" class="headerlink" title="横展開するのであれば最初から固く作っておいても良かったと思っている構成"></a>横展開するのであれば最初から固く作っておいても良かったと思っている構成</h3><p>連携先の品質その他の制御が取りにくい場合は、自衛的に固く作り込んでおくことが吉。</p><img src="/images/20220601b/失敗談技術ブログ-ページ5.drawio.png" alt="失敗談技術ブログ-ページ5.drawio.png" width="962" height="682" loading="lazy"><h2 id="その他"><a href="#その他" class="headerlink" title="その他"></a>その他</h2><ul><li><a href="https://github.com/go-swagger/go-swagger">go-swagger</a>も好きですが、 <a href="https://github.com/deepmap/oapi-codegen">deepmap/oapi-codegen</a> にしておけば良かった<ul><li>別にOpenAPI Specification v2（Swagger）で困ることもなく、v3を使いたいことはなかったのですが…</li></ul></li><li>go-swaggerで –strict-additional-properties をつけていることを忘れて、項目追加が許容できないため互換性を失い、リリースのときに困った<ul><li>開発時にtypoで誤った項目をcurlなどで呼ばれるよりはつけておいた方が間違いないだろうと考えたが、いつしかクライアントが増え、サーバ・クライアントのリリースサイクルがずれたときに困りました</li></ul></li><li>スキーマ駆動で自動生成したStructを、アプリ本体で用いるモデルのStructに埋め込めば良かった<ul><li>必ずしもWeb API時の項目とDBカラムが1:1ではないので、埋め込む方向に舵を切るとそれはそれで何か不満が出そうですが、項目詰め替え作業も<a href="https://github.com/jinzhu/copier">copier</a> を導入するのも何だかなと思っていた</li></ul></li><li>DynamoDBのGSIを用いて重複チェックをアプリ側で実装していましたが、反映まで時間がかかるため同時実行数の制御が必要などモヤるポイントがあった</li></ul><h2 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h2><p>列挙すると事前に回避ないしは途中で方向転換できそうな内容が多く、アーキテクチャ的な意思決定であったマネジメントレベルの調整ができなかったんだなと感じました。</p><p>また、こういった振り返りの記事がもっと増えると良いなと思います。</p>]]></content>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h1&gt;&lt;p&gt;TIG真野です。&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
+    
+    
+    <category term="DynamoDB" scheme="https://future-architect.github.io/tags/DynamoDB/"/>
+    
+    <category term="振り返り" scheme="https://future-architect.github.io/tags/%E6%8C%AF%E3%82%8A%E8%BF%94%E3%82%8A/"/>
+    
+    <category term="失敗談" scheme="https://future-architect.github.io/tags/%E5%A4%B1%E6%95%97%E8%AB%87/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>失敗談連載2022を始めます</title>
+    <link href="https://future-architect.github.io/articles/20220601a/"/>
+    <id>https://future-architect.github.io/articles/20220601a/</id>
+    <published>2022-05-31T15:00:00.000Z</published>
+    <updated>2022-06-01T05:22:07.420Z</updated>
+    
+    <content type="html"><![CDATA[<img src="/images/20220601a/the-eleventh-hour-g4dea65fba_1280.jpg" alt="" width="800" height="531"><p>こんにちは。技術ブログ運営の伊藤です。<br>今回は、タイトルの通り、普段仕事している中での失敗談を集めた連載開始のインデックス記事となります。</p><h2 id="いろんな失敗"><a href="#いろんな失敗" class="headerlink" title="いろんな失敗"></a>いろんな失敗</h2><p>普段、仕事で開発などを進めているとき、そのときのレビューが通過したり、気づきにくい小さなミスなどがあるかと思います。そういった内容がちょっとずつ積もっていき、どこかで障害になったり、性能の劣化を引き起こします。</p><p>はたまた、日頃の作業をしている中で、一つ忘れてしまったがために、クラウドプロバイダーから高額な請求が来てしまうこともあります。<br>そういった、人が作業、開発する上ではどこかに失敗はつきものであるので、本連載を読んで、失敗しそうな落とし穴を事前に把握したり、日々の業務をちょっと気をつけるなどしていただければ幸いです。</p><h2 id="連載スケジュール"><a href="#連載スケジュール" class="headerlink" title="連載スケジュール"></a>連載スケジュール</h2><p>本連載は以下のスケジュールで記事を公開します。<br>扱う内容が変わったり、公開日程がずれることがございますが、ご了承ください。</p><div class="scroll"><table><thead><tr><th>日付</th><th>執筆者</th><th>タイトル</th></tr></thead><tbody><tr><td>6/1</td><td>真野隼記</td><td><a href="/articles/20220601b/">GoとDynamoDBを用いた開発で反省していること</a></td></tr><tr><td>6/2</td><td>穴井智史</td><td>int32 型のサロゲートキーが数年でオーバーフローしそうになった件</td></tr><tr><td>6/3</td><td>原忠辰</td><td>Go言語において、map型の間違った使用による性能劣化と解決まで至った経緯</td></tr><tr><td>6/6</td><td>藤井亮佑</td><td>RDSの自動再起動によるインフラコストの悲劇</td></tr><tr><td>6/7</td><td>久保勇暉</td><td>Dynamoでユーザー要望で検索条件増えてく</td></tr><tr><td>6/8</td><td>辻大志郎</td><td>Lambdaのグローバル変数</td></tr><tr><td>6/9</td><td>岸下優介</td><td>Google Workspace Admin SDK の Directory APIのリクエスト間隔は気を付けましょう</td></tr></tbody></table></div><h2 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h2><p>失敗談連載は今年が初の試みになりますが、ジャストアイデアで募ったところ、6名の方が参加してくださいました。</p><p>失敗を経て、現在は修正されているネタなので、失敗からどう回復したか、なども是非読んでいただければと思います。</p><p>その他の連載は以下の連載スケジュールに記載されていたり、Twitterにて告知するので、ぜひ併せてご確認お願いします！</p><ul><li><a href="/articles/20220117a">2022年のブログ連載予定を発表します</a></li><li><a href="https://twitter.com/future_techblog">公式Twitter</a></li></ul>]]></content>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;img src=&quot;/images/20220601a/the-eleventh-hour-g4dea65fba_1280.jpg&quot; alt=&quot;&quot; width=&quot;800&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
+    
+    
+    <category term="インデックス" scheme="https://future-architect.github.io/tags/%E3%82%A4%E3%83%B3%E3%83%87%E3%83%83%E3%82%AF%E3%82%B9/"/>
+    
+    <category term="失敗談" scheme="https://future-architect.github.io/tags/%E5%A4%B1%E6%95%97%E8%AB%87/"/>
+    
+  </entry>
   
   <entry>
     <title>golang.tokyo #32 で go-twowaysql について紹介しました</title>
@@ -615,72 +675,6 @@
     <category term="書籍" scheme="https://future-architect.github.io/tags/%E6%9B%B8%E7%B1%8D/"/>
     
     <category term="書評" scheme="https://future-architect.github.io/tags/%E6%9B%B8%E8%A9%95/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>技術情報の調べ方</title>
-    <link href="https://future-architect.github.io/articles/20220421a/"/>
-    <id>https://future-architect.github.io/articles/20220421a/</id>
-    <published>2022-04-20T15:00:00.000Z</published>
-    <updated>2022-04-21T05:09:58.151Z</updated>
-    
-    <content type="html"><![CDATA[<img src="/images/20220421a/markus-winkler-afW1hht0NSs-unsplash.jpg" alt="" width="640" height="427" loading="lazy"><p>Photo by <a href="https://unsplash.com/@markuswinkler?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Markus Winkler</a> on <a href="https://unsplash.com/s/photos/search?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></p><h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIGの岸本卓也です。 <a href="/articles/20220418a/">春の入門連載2022</a> の4日目です。</p><p>業務を進める上では日々多くの技術情報を調べる必要がありますが、無策に調べると時間を浪費したりイマイチな解決策を採用してしまう可能性があります。そこで、本稿では普段私がやっている方法を中心に、調べる上でのポイントを紹介します。</p><p>調べる方法として、自分で調べる方法と人に聞く方法があると思いますので、それぞれの場合のポイントを紹介し、最後に調べる上で便利なツールを紹介します。</p><h1 id="自分で調べる場合のポイント"><a href="#自分で調べる場合のポイント" class="headerlink" title="自分で調べる場合のポイント"></a>自分で調べる場合のポイント</h1><p>自分で調べる場合は以下の点が大切です。</p><ol><li><strong>自力解決に制限時間を設け、それまでに解決できなければ上長に相談したり人に聞くといった別の方法に切り替える</strong><br>初めてチャレンジすることは分からないことが多いため、全て自分で調べていてはタスクに割り当てられた時間では足りません。課題によってはそもそも自力解決が不可能なこともあります。業務プロジェクトは期限が決まっているので、スケジュールを優先して適宜手段を切り替えていく必要があります。</li><li><strong>公式情報を当たる</strong><br>昨今は多数の情報を簡単に入手できますがその質は様々なため、適切な情報を選び取る必要があります。品質が高く信頼性に足る情報源としては公式情報が一番なため公式情報は必ず調べます。</li><li><strong>解決の選択肢を1個に絞らない</strong><br>課題の解決方法は複数あることが多いです。したがって最初に見つけた方法をそのまま採用するのではなく、複数の方法を調査、比較、検討して個別事情に適した方法を選択します。</li></ol><p>前述の通り公式情報が最も信頼できますが非公式の情報も参考になることが多いです。そこで、以下では公式/非公式それぞれの情報の使い方を紹介します。</p><h2 id="公式情報"><a href="#公式情報" class="headerlink" title="公式情報"></a>公式情報</h2><p>製品や規格のオーナー自身が公開しているまたはオーナーが認めたコミュニティなどの第三者が公開している情報や、広く認められた団体に登録された情報が公式情報にあたります。公式情報は最も信頼できる情報源のため、常に公式情報は調べるようにすると良いです。</p><p>代表的な公式情報には以下のものがあります。</p><ul><li><strong>公式の原文情報</strong><br>大抵は英語で記述されています。製品マニュアル、ブログ、課題追跡システム、規格・規約 (RFC) などがあります。使い方や仕様を調べる場合はマニュアルや規格・規約を、エラーや課題を調べる場合は製品のGitHub issuesを調べると良いです。</li><li><strong>公式の翻訳情報</strong><br>日本でもよく使われている場合は、製品マニュアルやブログの公式日本語翻訳版が公開されていることがあります。翻訳情報は以下に注意して参考にします。<ul><li>時々情報が古いことがあるため、公開日、更新日が古かったり、違和感がある場合は原文を参照します。</li><li>不自然な日本語のある翻訳情報の場合は機械翻訳の可能性があります。機械翻訳は理解しにくい日本語になっていることや、稀に原文と真逆の意味に翻訳されてしまっていることがあります。読みにくい場合や説明に違和感がある場合は原文を参照します。</li></ul></li><li><strong>製品サポート</strong><br>有償サポートやコミュニティによるサポートが公式に提供されていることがあります。プロプライエタリな製品について調べる場合は公開情報が少ないため積極的に活用する必要があります。調べたいことの期日感や難易度に応じて活用すると良いです。</li><li><strong>ソース</strong><br>プログラムの動きや事実を把握するには最も正確な情報源です。調べたいことの期日感や必要性に応じて調べると良いです。</li></ul><p>なお、製品マニュアルやソースは製品バージョン別の文書を公開していることが多いです。そういった情報は調査したい内容に一致するバージョンの文書を参照することが大切です。</p><h2 id="非公式情報"><a href="#非公式情報" class="headerlink" title="非公式情報"></a>非公式情報</h2><p>先人が残してくれた多種多様な非公式情報も参考になることがよくあります。しかし、一定の品質が担保される公式情報に対して非公式情報の信頼性はまちまちなため、以下のような工夫をして参考にします。</p><ul><li>複数の情報を組み合わせる。</li><li>情報源の信頼性を見極める。</li><li>公開日、更新日を確認し、古過ぎる情報は避ける。</li></ul><p>代表的な非公式情報には以下のものがあります。</p><ul><li><strong>非公式の翻訳情報</strong><br>公式原文情報の非公式翻訳であれば内容の信頼性はある程度期待できますが、情報の鮮度は公式の翻訳情報以上に注意が必要です。</li><li><strong>法人の技術サイトやブログ</strong><br>当ブログのように会社の看板を掲げている情報源はある程度品質担保された情報になっていると期待できます。</li><li><strong>技術系Q&amp;Aサイト</strong><br>Stack Exchangeネットワーク (代表的な物はStack Overflow, Super Userなど) やteratailといったQ&amp;Aサイトはコメント機能や評価機能があることが多く、信憑性のある情報を見つけやすいです。ただし、間違った回答や古い情報が高評価になっていることもあるため裏取りが必要です。</li><li><strong>個人執筆の記事</strong><br>情報が古くなりがちだったり、環境依存な解決策が記述されていることがあるため、注意深く検証と裏取りが必要です。</li><li><strong>ユーザーコミュニティ</strong><br>物によってはユーザーが集まるコミュニティがSlackやDiscordなどにできていることがあります。大抵は英語でのやり取りですが、日本のユーザー会が日本語でやり取りしているチャネルもあるのでログを探したり聞いてみる、という方法もあります。</li></ul><h1 id="人に聞く場合のポイント"><a href="#人に聞く場合のポイント" class="headerlink" title="人に聞く場合のポイント"></a>人に聞く場合のポイント</h1><p>人に聞く場合は相手が自分と齟齬のない共通認識を持ってもらうことが重要です。そのためには正確な内容を不足なく誤解を生まない表現で伝える必要があります。AWSで「 <a href="https://aws.amazon.com/jp/premiumsupport/tech-support-guidelines/">技術的なお問い合わせに関するガイドライン</a> 」という文書が公開されており、以下の部分はAWSに限らず質問する場合の方法としてとても参考になるため、まずはこれを参考にすると良いです。</p><ul><li>解決したい課題を明確にする</li><li>状況を正確に共有する</li><li>経緯を共有する</li></ul><p>このガイドラインに加えて、以下の点に注意すると良いです。</p><ul><li><strong>情報を絞らない</strong><ul><li>エラーメッセージ、ログ、ソースコードなどはパスワードのような機微情報だけマスクして全量共有します。ソースリポジトリ経由で共有する場合は、ブランチ名だけでなくタグ、コミットID、リビジョン番号といったソースのバージョンも伝えると良いです。</li><li>情報を絞ると質問を受けた方では確実に情報不足を感じます。</li></ul></li><li><strong>事実とそれ以外 (自分の考え、仮説など) を混在させない、明確に区別して伝える</strong><br>これらが混在していると認識齟齬を生みやすいです。</li><li><strong>試したこと、調べたこと、考えたことは初手で伝えておく</strong><br>これを試してください→それは既にやっていたけどダメでした、というやり取りは無駄なだけでなく相手の心証を悪くする可能性があります。</li><li><strong>なぜそれを聞きたいのか、背景も伝える</strong><br>背景を伝えることで、より良い別の方法や考え方を提示してもらえる可能性があります。</li><li><strong>解決してもしなくても最終的な結果とお礼を伝える</strong><br>質問した内容とその結果はナレッジや事例としてとても役に立つため、相談相手の糧となったり、同様の課題に直面する他の人の助けとなります。</li></ul><h1 id="Web検索におけるTips"><a href="#Web検索におけるTips" class="headerlink" title="Web検索におけるTips"></a>Web検索におけるTips</h1><p>最もよく使う調査方法はWeb検索だと思いますので、ここではWeb検索する上でのコツを紹介します。</p><ul><li><strong>英語で検索する</strong><br>できれば英語で検索します。特にエラーメッセージを検索する場合は、英文エラーメッセージが出力されるようにして英文で検索した方が良いです。日本語よりも英語の情報の方が圧倒的に多く、適切な情報ににたどり着けるかどうかに大きな差があるためです。ほぼ日本でしか使われていない製品に関する情報のみ日本語で検索します。</li><li><strong>質の低いページを検索結果から除外する</strong><br>昨今は高品質な情報が検索結果上位に表示されるとは限らなくなってしまっています。例えば日本語で検索するとStack Overflow英語版を機械翻訳しただけのWebページが出てくることもよくありますが、こういったWebページは、不自然な日本語で読みにくい、検索結果の一部を占めてしまう、悪質なスクリプトが埋め込まれている危険性があるといった問題があると考えています。<br>そのような低品質なWebページは、指定したドメインは検索結果から排除してくれるブラウザ拡張機能を使ってまとめて消しておくと良いです。</li><li><strong>検索エンジンの絞り込み機能を使う</strong><br>検索エンジンで提供されている、サイト内検索、フレーズ検索、除外検索、期間指定といった機能を使って適宜情報を絞り込みます。例えば、製品バージョン別のマニュアルが公開されている場合は特定バージョンのマニュアルだけ検索されるようにサイト内検索を指定したり、エラーメッセージならフレーズ検索したりします。</li><li><strong>ブラウザに検索ショートカットを追加する</strong><br>ブラウザによってはアドレスバーから直接任意のWebサイト内を検索するショートカットが追加できます (Google Chromeなら <a href="https://support.google.com/chrome/answer/95426">サイト内検索のショートカットを追加</a>)。私はよく調べる製品マニュアルや辞書サイトを追加しており、以下のようにすぐに調べられるようにしています。</li></ul><img src="/images/20220421a/insite-search_example.png" alt="insite-search_example" width="640" height="524" loading="lazy"><h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>本稿では既存の情報を調べるときに私が実践している方法を紹介しました。</p><p>課題によっては自力解決は不可能で、ベンダーやステークホルダーを巻き込んで解決策を模索したり想定する解決策に対して公式見解を引き出すといった方法が必要なこともよくあります。視野を広くすると採れる手段が複数見えてくるので、課題解決にあたっては周囲を巻き込んでいくことが大切です。自分で抱え込みすぎないために、最初に書いた制限時間を決めて手段を切り替えていくことを意識すると良いと思います。</p><p>春の入門連載2022の次は永井さんの「プロになるJava」読書感想文です。</p>]]></content>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;img src=&quot;/images/20220421a/markus-winkler-afW1hht0NSs-unsplash.jpg&quot; alt=&quot;&quot; width=&quot;640&quot; height=&quot;427&quot; loading=&quot;lazy&quot;&gt;
-
-&lt;p&gt;Photo by &lt;a</summary>
-        
-      
-    
-    
-    
-    <category term="Culture" scheme="https://future-architect.github.io/categories/Culture/"/>
-    
-    
-    <category term="入門" scheme="https://future-architect.github.io/tags/%E5%85%A5%E9%96%80/"/>
-    
-    <category term="新人向け" scheme="https://future-architect.github.io/tags/%E6%96%B0%E4%BA%BA%E5%90%91%E3%81%91/"/>
-    
-    <category term="トラブルシュート" scheme="https://future-architect.github.io/tags/%E3%83%88%E3%83%A9%E3%83%96%E3%83%AB%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%88/"/>
-    
-    <category term="ドキュメント" scheme="https://future-architect.github.io/tags/%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>強いお兄さん達に囲まれて</title>
-    <link href="https://future-architect.github.io/articles/20220420a/"/>
-    <id>https://future-architect.github.io/articles/20220420a/</id>
-    <published>2022-04-19T15:00:00.000Z</published>
-    <updated>2022-04-20T04:49:27.451Z</updated>
-    
-    <content type="html"><![CDATA[<img src="/images/20220420a/top.png" alt="" width="800" height="518"><h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>おはようございます、流通製造グループの戸田聖人です。<br><a href="https://future-architect.github.io/articles/20220418a/">春の入門連載2022</a>の3日目です。</p><p>「新人のときに知っておきたかったこと」として、自分が新人だったときに周りの強いお兄さんたちから学んだことを書いていこうと思います。<br>思考の持ち方の話ばかりなので、ぜひ他の連載記事も読んで技術的な話も見て行ってください！</p><h1 id="お兄さんたちの背中と言葉"><a href="#お兄さんたちの背中と言葉" class="headerlink" title="お兄さんたちの背中と言葉"></a>お兄さんたちの背中と言葉</h1><p>新人研修を終えて、縁あってアサインされたのは少しばかり特殊なプロジェクトで、OJTのリーダーとトレーナーにはプロジェクトのリーダーを統括する立場の人がついてくれました。<br>彼らを見ていて感じたこと、教えてくれたことを書いて行きます。</p><h2 id="言語化し、言語化した言葉を分解して具体的にしていくこと"><a href="#言語化し、言語化した言葉を分解して具体的にしていくこと" class="headerlink" title="言語化し、言語化した言葉を分解して具体的にしていくこと"></a>言語化し、言語化した言葉を分解して具体的にしていくこと</h2><p>アサインされてから他のプロジェクトに移るまで、彼らと話しているときに感じ続けたことは「言葉が重い」ということでした。<br>借りてきた言葉ではなく、彼ら自身の経験と思考からの言葉であることが伝わってきました。</p><p>その言葉の重みの源流は <strong>「言語化し、言語化した言葉を分解して具体的にしていくこと」</strong> であること思いました。</p><p>一つ一つの事柄・事象を言葉として表現し、表現した言葉を分解して要素に分解しそこから得られるものをすべて吸い上げるような思考をしていました。</p><p>非常に単純な例ですが「とあるタスクの期日までに終わらなかった」としましょう、その場合には下記のように分解していけます。</p><ul><li>タスクが期日までに終わらなかった（なぜ終わらなかったのか？）<ul><li>想定していた時間よりも多くの時間が必要だった（なぜ多くの時間が必要だったのか？）<ul><li>自分の能力を超えるタスクだった（どのように自分の能力を超えていたのか？）<ul><li>自分の知らない領域の知識が必要だった（習得を期限内に終わらせるにはどうすればよかったか？）<ul><li>既に知っている人（上司やメンバー）に質問するべきだった（なぜ質問ができなかったか？）<ul><li>話しかけるタイミングが無かった（なぜ話しかけるタイミングがなかったか？）<ul><li> ……</li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></li></ul><p>この様に具体的な行動な行動や施策になり、それを行う際に気をつけることが出るまで分解します。</p><p>上記は言ってしまえば「PDCAサイクルを回す」や「なぜなぜ分析」をすることそのものです。<br>しかしながら、その動作を自然体として行い、眼の前の事柄を単純な作業としてではなく考え続けた結果として彼らの言葉の重みがあると私は感じました。<br>当たり前のことを当たり前に積み重ねることの重要性を学びました。</p><h2 id="他人を観察し良いと思うことを吸収すること"><a href="#他人を観察し良いと思うことを吸収すること" class="headerlink" title="他人を観察し良いと思うことを吸収すること"></a>他人を観察し良いと思うことを吸収すること</h2><p>これは、面談の際に繰り返し受けたアドバイスです。</p><p>ただ「この人は仕事ができてすごいなぁ……」ではなく、「なぜそう感じるのか」「どこを見て自分がすごいと思ったのか」を観察して考えることです。</p><p>自分1人の行動とその振り返りの積み重ね自体も大切ですが、それでは自身の経験に線形に比例した成長しかできません。<br>しかし、他人が経験し身につけたものを吸収することができれば自分の経験に対して非線形な成長をしていけます。</p><p>チームのメンバーが増えればそれだけ吸収できる他人も増えます、その全員の良いところを観察し吸収すれば飛躍的な成長をしていくことができます。</p><p>今の自分が経験できないことも他人は経験し、それを糧にしています。<br>その他人の経験を吸収し自分が経験する際の基礎とすれば、自分の経験自体もより上質なものに変わっていきます。<br>そうすれば経験の積み重ねの成長もより早くなります。</p><p>今、自分が得られるものをすべて利用する貪欲さを学びました。</p><h2 id="視野を広く持つこと（先入観や前提を疑うこと）"><a href="#視野を広く持つこと（先入観や前提を疑うこと）" class="headerlink" title="視野を広く持つこと（先入観や前提を疑うこと）"></a>視野を広く持つこと（先入観や前提を疑うこと）</h2><p>私がアドバイスしてもらった「他人と目線を合わせること」を例に話します。</p><p>「目線を揃える」と聞くと私は、「話し手である自分が聞き手である相手がわかるように話す。」と言ったイメージを持っていました。<br>しかしながら、それは視野が狭いと教えてもらいました。</p><p>前述した「話し手である自分が聞き手である相手がわかるように話す。」は自分の目線を相手の目線に揃えるために「自分の目線を下げる」行動になります。<br>相手に伝えるということから、自分の目線が上であり相手の目線が低いこと・相手の目線は変えられないことを先入観・前提としてしまっています。</p><p>その先入観を排せば、話し手と聞き手と目線が揃っていないときにできることは次の4つに増えます。</p><ul><li>話し手が聞き手と同じ目線まで下げる</li><li>話し手が情報をインプットし聞き手と同じ目線まで上げる</li><li>聞き手に情報をインプットし目線を上げてもらう</li><li>聞き手に目線が高いことを伝えて目線を下げてもらう</li></ul><p>このアドバイスを受けたときに、自分自身が言葉にしていない先入観にとらわれていることに気付かされました。<br>先入観・意識しない前提がないかを疑うことを学びました。</p><h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>私がアサインされた当時を思い返しながらつらつらと書かせていただきました。</p><p>「当たり前のことを書いていたな」「そんな見方もあるんだ」「その考え方はおかしい」等の様々な感想があると思います。<br>私が感じたことを書いてあるので、否定も肯定もあると思います。<br>ただ、この記事をきっかけに皆さん自分自身の言葉と考えを持って、様々な経験を自身の成長の糧としていってほしいと思います。<br>皆さんの成長の礎になることが出来れば幸いです。</p><p>新しい環境に入って、新しい人と関わって、と新しいことだらけで不安になることもあると思います。<br>しかし、裏を返せばそれだけ吸収して成長できることにあふれているとも取れます。<br>ワクワクして楽しんで仕事をして成長していってください！</p><p><a href="https://future-architect.github.io/articles/20220418a/">春の入門連載2022</a>、次回は岸本さんです。お楽しみに！</p>]]></content>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;img src=&quot;/images/20220420a/top.png&quot; alt=&quot;&quot; width=&quot;800&quot; height=&quot;518&quot;&gt;
-
-&lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot;</summary>
-        
-      
-    
-    
-    
-    <category term="Culture" scheme="https://future-architect.github.io/categories/Culture/"/>
-    
-    
-    <category term="新人向け" scheme="https://future-architect.github.io/tags/%E6%96%B0%E4%BA%BA%E5%90%91%E3%81%91/"/>
-    
-    <category term="ビジネス" scheme="https://future-architect.github.io/tags/%E3%83%93%E3%82%B8%E3%83%8D%E3%82%B9/"/>
     
   </entry>
   
