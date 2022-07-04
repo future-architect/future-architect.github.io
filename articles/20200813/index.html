@@ -29,17 +29,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   
-  <meta name="description" content="フューチャー夏休み自由研究連載の9回目です。 はじめにこんにちは、TIG DXユニットの西田と申します。 業務では GCP のインフラの設計&#x2F;構築&#x2F;運用を担当しております。私は前職でネットワーク領域のキャリアが長かった事もあり、現職では GCP の中でも特にネットワークに関する部分を見ています。今回の自由研究もそれに関連する考察をしていきます。 記事についてクラウド上で、ワールドワイドのサービスを">
+  <meta name="description" content="フューチャー夏休み自由研究連載の9回目です。 はじめにこんにちは、TIG DXユニットの西田と申します。 業務では GCP のインフラの設計&#x2F;構築&#x2F;運用を担当しております。私は前職でネットワーク領域のキャリアが長かった事もあり、現職では GCP の中でも特にネットワークに関する部分を見ています。今回の自由研究もそれに関連する考察をしていきます。 記事についてクラウド上で、ワール">
 <meta property="og:type" content="article">
 <meta property="og:title" content="GCPのRegion間レイテンシからサービスのRegion集約を考察する | フューチャー技術ブログ">
 <meta property="og:url" content="https://future-architect.github.io/articles/20200813/index.html">
 <meta property="og:site_name" content="フューチャー技術ブログ">
-<meta property="og:description" content="フューチャー夏休み自由研究連載の9回目です。 はじめにこんにちは、TIG DXユニットの西田と申します。 業務では GCP のインフラの設計&#x2F;構築&#x2F;運用を担当しております。私は前職でネットワーク領域のキャリアが長かった事もあり、現職では GCP の中でも特にネットワークに関する部分を見ています。今回の自由研究もそれに関連する考察をしていきます。 記事についてクラウド上で、ワールドワイドのサービスを">
+<meta property="og:description" content="フューチャー夏休み自由研究連載の9回目です。 はじめにこんにちは、TIG DXユニットの西田と申します。 業務では GCP のインフラの設計&#x2F;構築&#x2F;運用を担当しております。私は前職でネットワーク領域のキャリアが長かった事もあり、現職では GCP の中でも特にネットワークに関する部分を見ています。今回の自由研究もそれに関連する考察をしていきます。 記事についてクラウド上で、ワール">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20200813/2020-08-02_233921.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20200813/2020-08-02_231622.jpg">
 <meta property="article:published_time" content="2020-08-12T15:00:00.000Z">
-<meta property="article:modified_time" content="2022-01-24T06:13:37.533Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:53.069Z">
 <meta property="article:tag" content="Network">
 <meta property="article:tag" content="GCP">
 <meta property="article:tag" content="Terraform">
@@ -59,7 +59,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
   <link rel="stylesheet" href="/metronic/assets/style.css">
   <link rel="stylesheet" href="/css/theme-styles.css">
-<meta name="generator" content="Hexo 6.2.0"></head>
+<meta name="generator" content="Hexo 5.4.2"></head>
 
 <body class="corporate">
   <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
@@ -122,7 +122,7 @@
           
             <p><a href="/articles/20200726/">フューチャー夏休み自由研究連載</a>の9回目です。</p>
 <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIG DXユニットの西田と申します。</p>
-<p>業務では <code>GCP</code> のインフラの設計/構築/運用を担当しております。私は前職でネットワーク領域のキャリアが長かった事もあり、現職では <code>GCP</code> の中でも特にネットワークに関する部分を見ています。今回の自由研究もそれに関連する考察をしていきます。</p>
+<p>業務では <code>GCP</code> のインフラの設計&#x2F;構築&#x2F;運用を担当しております。私は前職でネットワーク領域のキャリアが長かった事もあり、現職では <code>GCP</code> の中でも特にネットワークに関する部分を見ています。今回の自由研究もそれに関連する考察をしていきます。</p>
 <h1 id="記事について"><a href="#記事について" class="headerlink" title="記事について"></a>記事について</h1><p>クラウド上で、ワールドワイドのサービスを作るとき、<strong>『どれくらいの密度でどの Region にサーバを立てればよいのか？』</strong>って、悩みませんか？インターネット向けのWebサービスだったら <code>CDN</code> で対処すれば基本的にはOKですが、イントラネットだけからアクセスさせたい社内サービス、Backend 系のサービス、Webサービスではないアプリケーションなどはインスタンスを用意する必要が出てきますよね。<br>選択肢としては以下です。</p>
 <ul>
 <li>全リージョンにサーバを構築する<ul>
@@ -164,11 +164,11 @@
 </tr>
 <tr>
 <td align="left">それ以上</td>
-<td align="left">4Gで遅い時/3G利用など</td>
+<td align="left">4Gで遅い時&#x2F;3G利用など</td>
 <td align="left">これは遅い…使いたくない</td>
 </tr>
 </tbody></table></div>
-<p>なので、**<code>60ms</code> までは集約可能**と判断する事にします。<br>※重ねてになりますが、提供するサービスの種類/作りにこの基準は大きく依存します。音声系・映像系だと遅いと致命的な影響を受けますが、ファイルサーバの様なサービスだともう少し基準を下げられる、などはあり得ます。</p>
+<p>なので、**<code>60ms</code> までは集約可能**と判断する事にします。<br>※重ねてになりますが、提供するサービスの種類&#x2F;作りにこの基準は大きく依存します。音声系・映像系だと遅いと致命的な影響を受けますが、ファイルサーバの様なサービスだともう少し基準を下げられる、などはあり得ます。</p>
 <h1 id="GCP-の全-Region-間のレイテンシを計測する"><a href="#GCP-の全-Region-間のレイテンシを計測する" class="headerlink" title="GCP の全 Region 間のレイテンシを計測する"></a>GCP の全 Region 間のレイテンシを計測する</h1><h3 id="計測対象"><a href="#計測対象" class="headerlink" title="計測対象"></a>計測対象</h3><p>こちらの <a target="_blank" rel="noopener" href="https://cloud.google.com/compute/docs/regions-zones?hl=ja">Compute Engine リージョンとゾーン</a> に記載の全Region を対象にします。<br>※すいません、ムンバイだけ、QuotaがデフォルトでCPUS:0となっており、上げるリクエストを出したんですが、拒否されてしまいました。その関係で、ムンバイだけ計測が出来ませんでした🙇‍♂️<br><img src="/images/20200813/2020-08-02_233921.png" loading="lazy"></p>
 <h3 id=""><a href="#" class="headerlink" title=""></a></h3><ul>
 <li>フルメッシュで計測</li>
@@ -184,14 +184,14 @@
 <h1 id="考察"><a href="#考察" class="headerlink" title="考察"></a>考察</h1><p>考察に当たっては、少しを前提を置きます。</p>
 <ul>
 <li>対象となる企業は、グローバル展開している日本企業（<code>Japanese Multinational Corporations</code>）であり、Japan に Global Headquarters(<code>GHQ</code>) が存在する。<ul>
-<li>人数的には、Japan が最も従業員/顧客が多い。</li>
+<li>人数的には、Japan が最も従業員&#x2F;顧客が多い。</li>
 </ul>
 </li>
-<li>各国の支社/支部がイントラネットを通じて社内向けのサービスにアクセスする。</li>
+<li>各国の支社&#x2F;支部がイントラネットを通じて社内向けのサービスにアクセスする。</li>
 </ul>
 <p>割と現実的な前提ですよね。その前提を元に、考えると、以下の様になります。</p>
 <ul>
-<li>東京：日本/韓国/台湾/香港を集約（台湾/香港は、香港に別だしでも良い秒数）<ul>
+<li>東京：日本&#x2F;韓国&#x2F;台湾&#x2F;香港を集約（台湾&#x2F;香港は、香港に別だしでも良い秒数）<ul>
 <li>GHQがあるので、まずはココを起点に考えます。</li>
 </ul>
 </li>
