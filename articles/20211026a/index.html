@@ -38,7 +38,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20211026a/loop-button.png">
 <meta property="article:published_time" content="2021-10-25T15:00:00.000Z">
-<meta property="article:modified_time" content="2022-01-24T06:13:38.134Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:53.583Z">
 <meta property="article:tag" content="AWS">
 <meta property="article:tag" content="Network">
 <meta property="article:tag" content="Go">
@@ -62,7 +62,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
   <link rel="stylesheet" href="/metronic/assets/style.css">
   <link rel="stylesheet" href="/css/theme-styles.css">
-<meta name="generator" content="Hexo 6.2.0"></head>
+<meta name="generator" content="Hexo 5.4.2"></head>
 
 <body class="corporate">
   <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
@@ -172,7 +172,7 @@
 </ul>
 <p>書いていることを整理しました。</p>
 <ul>
-<li>（今回で言うとKinesis）へのサービスへのリクエストの書き込みに成功/失敗について、SDK側は分からない<ul>
+<li>（今回で言うとKinesis）へのサービスへのリクエストの書き込みに成功&#x2F;失敗について、SDK側は分からない<ul>
 <li>レスポンス読み取りに失敗しただけなので、リクエスト自体は成功した（Kinesisにデータはputできた）かもしれない</li>
 </ul>
 </li>
@@ -184,7 +184,7 @@
 <p>…なるほど、理由が分かるとスッキリしますね。<br><code>read</code>がない <code>connection reset</code> をリトライするのは、おそらく書き込み側（リクエストを送信する時）にエラーになったケースなので、その場合は処理が成功することはありえないので、リトライを行うということだったようです。</p>
 <h2 id="その上で今回はリトライすべきかどうか"><a href="#その上で今回はリトライすべきかどうか" class="headerlink" title="その上で今回はリトライすべきかどうか"></a>その上で今回はリトライすべきかどうか</h2><p>今回の構築したサービスの仕様だと、Kinesis Data Streamsをサブスクライブしているアプリは <strong>冪等</strong> であることを期待しているので、重複してputすることを許容し、そのままリトライさせることにします。（ていうかKinesisであればそもそもサービスとしてAt Least Onceなので、SDK側の判断で重複リトライしてもよいのでは..という気もしましたが、ダメなケースがあるのかな）。</p>
 <p>リトライ方法ですが、先程のカスタムリトライの記事にあったとおり、DefaultRetryerを拡張して実装します。</p>
-<h2 id="カスタムリトライの実装"><a href="#カスタムリトライの実装" class="headerlink" title="カスタムリトライの実装"></a>カスタムリトライの実装</h2><p>aws/aws-sdk-go のリポジトリの <a target="_blank" rel="noopener" href="https://github.com/aws/aws-sdk-go/tree/main/example/aws/request/customRetryer">exampleフォルダ</a>にカスタムリトライのサンプルコードがあり参考にできます。</p>
+<h2 id="カスタムリトライの実装"><a href="#カスタムリトライの実装" class="headerlink" title="カスタムリトライの実装"></a>カスタムリトライの実装</h2><p>aws&#x2F;aws-sdk-go のリポジトリの <a target="_blank" rel="noopener" href="https://github.com/aws/aws-sdk-go/tree/main/example/aws/request/customRetryer">exampleフォルダ</a>にカスタムリトライのサンプルコードがあり参考にできます。</p>
 <p>実装を見ると、500番台のエラーは常に <strong>リトライしない</strong> という拡張なようです。</p>
 <figure class="highlight go"><figcaption><span>custom_retryer.goから抜粋</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> CustomRetryer <span class="keyword">struct</span> &#123;</span><br><span class="line">	client.DefaultRetryer</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r CustomRetryer)</span></span> ShouldRetry(req *request.Request) <span class="type">bool</span> &#123;</span><br><span class="line">	<span class="keyword">if</span> req.HTTPResponse.StatusCode &gt;= <span class="number">500</span> &#123;</span><br><span class="line">		<span class="comment">// Don&#x27;t retry any 5xx status codes.</span></span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Fallback to SDK&#x27;s built in retry rules</span></span><br><span class="line">	<span class="keyword">return</span> r.DefaultRetryer.ShouldRetry(req)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -194,7 +194,7 @@
 
 <p>上記の実装だと、<code>read: connection reset</code>が発生した場合に規定の回数より多くリトライをしてしまうのでは？という懸念が浮かびましたが、ドキュメントを読むと最大リトライの配慮は別処理でなされるので問題ないようです。</p>
 <blockquote>
-<p>// Implementations may consider request attempt count when determining if a<br>// request is retryable, but the SDK will use MaxRetries to limit the<br>// number of attempts a request are made<br>ShouldRetry(*Request) bool<br><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/sdk-for-go/api/aws/request/#Retryer">https://docs.aws.amazon.com/sdk-for-go/api/aws/request/#Retryer</a></p>
+<p>&#x2F;&#x2F; Implementations may consider request attempt count when determining if a<br>&#x2F;&#x2F; request is retryable, but the SDK will use MaxRetries to limit the<br>&#x2F;&#x2F; number of attempts a request are made<br>ShouldRetry(*Request) bool<br><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/sdk-for-go/api/aws/request/#Retryer">https://docs.aws.amazon.com/sdk-for-go/api/aws/request/#Retryer</a></p>
 </blockquote>
 <p>それ以外の判定はDefaultRetryerに最終的な判断を移譲させます。</p>
 <p>実装したカスタムリトライは aws sessionで設定できます。</p>
