@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Engineer Camp2022 RustでSQLフォーマッタ作成（後編） | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="この記事は前編の続きです。この記事では、作成したフォーマッタの実装について説明します。 作成したフォーマッタの処理の流れ前編でも示しましたが、今回作成したフォーマッタの処理の流れを再度示します。   使用した技術フォーマッタの実装にはRustを使用し、構文解析にはtree-sitter-sqlを使用しました。 Rust  高速で、かつwasm-packなどのライブラリを用いてWebAssembly">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Engineer Camp2022 RustでSQLフォーマッタ作成（後編） | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20220916c/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="この記事は前編の続きです。この記事では、作成したフォーマッタの実装について説明します。 作成したフォーマッタの処理の流れ前編でも示しましたが、今回作成したフォーマッタの処理の流れを再度示します。   使用した技術フォーマッタの実装にはRustを使用し、構文解析にはtree-sitter-sqlを使用しました。 Rust  高速で、かつwasm-packなどのライブラリを用いてWebAssembly">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20220916c/nagare.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220916c/rustacean.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220916c/syntax_tree-Comment_tech.drawio_(3).png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220916c/syntax_tree-Comment_tech.drawio_(2).png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220916c/syntax_tree-to_comment.drawio_(1).png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220916c/syntax_tree-to_ID.drawio_(3).png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220916c/syntax_tree-Comment_tech.drawio_(2)_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220916c/syntax_tree-to_comment.drawio_(2).png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220916c/calc_tab_1.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220916c/calc_tab_2.png">
+<meta property="article:published_time" content="2022-09-15T15:00:02.000Z">
+<meta property="article:modified_time" content="2022-09-16T06:58:12.234Z">
+<meta property="article:tag" content="SQL">
+<meta property="article:tag" content="インターン">
+<meta property="article:tag" content="インターン2022">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20220916c/nagare.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20220916c/">
+  <meta content="SQL,インターン,インターン2022" name="keywords">
+  <meta content="川渕皓太" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Cuture/">Cutureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Engineer Camp2022 RustでSQLフォーマッタ作成（後編）
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20220916c_Engineer_Camp2022_RustでSQLフォーマッタ作成（後編）.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20220916c_Engineer_Camp2022_RustでSQLフォーマッタ作成（後編）" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-09-15T15:00:02.000Z" itemprop="datePublished">2022.09.16</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%B7%9D%E6%B8%95%E7%9A%93%E5%A4%AA" title="川渕皓太さんの記事一覧へ" class="post-author">川渕皓太</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/SQL/" title="SQLタグの記事へ" class="tag-list-link">SQL</a>
+  
+    
+    <a href="/tags/インターン/" title="インターンタグの記事へ" class="tag-list-link">インターン</a>
+  
+    
+    <a href="/tags/インターン2022/" title="インターン2022タグの記事へ" class="tag-list-link">インターン2022</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p>この記事は<a href="/articles/20220916b/">前編</a>の続きです。この記事では、作成したフォーマッタの実装について説明します。</p>
+<h1 id="作成したフォーマッタの処理の流れ"><a href="#作成したフォーマッタの処理の流れ" class="headerlink" title="作成したフォーマッタの処理の流れ"></a>作成したフォーマッタの処理の流れ</h1><p>前編でも示しましたが、今回作成したフォーマッタの処理の流れを再度示します。</p>
+<img src="/images/20220916c/nagare.png" alt="" width="960" height="228" loading="lazy">
+
+<h1 id="使用した技術"><a href="#使用した技術" class="headerlink" title="使用した技術"></a>使用した技術</h1><p>フォーマッタの実装にはRustを使用し、構文解析にはtree-sitter-sqlを使用しました。</p>
+<h3 id="Rust"><a href="#Rust" class="headerlink" title="Rust"></a>Rust</h3><img src="/images/20220916c/rustacean.png" alt="" width="1200" height="800" loading="lazy">
+
+<p>高速で、かつwasm-packなどのライブラリを用いてWebAssembly化することができることから、様々なプラットフォームで動作するため、Rustを採用しました。</p>
+<h3 id="tree-sitter-sql"><a href="#tree-sitter-sql" class="headerlink" title="tree-sitter-sql"></a><a target="_blank" rel="noopener" href="https://github.com/m-novikov/tree-sitter-sql">tree-sitter-sql</a></h3><p><a target="_blank" rel="noopener" href="https://tree-sitter.github.io/tree-sitter/">tree-sitter</a>で出力されたSQLパーサです。tree-sitterとは作成した文法ファイルからパーサを自動生成するパーサジェネレータの1つです。一般的なパーサライブラリは抽象構文木(AST)を出力するのに対して、tree-sitter-sqlは具象構文木(CST)を出力します。ASTが意味のない情報(例: コメントや多重括弧など)を保持しないのに対して、CSTはそのような情報も保持します。</p>
+<p>今回作成するフォーマッタではコメントや括弧の情報を使用したいため、CSTを出力することができるtree-sitter-sqlを採用しました。</p>
+<h1 id="フォーマット用の構造体の作成"><a href="#フォーマット用の構造体の作成" class="headerlink" title="フォーマット用の構造体の作成"></a>フォーマット用の構造体の作成</h1><p>行末に現れるコメントの取得や縦揃えの機能を実現するために、tree-sitter-sqlから得られたCSTをそのまま使用するのではなく、CSTのノードをDFS(深さ優先探索)で辿り、フォーマット用の構造体を用いて再構成しました。<br>次のような構造体を定義しています。</p>
+<figure class="highlight rust"><figcaption><span>定義した構造体の例(一部省略)</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 文</span></span><br><span class="line"><span class="title function_ invoke__">pub</span>(<span class="keyword">crate</span>) <span class="keyword">struct</span> <span class="title class_">Statement</span>&#123; <span class="comment">/* ... */</span> &#125;</span><br><span class="line"><span class="comment">// 句</span></span><br><span class="line"><span class="title function_ invoke__">pub</span>(<span class="keyword">crate</span>) <span class="keyword">struct</span> <span class="title class_">Clause</span> &#123; <span class="comment">/* ... */</span>&#125;</span><br><span class="line"><span class="comment">// 句の本体</span></span><br><span class="line"><span class="title function_ invoke__">pub</span>(<span class="keyword">crate</span>) <span class="keyword">enum</span> <span class="title class_">Body</span> &#123; <span class="comment">/* ... */</span> &#125;</span><br><span class="line"><span class="comment">// エイリアス式、演算式、行末コメントを含む式</span></span><br><span class="line"><span class="title function_ invoke__">pub</span>(<span class="keyword">crate</span>) <span class="keyword">struct</span> <span class="title class_">AlignedExpr</span> &#123; <span class="comment">/* ... */</span> &#125;</span><br><span class="line"><span class="comment">// 式</span></span><br><span class="line"><span class="title function_ invoke__">pub</span>(<span class="keyword">crate</span>) <span class="keyword">enum</span> <span class="title class_">Expr</span> &#123; <span class="comment">/* ... */</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// その他の式、Bodyは省略</span></span><br></pre></td></tr></table></figure>
+
+<p>実装した構造体について、一部抜粋して説明します。</p>
+<h3 id="Clause構造体"><a href="#Clause構造体" class="headerlink" title="Clause構造体"></a>Clause構造体</h3><figure class="highlight rust"><figcaption><span>Clause構造体</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 句</span></span><br><span class="line"><span class="title function_ invoke__">pub</span>(<span class="keyword">crate</span>) <span class="keyword">struct</span> <span class="title class_">Clause</span> &#123;</span><br><span class="line">    keyword: <span class="type">String</span>,    <span class="comment">// キーワード (e.g., SELECT, FROM)</span></span><br><span class="line">    body: <span class="type">Option</span>&lt;Body&gt;, <span class="comment">// 句の本体</span></span><br><span class="line">    loc: Location,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Clause</code>構造体は句(e.g., SELECT句、FROM句)に対応した構造体です。現状対応している構文に現れる句は、いずれも以下のような構造をしています。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Keyword</span><br><span class="line">    Body</span><br></pre></td></tr></table></figure>
+<p>e.g., SELECT句</p>
+<figure class="highlight sql"><figcaption><span>SELECT句の例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="comment">/* キーワード */</span></span><br><span class="line"><span class="comment">/* ここから本体 */</span></span><br><span class="line">    ID</span><br><span class="line">,   NAME</span><br><span class="line"><span class="comment">/* ここまで本体 */</span></span><br></pre></td></tr></table></figure>
+<p>そのため、フィールドにはキーワードと本体(<code>Body</code>)を保持させています。<br>詳細は割愛しますが、<code>Body</code>に後述する<code>AlignedExpr</code>を複数保持させることで、複数行の式の縦揃えを実現しています。</p>
+<h3 id="AlignedExpr構造体"><a href="#AlignedExpr構造体" class="headerlink" title="AlignedExpr構造体"></a>AlignedExpr構造体</h3><figure class="highlight rust"><figcaption><span>AlignedExpr</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// エイリアス式、演算式、行末コメントを含む式</span></span><br><span class="line"><span class="title function_ invoke__">pub</span>(<span class="keyword">crate</span>) <span class="keyword">struct</span> <span class="title class_">AlignedExpr</span> &#123;</span><br><span class="line">    lhs: Expr,                      <span class="comment">// 左辺</span></span><br><span class="line">    rhs: <span class="type">Option</span>&lt;Expr&gt;,              <span class="comment">// 右辺</span></span><br><span class="line">    op: <span class="type">Option</span>&lt;<span class="type">String</span>&gt;,             <span class="comment">// 演算子(ASや比較演算子)</span></span><br><span class="line">    loc: Location,                  <span class="comment">// ソースコード上の対応位置</span></span><br><span class="line">    trailing_comment: <span class="type">Option</span>&lt;<span class="type">String</span>&gt;,   <span class="comment">// 行末コメント</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>AlignedExpr</code>構造体は、現状揃えたいAS句や比較演算子、行末コメントを含む式に対応しています。<br>例えば、以下のSQLを考えてみます。</p>
+<figure class="highlight sql"><figcaption><span>例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	STD.ID		<span class="keyword">AS</span>	STD_ID		<span class="comment">-- 学籍番号</span></span><br><span class="line">,	STD.NAME	<span class="keyword">AS</span>	STD_NAME	<span class="comment">-- 名前</span></span><br></pre></td></tr></table></figure>
+
+<p>今回作成したフォーマッタでは、このように<code>AS</code>と行末のコメントの位置を縦揃えする必要がありました。そこで、揃える対象となる<code>AS</code>や<code>=</code>などの比較演算子、行末のコメントを持つ行(式)を<code>AlignedExpr</code>構造体で表現しています。<br><code>AlignedExpr</code>構造体は、左辺(<code>lhs</code>)、演算子(<code>op</code>)、右辺(<code>rhs</code>)と行末コメント(<code>trailing_comment</code>)をフィールドに保持しています。<br>上の例の学籍番号の行は、左辺が<code>STD.ID</code>、演算子が<code>AS</code>、右辺が<code>STD_ID</code>、そして行末コメントが<code>-- 学籍番号</code>であるような<code>AlignedExpr</code>のインスタンスです。<br>フォーマットを行う際には、左辺や右辺の長さを参照して縦揃えを実現しています。具体的な縦揃えの方法は後述します。</p>
+<h1 id="コメントノードの処理"><a href="#コメントノードの処理" class="headerlink" title="コメントノードの処理"></a>コメントノードの処理</h1><p>コメントの情報はCST上に保持されますが、直感的でない位置に現れてしまう場合があります。そのため、それに対応する処理を行います。例として以下のようなSQL文を考えます。</p>
+<figure class="highlight sql"><figcaption><span>行末に現れるコメント</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	ID</span><br><span class="line">,   GRADE <span class="comment">-- 成績</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><figcaption><span>次以降の行に現れるコメント</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    ID</span><br><span class="line">,   GRADE</span><br><span class="line"><span class="comment">/* <span class="doctag">TODO:</span> add NAME */</span></span><br></pre></td></tr></table></figure>
+
+<p>これらのSQLをtree-sitter-sqlでパースすると、どちらも以下のようなCSTが構築されます。</p>
+<img src="/images/20220916c/syntax_tree-Comment_tech.drawio_(3).png" alt="syntax_tree-Comment_tech.drawio_(3).png" width="582" height="222" loading="lazy">
+
+
+<p>これは、パース時にコメントの位置等を考慮しておらず、コメントの意味まで解釈できないためです。<br>下のSQLはこの木構造で問題ありませんが、上のSQLでは、<code>GRADE</code>とその末尾コメントである<code>-- 成績</code>がまとまっていたほうが直感的です。そこで、私たちのフォーマッタではCSTを走査する段階で、行末コメントとその行の式を対応付けています。<br>これからその対応付けの方法について説明します。例として以下のSQLを考えます。</p>
+<figure class="highlight sql"><figcaption><span>行末に現れるコメント</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	ID</span><br><span class="line">,   GRADE <span class="comment">-- 成績</span></span><br></pre></td></tr></table></figure>
+
+<p>このSQL文をtree-sitter-sqlでパースすると、以下のようなCSTが出力されます。</p>
+<img src="/images/20220916c/syntax_tree-Comment_tech.drawio_(2).png" alt="syntax_tree-Comment_tech.drawio_(2).png" width="581" height="222" loading="lazy">
+
+<p>出力されたCSTでは<code>GRADE</code>のコメントである<code>-- 成績</code>が<code>ファイル</code>ノードの子ノードになってしまっています。パーサーではコメントの意味まで解釈することができないため、このような直感的でない木構造になってしまうことがあります。<br>この離れた位置にある2つのノードを同じ<code>AlignedExpr</code>構造体に格納する方法について説明します。<br>まずCST上の<code>GRADE</code>ノードまで深さ優先探索順に辿ります。</p>
+<img src="/images/20220916c/syntax_tree-to_comment.drawio_(1).png" alt="syntax_tree-to_comment.drawio_(1).png" width="581" height="222" loading="lazy">
+
+<p><code>GRADE</code>ノードを辿り終わった時点での自作構造体は以下のようになります。</p>
+<img src="/images/20220916c/syntax_tree-to_ID.drawio_(3).png" alt="syntax_tree-to_ID.drawio_(3).png" width="381" height="211" loading="lazy">
+
+<p>この状態で次のノードへ辿ると、コメントノードが出現します。</p>
+<img src="/images/20220916c/syntax_tree-Comment_tech.drawio_(2)_2.png" alt="syntax_tree-Comment_tech.drawio_(2).png" width="581" height="222" loading="lazy">
+
+<p>コメントノードが出現した時点の自作構造体を参照し、自作構造体の一番最後の子とコメントが同じ行であれば<code>trailing_comment</code>にコメントを追加します。今回の例では<code>GRADE</code>を左辺として持っている<code>aligned_expr</code>に<code>-- 成績</code>を追加します。</p>
+<img src="/images/20220916c/syntax_tree-to_comment.drawio_(2).png" alt="syntax_tree-to_comment.drawio_(2).png" width="396" height="282" loading="lazy">
+
+<h1 id="レンダリング時の処理"><a href="#レンダリング時の処理" class="headerlink" title="レンダリング時の処理"></a>レンダリング時の処理</h1><p>先述したように構文木を再構築し、最後にレンダリングをして整形されたSQL文を出力します。このときにインデントの調整や縦揃えのためにタブ文字を適切な数挿入します。</p>
+<p>挿入するタブ文字の計算について説明します。例えば以下のようなSQLで、タブ幅4の場合を考えます。</p>
+<figure class="highlight sql"><figcaption><span>例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    LONGLONGTABLE   LLTB</span><br><span class="line">,   TABLE1          TB1</span><br></pre></td></tr></table></figure>
+
+<img src="/images/20220916c/calc_tab_1.png" alt="calc_tab_1.png" width="846" height="183" loading="lazy">
+
+<p>テーブル名を左辺、エイリアスを右辺として説明します。<br>上の行の左辺(<code>LONGLONGTABLE</code>)は13文字で、これにタブを1つ加えた16文字の位置から右辺(<code>LLTB</code>)が開始します。上の行の右辺の開始位置、すなわち16文字の位置に下の行の右辺(<code>TB1</code>)の開始位置が合わさるようにタブ文字を挿入します。</p>
+<img src="/images/20220916c/calc_tab_2.png" alt="calc_tab_2.png" width="842" height="231" loading="lazy">
+
+<p>下の行の左辺(<code>TABLE1</code>)は6文字であるため、今回の例ではタブ文字を3つ挿入することで右辺の位置が揃います。<br>このように、合わせたい部分における最長の左辺の長さを利用して、以下の式で各行で挿入するタブ文字の数を計算します。求めた数タブ文字を挿入することで縦揃えを実現できます。</p>
+<p><code>(左辺のタブ長) = ((文字列の長さ) / TAB_SIZE) + 1</code><br><code>(挿入するタブ文字の数) = ((左辺のタブ長最大値) - (合わせたい行の左辺のタブ長))</code></p>
+<p>同様の処理を行うことで、コメント、演算子も縦揃えをすることができます。</p>
+<h1 id="感想"><a href="#感想" class="headerlink" title="感想"></a>感想</h1><p>最後に本インターンの感想です。</p>
+<h2 id="インターンの感想-川渕"><a href="#インターンの感想-川渕" class="headerlink" title="インターンの感想 (川渕)"></a>インターンの感想 (川渕)</h2><p>今回のインターンでは齋藤さんとペアで設計~開発を行っていたため、お互いが何を考えているかを詳細に把握する必要がありました。また、毎日のミーティングで受け入れ先のプロジェクトの方に成果報告をする場面では、自分の頭の中を説明する難しさを改めて実感しました。このようなことから、相手にわかりやすく伝えることの難しさと大切さを実感したので、これから意識して伝える力を向上させたいと思いました。</p>
+<p>今回のインターンは4週間あり、始まる前は長いと感じていましたが、いざ始まってみると毎日充実しており、あっという間に過ぎてしまいました。受け入れ先のプロジェクトの方をはじめとしたFUTUREの方が楽しく成長できるように工夫していただいたからだと思います。4週間本当に楽しかったです！ありがとうございました！</p>
+<h2 id="インターンの感想-齋藤"><a href="#インターンの感想-齋藤" class="headerlink" title="インターンの感想 (齋藤)"></a>インターンの感想 (齋藤)</h2><p>私(齋藤)は研究で構文解析を扱っており、その経験が生かせると考えて本インターンシップに参加しました。実際の業務の中では、使用する構文解析ソフトウェアの選定や構文解析結果を利用したフォーマッタの開発など、構文解析に関する知識が生かせる業務が多くありました。</p>
+<p>このようなニッチな技術・分野は直接ビジネスにかかわってくるとは限りませんが、業務改善などの点でビジネスを支える重要な技術であるということを実感できました。<br>他にもチーム開発の経験が得られたり、フューチャーの社風を肌で感じることができ、様々なことを学ばせていただきました。4週間本当にありがとうございました！</p>
+<h1 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h1><p>今回はフォーマッタの作成を行いました。タスク外でも他のプロジェクトの参加者とのコミュ会やディナー等たくさんのイベントを開いていただきました。</p>
+<p>受け入れてくれたコアテクの皆さん、HRの皆さん、Engineer Camp2022に参加していたインターン生の皆さんに感謝します。<br>4週間本当にありがとうございました！</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20220916c/&related=twitterapi%2Ctwitter&text=Engineer%20Camp2022%20Rust%E3%81%A7SQL%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%82%BF%E4%BD%9C%E6%88%90%EF%BC%88%E5%BE%8C%E7%B7%A8%EF%BC%89%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20220916c/&t=Engineer%20Camp2022%20Rust%E3%81%A7SQL%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%82%BF%E4%BD%9C%E6%88%90%EF%BC%88%E5%BE%8C%E7%B7%A8%EF%BC%89" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20220916c/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20220916c/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.09.16</span><span class="snscount">&#9825;0</span><a href=/articles/20220916b/ title="みなさん、こんにちは！Future Engineer Camp 2022に参加した川渕と齋藤です。今回のインターンではSQLフォーマッタをRustで作成しました。私達が取り組んだ内容を紹介します。SQLフォーマッタとはSQLを統一された体裁にフォーマットしてくれるツールです。体裁を統一することで他人が見ても読みやすいコードになり、生産性が向上します。"><span class="newitem">NEW</span> Engineer Camp2022 RustでSQLフォーマッタ作成（前編）</a></li><li class="related-posts-item"><span>2022.09.16</span><span class="snscount">&#9825;0</span><a href=/articles/20220916a/ title="フューチャーのインターンシッププログラムの、Enginner Summer Camp 2022にてHealthCare Innovation Group（以下HIG）のインターンシップに参加した永田遊希です。インターン参加理由は..."><span class="newitem">NEW</span> Enginner Summer Camp 2022に参加しました（HIG編）</a></li><li class="related-posts-item"><span>2022.09.14</span><span class="snscount">&#9825;4</span><a href=/articles/20220914a/ title="みなさん、こんにちは！Future Engineer Camp 2022に参加いたしました、荒木です。本インターンに参加した経緯やそこでの学びについてお話ししたいと思います。元々、以下のような基準でインターンシップを探していました。"><span class="newitem">NEW</span> Engineer Camp 2022（プロパンガス配送計画の最適化に向けた数値データ解析）参戦記</a></li><li class="related-posts-item"><span>2022.06.06</span><span class="snscount">&#9825;5</span><a href=/articles/20220606b/ title="フューチャーのサマーインターン2022 Summer Engineer Camp🌞⛺🏃の募集が始まりました。フューチャーでは夏のインターンシップは2つのコースがあります。"> フューチャー夏のインターンシップ2022（Engineer Camp）の募集を開始しました！</a></li><li class="related-posts-item"><span>2020.09.19</span><span class="snscount">&#9825;9</span><a href=/articles/20200919/ title="はじめまして。フューチャーのインターンEngineer Campに参加した中村と申します。この記事では、今回のインターンで私が取り組んだ内容を紹介します。今回のインターンで私は、SQLフォーマッタの作成に取り組みました。"> Engineer Camp2020でSQLフォーマッタを開発しました</a></li><li class="related-posts-item"><span>2021.10.19</span><span class="snscount">&#9825;12</span><a href=/articles/20211019a/ title="こんにちは、Future のインターン Engineer Camp に参加した空閑です。今回のインターンではソースコード静的解析システムの開発に取り組みました。そこで本記事では、開発内容の一部である、Python の AST モジュールを使ったクラス構造の可視化について紹介します。Python の環境構築については以下を参考にしました。[サーバーアプリ開発環境"> Engineer Camp2021: Python の AST モジュールを使ってクラス構造を可視化する</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220916b/ title="みなさん、こんにちは！Future Engineer Camp 2022に参加した川渕と齋藤です。今回のインターンではSQLフォーマッタをRustで作成しました。私達が取り組んだ内容を紹介します。SQLフォーマッタとはSQLを統一された体裁にフォーマットしてくれるツールです。体裁を統一することで他人が見ても読みやすいコードになり、生産性が向上します。"><span class="newitem">NEW</span> Engineer Camp2022 RustでSQLフォーマッタ作成（前編）</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%9C%E6%88%90%E3%81%97%E3%81%9F%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%82%BF%E3%81%AE%E5%87%A6%E7%90%86%E3%81%AE%E6%B5%81%E3%82%8C"><span class="toc-text">作成したフォーマッタの処理の流れ</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%9F%E6%8A%80%E8%A1%93"><span class="toc-text">使用した技術</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Rust"><span class="toc-text">Rust</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tree-sitter-sql"><span class="toc-text">tree-sitter-sql</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88%E7%94%A8%E3%81%AE%E6%A7%8B%E9%80%A0%E4%BD%93%E3%81%AE%E4%BD%9C%E6%88%90"><span class="toc-text">フォーマット用の構造体の作成</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Clause%E6%A7%8B%E9%80%A0%E4%BD%93"><span class="toc-text">Clause構造体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AlignedExpr%E6%A7%8B%E9%80%A0%E4%BD%93"><span class="toc-text">AlignedExpr構造体</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%B3%E3%83%A1%E3%83%B3%E3%83%88%E3%83%8E%E3%83%BC%E3%83%89%E3%81%AE%E5%87%A6%E7%90%86"><span class="toc-text">コメントノードの処理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%AC%E3%83%B3%E3%83%80%E3%83%AA%E3%83%B3%E3%82%B0%E6%99%82%E3%81%AE%E5%87%A6%E7%90%86"><span class="toc-text">レンダリング時の処理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%84%9F%E6%83%B3"><span class="toc-text">感想</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%B3%E3%81%AE%E6%84%9F%E6%83%B3-%E5%B7%9D%E6%B8%95"><span class="toc-text">インターンの感想 (川渕)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%B3%E3%81%AE%E6%84%9F%E6%83%B3-%E9%BD%8B%E8%97%A4"><span class="toc-text">インターンの感想 (齋藤)</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%95%E3%81%84%E3%81%94%E3%81%AB"><span class="toc-text">さいごに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (327)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (192)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (79)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (43)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (17)</a></li>
+<li class=""><a href="/categories/Business/">Business (17)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/VR/">VR (11)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (5)</a></li>
+<li class=""><a href="/categories/Cuture/">Cuture (2)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/29-CSIG-e1mle23" title="フューチャーがお届けするポッドキャストです。#29 CSIGの見据えるセキュリティの未来は？安全な国「日本」におけるサイバーセキュリティの考え方（後編）" target="_blank" rel="noopener"> #29 CSIGの見据えるセキュリティの未来は？安全な国「日本」におけるサイバーセキュリティの考え方（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/28-CSIG-e1m7tcs" title="フューチャーがお届けするポッドキャストです。#28 CSIGってどんな組織？サイバーセキュリティ部隊の仕事を徹底解剖！！（前編）" target="_blank" rel="noopener"> #28 CSIGってどんな組織？サイバーセキュリティ部隊の仕事を徹底解剖！！（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/27-DX-----e1l8edo" title="フューチャーがお届けするポッドキャストです。#27 【DXアプローチ】デザインワークって何?!ミンさんに基本の"き"から教わりました - 後編" target="_blank" rel="noopener"> #27 【DXアプローチ】デザインワークって何?!ミンさんに基本の"き"から教わりました - 後編</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
