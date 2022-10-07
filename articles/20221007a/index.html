@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Auth0のトークン取得とITPへの対応 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは。フューチャーの棚井龍之介と申します。認証認可連載の 4 本目を担当しました。 認証認可周りは最近触りたてでして、普段の開発業務では、Go・React・AWS を利用しています。 先日、React ベースのモバイル向け Web アプリに Auth0 の認証を実装したところ、Silent Authentication（サイレント認証）のタイミングでブラウザからトークンが消失し、ログ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Auth0のトークン取得とITPへの対応 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20221007a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは。フューチャーの棚井龍之介と申します。認証認可連載の 4 本目を担当しました。 認証認可周りは最近触りたてでして、普段の開発業務では、Go・React・AWS を利用しています。 先日、React ベースのモバイル向け Web アプリに Auth0 の認証を実装したところ、Silent Authentication（サイレント認証）のタイミングでブラウザからトークンが消失し、ログ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20221007a/スクリーンショット_2022-10-05_3.12.54.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221007a/auth0_pkce.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221007a/failed_auth0.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221007a/failed_emulator.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221007a/スクリーンショット_2022-10-05_2.46.11.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221007a/スクリーンショット_2022-10-05_2.57.58.png">
+<meta property="article:published_time" content="2022-10-06T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-10-07T06:18:13.521Z">
+<meta property="article:tag" content="Auth0">
+<meta property="article:tag" content="AuthN">
+<meta property="article:tag" content="ITP">
+<meta property="article:tag" content="Cookie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20221007a/スクリーンショット_2022-10-05_3.12.54.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20221007a/">
+  <meta content="Auth0,AuthN,ITP,Cookie" name="keywords">
+  <meta content="棚井龍之介" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可カテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Auth0のトークン取得とITPへの対応
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20221007a_Auth0のトークン取得とITPへの対応.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20221007a_Auth0のトークン取得とITPへの対応" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-10-06T15:00:00.000Z" itemprop="datePublished">2022.10.07</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%A3%9A%E4%BA%95%E9%BE%8D%E4%B9%8B%E4%BB%8B" title="棚井龍之介さんの記事一覧へ" class="post-author">棚井龍之介</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Auth0/" title="Auth0タグの記事へ" class="tag-list-link">Auth0</a>
+  
+    
+    <a href="/tags/AuthN/" title="AuthNタグの記事へ" class="tag-list-link">AuthN</a>
+  
+    
+    <a href="/tags/ITP/" title="ITPタグの記事へ" class="tag-list-link">ITP</a>
+  
+    
+    <a href="/tags/Cookie/" title="Cookieタグの記事へ" class="tag-list-link">Cookie</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。フューチャーの棚井龍之介と申します。<a href="/articles/20221003a/">認証認可連載</a>の 4 本目を担当しました。</p>
+<p>認証認可周りは最近触りたてでして、普段の開発業務では、Go・React・AWS を利用しています。</p>
+<p>先日、React ベースのモバイル向け Web アプリに Auth0 の認証を実装したところ、Silent Authentication（サイレント認証）のタイミングでブラウザからトークンが消失し、ログイン状態が維持できない現象に遭遇しました。</p>
+<p>調べたところ、Safari に搭載されているトラッキング防止機能の ITP（Intelligent Tracking Prevention &#x2F; インテリジェント・トラッキング・プリベンション）が原因だと判明しました。</p>
+<p>調べる過程で、Cookie の基本的な機能からアドテク周りの技術要素、最近のプライバシー保護トレンドについて触れる機会を得ましたので、技術ブログとして整理しました。</p>
+<p>本記事では、以下の内容を扱います</p>
+<ul>
+<li>Cookie（1st Party、3rd Party）</li>
+<li>ITP（Intelligent Tracking Prevention）</li>
+<li>ITP による、Auth0 の PKCE フローへの影響<ul>
+<li>対応方法</li>
+</ul>
+</li>
+</ul>
+<p>前半は Cookie とプライバシー保護の話で、後半が Auth0 と ITP の話です。</p>
+<h1 id="Cookie-とは"><a href="#Cookie-とは" class="headerlink" title="Cookie とは"></a>Cookie とは</h1><p>Cookie とは、Web サイトに訪れたユーザの情報を、一時的に保存する機能のことです。<br>この「一時保存する機能」により、ユーザのログイン状態を維持することや、Web ページに再訪したときに「この人は、以前にウチのサイトに来た〇〇さんだ！」と判定できます。</p>
+<img src="/images/20221007a/スクリーンショット_2022-10-05_3.12.54.png" alt="" width="1200" height="614" loading="lazy">
+
+<p>「以前に来た〇〇さん」と技術的に判定できると、次は「きっと〇〇さんならば…」という「Cookie により収集された個人属性の、Web 広告利用」へと直結させる動きが当然出てきます。</p>
+<p>最近だとプライバシー保護の観点から、こういった Web 広告の規制が強化されるトレンドにあります。例えば、Web サイトのトップページに訪問した際に「Cookie の有効化に同意してください。Yes or No」がポップアップで表示されて、オプトインでの意思表示が求められるのは、このトレンドに乗ったものだと思います。</p>
+<h2 id="Cookie-の分類"><a href="#Cookie-の分類" class="headerlink" title="Cookie の分類"></a>Cookie の分類</h2><p>続いて、Cookie の分類を見ていきます。</p>
+<p>Cookie の発行元が、訪問しているサイト（ドメイン）と同じか別かにより、1st Party Cookie と 3rd Party Cookie と呼び方が変わります。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Cookie の発行元と訪問しているサイト(ドメイン)の関係</th>
+<th>Cookie の呼び方</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>同じ（Cookie の発行者は、訪問したサイトの運営者である）</td>
+<td>1st Party Cookie</td>
+</tr>
+<tr>
+<td>異なる（Cookie の発行者は、訪問しサイトとは別の外部の第三者である）</td>
+<td>3rd Party Cookie</td>
+</tr>
+</tbody></table></div>
+<p>主に、外部のサービスを利用して「ユーザ行動に合わせた Web 広告を表示したい（ターゲティング広告を実施したい）」や「ログイン状態管理などの特定の機能を外部に任せたい」ケースで 3rd Party Cookie が利用されることが多いと思います。</p>
+<h1 id="ITP（Intelligent-Tracking-Prevention）とは"><a href="#ITP（Intelligent-Tracking-Prevention）とは" class="headerlink" title="ITP（Intelligent Tracking Prevention）とは"></a>ITP（Intelligent Tracking Prevention）とは</h1><p>ひとこと言うと、ITP は「3rd Party Cookie の利用を禁止する技術」です。</p>
+<p>先ほど、3rd Party Cookie により実現できることの 1 つに「ターゲティング広告（ユーザの行動履歴を元にした、Web 広告最適化）」があると述べました。ターゲティング広告により、各ユーザごとに個別最適化された（高いクリック率を獲得できる見込みの）Web 広告が表示できます。これにより、Web 広告のクリック率向上 → 購入率の向上が見込まれます。アドテク技術の進歩により、この Web 広告の精度が高まるほど、広告掲載ページ・広告を載せたい企業・その仕組みを提供する企業などの「Web マーケティング」界隈にとっては嬉しい世界になります。</p>
+<p>その一方で、プライバシー保護の観点から、以下のような考え方が広まりつつあります。</p>
+<p>①Web 広告の精度が高まる<br>↓<br>② ユーザの趣味嗜好を高精度で特定できる<br>↓<br>③ 高精度な趣味嗜好の情報って、それはもはや個人情報では？<br>↓<br>④ 個人情報を無断でクロスドメインに共有するは、プライバシー保護観点から NG では？<br>（例えば、あるユーザ α の行動履歴を取得した A 社が、その情報を Web 広告機能を提供する B 社に「α の同意がない状況で」共有するケース）</p>
+<p>このような考え方はメガテック企業でも意識され、Safari や Chrome などのブラウザによる規制も進んでいます。</p>
+<p>例えば、Apple では 2017 年から Safari での 3rd Party Cookie の利用制限を段階的に導入しており、iOS14 ではついに Safari だけでなく Chrome・Firefox 含めて 3rd Party Cookie の利用が全面禁止になりました。<br>Google においても、Chrome での 3rd Party Cookie の利用を「2024 年後半に向けて段階的に廃止する可能性がある」と発表し、その代替技術として「プライバシー・サンドボックス」の開発・ユーザテストを進めています。ただ、Google は当初は 2022 年 1 月に規制を開始すると発表していましたが、その後に 2023 年後半に開始予定と延期し、さらに 2024 年後半と再延期しています。</p>
+<p>Safari での ITP 規制状況を見ると、ユーザー情報のクロスサイトトラッキングを規制しようとする Apple と、規制の穴を探すアドテク企業の戦いが垣間見れます。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>アップデート</th>
+<th>リリース</th>
+<th>規制概要(*1)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ITP1.0</td>
+<td>2017 年 9 月</td>
+<td>特定の 3rd Party Cookie は 24 時間で削除</td>
+</tr>
+<tr>
+<td>ITP2.0</td>
+<td>2018 年 9 月</td>
+<td>特定の 3rd Party Cookie は即時削除</td>
+</tr>
+<tr>
+<td>ITP2.1</td>
+<td>2019 年 3 月</td>
+<td>特定の 1st Party Cookie は 7 日間で削除</td>
+</tr>
+<tr>
+<td>ITP2.2</td>
+<td>2019 年 4 月</td>
+<td>特定の 1st Party Cookie は 24 時間で削除</td>
+</tr>
+<tr>
+<td>ITP2.3</td>
+<td>2019 年 9 月</td>
+<td>特定の localstrage 上のデータを即時削除</td>
+</tr>
+<tr>
+<td>iOS13.1</td>
+<td>2020 年 3 月</td>
+<td>全ての 3rd Party Cookie を即時削除</td>
+</tr>
+<tr>
+<td>iOS14.0</td>
+<td>2020 年 9 月</td>
+<td>iOS で稼働する Firefox, Chrome にも ITP を適応開始</td>
+</tr>
+</tbody></table></div>
+<p>(*1)より詳細な規制内容は<a target="_blank" rel="noopener" href="https://webkit.org/blog/category/privacy/">こちら</a>を参照お願いします。</p>
+<p>3rd Party Cookie は何もアドテク領域に閉じた技術ではなく、それ以外の分野でも利用されています。<br>次は、ITP により Auth0 のトークンがうまく動かなくなってしまう話に移ります。</p>
+<h1 id="Auth0-のトークン取得フローと-ITP-ブロックへの対応"><a href="#Auth0-のトークン取得フローと-ITP-ブロックへの対応" class="headerlink" title="Auth0 のトークン取得フローと ITP ブロックへの対応"></a>Auth0 のトークン取得フローと ITP ブロックへの対応</h1><p>Auth0 の React 用 SDK（<a target="_blank" rel="noopener" href="https://github.com/auth0/auth0-react">auth0-react</a>）を利用する場合、PKCE（Proof Key for Code Exchange）の認証認可フローに従います。フローの詳細は<a target="_blank" rel="noopener" href="https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow-with-proof-key-for-code-exchange-pkce">こちらのサイト</a>に記載があります。</p>
+<img src="/images/20221007a/auth0_pkce.png" alt="auth0_pkceフロー" width="1200" height="976" loading="lazy">
+
+<p>Auth0 の JavaScript SDK ではログイン成功後、トークンを取得して、ブラウザのインメモリにキャッシュされます（上図での ⑨ で取得した Access Token をインメモリに保存する）。インメモリに保存すると、ページ遷移や画面リロードの度にトークンの再取得が必要で色々と面倒になりそうですが、この辺のトークンリフレッシュを Auth0 側では「Silent Authentication（サイレント認証）」により解決しています。サイレント認証により、ログイン状態を維持しながら、トークンをインメモリでセキュアに保持できます。</p>
+<h2 id="3rd-Party-Cookie-が-ITP-で強制消去される"><a href="#3rd-Party-Cookie-が-ITP-で強制消去される" class="headerlink" title="3rd Party Cookie が ITP で強制消去される"></a>3rd Party Cookie が ITP で強制消去される</h2><p>Auth0 x React でのログイン状態の管理が<br>（1）ID&#x2F;Pass を入力してログインし、トークンを取得<br>（2）サイレント認証でトークンのリフレッシュ、ログイン状態を維持<br>（3）トークンの破棄、ログアウト<br>の 3 つで完結するならばこれで話は終わりですが、昨今の ITP（3rd Party Cookie の禁止）により、② のサイレント認証に失敗するケースが出てきました。</p>
+<p>例えば、会社 Z が Auth0 でログイン機能を実装した Web サービスを運営しているとします。サービスの運営会社 Z と Auth0 では「異なるドメインの会社」になるため、Auth0 の発行したトークンが、Z 社の Web ページ上では 3rd Party Cookie と判定されて、ブラウザにより Cookie が強制消去されるケースが有り得る、ということです。サイレント認証に失敗すると「ログイン状態を維持できない（ページ遷移・リロードの度にログイン処理を求めることになる）」ため、ユーザ体験を大きく損なってしまいます。</p>
+<p>ITP により 3rd Party Cookie が消去されたとき、Auth0 のコンソール画面、Safari の Web Inspector それぞれで以下の挙動が得られます。</p>
+<img src="/images/20221007a/failed_auth0.png" alt="auth0で失敗" width="1200" height="481" loading="lazy">
+
+<p>↑<br>Auth0 のコンソール画面では「ログインには成功」しているが「サイレント認証には失敗」している</p>
+<img src="/images/20221007a/failed_emulator.png" alt="サイレント認証に失敗" width="1200" height="212" loading="lazy">
+
+<p>↑<br>Web Inspector のネットワークのログから、前述した PKCE フロー ③ の <code>/authorize</code> は Call されているが、3rd Party Cookie がブラウザにより消去されているため、⑦ の <code>/oauth/token</code> が Call されない。→ PKCE フローが途中終了しているため、認証は「失敗」である。</p>
+<h2 id="ITP-への対応方法"><a href="#ITP-への対応方法" class="headerlink" title="ITP への対応方法"></a>ITP への対応方法</h2><p>サイレント認証が ITP により失敗する問題には、<a target="_blank" rel="noopener" href="https://auth0.com/docs/troubleshoot/authentication-issues/renew-tokens-when-using-safari">Auth0 公式が 2 つの対応方法</a>を提示しています。</p>
+<p>①<a target="_blank" rel="noopener" href="https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation">リフレッシュトークンローテーション</a>を設定する<br>②<a target="_blank" rel="noopener" href="https://auth0.com/docs/customize/custom-domains">カスタムドメイン</a>を設定する</p>
+<p>この 2 つを設定すれば、ITP による 3rd Party Cookie 消失問題には対応できます。</p>
+<p>また、ブラウザの設定変更で「ITP をオフにする」ことも可能なので、問題切り分け手法の 1 つとして覚えておくと、後々に役立つかも知れません。</p>
+<p>以下は iPhone のブラウザ設定画面です。<br>スクショは ITP がオンの状態で撮影したものなので、Safari は「『サイト越えトラッキングを防ぐ』をオフ」にすることで、Chrome は「『Web サイト超えトラッキングを許可』をオン」にすることで、ITP を無効化できます。</p>
+<img src="/images/20221007a/スクリーンショット_2022-10-05_2.46.11.png" alt="" width="1200" height="985" loading="lazy">
+
+<p>以下はリフレッシュトークン・カスタムドメインのどちらも設定せずに、エミュレーターの Safari 設定で ITP をオフにした場合の挙動です。Auth0 のコンソール画面、Web Inspector のログから、<code>/authorize</code>と<code>/oauth/token</code>が Call されて、PKCE フローが正常終了してサイレント認証に成功していることが分かります。</p>
+<img src="/images/20221007a/スクリーンショット_2022-10-05_2.57.58.png" alt="" width="1200" height="712" loading="lazy">
+
+<h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>モバイル向けの Web ページを作成してリリースし、リリース後の動作チェックで「あれ、iOS だとログイン状態が維持できてない！？」と気づき、OAuth2.0 の仕様や PKCE の確認、インスペクタのログと認証フローと付き合わせながら、処理に失敗している場所の特定にまで至れました。①「ITP」について知見がなかったこと、② 事前チェックが Android と Chrome シミュレーターだけで、iOS は工数削減のため未実施だったことが根原因なのですが、スマホと PC・iOS と Android で色々細かいところが違うのなー（なので、モバイル実機テストは Android と iOS は両方やろう）と再認識する機会になりました。</p>
+<p>次回は、山田勇一さんの「スマホの OSS」です！</p>
+<h2 id="参照サイト"><a href="#参照サイト" class="headerlink" title="参照サイト"></a>参照サイト</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://webkit.org/blog/category/privacy/">Webkit</a></li>
+<li><a target="_blank" rel="noopener" href="https://auth0.com/docs/troubleshoot/authentication-issues/renew-tokens-when-using-safari">Troubleshoot Renew Tokens When Using Safari</a></li>
+<li><a target="_blank" rel="noopener" href="https://dangerous-animal141.hatenablog.com/entry/2021/06/08/220637">Auth0 の Silent Authentication (サイレント認証)と Refresh Token Rotation (リフレッシュトークンローテーション)を完全に理解した (い)</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20221007a/&related=twitterapi%2Ctwitter&text=Auth0%E3%81%AE%E3%83%88%E3%83%BC%E3%82%AF%E3%83%B3%E5%8F%96%E5%BE%97%E3%81%A8ITP%E3%81%B8%E3%81%AE%E5%AF%BE%E5%BF%9C%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20221007a/&t=Auth0%E3%81%AE%E3%83%88%E3%83%BC%E3%82%AF%E3%83%B3%E5%8F%96%E5%BE%97%E3%81%A8ITP%E3%81%B8%E3%81%AE%E5%AF%BE%E5%BF%9C" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20221007a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20221007a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.10.03</span><span class="snscount">&#9825;5</span><a href=/articles/20221003a/ title="認証・認可の技術全般をテーマとして技術ブログ連載を始めます。2022年が初めての開催です。">認証認可連載2022<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.03.30</span><span class="snscount">&#9825;6</span><a href=/articles/20220330a/ title="Terraform stateをテーマにした勉強会が開かれました。私は後半パートでクラウドリソース自体をdestroy/createdせずに、Terraformリソース定義の記述場所を変更する方法について話しました。">FutureTechNight#20 TerraformState縛りの勉強会に登壇しました</a></li><li class="related-posts-item"><span>2021.11.10</span><span class="snscount">&#9825;11</span><a href=/articles/20211110a/ title="私が参画した案件で、Auth0に登録されているエンドユーザ向けのアカウントを用いてShopifyにSSOする検証を行ったので、今回はその方法をご紹介します。">Auth0アカウントでShopifyにSSOする</a></li><li class="related-posts-item"><span>2021.10.04</span><span class="snscount">&#9825;13</span><a href=/articles/20211004a/ title="こんにちは。TIGの棚井龍之介です。2021年9月10日 のエンジニアで集まり、合同での勉強会を開催しました。フューチャーからはインフラ担当1名と+アプリ担当2名が登壇して、クラウドサービスの紹介やクラウドでのしくじり話などを発表しました。ナイルさん側の発表内容もクラウド寄りのものが多く、期せずして「クラウド勉強会」のような雰囲気になりました。">Nyle × FUTURE で勉強会を開催しました</a></li><li class="related-posts-item"><span>2021.08.23</span><span class="snscount">&#9825;18</span><a href=/articles/20210823b/ title="夏の自由研究ブログ連載2021の第1投稿として、Wiresharkで実際に流れるパケットを観察し、通信プロトコルの動きを見てみました。">Wiresharkで通信プロトコルを見る</a></li><li class="related-posts-item"><span>2021.08.12</span><span class="snscount">&#9825;12</span><a href=/articles/20210812b/ title="2021年7月21日にFuture Tech Night #14～認証認可（IDaaS）勉強会～で発表させてもらいました。元々は、Rails Devise+cancancan、Cognito User Pools（5年前）、Auth0の開発経験があり、改めてOSSも加えて学んでみたかったのが、テーマを決めた背景になります。">Future Tech Night #14〜IDaaS/OSS/Managed比較〜</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20221003a/ title="認証・認可の技術全般をテーマとして技術ブログ連載を始めます。2022年が初めての開催です。">認証認可連載2022<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Cookie-%E3%81%A8%E3%81%AF"><span class="toc-text">Cookie とは</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Cookie-%E3%81%AE%E5%88%86%E9%A1%9E"><span class="toc-text">Cookie の分類</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ITP%EF%BC%88Intelligent-Tracking-Prevention%EF%BC%89%E3%81%A8%E3%81%AF"><span class="toc-text">ITP（Intelligent Tracking Prevention）とは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Auth0-%E3%81%AE%E3%83%88%E3%83%BC%E3%82%AF%E3%83%B3%E5%8F%96%E5%BE%97%E3%83%95%E3%83%AD%E3%83%BC%E3%81%A8-ITP-%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%E3%81%B8%E3%81%AE%E5%AF%BE%E5%BF%9C"><span class="toc-text">Auth0 のトークン取得フローと ITP ブロックへの対応</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3rd-Party-Cookie-%E3%81%8C-ITP-%E3%81%A7%E5%BC%B7%E5%88%B6%E6%B6%88%E5%8E%BB%E3%81%95%E3%82%8C%E3%82%8B"><span class="toc-text">3rd Party Cookie が ITP で強制消去される</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ITP-%E3%81%B8%E3%81%AE%E5%AF%BE%E5%BF%9C%E6%96%B9%E6%B3%95"><span class="toc-text">ITP への対応方法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E7%85%A7%E3%82%B5%E3%82%A4%E3%83%88"><span class="toc-text">参照サイト</span></a></li></ol></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (331)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (192)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (81)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/Business/">Business (18)</a></li>
+<li class=""><a href="/categories/DB/">DB (17)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (15)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/VR/">VR (11)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (5)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/32-IT-e1os12t" title="フューチャーがお届けするポッドキャストです。#32 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（前編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #32 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/31-SAIGAI-e1ohfku" title="フューチャーがお届けするポッドキャストです。#31 SAIG塚本さんの考えるAI領域の仕事（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #31 SAIG塚本さんの考えるAI領域の仕事（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/30-SAIGAI-e1o3f48" title="フューチャーがお届けするポッドキャストです。#30 SAIG塚本さんの考えるAI領域の仕事（前編）" target="_blank" rel="noopener"> #30 SAIG塚本さんの考えるAI領域の仕事（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
