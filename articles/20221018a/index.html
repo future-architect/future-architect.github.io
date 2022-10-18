@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>PostgreSQLで Goの flextime のような関数を作りテスト時間を差し替える | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="TIG 真野です。 Goで時刻モックライブラリである、Songmuさん開発のflextimeにはずっとお世話になっています。 素晴らしいライブラリですが、SQLを用いて結果を永続化するようなテストでの利用する時に冗長性を感じました。 例えばあるWeb APIやバッチ処理のテストとして、DB上のデータが想定通りに登録&#x2F;更新されていることを調べたいときです。検証対象のカラムが例えば cr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PostgreSQLで Goの flextime のような関数を作りテスト時間を差し替える | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20221018a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="TIG 真野です。 Goで時刻モックライブラリである、Songmuさん開発のflextimeにはずっとお世話になっています。 素晴らしいライブラリですが、SQLを用いて結果を永続化するようなテストでの利用する時に冗長性を感じました。 例えばあるWeb APIやバッチ処理のテストとして、DB上のデータが想定通りに登録&#x2F;更新されていることを調べたいときです。検証対象のカラムが例えば cr">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20221018a/safari-gb655953e6_640.jpg">
+<meta property="article:published_time" content="2022-10-17T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-10-18T05:22:17.251Z">
+<meta property="article:tag" content="PostgreSQL">
+<meta property="article:tag" content="テスト">
+<meta property="article:tag" content="flextime">
+<meta property="article:tag" content="トリガー">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20221018a/safari-gb655953e6_640.jpg">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20221018a/">
+  <meta content="PostgreSQL,テスト,flextime,トリガー" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">PostgreSQLで Goの flextime のような関数を作りテスト時間を差し替える
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20221018a_PostgreSQLで_Goの_flextime_のような関数を作りテスト時間を差し替える.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20221018a_PostgreSQLで_Goの_flextime_のような関数を作りテスト時間を差し替える" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-10-17T15:00:00.000Z" itemprop="datePublished">2022.10.18</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98" title="真野隼記さんの記事一覧へ" class="post-author">真野隼記</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/PostgreSQL/" title="PostgreSQLタグの記事へ" class="tag-list-link">PostgreSQL</a>
+  
+    
+    <a href="/tags/テスト/" title="テストタグの記事へ" class="tag-list-link">テスト</a>
+  
+    
+    <a href="/tags/flextime/" title="flextimeタグの記事へ" class="tag-list-link">flextime</a>
+  
+    
+    <a href="/tags/トリガー/" title="トリガータグの記事へ" class="tag-list-link">トリガー</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20221018a/safari-gb655953e6_640.jpg" alt="" width="640" height="426">
+
+<p>TIG 真野です。</p>
+<p>Goで時刻モックライブラリである、Songmuさん開発の<a target="_blank" rel="noopener" href="https://github.com/Songmu/flextime">flextime</a>にはずっとお世話になっています。</p>
+<p>素晴らしいライブラリですが、SQLを用いて結果を永続化するようなテストでの利用する時に冗長性を感じました。</p>
+<p>例えばあるWeb APIやバッチ処理のテストとして、DB上のデータが想定通りに登録&#x2F;更新されていることを調べたいときです。検証対象のカラムが例えば <code>created_at</code> 、<code>updated_at</code> だとします。通常は現在日時を登録する項目で、flextime で扱うのにうってつけです。ただし、これを固定化するには、Go側の <code>flextime</code> の値を外からSQLプレスホルダーで渡す必要があります。本来であれば、PostgreSQLであれば<code>current_timestamp</code> の関数で済むところを一々外から渡すのは面倒に感じます（仕方ないですが、これがなくなればGoもSQLのコードもスッキリするのにと思うこともしばしば）。</p>
+<figure class="highlight go"><figcaption><span>SQLバインド</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> example</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	_ <span class="string">&quot;embed&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/Songmu/flextime&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/jmoiron/sqlx&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">//go:embed update.sql</span></span><br><span class="line"><span class="keyword">var</span> updateSQL <span class="type">string</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">UpdateAlreadyRead</span><span class="params">(tx *sqlx.Tx, userID <span class="type">string</span>)</span></span> (<span class="type">int</span>, <span class="type">error</span>) &#123;</span><br><span class="line">	now := flextime.Now() <span class="comment">// 現在時刻取得</span></span><br><span class="line"></span><br><span class="line">	row := tx.QueryRow(updateSQL, now, userID) -- updated_atのためにnowをバインドする</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> updateCnt <span class="type">int64</span></span><br><span class="line">	<span class="keyword">if</span> err := row.Scan(&amp;updateCnt); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>, fmt.Errorf(<span class="string">&quot;update read status: %w&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="type">int</span>(updateCnt), <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><figcaption><span>update.sql</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WITH</span> update_cnt <span class="keyword">AS</span> (</span><br><span class="line">    <span class="keyword">UPDATE</span> notification</span><br><span class="line">        <span class="keyword">SET</span> read_status_typ <span class="operator">=</span> <span class="string">&#x27;2&#x27;</span></span><br><span class="line">            , updated_at <span class="operator">=</span> $<span class="number">1</span> <span class="comment">-- 要件上はcurrent_timestampで良いが、テスト観点でバインド項目化</span></span><br><span class="line">            , revision <span class="operator">=</span> revision <span class="operator">+</span> <span class="number">1</span></span><br><span class="line">        <span class="keyword">WHERE</span> user_id <span class="operator">=</span> $<span class="number">2</span></span><br><span class="line">            <span class="keyword">AND</span> read_status_typ <span class="operator">=</span> <span class="string">&#x27;0&#x27;</span> <span class="comment">-- 0:未読</span></span><br><span class="line">        RETURNING <span class="number">1</span>)</span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">as</span> cnt</span><br><span class="line"><span class="keyword">FROM</span> update_cnt;</span><br></pre></td></tr></table></figure>
+
+<p>もちろん、<code>created_at</code>, <code>updated_at</code> などの項目を検証から除外すれば上記は気にしなくても良いですが、経験的には検証を外せば外すほど、そのテストの信頼性は落ちるのであまりしたくないです（しばしば、実は更新されていないことが後続フェーズで発覚して苦労します）。この辺は<a target="_blank" rel="noopener" href="https://zenn.dev/mpyw/articles/rdb-ids-and-timestamps-best-practices">mpywさんの書いている記事</a>のように、PostgreSQLのトリガーなどでカバーするチームも多いかと思いますが、いったんそのやり方は忘れるとします。</p>
+<figure class="highlight go"><figcaption><span>go-cmpでupdated_atをチェック対象外にする</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestUpdateAlreadyRead</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 中略</span></span><br><span class="line">	opts := cmpopts.IgnoreFields(<span class="string">&quot;updated_at&quot;</span>) <span class="comment">// 検証をスキップする項目を増やすと、テスト漏れになりやすい</span></span><br><span class="line">	<span class="keyword">if</span> diff := cmp.Diff(wantRecords, gotRecords, opts); diff != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">		t.Errorf(<span class="string">&quot;records mismatch (-want +got):\n%s&quot;</span>, diff)</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>当然、PostgreSQLのもとから用意されている組み込み関数には、flextimeのような時刻固定の仕組みはないです。</p>
+<p>この例だと更新系なので1項目ですが、登録だとcreated_at分も合わせて2項目になります。また、SQLで抽出したGo側でゴリゴリ業務ロジックで組み立てて、またDBに書き戻すようなコードを書いていると、ここで書いた <code>now</code> を一々引き回す必要があり面倒です（引き回さないと、微妙に呼び出しタイミングで created_at, updated_at の値が変わって扱いにくくなります）。</p>
+<h2 id="PostgreSQL関数-を作成して代用してみる"><a href="#PostgreSQL関数-を作成して代用してみる" class="headerlink" title="PostgreSQL関数 を作成して代用してみる"></a>PostgreSQL関数 を作成して代用してみる</h2><p>次のようなテーブルと関数を作成してみる提案です。次の <code>flex_time</code> テーブルと、 <code>flex_timestamp()</code> 関数を定義します。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- テーブル定義</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> flex_time</span><br><span class="line">(</span><br><span class="line">    seq_num  BIGSERIAL,</span><br><span class="line">    fix_time TIMESTAMPTZ</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 関数定義</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">OR</span> REPLACE <span class="keyword">FUNCTION</span> flex_timestamp()</span><br><span class="line">    <span class="keyword">RETURNS</span> TIMESTAMPTZ <span class="keyword">AS</span></span><br><span class="line">$$</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">    <span class="keyword">DECLARE</span></span><br><span class="line">        flex_ts TIMESTAMPTZ :<span class="operator">=</span> (<span class="keyword">SELECT</span> fix_time</span><br><span class="line">                                <span class="keyword">FROM</span> flex_time</span><br><span class="line">                                <span class="keyword">WHERE</span> seq_num <span class="operator">=</span> (<span class="keyword">SELECT</span> <span class="built_in">max</span>(seq_num) <span class="keyword">FROM</span> flex_time));</span><br><span class="line">    <span class="keyword">BEGIN</span></span><br><span class="line">        IF flex_ts <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span></span><br><span class="line">        <span class="keyword">THEN</span></span><br><span class="line">            <span class="keyword">RETURN</span> flex_ts;</span><br><span class="line">        <span class="keyword">ELSE</span></span><br><span class="line">            <span class="keyword">RETURN</span> <span class="built_in">current_timestamp</span>;</span><br><span class="line">        <span class="keyword">END</span> IF;</span><br><span class="line">    <span class="keyword">END</span>;</span><br><span class="line"><span class="keyword">END</span>;</span><br><span class="line">$$ <span class="keyword">LANGUAGE</span> PLPGSQL;</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+
+<p>上記を作っておいて、、 <code>flex_timestamp()</code> を呼ぶと、何もしないと現在時刻を返します。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">postgres<span class="operator">=</span># <span class="keyword">SELECT</span> flex_timestamp();</span><br><span class="line">        flex_timestamp</span><br><span class="line"><span class="comment">------------------------------</span></span><br><span class="line"> <span class="number">2022</span><span class="number">-10</span><span class="number">-08</span> <span class="number">22</span>:<span class="number">50</span>:<span class="number">28.52979</span><span class="operator">+</span><span class="number">09</span></span><br><span class="line">(<span class="number">1</span> <span class="type">row</span>)</span><br><span class="line"></span><br><span class="line">postgres<span class="operator">=</span># <span class="keyword">SELECT</span> flex_timestamp();</span><br><span class="line">        flex_timestamp</span><br><span class="line"><span class="comment">-------------------------------</span></span><br><span class="line"> <span class="number">2022</span><span class="number">-10</span><span class="number">-08</span> <span class="number">22</span>:<span class="number">52</span>:<span class="number">33.674613</span><span class="operator">+</span><span class="number">09</span></span><br><span class="line">(<span class="number">1</span> <span class="type">row</span>)</span><br></pre></td></tr></table></figure>
+
+<p>テストで使用したい時間を登録します。</p>
+<figure class="highlight sql"><figcaption><span>時刻を固定化</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">postgres<span class="operator">=</span># <span class="keyword">INSERT</span> <span class="keyword">INTO</span> flex_time(fix_time) <span class="keyword">VALUES</span> (TO_TIMESTAMP(<span class="string">&#x27;2022-04-01 15:30:00&#x27;</span>, <span class="string">&#x27;YYYY-MM-DD HH24:MI:SS&#x27;</span>));</span><br><span class="line"><span class="keyword">INSERT</span> <span class="number">0</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>そうすると時間が固定化されます。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">postgres<span class="operator">=</span># <span class="keyword">SELECT</span> flex_timestamp();</span><br><span class="line">     flex_timestamp</span><br><span class="line"><span class="comment">------------------------</span></span><br><span class="line"> <span class="number">2022</span><span class="number">-04</span><span class="number">-01</span> <span class="number">15</span>:<span class="number">30</span>:<span class="number">00</span><span class="operator">+</span><span class="number">09</span></span><br><span class="line">(<span class="number">1</span> <span class="type">row</span>)</span><br><span class="line"></span><br><span class="line">postgres<span class="operator">=</span># <span class="keyword">SELECT</span> flex_timestamp();</span><br><span class="line">     flex_timestamp</span><br><span class="line"><span class="comment">------------------------</span></span><br><span class="line"> <span class="number">2022</span><span class="number">-04</span><span class="number">-01</span> <span class="number">15</span>:<span class="number">30</span>:<span class="number">00</span><span class="operator">+</span><span class="number">09</span></span><br><span class="line">(<span class="number">1</span> <span class="type">row</span>)</span><br></pre></td></tr></table></figure>
+
+<p>当たり前ですが、<code>flex_time</code> テーブルのレコードを削除すれば、現在時刻を返します。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">postgres<span class="operator">=</span># <span class="keyword">TRUNCATE</span> flex_time;</span><br><span class="line"><span class="keyword">TRUNCATE</span> <span class="keyword">TABLE</span></span><br><span class="line"></span><br><span class="line">postgres<span class="operator">=</span># <span class="keyword">SELECT</span> flex_timestamp();</span><br><span class="line">        flex_timestamp</span><br><span class="line"><span class="comment">-------------------------------</span></span><br><span class="line"> <span class="number">2022</span><span class="number">-10</span><span class="number">-08</span> <span class="number">22</span>:<span class="number">58</span>:<span class="number">17.919548</span><span class="operator">+</span><span class="number">09</span></span><br><span class="line">(<span class="number">1</span> <span class="type">row</span>)</span><br></pre></td></tr></table></figure>
+
+
+<p>これを用いれば、<code>current_timestamp</code> 関数とほぼ同等の使い方でSQLを書け、呼び出し元のコードもプレスホルダー文ちょっとすっきりすると思います。</p>
+<p>使い終わったら <code>TRUNCATE</code> でキレイにしておくのがお作法になると思います。</p>
+<h2 id="利用イメージ"><a href="#利用イメージ" class="headerlink" title="利用イメージ"></a>利用イメージ</h2><p>ここで最初の実装例に戻って適用してみます。</p>
+<figure class="highlight diff"><figcaption><span>Go側の差分</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">func UpdateAlreadyRead(tx *sqlx.Tx, userID string) (int, error) &#123;</span><br><span class="line"><span class="deletion">-	row := tx.QueryRow(updateSQL, now, userID)</span></span><br><span class="line"><span class="addition">+	row := tx.QueryRow(updateSQL, userID)</span></span><br><span class="line"></span><br><span class="line">	var updateCnt int64</span><br><span class="line">	if err := row.Scan(&amp;updateCnt); err != nil &#123;</span><br><span class="line">		return 0, fmt.Errorf(&quot;update read status: %w&quot;, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	return int(updateCnt), nil</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight diff"><figcaption><span>SQLの差分</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">WITH update_cnt AS (</span><br><span class="line">    UPDATE notification</span><br><span class="line">        SET read_status_typ = &#x27;2&#x27;</span><br><span class="line"><span class="deletion">-            , updated_at = $1</span></span><br><span class="line"><span class="addition">+            , updated_at = flex_timestamp()</span></span><br><span class="line">            , revision = revision + 1</span><br><span class="line">        WHERE user_id = $1</span><br><span class="line">            AND read_status_typ = &#x27;0&#x27; -- 未読</span><br><span class="line">        RETURNING 1)</span><br><span class="line">SELECT count(*) as cnt</span><br><span class="line">FROM update_cnt;</span><br></pre></td></tr></table></figure>
+
+<p>テストでは、次のようにテスト時間を固定化したいタイミングで <code>flex_time</code> に登録します。終わったらTRUNCATEはチームでお約束を決めればよいと思います（通常は不要な気がしますが、一応消す例で書いてみました）。</p>
+<figure class="highlight go"><figcaption><span>_test.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestUpdateAlreadyRead</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 中略</span></span><br><span class="line"></span><br><span class="line">	_, err = tx.Exec(<span class="string">&quot;INSERT INTO flex_time (fix_time) VALUES (TO_TIMESTAMP(&#x27;2022-10-11 10:10:10&#x27;, &#x27;YYYY-MM-DD HH24:MI:SS&#x27;));&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		t.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		_, err := tx.Exec(<span class="string">&quot;TRUNCATE TABLE flex_time&quot;</span>)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			t.Error(err)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br></pre></td></tr></table></figure>
+
+<p>ちょっとした違いですが、開発・レビューなどの観点で見落としになり得るポイントを1つでも減らせるのが大きいかなと思っています。</p>
+<h2 id="Appendix"><a href="#Appendix" class="headerlink" title="Appendix"></a>Appendix</h2><p>あまりないかもしれませんが、もしテストを並列に実行しかつ、固定化したい時間を変えたい場合は、コネクション単位で <code>application_name</code> を変え、その単位で設定するように関数を改修しても良いかもしれません。（flex_timeだけ分ける意味があるかはさておき）</p>
+<p><code>application_name</code> というカラムを追加したバージョンです。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> flex_time</span><br><span class="line">(</span><br><span class="line">    seq_num  BIGSERIAL,</span><br><span class="line">    fix_time TIMESTAMPTZ,</span><br><span class="line">    application_name <span class="type">VARCHAR</span>(<span class="number">64</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">OR</span> REPLACE <span class="keyword">FUNCTION</span> flex_timestamp()</span><br><span class="line">    <span class="keyword">RETURNS</span> TIMESTAMPTZ <span class="keyword">AS</span></span><br><span class="line">$$</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">    <span class="keyword">DECLARE</span></span><br><span class="line">        flex_ts TIMESTAMPTZ :<span class="operator">=</span> (<span class="keyword">SELECT</span> fix_time</span><br><span class="line">                                <span class="keyword">FROM</span> flex_time</span><br><span class="line">                                <span class="keyword">WHERE</span> seq_num <span class="operator">=</span> (<span class="keyword">SELECT</span> <span class="built_in">max</span>(seq_num) <span class="keyword">FROM</span> flex_time <span class="keyword">WHERE</span> application_name <span class="keyword">IS</span> <span class="keyword">NULL</span>));</span><br><span class="line">        app_flex_ts TIMESTAMPTZ :<span class="operator">=</span> (<span class="keyword">SELECT</span> fix_time</span><br><span class="line">                                <span class="keyword">FROM</span> flex_time</span><br><span class="line">                                <span class="keyword">WHERE</span> seq_num <span class="operator">=</span> (<span class="keyword">SELECT</span> <span class="built_in">max</span>(seq_num) <span class="keyword">FROM</span> flex_time <span class="keyword">WHERE</span> application_name <span class="operator">=</span> current_setting(<span class="string">&#x27;application_name&#x27;</span>)));</span><br><span class="line">    <span class="keyword">BEGIN</span></span><br><span class="line">        IF app_flex_ts <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">null</span></span><br><span class="line">             <span class="keyword">then</span> <span class="keyword">return</span> app_flex_ts;</span><br><span class="line">        ELSIF flex_ts <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span></span><br><span class="line">        <span class="keyword">THEN</span></span><br><span class="line">            <span class="keyword">RETURN</span> flex_ts;</span><br><span class="line">        <span class="keyword">ELSE</span></span><br><span class="line">            <span class="keyword">RETURN</span> <span class="built_in">current_timestamp</span>;</span><br><span class="line">        <span class="keyword">END</span> IF;</span><br><span class="line">    <span class="keyword">END</span>;</span><br><span class="line"><span class="keyword">END</span>;</span><br><span class="line">$$ <span class="keyword">LANGUAGE</span> PLPGSQL;</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+
+<p>これを用いると、グローバル設定と、アプリケーション固有のテスト時間で区別できます。どちらも設定されるとアプリケーション固有を優先です。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- グローバル設定</span></span><br><span class="line">postgres<span class="operator">=</span># <span class="keyword">INSERT</span> <span class="keyword">INTO</span> flex_time (application_name, fix_time) <span class="keyword">VALUES</span> (CURRENT_SETTING(<span class="string">&#x27;APPLICATION_NAME&#x27;</span>), TO_TIMESTAMP(<span class="string">&#x27;2022-06-27 11:20:00&#x27;</span>, <span class="string">&#x27;YYYY-MM-DD HH24:MI:SS&#x27;</span>));</span><br><span class="line"><span class="keyword">INSERT</span> <span class="number">0</span> <span class="number">1</span></span><br><span class="line">postgres<span class="operator">=</span># <span class="keyword">SELECT</span> flex_timestamp();</span><br><span class="line">     flex_timestamp</span><br><span class="line"><span class="comment">------------------------</span></span><br><span class="line"> <span class="number">2022</span><span class="number">-06</span><span class="number">-27</span> <span class="number">11</span>:<span class="number">20</span>:<span class="number">00</span><span class="operator">+</span><span class="number">09</span></span><br><span class="line">(<span class="number">1</span> <span class="type">row</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- アプリケーション単位</span></span><br><span class="line">postgres<span class="operator">=</span># <span class="keyword">INSERT</span> <span class="keyword">INTO</span> flex_time (application_name, fix_time) <span class="keyword">VALUES</span> (CURRENT_SETTING(<span class="string">&#x27;APPLICATION_NAME&#x27;</span>), TO_TIMESTAMP(<span class="string">&#x27;2022-06-27 11:20:00&#x27;</span>, <span class="string">&#x27;YYYY-MM-DD HH24:MI:SS&#x27;</span>));</span><br><span class="line"><span class="keyword">INSERT</span> <span class="number">0</span> <span class="number">1</span></span><br><span class="line"></span><br><span class="line">postgres<span class="operator">=</span># <span class="keyword">SELECT</span> flex_timestamp();</span><br><span class="line">     flex_timestamp</span><br><span class="line"><span class="comment">------------------------</span></span><br><span class="line"> <span class="number">2022</span><span class="number">-06</span><span class="number">-27</span> <span class="number">11</span>:<span class="number">20</span>:<span class="number">00</span><span class="operator">+</span><span class="number">09</span></span><br><span class="line">(<span class="number">1</span> <span class="type">row</span>)</span><br></pre></td></tr></table></figure>
+
+<p><code>application_name</code> ですが、次のようにコネクション接続時に指定できます。（<a target="_blank" rel="noopener" href="https://www.postgresql.jp/docs/9.2/libpq-connect.html">参考</a>）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">postgresql://user@localhost:5432/postgres?connect_timeout=10&amp;application_name=myapp</span><br></pre></td></tr></table></figure>
+
+<p>ただ、こういった多段の設定はデータ削除が難しい（気軽に<code>flex_time</code> テーブルを <code>TRUNCATE</code> しにくくなる）ため、やるならapplication_nameは <code>NOT NULL</code> にした運用にしたほうが良いかもしれません。要件に応じて調整ですが、できる限り最初の実装のシンプルモデルの利用に留めるという、用法用量が良い塩梅かと感じます。</p>
+<h2 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h2><p>PostgreSQLに、何も指定がなければ <code>current_timestamp</code>を、何か設定されていればその値を返す<code>flex_timestamp</code>関数 を定義して、使ってはどうかという記事でした。</p>
+<p>これを思いついたのはちょうどあるプロジェクトの開発ラッシュ終盤で、同僚の辻さんに「こんなん思いついたんですけど~」って声をかけたら、もう開発も終わりですから..と諭されたため導入に失敗しました。そのため、まだ本番稼働＆運用実績がゼロのアイデア状態です。機会があればこの仕組を使ってみたいと思います。先駆けてトライしてくださる方も大歓迎です。ぜひ感想をTwitterなどで教えてください。</p>
+<p>この記事で公開したサンプルコードは以下にアップしておきました。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/ma91n/postgres-flextime">https://github.com/ma91n/postgres-flextime</a></li>
+</ul>
+<p>アイキャッチは<a target="_blank" rel="noopener" href="https://pixabay.com/ja/users/fearscare-2010330/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=4043090">Patrick</a>による<a target="_blank" rel="noopener" href="https://pixabay.com/ja//?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=4043090">Pixabay</a>からの画像を利用させていただきました。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20221018a/&related=twitterapi%2Ctwitter&text=PostgreSQL%E3%81%A7%20Go%E3%81%AE%20flextime%20%E3%81%AE%E3%82%88%E3%81%86%E3%81%AA%E9%96%A2%E6%95%B0%E3%82%92%E4%BD%9C%E3%82%8A%E3%83%86%E3%82%B9%E3%83%88%E6%99%82%E9%96%93%E3%82%92%E5%B7%AE%E3%81%97%E6%9B%BF%E3%81%88%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20221018a/&t=PostgreSQL%E3%81%A7%20Go%E3%81%AE%20flextime%20%E3%81%AE%E3%82%88%E3%81%86%E3%81%AA%E9%96%A2%E6%95%B0%E3%82%92%E4%BD%9C%E3%82%8A%E3%83%86%E3%82%B9%E3%83%88%E6%99%82%E9%96%93%E3%82%92%E5%B7%AE%E3%81%97%E6%9B%BF%E3%81%88%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20221018a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20221018a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.06.09</span><span class="snscount">&#9825;158</span><a href=/articles/20200609/ title="フューチャーではGraphQLの活用事例はまだ少なく、自分はまだお目にかかったことはないです。しかし、HeadlessCMS界隈を初めGraphQLのAPIを提供するサービスが増えてきました。今後もさらに需要が増えてきそうな予感がしたためGoとGraphQLを春の入門祭りのテーマにしました。学習する上でドキュメントを読み込むだけでは忘れがちです。手を動かしながらタイトルにある鉄道データ検索APIを開発していきましょう">作って学ぶGraphQL。gqlgenを用いて鉄道データ検索API開発入門</a></li><li class="related-posts-item"><span>2022.10.14</span><span class="snscount">&#9825;13</span><a href=/articles/20221014a/ title="RDB（ここでは社内でも実績が多いPostgreSQLとさせてください）のGUIクライアントツールと言えば何を利用していますか？ チーム内で聞くと様々なプロダクトの名前が挙がりました。そんな中で私が推したいのは、 GoLand（JetBrainsの有償ライセンスを購入している人）を利用している人に対しては、Database Tools and SQLプラグインを利用することです">GoLand(JetBrains IDE)のDatabase Tools and SQLプラグインをメインのSQLクライアントにする<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.10.13</span><span class="snscount">&#9825;3</span><a href=/articles/20221013a/ title="2022/7/18 海の日 にFutureConというテックカンファレンスを開催しました。運営メンバーで行った振り返り内容を共有します。">FutureCon2022の運営ラップアップ<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.10.04</span><span class="snscount">&#9825;20</span><a href=/articles/20221004a/ title="ACL、RBAC、ABACなどの様々なモデルでアクセス制御を行えるライブラリであるCasbinについて紹介します。">Casbinで始めるアクセス制御<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.10.03</span><span class="snscount">&#9825;6</span><a href=/articles/20221003a/ title="認証・認可の技術全般をテーマとして技術ブログ連載を始めます。2022年が初めての開催です。">認証認可連載2022<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.08.29</span><span class="snscount">&#9825;61</span><a href=/articles/20220829a/ title="夏休み自由研究連載の5本目です。go-fuse でLocalStackでローカル環境にエミュレートされるS3バケットをマウントするツールを開発しました。">S3 on LocalStackをGoとFUSEを使ってMountする（WSL2）</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#PostgreSQL%E9%96%A2%E6%95%B0-%E3%82%92%E4%BD%9C%E6%88%90%E3%81%97%E3%81%A6%E4%BB%A3%E7%94%A8%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">PostgreSQL関数 を作成して代用してみる</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B8"><span class="toc-text">利用イメージ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Appendix"><span class="toc-text">Appendix</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%BE%8C%E3%81%AB"><span class="toc-text">最後に</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (331)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (193)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (82)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (18)</a></li>
+<li class=""><a href="/categories/Business/">Business (18)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (16)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/VR/">VR (11)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (5)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/32-IT-e1os12t" title="フューチャーがお届けするポッドキャストです。#32 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（前編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #32 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/31-SAIGAI-e1ohfku" title="フューチャーがお届けするポッドキャストです。#31 SAIG塚本さんの考えるAI領域の仕事（後編）" target="_blank" rel="noopener"> #31 SAIG塚本さんの考えるAI領域の仕事（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
