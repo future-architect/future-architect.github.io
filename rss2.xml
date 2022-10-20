@@ -15,8 +15,46 @@
     <atom:link href="https://future-architect.github.io/rss2.xml" rel="self" type="application/rss+xml"/>
     
     <description>フューチャーの開発者による公式技術ブログです。業務で利用している技術を幅広く紹介します。</description>
-    <pubDate>Wed, 19 Oct 2022 00:15:21 GMT</pubDate>
+    <pubDate>Thu, 20 Oct 2022 00:38:22 GMT</pubDate>
     <generator>http://hexo.io/</generator>
+    
+    <item>
+      <title>DynamoDB Streamsは同一ハッシュキーでもソートキーが異なれば順序保証されない</title>
+      <link>https://future-architect.github.io/articles/20221020a/</link>
+      <guid>https://future-architect.github.io/articles/20221020a/</guid>
+      <pubDate>Wed, 19 Oct 2022 15:00:00 GMT</pubDate>
+      
+        
+        
+          
+          
+      <description>&lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h1&gt;&lt;p&gt;TIG DXユニットの真野です。&lt;/p&gt;
+&lt;p&gt;タイトルに書いたままの内容の記事です。おそらくDynamoDB</description>
+          
+        
+      
+      
+      
+      <content:encoded><![CDATA[<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG DXユニットの真野です。</p><p>タイトルに書いたままの内容の記事です。おそらくDynamoDB Streams について調べたことがある方の多くの人には自明な内容だと思います。サマリです。</p><ul><li>DynamoDB Streamsの起動順序が保たれるのは <strong>項目単位</strong><ul><li>ハッシュキーのみのテーブルであればその単位</li><li>ハッシュキー＋ソートキーのテーブルであれば、 <strong>ソートキーまで含めた単位</strong></li><li>ソートキーが異なれば、起動順序が異なる可能性がある</li></ul></li><li>よく耳にするDynamoDB Streams シャードに言い換えると、シャードが同じであれば順序制御される<ul><li>異なるシャード同士では当然、順序保証はされない</li><li>同じハッシュキーでも、ソートキーが異なれば異なるシャードに割り当てられる可能性がある（あった）</li><li>DynamoDB Streamsのシャードは、DynamoDBテーブルのパーティションとは管理粒度が異なる</li></ul></li></ul><p>私がガッツリ勘違いしていて、でもトラブルシュートしてくれたのはチームの若手エースという、遺憾な結果でしたので、二度と繰り返さないという反省の意味も込め詳細を書きます。</p><h2 id="DynamoDB-Streamsとは"><a href="#DynamoDB-Streamsとは" class="headerlink" title="DynamoDB Streamsとは"></a>DynamoDB Streamsとは</h2><p>DynamoDB Streamsについては1.5年前に似たような小ネタを投稿しました。DynamoDB Streams自体についてはそちらを参照ください（今見ても（当時から）すでにタイトルが..）。</p><ul><li><a href="/articles/20210122/">オレのDynamoDB Streamsが再着火しないわけがない </a></li></ul><h2 id="ハマったケース"><a href="#ハマったケース" class="headerlink" title="ハマったケース"></a>ハマったケース</h2><p>例を上げて説明します。</p><img src="/images/20221020a/dynamodbstreams_構成.png" alt="dynamodbstreams_構成.png" width="1200" height="277" loading="lazy"><p>構成例のイメージです。何かしらスタッフの動作をセンシングするデバイスがあり、それをリアルタイムでDynamoDBに登録。そのデータをニアリアルタイムで別システムに連携する必要があるため、DynamoDB StreamsでS3に N 分間隔でタイムスタンプ付きのファイル名で出力。連携先の別システムはファイル名をもとに順次取り込む、といった連携方式です。</p><p>センシングされたデータは時系列に並んでおり、DynamoDBのキーとしては、デバイスIDがハッシュキー、読み取り時間がソートキーになるようなイメージです。</p><p>問題になった事象としては次です。</p><ul><li>生成されたファイルを順次取り込んだが、あるデバイスIDに絞ると時系列で順序が狂っていた</li><li>センシングされた最新の情報が誤って取り込まれ、実体とシステムの値が異なった</li></ul><img src="/images/20221020a/dynamodbstreams_構成-ページ2.drawio.png" alt="dynamodbstreams_構成-ページ2.drawio.png" width="1200" height="486" loading="lazy"><p>最初は、センシングするデバイス側から送られる順番が狂ったとか、図では省略していますが途中で経由するKinesis Data StreamsのシャードIDにデバイスIDが入っていないなど、DynamoDBに書き込まれるまでで順序が狂ったのかと思っていましたが、書き込みデータにデバイスから送信日時とサーバ受付時間、DBへの永続日時を比較すると原因がDynamoDB Streamsでの出力で狂っていることが分かりました。</p><h2 id="発生メカニズム"><a href="#発生メカニズム" class="headerlink" title="発生メカニズム"></a>発生メカニズム</h2><p><a href="https://aws.amazon.com/jp/blogs/news/how-to-perform-ordered-data-replication-between-applications-by-using-amazon-dynamodb-streams/">Amazon DynamoDB ストリームを使用して、順序付けされたデータをアプリケーション間でレプリケーションする方法 | Amazon Web Services ブログ</a> からの図を参照します。</p><p>DynamoDB Streamsは内部的にシャードと呼ばれる単位で分割されています。シャードがどういう単位で分割されるかは利用者側の制御ができず、操作数に応じて柔軟に拡大・縮小する仕組みです。（下図だと3シャードに分かれており、その単位でLambdaが起動します。）</p><img src="/images/20221020a/DDB-Stream.jpg" alt="DDB-Stream.jpg" width="880" height="459" loading="lazy"><p>Lambdaの起動数ですが、同時実行数を1にすれば、次のように1シャード、1Lambdaしか起動しないです。シャード内は更新順に並んでいるためその中ではLambdaで順番に処理すれば良いです。</p><img src="/images/20221020a/DDB-Table1.jpg" alt="DDB-Table1.jpg" width="760" height="293" loading="lazy"><p>今回の間違いは、下図のように、同一Partitionにあるけれど、異なるDynamoDB Streamsシャードに割り当てられたため、ほぼ同時タイミングで複数のLambdaが起動し、同一ハッシュキーのデータ順序が狂ったことが原因で発生しました。</p><img src="/images/20221020a/dynamodb順序-ページ3.drawio.png" alt="dynamodb順序-ページ3.drawio.png" width="1200" height="397" loading="lazy"><p>連携先システムとしてはどのファイルにどのキーが含まれているかわかりようがないので回避しようがない（ファイルをマージして取り込むにしても、まだ出力されていないファイルに順序が狂ったデータが無いと言い切れない）ため、出力側が調整すべきことです。</p><p>なお、図ではシャードごとのLambda起動順が狂った感じで書いていますが、起動順序が図とは逆であったとしても、Lambdaの実行時間によっては想定外の出力順序になりえます（どちらか片方がこの例でいくとS3の書き込みでリトライが走ったとか、Streamsの件数がたまたま片方が100件でもう片方が10件だったとか）。</p><p>これを開発した当初はデータ量もまだ少なく、シャードが細かく分割されていなかったためテストで検知されず、利用量が増えたことで顕在化したのかなとも思います。ハッシュキーが同じであればDynamoDB上は同一パーティションとなるので、そのままDynamoDB Streamsのシャードとなるのかと勘違いしていました。思い込みは良くないですね。後で切り分けするのは大変なので最初に裏取りしておくべきことでした。</p><h2 id="回避方法"><a href="#回避方法" class="headerlink" title="回避方法"></a>回避方法</h2><p>複数の回避手段があるかなと思います。てっとり早いのはDynamoDB Streamsではなく定時起動のジョブを作ることでしょう。</p><img src="/images/20221020a/改善案.png" alt="改善案.png" width="1200" height="642" loading="lazy"><p>もし、取り込み側のシステムのコントロールが効く、かつ過去分に対する補正処理が複雑でなければ、前回取り込んだデバイスのセンサー読み取り時刻より古ければ弾くといった処理を入れても良いかなと思います（状況によりますが）。</p><p>ちなみに、シャードが分かれることが原因であるため、Kinesis Data Streamsのキャプチャに変えても意味はないです。</p><ul><li><a href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/kds.html">Kinesis Data Streams を使用して DynamoDB への変更をキャプチャする。 - Amazon DynamoDB</a></li></ul><h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><ul><li>AWSドキュメント、ちゃんと読みましょう（自戒）</li><li>DynamoDB Streamsの起動順序は項目単位。ソートキーが指定されているテーブルの場合は、ハッシュキー＋ソートキーの単位での保証となる<ul><li>時系列DBのような使い方をしているテーブルに関しては、おそらく想定通りの挙動をしない</li></ul></li></ul>]]></content:encoded>
+      
+      
+      <category domain="https://future-architect.github.io/categories/Infrastructure/">Infrastructure</category>
+      
+      
+      <category domain="https://future-architect.github.io/tags/AWS/">AWS</category>
+      
+      <category domain="https://future-architect.github.io/tags/DynamoDB/">DynamoDB</category>
+      
+      <category domain="https://future-architect.github.io/tags/Lambda/">Lambda</category>
+      
+      <category domain="https://future-architect.github.io/tags/%E5%A4%B1%E6%95%97%E8%AB%87/">失敗談</category>
+      
+      <category domain="https://future-architect.github.io/tags/DynamoDBStreams/">DynamoDBStreams</category>
+      
+      
+      <comments>https://future-architect.github.io/articles/20221020a/#disqus_thread</comments>
+      
+    </item>
     
     <item>
       <title>技育祭2022秋に登壇しました。ソフトウェアアーキテクトって何やるの？～知っておくと役立つ考え方を共有します～</title>
@@ -696,45 +734,6 @@
       
       
       <comments>https://future-architect.github.io/articles/20220914a/#disqus_thread</comments>
-      
-    </item>
-    
-    <item>
-      <title>東京Node学園40時限目で話をしてきました</title>
-      <link>https://future-architect.github.io/articles/20220913a/</link>
-      <guid>https://future-architect.github.io/articles/20220913a/</guid>
-      <pubDate>Mon, 12 Sep 2022 15:00:00 GMT</pubDate>
-      
-        
-        
-          
-          
-      <description>&lt;img src=&quot;/images/20220913a/2022-09-05_21.02.24.png&quot; alt=&quot;&quot; width=&quot;1200&quot; height=&quot;544&quot; loading=&quot;lazy&quot;&gt;
-
-&lt;p&gt;オンライン開催された&lt;a</description>
-          
-        
-      
-      
-      
-      <content:encoded><![CDATA[<img src="/images/20220913a/2022-09-05_21.02.24.png" alt="" width="1200" height="544" loading="lazy"><p>オンライン開催された<a href="https://nodejs.connpass.com/event/258870/">東京Node学園40時限目</a>で発表してきました。スライドはこちらです。</p><iframe src="https://docs.google.com/presentation/d/e/2PACX-1vT-QRGzhwBhsx2BQIM1Ft1hx-hMhi-CauCeXCmmFiZvXbkmIhkJ57XvX-XZUQb3WrlqfTEd_2mAMpnW/embed?start=false&loop=false&delayms=3000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe><p>内容としてはこのブログに書いた、<a href="https://future-architect.github.io/articles/20220819a/">gRPCがフロントエンド通信の第一の選択肢になる時代がやってきたかも？</a>という記事をベースにして、gRPCとは何かとか、Connectプロトコルの存在や、今までの公式実装ととどのように開発のスタイルが変わるか、みたいな話を絵つきで説明したりしました。</p><img src="/images/20220913a/スクリーンショット_2022-09-06_19.55.06.png" alt="スクリーンショット_2022-09-06_19.55.06.png" width="1200" height="640" loading="lazy"><p>あとは、streamを使って受信する部分のTypeScriptコードがどうなるかの紹介とかも追加しました。</p><figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 単発実行</span></span><br><span class="line"><span class="keyword">return</span> <span class="keyword">await</span> client.<span class="title function_">greet</span>(&#123;name&#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// ストリームからの受信</span></span><br><span class="line"><span class="keyword">for</span> <span class="title function_">await</span>(<span class="params"><span class="keyword">const</span> res <span class="keyword">of</span> client.conversation(&#123;name&#125;)</span>) &#123;</span><br><span class="line">  <span class="title function_">setMessage</span>(res.<span class="property">message</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>あるいは最近追加された<a href="https://connect.build/docs/web/getting-started/">connect-webのドキュメント</a>や、<a href="https://github.com/bufbuild/connect-web-integration">connect-webの組み込みのサンプル集</a>の紹介とかですね。</p><p>はてブはそそこついたのですが、やはり口頭で説明するとさらに伝わる感じがありますね。まだ案件での投入はしていませんが、生成されるコードの品質とか使いやすさは圧倒的に良いので、今後積極的に使っていきたいと思っています。また更新があれば本ブログで紹介していきたいと思います。</p><p>僕の発表以外の古川会長のBunの発表も、yusukebeさんの高速なフレームワークの話も、どちらも面白かったです。Bunは発音はBunかと思ったらBunだったんですね。マイクロベンチマークの気をつけてみるポイントは興味深かったです。JSCにするだけでNode.jsと比べてそんなに早くなるとは思えなかったので、確かにな、というお話でした。最速のフレームワークも、処理系自体がどんどん加速していくなかで、さらに上を目指す話で興味深かったです。僕はどちらかというと作りたいものがいっぱいあって、1つのプロダクトにこんなにコミットしたことがなかったので、こういうのもやってみたいな、と思いました。</p>]]></content:encoded>
-      
-      
-      <category domain="https://future-architect.github.io/categories/Programming/">Programming</category>
-      
-      
-      <category domain="https://future-architect.github.io/tags/%E7%99%BB%E5%A3%87%E3%83%AC%E3%83%9D%E3%83%BC%E3%83%88/">登壇レポート</category>
-      
-      <category domain="https://future-architect.github.io/tags/%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%82%A8%E3%83%B3%E3%83%89/">フロントエンド</category>
-      
-      <category domain="https://future-architect.github.io/tags/Node-js/">Node.js</category>
-      
-      <category domain="https://future-architect.github.io/tags/Node%E5%AD%A6%E5%9C%92/">Node学園</category>
-      
-      <category domain="https://future-architect.github.io/tags/Connect/">Connect</category>
-      
-      
-      <comments>https://future-architect.github.io/articles/20220913a/#disqus_thread</comments>
       
     </item>
     
