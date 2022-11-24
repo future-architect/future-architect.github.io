@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Service Worker開発で起きた不具合を振り返る | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTIGの川端です。 先日、Vue.js + Service Worker開発案件が終わりました。その振り返りとして、Service Worker開発で起きた不具合と対応方法を記載します。    Service WorkerとはService Workerは、ブラウザがWebページとは別にバックグラウンドで実行するJavaScriptになります。 利用ブラウザ&#x2F;バージョン情報など">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Service Worker開発で起きた不具合を振り返る | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210216/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIGの川端です。 先日、Vue.js + Service Worker開発案件が終わりました。その振り返りとして、Service Worker開発で起きた不具合と対応方法を記載します。    Service WorkerとはService Workerは、ブラウザがWebページとは別にバックグラウンドで実行するJavaScriptになります。 利用ブラウザ&#x2F;バージョン情報など">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210216/thumbnail.png">
+<meta property="article:published_time" content="2021-02-15T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:53.237Z">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="フロントエンド">
+<meta property="article:tag" content="トラブルシュート">
+<meta property="article:tag" content="Vue.js">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210216/thumbnail.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210216/">
+  <meta content="JavaScript,フロントエンド,トラブルシュート,Vue.js" name="keywords">
+  <meta content="川端一輝" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Service Worker開発で起きた不具合を振り返る
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210216_Service_Worker開発で起きた不具合を振り返る.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210216_Service_Worker開発で起きた不具合を振り返る" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-02-15T15:00:00.000Z" itemprop="datePublished">2021.02.16</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%B7%9D%E7%AB%AF%E4%B8%80%E8%BC%9D" title="川端一輝さんの記事一覧へ" class="post-author">川端一輝</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/JavaScript/" title="JavaScriptタグの記事へ" class="tag-list-link">JavaScript</a>
+  
+    
+    <a href="/tags/フロントエンド/" title="フロントエンドタグの記事へ" class="tag-list-link">フロントエンド</a>
+  
+    
+    <a href="/tags/トラブルシュート/" title="トラブルシュートタグの記事へ" class="tag-list-link">トラブルシュート</a>
+  
+    
+    <a href="/tags/Vue-js/" title="Vue.jsタグの記事へ" class="tag-list-link">Vue.js</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIGの川端です。</p>
+<p>先日、Vue.js + Service Worker開発案件が終わりました。その振り返りとして、Service Worker開発で起きた不具合と対応方法を記載します。</p>
+<img src="/images/20210216/thumbnail.png" class="img-middle-size" alt="" title="Diego VelázquezによるPixabayからの画像" loading="lazy">
+
+
+<h1 id="Service-Workerとは"><a href="#Service-Workerとは" class="headerlink" title="Service Workerとは"></a>Service Workerとは</h1><p>Service Workerは、ブラウザがWebページとは別にバックグラウンドで実行するJavaScriptになります。</p>
+<h1 id="利用ブラウザ-x2F-バージョン情報など"><a href="#利用ブラウザ-x2F-バージョン情報など" class="headerlink" title="利用ブラウザ&#x2F;バージョン情報など"></a>利用ブラウザ&#x2F;バージョン情報など</h1><ul>
+<li>Chrome v88.0.4324.146</li>
+<li>Vue.js v2.6.11</li>
+</ul>
+<h1 id="起きた不具合その１"><a href="#起きた不具合その１" class="headerlink" title="起きた不具合その１"></a>起きた不具合その１</h1><h2 id="事象"><a href="#事象" class="headerlink" title="事象"></a>事象</h2><p>Service Worker上で、<code>setInterval</code>の処理を用意したところ、数分で止まるという報告が上がりました。<br><code>setInterval</code>は、バックグランド上で定期的にある処理をするために用意したものです。</p>
+<figure class="highlight js"><figcaption><span>service-worker.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> timer = <span class="built_in">setInterval</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 1秒ごとに処理を実行</span></span><br><span class="line">&#125;, <span class="number">1000</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>調べてみるとService Workerの活動には制限があるようでした。</p>
+<p>またブラウザのDevToolを起動している場合は、Service Workerは常時活動中となり、<code>setInterval</code>の処理が止まることはありません。開発中はブラウザのDevToolを常時起動中であったため、本件不具合に気づかないという事態になりました…</p>
+<p><a target="_blank" rel="noopener" href="https://w3c.github.io/ServiceWorker/#service-worker-lifetime">参考：Service Worker Lifetime</a></p>
+<h2 id="対応"><a href="#対応" class="headerlink" title="対応"></a>対応</h2><p><code>setInterval</code>の処理をService WorkerからVue.js側（Webアプリ側）に移動しました。</p>
+<p>簡単な例ですが、下記のように実行したい画面のComponentに組み込みました。</p>
+<figure class="highlight html"><figcaption><span>sample1.vue</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 省略 --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="language-javascript">  <span class="attr">name</span>: <span class="string">&#x27;sample1&#x27;</span>,</span></span><br><span class="line"><span class="language-javascript">  created () &#123;</span></span><br><span class="line"><span class="language-javascript">    <span class="keyword">const</span> timer = <span class="built_in">setInterval</span>(<span class="function">() =&gt;</span> &#123;</span></span><br><span class="line"><span class="language-javascript">    <span class="comment">// 1秒ごとに処理を実行</span></span></span><br><span class="line"><span class="language-javascript">    &#125;, <span class="number">1000</span>)</span></span><br><span class="line"><span class="language-javascript">  &#125;</span></span><br><span class="line"><span class="language-javascript">&#125;</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="補足"><a href="#補足" class="headerlink" title="補足"></a>補足</h2><p>本記事は、<code>setInterval</code>に焦点を当てましたが、Service Worker側に用意したWebSocket受信処理も止まってしまったため、WebSocket受信処理もVue.js側に移動する対応も実施しました。</p>
+<h1 id="起きた不具合その２"><a href="#起きた不具合その２" class="headerlink" title="起きた不具合その２"></a>起きた不具合その２</h1><h2 id="事象-1"><a href="#事象-1" class="headerlink" title="事象"></a>事象</h2><p>［Ctrl］＋［Shift］＋［R］キーでリロードすると、下記のエラーが出てVue.jsからService Workerへのメッセージ送信が失敗するという事象が起きました。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Uncaught TypeError: Cannot read property &#x27;postMessage&#x27; of null</span><br></pre></td></tr></table></figure>
+
+<h2 id="原因-1"><a href="#原因-1" class="headerlink" title="原因"></a>原因</h2><p>［Ctrl］＋［Shift］＋［R］キーでリロードすると、Service Workerが解除され、下記の<code>controller</code>が<code>null</code>になったことが原因でした。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">navigator.serviceWorker.controller.postMessage(&#123; msg &#125;)</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://w3c.github.io/ServiceWorker/#dom-serviceworkercontainer-controller">Service Worker Controller</a>を確認すると、</p>
+<blockquote>
+<p>navigator.serviceWorker.controller returns null if the request is a force refresh (shift+refresh).</p>
+</blockquote>
+<p>の記載があり、［Ctrl］＋［Shift］＋［R］キーでリロードしたときに<code>controller</code>が<code>null</code>になるのは仕様でした。</p>
+<h2 id="対応-1"><a href="#対応-1" class="headerlink" title="対応"></a>対応</h2><p>再度Service WorkerがWebアプリをコントロールする状態になるように下記を実施しました。<br>まずVue.js側に、Service Workerが<code>active</code>になったら、Service Worker側に<code>claim</code>するようにメッセージを送ります。</p>
+<figure class="highlight js"><figcaption><span>main.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="string">&#x27;serviceWorker&#x27;</span> <span class="keyword">in</span> navigator) &#123;</span><br><span class="line">  <span class="variable language_">window</span>.<span class="property">onload</span> = <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// Service Workerの登録</span></span><br><span class="line">    <span class="keyword">const</span> registration = <span class="keyword">await</span> navigator.<span class="property">serviceWorker</span>.<span class="title function_">register</span>(<span class="string">&#x27;/service-worker.js&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Service Workerがactiveになったら、実行される</span></span><br><span class="line">    <span class="keyword">const</span> activeRegistration = <span class="keyword">await</span> navigator.<span class="property">serviceWorker</span>.<span class="property">ready</span></span><br><span class="line">    <span class="comment">// この段階では、まだcontrollerはnullのため、active.postMessageでメッセージを送信</span></span><br><span class="line">    activeRegistration.<span class="property">active</span>.<span class="title function_">postMessage</span>(&#123; <span class="attr">action</span>: <span class="string">&#x27;claim&#x27;</span> &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>次にService Worker側で該当のメッセージを受け取ったら、<code>self.clients.claim()</code>を実施します。</p>
+<figure class="highlight js"><figcaption><span>service-worker.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">self.<span class="property">onmessage</span> = <span class="function">(<span class="params">message</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (message.<span class="property">data</span>.<span class="property">action</span> === <span class="string">&#x27;claim&#x27;</span>) &#123;</span><br><span class="line">    self.<span class="property">clients</span>.<span class="title function_">claim</span>()</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ここまで対応すると、Service WorkerがWebアプリをコントロールしている状態になります。<br>またService Workerがコントロールする状態になるまで、<code>navigator.serviceWorker.controller.postMessage</code>の処理は失敗します。<br>その失敗した処理のリカバリ方法として、下記のように画面をリロードして再実行するように対応しました。</p>
+<figure class="highlight js"><figcaption><span>main.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="string">&#x27;serviceWorker&#x27;</span> <span class="keyword">in</span> navigator) &#123;</span><br><span class="line">  <span class="variable language_">window</span>.<span class="property">onload</span> = <span class="keyword">async</span> () =&gt; &#123;</span><br><span class="line">    <span class="comment">// Service WorkerがWebアプリをコントロール開始</span></span><br><span class="line">    navigator.<span class="property">serviceWorker</span>.<span class="property">oncontrollerchange</span> = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">window</span>.<span class="property">location</span>.<span class="title function_">reload</span>()</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">const</span> registration = <span class="keyword">await</span> navigator.<span class="property">serviceWorker</span>.<span class="title function_">register</span>(<span class="string">&#x27;/service-worker.js&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> activeRegistration = <span class="keyword">await</span> navigator.<span class="property">serviceWorker</span>.<span class="property">ready</span></span><br><span class="line">    activeRegistration.<span class="property">active</span>.<span class="title function_">postMessage</span>(&#123; <span class="attr">action</span>: <span class="string">&#x27;claim&#x27;</span> &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="所感"><a href="#所感" class="headerlink" title="所感"></a>所感</h1><p>Service Worker開発で起きた不具合を２例紹介しました。</p>
+<p>なかなか解決策が見つからず辛いと感じることもありましたが、こうして考えた解決策を公開することができて、大変嬉しく思っています。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210216/&related=twitterapi%2Ctwitter&text=Service%20Worker%E9%96%8B%E7%99%BA%E3%81%A7%E8%B5%B7%E3%81%8D%E3%81%9F%E4%B8%8D%E5%85%B7%E5%90%88%E3%82%92%E6%8C%AF%E3%82%8A%E8%BF%94%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210216/&t=Service%20Worker%E9%96%8B%E7%99%BA%E3%81%A7%E8%B5%B7%E3%81%8D%E3%81%9F%E4%B8%8D%E5%85%B7%E5%90%88%E3%82%92%E6%8C%AF%E3%82%8A%E8%BF%94%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210216/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">4</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210216/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">5</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.10.13</span><span class="snscount">&#9825;393</span><a href=/articles/20201013/ title="TIGの伊藤真彦です。ここ最近はVue.jsでのフロントエンド開発を行っています。ほぼ何もない状態からのスタート段階から始めたのですが、その際調査したことが学びになったので共有します。">2020年秋にVue.jsのアプリケーションを作るなら、押さえておきたい5つのポイント</a></li><li class="related-posts-item"><span>2022.01.19</span><span class="snscount">&#9825;7</span><a href=/articles/20220119a/ title="Headless CMSサービスであるDatoCMSをつかってポートフォリオをサクッと作成する方法をご紹介します">DatoCMSでポートフォリオをサクッとつくる</a></li><li class="related-posts-item"><span>2021.06.23</span><span class="snscount">&#9825;14</span><a href=/articles/20210623a/ title="この記事ではこのフューチャー技術ブログを機能拡張する過程で学んだコレクション操作で利用頻度が高い順にまとめます。ブログ運営（？）の保守運用な雰囲気が少しでも伝わればなと思います。">JavaScriptのコレクション操作入門</a></li><li class="related-posts-item"><span>2021.06.17</span><span class="snscount">&#9825;99</span><a href=/articles/20210617a/ title="少し前にES2021にて変更される新機能が発表されました。JavaScriptを扱う上では知っとくべき！と意気込んだもののECMAScriptが何者なのかすら曖昧な理解だったので、この機会に学んだことをまとめてみようと思います。* ECMAScriptがJavaScriptにとってどのような役割を持つのかを知る">ES2021／ES2022を知ろう</a></li><li class="related-posts-item"><span>2021.06.14</span><span class="snscount">&#9825;22</span><a href=/articles/20210614b/ title="フロントエンド記事連載の1記事目です。Vue Testing LibraryはVue.js公式のライブラリであるvue-test-utilをベースとする、DOM Testing LibraryのVue.js用拡張です。Vue Testing Libraryを用いると、Vue.js公式ライブラリであるvue-test-utilと比較して内部構造を意識せずにテストを作成できます。">Jest + TypeScript + Vue 3環境で Vue Testing Library(@testing-library／vue) を動かす</a></li><li class="related-posts-item"><span>2021.04.26</span><span class="snscount">&#9825;57</span><a href=/articles/20210426b/ title="Go 1.16のembedとchiとSingle Page Application、Go 1.16のgo:embedとNext.jsの相性が悪い問題と戦うに近い感じの研究記事です。">Go 1.16のembedとgo-swaggerを組み合わせてフルスタック自動生成フレームワークを作る</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Service-Worker%E3%81%A8%E3%81%AF"><span class="toc-text">Service Workerとは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E3%83%96%E3%83%A9%E3%82%A6%E3%82%B6-x2F-%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E6%83%85%E5%A0%B1%E3%81%AA%E3%81%A9"><span class="toc-text">利用ブラウザ&#x2F;バージョン情報など</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B5%B7%E3%81%8D%E3%81%9F%E4%B8%8D%E5%85%B7%E5%90%88%E3%81%9D%E3%81%AE%EF%BC%91"><span class="toc-text">起きた不具合その１</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8B%E8%B1%A1"><span class="toc-text">事象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C"><span class="toc-text">対応</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A3%9C%E8%B6%B3"><span class="toc-text">補足</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B5%B7%E3%81%8D%E3%81%9F%E4%B8%8D%E5%85%B7%E5%90%88%E3%81%9D%E3%81%AE%EF%BC%92"><span class="toc-text">起きた不具合その２</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8B%E8%B1%A1-1"><span class="toc-text">事象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-1"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-1"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%89%80%E6%84%9F"><span class="toc-text">所感</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

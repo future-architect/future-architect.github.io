@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Goでio.Readerをラップしてio.ReadSeekerを作る関数を作った &amp; プロパティベーステストで徹底的にテスト | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="Goアドベントカレンダーその5の穴埋めです。 Goではインタフェースをうまく利用することで、ライブラリの柔軟性が大幅にあがります。ライブラリでデータの読み込みをos.Fileではなくて、io.Readerで行うようにすれば、メモリの情報を直接bytes.Readerやstrings.Readerで渡したり、http.Request.BodyでHTTPクライアントからアップロードされた内容を直接">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Goでio.Readerをラップしてio.ReadSeekerを作る関数を作った &amp; プロパティベーステストで徹底的にテスト | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20201211/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="Goアドベントカレンダーその5の穴埋めです。 Goではインタフェースをうまく利用することで、ライブラリの柔軟性が大幅にあがります。ライブラリでデータの読み込みをos.Fileではなくて、io.Readerで行うようにすれば、メモリの情報を直接bytes.Readerやstrings.Readerで渡したり、http.Request.BodyでHTTPクライアントからアップロードされた内容を直接">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20201211/readseeker.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201211/Screen_Shot_2020-12-10_at_19.21.58.png">
+<meta property="article:published_time" content="2020-12-10T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:53.189Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="テスト">
+<meta property="article:tag" content="PBT">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20201211/readseeker.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20201211/">
+  <meta content="Go,テスト,PBT" name="keywords">
+  <meta content="澁川喜規" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Goでio.Readerをラップしてio.ReadSeekerを作る関数を作った &amp; プロパティベーステストで徹底的にテスト
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20201211_Goでio.Readerをラップしてio.ReadSeekerを作る関数を作った_&amp;_プロパティベーステストで徹底的にテスト.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20201211_Goでio.Readerをラップしてio.ReadSeekerを作る関数を作った_&amp;_プロパティベーステストで徹底的にテスト" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2020/" class="publish-date"><time datetime="2020-12-10T15:00:00.000Z" itemprop="datePublished">2020.12.11</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%BE%81%E5%B7%9D%E5%96%9C%E8%A6%8F" title="澁川喜規さんの記事一覧へ" class="post-author">澁川喜規</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/テスト/" title="テストタグの記事へ" class="tag-list-link">テスト</a>
+  
+    
+    <a href="/tags/PBT/" title="PBTタグの記事へ" class="tag-list-link">PBT</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20201211/readseeker.png" class="img-small-size" loading="lazy">
+
+<p><a target="_blank" rel="noopener" href="https://qiita.com/advent-calendar/2020/go5">Goアドベントカレンダーその5</a>の穴埋めです。</p>
+<p>Goではインタフェースをうまく利用することで、ライブラリの柔軟性が大幅にあがります。ライブラリでデータの読み込みを<code>os.File</code>ではなくて、<code>io.Reader</code>で行うようにすれば、メモリの情報を直接<code>bytes.Reader</code>や<code>strings.Reader</code>で渡したり、http.Request.BodyでHTTPクライアントからアップロードされた内容を直接読み込ませたり、とかですね。</p>
+<p>で、<code>io.Reader</code>や<code>io.Writer</code>あたりはこの恩恵に授かりやすいのですが、標準ライブラリのioパッケージで定義されているものの、ごくごくたまーに要求されるが、そのインタフェースを実装している構造体が少なくてついつい慌てがちなのが、<code>io.Seeker</code>です。</p>
+<p>会社のチャットで話題になって、回答はしたものの、裏で自動でバッファリングしてシーク可能にするようなラッパー作れそうだな、と思ってつい書き始めました。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://gitlab.com/osaki-lab/iowrapper">https://gitlab.com/osaki-lab/iowrapper</a></li>
+</ul>
+<img src="/images/20201211/Screen_Shot_2020-12-10_at_19.21.58.png" loading="lazy">
+
+
+<p><code>io.Reader</code>としてラップ元の<code>io.Reader</code>から読み込まれた内容とか、<code>Seek()</code>呼び出しで内容の読み飛ばしが指示されたときに、内部にバッファリングして、自由にシークできるようにします。バッファサイズはデフォルトで1MBにしていますが、オプションで変更できるようにしました。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">readSeeker := iowrapper.NewSeeker(reader, iowrapper.MaxBufferSize(<span class="number">10</span> * <span class="number">1024</span> * <span class="number">1024</span>)</span><br></pre></td></tr></table></figure>
+
+<h1 id="徹底的にテストしてみる"><a href="#徹底的にテストしてみる" class="headerlink" title="徹底的にテストしてみる"></a>徹底的にテストしてみる</h1><p>この手の入出力が決まって、なおかつ内部の状態を持つものはとても歯ごたえがあってテストのしがいがあります。いろいろな組み合わせがあるので、テストのカバレッジをあげるのは頭を使います。いくつかチャレンジしてみました。</p>
+<h2 id="ペアワイズ法"><a href="#ペアワイズ法" class="headerlink" title="ペアワイズ法"></a>ペアワイズ法</h2><p>何度か使ったことがある、PICTを使って見ます。次のQiitaの記事が詳しいです。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://qiita.com/bremen/items/6eceddc534d87fc797cc">ペアワイズ法によるテストケース抽出ツール「PICT」を使ってテストケースを85%削減する</a></li>
+</ul>
+<p>M1 macでしたが、git cloneしてmake一発でビルド完了。ビルド時間もごくわずかです。入力パラメータとして、カテゴリとその構成要素をカンマ区切りで書きます。これでpictコマンドに渡すとテストすべき組み合わせがリストで出力されます。</p>
+<figure class="highlight text"><figcaption><span>state.txt</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">seek-whence: start, current, end</span><br><span class="line">seek-offset: negative, zero, positive</span><br><span class="line">read-position: negative, zero, in-buffer, out-of-buffer, end, exceed-end</span><br><span class="line">read-size: zero, in-range, end, exceed-end</span><br></pre></td></tr></table></figure>
+<p>このうち、条件で組み合わせが限定されるもの（確定されるもの、あるいは存在しない組み合わせ）を式で追加できます。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">if [seek-whence] = &quot;start&quot; AND [seek-offset] = &quot;negative&quot;</span><br><span class="line">  THEN ( [read-position] = &quot;negative&quot; );</span><br><span class="line">if [seek-whence] = &quot;start&quot; AND [seek-offset] = &quot;zero&quot;</span><br><span class="line">  THEN ( [read-position] = &quot;start&quot; );</span><br><span class="line">if [seek-whence] = &quot;end&quot; AND [seek-offset] = &quot;zero&quot;</span><br><span class="line">  THEN ( [read-position] = &quot;end&quot; );</span><br><span class="line">if [seek-whence] = &quot;end&quot; AND [seek-offset] = &quot;positive&quot;</span><br><span class="line">  THEN ( [read-position] = &quot;exceed-end&quot; );</span><br></pre></td></tr></table></figure>
+
+<p>結果はこのように出力されます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ pict state.txt</span><br><span class="line">seek-whence	seek-offset	read-position	read-size</span><br><span class="line">current	negative	negative	exceed-end</span><br><span class="line">start	positive	negative	end</span><br><span class="line">current	zero	exceed-end	in-range</span><br><span class="line">current	zero	in-buffer	exceed-end</span><br><span class="line">end	zero	end	end</span><br><span class="line">current	positive	end	exceed-end</span><br><span class="line">current	zero	negative	zero</span><br></pre></td></tr></table></figure>
+
+<p>これを元にテストコードを書けばばっちりです！</p>
+<p>・・・とはなかなかうまくはいきませんでした。</p>
+<p>これを元にテーブルテストの項目を手動で書いてみたのですが、「あ、この条件を足そう」と、カテゴリが増えたり、組み合わせの制約を足したら、がらっと結果が変わってしまって、過去に書いたテストがどれに該当するのか、どれが足りないのかを目視で確認するのが結構大変です。以前にも何度かチャレンジしたものの、やはり同様の理由で途中で放棄しました。出発点のテストのボイラープレート作成用の元データとして使い、コードが成長してきて、後からif文が増えたのでカバレッジ向上のために足したいものがあれば手動で足す・・・みたいな運用に結果的になってしまいました。テーブル駆動テストのネタ作りのための使い捨てと割り切って、組み合わせ算出の電卓として使うのが良さそう。</p>
+<p>テストコードを書きながら書いて設計していくようなサイクルを回して成長させていくテスト駆動開発に組み込むには、乱数の種を固定(<code>/r:N</code>オプション)しつつ、テストケースの中にこのカテゴリの値そのものをどこかに入れておいて、生成されたものと比較して足りないものを出力するみたいな静的解析との組み合わせが必要かな、と。あるいは、この入力をダイレクトにテスト実行時に読み込んでテストケースにしてしまう方法も考えられますが、それであれば、正直このツールを使うよりは次のプロパティベーステストの方が開発のサイクルには合わせやすいと思いました。</p>
+<p>まあ、組み合わせとかカバレッジを考えるには良い題材だと思うので、新入社員研修とかで触らせてみるのは良いかもしれません。</p>
+<h1 id="プロパティベーステスト（PBT"><a href="#プロパティベーステスト（PBT" class="headerlink" title="プロパティベーステスト（PBT)"></a>プロパティベーステスト（PBT)</h1><p>上記のPICTを（初期だけ）使って、テーブルテストを手動で書いて、一通りの実装を完成させるところまではできました。しかし、この手のバッファを扱うものは扱いを間違えると即座にバッファオーバーフローでセキュリティホールで・・・となる修羅の世界。せっかくなので、追加で、<a target="_blank" rel="noopener" href="https://github.com/leanovate/gopter">gopter</a>を使ってプロパティベーステストしたり、ファジングのテストもしました。プロパティベーステストについては次のサイトが日本語でよくわかる説明になっています。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.google.com/presentation/d/e/2PACX-1vR6RLKjIUv6ACJRK8Zqc63J0W2ycf7S5j2NoQTkIuwpxyI9DDELFTMH_fPIVbUiYrjEiF787N9t4xc2/pub?start=false&loop=false&delayms=3000">@ymotongpoo氏によるGoCon仙台の解説</a></li>
+<li><a target="_blank" rel="noopener" href="https://qiita.com/rerorero/items/568e227da3939dbf9532">gopterを使ってGoでProperty Based Testingする</a></li>
+</ul>
+<p>細かい定義とかは追っかけていないですが、形式仕様記述と、ユニットテストの1手法であるテーブル駆動テストの中間ぐらいの感触です。テーブル駆動テストだと、入力値を人力でリスト化し、テストコードに投入して期待する結果が出るかをテストします。形式仕様記述はAlloyをちょっと触っただけなので違う側面があるかもしれませんが、論理的に入出力や内部の状態の関係性を記述し、それを解釈して仕様が矛盾しないかを検証します。</p>
+<h2 id="PICTとの違い"><a href="#PICTとの違い" class="headerlink" title="PICTとの違い"></a>PICTとの違い</h2><p>PICTは、テストケースをなるべく削減するために、問題の発生原因となる因子の組み合わせ数を考慮してなるべく少ないテストケースを生成しますし、入力はenumの組み合わせです。Property Base Testも、因子を与えると、入力値の組み合えわせを生成する点は一緒ですが、こちらは「文字列が入力」と型の指定をすると、空文字列から長い文字列までいろんなバリエーションの文字列を生成してテストの入力とします。自動テスト前提なのでデフォルトで100件とかそれなりの分量のテストを生成します。実際の入力の組み合わせは無限大ありますが、PICT同様、無限大の選択肢の中から、100パターン効率よくいろいろなバリエーションのインプットを生成します。ただたくさん組み合わせを作るだけではなく、エラーが発生したときに、失敗した組み合わせを分析（シュリンク）し、「この要素が原因である」と少し分析したうえでエラーを返してくれます。問題が発生したかどうかだけではなく、問題の解析にも役立ちます。</p>
+<p>PBTはPICTのテストケース生成と異なり、「Aならば結果がBにはならない」みたいな論理的な記述はできません。評価は単にtrue&#x2F;falseで返すだけなので単にありえない組み合わせならさっさとtrueを返して終了、という方法もできますが、いろいろ考慮されて絞られた100通りのパターンのテストケースを、そこからさらに何割か削ってしまうと、本来テストすべきだったケースも検証がスキップされてしまう可能性があります。そういう無駄玉は打たない方が良いでしょう。</p>
+<h2 id="書いてみたテスト"><a href="#書いてみたテスト" class="headerlink" title="書いてみたテスト"></a>書いてみたテスト</h2><p>今回書いたテストはこんな感じです。プロパティを宣言し、それにテストを書いていきます。プロパティには入力値のジェネレータを渡します。ジェネレータでは文字数の上限とか数値の値の範囲とか細かく制御はできますが、今回みたいなケースの場合、「元のio.Readerのコンテンツよりも少ない数値を入力パラメータに利用したい」みたいなニーズが出てきます。しかし、ジェネレータが生成する値を元に別の値を生成する指定はできません。</p>
+<p>今回は、「読み飛ばす文字列」「実際に読む文字列」「読み残す文字列」と3つの文字列を生成し、それを合成してio.Readerの入力を生成したり、Seek()のオフセット値や読み込む量といった数値を算出しています。Property Base Testの場合はこのようなジェネレータを使ったパズルを解いて、効率よく入力を作り出す方法を考えるところが楽しいところですし、結果の質に影響がある部分です。</p>
+<p>プロパティベーステストがユニットテストと異なるのが、入力時が自動生成なので結果の比較をどうするか考える点です。今回の入力を3つに分けて生成しており、正解のデータも自動生成してから組み込んでいるので、厳密に正しいかどうかテストできます。他に先行実装があってその移植であればそれをテストにもできるでしょう。こちらも考慮が必要です。まあホワイトボックステストですね。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestSuccessfullyRead</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	properties := gopter.NewProperties(<span class="literal">nil</span>)</span><br><span class="line"></span><br><span class="line">	skipBytesGen := gen.AnyString()</span><br><span class="line">	readBytesGen := gen.AnyString()</span><br><span class="line">	remainedBytesGen := gen.AnyString()</span><br><span class="line"></span><br><span class="line">	properties.Property(<span class="string">&quot;Read successfully with SeekStart&quot;</span>, prop.ForAll(<span class="function"><span class="keyword">func</span><span class="params">(skipBytesSrc, readBytesSrc, remainedBytesSrc <span class="type">string</span>)</span></span> <span class="type">bool</span> &#123;</span><br><span class="line">		skipBytes := []<span class="type">byte</span>(skipBytesSrc)</span><br><span class="line">		readBytes := []<span class="type">byte</span>(readBytesSrc)</span><br><span class="line">		remainedBytes := []<span class="type">byte</span>(remainedBytesSrc)</span><br><span class="line">		<span class="keyword">var</span> buffer bytes.Buffer</span><br><span class="line">		buffer.Write(skipBytes)</span><br><span class="line">		buffer.Write(readBytes)</span><br><span class="line">		buffer.Write(remainedBytes)</span><br><span class="line"></span><br><span class="line">		readSeeker := NewSeeker(&amp;buffer)</span><br><span class="line">		readSeeker.Seek(<span class="type">int64</span>(<span class="built_in">len</span>(skipBytes)), io.SeekStart)</span><br><span class="line"></span><br><span class="line">		<span class="keyword">var</span> output bytes.Buffer</span><br><span class="line">		n, err := io.CopyN(&amp;output, readSeeker, <span class="type">int64</span>(<span class="built_in">len</span>(readBytes)))</span><br><span class="line">		<span class="keyword">if</span> n != <span class="type">int64</span>(<span class="built_in">len</span>(readBytes)) &#123;</span><br><span class="line">			t.Logf(<span class="string">&quot;Read successfully with SeekStart fail: n(%d) != len(readBytes)()%d\n&quot;</span>, n, <span class="built_in">len</span>(readBytes))</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> output.String() != readBytesSrc &#123;</span><br><span class="line">			t.Logf(<span class="string">&quot;Read successfully with SeekStart fail: %s != %s\n&quot;</span>, output.String(), readBytesSrc)</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			t.Logf(<span class="string">&quot;Read successfully with SeekStart fail: err(%v) != nil\n&quot;</span>, err)</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">	&#125;, skipBytesGen, readBytesGen, remainedBytesGen))</span><br><span class="line">	properties.TestingRun(t)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="ファジング"><a href="#ファジング" class="headerlink" title="ファジング"></a>ファジング</h2><p>PBTのライブラリは、ファジングにも便利です。ありとあらゆる入力値の可能性を与えて、パニックが起きないかどうかの検証です。Goでファジングだと、go-fuzzが有名ですが、gopterを使い回す方が、入力値の型に合わせたデータ生成ができるので使いやすいです。</p>
+<p>今回は、オフセット値や読み込むバイト数をソース文字列とは別に生成器を作っています。入力文字列よりもはるかに大きなオフセットを与えたり、読み込みを行おうとしたりします。このテストでは結果の検証はしなくて、完走したらreturn trueとしています。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestFuzzing</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	properties := gopter.NewProperties(<span class="literal">nil</span>)</span><br><span class="line"></span><br><span class="line">	srcGen := gen.AnyString()</span><br><span class="line">	whenceGen := gen.IntRange(<span class="number">0</span>, <span class="number">2</span>)</span><br><span class="line">	offsetGen := gen.Int64()</span><br><span class="line">	readBytesGen := gen.Int64()</span><br><span class="line"></span><br><span class="line">	properties.Property(<span class="string">&quot;Don&#x27;t panic&quot;</span>, prop.ForAll(<span class="function"><span class="keyword">func</span><span class="params">(srcStr <span class="type">string</span>, whence <span class="type">int</span>, offset, readBytes <span class="type">int64</span>)</span></span> <span class="type">bool</span> &#123;</span><br><span class="line">		src := strings.NewReader(srcStr)</span><br><span class="line">		readSeeker := NewSeeker(src)</span><br><span class="line">		readSeeker.Seek(offset, whence)</span><br><span class="line">		io.CopyN(ioutil.Discard, readSeeker, readBytes)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">	&#125;, srcGen, whenceGen, offsetGen, readBytesGen))</span><br><span class="line"></span><br><span class="line">	properties.TestingRun(t)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>Goのインタフェースのラッパーを作ってみたのと同時に、いつもよりも少し気合いを入れてテストを書いてみました。本体のコード量の数倍のテストになりました。</p>
+<p>PICTはお手軽に始められる言語非依存のツールです。テスト駆動開発のサイクルの出発時に状態の組み合わせを考えてみるお手伝いとして使う方が良いな、というのが実感です。</p>
+<p>一方プロパティベーステストはプログラミング言語に合わせて作られているライブラリを利用します。徹底的にテストされてしまうので、テスト駆動開発だといつまでも青くならない、真っ赤になり続けることになるため、テスト駆動開発に組み込むのは少し難いですね。一通り実装が完了したら、セルフQAとしてPBTを使ったテストを書いてみる使い方が良いかな、と思いました。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20201211/&related=twitterapi%2Ctwitter&text=Go%E3%81%A7io.Reader%E3%82%92%E3%83%A9%E3%83%83%E3%83%97%E3%81%97%E3%81%A6io.ReadSeeker%E3%82%92%E4%BD%9C%E3%82%8B%E9%96%A2%E6%95%B0%E3%82%92%E4%BD%9C%E3%81%A3%E3%81%9F%20&%20%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3%E3%83%99%E3%83%BC%E3%82%B9%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E5%BE%B9%E5%BA%95%E7%9A%84%E3%81%AB%E3%83%86%E3%82%B9%E3%83%88%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">4</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20201211/&t=Go%E3%81%A7io.Reader%E3%82%92%E3%83%A9%E3%83%83%E3%83%97%E3%81%97%E3%81%A6io.ReadSeeker%E3%82%92%E4%BD%9C%E3%82%8B%E9%96%A2%E6%95%B0%E3%82%92%E4%BD%9C%E3%81%A3%E3%81%9F%20&%20%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3%E3%83%99%E3%83%BC%E3%82%B9%E3%83%86%E3%82%B9%E3%83%88%E3%81%A7%E5%BE%B9%E5%BA%95%E7%9A%84%E3%81%AB%E3%83%86%E3%82%B9%E3%83%88" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20201211/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">4</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20201211/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">18</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;563</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2022.11.22</span><span class="snscount">&#9825;11</span><a href=/articles/20221122a/ title="前回の記事ではMSAL.jsを使い、シングルページアプリケーションの認証を試してみました。業務システムで扱う認証にはいろいろな種類がありますが、だいたい以下のどれかに該当するケースが多いと思います。">AzureAD＋MSAL for Goでバッチコマンドの認証<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.10.24</span><span class="snscount">&#9825;130</span><a href=/articles/20221024a/ title="ちょっとしたツールをGoで作ってみたのですが、わざわざインストールしなくてもいいようにWebのUIをつけてブラウザで使えるようにしてみました。ウェブフロントエンド部分はNext.jsの静的サイトで、GoはWASMにしてロードして実行しています。WASMを使うのは初めてなのであえて選んでみました。">Goで作ったロジックにWebUIをつけてGitHubページに公開する</a></li><li class="related-posts-item"><span>2022.09.21</span><span class="snscount">&#9825;91</span><a href=/articles/20220921a/ title="一般に、リフレクションは黒魔術と呼ばれることもあります。Goでは「リフレクションよりはコード生成」と長く言われてきました。ジェネリクスも一般的にはそのリフレクションとコード生成の間を埋めるもので、やはりリフレクションの使用を減らすためのもの（リフレクションではできない静的型チェックもできますが）です。ですが、リフレクションでしか実現できないこともあります。">たのしいGoリフレクション: 変数アサイン</a></li><li class="related-posts-item"><span>2022.09.02</span><span class="snscount">&#9825;270</span><a href=/articles/20220902a/ title="名前からすると日本の古き良き（悪名高い）デバイス認証方式のあれのように見えますが、パスワードレスな認証を実現するOSSのプロダクトです。Go製でライセンスはAGPL3です。なかなか面白そうなので動かしてみました。このhankoのメンバーが運営しているpasskeys.ioというウェブサイトもあり、パスワードレスなログインを広めていこう！という啓蒙サイトになっています。">パスワードレスな認証を実現する認証ミドルウェアのhanko</a></li><li class="related-posts-item"><span>2022.08.08</span><span class="snscount">&#9825;111</span><a href=/articles/20220808a/ title="Go 1.19リリース連載の6本目です。Go 1.19では、いくつかメモリ周りの更新がありました。1つはガベージコレクタ周りのお話と、あとはメモリモデルの更新です。　ライブラリでは[sync/atomic.Int64]など、いくつか型が追加されました。ガベージコレクタの詳細と調整の仕方についてのドキュメント...">Go 1.19のメモリ周りの更新</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%B9%E5%BA%95%E7%9A%84%E3%81%AB%E3%83%86%E3%82%B9%E3%83%88%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">徹底的にテストしてみる</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%9A%E3%82%A2%E3%83%AF%E3%82%A4%E3%82%BA%E6%B3%95"><span class="toc-text">ペアワイズ法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3%E3%83%99%E3%83%BC%E3%82%B9%E3%83%86%E3%82%B9%E3%83%88%EF%BC%88PBT"><span class="toc-text">プロパティベーステスト（PBT)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#PICT%E3%81%A8%E3%81%AE%E9%81%95%E3%81%84"><span class="toc-text">PICTとの違い</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B8%E3%81%84%E3%81%A6%E3%81%BF%E3%81%9F%E3%83%86%E3%82%B9%E3%83%88"><span class="toc-text">書いてみたテスト</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%95%E3%82%A1%E3%82%B8%E3%83%B3%E3%82%B0"><span class="toc-text">ファジング</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

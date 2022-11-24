@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>LocalStackでS3署名付きURLを使う時に気を付けるポイント | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="TIGの伊藤真彦です。 AWS S3を利用してファイルをアップロード、ダウンロードするフロントエンドアプリケーションの実装を行ったのですが、その際ハマったポイントがいくつかあったのでまとめます。 LocalStackでS3を利用するAWSの機能をローカル環境で模擬するツールでお馴染みのLocalStackですが、AWS S3の機能も模擬できるようになっています。 docker-compose.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LocalStackでS3署名付きURLを使う時に気を付けるポイント | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20211115a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="TIGの伊藤真彦です。 AWS S3を利用してファイルをアップロード、ダウンロードするフロントエンドアプリケーションの実装を行ったのですが、その際ハマったポイントがいくつかあったのでまとめます。 LocalStackでS3を利用するAWSの機能をローカル環境で模擬するツールでお馴染みのLocalStackですが、AWS S3の機能も模擬できるようになっています。 docker-compose.">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20211115a/localstack-readme-header.png">
+<meta property="article:published_time" content="2021-11-14T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:53.606Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="S3">
+<meta property="article:tag" content="LocalStack">
+<meta property="article:tag" content="署名付きURL">
+<meta property="article:tag" content="CORS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20211115a/localstack-readme-header.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20211115a/">
+  <meta content="AWS,S3,LocalStack,署名付きURL,CORS" name="keywords">
+  <meta content="伊藤真彦" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">LocalStackでS3署名付きURLを使う時に気を付けるポイント
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20211115a_localstackでS3署名付きURLを使う時に気を付けるポイント.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20211115a_localstackでS3署名付きURLを使う時に気を付けるポイント" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-11-14T15:00:00.000Z" itemprop="datePublished">2021.11.15</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E4%BC%8A%E8%97%A4%E7%9C%9F%E5%BD%A6" title="伊藤真彦さんの記事一覧へ" class="post-author">伊藤真彦</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/S3/" title="S3タグの記事へ" class="tag-list-link">S3</a>
+  
+    
+    <a href="/tags/LocalStack/" title="LocalStackタグの記事へ" class="tag-list-link">LocalStack</a>
+  
+    
+    <a href="/tags/署名付きURL/" title="署名付きURLタグの記事へ" class="tag-list-link">署名付きURL</a>
+  
+    
+    <a href="/tags/CORS/" title="CORSタグの記事へ" class="tag-list-link">CORS</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20211115a/localstack-readme-header.png" alt="" width="675" height="271">
+
+<p>TIGの伊藤真彦です。</p>
+<p>AWS S3を利用してファイルをアップロード、ダウンロードするフロントエンドアプリケーションの実装を行ったのですが、その際ハマったポイントがいくつかあったのでまとめます。</p>
+<h2 id="LocalStackでS3を利用する"><a href="#LocalStackでS3を利用する" class="headerlink" title="LocalStackでS3を利用する"></a>LocalStackでS3を利用する</h2><p>AWSの機能をローカル環境で模擬するツールでお馴染みのLocalStackですが、AWS S3の機能も模擬できるようになっています。</p>
+<p><code>docker-compose.yml</code>に設定を記述して、バックエンドAPIなど諸々のコンテナ群と一緒に利用するのが今日では一般的でしょうか。</p>
+<figure class="highlight yml"><figcaption><span>docker-compose.yml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&quot;3&quot;</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">localstack:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">localstack/localstack:0.11.3</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">localstack</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">4566</span><span class="string">:4566</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">8080</span><span class="string">:8080</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">DEFAULT_REGION=ap-northeast-1</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">SERVICES=s3</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">DATA_DIR=/tmp/localstack/data</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/Users/naoya-otani/.localstack:/tmp/localstack/</span></span><br></pre></td></tr></table></figure>
+
+<p>環境変数<code>SERVICES</code>にs3が含まれていないと利用できない点にご注意ください。</p>
+<p>localstackでS3が起用できるようになると、<code>localhost:4566</code>でS3を模擬した一連の機能が利用できるようになります。</p>
+<p>例えば下記のコマンドでローカル環境にS3バケットを作成する事ができます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws --endpoint-url http://localhost:4566 s3api create-bucket --bucket local-test-backet --profile <span class="built_in">local</span></span><br></pre></td></tr></table></figure>
+
+<p><code>--endpoint-url</code>、<code>--profile</code> といったオプションを利用する事が大事です。</p>
+<h2 id="署名付きURLとは"><a href="#署名付きURLとは" class="headerlink" title="署名付きURLとは"></a>署名付きURLとは</h2><p>AWS S3には<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html">署名付きURL</a>という機能が存在します。</p>
+<blockquote>
+<p>デフォルトでは、すべてのオブジェクトがプライベートです。オブジェクトの所有者のみがプライベートのオブジェクトにアクセスできます。ただし、オブジェクトの所有者はオプションで他ユーザーとオブジェクトを共有することができます。その場合は、署名付き URL を作成し、独自のセキュリティ証明書を使用して、オブジェクトをダウンロードするための期限付きの許可を相手に付与します。</p>
+</blockquote>
+<p>この機能により、S3のセキュリティ設定を緩めることなく、外部WEBサイトやアプリケーションからS3バケットへのアクセスが可能になります。</p>
+<p><strong>LocalStackでも署名付きURLを利用する事は可能ですが、いくつか独自の注意点があり、見落とすと上手く動かずに苦戦する事になります。</strong></p>
+<h2 id="署名の計算でエラーが発生する"><a href="#署名の計算でエラーが発生する" class="headerlink" title="署名の計算でエラーが発生する"></a>署名の計算でエラーが発生する</h2><p>サーバーサイドのAPIで署名付きURLを正しく払い出しているつもりでも<code>SignatureDoesNotMatch</code>というエラーが表示されることがあります。<br>これは署名付きURLが払いだすパラメータ<code>X-Amz-Signature</code>がS3が期待している内容と異なる場合に返されるエラーレスポンスです。</p>
+<h3 id="CREDENTIALの不一致によるエラー"><a href="#CREDENTIALの不一致によるエラー" class="headerlink" title="CREDENTIALの不一致によるエラー"></a>CREDENTIALの不一致によるエラー</h3><p>署名付きURLの署名の暗号計算には、AWS CLIの設定や環境変数でお馴染みの<code>AWS_ACCESS_KEY_ID</code>、<code>AWS_SECRET_ACCESS_KEY</code>が計算材料に利用されます。</p>
+<p>LocalStackのS3では、<code>AWS_SECRET_ACCESS_KEY</code>、<code>AWS_SECRET_ACCESS_KEY</code>が明示されていない場合、これら2種の値は<code>test</code>になります。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/localstack/awscli-local/blob/53876fbb7dcc75868402cc5593ab36db87c4c66d/bin/awslocal#L113-L119">LocalStackの実装</a>を見るとわかりやすいかもしれません。<br><code>os.environ.get</code>で環境変数を参照し、無い場合のデフォルト値は<code>test</code>になっています。</p>
+<p>ここで気を付けなければならないのは署名付きURLの発行を行うロジックで利用するAWS SDKの<code>AWS_ACCESS_KEY_ID</code>、<code>AWS_SECRET_ACCESS_KEY</code>が一致している必要があるということです。一般的にはバックエンドAPIの実装でS3を利用するSDKを利用するケースが多いと思います。</p>
+<p>そこで参照している<code>AWS_ACCESS_KEY_ID</code>、<code>AWS_SECRET_ACCESS_KEY</code>がLocalStackで参照しているものと一致していないと署名の計算結果が一致せずに<code>SignatureDoesNotMatch</code>エラーが発生します。</p>
+<p>特にこだわりが無ければローカル環境での環境変数<code>AWS_ACCESS_KEY_ID</code>、<code>AWS_SECRET_ACCESS_KEY</code>、およびAWS CLIの<code>~/.aws/profile</code>で利用する<code>AWS_ACCESS_KEY_ID</code>、<code>AWS_SECRET_ACCESS_KEY</code>は<code>test</code>にしておくのが無難です。</p>
+<p>もしくはdocker-compose.ymlに欠かさず<code>AWS_ACCESS_KEY_ID</code>、<code>AWS_SECRET_ACCESS_KEY</code>を明記しましょう。</p>
+<figure class="highlight yml"><figcaption><span>docker-compose.yml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&quot;3&quot;</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">localstack:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">localstack/localstack:0.11.3</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">localstack</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">4566</span><span class="string">:4566</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">8080</span><span class="string">:8080</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">AWS_ACCESS_KEY_ID=id</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">AWS_SECRET_ACCESS_KEY=key</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">DEFAULT_REGION=ap-northeast-1</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">SERVICES=s3</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">DATA_DIR=/tmp/localstack/data</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/Users/naoya-otani/.localstack:/tmp/localstack/</span></span><br></pre></td></tr></table></figure>
+
+<p>署名付きURLは、発行するたびにS3に予約するためのアクセスを行っているわけではなく、理論上こうなるはず、という値を計算している、という仕組みです。</p>
+<p>したがって対象のバケットが存在しなくてもURLは発行できますし、設定の違いにより誤った値を計算してURLを発行する事ができてしまいます。</p>
+<p>上記の仕組みを覚えて置くとエラーの原因を考える際に役に立つと思います。</p>
+<h3 id="特殊記号によるエラー"><a href="#特殊記号によるエラー" class="headerlink" title="特殊記号によるエラー"></a>特殊記号によるエラー</h3><p><code>AWS_ACCESS_KEY_ID</code>、<code>AWS_SECRET_ACCESS_KEY</code>が正常に一致していても<code>SignatureDoesNotMatch</code>エラーが起きるパターンがあります。</p>
+<p>それは、<code>AWS_ACCESS_KEY_ID</code>、<code>AWS_SECRET_ACCESS_KEY</code>、または予約するS3のパスに特殊記号が含まれている場合です。</p>
+<p>同様の症状に苦しむ<a target="_blank" rel="noopener" href="https://github.com/aws/aws-cli/issues/602#issuecomment-648952330">issue</a>が存在しますが、2021年時点ではこの現象は解決できていません。</p>
+<p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-troubleshooting.html#tshoot-signature-does-not-match">公式ドキュメント</a>にも記載されています。</p>
+<blockquote>
+<p>If your AWS secret key includes certain special characters, such as -, +, &#x2F;, or %, some operating system variants process the string improperly and cause the secret key string to be interpreted incorrectly.<br>If you process your access keys and secret keys using other tools or scripts, such as tools that build the credentials file on a new instance as part of its creation, those tools and scripts might have their own handling of special characters that causes them to be transformed into something that AWS no longer recognizes.<br>The easy solution is to regenerate the secret key to get one that does not include the special character.</p>
+<p>AWSシークレットキーに-、+、&#x2F;、％などの特定の特殊文字が含まれている場合、一部のオペレーティングシステムバリアントは文字列を不適切に処理し、シークレットキー文字列が誤って解釈される原因になります。<br>作成の一部として新しいインスタンスにクレデンシャルファイルを作成するツールなど、他のツールまたはスクリプトを使用してアクセスキーとシークレットキーを処理する場合、それらのツールとスクリプトは、特殊文字を独自に処理する可能性があります。 AWSが認識しなくなったものに変換されました。<br>簡単な解決策は、秘密鍵を再生成して、特殊文字を含まない鍵を取得することです。</p>
+</blockquote>
+<p>最も不幸な例は自動で払い出された<code>AWS_ACCESS_KEY_ID</code>、<code>AWS_SECRET_ACCESS_KEY</code>にこのエラーを引き起こす値が含まれているケースです。問題のない値になるまで再発行する必要があります。</p>
+<p>また、このエラーはアップロードしたいS3のパスに特殊記号がある場合でも同様の事象が発生します。</p>
+<p>つまりURLでお馴染みの<a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/%E3%83%91%E3%83%BC%E3%82%BB%E3%83%B3%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0">%エンコーディング</a>が必要な記号が対象パスに含まれている場合署名付きURLは使えなくなってしまいます。</p>
+<p>例えば秒単位のアップロード時刻がバケットのフォルダ名に含まれている場合、<code>hh:mm:ss</code>の<code>:</code>が<code>%3A</code>に変換され署名計算が失敗します。<br>バケットのフォルダ構成の仕様変更が必要になるので結構厄介ですね。</p>
+<h2 id="CORSの問題"><a href="#CORSの問題" class="headerlink" title="CORSの問題"></a>CORSの問題</h2><p>払い出した署名付きURLが正常に利用できるようになっても、フロントエンドアプリケーションでそのURLを利用するとお馴染みCORSエラーによってファイルのアップロードができない事があります。</p>
+<p>詳細なURLは省略していますが下記のようなエラーがブラウザのデバッグコンソールに表示されます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Access to XMLHttpRequest at <span class="string">&#x27;http://localhost:4566/local-test-bucket/test.txt&#x27;</span> from origin <span class="string">&#x27;localhost&#x27;</span> has been blocked by CORS policy: Request header field access-control-allow-origin is not allowed by Access-Control-Allow-Headers <span class="keyword">in</span> preflight response.</span><br></pre></td></tr></table></figure>
+
+<p>通常はS3のバケットポリシーでCORSを許可する必要がありますが、LocalStackの場合バケットポリシーを正しく設定してもこのエラーは解消されません。</p>
+<p>LocalStackで参照する環境変数<code>EXTRA_CORS_ALLOWED_ORIGINS</code>、<code>EXTRA_CORS_ALLOWED_HEADERS</code>を適切に設定する。<br>または<code>DISABLE_CORS_CHECKS</code>を<code>1</code>にする必要があります。<br>この設定が効いていればバケットポリシーの設定は不要です。</p>
+<figure class="highlight yml"><figcaption><span>docker-compose.yml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&quot;3&quot;</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">localstack:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">localstack/localstack:0.11.3</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">localstack</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">4566</span><span class="string">:4566</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">8080</span><span class="string">:8080</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">AWS_ACCESS_KEY_ID=id</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">AWS_SECRET_ACCESS_KEY=key</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">DEFAULT_REGION=ap-northeast-1</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">SERVICES=s3</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">DATA_DIR=/tmp/localstack/data</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">DISABLE_CORS_CHECKS=1</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/Users/naoya-otani/.localstack:/tmp/localstack/</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><ul>
+<li>LocalStack<code>SignatureDoesNotMatch</code>に悩まされる</li>
+<li>CORS設定もLocalStack独自のものがある</li>
+</ul>
+<p>これらは<a target="_blank" rel="noopener" href="https://github.com/localstack/localstack/blob/master/README.md">LocalStackのREADME</a>をよく見ると書いてあります。</p>
+<blockquote>
+<p>NOTE: Please use test as Access key id and secret Access Key to make S3 presign url work. We have added presign url signature verification algorithm to validate the presign url and its expiration. You can configure credentials into the system environment using export command in the linux&#x2F;Mac system. You also can add credentials in ~&#x2F;.aws&#x2F;credentials file directly.</p>
+<h2 id="Security-Configurations"><a href="#Security-Configurations" class="headerlink" title="Security Configurations"></a>Security Configurations</h2><p>Please be aware that the following configurations may have severe security implications!<br>ENABLE_CONFIG_UPDATES: Whether to enable dynamic configuration updates at runtime, see here (default: 0).<br>DISABLE_CORS_CHECKS: Whether to disable all CSRF mitigations (default: 0).<br>DISABLE_CUSTOM_CORS_S3: Whether to disable CORS override by S3 (default: 0).<br>DISABLE_CUSTOM_CORS_APIGATEWAY: Whether to disable CORS override by apigateway (default: 0).<br>EXTRA_CORS_ALLOWED_ORIGINS: Comma-separated list of origins that are allowed to communicate with localstack.<br>EXTRA_CORS_ALLOWED_HEADERS: Comma-separated list of header names to be be added to Access-Control-Allow-Headers CORS header<br>EXTRA_CORS_EXPOSE_HEADERS: Comma-separated list of header names to be be added to Access-Control-Expose-Headers CORS header</p>
+</blockquote>
+<p>しかしLocalStack独自の癖である、という発想に至る前に一般的な方法を試そうとして時間を吸われてしまう事がよくあります。</p>
+<p>こういうネタこそブログで発信する価値のあるものですね。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20211115a/&related=twitterapi%2Ctwitter&text=LocalStack%E3%81%A7S3%E7%BD%B2%E5%90%8D%E4%BB%98%E3%81%8DURL%E3%82%92%E4%BD%BF%E3%81%86%E6%99%82%E3%81%AB%E6%B0%97%E3%82%92%E4%BB%98%E3%81%91%E3%82%8B%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">11</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20211115a/&t=LocalStack%E3%81%A7S3%E7%BD%B2%E5%90%8D%E4%BB%98%E3%81%8DURL%E3%82%92%E4%BD%BF%E3%81%86%E6%99%82%E3%81%AB%E6%B0%97%E3%82%92%E4%BB%98%E3%81%91%E3%82%8B%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20211115a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20211115a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">6</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.11.18</span><span class="snscount">&#9825;8</span><a href=/articles/20201118/ title="S3としてお馴染みの、Amazon Simple Storage Serviceは皆さんご存じだと思います。「シンプル」の命名とは裏腹に、静的サイトホスティングをS3で行ったりといった様々な利用形態が存在します。また、アセットファイルの配置場所やSSL通信の証明書ストアとして何らかのサービスと組み合わせるような利用形態が多いサービスではないでしょうか">AWS S3をIP制限付きのファイルダウンロードリンクにする</a></li><li class="related-posts-item"><span>2020.04.15</span><span class="snscount">&#9825;7</span><a href=/articles/20200415/ title="目新しい機能ではなくずいぶん前から存在するS3の署名付きURLについて新発見したので記載してみようと思います。便利な署名付きURLですがインターネット上で検索する限り、URLを発行するにはAWS CLIを利用する、もしくはSDKを利用して簡単なプログラミングをするかしかないと思ってました。利用する人がITエンジニアであればそれでも良いかと思いますが、しかしながら世の中にはプログラミングが苦手だったり、操作が容易であったり様々な理由でマネジメントコンソールで操作している方も多いと思います。">【小ネタ】AWS S3 署名付きURLってマネジメントコンソールからでも作れたのね</a></li><li class="related-posts-item"><span>2022.08.29</span><span class="snscount">&#9825;64</span><a href=/articles/20220829a/ title="夏休み自由研究連載の5本目です。go-fuse でLocalStackでローカル環境にエミュレートされるS3バケットをマウントするツールを開発しました。">S3 on LocalStackをGoとFUSEを使ってMountする（WSL2）</a></li><li class="related-posts-item"><span>2022.04.28</span><span class="snscount">&#9825;5</span><a href=/articles/20220428a/ title="2021年の記事でもAWSの公式のDockerイメージを使って環境構築をする内容の記事があるのですが、Glue3.0の公式のDockerイメージがリリースされていたので、そちらを使って再度Glueのローカルでの開発環境構築の記事を書いてみようと思います。せっかくなので昨年の記事と少しコードを変えようと思い、AWSの公式ドキュメント[^2]に書かれたコードを基に解説します。">AWS Glueの開発環境の構築(2022)</a></li><li class="related-posts-item"><span>2022.02.02</span><span class="snscount">&#9825;36</span><a href=/articles/20220202a/ title="PipenvとLocalStackを使用したLambda開発環境の構築を紹介します。本記事で作成するデモアプリは以下のGitHubリポジトリに格納しています。">Pipenv+LocalStackで作るLambda開発環境</a></li><li class="related-posts-item"><span>2021.11.12</span><span class="snscount">&#9825;6</span><a href=/articles/20211112b/ title="TIGの伊藤真彦です。AWS Certified Database - Specialtyに合格しました。これにて2021年に受験できる11資格を全て制覇しました。来年SAP on AWS - 専門知識が登場する事が確定していますが、ひとまず完全制覇です。">AWS Certified Database - Specialty合格体験記</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#LocalStack%E3%81%A7S3%E3%82%92%E5%88%A9%E7%94%A8%E3%81%99%E3%82%8B"><span class="toc-text">LocalStackでS3を利用する</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BD%B2%E5%90%8D%E4%BB%98%E3%81%8DURL%E3%81%A8%E3%81%AF"><span class="toc-text">署名付きURLとは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BD%B2%E5%90%8D%E3%81%AE%E8%A8%88%E7%AE%97%E3%81%A7%E3%82%A8%E3%83%A9%E3%83%BC%E3%81%8C%E7%99%BA%E7%94%9F%E3%81%99%E3%82%8B"><span class="toc-text">署名の計算でエラーが発生する</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CREDENTIAL%E3%81%AE%E4%B8%8D%E4%B8%80%E8%87%B4%E3%81%AB%E3%82%88%E3%82%8B%E3%82%A8%E3%83%A9%E3%83%BC"><span class="toc-text">CREDENTIALの不一致によるエラー</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%B9%E6%AE%8A%E8%A8%98%E5%8F%B7%E3%81%AB%E3%82%88%E3%82%8B%E3%82%A8%E3%83%A9%E3%83%BC"><span class="toc-text">特殊記号によるエラー</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CORS%E3%81%AE%E5%95%8F%E9%A1%8C"><span class="toc-text">CORSの問題</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Security-Configurations"><span class="toc-text">Security Configurations</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

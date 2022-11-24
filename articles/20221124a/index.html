@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Language Server Protocolを用いたVSCode拡張機能開発 (前編) | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは、Futureでアルバイトをしている川渕です。アルバイトの前はFutureのインターンシップでRust製SQLフォーマッタの作成を行っていました(その時の記事はこちら)。現在はそのSQLフォーマッタをVSCodeの拡張機能にする作業を行っており、そのための方法を学んでいます。 本記事ではLanguage Server Protocol(以下LSP)を用いたVSCode拡張機能開発">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Language Server Protocolを用いたVSCode拡張機能開発 (前編) | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20221124a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、Futureでアルバイトをしている川渕です。アルバイトの前はFutureのインターンシップでRust製SQLフォーマッタの作成を行っていました(その時の記事はこちら)。現在はそのSQLフォーマッタをVSCodeの拡張機能にする作業を行っており、そのための方法を学んでいます。 本記事ではLanguage Server Protocol(以下LSP)を用いたVSCode拡張機能開発">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20221124a/lsp-languages-editors.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221124a/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221124a/image_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221124a/image_3.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221124a/image_4.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221124a/image_5.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221124a/image_6.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221124a/untitled.drawio.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221124a/warning.drawio.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221124a/hokan.drawio_(1).png">
+<meta property="article:published_time" content="2022-11-23T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-11-24T02:01:21.598Z">
+<meta property="article:tag" content="SQL">
+<meta property="article:tag" content="フォーマッター">
+<meta property="article:tag" content="TypeScript">
+<meta property="article:tag" content="VSCode">
+<meta property="article:tag" content="LSP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20221124a/lsp-languages-editors.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20221124a/">
+  <meta content="SQL,フォーマッター,TypeScript,VSCode,LSP" name="keywords">
+  <meta content="川渕皓太" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Language Server Protocolを用いたVSCode拡張機能開発 (前編)
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20221124a_Language_Server_Protocolを用いたVSCode拡張機能開発_(前編).md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20221124a_Language_Server_Protocolを用いたVSCode拡張機能開発_(前編)" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-11-23T15:00:00.000Z" itemprop="datePublished">2022.11.24</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%B7%9D%E6%B8%95%E7%9A%93%E5%A4%AA" title="川渕皓太さんの記事一覧へ" class="post-author">川渕皓太</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/SQL/" title="SQLタグの記事へ" class="tag-list-link">SQL</a>
+  
+    
+    <a href="/tags/フォーマッター/" title="フォーマッタータグの記事へ" class="tag-list-link">フォーマッター</a>
+  
+    
+    <a href="/tags/TypeScript/" title="TypeScriptタグの記事へ" class="tag-list-link">TypeScript</a>
+  
+    
+    <a href="/tags/VSCode/" title="VSCodeタグの記事へ" class="tag-list-link">VSCode</a>
+  
+    
+    <a href="/tags/LSP/" title="LSPタグの記事へ" class="tag-list-link">LSP</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、Futureでアルバイトをしている川渕です。アルバイトの前はFutureのインターンシップでRust製SQLフォーマッタの作成を行っていました(その時の記事は<a href="/articles/20220916b/">こちら</a>)。現在はそのSQLフォーマッタをVSCodeの拡張機能にする作業を行っており、そのための方法を学んでいます。</p>
+<p>本記事ではLanguage Server Protocol(以下LSP)を用いたVSCode拡張機能開発について説明します。</p>
+<p>前編ではLSPを用いたVSCodeの拡張機能開発チュートリアルと、チュートリアルに使用したサンプルコードの解説を行います。</p>
+<p>後編ではサンプルコードに機能を追加する方法を説明します。</p>
+<h1 id="Language-Serverとは"><a href="#Language-Serverとは" class="headerlink" title="Language Serverとは"></a>Language Serverとは</h1><p>Language Serverとは、自動補完、エラーチェック、型チェックなどの様々な言語機能をIDEに提供するものです。</p>
+<h1 id="Language-Server-Protocol-LSP-とは"><a href="#Language-Server-Protocol-LSP-とは" class="headerlink" title="Language Server Protocol (LSP)とは"></a>Language Server Protocol (LSP)とは</h1><p><a target="_blank" rel="noopener" href="https://microsoft.github.io/language-server-protocol/">LSP</a>とは2016年6月にMicrosoftが発表したプロトコルで、IDEとLanguage Server間の通信を標準化するものです。</p>
+<p>LSPがない場合は各IDEに対応した言語、仕様で言語サーバを実装しなければならず、非常に労力がかかってしまいます。しかし、LSPを使用することで1つの言語サーバを複数のIDEで利用できるようになり、実装言語の制約も無くなります。</p>
+<p>つまり、LSPを用いて開発した拡張機能はVSCodeだけでなく、VimやEmacsなどでも使用できます。</p>
+<img src="/images/20221124a/lsp-languages-editors.png" alt="lsp-languages-editors.png" width="1162" height="538" loading="lazy">
+
+
+<h1 id="本記事で説明すること"><a href="#本記事で説明すること" class="headerlink" title="本記事で説明すること"></a>本記事で説明すること</h1><ul>
+<li>LSPを用いたVSCodeの拡張機能開発チュートリアル</li>
+<li>チュートリアルコードの解説</li>
+</ul>
+<h1 id="本記事で説明しないこと"><a href="#本記事で説明しないこと" class="headerlink" title="本記事で説明しないこと"></a>本記事で説明しないこと</h1><ul>
+<li>VSCode以外で使用する方法</li>
+<li>拡張機能の公開方法</li>
+</ul>
+<h1 id="LSPチュートリアル"><a href="#LSPチュートリアル" class="headerlink" title="LSPチュートリアル"></a>LSPチュートリアル</h1><p>まずVSCodeの公式で配布されている<a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-extension-samples/tree/main/lsp-sample">LSPのサンプルコード</a>を動かしてみます。</p>
+<h3 id="1-サンプルリポジトリのダウンロード"><a href="#1-サンプルリポジトリのダウンロード" class="headerlink" title="1. サンプルリポジトリのダウンロード"></a>1. サンプルリポジトリのダウンロード</h3><p>まず適当なディレクトリで以下のコマンドを実行してVSCode拡張機能サンプルリポジトリをダウンロードします。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/microsoft/vscode-extension-samples.git</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-必要なパッケージのインストール"><a href="#2-必要なパッケージのインストール" class="headerlink" title="2. 必要なパッケージのインストール"></a>2. 必要なパッケージのインストール</h3><p>次にnpmを用いて必要なパッケージをインストールします。</p>
+<ol>
+<li>まず先程ダウンロードしたリポジトリ内のlsp-sampleディレクトリをvscodeで開く</li>
+<li>Ctrl+@(macOSの場合は^+@)でターミナルを開き、以下を実行する<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="3-コンパイルと実行"><a href="#3-コンパイルと実行" class="headerlink" title="3. コンパイルと実行"></a>3. コンパイルと実行</h3><ol>
+<li>Ctrl+Shift+Bでクライアントとサーバをコンパイル</li>
+<li>Ctrl+Shift+Dで「実行とデバッグ」を開き、Launch Clientを選択する<img src="/images/20221124a/image.png" alt="" width="1200" height="650" loading="lazy"></li>
+<li><font color="MediumSeaGreen">▷</font>をクリックする</li>
+<li>新たにVSCodeのウィンドウが開くのでそのVSCode上で適当なテキストファイルを作成</li>
+<li>テキストファイルで以下の機能が確認できれば完了<ul>
+<li>jと入力すると補完の候補としてJavaScriptが表示される <img src="/images/20221124a/image_2.png" alt="" width="682" height="84" loading="lazy"></li>
+<li>tと入力すると補完の候補としてTypeScriptが表示される <img src="/images/20221124a/image_3.png" alt="" width="676" height="74" loading="lazy"></li>
+<li>全て大文字、かつ長さが2以上の単語には警告が表示される<br> <img src="/images/20221124a/image_4.png" alt="" width="491" height="202" loading="lazy"></li>
+</ul>
+</li>
+</ol>
+<h3 id="4-サーバのデバッグ"><a href="#4-サーバのデバッグ" class="headerlink" title="4. サーバのデバッグ"></a>4. サーバのデバッグ</h3><ol>
+<li>Launch Clientしている状態で「実行とデバッグ」のAttach to Serverを選択</li>
+<li><font color="MediumSeaGreen">▷</font>をクリック<img src="/images/20221124a/image_5.png" alt="" width="1200" height="650" loading="lazy"></li>
+<li>サーバのブレークポイントが効くようになる<img src="/images/20221124a/image_6.png" alt="" width="1200" height="650" loading="lazy"></li>
+</ol>
+<h1 id="サンプルコードの解説"><a href="#サンプルコードの解説" class="headerlink" title="サンプルコードの解説"></a>サンプルコードの解説</h1><p>先程実行したlsp-sampleの実装について詳しく解説します。</p>
+<h2 id="ファイル構成"><a href="#ファイル構成" class="headerlink" title="ファイル構成"></a>ファイル構成</h2><p>ファイル構成は以下の通りです。<br>extension.tsにクライアントサイドの処理、server.tsにサーバサイドの処理を記述しています。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── client  <span class="comment"># クライアントサイド</span></span><br><span class="line">│   ├── src</span><br><span class="line">│   │   ├── <span class="built_in">test</span> <span class="comment"># テストコード</span></span><br><span class="line">│   │   └── extension.ts <span class="comment"># クライアントサイドの実装</span></span><br><span class="line">├── package.json <span class="comment"># パッケージ情報</span></span><br><span class="line">└── server <span class="comment"># サーバサイド</span></span><br><span class="line">    └── src</span><br><span class="line">        └── server.ts <span class="comment"># サーバサイドの実装</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="pakcage-json"><a href="#pakcage-json" class="headerlink" title="pakcage.json"></a>pakcage.json</h2><p>クライアントの機能について記述しています。詳しい情報は以下に記載されています。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://code.visualstudio.com/api/references/extension-manifest">Extension Manifest | Visual Studio Code Extension API</a></li>
+</ul>
+<p>この中から一部のフィールドを説明します。</p>
+<h3 id="name"><a href="#name" class="headerlink" title="name"></a>name</h3><p>拡張機能の名前で、今回のサンプルコードではlsp-sampleとなっています。<br>マーケットプレースでの表示名はdisplayNameで別に設定できます。</p>
+<h3 id="publisher"><a href="#publisher" class="headerlink" title="publisher"></a>publisher</h3><p>拡張機能を公開する際に使用するフィールドです。<br><a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-vsce">vsce</a>というVSCode拡張機能用コマンドラインツールで作成したpublisherIDをこのフィールドに入力します。</p>
+<p>拡張機能の公開方法は以下に記載されています。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://code.visualstudio.com/api/working-with-extensions/publishing-extension">Publishing Extensions | Visual Studio Code Extension API</a></li>
+</ul>
+<h3 id="categories"><a href="#categories" class="headerlink" title="categories"></a>categories</h3><p>拡張機能のカテゴリを入力します。</p>
+<details>
+<summary>許容するカテゴリ一覧</summary>
+
+<ul>
+<li>Programming Languages</li>
+<li>Snippets</li>
+<li>Linters</li>
+<li>Themes</li>
+<li>Debuggers</li>
+<li>Formatters</li>
+<li>Keymaps</li>
+<li>SCM Providers</li>
+<li>Other</li>
+<li>Extension Packs</li>
+<li>Language Packs</li>
+<li>Data Science</li>
+<li>Machine Learning</li>
+<li>Visualization</li>
+<li>Notebooks</li>
+<li>Education</li>
+<li>Testing</details></li>
+</ul>
+<h3 id="activateEvents"><a href="#activateEvents" class="headerlink" title="activateEvents"></a>activateEvents</h3><p>activateEventsに記述したイベントが発生すると、拡張機能が有効になります。<br>lsp-sampleでのactivateEventsは以下のようになっています。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-extension-samples/blob/fdd3bb95ce8e38ffe58fc9158797239fdf5017f1/lsp-sample/package.json#L19-L21">GitHub</a></p>
+<figure class="highlight json"><figcaption><span>package.json</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">&quot;activationEvents&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;onLanguage:plaintext&quot;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<p>これは、「プレーンテキスト(.txtなど)を開く」というイベントが発生すると拡張機能が有効になることを表しています。<br>他にもコマンド実行イベントやデバッグイベントなどを登録できます。詳しい情報は以下に記載されています。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://code.visualstudio.com/api/references/activation-events">Activation Events | Visual Studio Code Extension API</a></li>
+</ul>
+<h3 id="contributes"><a href="#contributes" class="headerlink" title="contributes"></a>contributes</h3><p>拡張機能の機能についての情報を記述します。<br>詳しい情報は以下に記載されています。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://code.visualstudio.com/api/references/contribution-points">Contribution Points | Visual Studio Code Extension API</a></li>
+</ul>
+<h2 id="extension-ts"><a href="#extension-ts" class="headerlink" title="extension.ts"></a>extension.ts</h2><p>extension.tsにはクライアント側の処理を記述します。</p>
+<h3 id="拡張機能の起動時の処理"><a href="#拡張機能の起動時の処理" class="headerlink" title="拡張機能の起動時の処理"></a>拡張機能の起動時の処理</h3><p>拡張機能の起動時に関数<code>activate()</code>が実行されます。</p>
+<p><code>activate()</code>内では接続先のサーバ、クライアントの設定、クライアントの起動処理を行います。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-extension-samples/blob/fdd3bb95ce8e38ffe58fc9158797239fdf5017f1/lsp-sample/client/src/extension.ts#L18-L58">GitHub</a></p>
+<figure class="highlight ts"><figcaption><span>extension.ts</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">function</span> <span class="title function_">activate</span>(<span class="params">context: ExtensionContext</span>) &#123;</span><br><span class="line">	<span class="comment">// サーバはnodeで実装されているものを使用</span></span><br><span class="line">	<span class="keyword">const</span> serverModule = context.<span class="title function_">asAbsolutePath</span>(</span><br><span class="line">		path.<span class="title function_">join</span>(<span class="string">&#x27;server&#x27;</span>, <span class="string">&#x27;out&#x27;</span>, <span class="string">&#x27;server.js&#x27;</span>)</span><br><span class="line">	);</span><br><span class="line">	<span class="comment">// サーバのデバッグオプション</span></span><br><span class="line">	<span class="comment">// --inspect=6009: VSCodeがサーバにアタッチできるようにサーバをNodeのインスペクタモードで実行</span></span><br><span class="line">	<span class="keyword">const</span> debugOptions = &#123; <span class="attr">execArgv</span>: [<span class="string">&#x27;--nolazy&#x27;</span>, <span class="string">&#x27;--inspect=6009&#x27;</span>] &#125;;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// デバッグモードで拡張機能を実行するとデバッグオプションが使用される</span></span><br><span class="line">	<span class="keyword">const</span> <span class="attr">serverOptions</span>: <span class="title class_">ServerOptions</span> = &#123;</span><br><span class="line">		<span class="attr">run</span>: &#123; <span class="attr">module</span>: serverModule, <span class="attr">transport</span>: <span class="title class_">TransportKind</span>.<span class="property">ipc</span> &#125;,</span><br><span class="line">		<span class="attr">debug</span>: &#123;</span><br><span class="line">			<span class="attr">module</span>: serverModule,</span><br><span class="line">			<span class="attr">transport</span>: <span class="title class_">TransportKind</span>.<span class="property">ipc</span>,</span><br><span class="line">			<span class="attr">options</span>: debugOptions</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// クライアントのオプション</span></span><br><span class="line">	<span class="keyword">const</span> <span class="attr">clientOptions</span>: <span class="title class_">LanguageClientOptions</span> = &#123;</span><br><span class="line">        <span class="comment">// プレーンテキストのファイルに機能を提供</span></span><br><span class="line">		<span class="attr">documentSelector</span>: [&#123; <span class="attr">scheme</span>: <span class="string">&#x27;file&#x27;</span>, <span class="attr">language</span>: <span class="string">&#x27;plaintext&#x27;</span> &#125;],</span><br><span class="line">        <span class="comment">// ワークスペース上のクライアント設定が変更された場合にサーバに通知</span></span><br><span class="line">		<span class="attr">synchronize</span>: &#123;</span><br><span class="line">			<span class="attr">fileEvents</span>: workspace.<span class="title function_">createFileSystemWatcher</span>(<span class="string">&#x27;**/.clientrc&#x27;</span>)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// クライアントを作成</span></span><br><span class="line">	client = <span class="keyword">new</span> <span class="title class_">LanguageClient</span>(</span><br><span class="line">		<span class="string">&#x27;languageServerExample&#x27;</span>,</span><br><span class="line">		<span class="string">&#x27;Language Server Example&#x27;</span>,</span><br><span class="line">		serverOptions,</span><br><span class="line">		clientOptions</span><br><span class="line">	);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// クライアントを起動 (同時にサーバも起動する)</span></span><br><span class="line">	client.<span class="title function_">start</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ちなみに、lsp-sampleではUntitledなファイル(新規作成した保存されていないファイル)には対応していませんが、<code>clientOptions</code>の<code>documentSelector</code>を以下のように変更することで対応できます。</p>
+<figure class="highlight diff"><figcaption><span>extension.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">	// クライアントのオプション</span><br><span class="line">	const clientOptions: LanguageClientOptions = &#123;</span><br><span class="line">        // プレーンテキストのファイルに機能を提供</span><br><span class="line">        documentSelector: [</span><br><span class="line">          &#123; scheme: &quot;file&quot;, language: &quot;plaintext&quot; &#125;,</span><br><span class="line"><span class="addition">+         &#123; scheme: &quot;untitled&quot;, language: &quot;plaintext&quot; &#125;,</span></span><br><span class="line">        ],</span><br><span class="line">        // ワークスペース上のクライアント設定が変更された場合にサーバに通知</span><br><span class="line">		synchronize: &#123;</span><br><span class="line">			fileEvents: workspace.createFileSystemWatcher(&#x27;**/.clientrc&#x27;)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;;</span><br></pre></td></tr></table></figure>
+
+<img src="/images/20221124a/untitled.drawio.png" alt="untitled.drawio.png" width="1200" height="215" loading="lazy">
+
+<h3 id="拡張機能の終了時の処理"><a href="#拡張機能の終了時の処理" class="headerlink" title="拡張機能の終了時の処理"></a>拡張機能の終了時の処理</h3><p>拡張機能の終了時に関数<code>deactive()</code>が実行されます。</p>
+<p>lsp-sampleでは関数<code>deactive()</code>にクライアントを終了する処理を記述しています。<br><a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-extension-samples/blob/fdd3bb95ce8e38ffe58fc9158797239fdf5017f1/lsp-sample/client/src/extension.ts#L60-L65">GitHub</a></p>
+<figure class="highlight ts"><figcaption><span>extension.ts</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">function</span> <span class="title function_">deactivate</span>(<span class="params"></span>): <span class="title class_">Thenable</span>&lt;<span class="built_in">void</span>&gt; | <span class="literal">undefined</span> &#123;</span><br><span class="line">	<span class="keyword">if</span> (!client) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">undefined</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> client.<span class="title function_">stop</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="server-ts"><a href="#server-ts" class="headerlink" title="server.ts"></a>server.ts</h2><p>server.tsにはサーバ側の処理を記述します。</p>
+<h3 id="サーバの接続を作成"><a href="#サーバの接続を作成" class="headerlink" title="サーバの接続を作成"></a>サーバの接続を作成</h3><p>サーバの接続を作成し、その接続を監視することで拡張機能を提供します。</p>
+<ul>
+<li>サーバの接続の作成<br><a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-extension-samples/blob/fdd3bb95ce8e38ffe58fc9158797239fdf5017f1/lsp-sample/server/src/server.ts#L26">GitHub</a></li>
+</ul>
+<figure class="highlight ts"><figcaption><span>server.ts</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> connection = <span class="title function_">createConnection</span>(<span class="title class_">ProposedFeatures</span>.<span class="property">all</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>接続の監視<br><a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-extension-samples/blob/fdd3bb95ce8e38ffe58fc9158797239fdf5017f1/lsp-sample/server/src/server.ts#L229-L230">GitHub</a></li>
+</ul>
+<figure class="highlight ts"><figcaption><span>server.ts</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">connection.<span class="title function_">listen</span>();</span><br></pre></td></tr></table></figure>
+
+<h3 id="ドキュメントマネージャの作成"><a href="#ドキュメントマネージャの作成" class="headerlink" title="ドキュメントマネージャの作成"></a>ドキュメントマネージャの作成</h3><p>ドキュメントマネージャとはサーバとクライアントのドキュメントを同期するものです。<br>ドキュメントマネージャを作成し、ドキュメントの監視を行います。</p>
+<ul>
+<li>ドキュメントマネージャの作成<br><a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-extension-samples/blob/fdd3bb95ce8e38ffe58fc9158797239fdf5017f1/lsp-sample/server/src/server.ts#L29">GitHub</a></li>
+</ul>
+<figure class="highlight ts"><figcaption><span>server.ts</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="attr">documents</span>: <span class="title class_">TextDocuments</span>&lt;<span class="title class_">TextDocument</span>&gt; = <span class="keyword">new</span> <span class="title class_">TextDocuments</span>(<span class="title class_">TextDocument</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>ドキュメントマネージャの監視<br><a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-extension-samples/blob/fdd3bb95ce8e38ffe58fc9158797239fdf5017f1/lsp-sample/server/src/server.ts#L227">GitHub</a></li>
+</ul>
+<figure class="highlight ts"><figcaption><span>server.ts</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">documents.<span class="title function_">listen</span>(connection);</span><br></pre></td></tr></table></figure>
+
+<p>ドキュメントマネージャはドキュメントを開くイベント、閉じるイベント、変更イベントを検知します。</p>
+<h3 id="初期化"><a href="#初期化" class="headerlink" title="初期化"></a>初期化</h3><p>最初のリクエスト受信時に実行されます。ここでサーバの設定を初期化します。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-extension-samples/blob/fdd3bb95ce8e38ffe58fc9158797239fdf5017f1/lsp-sample/server/src/server.ts#L35-L69">GitHub</a></p>
+<figure class="highlight ts"><figcaption><span>server.ts</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">connection.<span class="title function_">onInitialize</span>(<span class="function">(<span class="params">params: InitializeParams</span>) =&gt;</span> &#123;</span><br><span class="line">	<span class="keyword">const</span> capabilities = params.<span class="property">capabilities</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">        中略 (クライアントの設定を取得)</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="attr">result</span>: <span class="title class_">InitializeResult</span> = &#123;</span><br><span class="line">        <span class="comment">// サーバの機能</span></span><br><span class="line">        <span class="attr">capabilities</span>: &#123;</span><br><span class="line">            <span class="comment">// テキストドキュメントの同期方法の設定</span></span><br><span class="line">            <span class="comment">// 今回は最初に開いたときのみドキュメント全体を読み込み、その後は差分更新が送信されるように設定している</span></span><br><span class="line">            <span class="attr">textDocumentSync</span>: <span class="title class_">TextDocumentSyncKind</span>.<span class="property">Incremental</span>,</span><br><span class="line">            <span class="comment">// クライアントにこのサーバは補完に対応していることを伝える</span></span><br><span class="line">            <span class="attr">completionProvider</span>: &#123;</span><br><span class="line">                <span class="attr">resolveProvider</span>: <span class="literal">true</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="comment">// クライアントがワークスペースに対応している場合</span></span><br><span class="line">	<span class="keyword">if</span> (hasWorkspaceFolderCapability) &#123;</span><br><span class="line">		result.<span class="property">capabilities</span>.<span class="property">workspace</span> = &#123;</span><br><span class="line">			<span class="attr">workspaceFolders</span>: &#123;</span><br><span class="line">				<span class="attr">supported</span>: <span class="literal">true</span>,</span><br><span class="line">			&#125;,</span><br><span class="line">		&#125;;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> result;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="警告表示機能の実装"><a href="#警告表示機能の実装" class="headerlink" title="警告表示機能の実装"></a>警告表示機能の実装</h3><p>lsp-sampleではテキストドキュメントの変更時に全て大文字で、かつ長さが2以上の単語を特定し、その箇所に警告を表示します。<br>この機能の実装方法について説明します。</p>
+<p>テキストドキュメントが変更、または初めて開かれた場合にこのメソッドが呼び出されます。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-extension-samples/blob/fdd3bb95ce8e38ffe58fc9158797239fdf5017f1/lsp-sample/server/src/server.ts#L131-L135">GitHub</a></p>
+<figure class="highlight ts"><figcaption><span>server.ts</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">documents.<span class="title function_">onDidChangeContent</span>(<span class="function">(<span class="params">change</span>) =&gt;</span> &#123;</span><br><span class="line">	<span class="title function_">validateTextDocument</span>(change.<span class="property">document</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>このメソッド内で呼び出している関数<code>validateTextDocument</code>の処理は以下の通りです。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-extension-samples/blob/fdd3bb95ce8e38ffe58fc9158797239fdf5017f1/lsp-sample/server/src/server.ts#L137-L182">GitHub</a></p>
+<figure class="highlight ts"><figcaption><span>server.ts</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">validateTextDocument</span>(<span class="params">textDocument: TextDocument</span>): <span class="title class_">Promise</span>&lt;<span class="built_in">void</span>&gt; &#123;</span><br><span class="line">	<span class="comment">// ドキュメントの設定を取得</span></span><br><span class="line">	<span class="keyword">const</span> settings = <span class="keyword">await</span> <span class="title function_">getDocumentSettings</span>(textDocument.<span class="property">uri</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 長さが2以上の全て大文字の単語に対して診断を発行する</span></span><br><span class="line">	<span class="keyword">const</span> text = textDocument.<span class="title function_">getText</span>();</span><br><span class="line">	<span class="keyword">const</span> pattern = <span class="regexp">/\b[A-Z]&#123;2,&#125;\b/g</span>;</span><br><span class="line">	<span class="keyword">let</span> <span class="attr">m</span>: <span class="title class_">RegExpExecArray</span> | <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">let</span> problems = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">const</span> <span class="attr">diagnostics</span>: <span class="title class_">Diagnostic</span>[] = [];</span><br><span class="line">	<span class="keyword">while</span> ((m = pattern.<span class="title function_">exec</span>(text)) &amp;&amp; problems &lt; settings.<span class="property">maxNumberOfProblems</span>) &#123;</span><br><span class="line">		problems++;</span><br><span class="line">		<span class="keyword">const</span> <span class="attr">diagnostic</span>: <span class="title class_">Diagnostic</span> = &#123;</span><br><span class="line">            <span class="comment">// 診断の強さ。今回は警告。</span></span><br><span class="line">			<span class="attr">severity</span>: <span class="title class_">DiagnosticSeverity</span>.<span class="property">Warning</span>,</span><br><span class="line">            <span class="comment">// 診断の範囲。今回は該当の単語の開始位置から終了位置までを範囲としている。</span></span><br><span class="line">			<span class="attr">range</span>: &#123;</span><br><span class="line">				<span class="attr">start</span>: textDocument.<span class="title function_">positionAt</span>(m.<span class="property">index</span>),</span><br><span class="line">				<span class="attr">end</span>: textDocument.<span class="title function_">positionAt</span>(m.<span class="property">index</span> + m[<span class="number">0</span>].<span class="property">length</span>),</span><br><span class="line">			&#125;,</span><br><span class="line">            <span class="comment">// 診断のメッセージ</span></span><br><span class="line">			<span class="attr">message</span>: <span class="string">`<span class="subst">$&#123;m[<span class="number">0</span>]&#125;</span> is all uppercase.`</span>,</span><br><span class="line">            <span class="comment">// 診断がどこから発行されたかを示す文字列</span></span><br><span class="line">			<span class="attr">source</span>: <span class="string">&#x27;ex&#x27;</span>,</span><br><span class="line">		&#125;;</span><br><span class="line">        <span class="comment">// クライアントが診断の関連情報を受け取るように設定している場合、関連情報を付与する。</span></span><br><span class="line">		<span class="keyword">if</span> (hasDiagnosticRelatedInformationCapability) &#123;</span><br><span class="line">			diagnostic.<span class="property">relatedInformation</span> = [</span><br><span class="line">				&#123;</span><br><span class="line">					<span class="attr">location</span>: &#123;</span><br><span class="line">						<span class="attr">uri</span>: textDocument.<span class="property">uri</span>,</span><br><span class="line">						<span class="attr">range</span>: <span class="title class_">Object</span>.<span class="title function_">assign</span>(&#123;&#125;, diagnostic.<span class="property">range</span>),</span><br><span class="line">					&#125;,</span><br><span class="line">					<span class="attr">message</span>: <span class="string">&#x27;Spelling matters&#x27;</span>,</span><br><span class="line">				&#125;,</span><br><span class="line">				&#123;</span><br><span class="line">					<span class="attr">location</span>: &#123;</span><br><span class="line">						<span class="attr">uri</span>: textDocument.<span class="property">uri</span>,</span><br><span class="line">						<span class="attr">range</span>: <span class="title class_">Object</span>.<span class="title function_">assign</span>(&#123;&#125;, diagnostic.<span class="property">range</span>),</span><br><span class="line">					&#125;,</span><br><span class="line">					<span class="attr">message</span>: <span class="string">&#x27;Particularly for names&#x27;</span>,</span><br><span class="line">				&#125;,</span><br><span class="line">			];</span><br><span class="line">		&#125;</span><br><span class="line">		diagnostics.<span class="title function_">push</span>(diagnostic);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 診断を表示する</span></span><br><span class="line">	connection.<span class="title function_">sendDiagnostics</span>(&#123; <span class="attr">uri</span>: textDocument.<span class="property">uri</span>, diagnostics &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>診断メッセージ、診断の発行元、関連情報は以下のように表示されます。<br><img src="/images/20221124a/warning.drawio.png" alt="warning.drawio.png" width="644" height="268" loading="lazy"></p>
+<h3 id="補完機能の実装"><a href="#補完機能の実装" class="headerlink" title="補完機能の実装"></a>補完機能の実装</h3><p>lsp-sampleでは”TypeScript”、”JavaScript”という2つの単語の補完を提供します。</p>
+<p>補完は<code>connection</code>の<code>onCompletion</code>メソッドで提供します。<br><a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-extension-samples/blob/fdd3bb95ce8e38ffe58fc9158797239fdf5017f1/lsp-sample/server/src/server.ts#L189-L208">GitHub</a></p>
+<figure class="highlight ts"><figcaption><span>server.ts</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">connection.<span class="title function_">onCompletion</span>(</span><br><span class="line">	(<span class="attr">_textDocumentPosition</span>: <span class="title class_">TextDocumentPositionParams</span>): <span class="title class_">CompletionItem</span>[] =&gt; &#123;</span><br><span class="line">		<span class="keyword">return</span> [</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="attr">label</span>: <span class="string">&#x27;TypeScript&#x27;</span>,</span><br><span class="line">				<span class="attr">kind</span>: <span class="title class_">CompletionItemKind</span>.<span class="property">Text</span>,</span><br><span class="line">				<span class="attr">data</span>: <span class="number">1</span>,</span><br><span class="line">			&#125;,</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="attr">label</span>: <span class="string">&#x27;JavaScript&#x27;</span>,</span><br><span class="line">				<span class="attr">kind</span>: <span class="title class_">CompletionItemKind</span>.<span class="property">Text</span>,</span><br><span class="line">				<span class="attr">data</span>: <span class="number">2</span>,</span><br><span class="line">			&#125;,</span><br><span class="line">		];</span><br><span class="line">	&#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>また、<code>onCompletionResolve</code>メソッドに各補完が選択された場合に表示する情報を記述しています。<br><a target="_blank" rel="noopener" href="https://github.com/microsoft/vscode-extension-samples/blob/fdd3bb95ce8e38ffe58fc9158797239fdf5017f1/lsp-sample/server/src/server.ts#L210-L223">GitHub</a></p>
+<figure class="highlight ts"><figcaption><span>server.ts</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">connection.<span class="title function_">onCompletionResolve</span>((<span class="attr">item</span>: <span class="title class_">CompletionItem</span>): <span class="function"><span class="params">CompletionItem</span> =&gt;</span> &#123;</span><br><span class="line">	<span class="keyword">if</span> (item.<span class="property">data</span> === <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="comment">// &quot;TypeScript&quot;が選択された場合</span></span><br><span class="line">		item.<span class="property">detail</span> = <span class="string">&#x27;TypeScript details&#x27;</span>;</span><br><span class="line">		item.<span class="property">documentation</span> = <span class="string">&#x27;TypeScript documentation&#x27;</span>;</span><br><span class="line">	&#125; <span class="keyword">else</span> <span class="keyword">if</span> (item.<span class="property">data</span> === <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="comment">// &quot;JavaScript&quot;が選択された場合</span></span><br><span class="line">		item.<span class="property">detail</span> = <span class="string">&#x27;JavaScript details&#x27;</span>;</span><br><span class="line">		item.<span class="property">documentation</span> = <span class="string">&#x27;JavaScript documentation&#x27;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> item;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>補完、追加情報は以下のように表示されます。<br><img src="/images/20221124a/hokan.drawio_(1).png" alt="" width="816" height="205" loading="lazy"></p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>LSPを用いたVSCodeの拡張機能開発チュートリアルとチュートリアルコードの解説を行いました。</p>
+<p><a target="_blank" rel="noopener" href="https://qiita.com/k-kawabt-8u/private/7a7a27c95f4f7c1b85b0">後編</a>ではlsp-sampleに機能を追加する方法を説明しています。</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://qiita.com/Ikuyadeu/items/98458f9ab760d09660ff">Language Server Protocol開発チュートリアル - Qiita</a></li>
+<li><a target="_blank" rel="noopener" href="https://code.visualstudio.com/api/language-extensions/language-server-extension-guide">Language Server Extension Guide | Visual Studio Code Extension API</a></li>
+<li><a target="_blank" rel="noopener" href="https://qiita.com/atsushieno/items/ce31df9bd88e98eec5c4">language server protocolについて (前編) - Qiita</a></li>
+<li><a href="https://future-architect.github.io/articles/20220303a/">Pyright を LSP サーバとした自作 LSP クライアント（実装編） | フューチャー技術ブログ</a></li>
+<li><a href="https://future-architect.github.io/articles/20220302a/">Pyright を LSP サーバとした自作 LSP クライアント（調査編） | フューチャー技術ブログ</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20221124a/&related=twitterapi%2Ctwitter&text=Language%20Server%20Protocol%E3%82%92%E7%94%A8%E3%81%84%E3%81%9FVSCode%E6%8B%A1%E5%BC%B5%E6%A9%9F%E8%83%BD%E9%96%8B%E7%99%BA%20(%E5%89%8D%E7%B7%A8)%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20221124a/&t=Language%20Server%20Protocol%E3%82%92%E7%94%A8%E3%81%84%E3%81%9FVSCode%E6%8B%A1%E5%BC%B5%E6%A9%9F%E8%83%BD%E9%96%8B%E7%99%BA%20(%E5%89%8D%E7%B7%A8)" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20221124a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20221124a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.09.16</span><span class="snscount">&#9825;8</span><a href=/articles/20220916c/ title="作成したフォーマッタの実装について説明します。前編でも示しましたが、今回作成したフォーマッタの処理の流れを再度示します。">Engineer Camp2022 RustでSQLフォーマッタ作成（後編）</a></li><li class="related-posts-item"><span>2022.09.16</span><span class="snscount">&#9825;58</span><a href=/articles/20220916b/ title="みなさん、こんにちは！Future Engineer Camp 2022に参加した川渕と齋藤です。今回のインターンではSQLフォーマッタをRustで作成しました。私達が取り組んだ内容を紹介します。SQLフォーマッタとはSQLを統一された体裁にフォーマットしてくれるツールです。体裁を統一することで他人が見ても読みやすいコードになり、生産性が向上します。">Engineer Camp2022 RustでSQLフォーマッタ作成（前編）</a></li><li class="related-posts-item"><span>2020.09.19</span><span class="snscount">&#9825;9</span><a href=/articles/20200919/ title="はじめまして。フューチャーのインターンEngineer Campに参加した中村と申します。この記事では、今回のインターンで私が取り組んだ内容を紹介します。今回のインターンで私は、SQLフォーマッタの作成に取り組みました。">Engineer Camp2020でSQLフォーマッタを開発しました</a></li><li class="related-posts-item"><span>2017.02.28</span><span class="snscount">&#9825;76</span><a href=/articles/20170228/ title="弊社謹製のSQLフォーマッターuroboroSQL formatterを公開しましたので、その紹介をさせていただきます。">SQL開発者を幸せにする！？ Sublime Text 3でも使える uroboroSQL Formatter を公開しました</a></li><li class="related-posts-item"><span>2022.10.14</span><span class="snscount">&#9825;14</span><a href=/articles/20221014a/ title="RDB（ここでは社内でも実績が多いPostgreSQLとさせてください）のGUIクライアントツールと言えば何を利用していますか？ チーム内で聞くと様々なプロダクトの名前が挙がりました。そんな中で私が推したいのは、 GoLand（JetBrainsの有償ライセンスを購入している人）を利用している人に対しては、Database Tools and SQLプラグインを利用することです">GoLand(JetBrains IDE)のDatabase Tools and SQLプラグインをメインのSQLクライアントにする</a></li><li class="related-posts-item"><span>2022.08.26</span><span class="snscount">&#9825;100</span><a href=/articles/20220826a/ title="夏の自由研究ブログ連載2022の 5日目の記事です。今回は勉強中のReact、TypeScript、Goを使って掲示板アプリを作りました。">React + Goで簡素な掲示板アプリを作ってみた</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Language-Server%E3%81%A8%E3%81%AF"><span class="toc-text">Language Serverとは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Language-Server-Protocol-LSP-%E3%81%A8%E3%81%AF"><span class="toc-text">Language Server Protocol (LSP)とは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%AC%E8%A8%98%E4%BA%8B%E3%81%A7%E8%AA%AC%E6%98%8E%E3%81%99%E3%82%8B%E3%81%93%E3%81%A8"><span class="toc-text">本記事で説明すること</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%AC%E8%A8%98%E4%BA%8B%E3%81%A7%E8%AA%AC%E6%98%8E%E3%81%97%E3%81%AA%E3%81%84%E3%81%93%E3%81%A8"><span class="toc-text">本記事で説明しないこと</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#LSP%E3%83%81%E3%83%A5%E3%83%BC%E3%83%88%E3%83%AA%E3%82%A2%E3%83%AB"><span class="toc-text">LSPチュートリアル</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA%E3%81%AE%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89"><span class="toc-text">1. サンプルリポジトリのダウンロード</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%BF%85%E8%A6%81%E3%81%AA%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB"><span class="toc-text">2. 必要なパッケージのインストール</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E3%82%B3%E3%83%B3%E3%83%91%E3%82%A4%E3%83%AB%E3%81%A8%E5%AE%9F%E8%A1%8C"><span class="toc-text">3. コンパイルと実行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E3%82%B5%E3%83%BC%E3%83%90%E3%81%AE%E3%83%87%E3%83%90%E3%83%83%E3%82%B0"><span class="toc-text">4. サーバのデバッグ</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E8%A7%A3%E8%AA%AC"><span class="toc-text">サンプルコードの解説</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E6%A7%8B%E6%88%90"><span class="toc-text">ファイル構成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pakcage-json"><span class="toc-text">pakcage.json</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#name"><span class="toc-text">name</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#publisher"><span class="toc-text">publisher</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#categories"><span class="toc-text">categories</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#activateEvents"><span class="toc-text">activateEvents</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#contributes"><span class="toc-text">contributes</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#extension-ts"><span class="toc-text">extension.ts</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%A1%E5%BC%B5%E6%A9%9F%E8%83%BD%E3%81%AE%E8%B5%B7%E5%8B%95%E6%99%82%E3%81%AE%E5%87%A6%E7%90%86"><span class="toc-text">拡張機能の起動時の処理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%A1%E5%BC%B5%E6%A9%9F%E8%83%BD%E3%81%AE%E7%B5%82%E4%BA%86%E6%99%82%E3%81%AE%E5%87%A6%E7%90%86"><span class="toc-text">拡張機能の終了時の処理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#server-ts"><span class="toc-text">server.ts</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%B5%E3%83%BC%E3%83%90%E3%81%AE%E6%8E%A5%E7%B6%9A%E3%82%92%E4%BD%9C%E6%88%90"><span class="toc-text">サーバの接続を作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E3%83%9E%E3%83%8D%E3%83%BC%E3%82%B8%E3%83%A3%E3%81%AE%E4%BD%9C%E6%88%90"><span class="toc-text">ドキュメントマネージャの作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9D%E6%9C%9F%E5%8C%96"><span class="toc-text">初期化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AD%A6%E5%91%8A%E8%A1%A8%E7%A4%BA%E6%A9%9F%E8%83%BD%E3%81%AE%E5%AE%9F%E8%A3%85"><span class="toc-text">警告表示機能の実装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A3%9C%E5%AE%8C%E6%A9%9F%E8%83%BD%E3%81%AE%E5%AE%9F%E8%A3%85"><span class="toc-text">補完機能の実装</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="toc-text">参考文献</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

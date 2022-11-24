@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>HTTP検索条件、GETにするか？POSTにするか？ | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTIG DXユニット 1真野です。 RESTfullとかRESTishな方針でWebA PIの横断検索を設計する際にチーム内で方針について議論したやり取りの備忘記事です。 注意としてB2C向けなWeb APIを提供するというよりは、主に企業間または企業内部で使われるようなAPIの設計のバイアスがあります。LSUDs（Large Set of Unknown Developers）かSSKD">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTTP検索条件、GETにするか？POSTにするか？ | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210518a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIG DXユニット 1真野です。 RESTfullとかRESTishな方針でWebA PIの横断検索を設計する際にチーム内で方針について議論したやり取りの備忘記事です。 注意としてB2C向けなWeb APIを提供するというよりは、主に企業間または企業内部で使われるようなAPIの設計のバイアスがあります。LSUDs（Large Set of Unknown Developers）かSSKD">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210518a/choice-2692575_640.jpg">
+<meta property="article:published_time" content="2021-05-17T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:53.392Z">
+<meta property="article:tag" content="Web">
+<meta property="article:tag" content="HTTP">
+<meta property="article:tag" content="設計">
+<meta property="article:tag" content="WebAPI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210518a/choice-2692575_640.jpg">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210518a/">
+  <meta content="Web,HTTP,設計,WebAPI" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">HTTP検索条件、GETにするか？POSTにするか？
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210518a_HTTP検索条件、GETにするか？POSTにするか？.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210518a_HTTP検索条件、GETにするか？POSTにするか？" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-05-17T15:00:00.000Z" itemprop="datePublished">2021.05.18</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98" title="真野隼記さんの記事一覧へ" class="post-author">真野隼記</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Web/" title="Webタグの記事へ" class="tag-list-link">Web</a>
+  
+    
+    <a href="/tags/HTTP/" title="HTTPタグの記事へ" class="tag-list-link">HTTP</a>
+  
+    
+    <a href="/tags/設計/" title="設計タグの記事へ" class="tag-list-link">設計</a>
+  
+    
+    <a href="/tags/WebAPI/" title="WebAPIタグの記事へ" class="tag-list-link">WebAPI</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>TIG DXユニット <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>真野です。</p>
+<p>RESTfullとかRESTishな方針でWebA PIの横断検索を設計する際にチーム内で方針について議論したやり取りの備忘記事です。</p>
+<p>注意としてB2C向けなWeb APIを提供するというよりは、主に企業間または企業内部で使われるようなAPIの設計のバイアスがあります。LSUDs（Large Set of Unknown Developers）かSSKDs（Small Set of Known Developers）で言えば、確実にSSKDs脳で記事が書かれています。</p>
+<h2 id="REST-API"><a href="#REST-API" class="headerlink" title="REST API"></a>REST API</h2><p>広く使われているため日本語記事も多数です。<a target="_blank" rel="noopener" href="https://www.infoq.com/jp/articles/designing-restful-http-apps-roth/">実践RESTful HTTP - InfoQ</a> や、<a target="_blank" rel="noopener" href="https://qiita.com/masato44gm/items/dffb8281536ad321fb08">0からREST APIについて調べてみた</a> など良さそうな記事が沢山でてくるの読むと良いでしょう。一般的な設計方法はやや古いですが<a target="_blank" rel="noopener" href="https://www.oreilly.co.jp/books/9784873116860/">Web API: The Good Parts</a>の書籍が短くまとまっているためサクッと目を通す人が多いかなと思います。</p>
+<h2 id="背景と論点"><a href="#背景と論点" class="headerlink" title="背景と論点"></a>背景と論点</h2><img src="/images/20210518a/choice-2692575_640.jpg" alt="アイキャッチ" title="Gerd AltmannによるPixabayからの画像" width="640" height="237" loading="lazy">
+
+<p>やりたいことの背景です。</p>
+<ul>
+<li><strong>Web APIで横断的な検索条件を指定したい</strong><ul>
+<li>アプリケーションドメインとしてネストを含む構造化が必要<ul>
+<li>JSONで指定できるようにしたい</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>URLのクエリパラメータにすることも考えたが、検索条件だけURLエンコードにするのは特殊すぎるので避けたい<ul>
+<li>あと、最大URL長を超える可能性がゼロではないので避けておきたい</li>
+</ul>
+</li>
+<li>既存はRESTishなWeb APIであるため、ここだけgRPCとかGraphQLにするのは状況的に不可</li>
+</ul>
+<p>このため、 <strong>検索条件はリクエストボディにJSONで指定する</strong> ことにします。リクエストボディにJSONをもたせること自体は、OpenAPIでも普通に記述できますし一般的でしょう。</p>
+<p>その前提で論点として掲題にあるGET&#x2F;POSTの議論がでてきました。それぞれの主張はです。</p>
+<ol>
+<li>実現したいことはデータ取得であるため、<strong>WebのセマンティックスとしてHTTPのGETメソッドを利用</strong> しリクエストボディを付けて指定すべき</li>
+<li><strong>HTTP GETメソッドにリクエストボディをもたせるのは違和感がある</strong>。POSTの方がまだ自然ではないか</li>
+</ol>
+<p>この話が3年で3回くらい周囲で発生したのでまとめます。</p>
+<h2 id="よくある議論の流れ"><a href="#よくある議論の流れ" class="headerlink" title="よくある議論の流れ"></a>よくある議論の流れ</h2><p>それぞれの主張について補足していきます。大体の会話の流れを楽しんで貰えればです。</p>
+<h3 id="GETでリクエストボディを使うことの是非"><a href="#GETでリクエストボディを使うことの是非" class="headerlink" title="GETでリクエストボディを使うことの是非"></a>GETでリクエストボディを使うことの是非</h3><p>まずは概念的なあるべき論。</p>
+<ul>
+<li>検索（参照）の処理なのにPOSTメソッドを利用するのは分かりにくいのではないか？</li>
+<li>例えば、ElasticsearchはGETメソッドにリクエストボディを指定している（POSTにフォールバックもしています）<ul>
+<li>Issueの<a target="_blank" rel="noopener" href="https://github.com/elastic/elasticsearch/issues/16024">ここ</a>でそれってどうなの？っていう議論がある</li>
+<li>GETにリクエストボディを置くこと自体は、実プロダクトでも事例がある</li>
+</ul>
+</li>
+<li>GETにリクエストボディって、RFCに違反していない？<ul>
+<li><a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc7231">RFC7231 Hypertext Transfer Protocol (HTTP&#x2F;1.1): Semantics and Content</a>だと、明示的に違反とは書かれていなさそう。GET（とDELETE）でリクエストボディを含めると、実装によってはリクエストが拒否されるかもよという記述</li>
+<li>微妙な記述だが、GETにリクエストボディを指定することを禁じているというわけではなさそう</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>A payload within a GET request message has no defined semantics;<br>sending a payload body on a GET request might cause some existing implementations to reject the request.<br>A payload within a DELETE request message has no defined semantics;<br>sending a payload body on a DELETE request might cause some existing<br>implementations to reject the request.</p>
+</blockquote>
+<h3 id="周辺ツールの対応状況"><a href="#周辺ツールの対応状況" class="headerlink" title="周辺ツールの対応状況"></a>周辺ツールの対応状況</h3><p>続いて実務的な話へ議論が進むことが多いです。</p>
+<ul>
+<li>そもそもGETにリクエストボディを指定するって、ツールが対応しているの？<ul>
+<li>curlは指定できる<ul>
+<li><code>curl -X GET http://localhost:8000/search --data &#39;&#123;&quot;q&quot;:&quot;example&quot;&#125;&#39;</code></li>
+</ul>
+</li>
+<li>VS Codeの<a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=humao.rest-client">Rest Client</a> の対応状況<ul>
+<li>対応している</li>
+</ul>
+</li>
+<li><a target="_blank" rel="noopener" href="https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop/related">Postman</a>では不可じゃないか？<ul>
+<li>裏技があるかもしれないけど、GETのときはタブが無効化されていて指定できない</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>OpenAPIで指定できるの？<ul>
+<li>OpenAPI Specification v2（Swagger）だと指定可能<ul>
+<li>少なくてもgo-swaggerのコード生成は対応していそう</li>
+</ul>
+</li>
+<li>OpenAPI Specification v3だと仕様的に <strong>不可</strong><ul>
+<li><code>GET, DELETE and HEAD are no longer allowed to have request body because it does not have defined semantics as per RFC 7231.</code> と書かれている</li>
+<li><a target="_blank" rel="noopener" href="https://swagger.io/docs/specification/describing-request-body/">https://swagger.io/docs/specification/describing-request-body/</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>ライブラリ対応しているのか？<ul>
+<li>AxiosだとGETでBodyを送ってくれないようだ。<a target="_blank" rel="noopener" href="https://github.com/axios/axios/issues/787">Issue</a>にその話がある<ul>
+<li>フロントエンドがAxiosに依存していると厳しい..</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a target="_blank" rel="noopener" href="https://qiita.com/uhooi/items/e82c8d294a8465a3e6f3">GETメソッドでリクエストボディを指定してはいけない(Swift) - Qiita</a><ul>
+<li>iOSがクライアントにいるとマズイかも</li>
+</ul>
+</li>
+<li>AWSのCloudFrontは<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/RequestAndResponseBehaviorCustomOrigin.html#RequestCustom-get-body">GETリクエストでリクエストボディを含むと403(Forbidden)を返す</a><ul>
+<li><code>If a viewer GET request includes a body, CloudFront returns an HTTP status code 403 (Forbidden) to the viewer.</code> とドキュメントに書いています</li>
+</ul>
+</li>
+</ul>
+<p>概念的なあるべき論が落ち着いた後、GETにリクエストボディの設定は、OpenAPI v3でNGだったり、各種ライブラリで利用不可だったりで茨の道だという結論になりがちです。</p>
+<p>私もあるべき論は置いておいて、業務ではPOSTメソッドで検索APIを設計する方向で舵を切るようになりました。</p>
+<h2 id="FAQ"><a href="#FAQ" class="headerlink" title="FAQ"></a>FAQ</h2><ol>
+<li>GET&#x2F;POSTの両方用意したら良いのでは？<ul>
+<li>LSUDsとかOSSツールならそれの方が良い気がします</li>
+<li>SSKDsだと、誤ってGET版を触って動かないんだけどなんで？とか問い合わせを受けそうなので、利用者側の設計の余地を狭めるためにどっちか片方だけ（POSTだけ）の提供にしたいと思っています</li>
+</ul>
+</li>
+</ol>
+<h2 id="HTTP-SEARCH-メソッドの提案がある"><a href="#HTTP-SEARCH-メソッドの提案がある" class="headerlink" title="HTTP SEARCH メソッドの提案がある"></a>HTTP SEARCH メソッドの提案がある</h2><p>2021&#x2F;05&#x2F;01時点ではDraftフェーズですが、何度かHTTP SEARCH メソッドの仕様検討があるようです。</p>
+<p>簡単に言うと、GETのように参照（検索）の意味を持つSEARCHメソッドで、条件はPOSTのようにリクエストボディに記載することができます</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://tools.ietf.org/html/draft-snell-search-method-02">https://tools.ietf.org/html/draft-snell-search-method-02</a><ul>
+<li>Expiresが2021&#x2F;03&#x2F;06なので、もう無効になっているので注意です。過去には00, 01版もあり定期的に検討されていそう</li>
+</ul>
+</li>
+<li>あまり詳しくないですが、次はこちらのトラッカーで議論がされていそう<ul>
+<li><a target="_blank" rel="noopener" href="https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/?include_text=1">https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/?include_text=1</a></li>
+</ul>
+</li>
+</ul>
+<p>SEARCH自体はWebDAV（サーバー上のファイルを読み取りや編集をWebブラウザ上で行えるようにする仕組み）の<a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc5323">RFC5323</a> で存在するので、互換性について検討中とのこと。SEARCHじゃなくてQUERYやFETCHなどにする話もあるらしいです。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://httptoolkit.tech/blog/http-search-method/">https://httptoolkit.tech/blog/http-search-method/</a></li>
+</ul>
+<p>もし、本当にSEARCHが実現したとすると、この記事であるような議論が出ることもなくなると思いますので期待です。</p>
+<p><strong>2021.11.25追記</strong></p>
+<p>Queryメソッドについて記載がありましたので追記しました。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://asnokaze.hatenablog.com/entry/2021/11/09/231858">新しいHTTPメソッド、QUERYメソッドの仕様 - ASnoKaze blog</a></li>
+</ul>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><ul>
+<li>ネストを含む構造化した検索条件の指定は、POSTメソッドで設計しておくのが無難</li>
+<li>Webのセマンティクス的にはGETかもしれないが、エコシステム側が対応していないケースがあり、変なハマりを生む可能性があるので業務では避けたほうが無難<ul>
+<li>GETのフォールバック先でPOSTを用意する、ElasticSearchのようなパターンもありかもしれないが、特にSSKDsなWebAPIの場合はPOSTのみ準備することが良さそう<ul>
+<li>保守対象のエンドポイントを少しでも減らすのと、下手にGETを用意してツールでハマる利用者もいるかもしれないので</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>HTTP SEARCHメソッドの標準化に期待</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/978061/http-get-with-request-body">https://stackoverflow.com/questions/978061/http-get-with-request-body</a></li>
+<li><a target="_blank" rel="noopener" href="https://dev.classmethod.jp/articles/cloudfront-return-403-for-get-method-with-message-body/">https://dev.classmethod.jp/articles/cloudfront-return-403-for-get-method-with-message-body/</a></li>
+</ul>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">Technology Innovation Group（TIG）は、「最先端、且つ先進的なテクノロジーのプロフェッショナル集団」、「プロジェクト品質と生産性の向上」、「自社サービス事業の立ち上げ」を主なミッションとする、技術部隊です。DXユニットとはデジタルトランスフォーメーションを推進するチームで、IoTやらMaaSなどのテクノロジーカットでビジネス転換を支援しています。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210518a/&related=twitterapi%2Ctwitter&text=HTTP%E6%A4%9C%E7%B4%A2%E6%9D%A1%E4%BB%B6%E3%80%81GET%E3%81%AB%E3%81%99%E3%82%8B%E3%81%8B%EF%BC%9FPOST%E3%81%AB%E3%81%99%E3%82%8B%E3%81%8B%EF%BC%9F%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">116</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210518a/&t=HTTP%E6%A4%9C%E7%B4%A2%E6%9D%A1%E4%BB%B6%E3%80%81GET%E3%81%AB%E3%81%99%E3%82%8B%E3%81%8B%EF%BC%9FPOST%E3%81%AB%E3%81%99%E3%82%8B%E3%81%8B%EF%BC%9F" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210518a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">305</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210518a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">81</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.07.17</span><span class="snscount">&#9825;23</span><a href=/articles/20200717/ title="こんにちは、TIG DXユニットの真野です。この技術ブログの運営や、ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。本エントリーのネタを書くキッカケになったのは、[GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる]多芸な加部さんと某IoTな案件のバックエンドの接続テストをしているときに気がついたネタです。">CORSのプリフライトリクエスト（OPTIONメソッド）はAPI Keyの認証なしでOKにしておかないと失敗する話</a></li><li class="related-posts-item"><span>2019.04.10</span><span class="snscount">&#9825;1</span><a href=/articles/20190410/ title="Real World HTTPミニ版を記念にフューチャーのオフィスで勉強会を実施しましたら、リアル渋川さんに出会えました話です">Real World HTTPミニ版リリース記念勉強会の実施報告</a></li><li class="related-posts-item"><span>2022.06.21</span><span class="snscount">&#9825;858</span><a href=/articles/20220621a/ title="Real World HTTPでも紹介したネタですが、お仕事で受けている技術コンサル中に質問をいただいた時に整理のためにブログ記事にしてみました。サーバーx2、ブラウザx2と、ダウンロードするかどうかを制御する方法を合計4つと、絶対にダウンロードさせたいとか、S3を使う場合とか、サーバー側のファイルを閲覧するというケースについて紹介します。">ファイルダウンロード完全マスター</a></li><li class="related-posts-item"><span>2021.04.27</span><span class="snscount">&#9825;37</span><a href=/articles/20210427a/ title="TIG真野です。2021/3/19に「Future Tech Night #7 〜フューチャーの開発事例と共に学べるGo勉強会〜」を開催しました。トップバッターでGoの開発構成・アプリアーキテクチャについて話したので報告します。">Goのフラットパッケージについて登壇しました</a></li><li class="related-posts-item"><span>2020.11.09</span><span class="snscount">&#9825;199</span><a href=/articles/20201109/ title="1年弱ほどGo言語でWebAPIアプリケーション開発を行っていますが、かなり割り切った構成・テスト方針を採用しました。そろそろ1年弱になり機能開発も比較的落ち着き、保守運用フェーズの割合も徐々に増えてきた頃合いなので、やったこと・学び・反省といった振り返りを共有します。">GoのWebアプリ開発でフラットパッケージにした話</a></li><li class="related-posts-item"><span>2020.08.09</span><span class="snscount">&#9825;13</span><a href=/articles/20200809/ title="[API Meetup Online #3]での登壇をお誘いをいただいたので、以前から調査していたものの、発表の機会のなかった限定公開URLについて調べていた内容を発表しました。Real World HTTPの第3版が出るとしたら（具体的な計画とかはないですが）入れるかも、なネタでした。どちらかというとコンシューマー向けな機能な気がしますが、hipchatは以前、共有したファイルがこのCapability URLsだった....">API Meetup Online #3で限定公開URL（Capability URLs）について話をしてきました。</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#REST-API"><span class="toc-text">REST API</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%8C%E6%99%AF%E3%81%A8%E8%AB%96%E7%82%B9"><span class="toc-text">背景と論点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%88%E3%81%8F%E3%81%82%E3%82%8B%E8%AD%B0%E8%AB%96%E3%81%AE%E6%B5%81%E3%82%8C"><span class="toc-text">よくある議論の流れ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GET%E3%81%A7%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%83%9C%E3%83%87%E3%82%A3%E3%82%92%E4%BD%BF%E3%81%86%E3%81%93%E3%81%A8%E3%81%AE%E6%98%AF%E9%9D%9E"><span class="toc-text">GETでリクエストボディを使うことの是非</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%91%A8%E8%BE%BA%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E5%AF%BE%E5%BF%9C%E7%8A%B6%E6%B3%81"><span class="toc-text">周辺ツールの対応状況</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FAQ"><span class="toc-text">FAQ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTP-SEARCH-%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89%E3%81%AE%E6%8F%90%E6%A1%88%E3%81%8C%E3%81%82%E3%82%8B"><span class="toc-text">HTTP SEARCH メソッドの提案がある</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E8%AB%96"><span class="toc-text">結論</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-text">参考</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

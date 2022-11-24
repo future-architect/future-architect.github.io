@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>DynamoDBのページング | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTIG&#x2F;DXユニットの棚井龍之介です。入社以来、Go × AWS でのバックエンド開発を担当しています。 AWSのDBといえば「RDS」が代表格ですが、近年のサーバレス普及に伴い「DynamoDB」が第一選択肢として選ばれる機会が増えています。私の所属するプロジェクトでは、API Gateway, Lambda, DynamoDBのAWSサーバレス3兄弟をメイン利用しているた">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DynamoDBのページング | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20201130/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIG&#x2F;DXユニットの棚井龍之介です。入社以来、Go × AWS でのバックエンド開発を担当しています。 AWSのDBといえば「RDS」が代表格ですが、近年のサーバレス普及に伴い「DynamoDB」が第一選択肢として選ばれる機会が増えています。私の所属するプロジェクトでは、API Gateway, Lambda, DynamoDBのAWSサーバレス3兄弟をメイン利用しているた">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20201130/Screen_Shot_2020-11-30_at_5.34.55.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201130/Screen_Shot_2020-11-30_at_5.36.09.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201130/Screen_Shot_2020-11-30_at_5.36.19.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201130/Screen_Shot_2020-11-30_at_5.36.33.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201130/Screen_Shot_2020-11-30_at_5.36.43.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20201130/Screen_Shot_2020-11-30_at_5.36.58.png">
+<meta property="article:published_time" content="2020-11-29T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:53.182Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="DynamoDB">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20201130/Screen_Shot_2020-11-30_at_5.34.55.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20201130/">
+  <meta content="AWS,Go,DynamoDB" name="keywords">
+  <meta content="棚井龍之介" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">DynamoDBのページング
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20201130_DynamoDBのページング.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20201130_DynamoDBのページング" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2020/" class="publish-date"><time datetime="2020-11-29T15:00:00.000Z" itemprop="datePublished">2020.11.30</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%A3%9A%E4%BA%95%E9%BE%8D%E4%B9%8B%E4%BB%8B" title="棚井龍之介さんの記事一覧へ" class="post-author">棚井龍之介</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/DynamoDB/" title="DynamoDBタグの記事へ" class="tag-list-link">DynamoDB</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20201130/Screen_Shot_2020-11-30_at_5.34.55.png" loading="lazy">
+
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG&#x2F;DXユニットの棚井龍之介です。入社以来、Go × AWS でのバックエンド開発を担当しています。</p>
+<p>AWSのDBといえば「RDS」が代表格ですが、近年のサーバレス普及に伴い「DynamoDB」が第一選択肢として選ばれる機会が増えています。私の所属するプロジェクトでは、API Gateway, Lambda, DynamoDBのAWSサーバレス3兄弟をメイン利用しているため、メンバーによっては「研修はSQL地獄だったけど、配属後はNoSQLオンリーだ！」という人もいます。</p>
+<p>徐々に利用機会が増えているDynamoDBですが、いくつかの「初見殺し」があります。今回はその中での「ページング」について、DynamoDBのデータ格納状況と照らし合わせながら、基本的な仕組みを見ていこうと思います。</p>
+<p>DynamoDBの操作経験がある方を想定しているため、まだ一度も触ったことのない方や基本操作に不安のある方は、<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html">公式docs</a>や冨山さんの書かれた<a href="/articles/20200818/">入門記事</a>をご覧ください。</p>
+<h2 id="前提知識"><a href="#前提知識" class="headerlink" title="前提知識"></a>前提知識</h2><ul>
+<li>プライマリーキー<ul>
+<li>パーティションキーのみ</li>
+<li>複合プライマリキー (パーティションキーとソートキー)</li>
+</ul>
+</li>
+<li>DynamoDB API<ul>
+<li>Scan</li>
+<li>Query</li>
+</ul>
+</li>
+</ul>
+<h1 id="DynamoDBの1MB制約"><a href="#DynamoDBの1MB制約" class="headerlink" title="DynamoDBの1MB制約"></a>DynamoDBの1MB制約</h1><p>テーブル操作には大きく分けて「Read(読み込み)」と「Write(書き込み)」の2タイプがあります。</p>
+<p>このうち、ReadのScanとQueryは、一度のDynamoDB API操作では <strong>1MBが取得上限</strong> です。1MB以上のデータを抜き出したい場合は、ページング処理が必要です。ページング処理の対応実装はシンプルであり、1度誰かが書いたコードをコピペで利用できるため、中身を深く理解せずとも使えてしまいます。(Goのサンプルコードは最後に掲載します)</p>
+<p>しかし、詳細を理解しないコピペ実装だと、ちょっと手の込んだ実装などができなくなってしまうため、ページング処理を説明する前にDynamoDBのデータ格納方法を説明します。</p>
+<h1 id="DynamoDBのデータ格納方法"><a href="#DynamoDBのデータ格納方法" class="headerlink" title="DynamoDBのデータ格納方法"></a>DynamoDBのデータ格納方法</h1><p>DynamoDBのテーブルにItemを格納する場合、プライマリーキーによって格納場所が決まります。</p>
+<p>データ格納空間(Key Space)を00~FF、idをHash-Keyとした場合、各Itemは下図のように格納されます。プライマリーキーは重複できないため、新しいデータをid&#x3D;1でPutItemした場合、データは上書きされます。</p>
+<p>table</p>
+<ul>
+<li>Hash-Table<br>key</li>
+<li>Hash-Key: id</li>
+</ul>
+<img src="/images/20201130/Screen_Shot_2020-11-30_at_5.36.09.png" loading="lazy">
+
+
+<p>複合プライマリーキーの場合でも同様です。Hash-Keyによりいずれかのパーティションへ割り当てて、同一パーティションに含まれるItemはSort-Key順で格納されます。</p>
+<p>table</p>
+<ul>
+<li>Hash-Sort-Table<br>key</li>
+<li>Hash-Key: id</li>
+<li>Sort-Key: order</li>
+</ul>
+<img src="/images/20201130/Screen_Shot_2020-11-30_at_5.36.19.png" loading="lazy">
+
+
+<h1 id="格納場所を特定するKey"><a href="#格納場所を特定するKey" class="headerlink" title="格納場所を特定するKey"></a>格納場所を特定するKey</h1><p>DynamoDBは、全てのItemをプライマリーキーでソートした上で保持しています。</p>
+<p>したがって、Hash-Tableの場合はプライマリーキーの値が分かれば、Hash-Sort-Tableの場合は複合プライマリーキーの値が分かれば、データの格納場所を一意に特定できます。DynamoDBから1MB以上データを取得するために、この一意となるキー情報を利用します。</p>
+<h1 id="1MB以上のデータ取得"><a href="#1MB以上のデータ取得" class="headerlink" title="1MB以上のデータ取得"></a>1MB以上のデータ取得</h1><ul>
+<li>プライマリーキー: Hash-Table</li>
+<li>複合プライマリーキー: Hash-Sort-Table</li>
+</ul>
+<p>で分けて説明します。</p>
+<h2 id="Hash-Table"><a href="#Hash-Table" class="headerlink" title="Hash-Table"></a>Hash-Table</h2><p>1MB以上のデータを持つテーブルへScanを実行した場合、テーブルの先頭から1MB分のデータと共に、LastEvaluatedKey(LK)が返されます。LKの値は、1MB分取得したデータの、最後のItemのプライマリーキーです。</p>
+<img src="/images/20201130/Screen_Shot_2020-11-30_at_5.36.33.png" loading="lazy">
+
+
+<p>1MB分データとLKを受け取った後、そのまま終わらせずにScanを再実行するのがポイントです<br>。<br>Scanの引数ExclusiveStartKey(SK)にLKを渡すと、LK地点から1MB分のデータが取得できます。EKはScanの開始位置をテーブルに伝えるため、プライマリーキーを渡すことにより、前回Scanの終了地点からデータ取得再開が可能となります。</p>
+<img src="/images/20201130/Screen_Shot_2020-11-30_at_5.36.43.png" loading="lazy">
+
+
+<p>2回目のScanでも、初回と同様に 1MB分のデータ+LK’ が返されます。再度LK’を渡してScanすることにより、次の1MB分データを取得できます。このループを繰り返して、最終的にLKが返ってこなかった(空のLKが返ってきた)とき、テーブルのScanが完了したことになります。</p>
+<h2 id="Hash-Sort-Table"><a href="#Hash-Sort-Table" class="headerlink" title="Hash-Sort-Table"></a>Hash-Sort-Table</h2><p>複合プライマリーキーの場合も考え方は同じです。</p>
+<p>キーによってデータの格納場所が一意に特定されるため</p>
+<ul>
+<li>Scanで1MB分のデータとLKを取得</li>
+<li>次のScanでLKをEKに代入</li>
+</ul>
+<p>を繰り返すことで、全データを取得可能です。</p>
+<img src="/images/20201130/Screen_Shot_2020-11-30_at_5.36.58.png" loading="lazy">
+
+<p>以上で、図によるデータ取得方法の説明は終了です。<br>次は実装コードを見ていきましょう。</p>
+<h1 id="実装コードのサンプル"><a href="#実装コードのサンプル" class="headerlink" title="実装コードのサンプル"></a>実装コードのサンプル</h1><p>GoでDynamoDBから1MB以上を取得するコードのサンプルです。</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws/session&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/service/dynamodb&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fmt.Println(<span class="string">&quot;Full Scan Start.&quot;</span>)</span><br><span class="line"></span><br><span class="line">    ctx := context.Background()</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> ek <span class="keyword">map</span>[<span class="type">string</span>]*dynamodb.AttributeValue</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		resp, lk, err := scanWithKey(ctx, ek)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 1MB分取得データの処理</span></span><br><span class="line">        <span class="comment">// ex. データETL, csv保存</span></span><br><span class="line"></span><br><span class="line">		ek = lk</span><br><span class="line">		<span class="keyword">if</span> <span class="built_in">len</span>(ek) == <span class="number">0</span> &#123;</span><br><span class="line">            <span class="comment">// LKが空で返ってきた -&gt; 最後のItemまでScan完了</span></span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line">		&#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    fmt.Println(<span class="string">&quot;Full Scan Finish.&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">scanWithKey</span><span class="params">(ctx context.Context, lk <span class="keyword">map</span>[<span class="type">string</span>]*dynamodb.AttributeValue)</span></span> ([]TableModel, <span class="keyword">map</span>[<span class="type">string</span>]*dynamodb.AttributeValue, <span class="type">error</span>) &#123;</span><br><span class="line">	out, err := db.ScanWithContext(ctx, &amp;dynamodb.ScanInput&#123;</span><br><span class="line">		ExclusiveStartKey: lk,</span><br><span class="line">		TableName:         aws.String(tableName),</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;scan %s, %w&quot;</span>, tableName, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> resp []TableModel</span><br><span class="line">	<span class="keyword">if</span> err := dynamodbattribute.UnmarshalListOfMaps(out.Items, &amp;resp); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;dynamodb attribute marshalling map: %w&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> resp, out.LastEvaluatedKey, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>初回Scanでは空のEKを渡して、2回目以降はLKを代入します。空のLKが返されるまでループを継続することで、Full Scanが完了します。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>DynamoDBから1MB以上のデータを取得する方法について、図を多用して説明しました。</p>
+<p>データがどのように格納されているのか？をイメージできるようになれば</p>
+<ul>
+<li>テーブル設計力の向上</li>
+<li>処理コードのボトルネック特定</li>
+<li>公式ドキュメントのより詳細な理解</li>
+</ul>
+<p>につながると思います。</p>
+<p>DynamoDBは難しいポイントが多いですが、一つずつ解決していきましょう。</p>
+<p>最後まで読んでいただき、ありがとうございました！</p>
+<h2 id="参照記事"><a href="#参照記事" class="headerlink" title="参照記事"></a>参照記事</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Introduction.html">Amazon DynamoDB とは</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.slideshare.net/AmazonWebServicesJapan/20150805-aws-blackbeltdynamodb">AWS Black Belt Tech シリーズ 2015 - Amazon DynamoDB</a></li>
+<li><a href="/articles/20200818/">【入門】私を苦しめたDynamoDB</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20201130/&related=twitterapi%2Ctwitter&text=DynamoDB%E3%81%AE%E3%83%9A%E3%83%BC%E3%82%B8%E3%83%B3%E3%82%B0%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20201130/&t=DynamoDB%E3%81%AE%E3%83%9A%E3%83%BC%E3%82%B8%E3%83%B3%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20201130/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20201130/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">7</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2021.10.25</span><span class="snscount">&#9825;14</span><a href=/articles/20211025a/ title="DynamoDBをGoで操作することにかけては、[DynamoDB×Go連載] に参加するくらい関心があるのですが、AWS SDK for Goの公式ライブラリに含まれる、ヘルパーパッケージについて存在を今までスルーしていました。使ってみると業務的には利用一択だと思ったので今後使っていくぞという覚書としてまとめます。">AWS SDK for GoでDynamoDBの式を扱うヘルパーパッケージの使い方</a></li><li class="related-posts-item"><span>2021.04.03</span><span class="snscount">&#9825;11</span><a href=/articles/20210403/ title="DynamoDBを頻繁に利用しており、連日DynamoDBコンソール画面と睨めっこをしています。DynamoDBのコンソール画面は特定のデータをピンポイントで探すには優秀ですが、データ集計には全く向いていません。">DynamoDBをS3へExportして、Glue+AthenaでSQLを実行する</a></li><li class="related-posts-item"><span>2021.01.22</span><span class="snscount">&#9825;13</span><a href=/articles/20210122/ title="DynamoDB Streamsは、DynamoDBに対する項目の追加、変更、削除をイベントとして検出できる機能です。テーブルの項目が変更されるとすぐに、新しいレコードがテーブルのストリームに表示されます">オレのDynamoDB Streamsが再着火しないわけがない</a></li><li class="related-posts-item"><span>2020.11.13</span><span class="snscount">&#9825;100</span><a href=/articles/20201113/ title="- ローカル環境に立ち上げた localstack に向けて、terraform plan/apply/destroy を実行するFutureの棚井龍之介ですTIGグループのDXユニットに所属しています">LocalStackに向けてTerraformを実行する</a></li><li class="related-posts-item"><span>2020.07.22</span><span class="snscount">&#9825;8</span><a href=/articles/20200722/ title="昨今様々なシステムで利用さているAWSのLambdaですが、サーバレスということもあり何かのイベントをトリガに関数を起動させる方法が一般的かと思います。LambdaはAWSの様々なサービスをトリガとして起動することが可能で、自分たちの利用しているAWSサービスと組み合わせて実装するることでその真価を発揮します。AWSに少し詳しい人であればLambdaをAWSのサービストリガで起動させる事ができることは知っていると思いますが、いざ実装するとなると具体的にどういった手順で、なんの設定が必要かというところがわからないという人もいるのではないでしょうか。">AWSサービストリガによるLambda起動</a></li><li class="related-posts-item"><span>2020.03.27</span><span class="snscount">&#9825;173</span><a href=/articles/20200327/ title="クラウドサービスが充実してくるにつれて、サーバーレスではいろいろなことができるようになっています。HTTPサーバーは動きますし、RDBやNoSQLなストレージも使えますし、PubSubみたいなサービスも利用できます。これらを駆使するとそこそこ複雑な処理も記述できます。一方で、上から下までサーバーレスにしようとするとできないものもいくつかあります。例えば、RDBも使えるといっても制約があり、LambdaやCloud ...">Serverless連載3: Goでサーバーレス用の検索エンジンwatertowerを作ってみました</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20210225/ title="こんにちは。TIG DXユニット所属の村上です。最近データ分析絡みでDynamoDBを触る機会が多く、DynamoDBが体の一部みたいになってきました。本記事の結論はこれです。">DynamoDBから効率的に大量のデータを取得する方法</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E6%8F%90%E7%9F%A5%E8%AD%98"><span class="toc-text">前提知識</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#DynamoDB%E3%81%AE1MB%E5%88%B6%E7%B4%84"><span class="toc-text">DynamoDBの1MB制約</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#DynamoDB%E3%81%AE%E3%83%87%E3%83%BC%E3%82%BF%E6%A0%BC%E7%B4%8D%E6%96%B9%E6%B3%95"><span class="toc-text">DynamoDBのデータ格納方法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A0%BC%E7%B4%8D%E5%A0%B4%E6%89%80%E3%82%92%E7%89%B9%E5%AE%9A%E3%81%99%E3%82%8BKey"><span class="toc-text">格納場所を特定するKey</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1MB%E4%BB%A5%E4%B8%8A%E3%81%AE%E3%83%87%E3%83%BC%E3%82%BF%E5%8F%96%E5%BE%97"><span class="toc-text">1MB以上のデータ取得</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Hash-Table"><span class="toc-text">Hash-Table</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hash-Sort-Table"><span class="toc-text">Hash-Sort-Table</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9F%E8%A3%85%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB"><span class="toc-text">実装コードのサンプル</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E7%85%A7%E8%A8%98%E4%BA%8B"><span class="toc-text">参照記事</span></a></li></ol></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

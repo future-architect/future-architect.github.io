@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Redisのジオメトリ機能 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="地図・GIS・位置特定に関する連載の4日目のエントリーです。最初はブラウザの座標を取得するAPIとか、IPアドレスから場所を推定するGeoIPを使って、近い場所の人を探すサービスでも作ってみようかと思っていました。Quad-Treeみたいなゲームでよくある座標系を収めるデータ構造を使って、近くのメンバーを探す機能とかを作ろうと思っていましたが、ふと「座標系をそのまま格納して検索できるデータベー">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redisのジオメトリ機能 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20220721a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="地図・GIS・位置特定に関する連載の4日目のエントリーです。最初はブラウザの座標を取得するAPIとか、IPアドレスから場所を推定するGeoIPを使って、近い場所の人を探すサービスでも作ってみようかと思っていました。Quad-Treeみたいなゲームでよくある座標系を収めるデータ構造を使って、近くのメンバーを探す機能とかを作ろうと思っていましたが、ふと「座標系をそのまま格納して検索できるデータベー">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20220721a/Logo-redis.png">
+<meta property="article:published_time" content="2022-07-20T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-22T04:13:32.150Z">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="ジオメトリ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20220721a/Logo-redis.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20220721a/">
+  <meta content="Redis,ジオメトリ" name="keywords">
+  <meta content="澁川喜規" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Redisのジオメトリ機能
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20220721a_Redisのジオメトリ機能.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20220721a_Redisのジオメトリ機能" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-07-20T15:00:00.000Z" itemprop="datePublished">2022.07.21</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%BE%81%E5%B7%9D%E5%96%9C%E8%A6%8F" title="澁川喜規さんの記事一覧へ" class="post-author">澁川喜規</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Redis/" title="Redisタグの記事へ" class="tag-list-link">Redis</a>
+  
+    
+    <a href="/tags/ジオメトリ/" title="ジオメトリタグの記事へ" class="tag-list-link">ジオメトリ</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20220721a/Logo-redis.png" alt="" width="700" height="239">
+
+<p><a href="/articles/20220719a/">地図・GIS・位置特定に関する連載</a>の4日目のエントリーです。最初はブラウザの座標を取得するAPIとか、IPアドレスから場所を推定するGeoIPを使って、近い場所の人を探すサービスでも作ってみようかと思っていました。Quad-Treeみたいなゲームでよくある座標系を収めるデータ構造を使って、近くのメンバーを探す機能とかを作ろうと思っていましたが、ふと「座標系をそのまま格納して検索できるデータベースとかありそうだな」と思って調べたところRedisがヒットして横道にそれてしまったのでそのまま横道を突き進んでみました。</p>
+<p>Redisは<a target="_blank" rel="noopener" href="http://redis.shibu.jp/">2010年ぐらいに有志でドキュメント翻訳したり</a>したりして、チョットワカル程度でしたが、久々にドキュメントを見ていたら座標情報を保持したり検索したりするコマンドが増えていました。その辺りを少し調べてみました。</p>
+<h1 id="Redisのジオメトリ機能"><a href="#Redisのジオメトリ機能" class="headerlink" title="Redisのジオメトリ機能"></a>Redisのジオメトリ機能</h1><p>Redisの<a target="_blank" rel="noopener" href="https://redis.io/commands/?group=geo">ジオメトリ関係のコマンド</a>は10個ほどあります。</p>
+<ul>
+<li>GEOADD: 座標つきでメンバーを登録</li>
+<li>GEODIST: 登録したメンバーの距離を計測</li>
+<li>GEOPOS: 登録したメンバーの座標を取得</li>
+</ul>
+<p>メインの検索機能はこちら</p>
+<ul>
+<li>GEOSEARCH: 指定の座標&#x2F;メンバーから範囲内（矩形、もしくは半径）のメンバー一覧を返す</li>
+</ul>
+<p>メインの検索機能を便利にするメソッドはこちら</p>
+<ul>
+<li>GEOSEARCHSTORE: GEOSEARCHの結果をsorted setに保存</li>
+<li>GEORADIUS: GEOSEARCHの座標→半径計算特化版。STOREも可能。</li>
+<li>GEORADIUS_RO: GEOSEARCHの座標→半径計算特化版。STOREなし。</li>
+<li>GEORADIUSBYMEMBER: GEOSEARCHのメンバー→半径計算特化版。STOREも可能。</li>
+<li>GEORADIUSBYMEMBER_RO: GEOSEARCHのメンバー→半径計算特化版。STOREも可能。</li>
+</ul>
+<p>なお、これらはネイティブなデータ構造になっているわけではなく、次のコマンドを使ってGeoHashというキーを生成し、sorted setに格納されています。登録したメンバーの一覧を取得や、メンバーの数の取得、メンバーの削除はsorted setのコマンドをそのまま使うことになっています。</p>
+<ul>
+<li>GEOHASH: 緯度・経度をgeohashというアルゴリズムでハッシュキー化します。</li>
+</ul>
+<p>Redisのドキュメントから持ってきたサンプルは以下の通りです。</p>
+<p>このサンプルのSicilyというのはsorted setの名前です。地球の座標系、火星の座標系など、複数のスペースを分けて使います。GEOADDは複数の要素を一括で入れられて、緯度・経度・キーをセットで入れます。GEODISTは登録したメンバー同士の距離を返す機能で、GEORADIUSは特定の座標から一定距離内のメンバー一覧を返しています。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">redis:6379&gt; GEOADD Sicily 13.361389 38.115556 <span class="string">&quot;Palermo&quot;</span> 15.087269 37.502669 <span class="string">&quot;Catania&quot;</span></span><br><span class="line">(<span class="built_in">integer</span>) 2</span><br><span class="line">redis:6379&gt; GEODIST Sicily Palermo Catania</span><br><span class="line"><span class="string">&quot;166274.1516&quot;</span></span><br><span class="line">redis:6379&gt; GEORADIUS Sicily 15 37 100 km</span><br><span class="line">1) <span class="string">&quot;Catania&quot;</span></span><br><span class="line">redis:6379&gt; GEORADIUS Sicily 15 37 200 km</span><br><span class="line">1) <span class="string">&quot;Palermo&quot;</span></span><br><span class="line">2) <span class="string">&quot;Catania&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="GeoHash"><a href="#GeoHash" class="headerlink" title="GeoHash"></a>GeoHash</h1><p>このジオメトリ機能の肝は<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Geohash">GeoHash</a>です。パブリックドメインなアルゴリズムです。たとえば、13.361389 38.115556という座標は<code>sqc8b49rny0</code>というキーになります。</p>
+<p>Redisは経度としては±180度、緯度は±85.05112878度までをサポートしています。北極点、南極点から555kmの範囲は表現できなそうですね。</p>
+<p>GeoHashは長さが長くなればなるほど精度があがって細かい座標も表現できるというモデルになっています。<code>sqc8b49rny0</code>の末尾の文字列を削ってもだいたい同じ位置になるが、丸められてしまう、みたいな欠損してもvalidな面白いデータ構造になっています。</p>
+<p>GeoHashの各文字はbase32にエンコードされた数値です。1文字で5ビットあります。奇数文字列目は3ビットの経度＋2ビットの緯度、偶数文字列目は2ビットの経度＋3ビットの緯度で表現されます。Redisは11文字の文字列で表現されるので、55ビットと思いきや、内部的には<a target="_blank" rel="noopener" href="https://redis.io/commands/geohash/">52ビット</a>となるようです。なので、おそらく、緯度・経度ともに26ビットの精度になると思われます。本来のGeoHashはRedisと違って緯度は±90度なので、ちょっと計算は違うかもしれませんが、Wikipediaの計算をもとにすると、誤差は30cm程度。十分な精度ですね。</p>
+<p>ちなみに、これらは地球上の座標として表現されているので、Redisで火星の座標系とかを表現しようとすると、補正が必要ですね。</p>
+<h1 id="ベンチマーク"><a href="#ベンチマーク" class="headerlink" title="ベンチマーク"></a>ベンチマーク</h1><p>Redis 7.0.3、Go 1.18.4、ドライバとしてgithub.com&#x2F;go-redis&#x2F;redis&#x2F;v9を使って、M2 MacBook Airでベンチマークを取ってみました。RedisのドキュメントにはO(N+log(M)) (Nは検索範囲のバウンディングボックスの中のメンバー数、Mはその図形の中のメンバー数)とドキュメントにはあるのですが、実際にかかる時間の肌感覚を知りたかったので。コードは次のところにあります。</p>
+<p><a target="_blank" rel="noopener" href="https://gist.github.com/shibukawa/2cf8fc518d58f5031619798d3d43ceb7">https://gist.github.com/shibukawa/2cf8fc518d58f5031619798d3d43ceb7</a></p>
+<p>要素数は以下の通りで、関東の範囲(東経139-141, 北緯35-37)にランダムにメンバーを登録して、検索をかけてみました。要素数は以下のケースで検証してみました。</p>
+<ul>
+<li>1000: (<a target="_blank" rel="noopener" href="https://mitok.info/?p=107992">関東のマクドナルドの店舗数</a>の1377と同じぐらいのオーダー</li>
+<li>10000: (<a target="_blank" rel="noopener" href="https://www.post.japanpost.jp/newsrelease/storeinformation/pdf/02_87.pdf">関東の郵便局数</a>の4627と<a target="_blank" rel="noopener" href="https://uub.jp/pdr/m/c.html">関東のコンビニの店舗数</a>20779の間ぐらいのオーダー</li>
+<li>100000: (<a target="_blank" rel="noopener" href="https://www.npa.go.jp/bureau/traffic/seibi2/annzen-shisetu/hyoushiki-shingouki/pdf/R02kazu.pdf">関東の信号の数</a>の59188よりもちょっと多いオーダー)</li>
+</ul>
+<p>ちなみに、100000件データを入れても、Redisの消費メモリは16MB程度、Redisが生成したファイルが1.2MB程度で想像よりも遥かに少ないです。</p>
+<p>結果は以下の通りで、このぐらいの検索だと誤差の範囲ぐらいですね、というか本当かよ？と思うぐらいの高パフォーマンス。一番最後のやつで40件近くヒットしていて、動作上は肌感覚的に間違ってなさそうな結果は出ています。要素数が増えても、検索対象を賢く絞ってパフォーマンスが落ちないような工夫がされていそうです。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center">要素数</th>
+<th align="center">検索条件</th>
+<th align="center">時間</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1000</td>
+<td align="center">1辺1kmの矩形</td>
+<td align="center">24μs</td>
+</tr>
+<tr>
+<td align="center">1000</td>
+<td align="center">半径1kmの円</td>
+<td align="center">22μs</td>
+</tr>
+<tr>
+<td align="center">1000</td>
+<td align="center">1辺2kmの矩形</td>
+<td align="center">23μs</td>
+</tr>
+<tr>
+<td align="center">1000</td>
+<td align="center">半径2kmの円</td>
+<td align="center">23μs</td>
+</tr>
+<tr>
+<td align="center">10000</td>
+<td align="center">1辺1kmの矩形</td>
+<td align="center">23μs</td>
+</tr>
+<tr>
+<td align="center">10000</td>
+<td align="center">半径1kmの円</td>
+<td align="center">24μs</td>
+</tr>
+<tr>
+<td align="center">10000</td>
+<td align="center">1辺2kmの矩形</td>
+<td align="center">24μs</td>
+</tr>
+<tr>
+<td align="center">10000</td>
+<td align="center">半径2kmの円</td>
+<td align="center">27μs</td>
+</tr>
+<tr>
+<td align="center">100000</td>
+<td align="center">1辺1kmの矩形</td>
+<td align="center">26μs</td>
+</tr>
+<tr>
+<td align="center">100000</td>
+<td align="center">半径1kmの円</td>
+<td align="center">33μs</td>
+</tr>
+<tr>
+<td align="center">100000</td>
+<td align="center">1辺2kmの矩形</td>
+<td align="center">33μs</td>
+</tr>
+<tr>
+<td align="center">100000</td>
+<td align="center">半径2kmの円</td>
+<td align="center">52μs</td>
+</tr>
+</tbody></table></div>
+<p>GeoHashがすごいのは、文字列長さによって精度が変わることと、1次元にマッピングしていること。つまり、探したい座標と範囲が分かれば先頭一致で要素が絞れます。2次元を1次元で表現する方法は昔考えたことがあるものの、なかなか思いつかなかったのですが、コンピューターサイエンスの勝利というか、久々に胸が熱くなるものを見つけました。あらかじめQuadTreeの深さとかパラメータを調整する必要もないですしね。<a href="https://future-architect.github.io/articles/20210701a/">LOUDS</a>みたいなデータ構造との相性も良いですしね。夢が広がります。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>こちらの機能としてはウェブサービスを作る時とかに便利に使えそうですよね。座標はブラウザの機能とか使えば簡単にとれます。Redis側にあらかじめいろんな場所情報を入れてあげて、ブラウザから取得した座標を投げ込めば簡単に近隣のスポットを探す、というサービスが作れそうです。</p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API">https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API</a></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">navigator.<span class="property">geolocation</span>. <span class="title function_">getCurrentPosition</span>(<span class="function">(<span class="params">pos: GeolocationPosition</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(pos.<span class="property">coords</span>);</span><br><span class="line">    <span class="comment">// &#123;latitude: 35.0, longitude: 135.0, altitude: null&#125;</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>SQLiteでマスターを配布するような感じで、Redisも読み込み専用で使ってあげるとかも面白い気がします。ビジネス利用がいろいろ考えられますね。</p>
+<p>今回はRedisを調べただけですが、座標周りのロジックにはいろいろあります。</p>
+<ul>
+<li>IPアドレスから座標を推定するGeoIP</li>
+<li>場所から座標を調べるジオロケーション</li>
+<li>座標から場所を調べる逆ジオロケーション</li>
+</ul>
+<p>人間にわかりやすいコード体系やら機械にわかりやすいコード体系、それぞれの変換など、「場所」の世界は奥深いですね。これらを組み合わせると場所を使った面白いサービスが作れそうです。</p>
+<p>次は塚本さんの<a href="/articles/20220722a/">住所情報から経路を探索する”そこそこ”な方法</a>です。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20220721a/&related=twitterapi%2Ctwitter&text=Redis%E3%81%AE%E3%82%B8%E3%82%AA%E3%83%A1%E3%83%88%E3%83%AA%E6%A9%9F%E8%83%BD%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">16</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20220721a/&t=Redis%E3%81%AE%E3%82%B8%E3%82%AA%E3%83%A1%E3%83%88%E3%83%AA%E6%A9%9F%E8%83%BD" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20220721a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20220721a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">5</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.11.22</span><span class="snscount">&#9825;11</span><a href=/articles/20221122a/ title="前回の記事ではMSAL.jsを使い、シングルページアプリケーションの認証を試してみました。業務システムで扱う認証にはいろいろな種類がありますが、だいたい以下のどれかに該当するケースが多いと思います。">AzureAD＋MSAL for Goでバッチコマンドの認証<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.11.18</span><span class="snscount">&#9825;4</span><a href=/articles/20221118a/ title="AzureADを使って認証を行っている企業は多いと思います。このAzureADを使った場合にはMSAL.jsを使えば認証は楽だぞ、というのはAzureADのサイトには書かれているのですが、OpenID Connectのプロトコルの動きの理解と、ライブラリのAPIがどう対応づいているのかがわからずにちょっと試行錯誤したので、そのメモを残しておきます。">MSAL.jsを使ってウェブフロントエンドだけでAzureAD認証する<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.11.11</span><span class="snscount">&#9825;1102</span><a href=/articles/20221111a/ title="「中間層を増やして柔軟性を高めるのがソフトウェアの歴史」これは大学時代に2つ上の先輩が言っていた言葉です。例えばマシン語を直接書くのではなく、アセンブラで書けば、変換（コンパイル）の手間はかかりますが、他のCPUへの移植はしやすくなります。">データベースと向き合う決意<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.10.28</span><span class="snscount">&#9825;17</span><a href=/articles/20221028a/ title="前回の記事ではMermaid.jsをレンダリングしましたが、次はPlantUMLをレンダリングしてみます。こちらも、前回のMermaid.js同様、メンテナンスされているPlantUML対応コンポーネントはありません。PlantUMLもMermaid.js同様、多様なダイアグラムをサポートしています。">PlantUMLをReact上でレンダリングする<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.10.27</span><span class="snscount">&#9825;22</span><a href=/articles/20221027a/ title="Mermaid.jsをReactで表示しようとしたものの、Reactラッパーとしてnpmに公開されているものがどれも古くてメンテナンスされていなそうという問題がありました。この手のアダプター系のライブラリはどうしてもメンテナンスがされなくて放置されるのが早くなりがちです。脆弱性が残り続けたりします。そこで自前でやったところ、思ったよりも簡単だったのでそのやり方を紹介します。">Mermaid.jsをReact上でレンダリングする<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.10.24</span><span class="snscount">&#9825;130</span><a href=/articles/20221024a/ title="ちょっとしたツールをGoで作ってみたのですが、わざわざインストールしなくてもいいようにWebのUIをつけてブラウザで使えるようにしてみました。ウェブフロントエンド部分はNext.jsの静的サイトで、GoはWASMにしてロードして実行しています。WASMを使うのは初めてなのであえて選んでみました。">Goで作ったロジックにWebUIをつけてGitHubページに公開する</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220726a/ title="緯度・経度をコード化する技術に興味があったのでOpen Location Code（Plus Code）について調べました。">Plus Codeについて調べた</a></li><li class="reference-posts-item"><a href=/articles/20220720a/ title="先日Kaggleで開催された「Foursquare - Location Matching」コンペ(以下4sqコンペ)に社外の知人共にチームで参加し、1083チーム中7位をとりました。（初の金メダルでKaggle Competitions Masterになりました！)本記事では参加記として以下の内容を紹介します。">Foursquare - Location Matching 参加記 (7th / 1083)</a></li><li class="reference-posts-item"><a href=/articles/20220719a/ title="「地図・GIS・住所・位置特定」周りをテーマにした企画を始めます。">地図・GIS・位置特定に関する連載を始めます</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Redis%E3%81%AE%E3%82%B8%E3%82%AA%E3%83%A1%E3%83%88%E3%83%AA%E6%A9%9F%E8%83%BD"><span class="toc-text">Redisのジオメトリ機能</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#GeoHash"><span class="toc-text">GeoHash</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%99%E3%83%B3%E3%83%81%E3%83%9E%E3%83%BC%E3%82%AF"><span class="toc-text">ベンチマーク</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

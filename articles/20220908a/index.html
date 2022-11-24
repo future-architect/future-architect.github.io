@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Raspberry Piをかき集めてKubernetesを体感する | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="夏の自由研究ブログ連載2022 の10本目です。 はじめにTIG 岸下です。業務でGKE（Google Kubernetes Engine）を利用することがあるのですが、Kubernetesの挙動や仕組みなど如何せん理解が難しいです。 そこで今回は、自分の手でイチからKubernetesを構築することで勉強しようと思ったのが本記事のモチベーションです。 ちょうど自宅にRaspberry Piが3台">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Raspberry Piをかき集めてKubernetesを体感する | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20220908a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="夏の自由研究ブログ連載2022 の10本目です。 はじめにTIG 岸下です。業務でGKE（Google Kubernetes Engine）を利用することがあるのですが、Kubernetesの挙動や仕組みなど如何せん理解が難しいです。 そこで今回は、自分の手でイチからKubernetesを構築することで勉強しようと思ったのが本記事のモチベーションです。 ちょうど自宅にRaspberry Piが3台">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20220908a/Screenshot_from_2022-09-04_20-54-30.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220908a/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220908a/Screenshot_from_2022-09-03_15-19-08.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220908a/9e8e89cf-751b-32cf-e060-c445acc0784c.png">
+<meta property="article:published_time" content="2022-09-07T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-09-08T05:32:18.696Z">
+<meta property="article:tag" content="Kubernetes">
+<meta property="article:tag" content="RaspberryPi">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20220908a/Screenshot_from_2022-09-04_20-54-30.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20220908a/">
+  <meta content="Kubernetes,RaspberryPi" name="keywords">
+  <meta content="岸下優介" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Raspberry Piをかき集めてKubernetesを体感する
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20220908a_Raspberry_Piをかき集めてKubernetesを体感する.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20220908a_Raspberry_Piをかき集めてKubernetesを体感する" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-09-07T15:00:00.000Z" itemprop="datePublished">2022.09.08</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%B2%B8%E4%B8%8B%E5%84%AA%E4%BB%8B" title="岸下優介さんの記事一覧へ" class="post-author">岸下優介</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Kubernetes/" title="Kubernetesタグの記事へ" class="tag-list-link">Kubernetes</a>
+  
+    
+    <a href="/tags/RaspberryPi/" title="RaspberryPiタグの記事へ" class="tag-list-link">RaspberryPi</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p><a href="/articles/20220822a/">夏の自由研究ブログ連載2022</a> の10本目です。</p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG 岸下です。業務でGKE（Google Kubernetes Engine）を利用することがあるのですが、Kubernetesの挙動や仕組みなど如何せん理解が難しいです。</p>
+<p>そこで今回は、自分の手でイチからKubernetesを構築することで勉強しようと思ったのが本記事のモチベーションです。</p>
+<p>ちょうど自宅にRaspberry Piが3台あったのでRaspberry Piでクラスタを構築していこうと思います。基本的には以下の記事を参考に設定を行っていき、自分の理解を深めるために解説を挟みながら書いていこうと思います。</p>
+<p>参考：<a target="_blank" rel="noopener" href="https://qiita.com/yasthon/items/c29d0b9ce34d66eab3ec">RaspberryPi 4 にUbuntu20.04 をインストールして、Kubernetes を構築してコンテナを動かす</a></p>
+<h1 id="今回Kubernetes構築するにあたって用意したもの"><a href="#今回Kubernetes構築するにあたって用意したもの" class="headerlink" title="今回Kubernetes構築するにあたって用意したもの"></a>今回Kubernetes構築するにあたって用意したもの</h1><ul>
+<li>Raspberry Pi3 Model B（メモリ1GB）</li>
+<li>Raspberry Pi4 Model B（メモリ4GB）</li>
+<li>Raspberry Pi4 Model B（メモリ8GB）</li>
+<li>SDカード（64GB）x 3</li>
+<li>5ポートスイッチングハブ（BUFFALO LSW6-GT-5EPL&#x2F;NBK）</li>
+<li>LANケーブル x 4（CATはバラバラ）</li>
+<li>キーボード</li>
+<li>マウス</li>
+</ul>
+<p>各種Raspberry Piの電源はコンセントから取っています。</p>
+<h1 id="ラズパイの設定"><a href="#ラズパイの設定" class="headerlink" title="ラズパイの設定"></a>ラズパイの設定</h1><ul>
+<li>3台共通のものと、3台それぞれで設定する内容があるので注意して下さい。</li>
+</ul>
+<h2 id="OS"><a href="#OS" class="headerlink" title="OS"></a>OS</h2><ul>
+<li>OS: Ubuntu 20.04LTS（3台共通）</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.raspberrypi.com/software/">Raspberry Pi Imager</a>を使うと簡単にSDカードへOSを焼くことが出来ます。<br>SDカード3枚全てにUbuntu 20.04LTSを焼きます。</p>
+<h2 id="Kubernetesのバージョン"><a href="#Kubernetesのバージョン" class="headerlink" title="Kubernetesのバージョン"></a>Kubernetesのバージョン</h2><ul>
+<li>v1.25.0</li>
+</ul>
+<h2 id="初期設定（3台共通）"><a href="#初期設定（3台共通）" class="headerlink" title="初期設定（3台共通）"></a>初期設定（3台共通）</h2><p>ラズパイにOSをインストールしたSDカードを差し込み、パッケージを最新版にしておきます。</p>
+<figure class="highlight bash"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt upgrade -y</span><br></pre></td></tr></table></figure>
+
+<h2 id="ネットワーク周り"><a href="#ネットワーク周り" class="headerlink" title="ネットワーク周り"></a>ネットワーク周り</h2><h3 id="物理的な構成図"><a href="#物理的な構成図" class="headerlink" title="物理的な構成図"></a>物理的な構成図</h3><img src="/images/20220908a/Screenshot_from_2022-09-04_20-54-30.png" alt="Screenshot_from_2022-09-04_20-54-30.png" width="1200" height="732" loading="lazy">
+
+<img src="/images/20220908a/image.png" alt="image.png" width="939" height="730" loading="lazy">
+
+<p><strong>※Desktop PCはラズパイ達とSSHするために繋いでいます。Kubernetesの構成には必要ありません。</strong></p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>ラズパイ</th>
+<th>役割</th>
+<th>IPアドレス</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ラズパイ4B（8GB）</td>
+<td>マスター</td>
+<td>192.168.1.101</td>
+</tr>
+<tr>
+<td>ラズパイ4B（4GB）</td>
+<td>ワーカー①</td>
+<td>192.168.1.102</td>
+</tr>
+<tr>
+<td>ラズパイ3B</td>
+<td>ワーカー②</td>
+<td>192.168.1.103</td>
+</tr>
+</tbody></table></div>
+<p>で構成しております。</p>
+<h3 id="ネットワークの設定（ラズパイ3台それぞれで）"><a href="#ネットワークの設定（ラズパイ3台それぞれで）" class="headerlink" title="ネットワークの設定（ラズパイ3台それぞれで）"></a>ネットワークの設定（ラズパイ3台それぞれで）</h3><p>上記のIPアドレスを各ラズパイに割り振って固定化します。<br>以下のファイルを作成します。</p>
+<figure class="highlight bash"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/netplan/99-network.yaml</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><figcaption><span>99-network.yaml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">network:</span></span><br><span class="line">  <span class="attr">version:</span> <span class="number">2</span></span><br><span class="line">  <span class="attr">renderer:</span> <span class="string">networkd</span></span><br><span class="line">  <span class="attr">ethernets:</span></span><br><span class="line">    <span class="attr">eth0:</span></span><br><span class="line">      <span class="attr">dhcp4:</span> <span class="literal">false</span></span><br><span class="line">      <span class="attr">dhcp6:</span> <span class="literal">false</span></span><br><span class="line">      <span class="attr">addresses:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="number">192.168</span><span class="number">.1</span><span class="number">.101</span><span class="string">/24</span> <span class="comment"># ラズパイ毎でIPを変更してください。（末尾がそれぞれ101, 102, 103になります。）</span></span><br><span class="line">      <span class="attr">gateway4:</span> <span class="number">192.168</span><span class="number">.1</span><span class="number">.1</span> <span class="comment"># 自宅のルーターからゲートウェイを調べて下さい。ここを間違えるとラズパイはネットに繋がらなくなります…</span></span><br><span class="line">      <span class="attr">nameservers:</span></span><br><span class="line">        <span class="attr">addresses:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="number">192.168</span><span class="number">.1</span><span class="number">.1</span></span><br></pre></td></tr></table></figure>
+
+<p>作成したら、適用します。</p>
+<figure class="highlight bash"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo netplan apply</span><br><span class="line">ifconfig</span><br><span class="line"><span class="comment"># eth0の部分が所望のIPアドレスに変わっていることを確認。</span></span><br><span class="line"><span class="comment"># ifconfigが無ければ</span></span><br><span class="line"><span class="comment"># sudo apt install ifconfig</span></span><br><span class="line"><span class="comment"># でインストール</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="SSHの設定（デスクトップPC）"><a href="#SSHの設定（デスクトップPC）" class="headerlink" title="SSHの設定（デスクトップPC）"></a>SSHの設定（デスクトップPC）</h3><p>IPアドレスの固定化が完了したので、ここからはSSHで操作を行うようにします。</p>
+<p><strong>※SSHは利用しなくても設定することができますが、3台分のラズパイのディスプレイを切り替える作業のストレスが無くなります。</strong></p>
+<h4 id="VSCodeのRemote-SSHを用意"><a href="#VSCodeのRemote-SSHを用意" class="headerlink" title="VSCodeのRemote SSHを用意"></a>VSCodeのRemote SSHを用意</h4><p>デスクトップPCにてVSCodeをインストールして、「拡張機能」から<a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh">Remote - SSH</a>をインストールしてください。</p>
+<img src="/images/20220908a/Screenshot_from_2022-09-03_15-19-08.png" alt="Screenshot_from_2022-09-03_15-19-08.png" width="1200" height="233" loading="lazy">
+
+<h4 id="SSH構成ファイルを用意"><a href="#SSH構成ファイルを用意" class="headerlink" title="SSH構成ファイルを用意"></a>SSH構成ファイルを用意</h4><p>VSCodeウィンドウ左下の「＞＜」をクリックして、「SSH構成ファイルを開く」から<code>config</code>を開いて以下のように設定して保存します。</p>
+<figure class="highlight plaintext"><figcaption><span>config</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Host rpi4_8</span><br><span class="line">    HostName 192.168.1.101</span><br><span class="line">    User ubuntu</span><br><span class="line"></span><br><span class="line">Host rpi4_4</span><br><span class="line">    HostName 192.168.1.102</span><br><span class="line">    User ubuntu</span><br><span class="line"></span><br><span class="line">Host rpi3</span><br><span class="line">    HostName 192.168.1.103</span><br><span class="line">    User ubuntu</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Host名も好きに変更して頂いて構いません。</li>
+<li>IPアドレスは自宅の環境に合わせて適宜変更して下さい。</li>
+<li>User名を変更している場合も適宜変更して下さい。</li>
+</ul>
+<h4 id="各ラズパイに接続する"><a href="#各ラズパイに接続する" class="headerlink" title="各ラズパイに接続する"></a>各ラズパイに接続する</h4><p>VSCodeウィンドウ左下の「＞＜」をクリックして、「ホストに接続する」からホスト名を選んで接続します。<br>初回は接続キーの登録が行われるため、キーが表示されたら「続行」を押し、あとはログイン用のパスワードを入力すると接続できます。<br>複数台同時に接続できるので、3画面分用意しておけばデスクトップPC側からラズパイの操作が可能となります。</p>
+<h3 id="ホスト名の変更（ラズパイ3台それぞれ）"><a href="#ホスト名の変更（ラズパイ3台それぞれ）" class="headerlink" title="ホスト名の変更（ラズパイ3台それぞれ）"></a>ホスト名の変更（ラズパイ3台それぞれ）</h3><p>ここからはまたラズパイの操作となります。<br>以下のホスト名を割り振っていきましょう。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>ラズパイ</th>
+<th>役割</th>
+<th>ホスト名</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ラズパイ4B（8GB）</td>
+<td>マスター</td>
+<td>mas01.example.com</td>
+</tr>
+<tr>
+<td>ラズパイ4B（4GB）</td>
+<td>ワーカー①</td>
+<td>work01.example.com</td>
+</tr>
+<tr>
+<td>ラズパイ3B</td>
+<td>ワーカー②</td>
+<td>work02.example.com</td>
+</tr>
+</tbody></table></div>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo hostnamectl set-hostname mas.example.com <span class="comment"># 各々のラズパイでhostnameは変える</span></span><br><span class="line">hostname <span class="comment"># 変更の確認作業</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="x2F-etc-x2F-hostsの設定（ラズパイ3台共通）"><a href="#x2F-etc-x2F-hostsの設定（ラズパイ3台共通）" class="headerlink" title="&#x2F;etc&#x2F;hostsの設定（ラズパイ3台共通）"></a>&#x2F;etc&#x2F;hostsの設定（ラズパイ3台共通）</h3><p>ホスト名とIPアドレスを対応させるために、<code>etc/hosts</code>に以下の内容を追記します。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/hosts</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><figcaption><span>hosts</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># ...</span><br><span class="line"></span><br><span class="line">192.168.1.101 mas01 mas01.example.com</span><br><span class="line">192.168.1.102 work01 work01.example.com</span><br><span class="line">192.168.1.103 work02 work02.example.com</span><br><span class="line"></span><br><span class="line"># ...</span><br></pre></td></tr></table></figure>
+
+<p>これによって、ネットワークの名前解決ができるようになります。</p>
+<h4 id="余談"><a href="#余談" class="headerlink" title="余談"></a>余談</h4><p>以下はKubernetesの設定とは関係のない話なので余談ですが、ターミナル上で</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh work01.example.com</span><br></pre></td></tr></table></figure>
+
+<p>と打てば、<code>192.168.1.102</code>に接続することができます。<br>これはDNS（Domain Name Service）でも同じことが行われています。<br>DNSについては、ぜひTIG西田さんの<a href="https://future-architect.github.io/articles/20200604/">NW入門</a>を読んでみてください。ハンズオン形式でわかりやすいと思います。</p>
+<h3 id="IPv6の停止（ラズパイ3台共通）"><a href="#IPv6の停止（ラズパイ3台共通）" class="headerlink" title="IPv6の停止（ラズパイ3台共通）"></a>IPv6の停止（ラズパイ3台共通）</h3><p>IPv6は今回利用しないので停止します。<br><code>sysctl.conf</code>をvimで開きます。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/sysctl.conf</span><br></pre></td></tr></table></figure>
+
+<p>下記設定を最後の方へ追記します。<br>設定を1にすることで停止となります。</p>
+<figure class="highlight plaintext"><figcaption><span>sysctl.conf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#...</span><br><span class="line"></span><br><span class="line">net.ipv6.conf.all.disable_ipv6 = 1</span><br><span class="line">net.ipv6.conf.default.disable_ipv6 = 1</span><br><span class="line">net.ipv6.conf.eth0.disable_ipv6 = 1</span><br><span class="line">net.ipv6.conf.lo.disable_ipv6 = 1</span><br></pre></td></tr></table></figure>
+
+<h4 id="余談-1"><a href="#余談-1" class="headerlink" title="余談"></a>余談</h4><p>また余談ですが、最近はKubernetesでIPv4&#x2F;IPv6デュアルスタックが利用できるそうです。<br>参考：<a target="_blank" rel="noopener" href="https://kubernetes.io/ja/docs/concepts/services-networking/dual-stack/">IPv4&#x2F;IPv6デュアルスタック</a></p>
+<blockquote>
+<p>IPv4&#x2F;IPv6デュアルスタックを利用するとIPv4とIPv6のアドレスの両方をPod及びServiceに指定できるようになります。</p>
+</blockquote>
+<p>なるほど、わからんという感じです。<br>IPv6自体はIPv4アドレスの枯渇問題を解決するためのプロトコルで、他にもIPv4に対する不満の多くを一挙に解消しようとしています（<a target="_blank" rel="noopener" href="https://www.ohmsha.co.jp/book/9784274224478/">マスタリングTCP&#x2F;IP入門編</a> P.171）。<br>デュアルスタック機能によって、お互いは仕様の異なるプロトコルスタックですが共存させる仕組みで、やはりどちらのプロトコルも使えるのが美味しいポイントとなるのでしょうか。利用する機会があればまた調べて見ようと思います。</p>
+<h3 id="timezone-keymapの変更（ラズパイ3台共通）"><a href="#timezone-keymapの変更（ラズパイ3台共通）" class="headerlink" title="timezone, keymapの変更（ラズパイ3台共通）"></a>timezone, keymapの変更（ラズパイ3台共通）</h3><p>タイムゾーンを日本に、keymapを日本語にします。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># タイムゾーンの変更</span></span><br><span class="line">sudo timedatectl set-timezone Asia/Tokyo</span><br><span class="line"></span><br><span class="line"><span class="comment"># keymapの変更</span></span><br><span class="line">sudo localectl set-keymap jp106</span><br></pre></td></tr></table></figure>
+
+<h2 id="Kubernetes周り"><a href="#Kubernetes周り" class="headerlink" title="Kubernetes周り"></a>Kubernetes周り</h2><p>ここからKubernetes周りの設定を行っていきます。<br>基本はkubeadmの設定に沿っていきます。</p>
+<p>参考：<a target="_blank" rel="noopener" href="https://kubernetes.io/ja/docs/setup/production-environment/tools/kubeadm/install-kubeadm/">kubeadmのインストール</a></p>
+<h3 id="iptablesがnftablesバックエンドを使用しないようにする（ラズパイ3台共通）"><a href="#iptablesがnftablesバックエンドを使用しないようにする（ラズパイ3台共通）" class="headerlink" title="iptablesがnftablesバックエンドを使用しないようにする（ラズパイ3台共通）"></a>iptablesがnftablesバックエンドを使用しないようにする（ラズパイ3台共通）</h3><blockquote>
+<p>nftablesバックエンドは現在のkubeadmパッケージと互換性がありません。(ファイアウォールルールが重複し、kube-proxyを破壊するためです。)</p>
+</blockquote>
+<p>だそうです。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># レガシーバイナリをインストール</span></span><br><span class="line">sudo apt-get install -y iptables arptables ebtables</span><br><span class="line"></span><br><span class="line"><span class="comment"># レガシーバージョンに切り替える</span></span><br><span class="line">sudo update-alternatives --<span class="built_in">set</span> iptables /usr/sbin/iptables-legacy</span><br><span class="line">sudo update-alternatives --<span class="built_in">set</span> ip6tables /usr/sbin/ip6tables-legacy</span><br><span class="line">sudo update-alternatives --<span class="built_in">set</span> arptables /usr/sbin/arptables-legacy</span><br><span class="line">sudo update-alternatives --<span class="built_in">set</span> ebtables /usr/sbin/ebtables-legacy</span><br></pre></td></tr></table></figure>
+
+<p>参考：<a target="_blank" rel="noopener" href="https://kubernetes.io/ja/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#iptables%E3%81%8Cnftables%E3%83%90%E3%83%83%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%89%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%AA%E3%81%84%E3%82%88%E3%81%86%E3%81%AB%E3%81%99%E3%82%8B">kubernetes: iptablesがnftablesバックエンドを使用しないようにする</a></p>
+<h3 id="Dockerのインストール（ラズパイ3台共通）"><a href="#Dockerのインストール（ラズパイ3台共通）" class="headerlink" title="Dockerのインストール（ラズパイ3台共通）"></a>Dockerのインストール（ラズパイ3台共通）</h3><p>参考：<a target="_blank" rel="noopener" href="https://docs.docker.com/engine/install/ubuntu/">Install Docker Engine on Ubuntu</a></p>
+<p>ターミナルにて以下のコマンドでインストールします。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get -y install \</span><br><span class="line">    apt-transport-https \</span><br><span class="line">    ca-certificates \</span><br><span class="line">    curl \</span><br><span class="line">    gnupg-agent \</span><br><span class="line">    software-properties-common</span><br><span class="line">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -</span><br><span class="line">sudo add-apt-repository <span class="string">&quot;deb [arch=arm64] https://download.docker.com/linux/ubuntu <span class="subst">$(lsb_release -cs)</span> stable&quot;</span></span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get -y install docker-ce docker-ce-cli containerd.io</span><br><span class="line"><span class="comment"># apt-mark holdで、バージョンを固定します。</span></span><br><span class="line">sudo apt-mark hold docker-ce docker-ce-cli containerd.io</span><br></pre></td></tr></table></figure>
+
+<p>dockerをroot権限無しで実行するためにdockerグループへユーザーを割り当てます。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo adduser ubuntu docker</span><br><span class="line"><span class="built_in">cat</span> /etc/group | grep docker</span><br><span class="line"><span class="comment"># 自分のユーザー名が追加されていることを確認</span></span><br></pre></td></tr></table></figure>
+
+<p>グループ割当を適用するために、一度ログオフ or 再起動をしましょう。<br>Dockerのバージョンを確認します。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker version</span><br><span class="line"><span class="comment"># Dockerのバージョンが表示されればOK</span></span><br><span class="line"><span class="comment"># グループ割当が適用されていないと、Warningが出る。</span></span><br></pre></td></tr></table></figure>
+
+<p>dockerの動作確認に<code>hello-world</code>コンテナを使います。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker run hello-world</span><br><span class="line"><span class="comment"># Hello from Docker!と表示されればOK</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="kubeadm、kubelet、kubectlのインストール（ラズパイ3台共通）"><a href="#kubeadm、kubelet、kubectlのインストール（ラズパイ3台共通）" class="headerlink" title="kubeadm、kubelet、kubectlのインストール（ラズパイ3台共通）"></a>kubeadm、kubelet、kubectlのインストール（ラズパイ3台共通）</h3><p>参考：<a target="_blank" rel="noopener" href="https://kubernetes.io/ja/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#kubeadm-kubelet-kubectl%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB">kubeadm、kubelet、kubectlのインストール</a></p>
+<p>以下のコマンドでインストールします。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update &amp;&amp; sudo apt-get install -y apt-transport-https curl</span><br><span class="line">curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -</span><br><span class="line"><span class="built_in">cat</span> &lt;&lt;<span class="string">EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list</span></span><br><span class="line"><span class="string">deb https://apt.kubernetes.io/ kubernetes-xenial main</span></span><br><span class="line"><span class="string">EOF</span></span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install -y kubelet kubeadm kubectl</span><br><span class="line">sudo apt-mark hold kubelet kubeadm kubectl</span><br></pre></td></tr></table></figure>
+
+<p>そもそもこのkubeadm、kubelet、kubectlは何に使われるのでしょうか？</p>
+<h4 id="kubeadm"><a href="#kubeadm" class="headerlink" title="kubeadm"></a>kubeadm</h4><p>参考：<a target="_blank" rel="noopener" href="https://kubernetes.io/docs/reference/setup-tools/kubeadm/">Kubeadm</a></p>
+<ul>
+<li>Kubeadmは<code>kube init</code>や<code>kubeadm join</code>といったコマンドを提供するために作られたツールである。</li>
+<li>最低限実行可能なKubernetesクラスタを立ち上げるために必要なアクションを実行する。</li>
+<li>Kubeadmの設計上、クラスタの立ち上げのみにフォーカスを当てており、マシンへのプロビジョニングまでは考えていない。<ul>
+<li>同様に、Kubernetesダッシュボードのような種々の便利なアドオンをインストールしたり、モニタリング、クラウド固有のアドオンもスコープ外である。</li>
+</ul>
+</li>
+<li>理想的には全てのデプロイのベースとしてkubeadmを使うことで、適合するクラスタの作成が容易になる。</li>
+</ul>
+<p>クラスタの立ち上げまではkubeadmが面倒見てくれて、残りのツールとか設定は各々よしなにやりましょうという感じでしょうか。</p>
+<h4 id="kubelet"><a href="#kubelet" class="headerlink" title="kubelet"></a>kubelet</h4><p>参考：<a target="_blank" rel="noopener" href="https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/">kubelet</a></p>
+<p>kubeletを理解する前に、クラスターの全体像をまず理解する必要がありそうです。</p>
+<img src="/images/20220908a/9e8e89cf-751b-32cf-e060-c445acc0784c.png" alt="" width="1200" height="561" loading="lazy">
+
+<p>画像引用先： <a target="_blank" rel="noopener" href="https://kubernetes.io/ja/docs/concepts/overview/components/">Kubernetesのコンポーネント</a></p>
+<p>グレーの箇所はクラスターになり、先程紹介したKubeadmによって提供されます。</p>
+<ul>
+<li>Control Plane（マスターノード）に対してNode（ワーカーノード）がぶら下がる。<ul>
+<li>今回で言えば、マスターノードであるラズパイ<code>master01</code>にワーカーノードである<code>worker01</code>、<code>worker02</code>がぶら下がる。</li>
+</ul>
+</li>
+<li>マスターノードはワーカーノードとPodを管理する。</li>
+<li>ワーカーノードはアプリケーションのコンポーネントであるPodをホストする</li>
+<li>Podは1つ以上のコンテナのグループを持ち、Kubernetesにデプロイできる最小単位になる<ul>
+<li>種々のアプリケーションはPodの中のコンテナ上で動作</li>
+</ul>
+</li>
+</ul>
+<p>で、kubeletですが図を見ると各ワーカーノードの中にkubeletが存在し、ワーカーノードの中で使われることがわかります。どこで使われるかがわかったところでkubeletの機能についてまとめていきます。</p>
+<ul>
+<li>kubeletは、各ノード上で実行される主要な”ノードエージェント”<ul>
+<li>”エージェント”なので各ノードの中での仲介者で、Podの起動・管理を行う</li>
+</ul>
+</li>
+<li>kubeletは、PodSpecの観点から動作する<ul>
+<li>PodSpecはPodに関する様々な情報（例えばコンテナの名前やimage）を載せたYAML or JSONファイル</li>
+<li>PodSpec通りにコンテナが実行・動作されているかを確認することでPodを管理する</li>
+</ul>
+</li>
+</ul>
+<p>kubeletは各Pod内の管理・仲介者と考えておくとよさそうです。</p>
+<h4 id="kubectl"><a href="#kubectl" class="headerlink" title="kubectl"></a>kubectl</h4><p>参考：<a target="_blank" rel="noopener" href="https://kubernetes.io/ja/docs/reference/kubectl/overview/">kubectlの概要</a></p>
+<p>kubectlはKubernetesクラスターを制御するためのコマンドラインインターフェース（CLI）です。ターミナルからKubernetesクラスターを制御するのに使われます。</p>
+<h3 id="cgroupでmemoryの有効化（ラズパイ3台共通）"><a href="#cgroupでmemoryの有効化（ラズパイ3台共通）" class="headerlink" title="cgroupでmemoryの有効化（ラズパイ3台共通）"></a>cgroupでmemoryの有効化（ラズパイ3台共通）</h3><p>Kubernetesを利用する際に、cgroupのmemoryを有効化する必要があります。<br>はて、cgroupとは何なんでしょうか。</p>
+<h4 id="Kubernetes内でのcgroup"><a href="#Kubernetes内でのcgroup" class="headerlink" title="Kubernetes内でのcgroup"></a>Kubernetes内でのcgroup</h4><p>参考：<a target="_blank" rel="noopener" href="https://gihyo.jp/admin/serial/01/linux_containers/0003">Linuxカーネルのコンテナ機能［2］ ─cgroupとは？（その1）</a><br>参考：<a target="_blank" rel="noopener" href="https://valinux.hatenablog.com/entry/20210114">Kubernetes で cgroup がどう利用されているか</a></p>
+<p>cgroupはControle Groupの略で、プロセスをグループ化して、そのグループ内に存在するプロセスに対して共通の管理を行うために使われます。例としては、ホストOSが持つCPUやメモリなどのリソースに対して、グループごとに制限をかけることができます。</p>
+<p>kubeletの説明の中でPodSpecの話が出てきました。PodSpecのファイルではPod内のコンテナに関する情報を書くわけですが、この中でCPUやメモリの量も制限する（<code>resources</code>の<code>limits</code>）ことが可能です。正にここでcgroupが使われていて、ラズパイの計算リソースに対して、例えば計算リソースをそこまで必要としないPodに対しては制限をすることで、ラズパイのリソースを無駄に食い潰さないようにすることができます。</p>
+<h4 id="有効化の設定"><a href="#有効化の設定" class="headerlink" title="有効化の設定"></a>有効化の設定</h4><p>さて、cgroupのメモリーを有効化していきます。<br>以下のコマンドで確認すると、初期では無効化（末尾が0）されています。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /proc/cgroups | grep memory</span><br><span class="line"><span class="comment"># 下記が表示される</span></span><br><span class="line">memory  0       105     0</span><br></pre></td></tr></table></figure>
+
+<p><code>boot/firmware/cmdline.txt</code>を開き、<code>cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory</code>を追記します。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /boot/firmware/cmdline.txt</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight txt"><figcaption><span>/boot/firmware/cmdline.txt</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">elevator=deadline net.ifnames=0 console=serial0,115200 dwc_otg.lpm_enable=0 console=tty1 root=LABEL=writable rootfstype=ext4 rootwait fixrtc quiet splash cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory</span><br></pre></td></tr></table></figure>
+
+<p><strong>※改行はありません。既に書かれている文の末尾にスペースを空けて追記する形となります。</strong></p>
+<p>変更を適用するために再起動します。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo reboot</span><br><span class="line"><span class="comment"># SSH接続が切れるので、ログインし直す</span></span><br></pre></td></tr></table></figure>
+
+<p>memoryが有効化されていることを確認します。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /proc/cgroups | grep memory</span><br><span class="line"><span class="comment"># 下記が表示される</span></span><br><span class="line">memory  7       107     1</span><br></pre></td></tr></table></figure>
+
+<h1 id="Kubernetesクラスターの作成"><a href="#Kubernetesクラスターの作成" class="headerlink" title="Kubernetesクラスターの作成"></a>Kubernetesクラスターの作成</h1><p>参考：<a target="_blank" rel="noopener" href="https://kubernetes.io/ja/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/">kubeadmを使用したクラスターの作成</a></p>
+<h2 id="コントロールプレーンノードの初期化（マスターノードのラズパイのみ）"><a href="#コントロールプレーンノードの初期化（マスターノードのラズパイのみ）" class="headerlink" title="コントロールプレーンノードの初期化（マスターノードのラズパイのみ）"></a>コントロールプレーンノードの初期化（マスターノードのラズパイのみ）</h2><p>先程も出てきましたが、コントロールプレーンノード＝マスターノードです。<br>マスターノードにて操作を行っていきます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo kubeadm init --apiserver-advertise-address=192.168.1.101 --pod-network-cidr=10.244.0.0/16</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>apiserver-advertise-address</code><ul>
+<li>このオプションを利用して明示的にAPIサーバーのadvertise addressを設定します。</li>
+<li>明示的に指定しない場合はデフォルトゲートウェイに関連付けられたネットワークインターフェースを使用して設定されます。</li>
+</ul>
+</li>
+<li><code>pod-network-cidr</code><ul>
+<li>Flannelを使用する場合、こちらを指定する必要があります。</li>
+<li>Flannelはノード間をつなぐネットワークに仮想的なトンネルを構成することで、クラスター内のPod同士の通信を実現しています。</li>
+<li><code>/16</code>と広めに設定します（<a target="_blank" rel="noopener" href="https://github.com/flannel-io/flannel/blob/master/Documentation/kubernetes.md">GitHub - flannel-io&#x2F;flannel</a>）。</li>
+</ul>
+</li>
+</ul>
+<p>初期化後、<code>kubeadm join 192.168.1.101:6443 --token ...</code>という出力が出たら、どこかのテキストエディタにコピーしておきます。<br>このコマンドはワーカーノードを追加する際に利用します。</p>
+<h3 id="もしinit時にcontainer-runtime-is-not-runningというエラーが出た場合"><a href="#もしinit時にcontainer-runtime-is-not-runningというエラーが出た場合" class="headerlink" title="もしinit時にcontainer runtime is not runningというエラーが出た場合"></a>もしinit時に<code>container runtime is not running</code>というエラーが出た場合</h3><p>参考：<a target="_blank" rel="noopener" href="https://github.com/containerd/containerd/issues/4581">Kubeadm unknown service runtime.v1alpha2.RuntimeService #4581</a></p>
+<p>上記ページにエラーについて載っており、内容を読むと以下のように書いております。</p>
+<blockquote>
+<p>In the config.toml file installed by package containerd.io there is the line disabled_plugins &#x3D; [“cri”] that am guessing creating the issue.</p>
+</blockquote>
+<p>パッケージ<code>containerd.io</code>から<code>config.toml</code>をインストールした際に今回のエラーを引き起こす行があるようです（確証ではないみたい？）。<br>解決方法はマスターノードにて以下のコマンドを実行し、configファイルを削除します。<br>そして、<code>containerd</code>を再実行します。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># configファイルを削除</span></span><br><span class="line">sudo <span class="built_in">rm</span> /etc/containerd/config.toml</span><br><span class="line"><span class="comment"># containerdを再実行</span></span><br><span class="line">systemctl restart containerd</span><br></pre></td></tr></table></figure>
+
+<h2 id="環境変数と入力補完の設定（マスターノードのラズパイのみ）"><a href="#環境変数と入力補完の設定（マスターノードのラズパイのみ）" class="headerlink" title="環境変数と入力補完の設定（マスターノードのラズパイのみ）"></a>環境変数と入力補完の設定（マスターノードのラズパイのみ）</h2><p>kubectlをroot以外のユーザーでも実行できるようにするために、以下の設定を行っていきます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ホームディレクトリに.kubeディレクトリを作成</span></span><br><span class="line"><span class="built_in">mkdir</span> -p ~/.kube</span><br><span class="line"><span class="comment"># Kubernetesのadmin.confを.kubeディレクトリのconfigファイルへコピー</span></span><br><span class="line">sudo <span class="built_in">cp</span> -i /etc/kubernetes/admin.conf ~/.kube/config</span><br><span class="line"><span class="comment"># configファイルの所有者がrootになっているのでk8suserへ変更</span></span><br><span class="line">sudo <span class="built_in">chown</span> $(<span class="built_in">id</span> -u):$(<span class="built_in">id</span> -g) ~/.kube/config</span><br><span class="line"><span class="comment"># .bashrcへ環境変数の追加</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;KUBECONFIG=$HOME/.kube/config&#x27;</span> &gt;&gt; ~/.bashrc</span><br><span class="line"><span class="comment"># コマンドの入力補完を設定</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;source &lt;(kubectl completion bash)&quot;</span> &gt;&gt; <span class="variable">$HOME</span>/.bashrc</span><br><span class="line"><span class="comment"># 変更を適用</span></span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
+
+<h2 id="Flannelの設定（マスターノードのラズパイのみ）"><a href="#Flannelの設定（マスターノードのラズパイのみ）" class="headerlink" title="Flannelの設定（マスターノードのラズパイのみ）"></a>Flannelの設定（マスターノードのラズパイのみ）</h2><p>先程もちょろっと説明しましたが、Flannelはノードを跨いでコンテナ同士が通信できるようにするPodネットワークアドオンになります。<br>コンテナにはIPアドレスが付与されるのですが、Internal IPなのでそのままだとノードを跨いでコンテナ間で通信することができません。これを解決するために、Flannelによってノード間をつなぐネットワークに仮想的なトンネル（オーバーレイネットワーク）を構成することで、Kubernetesクラスター内のPod同士の通信（Podネットワーク）を実現しています。</p>
+<p>参考：<a target="_blank" rel="noopener" href="https://book.impress.co.jp/books/1119101148">Kubernetes完全ガイド 3.3.3 Flannel</a></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml</span><br></pre></td></tr></table></figure>
+
+<p>flannelが動作しているか確認します。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubectl get pods -n kube-flannel</span><br><span class="line"><span class="comment"># 以下が出力される</span></span><br><span class="line">NAME                    READY   STATUS    RESTARTS   AGE</span><br><span class="line">kube-flannel-ds-qcspv   1/1     Running   0          23m</span><br></pre></td></tr></table></figure>
+
+<h2 id="ロードバランサーのインストール（マスターノードのラズパイのみ）"><a href="#ロードバランサーのインストール（マスターノードのラズパイのみ）" class="headerlink" title="ロードバランサーのインストール（マスターノードのラズパイのみ）"></a>ロードバランサーのインストール（マスターノードのラズパイのみ）</h2><p><a target="_blank" rel="noopener" href="https://qiita.com/yasthon/items/c29d0b9ce34d66eab3ec">こちら</a>を参考にして作っているので、同様にMetalLBをインストールします。<br><a target="_blank" rel="noopener" href="https://metallb.universe.tf/installation/">MetalLB, bare metal load-balancer for Kubernetes </a>を参考にインストールします。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.5/config/manifests/metallb-native.yaml</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line">kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey=<span class="string">&quot;<span class="subst">$(openssl rand -base64 128)</span>&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>起動の確認を行います。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">kubectl get pod -n metallb-system</span><br><span class="line"><span class="comment"># 以下が表示される</span></span><br><span class="line">NAME                          READY   STATUS    RESTARTS   AGE</span><br><span class="line">controller-8689779bc5-txnbg   0/1     Pending   0          70s</span><br><span class="line">speaker-vcg4j                 1/1     Running   0          70s</span><br></pre></td></tr></table></figure>
+
+<h2 id="ワーカーノードをクラスタにジョイン"><a href="#ワーカーノードをクラスタにジョイン" class="headerlink" title="ワーカーノードをクラスタにジョイン"></a>ワーカーノードをクラスタにジョイン</h2><p>先程、テキストエディタにコピーしておいたコマンドを実行します。<br><strong>※<code>sudo</code>忘れに注意</strong></p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo kubeadm <span class="built_in">join</span> 192.168.1.101:6443 --token y2grpy.nbvcyr1em9o5aigj　--discovery-token-ca-cert-hash sha256:3e9ef8910b95e0a366041c1e156b7cbd6802df4c857cd53ad59bbba631749983</span><br></pre></td></tr></table></figure>
+
+<p>ちゃんとワーカーノードがジョインされたか確認してみましょう。</p>
+<figure class="highlight sh"><figcaption><span>terminal（マスターノード）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">kubectl get nodes</span><br><span class="line"><span class="comment"># 以下が表示される</span></span><br><span class="line">NAME       STATUS     ROLES           AGE    VERSION</span><br><span class="line">master01   Ready   control-plane      6d     v1.25.0</span><br><span class="line">work01     Ready      &lt;none&gt;          122m   v1.25.0</span><br><span class="line">work02     Ready      &lt;none&gt;          121m   v1.25.0</span><br></pre></td></tr></table></figure>
+
+<p><code>ROLES</code>がデフォルトになっているので変更します。</p>
+<figure class="highlight sh"><figcaption><span>terminal（マスターノード）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># work01</span></span><br><span class="line">kubectl label node work01 node-role.kubernetes.io/worker=worker</span><br><span class="line"><span class="comment"># work02</span></span><br><span class="line">kubectl label node work02 node-role.kubernetes.io/worker=worker</span><br><span class="line"><span class="comment"># 確認</span></span><br><span class="line">kubectl get nodes</span><br><span class="line"><span class="comment"># 以下が表示される</span></span><br><span class="line">NAME       STATUS     ROLES           AGE    VERSION</span><br><span class="line">master01   Ready   control-plane      6d     v1.25.0</span><br><span class="line">work01     Ready      worker          122m   v1.25.0</span><br><span class="line">work02     Ready      worker          121m   v1.25.0</span><br></pre></td></tr></table></figure>
+
+<p>これでクラスタの完成です。遂に我が家にKubernetesがやって来ました。</p>
+<h3 id="もしコピペを忘れた場合"><a href="#もしコピペを忘れた場合" class="headerlink" title="もしコピペを忘れた場合"></a>もしコピペを忘れた場合</h3><p>以下のコマンドで発行したトークンを確認することが出来ます。</p>
+<figure class="highlight sh"><figcaption><span>terminal（マスターノード）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubeadm token list</span><br><span class="line"><span class="comment"># 以下が表示される</span></span><br><span class="line">TOKEN                     TTL         EXPIRES                USAGES                   DESCRIPTION                                                EXTRA GROUPS</span><br><span class="line">y2grpy.nbvcyr1em9o5aigj   22h         2022-09-04T08:03:11Z   authentication,signing   &lt;none&gt;                                                     system:bootstrappers:kubeadm:default-node-token</span><br></pre></td></tr></table></figure>
+
+<p>有効期限が切れてしまった場合は以下のコマンドで再発行します。</p>
+<figure class="highlight sh"><figcaption><span>terminal（マスターノード）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo kubeadm token create</span><br></pre></td></tr></table></figure>
+
+<p>CA証明書のhashも必要なので、以下のコマンドで出力させます。</p>
+<figure class="highlight sh"><figcaption><span>terminal（マスターノード）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl x509 -pubkey -<span class="keyword">in</span> /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2&gt;/dev/null | openssl dgst -sha256 -hex | sed <span class="string">&#x27;s/^.* //&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="Kubernetesでコンテナを動かす"><a href="#Kubernetesでコンテナを動かす" class="headerlink" title="Kubernetesでコンテナを動かす"></a>Kubernetesでコンテナを動かす</h1><h2 id="yamlファイルの作成とapply"><a href="#yamlファイルの作成とapply" class="headerlink" title="yamlファイルの作成とapply"></a>yamlファイルの作成とapply</h2><p><a target="_blank" rel="noopener" href="https://qiita.com/yasthon/items/6a4627f249bb7fa52eb9">Dockerが動作しているホストのHostnameを表示するNginxコンテナ</a>をお借りして、Metal-LBででロードバランシングします。</p>
+<p>yamlは<a target="_blank" rel="noopener" href="https://qiita.com/yasthon/items/c29d0b9ce34d66eab3ec#kubernetes-%E3%81%A7-%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99">こちら</a>を参考にさせて頂いております。<br>MetalLB v0.13以降はConfigMapでの設定が廃止され、Custom Resource Definitions（CRD）での設定が推奨になったようで、MetalLBの部分だけv0.13に適合するように書き換えます。</p>
+<figure class="highlight yaml"><figcaption><span>display-hostname.yaml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Namespace</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-prod</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">metallb.io/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">IPAddressPool</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pool-ips</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">metallb-system</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">addresses:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="number">192.168</span><span class="number">.1</span><span class="number">.210</span><span class="number">-192.168</span><span class="number">.1</span><span class="number">.215</span> <span class="comment"># 外部IPレンジ（この中から適当に外部IPが選ばれる）</span></span><br><span class="line">  <span class="attr">autoAssign:</span> <span class="literal">true</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">metallb.io/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">L2Advertisement</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pool-ips</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">metallb-system</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">ipAddressPools:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">pool-ips</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-service-lb</span> <span class="comment"># Service(LoadBalancer) の名前</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">nginx-prod</span></span><br><span class="line">  <span class="attr">annotations:</span></span><br><span class="line">    <span class="attr">metallb.universe.tf/address-pool:</span> <span class="string">pool-ips</span> <span class="comment"># MetallbのIPプール名</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">LoadBalancer</span></span><br><span class="line">  <span class="attr">ports:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx-service-lb</span></span><br><span class="line">      <span class="attr">protocol:</span> <span class="string">TCP</span></span><br><span class="line">      <span class="attr">port:</span> <span class="number">8080</span> <span class="comment"># ServiceのIPでlistenするポート</span></span><br><span class="line">      <span class="attr">nodePort:</span> <span class="number">30080</span> <span class="comment"># nodeのIPでlistenするポート（30000-32767）</span></span><br><span class="line">      <span class="attr">targetPort:</span> <span class="number">80</span> <span class="comment"># 転送先(コンテナ)でlistenしているPort番号のポート</span></span><br><span class="line">  <span class="attr">selector:</span> <span class="comment"># service のselctorは、matchLabels 扱いになる</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">nginx-pod</span> <span class="comment"># 転送先の Pod のラベル</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-deployment</span> <span class="comment"># Deployment の名前(ReplicaSetの名前もこれになる)</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">nginx-prod</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span> <span class="comment"># ラベルがマッチしたPodを対象とするReplicaSetの作成</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">nginx-pod</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">2</span></span><br><span class="line">  <span class="attr">template:</span> <span class="comment"># Pod のテンプレート</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">name:</span> <span class="string">nginx-pod</span> <span class="comment"># Pod の名前</span></span><br><span class="line">      <span class="attr">namespace:</span> <span class="string">nginx-prod</span></span><br><span class="line">      <span class="attr">labels:</span> <span class="comment"># Pod のラベル</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">nginx-pod</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span> <span class="comment"># コンテナの設定</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx-container</span> <span class="comment"># コンテナの名前</span></span><br><span class="line">          <span class="attr">image:</span> <span class="string">yasthon/nginx-display-hostname</span> <span class="comment"># イメージの名前</span></span><br><span class="line">          <span class="attr">env:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx-container</span></span><br><span class="line">          <span class="attr">ports:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">80</span> <span class="comment"># コンテナのポート</span></span><br><span class="line">          <span class="attr">volumeMounts:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">file-hostname</span></span><br><span class="line">              <span class="attr">mountPath:</span> <span class="string">/usr/share/nginx/html/hostname</span></span><br><span class="line">      <span class="attr">volumes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">file-hostname</span></span><br><span class="line">          <span class="attr">hostPath:</span></span><br><span class="line">            <span class="attr">path:</span> <span class="string">/etc/hostname</span></span><br></pre></td></tr></table></figure>
+
+<p>参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://thr3a.hatenablog.com/entry/20220718/1658127951">MetalLB v0.13以降はConfigmapでの設定ができない</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/metallb/metallb/issues/1473">Heads up: breaking changes in 0.13.x #1473</a></li>
+</ul>
+<p>以下のコマンドでリソースを作成します。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># リソースの作成</span></span><br><span class="line">kubectl apply -f display-hostname.yaml</span><br></pre></td></tr></table></figure>
+
+<h2 id="動作確認"><a href="#動作確認" class="headerlink" title="動作確認"></a>動作確認</h2><p>色々確認していきましょう。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ポッドの確認</span></span><br><span class="line">kubectl get pods -n nginx-prod</span><br><span class="line"><span class="comment"># 以下が表示される</span></span><br><span class="line">NAME                                READY   STATUS    RESTARTS   AGE</span><br><span class="line">nginx-deployment-5bd979fdf9-dftnr   1/1     Running   0          92s</span><br><span class="line">nginx-deployment-5bd979fdf9-m9b58   1/1     Running   0          92s</span><br><span class="line"></span><br><span class="line"><span class="comment"># デプロイメントの確認</span></span><br><span class="line">kubectl get deployment -n nginx-prod</span><br><span class="line"><span class="comment">#</span></span><br><span class="line">NAME               READY   UP-TO-DATE   AVAILABLE   AGE</span><br><span class="line">nginx-deployment   2/2     2            2           23m</span><br><span class="line"></span><br><span class="line"><span class="comment"># ReplicaSetの確認</span></span><br><span class="line">kubectl get replicaset -n nginx-prod</span><br><span class="line"><span class="comment">#</span></span><br><span class="line">NAME                          DESIRED   CURRENT   READY   AGE</span><br><span class="line">nginx-deployment-5bd979fdf9   2         2         2       23m</span><br></pre></td></tr></table></figure>
+
+<p>ちゃんと2つ立ち上がってます🙌</p>
+<p>サービスを見ることでロードバランサーの外部IPを取得し、アクセスしてみましょう。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">kubectl get svc -n nginx-prod</span><br><span class="line"><span class="comment"># 以下が表示される</span></span><br><span class="line">NAME               TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)          AGE</span><br><span class="line">nginx-service-lb   LoadBalancer   10.101.40.46   192.168.1.210   8080:30080/TCP   3m26s</span><br><span class="line"><span class="comment"># 外部IPへアクセスしてみる</span></span><br><span class="line"><span class="comment"># ポート番号の入力を忘れないように注意する。</span></span><br><span class="line">curl 192.168.1.210:8080/index.sh</span><br><span class="line"><span class="comment"># work02が表示される。</span></span><br><span class="line">&lt;html&gt;&lt;<span class="built_in">head</span>&gt;</span><br><span class="line">&lt;title&gt;work02&lt;/title&gt;</span><br><span class="line">&lt;meta http-equiv=<span class="string">&quot;Content-type&quot;</span> content=<span class="string">&quot;text/html;charset=UTF-8&quot;</span>&gt;</span><br><span class="line">&lt;/head&gt;&lt;body&gt;</span><br><span class="line">HOSTNAME : work02</span><br><span class="line">&lt;/body&gt;&lt;/html&gt;</span><br><span class="line"><span class="comment"># もう一度アクセスしてみる</span></span><br><span class="line">curl 192.168.1.210:8080/index.sh</span><br><span class="line"><span class="comment"># 今度はwork01が表示される</span></span><br><span class="line">&lt;html&gt;&lt;<span class="built_in">head</span>&gt;</span><br><span class="line">&lt;title&gt;work01&lt;/title&gt;</span><br><span class="line">&lt;meta http-equiv=<span class="string">&quot;Content-type&quot;</span> content=<span class="string">&quot;text/html;charset=UTF-8&quot;</span>&gt;</span><br><span class="line">&lt;/head&gt;&lt;body&gt;</span><br><span class="line">HOSTNAME : work01</span><br><span class="line">&lt;/body&gt;&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<p>アクセスするたびに接続先が変わっていることから、ロードバランシングされていることが見受けられます。<br>同じネットワーク内につながっているPCであれば、ブラウザから上記アドレスへアクセスすることも可能です。</p>
+<h2 id="可用性を体感する"><a href="#可用性を体感する" class="headerlink" title="可用性を体感する"></a>可用性を体感する</h2><p><a target="_blank" rel="noopener" href="https://qiita.com/yasthon/items/c29d0b9ce34d66eab3ec#kubernetes-%E3%81%A7-%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99">こちら</a>の記事同様、ワーカーを物理的に落としても外部IPへアクセスできることを確認します。<br>ワーカーノード①に接続されたLANケーブルを抜いてアクセスしてみます。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">curl 192.168.1.210:8080/index.sh</span><br><span class="line"><span class="comment"># ワーカーノード②に繋がる</span></span><br><span class="line">&lt;html&gt;&lt;<span class="built_in">head</span>&gt;</span><br><span class="line">&lt;title&gt;work02&lt;/title&gt;</span><br><span class="line">&lt;meta http-equiv=<span class="string">&quot;Content-type&quot;</span> content=<span class="string">&quot;text/html;charset=UTF-8&quot;</span>&gt;</span><br><span class="line">&lt;/head&gt;&lt;body&gt;</span><br><span class="line">HOSTNAME : work02</span><br><span class="line">&lt;/body&gt;&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<p>次に、ワーカーノード①を繋ぎ直し、ワーカーノード②に接続されたLANケーブルを抜いてアクセスしてみます。<br>（ワーカーノード①を繋いでから接続できるようになるまで少し時間がかかります。）</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">curl 192.168.1.210:8080/index.sh</span><br><span class="line"><span class="comment"># ワーカーノード①に繋がる</span></span><br><span class="line">&lt;html&gt;&lt;<span class="built_in">head</span>&gt;</span><br><span class="line">&lt;title&gt;work01&lt;/title&gt;</span><br><span class="line">&lt;meta http-equiv=<span class="string">&quot;Content-type&quot;</span> content=<span class="string">&quot;text/html;charset=UTF-8&quot;</span>&gt;</span><br><span class="line">&lt;/head&gt;&lt;body&gt;</span><br><span class="line">HOSTNAME : work01</span><br><span class="line">&lt;/body&gt;&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<p>このように、どちらかのワーカーが落ちても外部IPアドレスにアクセスすることができ、可用性を体感することができました。<br>ロードバランサー自体はアクセス先を2つのワーカーに振り分けることで負荷を分散させる役割を持っていますが、このようにアクセス可能なワーカーのみに振り分けることも可能です。</p>
+<p>最後に2つのワーカーノードの接続を外してみます。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl 192.168.1.210:8080/index.sh</span><br><span class="line"><span class="comment"># 繋がらない</span></span><br><span class="line">curl: (7) Failed to connect to 192.168.1.210 port 8080: No route to host</span><br></pre></td></tr></table></figure>
+
+<p>当然ですが、アクセスできないことが確認できます。</p>
+<h2 id="再起動してみる"><a href="#再起動してみる" class="headerlink" title="再起動してみる"></a>再起動してみる</h2><p>クラスターを止めずに全ノード再起動して、再度確認してみます。</p>
+<figure class="highlight sh"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># nodeの状態を確認する</span></span><br><span class="line">kubectl get node -A</span><br><span class="line"><span class="comment"># STATUSがReadyなことが確認できる</span></span><br><span class="line">NAME                STATUS   ROLES           AGE    VERSION</span><br><span class="line">mas01.example.com   Ready    control-plane   107m   v1.25.0</span><br><span class="line">work01              Ready    worker          101m   v1.25.0</span><br><span class="line">work02              Ready    worker          101m   v1.25.0</span><br><span class="line"><span class="comment"># コンテナの情報を見てみる</span></span><br><span class="line">kubectl get all -n nginx-prod</span><br><span class="line"><span class="comment"># コンテナが動いていることが確認できる</span></span><br><span class="line">NAME                                    READY   STATUS    RESTARTS      AGE</span><br><span class="line">pod/nginx-deployment-5bd979fdf9-h89bh   1/1     Running   1 (13m ago)   38m</span><br><span class="line">pod/nginx-deployment-5bd979fdf9-xnltc   1/1     Running   1 (13m ago)   38m</span><br><span class="line"></span><br><span class="line">NAME                       TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)          AGE</span><br><span class="line">service/nginx-service-lb   LoadBalancer   10.101.40.46   192.168.1.210   8080:30080/TCP   84m</span><br><span class="line"></span><br><span class="line">NAME                               READY   UP-TO-DATE   AVAILABLE   AGE</span><br><span class="line">deployment.apps/nginx-deployment   2/2     2            2           84m</span><br><span class="line"></span><br><span class="line">NAME                                          DESIRED   CURRENT   READY   AGE</span><br><span class="line">replicaset.apps/nginx-deployment-5bd979fdf9   2         2         2       84m</span><br><span class="line"><span class="comment"># 外部IPにアクセスしてみる</span></span><br><span class="line">curl 192.168.1.210:8080/index.sh</span><br><span class="line"><span class="comment"># アクセス可能</span></span><br><span class="line">&lt;html&gt;&lt;<span class="built_in">head</span>&gt;</span><br><span class="line">&lt;title&gt;work01&lt;/title&gt;</span><br><span class="line">&lt;meta http-equiv=<span class="string">&quot;Content-type&quot;</span> content=<span class="string">&quot;text/html;charset=UTF-8&quot;</span>&gt;</span><br><span class="line">&lt;/head&gt;&lt;body&gt;</span><br><span class="line">HOSTNAME : work01</span><br><span class="line">&lt;/body&gt;&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<p>このように、ラズパイ自体を再起動してもまたクラスタが立ち上がっていることが確認できます。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>ラズパイを使ってKubernetesのクラスタを作成し、ロードバランシング・可用性を体感することができました。クラウド上でゴニョゴニョ行われていることに対して、物理的な構成から作ってみることで解像度が上がった気がします。また、Kubernetes周りで使われている技術（cgroup, kubeadm, kubelet, flannel, …）について調べながら進めることで、Kubernetesに対して理解が進みました。<br>今回、コンテナの構成に関しては自分で作らなかったので、次はWebアプリでも作ってデプロイしてみたいと思います。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20220908a/&related=twitterapi%2Ctwitter&text=Raspberry%20Pi%E3%82%92%E3%81%8B%E3%81%8D%E9%9B%86%E3%82%81%E3%81%A6Kubernetes%E3%82%92%E4%BD%93%E6%84%9F%E3%81%99%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">35</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20220908a/&t=Raspberry%20Pi%E3%82%92%E3%81%8B%E3%81%8D%E9%9B%86%E3%82%81%E3%81%A6Kubernetes%E3%82%92%E4%BD%93%E6%84%9F%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20220908a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">39</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20220908a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">18</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.11.07</span><span class="snscount">&#9825;6</span><a href=/articles/20221107a/ title="最近、Netflixで配信中のSpotify創業ドキュメンタリー：[The Playlist]を見ました。そんなわけでSpotify熱が高まっていたこと、自分がプロジェクトの方でSRE活動に関わっていることもあり..">SREの探究 - Spotifyの事例：Ops-in-Squads<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.09.30</span><span class="snscount">&#9825;9</span><a href=/articles/20220930a/ title="先日、Google Cloudの認定資格であるProfessional Machine Learning Engineer認定資格を受験し、取得することができました。また、今回はリモート試験にて受験をしてみました。この記事ではProfessional Machine Learning Engineer認定資格の合格に至った学習過程とリモート試験体験記について...">【合格記】Google Cloud Professional Machine Learning Engineer認定資格を振り返る</a></li><li class="related-posts-item"><span>2022.07.25</span><span class="snscount">&#9825;5</span><a href=/articles/20220725a/ title="マイコンとか電子工作などIoT関連が好きで、Bluetooth信号を使った位置推定手法について調査したことがあったので、紹介します。">Bluetoothで位置推定</a></li><li class="related-posts-item"><span>2022.06.09</span><span class="snscount">&#9825;6</span><a href=/articles/20220609a/ title="Google Workspace Admin SDKのDirectory APIを使った開発を行いました。本記事では、APIを利用した際に500エラーを頻発させてしまった件について執筆していこうと思います。">GoogleWorkspace SDKのAPIリクエスト間隔は気を付けましょう</a></li><li class="related-posts-item"><span>2022.03.21</span><span class="snscount">&#9825;26</span><a href=/articles/20220321a/ title="初めまして、2022年中途入社でTIG所属の岸下です。FlutterとTensorFlow Liteを使ったモバイル画像識別について執筆させて頂きます。TensorFlow Liteとは...">TensorFlow Liteを使ったFlutterによるモバイル画像識別器を作ってみた</a></li><li class="related-posts-item"><span>2022.01.12</span><span class="snscount">&#9825;84</span><a href=/articles/20220112a/ title="チームの輪読会でKuberntes完全ガイドを読みました。 k8s本は、GKEを例にしながら、k8sのCLIツールだったりマニフェストのyamlファイルを丁寧に紹介しており、実践的に勉強するの適しています。手を動かしつつ勉強したいところですが、クラウドプロバイダーが提供するマネージドk8sはコストが高めで気分的にほいほい使えないところがあります。となるとローカル環境でk8sを用意したくなります。 ">Minikubeでk8s学習を進めるためのヒント</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220822a/ title="2022年も夏の自由研究ブログ連載を始めます。！">夏の自由研究ブログ連載2022を始めます</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%8A%E5%9B%9EKubernetes%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B%E3%81%AB%E3%81%82%E3%81%9F%E3%81%A3%E3%81%A6%E7%94%A8%E6%84%8F%E3%81%97%E3%81%9F%E3%82%82%E3%81%AE"><span class="toc-text">今回Kubernetes構築するにあたって用意したもの</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A4%E3%81%AE%E8%A8%AD%E5%AE%9A"><span class="toc-text">ラズパイの設定</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#OS"><span class="toc-text">OS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Kubernetes%E3%81%AE%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3"><span class="toc-text">Kubernetesのバージョン</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9D%E6%9C%9F%E8%A8%AD%E5%AE%9A%EF%BC%883%E5%8F%B0%E5%85%B1%E9%80%9A%EF%BC%89"><span class="toc-text">初期設定（3台共通）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E5%91%A8%E3%82%8A"><span class="toc-text">ネットワーク周り</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%A9%E7%90%86%E7%9A%84%E3%81%AA%E6%A7%8B%E6%88%90%E5%9B%B3"><span class="toc-text">物理的な構成図</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%81%AE%E8%A8%AD%E5%AE%9A%EF%BC%88%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A43%E5%8F%B0%E3%81%9D%E3%82%8C%E3%81%9E%E3%82%8C%E3%81%A7%EF%BC%89"><span class="toc-text">ネットワークの設定（ラズパイ3台それぞれで）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SSH%E3%81%AE%E8%A8%AD%E5%AE%9A%EF%BC%88%E3%83%87%E3%82%B9%E3%82%AF%E3%83%88%E3%83%83%E3%83%97PC%EF%BC%89"><span class="toc-text">SSHの設定（デスクトップPC）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#VSCode%E3%81%AERemote-SSH%E3%82%92%E7%94%A8%E6%84%8F"><span class="toc-text">VSCodeのRemote SSHを用意</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SSH%E6%A7%8B%E6%88%90%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%82%92%E7%94%A8%E6%84%8F"><span class="toc-text">SSH構成ファイルを用意</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%84%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A4%E3%81%AB%E6%8E%A5%E7%B6%9A%E3%81%99%E3%82%8B"><span class="toc-text">各ラズパイに接続する</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%9B%E3%82%B9%E3%83%88%E5%90%8D%E3%81%AE%E5%A4%89%E6%9B%B4%EF%BC%88%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A43%E5%8F%B0%E3%81%9D%E3%82%8C%E3%81%9E%E3%82%8C%EF%BC%89"><span class="toc-text">ホスト名の変更（ラズパイ3台それぞれ）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#x2F-etc-x2F-hosts%E3%81%AE%E8%A8%AD%E5%AE%9A%EF%BC%88%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A43%E5%8F%B0%E5%85%B1%E9%80%9A%EF%BC%89"><span class="toc-text">&#x2F;etc&#x2F;hostsの設定（ラズパイ3台共通）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%99%E8%AB%87"><span class="toc-text">余談</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IPv6%E3%81%AE%E5%81%9C%E6%AD%A2%EF%BC%88%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A43%E5%8F%B0%E5%85%B1%E9%80%9A%EF%BC%89"><span class="toc-text">IPv6の停止（ラズパイ3台共通）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%99%E8%AB%87-1"><span class="toc-text">余談</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#timezone-keymap%E3%81%AE%E5%A4%89%E6%9B%B4%EF%BC%88%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A43%E5%8F%B0%E5%85%B1%E9%80%9A%EF%BC%89"><span class="toc-text">timezone, keymapの変更（ラズパイ3台共通）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Kubernetes%E5%91%A8%E3%82%8A"><span class="toc-text">Kubernetes周り</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#iptables%E3%81%8Cnftables%E3%83%90%E3%83%83%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%89%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%AA%E3%81%84%E3%82%88%E3%81%86%E3%81%AB%E3%81%99%E3%82%8B%EF%BC%88%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A43%E5%8F%B0%E5%85%B1%E9%80%9A%EF%BC%89"><span class="toc-text">iptablesがnftablesバックエンドを使用しないようにする（ラズパイ3台共通）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Docker%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%EF%BC%88%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A43%E5%8F%B0%E5%85%B1%E9%80%9A%EF%BC%89"><span class="toc-text">Dockerのインストール（ラズパイ3台共通）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#kubeadm%E3%80%81kubelet%E3%80%81kubectl%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%EF%BC%88%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A43%E5%8F%B0%E5%85%B1%E9%80%9A%EF%BC%89"><span class="toc-text">kubeadm、kubelet、kubectlのインストール（ラズパイ3台共通）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#kubeadm"><span class="toc-text">kubeadm</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#kubelet"><span class="toc-text">kubelet</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#kubectl"><span class="toc-text">kubectl</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cgroup%E3%81%A7memory%E3%81%AE%E6%9C%89%E5%8A%B9%E5%8C%96%EF%BC%88%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A43%E5%8F%B0%E5%85%B1%E9%80%9A%EF%BC%89"><span class="toc-text">cgroupでmemoryの有効化（ラズパイ3台共通）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Kubernetes%E5%86%85%E3%81%A7%E3%81%AEcgroup"><span class="toc-text">Kubernetes内でのcgroup</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%89%E5%8A%B9%E5%8C%96%E3%81%AE%E8%A8%AD%E5%AE%9A"><span class="toc-text">有効化の設定</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Kubernetes%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E4%BD%9C%E6%88%90"><span class="toc-text">Kubernetesクラスターの作成</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%AB%E3%83%97%E3%83%AC%E3%83%BC%E3%83%B3%E3%83%8E%E3%83%BC%E3%83%89%E3%81%AE%E5%88%9D%E6%9C%9F%E5%8C%96%EF%BC%88%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%8E%E3%83%BC%E3%83%89%E3%81%AE%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A4%E3%81%AE%E3%81%BF%EF%BC%89"><span class="toc-text">コントロールプレーンノードの初期化（マスターノードのラズパイのみ）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%82%E3%81%97init%E6%99%82%E3%81%ABcontainer-runtime-is-not-running%E3%81%A8%E3%81%84%E3%81%86%E3%82%A8%E3%83%A9%E3%83%BC%E3%81%8C%E5%87%BA%E3%81%9F%E5%A0%B4%E5%90%88"><span class="toc-text">もしinit時にcontainer runtime is not runningというエラーが出た場合</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%92%B0%E5%A2%83%E5%A4%89%E6%95%B0%E3%81%A8%E5%85%A5%E5%8A%9B%E8%A3%9C%E5%AE%8C%E3%81%AE%E8%A8%AD%E5%AE%9A%EF%BC%88%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%8E%E3%83%BC%E3%83%89%E3%81%AE%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A4%E3%81%AE%E3%81%BF%EF%BC%89"><span class="toc-text">環境変数と入力補完の設定（マスターノードのラズパイのみ）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Flannel%E3%81%AE%E8%A8%AD%E5%AE%9A%EF%BC%88%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%8E%E3%83%BC%E3%83%89%E3%81%AE%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A4%E3%81%AE%E3%81%BF%EF%BC%89"><span class="toc-text">Flannelの設定（マスターノードのラズパイのみ）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%AD%E3%83%BC%E3%83%89%E3%83%90%E3%83%A9%E3%83%B3%E3%82%B5%E3%83%BC%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%EF%BC%88%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%8E%E3%83%BC%E3%83%89%E3%81%AE%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A4%E3%81%AE%E3%81%BF%EF%BC%89"><span class="toc-text">ロードバランサーのインストール（マスターノードのラズパイのみ）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%AF%E3%83%BC%E3%82%AB%E3%83%BC%E3%83%8E%E3%83%BC%E3%83%89%E3%82%92%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%81%AB%E3%82%B8%E3%83%A7%E3%82%A4%E3%83%B3"><span class="toc-text">ワーカーノードをクラスタにジョイン</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%82%E3%81%97%E3%82%B3%E3%83%94%E3%83%9A%E3%82%92%E5%BF%98%E3%82%8C%E3%81%9F%E5%A0%B4%E5%90%88"><span class="toc-text">もしコピペを忘れた場合</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Kubernetes%E3%81%A7%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99"><span class="toc-text">Kubernetesでコンテナを動かす</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#yaml%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E4%BD%9C%E6%88%90%E3%81%A8apply"><span class="toc-text">yamlファイルの作成とapply</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D"><span class="toc-text">動作確認</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AF%E7%94%A8%E6%80%A7%E3%82%92%E4%BD%93%E6%84%9F%E3%81%99%E3%82%8B"><span class="toc-text">可用性を体感する</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%8D%E8%B5%B7%E5%8B%95%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">再起動してみる</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

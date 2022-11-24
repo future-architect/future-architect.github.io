@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>AWS内の通信がインターネットを経由しない今、VPC Endpointを利用する意味はあるのか？ | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは。TIG村瀬です。 タイトルの通りですがAWS内の通信においてインターネットを経由しないことが最近になって公式ドキュメントに明記されたことを受け、改めてVPC Endpointの必要性について調べてみました。  Q:2 つのインスタンスがパブリック IP アドレスを使用して通信する場合、またはインスタンスが AWS のサービスのパブリックエンドポイントと通信する場合、トラフィック">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS内の通信がインターネットを経由しない今、VPC Endpointを利用する意味はあるのか？ | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210618a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは。TIG村瀬です。 タイトルの通りですがAWS内の通信においてインターネットを経由しないことが最近になって公式ドキュメントに明記されたことを受け、改めてVPC Endpointの必要性について調べてみました。  Q:2 つのインスタンスがパブリック IP アドレスを使用して通信する場合、またはインスタンスが AWS のサービスのパブリックエンドポイントと通信する場合、トラフィック">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210618a/vpcendpoint.png">
+<meta property="article:published_time" content="2021-06-17T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:53.440Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Network">
+<meta property="article:tag" content="技術選定">
+<meta property="article:tag" content="VPC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210618a/vpcendpoint.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210618a/">
+  <meta content="AWS,Network,技術選定,VPC" name="keywords">
+  <meta content="村瀬善則" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">AWS内の通信がインターネットを経由しない今、VPC Endpointを利用する意味はあるのか？
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210618a_AWS内の通信がインターネットを経由しない今、VPC_Endpointを利用する意味はあるのか？.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210618a_AWS内の通信がインターネットを経由しない今、VPC_Endpointを利用する意味はあるのか？" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-06-17T15:00:00.000Z" itemprop="datePublished">2021.06.18</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%9D%91%E7%80%AC%E5%96%84%E5%89%87" title="村瀬善則さんの記事一覧へ" class="post-author">村瀬善則</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/Network/" title="Networkタグの記事へ" class="tag-list-link">Network</a>
+  
+    
+    <a href="/tags/技術選定/" title="技術選定タグの記事へ" class="tag-list-link">技術選定</a>
+  
+    
+    <a href="/tags/VPC/" title="VPCタグの記事へ" class="tag-list-link">VPC</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIG村瀬です。</p>
+<p>タイトルの通りですがAWS内の通信においてインターネットを経由しないことが最近になって公式ドキュメントに明記されたことを受け、改めてVPC Endpointの必要性について調べてみました。</p>
+<blockquote>
+<p>Q:2 つのインスタンスがパブリック IP アドレスを使用して通信する場合、またはインスタンスが AWS のサービスのパブリックエンドポイントと通信する場合、トラフィックはインターネットを経由しますか?</p>
+<p>いいえ。パブリックアドレススペースを使用する場合、AWS でホストされているインスタンスとサービス間のすべての通信は AWS のプライベートネットワークを使用します。<br>AWS ネットワークから発信され、AWS ネットワーク上の送信先を持つパケットは、AWS 中国リージョンとの間のトラフィックを除いて、AWS グローバルネットワークにとどまります。</p>
+<p><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/vpc/faqs/">https://aws.amazon.com/jp/vpc/faqs/</a>　より引用</p>
+</blockquote>
+<p>ちなみにこちらのツイートきっかけで知りました。ありがとうございます！</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">これがプライベートネットワークの通信と明示された意味は大きい<br><br>『Q:2つのインスタンスがパブリック IP アドレスを使用して通信する場合、またはインスタンスが AWS のサービスのパブリックエンドポイントと通信する場合、トラフィックはインターネットを経由しますか?』<a target="_blank" rel="noopener" href="https://t.co/uy26KyCZKn">https://t.co/uy26KyCZKn</a></p>&mdash; Takuro SASAKI (@dkfj) <a target="_blank" rel="noopener" href="https://twitter.com/dkfj/status/1385182566160891909?ref_src=twsrc%5Etfw">April 22, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<h1 id="VPC-Endpointとは"><a href="#VPC-Endpointとは" class="headerlink" title="VPC Endpointとは"></a>VPC Endpointとは</h1><p>こちらもAWSの公式サイトから抜粋</p>
+<blockquote>
+<p>PrivateLink を使用してサポートされている AWS のサービスや VPC エンドポイントサービスに VPC をプライベートに接続できます。<br>インターネットゲートウェイ、NAT デバイス、VPN 接続、または AWS Direct Connect 接続は必要ありません。<br>VPC のインスタンスは、サービスのリソースと通信するためにパブリック IP アドレスを必要としません。<br>VPC と他のサービス間のトラフィックは、Amazon ネットワークを離れません。詳細については、「AWS PrivateLink および VPC エンドポイント」を参照してください。</p>
+<p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/vpc/latest/userguide/what-is-amazon-vpc.html">https://docs.aws.amazon.com/ja_jp&#x2F;vpc&#x2F;latest&#x2F;userguide&#x2F;what-is-amazon-vpc.html</a>　より引用</p>
+</blockquote>
+<p>多少語弊があるかもしれませんが、一言で言うならばVPC内からVPC外に存在するAWSサービスにインターネットを経由せずに接続できる仕組みです。</p>
+<h1 id="疑問"><a href="#疑問" class="headerlink" title="疑問"></a>疑問</h1><p>以前はセキュリティを考慮しインターネットを経由しないようにするにはVPC Endpointが必須でしたが、今はVPC Endpointを利用しなくともインターネットを経由しない通信が可能です。</p>
+<p>はたして今でもVPC Endpointを利用するメリットはあるのでしょうか？ケース別に確認してみます。</p>
+<h1 id="確認"><a href="#確認" class="headerlink" title="確認"></a>確認</h1><h2 id="ケース1-NAT-Gatewayが存在せずprivate-subnetからAWSのサービスに接続する場合"><a href="#ケース1-NAT-Gatewayが存在せずprivate-subnetからAWSのサービスに接続する場合" class="headerlink" title="ケース1 NAT Gatewayが存在せずprivate subnetからAWSのサービスに接続する場合"></a>ケース1 NAT Gatewayが存在せずprivate subnetからAWSのサービスに接続する場合</h2><p>この場合は明らかでNAT Gatewayを用意せずともprivate subnetからAWSのサービスに接続するためにVPC Endpointは必要ですね。 (NAT Gatewayが存在しないケースはあまりないと思いますが)</p>
+<h2 id="ケース2-NAT-Gatewayが存在する場合"><a href="#ケース2-NAT-Gatewayが存在する場合" class="headerlink" title="ケース2 NAT Gatewayが存在する場合"></a>ケース2 NAT Gatewayが存在する場合</h2><p>この場合のメリットは何なのでしょうか？すぐにわからなかったのでコストの面で確認してみます。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>サービス</th>
+<th>コスト種別</th>
+<th align="right">コスト($&#x2F;h)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NAT Gateway</td>
+<td>NAT Gatewayあたりの料金</td>
+<td align="right">0.062</td>
+</tr>
+<tr>
+<td>NAT Gateway</td>
+<td>処理データ1GBあたりの料金</td>
+<td align="right">0.062</td>
+</tr>
+<tr>
+<td>VPC Endpoint(ゲートウェイ型)</td>
+<td>-</td>
+<td align="right">0.0</td>
+</tr>
+<tr>
+<td>VPC Endpoint(インターフェイス型)</td>
+<td>VPC エンドポイント1つあたりの料金</td>
+<td align="right">0.014</td>
+</tr>
+<tr>
+<td>VPC Endpoint(インターフェイス型)</td>
+<td>処理データ1GBあたりの料金</td>
+<td align="right">0.0035</td>
+</tr>
+</tbody></table></div>
+<p>※Tokyoリージョンにおけるコスト</p>
+<p>コストを明確にしたことで理解できました。NAT Gatewayの処理データと比較するとVPC Endpointの処理データコストの方が桁違いに安いです。</p>
+<p>VPC Endpoint(ゲートウェイ型)に関しては、なんと無料！</p>
+<p>マルチAZで2つのAZを利用し、1GB,100GB,1TB,10TB&#x2F;月の通信をする場合の試算をしてみます。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>サービス</th>
+<th>計算式</th>
+<th align="right">1GBコスト($&#x2F;month)</th>
+<th align="right">100GBコスト($&#x2F;month)</th>
+<th align="right">1TBコスト($&#x2F;month)</th>
+<th align="right">10TBコスト($&#x2F;month)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NAT Gatewayのみ</td>
+<td>0.062 * 24 * 31 * 2 + 0.062 * n</td>
+<td align="right">92.32</td>
+<td align="right">98.46</td>
+<td align="right">154.26</td>
+<td align="right">712.26</td>
+</tr>
+<tr>
+<td>NAT Gateway + VPC Endpoint(インターフェイス型)</td>
+<td>0.062 * 24 * 31 * 2 + 0.014 * 24 * 31 * 2 + 0.0035 * n</td>
+<td align="right">113.09</td>
+<td align="right">113.44</td>
+<td align="right">116.59</td>
+<td align="right">148.09</td>
+</tr>
+<tr>
+<td>NAT Gateway + VPC Endpoint(ゲートウェイ型)</td>
+<td>0.062 * 24 * 31 * 2 + 0 * n</td>
+<td align="right">92.26</td>
+<td align="right">92.26</td>
+<td align="right">92.26</td>
+<td align="right">92.26</td>
+</tr>
+</tbody></table></div>
+<img src="/images/20210618a/vpcendpoint.png" alt="通信費用の資産" loading="lazy">
+
+
+<p>通信量が少ないとインターフェイス自体の料金が掛かる分、メリットが無いですが通信量が増えれば増えるほどVPC Endpointのありがたみが実感できますね！</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>VPC Endpointを利用せずともAWSサービスとのインターネットを経由しない通信は可能です。</p>
+<p>VPC Endpoint(ゲートウェイ型)については導入の手間を考慮しなければコストは掛からないのでデータ量によらず導入した方がお得です。</p>
+<p>少量の通信であればVPC Endpoint(インターフェイス型)を利用してもコスト面においてメリットはありません(むしろ割高)が通信量が多いシステムであればあるほどコストメリットを感じられます。</p>
+<p>万能なアーキテクチャは存在しないのでデータ量に応じてVPC Endpointの導入を検討すると良いかと思います。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210618a/&related=twitterapi%2Ctwitter&text=AWS%E5%86%85%E3%81%AE%E9%80%9A%E4%BF%A1%E3%81%8C%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%8D%E3%83%83%E3%83%88%E3%82%92%E7%B5%8C%E7%94%B1%E3%81%97%E3%81%AA%E3%81%84%E4%BB%8A%E3%80%81VPC%20Endpoint%E3%82%92%E5%88%A9%E7%94%A8%E3%81%99%E3%82%8B%E6%84%8F%E5%91%B3%E3%81%AF%E3%81%82%E3%82%8B%E3%81%AE%E3%81%8B%EF%BC%9F%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">265</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210618a/&t=AWS%E5%86%85%E3%81%AE%E9%80%9A%E4%BF%A1%E3%81%8C%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%8D%E3%83%83%E3%83%88%E3%82%92%E7%B5%8C%E7%94%B1%E3%81%97%E3%81%AA%E3%81%84%E4%BB%8A%E3%80%81VPC%20Endpoint%E3%82%92%E5%88%A9%E7%94%A8%E3%81%99%E3%82%8B%E6%84%8F%E5%91%B3%E3%81%AF%E3%81%82%E3%82%8B%E3%81%AE%E3%81%8B%EF%BC%9F" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210618a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">302</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210618a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">133</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2021.08.31</span><span class="snscount">&#9825;12</span><a href=/articles/20210831a/ title="AWS初心者にとって、最初に躓きやすい部分がNWの構築かと思います。インスタンス立ててみたけど、これってどうやると他のノードと通信できるんだっけ？なんとなく通信できたけど、なんでだ？といった辺り、なんとなく有耶無耶なままにしていませんか。今回は2020年12月にローンチされたReachability Analyzerを利用して、AWS初心者向けのNW構築ハンズオン-Internal編-をやってみたいと思います。">AWS初心者向けNW構築ハンズオン-Internal編-</a></li><li class="related-posts-item"><span>2022.11.21</span><span class="snscount">&#9825;10</span><a href=/articles/20221121a/ title="情報処理推進機構(IPA)のネットワークスペシャリスト試験の過去問からC&C(Command & Control)サーバの手法と対応策が興味深かったので自分の知識を整理するためブログにしてみました">IPAの過去問で学ぶC & C(Command & Control)サーバの手法と対応策<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.05.11</span><span class="snscount">&#9825;6</span><a href=/articles/20220511a/ title="情報処理推進機構のネットワークスペシャリスト試験の過去問を解いていて興味深い問題がありました。  ">IPAの過去問で学ぶDNSキャッシュポイズニングの攻撃手法と対応策</a></li><li class="related-posts-item"><span>2022.01.11</span><span class="snscount">&#9825;30</span><a href=/articles/20220111a/ title="TIG 所属の多賀です。AWS 上でのワークフロー構築のため、Step Functions を直近で導入しました。 ">Step Functions を利用して感じた Airflow との比較</a></li><li class="related-posts-item"><span>2021.10.26</span><span class="snscount">&#9825;28</span><a href=/articles/20211026a/ title="DynamoDBやKinesis Data Streamsなどを利用するサービスをそれなりの期間で稼働させているとポツポツ下記のようなエラーが発生することが分かりました。RequestError: send request failedcaused by: Post ...: read tcp 169.254.0.1:55638->3.113.218.4:443: read: connection reset by peer">AWS利用時に read: connection reset by peer が出たときのリトライ検討</a></li><li class="related-posts-item"><span>2021.10.13</span><span class="snscount">&#9825;3</span><a href=/articles/20211013b/ title="TIGの伊藤真彦です。来たる11月13日に[Go Conference 2021 Autumn]に、技術ブログでもお馴染みの澁川さん、辻さんと共に登壇させていただくことになりました。楽しい発表になるように頑張ります。宣伝を挟みましたが、AWS Certified Advanced Networking - Specialtyに合格しましたので、今回も合格体験記を書きます。">AWS Certified Advanced Networking - Specialty合格体験記</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#VPC-Endpoint%E3%81%A8%E3%81%AF"><span class="toc-text">VPC Endpointとは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%96%91%E5%95%8F"><span class="toc-text">疑問</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%A2%BA%E8%AA%8D"><span class="toc-text">確認</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%B1%E3%83%BC%E3%82%B91-NAT-Gateway%E3%81%8C%E5%AD%98%E5%9C%A8%E3%81%9B%E3%81%9Aprivate-subnet%E3%81%8B%E3%82%89AWS%E3%81%AE%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%AB%E6%8E%A5%E7%B6%9A%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88"><span class="toc-text">ケース1 NAT Gatewayが存在せずprivate subnetからAWSのサービスに接続する場合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%B1%E3%83%BC%E3%82%B92-NAT-Gateway%E3%81%8C%E5%AD%98%E5%9C%A8%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88"><span class="toc-text">ケース2 NAT Gatewayが存在する場合</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

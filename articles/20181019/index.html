@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>PostgreSQLパーティションプルーニングの動作を確認する | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="PostgreSQL10までのパーティション機能を利用したプロジェクトにおいて、遅延SQLの調査をするなかで以下のような長い長い実行計画を目にすることがありました。 こちらはサンプルテーブルでそれを再現したものです。長いので畳みました。 123456789101112131415161718192021222324252627282930313233343536373839404142434445">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PostgreSQLパーティションプルーニングの動作を確認する | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20181019/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="PostgreSQL10までのパーティション機能を利用したプロジェクトにおいて、遅延SQLの調査をするなかで以下のような長い長い実行計画を目にすることがありました。 こちらはサンプルテーブルでそれを再現したものです。長いので畳みました。 123456789101112131415161718192021222324252627282930313233343536373839404142434445">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20181019/1.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20181019/2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20181019/3.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20181019/4.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20181019/5.png">
+<meta property="article:published_time" content="2018-10-19T07:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:52.693Z">
+<meta property="article:tag" content="DB">
+<meta property="article:tag" content="PostgreSQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20181019/1.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20181019/">
+  <meta content="DB,PostgreSQL" name="keywords">
+  <meta content="杉山量彦" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/DB/">DBカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">PostgreSQLパーティションプルーニングの動作を確認する
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20181019-postgresql10.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20181019-postgresql10" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2018/" class="publish-date"><time datetime="2018-10-19T07:00:00.000Z" itemprop="datePublished">2018.10.19</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%9D%89%E5%B1%B1%E9%87%8F%E5%BD%A6" title="杉山量彦さんの記事一覧へ" class="post-author">杉山量彦</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/DB/" title="DBタグの記事へ" class="tag-list-link">DB</a>
+  
+    
+    <a href="/tags/PostgreSQL/" title="PostgreSQLタグの記事へ" class="tag-list-link">PostgreSQL</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p>PostgreSQL10までのパーティション機能を利用したプロジェクトにおいて、遅延SQLの調査をするなかで以下のような長い長い実行計画を目にすることがありました。</p>
+<details><summary>こちらはサンプルテーブルでそれを再現したものです。長いので畳みました。</summary>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">Update on tr_part tgt  (cost=0.83..115.84 rows=4 width=44)</span><br><span class="line">  Update on tr_part_p_1809_01 tgt_1</span><br><span class="line">  Update on tr_part_p_1809_02 tgt_2</span><br><span class="line">  Update on tr_part_p_1809_03 tgt_3</span><br><span class="line">  Update on tr_part_p_9912_31 tgt_4</span><br><span class="line">  -&gt;  Nested Loop  (cost=0.83..28.01 rows=1 width=38)</span><br><span class="line">        Join Filter: ((a.related_key = b.key) AND (a.target_date = b.part_date))</span><br><span class="line">        -&gt;  Nested Loop  (cost=0.42..26.34 rows=1 width=32)</span><br><span class="line">              -&gt;  Seq Scan on wk_input a  (cost=0.00..1.03 rows=3 width=16)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 tgt_1  (cost=0.42..8.44 rows=1 width=16)</span><br><span class="line">                    Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</span><br><span class="line">        -&gt;  Append  (cost=0.42..1.61 rows=4 width=26)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 b  (cost=0.42..0.48 rows=1 width=26)</span><br><span class="line">                    Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 b_1  (cost=0.42..0.48 rows=1 width=26)</span><br><span class="line">                    Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 b_2  (cost=0.42..0.48 rows=1 width=26)</span><br><span class="line">                    Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 b_3  (cost=0.15..0.17 rows=1 width=78)</span><br><span class="line">                    Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">  -&gt;  Nested Loop  (cost=0.83..28.01 rows=1 width=38)</span><br><span class="line">        Join Filter: ((a.related_key = b.key) AND (a.target_date = b.part_date))</span><br><span class="line">        -&gt;  Nested Loop  (cost=0.42..26.34 rows=1 width=32)</span><br><span class="line">              -&gt;  Seq Scan on wk_input a  (cost=0.00..1.03 rows=3 width=16)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 tgt_2  (cost=0.42..8.44 rows=1 width=16)</span><br><span class="line">                    Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</span><br><span class="line">        -&gt;  Append  (cost=0.42..1.61 rows=4 width=26)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 b  (cost=0.42..0.48 rows=1 width=26)</span><br><span class="line">                    Index Cond: ((part_date = tgt_2.part_date) AND (key = tgt_2.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 b_1  (cost=0.42..0.48 rows=1 width=26)</span><br><span class="line">                    Index Cond: ((part_date = tgt_2.part_date) AND (key = tgt_2.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 b_2  (cost=0.42..0.48 rows=1 width=26)</span><br><span class="line">                    Index Cond: ((part_date = tgt_2.part_date) AND (key = tgt_2.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 b_3  (cost=0.15..0.17 rows=1 width=78)</span><br><span class="line">                    Index Cond: ((part_date = tgt_2.part_date) AND (key = tgt_2.key))</span><br><span class="line">  -&gt;  Nested Loop  (cost=0.83..28.01 rows=1 width=38)</span><br><span class="line">        Join Filter: ((a.related_key = b.key) AND (a.target_date = b.part_date))</span><br><span class="line">        -&gt;  Nested Loop  (cost=0.42..26.34 rows=1 width=32)</span><br><span class="line">              -&gt;  Seq Scan on wk_input a  (cost=0.00..1.03 rows=3 width=16)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 tgt_3  (cost=0.42..8.44 rows=1 width=16)</span><br><span class="line">                    Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</span><br><span class="line">        -&gt;  Append  (cost=0.42..1.61 rows=4 width=26)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 b  (cost=0.42..0.48 rows=1 width=26)</span><br><span class="line">                    Index Cond: ((part_date = tgt_3.part_date) AND (key = tgt_3.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 b_1  (cost=0.42..0.48 rows=1 width=26)</span><br><span class="line">                    Index Cond: ((part_date = tgt_3.part_date) AND (key = tgt_3.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 b_2  (cost=0.42..0.48 rows=1 width=26)</span><br><span class="line">                    Index Cond: ((part_date = tgt_3.part_date) AND (key = tgt_3.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 b_3  (cost=0.15..0.17 rows=1 width=78)</span><br><span class="line">                    Index Cond: ((part_date = tgt_3.part_date) AND (key = tgt_3.key))</span><br><span class="line">  -&gt;  Nested Loop  (cost=0.57..31.81 rows=1 width=64)</span><br><span class="line">        Join Filter: ((a.related_key = b.key) AND (a.target_date = b.part_date))</span><br><span class="line">        -&gt;  Nested Loop  (cost=0.15..17.55 rows=1 width=58)</span><br><span class="line">              -&gt;  Seq Scan on wk_input a  (cost=0.00..1.03 rows=3 width=16)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 tgt_4  (cost=0.15..5.50 rows=1 width=42)</span><br><span class="line">                    Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</span><br><span class="line">        -&gt;  Append  (cost=0.42..14.20 rows=4 width=26)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 b  (cost=0.42..4.65 rows=1 width=26)</span><br><span class="line">                    Index Cond: ((part_date = tgt_4.part_date) AND (key = tgt_4.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 b_1  (cost=0.42..4.66 rows=1 width=26)</span><br><span class="line">                    Index Cond: ((part_date = tgt_4.part_date) AND (key = tgt_4.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 b_2  (cost=0.42..4.66 rows=1 width=26)</span><br><span class="line">                    Index Cond: ((part_date = tgt_4.part_date) AND (key = tgt_4.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 b_3  (cost=0.15..0.22 rows=1 width=78)</span><br><span class="line">                    Index Cond: ((part_date = tgt_4.part_date) AND (key = tgt_4.key))</span><br></pre></td></tr></table></figure>
+</details>
+
+
+<p>なぜこのようなことになっているのか、仮に性能問題（SQLの遅延）が発生しているとき、どのような対処が考えられるか説明してきます。</p>
+<h2 id="PostgreSQL10での確認"><a href="#PostgreSQL10での確認" class="headerlink" title="PostgreSQL10での確認"></a>PostgreSQL10での確認</h2><p>以下のようにパーティションテーブルを用意しました。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--drop table tr_part;</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> tr_part(</span><br><span class="line">    part_date <span class="type">date</span></span><br><span class="line">,   key <span class="type">numeric</span></span><br><span class="line">,   data <span class="type">numeric</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">partition</span> <span class="keyword">by</span> <span class="keyword">range</span>(part_date);</span><br><span class="line"><span class="comment">--パーティション作成</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tr_part_p_1809_01 <span class="keyword">partition</span> <span class="keyword">of</span>      tr_part <span class="keyword">for</span> <span class="keyword">values</span> <span class="keyword">from</span> ( MINVALUE ) <span class="keyword">to</span> (<span class="string">&#x27;20180902&#x27;</span>);</span><br><span class="line"><span class="keyword">alter</span>  <span class="keyword">table</span> tr_part_p_1809_01 <span class="keyword">add</span> <span class="keyword">constraint</span> pk_tr_part_p_1809_01 <span class="keyword">primary</span> key(ymd,key);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tr_part_p_1809_02 <span class="keyword">partition</span> <span class="keyword">of</span>      tr_part <span class="keyword">for</span> <span class="keyword">values</span> <span class="keyword">from</span> ( <span class="string">&#x27;20180902&#x27;</span> ) <span class="keyword">to</span> (<span class="string">&#x27;20180903&#x27;</span>);</span><br><span class="line"><span class="keyword">alter</span>  <span class="keyword">table</span> tr_part_p_1809_02 <span class="keyword">add</span> <span class="keyword">constraint</span> pk_tr_part_p_1809_02 <span class="keyword">primary</span> key(ymd,key);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tr_part_p_1809_03 <span class="keyword">partition</span> <span class="keyword">of</span>      tr_part <span class="keyword">for</span> <span class="keyword">values</span> <span class="keyword">from</span> ( <span class="string">&#x27;20180903&#x27;</span> ) <span class="keyword">to</span> (<span class="string">&#x27;20180904&#x27;</span>);</span><br><span class="line"><span class="keyword">alter</span>  <span class="keyword">table</span> tr_part_p_1809_03 <span class="keyword">add</span> <span class="keyword">constraint</span> pk_tr_part_p_1809_03 <span class="keyword">primary</span> key(ymd,key);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tr_part_p_9912_31 <span class="keyword">partition</span> <span class="keyword">of</span>      tr_part <span class="keyword">for</span> <span class="keyword">values</span> <span class="keyword">from</span> ( <span class="string">&#x27;20180904&#x27;</span> ) <span class="keyword">to</span> (<span class="string">&#x27;99991231&#x27;</span>);</span><br><span class="line"><span class="keyword">alter</span>  <span class="keyword">table</span> tr_part_p_9912_31 <span class="keyword">add</span> <span class="keyword">constraint</span> pk_tr_part_p_9912_31 <span class="keyword">primary</span> key(ymd,key);</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> tr_part <span class="keyword">select</span> <span class="string">&#x27;20180901&#x27;</span>,generate_series,round(generate_series <span class="operator">*</span> random() <span class="operator">*</span> <span class="number">100</span>) <span class="keyword">from</span> generate_series(<span class="number">1</span>,<span class="number">100000</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> tr_part <span class="keyword">select</span> <span class="string">&#x27;20180902&#x27;</span>,generate_series,round(generate_series <span class="operator">*</span> random() <span class="operator">*</span> <span class="number">100</span>) <span class="keyword">from</span> generate_series(<span class="number">100001</span>,<span class="number">200000</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> tr_part <span class="keyword">select</span> <span class="string">&#x27;20180903&#x27;</span>,generate_series,round(generate_series <span class="operator">*</span> random() <span class="operator">*</span> <span class="number">100</span>) <span class="keyword">from</span> generate_series(<span class="number">200001</span>,<span class="number">300000</span>);</span><br><span class="line">analyze tr_part;</span><br></pre></td></tr></table></figure>
+
+<p>データを投入した <code>p_1809_01</code>、 <code>p_1809_02</code>、 <code>p_1809_03</code> のパーティションに注目すると次のようなイメージです。 <code>part_date</code> の値によってレコードがパーティションに振り分けられて格納されています。</p>
+<img src="/images/20181019/1.png" loading="lazy">
+
+
+<p>続いて以下のような小さなテーブルを用意します。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--drop table wk_input;</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> wk_input(</span><br><span class="line">	key <span class="type">numeric</span></span><br><span class="line">,	related_key <span class="type">numeric</span></span><br><span class="line">,	target_date <span class="type">date</span></span><br><span class="line">)</span><br><span class="line">;</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> wk_input <span class="keyword">select</span> <span class="number">1</span>,<span class="number">1</span>     ,<span class="string">&#x27;20180901&#x27;</span>;</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> wk_input <span class="keyword">select</span> <span class="number">2</span>,<span class="number">100001</span>,<span class="string">&#x27;20180902&#x27;</span>;</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> wk_input <span class="keyword">select</span> <span class="number">3</span>,<span class="number">200001</span>,<span class="string">&#x27;20180903&#x27;</span>;</span><br><span class="line">analyze wk_input;</span><br></pre></td></tr></table></figure>
+
+<p>そして、以下のようなselectを実行するとどのような動作となるでしょうか。<br>ポイントはパーティションテーブルのパーティションキーに設定した<code>part_date</code>の列が結合条件としてのみ指定されていることです。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	<span class="operator">*</span></span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	wk_input a</span><br><span class="line">,	tr_part b</span><br><span class="line"><span class="keyword">where</span> <span class="number">1</span> <span class="operator">=</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">and</span> a.related_key <span class="operator">=</span> b.key</span><br><span class="line"><span class="keyword">and</span> a.target_date <span class="operator">=</span> b.part_date</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+
+<p>このとき期待するのは次図の赤線のような動作でしょう。<br><img src="/images/20181019/2.png" loading="lazy"></p>
+<p>wk_input の target_date が <code>20180901</code> のレコードに対し、tr_partのpart_dateが <code>20180901</code> のパーティションにアクセスし、<br>wk_input の target_date が <code>20180902</code> のレコードに対し、tr_partのpart_dateが <code>20180902</code> のパーティションにアクセスし、<br>wk_input の target_date が <code>20180903</code> のレコードに対し、tr_partのpart_dateが <code>20180903</code> のパーティションにアクセスする。</p>
+<p>ORACLEの場合はまさにそのような動作になります。<br>実行計画でみると以下のようになります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> STATEMENT</span><br><span class="line">    NESTED LOOPS</span><br><span class="line">        <span class="keyword">TABLE</span> ACCESS <span class="keyword">FULL</span> WK_INPUT</span><br><span class="line">        <span class="keyword">PARTITION</span> <span class="keyword">RANGE</span> ITERATOR</span><br><span class="line">            <span class="keyword">TABLE</span> ACCESS <span class="keyword">BY</span> ROWID TR_PART</span><br><span class="line">                INDEX <span class="keyword">UNIQUE</span> SCAN PK_TR_PART</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>PARTITION RANGE ITERATOR</code>のところがまさに、WK_INPUTの各行に対応するパーティションへのアクセスを示しています。</p>
+<p>では、PostgreSQL10ではどのようになるかというと<code>explain analyze</code>で先のselect文を実行すると以下のような出力になりました。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Nested Loop  (cost=0.42..93.60 rows=1 width=31) (actual time=66.130..275.215 rows=3 loops=1)</span><br><span class="line">  -&gt;  Seq Scan on wk_input a  (cost=0.00..1.03 rows=3 width=15) (actual time=16.125..16.261 rows=3 loops=1)</span><br><span class="line">  -&gt;  Append  (cost=0.42..30.82 rows=4 width=16) (actual time=69.391..86.303 rows=1 loops=3)</span><br><span class="line">        -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 b  (cost=0.42..8.44 rows=1 width=16) (actual time=48.916..51.817 rows=0 loops=3★)</span><br><span class="line">              Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</span><br><span class="line">        -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 b_1  (cost=0.42..8.44 rows=1 width=16) (actual time=17.012..21.819 rows=0 loops=3★)</span><br><span class="line">              Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</span><br><span class="line">        -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 b_2  (cost=0.42..8.44 rows=1 width=16) (actual time=12.144..12.594 rows=0 loops=3★)</span><br><span class="line">              Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</span><br><span class="line">        -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 b_3  (cost=0.15..5.50 rows=1 width=68) (actual time=0.013..0.013 rows=0 loops=3★)</span><br><span class="line">              Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</span><br><span class="line">Planning time: 118.634 ms</span><br><span class="line">Execution time: 275.380 ms</span><br></pre></td></tr></table></figure>
+
+<p>注目は★マークを付けた4,6,8,10行目の <code>loops=3</code> のところでしょうか。どのパーティションにもwk_inputの3行に対し3回のアクセスがあることが確認できます。</p>
+<p>図にすると次のようなイメージです。<br><img src="/images/20181019/3.png" loading="lazy"></p>
+<p>つまりPostgreSQL10ではクエリ実行時にwk_inputのレコードの値をみて、パーティションプルーニングするような動作はできないことがわかります。<br>これを踏まえたうえで、パーティションテーブルとパーティションテーブルの結合を考えてみます。</p>
+<p>冒頭の実行計画は以下のクエリをexplainしたものです。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> tr_part tgt</span><br><span class="line"><span class="keyword">set</span></span><br><span class="line">	data <span class="operator">=</span> b.data <span class="operator">*</span><span class="number">0.8</span></span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	wk_input a</span><br><span class="line">,	tr_part b</span><br><span class="line"><span class="keyword">where</span> <span class="number">1</span> <span class="operator">=</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">and</span> a.related_key <span class="operator">=</span> b.key</span><br><span class="line"><span class="keyword">and</span> a.target_date <span class="operator">=</span> b.part_date</span><br><span class="line"><span class="keyword">and</span> b.key <span class="operator">=</span> tgt.key</span><br><span class="line"><span class="keyword">and</span> b.part_date <span class="operator">=</span> tgt.part_date</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+
+<p>冒頭の実行計画の先頭部分を抜き出して以下に貼り付けました。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"> Update on tr_part tgt  (cost=0.83..115.84 rows=4 width=44)</span><br><span class="line">   Update on tr_part_p_1809_01 tgt_1</span><br><span class="line">   Update on tr_part_p_1809_02 tgt_2</span><br><span class="line">   Update on tr_part_p_1809_03 tgt_3</span><br><span class="line">   Update on tr_part_p_9912_31 tgt_4</span><br><span class="line">   -&gt;  Nested Loop  (cost=0.83..28.01 rows=1 width=38)</span><br><span class="line">         Join Filter: ((a.related_key = b.key) AND (a.target_date = b.part_date))</span><br><span class="line">         -&gt;  Nested Loop  (cost=0.42..26.34 rows=1 width=32)</span><br><span class="line">               -&gt;  Seq Scan on wk_input a  (cost=0.00..1.03 rows=3 width=16)</span><br><span class="line">               -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01★ tgt_1  (cost=0.42..8.44 rows=1 width=16)</span><br><span class="line">                     Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</span><br><span class="line">         -&gt;  Append  (cost=0.42..1.61 rows=4 width=26)</span><br><span class="line">               -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01● b  (cost=0.42..0.48 rows=1 width=26)</span><br><span class="line">                     Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">               -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02● b_1  (cost=0.42..0.48 rows=1 width=26)</span><br><span class="line">                     Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">               -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03● b_2  (cost=0.42..0.48 rows=1 width=26)</span><br><span class="line">                     Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">               -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31● b_3  (cost=0.15..0.17 rows=1 width=78)</span><br><span class="line">                     Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">...省略</span><br></pre></td></tr></table></figure>
+
+<p>パーティションテーブルであるtr_partに注目します。<br>10行目にあるtr_partテーブルの <code>p_1809_01★</code> に対し、13~19行目のtr_partテーブルの <code>p_1809_01●</code>、 <code>p_1809_02●</code>、 <code>p_1809_03●</code>、 <code>p_9912_31●</code> が参照されています。</p>
+<p>パーティションテーブルtr_partに着目すると、期待する動きは次図ですが、、、<br><img src="/images/20181019/4.png" loading="lazy"></p>
+<p>実際は次図のようになっているということです。<br><img src="/images/20181019/5.png" loading="lazy"></p>
+<p>パーティション数が多いと、PostgreSQLのこのような動作がかなりな性能遅延を引き起こします。</p>
+<p>PostgreSQLでは1テーブルに100を超えるほどのパーティションを定義することはあまり無いでしょう。<br>しかし、例えば1月分のデータを日次のパーティションで保持している場合の約30パーティションのテーブル同士の結合を想定すると、30×30で900通りのパーティション間の結合を試みることになります。<br>これがどれほど非効率かは想像にかたくありません。</p>
+<p>PostgreSQLのこのような動作に起因して性能劣化が見られる場合は、ユーザからアクセスすべきパーティションを教えてあげる必要があります。<br>つまり、この例ではアクセス対象のパーティションはwk_inputに保持されているtarget_dateの値で決まっています。<br>そのため、<code>select distinct target_date from wk_iput</code>のように一度target_dateの一覧を抽出します。<br>そのうえで、以下のようにパーティションキーのpart_dateの値を以下のクエリの<code>/*あらかじめ取得した値*/</code>のところで指定してループ実行します。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> tr_part tgt</span><br><span class="line"><span class="keyword">set</span></span><br><span class="line">	data <span class="operator">=</span> b.data <span class="operator">*</span><span class="number">0.8</span></span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	wk_input a</span><br><span class="line">,	tr_part b</span><br><span class="line"><span class="keyword">where</span> <span class="number">1</span> <span class="operator">=</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">and</span> a.related_key <span class="operator">=</span> b.key</span><br><span class="line"><span class="keyword">and</span> a.target_date <span class="operator">=</span> b.part_date</span><br><span class="line"><span class="keyword">and</span> b.key <span class="operator">=</span> tgt.key</span><br><span class="line"><span class="keyword">and</span> b.part_date <span class="operator">=</span> tgt.part_date</span><br><span class="line"><span class="keyword">and</span> b.part_date <span class="operator">=</span> <span class="comment">/*あらかじめ取得した値*/</span></span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+
+<p>パーティション数が多く、アクセスが非効率になっているような場合は、このようにパーティションをユーザから特定してあげることで大きな改善がみられる場合があります。</p>
+<h2 id="PostgreSQL11での確認"><a href="#PostgreSQL11での確認" class="headerlink" title="PostgreSQL11での確認"></a>PostgreSQL11での確認</h2><p>さて、ある日dockerで環境構築をしていてふとPostgreSQL11（β版）がpullできるようになっていることに気づきましたので、<br>ちょろっと触ってみようと思い上記と同様にパーティションプルーニングの動作を確認してみました。</p>
+<details><summary>やはりとても長い実行計画が確認できました。。</summary><div>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">Update on tr_part tgt  (cost=0.83..115.93 rows=4 width=70) (actual time=235.751..235.751 rows=0 loops=1)</span><br><span class="line">  Update on tr_part_p_1809_01 tgt_1</span><br><span class="line">  Update on tr_part_p_1809_02 tgt_2</span><br><span class="line">  Update on tr_part_p_1809_03 tgt_3</span><br><span class="line">  Update on tr_part_p_9912_31 tgt_4</span><br><span class="line">  -&gt;  Nested Loop  (cost=0.83..28.03 rows=1 width=64) (actual time=61.837..72.983 rows=1 loops=1)</span><br><span class="line">        Join Filter: ((a.related_key = b.key) AND (a.target_date = b.part_date))</span><br><span class="line">        -&gt;  Nested Loop  (cost=0.42..26.34 rows=1 width=32) (actual time=61.790..62.534 rows=1 loops=1)</span><br><span class="line">              -&gt;  Seq Scan on wk_input a  (cost=0.00..1.03 rows=3 width=16) (actual time=17.805..17.811 rows=3 loops=1)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 tgt_1  (cost=0.42..8.44 rows=1 width=16) (actual time=14.901..14.901 rows=0 loops=3)</span><br><span class="line">                    Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</span><br><span class="line">        -&gt;  Append  (cost=0.42..1.63 rows=4 width=26) (actual time=0.036..10.437 rows=1 loops=1)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 b  (cost=0.42..0.48 rows=1 width=26) (actual time=0.027..10.424 rows=1 loops=1)</span><br><span class="line">                    Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 b_1  (cost=0.42..0.48 rows=1 width=26) (never executed)</span><br><span class="line">                    Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 b_2  (cost=0.42..0.48 rows=1 width=26) (never executed)</span><br><span class="line">                    Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 b_3  (cost=0.15..0.17 rows=1 width=78) (never executed)</span><br><span class="line">                    Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">  -&gt;  Nested Loop  (cost=0.83..28.03 rows=1 width=64) (actual time=56.255..96.389 rows=1 loops=1)</span><br><span class="line">        Join Filter: ((a.related_key = b.key) AND (a.target_date = b.part_date))</span><br><span class="line">        -&gt;  Nested Loop  (cost=0.42..26.34 rows=1 width=32) (actual time=56.211..74.941 rows=1 loops=1)</span><br><span class="line">              -&gt;  Seq Scan on wk_input a  (cost=0.00..1.03 rows=3 width=16) (actual time=0.011..0.020 rows=3 loops=1)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 tgt_2  (cost=0.42..8.44 rows=1 width=16) (actual time=24.968..24.968 rows=0 loops=3)</span><br><span class="line">                    Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</span><br><span class="line">        -&gt;  Append  (cost=0.42..1.63 rows=4 width=26) (actual time=0.033..21.437 rows=1 loops=1)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 b  (cost=0.42..0.48 rows=1 width=26) (never executed)</span><br><span class="line">                    Index Cond: ((part_date = tgt_2.part_date) AND (key = tgt_2.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 b_1  (cost=0.42..0.48 rows=1 width=26) (actual time=0.028..21.431 rows=1 loops=1)</span><br><span class="line">                    Index Cond: ((part_date = tgt_2.part_date) AND (key = tgt_2.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 b_2  (cost=0.42..0.48 rows=1 width=26) (never executed)</span><br><span class="line">                    Index Cond: ((part_date = tgt_2.part_date) AND (key = tgt_2.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 b_3  (cost=0.15..0.17 rows=1 width=78) (never executed)</span><br><span class="line">                    Index Cond: ((part_date = tgt_2.part_date) AND (key = tgt_2.key))</span><br><span class="line">  -&gt;  Nested Loop  (cost=0.83..28.03 rows=1 width=64) (actual time=65.428..66.187 rows=1 loops=1)</span><br><span class="line">        Join Filter: ((a.related_key = b.key) AND (a.target_date = b.part_date))</span><br><span class="line">        -&gt;  Nested Loop  (cost=0.42..26.34 rows=1 width=32) (actual time=65.375..65.377 rows=1 loops=1)</span><br><span class="line">              -&gt;  Seq Scan on wk_input a  (cost=0.00..1.03 rows=3 width=16) (actual time=0.021..0.028 rows=3 loops=1)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 tgt_3  (cost=0.42..8.44 rows=1 width=16) (actual time=21.778..21.778 rows=0 loops=3)</span><br><span class="line">                    Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</span><br><span class="line">        -&gt;  Append  (cost=0.42..1.63 rows=4 width=26) (actual time=0.038..0.794 rows=1 loops=1)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 b  (cost=0.42..0.48 rows=1 width=26) (never executed)</span><br><span class="line">                    Index Cond: ((part_date = tgt_3.part_date) AND (key = tgt_3.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 b_1  (cost=0.42..0.48 rows=1 width=26) (never executed)</span><br><span class="line">                    Index Cond: ((part_date = tgt_3.part_date) AND (key = tgt_3.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 b_2  (cost=0.42..0.48 rows=1 width=26) (actual time=0.031..0.785 rows=1 loops=1)</span><br><span class="line">                    Index Cond: ((part_date = tgt_3.part_date) AND (key = tgt_3.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 b_3  (cost=0.15..0.17 rows=1 width=78) (never executed)</span><br><span class="line">                    Index Cond: ((part_date = tgt_3.part_date) AND (key = tgt_3.key))</span><br><span class="line">  -&gt;  Nested Loop  (cost=0.57..31.83 rows=1 width=90) (actual time=0.039..0.039 rows=0 loops=1)</span><br><span class="line">        Join Filter: ((a.related_key = b.key) AND (a.target_date = b.part_date))</span><br><span class="line">        -&gt;  Nested Loop  (cost=0.15..17.55 rows=1 width=58) (actual time=0.039..0.039 rows=0 loops=1)</span><br><span class="line">              -&gt;  Seq Scan on wk_input a  (cost=0.00..1.03 rows=3 width=16) (actual time=0.018..0.019 rows=3 loops=1)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 tgt_4  (cost=0.15..5.50 rows=1 width=42) (actual time=0.005..0.005 rows=0 loops=3)</span><br><span class="line">                    Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</span><br><span class="line">        -&gt;  Append  (cost=0.42..14.22 rows=4 width=26) (never executed)</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01 b  (cost=0.42..4.65 rows=1 width=26) (never executed)</span><br><span class="line">                    Index Cond: ((part_date = tgt_4.part_date) AND (key = tgt_4.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02 b_1  (cost=0.42..4.66 rows=1 width=26) (never executed)</span><br><span class="line">                    Index Cond: ((part_date = tgt_4.part_date) AND (key = tgt_4.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03 b_2  (cost=0.42..4.66 rows=1 width=26) (never executed)</span><br><span class="line">                    Index Cond: ((part_date = tgt_4.part_date) AND (key = tgt_4.key))</span><br><span class="line">              -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31 b_3  (cost=0.15..0.22 rows=1 width=78) (never executed)</span><br><span class="line">                    Index Cond: ((part_date = tgt_4.part_date) AND (key = tgt_4.key))</span><br></pre></td></tr></table></figure>
+</div></details>
+
+
+
+<p>残念…と思いきや<code>explain analyze</code>の結果を見ると動作が改善されていることがわかりました。<br>以下に冒頭部分を抜き出しました。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"> Update on tr_part tgt  (cost=0.83..115.93 rows=4 width=70) (actual time=235.751..235.751 rows=0 loops=1)</span><br><span class="line">   Update on tr_part_p_1809_01 tgt_1</span><br><span class="line">   Update on tr_part_p_1809_02 tgt_2</span><br><span class="line">   Update on tr_part_p_1809_03 tgt_3</span><br><span class="line">   Update on tr_part_p_9912_31 tgt_4</span><br><span class="line">   -&gt;  Nested Loop  (cost=0.83..28.03 rows=1 width=64) (actual time=61.837..72.983 rows=1 loops=1)</span><br><span class="line">         Join Filter: ((a.related_key = b.key) AND (a.target_date = b.part_date))</span><br><span class="line">         -&gt;  Nested Loop  (cost=0.42..26.34 rows=1 width=32) (actual time=61.790..62.534 rows=1 loops=1)</span><br><span class="line">               -&gt;  Seq Scan on wk_input a  (cost=0.00..1.03 rows=3 width=16) (actual time=17.805..17.811 rows=3 loops=1)</span><br><span class="line">               -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01★ tgt_1  (cost=0.42..8.44 rows=1 width=16) (actual time=14.901..14.901 rows=0 loops=3)</span><br><span class="line">                     Index Cond: ((part_date = a.target_date) AND (key = a.related_key))</span><br><span class="line">         -&gt;  Append  (cost=0.42..1.63 rows=4 width=26) (actual time=0.036..10.437 rows=1 loops=1)</span><br><span class="line">               -&gt;  Index Scan using pk_tr_part_p_1809_01 on tr_part_p_1809_01● b  (cost=0.42..0.48 rows=1 width=26) (actual time=0.027..10.424 rows=1 loops=1■)</span><br><span class="line">                     Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">               -&gt;  Index Scan using pk_tr_part_p_1809_02 on tr_part_p_1809_02▲ b_1  (cost=0.42..0.48 rows=1 width=26) (never executed▼)</span><br><span class="line">                     Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">               -&gt;  Index Scan using pk_tr_part_p_1809_03 on tr_part_p_1809_03▲ b_2  (cost=0.42..0.48 rows=1 width=26) (never executed▼)</span><br><span class="line">                     Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key))</span><br><span class="line">               -&gt;  Index Scan using pk_tr_part_p_9912_31 on tr_part_p_9912_31▲ b_3  (cost=0.15..0.17 rows=1 width=78) (never executed▼)</span><br><span class="line">                     Index Cond: ((part_date = tgt_1.part_date) AND (key = tgt_1.key)</span><br><span class="line">...省略</span><br></pre></td></tr></table></figure>
+
+<p>10行目のtr_partテーブルの <code>p_1809_01★</code> に対し、13行目の●の同パーティションに、13行目最右の■部分でアクセスがあったことが確認できます。</p>
+<p>これに対して、15行目移行の▲で目印をした <code>p_1809_02</code>、 <code>p_1809_03</code>、 <code>p_9912_31</code> のパーティションに対しては、▼部分（never executedと書いていますね）で実際の実行がスキップされていることが確認できます。<br>PostgreSQLがバージョン11になって、パーティション <code>p_1809_02</code>、 <code>p_1809_03</code>、 <code>p_9912_31</code> の結合を試みても仕方のないものとしてスキップを判断できるようになっています。</p>
+<p>長年ORACLEを使い倒してきて、ふとPostgreSQLを使うと、こんなこともできないのか、と思うことがあります。<br>しかし、日々成長してきていることも感じられ、愛おしくも思えてくるのがPostgreSQLのいいところですね。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20181019/&related=twitterapi%2Ctwitter&text=PostgreSQL%E3%83%91%E3%83%BC%E3%83%86%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%97%E3%83%AB%E3%83%BC%E3%83%8B%E3%83%B3%E3%82%B0%E3%81%AE%E5%8B%95%E4%BD%9C%E3%82%92%E7%A2%BA%E8%AA%8D%E3%81%99%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20181019/&t=PostgreSQL%E3%83%91%E3%83%BC%E3%83%86%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%97%E3%83%AB%E3%83%BC%E3%83%8B%E3%83%B3%E3%82%B0%E3%81%AE%E5%8B%95%E4%BD%9C%E3%82%92%E7%A2%BA%E8%AA%8D%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">18</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20181019/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20181019/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2021.04.16</span><span class="snscount">&#9825;0</span><a href=/articles/20210416b/ title="今回は業界歴の比較的浅い方々をターゲットに、覚えておくと現場で役立ちそうなSQLの小技をいくつか紹介したいと思います。">(新卒で役にたつ！)SQL小技集</a></li><li class="related-posts-item"><span>2022.10.18</span><span class="snscount">&#9825;14</span><a href=/articles/20221018a/ title="Songmuさんのflextimeにはずっとお世話になっています。素晴らしいライブラリですが、SQLを用いて結果を永続化するようなテストでの利用する時に冗長性を感じました。PostgreSQL関数 を作成して代用できないか考えてみました。">PostgreSQLで Goの flextime のような関数を作りテスト時間を差し替える</a></li><li class="related-posts-item"><span>2021.11.12</span><span class="snscount">&#9825;6</span><a href=/articles/20211112b/ title="TIGの伊藤真彦です。AWS Certified Database - Specialtyに合格しました。これにて2021年に受験できる11資格を全て制覇しました。来年SAP on AWS - 専門知識が登場する事が確定していますが、ひとまず完全制覇です。">AWS Certified Database - Specialty合格体験記</a></li><li class="related-posts-item"><span>2021.10.05</span><span class="snscount">&#9825;11</span><a href=/articles/20211005b/ title="今回の投稿は、先日TIG」の登壇後記です。以前に実施した社内勉強会のコンテンツを外部発信向けに整理したものとなります。私は元の資料の作成に関わっていなかったため、整理に際して一から目を通しました。">Future Tech Night #16 ～クラウド時代のDWH～</a></li><li class="related-posts-item"><span>2021.09.16</span><span class="snscount">&#9825;16</span><a href=/articles/20210916a/ title="GoのORマッパー連載、おまけ記事です。特に示し合わせた訳では無いのですが、RDBは全員がPostgreSQLを使っていましたね。さて、今回の連載記事のいくつかでも言及されていた、jackc/pgx について簡単に紹介します。">lib/pq から jackc/pgx への移行</a></li><li class="related-posts-item"><span>2021.07.27</span><span class="snscount">&#9825;63</span><a href=/articles/20210727a/ title="データベースでパフォーマンスが大きな問題になりがちなのが、バッチでのデータのインサートと、複雑なクエリーです。が、今回は後者は置いといて、前者のデータの取り込みについて扱います。データの挿入の高速化は最近、ちょびっと大事かなと思うところがあります。というのも...">GoとPoatgreSQLでCOPY</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20200703/ title="エンタープライズでのミッションクリティカル領域においてもクラウド利用が普通になってきています。その過程において今までできないことを指向する試みも行われてきています。その代表的なものがクラウドの備えるリソースの高い拡張性と弾力性を利用したシステム展開です。例えば「より多くのデータを扱う」「同業他社に向けたサービス展開をする（マルチテナンシー）」といったものがあります。その際のアーキテクチャ選定では将来の利用を想定した選択を行う必要がありますが、データベースのスケールというのは非常に難しく簡単ではありません。">スケーラブルデータベース ～クラウドにおける後悔しないデータベース選定～</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#PostgreSQL10%E3%81%A7%E3%81%AE%E7%A2%BA%E8%AA%8D"><span class="toc-text">PostgreSQL10での確認</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PostgreSQL11%E3%81%A7%E3%81%AE%E7%A2%BA%E8%AA%8D"><span class="toc-text">PostgreSQL11での確認</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

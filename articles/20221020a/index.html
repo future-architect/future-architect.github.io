@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>DynamoDB Streamsは同一ハッシュキーでもソートキーが異なれば順序保証されない | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTIG DXユニットの真野です。 タイトルに書いたままの内容の記事です。おそらくDynamoDB Streams について調べたことがある方の多くの人には自明な内容だと思います。サマリです。  DynamoDB Streamsの起動順序が保たれるのは 項目単位 ハッシュキーのみのテーブルであればその単位 ハッシュキー＋ソートキーのテーブルであれば、 ソートキーまで含めた単位 ソートキーが異">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DynamoDB Streamsは同一ハッシュキーでもソートキーが異なれば順序保証されない | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20221020a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIG DXユニットの真野です。 タイトルに書いたままの内容の記事です。おそらくDynamoDB Streams について調べたことがある方の多くの人には自明な内容だと思います。サマリです。  DynamoDB Streamsの起動順序が保たれるのは 項目単位 ハッシュキーのみのテーブルであればその単位 ハッシュキー＋ソートキーのテーブルであれば、 ソートキーまで含めた単位 ソートキーが異">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20221020a/dynamodbstreams_構成.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221020a/dynamodbstreams_構成-ページ2.drawio.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221020a/DDB-Stream.jpg">
+<meta property="og:image" content="https://future-architect.github.io/images/20221020a/DDB-Table1.jpg">
+<meta property="og:image" content="https://future-architect.github.io/images/20221020a/dynamodb順序-ページ3.drawio.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20221020a/改善案.png">
+<meta property="article:published_time" content="2022-10-19T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-10-20T00:38:22.632Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="DynamoDB">
+<meta property="article:tag" content="Lambda">
+<meta property="article:tag" content="DynamoDBStreams">
+<meta property="article:tag" content="失敗談">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20221020a/dynamodbstreams_構成.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20221020a/">
+  <meta content="AWS,DynamoDB,Lambda,DynamoDBStreams,失敗談" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">DynamoDB Streamsは同一ハッシュキーでもソートキーが異なれば順序保証されない
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20221020a_DynamoDB_Streamsは同一ハッシュキーでもソートキーが異なれば順序保証されない.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20221020a_DynamoDB_Streamsは同一ハッシュキーでもソートキーが異なれば順序保証されない" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-10-19T15:00:00.000Z" itemprop="datePublished">2022.10.20</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98" title="真野隼記さんの記事一覧へ" class="post-author">真野隼記</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/DynamoDB/" title="DynamoDBタグの記事へ" class="tag-list-link">DynamoDB</a>
+  
+    
+    <a href="/tags/Lambda/" title="Lambdaタグの記事へ" class="tag-list-link">Lambda</a>
+  
+    
+    <a href="/tags/DynamoDBStreams/" title="DynamoDBStreamsタグの記事へ" class="tag-list-link">DynamoDBStreams</a>
+  
+    
+    <a href="/tags/失敗談/" title="失敗談タグの記事へ" class="tag-list-link">失敗談</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG DXユニットの真野です。</p>
+<p>タイトルに書いたままの内容の記事です。おそらくDynamoDB Streams について調べたことがある方の多くの人には自明な内容だと思います。サマリです。</p>
+<ul>
+<li>DynamoDB Streamsの起動順序が保たれるのは <strong>項目単位</strong><ul>
+<li>ハッシュキーのみのテーブルであればその単位</li>
+<li>ハッシュキー＋ソートキーのテーブルであれば、 <strong>ソートキーまで含めた単位</strong></li>
+<li>ソートキーが異なれば、起動順序が異なる可能性がある</li>
+</ul>
+</li>
+<li>よく耳にするDynamoDB Streams シャードに言い換えると、シャードが同じであれば順序制御される<ul>
+<li>異なるシャード同士では当然、順序保証はされない</li>
+<li>同じハッシュキーでも、ソートキーが異なれば異なるシャードに割り当てられる可能性がある（あった）</li>
+<li>DynamoDB Streamsのシャードは、DynamoDBテーブルのパーティションとは管理粒度が異なる</li>
+</ul>
+</li>
+</ul>
+<p>私がガッツリ勘違いしていて、でもトラブルシュートしてくれたのはチームの若手エースという、遺憾な結果でしたので、二度と繰り返さないという反省の意味も込め詳細を書きます。</p>
+<h2 id="DynamoDB-Streamsとは"><a href="#DynamoDB-Streamsとは" class="headerlink" title="DynamoDB Streamsとは"></a>DynamoDB Streamsとは</h2><p>DynamoDB Streamsについては1.5年前に似たような小ネタを投稿しました。DynamoDB Streams自体についてはそちらを参照ください（今見ても（当時から）すでにタイトルが..）。</p>
+<ul>
+<li><a href="/articles/20210122/">オレのDynamoDB Streamsが再着火しないわけがない </a></li>
+</ul>
+<h2 id="ハマったケース"><a href="#ハマったケース" class="headerlink" title="ハマったケース"></a>ハマったケース</h2><p>例を上げて説明します。</p>
+<img src="/images/20221020a/dynamodbstreams_構成.png" alt="dynamodbstreams_構成.png" width="1200" height="277" loading="lazy">
+
+<p>構成例のイメージです。何かしらスタッフの動作をセンシングするデバイスがあり、それをリアルタイムでDynamoDBに登録。そのデータをニアリアルタイムで別システムに連携する必要があるため、DynamoDB StreamsでS3に N 分間隔でタイムスタンプ付きのファイル名で出力。連携先の別システムはファイル名をもとに順次取り込む、といった連携方式です。</p>
+<p>センシングされたデータは時系列に並んでおり、DynamoDBのキーとしては、デバイスIDがハッシュキー、読み取り時間がソートキーになるようなイメージです。</p>
+<p>問題になった事象としては次です。</p>
+<ul>
+<li>生成されたファイルを順次取り込んだが、あるデバイスIDに絞ると時系列で順序が狂っていた</li>
+<li>センシングされた最新の情報が誤って取り込まれ、実体とシステムの値が異なった</li>
+</ul>
+<img src="/images/20221020a/dynamodbstreams_構成-ページ2.drawio.png" alt="dynamodbstreams_構成-ページ2.drawio.png" width="1200" height="486" loading="lazy">
+
+<p>最初は、センシングするデバイス側から送られる順番が狂ったとか、図では省略していますが途中で経由するKinesis Data StreamsのシャードIDにデバイスIDが入っていないなど、DynamoDBに書き込まれるまでで順序が狂ったのかと思っていましたが、書き込みデータにデバイスから送信日時とサーバ受付時間、DBへの永続日時を比較すると原因がDynamoDB Streamsでの出力で狂っていることが分かりました。</p>
+<h2 id="発生メカニズム"><a href="#発生メカニズム" class="headerlink" title="発生メカニズム"></a>発生メカニズム</h2><p><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/blogs/news/how-to-perform-ordered-data-replication-between-applications-by-using-amazon-dynamodb-streams/">Amazon DynamoDB ストリームを使用して、順序付けされたデータをアプリケーション間でレプリケーションする方法 | Amazon Web Services ブログ</a> からの図を参照します。</p>
+<p>DynamoDB Streamsは内部的にシャードと呼ばれる単位で分割されています。シャードがどういう単位で分割されるかは利用者側の制御ができず、操作数に応じて柔軟に拡大・縮小する仕組みです。（下図だと3シャードに分かれており、その単位でLambdaが起動します。）</p>
+<img src="/images/20221020a/DDB-Stream.jpg" alt="DDB-Stream.jpg" width="880" height="459" loading="lazy">
+
+<p>Lambdaの起動数ですが、同時実行数を1にすれば、次のように1シャード、1Lambdaしか起動しないです。シャード内は更新順に並んでいるためその中ではLambdaで順番に処理すれば良いです。</p>
+<img src="/images/20221020a/DDB-Table1.jpg" alt="DDB-Table1.jpg" width="760" height="293" loading="lazy">
+
+<p>今回の間違いは、下図のように、同一Partitionにあるけれど、異なるDynamoDB Streamsシャードに割り当てられたため、ほぼ同時タイミングで複数のLambdaが起動し、同一ハッシュキーのデータ順序が狂ったことが原因で発生しました。</p>
+<img src="/images/20221020a/dynamodb順序-ページ3.drawio.png" alt="dynamodb順序-ページ3.drawio.png" width="1200" height="397" loading="lazy">
+
+<p>連携先システムとしてはどのファイルにどのキーが含まれているかわかりようがないので回避しようがない（ファイルをマージして取り込むにしても、まだ出力されていないファイルに順序が狂ったデータが無いと言い切れない）ため、出力側が調整すべきことです。</p>
+<p>なお、図ではシャードごとのLambda起動順が狂った感じで書いていますが、起動順序が図とは逆であったとしても、Lambdaの実行時間によっては想定外の出力順序になりえます（どちらか片方がこの例でいくとS3の書き込みでリトライが走ったとか、Streamsの件数がたまたま片方が100件でもう片方が10件だったとか）。</p>
+<p>これを開発した当初はデータ量もまだ少なく、シャードが細かく分割されていなかったためテストで検知されず、利用量が増えたことで顕在化したのかなとも思います。ハッシュキーが同じであればDynamoDB上は同一パーティションとなるので、そのままDynamoDB Streamsのシャードとなるのかと勘違いしていました。思い込みは良くないですね。後で切り分けするのは大変なので最初に裏取りしておくべきことでした。</p>
+<h2 id="回避方法"><a href="#回避方法" class="headerlink" title="回避方法"></a>回避方法</h2><p>複数の回避手段があるかなと思います。てっとり早いのはDynamoDB Streamsではなく定時起動のジョブを作ることでしょう。</p>
+<img src="/images/20221020a/改善案.png" alt="改善案.png" width="1200" height="642" loading="lazy">
+
+<p>もし、取り込み側のシステムのコントロールが効く、かつ過去分に対する補正処理が複雑でなければ、前回取り込んだデバイスのセンサー読み取り時刻より古ければ弾くといった処理を入れても良いかなと思います（状況によりますが）。</p>
+<p>ちなみに、シャードが分かれることが原因であるため、Kinesis Data Streamsのキャプチャに変えても意味はないです。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/kds.html">Kinesis Data Streams を使用して DynamoDB への変更をキャプチャする。 - Amazon DynamoDB</a></li>
+</ul>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><ul>
+<li>AWSドキュメント、ちゃんと読みましょう（自戒）</li>
+<li>DynamoDB Streamsの起動順序は項目単位。ソートキーが指定されているテーブルの場合は、ハッシュキー＋ソートキーの単位での保証となる<ul>
+<li>時系列DBのような使い方をしているテーブルに関しては、おそらく想定通りの挙動をしない</li>
+</ul>
+</li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20221020a/&related=twitterapi%2Ctwitter&text=DynamoDB%20Streams%E3%81%AF%E5%90%8C%E4%B8%80%E3%83%8F%E3%83%83%E3%82%B7%E3%83%A5%E3%82%AD%E3%83%BC%E3%81%A7%E3%82%82%E3%82%BD%E3%83%BC%E3%83%88%E3%82%AD%E3%83%BC%E3%81%8C%E7%95%B0%E3%81%AA%E3%82%8C%E3%81%B0%E9%A0%86%E5%BA%8F%E4%BF%9D%E8%A8%BC%E3%81%95%E3%82%8C%E3%81%AA%E3%81%84%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">10</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20221020a/&t=DynamoDB%20Streams%E3%81%AF%E5%90%8C%E4%B8%80%E3%83%8F%E3%83%83%E3%82%B7%E3%83%A5%E3%82%AD%E3%83%BC%E3%81%A7%E3%82%82%E3%82%BD%E3%83%BC%E3%83%88%E3%82%AD%E3%83%BC%E3%81%8C%E7%95%B0%E3%81%AA%E3%82%8C%E3%81%B0%E9%A0%86%E5%BA%8F%E4%BF%9D%E8%A8%BC%E3%81%95%E3%82%8C%E3%81%AA%E3%81%84" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20221020a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20221020a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">4</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2021.01.22</span><span class="snscount">&#9825;13</span><a href=/articles/20210122/ title="DynamoDB Streamsは、DynamoDBに対する項目の追加、変更、削除をイベントとして検出できる機能です。テーブルの項目が変更されるとすぐに、新しいレコードがテーブルのストリームに表示されます">オレのDynamoDB Streamsが再着火しないわけがない</a></li><li class="related-posts-item"><span>2022.06.07</span><span class="snscount">&#9825;52</span><a href=/articles/20220607a/ title="失敗談をテーマにした連載の5本目です。AWS Lambdaで、予約済同時実行数を1に制限して使っていたときに、初期化処理と初期化タイミングの考慮不足により、はまったことがありました。本記事ではLambdaの初期化処理についておさらいした後、はまったケースの事例や原因、対応した方法を紹介します。">AWS Lambdaの初期化処理と初期化タイミングの考慮不足によるはまりどころ</a></li><li class="related-posts-item"><span>2022.06.01</span><span class="snscount">&#9825;258</span><a href=/articles/20220601b/ title="失敗談をテーマにした連載ということで、ちょうどプロダクト開発的に良い区切りのタイミングでもあるため、振り返りがてら、DynamoDB,Go,AWS Lambdaの技術要素について自分自身の理解・見込みの甘さについて反省します。">GoとDynamoDBを用いた開発で反省していること</a></li><li class="related-posts-item"><span>2021.10.25</span><span class="snscount">&#9825;14</span><a href=/articles/20211025a/ title="DynamoDBをGoで操作することにかけては、[DynamoDB×Go連載] に参加するくらい関心があるのですが、AWS SDK for Goの公式ライブラリに含まれる、ヘルパーパッケージについて存在を今までスルーしていました。使ってみると業務的には利用一択だと思ったので今後使っていくぞという覚書としてまとめます。">AWS SDK for GoでDynamoDBの式を扱うヘルパーパッケージの使い方</a></li><li class="related-posts-item"><span>2020.07.27</span><span class="snscount">&#9825;9</span><a href=/articles/20200727/ title="[サーバレス連載企画]の8回目です。TIG DXユニットの真野です。ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。[工場をハックするための基本知識] の記事を書いた棚井さんと同じチームに所属しています。[サーバレス連載企画] の第8弾目として、Serverlessの代表格であるAWS LambdaでGoを用いてKinesisに対するKPL/KCL相当の処理についてまとめていきます。">GoからAWS KinesisのAggregationFormatを利用する</a></li><li class="related-posts-item"><span>2020.07.22</span><span class="snscount">&#9825;8</span><a href=/articles/20200722/ title="昨今様々なシステムで利用さているAWSのLambdaですが、サーバレスということもあり何かのイベントをトリガに関数を起動させる方法が一般的かと思います。LambdaはAWSの様々なサービスをトリガとして起動することが可能で、自分たちの利用しているAWSサービスと組み合わせて実装するることでその真価を発揮します。AWSに少し詳しい人であればLambdaをAWSのサービストリガで起動させる事ができることは知っていると思いますが、いざ実装するとなると具体的にどういった手順で、なんの設定が必要かというところがわからないという人もいるのではないでしょうか。">AWSサービストリガによるLambda起動</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#DynamoDB-Streams%E3%81%A8%E3%81%AF"><span class="toc-text">DynamoDB Streamsとは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%8F%E3%83%9E%E3%81%A3%E3%81%9F%E3%82%B1%E3%83%BC%E3%82%B9"><span class="toc-text">ハマったケース</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%99%BA%E7%94%9F%E3%83%A1%E3%82%AB%E3%83%8B%E3%82%BA%E3%83%A0"><span class="toc-text">発生メカニズム</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9E%E9%81%BF%E6%96%B9%E6%B3%95"><span class="toc-text">回避方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

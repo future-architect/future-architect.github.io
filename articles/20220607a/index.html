@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>AWS Lambdaの初期化処理と初期化タイミングの考慮不足によるはまりどころ | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="こんにちは、TIGの辻です。失敗談をテーマにした連載の5本目です。 AWS Lambda（以下Lambda）は様々なユースケースで利用できる、なにかと便利で強力なサービスです。本ブログでも以下のようにLambdaに関するたくさんの記事が投稿されています。  Lambda Function URLs をGoでお試し。実行時間の上限（タイムアウト）やWeb API構築周りで気になること Lambda×">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS Lambdaの初期化処理と初期化タイミングの考慮不足によるはまりどころ | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20220607a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="こんにちは、TIGの辻です。失敗談をテーマにした連載の5本目です。 AWS Lambda（以下Lambda）は様々なユースケースで利用できる、なにかと便利で強力なサービスです。本ブログでも以下のようにLambdaに関するたくさんの記事が投稿されています。  Lambda Function URLs をGoでお試し。実行時間の上限（タイムアウト）やWeb API構築周りで気になること Lambda×">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20220607a/Overview-Successful-Invokes.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220607a/before.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220607a/after.png">
+<meta property="article:published_time" content="2022-06-06T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:55:58.141Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Lambda">
+<meta property="article:tag" content="失敗談">
+<meta property="article:tag" content="TCP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20220607a/Overview-Successful-Invokes.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20220607a/">
+  <meta content="AWS,Lambda,失敗談,TCP" name="keywords">
+  <meta content="辻大志郎" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">AWS Lambdaの初期化処理と初期化タイミングの考慮不足によるはまりどころ
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20220607a_AWS_Lambdaの初期化処理と初期化タイミングの考慮不足によるはまりどころ.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20220607a_AWS_Lambdaの初期化処理と初期化タイミングの考慮不足によるはまりどころ" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-06-06T15:00:00.000Z" itemprop="datePublished">2022.06.07</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E8%BE%BB%E5%A4%A7%E5%BF%97%E9%83%8E" title="辻大志郎さんの記事一覧へ" class="post-author">辻大志郎</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/Lambda/" title="Lambdaタグの記事へ" class="tag-list-link">Lambda</a>
+  
+    
+    <a href="/tags/失敗談/" title="失敗談タグの記事へ" class="tag-list-link">失敗談</a>
+  
+    
+    <a href="/tags/TCP/" title="TCPタグの記事へ" class="tag-list-link">TCP</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p>こんにちは、TIGの辻です。<a href="/articles/20220601a/">失敗談をテーマにした連載</a>の5本目です。</p>
+<p>AWS Lambda（以下Lambda）は様々なユースケースで利用できる、なにかと便利で強力なサービスです。本ブログでも以下のようにLambdaに関するたくさんの記事が投稿されています。</p>
+<ul>
+<li><a href="/articles/20220510a/">Lambda Function URLs をGoでお試し。実行時間の上限（タイムアウト）やWeb API構築周りで気になること</a></li>
+<li><a href="/articles/20220516a/">Lambda×Go並列処理で100万回APIを呼び出す</a></li>
+<li><a href="/articles/20210914a/">LambdaをカスタムDockerランタイムで開発する方法</a></li>
+</ul>
+<p>私もLambdaが好きで、Lambdaの実行時間制約以内で終了する処理であれば、初手の候補の一つとしてLambdaを考えます。</p>
+<p>そんなLambdaですが、予約済同時実行数<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>を1に制限して使っていたときに、初期化処理と初期化タイミングの考慮不足により、はまったことがありました。本記事ではLambdaの初期化処理についておさらいした後、はまったケースの事例や原因、対応した方法を紹介します。</p>
+<h2 id="Lambdaのライフサイクルと初期化処理"><a href="#Lambdaのライフサイクルと初期化処理" class="headerlink" title="Lambdaのライフサイクルと初期化処理"></a>Lambdaのライフサイクルと初期化処理</h2><p>Lambda実行環境のライフサイクルは3つに分かれています。INITとINVOKEとSHUTDOWNです。</p>
+<img src="/images/20220607a/Overview-Successful-Invokes.png" alt="Overview-Successful-Invokes.png" width="1200" height="225" loading="lazy">
+
+<p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/lambda-runtime-environment.html">https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/lambda-runtime-environment.html</a> より</p>
+<p>INITフェーズでは、関数インスタンス（Lambda関数が実行される環境のこと）作成やハンドラ関数外に実装されている初期化処理が行われます。たとえばGoの場合、AWSのサンプルにある <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup> 以下のような <code>init()</code> の処理はINITフェーズで行われます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">        <span class="string">&quot;log&quot;</span></span><br><span class="line">        <span class="string">&quot;github.com/aws/aws-lambda-go/lambda&quot;</span></span><br><span class="line">        <span class="string">&quot;github.com/aws/aws-sdk-go/aws/session&quot;</span></span><br><span class="line">        <span class="string">&quot;github.com/aws/aws-sdk-go/service/s3&quot;</span></span><br><span class="line">        <span class="string">&quot;github.com/aws/aws-sdk-go/aws&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> invokeCount = <span class="number">0</span></span><br><span class="line"><span class="keyword">var</span> myObjects []*s3.Object</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">        svc := s3.New(session.New())</span><br><span class="line">        input := &amp;s3.ListObjectsV2Input&#123;</span><br><span class="line">                Bucket: aws.String(<span class="string">&quot;examplebucket&quot;</span>),</span><br><span class="line">        &#125;</span><br><span class="line">        result, _ := svc.ListObjectsV2(input)</span><br><span class="line">        myObjects = result.Contents</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">LambdaHandler</span><span class="params">()</span></span> (<span class="type">int</span>, <span class="type">error</span>) &#123;</span><br><span class="line">        invokeCount = invokeCount + <span class="number">1</span></span><br><span class="line">        log.Print(myObjects)</span><br><span class="line">        <span class="keyword">return</span> invokeCount, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">        lambda.Start(LambdaHandler)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>データベースとの接続などの、実行タイミングに依存しない処理を初期化処理として実施し、グローバル変数として再利用できるようにすることはパフォーマンスの観点から有効です。ハンドラの関数外に宣言されているグローバル変数は、Lambdaの関数インスタンスの一部として保存され、その後のリクエストで再利用されることがあるためです。<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></p>
+<p>なお、上のサンプルで <code>LambdaHandler()</code> に該当するハンドラ関数内の処理はINVOKEフェーズで実行されます。</p>
+<h2 id="はまりケース"><a href="#はまりケース" class="headerlink" title="はまりケース"></a>はまりケース</h2><p>はまりケースでもパフォーマンスを考慮して、TCP通信の確立をLambdaの初期化処理として実装していました。構成はざっくり以下のようなクライアントサーバモデルです。</p>
+<ul>
+<li>対向システム（サーバ）<ul>
+<li>ある処理を受け付けるサーバがある。スケールアウトはしない</li>
+<li>サーバ制約上、複数のクライアントから同時に接続することはできない</li>
+</ul>
+</li>
+<li>Lambda（クライアント）<ul>
+<li>対向システムとTCP通信して処理を行う</li>
+<li>同期呼び出しLambdaである</li>
+<li>Lambdaは複数起動しても通信確立できないため、予約済同時実行数を1としていた</li>
+<li>TCP通信するための変数はグローバル変数として宣言し、初期化処理で通信を確立するようにしていた</li>
+</ul>
+</li>
+</ul>
+<p>対向システムの制約と（詳細は割愛しますが）非機能要件上、Lambdaの予約済同時実行数を1で絞ることで、Lambdaが2つ以上同時実行されないようにしている、という点がトリッキーな感じです。<sup id="fnref:7"><a href="#fn:7" rel="footnote">7</a></sup></p>
+<p>このとき、ロングランテスト<sup id="fnref:8"><a href="#fn:8" rel="footnote">8</a></sup>中に、稀に以下の問題となる事象を観測することがありました。</p>
+<ul>
+<li>あるタイミングで一定時間Lambdaと対向システムのTCP接続が確立できず、処理が失敗する</li>
+<li>対向システムのサーバは電源断などは起きておらず、通常通り通信できる状態であった</li>
+<li>通信できなくなるLambda起動の前に、別の関数インスタンスによるTCP通信の初期化処理を行っているログがあった</li>
+<li>先に通信を確立した関数インスタンスではハンドラ関数内の処理は行われていない</li>
+</ul>
+<p>イメージ図は以下になります。</p>
+<img src="/images/20220607a/before.png" alt="対向システムが同時接続数が1" width="872" height="462" loading="lazy">
+
+<p>ログから原因は以下のように推測しています。</p>
+<ul>
+<li>Lambdaの予約済同時実行数は1としていたものの、AWS側での関数インスタンスの作成が必ずしも1つとなるわけではない</li>
+<li>なんらかの理由により、Lambdaの実行環境のライフサイクルを管理しているAWS側で関数インスタンスが作成された</li>
+<li>関数インスタンス作成時にINITフェーズが起動し、意図しないタイミングでTCP通信の確立がなされたが、Lambdaのハンドラ関数は呼び出されなかった</li>
+<li>先に作成されていた関数インスタンスでTCP接続が確立されていたため、後から作成した別の関数インスタンスではTCP通信を確立できず、実行に失敗した</li>
+</ul>
+<h2 id="対応"><a href="#対応" class="headerlink" title="対応"></a>対応</h2><p>本ケースではTCP通信の確立は初期化処理ではなく、Lambdaハンドラ関数内で行うようにしました。意図しないタイミングで初期化処理が行われ、対向システムと通信が確立されることを防ぐためです。</p>
+<p>結果として、この対応以降は同様のTCP通信が確立できなくなる事象は発生しておらず、期待した動作を得ることができました。</p>
+<img src="/images/20220607a/after.png" alt="毎回TCPコネクションをオープン・クローズする" width="872" height="462" loading="lazy">
+
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>予約済同時実行数を1で動かしていたケースで、Lambdaの初期化処理と初期化タイミングに関するはまった内容を紹介しました。予約済同時実行数を1とするケースはあまりないとは思いますが、このようにトリッキーな状況で動作する場合、特にLambdaの初期化処理と初期化タイミングに注意しましょう。<sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup></p>
+<p><a href="/articles/20220601a/">失敗談連載2022</a>の次は、久保さんの<a href="/articles/20220608a/">ユーザー要望で要件が増えてく〜アジャイル開発での落とし穴〜</a>です。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:2"><span style="vertical-align: top; padding-right: 10px;">2.</span><span style="vertical-align: top;"><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/golang-handler.html">https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/golang-handler.html</a></span><a href="#fnref:2" rev="footnote"> ↩</a></li><li id="fn:3"><span style="vertical-align: top; padding-right: 10px;">3.</span><span style="vertical-align: top;"><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/lambda/faqs/">https://aws.amazon.com/jp/lambda/faqs/</a></span><a href="#fnref:3" rev="footnote"> ↩</a></li><li id="fn:5"><span style="vertical-align: top; padding-right: 10px;">5.</span><span style="vertical-align: top;"><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/configuration-concurrency.html">https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/configuration-concurrency.html</a></span><a href="#fnref:5" rev="footnote"> ↩</a></li><li id="fn:6"><span style="vertical-align: top; padding-right: 10px;">6.</span><span style="vertical-align: top;">その他、実行タイミングに依存するデータはLambdaのグローバル変数に保存するべきではない、というような一般的な注意ポイントもありますが、本記事では割愛します。詳細は <a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/blogs/news/operating-lambda-performance-optimization-part-2/">https://aws.amazon.com/jp/blogs/news/operating-lambda-performance-optimization-part-2/</a> などを参照ください。</span><a href="#fnref:6" rev="footnote"> ↩</a></li><li id="fn:7"><span style="vertical-align: top; padding-right: 10px;">7.</span><span style="vertical-align: top;">本ケースでは仕方がなく予約済同時実行数を1と設定しましたが、本来であればこうならないように設計を工夫したいところです。</span><a href="#fnref:7" rev="footnote"> ↩</a></li><li id="fn:8"><span style="vertical-align: top; padding-right: 10px;">8.</span><span style="vertical-align: top;"><a target="_blank" rel="noopener" href="https://e-words.jp/w/%E3%83%AD%E3%83%B3%E3%82%B0%E3%83%A9%E3%83%B3%E3%83%86%E3%82%B9%E3%83%88.html">https://e-words.jp/w/ロングランテスト.html</a></span><a href="#fnref:8" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20220607a/&related=twitterapi%2Ctwitter&text=AWS%20Lambda%E3%81%AE%E5%88%9D%E6%9C%9F%E5%8C%96%E5%87%A6%E7%90%86%E3%81%A8%E5%88%9D%E6%9C%9F%E5%8C%96%E3%82%BF%E3%82%A4%E3%83%9F%E3%83%B3%E3%82%B0%E3%81%AE%E8%80%83%E6%85%AE%E4%B8%8D%E8%B6%B3%E3%81%AB%E3%82%88%E3%82%8B%E3%81%AF%E3%81%BE%E3%82%8A%E3%81%A9%E3%81%93%E3%82%8D%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">9</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20220607a/&t=AWS%20Lambda%E3%81%AE%E5%88%9D%E6%9C%9F%E5%8C%96%E5%87%A6%E7%90%86%E3%81%A8%E5%88%9D%E6%9C%9F%E5%8C%96%E3%82%BF%E3%82%A4%E3%83%9F%E3%83%B3%E3%82%B0%E3%81%AE%E8%80%83%E6%85%AE%E4%B8%8D%E8%B6%B3%E3%81%AB%E3%82%88%E3%82%8B%E3%81%AF%E3%81%BE%E3%82%8A%E3%81%A9%E3%81%93%E3%82%8D" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20220607a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">23</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20220607a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">17</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.10.20</span><span class="snscount">&#9825;17</span><a href=/articles/20221020a/ title="TIG DXユニットの真野です。タイトルに書いたままの内容の記事です。おそらくDynamoDB Streams について調べたことがある方の多くの人には自明な内容だと思います。サマリです。* DynamoDB Streamsの起動順序が保たれるのは 項目単位">DynamoDB Streamsは同一ハッシュキーでもソートキーが異なれば順序保証されない</a></li><li class="related-posts-item"><span>2020.11.12</span><span class="snscount">&#9825;11</span><a href=/articles/20201112/ title="TIGの辻です。サーバーレスなアプリケーションを開発するときにAWS LambdaやCloud RunといったFaaSはとても重宝します。デプロイする関数のコードは1つの関数がモノリシックな大きな関数にならないように、小さな関数を組み合わせて実装するのが基本です。いくつかのユースケースでAWS LambdaからAWS Lambdaを同期的に呼び出したいケースがあったのですが、開発者が意識しておいたほうがいいようなハマりどころがいくつかありました。本記事ではGoで[AWS LambdaからAWS Lambdaを同期的に呼び出すとき]のハマりどころやTipsを紹介します。以下のような構成です">GoでLambdaからLambdaを呼び出すときに気をつけたいポイント6選</a></li><li class="related-posts-item"><span>2022.06.06</span><span class="snscount">&#9825;15</span><a href=/articles/20220606a/ title="この記事ではクラウドインフラにはつきものの、インフラコストについての失敗談をご紹介します。ぜひご一読いただき、私の屍を乗り越えていく事で、悲劇の発生を未然に防いでいただければと思います。">RDSの自動再起動によるインフラコストの悲劇</a></li><li class="related-posts-item"><span>2022.05.16</span><span class="snscount">&#9825;34</span><a href=/articles/20220516a/ title="こんにちは。TIG DXチームの後藤です。2021年7月に新卒でフューチャーに入社しました。業務でAPIを通して数万～100万のデータのバッチ処理を行うLambdaの開発を行ったので、学びを共有したいと思います。　　">Lambda×Go並列処理で100万回APIを呼び出す</a></li><li class="related-posts-item"><span>2022.02.02</span><span class="snscount">&#9825;36</span><a href=/articles/20220202a/ title="PipenvとLocalStackを使用したLambda開発環境の構築を紹介します。本記事で作成するデモアプリは以下のGitHubリポジトリに格納しています。">Pipenv+LocalStackで作るLambda開発環境</a></li><li class="related-posts-item"><span>2021.09.14</span><span class="snscount">&#9825;38</span><a href=/articles/20210914a/ title="普段からAWS Lambdaにはお世話になっているのですが、初めてカスタムランタイムを動かす仕事が舞い込んできました。AWS Lambdaでは下記のランタイムがサポートされています。">LambdaをカスタムDockerランタイムで開発する方法</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220606a/ title="この記事ではクラウドインフラにはつきものの、インフラコストについての失敗談をご紹介します。ぜひご一読いただき、私の屍を乗り越えていく事で、悲劇の発生を未然に防いでいただければと思います。">RDSの自動再起動によるインフラコストの悲劇</a></li><li class="reference-posts-item"><a href=/articles/20220601a/ title="普段仕事している中での失敗談を集めた連載開始のインデックス記事となります。普段、仕事で開発などを進めているとき、そのときのレビューが通過したり、気づきにくい小さなミスなどがあるかと思います。そういった内容がちょっとずつ積もっていき、どこかで障害になったり、性能の劣化を引き起こします。はたまた...">失敗談連載2022を始めます</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Lambda%E3%81%AE%E3%83%A9%E3%82%A4%E3%83%95%E3%82%B5%E3%82%A4%E3%82%AF%E3%83%AB%E3%81%A8%E5%88%9D%E6%9C%9F%E5%8C%96%E5%87%A6%E7%90%86"><span class="toc-text">Lambdaのライフサイクルと初期化処理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%BE%E3%82%8A%E3%82%B1%E3%83%BC%E3%82%B9"><span class="toc-text">はまりケース</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C"><span class="toc-text">対応</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

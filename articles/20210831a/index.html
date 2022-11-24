@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>AWS初心者向けNW構築ハンズオン-Internal編- | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにAWS初心者にとって、最初に躓きやすい部分がNWの構築かと思います。 インスタンス立ててみたけど、これってどうやると他のノードと通信できるんだっけ？なんとなく通信できたけど、なんでだ？といった辺り、なんとなく有耶無耶なままにしていませんか。 今回は2020年12月にローンチされたReachability Analyzerを利用して、AWS初心者向けのNW構築ハンズオン-Internal編-">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS初心者向けNW構築ハンズオン-Internal編- | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210831a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにAWS初心者にとって、最初に躓きやすい部分がNWの構築かと思います。 インスタンス立ててみたけど、これってどうやると他のノードと通信できるんだっけ？なんとなく通信できたけど、なんでだ？といった辺り、なんとなく有耶無耶なままにしていませんか。 今回は2020年12月にローンチされたReachability Analyzerを利用して、AWS初心者向けのNW構築ハンズオン-Internal編-">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210831a/vpc_a.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210831a/vpc_b.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210831a/subnet.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210831a/ec2_a.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210831a/ec2_b.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210831a/sg_a.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210831a/sg_b.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210831a/ra01.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210831a/ra02.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210831a/ra03.png">
+<meta property="article:published_time" content="2021-08-30T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:53.525Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="初心者向け">
+<meta property="article:tag" content="Network">
+<meta property="article:tag" content="ハンズオン">
+<meta property="article:tag" content="VPC">
+<meta property="article:tag" content="VPC_Reachability_Analyzer">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210831a/vpc_a.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210831a/">
+  <meta content="AWS,初心者向け,Network,ハンズオン,VPC,VPC_Reachability_Analyzer" name="keywords">
+  <meta content="加藤周平" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">AWS初心者向けNW構築ハンズオン-Internal編-
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210831a_AWS初心者向けNW構築ハンズオン-Internal編-.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210831a_AWS初心者向けNW構築ハンズオン-Internal編-" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-08-30T15:00:00.000Z" itemprop="datePublished">2021.08.31</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%8A%A0%E8%97%A4%E5%91%A8%E5%B9%B3" title="加藤周平さんの記事一覧へ" class="post-author">加藤周平</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/初心者向け/" title="初心者向けタグの記事へ" class="tag-list-link">初心者向け</a>
+  
+    
+    <a href="/tags/Network/" title="Networkタグの記事へ" class="tag-list-link">Network</a>
+  
+    
+    <a href="/tags/ハンズオン/" title="ハンズオンタグの記事へ" class="tag-list-link">ハンズオン</a>
+  
+    
+    <a href="/tags/VPC/" title="VPCタグの記事へ" class="tag-list-link">VPC</a>
+  
+    
+    <a href="/tags/VPC-Reachability-Analyzer/" title="VPC_Reachability_Analyzerタグの記事へ" class="tag-list-link">VPC_Reachability_Analyzer</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>AWS初心者にとって、最初に躓きやすい部分がNWの構築かと思います。</p>
+<p>インスタンス立ててみたけど、これってどうやると他のノードと通信できるんだっけ？なんとなく通信できたけど、なんでだ？といった辺り、なんとなく有耶無耶なままにしていませんか。</p>
+<p>今回は2020年12月にローンチされたReachability Analyzerを利用して、AWS初心者向けのNW構築ハンズオン-Internal編-をやってみたいと思います。</p>
+<p>参考：<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/blogs/news/new-vpc-insights-analyzes-reachability-and-visibility-in-vpcs/">新機能 – VPC Reachability Analyzer</a></p>
+<h1 id="流れ"><a href="#流れ" class="headerlink" title="流れ"></a>流れ</h1><ul>
+<li>前準備<ol>
+<li>VPCを２つ作成</li>
+<li>各VPCにサブネットを作成</li>
+<li>各VPC内にEC2を作成</li>
+</ol>
+</li>
+<li>AWS Reachability Analyzerを利用しての疎通確認<ul>
+<li>#1 VPC Peeringが不足している</li>
+<li>#2 Route Tableのルーティングが不足している</li>
+<li>#3 Security Groupのインバウンドの許可設定が不足している</li>
+<li>#4 振り返り</li>
+</ul>
+</li>
+</ul>
+<h1 id="前準備"><a href="#前準備" class="headerlink" title="前準備"></a>前準備</h1><h2 id="1-VPCを作成"><a href="#1-VPCを作成" class="headerlink" title="1. VPCを作成"></a>1. VPCを作成</h2><p>VPCを2つ作成<br><img src="/images/20210831a/vpc_a.png" alt="vpc_a.png" width="1008" height="266" loading="lazy"><br><img src="/images/20210831a/vpc_b.png" alt="vpc_b.png" width="1019" height="270" loading="lazy"><br>参考：<a target="_blank" rel="noopener" href="https://dev.classmethod.jp/articles/vpc-cidr/">Amazon VPC IPアドレス設計レシピ</a></p>
+<h2 id="2-各VPCにサブネットを作成"><a href="#2-各VPCにサブネットを作成" class="headerlink" title="2. 各VPCにサブネットを作成"></a>2. 各VPCにサブネットを作成</h2><p>各VPC（InternalA, B）に、それぞれサブネットを作成する<br><img src="/images/20210831a/subnet.png" alt="subnet.png" width="1200" height="83" loading="lazy"></p>
+<h2 id="3-各VPCにEC2を作成"><a href="#3-各VPCにEC2を作成" class="headerlink" title="3. 各VPCにEC2を作成"></a>3. 各VPCにEC2を作成</h2><p>今しがた作成した各サブネットにEC2を立てます。<br>イメージはAmazon Linux2、インスタンスサイズはt2.microの無料利用枠にしています。<br><img src="/images/20210831a/ec2_a.png" alt="ec2_a.png" width="851" height="356" loading="lazy"><br><img src="/images/20210831a/ec2_b.png" alt="ec2_b.png" width="856" height="347" loading="lazy"></p>
+<p>また、EC2作成のタイミングで、Security Groupも作成しています。<br>判別しやすいようNameのみ設定しており、ルールはデフォルトのままです。<br><img src="/images/20210831a/sg_a.png" alt="sg_a.png" width="660" height="362" loading="lazy"><br><img src="/images/20210831a/sg_b.png" alt="sg_b.png" width="623" height="366" loading="lazy"></p>
+<h1 id="Reachability-Analyzerを利用しての疎通確認"><a href="#Reachability-Analyzerを利用しての疎通確認" class="headerlink" title="Reachability Analyzerを利用しての疎通確認"></a>Reachability Analyzerを利用しての疎通確認</h1><p>前準備は完了したので、ここからはReachability Analyzerを利用しながら疎通確認をしていきましょう。</p>
+<p>VPCのメニューバーから選択利用できます。<br><img src="/images/20210831a/ra01.png" alt="ra01.png" width="423" height="121" loading="lazy"></p>
+<p><code>パスの作成と分析</code>からパスを作成します。<br>今回はInterna-AのEC2からInternal-BのEC2への疎通確認をします。<br>ポートはhttpsを意識して443としています。<br><img src="/images/20210831a/ra02.png" alt="ra02.png" width="1163" height="157" loading="lazy"></p>
+<h2 id="1-VPC-Peeringが不足している"><a href="#1-VPC-Peeringが不足している" class="headerlink" title="#1 VPC Peeringが不足している"></a>#1 VPC Peeringが不足している</h2><p>パスを作成すると同時に分析が実行されます。<br>分析が完了し、ステータスが<code>到達不可能</code>になっていることが確認できます。<br>詳細を見ていきましょう。<br><img src="/images/20210831a/ra03.png" alt="ra03.png" width="517" height="72" loading="lazy"></p>
+<p>詳細を確認すると、VPC Peeringが接続できていないようです。<br><img src="/images/20210831a/ra04.png" alt="ra04.png" width="1169" height="526" loading="lazy"></p>
+<p>VPC Peeringとは、異なるVPC間の通信を実現するためのサービスです。<br>参考：<a target="_blank" rel="noopener" href="https://dev.classmethod.jp/articles/handson-vpc-peering/">VPCピアリングを作りながら学んでみた</a></p>
+<p>VPCのコンソール画面からピアリング接続を設定します。<br><img src="/images/20210831a/vpc_peering_atob01.png" alt="vpc_peering_atob01.png" width="736" height="524" loading="lazy"></p>
+<p>設定後、アクションメニューバーから承諾を行う必要がある点に注意です。<br><img src="/images/20210831a/vpc_peering_atob02.png" alt="vpc_peering_atob02.png" width="972" height="195" loading="lazy"></p>
+<p>再度、分析してみましょう。</p>
+<h2 id="2-Route-Tableのルーティングが不足している"><a href="#2-Route-Tableのルーティングが不足している" class="headerlink" title="#2 Route Tableのルーティングが不足している"></a>#2 Route Tableのルーティングが不足している</h2><p>分析結果が変わっています。3つ指摘があるようです。先に、1つ目と3つ目を見ていきます。<br><img src="/images/20210831a/ra05.png" alt="ra05.png" width="790" height="170" loading="lazy"></p>
+<p><code>rtb-026e0943b428a980d</code>とは、Internal A（VPC）に紐付いているルートテーブルです。<br><code>pcx-032cb64744c1e754a</code>とは、先程作成したVPC Peeringのことです。<br>Internal AからVPC Peeringに対するルーティング設定が不足しているという指摘のようです。<br>ルーティングを設定しましょう。ターゲットを先のVPC Peeringに向けて、送信先のCIDRはInternal Bを指定します。</p>
+<img src="/images/20210831a/vpc_a_rt.png" alt="vpc_a_rt.png" width="750" height="230" loading="lazy">
+
+<p>3つ目は反対に、Internal BからVPC Peeringに対するルーティング設定が不足しているという指摘です。同じ要領で設定をします。この時、送信先のCIDRはInternal Aを指定します。<br><img src="/images/20210831a/vpc_b_rt.png" alt="vpc_b_rt.png" width="742" height="187" loading="lazy"></p>
+<p>再度、分析してみましょう。</p>
+<h2 id="3-Security-Groupのインバウンドの許可設定が不足している"><a href="#3-Security-Groupのインバウンドの許可設定が不足している" class="headerlink" title="#3 Security Groupのインバウンドの許可設定が不足している"></a>#3 Security Groupのインバウンドの許可設定が不足している</h2><p>先の指摘がクリアになっています。いい感じです。<br>残りの指摘を見ると、Security Groupのingressルールが不足しているようです。<br><img src="/images/20210831a/ra06.png" alt="ra06.png" width="501" height="87" loading="lazy"></p>
+<p><code>03766d1ad9783c83b</code>とはInternal BのEC2にアタッチされているSecurity Groupのことです。<br>このSecurity GroupがInternal AのEC2からの通信を拒絶しているので、許可設定をします。</p>
+<p>今回はhttps通信を想定して、443ポートでの疎通確認をしていました。<br>そのためSecurity Groupのインバウンドルールに443ポート、CIDR10.1.0.0&#x2F;16からの通信を許可する設定を追加します。<br><img src="/images/20210831a/sg_b_inbound.png" alt="sg_b_inbound.png" width="1049" height="253" loading="lazy"></p>
+<p>再度、分析してみましょう。</p>
+<h2 id="4-振り返り"><a href="#4-振り返り" class="headerlink" title="#4 振り返り"></a>#4 振り返り</h2><p>通信に成功しました！<br><img src="/images/20210831a/ra07.png" alt="ra07.png" width="364" height="156" loading="lazy"></p>
+<p>通信経路も視覚的に確認できます。<br><img src="/images/20210831a/ra08.png" alt="ra08.png" width="317" height="442" loading="lazy"></p>
+<p>わかりやすく注釈をつけてみました。<br><img src="/images/20210831a/ra09.png" alt="ra09.png" width="440" height="435" loading="lazy"><br>黒字で記載している箇所は今回意識しなかった箇所です。</p>
+<ul>
+<li>EC2のENI：<ul>
+<li>EC2が通信を行うためのインターフェースです。ENIがないとEC２は通信を行うことができません。EC2を作成したタイミングで合わせて払い出されています。</li>
+</ul>
+</li>
+<li>VPCのACL：<ul>
+<li>VPCの単位でNWの制御を行うためのサービスです。セキュリティグループ同様にセキュリティを高める目的で利用します。</li>
+</ul>
+</li>
+</ul>
+<p>参考：<a target="_blank" rel="noopener" href="https://business.ntt-east.co.jp/content/cloudsolution/column-14.html">AWSのネットワークインターフェース「ENI」とは</a><br>参考：<a target="_blank" rel="noopener" href="https://dev.classmethod.jp/articles/amazon-vpc-acl/">Amazon VPCのネットワークACLについて</a></p>
+<p>なぜ、今回はInternal AのSecurity Groupの設定を操作せずに済んだのかというと、もともと外向きの通信が許可されていたためです。<br><img src="/images/20210831a/sg_a_outbound.png" alt="sg_a_outbound.png" width="1090" height="245" loading="lazy"></p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>今回のNW構成を簡単に図化すると以下です。</p>
+<p>Internal AのVPCにいるEC2からInternal BのVPCにいるEC２に向けて投げられた通信は、SecurityGroupを抜けて、VPCのRouteTableを利用して、VPCPeeringへと流れていきます。</p>
+<p>VPC Peeringを抜けた通信はやがてInternal Bに到達し、Securituy Groupを抜けて対向のEC2へとたどり着きました。</p>
+<img src="/images/20210831a/diagram.png" alt="diagram.png" width="1200" height="723" loading="lazy">
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210831a/&related=twitterapi%2Ctwitter&text=AWS%E5%88%9D%E5%BF%83%E8%80%85%E5%90%91%E3%81%91NW%E6%A7%8B%E7%AF%89%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3-Internal%E7%B7%A8-%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">7</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210831a/&t=AWS%E5%88%9D%E5%BF%83%E8%80%85%E5%90%91%E3%81%91NW%E6%A7%8B%E7%AF%89%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3-Internal%E7%B7%A8-" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210831a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210831a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">4</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2021.06.18</span><span class="snscount">&#9825;700</span><a href=/articles/20210618a/ title="AWS内の通信においてインターネットを経由しないことが最近になって公式ドキュメントに明記されたことを受け、改めてVPC Endpointの必要性について調べてみました。">AWS内の通信がインターネットを経由しない今、VPC Endpointを利用する意味はあるのか？</a></li><li class="related-posts-item"><span>2021.10.26</span><span class="snscount">&#9825;28</span><a href=/articles/20211026a/ title="DynamoDBやKinesis Data Streamsなどを利用するサービスをそれなりの期間で稼働させているとポツポツ下記のようなエラーが発生することが分かりました。RequestError: send request failedcaused by: Post ...: read tcp 169.254.0.1:55638->3.113.218.4:443: read: connection reset by peer">AWS利用時に read: connection reset by peer が出たときのリトライ検討</a></li><li class="related-posts-item"><span>2021.10.13</span><span class="snscount">&#9825;3</span><a href=/articles/20211013b/ title="TIGの伊藤真彦です。来たる11月13日に[Go Conference 2021 Autumn]に、技術ブログでもお馴染みの澁川さん、辻さんと共に登壇させていただくことになりました。楽しい発表になるように頑張ります。宣伝を挟みましたが、AWS Certified Advanced Networking - Specialtyに合格しましたので、今回も合格体験記を書きます。">AWS Certified Advanced Networking - Specialty合格体験記</a></li><li class="related-posts-item"><span>2021.10.06</span><span class="snscount">&#9825;87</span><a href=/articles/20211006b/ title="先日クラウドサービスの障害について社内で体系的に説明する機会があり、0から全体的なイメージがつかめるような情報を整理してみました。Webサービス、ITソリューションが自前のサーバーではなくクラウドサービスを利用して構築されるようになって久しいですが...と語っていきたい所ですが">AWSクラウドの耐障害性、可用性を高めるための前提知識</a></li><li class="related-posts-item"><span>2021.09.24</span><span class="snscount">&#9825;13</span><a href=/articles/20210924a/ title=" Gateway+Lambda という構成でWebAPI開発を行う際、ちょっと便利に使える疎通方法をまとめます。API GatewayですがPublicなエンドポイントがあれば `curl`コマンドや`Postman`を用いての動作検証も容易だと思います。">VPC内のAmazon API Gatewayをインターネットオーバーで疎通確認する</a></li><li class="related-posts-item"><span>2021.08.23</span><span class="snscount">&#9825;18</span><a href=/articles/20210823b/ title="夏の自由研究ブログ連載2021の第1投稿として、Wiresharkで実際に流れるパケットを観察し、通信プロトコルの動きを見てみました。">Wiresharkで通信プロトコルを見る</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B5%81%E3%82%8C"><span class="toc-text">流れ</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E6%BA%96%E5%82%99"><span class="toc-text">前準備</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-VPC%E3%82%92%E4%BD%9C%E6%88%90"><span class="toc-text">1. VPCを作成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%90%84VPC%E3%81%AB%E3%82%B5%E3%83%96%E3%83%8D%E3%83%83%E3%83%88%E3%82%92%E4%BD%9C%E6%88%90"><span class="toc-text">2. 各VPCにサブネットを作成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%90%84VPC%E3%81%ABEC2%E3%82%92%E4%BD%9C%E6%88%90"><span class="toc-text">3. 各VPCにEC2を作成</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Reachability-Analyzer%E3%82%92%E5%88%A9%E7%94%A8%E3%81%97%E3%81%A6%E3%81%AE%E7%96%8E%E9%80%9A%E7%A2%BA%E8%AA%8D"><span class="toc-text">Reachability Analyzerを利用しての疎通確認</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-VPC-Peering%E3%81%8C%E4%B8%8D%E8%B6%B3%E3%81%97%E3%81%A6%E3%81%84%E3%82%8B"><span class="toc-text">#1 VPC Peeringが不足している</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Route-Table%E3%81%AE%E3%83%AB%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%8C%E4%B8%8D%E8%B6%B3%E3%81%97%E3%81%A6%E3%81%84%E3%82%8B"><span class="toc-text">#2 Route Tableのルーティングが不足している</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Security-Group%E3%81%AE%E3%82%A4%E3%83%B3%E3%83%90%E3%82%A6%E3%83%B3%E3%83%89%E3%81%AE%E8%A8%B1%E5%8F%AF%E8%A8%AD%E5%AE%9A%E3%81%8C%E4%B8%8D%E8%B6%B3%E3%81%97%E3%81%A6%E3%81%84%E3%82%8B"><span class="toc-text">#3 Security Groupのインバウンドの許可設定が不足している</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%8C%AF%E3%82%8A%E8%BF%94%E3%82%8A"><span class="toc-text">#4 振り返り</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

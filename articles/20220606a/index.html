@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>RDSの自動再起動によるインフラコストの悲劇 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは。TIG DXユニット所属、金欠コンサルタントの藤井です。最近買ってよかったものは玄関に設置できる宅配ボックスです。 失敗談連載2022 4日目のこの記事では、クラウドインフラにはつきものの、インフラコストについての失敗談をご紹介します。ぜひご一読いただき、私の屍を乗り越えていく事で、悲劇の発生を未然に防いでいただければと思います。（一部記事にするにあたり、経緯を改変している">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RDSの自動再起動によるインフラコストの悲劇 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20220606a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは。TIG DXユニット所属、金欠コンサルタントの藤井です。最近買ってよかったものは玄関に設置できる宅配ボックスです。 失敗談連載2022 4日目のこの記事では、クラウドインフラにはつきものの、インフラコストについての失敗談をご紹介します。ぜひご一読いただき、私の屍を乗り越えていく事で、悲劇の発生を未然に防いでいただければと思います。（一部記事にするにあたり、経緯を改変している">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20220606a/catch-g298cbbc5a_640.jpg">
+<meta property="og:image" content="https://future-architect.github.io/images/20220606a/image.png">
+<meta property="article:published_time" content="2022-06-05T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:55:58.139Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="失敗談">
+<meta property="article:tag" content="RDS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20220606a/catch-g298cbbc5a_640.jpg">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20220606a/">
+  <meta content="AWS,失敗談,RDS" name="keywords">
+  <meta content="藤井亮佑" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">RDSの自動再起動によるインフラコストの悲劇
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20220606a_RDSの自動再起動によるインフラコストの悲劇.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20220606a_RDSの自動再起動によるインフラコストの悲劇" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-06-05T15:00:00.000Z" itemprop="datePublished">2022.06.06</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E8%97%A4%E4%BA%95%E4%BA%AE%E4%BD%91" title="藤井亮佑さんの記事一覧へ" class="post-author">藤井亮佑</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/失敗談/" title="失敗談タグの記事へ" class="tag-list-link">失敗談</a>
+  
+    
+    <a href="/tags/RDS/" title="RDSタグの記事へ" class="tag-list-link">RDS</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20220606a/catch-g298cbbc5a_640.jpg" alt="" width="640" height="435">
+
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIG DXユニット所属、金欠コンサルタントの藤井です。<br>最近買ってよかったものは玄関に設置できる宅配ボックスです。</p>
+<p><a href="/articles/20220601a/">失敗談連載2022</a> 4日目のこの記事では、クラウドインフラにはつきものの、インフラコストについての失敗談をご紹介します。<br>ぜひご一読いただき、私の屍を乗り越えていく事で、悲劇の発生を未然に防いでいただければと思います。<br>（一部記事にするにあたり、経緯を改変している部分があります。ご容赦ください）</p>
+<h2 id="RDSについて"><a href="#RDSについて" class="headerlink" title="RDSについて"></a>RDSについて</h2><h3 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h3><p>皆さん、RDSはお好きでしょうか。私は<strong>基本的に</strong>好きです。Amazon <strong>R</strong>elational <strong>D</strong>atabase <strong>S</strong>ervice、略してRDS。その名の通りAWSが提供する、RDBを運用するためのマネージド型サービスです。</p>
+<p>高い可用性・耐久性・スケーラビリティを誇るサービスであるため、サービスの管理者はDBサーバそのものをほとんど意識をすることなくサービスを提供することが可能となります。</p>
+<p>そんなRDSですが、二つだけどうしても私が好きになれない点があるので、紹介させてください。</p>
+<h3 id="私が好きになれない点"><a href="#私が好きになれない点" class="headerlink" title="私が好きになれない点"></a>私が好きになれない点</h3><h4 id="単純に利用料金が高い"><a href="#単純に利用料金が高い" class="headerlink" title="単純に利用料金が高い"></a>単純に利用料金が高い</h4><p>前述のとおり、RDSはDBサーバの構築・運用において非常に便利なサービスを提供してくれます。EC2へのRDBMSのインストールから、ストレージ管理、障害時のフェイルオーバー、等と言った作業を管理者が実施する場合、人的コストもかなりかかってしまいます。</p>
+<p>そのため、ある程度利用料金が高くなるのは仕方がないことではあります。</p>
+<p>ご参考までに2022年5月時点での東京リージョンにおけるRDS<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>（シングルAZ・Aurora PostgreSQL互換エディション・オンデマンドインスタンス）とEC2<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>（オンデマンド・OSはLinux）の料金比較をいくつかのインスタンスタイプについて以下に掲載します。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>インスタンスタイプ</th>
+<th>RDSの時間あたりの料金 (USD)</th>
+<th>EC2の時間あたりの料金 (USD)</th>
+<th>RDSコスト&#x2F;EC2コスト</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>t4g.medium</td>
+<td>0.113</td>
+<td>0.0432</td>
+<td>2.62</td>
+</tr>
+<tr>
+<td>t4g.large</td>
+<td>0.225</td>
+<td>0.0864</td>
+<td>2.60</td>
+</tr>
+<tr>
+<td>t3.medium</td>
+<td>0.125</td>
+<td>0.0544</td>
+<td>2.30</td>
+</tr>
+<tr>
+<td>t3.large</td>
+<td>0.250</td>
+<td>0.1088</td>
+<td>2.30</td>
+</tr>
+<tr>
+<td>r6g.large</td>
+<td>0.313</td>
+<td>0.1216</td>
+<td>2.57</td>
+</tr>
+<tr>
+<td>r6g.xlarge</td>
+<td>0.627</td>
+<td>0.2432</td>
+<td>2.58</td>
+</tr>
+<tr>
+<td>r5.large</td>
+<td>0.350</td>
+<td>0.152</td>
+<td>2.30</td>
+</tr>
+<tr>
+<td>r5.xlarge</td>
+<td>0.700</td>
+<td>0.304</td>
+<td>2.30</td>
+</tr>
+</tbody></table></div>
+<p>だいたいRDSはEC2の2～3倍のコストがかかるようです。（ストレージ・通信等は除く）<br>もちろんリザーブドインスタンスを用いたり、<strong>不要な時間帯は停止する</strong>等で節約することは可能です。<br>基本的な利用料金が高いからこそ、不要な課金をしないよう管理する必要があります。</p>
+<h4 id="7日間しか停止できない"><a href="#7日間しか停止できない" class="headerlink" title="7日間しか停止できない"></a>7日間しか停止できない</h4><p><strong>罠です</strong>。記載の通り、RDSは7日間しか停止することができません。<br>例えばこの記事が公開される2022年6月6日にRDSを停止した場合、7日後の6月13日に自動的に再起動されます。<br>もちろん停止時には以下のように停止可能期間について案内されるため、管理者はこの仕様について把握することができます。<br><img src="/images/20220606a/image.png" alt="image.png" width="529" height="214" loading="lazy"></p>
+<p>この仕様について、公式ドキュメント<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>には</p>
+<blockquote>
+<p>DB インスタンスは最大 7 日間停止できます。7 日後に DB インスタンスを手動で起動しなかった場合、DB インスタンスは自動的に起動されるため、必要なメンテナンス更新が遅れることはありません。</p>
+</blockquote>
+<p>と記載されていますが、個人的には「最大7日間しか停止できません」と書くべきだと思います。7日後に自動で再起動される理由としては、ハードウェアやRDBMS等のメンテナンスにインスタンスが遅れないようにするため、とのことです。</p>
+<p>2022年5月時点でRDSを7日間以上停止し続ける方法は存在せず、Lambda等で定期的に再起動・停止をスケジューリングする<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>等の方法でしか長期的なRDSの停止はできないようです。</p>
+<h2 id="失敗談"><a href="#失敗談" class="headerlink" title="失敗談"></a>失敗談</h2><p>ここまでの記載内容で私が何をやらかしたか、予想が付いている方も居られるかとは思います。</p>
+<p>検証用に立ち上げ、不要になったため停止したDBが7日後に自動で再起動・利用料金が発生してしまったのです。</p>
+<p>しかも必要以上に大きなインスタンスサイズで構築してしまっていたため、発生した余分コストは高額でした。</p>
+<h3 id="悲劇の発生経緯"><a href="#悲劇の発生経緯" class="headerlink" title="悲劇の発生経緯"></a>悲劇の発生経緯</h3><ol>
+<li>EC2との接続検証用にRDSのインスタンスを1つ（すぐ落とす想定だったため、インスタンスサイズはxlargeを選択）立ち上げ、無事検証を終えました。</li>
+<li>検証が完了したため、このRDSインスタンスは不要となりました。しかし追加で検証が必要になることが予想されるため、ここではインスタンスの削除ではなく停止を選択しました。</li>
+<li>結果として、追加検証は不要であったため、結局インスタンスが再利用されることはありませんでした。</li>
+<li>停止から7日後、RDSは自動でインスタンスを再起動しました。<ul>
+<li>このとき、私の頭には既にこのインスタンスの記憶はありません。</li>
+<li>RDS周りの検証は完了しているため、RDSのマネジメントコンソールにアクセスする理由も無いので、インスタンスの再起動に気づくことはありません。</li>
+</ul>
+</li>
+<li>各種構築が完了し、最後に念のため請求書を確認したところ、想定外の請求が発生している事に気づきます。<ul>
+<li>明細を見ると、よくわからないRDSインスタンスについての請求が・・・</li>
+</ul>
+</li>
+</ol>
+<p>おおよそ上記のような流れで悲劇は発生・検知されました。<br>検知後の対処にも2やらかしぐらいあるのですが、こちらは技術話では無いのでここでは割愛します。</p>
+<h3 id="どうすればよかったのか"><a href="#どうすればよかったのか" class="headerlink" title="どうすればよかったのか"></a>どうすればよかったのか</h3><p>ここまで失敗談について記載しましたが、ではどうすればこの悲劇は回避できたのでしょうか。<br>この悲劇に限らず、大体の事象において以下2つの対応が重要と考えます。</p>
+<ul>
+<li>根本原因を取り除き、悲劇が発生しないようにする</li>
+<li>事象を早期検知し、悲劇を発展させない</li>
+</ul>
+<h4 id="根本原因を取り除き、悲劇が発生しないようにする"><a href="#根本原因を取り除き、悲劇が発生しないようにする" class="headerlink" title="根本原因を取り除き、悲劇が発生しないようにする"></a>根本原因を取り除き、悲劇が発生しないようにする</h4><p>悲劇が発生しないよう、根本原因を排除することができれば悲しむ人は生まれません。</p>
+<p>今回の悲劇に関しては、これはとても簡単で、<strong>RDSは停止せず、削除</strong>すればよいです。後で再利用することが予想される場合は、バックアップを取得した上でインスタンスはためらいなく削除してしまいましょう。</p>
+<p>停止→再起動に比べるとバックアップからの復元の方が多少手間はかかりますが、確実に勝手に再起動されることはありません。バックアップもストレージ分のコストはかかりますが、Auroraの場合月額 0.023USD&#x2F;GB<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup> と軽微です。</p>
+<p>また、これはRDSに限らずですが、そもそもインスタンスサイズは必要最小限に設定しましょう。</p>
+<h4 id="事象を早期検知し、悲劇を発展させない"><a href="#事象を早期検知し、悲劇を発展させない" class="headerlink" title="事象を早期検知し、悲劇を発展させない"></a>事象を早期検知し、悲劇を発展させない</h4><p>万一悲劇が発生してしまっても、早期に検知・食い止めることが出来れば最小限の悲しみに抑えられます。</p>
+<p>一方検知が遅れれば利用料金と共に悲劇は発展し続けます。</p>
+<p>詳細はこの記事には記載しません（いつか別記事として書くかも）が、早期検知には以下のような対策が考えられます。</p>
+<ul>
+<li><strong>システムで検知</strong><ul>
+<li>AWS Budget、AWSコスト異常検出を適切に設定し、想定外の請求が発生した際に検知・通知する</li>
+<li>停止中のRDSがあれば検知・再起動までの期間を通知するLambdaを作成・定期実行する</li>
+</ul>
+</li>
+<li><strong>運用で検知（検知システムの構築ができない場合）</strong><ul>
+<li>定期的（日次・週次など）に請求額を確認する。可能であればリソース毎の請求内容も確認する</li>
+<li>定期的（日次・週次など）にRDSマネジメントコンソールを確認し、想定外インスタンスが存在しないことを確認する</li>
+</ul>
+</li>
+</ul>
+<p>なお、利用サービスに種類や検証などの用途に問わず、利用金額の通知周りについては、AWSアカウントを作成の初期段階で常に設定を行っておくとよいでしょう。</p>
+<h2 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h2><p>私の失敗談は以上です。</p>
+<p>インフラコストにまつわる悲劇は様々な原因で起こり得るものです。今回の内容はRDSの、それも自動再起動に特化した内容ではありましたが、対策についての考え方は様々な悲劇に共通するものです。</p>
+<p>どうすれば悲劇を予防できるのか、早期検知できるのかについて考え続け、少しでも悲劇を抑えられると良いと思います。</p>
+<p><a href="/articles/20220601a/">失敗談連載2022</a> 明日は辻さんの<a href="/articles/20220607a/">AWS Lambdaの初期化処理と初期化タイミングの考慮不足によるはまりどころ</a>です。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">Amazon RDS の料金 <a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/rds/pricing/">https://aws.amazon.com/jp/rds/pricing/</a></span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="vertical-align: top; padding-right: 10px;">2.</span><span style="vertical-align: top;">Amazon EC2 の料金 <a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/ec2/pricing/">https://aws.amazon.com/jp/ec2/pricing/</a></span><a href="#fnref:2" rev="footnote"> ↩</a></li><li id="fn:3"><span style="vertical-align: top; padding-right: 10px;">3.</span><span style="vertical-align: top;">一時的に Amazon RDS DB インスタンスを停止する <a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_StopInstance.html">https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_StopInstance.html</a></span><a href="#fnref:3" rev="footnote"> ↩</a></li><li id="fn:4"><span style="vertical-align: top; padding-right: 10px;">4.</span><span style="vertical-align: top;">Amazon RDS インスタンスを 7 日以上停止する方法を教えて下さい。 <a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/premiumsupport/knowledge-center/rds-stop-seven-days/">https://aws.amazon.com/jp/premiumsupport/knowledge-center/rds-stop-seven-days/</a></span><a href="#fnref:4" rev="footnote"> ↩</a></li><li id="fn:5"><span style="vertical-align: top; padding-right: 10px;">5.</span><span style="vertical-align: top;">Amazon Aurora の料金 <a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/rds/aurora/pricing/">https://aws.amazon.com/jp/rds/aurora/pricing/</a></span><a href="#fnref:5" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20220606a/&related=twitterapi%2Ctwitter&text=RDS%E3%81%AE%E8%87%AA%E5%8B%95%E5%86%8D%E8%B5%B7%E5%8B%95%E3%81%AB%E3%82%88%E3%82%8B%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E3%82%B3%E3%82%B9%E3%83%88%E3%81%AE%E6%82%B2%E5%8A%87%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">7</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20220606a/&t=RDS%E3%81%AE%E8%87%AA%E5%8B%95%E5%86%8D%E8%B5%B7%E5%8B%95%E3%81%AB%E3%82%88%E3%82%8B%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E3%82%B3%E3%82%B9%E3%83%88%E3%81%AE%E6%82%B2%E5%8A%87" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20220606a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20220606a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">8</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.10.20</span><span class="snscount">&#9825;17</span><a href=/articles/20221020a/ title="TIG DXユニットの真野です。タイトルに書いたままの内容の記事です。おそらくDynamoDB Streams について調べたことがある方の多くの人には自明な内容だと思います。サマリです。* DynamoDB Streamsの起動順序が保たれるのは 項目単位">DynamoDB Streamsは同一ハッシュキーでもソートキーが異なれば順序保証されない</a></li><li class="related-posts-item"><span>2022.06.07</span><span class="snscount">&#9825;52</span><a href=/articles/20220607a/ title="失敗談をテーマにした連載の5本目です。AWS Lambdaで、予約済同時実行数を1に制限して使っていたときに、初期化処理と初期化タイミングの考慮不足により、はまったことがありました。本記事ではLambdaの初期化処理についておさらいした後、はまったケースの事例や原因、対応した方法を紹介します。">AWS Lambdaの初期化処理と初期化タイミングの考慮不足によるはまりどころ</a></li><li class="related-posts-item"><span>2022.08.23</span><span class="snscount">&#9825;24</span><a href=/articles/20220823a/ title="長らく買おう買おうと思っていたMeta Quest 2をとうとう買いました。Meta Quest 2向けに作ってみた、VRテルミンシミュレータというものを題材に記事を書きます。作ったものはこちらです。">Quest2のハンドトラッキングでVRテルミンシミュレータを作ってみた</a></li><li class="related-posts-item"><span>2022.08.10</span><span class="snscount">&#9825;8</span><a href=/articles/20220810a/ title="こんにちは！2021年入社、TIGメディアユニット所属の武田です。">【メディア業界】新聞社の編集業務とフューチャーの取組み</a></li><li class="related-posts-item"><span>2022.06.09</span><span class="snscount">&#9825;6</span><a href=/articles/20220609a/ title="Google Workspace Admin SDKのDirectory APIを使った開発を行いました。本記事では、APIを利用した際に500エラーを頻発させてしまった件について執筆していこうと思います。">GoogleWorkspace SDKのAPIリクエスト間隔は気を付けましょう</a></li><li class="related-posts-item"><span>2022.06.08</span><span class="snscount">&#9825;25</span><a href=/articles/20220608a/ title="失敗談をテーマにした連載の6本目です。自分が担当した業務でのアジャイル開発での失敗について反省したいと思います。選定したアーキテクチャとアジャイル開発の相性があまりよくなく苦労しました。これはアジャイルの本にはなかった知見でした。">ユーザー要望で要件が増えてく〜アジャイル開発での落とし穴〜</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220603a/ title="参加しているプロジェクトで、数百万件のデータを処理する機能を担当したことがありました。本記事はその際の失敗と、その失敗から得た経験を共有するため、執筆しました。">Go言語で定数として扱いたいmapを毎回アロケートさせて性能劣化した話</a></li><li class="reference-posts-item"><a href=/articles/20220601a/ title="普段仕事している中での失敗談を集めた連載開始のインデックス記事となります。普段、仕事で開発などを進めているとき、そのときのレビューが通過したり、気づきにくい小さなミスなどがあるかと思います。そういった内容がちょっとずつ積もっていき、どこかで障害になったり、性能の劣化を引き起こします。はたまた...">失敗談連載2022を始めます</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#RDS%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">RDSについて</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A6%82%E8%A6%81"><span class="toc-text">概要</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A7%81%E3%81%8C%E5%A5%BD%E3%81%8D%E3%81%AB%E3%81%AA%E3%82%8C%E3%81%AA%E3%81%84%E7%82%B9"><span class="toc-text">私が好きになれない点</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%98%E7%B4%94%E3%81%AB%E5%88%A9%E7%94%A8%E6%96%99%E9%87%91%E3%81%8C%E9%AB%98%E3%81%84"><span class="toc-text">単純に利用料金が高い</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7%E6%97%A5%E9%96%93%E3%81%97%E3%81%8B%E5%81%9C%E6%AD%A2%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><span class="toc-text">7日間しか停止できない</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%B1%E6%95%97%E8%AB%87"><span class="toc-text">失敗談</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%82%B2%E5%8A%87%E3%81%AE%E7%99%BA%E7%94%9F%E7%B5%8C%E7%B7%AF"><span class="toc-text">悲劇の発生経緯</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%81%A9%E3%81%86%E3%81%99%E3%82%8C%E3%81%B0%E3%82%88%E3%81%8B%E3%81%A3%E3%81%9F%E3%81%AE%E3%81%8B"><span class="toc-text">どうすればよかったのか</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%B9%E6%9C%AC%E5%8E%9F%E5%9B%A0%E3%82%92%E5%8F%96%E3%82%8A%E9%99%A4%E3%81%8D%E3%80%81%E6%82%B2%E5%8A%87%E3%81%8C%E7%99%BA%E7%94%9F%E3%81%97%E3%81%AA%E3%81%84%E3%82%88%E3%81%86%E3%81%AB%E3%81%99%E3%82%8B"><span class="toc-text">根本原因を取り除き、悲劇が発生しないようにする</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8B%E8%B1%A1%E3%82%92%E6%97%A9%E6%9C%9F%E6%A4%9C%E7%9F%A5%E3%81%97%E3%80%81%E6%82%B2%E5%8A%87%E3%82%92%E7%99%BA%E5%B1%95%E3%81%95%E3%81%9B%E3%81%AA%E3%81%84"><span class="toc-text">事象を早期検知し、悲劇を発展させない</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a></li></ol></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Pyright を LSP サーバとした自作 LSP クライアント（調査編） | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにLanguage Server Protocol の理解として、Pyright を LSP サーバとした自作クライアントの作成を行いました（Pyright を LSP サーバとした自作 LSP クライアント（実装編））。その際、Pyright に解析を行わせるための初期化方法がドキュメントには書かれていなかったので、VSCode 拡張用のクライアントをトレースして調査することにしました。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pyright を LSP サーバとした自作 LSP クライアント（調査編） | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20220302a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにLanguage Server Protocol の理解として、Pyright を LSP サーバとした自作クライアントの作成を行いました（Pyright を LSP サーバとした自作 LSP クライアント（実装編））。その際、Pyright に解析を行わせるための初期化方法がドキュメントには書かれていなかったので、VSCode 拡張用のクライアントをトレースして調査することにしました。">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20220302a/s.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220302a/ss.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220302a/スクリーンショット_(8).png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220302a/スクリーンショット_(10).png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220302a/スクリーンショット_(12).png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220302a/スクリーンショット_(11).png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220302a/スクリーンショット_(13).png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220302a/スクリーンショット_(14).png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220302a/スクリーンショット_(15).png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220302a/スクリーンショット_(16).png">
+<meta property="article:published_time" content="2022-03-01T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:55:58.037Z">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="コアテク">
+<meta property="article:tag" content="構文解析">
+<meta property="article:tag" content="Pyright">
+<meta property="article:tag" content="LSP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20220302a/s.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20220302a/">
+  <meta content="Python,コアテク,構文解析,Pyright,LSP" name="keywords">
+  <meta content="空閑康太" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Pyright を LSP サーバとした自作 LSP クライアント（調査編）
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20220302a_Pyright_を_LSP_サーバとした自作_LSP_クライアント（調査編）.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20220302a_Pyright_を_LSP_サーバとした自作_LSP_クライアント（調査編）" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-03-01T15:00:00.000Z" itemprop="datePublished">2022.03.02</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%A9%BA%E9%96%91%E5%BA%B7%E5%A4%AA" title="空閑康太さんの記事一覧へ" class="post-author">空閑康太</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Python/" title="Pythonタグの記事へ" class="tag-list-link">Python</a>
+  
+    
+    <a href="/tags/コアテク/" title="コアテクタグの記事へ" class="tag-list-link">コアテク</a>
+  
+    
+    <a href="/tags/構文解析/" title="構文解析タグの記事へ" class="tag-list-link">構文解析</a>
+  
+    
+    <a href="/tags/Pyright/" title="Pyrightタグの記事へ" class="tag-list-link">Pyright</a>
+  
+    
+    <a href="/tags/LSP/" title="LSPタグの記事へ" class="tag-list-link">LSP</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>Language Server Protocol の理解として、Pyright を LSP サーバとした自作クライアントの作成を行いました（<a href="/articles/20220303a/">Pyright を LSP サーバとした自作 LSP クライアント（実装編）</a>）。その際、Pyright に解析を行わせるための初期化方法がドキュメントには書かれていなかったので、VSCode 拡張用のクライアントをトレースして調査することにしました。</p>
+<h1 id="調査方法"><a href="#調査方法" class="headerlink" title="調査方法"></a>調査方法</h1><p>Pyright のリポジトリには言語サーバ（<a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright/tree/main/packages/pyright"><code>packages/pyright</code></a>）だけでなく、VSCode 拡張用のクライアント（<a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright/tree/main/packages/vscode-pyright"><code>packages/vscode-pyright</code></a>）が存在します。今回はこの二つをデバッガで実行して調査します。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright">https://github.com/microsoft/pyright</a></p>
+<h2 id="1-インストール"><a href="#1-インストール" class="headerlink" title="1. インストール"></a>1. インストール</h2><p><a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright/blob/main/docs/build-debug.md">https://github.com/microsoft/pyright/blob/main/docs/build-debug.md</a></p>
+<p>ます、上の記事にしたがって Pyright をローカルでビルドします。</p>
+<ol>
+<li>Node.js のインストール</li>
+<li><code>git clone https://github.com/microsoft/pyright.git &amp;&amp; cd pyright</code></li>
+<li><code>npm install</code></li>
+</ol>
+<p>また、拡張機能として Pyright および Pylance を導入している場合には無効にします。</p>
+<h2 id="2-デバッグ実行"><a href="#2-デバッグ実行" class="headerlink" title="2. デバッグ実行"></a>2. デバッグ実行</h2><p>Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイドバーから「実行とデバッグ」を選択し、プルダウンメニューから “Pyright extension” を選択、実行します。なお、実行時のオプションについてはプルダウンメニュー横の歯車、あるいは <a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright/blob/main/.vscode/launch.json"><code>.vscode/launch.json</code></a> から確認できます。</p>
+<img src="/images/20220302a/s.png" alt="VS Codeデバッグ実行" width="1200" height="656" loading="lazy">
+
+<p>実行すると、VSCode がもう一つ別のウィンドウで立ち上がります。上部に [拡張機能開発ホスト] と書かれていることを確認します。このウィンドウは現在実行している拡張機能が反映された VSCode になっています。<br><img src="/images/20220302a/ss.png" alt="VSCode がもう一つ別のウィンドウ" width="1200" height="84" loading="lazy"></p>
+<p>ブレークポイントが動作することを確認します。<a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright/blob/06e9f626f4388bc9b894daf4239a9e4a8e3ffb11/packages/vscode-pyright/src/extension.ts#L206"><code>packages/vscode-pyright/src/extension.ts:206</code></a> にはクライアントからサーバへ再起動を要求するメッセージ送信が実装されているので、ここにブレークポイントを置いてみます。[拡張機能開発ホスト] のウィンドウでコマンドパレットを開き、”Pyright: Restart Server” を実行すると、プログラムが一時停止しておりブレークポイントが機能していることを確認できます。</p>
+<img src="/images/20220302a/スクリーンショット_(8).png" alt="コマンドパレット" width="924" height="229" loading="lazy">
+
+<img src="/images/20220302a/スクリーンショット_(10).png" alt="ブレークポイントが機能している" width="1200" height="499" loading="lazy">
+
+
+<h2 id="3-デバッガのアタッチ"><a href="#3-デバッガのアタッチ" class="headerlink" title="3. デバッガのアタッチ"></a>3. デバッガのアタッチ</h2><p>2 までの手順では、クライアントのみがデバッガで実行されます。しかし、メッセージを受信した後の処理はサーバ側で行われるため、調査のためにはこちらもデバッガで実行したくなります。<a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright/blob/06e9f626f4388bc9b894daf4239a9e4a8e3ffb11/packages/vscode-pyright/src/extension.ts#L66"><code>extension.ts:66</code></a> では、サーバがポート 6600 で建てられているので、ここにデバッガをアタッチします。<br><img src="/images/20220302a/スクリーンショット_(12).png" alt="スクリーンショット_(12).png" width="1074" height="367" loading="lazy"></p>
+<p>「実行とデバッグ」のプルダウンメニューに “Pyright attach server” があるのでこれを “Pyright extension” 実行後に実行すればよいです。<a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright/blob/main/.vscode/launch.json"><code>.vscode/launch.json</code></a> の <code>&quot;port&quot;: 6600</code> が先ほど確認したポートと一致することに注意します。<br><img src="/images/20220302a/スクリーンショット_(11).png" alt="スクリーンショット_(11).png" width="1200" height="546" loading="lazy"></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright/blob/06e9f626f4388bc9b894daf4239a9e4a8e3ffb11/packages/pyright-internal/src/commands/restartServer.ts#L18"><code>pyright-internal/src/commands/restartServer.ts</code></a> がサーバ側で再起動コマンドを扱う部分です。ブレークポイントを打って同様にメッセージを送信すると、一時停止することが確認できます。<br><img src="/images/20220302a/スクリーンショット_(13).png" alt="デバッガをアタッチ" width="1200" height="586" loading="lazy"></p>
+<p>アタッチできていない場合には、下の画像のように Unbound breakpoint となり一時停止しません。<br><img src="/images/20220302a/スクリーンショット_(14).png" alt=".vscode/launch.json" width="909" height="224" loading="lazy"></p>
+<h1 id="調査内容"><a href="#調査内容" class="headerlink" title="調査内容"></a>調査内容</h1><h2 id="1-Initialize-Request"><a href="#1-Initialize-Request" class="headerlink" title="1. Initialize Request"></a>1. Initialize Request</h2><p><a target="_blank" rel="noopener" href="https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialize">初期化関連の仕様</a>を見ると、メソッド <code>initialize</code> は送信する必要がありそうです。そこでまず次の二つを順に送信してみます。</p>
+<blockquote>
+<ol>
+<li><code>initialize</code> メソッド：サーバの初期化を要求</li>
+<li>適当な解析メソッド</li>
+</ol>
+</blockquote>
+<p>すると、<a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright/blob/844f7cb98987955dc617cd97b1372325e76a4530/packages/pyright-internal/src/languageServerBase.ts#L415"><code>pyright-internal/src/commands/languageServerBase.ts:417</code></a> で停止してしまいました。<code>workspace.isInitialized</code> が <code>true</code> とならないことが原因です。</p>
+<img src="/images/20220302a/スクリーンショット_(15).png" alt="workspace.isInitialized" width="923" height="131" loading="lazy">
+
+<p>したがって、<code>initialize</code> メソッドの後に何か他のメソッドを送信する必要がありそうです。</p>
+<blockquote>
+<ol>
+<li><code>initialize</code> メソッド：サーバの初期化を要求</li>
+<li>???：ワークスペースを初期化</li>
+<li>適当な解析メソッド</li>
+</ol>
+</blockquote>
+<h2 id="2-DidChangeWorkspaceFolders-Notification"><a href="#2-DidChangeWorkspaceFolders-Notification" class="headerlink" title="2. DidChangeWorkspaceFolders Notification"></a>2. DidChangeWorkspaceFolders Notification</h2><p>調べると、<code>workspace.isInitialized</code> はメソッド <a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright/blob/844f7cb98987955dc617cd97b1372325e76a4530/packages/pyright-internal/src/languageServerBase.ts#L1265"><code>updateSettingsForWorkspace</code></a> が実行されて <code>true</code> となります。</p>
+<img src="/images/20220302a/スクリーンショット_(16).png" alt="DidChangeWorkspaceFolders Notification" width="967" height="384" loading="lazy">
+
+<p>このメソッドは <a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright/blob/844f7cb98987955dc617cd97b1372325e76a4530/packages/pyright-internal/src/languageServerBase.ts#L581"><code>onDidChangeWorkspaceFolders</code></a> で管理されているので、<code>workspace/didChangeWorkspaceFolders</code> を送信することで呼ばれます。</p>
+<img src="/images/20220302a/スクリーンショット_(18).png" alt="workspace/didChangeWorkspaceFolders" width="742" height="269" loading="lazy">
+
+<p>つまり、手順としては次のようになります。</p>
+<blockquote>
+<ol>
+<li><code>initialize</code> メソッド：サーバの初期化を要求</li>
+<li><code>workspace/didChangeWorkspaceFolders</code> メソッド：ワークスペースフォルダを変更</li>
+<li>適当な解析メソッド</li>
+</ol>
+</blockquote>
+<p>ただし、<code>onDidChangeWorkspaceFolders</code> は特定の条件で有効化されることに注意します。</p>
+<h2 id="3-Initialized-Notification"><a href="#3-Initialized-Notification" class="headerlink" title="3. Initialized Notification"></a>3. Initialized Notification</h2><p><a target="_blank" rel="noopener" href="https://github.com/microsoft/pyright/blob/844f7cb98987955dc617cd97b1372325e76a4530/packages/pyright-internal/src/languageServerBase.ts#L579"><code>onDidChangeWorkspaceFolders</code>の前後</a> を確認すると、有効化には以下の二つの条件を満たす必要があります。</p>
+<ol>
+<li><code>initialized</code> メソッドの送信</li>
+<li><code>this.client.hasWorkspaceFoldersCapability = true</code></li>
+</ol>
+<p>1 は明らかに送信するだけです。<a target="_blank" rel="noopener" href="https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialized"><code>initialized</code> メソッド</a> は サーバからの InitializeResult に対応するものなので、タイミングは InitializeResult を受け取った後、<code>workspace/didChangeWorkspaceFolders</code> メソッドを送信する前になります。2 はわかりにくいですが、<a target="_blank" rel="noopener" href="https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialize"><code>initialize</code>メソッド</a> のオプションに <code>capabilities</code> があるのでここで登録します。つまり、初期化方法は全体で次のようになることがわかりました。</p>
+<blockquote>
+<ol>
+<li><code>initialize</code> メソッド：サーバの初期化を要求<br>  a. <code>capabilities.workspace.workspaceFolders = true</code>：ワークスペースフォルダ機能を有効化</li>
+<li><code>initialized</code> メソッド：クライアント側の初期化が完了したことを通知</li>
+<li><code>workspace/didChangeWorkspaceFolders</code> メソッド：ワークスペースフォルダの変更を通知</li>
+<li>適当な解析メソッド</li>
+</ol>
+</blockquote>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>以上から、Pyright の初期化は下図のようにして行われることがわかりました。実装は<a href="/articles/20220303a/">Pyright を LSP サーバとした自作 LSP クライアント（実装編）</a>で扱っていますので、合わせて読んでいただければと思います。</p>
+<img src="/images/20220302a/スクリーンショット_(19).PNG" alt="シーケンス図" width="807" height="529" loading="lazy">
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20220302a/&related=twitterapi%2Ctwitter&text=Pyright%20%E3%82%92%20LSP%20%E3%82%B5%E3%83%BC%E3%83%90%E3%81%A8%E3%81%97%E3%81%9F%E8%87%AA%E4%BD%9C%20LSP%20%E3%82%AF%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88%EF%BC%88%E8%AA%BF%E6%9F%BB%E7%B7%A8%EF%BC%89%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20220302a/&t=Pyright%20%E3%82%92%20LSP%20%E3%82%B5%E3%83%BC%E3%83%90%E3%81%A8%E3%81%97%E3%81%9F%E8%87%AA%E4%BD%9C%20LSP%20%E3%82%AF%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88%EF%BC%88%E8%AA%BF%E6%9F%BB%E7%B7%A8%EF%BC%89" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20220302a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20220302a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.03.01</span><span class="snscount">&#9825;24</span><a href=/articles/20220301a/ title="Mypy や Pyright は Python の静的解析ツールとして有名ですが、これら二つに解析情報でどのような違いがあるのかわからなかったので、実験することにしました。Pyright は Mypy に比べて後発のプロジェクトですが、性能面で優れているなどとして徐々に注目を集めています。">Mypy と Pyright の解析手法と型情報の比較</a></li><li class="related-posts-item"><span>2022.03.03</span><span class="snscount">&#9825;9</span><a href=/articles/20220303a/ title="Pyright を LSP  サーバとした自作クライアントを実装しますが、その前に経緯について説明します。アルバイトの前は、Future のインターン Engineer Camp で Python のソースコード解析に取り組んでいました。当時は Python の AST モジュールを活用する方針で、それ以外は自前で解析を行っていました。アルバイトでも引き続き解析に取り組んでいますが、次第に型推論などの技術が必要になってきており、全てを自前で実装することは困難な状況です。そこで現在は、既存のツールを拡張する方針を取っています。ツールの候補としては、Mypy および Pyright が挙がりましたが...">Pyright を LSP サーバとした自作 LSP クライアント（実装編）</a></li><li class="related-posts-item"><span>2021.10.19</span><span class="snscount">&#9825;12</span><a href=/articles/20211019a/ title="こんにちは、Future のインターン Engineer Camp に参加した空閑です。今回のインターンではソースコード静的解析システムの開発に取り組みました。そこで本記事では、開発内容の一部である、Python の AST モジュールを使ったクラス構造の可視化について紹介します。Python の環境構築については以下を参考にしました。[サーバーアプリ開発環境">Engineer Camp2021: Python の AST モジュールを使ってクラス構造を可視化する</a></li><li class="related-posts-item"><span>2020.09.19</span><span class="snscount">&#9825;9</span><a href=/articles/20200919/ title="はじめまして。フューチャーのインターンEngineer Campに参加した中村と申します。この記事では、今回のインターンで私が取り組んだ内容を紹介します。今回のインターンで私は、SQLフォーマッタの作成に取り組みました。">Engineer Camp2020でSQLフォーマッタを開発しました</a></li><li class="related-posts-item"><span>2020.09.03</span><span class="snscount">&#9825;19</span><a href=/articles/20200903/ title="皆さんは[ANTLR]をご存知でしょうか？ANTLRとはparser(構文解析器)を生成するためのツール(パーサジェネレータ)で、以下のような特徴があります。">ANTLRを業務で活用した話</a></li><li class="related-posts-item"><span>2022.11.24</span><span class="snscount">&#9825;0</span><a href=/articles/20221124a/ title="SQLフォーマッタをVSCodeの拡張機能にする作業を行っており、そのための方法を学んでいます。本記事ではLanguage Server Protocolを用いたVSCode拡張機能開発について説明します。。">Language Server Protocolを用いたVSCode拡張機能開発 (前編)<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20221124a/ title="SQLフォーマッタをVSCodeの拡張機能にする作業を行っており、そのための方法を学んでいます。本記事ではLanguage Server Protocolを用いたVSCode拡張機能開発について説明します。。">Language Server Protocolを用いたVSCode拡張機能開発 (前編)<span class="newitem">NEW</span></a></li><li class="reference-posts-item"><a href=/articles/20220303a/ title="Pyright を LSP  サーバとした自作クライアントを実装しますが、その前に経緯について説明します。アルバイトの前は、Future のインターン Engineer Camp で Python のソースコード解析に取り組んでいました。当時は Python の AST モジュールを活用する方針で、それ以外は自前で解析を行っていました。アルバイトでも引き続き解析に取り組んでいますが、次第に型推論などの技術が必要になってきており、全てを自前で実装することは困難な状況です。そこで現在は、既存のツールを拡張する方針を取っています。ツールの候補としては、Mypy および Pyright が挙がりましたが...">Pyright を LSP サーバとした自作 LSP クライアント（実装編）</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AA%BF%E6%9F%BB%E6%96%B9%E6%B3%95"><span class="toc-text">調査方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB"><span class="toc-text">1. インストール</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E3%83%87%E3%83%90%E3%83%83%E3%82%B0%E5%AE%9F%E8%A1%8C"><span class="toc-text">2. デバッグ実行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E3%83%87%E3%83%90%E3%83%83%E3%82%AC%E3%81%AE%E3%82%A2%E3%82%BF%E3%83%83%E3%83%81"><span class="toc-text">3. デバッガのアタッチ</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AA%BF%E6%9F%BB%E5%86%85%E5%AE%B9"><span class="toc-text">調査内容</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Initialize-Request"><span class="toc-text">1. Initialize Request</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-DidChangeWorkspaceFolders-Notification"><span class="toc-text">2. DidChangeWorkspaceFolders Notification</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Initialized-Notification"><span class="toc-text">3. Initialized Notification</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>15分の壁を超えて。Lambda分散実行術 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTIG DXユニット1の真野です。Serverless連載2021の2日目です。 AWSで一度Lambdaを利用すると、その利便性から徐々に利用範囲が広がっていくことがよく観測されます。一度だけならと一度手を出すと、いつの間にかLambda以外で動かすことによるイベント連携の手間や、キャパシティプランニング、CI&#x2F;CDパイプライン構築と運用監視の手間など、フルマネージド及び周辺シ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="15分の壁を超えて。Lambda分散実行術 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210601a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIG DXユニット1の真野です。Serverless連載2021の2日目です。 AWSで一度Lambdaを利用すると、その利便性から徐々に利用範囲が広がっていくことがよく観測されます。一度だけならと一度手を出すと、いつの間にかLambda以外で動かすことによるイベント連携の手間や、キャパシティプランニング、CI&#x2F;CDパイプライン構築と運用監視の手間など、フルマネージド及び周辺シ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210601a/BroadcastAggregate.gif">
+<meta property="og:image" content="https://future-architect.github.io/images/20210601a/scatter.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210601a/gather.png">
+<meta property="article:published_time" content="2021-05-31T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:55:57.973Z">
+<meta property="article:tag" content="サーバーレス">
+<meta property="article:tag" content="バッチ処理">
+<meta property="article:tag" content="Lambda">
+<meta property="article:tag" content="Kinesis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210601a/BroadcastAggregate.gif">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210601a/">
+  <meta content="サーバーレス,バッチ処理,Lambda,Kinesis" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">15分の壁を超えて。Lambda分散実行術
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210601a_15分の壁を超えて。Lambda分散実行術.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210601a_15分の壁を超えて。Lambda分散実行術" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-05-31T15:00:00.000Z" itemprop="datePublished">2021.06.01</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98" title="真野隼記さんの記事一覧へ" class="post-author">真野隼記</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/サーバーレス/" title="サーバーレスタグの記事へ" class="tag-list-link">サーバーレス</a>
+  
+    
+    <a href="/tags/バッチ処理/" title="バッチ処理タグの記事へ" class="tag-list-link">バッチ処理</a>
+  
+    
+    <a href="/tags/Lambda/" title="Lambdaタグの記事へ" class="tag-list-link">Lambda</a>
+  
+    
+    <a href="/tags/Kinesis/" title="Kinesisタグの記事へ" class="tag-list-link">Kinesis</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG DXユニット<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>の真野です。<a href="/articles/20210531a/">Serverless連載2021</a>の2日目です。</p>
+<p>AWSで一度Lambdaを利用すると、その利便性から徐々に利用範囲が広がっていくことがよく観測されます。一度だけならと一度手を出すと、いつの間にかLambda以外で動かすことによるイベント連携の手間や、キャパシティプランニング、CI&#x2F;CDパイプライン構築と運用監視の手間など、フルマネージド及び周辺システムのエコシステムの恩恵を得られなくてイライラする事も、身体に耐性がついてつい利用量が増えていくこともしばしばです。（例のサイクルの画像は割愛）。</p>
+<p>本記事ではAWS Lambdaでのバッチ処理について検討します。</p>
+<h1 id="AWS-Lambdaとバッチ処理との相性"><a href="#AWS-Lambdaとバッチ処理との相性" class="headerlink" title="AWS Lambdaとバッチ処理との相性"></a>AWS Lambdaとバッチ処理との相性</h1><p>そんなAWS Lambdaですが2021.06.01時点では実行時間に制約があり<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html">15分</a>です。過去、<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/blogs/news/aws-lambda-timeout-15min/">5分から15分にアップデート</a>された経緯がありますが、今後も何かしらの制約は残るでしょう。</p>
+<p>そのため、AWS Lambdaのサービス単体でバッチ処理を行うのは難しく、他のサービスあるいは、他のサービスと組み合わせてバッチ処理を実現することが多いです。</p>
+<p>よく見るのは以下3つでしょうか。</p>
+<ol>
+<li>ECSで処理</li>
+<li>AWS Batchで処理</li>
+<li>Step FunctionsとLambdaを組み合わせ</li>
+</ol>
+<p>3つ目のStep Functionsは<a href="/articles/20200515/">過去にまとめた</a>ことがあります。</p>
+<p>今回はLambda中毒者らしく、1のECSや2のAWS Batchに頼らず、3のStep Functionsでもなく、LambdaとKinesisでバッチ処理を実現しようと思います。</p>
+<h1 id="Scatter-Fanout-パターン"><a href="#Scatter-Fanout-パターン" class="headerlink" title="Scatter(Fanout)パターン"></a>Scatter(Fanout)パターン</h1><p>Enterprise Integration Patternで分散・集約するパターンをScatter-Gatherパターンと呼びますが、今回はこちらの分散する部分のみを利用します。GatherなしのScatterパターンとはあまり聞かないので、Fanoutパターンが正しいのかもです。タイトルでは15分の壁を超えてとありますが、個別のLambdaでその壁は超えられないので、複数のLambdaを並列で実行させることで、それら処理時間の合計で仮想的に超えることにします。</p>
+<img src="/images/20210601a/BroadcastAggregate.gif" alt="Scatter Gatherパターン" width="377" height="226" loading="lazy">
+
+<p><a target="_blank" rel="noopener" href="https://www.enterpriseintegrationpatterns.com/patterns/messaging/BroadcastAggregate.html">https://www.enterpriseintegrationpatterns.com/patterns/messaging/BroadcastAggregate.html</a></p>
+<p>何かしらの入力ソースを元に、Lambdaで分散数だけKinesisにジョブを示すメッセージを送信。後続のLambdaで処理を行う構成にします。最初のLambdaがScatterと呼ばれる分散の開始部分です。</p>
+<img src="/images/20210601a/scatter.png" alt="LambdaでKinesisにPutする図" width="801" height="377" loading="lazy">
+
+
+<p>Gatherについては、DynamoDBのIncrement an Atomic Counterなどを利用しつつ実装するのかなと思います。同じ設計で実装するのであれば下記のような構成になるかなと思います。</p>
+<img src="/images/20210601a/gather.png" alt="DynamoDBを管理テーブルに利用する図" width="1200" height="576" loading="lazy">
+
+<p>ただ、現実的にはスクラッチでGatherの作り込みを行うのではなく、Step FunctionsやManaged Workflows for Apache Airflowを利用することが大半だと思いますので、本記事では細かい設計・実装について触れていきません。</p>
+<h1 id="実装"><a href="#実装" class="headerlink" title="実装"></a>実装</h1><p>バッチ処理対象のデータはDynamoDBにあることにします。あるテーブルをフルスキャンしてそのデータを駆動にして何かしら処理を加えると仮定します。</p>
+<p>コードは<a target="_blank" rel="noopener" href="https://github.com/ma91n/servlerless-batch-example/tree/master/scatterkinesis">こちら</a>にあげていますので、適時参照ください。</p>
+<h2 id="Kinesis-Data-Streamに連携するペイロード"><a href="#Kinesis-Data-Streamに連携するペイロード" class="headerlink" title="Kinesis Data Streamに連携するペイロード"></a>Kinesis Data Streamに連携するペイロード</h2><p>Jobという名前のStructの形式で連携します。Totalに分散トータル数、Segに今の分散番号を指定する仕様にします。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Job <span class="keyword">struct</span> &#123;</span><br><span class="line">	Total <span class="type">int64</span> <span class="string">`json:&quot;total&quot;`</span></span><br><span class="line">	Seg   <span class="type">int64</span> <span class="string">`json:&quot;seg&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>また、処理対象のDynamoDBには7000件弱のデータと登録しました。</p>
+<h2 id="Scatter"><a href="#Scatter" class="headerlink" title="Scatter"></a>Scatter</h2><p>最初に処理対象のDynamoDBテーブルの件数を取得し、一定のしきい値単位になるように分散数を計算します。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> db = dynamodb.New(session.Must(session.NewSession()))</span><br><span class="line"><span class="keyword">var</span> kc = kinesis.New(session.Must(session.NewSession()))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(Handle)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Handle</span><span class="params">(ctx context.Context)</span></span> <span class="type">error</span> &#123;</span><br><span class="line"></span><br><span class="line">	resp, err := db.ScanWithContext(ctx, &amp;dynamodb.ScanInput&#123;</span><br><span class="line">		Select:    aws.String(dynamodb.SelectCount),</span><br><span class="line">		TableName: aws.String(<span class="string">&quot;TestTable&quot;</span>),</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	total := <span class="number">1</span></span><br><span class="line">	<span class="keyword">if</span> <span class="type">int</span>(*resp.Count) &gt; <span class="number">1000</span> &#123;</span><br><span class="line">		total = <span class="type">int</span>(*resp.Count) / <span class="number">1000</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; total; i++ &#123;</span><br><span class="line">		log.Printf(<span class="string">&quot;i=%d\n&quot;</span>, i)</span><br><span class="line">		job := Job&#123;</span><br><span class="line">			Total: <span class="type">int64</span>(total),</span><br><span class="line">			Seg:   <span class="type">int64</span>(i),</span><br><span class="line">		&#125;</span><br><span class="line">		b, err := json.Marshal(job)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> _, err = kc.PutRecordWithContext(ctx, &amp;kinesis.PutRecordInput&#123;</span><br><span class="line">			StreamName:   aws.String(<span class="string">&quot;scatter&quot;</span>),</span><br><span class="line">			PartitionKey: aws.String(fmt.Sprintf(<span class="string">&quot;partitionKey-%d&quot;</span>, i)),</span><br><span class="line">			Data:         b,</span><br><span class="line">		&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">	log.Println(<span class="string">&quot;done&quot;</span>)</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>db.ScanWithContext</code> でテーブル件数を取得し、今回はしきい値を1000で分散トータル数を導出しています。<br>あとは、その数だけKinesis Data StreamにJobを送信します。</p>
+<p>動かしてみると、以下のような結果がでると、無事KinesisにメッセージをPutできています。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">START RequestId: 9469393a-eba9-4a21-9e98-8a3fc7f2a3f5 Version: $LATEST</span><br><span class="line">2021/06/01 03:45:44 i=0</span><br><span class="line">2021/06/01 03:45:44 i=1</span><br><span class="line">2021/06/01 03:45:44 i=2</span><br><span class="line">2021/06/01 03:45:44 i=3</span><br><span class="line">2021/06/01 03:45:44 i=4</span><br><span class="line">2021/06/01 03:45:44 i=5</span><br><span class="line">2021/06/01 03:45:44 i=6</span><br><span class="line">2021/06/01 03:45:44 done</span><br><span class="line">END RequestId: 9469393a-eba9-4a21-9e98-8a3fc7f2a3f5</span><br><span class="line">REPORT RequestId: 9469393a-eba9-4a21-9e98-8a3fc7f2a3f5	Duration: 299.30 ms	Billed Duration: 300 ms	Memory Size: 512 MB	Max Memory Used: 45 MB	Init Duration: 118.30 ms</span><br></pre></td></tr></table></figure>
+
+<h2 id="並列処理部分"><a href="#並列処理部分" class="headerlink" title="並列処理部分"></a>並列処理部分</h2><p>次は、Kinesisのメッセージトリガーで起動するLambdaです。分散処理で行うメインの処理を実装する部分です。<br>今回は、 <code>executeBizLogic</code> の中身では単純に指定された件数のカウントを取る内容にしています。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(Handle)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Handle</span><span class="params">(ctx context.Context, e events.KinesisEvent)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">	<span class="keyword">for</span> _, r := <span class="keyword">range</span> e.Records &#123;</span><br><span class="line">		<span class="keyword">var</span> job Job</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> err := json.Unmarshal(r.Kinesis.Data, &amp;job); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		count, err := executeBizLogic(ctx, job.Total, job.Seg)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		log.Printf(<span class="string">&quot;count: %v&quot;</span>, count)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> db = dynamodb.New(session.Must(session.NewSession()))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">executeBizLogic</span><span class="params">(ctx context.Context, total, seg <span class="type">int64</span>)</span></span> (<span class="type">int64</span>, <span class="type">error</span>) &#123;</span><br><span class="line">	out, err := db.ScanWithContext(ctx, &amp;dynamodb.ScanInput&#123;</span><br><span class="line">		TableName:     aws.String(<span class="string">&quot;TestTable&quot;</span>),</span><br><span class="line">		TotalSegments: aws.Int64(total),</span><br><span class="line">		Segment:       aws.Int64(seg),</span><br><span class="line">		Select:        aws.String(dynamodb.SelectCount),</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>, fmt.Errorf(<span class="string">&quot;db.ScanWithContext: %w&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> *out.Count, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>動かしてみると以下のようなログが出る想定です。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">2021-06-01T12:45:46.143+09:00	START RequestId: d44ecc4c-433c-481b-9051-435280c81900 Version: $LATEST</span><br><span class="line">2021-06-01T12:45:46.338+09:00	2021/06/01 03:45:46 count: 1016</span><br><span class="line">2021-06-01T12:45:46.339+09:00	END RequestId: d44ecc4c-433c-481b-9051-435280c81900</span><br><span class="line">2021-06-01T12:45:46.339+09:00	REPORT RequestId: d44ecc4c-433c-481b-9051-435280c81900 Duration: 195.60 ms Billed Duration: 196 ms Memory Size: 512 MB Max Memory Used: 44 MB Init Duration: 107.35 ms</span><br><span class="line">2021-06-01T12:45:46.391+09:00	START RequestId: bd6839aa-bdb0-40f5-9455-a9a445035b4d Version: $LATEST</span><br><span class="line">2021-06-01T12:45:46.406+09:00	2021/06/01 03:45:46 count: 1085</span><br><span class="line">2021-06-01T12:45:46.406+09:00	END RequestId: bd6839aa-bdb0-40f5-9455-a9a445035b4d</span><br><span class="line">2021-06-01T12:45:46.406+09:00	REPORT RequestId: bd6839aa-bdb0-40f5-9455-a9a445035b4d Duration: 10.36 ms Billed Duration: 11 ms Memory Size: 512 MB Max Memory Used: 45 MB</span><br><span class="line">aa4f-30057e967514 Duration: 7.72 ms Billed Duration: 8 ms Memory Size: 512 MB Max Memory Used: 45 MB</span><br><span class="line">中略</span><br><span class="line">2021-06-01T12:45:46.611+09:00	START RequestId: 5f9cec98-2434-4872-8de9-df605b3e339c Version: $LATEST</span><br><span class="line">2021-06-01T12:45:46.624+09:00	2021/06/01 03:45:46 count: 1072</span><br><span class="line">2021-06-01T12:45:46.625+09:00	END RequestId: 5f9cec98-2434-4872-8de9-df605b3e339c</span><br><span class="line">2021-06-01T12:45:46.625+09:00	REPORT RequestId: 5f9cec98-2434-4872-8de9-df605b3e339c Duration: 8.59 ms Billed Duration: 9 ms Memory Size: 512 MB Max M</span><br></pre></td></tr></table></figure>
+
+<p>最初のLambdaでKinesisに呼び出した分だけ、後続のLambdaが起動していることがわかると思います。</p>
+<h1 id="この実装の使い所"><a href="#この実装の使い所" class="headerlink" title="この実装の使い所"></a>この実装の使い所</h1><p>ジョブの依存関係が多くない場合で、かつECSやAWS Batchを導入せずカジュアルに分散実行したい時に試せるかと思います。</p>
+<p>また、今回の例としては分散トータル数＋分散番号の処理モデルですが、処理対象のデータモデル次第では、ユーザIDの範囲をしていしたり、良い感じのカーディナリティになる業務コードを指定しても良いかなと思います。支社CDとか営業エリアCDとかです。</p>
+<h1 id="リランについて"><a href="#リランについて" class="headerlink" title="リランについて"></a>リランについて</h1><p>後続のLambdaのある分散番号だけ障害が発生し、リカバリが必要になった場合の対応について説明します。</p>
+<p>今回の実装では作り込んでいないんですが、例えばエラージョブキューを格納するDead Letter Queueを用意するのが一手です。ちょっとツールで利用する用途であれば、連携された連携情報を awscli で直接Kinesisにputするのも一手だと思います</p>
+<h1 id="処理データの一貫性"><a href="#処理データの一貫性" class="headerlink" title="処理データの一貫性"></a>処理データの一貫性</h1><p>実行するLambdaが分割される関係上、利用するのがPostgreSQLのようなRDBであっても、バッチ処理全体の処理結果の一貫性を保つことはできません。そのため分散処理単位で登録してよいかが利用する上での大前提だと思います。</p>
+<h1 id="実用上の話"><a href="#実用上の話" class="headerlink" title="実用上の話"></a>実用上の話</h1><p>この手の分散処理を1日に複数回実行し、かつある分散処理番号のみ失敗する場合を考慮すると、システム運用上の負荷が高まります。</p>
+<p>そのため、実用に耐えうるためにはScatterのLambdaの起動のたびに一意な実行IDを取得し、それをキーに管理テーブルを用意することが多いと思います。それぞれが成功・失敗・処理中などのステータスを持つと役立つことが多いです。それぞれの処理件数や処理時間を格納すると嬉しいこともおおいでしょう。</p>
+<p>一方でそこまでやるのであれば、Managed Workflows for Apache Airflowといったワークフローエンジンの導入も検討したほうが良いかもしれません。</p>
+<p>また、分散しなくてもAWS BatchやECSで15分の制約を持たないサービスを選定したほうが良い場面は多分にあるので、程々に利用しましょう。</p>
+<h1 id="インフラ上の注意"><a href="#インフラ上の注意" class="headerlink" title="インフラ上の注意"></a>インフラ上の注意</h1><p>並列処理Lambdaですが、Kinesisトリガーのバッチサイズは <code>1</code> が推奨です。これが10などにすると今回だとタイミングによっては1つのLambdaですべてメッセージを処理してしまう可能性があるからです。</p>
+<p>また、 <code>シャードあたりの同時バッチ</code> で1シャードあたりの同時起動数を制御できます。デフォルトはおそらく1です。現状は1シャードあたり最大10までです。Kinesis Data Streamをジョブキューとして利用すると、だいたいシャードは1なので通常は同時起動数の制約がここで決まります。</p>
+<p><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/about-aws/whats-new/2019/11/aws-lambda-supports-parallelization-factor-for-kinesis-and-dynamodb-event-sources/">https://aws.amazon.com/jp/about-aws/whats-new/2019/11/aws-lambda-supports-parallelization-factor-for-kinesis-and-dynamodb-event-sources/</a></p>
+<p>通常は10並列で十分かと思いますが、もし上げたい場合はシャードを増やす対応です。多少費用が増えますが通常は誤差の範囲かと思います。</p>
+<h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>AWS Lambda実行時間15分の壁は、当然ハードリミットなのでそれ単体では超えられないですが、Kinesis Data Streamsと組み合わせて、仮想的にコンピューティング時間の合計で15分を越えようという記事でした。</p>
+<p>実用上はいくつか壁があるので、用法用量を守り正しく参考にしていただければ幸いです。</p>
+<p>次は伊藤真彦さんの<a href="/articles/20210602a/">AWS LambdaにおけるGo Contextの取り扱い</a>です。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">Technology Innovation Group（TIG）は、「最先端、且つ先進的なテクノロジーのプロフェッショナル集団」、「プロジェクト品質と生産性の向上」、「自社サービス事業の立ち上げ」を主なミッションとする、技術部隊です。DXユニットとはデジタルトランスフォーメーションを推進するチームで、IoTやらMaaSなどのテクノロジーカットでビジネス転換を行います。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210601a/&related=twitterapi%2Ctwitter&text=15%E5%88%86%E3%81%AE%E5%A3%81%E3%82%92%E8%B6%85%E3%81%88%E3%81%A6%E3%80%82Lambda%E5%88%86%E6%95%A3%E5%AE%9F%E8%A1%8C%E8%A1%93%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">6</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210601a/&t=15%E5%88%86%E3%81%AE%E5%A3%81%E3%82%92%E8%B6%85%E3%81%88%E3%81%A6%E3%80%82Lambda%E5%88%86%E6%95%A3%E5%AE%9F%E8%A1%8C%E8%A1%93" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210601a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210601a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">8</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.07.27</span><span class="snscount">&#9825;9</span><a href=/articles/20200727/ title="[サーバレス連載企画]の8回目です。TIG DXユニットの真野です。ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。[工場をハックするための基本知識] の記事を書いた棚井さんと同じチームに所属しています。[サーバレス連載企画] の第8弾目として、Serverlessの代表格であるAWS LambdaでGoを用いてKinesisに対するKPL/KCL相当の処理についてまとめていきます。">GoからAWS KinesisのAggregationFormatを利用する</a></li><li class="related-posts-item"><span>2022.05.10</span><span class="snscount">&#9825;54</span><a href=/articles/20220510a/ title="2022/04/06にGAになったと発表された、Lambda Function URLsは、AWS Lambdaに直接HTTPSエンドポイントを追加できるというもので、API Gateway（やALB）無しでWeb APIやサイトを構築できると話題になりました。">Lambda Function URLs をGoでお試し。実行時間の上限（タイムアウト）やWeb API構築周りで気になること</a></li><li class="related-posts-item"><span>2021.05.31</span><span class="snscount">&#9825;15</span><a href=/articles/20210531b/ title="「Kinesis+Lambda構成」でのメトリクス監視について取り上げます。データ流入量が徐々に増加する見込みのとき、各リソースのどのメトリクスを重点チェックすべきか。また、メトリクスがリソースの制限にぶつかった場合やアラート検知された場合にどのような対応アクションを取るべきか。KinesisやLambdaのリソース監視設定から得た知見を、本ブログに整理しました。そもそもの「サーバレスって、何が便利なんだっけ？」から整理したい勉強熱心なエンジニアは、[AWS公式のグラレコ解説記事]をご覧ください。">Kinesis+Lambda構成での、処理遅延を監視する</a></li><li class="related-posts-item"><span>2020.05.15</span><span class="snscount">&#9825;29</span><a href=/articles/20200515/ title="AWS StepFunctionsとLambdaを活用してバッチ処理を行う記事です。">Serverless連載6: AWSのStep FunctionsとLambdaでServelessなBatch処理を実現する</a></li><li class="related-posts-item"><span>2020.03.26</span><span class="snscount">&#9825;7</span><a href=/articles/20200326/ title="サーバレス連載の第2弾はLambdaアプリをGoで開発する中で調べた内容や、Tipsを紹介します。">Serverless連載2: AWS Lambda×Goの開発Tips</a></li><li class="related-posts-item"><span>2022.10.20</span><span class="snscount">&#9825;17</span><a href=/articles/20221020a/ title="TIG DXユニットの真野です。タイトルに書いたままの内容の記事です。おそらくDynamoDB Streams について調べたことがある方の多くの人には自明な内容だと思います。サマリです。* DynamoDB Streamsの起動順序が保たれるのは 項目単位">DynamoDB Streamsは同一ハッシュキーでもソートキーが異なれば順序保証されない</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220512a/ title="Google Cloud上の大規模なシステムのとあるログがCloud Storageに溜まっており、それらをBigQueryにロードし、分析したい、ということがありました。このログは未加工のままBigQueryに読み込めるフォーマットではなく、いわゆるETL処理が必要でした。運用面を考慮し利用サービスを増やしたくない、ということで使い慣れたCloud Functionsを使うことにしました。">Cloud Functions+ GoでビッグデータETLするときのコツ</a></li><li class="reference-posts-item"><a href=/articles/20210531a/ title="2021年もServerless連載を開催します！サーバーレスは、「サーバーが存在しない」ではなく「サーバーの管理を不要、もしくは極小化する」ことを主眼においた考え方です。パブリッククラウドには必ずと言っていいほど..">Serverless連載2021を始めます</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#AWS-Lambda%E3%81%A8%E3%83%90%E3%83%83%E3%83%81%E5%87%A6%E7%90%86%E3%81%A8%E3%81%AE%E7%9B%B8%E6%80%A7"><span class="toc-text">AWS Lambdaとバッチ処理との相性</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Scatter-Fanout-%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3"><span class="toc-text">Scatter(Fanout)パターン</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9F%E8%A3%85"><span class="toc-text">実装</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Kinesis-Data-Stream%E3%81%AB%E9%80%A3%E6%90%BA%E3%81%99%E3%82%8B%E3%83%9A%E3%82%A4%E3%83%AD%E3%83%BC%E3%83%89"><span class="toc-text">Kinesis Data Streamに連携するペイロード</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Scatter"><span class="toc-text">Scatter</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%A6%E5%88%97%E5%87%A6%E7%90%86%E9%83%A8%E5%88%86"><span class="toc-text">並列処理部分</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%93%E3%81%AE%E5%AE%9F%E8%A3%85%E3%81%AE%E4%BD%BF%E3%81%84%E6%89%80"><span class="toc-text">この実装の使い所</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%AA%E3%83%A9%E3%83%B3%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">リランについて</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%87%A6%E7%90%86%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AE%E4%B8%80%E8%B2%AB%E6%80%A7"><span class="toc-text">処理データの一貫性</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9F%E7%94%A8%E4%B8%8A%E3%81%AE%E8%A9%B1"><span class="toc-text">実用上の話</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9%E4%B8%8A%E3%81%AE%E6%B3%A8%E6%84%8F"><span class="toc-text">インフラ上の注意</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%80%E5%BE%8C%E3%81%AB"><span class="toc-text">最後に</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

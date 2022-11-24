@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Go 1.19のメモリ周りの更新 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="Go 1.19リリース連載の6本目です。 Go 1.19では、いくつかメモリ周りの更新がありました。1つはガベージコレクタ周りのお話と、あとはメモリモデルの更新です。　ライブラリではsync&#x2F;atomic.Int64など、いくつか型が追加されました。 ガベージコレクタガベージコレクタの詳細と調整の仕方についてのドキュメントが追加されました。このドキュメントはスライダーで動作の変化がみられ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 1.19のメモリ周りの更新 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20220808a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="Go 1.19リリース連載の6本目です。 Go 1.19では、いくつかメモリ周りの更新がありました。1つはガベージコレクタ周りのお話と、あとはメモリモデルの更新です。　ライブラリではsync&#x2F;atomic.Int64など、いくつか型が追加されました。 ガベージコレクタガベージコレクタの詳細と調整の仕方についてのドキュメントが追加されました。このドキュメントはスライダーで動作の変化がみられ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20220808a/スクリーンショット_2022-08-03_21.22.41.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220808a/一貫性.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220808a/intel.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220808a/ARM.png">
+<meta property="article:published_time" content="2022-08-07T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-08-08T01:44:06.100Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Go1.19">
+<meta property="article:tag" content="メモリモデル">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20220808a/スクリーンショット_2022-08-03_21.22.41.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20220808a/">
+  <meta content="Go,Go1.19,メモリモデル" name="keywords">
+  <meta content="澁川喜規" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Go 1.19のメモリ周りの更新
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20220808a_Go_1.19のメモリ周りの更新.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20220808a_Go_1.19のメモリ周りの更新" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-08-07T15:00:00.000Z" itemprop="datePublished">2022.08.08</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%BE%81%E5%B7%9D%E5%96%9C%E8%A6%8F" title="澁川喜規さんの記事一覧へ" class="post-author">澁川喜規</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/Go1-19/" title="Go1.19タグの記事へ" class="tag-list-link">Go1.19</a>
+  
+    
+    <a href="/tags/メモリモデル/" title="メモリモデルタグの記事へ" class="tag-list-link">メモリモデル</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p><a href="/articles/20220801a/">Go 1.19リリース連載</a>の6本目です。</p>
+<p>Go 1.19では、いくつかメモリ周りの更新がありました。1つはガベージコレクタ周りのお話と、あとはメモリモデルの更新です。　ライブラリでは<a target="_blank" rel="noopener" href="https://pkg.go.dev/sync/atomic#Int64">sync&#x2F;atomic.Int64</a>など、いくつか型が追加されました。</p>
+<h1 id="ガベージコレクタ"><a href="#ガベージコレクタ" class="headerlink" title="ガベージコレクタ"></a>ガベージコレクタ</h1><p><a target="_blank" rel="noopener" href="https://go.dev/doc/gc-guide">ガベージコレクタの詳細と調整の仕方についてのドキュメント</a><br>が追加されました。このドキュメントはスライダーで動作の変化がみられるインタラクティブなドキュメントになっているので、ぜひご覧ください。</p>
+<img src="/images/20220808a/スクリーンショット_2022-08-03_21.22.41.png" alt="" width="1200" height="500" loading="lazy">
+
+<p>「GoはJavaと違って、GCの調整ポイントがほとんどなく、最初からトップスピード（オプションの選択の中で相対的に）だよ」みたいに説明されることもありましたが、そういうわけにも行かなくなったというか、ある程度知っておく必要はあるかもしれません。とはいえ、デフォルトでも十分うまくやってくれますし、そもそも即座に終了するユーティリティでは頑張る必要もないので、長期間動作するサーバー系とくにリクエストごとのメモリ消費が大きいものを使っている人は必読ですが、そうでない人はそこまで追いかける必要はないかもしれません。</p>
+<p>なお、これはGoの言語仕様ではなく、Go製の純正Go処理系に特化した話（ただしgccgoもかなり似ているという注釈つき)とのことです。また、処理系依存の話なので将来はまた変わってくる可能性があります。</p>
+<p>Goのメモリ戦略が最初に紹介されています。</p>
+<ul>
+<li>スタックメモリはGCを使わずにまとめて解放という戦略で扱われている</li>
+<li>ヒープはGCが管理する。ヒープにおくかスタックにおくかはプログラムのロジックを見てきまる</li>
+<li>GoのGCはマークアンドスイープ方式を利用</li>
+</ul>
+<h2 id="環境変数-GOGC-（go-1-18以前よりあった）"><a href="#環境変数-GOGC-（go-1-18以前よりあった）" class="headerlink" title="環境変数: GOGC （go 1.18以前よりあった）"></a>環境変数: GOGC （go 1.18以前よりあった）</h2><p>ここで設定した値(100で10MB、200で20MB)だけヒープメモリが使用されると、GCが実行されるようになります。数値を小さくすればするほど、GCが走りやすくなるため、無駄なメモリは減ります。一方でGCのマーク処理は重いため、CPUを消費します。このパラメータは「CPUコストとメモリ使用量の間のトレードオフ」を調整するものであると説明されています。</p>
+<h2 id="環境変数-GOMEMLIMIT-（go-1-19で追加）"><a href="#環境変数-GOMEMLIMIT-（go-1-19で追加）" class="headerlink" title="環境変数: GOMEMLIMIT （go 1.19で追加）"></a>環境変数: GOMEMLIMIT （go 1.19で追加）</h2><p>GOGCはCPUとメモリのトレードオフの設定としては有効ですが、実際のメモリ使用量を考慮したものではありません。実際に必要なライブヒープ（GCで削除されない）が急に増えた場合に、GOGCだけで調整しようとするとCPU消費量が無駄に多くなり過ぎてしまいます。そこで<a target="_blank" rel="noopener" href="https://go.googlesource.com/proposal/+/master/design/48409-soft-memory-limit.md">提案された</a>のがこの環境変数での設定です。このGCガイドには書かれてないですが、”100MB”とか、”100MiB”といった内容を設定するようです。</p>
+<p>なお、これはソフトリミットであって、GCが稼働後にこのメモリ量以下になることが保証されてません。GC対象じゃないライブヒープが増えてしまうといくらGCでも解放できません。ガベージじゃないですし。5-10%ほど余裕をみて設定しましょう、と書かれています。また、データ量に比例してメモリを消費するようなプログラムの場合、データ量側を制限せずにメモリ制限だけしてしまうとパフォーマンス低下が発生するとあります。</p>
+<p>このドキュメントでは、Goの仮想メモリの使い方の解説、ストップザワールドのGCは重い(CPUの25%を持っていくし、マークとスイープを同時に行うのでレイテンシーが大幅に伸びる）という話や、プロファイリングの指標の紹介などがあります。</p>
+<h1 id="メモリモデルの更新"><a href="#メモリモデルの更新" class="headerlink" title="メモリモデルの更新"></a>メモリモデルの更新</h1><p><a target="_blank" rel="noopener" href="https://go.dev/ref/mem">The Go Memory Model</a>が8年ぶりに更新されています。そのベースとなっているのがRuss Coxが投稿した3つのドキュメントです。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://research.swtch.com/hwmm">Hardware Memory Models</a></li>
+<li><a target="_blank" rel="noopener" href="https://research.swtch.com/plmm">Programming Language Memory Models</a></li>
+<li><a target="_blank" rel="noopener" href="https://research.swtch.com/gomm">Updating the Go Memory Model</a></li>
+</ul>
+<p>なお、2014年版も、2022年版も同じ前書きとなっています。</p>
+<blockquote>
+<p>アドバイス</p>
+<p>同時にアクセスする複数のgoroutineによってデータを変更するようなプログラムでは、そのようなアクセスを直列化しなければなりません。</p>
+<p>アクセスを直列化してデータを保護するには、チャネル操作またはsync、sync&#x2F;atomicパッケージ内の要素などを使います。</p>
+<p>プログラムの動作を理解するためにこのドキュメントの残りの部分を読まなければならない場合、あなたは頭が良すぎます。</p>
+<p>賢くならないでください。</p>
+</blockquote>
+<p>ようするにGo開発者が行うべきことは、チャネル、sync&#x2F;atomicパッケージなどを適切に使うこと、と言い切っています。これは2014年版も2022年版も変わりません。CPU特有の癖などを駆使したトリッキーなロックフリーな順序制御！！！みたいなことをするとトラブルの元になるのでやめとけよ、ということですね。このドキュメント自体はGoでアプリを書く人向けというよりも、主にランタイムやコンパイラを実装する人向けのデザインドキュメントのようなものかと思います。</p>
+<h3 id="The-Go-Memory-Modelの更新内容"><a href="#The-Go-Memory-Modelの更新内容" class="headerlink" title="The Go Memory Modelの更新内容"></a>The Go Memory Modelの更新内容</h3><p>Go公式ドキュメントの方でどのような変更があったのかを目diffで差分を調べました。</p>
+<ul>
+<li>Happens Beforeが[<a target="_blank" rel="noopener" href="https://go.dev/ref/mem#model]">https://go.dev/ref/mem#model]</a>(Memory Model)にリライト<ul>
+<li>他の言語のメモリモデルの論文等と同じ語彙を使って厳密に書き換えたように見える</li>
+</ul>
+</li>
+<li><a target="_blank" rel="noopener" href="https://go.dev/ref/mem#restrictions">Implementation Restrictions for Programs Containing Data Races</a>が追加<ul>
+<li>ThreadSanitizer (go build -race) の紹介や、単一の命令で一度に読み書きできない操作が分断されて行われた時（スライスの3つの構成要素とか)の問題について言及</li>
+</ul>
+</li>
+<li>Synchronization<ul>
+<li><a target="_blank" rel="noopener" href="https://go.dev/ref/mem#locks">Locksのセクション</a>で、1.18で追加されたTryLockの記述が追加</li>
+<li><a target="_blank" rel="noopener" href="https://go.dev/ref/mem#atomic">Atomic Values</a>, <a target="_blank" rel="noopener" href="https://go.dev/ref/mem#finalizer">Finalizers</a>, <a target="_blank" rel="noopener" href="https://go.dev/ref/mem#more">Additional Mechanisms</a>が追加</li>
+</ul>
+</li>
+<li><a target="_blank" rel="noopener" href="https://go.dev/ref/mem#badcompiler">Incorrect compilation</a>が追加<ul>
+<li>コンパイラ実装者向け</li>
+</ul>
+</li>
+</ul>
+<p>Synchronizationのセクションは追加説明やここ　８年間のライブラリの追加を反映した小粒な変更となっています。大きく説明が変わったのが最初のモデル説明（ただし内容は大きく変わっていないように見える）と、コンパイラ実装者向けの説明の追加ですね。</p>
+<h2 id="メモリモデルの概要"><a href="#メモリモデルの概要" class="headerlink" title="メモリモデルの概要"></a>メモリモデルの概要</h2><p>Russ Coxの3つの記事を読んでみました。1周では理解できなかったので、何周か読んでみた結果のダイジェストです。</p>
+<h3 id="メモリモデルとは"><a href="#メモリモデルとは" class="headerlink" title="メモリモデルとは"></a>メモリモデルとは</h3><ul>
+<li>シングルスレッドでは不要だったが、マルチプロセスが出てきたので必要になった。</li>
+<li>大雑把にメモリモデルというのは、「メモリの読み書きの順序」の決定性の問題<ul>
+<li>コンパイラが最適化目的で命令を入れ替えることもある<ul>
+<li>RISCのCPU向けコンパイラの方が積極的に介入するというのを聴いたことがある(渋川補足)</li>
+</ul>
+</li>
+<li>CPUが命令を解釈して制約を崩さない中でリアルタイムに順序を勝手に書き換えることもある（渋川補足: アウトオブオーダー）</li>
+</ul>
+</li>
+<li>メモリオーダーにはランクがある。逐次一貫性(Sequential Consistency)→弱い一貫性→ゆるい一貫性とここでは３段階あるある。弱いほど並び替えが自由に行われる。<ul>
+<li>保証が弱ければ弱いほど、パフォーマンスのための組み替えの自由度が上がるのでパフォーマンスは上がる</li>
+</ul>
+</li>
+<li>ハードウェアとプログラミング言語の両方がメモリをモデルを持つ</li>
+<li>ハードウェアメモリモデルは、ハードウェアとその上で動くソフトウェアの契約</li>
+<li>言語側のメモリモデルは、コンパイラとプログラマーの契約</li>
+<li>言語側のメモリモデルの現在の標準は極めて保守的な（Java 1.5、C++11、Go 1.19など)は逐次一貫性だが、 これでは性能が上がらないため、ハードウェアはより柔軟性が高い（ゆるい）メモリモデルを持つのが普通とのこと</li>
+<li>保証が必要以上に強いと、それに甘えたソフトウェア実装になってしまい、将来速度のためにゆるいメモリモデルのCPUがリリースされると動かないということになりかねない。</li>
+</ul>
+<h3 id="ハードウェアのお話"><a href="#ハードウェアのお話" class="headerlink" title="ハードウェアのお話"></a>ハードウェアのお話</h3><p>以下の図は<a target="_blank" rel="noopener" href="https://research.swtch.com/hwmm">Hardware Memory Models</a>からの引用になります。</p>
+<ul>
+<li>逐次一貫性では常に共有メモリと同期を取る</li>
+</ul>
+<img src="/images/20220808a/一貫性.png" alt="一貫性" width="964" height="190" loading="lazy">
+
+<ul>
+<li>Intel(x86-TSO)の方がそれよりもゆるいモデルとなっている。</li>
+</ul>
+<img src="/images/20220808a/intel.png" alt="intel" width="964" height="360" loading="lazy">
+
+<ul>
+<li>ARMはさらに弱いモデル。スレッドがメモリのコピーを持って、必要に応じて他のスレッドにコピーを伝搬させる実装とのこと。</li>
+</ul>
+<img src="/images/20220808a/ARM.png" alt="ARM" width="616" height="588" loading="lazy">
+
+<ul>
+<li>メモリバリア（あるいはメモリフェンスとも呼ばれる）を使うことで、前の処理が終わることを明示的に示せる。</li>
+</ul>
+<p>あとは、Plan 9をPentium Proに移植しようとしたときの苦労話がたくさん書かれています。ここが一番語りたかったことではないか？</p>
+<h3 id="プログラミング言語のメモリモデル"><a href="#プログラミング言語のメモリモデル" class="headerlink" title="プログラミング言語のメモリモデル"></a>プログラミング言語のメモリモデル</h3><ul>
+<li>主にDRF-SCが利用される<ul>
+<li>SC for DRFとも呼ばれる</li>
+<li>データレースがない状態ではデータレースがないプログラムは逐次一貫した方法で実行されることが保証されて、結果が想像しやすい。</li>
+</ul>
+</li>
+<li>Goのメモリモデル<ul>
+<li>DRF-SC。他の言語と同じ。</li>
+<li>データのレースコンディションがある状況での実装がちょっと違う。<ul>
+<li>C++は自由</li>
+<li>Javaはそのコンディションの状況もより厳密に定義されていてデバッグが楽</li>
+<li>Goは保守的なrace conditionチェックと、実行時はノーガード(パニック)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>1行にまとめると、メモリモデルの強度はパフォーマンスとのトレードオフがあり、弱くするほど最適化の余地があるが、コードと実際の動きの違いが出てきて動作の予測はしにくくなる。最新のGoをはじめとした各種プログラミング言語は保守的で予測しやすいものを選んだが、その下のハードウェアは柔軟なモデルを採用している、という感じですかね。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>GCの方は調整の余地が多少出てきたため、大規模なアプリケーションではこのあたりも意識する必要が出てきました。といっても、調整の環境変数はまだ2つなので、まだまだ十分にシンプルかと思います。</p>
+<p>メモリモデルの説明は、読めば読むほど普段のプログラミングの話からはちょっと遠い、レイヤーがかなり低い話でした。普段の開発でどのような影響があるかというとあまりないかと思います。syncパッケージの提供する各種同期プリミティブ、チャネルを使った同期、sync&#x2F;atomicパッケージなどを普段から正しく使っていれば特に問題はありません。</p>
+<p>The Go Memory Modelのドキュメントを今回初めてじっくり読んでみましたが、<a target="_blank" rel="noopener" href="https://go.dev/ref/mem#synchronization">Synchronization</a>のセクションが、メモリに限らず、「○○と△△は、必ず前者の完了後にもう片方が呼ばれる」といったタイミングについての言語仕様集ともなっていますので、一度軽く目を通しておくとよさそうです。読書会のネタに最適。</p>
+<p>余談ですが、Apple SiliconのmacはRosetta2でインテルバイナリをARMでエミュレーションして実行しますが、Appleはこのためにインテル方式の強い制約を実装したようです。同じARMといっても、MicrosoftのSurfaceのインテルエミュレーションと比べてAppleの方がパフォーマンスが圧倒的に高いのは、元々のコアの性能差もあるがこういうところにあるようです。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.infoq.com/news/2020/11/rosetta-2-translation/">https://www.infoq.com/news/2020/11/rosetta-2-translation/</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20220808a/&related=twitterapi%2Ctwitter&text=Go%201.19%E3%81%AE%E3%83%A1%E3%83%A2%E3%83%AA%E5%91%A8%E3%82%8A%E3%81%AE%E6%9B%B4%E6%96%B0%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">24</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20220808a/&t=Go%201.19%E3%81%AE%E3%83%A1%E3%83%A2%E3%83%AA%E5%91%A8%E3%82%8A%E3%81%AE%E6%9B%B4%E6%96%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20220808a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">48</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20220808a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">38</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.08.01</span><span class="snscount">&#9825;151</span><a href=/articles/20220801a/ title="Go 1.18のジェネリクス導入の大規模リリースと比べると比較的小さな1.19ですが、それでもさまざまな変更があります。今回ももちろん、恒例行事になりつつある、このテックブログでリリース連載をやります。まずは、GoDocと、その他ツール周りのアップデートの紹介です。"> Go 1.19リリース連載始まります GoDoc/ツール周りのアップデート</a></li><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;563</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2022.11.22</span><span class="snscount">&#9825;11</span><a href=/articles/20221122a/ title="前回の記事ではMSAL.jsを使い、シングルページアプリケーションの認証を試してみました。業務システムで扱う認証にはいろいろな種類がありますが、だいたい以下のどれかに該当するケースが多いと思います。">AzureAD＋MSAL for Goでバッチコマンドの認証<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.10.24</span><span class="snscount">&#9825;130</span><a href=/articles/20221024a/ title="ちょっとしたツールをGoで作ってみたのですが、わざわざインストールしなくてもいいようにWebのUIをつけてブラウザで使えるようにしてみました。ウェブフロントエンド部分はNext.jsの静的サイトで、GoはWASMにしてロードして実行しています。WASMを使うのは初めてなのであえて選んでみました。">Goで作ったロジックにWebUIをつけてGitHubページに公開する</a></li><li class="related-posts-item"><span>2022.09.21</span><span class="snscount">&#9825;91</span><a href=/articles/20220921a/ title="一般に、リフレクションは黒魔術と呼ばれることもあります。Goでは「リフレクションよりはコード生成」と長く言われてきました。ジェネリクスも一般的にはそのリフレクションとコード生成の間を埋めるもので、やはりリフレクションの使用を減らすためのもの（リフレクションではできない静的型チェックもできますが）です。ですが、リフレクションでしか実現できないこともあります。">たのしいGoリフレクション: 変数アサイン</a></li><li class="related-posts-item"><span>2022.09.02</span><span class="snscount">&#9825;270</span><a href=/articles/20220902a/ title="名前からすると日本の古き良き（悪名高い）デバイス認証方式のあれのように見えますが、パスワードレスな認証を実現するOSSのプロダクトです。Go製でライセンスはAGPL3です。なかなか面白そうなので動かしてみました。このhankoのメンバーが運営しているpasskeys.ioというウェブサイトもあり、パスワードレスなログインを広めていこう！という啓蒙サイトになっています。">パスワードレスな認証を実現する認証ミドルウェアのhanko</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220801a/ title="Go 1.18のジェネリクス導入の大規模リリースと比べると比較的小さな1.19ですが、それでもさまざまな変更があります。今回ももちろん、恒例行事になりつつある、このテックブログでリリース連載をやります。まずは、GoDocと、その他ツール周りのアップデートの紹介です。"> Go 1.19リリース連載始まります GoDoc/ツール周りのアップデート</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%AC%E3%83%99%E3%83%BC%E3%82%B8%E3%82%B3%E3%83%AC%E3%82%AF%E3%82%BF"><span class="toc-text">ガベージコレクタ</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%92%B0%E5%A2%83%E5%A4%89%E6%95%B0-GOGC-%EF%BC%88go-1-18%E4%BB%A5%E5%89%8D%E3%82%88%E3%82%8A%E3%81%82%E3%81%A3%E3%81%9F%EF%BC%89"><span class="toc-text">環境変数: GOGC （go 1.18以前よりあった）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%92%B0%E5%A2%83%E5%A4%89%E6%95%B0-GOMEMLIMIT-%EF%BC%88go-1-19%E3%81%A7%E8%BF%BD%E5%8A%A0%EF%BC%89"><span class="toc-text">環境変数: GOMEMLIMIT （go 1.19で追加）</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%A1%E3%83%A2%E3%83%AA%E3%83%A2%E3%83%87%E3%83%AB%E3%81%AE%E6%9B%B4%E6%96%B0"><span class="toc-text">メモリモデルの更新</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#The-Go-Memory-Model%E3%81%AE%E6%9B%B4%E6%96%B0%E5%86%85%E5%AE%B9"><span class="toc-text">The Go Memory Modelの更新内容</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%A1%E3%83%A2%E3%83%AA%E3%83%A2%E3%83%87%E3%83%AB%E3%81%AE%E6%A6%82%E8%A6%81"><span class="toc-text">メモリモデルの概要</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%A1%E3%83%A2%E3%83%AA%E3%83%A2%E3%83%87%E3%83%AB%E3%81%A8%E3%81%AF"><span class="toc-text">メモリモデルとは</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%8F%E3%83%BC%E3%83%89%E3%82%A6%E3%82%A7%E3%82%A2%E3%81%AE%E3%81%8A%E8%A9%B1"><span class="toc-text">ハードウェアのお話</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0%E8%A8%80%E8%AA%9E%E3%81%AE%E3%83%A1%E3%83%A2%E3%83%AA%E3%83%A2%E3%83%87%E3%83%AB"><span class="toc-text">プログラミング言語のメモリモデル</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

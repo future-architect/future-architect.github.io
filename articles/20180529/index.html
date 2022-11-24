@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>データベースマイグレーション ～OracleからPostgreSQLへ～　ー第１回ー | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="1. 初めにこんにちは。Technology Innovation Groupの岸田です。 データベースシステムに対しては、高い信頼性・可用性・安定性が求められることから、データベースとしては、Oracle Database（以降はOracleと記載）やMicrosoft SQL Serverなどの商用製品が採用されてきました。 十数年前より、商用データベースの高いコストに不満を持つ企業において、">
+<meta property="og:type" content="article">
+<meta property="og:title" content="データベースマイグレーション ～OracleからPostgreSQLへ～　ー第１回ー | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20180529/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="1. 初めにこんにちは。Technology Innovation Groupの岸田です。 データベースシステムに対しては、高い信頼性・可用性・安定性が求められることから、データベースとしては、Oracle Database（以降はOracleと記載）やMicrosoft SQL Serverなどの商用製品が採用されてきました。 十数年前より、商用データベースの高いコストに不満を持つ企業において、">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/migration_phase.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/demo.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/outerjoin_result_SQL.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/outerjoin_result_SQL.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/outerjoin_result_postgres.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/decode_oracle.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/decode_postgres.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/merge_empup.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/merge_result.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20180529/upsert_result.png">
+<meta property="article:published_time" content="2018-05-29T02:06:05.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:52.684Z">
+<meta property="article:tag" content="PostgreSQL">
+<meta property="article:tag" content="Oracle">
+<meta property="article:tag" content="DB移行">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20180529/migration_phase.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20180529/">
+  <meta content="PostgreSQL,Oracle,DB移行" name="keywords">
+  <meta content="岸田聡" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/DB/">DBカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">データベースマイグレーション ～OracleからPostgreSQLへ～　ー第１回ー
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20180529-dbmigration1.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20180529-dbmigration1" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2018/" class="publish-date"><time datetime="2018-05-29T02:06:05.000Z" itemprop="datePublished">2018.05.29</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%B2%B8%E7%94%B0%E8%81%A1" title="岸田聡さんの記事一覧へ" class="post-author">岸田聡</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/PostgreSQL/" title="PostgreSQLタグの記事へ" class="tag-list-link">PostgreSQL</a>
+  
+    
+    <a href="/tags/Oracle/" title="Oracleタグの記事へ" class="tag-list-link">Oracle</a>
+  
+    
+    <a href="/tags/DB移行/" title="DB移行タグの記事へ" class="tag-list-link">DB移行</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h2 id="1-初めに"><a href="#1-初めに" class="headerlink" title="1. 初めに"></a>1. 初めに</h2><p>こんにちは。Technology Innovation Groupの岸田です。</p>
+<p>データベースシステムに対しては、高い信頼性・可用性・安定性が求められることから、データベースとしては、Oracle Database（以降はOracleと記載）やMicrosoft SQL Serverなどの商用製品が採用されてきました。</p>
+<p>十数年前より、商用データベースの高いコストに不満を持つ企業において、OSSデータベースに注目が集まってきており、近年では基幹システムにおいてもOSSデータベースが採用されるケースも多くなっています。<br>このような背景から技術者としてもOSSデータベースのスキルは非常に求められている状況かと思います。</p>
+<p>元々高額なライセンス料に加え、仮想基盤における課金体系の問題や2016年のOracle Database Standard Edition Oneの廃止などにより、基盤更改などを契機にOSS検討事例が増えてきました。<br>また、クラウド基盤を選択肢に入れた場合にも、柔軟にスケールアップが可能なOSSを採用したいという要望もあります。</p>
+<p>OSSデータベースで広く採用されているのはPostgreSQLとMySQLがあります。今回は、エンタープライズ領域においてマイグレーション例が多いOracleからPostgreSQLについて、考慮すべき事項について2回にわたり紹介していきます。</p>
+<ul>
+<li><a href="/articles/20180809/">データベースマイグレーション ～OracleからPostgreSQLへ～　−第２回ー
+</a> もぜひ参考ください</li>
+</ul>
+<h2 id="2-マイグレーションの流れ"><a href="#2-マイグレーションの流れ" class="headerlink" title="2. マイグレーションの流れ"></a>2. マイグレーションの流れ</h2><h3 id="データベースの選定（アセスメント）"><a href="#データベースの選定（アセスメント）" class="headerlink" title="データベースの選定（アセスメント）"></a>データベースの選定（アセスメント）</h3><p>単にコスト面に問題を抱えているからといって、安易にOSSデータベースへのマイグレーションを決断することは危険です。そのシステムにおいて提供しているサービスに関して、マイグレーションによって機能要件及び非機能要件を満たせなくなっては元も子もありません。</p>
+<p>マイグレーションの検討については、OracleとPostgreSQLの技術的な検討だけでなく、コスト算定（コストメリット）、移行期間やテストなどで多方面での検討が必要となります。この検討については、以下のようにQCDの視点で検討を行う必要があります。</p>
+<h4 id="Quality（品質）"><a href="#Quality（品質）" class="headerlink" title="Quality（品質）"></a>Quality（品質）</h4><p>「アプリケーション機能面」「システム非機能面」の両面について実現性を検討し、ノックアウト項目が存在しないかを評価します。システムによっては現行システムとのデータ連携や災害対策目的で別サイトへのレプリケーションを実現する必要が出てきます。この時点で抜け漏れが発生してしまわないように、現行の運用面を含めた細かい評価が必要となります。</p>
+<h4 id="Cost（コスト）"><a href="#Cost（コスト）" class="headerlink" title="Cost（コスト）"></a>Cost（コスト）</h4><p>マイグレーションに関連するコスト評価をおこないます。以下の2点が考えられます。</p>
+<ol>
+<li>マイグレーションに関連する費用：「アプリケーションソース移行」「データベースミドルウェア自体の移行」「データ移行」</li>
+<li>新基盤での費用：「ソフトウェアライセンス、基盤費用」</li>
+</ol>
+<h4 id="Delivery（納期）"><a href="#Delivery（納期）" class="headerlink" title="Delivery（納期）"></a>Delivery（納期）</h4><p>マイグレーション実現にむけたスケジュールの評価を行います。基盤更改期限がある場合についはその期間内に実現可能かという評価が必要になります。</p>
+<p>これらの検討結果を基にデータベースマイグレーションの判断を行います。</p>
+<h3 id="マイグレーション決定後の作業イメージ"><a href="#マイグレーション決定後の作業イメージ" class="headerlink" title="マイグレーション決定後の作業イメージ"></a>マイグレーション決定後の作業イメージ</h3><p>データベースのマイグレーションが決定した後は、一例として以下のように進めていきます。</p>
+<img src="/images/20180529/migration_phase.png" loading="lazy">
+
+
+<p>赤字となっている作業については、実装されているアプリケーションにより作業量が大きく変動するものとなります。<br>データベースのマイグレーションの成功は、現状アプリケーションの正確な把握に直結すると考えておりますので、現状把握については専門技術者を交えてしっかりと実施することをお奨め致します。</p>
+<h2 id="3-マイグレーションのポイント"><a href="#3-マイグレーションのポイント" class="headerlink" title="3. マイグレーションのポイント"></a>3. マイグレーションのポイント</h2><p>前章にてマイグレーションの流れを説明しましたが、この章では実際にマイグレーションを実施するにあたりポイントとなる点を記載していきます。ポイントとしては以下の3点となります。</p>
+<ol>
+<li><strong>スキーマ移行</strong></li>
+</ol>
+<ul>
+<li>データベースの内部環境（オブジェクト等）の移行</li>
+<li>2章のDB設計・データベース移行（定義移行）にあたる</li>
+</ul>
+<ol start="2">
+<li><strong>アプリケーション移行</strong></li>
+</ol>
+<ul>
+<li>アプリケーションプログラムの移行。主にSQL改修となる</li>
+</ul>
+<ol start="3">
+<li><strong>データ移行</strong></li>
+</ol>
+<ul>
+<li>データベースに格納されているデータの移行</li>
+</ul>
+<p>上記それぞれについてみていきます。（今回はデータ移行は紹介まで）</p>
+<h3 id="3-1-スキーマ移行（データベースオブジェクト）"><a href="#3-1-スキーマ移行（データベースオブジェクト）" class="headerlink" title="3-1. スキーマ移行（データベースオブジェクト）"></a>3-1. スキーマ移行（データベースオブジェクト）</h3><p>2章で記載しましたDB設計フェーズにて方針を設計し、データベース移行フェーズにて実装致します。</p>
+<p>Oracleに存在する主なオブジェクトについてPostgreSQLの存在有無は以下の通りです。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="left">Oracle</th>
+<th align="left">PostgreSQL</th>
+<th align="left">備考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">テーブル</td>
+<td align="left">〇</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">インデックス</td>
+<td align="left">△</td>
+<td align="left">B-Treeインデックスとパーティションインデックスが存在。逆キーインデックス、ビットマップインデックス等は存在しない。</td>
+</tr>
+<tr>
+<td align="left">ビュー</td>
+<td align="left">〇</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">マテリアライズド・ビュー</td>
+<td align="left">〇</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">シノニム</td>
+<td align="left">×</td>
+<td align="left">一部ビューで代替可能。</td>
+</tr>
+<tr>
+<td align="left">シーケンス</td>
+<td align="left">〇</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">トリガー</td>
+<td align="left">〇</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">データベースリンク</td>
+<td align="left">×</td>
+<td align="left">dblink関数または、FDW(Foreign Data Wrapper) で代替可能。</td>
+</tr>
+<tr>
+<td align="left">パッケージ</td>
+<td align="left">×</td>
+<td align="left">3-2で記載。</td>
+</tr>
+<tr>
+<td align="left">プロシージャ</td>
+<td align="left">×</td>
+<td align="left">3-2で記載。</td>
+</tr>
+<tr>
+<td align="left">ファンクション</td>
+<td align="left">〇</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">〇：存在　△：一部存在　×：無し</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+</tbody></table></div>
+<p>インデックスについては一部の種類のインデックスは存在しませんが、インデックス自体は性能要件を満たすために作成されていますので、インデックスの存在自体がマイグレーションに影響を及ぼすことはありません。ただし、マイグレーション後の性能要件を満たすために別の方法を検討する可能性があります。</p>
+<p>その他につきましては、代替機能を含めてPostgreSQLにて実装ができると考えております。</p>
+<p>ストアド・パッケージ／プロシージャ／ファンクションについては3-2.アプリケーション移行で記載致します。</p>
+<h4 id="データ型の変換"><a href="#データ型の変換" class="headerlink" title="データ型の変換"></a>データ型の変換</h4><p>テーブルのコンバージョンの際には、データ型を意識する必要があります。OracleとPostgreSQLのデータ型の対応表は以下の通りです。数値型にはいくつかのデータ型が存在しますので、システムとしてルールを定めることをお奨め致します。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="left">属性</th>
+<th align="left">Oracleのデータ型</th>
+<th align="left">PostgreSQLのデータ型</th>
+<th align="left">備考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">文字列</td>
+<td align="left">CHAR&#x2F;NCHAR&#x2F;VARCHAR2&#x2F;NVARCHAR2</td>
+<td align="left">char&#x2F;varchar</td>
+<td align="left">PostgreSQLの文字型の精度は文字数を意味する</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">CLOB&#x2F;LONG</td>
+<td align="left">text</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">数値</td>
+<td align="left">NUMBER</td>
+<td align="left">smallint&#x2F;bigint&#x2F;integer&#x2F;decimal&#x2F;real&#x2F;double precision</td>
+<td align="left">精度によってデータ型を選択</td>
+</tr>
+<tr>
+<td align="left">日付</td>
+<td align="left">DATE&#x2F;TIMESTAMP</td>
+<td align="left">timestamp</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">バイナリ</td>
+<td align="left">BLOB&#x2F;RAW</td>
+<td align="left">bytea</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">その他</td>
+<td align="left">ROWID</td>
+<td align="left">oid</td>
+<td align="left"></td>
+</tr>
+</tbody></table></div>
+<h3 id="3-2-アプリケーション（SQL）移行"><a href="#3-2-アプリケーション（SQL）移行" class="headerlink" title="3-2.アプリケーション（SQL）移行"></a>3-2.アプリケーション（SQL）移行</h3><p>アプリケーションの移行については、同じ製品のバージョンアップをする場合であっても一通りアプリケーションの動作確認（結果の現新一致確認）は実施することが多いと思います。</p>
+<p>データベースのマイグレーションの場合は、このアプリケーションの動作確認において結果の不一致による原因究明やアプリケーションの見直しが発生する可能性が高くなることが考えられるため、当初よりアプリケーションの移行作業の作業量を多めに見積もることが大事だと思います。3章で説明したツールなどを利用して自動的なコンバージョンでアプリケーションの改修にかかる時間は削減できますが、アプリケーションの動作確認は必ず実施してください。</p>
+<p>アプリケーションの動作確認と同様に重要なのは、性能テストとなります。データベースのマイグレーションでは、データベースの機能の差異がありますので、SQLの処理性能は事前の机上予測が難しいといえます。この性能テストについてもデータベースのバージョンアップ時のテスト作業量よりも多めに見積もっておくことをお奨め致します。</p>
+<p>Oracleにて実装されているSQLについて、Oracle独自の記法であったとしてもPostgreSQLにて実装は可能であると考えておりますので、アプリケーション改修によりマイグレーションがNGとなることは無いと思います。</p>
+<p>ただし、アプリケーションに依存して、改修作業や改修後の確認テストの作業量が変動していきますので注意が必要です。</p>
+<p>アプリケーション移行についての考え方及び対策の一部を以下に紹介していきます。</p>
+<h4 id="ストアド・サブプログラム変換"><a href="#ストアド・サブプログラム変換" class="headerlink" title="ストアド・サブプログラム変換"></a>ストアド・サブプログラム変換</h4><p>ストアド・サブプログラムは、Oracleでのストアド・パッケージ、ストアド・プロシージャ、ストアド・ファンクションの総称です。<br>PostgreSQLにはパッケージ及びプロシージャが存在しません。<br>Oracleのストアド・パッケージ及びストアド・プロシージャはPostgreSQLのファンクションで実装することになります。<br>プロシージャ、ファンクションの集合体であるパッケージはスキーマで代用します。<br>まとめると以下のようになります。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="left">Oracle</th>
+<th align="left">PostgreSQL</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">パッケージ</td>
+<td align="left">スキーマ</td>
+</tr>
+<tr>
+<td align="left">プロシージャ</td>
+<td align="left">ファンクション</td>
+</tr>
+<tr>
+<td align="left">ファンクション</td>
+<td align="left">ファンクション</td>
+</tr>
+</tbody></table></div>
+<p>PostgreSQLのファンクションでOracleと大きく異なる部分は、トランザクションの制御となります。PostgreSQLのファンクションは、呼び出し元のトランザクションに依存するため、ファンクション内でCOMMITの発行はできません。つまり、ファンクション内でエラーが発生した場合は、ファンクション内の処理はすべてロールバックします。</p>
+<p>参考までに、Oracleでは、<code>PRAGMA AUTONOMOUS_TRANSACTION</code>を利用して呼び出し元とトランザクションを分離することができます。Oracleのストアド・サブプログラム内でトランザクションを分離している場合は、PostgreSQLではロジックを見直す必要があります。</p>
+<h4 id="外部結合"><a href="#外部結合" class="headerlink" title="外部結合"></a>外部結合</h4><p>Oracle独自の記法としては外部結合が挙げられます。外部結合はSQLにおいて結合条件で対応するレコードが存在しない場合でも優先となるテーブルについてはレコードが除外されない結合方法です。</p>
+<p>Oracle 9i以降はSQL標準である<code>[LEFT | RIGHT] OUTER JOIN</code>の記述がサポートされるようになり、オラクル社としても同バージョンからOUTER JOINによる記法を<a target="_blank" rel="noopener" href="https://docs.oracle.com/cd/E82638_01/SQLRF/Joins.htm#GUID-29A4584C-0741-4E6A-A89B-DCFAA222994A">マニュアル上でも推奨しています</a>。</p>
+<p>とはいえ、Oracleで動かすSQLの外部結合は(+)表記をよく目にします。<br>主な理由としては以下じゃないかなと思ってます。</p>
+<ul>
+<li>Oracle 8i 以前に作成したSQLが今でも使われている。（バージョンアップを繰り返していて改修していない。）</li>
+<li>以前プロジェクトとして作成していたシステムのSQLコーディング基準書では(+)表記で記載することが基準となっており、現状でも(+)表記自体は利用可能であるため、基準書自体を修正することができていない。また、成功したプロジェクトの基準書を横展開している。</li>
+<li>プログラムの改修や新機能導入においても、現行で動作しているSQLを踏襲して作成する。</li>
+</ul>
+<p>PostgreSQLにおいて外部結合は当然SQL標準であるOUTER JOINの記載となりますので、データベースマイグレーションの際にはSQLのコンバージョンが必要です。</p>
+<p>(+)表記での外部結合をコンバージョンするときに気を付けなければならないのは、リテラル値に対する外部結合の条件がある場合です。</p>
+<p>言葉だけでは分かりづらいと思いますので、Oracleで用意されているサンプルスキーマ（SCOTTユーザ）で見ていきます。テーブルはEMP表とDEPT表を使います。デフォルトの状態から少しだけ値を変えているところはあります。</p>
+<img src="/images/20180529/demo.png" loading="lazy">
+
+
+<p>2種類の外部結合表記のSQL文を用意しました。</p>
+<p>①リテラル条件にも「(+)」を付与したパターン</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> d.deptno, d.dname, e.empno, e.ename, e.comm</span><br><span class="line"><span class="keyword">FROM</span> emp e, dept d</span><br><span class="line"><span class="keyword">WHERE</span> e.deptno(<span class="operator">+</span>) <span class="operator">=</span> d.deptno</span><br><span class="line"><span class="keyword">AND</span> e.comm(<span class="operator">+</span>) <span class="operator">=</span> <span class="number">300</span>;</span><br></pre></td></tr></table></figure>
+
+<p>②リテラル条件には「(+)」を付与しないパターン</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> d.deptno, d.dname, e.empno, e.ename, e.comm</span><br><span class="line"><span class="keyword">FROM</span> emp e, dept d</span><br><span class="line"><span class="keyword">WHERE</span> e.deptno(<span class="operator">+</span>) <span class="operator">=</span> d.deptno</span><br><span class="line"><span class="keyword">AND</span> e.comm <span class="operator">=</span> <span class="number">300</span>;</span><br></pre></td></tr></table></figure>
+
+<p>検索結果は以下の通りです。</p>
+<img src="/images/20180529/outerjoin_result_SQL.png" loading="lazy">
+
+<p>①の場合は結合前にリテラル条件で絞っている、②の場合は結合後にリテラル条件で絞っている、ということです。</p>
+<p>これをSQL標準であるOUTER JOINで記載すると以下のようになります。OUTER JOINの条件となるか全体の条件となるかの違いがSQL標準の方が分かりやすいですね。</p>
+<p>①</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> d.deptno, d.dname, e.empno, e.ename, e.comm</span><br><span class="line"><span class="keyword">FROM</span> scott.emp e</span><br><span class="line">    <span class="keyword">RIGHT</span> <span class="keyword">OUTER</span> <span class="keyword">JOIN</span> scott.dept d</span><br><span class="line">        <span class="keyword">ON</span> (e.deptno <span class="operator">=</span> d.deptno <span class="keyword">AND</span> e.comm <span class="operator">=</span> <span class="number">300</span>);</span><br></pre></td></tr></table></figure>
+
+<p>②</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> d.deptno, d.dname, e.empno, e.ename, e.comm</span><br><span class="line"><span class="keyword">FROM</span> scott.emp e</span><br><span class="line">    <span class="keyword">RIGHT</span> <span class="keyword">OUTER</span> <span class="keyword">JOIN</span> scott.dept d</span><br><span class="line">        <span class="keyword">ON</span> (e.deptno <span class="operator">=</span> d.deptno)</span><br><span class="line"><span class="keyword">WHERE</span> e.comm <span class="operator">=</span> <span class="number">300</span>;</span><br></pre></td></tr></table></figure>
+
+<p>念のため結果も。</p>
+<img src="/images/20180529/outerjoin_result_SQL.png" loading="lazy">
+
+<p>PostgreSQLでも。</p>
+<img src="/images/20180529/outerjoin_result_postgres.png" loading="lazy">
+
+<p>同じですね。</p>
+<p>将来のことを考えて、外部結合はSQL標準のOUTER JOINで記述していくことにしましょう。</p>
+<h4 id="組み込み関数"><a href="#組み込み関数" class="headerlink" title="組み込み関数"></a>組み込み関数</h4><p>組み込み関数はデータベース毎に事前に用意されている関数です。データベース毎に仕様が異なることもありますので、移行の際には注意が必要です。OracleとPostgreSQLの組み込み関数の対比表については<a target="_blank" rel="noopener" href="https://www.pgecons.org/wp-content/uploads/PGECons/2012/WG2/10_Built-inFunctionMigrationResearch/10_Appendix_01_Built-inFunctionComparativeTable(Oracle-PostgreSQL).pdf">こちら</a>に詳しく載っておりますので、参考にしてください。</p>
+<p>OracleとPostgreSQLの両方で用意されていますが、機能仕様が全く異なる関数としては<code>DECODE</code>があります。<br>OracleではDECODE関数は条件分岐として使われています。構文としては以下です。</p>
+<img src="/images/20180529/decode_oracle.png"  class="img-middle-size" loading="lazy">
+
+<p>PostgreSQLでは、DECODE関数はテキスト表現からバイナリデータを復号する関数となっております。構文としては以下です。（formatオプションはbase64&#x2F;hex&#x2F;escapeから選択。）</p>
+<img src="/images/20180529/decode_postgres.png"  class="img-small-size" loading="lazy">
+
+<p>OracleでのDECODE関数はPostgreSQLではcase文に変換します。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> empno, ename, deptno,</span><br><span class="line">DECODE( deptno, <span class="number">10</span>, <span class="string">&#x27;ACCOUNTING&#x27;</span>,</span><br><span class="line">                <span class="number">20</span>, <span class="string">&#x27;RESEARCH&#x27;</span>,</span><br><span class="line">                <span class="number">30</span>, <span class="string">&#x27;SALES&#x27;</span>,</span><br><span class="line">                <span class="number">40</span>, <span class="string">&#x27;OPERATIONS&#x27;</span> ) <span class="keyword">as</span> dname</span><br><span class="line"><span class="keyword">FROM</span> emp;</span><br></pre></td></tr></table></figure>
+
+<p>変換後は以下となります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> empno, ename, deptno,</span><br><span class="line"><span class="keyword">CASE</span> deptno <span class="keyword">WHEN</span> <span class="number">10</span> <span class="keyword">THEN</span> <span class="string">&#x27;ACCOUNTING&#x27;</span></span><br><span class="line">            <span class="keyword">WHEN</span> <span class="number">20</span> <span class="keyword">THEN</span> <span class="string">&#x27;RESEARCH&#x27;</span></span><br><span class="line">            <span class="keyword">WHEN</span> <span class="number">30</span> <span class="keyword">THEN</span> <span class="string">&#x27;SALES&#x27;</span></span><br><span class="line">            <span class="keyword">WHEN</span> <span class="number">40</span> <span class="keyword">THEN</span> <span class="string">&#x27;OPERATIONS&#x27;</span> <span class="keyword">END</span> <span class="keyword">as</span> dname</span><br><span class="line"><span class="keyword">FROM</span> emp;</span><br></pre></td></tr></table></figure>
+
+<p>DECODEについては以上です。</p>
+<p>一部のOracle独自の組み込み関数は、orafceモジュールをインストールすることで、いくつかOracleと同じ関数が実装されます。orafceで実装される関数については<a target="_blank" rel="noopener" href="http://orafce.github.io/orafce/index-ja.html">こちら</a>を参考にしてください。また、AWSのRDSでも事前にOracleからの移行用にモジュール（スキーマ：aws_oracle_ext）が準備されています。</p>
+<h4 id="行レベルロック"><a href="#行レベルロック" class="headerlink" title="行レベルロック"></a>行レベルロック</h4><p>一般的に業務ロジック上では競合による不整合を回避するため、<code>SELECT ～ FOR UPDATE</code>により行レベルでロックを取得し、トランザクション中のレコードが他から更新・削除されることを防ぎます。</p>
+<p>Oracleにおいては、<code>FOR UPDATE</code>句として<code>[WAIT n|NOWAIT]</code>の記述ができます。どちらも指定しない場合は、行が使用可能になるまで待機した後でSELECT文の結果が戻されます。（そんな記載はできませんが、<code>WAIT ∞</code>の指定のような挙動です。）</p>
+<p>PostgreSQLでは、<code>WAIT n</code>が存在しないため、WAITと記載するとOracleにおける<code>WAIT</code>句を未指定とした場合と同様の挙動となります。つまり、Oracleにおいて<code>WAIT n</code>が指定されていた場合は、PostgreSQLではSQLにて実装することができません。</p>
+<p>代替となるかは実行形式によりますが、<code>lock_timeout</code>のパラメータを指定することでOracleと同じ挙動となる可能性はあります。このパラメータを設定して<code>SELECT ～ FOR UPDATE</code>を発行しすると、該当レコードがロック状態であった場合は設定したパラメータの時間経過するとエラーとなります。<code>lock_timeout</code>はセッションレベルでの変更も可能ですので、トランザクション開始時にパラメータを設定をしてSQLを実行、トランザクション終了時にパラメータをリセットするという処理仕様とすることもできます。</p>
+<h4 id="ヒント句"><a href="#ヒント句" class="headerlink" title="ヒント句"></a>ヒント句</h4><p>OracleにおいてSQLの性能問題は実行計画が原因であることが多いのではないでしょうか。確かに、Oracleにおける性能劣化対策としての「ヒント句を記載して実行計画を固定化する」は、統計情報に依存せずにSQLの性能を安定させる最適な解決策なのかもしれません。（バージョンアップの時にヒントが無くなったり、オプティマイザの機能向上により性能の良い実行計画が選ばれないというデメリット(?)もあります。）また、システムのSQLコーディング基準でヒント句を記載するといったルールがある場合もあるでしょう。</p>
+<p>PostgreSQLではバージョン9.1以降<code>pg_hint_plan</code>モジュールをインストールすることでヒント句の記載はできますが、Oracleほど数多くの種類のヒントがあるわけではありません。（参考までにヒント句の種類としては、pg_hint_plan 1.1で23個、Oracle 12cR1で332個あります。）</p>
+<p>データベースによりオプティマイザが全く異なりますので、データベースをマイグレーションすると実行計画が変化するのは致し方無いと考えております。そこで、ヒント句の記載のあるSQLについては、コンバージョン時には一旦ヒント句を削除して性能を見ることになります。処理性能が思わしくない場合は個別にチューニングの対応を施すことになります。</p>
+<h4 id="NULLと空文字"><a href="#NULLと空文字" class="headerlink" title="NULLと空文字"></a>NULLと空文字</h4><p>OracleではNULLと空文字は同義で、空文字はNULLとして扱われます。PostgreSQLではNULLと空文字は別物です。従いまして、Oracle上で動作するSQL内で条件句として<code>WHERE COL is NULL</code>といった記載がある場合は、マイグレーションにより結果が異なってくる可能性があるので注意が必要です。</p>
+<p>PostgreSQLでは、NULLの使用を禁止するといった基準を作った方が良いと思います。その場合は、データの移行時にNULLはすべて空文字に変換することは忘れずに！</p>
+<p>NULLの四則演算やNULLと文字列の連結については、すべてNULLとなってしまうため、NULLが格納される可能性がある列を取り扱う場合は、必ず<code>COALESCE</code>関数を使って処理してください。（OracleでいうところのNVL関数ですね。）</p>
+<h4 id="MERGE文"><a href="#MERGE文" class="headerlink" title="MERGE文"></a>MERGE文</h4><p>OracleではMERGE文が利用できますが、PosrgreSQLではMERGE文は存在しません。<br>PosrgreSQL 9.5からUPSERT文（INSERT ON CONFLICT）が使用可能となります。</p>
+<p>こちらもサンプルスキーマ環境で見てみましょう。<br>empと同じ定義のemp_up表を作成してます。</p>
+<img src="/images/20180529/merge_empup.png" loading="lazy">
+
+<p>emp_up表のレコードを見てemp表にレコードが存在した場合はUPDATEをして、emp表にレコードが無ければINSERTをするというMERGE文を作ってみました。（今回はSAL列とCOMM列だけをUPDATEしてます。）</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">MERGE</span> <span class="keyword">INTO</span> emp e</span><br><span class="line"><span class="keyword">USING</span> emp_up u <span class="keyword">ON</span> (e.empno <span class="operator">=</span> u.empno)</span><br><span class="line">  <span class="keyword">WHEN</span> MATCHED <span class="keyword">THEN</span></span><br><span class="line">    <span class="keyword">UPDATE</span> <span class="keyword">SET</span> e.sal <span class="operator">=</span> u.sal, e.comm <span class="operator">=</span> u.comm</span><br><span class="line">  <span class="keyword">WHEN</span> <span class="keyword">NOT</span> MATCHED <span class="keyword">THEN</span></span><br><span class="line">    <span class="keyword">INSERT</span> <span class="keyword">VALUES</span> ( u.empno, u.ename, u.job, u.mgr, u.hiredate, u.sal, u.comm, u.deptno );</span><br></pre></td></tr></table></figure>
+
+<p>実行結果です。</p>
+<img src="/images/20180529/merge_result.png" loading="lazy">
+
+<p>empno:7369のsal列が変更され、empno:8000のレコードが作成されていますね。</p>
+<p>これをPostgreSQLで実装すると以下のようになります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> scott.emp</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> scott.emp_up</span><br><span class="line"><span class="keyword">ON</span> CONFLICT (empno)</span><br><span class="line">DO <span class="keyword">UPDATE</span> <span class="keyword">SET</span> sal <span class="operator">=</span> excluded.sal, comm <span class="operator">=</span> excluded.comm ;</span><br></pre></td></tr></table></figure>
+<p>実行結果です。</p>
+<img src="/images/20180529/upsert_result.png" loading="lazy">
+
+<p>同じ結果となりました。</p>
+<p>このUPSERT文ですが、PostgreSQL 9におけるパーティションテーブルに対しては機能しません。理由としては、PostgreSQLのパーティションテーブルは親となるテーブルとパーティション単位の個別テーブルを作成して、親テーブルへのDML発行時にはトリガーにより該当のパーティションテーブルを更新しており、親表に対して<code>INSERT ON CONFLICT</code>を発行したとしてもトリガーとしては該当パーティションテーブルに対して<code>INSERT ON CONFLICT</code>を発行しないからです。</p>
+<p>それであれば、トリガー内でのパーティションテーブルに対する構文を<code>INSERT ON CONFLICT</code>となるように作り直せば良いかというとそうもいきません。それは通常のINSERT文が発行された際もON CONFLICT付きのINSERTとなってしまうからです。</p>
+<p>では、パーティションテーブルに対するMERGE文の変換はどうすればよいかというと、PostgreSQL 9.1で導入されたCommon Table Expression(CTE)を使って代替ができます。SQL文としては以下のようになります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WITH</span> insrt <span class="keyword">AS</span> (<span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> scott.emp_up),</span><br><span class="line">     updt  <span class="keyword">AS</span> (<span class="keyword">UPDATE</span> scott.emp <span class="keyword">set</span> sal <span class="operator">=</span> insrt.sal <span class="keyword">FROM</span> insrt</span><br><span class="line">                             <span class="keyword">WHERE</span> emp.empno <span class="operator">=</span> insrt.empno RETURNING emp.empno)</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> scott.emp</span><br><span class="line">(<span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> insrt <span class="keyword">WHERE</span> empno <span class="keyword">NOT</span> <span class="keyword">IN</span> (<span class="keyword">SELECT</span> empno <span class="keyword">FROM</span> updt));</span><br></pre></td></tr></table></figure>
+<p>実行結果です。</p>
+<img src="/images/20180529/insert_CTE_result.png" loading="lazy">
+
+<p>通常テーブルであれば、もちろんUPSERTでもCTEでも結果は一緒ですね。</p>
+<h3 id="3-3-データ移行について"><a href="#3-3-データ移行について" class="headerlink" title="3-3. データ移行について"></a>3-3. データ移行について</h3><p>データ移行については今回のブログでは詳細な記載は割愛しますが、データ移行もマイグレーションにおいては非常に重要な作業となります。移行時間、キャラクタセットの違いやデータ抽出方法など、移行要件を満たすために様々な検討・設計が必要となります。</p>
+<p>データベースの切替時にはデータベースを利用する業務の全面停止が必要にはなりますが、その停止時間を最小限とする要件を持つシステムも多いと思います。その場合は、データの事前移行＋切替直前まで常時レプリケーション⇒切替といった方式で業務停止時間を最短とする案もあります。事前移行方法やレプリケーション方式については機会があれば詳しく書こうとは思いますが、検討する事項はたくさんあります。<br>レプリケーション方式の一例としては、SaaSとして提供されているAWS Database Migration Serviceがあります。こちらのサービスは移行先のデータベースがAWSのPaaSを利用している場合となります。<br>AWS DMSの詳細は<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/dms/">こちら</a>を参照してください。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>第1回では、データベースマイグレーションの背景や流れと一般的なマイグレーションのポイントとなる点について記載していきました。データベースオブジェクト（スキーマ）、アプリケーション（SQL）について、多くの場合は一定ルールに基づき変更可能であることが分かります。</p>
+<p>次回は、一般的に利用されているマイグレーションツールと、実際のアプリケーションにてマイグレーションの評価をおこなった例ついて記載していきたいと思います。</p>
+<ul>
+<li><a href="/articles/20180809/">データベースマイグレーション ～OracleからPostgreSQLへ～　−第２回ー
+</a> もぜひ参考ください</li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20180529/&related=twitterapi%2Ctwitter&text=%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%20%EF%BD%9EOracle%E3%81%8B%E3%82%89PostgreSQL%E3%81%B8%EF%BD%9E%E3%80%80%E3%83%BC%E7%AC%AC%EF%BC%91%E5%9B%9E%E3%83%BC%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20180529/&t=%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%20%EF%BD%9EOracle%E3%81%8B%E3%82%89PostgreSQL%E3%81%B8%EF%BD%9E%E3%80%80%E3%83%BC%E7%AC%AC%EF%BC%91%E5%9B%9E%E3%83%BC" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">17</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20180529/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">35</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20180529/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">40</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2018.08.09</span><span class="snscount">&#9825;19</span><a href=/articles/20180809/ title="データベースマイグレーションツールの紹介と実際にシステムで稼働しているデータベース環境とアプリケーション（SQL）を使ってマイグレーションの評価をした例と、データベースマイグレーションを検討するための方針について説明します">データベースマイグレーション ～OracleからPostgreSQLへ～　−第２回ー</a></li><li class="related-posts-item"><span>2019.11.21</span><span class="snscount">&#9825;349</span><a href=/articles/20191121/ title="2019年10月15日、Amazonは自社サービスにおける実質的な脱Oracleを発表しました。75PBに及ぶデータを、傘下のAWSが提供するDatabase Service（AuroraやDynamoDB、Redshiftなど）へと移行したとの事。この一報は、Amazonというグローバル規模のECの巨人、クラウド・プラットフォーマーのリーダーの一角が、大規模基幹システム領域におけるRDBMSのデファクト・スタンダードと決別したという点で、業界関係者に対して非常に大きなインパクトを残したものかと思います。">「脱Oracle」の背景にある、Oracle Databaseの価値を改めて考える</a></li><li class="related-posts-item"><span>2022.10.18</span><span class="snscount">&#9825;14</span><a href=/articles/20221018a/ title="Songmuさんのflextimeにはずっとお世話になっています。素晴らしいライブラリですが、SQLを用いて結果を永続化するようなテストでの利用する時に冗長性を感じました。PostgreSQL関数 を作成して代用できないか考えてみました。">PostgreSQLで Goの flextime のような関数を作りテスト時間を差し替える</a></li><li class="related-posts-item"><span>2021.09.16</span><span class="snscount">&#9825;16</span><a href=/articles/20210916a/ title="GoのORマッパー連載、おまけ記事です。特に示し合わせた訳では無いのですが、RDBは全員がPostgreSQLを使っていましたね。さて、今回の連載記事のいくつかでも言及されていた、jackc/pgx について簡単に紹介します。">lib/pq から jackc/pgx への移行</a></li><li class="related-posts-item"><span>2021.09.14</span><span class="snscount">&#9825;38</span><a href=/articles/20210914a/ title="普段からAWS Lambdaにはお世話になっているのですが、初めてカスタムランタイムを動かす仕事が舞い込んできました。AWS Lambdaでは下記のランタイムがサポートされています。">LambdaをカスタムDockerランタイムで開発する方法</a></li><li class="related-posts-item"><span>2021.07.27</span><span class="snscount">&#9825;63</span><a href=/articles/20210727a/ title="データベースでパフォーマンスが大きな問題になりがちなのが、バッチでのデータのインサートと、複雑なクエリーです。が、今回は後者は置いといて、前者のデータの取り込みについて扱います。データの挿入の高速化は最近、ちょびっと大事かなと思うところがあります。というのも...">GoとPoatgreSQLでCOPY</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20201127/ title="フューチャー技術ブログの2020年を数値で振り返りたいと思います。投稿数、カテゴリ割合、PV、人気の記事ランキングなどを大公開します">数字で振り返るフューチャー技術ブログ（2020）</a></li><li class="reference-posts-item"><a href=/articles/20180809/ title="データベースマイグレーションツールの紹介と実際にシステムで稼働しているデータベース環境とアプリケーション（SQL）を使ってマイグレーションの評価をした例と、データベースマイグレーションを検討するための方針について説明します">データベースマイグレーション ～OracleからPostgreSQLへ～　−第２回ー</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%88%9D%E3%82%81%E3%81%AB"><span class="toc-text">1. 初めに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E6%B5%81%E3%82%8C"><span class="toc-text">2. マイグレーションの流れ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E3%81%AE%E9%81%B8%E5%AE%9A%EF%BC%88%E3%82%A2%E3%82%BB%E3%82%B9%E3%83%A1%E3%83%B3%E3%83%88%EF%BC%89"><span class="toc-text">データベースの選定（アセスメント）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Quality%EF%BC%88%E5%93%81%E8%B3%AA%EF%BC%89"><span class="toc-text">Quality（品質）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Cost%EF%BC%88%E3%82%B3%E3%82%B9%E3%83%88%EF%BC%89"><span class="toc-text">Cost（コスト）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Delivery%EF%BC%88%E7%B4%8D%E6%9C%9F%EF%BC%89"><span class="toc-text">Delivery（納期）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E6%B1%BA%E5%AE%9A%E5%BE%8C%E3%81%AE%E4%BD%9C%E6%A5%AD%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B8"><span class="toc-text">マイグレーション決定後の作業イメージ</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88"><span class="toc-text">3. マイグレーションのポイント</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E7%A7%BB%E8%A1%8C%EF%BC%88%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%EF%BC%89"><span class="toc-text">3-1. スキーマ移行（データベースオブジェクト）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%83%87%E3%83%BC%E3%82%BF%E5%9E%8B%E3%81%AE%E5%A4%89%E6%8F%9B"><span class="toc-text">データ型の変換</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%EF%BC%88SQL%EF%BC%89%E7%A7%BB%E8%A1%8C"><span class="toc-text">3-2.アプリケーション（SQL）移行</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%82%B9%E3%83%88%E3%82%A2%E3%83%89%E3%83%BB%E3%82%B5%E3%83%96%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0%E5%A4%89%E6%8F%9B"><span class="toc-text">ストアド・サブプログラム変換</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%96%E9%83%A8%E7%B5%90%E5%90%88"><span class="toc-text">外部結合</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%B5%84%E3%81%BF%E8%BE%BC%E3%81%BF%E9%96%A2%E6%95%B0"><span class="toc-text">組み込み関数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A1%8C%E3%83%AC%E3%83%99%E3%83%AB%E3%83%AD%E3%83%83%E3%82%AF"><span class="toc-text">行レベルロック</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%83%92%E3%83%B3%E3%83%88%E5%8F%A5"><span class="toc-text">ヒント句</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NULL%E3%81%A8%E7%A9%BA%E6%96%87%E5%AD%97"><span class="toc-text">NULLと空文字</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#MERGE%E6%96%87"><span class="toc-text">MERGE文</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E3%83%87%E3%83%BC%E3%82%BF%E7%A7%BB%E8%A1%8C%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">3-3. データ移行について</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

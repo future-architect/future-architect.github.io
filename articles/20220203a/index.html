@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Goのnet/httpパッケージに出てくるTemporary()がなにか調べた | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTIG真野です。net&#x2F;httpパッケージには非常にお世話になっています。Goの net&#x2F;httpの内部にはサーバー&#x2F;クライアントの両方が含まれていますが、今回はクライアントサイドの話です。 TCPレベルの接続エラーの調査のために標準パッケージやサードパーティのライブラリのコードを読み込んでいくと、Temporary() 関数だけをもった temporar">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Goのnet&#x2F;httpパッケージに出てくるTemporary()がなにか調べた | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20220203a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIG真野です。net&#x2F;httpパッケージには非常にお世話になっています。Goの net&#x2F;httpの内部にはサーバー&#x2F;クライアントの両方が含まれていますが、今回はクライアントサイドの話です。 TCPレベルの接続エラーの調査のために標準パッケージやサードパーティのライブラリのコードを読み込んでいくと、Temporary() 関数だけをもった temporar">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20220203a/top.png">
+<meta property="article:published_time" content="2022-02-02T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:55:58.008Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Go1.18">
+<meta property="article:tag" content="ソースコードリーディング">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20220203a/top.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20220203a/">
+  <meta content="Go,Go1.18,ソースコードリーディング" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Goのnet/httpパッケージに出てくるTemporary()がなにか調べた
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20220203a_Goのnet／httpパッケージに出てくるTemporary()がなにか調べた.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20220203a_Goのnet／httpパッケージに出てくるTemporary()がなにか調べた" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-02-02T15:00:00.000Z" itemprop="datePublished">2022.02.03</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98" title="真野隼記さんの記事一覧へ" class="post-author">真野隼記</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/Go1-18/" title="Go1.18タグの記事へ" class="tag-list-link">Go1.18</a>
+  
+    
+    <a href="/tags/ソースコードリーディング/" title="ソースコードリーディングタグの記事へ" class="tag-list-link">ソースコードリーディング</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20220203a/top.png" alt="" width="500" height="208" loading="lazy">
+
+<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>TIG真野です。net&#x2F;httpパッケージには非常にお世話になっています。Goの net&#x2F;httpの内部にはサーバー&#x2F;クライアントの両方が含まれていますが、今回はクライアントサイドの話です。</p>
+<p><a href="https://future-architect.github.io/articles/20211026a/">TCPレベルの接続エラーの調査</a>のために標準パッケージやサードパーティのライブラリのコードを読み込んでいくと、Temporary() 関数だけをもった temporary インターフェースが登場します。HTTP周りでtemporaryと聞くと、 307 Temporary Redirect のステータスコードのことかと思いますが、ちょっと違いそうです。どういったものでどういった場合に出てくるのか、調べました。</p>
+<h2 id="Temporary-とは"><a href="#Temporary-とは" class="headerlink" title="Temporary()とは"></a>Temporary()とは</h2><p>Temporary()はnet&#x2F;http パッケージなどのコードを見ていると出てくる関数です。プライベートなインターフェースがあちこちのパッケージや呼び出し元のライブラリでつくられています。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> temporary <span class="keyword">interface</span> &#123;</span><br><span class="line">	Temporary() <span class="type">bool</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>例えば次のhttpErrorはtemporaryインターフェースを満たし、常にtrueを返すように実装されています。</p>
+<figure class="highlight go"><figcaption><span>transport.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> httpError <span class="keyword">struct</span> &#123;</span><br><span class="line">	err     <span class="type">string</span></span><br><span class="line">	timeout <span class="type">bool</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e *httpError)</span></span> Error() <span class="type">string</span>   &#123; <span class="keyword">return</span> e.err &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e *httpError)</span></span> Timeout() <span class="type">bool</span>   &#123; <span class="keyword">return</span> e.timeout &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e *httpError)</span></span> Temporary() <span class="type">bool</span> &#123; <span class="keyword">return</span> <span class="literal">true</span> &#125;  <span class="comment">//  常に true を返しているが..？</span></span><br></pre></td></tr></table></figure>
+
+<p>netパッケージのOpErrorもtemporaryインターフェースを満たし、Temporary()関数にはロジックが結構が入っています。</p>
+<figure class="highlight go"><figcaption><span>net.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e *OpError)</span></span> Temporary() <span class="type">bool</span> &#123;</span><br><span class="line">	<span class="comment">// Treat ECONNRESET and ECONNABORTED as temporary errors when</span></span><br><span class="line">	<span class="comment">// they come from calling accept. See issue 6163.</span></span><br><span class="line">	<span class="keyword">if</span> e.Op == <span class="string">&quot;accept&quot;</span> &amp;&amp; isConnError(e.Err) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> ne, ok := e.Err.(*os.SyscallError); ok &#123;</span><br><span class="line">		t, ok := ne.Err.(temporary)</span><br><span class="line">		<span class="keyword">return</span> ok &amp;&amp; t.Temporary()</span><br><span class="line">	&#125;</span><br><span class="line">	t, ok := e.Err.(temporary)</span><br><span class="line">	<span class="keyword">return</span> ok &amp;&amp; t.Temporary()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>AWS SDK for GoにもorigiErrがtemporaryインターフェース(Temporary() boolの関数)を満たしていて、かつTemporary()の結果がtrueの場合はリトライする、みたいな実装がよくあります。</p>
+<figure class="highlight go"><figcaption><span>retryer.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AWS SDK for Goのretyer.goの例</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">shouldRetryError</span><span class="params">(origErr <span class="type">error</span>)</span></span> <span class="type">bool</span> &#123;</span><br><span class="line">	<span class="keyword">switch</span> err := origErr.(<span class="keyword">type</span>) &#123;</span><br><span class="line">	<span class="comment">// 中略</span></span><br><span class="line">	<span class="keyword">case</span> temporary:</span><br><span class="line">		<span class="keyword">if</span> netErr, ok := err.(*net.OpError); ok &amp;&amp; netErr.Op == <span class="string">&quot;dial&quot;</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// If the error is temporary, we want to allow continuation of the</span></span><br><span class="line">		<span class="comment">// retry process</span></span><br><span class="line">		<span class="keyword">return</span> err.Temporary() || isErrConnectionReset(origErr) <span class="comment">// Temporary()がtrueの場合はリトライするのはなぜ？</span></span><br></pre></td></tr></table></figure>
+
+<p>どういったルールでtrue&#x2F;falseになって、どのように使われるべきなんでしょうか。</p>
+<h2 id="Temporary-の使い方"><a href="#Temporary-の使い方" class="headerlink" title="Temporary() の使い方"></a>Temporary() の使い方</h2><p>go.devの<a target="_blank" rel="noopener" href="https://go.dev/blog/error-handling-and-go">Error handling and Go</a> にドンピシャな説明が書いてありました（本来はエラーハンドリングの説明ですが）。</p>
+<figure class="highlight go"><figcaption><span>net.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> net</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Error <span class="keyword">interface</span> &#123;</span><br><span class="line">    <span class="type">error</span></span><br><span class="line">    Timeout() <span class="type">bool</span>   <span class="comment">// Is the error a timeout?</span></span><br><span class="line">    Temporary() <span class="type">bool</span> <span class="comment">// Is the error temporary?</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>このerrorは、Temporary()を呼ぶことで、一時的なネットワークエラーと永続的なネットワークエラーを区別するために用意されたようです。例えばWebクローラーは、一時的なエラーが発生したときにスリープして再試行し、それ以外の場合はあきらめるといった使い方に利用できるとのこと。サンプルコードも付いていました。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> nerr, ok := err.(net.Error); ok &amp;&amp; nerr.Temporary() &#123;</span><br><span class="line">    time.Sleep(<span class="number">1e9</span>)</span><br><span class="line">    <span class="keyword">continue</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">    log.Fatal(err)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ということで、Temporary() は日本語訳そのままで、一時的なエラー（リトライすると成功するかも）かどうかを区別するために用意されたものでした。例えばURLが無効であるとかクライアントサイドの指定の問題は、何回繰り返しても成功することは無いのでTemporary() はfalseを返すべきだということです。</p>
+<p>例を探すとIPアドレスのパースに失敗したときに呼ばれるnetパッケージのParseErrorはTemporary()を常にfalseを返していました。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A ParseError is the error type of literal network address parsers.</span></span><br><span class="line"><span class="keyword">type</span> ParseError <span class="keyword">struct</span> &#123;</span><br><span class="line">	Type <span class="type">string</span></span><br><span class="line">	Text <span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e *ParseError)</span></span> Error() <span class="type">string</span> &#123; <span class="keyword">return</span> <span class="string">&quot;invalid &quot;</span> + e.Type + <span class="string">&quot;: &quot;</span> + e.Text &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e *ParseError)</span></span> Timeout() <span class="type">bool</span>   &#123; <span class="keyword">return</span> <span class="literal">false</span> &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e *ParseError)</span></span> Temporary() <span class="type">bool</span> &#123; <span class="keyword">return</span> <span class="literal">false</span> &#125;  <span class="comment">// IPアドレスのパース失敗時は同じ値を何度繰り返しても成功することは無いので、毎回false</span></span><br></pre></td></tr></table></figure>
+
+<p>最初に説明したhttpErrorはクライアント側で指定した時間に対してタイムアウトしたときに利用されていたため、再試行で成功する可能性があるためtrueが返されるのだと思います。OpErrorはシステムコール側の処理でのエラーハンドリング結果に移譲していますが、ECONNRESET(connection reset by peer)やアボートされたときはリトライの余地がありと判定しtrueを返しています。</p>
+<h2 id="もはや非推奨である"><a href="#もはや非推奨である" class="headerlink" title="もはや非推奨である"></a>もはや非推奨である</h2><p>ここまでTemporary()について説明してきましたが、netパッケージのErrorでは（おそらく）Go 1.18からのように書かれます。Deprecated（非推奨）になります。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// An Error represents a network error.</span></span><br><span class="line"><span class="keyword">type</span> Error <span class="keyword">interface</span> &#123;</span><br><span class="line">	<span class="type">error</span></span><br><span class="line">	Timeout() <span class="type">bool</span> <span class="comment">// Is the error a timeout?</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Deprecated: Temporary errors are not well-defined.</span></span><br><span class="line">	<span class="comment">// Most &quot;temporary&quot; errors are timeouts, and the few exceptions are surprising.</span></span><br><span class="line">	<span class="comment">// Do not use this method.</span></span><br><span class="line">	Temporary() <span class="type">bool</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/32463">net: deprecate Temporary error status #45729</a>に理由が書かれています。 Timeout()はわかりやすいけど、Temporary()は何が一時的で何が永続的なのかの区別が明確じゃなく、本来別の表現で区別されるものもTemporary()として扱われてしまっているのでは無いかということ。Timeout()で区別がつけるものはそちらを使いましょうということかと思います。（これだとECONNRESET, ECONNABORTEDが表現できない気がしますが…）</p>
+<p>ちなみに、<a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/32463">os: remove ErrTemporary in Go 1.13 #32463</a> にあるように、 <code>os.ErrTemporary</code> は削除されたようです。</p>
+<h2 id="Temporary-の判定方法"><a href="#Temporary-の判定方法" class="headerlink" title="Temporary()の判定方法"></a>Temporary()の判定方法</h2><p>Temporary()の判定にはType Switchしたり、次のようなerrors.As()を使って判定することが多かったかと思います。</p>
+<figure class="highlight go"><figcaption><span>繰り返されるボイラーコード</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> temporary <span class="keyword">interface</span> &#123; Temporary() <span class="type">bool</span> &#125;</span><br><span class="line"><span class="keyword">var</span> terr temporary</span><br><span class="line"><span class="keyword">if</span> errors.As(err, &amp;terr) &amp;&amp; terr.Temporary() &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>この辺は標準パッケージ側でヘルパー関数を作ったら？という提案が<a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/37250">proposal: errors: add new function Temporary(error) bool</a>出ています。期待ですねと言いたいところですが、Temporary() の立ち位置自体が先程説明したようにちょっと微妙であるため、その結果次第ですがおそらく追加されることは無さそうです。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><ul>
+<li>Temporary()は一時的なエラーであるかどうかを示し、リトライで成功する可能性がある場合にtrueを返す</li>
+<li>例えば、タイムアウトやTCP通信でコネクションリセットなどを返されたときにtrueになる</li>
+<li>とは言え、Temporary()の使い分けのハッキリとした定義が難しく、位置づけがTimeout()と被ることもあり非推奨の方向で進んでいる</li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20220203a/&related=twitterapi%2Ctwitter&text=Go%E3%81%AEnet/http%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8%E3%81%AB%E5%87%BA%E3%81%A6%E3%81%8F%E3%82%8BTemporary()%E3%81%8C%E3%81%AA%E3%81%AB%E3%81%8B%E8%AA%BF%E3%81%B9%E3%81%9F%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">12</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20220203a/&t=Go%E3%81%AEnet/http%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8%E3%81%AB%E5%87%BA%E3%81%A6%E3%81%8F%E3%82%8BTemporary()%E3%81%8C%E3%81%AA%E3%81%AB%E3%81%8B%E8%AA%BF%E3%81%B9%E3%81%9F" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20220203a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20220203a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.02.10</span><span class="snscount">&#9825;21</span><a href=/articles/20220210a/ title="Go 1.18のRelease Notesに記載があったMinor changes to the libraryにあったnet/httpの3点の更新について触れていきます。">Go 1.18集中連載 net/httpのマイナーチェンジ</a></li><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;563</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2022.10.04</span><span class="snscount">&#9825;20</span><a href=/articles/20221004a/ title="ACL、RBAC、ABACなどの様々なモデルでアクセス制御を行えるライブラリであるCasbinについて紹介します。">Casbinで始めるアクセス制御</a></li><li class="related-posts-item"><span>2022.08.29</span><span class="snscount">&#9825;64</span><a href=/articles/20220829a/ title="夏休み自由研究連載の5本目です。go-fuse でLocalStackでローカル環境にエミュレートされるS3バケットをマウントするツールを開発しました。">S3 on LocalStackをGoとFUSEを使ってMountする（WSL2）</a></li><li class="related-posts-item"><span>2022.08.02</span><span class="snscount">&#9825;16</span><a href=/articles/20220802a/ title="Go 1.19 のencoding/csv のアップデート内容について紹介します。Go 1.19 Release Notesに1行だけ追加されています。">Go1.19 encoding/csv のアップデート</a></li><li class="related-posts-item"><span>2022.05.10</span><span class="snscount">&#9825;54</span><a href=/articles/20220510a/ title="2022/04/06にGAになったと発表された、Lambda Function URLsは、AWS Lambdaに直接HTTPSエンドポイントを追加できるというもので、API Gateway（やALB）無しでWeb APIやサイトを構築できると話題になりました。">Lambda Function URLs をGoでお試し。実行時間の上限（タイムアウト）やWeb API構築周りで気になること</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Temporary-%E3%81%A8%E3%81%AF"><span class="toc-text">Temporary()とは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Temporary-%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9"><span class="toc-text">Temporary() の使い方</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%82%E3%81%AF%E3%82%84%E9%9D%9E%E6%8E%A8%E5%A5%A8%E3%81%A7%E3%81%82%E3%82%8B"><span class="toc-text">もはや非推奨である</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Temporary-%E3%81%AE%E5%88%A4%E5%AE%9A%E6%96%B9%E6%B3%95"><span class="toc-text">Temporary()の判定方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

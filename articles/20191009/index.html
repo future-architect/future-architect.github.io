@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>AWS Session Managerでセッションを切断されにくくする方法 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは。TIG DXチーム 1の村瀬です。 世の中コンテナ化の流れでEC2インスタンスを直接利用する機会が減ってきていますが、まだまだサーバにSSH接続する機会もあるかと思います。 今回はSSH相当の処理をよりセキュアに行えるSession Managerについて調査・検証してみました。 2020&#x2F;04&#x2F;23追記: こちらの記事もぜひ参考ください。  Session">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS Session Managerでセッションを切断されにくくする方法 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20191009/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは。TIG DXチーム 1の村瀬です。 世の中コンテナ化の流れでEC2インスタンスを直接利用する機会が減ってきていますが、まだまだサーバにSSH接続する機会もあるかと思います。 今回はSSH相当の処理をよりセキュアに行えるSession Managerについて調査・検証してみました。 2020&#x2F;04&#x2F;23追記: こちらの記事もぜひ参考ください。  Session">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20191009/1-a.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191009/2-a.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191009/3.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191009/5.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191009/6.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191009/7.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20191009/8.png">
+<meta property="article:published_time" content="2019-10-08T23:56:31.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:52.783Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Session-Manager">
+<meta property="article:tag" content="踏み台">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20191009/1-a.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20191009/">
+  <meta content="AWS,Session-Manager,踏み台" name="keywords">
+  <meta content="村瀬善則" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">AWS Session Managerでセッションを切断されにくくする方法
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20191009-aws-sessionmanager.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20191009-aws-sessionmanager" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2019/" class="publish-date"><time datetime="2019-10-08T23:56:31.000Z" itemprop="datePublished">2019.10.09</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%9D%91%E7%80%AC%E5%96%84%E5%89%87" title="村瀬善則さんの記事一覧へ" class="post-author">村瀬善則</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/Session-Manager/" title="Session-Managerタグの記事へ" class="tag-list-link">Session-Manager</a>
+  
+    
+    <a href="/tags/踏み台/" title="踏み台タグの記事へ" class="tag-list-link">踏み台</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIG DXチーム <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>の村瀬です。</p>
+<p>世の中コンテナ化の流れでEC2インスタンスを直接利用する機会が減ってきていますが、まだまだサーバにSSH接続する機会もあるかと思います。</p>
+<p>今回はSSH相当の処理をよりセキュアに行えるSession Managerについて調査・検証してみました。</p>
+<p><strong>2020&#x2F;04&#x2F;23追記</strong>: こちらの記事もぜひ参考ください。</p>
+<ul>
+<li><a href="/articles/20200423/">Session Manager と踏み台サーバの共存構成</a></li>
+</ul>
+<h1 id="Session-Managerとは"><a href="#Session-Managerとは" class="headerlink" title="Session Managerとは"></a>Session Managerとは</h1><blockquote>
+<p>Session Manager はフルマネージド型 AWS Systems Manager 機能で、インタラクティブなワンクリックブラウザベースのシェル、または AWS CLI を介して Amazon EC2 インスタンスを管理できます。Session Manager は、インバウンドポートを開いたり、踏み台ホストを維持したり、SSH キーを管理したりすることなく、安全で監査可能なインスタンスの管理を提供します。Session Manager は、Amazon EC2 インスタンスへの簡単なワンクリックのクロスプラットフォームアクセスをエンドユーザーに提供しつつ、インスタンスへの制御されたアクセス、厳格なセキュリティプラクティス、インスタンスアクセスの詳細を含む、完全に監査可能なログを必要とする企業ポリシーに準拠することを容易にします。</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/systems-manager/latest/userguide/session-manager.html">https://docs.aws.amazon.com/ja_jp/systems-manager/latest/userguide/session-manager.html</a>　より</p>
+<h1 id="利用方法"><a href="#利用方法" class="headerlink" title="利用方法"></a>利用方法</h1><h3 id="手順1-サービスメニューからSystems-Managerをクリック"><a href="#手順1-サービスメニューからSystems-Managerをクリック" class="headerlink" title="手順1　サービスメニューからSystems Managerをクリック"></a>手順1　サービスメニューからSystems Managerをクリック</h3><img src="/images/20191009/1-a.png" style="border:solid 1px #000000"  loading="lazy">
+
+<h3 id="手順2-セッションマネージャーをクリック"><a href="#手順2-セッションマネージャーをクリック" class="headerlink" title="手順2　セッションマネージャーをクリック"></a>手順2　セッションマネージャーをクリック</h3><img src="/images/20191009/2-a.png" style="border:solid 1px #000000"  loading="lazy">
+
+<h3 id="手順3-セッションの開始をクリック"><a href="#手順3-セッションの開始をクリック" class="headerlink" title="手順3　セッションの開始をクリック"></a>手順3　セッションの開始をクリック</h3><img src="/images/20191009/3.png" style="border:solid 1px #000000"  loading="lazy">
+
+<h3 id="手順4-似たような画面で同名のボタンですがインスタンスを選択してセッションの開始をクリック"><a href="#手順4-似たような画面で同名のボタンですがインスタンスを選択してセッションの開始をクリック" class="headerlink" title="手順4　似たような画面で同名のボタンですがインスタンスを選択してセッションの開始をクリック"></a>手順4　似たような画面で同名のボタンですがインスタンスを選択してセッションの開始をクリック</h3><img src="/images/20191009/5.png" style="border:solid 1px #000000"  loading="lazy">
+
+<p>するとSession Managerのコンソールが表示されます。<br>あとはSSHと同じ要領でコマンドが実行できます。<br><img src="/images/20191009/6.png" style="border:solid 1px #000000"  loading="lazy"></p>
+<h1 id="メリット"><a href="#メリット" class="headerlink" title="メリット"></a>メリット</h1><p>Session Managerを利用することで以下のメリットがあります。</p>
+<p>・SSHが必要ないのでSSHクライアントがなくても気軽に利用できる。<br>・セキュリティグループのインバウンドのメンテナンスが不要<br>・SSHの鍵やパスフレーズの管理、ローテーションが不要</p>
+<h1 id="困りごと"><a href="#困りごと" class="headerlink" title="困りごと"></a>困りごと</h1><p>そんな便利なSession Managerですが、プロジェクトメンバーから以下のような声が上がりました。</p>
+<p>・セッションがすぐに切れるんだけど<br>・セッション時間が短いので伸ばしてくれない？</p>
+<p>設定項目を見てもセッション時間の設定はありません。<br>どうやら、何らかの理由によりセッションがすぐに切断されてしまうようです。</p>
+<p>プロジェクトメンバーはLinuxOSのEC2インスタンスに対してマネジメントコンソールにて使用している状況です。<br>その他の条件としては以下の通りです。</p>
+<p>・エージェントのバージョン - 2.3.662.0<br>・プラットフォーム　- Amazon Linux</p>
+<h1 id="調査・検証"><a href="#調査・検証" class="headerlink" title="調査・検証"></a>調査・検証</h1><p>まず、原因の仮説を立てます。<br>a.見落としているだけでセッション時間の設定が実はある？</p>
+<p>b.ブラウザのタブで他AWSアカウントを開いている為にセッションが切れてしまっている？</p>
+<p>c.マネジメントコンソールを使用しているから？CLIを使用すると切断されない？</p>
+<p>d.同時に複数の接続をしているから？</p>
+<p>※他にもいろいろありそうですが、検証時間の関係で省略してます。</p>
+<h2 id="a-見落としているだけでセッション時間の設定が実はある？"><a href="#a-見落としているだけでセッション時間の設定が実はある？" class="headerlink" title="a.見落としているだけでセッション時間の設定が実はある？"></a>a.見落としているだけでセッション時間の設定が実はある？</h2><p>マネジメントコンソールの設定を確認しましたが設定項目はありませんでした。</p>
+<h2 id="b-ブラウザのタブで他AWSアカウントを開いている為にセッションが切れてしまっている？"><a href="#b-ブラウザのタブで他AWSアカウントを開いている為にセッションが切れてしまっている？" class="headerlink" title="b.ブラウザのタブで他AWSアカウントを開いている為にセッションが切れてしまっている？"></a>b.ブラウザのタブで他AWSアカウントを開いている為にセッションが切れてしまっている？</h2><p>複数AWSアカウントやユーザを利用しているときに起きるこれ↓を起こしてみます。</p>
+<img src="/images/20191009/7.png" class="img-small-size" style="border:solid 1px #000000"  loading="lazy">
+
+
+<p>切断されず、影響ありませんでした。</p>
+<h2 id="c-マネジメントコンソールを使用しているから？CLIを使用すると切断されない？"><a href="#c-マネジメントコンソールを使用しているから？CLIを使用すると切断されない？" class="headerlink" title="c.マネジメントコンソールを使用しているから？CLIを使用すると切断されない？"></a>c.マネジメントコンソールを使用しているから？CLIを使用すると切断されない？</h2><img src="/images/20191009/8.png" class="img-small-size" style="border:solid 1px #000000"  loading="lazy">
+
+
+<p>そんなこともありませんでした。</p>
+<h2 id="d-同時に複数の接続をしているから？"><a href="#d-同時に複数の接続をしているから？" class="headerlink" title="d.同時に複数の接続をしているから？"></a>d.同時に複数の接続をしているから？</h2><p>マネジメントコンソールから複数のセッションを開始してみましたが、先勝ち、後勝ちなどなく同時に複数の接続が利用できます。</p>
+<h1 id="結果＋"><a href="#結果＋" class="headerlink" title="結果＋"></a>結果＋</h1><p>これまでの検証ではセッションが切断されてしまう原因を見つけられませんでしたm(__)m<br>このままではくやしいので、せめてどれぐらいで切断されてしまうのか測定してみました。</p>
+<p>測定方法は以下のコマンドで10秒ごとに現在時刻を表示し、いつまでセッションが生きていたか確認します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> <span class="built_in">sleep</span> 10; <span class="keyword">do</span> <span class="built_in">date</span>; <span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+<p>10分経過…</p>
+<p>1時間経過…</p>
+<p>3時間経過…</p>
+<p>すぐに切断されることを証明しようといる時に限ってなかなか切れません。</p>
+<p>！？</p>
+<p>もしかしてこの測定をしていると切れないのでは？</p>
+<p>その後、以下の3パターンで数回測定をしてみたところaのみが切断されることなく長時間セッションが接続されていました。<br>　a.フォアグラウンドで定期実行するパターン<br>　b.バックグラウンドで定期実行するパターン<br>　c.コマンドを実行せず放置するパターン</p>
+<p>検証回数は少ないものの、検証した範囲ではフォアグラウンドで定期的にコマンドを実行し続けていればセッションは切断されませんでした。<br>マネジメントコンソールではエラーメッセージが表示されないので気が付きませんでしたがCLIの検証で「Your session timed out due to inactivity」とエラーメッセージが記載されており、ことからも画面に何らかの変更が行われていれば切断されないようです。</p>
+<p>使い勝手はとても良いとは言えませんが、Session Managerにおける作業で時間が空くようであれば無害なコマンドを定期実行することでセッションを保持することができます。(そもそも論として一旦セッションを終了させればよいのかもしれませんが。。。)</p>
+<h1 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h1><p>Session Managerは不意に切断されてしまうことがありますが、セキュアで非常に便利な機能であることには違いありません。<br>長時間利用する場合や、作業の途中で切断されては困る場合には不向きですが、特性を理解した上で利用するのが良いのではないでしょうか？<br>より良い方法をご存じの方がおりましたら教えていただけると幸いです。</p>
+<p>なお、この記事を作成する上で以下のページを参考にさせていただきました。<br><a target="_blank" rel="noopener" href="https://qiita.com/serima/items/7260cef8a05d13ec6a47">https://qiita.com/serima/items/7260cef8a05d13ec6a47</a></p>
+<p>こちらの<a href="/articles/20200423/">Session Manager と踏み台サーバの共存構成</a> 記事もおすすめです。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。その中でもDXチームは特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20191009/&related=twitterapi%2Ctwitter&text=AWS%20Session%20Manager%E3%81%A7%E3%82%BB%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E5%88%87%E6%96%AD%E3%81%95%E3%82%8C%E3%81%AB%E3%81%8F%E3%81%8F%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20191009/&t=AWS%20Session%20Manager%E3%81%A7%E3%82%BB%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E5%88%87%E6%96%AD%E3%81%95%E3%82%8C%E3%81%AB%E3%81%8F%E3%81%8F%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20191009/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">4</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20191009/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">5</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.04.23</span><span class="snscount">&#9825;10</span><a href=/articles/20200423/ title="突然ですが、Session Manager 使ってますか？調べるとブログがたくさん掲載されているので使っているところは多いのかな？って思っています。">Session Manager と踏み台サーバの共存構成</a></li><li class="related-posts-item"><span>2021.06.18</span><span class="snscount">&#9825;700</span><a href=/articles/20210618a/ title="AWS内の通信においてインターネットを経由しないことが最近になって公式ドキュメントに明記されたことを受け、改めてVPC Endpointの必要性について調べてみました。">AWS内の通信がインターネットを経由しない今、VPC Endpointを利用する意味はあるのか？</a></li><li class="related-posts-item"><span>2021.05.27</span><span class="snscount">&#9825;63</span><a href=/articles/20210527a/ title="こんにちは。TIG村瀬です。2021/4/21を開催しました。私は、運用まで考慮したクラウドアーキテクチャ設計できていますか？というタイトルでお話させていただきました。発表資料は...">Future Tech Night #9 ～運用で後悔しないためのAWS設計術～　を開催しました。</a></li><li class="related-posts-item"><span>2020.04.15</span><span class="snscount">&#9825;7</span><a href=/articles/20200415/ title="目新しい機能ではなくずいぶん前から存在するS3の署名付きURLについて新発見したので記載してみようと思います。便利な署名付きURLですがインターネット上で検索する限り、URLを発行するにはAWS CLIを利用する、もしくはSDKを利用して簡単なプログラミングをするかしかないと思ってました。利用する人がITエンジニアであればそれでも良いかと思いますが、しかしながら世の中にはプログラミングが苦手だったり、操作が容易であったり様々な理由でマネジメントコンソールで操作している方も多いと思います。">【小ネタ】AWS S3 署名付きURLってマネジメントコンソールからでも作れたのね</a></li><li class="related-posts-item"><span>2020.01.21</span><span class="snscount">&#9825;28</span><a href=/articles/20200121/ title="スロットリングとは 一定時間内に受信可能なリクエスト数を制限し、制限を上回るリクエストがなされた際には受信を拒否しエラーコードを返却すること。時間経過により再び受信可能となる仕組みです。">スロットリングとの付き合い方</a></li><li class="related-posts-item"><span>2019.11.01</span><span class="snscount">&#9825;16</span><a href=/articles/20191101/ title="AWS Glue利用していますか？ETL処理をする上で大変便利ですよね。しかしながら開発に必要不可欠な開発エンドポイントが少々お高く、もう少し安価に利用できればなーと思っていたところ、さすがAWSさん素敵なリリースをしてくれました。">AWS Glueの開発エンドポイントがそこそこお高いのでローカル開発環境を用意しました</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Session-Manager%E3%81%A8%E3%81%AF"><span class="toc-text">Session Managerとは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E6%96%B9%E6%B3%95"><span class="toc-text">利用方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%8B%E9%A0%861-%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%83%A1%E3%83%8B%E3%83%A5%E3%83%BC%E3%81%8B%E3%82%89Systems-Manager%E3%82%92%E3%82%AF%E3%83%AA%E3%83%83%E3%82%AF"><span class="toc-text">手順1　サービスメニューからSystems Managerをクリック</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%8B%E9%A0%862-%E3%82%BB%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%9E%E3%83%8D%E3%83%BC%E3%82%B8%E3%83%A3%E3%83%BC%E3%82%92%E3%82%AF%E3%83%AA%E3%83%83%E3%82%AF"><span class="toc-text">手順2　セッションマネージャーをクリック</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%8B%E9%A0%863-%E3%82%BB%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E9%96%8B%E5%A7%8B%E3%82%92%E3%82%AF%E3%83%AA%E3%83%83%E3%82%AF"><span class="toc-text">手順3　セッションの開始をクリック</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%8B%E9%A0%864-%E4%BC%BC%E3%81%9F%E3%82%88%E3%81%86%E3%81%AA%E7%94%BB%E9%9D%A2%E3%81%A7%E5%90%8C%E5%90%8D%E3%81%AE%E3%83%9C%E3%82%BF%E3%83%B3%E3%81%A7%E3%81%99%E3%81%8C%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%82%92%E9%81%B8%E6%8A%9E%E3%81%97%E3%81%A6%E3%82%BB%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E9%96%8B%E5%A7%8B%E3%82%92%E3%82%AF%E3%83%AA%E3%83%83%E3%82%AF"><span class="toc-text">手順4　似たような画面で同名のボタンですがインスタンスを選択してセッションの開始をクリック</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%A1%E3%83%AA%E3%83%83%E3%83%88"><span class="toc-text">メリット</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%B0%E3%82%8A%E3%81%94%E3%81%A8"><span class="toc-text">困りごと</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AA%BF%E6%9F%BB%E3%83%BB%E6%A4%9C%E8%A8%BC"><span class="toc-text">調査・検証</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#a-%E8%A6%8B%E8%90%BD%E3%81%A8%E3%81%97%E3%81%A6%E3%81%84%E3%82%8B%E3%81%A0%E3%81%91%E3%81%A7%E3%82%BB%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3%E6%99%82%E9%96%93%E3%81%AE%E8%A8%AD%E5%AE%9A%E3%81%8C%E5%AE%9F%E3%81%AF%E3%81%82%E3%82%8B%EF%BC%9F"><span class="toc-text">a.見落としているだけでセッション時間の設定が実はある？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#b-%E3%83%96%E3%83%A9%E3%82%A6%E3%82%B6%E3%81%AE%E3%82%BF%E3%83%96%E3%81%A7%E4%BB%96AWS%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E3%82%92%E9%96%8B%E3%81%84%E3%81%A6%E3%81%84%E3%82%8B%E7%82%BA%E3%81%AB%E3%82%BB%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%8C%E5%88%87%E3%82%8C%E3%81%A6%E3%81%97%E3%81%BE%E3%81%A3%E3%81%A6%E3%81%84%E3%82%8B%EF%BC%9F"><span class="toc-text">b.ブラウザのタブで他AWSアカウントを開いている為にセッションが切れてしまっている？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#c-%E3%83%9E%E3%83%8D%E3%82%B8%E3%83%A1%E3%83%B3%E3%83%88%E3%82%B3%E3%83%B3%E3%82%BD%E3%83%BC%E3%83%AB%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%A6%E3%81%84%E3%82%8B%E3%81%8B%E3%82%89%EF%BC%9FCLI%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%99%E3%82%8B%E3%81%A8%E5%88%87%E6%96%AD%E3%81%95%E3%82%8C%E3%81%AA%E3%81%84%EF%BC%9F"><span class="toc-text">c.マネジメントコンソールを使用しているから？CLIを使用すると切断されない？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#d-%E5%90%8C%E6%99%82%E3%81%AB%E8%A4%87%E6%95%B0%E3%81%AE%E6%8E%A5%E7%B6%9A%E3%82%92%E3%81%97%E3%81%A6%E3%81%84%E3%82%8B%E3%81%8B%E3%82%89%EF%BC%9F"><span class="toc-text">d.同時に複数の接続をしているから？</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B5%90%E6%9E%9C%EF%BC%8B"><span class="toc-text">結果＋</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%95%E3%81%84%E3%81%94%E3%81%AB"><span class="toc-text">さいごに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

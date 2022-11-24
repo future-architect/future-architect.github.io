@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>OpenAPIにおけるundefinedとnullの設計 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにOpenAPI仕様に則ってREST APIの設計をする際に、値が存在しないという状態をどのように表現するかというお話です。 undefinedとはまずはじめに、ここでundefinedと言っているのは、OpenAPIの仕様において、リクエスト&#x2F;レスポンスのデータ型を定義するSchema Objectのプロパティの1つであるrequiredが指定されていない状態を指します。 O">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenAPIにおけるundefinedとnullの設計 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20211028b/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにOpenAPI仕様に則ってREST APIの設計をする際に、値が存在しないという状態をどのように表現するかというお話です。 undefinedとはまずはじめに、ここでundefinedと言っているのは、OpenAPIの仕様において、リクエスト&#x2F;レスポンスのデータ型を定義するSchema Objectのプロパティの1つであるrequiredが指定されていない状態を指します。 O">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20211028b/top.png">
+<meta property="article:published_time" content="2021-10-27T15:00:01.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:53.590Z">
+<meta property="article:tag" content="Swagger">
+<meta property="article:tag" content="OpenAPI">
+<meta property="article:tag" content="設計">
+<meta property="article:tag" content="jsonschema">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20211028b/top.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20211028b/">
+  <meta content="Swagger,OpenAPI,設計,jsonschema" name="keywords">
+  <meta content="武田大輝" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">OpenAPIにおけるundefinedとnullの設計
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20211028b_OpenAPIにおけるundefinedとnullの設計.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20211028b_OpenAPIにおけるundefinedとnullの設計" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-10-27T15:00:01.000Z" itemprop="datePublished">2021.10.28</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%AD%A6%E7%94%B0%E5%A4%A7%E8%BC%9D" title="武田大輝さんの記事一覧へ" class="post-author">武田大輝</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Swagger/" title="Swaggerタグの記事へ" class="tag-list-link">Swagger</a>
+  
+    
+    <a href="/tags/OpenAPI/" title="OpenAPIタグの記事へ" class="tag-list-link">OpenAPI</a>
+  
+    
+    <a href="/tags/設計/" title="設計タグの記事へ" class="tag-list-link">設計</a>
+  
+    
+    <a href="/tags/jsonschema/" title="jsonschemaタグの記事へ" class="tag-list-link">jsonschema</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20211028b/top.png" alt="" width="800" height="414">
+
+<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>OpenAPI仕様に則ってREST APIの設計をする際に、値が存在しないという状態をどのように表現するかというお話です。</p>
+<h2 id="undefinedとは"><a href="#undefinedとは" class="headerlink" title="undefinedとは"></a>undefinedとは</h2><p>まずはじめに、ここで<code>undefined</code>と言っているのは、OpenAPIの仕様において、リクエスト&#x2F;レスポンスのデータ型を定義するSchema Objectのプロパティの1つである<code>required</code>が指定されていない状態を指します。</p>
+<p>OpenAPIにおける<code>required</code>の定義を確認してみましょう。<br><a target="_blank" rel="noopener" href="https://spec.openapis.org/oas/v3.1.0#schema-object">OpenAPIの仕様</a>を参照すると、Schema ObjectはJSON Schemaの仕様に従うと記載されています。</p>
+<blockquote>
+<p>The Schema Object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. This object is a superset of the JSON Schema Specification Draft 2020-12.</p>
+<p>For more information about the properties, see JSON Schema Core and JSON Schema Validation.</p>
+</blockquote>
+<p>それでは<a target="_blank" rel="noopener" href="https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.15">JSON Schemaの仕様</a>を確認してみましょう。</p>
+<blockquote>
+<p>An object instance is valid against this keyword if its property set contains all elements in this keyword’s array value.</p>
+</blockquote>
+<p>少しわかりづらいですが、<code>required</code>として指定されたプロパティはキーとしてインスタンスに含まれなければならないことを意味します。</p>
+<p>具体的な例として下記のようなOpenAPI定義を考えてみましょう。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">application/json:</span></span><br><span class="line">  <span class="attr">schema:</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">object</span></span><br><span class="line">    <span class="attr">properties:</span></span><br><span class="line">      <span class="attr">id:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">    <span class="attr">required:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">id</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>正しいケース</strong></p>
+<p>✅ <code>id</code>に具体的な文字列が指定されている</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00001&quot;</span> <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>✅ <code>id</code>に空文字が指定されている</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span> <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>正しくないケース</strong></p>
+<p>❌ <code>id</code>のキーが存在しない</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>❌ <code>id</code>の値に<code>null</code>が指定されている</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="keyword">null</span> <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>後述しますが、この場合<code>required</code>の条件は満たしますが、データ形が文字列ではないため、NGとなります。</p>
+<p>このように<code>required</code>とはキー自体の必須・非必須を定義するプロパティであり、キーの具体的な値については関与していないということをまずは頭に入れておいてください。</p>
+<h2 id="nullとは"><a href="#nullとは" class="headerlink" title="nullとは"></a>nullとは</h2><p>次に<code>null</code>というのは、リクエスト&#x2F;レスポンスにおけるプロパティの値としての<code>null</code>を指しています。<br>リクエスト&#x2F;レスポンスのフォーマットとしてJSONが用いられることが多いと思いますが、<a target="_blank" rel="noopener" href="https://www.rfc-editor.org/rfc/rfc8259.html#section-3">JSONの仕様</a>として <code>null</code>型というのは明確に定義されています。</p>
+<p>OpenAPIにおいてこの<code>null</code>型はどのように表現されるのでしょうか。<br>結論から言うとバージョンによって表現が異なります。</p>
+<p><strong>OpenAPI3.0の場合</strong><br><a target="_blank" rel="noopener" href="https://spec.openapis.org/oas/v3.0.3#data-types">https://spec.openapis.org/oas/v3.0.3#data-types</a></p>
+<blockquote>
+<p>null is not supported as a type (see nullable for an alternative solution)</p>
+</blockquote>
+<p><code>null</code>は型としてサポートされておらず、代わりにnullableを利用する仕様となっています。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">application/json:</span></span><br><span class="line">  <span class="attr">schema:</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">object</span></span><br><span class="line">    <span class="attr">properties:</span></span><br><span class="line">      <span class="attr">id:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">        <span class="attr">nullable:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">required:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">id</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>OpenAPI3.1の場合</strong><br><a target="_blank" rel="noopener" href="https://spec.openapis.org/oas/v3.1.0#data-types">https://spec.openapis.org/oas/v3.1.0#data-types</a><br><code>null</code>に関する注記は削除され、JSON Schemaの仕様と同じく&#96;null&#96;&#96;を型として明確にサポートするようになりました。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">application/json:</span></span><br><span class="line">  <span class="attr">schema:</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">object</span></span><br><span class="line">    <span class="attr">properties:</span></span><br><span class="line">      <span class="attr">id:</span></span><br><span class="line">        <span class="attr">type:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">string</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">&#x27;null&#x27;</span></span><br><span class="line">    <span class="attr">required:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">id</span></span><br></pre></td></tr></table></figure>
+
+<p>バージョンによって表現の差異はありますが、意味するところは同じです。</p>
+<p><strong>正しいケース</strong></p>
+<p>✅ <code>id</code>に具体的な文字列が指定されている</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00001&quot;</span> <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>✅ <code>id</code>に空文字が指定されている</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span> <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>✅ <code>id</code>に<code>null</code>が指定されている</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="keyword">null</span> <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>正しくないケース</strong></p>
+<p>❌ <code>id</code>のキーが存在しない</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>これは先述した<code>required</code>の条件を満たしていないためNGとなります。</p>
+<h2 id="undefined-vs-null"><a href="#undefined-vs-null" class="headerlink" title="undefined vs null"></a>undefined vs null</h2><p>ここまで見てきたように<code>undefined</code>と<code>null</code>は似て非なるものです。<br><code>undefined</code>はキーの必須・非必須を定義しているのに対し、<code>null</code>は値が<code>null</code>かどうかを定義しています。</p>
+<p>しかしながらREST APIを設計するにあたって空の項目をどちらで表現するかは意見が分かれているように思います。<br>例えば以下のようなユーザオブジェクトのJSON表現を考えてみましょう。<br>オプショナルなユーザ属性としてスコアを持ちますが、スコアが存在しない状態をどのように表現するのでしょうか。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>データ型</th>
+<th>必須</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ID</td>
+<td>文字列</td>
+<td>○</td>
+</tr>
+<tr>
+<td>Name</td>
+<td>文字列</td>
+<td>○</td>
+</tr>
+<tr>
+<td>Score</td>
+<td>数値</td>
+<td></td>
+</tr>
+</tbody></table></div>
+<p><code>undefined</code>として表現する場合</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00001&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Bob&quot;</span> <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>null</code>として表現する場合</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00001&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Bob&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;score&quot;</span><span class="punctuation">:</span> <span class="keyword">null</span> <span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="undefined派"><a href="#undefined派" class="headerlink" title="undefined派"></a>undefined派</h3><ul>
+<li>リクエスト&#x2F;レスポンスのペイロードサイズを小さくするために<code>null</code>値は利用しない方が良い。</li>
+<li>必要なプロパティのみが含まれている方が視認性が良い。</li>
+</ul>
+<p>なおGoogleの<a target="_blank" rel="noopener" href="https://google.github.io/styleguide/jsoncstyleguide.xml?showone=Empty/Null_Property_Values#Empty/Null_Property_Values">JSON Style Guide</a>では、明確に<code>null</code>値が必要となる場合以外は、プロパティ自体含めない形が推奨（ここでいう<code>undefined</code>派）されています。</p>
+<blockquote>
+<p>If a property is optional or has an empty or null value, consider dropping the property from the JSON, unless there’s a strong semantic reason for its existence.</p>
+</blockquote>
+<h3 id="null派"><a href="#null派" class="headerlink" title="null派"></a>null派</h3><ul>
+<li>データの構造の全量を把握できるため、<code>null</code>値を含めた方が良い。</li>
+</ul>
+<h3 id="null以外の方法で空値を表現する派"><a href="#null以外の方法で空値を表現する派" class="headerlink" title="null以外の方法で空値を表現する派"></a>null以外の方法で空値を表現する派</h3><p><code>null派</code>の亜種となりますが、データ型に応じては<code>null</code>以外の方法で空値を表現できる場合があり、明示的に<code>null</code>型を利用しない方法となります。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="left">データ型</th>
+<th align="left">空値の表現</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">string</td>
+<td align="left">“”（空文字）</td>
+</tr>
+<tr>
+<td align="left">integer</td>
+<td align="left">表現不可</td>
+</tr>
+<tr>
+<td align="left">number</td>
+<td align="left">表現不可</td>
+</tr>
+<tr>
+<td align="left">boolean</td>
+<td align="left">表現不可</td>
+</tr>
+<tr>
+<td align="left">array</td>
+<td align="left">[]（空配列）</td>
+</tr>
+<tr>
+<td align="left">object</td>
+<td align="left">{}（空オブジェクト）</td>
+</tr>
+</tbody></table></div>
+<p>そもそも<code>integer</code>や<code>number</code>のような数値型やブーリアン型は空値を表現する方法がないので、この方法は採用できません。<br>数値について、例えば業務上自然数しか入りえない項目（例. 年齢）に対して<code>-1</code>のような値を利用して空値を表現するような場合を見かけますが、これは設計上望ましくないと考えます。</p>
+<p>さらに言うと、空値の表現が可能な文字列やオブジェクト含め、後述するバリデーションの観点から、<code>null</code>型以外の型で空値を表現するのは基本的に望ましくないと考えています。</p>
+<h3 id="筆者の意見"><a href="#筆者の意見" class="headerlink" title="筆者の意見"></a>筆者の意見</h3><p>結論から言うと原則<code>null</code>値は利用せずキー自体を含めない<code>undefined</code>が良いと思っています。<br>特にOpenAPIの仕様に基づいてAPI仕様をドキュメントする場合において、<code>null値</code>を許容するように記述するのは煩雑です。</p>
+<p>ただしここで「原則」と言ったのはAPIのユースケースに応じて明確に<code>null</code>値を表現したいケースは存在すると考えています。</p>
+<h4 id="ユースケースの観点"><a href="#ユースケースの観点" class="headerlink" title="ユースケースの観点"></a>ユースケースの観点</h4><p>先程のユーザリソースを例にCRUDを考えてみましょう。</p>
+<h5 id="取得（GET）"><a href="#取得（GET）" class="headerlink" title="取得（GET）"></a>取得（GET）</h5><p><code>score</code>が存在する場合は、<code>score</code>値が返却されます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -X GET /users/00001</span><br><span class="line">&#123; <span class="string">&quot;id&quot;</span>: <span class="string">&quot;00001&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;Bob&quot;</span>, score: 70 &#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>score</code>が存在しない場合は、レスポンスに<code>score</code>プロパティは含めません。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -X GET /users/00001</span><br><span class="line">&#123; <span class="string">&quot;id&quot;</span>: <span class="string">&quot;00001&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;Bob&quot;</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="新規作成（POST）"><a href="#新規作成（POST）" class="headerlink" title="新規作成（POST）"></a>新規作成（POST）</h5><p>作成時に<code>score</code>値が存在する場合は、リクエストに<code>score</code>値を含めます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$curl</span> -X POST /users --data <span class="string">&#x27;&#123; &quot;name&quot;: &quot;Bob&quot;, &quot;score&quot;: 70 &#125;&#x27;</span></span><br><span class="line">&#123; <span class="string">&quot;id&quot;</span>: <span class="string">&quot;00001&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;Bob&quot;</span>, score: 70 &#125;</span><br></pre></td></tr></table></figure>
+
+<p>作成時に<code>score</code>値が存在しない場合は、リクエストに<code>score</code>プロパティは含めません。もちろんこの時のレスポンスとして作成したリソースを返却する場合、レスポンスの中にも<code>score</code>プロパティは含まれません。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$curl</span> -X POST /users --data <span class="string">&#x27;&#123; &quot;name&quot;: &quot;Bob&quot; &#125;&#x27;</span></span><br><span class="line">&#123; <span class="string">&quot;id&quot;</span>: <span class="string">&quot;00001&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;Bob&quot;</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="全件更新（PUT）"><a href="#全件更新（PUT）" class="headerlink" title="全件更新（PUT）"></a>全件更新（PUT）</h5><p>新規作成（POST）の場合と同様です。</p>
+<h5 id="差分更新（PATCH）"><a href="#差分更新（PATCH）" class="headerlink" title="差分更新（PATCH）"></a>差分更新（PATCH）</h5><p>差分更新として指定された一部の項目のみを更新したいというケースは多からず存在するでしょう。この場合はnull値を明示的に指定する必要があると考えています。</p>
+<p>というのもリクエストのプロパティからscore自体を除外してしまうと、更新対象外となってしまい意図した挙動となりません。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$curl</span> -X PATCH /users/00001 --data <span class="string">&#x27;&#123; &#125;&#x27;</span></span><br><span class="line">&#123; <span class="string">&quot;id&quot;</span>: <span class="string">&quot;00001&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;Bob&quot;</span>, score: 70 &#125; // score　is not cleared.</span><br></pre></td></tr></table></figure>
+
+<p>このような場合、明確に<code>null</code>値を指定してアップデートをする必要があります。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$curl</span> -X PATCH /users/00001 --data <span class="string">&#x27;&#123; &quot;score&quot;: null &#125;&#x27;</span></span><br><span class="line">&#123; <span class="string">&quot;id&quot;</span>: <span class="string">&quot;00001&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;Bob&quot;</span> &#125;  // score　is cleared.</span><br></pre></td></tr></table></figure>
+
+<h4 id="バリデーションの観点"><a href="#バリデーションの観点" class="headerlink" title="バリデーションの観点"></a>バリデーションの観点</h4><p>リクエスト&#x2F;レスポンス（特にリクエスト）はサーバ側でバリデーションを実施することが基本です。<br>先程例としてあげたユーザオブジェクトが<code>score</code>の代わりにオプショナルな属性として<code>email</code>を持つケースをもとに考えてみましょう。<br>バリデーションを行うため、<code>email</code>は<a target="_blank" rel="noopener" href="https://datatracker.ietf.org/doc/html/rfc5321#section-4.1.2">RFC 5321</a>の仕様に則ったフォーマットを保持することを前提として考えます。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>データ型</th>
+<th>必須</th>
+<th>フォーマット</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ID</td>
+<td>文字列</td>
+<td>○</td>
+<td></td>
+</tr>
+<tr>
+<td>Name</td>
+<td>文字列</td>
+<td>○</td>
+<td></td>
+</tr>
+<tr>
+<td>Email</td>
+<td>文字列</td>
+<td></td>
+<td>RFC 5321形式</td>
+</tr>
+</tbody></table></div>
+<h5 id="undefinedで表現する場合"><a href="#undefinedで表現する場合" class="headerlink" title="undefinedで表現する場合"></a>undefinedで表現する場合</h5><p>OpenAPI定義は次のようになります。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">application/json:</span></span><br><span class="line">  <span class="attr">schema:</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">object</span></span><br><span class="line">    <span class="attr">properties:</span></span><br><span class="line">      <span class="attr">id:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">      <span class="attr">name:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">      <span class="attr">email:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">        <span class="attr">format:</span> <span class="string">email</span></span><br><span class="line">    <span class="attr">required:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">id</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">name</span></span><br></pre></td></tr></table></figure>
+
+<p>JSON Schemaに基づいたValidation結果は次のようになり、特筆すべき事項はありません。</p>
+<p>✅ <code>email</code>に適切なフォーマットの値が指定される場合</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00001&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Bob&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;email&quot;</span><span class="punctuation">:</span> <span class="string">&quot;bob@example.com&quot;</span> <span class="punctuation">&#125;</span> <span class="comment">// Valid</span></span><br></pre></td></tr></table></figure>
+
+<p>✅ <code>email</code>が存在しない場合</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00001&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Bob&quot;</span> <span class="punctuation">&#125;</span> <span class="comment">// Valid</span></span><br></pre></td></tr></table></figure>
+
+<p>❌ <code>email</code>に不適切なフォーマットの値が指定される場合</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00001&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Bob&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;email&quot;</span><span class="punctuation">:</span> <span class="string">&quot;invalid&quot;</span> <span class="punctuation">&#125;</span> <span class="comment">// Invalid</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="null型で表現する場合"><a href="#null型で表現する場合" class="headerlink" title="null型で表現する場合"></a>null型で表現する場合</h5><p>OpenAPI定義は次のようになります。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">application/json:</span></span><br><span class="line">  <span class="attr">schema:</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">object</span></span><br><span class="line">    <span class="attr">properties:</span></span><br><span class="line">      <span class="attr">id:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">      <span class="attr">name:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">      <span class="attr">email:</span></span><br><span class="line">        <span class="attr">type:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">string</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">&#x27;null&#x27;</span></span><br><span class="line">        <span class="attr">format:</span> <span class="string">email</span></span><br><span class="line">    <span class="attr">required:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">id</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">name</span></span><br></pre></td></tr></table></figure>
+
+<p>こちらもundefinedで表現した場合と同様にバリデーションについては特筆すべき事項はありません。</p>
+<p>✅ <code>email</code>に適切なフォーマットの値が指定される場合</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00001&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Bob&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;email&quot;</span><span class="punctuation">:</span> <span class="string">&quot;bob@example.com&quot;</span> <span class="punctuation">&#125;</span> <span class="comment">// Valid</span></span><br></pre></td></tr></table></figure>
+
+<p>✅ <code>email</code>に<code>null</code>値が指定される場合</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00001&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Bob&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;email&quot;</span><span class="punctuation">:</span> <span class="keyword">null</span> <span class="punctuation">&#125;</span> <span class="comment">// Valid</span></span><br></pre></td></tr></table></figure>
+
+<p>❌ <code>email</code>に不適切なフォーマットの値が指定される場合</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00001&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Bob&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;email&quot;</span><span class="punctuation">:</span> <span class="string">&quot;invalid&quot;</span> <span class="punctuation">&#125;</span> <span class="comment">// Invalid</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="null型以外で空値を表現する場合"><a href="#null型以外で空値を表現する場合" class="headerlink" title="null型以外で空値を表現する場合"></a>null型以外で空値を表現する場合</h5><p>最後に<code>email</code>の空値を<code>null</code>型ではなく空文字で表現する場合を考えてみましょう。<br>OpenAPI定義は次のようになります。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">application/json:</span></span><br><span class="line">  <span class="attr">schema:</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">object</span></span><br><span class="line">    <span class="attr">properties:</span></span><br><span class="line">      <span class="attr">id:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">      <span class="attr">name:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">      <span class="attr">email:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">        <span class="attr">format:</span> <span class="string">email</span></span><br><span class="line">    <span class="attr">required:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">id</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">name</span></span><br></pre></td></tr></table></figure>
+
+<p>このときJSONにて空の<code>email</code>を表現するためには空文字を利用することになりますが、下記のJSONはJSON Schema ValidationでNGと判断されます。</p>
+<p>❌ <code>email</code>に空文字が指定される場合</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span> <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00001&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Bob&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;email&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span> <span class="punctuation">&#125;</span> <span class="comment">// Invalid</span></span><br></pre></td></tr></table></figure>
+
+<p>これは空文字がメールアドレスのフォーマットとして許容されないからです。<br>null型の代わりに空文字を採用する場合、OpenAPIの定義上<code>format: email</code>を除いてあげないと、空値を表現することができません。これは本末転倒と言わざるを得ないでしょう。</p>
+<h5 id="その他注意事項"><a href="#その他注意事項" class="headerlink" title="その他注意事項"></a>その他注意事項</h5><p>空値の表現にnull型を用いる場合で、<code>enum</code>（列挙型）を利用している場合は、型だけでなく<code>enum</code>の要素としても<code>null</code>を含めてあげないとエラーとなります。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">application/json:</span></span><br><span class="line">  <span class="attr">schema:</span></span><br><span class="line">    <span class="attr">type:</span> <span class="string">object</span></span><br><span class="line">    <span class="attr">properties:</span></span><br><span class="line">      <span class="attr">id:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">      <span class="attr">name:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">      <span class="attr">color:</span></span><br><span class="line">        <span class="attr">type:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">string</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">&#x27;null&#x27;</span></span><br><span class="line">        <span class="attr">enum:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">&#x27;red&#x27;</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">&#x27;yellow&#x27;</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">&#x27;green&#x27;</span></span><br><span class="line">          <span class="bullet">-</span> <span class="literal">null</span> <span class="comment"># これがないとnull指定時にエラーとなる</span></span><br><span class="line">    <span class="attr">required:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">id</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">name</span></span><br></pre></td></tr></table></figure>
+
+
+<h4 id="プログラムの観点"><a href="#プログラムの観点" class="headerlink" title="プログラムの観点"></a>プログラムの観点</h4><p>最後に実装するプログラム視点での注意点を補足しておこうと思います。</p>
+<h5 id="クライアントサイド"><a href="#クライアントサイド" class="headerlink" title="クライアントサイド"></a>クライアントサイド</h5><p>フロントエンドがWEBの場合は、JavaScriptやTypeScriptを用いてクライアント側の実装をすることが多いと思います。<br>JavaScriptは言語としてundefined型とnull型を持つので上記のいずれのパターンにも、特に問題なく対応できると思っています。（今のところ筆者は課題感を持っていません。）</p>
+<h5 id="サーバサイド"><a href="#サーバサイド" class="headerlink" title="サーバサイド"></a>サーバサイド</h5><p>サーバサイドについては、上述した差分更新のユースケースなどで<code>undefined</code>の場合と<code>null</code>値の場合を識別したい場合に少し工夫が必要になる場合があるかもしれません。</p>
+<p>ほとんどのプログラムにおいてはJSONを対応するオブジェクトにデシリアライズすることになると思いますが、デシリアライズした後に上記の識別をしなければならないケースが該当します。</p>
+<p>例えばGolangをで先程のユーザオブジェクトを素直に表現すると次のようになります。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	ID    <span class="type">string</span>  <span class="string">`json:&quot;id&quot;`</span></span><br><span class="line">	Name  <span class="type">string</span>  <span class="string">`json:&quot;name&quot;`</span></span><br><span class="line">	Email *<span class="type">string</span> <span class="string">`json:&quot;email&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>この場合、<code>email</code>が<code>undefined</code>の場合と<code>null</code>値の場合を判別することができません。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// The email is undefined.</span></span><br><span class="line">	user1 := &amp;User&#123;&#125;</span><br><span class="line">	json.Unmarshal([]<span class="type">byte</span>(<span class="string">`&#123; &quot;id&quot;: &quot;00001&quot;, &quot;name&quot;: &quot;Bob&quot; &#125;`</span>), user1)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// The email is null.</span></span><br><span class="line">	user2 := &amp;User&#123;&#125;</span><br><span class="line">	json.Unmarshal([]<span class="type">byte</span>(<span class="string">`&#123; &quot;id&quot;: &quot;00001&quot;, &quot;name&quot;: &quot;Bob&quot;, &quot;email&quot;: null &#125;`</span>), user2)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Both email values are nil</span></span><br><span class="line">	fmt.Println(user1.Email == user2.Email)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>undefined</code>の場合と<code>null</code>値を判別したい場合は別途構造体を用意する形となります。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// NullString represents a string value that may be null.</span></span><br><span class="line"><span class="keyword">type</span> NullString <span class="keyword">struct</span> &#123;</span><br><span class="line">	Value *<span class="type">string</span></span><br><span class="line">	Set   <span class="type">bool</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(v NullString)</span></span> MarshalJSON() ([]<span class="type">byte</span>, <span class="type">error</span>) &#123;</span><br><span class="line">	<span class="keyword">if</span> v.Set &#123;</span><br><span class="line">		<span class="keyword">return</span> json.Marshal(v.Value)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> json.Marshal(<span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(v *NullString)</span></span> UnmarshalJSON(data []<span class="type">byte</span>) <span class="type">error</span> &#123;</span><br><span class="line">	v.Set = <span class="literal">true</span></span><br><span class="line">	<span class="comment">// Return if the data is null</span></span><br><span class="line">	<span class="keyword">if</span> <span class="type">string</span>(data) == <span class="string">&quot;null&quot;</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> err := json.Unmarshal(data, &amp;v.Value); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(v NullString)</span></span> String() <span class="type">string</span> &#123;</span><br><span class="line">	<span class="keyword">if</span> !v.Set &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="string">&quot;&lt;nil&gt;&quot;</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> v.Value == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="string">&quot;null&quot;</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> *v.Value</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これを用いてユーザオブジェクトを再定義すると下記のようになります。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	ID    <span class="type">string</span>     <span class="string">`json:&quot;id&quot;`</span></span><br><span class="line">	Name  <span class="type">string</span>     <span class="string">`json:&quot;name&quot;`</span></span><br><span class="line">	Email NullString <span class="string">`json:&quot;email&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>undefined</code>の場合は<code>Set</code>プロパティが<code>false</code>、<code>null</code>値が指定された場合はは<code>Set</code>プロパティが<code>true</code>となります。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// The email is undefined.</span></span><br><span class="line">	user1 := &amp;User&#123;&#125;</span><br><span class="line">	json.Unmarshal([]<span class="type">byte</span>(<span class="string">`&#123; &quot;id&quot;: &quot;00001&quot;, &quot;name&quot;: &quot;Bob&quot; &#125;`</span>), user1)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// The email is null.</span></span><br><span class="line">	user2 := &amp;User&#123;&#125;</span><br><span class="line">	json.Unmarshal([]<span class="type">byte</span>(<span class="string">`&#123; &quot;id&quot;: &quot;00001&quot;, &quot;name&quot;: &quot;Bob&quot;, &quot;email&quot;: null &#125;`</span>), user2)</span><br><span class="line"></span><br><span class="line">	fmt.Println(user1.Email.Set) <span class="comment">// false</span></span><br><span class="line">	fmt.Println(user2.Email.Set) <span class="comment">// true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h2><p>いかがでしたでしょうか。</p>
+<p>この辺りの設計は一概に正解があるというものではないので、ぜひご意見ある方はコメントいただけますと幸いです。</p>
+<p>いずれにしても設計・開発を推進していく上では、設計者・開発者でこのあたりの方針について認識を合わせ、システム全体として統一感のとれた作りにしておくことが大切だと思っています。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20211028b/&related=twitterapi%2Ctwitter&text=OpenAPI%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8Bundefined%E3%81%A8null%E3%81%AE%E8%A8%AD%E8%A8%88%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">12</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20211028b/&t=OpenAPI%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8Bundefined%E3%81%A8null%E3%81%AE%E8%A8%AD%E8%A8%88" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20211028b/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">61</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20211028b/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">44</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.04.09</span><span class="snscount">&#9825;189</span><a href=/articles/20200409/ title="みなさん、Swagger使ってますか？本記事では実際にSwaggerのスキーマ定義を設計していく上で取り決めた規約について書いてみたいと思います。">スキーマファースト開発のためのOpenAPI（Swagger）設計規約</a></li><li class="related-posts-item"><span>2019.10.08</span><span class="snscount">&#9825;1144</span><a href=/articles/20191008/ title="みなさんSwagger使ってますか？弊社でもREST APIを構築するに当たってSwaggerを導入する機会が増えています。本記事ではSwaggerを導入するに当たって、合わせて利用して便利だったツールを紹介したいと思います。">本当に使ってよかったOpenAPI (Swagger) ツール</a></li><li class="related-posts-item"><span>2022.09.06</span><span class="snscount">&#9825;51</span><a href=/articles/20220906a/ title="一般的に複数のトランザクションが並行して同じオブジェクトに対してアクセスを行う場合には、トランザクションの分離レベル（SERIALIZABLE/REPEATABLE READ/READ COMMITTED/READ UNCOMMITTED）によって様々な問題が発生します。DynamoDBは2018年にトランザクションがサポートされましたが、本記事ではファントムリードによる書き込みスキューの問題とその対応について取り上げたいと思います。">DynamoDB利用時の書き込みスキュー（Write Skew）の回避</a></li><li class="related-posts-item"><span>2022.07.21</span><span class="snscount">&#9825;24</span><a href=/articles/20220721b/ title="TIG DX Unitの武田です。先日（2022年7月15日）発売された技術評論社の [Software Design 2022年 8月号] に寄稿させていただきました。まずはじめに、このような寄稿の機会をくださった技術評論社の方々には、心からお礼申し上げます。">Software Design 2022年8月号 執筆記</a></li><li class="related-posts-item"><span>2022.03.16</span><span class="snscount">&#9825;31</span><a href=/articles/20220316a/ title="FlutterでWidgetを開発するとき、Stateless WidgetやStateful Widgetを継承したクラスを作成することが一般的だと思います。一方でクラスを定義せずとも、Widgetを返却するFunctionを定義することで同様のことが実現できるのでは？と考えたことはないでしょうか。">Class Widgets vs Functional Widgets</a></li><li class="related-posts-item"><span>2021.05.11</span><span class="snscount">&#9825;15</span><a href=/articles/20210511b/ title="Dart/Flutter連載の2記事目です。はじめまして、TIGの宮崎将太です。突然ですがみなさん、Swagger使いたいですよね。">Flutter Swagger統合</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220721b/ title="TIG DX Unitの武田です。先日（2022年7月15日）発売された技術評論社の [Software Design 2022年 8月号] に寄稿させていただきました。まずはじめに、このような寄稿の機会をくださった技術評論社の方々には、心からお礼申し上げます。">Software Design 2022年8月号 執筆記</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#undefined%E3%81%A8%E3%81%AF"><span class="toc-text">undefinedとは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#null%E3%81%A8%E3%81%AF"><span class="toc-text">nullとは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#undefined-vs-null"><span class="toc-text">undefined vs null</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#undefined%E6%B4%BE"><span class="toc-text">undefined派</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#null%E6%B4%BE"><span class="toc-text">null派</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#null%E4%BB%A5%E5%A4%96%E3%81%AE%E6%96%B9%E6%B3%95%E3%81%A7%E7%A9%BA%E5%80%A4%E3%82%92%E8%A1%A8%E7%8F%BE%E3%81%99%E3%82%8B%E6%B4%BE"><span class="toc-text">null以外の方法で空値を表現する派</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AD%86%E8%80%85%E3%81%AE%E6%84%8F%E8%A6%8B"><span class="toc-text">筆者の意見</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%83%A6%E3%83%BC%E3%82%B9%E3%82%B1%E3%83%BC%E3%82%B9%E3%81%AE%E8%A6%B3%E7%82%B9"><span class="toc-text">ユースケースの観点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%83%90%E3%83%AA%E3%83%87%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E8%A6%B3%E7%82%B9"><span class="toc-text">バリデーションの観点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0%E3%81%AE%E8%A6%B3%E7%82%B9"><span class="toc-text">プログラムの観点</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

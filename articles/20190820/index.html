@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>初めてのGCPで環境構築してハマったこと | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにお仕事でGCP使って環境を構築することがあったのですが、色々とハマることが多かったので供養を兼ねて共有したいと思います。 当時の私の経験値としては「AWSの一部サービスは触ったことがある」程度でクラウド環境を下地から構築するのは初めての経験でした。一度触ってみれば常識だよねって内容が多いですが、初心者が小石につまずいてもすぐに立ち上れるようになれば幸いです。 今回構築した環境の概要 既存の">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初めてのGCPで環境構築してハマったこと | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20190820/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにお仕事でGCP使って環境を構築することがあったのですが、色々とハマることが多かったので供養を兼ねて共有したいと思います。 当時の私の経験値としては「AWSの一部サービスは触ったことがある」程度でクラウド環境を下地から構築するのは初めての経験でした。一度触ってみれば常識だよねって内容が多いですが、初心者が小石につまずいてもすぐに立ち上れるようになれば幸いです。 今回構築した環境の概要 既存の">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20190820/photo_20190820_01.png">
+<meta property="article:published_time" content="2019-08-20T00:19:49.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:52.754Z">
+<meta property="article:tag" content="DB">
+<meta property="article:tag" content="Network">
+<meta property="article:tag" content="GCP">
+<meta property="article:tag" content="Kubernetes">
+<meta property="article:tag" content="環境構築">
+<meta property="article:tag" content="CIDR">
+<meta property="article:tag" content="トラブルシュート">
+<meta property="article:tag" content="設計">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20190820/photo_20190820_01.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20190820/">
+  <meta content="DB,Network,GCP,Kubernetes,環境構築,CIDR,トラブルシュート,設計" name="keywords">
+  <meta content="ghost" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">初めてのGCPで環境構築してハマったこと
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20190820-gcp-tips.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20190820-gcp-tips" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2019/" class="publish-date"><time datetime="2019-08-20T00:19:49.000Z" itemprop="datePublished">2019.08.20</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/ghost" title="ghostさんの記事一覧へ" class="post-author">ghost</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/DB/" title="DBタグの記事へ" class="tag-list-link">DB</a>
+  
+    
+    <a href="/tags/Network/" title="Networkタグの記事へ" class="tag-list-link">Network</a>
+  
+    
+    <a href="/tags/GCP/" title="GCPタグの記事へ" class="tag-list-link">GCP</a>
+  
+    
+    <a href="/tags/Kubernetes/" title="Kubernetesタグの記事へ" class="tag-list-link">Kubernetes</a>
+  
+    
+    <a href="/tags/環境構築/" title="環境構築タグの記事へ" class="tag-list-link">環境構築</a>
+  
+    
+    <a href="/tags/CIDR/" title="CIDRタグの記事へ" class="tag-list-link">CIDR</a>
+  
+    
+    <a href="/tags/トラブルシュート/" title="トラブルシュートタグの記事へ" class="tag-list-link">トラブルシュート</a>
+  
+    
+    <a href="/tags/設計/" title="設計タグの記事へ" class="tag-list-link">設計</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>お仕事でGCP使って環境を構築することがあったのですが、色々とハマることが多かったので供養を兼ねて共有したいと思います。</p>
+<p>当時の私の経験値としては「AWSの一部サービスは触ったことがある」程度でクラウド環境を下地から構築するのは初めての経験でした。一度触ってみれば常識だよねって内容が多いですが、初心者が小石につまずいてもすぐに立ち上れるようになれば幸いです。</p>
+<h1 id="今回構築した環境の概要"><a href="#今回構築した環境の概要" class="headerlink" title="今回構築した環境の概要"></a>今回構築した環境の概要</h1><ul>
+<li>既存のオンプレ環境との共存を前提とし、使えるアドレス範囲もオンプレのNWから払い出し</li>
+<li>オンプレ環境とインターネットVPNでつなぐプロジェクトは1つ（ホストプロジェクト）</li>
+<li>各環境（production、staging・・）は共有VPCで接続（サービスプロジェクト）</li>
+</ul>
+<img src="/images/20190820/photo_20190820_01.png" loading="lazy">
+
+<p>なお、構築はTerraform, Ansibleで行いました。</p>
+<h1 id="GCPで環境構築してハマったこと"><a href="#GCPで環境構築してハマったこと" class="headerlink" title="GCPで環境構築してハマったこと"></a>GCPで環境構築してハマったこと</h1><p>本編です。<br>カテゴリ別に記載しています。</p>
+<h2 id="1-GKE関連"><a href="#1-GKE関連" class="headerlink" title="1. GKE関連"></a>1. GKE関連</h2><h3 id="1-1-GKEのコア数を増やせない"><a href="#1-1-GKEのコア数を増やせない" class="headerlink" title="1-1. GKEのコア数を増やせない"></a>1-1. GKEのコア数を増やせない</h3><h4 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h4><p>アカウントあたりの割り当て上限に達していた。</p>
+<h4 id="対応"><a href="#対応" class="headerlink" title="対応"></a>対応</h4><p>制限変更を依頼することで解消しました。<br>自分が依頼したときは数分で対応してくれましたが、常に数分で対応されるかは定かではありません。<br>サービスインする前は想定されるスケール具合に合わせて事前に拡張しておきましょう。<br>割り当て増加の手順は他の方が書かれていますのでこちらをご参考に。<br><a target="_blank" rel="noopener" href="https://qiita.com/mouse2/items/dd136453798804f99de7">https://qiita.com/mouse2/items/dd136453798804f99de7</a><br><a target="_blank" rel="noopener" href="https://cloud.google.com/compute/quotas?hl=ja&amp;_ga=1.181298212.2042940000.1483498197">https://cloud.google.com/compute/quotas?hl=ja&amp;_ga=1.181298212.2042940000.1483498197</a></p>
+<h3 id="1-2-プライベートGKEクラスタからインターネットアクセスできない"><a href="#1-2-プライベートGKEクラスタからインターネットアクセスできない" class="headerlink" title="1-2. プライベートGKEクラスタからインターネットアクセスできない"></a>1-2. プライベートGKEクラスタからインターネットアクセスできない</h3><h4 id="原因-1"><a href="#原因-1" class="headerlink" title="原因"></a>原因</h4><p>プライベートクラスタではノード（pod）に外部IPが付与されないため。</p>
+<h4 id="対応-1"><a href="#対応-1" class="headerlink" title="対応"></a>対応</h4><p>CloudNATを設定しNAT経由でインターネットに出るようにしました。<br>今回はシステム要件で外部IPの付与が不可でしたが、外部IPが付与されていれば問題なくインターネットアクセスできます。</p>
+<h3 id="1-3-GKEへのデプロイ時、kubectlコマンドが接続できない"><a href="#1-3-GKEへのデプロイ時、kubectlコマンドが接続できない" class="headerlink" title="1-3. GKEへのデプロイ時、kubectlコマンドが接続できない"></a>1-3. GKEへのデプロイ時、kubectlコマンドが接続できない</h3><h4 id="原因-2"><a href="#原因-2" class="headerlink" title="原因"></a>原因</h4><p>デプロイサーバが外部IPしか持っていなかったため。<br>GKEクラスタはこの時点でプライベートクラスタであった。</p>
+<h4 id="対応-2"><a href="#対応-2" class="headerlink" title="対応"></a>対応</h4><p>システム要件もありデプロイサーバに内部IPを付与し、外部IPを削除しました。<br>その上でGKEクラスタの承認済みネットワークにデプロイサーバの属するサブネットを追加しました。</p>
+<h3 id="1-4-GKEのLBでフロントのIPが固定できない"><a href="#1-4-GKEのLBでフロントのIPが固定できない" class="headerlink" title="1-4. GKEのLBでフロントのIPが固定できない"></a>1-4. GKEのLBでフロントのIPが固定できない</h3><h4 id="事象"><a href="#事象" class="headerlink" title="事象"></a>事象</h4><p>LB作成時にフロントエンドのIPが自動的に割り振られてしまう。</p>
+<h4 id="対応-3"><a href="#対応-3" class="headerlink" title="対応"></a>対応</h4><p>Ingressを利用して意図したIPを割り当てました。<br>詳細は他の方が書かれていますのでこちらをご参考に。<br><a target="_blank" rel="noopener" href="https://qiita.com/tinjyuu/items/fd7a97b0b81963dcc7f2">https://qiita.com/tinjyuu/items/fd7a97b0b81963dcc7f2</a></p>
+<h3 id="1-5-共有VPC上のGKEクラスタのセカンダリCIDR設計"><a href="#1-5-共有VPC上のGKEクラスタのセカンダリCIDR設計" class="headerlink" title="1-5. 共有VPC上のGKEクラスタのセカンダリCIDR設計"></a>1-5. 共有VPC上のGKEクラスタのセカンダリCIDR設計</h3><h4 id="事象-1"><a href="#事象-1" class="headerlink" title="事象"></a>事象</h4><p>オンプレ環境と接続する1つの共有VPC上にproduction, stagingなど複数プロジェクトを相乗りさせる場合、各プロジェクトで利用するセカンダリCIDRの設計が必要。</p>
+<h4 id="対応-4"><a href="#対応-4" class="headerlink" title="対応"></a>対応</h4><p>GKEで必要なセカンダリCIDRを本腰入れて設計しました。<br>スタンダードなこれと言った解はなく、必要な環境数、オンプレ環境から割り当てられたIP範囲から適宜設計する必要があります。<br>ここだけでも1記事くらいのボリュームになりそうなので詳細はまた別途。</p>
+<p>2019&#x2F;10&#x2F;17 公開しました：</p>
+<ul>
+<li><a href="/articles/20191017/">GKEクラスタに割り当てるCIDRを設計する</a></li>
+</ul>
+<h3 id="1-6-GKEクラスタが大量に作成できない"><a href="#1-6-GKEクラスタが大量に作成できない" class="headerlink" title="1-6. GKEクラスタが大量に作成できない"></a>1-6. GKEクラスタが大量に作成できない</h3><h4 id="原因-3"><a href="#原因-3" class="headerlink" title="原因"></a>原因</h4><p>利用可能なセカンダリCIDRの上限に掛かるため。<br>共有VPC上にプライベートGKEクラスタを構築するためには、1クラスタあたりに2つのアドレス範囲（pod&#x2F;service）を割り当てる必要があるが、1サブネット内にセカンダリCIDRは <del>上限5つまで</del> しか作成できない。</p>
+<p>今回、1プロジェクト&#x3D;1サブネットを共有するという方針であったため、1プロジェクト当たりに2つしかクラスタを作成できなかった。</p>
+<p>(2019&#x2F;08&#x2F;28追記)上限が30までに緩和されたようです。</p>
+<blockquote>
+<p>必要に応じて、サブネットごとに最大 30 個のセカンダリ CIDR ブロックを定義できます。このセカンダリ IP 範囲は、エイリアス IP アドレスにのみ使用できます。この上限を引き上げることはできません。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/vpc/docs/quota#per_network">https://cloud.google.com/vpc/docs/quota#per_network</a></p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://twitter.com/urasoko">@urasoko</a>さん、ご指摘ありがとうございます！</p>
+<p>これで、GKEのクラスタ数を増やしたい時も対応できます。</p>
+<h4 id="対応-5"><a href="#対応-5" class="headerlink" title="対応"></a>対応</h4><p>用途に応じてクラスタを分けるのではなく、ノードプールを分ける方針としました。<br>GKEの設計でクラスタを分けるかノードプールを分けるかはしばしば話に挙がりますが、共有VPC上に構築する場合はノードプールを分けるしかないです。</p>
+<h2 id="2-CloudSQL関連"><a href="#2-CloudSQL関連" class="headerlink" title="2. CloudSQL関連"></a>2. CloudSQL関連</h2><h3 id="2-1-CloudSQLのインスタンスが再作成できない"><a href="#2-1-CloudSQLのインスタンスが再作成できない" class="headerlink" title="2-1. CloudSQLのインスタンスが再作成できない"></a>2-1. CloudSQLのインスタンスが再作成できない</h3><h4 id="原因-4"><a href="#原因-4" class="headerlink" title="原因"></a>原因</h4><p>同じインスタンス名は数日間（1週間ほど）は作成できない仕様であったため。</p>
+<h4 id="対応-6"><a href="#対応-6" class="headerlink" title="対応"></a>対応</h4><p>初期構築時は連番やタイムスタンプなどを入れ確実に構築可能なことの保証が取れてから真名で構築することにしました。<br>インスタンス名にタイムスタンプなどを入れてクライアント側の接続情報を変更していく運用も考えましたが、担当した案件では開発に複数社入っていたりする状況もあり諦めました。</p>
+<h3 id="2-2-CloudSQLのアクセス制限"><a href="#2-2-CloudSQLのアクセス制限" class="headerlink" title="2-2. CloudSQLのアクセス制限"></a>2-2. CloudSQLのアクセス制限</h3><h4 id="事象-2"><a href="#事象-2" class="headerlink" title="事象"></a>事象</h4><p>CloudSQLにアクセス可能なインスタンスを同一プロジェクトのインスタンスに絞りたいが、以下の制約がある。</p>
+<ul>
+<li>Firewall Ruleはサブネット単位（今回の構成のプロジェクト単位）で指定できない</li>
+<li>CloudSQLにFirewall Ruleで利用するネットワークタグを設定できない。</li>
+<li>承認済みネットワークにプライベートIPは設定できない</li>
+</ul>
+<h4 id="対応-7"><a href="#対応-7" class="headerlink" title="対応"></a>対応</h4><p>出来上がったCloudSQLのIPを、gcloudで取得して、それをFirewall Ruleに設定しました。なおFirewall Ruleはインスタンスに対して適応されるため、インスタンスからの下りに対して制御をかけることしかできません。</p>
+<p>デフォルトは下りが全てallowされているので、まずはCloudSQLのIP範囲にdenyをかけて、その上で接続するSQLインスタンスのみallowするという対応をしています。<br>Firewall Ruleの話だけで1記事くらいのボリュームになりそうなので詳細はまた別途書きます。</p>
+<h3 id="2-3-CloudSQL-のパスワードが有効では無かった"><a href="#2-3-CloudSQL-のパスワードが有効では無かった" class="headerlink" title="2-3. CloudSQL のパスワードが有効では無かった"></a>2-3. CloudSQL のパスワードが有効では無かった</h3><h4 id="原因-5"><a href="#原因-5" class="headerlink" title="原因"></a>原因</h4><p>Terraformでデプロイしていたが、その定義が不正だったため。<br>後述のサンプルだとインスタンス名が正しく紐づかない。GCPは関係なくTerraformの記述ミスが原因でした。</p>
+<h4 id="対応-8"><a href="#対応-8" class="headerlink" title="対応"></a>対応</h4><p>依存関係があるリソースは、ハードコードで名称を設定しない。<br>${xxxxx}を使用して実際に設定されている名称を取得する。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// インスタンスの作成</span></span><br><span class="line">resource <span class="string">&quot;google_sql_database_instance&quot;</span> <span class="string">&quot;db-instance-test&quot;</span> &#123;</span><br><span class="line">    name = <span class="string">&quot;test-instance&quot;</span></span><br><span class="line">    <span class="comment">/*省略*/</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// パスワード設定：NGパターン</span></span><br><span class="line">resource <span class="string">&quot;google_sql_user&quot;</span> <span class="string">&quot;test-postgres-user&quot;</span> &#123;</span><br><span class="line">    name = <span class="string">&quot;postgres&quot;</span></span><br><span class="line">    instance = <span class="string">&quot;test-instance&quot;</span></span><br><span class="line">    password = <span class="string">&quot;postgres&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// パスワード設定：OKパターン</span></span><br><span class="line">resource <span class="string">&quot;google_sql_user&quot;</span> <span class="string">&quot;test-postgres-user&quot;</span> &#123;</span><br><span class="line">    name = <span class="string">&quot;postgres&quot;</span></span><br><span class="line">    instance = <span class="string">&quot;$&#123;google_sql_database_instance.db-instance-test.name&#125;&quot;</span></span><br><span class="line">    password = <span class="string">&quot;postgres&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="2-4-CloudSqlProxyを使ってSQLインスタンスにつながらない"><a href="#2-4-CloudSqlProxyを使ってSQLインスタンスにつながらない" class="headerlink" title="2-4. CloudSqlProxyを使ってSQLインスタンスにつながらない"></a>2-4. CloudSqlProxyを使ってSQLインスタンスにつながらない</h3><h4 id="原因-6"><a href="#原因-6" class="headerlink" title="原因"></a>原因</h4><p>Cloud SQL Administration APIが有効化されていないため。<br>CloudSqlProxyを使う際は有効化する必要があります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/sql/docs/postgres/connect-external-app?hl=ja">https://cloud.google.com/sql/docs/postgres/connect-external-app?hl=ja</a></p>
+<h4 id="対応-9"><a href="#対応-9" class="headerlink" title="対応"></a>対応</h4><p>Cloud SQL Administration APIを有効化します。<br>環境の断面が増えてくると、Administration APIの有効化手順が漏れるので、これもちゃんと<a target="_blank" rel="noopener" href="https://www.terraform.io/docs/providers/google/r/google_project_services.html">Terraformで管理</a>することになりました。<br>（※それまでは手動で有効にしていました☠）</p>
+<h3 id="2-5-CloudSQLの接続CIDRが任意のアドレス範囲で作成されてしまった"><a href="#2-5-CloudSQLの接続CIDRが任意のアドレス範囲で作成されてしまった" class="headerlink" title="2-5. CloudSQLの接続CIDRが任意のアドレス範囲で作成されてしまった"></a>2-5. CloudSQLの接続CIDRが任意のアドレス範囲で作成されてしまった</h3><h4 id="原因-7"><a href="#原因-7" class="headerlink" title="原因"></a>原因</h4><p>IPアドレスの設計前にCloudSQLのインスタンスを立てて検証していたため初期構築時にCIDRの割り当てを明確に行っていなかった。</p>
+<h4 id="対応-10"><a href="#対応-10" class="headerlink" title="対応"></a>対応</h4><p>GCPのSREチーム（米国）へ変更対応を依頼しました（ちょうどクリスマスシーズンだったので大変でした）。2019年1月時点では、このCIDRは一度設定するとGUIやコマンドで変更できないため依頼する必要がありました。<br><del>共有VPCの環境でCloudSQLのアドレス範囲を明示的に定めたい場合は注意しましょう。</del></p>
+<p>(2019&#x2F;08&#x2F;28追記) 2019年4月以降は <code>gcloud services vpc-peerings update</code> コマンドで更新できるそうです。<br><a target="_blank" rel="noopener" href="https://issuetracker.google.com/issues/118849070">https://issuetracker.google.com/issues/118849070</a></p>
+<p>これからは、わざわざサポートに連絡を取る必要はありません！間違っても比較的気軽にやり直せるようになったのは嬉しいですね。</p>
+<h3 id="2-6-GCEからCloudSQLへ接続ができない"><a href="#2-6-GCEからCloudSQLへ接続ができない" class="headerlink" title="2-6. GCEからCloudSQLへ接続ができない"></a>2-6. GCEからCloudSQLへ接続ができない</h3><h4 id="原因-8"><a href="#原因-8" class="headerlink" title="原因"></a>原因</h4><p>GCEインスタンスには内部IPのみで外部IPが付与されておらず、SQLインスタンスには外部IPのみで内部IPを付与していなかった（β版のため）。<br>SQL Proxyが上手いことやってくれると淡い期待をしたがダメであった。</p>
+<h4 id="対応-11"><a href="#対応-11" class="headerlink" title="対応"></a>対応</h4><p>他のシステム要件からCloudSQLに内部IPを付与しました</p>
+<h2 id="3-LB関連"><a href="#3-LB関連" class="headerlink" title="3. LB関連"></a>3. LB関連</h2><h3 id="3-1-Internal-特定の通信においてInternal-LBで負荷分散されない"><a href="#3-1-Internal-特定の通信においてInternal-LBで負荷分散されない" class="headerlink" title="3-1. Internal 特定の通信においてInternal LBで負荷分散されない"></a>3-1. Internal 特定の通信においてInternal LBで負荷分散されない</h3><h4 id="原因-9"><a href="#原因-9" class="headerlink" title="原因"></a>原因</h4><p>コネクションを貼って通信していたため。<br>Internal LBでセッションアフィニティをOFFにしてもコネクション貼って通信するものはコネクション貼ったバックエンドに流れる仕様であった。</p>
+<p>※参考<br><a target="_blank" rel="noopener" href="https://cloud.google.com/load-balancing/docs/backend-service?hl=ja&amp;_ga=2.47555939.-570213192.1545967516">https://cloud.google.com/load-balancing/docs/backend-service?hl=ja&amp;_ga=2.47555939.-570213192.1545967516</a><br><a target="_blank" rel="noopener" href="https://cloud.google.com/compute/docs/reference/rest/v1/backendServices?hl=ja">https://cloud.google.com/compute/docs/reference/rest/v1/backendServices?hl=ja</a></p>
+<h4 id="対応-12"><a href="#対応-12" class="headerlink" title="対応"></a>対応</h4><p>クライアント側で定期的にコネクションを貼りなおすようにした。<br>大量のクライアントがいる処理であれば正常時はコネクションを貼る時点で後ろのノードは分散されれるので問題ないですが、ノード障害で別ノードとコネクション貼ってしまうとノード復旧時に再度振り分けられなくなってしまうのを回避するためです。</p>
+<h3 id="3-2-Internal-LBのヘルスチェックが通らない"><a href="#3-2-Internal-LBのヘルスチェックが通らない" class="headerlink" title="3-2. Internal LBのヘルスチェックが通らない"></a>3-2. Internal LBのヘルスチェックが通らない</h3><h4 id="原因-10"><a href="#原因-10" class="headerlink" title="原因"></a>原因</h4><p>Internal LBのヘルスチェックが「130.211.0.0&#x2F;22」と「35.191.0.0&#x2F;16」 内のアドレスから送信されるため。<br>これらの接続を許可するようにFirewall Ruleを設定する必要があった。</p>
+<h4 id="対応-13"><a href="#対応-13" class="headerlink" title="対応"></a>対応</h4><p>ヘルスチェックの通信元のIPに対して通信を許可するようにファイアウォールルールを追加しました。</p>
+<h2 id="4-GCPプロジェクト"><a href="#4-GCPプロジェクト" class="headerlink" title="4. GCPプロジェクト"></a>4. GCPプロジェクト</h2><h3 id="4-1-新規に環境構築できない"><a href="#4-1-新規に環境構築できない" class="headerlink" title="4-1. 新規に環境構築できない"></a>4-1. 新規に環境構築できない</h3><h4 id="原因-11"><a href="#原因-11" class="headerlink" title="原因"></a>原因</h4><p>課金プロジェクトの作成数に限りがあったため</p>
+<h4 id="対応-14"><a href="#対応-14" class="headerlink" title="対応"></a>対応</h4><p>サポートに連絡して上限を上げてもらった。<br>コア数の上限同様に事前に確認すべきでした。</p>
+<h3 id="4-2-プロジェクトID-x2F-名を指定してリソースにアクセスできない。"><a href="#4-2-プロジェクトID-x2F-名を指定してリソースにアクセスできない。" class="headerlink" title="4-2. プロジェクトID&#x2F;名を指定してリソースにアクセスできない。"></a>4-2. プロジェクトID&#x2F;名を指定してリソースにアクセスできない。</h3><h4 id="原因-12"><a href="#原因-12" class="headerlink" title="原因"></a>原因</h4><p>プロジェクトID＝プロジェクト名を前提としてリソースにアクセスしていたが、プロジェクトIDとプロジェクト名が異なっていた。</p>
+<h4 id="対応-15"><a href="#対応-15" class="headerlink" title="対応"></a>対応</h4><p>プロジェクトIDとプロジェクト名を同じに変更しました。<br>特に制約が無ければ同じにしておいた方がハマりどころ減ります。</p>
+<h3 id="4-3-突然CloudSQLやGKEにアクセスできなくなった。"><a href="#4-3-突然CloudSQLやGKEにアクセスできなくなった。" class="headerlink" title="4-3. 突然CloudSQLやGKEにアクセスできなくなった。"></a>4-3. 突然CloudSQLやGKEにアクセスできなくなった。</h3><h4 id="原因-13"><a href="#原因-13" class="headerlink" title="原因"></a>原因</h4><p>アカウントが有効なクレジットと紐付いていなかった(!!!)。<br>最初は無料利用枠で動いてしまうため、構築して数日後に発覚した。</p>
+<h4 id="対応-16"><a href="#対応-16" class="headerlink" title="対応"></a>対応</h4><p>アカウントを有効なクレジットと紐付けた。<br>プロジェクト構築時のオペレーションとして手順化した。</p>
+<h2 id="5-踏み台"><a href="#5-踏み台" class="headerlink" title="5. 踏み台"></a>5. 踏み台</h2><h3 id="5-1-踏み台サーバにsshで接続できない"><a href="#5-1-踏み台サーバにsshで接続できない" class="headerlink" title="5-1. 踏み台サーバにsshで接続できない"></a>5-1. 踏み台サーバにsshで接続できない</h3><h4 id="原因-14"><a href="#原因-14" class="headerlink" title="原因"></a>原因</h4><p>IAMの権限不足。<br>「編集者」をベースとしたカスタム権限を作成していたが、GCEのログイン権限が継承されていなかった。</p>
+<h4 id="対応-17"><a href="#対応-17" class="headerlink" title="対応"></a>対応</h4><p>IAMに「編集者」を直接付与する形式に変更。<br>アクセスするメンバーが限られていたため、カスタム権限で細かく制御は不要と判断しました。</p>
+<h3 id="5-2-どの環境の踏み台サーバで作業しているか分からない"><a href="#5-2-どの環境の踏み台サーバで作業しているか分からない" class="headerlink" title="5-2. どの環境の踏み台サーバで作業しているか分からない"></a>5-2. どの環境の踏み台サーバで作業しているか分からない</h3><h4 id="原因-15"><a href="#原因-15" class="headerlink" title="原因"></a>原因</h4><p>踏み台サーバのインスタンス名が全ての環境（productionとかstagingとか）で同一のため。<br>CloudShellだとURL部分にPJ名が出るので判断可能であるがsshのターミナルツールによっては判別できない。</p>
+<h4 id="対応-18"><a href="#対応-18" class="headerlink" title="対応"></a>対応</h4><p>踏み台にはインスタンス名に環境名を付与した。<br>命名規約上他のインスタンスに対して環境名を付けないとしても、実際にログインして作業することが多い踏み台だけは付けてあげた方が優しいです。</p>
+<h2 id="6-その他"><a href="#6-その他" class="headerlink" title="6. その他"></a>6. その他</h2><h3 id="6-1-共有VPC設定ができない"><a href="#6-1-共有VPC設定ができない" class="headerlink" title="6-1. 共有VPC設定ができない"></a>6-1. 共有VPC設定ができない</h3><h4 id="原因-16"><a href="#原因-16" class="headerlink" title="原因"></a>原因</h4><p>共有VPCを設定するためには「共有 VPC 管理者」権限が必要であったが権限がなかった。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/vpc/docs/provisioning-shared-vpc#nominating_shared_vpc_admins_for_the_organization">https://cloud.google.com/vpc/docs/provisioning-shared-vpc#nominating_shared_vpc_admins_for_the_organization</a><br>更には「共有 VPC 管理者」を付与するために「組織管理者」権限が必要であるが、構築メンバーが誰も権限を持っていなかった。</p>
+<h4 id="対応-19"><a href="#対応-19" class="headerlink" title="対応"></a>対応</h4><p>「組織管理者」権限は契約者しか権限持っていなかったため依頼して操作ユーザに対して「組織管理者」権限を付与し、その上で「共有 VPC 管理者」を付与しました。</p>
+<h3 id="6-2-特定アプリケーションのインストールができない"><a href="#6-2-特定アプリケーションのインストールができない" class="headerlink" title="6-2. 特定アプリケーションのインストールができない"></a>6-2. 特定アプリケーションのインストールができない</h3><h4 id="原因-17"><a href="#原因-17" class="headerlink" title="原因"></a>原因</h4><p>外部サイトへアクティベーションが必要であったが外部IPが無く接続できなかったため。</p>
+<h4 id="対応-20"><a href="#対応-20" class="headerlink" title="対応"></a>対応</h4><p>一時的に外部IPを付与してインストールを行った。<br>※前述のCloudNAT導入前だったためこのような対応しています。<br>※CloudNAT導入後であれば問題なく出来たと思われます。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>ここまでお疲れ様でした。<br>忙しい人向けに、全体通してのまとめです。</p>
+<ul>
+<li>全体的にネットワーク、権限周りがハマりどころ多かった。</li>
+<li>GKEは共有VPC、ネットワークの制約によるハマりどころが多かった。</li>
+<li>逆にこの辺りがすんなりいけば簡単に環境作れる感じがした。</li>
+<li>GCP、ネットワーク知識いらないって聞いてた（自分だけ？）けど結構必要。</li>
+<li>オンプレ環境と密な構成は難易度が跳ね上がる。</li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20190820/&related=twitterapi%2Ctwitter&text=%E5%88%9D%E3%82%81%E3%81%A6%E3%81%AEGCP%E3%81%A7%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89%E3%81%97%E3%81%A6%E3%83%8F%E3%83%9E%E3%81%A3%E3%81%9F%E3%81%93%E3%81%A8%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20190820/&t=%E5%88%9D%E3%82%81%E3%81%A6%E3%81%AEGCP%E3%81%A7%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89%E3%81%97%E3%81%A6%E3%83%8F%E3%83%9E%E3%81%A3%E3%81%9F%E3%81%93%E3%81%A8" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">26</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20190820/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">72</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20190820/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">42</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2019.10.17</span><span class="snscount">&#9825;25</span><a href=/articles/20191017/ title="「初めてのGCPで環境構築してハマったこと」記事にトピックにあったGKEクラスタのCIDR設計について、深堀りした記事になります。">GKEクラスタに割り当てるCIDRを設計する</a></li><li class="related-posts-item"><span>2019.08.27</span><span class="snscount">&#9825;7</span><a href=/articles/20190827/ title="今回は、GCPのKubernetesサービスであるGoogle Kubernetes Engineを利用している際にハマった事象について共有します。">GKEのPodから異なるプロジェクトのIPアドレスへ接続できずハマった話</a></li><li class="related-posts-item"><span>2022.01.12</span><span class="snscount">&#9825;84</span><a href=/articles/20220112a/ title="チームの輪読会でKuberntes完全ガイドを読みました。 k8s本は、GKEを例にしながら、k8sのCLIツールだったりマニフェストのyamlファイルを丁寧に紹介しており、実践的に勉強するの適しています。手を動かしつつ勉強したいところですが、クラウドプロバイダーが提供するマネージドk8sはコストが高めで気分的にほいほい使えないところがあります。となるとローカル環境でk8sを用意したくなります。 ">Minikubeでk8s学習を進めるためのヒント</a></li><li class="related-posts-item"><span>2021.10.26</span><span class="snscount">&#9825;28</span><a href=/articles/20211026a/ title="DynamoDBやKinesis Data Streamsなどを利用するサービスをそれなりの期間で稼働させているとポツポツ下記のようなエラーが発生することが分かりました。RequestError: send request failedcaused by: Post ...: read tcp 169.254.0.1:55638->3.113.218.4:443: read: connection reset by peer">AWS利用時に read: connection reset by peer が出たときのリトライ検討</a></li><li class="related-posts-item"><span>2021.03.19</span><span class="snscount">&#9825;29</span><a href=/articles/20210319/ title="Anthosは2019年にGoogleが発表した、「ハイブリッドクラウド・マルチクラウド環境に対応したアプリケーション管理プラットフォーム」です。発表から2年ほど経って、エンタープライズ向けのシステム構成を検討する際に名前が挙がることも増えてきている実感があります。そんなAnthosですが、構成要素が多くて中々全体像が掴みきれない人も多いのではないかと思います。">Anthosの話についていくための最低限の知識をまとめてみた</a></li><li class="related-posts-item"><span>2021.03.18</span><span class="snscount">&#9825;11</span><a href=/articles/20210318/ title="テーマは、2021年2月24日に公開されたGKE Autopilotです。この記事は、Kubernetesに触ったことがない方でもわかるように、最も簡単な構成で試してみました。Kubernetesを触ったことがない方にもみていただけるとありがたく思います。">GKE Autopilotを触ってみた</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20200902/ title="今回、GCP の `Professional Cloud Network Engineer` という資格に合格したので、その際の体験を記載しておきます。">GCP Professional Cloud Network Engineer に合格しました</a></li><li class="reference-posts-item"><a href=/articles/20191017/ title="「初めてのGCPで環境構築してハマったこと」記事にトピックにあったGKEクラスタのCIDR設計について、深堀りした記事になります。">GKEクラスタに割り当てるCIDRを設計する</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%8A%E5%9B%9E%E6%A7%8B%E7%AF%89%E3%81%97%E3%81%9F%E7%92%B0%E5%A2%83%E3%81%AE%E6%A6%82%E8%A6%81"><span class="toc-text">今回構築した環境の概要</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#GCP%E3%81%A7%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89%E3%81%97%E3%81%A6%E3%83%8F%E3%83%9E%E3%81%A3%E3%81%9F%E3%81%93%E3%81%A8"><span class="toc-text">GCPで環境構築してハマったこと</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-GKE%E9%96%A2%E9%80%A3"><span class="toc-text">1. GKE関連</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-GKE%E3%81%AE%E3%82%B3%E3%82%A2%E6%95%B0%E3%82%92%E5%A2%97%E3%82%84%E3%81%9B%E3%81%AA%E3%81%84"><span class="toc-text">1-1. GKEのコア数を増やせない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E3%83%97%E3%83%A9%E3%82%A4%E3%83%99%E3%83%BC%E3%83%88GKE%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%81%8B%E3%82%89%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%8D%E3%83%83%E3%83%88%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><span class="toc-text">1-2. プライベートGKEクラスタからインターネットアクセスできない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-1"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-1"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-GKE%E3%81%B8%E3%81%AE%E3%83%87%E3%83%97%E3%83%AD%E3%82%A4%E6%99%82%E3%80%81kubectl%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%81%8C%E6%8E%A5%E7%B6%9A%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><span class="toc-text">1-3. GKEへのデプロイ時、kubectlコマンドが接続できない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-2"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-2"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-GKE%E3%81%AELB%E3%81%A7%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%81%AEIP%E3%81%8C%E5%9B%BA%E5%AE%9A%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><span class="toc-text">1-4. GKEのLBでフロントのIPが固定できない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8B%E8%B1%A1"><span class="toc-text">事象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-3"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-%E5%85%B1%E6%9C%89VPC%E4%B8%8A%E3%81%AEGKE%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%81%AE%E3%82%BB%E3%82%AB%E3%83%B3%E3%83%80%E3%83%AACIDR%E8%A8%AD%E8%A8%88"><span class="toc-text">1-5. 共有VPC上のGKEクラスタのセカンダリCIDR設計</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8B%E8%B1%A1-1"><span class="toc-text">事象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-4"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-GKE%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%81%8C%E5%A4%A7%E9%87%8F%E3%81%AB%E4%BD%9C%E6%88%90%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><span class="toc-text">1-6. GKEクラスタが大量に作成できない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-3"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-5"><span class="toc-text">対応</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-CloudSQL%E9%96%A2%E9%80%A3"><span class="toc-text">2. CloudSQL関連</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-CloudSQL%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%81%8C%E5%86%8D%E4%BD%9C%E6%88%90%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><span class="toc-text">2-1. CloudSQLのインスタンスが再作成できない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-4"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-6"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-CloudSQL%E3%81%AE%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E5%88%B6%E9%99%90"><span class="toc-text">2-2. CloudSQLのアクセス制限</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8B%E8%B1%A1-2"><span class="toc-text">事象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-7"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-CloudSQL-%E3%81%AE%E3%83%91%E3%82%B9%E3%83%AF%E3%83%BC%E3%83%89%E3%81%8C%E6%9C%89%E5%8A%B9%E3%81%A7%E3%81%AF%E7%84%A1%E3%81%8B%E3%81%A3%E3%81%9F"><span class="toc-text">2-3. CloudSQL のパスワードが有効では無かった</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-5"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-8"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-CloudSqlProxy%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6SQL%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%81%AB%E3%81%A4%E3%81%AA%E3%81%8C%E3%82%89%E3%81%AA%E3%81%84"><span class="toc-text">2-4. CloudSqlProxyを使ってSQLインスタンスにつながらない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-6"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-9"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-CloudSQL%E3%81%AE%E6%8E%A5%E7%B6%9ACIDR%E3%81%8C%E4%BB%BB%E6%84%8F%E3%81%AE%E3%82%A2%E3%83%89%E3%83%AC%E3%82%B9%E7%AF%84%E5%9B%B2%E3%81%A7%E4%BD%9C%E6%88%90%E3%81%95%E3%82%8C%E3%81%A6%E3%81%97%E3%81%BE%E3%81%A3%E3%81%9F"><span class="toc-text">2-5. CloudSQLの接続CIDRが任意のアドレス範囲で作成されてしまった</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-7"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-10"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-GCE%E3%81%8B%E3%82%89CloudSQL%E3%81%B8%E6%8E%A5%E7%B6%9A%E3%81%8C%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><span class="toc-text">2-6. GCEからCloudSQLへ接続ができない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-8"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-11"><span class="toc-text">対応</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-LB%E9%96%A2%E9%80%A3"><span class="toc-text">3. LB関連</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-Internal-%E7%89%B9%E5%AE%9A%E3%81%AE%E9%80%9A%E4%BF%A1%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A6Internal-LB%E3%81%A7%E8%B2%A0%E8%8D%B7%E5%88%86%E6%95%A3%E3%81%95%E3%82%8C%E3%81%AA%E3%81%84"><span class="toc-text">3-1. Internal 特定の通信においてInternal LBで負荷分散されない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-9"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-12"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-Internal-LB%E3%81%AE%E3%83%98%E3%83%AB%E3%82%B9%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%81%8C%E9%80%9A%E3%82%89%E3%81%AA%E3%81%84"><span class="toc-text">3-2. Internal LBのヘルスチェックが通らない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-10"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-13"><span class="toc-text">対応</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-GCP%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88"><span class="toc-text">4. GCPプロジェクト</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E6%96%B0%E8%A6%8F%E3%81%AB%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><span class="toc-text">4-1. 新規に環境構築できない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-11"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-14"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88ID-x2F-%E5%90%8D%E3%82%92%E6%8C%87%E5%AE%9A%E3%81%97%E3%81%A6%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%81%AB%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84%E3%80%82"><span class="toc-text">4-2. プロジェクトID&#x2F;名を指定してリソースにアクセスできない。</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-12"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-15"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E7%AA%81%E7%84%B6CloudSQL%E3%82%84GKE%E3%81%AB%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%9F%E3%80%82"><span class="toc-text">4-3. 突然CloudSQLやGKEにアクセスできなくなった。</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-13"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-16"><span class="toc-text">対応</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E8%B8%8F%E3%81%BF%E5%8F%B0"><span class="toc-text">5. 踏み台</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E8%B8%8F%E3%81%BF%E5%8F%B0%E3%82%B5%E3%83%BC%E3%83%90%E3%81%ABssh%E3%81%A7%E6%8E%A5%E7%B6%9A%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><span class="toc-text">5-1. 踏み台サーバにsshで接続できない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-14"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-17"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E3%81%A9%E3%81%AE%E7%92%B0%E5%A2%83%E3%81%AE%E8%B8%8F%E3%81%BF%E5%8F%B0%E3%82%B5%E3%83%BC%E3%83%90%E3%81%A7%E4%BD%9C%E6%A5%AD%E3%81%97%E3%81%A6%E3%81%84%E3%82%8B%E3%81%8B%E5%88%86%E3%81%8B%E3%82%89%E3%81%AA%E3%81%84"><span class="toc-text">5-2. どの環境の踏み台サーバで作業しているか分からない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-15"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-18"><span class="toc-text">対応</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E3%81%9D%E3%81%AE%E4%BB%96"><span class="toc-text">6. その他</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E5%85%B1%E6%9C%89VPC%E8%A8%AD%E5%AE%9A%E3%81%8C%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><span class="toc-text">6-1. 共有VPC設定ができない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-16"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-19"><span class="toc-text">対応</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E7%89%B9%E5%AE%9A%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E3%81%8C%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><span class="toc-text">6-2. 特定アプリケーションのインストールができない</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0-17"><span class="toc-text">原因</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C-20"><span class="toc-text">対応</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

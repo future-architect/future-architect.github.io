@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>S3 on LocalStackをGoとFUSEを使ってMountする（WSL2） | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTIG DXユニットの真野です。夏休み自由研究連載の5本目です。 ずっと気になっていた、go-fuseを用いて、LocalStack でローカル環境にエミュレートされるS3バケットをマウントするツールを開発しました。普段はWebのAPIサーバを中心に開発しているので、FUSEとはいえファイルシステムの知識が無く、トライ＆エラーの連続ですごく楽しい自由研究（工作）でした。 モチベーションは以">
+<meta property="og:type" content="article">
+<meta property="og:title" content="S3 on LocalStackをGoとFUSEを使ってMountする（WSL2） | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20220829a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIG DXユニットの真野です。夏休み自由研究連載の5本目です。 ずっと気になっていた、go-fuseを用いて、LocalStack でローカル環境にエミュレートされるS3バケットをマウントするツールを開発しました。普段はWebのAPIサーバを中心に開発しているので、FUSEとはいえファイルシステムの知識が無く、トライ＆エラーの連続ですごく楽しい自由研究（工作）でした。 モチベーションは以">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20220829a/800px-FUSE_structure.svg.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220829a/demo1.gif">
+<meta property="og:image" content="https://future-architect.github.io/images/20220829a/demo2.gif">
+<meta property="og:image" content="https://future-architect.github.io/images/20220829a/FbGZVhJUIAA3Im7.jpg">
+<meta property="article:published_time" content="2022-08-28T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-08-31T03:01:44.646Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="S3">
+<meta property="article:tag" content="LocalStack">
+<meta property="article:tag" content="FUSE">
+<meta property="article:tag" content="go-fuse">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20220829a/800px-FUSE_structure.svg.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20220829a/">
+  <meta content="Go,S3,LocalStack,FUSE,go-fuse" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">S3 on LocalStackをGoとFUSEを使ってMountする（WSL2）
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20220829a_S3_on_LocalStackをGoとFUSEを使ってMountする（WSL2）.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20220829a_S3_on_LocalStackをGoとFUSEを使ってMountする（WSL2）" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-08-28T15:00:00.000Z" itemprop="datePublished">2022.08.29</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98" title="真野隼記さんの記事一覧へ" class="post-author">真野隼記</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/S3/" title="S3タグの記事へ" class="tag-list-link">S3</a>
+  
+    
+    <a href="/tags/LocalStack/" title="LocalStackタグの記事へ" class="tag-list-link">LocalStack</a>
+  
+    
+    <a href="/tags/FUSE/" title="FUSEタグの記事へ" class="tag-list-link">FUSE</a>
+  
+    
+    <a href="/tags/go-fuse/" title="go-fuseタグの記事へ" class="tag-list-link">go-fuse</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG DXユニットの真野です。<a href="/articles/20220822a/">夏休み自由研究連載</a>の5本目です。</p>
+<p>ずっと気になっていた、<a target="_blank" rel="noopener" href="https://github.com/hanwen/go-fuse">go-fuse</a>を用いて、<a target="_blank" rel="noopener" href="https://github.com/localstack/localstack">LocalStack</a> でローカル環境にエミュレートされるS3バケットをマウントするツールを開発しました。普段はWebのAPIサーバを中心に開発しているので、FUSEとはいえファイルシステムの知識が無く、トライ＆エラーの連続ですごく楽しい自由研究（工作）でした。</p>
+<p>モチベーションは以下です。</p>
+<ul>
+<li>業務でよくS3にアクセスするコードを書き、ローカル開発ではLocalStack上のS3を用いてテストしている</li>
+<li>LocalStack上のS3に事前データを置いたり、事後データの検証にいちいちアクセスコードを書くのが面倒<ul>
+<li>実装ミスで予期しない階層にファイルを出力してしまったりするときに、容易に視認できるようにしたい</li>
+<li>aws cliコマンドを叩けば良いけど、コマンドを覚えられないし手間がある</li>
+</ul>
+</li>
+<li>FUSEを用いてマウントできたら、初心者フレンドリーである<ul>
+<li>WindowsでもWSL2であればFUSEが利用できる</li>
+<li>標準のエクスプローラー（explorer.exe）で、WSL2上のUbuntu-20.04上のディレクトリも見れるのでより便利</li>
+<li>VS Codeなどでのエディタでも確認できツールを統一できるし、ターミナルの手慣れたコマンドを利用できる（diffなど）</li>
+</ul>
+</li>
+</ul>
+<p>ポイントは、LocakStack自体がローカル（やCIでの）テスト環境ですので、これをマウントするツールもテスト支援ツールとして動かしたいということがあります。AWSなどクラウド上で稼働するランタイムのアプリケーションが直接マウントしたディレクトリを経由してS3に書き込むことは想定していません。</p>
+<p>※動作検証したのがWSL2だけで、Macだと新し目のOSだと動かないようです（古いMacしか手持ちになく、すいません）。</p>
+<h2 id="LocalStackとは"><a href="#LocalStackとは" class="headerlink" title="LocalStackとは"></a>LocalStackとは</h2><p><a target="_blank" rel="noopener" href="https://localstack.cloud/blog/2022-07-13-announcing-localstack-v1-general-availability/">2022年7月13日にGA 1.0になったと発表された</a>、AWSの主要なサービスのAPIをローカル端末上でエミュレートするという、開発に便利なツールです。</p>
+<p>2016年頃は、API Gateway、Lambda、DynamoDBなど8つのサービスをサポートしていましたが、今や80を超えるサービスが利用できるとのことです。わたしも現在業務で使っており、開発上ほぼすべてのユースケースを網羅できていて助かっています。どれくらいのカバレッジか気になる人は<a target="_blank" rel="noopener" href="https://docs.localstack.cloud/aws/feature-coverage/">AWS Service Feature Coverage</a> ページもあります。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://localstack.cloud/">https://localstack.cloud/</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/localstack/localstack">https://github.com/localstack/localstack</a></li>
+</ul>
+<h2 id="FUSEとは"><a href="#FUSEとは" class="headerlink" title="FUSEとは"></a>FUSEとは</h2><p>FUSEとはFilesystem in Userspaceの略で、ユーザーランドで手軽に動作するファイルシステムを作成するための仕組みです。FUSEではカーネルがファイルなどの操作のシステムコールを、ユーザーランド側で動作しているプロセスに転送する仕組みで、決められたインターフェースを実装すると、手軽にファイルシステムを実装できます。同僚の澁川さん著作な<a target="_blank" rel="noopener" href="https://www.lambdanote.com/products/go-2">Goならわかるシステムプログラミング 第2版</a> の10章にも触れられています。</p>
+<p>下図は<a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/Filesystem_in_Userspace">Wikipedia</a>より引用した動作イメージです。左上の <code>ls -l</code> をされると、カーネルにシステム要求が飛び、それをFUSEの仕組みを経由してユーザーランドのアプリケーションが応答するような流れです。</p>
+<img src="/images/20220829a/800px-FUSE_structure.svg.png" alt="800px-FUSE_structure.svg.png" width="800" height="606" loading="lazy">
+
+<p>今回は右上のユーザーランド側のプロセスで、AWS SDK for Goを用いてS3 on LocalStackをバックエンドにadaptorするようなコードを書きました。</p>
+<p>ファイル操作がカーネル→ユーザーランドと切り替わるということは、コンテキストスイッチが発生することで、性能は一般的に良くなさそうですよね。今回の用途では実際の永続化先がS3であり、I&#x2F;O待ちが支配的だと思うので、裏側がS3だと分かっていればそこまでレイテンシは気にはなりませんでした（重い処理をすると当然遅いですが）。</p>
+<h2 id="go-fuse-とは"><a href="#go-fuse-とは" class="headerlink" title="go-fuse とは"></a>go-fuse とは</h2><p><a target="_blank" rel="noopener" href="https://github.com/hanwen/go-fuse">go-fuse</a>はFUSEのGoバインディングです。この自由研究では安直ですがStar数が多かったのでこれを採用しました。他の選択肢としては<a target="_blank" rel="noopener" href="https://github.com/winfsp/cgofuse">winfsp&#x2F;cgofuse</a> が良さそうな感じがします。</p>
+<p>go-fuseのAPIはバージョンが1系と2系がありますが、今回うっかり1系で実装してしまったのは反省です。</p>
+<h2 id="デモ"><a href="#デモ" class="headerlink" title="デモ"></a>デモ</h2><p>作ったものを紹介します。すでにLocalStack上のS3が起動していれば不要ですが、なければ次のコマンドを実行して立ち上げます。</p>
+<figure class="highlight sh"><figcaption><span>LocalStackの起動</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/ma91n/localstackmount.git</span><br><span class="line"><span class="built_in">cd</span> localstackmount</span><br><span class="line">docker compose up -d</span><br></pre></td></tr></table></figure>
+
+<p>次にlocalstackmountを起動します。Windowsの人はWSL2で実行してください。</p>
+<figure class="highlight sh"><figcaption><span>マウントの実行</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go install github.com/ma91n/localstackmount@latest</span><br><span class="line">localstackmount</span><br></pre></td></tr></table></figure>
+
+<p>そうすると、 <code>~/mount/localstack</code> 配下にLocalStackの全S3バケットがマウントされます。</p>
+<p>awscliでファイルを予め登録したファイル(hello.txt)を確認→マウント上でそのファイルに1行追記→awscliで追記されていることを確認するデモをしてみました。</p>
+<p>デモは以下のことをしています。</p>
+<ol>
+<li>左のウィンドウで <code>localstackmount</code> を起動</li>
+<li>真ん中のウインドウで、 awscliの <code>s3 api list-buckets</code> でバケットの一覧、<code>s3 ls --recursive</code> と <code>s3 cp</code> コマンドでファイルをダウンロードし表示</li>
+<li>右のウインドウで、LocalStackをマウントしたディレクトリにアクセスし、先程ダウンロードしたファイルを編集・保存</li>
+<li>真ん中のウインドウに戻って、マウント経由で編集したファイルをaws cli経由で再度ダウンロードし、編集結果が反映されていることを確認</li>
+</ol>
+<img src="/images/20220829a/demo1.gif" alt="" width="1200" height="502" loading="lazy">
+
+<p>もちろん、エクスプローラからも確認できます。</p>
+<img src="/images/20220829a/demo2.gif" alt="" width="1200" height="565" loading="lazy">
+
+<p>GIF動画では実演してないですが、もちろんVS Codeで好きに編集・保存をしても、LocalStack上のS3に反映されます。そこそこ便利かと思います。</p>
+<h2 id="実装"><a href="#実装" class="headerlink" title="実装"></a>実装</h2><p>コードはここに上げています。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/ma91n/localstackmount">https://github.com/ma91n/localstackmount</a></li>
+</ul>
+<p>詳細はリポジトリを見ていただくとして、大きな実装の流れとしてはまず以下のAPIを実装することです（多いです）。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> FileSystem <span class="keyword">interface</span> &#123;</span><br><span class="line">	<span class="comment">// 中略</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Attributes.  This function is the main entry point, through</span></span><br><span class="line">	<span class="comment">// which FUSE discovers which files and directories exist.</span></span><br><span class="line">	GetAttr(name <span class="type">string</span>, context *fuse.Context) (*fuse.Attr, fuse.Status)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// These should update the file&#x27;s ctime too.</span></span><br><span class="line">	Chmod(name <span class="type">string</span>, mode <span class="type">uint32</span>, context *fuse.Context) (code fuse.Status)</span><br><span class="line">	Chown(name <span class="type">string</span>, uid <span class="type">uint32</span>, gid <span class="type">uint32</span>, context *fuse.Context) (code fuse.Status)</span><br><span class="line">	Utimens(name <span class="type">string</span>, Atime *time.Time, Mtime *time.Time, context *fuse.Context) (code fuse.Status)</span><br><span class="line"></span><br><span class="line">	Truncate(name <span class="type">string</span>, size <span class="type">uint64</span>, context *fuse.Context) (code fuse.Status)</span><br><span class="line"></span><br><span class="line">	Access(name <span class="type">string</span>, mode <span class="type">uint32</span>, context *fuse.Context) (code fuse.Status)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Tree structure</span></span><br><span class="line">	Link(oldName <span class="type">string</span>, newName <span class="type">string</span>, context *fuse.Context) (code fuse.Status)</span><br><span class="line">	Mkdir(name <span class="type">string</span>, mode <span class="type">uint32</span>, context *fuse.Context) fuse.Status</span><br><span class="line">	Mknod(name <span class="type">string</span>, mode <span class="type">uint32</span>, dev <span class="type">uint32</span>, context *fuse.Context) fuse.Status</span><br><span class="line">	Rename(oldName <span class="type">string</span>, newName <span class="type">string</span>, context *fuse.Context) (code fuse.Status)</span><br><span class="line">	Rmdir(name <span class="type">string</span>, context *fuse.Context) (code fuse.Status)</span><br><span class="line">	Unlink(name <span class="type">string</span>, context *fuse.Context) (code fuse.Status)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Extended attributes.</span></span><br><span class="line">	GetXAttr(name <span class="type">string</span>, attribute <span class="type">string</span>, context *fuse.Context) (data []<span class="type">byte</span>, code fuse.Status)</span><br><span class="line">	ListXAttr(name <span class="type">string</span>, context *fuse.Context) (attributes []<span class="type">string</span>, code fuse.Status)</span><br><span class="line">	RemoveXAttr(name <span class="type">string</span>, attr <span class="type">string</span>, context *fuse.Context) fuse.Status</span><br><span class="line">	SetXAttr(name <span class="type">string</span>, attr <span class="type">string</span>, data []<span class="type">byte</span>, flags <span class="type">int</span>, context *fuse.Context) fuse.Status</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Called after mount.</span></span><br><span class="line">	OnMount(nodeFs *PathNodeFs)</span><br><span class="line">	OnUnmount()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// File handling.  If opening for writing, the file&#x27;s mtime</span></span><br><span class="line">	<span class="comment">// should be updated too.</span></span><br><span class="line">	Open(name <span class="type">string</span>, flags <span class="type">uint32</span>, context *fuse.Context) (file nodefs.File, code fuse.Status)</span><br><span class="line">	Create(name <span class="type">string</span>, flags <span class="type">uint32</span>, mode <span class="type">uint32</span>, context *fuse.Context) (file nodefs.File, code fuse.Status)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Directory handling</span></span><br><span class="line">	OpenDir(name <span class="type">string</span>, context *fuse.Context) (stream []fuse.DirEntry, code fuse.Status)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Symlinks.</span></span><br><span class="line">	Symlink(value <span class="type">string</span>, linkName <span class="type">string</span>, context *fuse.Context) (code fuse.Status)</span><br><span class="line">	Readlink(name <span class="type">string</span>, context *fuse.Context) (<span class="type">string</span>, fuse.Status)</span><br><span class="line"></span><br><span class="line">	StatFs(name <span class="type">string</span>) *fuse.StatfsOut</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>多すぎて大変！って思われた方も大丈夫です。</p>
+<p>すべてを実装しなくても、<code>pathfs.NewDefaultFileSystem()</code> と言う一律 <code>fuse.ENOSYS(Function not implemented)</code> を返すデフォルト実装があるためこれを組み込んで、必要なものだけ順次、動作を確認しながら実装できます。</p>
+<figure class="highlight go"><figcaption><span>組み込みの例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> FileSystem <span class="keyword">struct</span> &#123;</span><br><span class="line">	pathfs.FileSystem</span><br><span class="line"></span><br><span class="line">	sess *S3Session</span><br><span class="line"></span><br><span class="line">	callTime *time.Time</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(f *FileSystem)</span></span> GetAttr(name <span class="type">string</span>, ctx *fuse.Context) (*fuse.Attr, fuse.Status) &#123;</span><br><span class="line">  <span class="comment">// 必要な関数だけ選抜して実装する</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>あと、<code>Open</code> など <code>nodefs.File</code> を返すのですが、こういったインターフェースです。実際にファイルへの追記・編集で使われます（例えばファイルを編集して保存するとWrite、Flush、Releaseが呼ばれます）。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> File <span class="keyword">interface</span> &#123;</span><br><span class="line">	<span class="comment">// 中略</span></span><br><span class="line"></span><br><span class="line">	Read(dest []<span class="type">byte</span>, off <span class="type">int64</span>) (fuse.ReadResult, fuse.Status)</span><br><span class="line">	Write(data []<span class="type">byte</span>, off <span class="type">int64</span>) (written <span class="type">uint32</span>, code fuse.Status)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// File locking</span></span><br><span class="line">	GetLk(owner <span class="type">uint64</span>, lk *fuse.FileLock, flags <span class="type">uint32</span>, out *fuse.FileLock) (code fuse.Status)</span><br><span class="line">	SetLk(owner <span class="type">uint64</span>, lk *fuse.FileLock, flags <span class="type">uint32</span>) (code fuse.Status)</span><br><span class="line">	SetLkw(owner <span class="type">uint64</span>, lk *fuse.FileLock, flags <span class="type">uint32</span>) (code fuse.Status)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Flush is called for close() call on a file descriptor.</span></span><br><span class="line">	Flush() fuse.Status</span><br><span class="line"></span><br><span class="line">	<span class="comment">// This is called to before the file handle is forgotten.</span></span><br><span class="line">	Release()</span><br><span class="line">	Fsync(flags <span class="type">int</span>) (code fuse.Status)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// The methods below may be called on closed files, due to concurrency.  In that case, you should return EBADF.</span></span><br><span class="line">	Truncate(size <span class="type">uint64</span>) fuse.Status</span><br><span class="line">	GetAttr(out *fuse.Attr) fuse.Status</span><br><span class="line">	Chown(uid <span class="type">uint32</span>, gid <span class="type">uint32</span>) fuse.Status</span><br><span class="line">	Chmod(perms <span class="type">uint32</span>) fuse.Status</span><br><span class="line">	Utimens(atime *time.Time, mtime *time.Time) fuse.Status</span><br><span class="line">	Allocate(off <span class="type">uint64</span>, size <span class="type">uint64</span>, mode <span class="type">uint32</span>) (code fuse.Status)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>今回開発した ma91n&#x2F;localstack では、ChmodやChown、Symlinkなどは非対応にしました。かつ、<code>Extended attributes</code> と書かれている <code>GetXAttr</code>、<code>ListXAttr</code>、<code>RemoveXAttr</code>、<code>SetXAttr</code> も未実装です（実装していれば適時呼ばれますが、なければノーマルな <code>GetAttr</code> などにフォールバックされる仕組みなようです。）</p>
+<p>どれがどれに紐づくか、最初はピンとこなかったのでざっくりと紹介します。</p>
+<ul>
+<li>GetAttr<ul>
+<li>ファイルディレクトリの属性（ファイル、ディレクトリ、リンクなどの種別や、権限、サイズ、オーナー、作成日時）などを返します</li>
+<li>すべての操作で呼ばれます。 <code>cd</code> や <code>ls</code> や <code>cat</code> などマウントしたファイル・ディレクトリ操作で頻発に呼ばれます</li>
+<li>かなり高速に動くこと必要です</li>
+<li>初戦はテスト用のLocalStack。ファイル数は大したことがないので毎回通信で存在チェックすれば良いと思っていましたが、キャッシュを入れないとかなりもっさりでした</li>
+</ul>
+</li>
+<li>Access<ul>
+<li><code>cd</code> など、ディレクトリに移動可能かの確認で呼ばれます</li>
+</ul>
+</li>
+<li>Mkdir, Rename, Rmdir<ul>
+<li>読んだままですが、  <code>mkdir</code>, <code>mv(rename)</code>, <code>rm -r</code> で呼ばれます</li>
+</ul>
+</li>
+<li>Unlink<ul>
+<li><code>rm</code> で呼ばれます。削除です</li>
+</ul>
+</li>
+<li>Open<ul>
+<li>head, cat, tail, lessなどファイルを開くと呼ばれます</li>
+</ul>
+</li>
+<li>Create<ul>
+<li>touchや echo hello &gt; hello.txt などで呼ばれます</li>
+</ul>
+</li>
+<li>OpenDir<ul>
+<li><code>cd</code>や<code>ls</code>などでディレクトアクセスするときに呼ばれます</li>
+</ul>
+</li>
+</ul>
+<p>概ね上記の関数を実装すればファイルエクスプローラを用いてのメインどころの操作はどうにかなりました。</p>
+<p>ファイルエディタ系は <code>Read</code>、<code>Write</code>、<code>Flush</code>、 <code>Release</code>、<code>GetAttr</code> あたりを実装すれば、S3を用いた単体テストで用いるようなS3の操作は動くようになりました。</p>
+<h2 id="実装メモ"><a href="#実装メモ" class="headerlink" title="実装メモ"></a>実装メモ</h2><p>今までファイルシステム周りが何もわからなかったので、実装を通して感じたことを記録に残します。</p>
+<ul>
+<li>S3でディレクトリの表現について仕様が公式ドキュメントに書かれている（仕様が合ったのか）<ul>
+<li><code>/</code> で終わるとフォルダとして判定される<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-folders.html">https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-folders.html</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>想像以上に <code>GetAttr</code> が利用される<ul>
+<li>例えば、 mnt-point&#x2F;bucket&#x2F;aaa&#x2F;bbb&#x2F;ccc&#x2F;log.txt というファイルを操作すると、 <code>bucket</code>, <code>bucket/aaa</code>, <code>bucket/aaa/bbb</code>, <code>bucket/aaa/bbb/ccc</code>, <code>bucket/aaa/bbb/ccc/log.txt</code> といった親のパス全てに対して <code>GetAttr</code> が呼ばれます</li>
+<li>S3バックエンドだと、実際には <code>aaa/bbb/ccc/log.txt</code> というオブジェクトがあるだけで、実際にフォルダとして <code>aaa</code>や<code>bbb</code>があるわけではないことがあるので、上記の大部分は無駄です</li>
+<li>最終的にはキャッシュレスは諦め、<a target="_blank" rel="noopener" href="https://github.com/patrickmn/go-cache">go-cache</a>を導入しました</li>
+</ul>
+</li>
+<li>キャッシュの扱い。難しい・うまくハマると速度向上が体感できて楽しい<ul>
+<li>キャッシュの扱いですが、例えばファイルを書き込んだ後には破棄しないと、エディタによってはアプリで持っている情報と不整合が生じて警告を出してくることがあります。別にFUSEを用いた実装に閉じた話でもないですが、適切なハンドリングが必要でした<img src="/images/20220829a/FbGZVhJUIAA3Im7.jpg" alt="FbGZVhJUIAA3Im7.jpg" width="1143" height="699" loading="lazy"></li>
+<li>オブジェクトストレージと、ファイルシステムとのギャップも感じました<ul>
+<li>例えば、 <code>/bucket/dir1/aaa.txt</code> を削除すると、<code>GetAttr</code> のキャッシュとしては <code>/bucket/dir1/aaa.txt</code>、<code>/bucket/dir1</code>、<code>/bucket</code> の3つを無効化しないと不整合になる場合があります<ul>
+<li>※実際に <code>dir1/</code> のオブジェクトが存在するとは限らないため、<code>aaa.txt</code> が消えたら <code>bucket</code> だけが残る方が自然なケースがある</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>フォルダのリネームが面倒くさい<ul>
+<li>S3だとキーの途中をリネームすることになりますが、複数オブジェクトが存在すると面倒です</li>
+<li>prefixをもとにlistObjectし、対象となった全オブジェクトに対してgetObject、キーを書き換えてputObjectし、もとのキーをdeleteObjectする必要があり重い処理です</li>
+<li>S3マウントツールで有名な<a target="_blank" rel="noopener" href="https://github.com/kahing/goofys">kahing&#x2F;goofys</a> も、1000個までと制約をかけているようです</li>
+</ul>
+</li>
+<li>ctrl+c で停止できない理由は、ターミナルで開いていたから<ul>
+<li><code>signal.Notify(ch, os.Interrupt, syscall.SIGTERM)</code> といったコードで、チャネル経由でシグナルを拾ってアンマウントする処理を実装していたんですが、<code>Device or resource busy </code> で失敗することがありました</li>
+<li>調べてもよくわからなかったのですが、マウントしているディレクトリじょうにターミナルで移動していると、何かしらのファイルディスクリプタを握ってしまうのか、アンマウントに失敗するようです<ul>
+<li>面倒くさいですが、再起動するときは <code>cd ~</code> していました（どうにかならないものか）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>エクスプローラー（explore.exe）で開くためにはオプションが必要<ul>
+<li><code>allow_other</code> というオプションが必要でした</li>
+</ul>
+</li>
+<li>Macで動かない？<ul>
+<li>Macでは標準でFUSEが入っていないので、<a target="_blank" rel="noopener" href="https://osxfuse.github.io/">osxfuse</a>をインストールしてもらう必要がある</li>
+<li>go-fuseはosxfuseの3系は動くようですが、4系は動かない模様（自環境が無く未検証）</li>
+<li>osxfuseの3系が入るOSバージョンであれば、動作しました</li>
+</ul>
+</li>
+<li>開発環境<ul>
+<li>Windowsで開発する場合、goosをlinuxにしないとビルドが通らないのでご注意を</li>
+</ul>
+</li>
+</ul>
+<h2 id="実装して学べたこと"><a href="#実装して学べたこと" class="headerlink" title="実装して学べたこと"></a>実装して学べたこと</h2><p>総じて、普段あまり意識しないレイヤーがどう動作するかを感じることができ、やってみて良かったと思っています。</p>
+<ul>
+<li><code>cd</code>、<code>ls</code> などのコマンドが、どのようなファイルシステム操作をしているか再認識したり、挙動について覚え直すキッカケなった<ul>
+<li>mvするときに、既存のファイルが存在したら上書きする or しない</li>
+</ul>
+</li>
+<li>ファイルシステムとしての実装の考え方が少しわかった<ul>
+<li>どの操作で、どういうAPIが呼び出されるかの脳内マッピング（これくらいのAPI数で逆に成り立つのか、まぁ成り立つよねという心の天秤）</li>
+<li>どこにキャッシュを用いると効果的かの勘所</li>
+<li>高速化の工夫と、マウントを経由しない別経路での更新（例えばAWS CLIで直接更新など）とのバランス（キャッシュの有効期限のパラメータ調整）</li>
+</ul>
+</li>
+<li>例えばVS Codeがどういう情報をファイルシステムに問い合わせているか、FUSE側のAPI呼び出しのログを見てイメージが湧いた<ul>
+<li>VS Codeでmy-bucket&#x2F;aaa&#x2F;bbb&#x2F;hello.txtにあるマウントしたファイルを開くと、以下のファイルを探していた<ul>
+<li>my-bucket&#x2F;aaa&#x2F;bbb&#x2F;git.exe</li>
+<li>my-bucket&#x2F;aaa&#x2F;.git</li>
+<li>my-bucket&#x2F;aaa&#x2F;HEAD</li>
+<li>my-bucket&#x2F;.git</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>FUSE、思ったよりWSL2でシャキシャキ動く<ul>
+<li>Windowsならではのハマりがもっと壮絶にあると思ったんですが、環境周りのハマりはほぼ無しで余裕でした<ul>
+<li>逆にMacは新しいバージョンの手持ちが無く動作検証ができず</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="今後について"><a href="#今後について" class="headerlink" title="今後について"></a>今後について</h2><p>どこまでがんばるかということはあるのですが、いくつか試したいことがあります。</p>
+<ul>
+<li>go-fuseの2系のAPIに書き換える<ul>
+<li>winfsp&#x2F;cgofuse に載せ替える（Macなどのサポート的にこっちの方が良い気も..？）</li>
+</ul>
+</li>
+<li><code>Extended attributes</code> 系のAPI対応<ul>
+<li>おそらく性能などに有利</li>
+</ul>
+</li>
+<li>各操作の goroutine 化<ul>
+<li>現状の実装だと、全て同期的に書いているのでマルチコアを全く行かせていません</li>
+<li>一般的にはgoroutineを活用したほうが良さそうです</li>
+</ul>
+</li>
+<li>ファイル自体のキャシュ<ul>
+<li>現状ではS3に対するファイル属性の取得のための、listObjectを中心にキャッシュしています</li>
+<li>S3のgetObjectは、<code>IfModifiedSince</code> と呼ばれる機能があり、指定した時間より更新がなければ <code>304 (not modified)</code> を返す機能があります</li>
+<li>これを用いた、マウント外のディレクトリにファイルをキャッシュしておき、更新がなればそのファイルを用いれば有効なケースもあるかなと目論んでいます</li>
+</ul>
+</li>
+</ul>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><ul>
+<li>WSL2（Macは一部OS）に対応した LocalStack上のS3をマウントするツールを、go-fuse を用いて実装してみたよ</li>
+<li>ファイルシステムといっても、FUSEと各言語ごとのバインド（例: go-fuse）を用いれば気軽に実装できるよ</li>
+<li>普段あまり意識しない人にもオススメだよ</li>
+<li>S3とファイルシステムのギャップは色々あるけど、工夫のしどころが多くて楽しいよ</li>
+</ul>
+<p>最後まで読んでいただきありがとうございました。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20220829a/&related=twitterapi%2Ctwitter&text=S3%20on%20LocalStack%E3%82%92Go%E3%81%A8FUSE%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6Mount%E3%81%99%E3%82%8B%EF%BC%88WSL2%EF%BC%89%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">33</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20220829a/&t=S3%20on%20LocalStack%E3%82%92Go%E3%81%A8FUSE%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6Mount%E3%81%99%E3%82%8B%EF%BC%88WSL2%EF%BC%89" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20220829a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">18</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20220829a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">13</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;563</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2019.11.15</span><span class="snscount">&#9825;10</span><a href=/articles/20191115/ title="本記事ではGo Cloud経由でAWSのローカルモック環境であるLocalStackに接続してみたいと思います。">Go Cloud#5 AWSのローカルモック環境であるLocalStackを活用する</a></li><li class="related-posts-item"><span>2022.10.04</span><span class="snscount">&#9825;20</span><a href=/articles/20221004a/ title="ACL、RBAC、ABACなどの様々なモデルでアクセス制御を行えるライブラリであるCasbinについて紹介します。">Casbinで始めるアクセス制御</a></li><li class="related-posts-item"><span>2022.08.02</span><span class="snscount">&#9825;16</span><a href=/articles/20220802a/ title="Go 1.19 のencoding/csv のアップデート内容について紹介します。Go 1.19 Release Notesに1行だけ追加されています。">Go1.19 encoding/csv のアップデート</a></li><li class="related-posts-item"><span>2022.05.10</span><span class="snscount">&#9825;54</span><a href=/articles/20220510a/ title="2022/04/06にGAになったと発表された、Lambda Function URLsは、AWS Lambdaに直接HTTPSエンドポイントを追加できるというもので、API Gateway（やALB）無しでWeb APIやサイトを構築できると話題になりました。">Lambda Function URLs をGoでお試し。実行時間の上限（タイムアウト）やWeb API構築周りで気になること</a></li><li class="related-posts-item"><span>2022.02.10</span><span class="snscount">&#9825;21</span><a href=/articles/20220210a/ title="Go 1.18のRelease Notesに記載があったMinor changes to the libraryにあったnet/httpの3点の更新について触れていきます。">Go 1.18集中連載 net/httpのマイナーチェンジ</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220822a/ title="2022年も夏の自由研究ブログ連載を始めます。！">夏の自由研究ブログ連載2022を始めます</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#LocalStack%E3%81%A8%E3%81%AF"><span class="toc-text">LocalStackとは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FUSE%E3%81%A8%E3%81%AF"><span class="toc-text">FUSEとは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#go-fuse-%E3%81%A8%E3%81%AF"><span class="toc-text">go-fuse とは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%87%E3%83%A2"><span class="toc-text">デモ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9F%E8%A3%85"><span class="toc-text">実装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9F%E8%A3%85%E3%83%A1%E3%83%A2"><span class="toc-text">実装メモ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9F%E8%A3%85%E3%81%97%E3%81%A6%E5%AD%A6%E3%81%B9%E3%81%9F%E3%81%93%E3%81%A8"><span class="toc-text">実装して学べたこと</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8A%E5%BE%8C%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">今後について</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

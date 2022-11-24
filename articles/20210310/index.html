@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>本番データが急に欲しくなったアナタに贈る、CloudSQLのサーバレスエクスポートを試してみた | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは。TIG 市川です。GCP連載2021の2日目です。 本番運用しているデータをサクッと引っこ抜いてCSV錬金したり、DWHなどに連携していないデータを元にDataStudioでコネコネしたり・・・（負荷を気にせず）気軽にやりたいなぁ・・・というアナタに贈る記事になります。 おことわり 実際のシステムにおける本番データは正しく取り扱いましょう。運用ポリシー・セキュリティポリシーに従">
+<meta property="og:type" content="article">
+<meta property="og:title" content="本番データが急に欲しくなったアナタに贈る、CloudSQLのサーバレスエクスポートを試してみた | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210310/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは。TIG 市川です。GCP連載2021の2日目です。 本番運用しているデータをサクッと引っこ抜いてCSV錬金したり、DWHなどに連携していないデータを元にDataStudioでコネコネしたり・・・（負荷を気にせず）気軽にやりたいなぁ・・・というアナタに贈る記事になります。 おことわり 実際のシステムにおける本番データは正しく取り扱いましょう。運用ポリシー・セキュリティポリシーに従">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210310/serverless_export.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210310/2021-03-09_13h46_23.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210310/2021-03-09_13h49_22.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210310/2021-03-09_13h49_40.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210310/2021-03-09_13h50_11.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210310/2021-03-09_13h57_31.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210310/2021-03-09_14h12_59.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210310/2021-03-09_15h28_29.png">
+<meta property="article:published_time" content="2021-03-09T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:53.271Z">
+<meta property="article:tag" content="SQL">
+<meta property="article:tag" content="GCP">
+<meta property="article:tag" content="CloudSQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210310/serverless_export.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210310/">
+  <meta content="SQL,GCP,CloudSQL" name="keywords">
+  <meta content="市川諒" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">本番データが急に欲しくなったアナタに贈る、CloudSQLのサーバレスエクスポートを試してみた
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210310_本番データが急に欲しいアナタに贈る、CloudSQLのサーバレスエクスポートを試してみた.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210310_本番データが急に欲しいアナタに贈る、CloudSQLのサーバレスエクスポートを試してみた" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-03-09T15:00:00.000Z" itemprop="datePublished">2021.03.10</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%B8%82%E5%B7%9D%E8%AB%92" title="市川諒さんの記事一覧へ" class="post-author">市川諒</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/SQL/" title="SQLタグの記事へ" class="tag-list-link">SQL</a>
+  
+    
+    <a href="/tags/GCP/" title="GCPタグの記事へ" class="tag-list-link">GCP</a>
+  
+    
+    <a href="/tags/CloudSQL/" title="CloudSQLタグの記事へ" class="tag-list-link">CloudSQL</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは。TIG 市川です。<a href="/articles/20210307/">GCP連載2021</a>の2日目です。</p>
+<p>本番運用しているデータをサクッと引っこ抜いてCSV錬金したり、DWHなどに連携していないデータを元にDataStudioでコネコネしたり・・・（負荷を気にせず）気軽にやりたいなぁ・・・というアナタに贈る記事になります。</p>
+<h2 id="おことわり"><a href="#おことわり" class="headerlink" title="おことわり"></a>おことわり</h2><ul>
+<li>実際のシステムにおける本番データは正しく取り扱いましょう。運用ポリシー・セキュリティポリシーに従い、機密情報などを気軽に引っこ抜いてはいけません</li>
+</ul>
+<h2 id="サーバレスエクスポートとは？"><a href="#サーバレスエクスポートとは？" class="headerlink" title="サーバレスエクスポートとは？"></a>サーバレスエクスポートとは？</h2><img src="/images/20210310/serverless_export.png" loading="lazy">
+
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://cloud.google.com/blog/products/databases/introducing-cloud-sql-serverless-exports">https://cloud.google.com/blog/products/databases/introducing-cloud-sql-serverless-exports</a> より引用</p>
+</blockquote>
+<p>データベースからデータをエクスポートすることは運用上起こりえるタスクではありますが、その実、エクスポートの仕方を誤ると本番のワークロードに影響を及ぼす可能性があります。</p>
+<p>しかし、データのすべてはデータベースに入っていて、欲しい、今すぐ分析したい・・・という時もあると思います。</p>
+<p>我々エンジニアは可能な限り手間は省きたい生き物です。</p>
+<ul>
+<li>別途データベースを建てたくない</li>
+<li>わざわざGCEやローカルPCからSQLクエリ打ちたくない</li>
+<li>データをGCSに持って行くのも面倒</li>
+<li>本番ワークロード影響はあってはならない</li>
+</ul>
+<p>などなどのワガママに対応したのが、このサーバレスエクスポートです。CloudSQLではデータベースからのエクスポートは対応していましたが、2020年9月にサーバレスエクスポートに対応しました！</p>
+<p>サーバレスエクスポートでは<strong>エクスポート専用の一時的なインスタンス</strong>を建て、そこからデータを抜くことで本番ワークロードに一切の影響を与えず、GCSにファイルをアップロードしてくれる優れものです。その上、SQL形式とCSV形式に対応し、カスタムSQLで狙ったデータだけ抜くこともできるかゆいところに手が届くサービスになっています。</p>
+<h2 id="事前準備"><a href="#事前準備" class="headerlink" title="事前準備"></a>事前準備</h2><p>今回のケースでは特に準備することはありません。グローバルIPを持ったCloudSQLを建てたのみです。あとはエクスポート先のGCSバケットさえあればよいのです。</p>
+<p>データベースはMySQLとPostgreSQLでサポートしています。（今回はPostgreSQLで試しました）</p>
+<p>今回、データはPostgreSQLの<a target="_blank" rel="noopener" href="https://sp.postgresqltutorial.com/wp-content/uploads/2019/05/dvdrental.zip">サンプルデータベース</a>を利用します。CloudShellなどで接続し、pg_restoreを使ってサクッとインポートしましょう。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># DB作成</span></span><br><span class="line">$ gcloud sql connect serverless-demo-db --user=postgres --quiet</span><br><span class="line">postgres=&gt; CREATE DATABASE dvdrental;</span><br><span class="line">postgres=&gt; \q</span><br><span class="line"></span><br><span class="line"><span class="comment"># サンプルデータベースのダウンロード&amp;インポート</span></span><br><span class="line">$ wget https://sp.postgresqltutorial.com/wp-content/uploads/2019/05/dvdrental.zip</span><br><span class="line">$ unzip dvdrental.zip</span><br><span class="line">$ pg_restore -h 34.123.239.237 -U postgres -d dvdrental ./dvdrental.tar</span><br><span class="line"></span><br><span class="line"><span class="comment"># データの確認</span></span><br><span class="line">$ gcloud sql connect serverless-demo-db --user=postgres --quiet --database=dvdrental</span><br><span class="line">dvdrental=&gt; \dt</span><br><span class="line">             List of relations</span><br><span class="line"> Schema |     Name      | Type  |  Owner</span><br><span class="line">--------+---------------+-------+----------</span><br><span class="line"> public | actor         | table | postgres</span><br><span class="line"> public | address       | table | postgres</span><br><span class="line"> public | category      | table | postgres</span><br><span class="line"> public | city          | table | postgres</span><br><span class="line"> public | country       | table | postgres</span><br><span class="line"> public | customer      | table | postgres</span><br><span class="line"> public | film          | table | postgres</span><br><span class="line"> public | film_actor    | table | postgres</span><br><span class="line"> public | film_category | table | postgres</span><br><span class="line"> public | inventory     | table | postgres</span><br><span class="line"> public | language      | table | postgres</span><br><span class="line"> public | payment       | table | postgres</span><br><span class="line"> public | rental        | table | postgres</span><br><span class="line"> public | staff         | table | postgres</span><br><span class="line"> public | store         | table | postgres</span><br><span class="line">(15 rows)</span><br></pre></td></tr></table></figure>
+
+<h2 id="クエリの作成"><a href="#クエリの作成" class="headerlink" title="クエリの作成"></a>クエリの作成</h2><p>さて、では2007年03月の担当者別売上げ（っぽい）クエリを作ってみます。</p>
+<p>今回は分析用にこのデータがすごく欲しいと仮定します。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WITH</span> staff_detail <span class="keyword">as</span> (</span><br><span class="line">  <span class="keyword">SELECT</span></span><br><span class="line">    staff.staff_id,</span><br><span class="line">    staff.first_name <span class="operator">||</span> <span class="string">&#x27; &#x27;</span> <span class="operator">||</span> staff.last_name <span class="keyword">as</span> staff_name,</span><br><span class="line">    store.store_id</span><br><span class="line">  <span class="keyword">FROM</span></span><br><span class="line">    staff</span><br><span class="line">  <span class="keyword">LEFT</span> <span class="keyword">JOIN</span></span><br><span class="line">    store</span><br><span class="line">  <span class="keyword">ON</span></span><br><span class="line">    store.store_id <span class="operator">=</span> staff.store_id</span><br><span class="line">)</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">  staff_detail.staff_id,</span><br><span class="line">  staff_detail.staff_name,</span><br><span class="line">  staff_detail.store_id,</span><br><span class="line">  payment.payment_date,</span><br><span class="line">  payment.amount,</span><br><span class="line">  payment.customer_id</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">  payment</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span></span><br><span class="line">  staff_detail</span><br><span class="line"><span class="keyword">ON</span></span><br><span class="line">  payment.staff_id <span class="operator">=</span> staff_detail.staff_id</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">  <span class="string">&#x27;2007/03/01&#x27;</span>::<span class="type">timestamp</span> <span class="operator">&lt;=</span> payment_date <span class="keyword">and</span> payment_date <span class="operator">&lt;</span> <span class="string">&#x27;2007/03/31&#x27;</span>::<span class="type">timestamp</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="データのサーバレスエクスポート実践！"><a href="#データのサーバレスエクスポート実践！" class="headerlink" title="データのサーバレスエクスポート実践！"></a>データのサーバレスエクスポート実践！</h2><p>CLIからももちろん可能ですが、今回は画面からエクスポートを行ってみます。<br><img src="/images/20210310/2021-03-09_13h46_23.png"  style="border:solid 1px #000000" loading="lazy"></p>
+<p>SQLクエリ部分に先ほど記載したSQLをおもむろに貼り付けます。</p>
+<img src="/images/20210310/2021-03-09_13h49_22.png"  style="border:solid 1px #000000" loading="lazy">
+
+<p><strong>一時インスタンスへのエクスポートをオフロードする</strong>にチェックを入れます。</p>
+<img src="/images/20210310/2021-03-09_13h49_40.png"  style="border:solid 1px #000000" loading="lazy">
+
+<p>エクスポートが開始されると概要画面に戻りぐるぐる回ります。</p>
+<img src="/images/20210310/2021-03-09_13h50_11.png"  style="border:solid 1px #000000" loading="lazy">
+
+
+<p>が、WITH句には対応していませんでした・・・<br><img src="/images/20210310/2021-03-09_13h57_31.png" loading="lazy"></p>
+<p>気を取り直してサブクエリ版のSQLを作成します。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    staff_detail.staff_id,</span><br><span class="line">    staff_detail.staff_name,</span><br><span class="line">    staff_detail.store_id,</span><br><span class="line">    payment.payment_date,</span><br><span class="line">    payment.amount,</span><br><span class="line">    payment.customer_id</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    payment</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span>(</span><br><span class="line">    <span class="keyword">SELECT</span></span><br><span class="line">        staff.staff_id,</span><br><span class="line">        staff.first_name <span class="operator">||</span> <span class="string">&#x27; &#x27;</span> <span class="operator">||</span> staff.last_name <span class="keyword">as</span> staff_name,</span><br><span class="line">        store.store_id</span><br><span class="line">    <span class="keyword">FROM</span></span><br><span class="line">        staff</span><br><span class="line">    <span class="keyword">LEFT</span> <span class="keyword">JOIN</span></span><br><span class="line">        store</span><br><span class="line">    <span class="keyword">ON</span></span><br><span class="line">        store.store_id <span class="operator">=</span> staff.store_id</span><br><span class="line">    ) <span class="keyword">AS</span> staff_detail</span><br><span class="line"><span class="keyword">ON</span></span><br><span class="line">    payment.staff_id <span class="operator">=</span> staff_detail.staff_id</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">    <span class="string">&#x27;2007/03/01&#x27;</span>::<span class="type">timestamp</span> <span class="operator">&lt;=</span> payment_date <span class="keyword">and</span> payment_date <span class="operator">&lt;</span> <span class="string">&#x27;2007/03/31&#x27;</span>::<span class="type">timestamp</span>;</span><br></pre></td></tr></table></figure>
+
+<p>そして改めてエクスポートを行い、GCSを確認すると・・・</p>
+<img src="/images/20210310/2021-03-09_14h12_59.png"  style="border:solid 1px #000000" loading="lazy">
+
+
+<p>エクスポートされていますね！</p>
+<p>サーバレスエクスポートでは一時インスタンスを建てるため、最低でも5分程度時間を要します。後はデータ量によってエクスポートまでの時間がかかります。今回はきっかり5分程度で終わりました。</p>
+<p>この間、本番サーバではSQLの呼び出しなどは行われず、一切の影響なしにデータが抜けました！</p>
+<p>なんてお手軽！</p>
+<p>作成されたCSVはヘッダなしのカンマ区切りで作成されます。</p>
+<img src="/images/20210310/2021-03-09_15h28_29.png" loading="lazy">
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$file</span> -i Cloud_SQL_Export_2021-03-09-14-07-39.csv</span><br><span class="line">Cloud_SQL_Export_2021-03-09-14-07-39.csv: text/plain; charset=us-ascii</span><br></pre></td></tr></table></figure>
+
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>非常に簡単に本番影響を出さないデータエクスポートができました！</p>
+<p>もちろん無料というわけにはいきませんが、ちょっとしたデータ集計や検証の為に利用価値が高いのではないでしょうか。</p>
+<p>本番データを見たいけど、影響が。。。という方、是非試してみてください。</p>
+<p>明日は澁川さんの<a href="/articles/20210311/">20210311_PythonでCloud_Operationsの機能を使ってみる</a>です。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://cloud.google.com/blog/ja/products/databases/introducing-cloud-sql-serverless-exports">Google Cloud blog Japan</a><br><a target="_blank" rel="noopener" href="https://cloud.google.com/sql/docs/mysql/import-export/exporting?hl=ja">Google公式ドキュメント</a></p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210310/&related=twitterapi%2Ctwitter&text=%E6%9C%AC%E7%95%AA%E3%83%87%E3%83%BC%E3%82%BF%E3%81%8C%E6%80%A5%E3%81%AB%E6%AC%B2%E3%81%97%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%9F%E3%82%A2%E3%83%8A%E3%82%BF%E3%81%AB%E8%B4%88%E3%82%8B%E3%80%81CloudSQL%E3%81%AE%E3%82%B5%E3%83%BC%E3%83%90%E3%83%AC%E3%82%B9%E3%82%A8%E3%82%AF%E3%82%B9%E3%83%9D%E3%83%BC%E3%83%88%E3%82%92%E8%A9%A6%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210310/&t=%E6%9C%AC%E7%95%AA%E3%83%87%E3%83%BC%E3%82%BF%E3%81%8C%E6%80%A5%E3%81%AB%E6%AC%B2%E3%81%97%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%9F%E3%82%A2%E3%83%8A%E3%82%BF%E3%81%AB%E8%B4%88%E3%82%8B%E3%80%81CloudSQL%E3%81%AE%E3%82%B5%E3%83%BC%E3%83%90%E3%83%AC%E3%82%B9%E3%82%A8%E3%82%AF%E3%82%B9%E3%83%9D%E3%83%BC%E3%83%88%E3%82%92%E8%A9%A6%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210310/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210310/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.02.12</span><span class="snscount">&#9825;13</span><a href=/articles/20200212/ title="突然ですが、普段生活するうえでカギ🔑をなくした、忘れたことはないでしょうか。私はあります。なくしたことはないけど、うっかり置き忘れちゃうんですよね。
+それがことインフラ構築の場面ではどうでしょうか。最近はとにかく多くのカギを管理しなくてはなりません。API Keyとか気づいたら何が何だか分からなくなり、苦渋の決断の末、再度払い出すことも多いのでは無いでしょうか。検証ならまぁ...ギリギリですが、本番ではやっちゃダメ絶対です。
+ということで、そんな管理人の皆さんに朗報です。 遂にGCPにシークレット管理機能がやってきました！ CLIツールのBerglasとGUIで管理するSecret Managerを簡単にご紹介したいと思います。">GCP連載#5【もう鍵なくさない】GCPのSecret ManagerとBerglasで幸せになる</a></li><li class="related-posts-item"><span>2019.05.30</span><span class="snscount">&#9825;145</span><a href=/articles/20190530/ title="GCP Professional Cloud Architect認定資格を取得するために何をしたか、その結果で何を得たかなど赤裸々に語ります。">【合格記】GCP Professional Cloud Architect認定資格を振り返る</a></li><li class="related-posts-item"><span>2022.11.24</span><span class="snscount">&#9825;0</span><a href=/articles/20221124a/ title="SQLフォーマッタをVSCodeの拡張機能にする作業を行っており、そのための方法を学んでいます。本記事ではLanguage Server Protocolを用いたVSCode拡張機能開発について説明します。。">Language Server Protocolを用いたVSCode拡張機能開発 (前編)<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.10.14</span><span class="snscount">&#9825;14</span><a href=/articles/20221014a/ title="RDB（ここでは社内でも実績が多いPostgreSQLとさせてください）のGUIクライアントツールと言えば何を利用していますか？ チーム内で聞くと様々なプロダクトの名前が挙がりました。そんな中で私が推したいのは、 GoLand（JetBrainsの有償ライセンスを購入している人）を利用している人に対しては、Database Tools and SQLプラグインを利用することです">GoLand(JetBrains IDE)のDatabase Tools and SQLプラグインをメインのSQLクライアントにする</a></li><li class="related-posts-item"><span>2022.09.30</span><span class="snscount">&#9825;9</span><a href=/articles/20220930a/ title="先日、Google Cloudの認定資格であるProfessional Machine Learning Engineer認定資格を受験し、取得することができました。また、今回はリモート試験にて受験をしてみました。この記事ではProfessional Machine Learning Engineer認定資格の合格に至った学習過程とリモート試験体験記について...">【合格記】Google Cloud Professional Machine Learning Engineer認定資格を振り返る</a></li><li class="related-posts-item"><span>2022.09.20</span><span class="snscount">&#9825;11</span><a href=/articles/20220920b/ title="Dataflowを使うための事前準備からパイプライン実行までの一連の流れについて説明します。次の手順で進めていきます。APIの有効化、IAMの設定、Apache Beam SDKのインストール...">Dataflow後編（Dataflowの事前準備からPub/Sub・BigQueryとの連携例まで）</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20210309/ title="本記事では2021年3月に発表されたCloud PubSubのメッセージスキーマを試します。">PubSubのメッセージスキーマを試してみる</a></li><li class="reference-posts-item"><a href=/articles/20210307/ title="GCP連載2021ということで昨年に引き続き連載を行うので、そのインデックス記事です。">GCP連載2021を始めます</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%8A%E3%81%93%E3%81%A8%E3%82%8F%E3%82%8A"><span class="toc-text">おことわり</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%B5%E3%83%BC%E3%83%90%E3%83%AC%E3%82%B9%E3%82%A8%E3%82%AF%E3%82%B9%E3%83%9D%E3%83%BC%E3%83%88%E3%81%A8%E3%81%AF%EF%BC%9F"><span class="toc-text">サーバレスエクスポートとは？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8B%E5%89%8D%E6%BA%96%E5%82%99"><span class="toc-text">事前準備</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%AF%E3%82%A8%E3%83%AA%E3%81%AE%E4%BD%9C%E6%88%90"><span class="toc-text">クエリの作成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AE%E3%82%B5%E3%83%BC%E3%83%90%E3%83%AC%E3%82%B9%E3%82%A8%E3%82%AF%E3%82%B9%E3%83%9D%E3%83%BC%E3%83%88%E5%AE%9F%E8%B7%B5%EF%BC%81"><span class="toc-text">データのサーバレスエクスポート実践！</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-text">参考</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (342)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (20)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"><span class="newitem">NEW</span> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
