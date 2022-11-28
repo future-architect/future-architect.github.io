@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>業務システム開発でsqlcを導入して良かった点とハマった点 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTechnogoly Innovation Group 辻です。Go には Gorm や SQLBoiler をはじめとして様々な ORM があります。2021 年には当社のブログで OR マッパーの連載を行ったこともありました。絶対的な ORM があるわけではなく、業務システムの特性やチーム構成などに合わせて ORM を選択することになるでしょう。 今回、私たちのチームでは、バッチ処">
+<meta property="og:type" content="article">
+<meta property="og:title" content="業務システム開発でsqlcを導入して良かった点とハマった点 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20221128a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTechnogoly Innovation Group 辻です。Go には Gorm や SQLBoiler をはじめとして様々な ORM があります。2021 年には当社のブログで OR マッパーの連載を行ったこともありました。絶対的な ORM があるわけではなく、業務システムの特性やチーム構成などに合わせて ORM を選択することになるでしょう。 今回、私たちのチームでは、バッチ処">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20221128a/logo.png">
+<meta property="article:published_time" content="2022-11-27T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-11-28T04:21:05.437Z">
+<meta property="article:tag" content="SQL">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="ORM">
+<meta property="article:tag" content="sqlc">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20221128a/logo.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20221128a/">
+  <meta content="SQL,Go,ORM,sqlc" name="keywords">
+  <meta content="辻大志郎" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/DB/">DBカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">業務システム開発でsqlcを導入して良かった点とハマった点
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20221128a_業務システム開発でsqlcを導入して良かった点とハマった点.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20221128a_業務システム開発でsqlcを導入して良かった点とハマった点" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-11-27T15:00:00.000Z" itemprop="datePublished">2022.11.28</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E8%BE%BB%E5%A4%A7%E5%BF%97%E9%83%8E" title="辻大志郎さんの記事一覧へ" class="post-author">辻大志郎</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/SQL/" title="SQLタグの記事へ" class="tag-list-link">SQL</a>
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/ORM/" title="ORMタグの記事へ" class="tag-list-link">ORM</a>
+  
+    
+    <a href="/tags/sqlc/" title="sqlcタグの記事へ" class="tag-list-link">sqlc</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20221128a/logo.png" alt="" width="500" height="254">
+
+<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>Technogoly Innovation Group 辻です。Go には <a target="_blank" rel="noopener" href="https://github.com/go-gorm/gorm">Gorm</a> や <a target="_blank" rel="noopener" href="https://github.com/volatiletech/sqlboiler">SQLBoiler</a> をはじめとして様々な ORM があります。2021 年には当社のブログで <a href="/articles/20210726a/">OR マッパーの連載</a>を行ったこともありました。絶対的な ORM があるわけではなく、業務システムの特性やチーム構成などに合わせて ORM を選択することになるでしょう。</p>
+<p>今回、私たちのチームでは、バッチ処理が中心的な業務システム開発において Go の ORM に <a target="_blank" rel="noopener" href="https://github.com/kyleconroy/sqlc">sqlc</a> を採用しました。素の SQL を書いていくチームの開発方針<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>とマッチし、開発体験は非常に良かったです。一方、枯れきってはいない ORM ではあります。いくつか想定外の挙動が発生し GitHub の Issue を見ながら問題を切り分けることもありました。</p>
+<p>これから sqlc を導入してみようかな、と考えている方々の参考になればと思い、sqlc を業務システム開発に導入してみて良かった点とハマった点を紹介します。</p>
+<p>なお本記事では sqlc の概要は扱いません。そもそも sqlc って何？って方は sqlc の作者が書いた<a target="_blank" rel="noopener" href="https://conroy.org/introducing-sqlc">記事</a>や OR マッパー連載で紹介した<a href="https://future-architect.github.io/articles/20210804a/">こちら</a>の記事を見てみると良いでしょう。</p>
+<p>ソフトウェアのバージョンは以下です。データベースは PostgreSQL を採用していることに注意してください。</p>
+<ul>
+<li>PostgreSQL 13.7</li>
+<li>Go 1.19</li>
+<li>sqlc 1.15.0</li>
+</ul>
+<h2 id="良かった点"><a href="#良かった点" class="headerlink" title="良かった点"></a>良かった点</h2><h3 id="1-SQL-の開発に集中できる"><a href="#1-SQL-の開発に集中できる" class="headerlink" title="1. SQL の開発に集中できる"></a>1. SQL の開発に集中できる</h3><p>sqlc を使う一番のメリットは SQL の開発に集中できることです。SQL の実装以外の面倒なことは sqlc がやってくれます。以下の流れで開発できます。</p>
+<ul>
+<li>SQL を書く</li>
+<li><code>sqlc generate</code> でコード生成する</li>
+<li>生成された API を Go のコードから呼び出す</li>
+</ul>
+<p>sqlc を使うと、SQL から、SQL の結果をマッピングできる構造体やデータベースにアクセスできる API を生成できます。生成される構造体のフィールドの型は SQL の結果に応じて、適切に選択されます。また、バインドパラメータとして SQL に値を渡す場合も、パラメータを渡すための構造体とその構造体を API に渡せるコードが生成されます。アプリケーションではパラメータの構造体に値をセットするだけでよく、構造体のフィールドの型はコンパイル時にチェックできます。</p>
+<p>クエリの結果をマッピングする Go の構造体を作成したり、バインドパラメータの順番やデータ型を注意深く確認したり、クエリを発行するボイラープレートコードを実装したりすることは必要はなくなります。</p>
+<h3 id="2-ファイル生成が高速である"><a href="#2-ファイル生成が高速である" class="headerlink" title="2. ファイル生成が高速である"></a>2. ファイル生成が高速である</h3><p>sqlc はファイル生成が高速です。数十の SQL ファイルからコードを生成するのに 1 秒もかかりません<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>。高速な理由の 1 つは sqlc ではコード生成時にデータベースアクセスを必要としないためです<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>。SQL ファイルからクエリの結果をマッピングできるコード生成ライブラリは sqlc の他に <a target="_blank" rel="noopener" href="https://github.com/xo/xo">xo&#x2F;xo</a> などがあります<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>。ただコードを生成するときにデータベースアクセスが必要になり、生成にオーバーヘッドがかかります。ファイル生成は何度も実行するため、その操作が高速であることは地味ながら非常に嬉しいポイントでした。</p>
+<h3 id="3-自然なコードが生成できる"><a href="#3-自然なコードが生成できる" class="headerlink" title="3. 自然なコードが生成できる"></a>3. 自然なコードが生成できる</h3><p>自然なコードが生成でき、sqlc が生成したコードを違和感なく利用できました。特に、パラメータに関して <code>$1</code>, <code>$2</code> などとしたときに、生成される Go のコードはテーブルのカラム名に応じたフィールド名となります。たとえば以下の <code>users</code> テーブルにレコードを INSERT する SQL から生成されるコードは <code>NewUser()</code> と <code>NewUserParams</code> のようになります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- name: NewUser :exec</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> users (</span><br><span class="line">    id,</span><br><span class="line">    first_name,</span><br><span class="line">    last_name,</span><br><span class="line">    age,</span><br><span class="line">) <span class="keyword">VALUES</span> ($<span class="number">1</span>, $<span class="number">2</span>, $<span class="number">3</span>, $<span class="number">4</span>);</span><br></pre></td></tr></table></figure>
+
+<p><code>ID</code> や <code>FirstName</code> といったフィールド名を持つ構造体が生成されます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> NewUserParams <span class="keyword">struct</span> &#123;</span><br><span class="line">	ID        <span class="type">int32</span></span><br><span class="line">	FirstName <span class="type">string</span></span><br><span class="line">	LastName  sql.NullString</span><br><span class="line">	Age       <span class="type">int32</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(q *Queries)</span></span> NewUser(ctx context.Context, arg NewUserParams) <span class="type">error</span> &#123;</span><br><span class="line">	_, err := q.db.ExecContext(ctx, newUser,</span><br><span class="line">		arg.ID,</span><br><span class="line">		arg.FirstName,</span><br><span class="line">		arg.LastName,</span><br><span class="line">		arg.Age,</span><br><span class="line">	)</span><br><span class="line">	<span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>また、必要に応じて SQL 上のパラメータを sqlc 固有の特殊な構文を使い、 <code>@my_first_name</code> などと記述して、生成される Go のコードのフィールド名を書き換えられます<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>。<code>$1</code> などのパラメータで生成できるフィールド名に違和感がある場合は <code>@xxxx</code> を使って任意のフィールド名に書き換えられる柔軟さも良かったです。</p>
+<ul>
+<li>補足事項</li>
+</ul>
+<p>なお、チーム開発で導入する場合はあらかじめ命名規約を決めておいたほうが良いです。</p>
+<p>API 名は SQL のコメントで記載した命名が使われます。上の例では <code>-- name: NewUser</code> としている <code>NewUser</code> が API 名や構造体名に使われます。<code>NewUser</code>, <code>CreateUser</code> あるいは <code>InsertUser</code> などと選択する余地があり、開発者間で揺れるポイントです。</p>
+<h3 id="4-生成できるコードの種類が豊富である"><a href="#4-生成できるコードの種類が豊富である" class="headerlink" title="4. 生成できるコードの種類が豊富である"></a>4. 生成できるコードの種類が豊富である</h3><p><code>database/sql</code> パッケージの <code>ExecContext()</code> や <code>QueryContext()</code>、<code>QueryRowContext()</code> を使って SQL を実行できるコードが生成できます。また PostgreSQL 専用のドライバーである <code>pgx</code> の機能を使ったバッチ処理可能なコードも生成できます。さらに <code>Copy</code> プロトコルを使った高速なデータコピーができるコードも生成できます。業務システム開発では 10 万～100 万といったオーダーのデータを扱うこともあったため、バッチ処理や <code>Copy</code> プロトコルをサポートしていることは非常に嬉しいです。</p>
+<p>生成するコードは <code>sqlc</code> のクエリアノテーションで指定できます。詳しくは <a target="_blank" rel="noopener" href="https://docs.sqlc.dev/en/stable/reference/query-annotations.html">Query annotations</a> などを参照してください。</p>
+<h3 id="5-生成されるデータ型を柔軟に変更できる"><a href="#5-生成されるデータ型を柔軟に変更できる" class="headerlink" title="5. 生成されるデータ型を柔軟に変更できる"></a>5. 生成されるデータ型を柔軟に変更できる</h3><p>生成されるコードのデータ型を柔軟に設定できる点も便利です。</p>
+<p>たとえばドライバーに <code>pgx</code> を使っているとき PostgreSQL の <code>numeric</code> 型のカラムはデフォルトでは <code>pgtype.Numeric</code> 型にマッピングされます。しかし誤差を許容して <code>float64</code> 型で扱いたいケースがありました<sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup>。</p>
+<p>設定ファイルの <code>overrides</code> 機能を使うことで生成される型を変更できます。上記のケースであれば、以下のような記述を YAML の設定ファイルに記載します。</p>
+<figure class="highlight yaml"><figcaption><span>データベースの numeric 型を Go の sql.NullFloat64 型でマッピングするように更新する設定ファイル例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">overrides:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">db_type:</span> <span class="string">&quot;pg_catalog.numeric&quot;</span></span><br><span class="line">    <span class="attr">go_type:</span> <span class="string">&quot;database/sql.NullFloat64&quot;</span></span><br><span class="line">    <span class="attr">nullable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">db_type:</span> <span class="string">&quot;pg_catalog.numeric&quot;</span></span><br><span class="line">    <span class="attr">go_type:</span> <span class="string">&quot;float64&quot;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="6-複数の開発言語をサポートしている"><a href="#6-複数の開発言語をサポートしている" class="headerlink" title="6. 複数の開発言語をサポートしている"></a>6. 複数の開発言語をサポートしている</h3><p>2022&#x2F;11 現時点ではまだベータ版ですが、実は sqlc は Go 以外にも Python や Kotlin といった言語をサポートしています<sup id="fnref:7"><a href="#fn:7" rel="footnote">7</a></sup>。「SQL を書いて、コード生成し、そのコードを呼び出す」という開発体験は言語を問わず、同じです。私たちのチームでは主に Go での開発がメインでした。ただ、いくつか小さなバッチ機能を Python で実装する必要があり、 sqlc を導入することでスムーズに開発できました。</p>
+<p>sqlc の作者は <code>protoc</code> のような多言語のコードを生成することを目的の 1 つとしている、と言っています。TypeScript や Rust などの言語も将来的にサポートされるかもしれません（<a target="_blank" rel="noopener" href="https://github.com/kyleconroy/sqlc/issues/296">#296</a>）。</p>
+<h3 id="7-1SQL-ファイルに複数のクエリを書いても良い"><a href="#7-1SQL-ファイルに複数のクエリを書いても良い" class="headerlink" title="7. 1SQL ファイルに複数のクエリを書いても良い"></a>7. 1SQL ファイルに複数のクエリを書いても良い</h3><p>1SQL ファイルに 1 クエリ、というイメージがあるかもしれませんが特に制約はありません。1SQL ファイルに複数のクエリを書いても良いです。たとえば、以下のように CRUD を 1SQL ファイルに集約しても、各 SQL に紐づく API が生成できます。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- name: GetAll :many</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> users;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- name: NewUser :exec</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> users (</span><br><span class="line">    id,</span><br><span class="line">    first_name,</span><br><span class="line">    last_name,</span><br><span class="line">    age,</span><br><span class="line">    shoe_size,</span><br><span class="line">    shirt_size</span><br><span class="line">) <span class="keyword">VALUES</span></span><br><span class="line">($<span class="number">1</span>, $<span class="number">2</span>, $<span class="number">3</span>, $<span class="number">4</span>, $<span class="number">5</span>, $<span class="number">6</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- name: UpdateSizes :exec</span></span><br><span class="line"><span class="keyword">UPDATE</span> users</span><br><span class="line"><span class="keyword">SET</span> shoe_size <span class="operator">=</span> $<span class="number">2</span>, shirt_size <span class="operator">=</span> $<span class="number">3</span></span><br><span class="line"><span class="keyword">WHERE</span> id <span class="operator">=</span> $<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- name: DeleteBySize :exec</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> users</span><br><span class="line"><span class="keyword">WHERE</span> shoe_size <span class="operator">=</span> $<span class="number">1</span> <span class="keyword">AND</span> shirt_size <span class="operator">=</span> $<span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="ハマった点"><a href="#ハマった点" class="headerlink" title="ハマった点"></a>ハマった点</h2><p>sqlc は素晴らしい ORM ですが、開発中にいくつかハマりどころがありました。インパクトが大きかった順に記載します。</p>
+<h3 id="1-有効な-SQL-にもかかわらず-sqlc-でコード生成できないことがある"><a href="#1-有効な-SQL-にもかかわらず-sqlc-でコード生成できないことがある" class="headerlink" title="1. 有効な SQL にもかかわらず sqlc でコード生成できないことがある"></a>1. 有効な SQL にもかかわらず sqlc でコード生成できないことがある</h3><p>基本的には PostgreSQL で実行できる SQL はすべて sqlc で扱えます。しかし、いくつかの SQL は PostgreSQL 上は有効にも関わらず、sqlc でコード生成に失敗します。コード生成できない場合はその SQL を sqlc では使わないように書き換えする、あるいは sqlc を経由せず <code>database/sql</code> パッケージの API から直接 SQL を呼び出すなどの回避する必要があります。</p>
+<p>参考までに sqlc でコード生成できない SQL の例をあげます。</p>
+<ul>
+<li>例１：UPDATE 句で JOIN を使う場合（<a target="_blank" rel="noopener" href="https://github.com/kyleconroy/sqlc/issues/1100">#1100</a>）</li>
+</ul>
+<p>このパターンが一番影響がありました。<code>JOIN</code> と <code>UPDATE</code> が同時にできないため、<code>JOIN</code> して更新データを <code>SELECT</code> するクエリと <code>UPDATE</code> するクエリの 2 つに分割して対処しました。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span></span><br><span class="line">	group_calc_totals gct</span><br><span class="line"><span class="keyword">SET</span></span><br><span class="line">	npn <span class="operator">=</span> nem.npn</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	producer_group_attribute ga</span><br><span class="line"><span class="keyword">JOIN</span></span><br><span class="line">	npn_external_map nem</span><br><span class="line"><span class="keyword">ON</span>	ga.npn_external_map_id <span class="operator">=</span> nem.id</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	gct.group_id <span class="operator">=</span> ga.group_id;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>例２：サブクエリと <code>AS</code>, <code>GROUP</code> 句を使う場合（<a target="_blank" rel="noopener" href="https://github.com/kyleconroy/sqlc/issues/1886">#1886</a>）</li>
+</ul>
+<p>以下のような SQL もコード生成に失敗します。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	s.id <span class="keyword">AS</span> &quot;s_id&quot;</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	(</span><br><span class="line">		<span class="keyword">SELECT</span></span><br><span class="line">			spam.id</span><br><span class="line">		<span class="keyword">FROM</span></span><br><span class="line">			spam</span><br><span class="line">  ) <span class="keyword">AS</span> &quot;s&quot;</span><br><span class="line"><span class="comment">-- 以下を s.id に変更すれば機能する</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> s_id;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-マッピングする構造体の型が-NULL-になりうる場合でも-NULL-を許容しない型で生成されることがある"><a href="#2-マッピングする構造体の型が-NULL-になりうる場合でも-NULL-を許容しない型で生成されることがある" class="headerlink" title="2. マッピングする構造体の型が NULL になりうる場合でも NULL を許容しない型で生成されることがある"></a>2. マッピングする構造体の型が NULL になりうる場合でも NULL を許容しない型で生成されることがある</h3><p>テーブルのカラム自体は NOT NULL 制約があるが、SQL の条件によって NULL になりうるケースです（<a target="_blank" rel="noopener" href="https://github.com/kyleconroy/sqlc/issues/1208">#1208</a>）。このケースはコンパイル時はエラーにならず、実行時にカラムの値が NULL になるとエラーが発生するため、注意が必要です。</p>
+<p>たとえば以下の <code>one</code> テーブルの <code>name</code> カラムは NOT NULL 制約が付与されています。しかしサブクエリの WHERE 句の条件に該当しない場合は SELECT できる結果が NULL になりえます。このような条件下でも sqlc は NOT NULL なカラムとして構造体を生成します。期待としては <code>sql.NullInt32</code> 型として NULL を許容される型のフィールドを想定しますが、実際には <code>int32</code> と NULL な値をマッピングできない型のフィールドになります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">one</span> (</span><br><span class="line">	id <span class="type">INTEGER</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">	otherfield TEXT,</span><br><span class="line">	name <span class="type">VARCHAR</span>(<span class="number">128</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	otherfield,</span><br><span class="line">	(<span class="keyword">SELECT</span> o.id <span class="keyword">FROM</span> <span class="keyword">one</span> o <span class="keyword">WHERE</span> one.name <span class="operator">=</span> <span class="string">&#x27;foo&#x27;</span> LIMIT <span class="number">1</span>) <span class="keyword">AS</span> &quot;id&quot;</span><br><span class="line"><span class="keyword">FROM</span> <span class="keyword">one</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> TestRow <span class="keyword">struct</span> &#123;</span><br><span class="line">	Otherfield sql.NullString</span><br><span class="line">	ID         <span class="type">int32</span>    <span class="comment">// 本当は sql.NullInt32 になってほしい!</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-IN-句に複数の値を渡せない"><a href="#3-IN-句に複数の値を渡せない" class="headerlink" title="3. IN 句に複数の値を渡せない"></a>3. IN 句に複数の値を渡せない</h3><p><code>IN</code> 句で複数の値を渡して、複数のレコードを抽出するクエリは一般的ですが sqlc を使ってコード生成する場合は技巧が必要になります（<a target="_blank" rel="noopener" href="https://github.com/kyleconroy/sqlc/issues/77">#77</a>, <a target="_blank" rel="noopener" href="https://github.com/kyleconroy/sqlc/issues/167">#167</a>）。たとえば <code>authors</code> テーブルからいくつかの <code>id</code> にマッチするレコードを抽出するクエリを考えてみます。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- name: ListAuthorsByIDs :many</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> authors</span><br><span class="line"><span class="keyword">WHERE</span> id <span class="keyword">IN</span> ($<span class="number">1</span>)</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+
+<p>このようなクエリから生成される Go のコードでは <code>string</code> の単一の値は渡せますが複数の ID を含んだ <code>[]string</code> の値は渡せません。生成されるメソッドのシグネチャは以下になります。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ListAuthorsByIDs(ctx context.Context, id <span class="type">string</span>) ([]Author, <span class="type">error</span>)</span><br></pre></td></tr></table></figure>
+
+<p>対処方法として、クエリを以下のように <code>ANY</code> 句<sup id="fnref:8"><a href="#fn:8" rel="footnote">8</a></sup>を使うように書き換える必要があります。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> authors</span><br><span class="line"><span class="keyword">WHERE</span> id <span class="operator">=</span> <span class="keyword">ANY</span>(<span class="variable">@ids</span>::<span class="type">VARCHAR</span>[]);</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+
+<p>上記のような SQL からは以下のシグネチャのコードが生成でき、また複数の値にマッチするレコードを取得できます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ListAuthorsByIDs(ctx context.Context, ids []<span class="type">string</span>) ([]Author, <span class="type">error</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-集計関数の結果や-CASE-句の値が-interface-型になる"><a href="#4-集計関数の結果や-CASE-句の値が-interface-型になる" class="headerlink" title="4. 集計関数の結果や CASE 句の値が interface{} 型になる"></a>4. 集計関数の結果や CASE 句の値が interface{} 型になる</h3><p><code>MIN()</code> や <code>MAX()</code>, <code>SUM()</code> といった集計関数の結果は、引数のデータ型ではなく <code>interface&#123;&#125;</code> 型として生成されます。</p>
+<p>たとえば以下の <code>MIN</code> を使うケースでは <code>int32</code> 型で生成されることを期待するかもしれませんが、<code>interface&#123;&#125;</code> 型になります（<a target="_blank" rel="noopener" href="https://github.com/kyleconroy/sqlc/issues/1574">#1574</a>）。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> sales (</span><br><span class="line">	id SERIAL <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">	vat <span class="type">INTEGER</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	<span class="built_in">MIN</span>(vat) <span class="keyword">AS</span> vatpence</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	sales;</span><br></pre></td></tr></table></figure>
+
+<p>こうしたケースでは明示的に SQL で型キャストを行うことで回避できます。上記のケースであれば <code>::INTEGER</code> あるいは <code>CAST(MIN(vat) AS INTEGER)</code> と明示することで Go では <code>int32</code> 型にマッピングできます。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	<span class="built_in">MIN</span>(vat)::<span class="type">INTEGER</span> <span class="keyword">AS</span> vatpence</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	sales;</span><br></pre></td></tr></table></figure>
+
+<p>CASE 句を扱う場合も同様に <code>interface&#123;&#125;</code> 型となるため、必要に応じて型キャストをすると良いでしょう。</p>
+<h3 id="5-DDL-が扱えない"><a href="#5-DDL-が扱えない" class="headerlink" title="5. DDL が扱えない"></a>5. DDL が扱えない</h3><p>sqlc は 1.15.0 では DDL をサポートしていません（<a target="_blank" rel="noopener" href="https://github.com/kyleconroy/sqlc/issues/1661">#1661</a>）。複雑なビジネスロジックを SQL で実装しているときに、処理の中間結果を一時表に保持したいユースケースがありました。セッション開始時に <code>CREATE TEMPORARY TABLE ...</code> として一時表を作成しようとしましたが sqlc ではコード生成できませんでした。これは <code>pgx</code> の <code>Exec()</code> から直接クエリを発行して対処しました。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>業務システム開発に sqlc を導入して良かった点とハマった点を紹介しました。素の SQL を書きたいケースでは非常に良い ORM と感じています。Go の ORM の選択に迷っている方の参考になれば嬉しいです。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">業務システム開発ではロジックを SQL に寄せることも多く、複数のテーブルを JOIN したり、ウィンドウ関数を使って処理をしたりなど、SQL が複雑になりがちです。複雑な SQL は ORM のクエリビルダーAPI を使ってクエリを組み立てるのではなく、手書きで実装したいケースが多いです。たとえば ORM に Gorm を使っていたとしても <a target="_blank" rel="noopener" href="https://pkg.go.dev/github.com/jinzhu/gorm#DB.Raw">Raw()</a> を使わざるを得ない、あるいは使いたいケースが多くありました。</span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="vertical-align: top; padding-right: 10px;">2.</span><span style="vertical-align: top;">生成するコード量は 1 ファイルに含まれる SQL の数にもよるため、あくまで目安です。</span><a href="#fnref:2" rev="footnote"> ↩</a></li><li id="fn:3"><span style="vertical-align: top; padding-right: 10px;">3.</span><span style="vertical-align: top;">データベースアクセスしないにも関わらず型安全なコードを生成できるのは理由は、sqlc が C 言語で書かれた本物の PostgreSQL のクエリパーサを Go から呼び出し、パースされたツリーからコード生成するアプローチを採用しているためです。</span><a href="#fnref:3" rev="footnote"> ↩</a></li><li id="fn:4"><span style="vertical-align: top; padding-right: 10px;">4.</span><span style="vertical-align: top;"><code>xo</code> はファイル生成に時間がかかるだけでなく、生成できるコードが私たちの求める機能/非機能要件と合わなかったため、採用を見送りました。</span><a href="#fnref:4" rev="footnote"> ↩</a></li><li id="fn:5"><span style="vertical-align: top; padding-right: 10px;">5.</span><span style="vertical-align: top;"><a target="_blank" rel="noopener" href="https://docs.sqlc.dev/en/stable/howto/named_parameters.html?highlight=Named%20parameter#naming-parameters">https://docs.sqlc.dev/en/stable/howto/named_parameters.html?highlight=Named parameter#naming-parameters</a></span><a href="#fnref:5" rev="footnote"> ↩</a></li><li id="fn:6"><span style="vertical-align: top; padding-right: 10px;">6.</span><span style="vertical-align: top;"><code>pgtype.Numeric</code> 型は <code>big.Int</code> 型の値をフィールドに含んでおり、浮動小数点演算の誤差が許されない場合では、このデータ型を使うことは妥当です。一方、数値計算が <code>float64</code> のような <code>+</code>, <code>-</code>, <code>/</code>, <code>*</code> でできません。API を使って演算しますが、コードが読みづらく、メンテナンスが難しくなる点がデメリットとしてあります。</span><a href="#fnref:6" rev="footnote"> ↩</a></li><li id="fn:7"><span style="vertical-align: top; padding-right: 10px;">7.</span><span style="vertical-align: top;"><a target="_blank" rel="noopener" href="https://docs.sqlc.dev/en/stable/reference/language-support.html?highlight=beta#database-and-language-support">https://docs.sqlc.dev/en/stable/reference/language-support.html?highlight=beta#database-and-language-support</a></span><a href="#fnref:7" rev="footnote"> ↩</a></li><li id="fn:8"><span style="vertical-align: top; padding-right: 10px;">8.</span><span style="vertical-align: top;"><code>ANY</code> 句は <code>SOME</code> 句でもよいです。<a target="_blank" rel="noopener" href="https://www.postgresql.jp/document/13/html/functions-comparisons.html">https://www.postgresql.jp/document/13/html/functions-comparisons.html</a></span><a href="#fnref:8" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20221128a/&related=twitterapi%2Ctwitter&text=%E6%A5%AD%E5%8B%99%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E9%96%8B%E7%99%BA%E3%81%A7sqlc%E3%82%92%E5%B0%8E%E5%85%A5%E3%81%97%E3%81%A6%E8%89%AF%E3%81%8B%E3%81%A3%E3%81%9F%E7%82%B9%E3%81%A8%E3%83%8F%E3%83%9E%E3%81%A3%E3%81%9F%E7%82%B9%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20221128a/&t=%E6%A5%AD%E5%8B%99%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E9%96%8B%E7%99%BA%E3%81%A7sqlc%E3%82%92%E5%B0%8E%E5%85%A5%E3%81%97%E3%81%A6%E8%89%AF%E3%81%8B%E3%81%A3%E3%81%9F%E7%82%B9%E3%81%A8%E3%83%8F%E3%83%9E%E3%81%A3%E3%81%9F%E7%82%B9" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20221128a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20221128a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2021.08.04</span><span class="snscount">&#9825;220</span><a href=/articles/20210804a/ title="本記事では `sqlc` を紹介します。早速ですが、結論から行きましょう。- SQLファイルからデータベースにアクセスできる型安全なGoのコードを生成するライブラリ  - 構造体のモデルの手書き実装不要  - 複数テーブルをJOINしたときのマッパー実装不要">SQLファイルから型安全なコードを生成するsqlc</a></li><li class="related-posts-item"><span>2021.08.03</span><span class="snscount">&#9825;9</span><a href=/articles/20210803a/ title="こんにちは。2021年4月入社の本田です。本記事では私が当社でアルバイトをしていたときに作成したtwowaysqlというツールについて紹介させていただきます。JavaではuroboroSQLなど広く使われている2WaySQLライブラリが存在しますが、Goでこれがデファクトスタンダートというものは現在のところ存在しません。従って、Go言語でtwowaysqlという2WaySQLライブラリを実装することにしました。">Go言語で2WaySQL</a></li><li class="related-posts-item"><span>2021.08.02</span><span class="snscount">&#9825;8</span><a href=/articles/20210802a/ title="業務では専らDynamoDBに触れており、１年以上RDBMSの世界から離れていたのですが、連載のために帰ってきました。というわけで無からネタを考え、goqu体験記を書くことにしました。">SQLビルダーgoquの使い方</a></li><li class="related-posts-item"><span>2020.07.28</span><span class="snscount">&#9825;35</span><a href=/articles/20200728/ title="Goでデータベースを扱う場合、[Gorm] といった ORM がよく使われます。多くの場合は構造体のフィールドとデータベースのカラム名のマッピングをするタグ付きの構造体を実装します。例えば Gorm を用いて users テーブルにアクセスする場合、以下のような構造体が一例として考えられます。">DBスキーマを駆動にした開発のためのライブラリ調査</a></li><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;563</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2019.09.26</span><span class="snscount">&#9825;30</span><a href=/articles/20190926/ title="GoのDBレイヤーライブラリとして有名な、GORM,SQLBoiler,XORMの三つについて違いと評価をまとめてみました。">Go言語のDBレイヤーライブラリの評価</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%89%AF%E3%81%8B%E3%81%A3%E3%81%9F%E7%82%B9"><span class="toc-text">良かった点</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-SQL-%E3%81%AE%E9%96%8B%E7%99%BA%E3%81%AB%E9%9B%86%E4%B8%AD%E3%81%A7%E3%81%8D%E3%82%8B"><span class="toc-text">1. SQL の開発に集中できる</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E7%94%9F%E6%88%90%E3%81%8C%E9%AB%98%E9%80%9F%E3%81%A7%E3%81%82%E3%82%8B"><span class="toc-text">2. ファイル生成が高速である</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E8%87%AA%E7%84%B6%E3%81%AA%E3%82%B3%E3%83%BC%E3%83%89%E3%81%8C%E7%94%9F%E6%88%90%E3%81%A7%E3%81%8D%E3%82%8B"><span class="toc-text">3. 自然なコードが生成できる</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E7%94%9F%E6%88%90%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E7%A8%AE%E9%A1%9E%E3%81%8C%E8%B1%8A%E5%AF%8C%E3%81%A7%E3%81%82%E3%82%8B"><span class="toc-text">4. 生成できるコードの種類が豊富である</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E7%94%9F%E6%88%90%E3%81%95%E3%82%8C%E3%82%8B%E3%83%87%E3%83%BC%E3%82%BF%E5%9E%8B%E3%82%92%E6%9F%94%E8%BB%9F%E3%81%AB%E5%A4%89%E6%9B%B4%E3%81%A7%E3%81%8D%E3%82%8B"><span class="toc-text">5. 生成されるデータ型を柔軟に変更できる</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E8%A4%87%E6%95%B0%E3%81%AE%E9%96%8B%E7%99%BA%E8%A8%80%E8%AA%9E%E3%82%92%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%E3%81%97%E3%81%A6%E3%81%84%E3%82%8B"><span class="toc-text">6. 複数の開発言語をサポートしている</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1SQL-%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AB%E8%A4%87%E6%95%B0%E3%81%AE%E3%82%AF%E3%82%A8%E3%83%AA%E3%82%92%E6%9B%B8%E3%81%84%E3%81%A6%E3%82%82%E8%89%AF%E3%81%84"><span class="toc-text">7. 1SQL ファイルに複数のクエリを書いても良い</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%8F%E3%83%9E%E3%81%A3%E3%81%9F%E7%82%B9"><span class="toc-text">ハマった点</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%9C%89%E5%8A%B9%E3%81%AA-SQL-%E3%81%AB%E3%82%82%E3%81%8B%E3%81%8B%E3%82%8F%E3%82%89%E3%81%9A-sqlc-%E3%81%A7%E3%82%B3%E3%83%BC%E3%83%89%E7%94%9F%E6%88%90%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84%E3%81%93%E3%81%A8%E3%81%8C%E3%81%82%E3%82%8B"><span class="toc-text">1. 有効な SQL にもかかわらず sqlc でコード生成できないことがある</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E3%83%9E%E3%83%83%E3%83%94%E3%83%B3%E3%82%B0%E3%81%99%E3%82%8B%E6%A7%8B%E9%80%A0%E4%BD%93%E3%81%AE%E5%9E%8B%E3%81%8C-NULL-%E3%81%AB%E3%81%AA%E3%82%8A%E3%81%86%E3%82%8B%E5%A0%B4%E5%90%88%E3%81%A7%E3%82%82-NULL-%E3%82%92%E8%A8%B1%E5%AE%B9%E3%81%97%E3%81%AA%E3%81%84%E5%9E%8B%E3%81%A7%E7%94%9F%E6%88%90%E3%81%95%E3%82%8C%E3%82%8B%E3%81%93%E3%81%A8%E3%81%8C%E3%81%82%E3%82%8B"><span class="toc-text">2. マッピングする構造体の型が NULL になりうる場合でも NULL を許容しない型で生成されることがある</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-IN-%E5%8F%A5%E3%81%AB%E8%A4%87%E6%95%B0%E3%81%AE%E5%80%A4%E3%82%92%E6%B8%A1%E3%81%9B%E3%81%AA%E3%81%84"><span class="toc-text">3. IN 句に複数の値を渡せない</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E9%9B%86%E8%A8%88%E9%96%A2%E6%95%B0%E3%81%AE%E7%B5%90%E6%9E%9C%E3%82%84-CASE-%E5%8F%A5%E3%81%AE%E5%80%A4%E3%81%8C-interface-%E5%9E%8B%E3%81%AB%E3%81%AA%E3%82%8B"><span class="toc-text">4. 集計関数の結果や CASE 句の値が interface{} 型になる</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-DDL-%E3%81%8C%E6%89%B1%E3%81%88%E3%81%AA%E3%81%84"><span class="toc-text">5. DDL が扱えない</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (343)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (198)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (84)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (44)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (19)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (18)</a></li>
+<li class=""><a href="/categories/Management/">Management (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (6)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2022 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
