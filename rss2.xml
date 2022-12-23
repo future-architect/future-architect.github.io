@@ -15,8 +15,43 @@
     <atom:link href="https://future-architect.github.io/rss2.xml" rel="self" type="application/rss+xml"/>
     
     <description>フューチャーの開発者による公式技術ブログです。業務で利用している技術を幅広く紹介します。</description>
-    <pubDate>Tue, 20 Dec 2022 02:16:26 GMT</pubDate>
+    <pubDate>Fri, 23 Dec 2022 00:58:00 GMT</pubDate>
     <generator>http://hexo.io/</generator>
+    
+    <item>
+      <title>俺のシステムがこんなに脆弱性だらけのわけがない(linkedpackageの紹介)</title>
+      <link>https://future-architect.github.io/articles/20221223a/</link>
+      <guid>https://future-architect.github.io/articles/20221223a/</guid>
+      <pubDate>Thu, 22 Dec 2022 15:00:00 GMT</pubDate>
+      
+        
+        
+          
+          
+      <description>&lt;img src=&quot;/images/20221223a/top.jpg&quot; alt=&quot;&quot; width=&quot;842&quot;</description>
+          
+        
+      
+      
+      
+      <content:encoded><![CDATA[<img src="/images/20221223a/top.jpg" alt="" width="842" height="523"><p>セキュリティに対して、きちんとお金をかけて対応すべきである、というのが近年の風潮です。そんな中、システム開発では多くのオープンソースのコンポーネントを組み合わせてシステムを構築するようになってきたため、使っている部品の脆弱性管理、というのがかなり大きな市場になってきました。</p><p>当社にはOSSの<a href="https://vuls.io/">Vuls</a>と、それに脆弱性管理の手間を減らしてくれる<a href="https://vuls.biz/">FutureVuls</a>というSaaSサービスがあります。コンテナのスキャンだとAqua Securityの<a href="https://trivy.dev/">Trivy</a>が有名ですね。</p><p>開発中のアプリケーションのスキャナーというと、Node.jsのnpmコマンドが脆弱なパッケージの検知機能（auditサブコマンド）を内蔵していますし、Goも<a href="https://vuln.go.dev/">公式脆弱性管理データベース</a>のページを作り、新しい仕組みを構築しようとしています(<a href="https://go.dev/security/vuln/">ドキュメント</a>、<a href="https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck">準標準のチェックコマンド</a>)。言語をまたいで使えるものには<a href="https://snyk.io/">snyk</a>もありますね。</p><h1 id="フォールスポジティブ（偽陽性）を減らす"><a href="#フォールスポジティブ（偽陽性）を減らす" class="headerlink" title="フォールスポジティブ（偽陽性）を減らす"></a>フォールスポジティブ（偽陽性）を減らす</h1><p>Node.jsでの開発は4桁ぐらいパッケージに依存することがありえます。npm auditで少しでも古いパッケージを使うと大量の脆弱性が報告されることがあります。でも、よくよく見てみると実は関係ないのかな？とも思えるような脆弱性もたくさん出てきますが、なかなか判定を1つ1つ行うのは大変です。</p><p>ですが、アプリケーションの開発でいうと、「パッケージリストには追加してみたのだけど、実際には使っていないパッケージ」などがあったりします。Goだとgo mod tidyでお掃除してくれますが。あとは開発用に追加したもので、本番コードにはリンクされていないものもあります。Node.jsなんかは、ほとんどはそうなんじゃないですかね。</p><p>あとは、脆弱性がヒットしたとしても、そのパッケージ中の一部の機能は使っているが該当する機能は使っていない、ということもあります。そのため、実際にビルドしたアプリケーションに含まれるソースコードでフィルタリングしたらいいんじゃないか、と思って実証実験的に作ったパッケージが次のものです。</p><p><a href="https://github.com/future-architect/linkedpackage">https://github.com/future-architect/linkedpackage</a></p><p>神戸さんからメッセージもらうまでは、作ったことをすっかり忘れていて、とりあえず公開だけしたのが上のリポジトリです。ライセンスはひとまずVulsにあわせてGPLにしています。とりあえず公開だけしたのでREADMEもないですが</p><h1 id="処理の方法"><a href="#処理の方法" class="headerlink" title="処理の方法"></a>処理の方法</h1><p>現時点ではJavaScriptのプロジェクトに限定した機能になっています。ソースマップをざっとスキャンして、実行ファイルに含まれるソース片を提供しているパッケージを取り出します。コマンドとしても動かせるようにしてあり、linkedpackage auditコマンドを使うと、npm auditの結果を、利用パッケージに限定してフィルタリングして表示、みたいなことができます。</p><p>ソースマップ中のパス表記は、その中で識別子が認識一致していたら問題はないと思うのですが、実際のソースコードとリンクさせるには逆変換が必要かなと思っています。ツールによって出てくるパス表記がいろいろあるので、これを地道に拾ってモジュール名を拾うようにしています。地道さが必要ですね。</p><ul><li><code>webpack:///./node_modules/@babel/runtime/helpers/wrapNativeSuper/_index.mjs</code></li><li><code>../webpack:/ncc-project/node_modules/trim/index.js</code></li><li><code>webpack://_N_E/ignored|/prj/node_modules/next/dist/shared/lib/router|./utils/resolve-rewrites</code></li></ul><h1 id="今後"><a href="#今後" class="headerlink" title="今後"></a>今後</h1><p>Goも<a href="https://pkg.go.dev/debug/buildinfo@go1.19.4#Read">debugパッケージ</a>使えば実行ファイルから、利用しているモジュール一覧が取れるので行けそうですね。そのうち作ろうかな。</p><p>ただ、実行ファイルに入っているからといって、それがまた実行されるわけではない、というのはあります。JavaScriptだとtree shakingという最適化がありますが完璧にフィルタリングできるわけではありません。Goはそこまで積極的なCode Eliminationはしてない印象がありますし、グローバル変数を含めinit()から参照されるオブジェクトなんかは使ってなくてもリンクされてしまいます。Goは1.20から<a href="https://go.googlesource.com/proposal/+/master/design/55022-pgo.md">プロファイラ機能とリンクしたオプティマイザ</a>が入ります。この情報が外部のツールから使えるかどうかはわからないですが、実際に実行されている行だけ取り出せれば、また精度の高いフィルタリングができるんじゃないかな、と思っています。</p>]]></content:encoded>
+      
+      
+      <category domain="https://future-architect.github.io/categories/Security/">Security</category>
+      
+      
+      <category domain="https://future-architect.github.io/tags/JavaScript/">JavaScript</category>
+      
+      <category domain="https://future-architect.github.io/tags/Node-js/">Node.js</category>
+      
+      <category domain="https://future-architect.github.io/tags/%E8%84%86%E5%BC%B1%E6%80%A7/">脆弱性</category>
+      
+      <category domain="https://future-architect.github.io/tags/npm/">npm</category>
+      
+      
+      <comments>https://future-architect.github.io/articles/20221223a/#disqus_thread</comments>
+      
+    </item>
     
     <item>
       <title>MSAL.jsで開発時は認証スキップしたい</title>
@@ -871,42 +906,6 @@
       
       
       <comments>https://future-architect.github.io/articles/20221102a/#disqus_thread</comments>
-      
-    </item>
-    
-    <item>
-      <title>Go入門の軌跡</title>
-      <link>https://future-architect.github.io/articles/20221101a/</link>
-      <guid>https://future-architect.github.io/articles/20221101a/</guid>
-      <pubDate>Mon, 31 Oct 2022 15:00:00 GMT</pubDate>
-      
-        
-        
-          
-          
-      <description>&lt;img src=&quot;/images/20221101a/top.drawio.png&quot; alt=&quot;&quot; width=&quot;800&quot; height=&quot;430&quot;&gt;
-
-&lt;p&gt;Gopher wan designed by Renee Frenc.&lt;/p&gt;
-&lt;h1 id=&quot;はじめに&quot;&gt;&lt;a</description>
-          
-        
-      
-      
-      
-      <content:encoded><![CDATA[<img src="/images/20221101a/top.drawio.png" alt="" width="800" height="430"><p>Gopher wan designed by Renee Frenc.</p><h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIG DXユニットの今泉です。<br><a href="/articles/20221031a/">秋のブログ週間</a>の２本目です。</p><p>業務ではJavaを使用する機会が多かったのですが、今年に入ってからGo言語を扱うようになりました。</p><p>これまでプライベートではエディタに叱られながらGoを雰囲気で書いていたりはしたのですが、これを機にしっかりと学ぶことにしました。</p><p>本記事ではキャッチアップのため自分が参考にさせていただいたリソースを紹介させていただきます。</p><p>一通り学んだ結果、コードが読み解けなかったりWebAPI開発で困るような場面はかなり減ったと思います（コードレビューでGoっぽくないよね、みたいな指摘は受けるのでまだまだ精進は必要です）。</p><h1 id="言語仕様を学ぶ"><a href="#言語仕様を学ぶ" class="headerlink" title="言語仕様を学ぶ"></a>言語仕様を学ぶ</h1><ul><li><a href="https://go.dev/tour/welcome/1">A Tour of Go</a><br>Goの言語仕様をブラウザ上で学ぶことができる公式のチュートリアルです。<br>実際にコードを実行しながら一通りの書き方や仕様を把握することができました。</li><li><a href="https://go.dev/doc/effective_go#allocation_new">Effective Go</a><br>Goらしい書き方が紹介されているガイドラインです。こちらも公式から。<br>時々思い返したように見直したりします。</li><li><a href="https://future-architect.github.io/articles/20190713/">Goを学ぶときにつまずきやすいポイントFAQ</a><br>Goを始めて一番最初につまずいたポイントは大体この記事で解消することができました。</li><li><a href="https://future-architect.github.io/articles/20200311">JavaプログラマーのためのGo言語入門</a><br>実際に今まで自分が利用していた言語との違いを把握することで、より経験に近い形で仕様についての理解を深めることができました。Javaプログラマーの方はまず本記事を読んでGoの解像度を高めることで、より早くキャッチアップができると思います。</li><li><a href="https://www.how2go.dev/">How to GO</a><br>基本的な文法について「これってGOでどう書くんだったっけな..?」となった時にいつも参考にさせていただいています。</li></ul><h1 id="コードを読む"><a href="#コードを読む" class="headerlink" title="コードを読む"></a>コードを読む</h1><ul><li><a href="https://github.com/golang/go">golang&#x2F;go</a></li><li><a href="https://future-architect.github.io/articles/20200310/">Goの標準ライブラリのコードリーディングのすすめ</a><br>やはり新しい言語に触るからには標準ライブラリの仕様について正しく理解しておきたいものです。よく利用するため距離が近いというのも精神的なハードルが低くてgoodです。<br>と、いいつつも標準ライブラリだけでかなりのボリュームがあるためどうしようかと思案していたところ、フューチャー技術ブログで標準ライブラリのコードリーディングについて言及していた記事があったので参考にしてerrors、net&#x2F;http、sort、testingあたりを読みました。<br>またコードリーディング会やらないかなあ…。（当時私はGoに入門していませんでした）<br>また、<a href="https://github.com/golang/go/wiki">Wiki</a>にもかなり有用な情報が詰まっていたので参考になりました。</li><li><a href="https://future-architect.github.io/articles/20200601/">Goのテストに入門してみよう！</a><br>コードリーディングを始めたもののtestingパッケージが激ムズだったので、知識の補完に参考にさせていただきました。</li><li><a href="https://future-architect.github.io/articles/20210714a/">Goのおすすめのフレームワークはnet&#x2F;http</a><br>私はWEB開発が中心のため、なにかWEBフレームワークのコードも読んでおこうか…と思ったのですが、いざ読んでみると「はわわ、これってnet&#x2F;httpのラッパーじゃね..？」というお気持ちになり、この記事を読んで確信に変わったためnet&#x2F;http自体を読むようにしました。</li></ul><h1 id="書籍を読む"><a href="#書籍を読む" class="headerlink" title="書籍を読む"></a>書籍を読む</h1><ul><li><a href="https://www.oreilly.co.jp/books/9784873119694/">実用 Go言語</a><br>Goはシンプルな言語であるがゆえにある機能を満たすコードを書こうとすると様々なものを組み合わる必要があります。<br>本書ではその組み合わせ..つまり、より実用的なGoの書き方について紹介されており、自分がGoでの開発を進めていく中で必要になったテーマをつまみ食い的に読んで参考にさせていただいています。インターネットではお目当ての知識にたどり着くのが大変ですが、目次を見ただけでサッと欲しい情報が得られるのが書籍の強みですね。</li><li><a href="https://www.oreilly.co.jp/books/9784873119038/">Real World HTTP</a><br>Goについてではなく、ウェブの知識や技術について触れている書籍です。<br>元々、HTTPの基礎を学ぶため数年前に購入していたものですが、そいうえば実装がGoで書かれていたな、と思い出し知識の整理も兼ねて読み直してみました。<br>net&#x2F;httpライブラリを読んだあとに本書で紹介されているコードを自分で実装してみたりすると理解が進んで気持ち良かったです。</li></ul><h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>分かっていたことではありましたが、自分がGoをキャッチアップするのにかなり当社のメンバーが外部発信している記事&#x2F;書籍に助けられています。</p><p>日本語での２次情報はほぼ当社から得ているかもしれません…。<br>これらのリソースを享受するだけではなく、発信する側にも回れるよう引き続き努力していきたいと思います。</p>]]></content:encoded>
-      
-      
-      <category domain="https://future-architect.github.io/categories/Programming/">Programming</category>
-      
-      
-      <category domain="https://future-architect.github.io/tags/%E5%85%A5%E9%96%80/">入門</category>
-      
-      <category domain="https://future-architect.github.io/tags/%E5%88%9D%E5%BF%83%E8%80%85%E5%90%91%E3%81%91/">初心者向け</category>
-      
-      <category domain="https://future-architect.github.io/tags/Go/">Go</category>
-      
-      
-      <comments>https://future-architect.github.io/articles/20221101a/#disqus_thread</comments>
       
     </item>
     
