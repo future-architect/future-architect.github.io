@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Jenkinsのエージェントノードをストレージを永続化しながらスポットインスタンスで運用する | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにはじめまして。フューチャーインスペースの平井です。 昨今の円安でAWS使用料が増加したことにより、構成見直し等で費用削減を図っている方も多いと思います。 私の現場でも費用削減の一環として、先日Jenkinsで使用しているエージェントノード(※1)をオンデマンドインスタンスからスポットインスタンスに移行しました。 ※1:昨今のマスターやスレーブといったプログラミング用語置き換えの流れによ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jenkinsのエージェントノードをストレージを永続化しながらスポットインスタンスで運用する | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20230315a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにはじめまして。フューチャーインスペースの平井です。 昨今の円安でAWS使用料が増加したことにより、構成見直し等で費用削減を図っている方も多いと思います。 私の現場でも費用削減の一環として、先日Jenkinsで使用しているエージェントノード(※1)をオンデマンドインスタンスからスポットインスタンスに移行しました。 ※1:昨今のマスターやスレーブといったプログラミング用語置き換えの流れによ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20230315a/logo-title-opengraph.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230315a/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230315a/image_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230315a/2023-02-21_14h48_27.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230315a/2023-02-21_14h48_44.png">
+<meta property="article:published_time" content="2023-03-14T15:00:00.000Z">
+<meta property="article:modified_time" content="2023-03-15T01:08:41.029Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Jenkins">
+<meta property="article:tag" content="ebs">
+<meta property="article:tag" content="スポットインスタンス">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20230315a/logo-title-opengraph.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20230315a/">
+  <meta content="AWS,Jenkins,ebs,スポットインスタンス" name="keywords">
+  <meta content="平井龍之介" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Jenkinsのエージェントノードをストレージを永続化しながらスポットインスタンスで運用する
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20230315a_Jenkinsのエージェントノードをストレージを永続化しながらスポットインスタンスで運用する.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20230315a_Jenkinsのエージェントノードをストレージを永続化しながらスポットインスタンスで運用する" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2023/" class="publish-date"><time datetime="2023-03-14T15:00:00.000Z" itemprop="datePublished">2023.03.15</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%B9%B3%E4%BA%95%E9%BE%8D%E4%B9%8B%E4%BB%8B" title="平井龍之介さんの記事一覧へ" class="post-author">平井龍之介</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/Jenkins/" title="Jenkinsタグの記事へ" class="tag-list-link">Jenkins</a>
+  
+    
+    <a href="/tags/ebs/" title="ebsタグの記事へ" class="tag-list-link">ebs</a>
+  
+    
+    <a href="/tags/スポットインスタンス/" title="スポットインスタンスタグの記事へ" class="tag-list-link">スポットインスタンス</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20230315a/logo-title-opengraph.png" alt="" width="500" height="250">
+
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>はじめまして。フューチャーインスペースの平井です。</p>
+<p>昨今の円安でAWS使用料が増加したことにより、構成見直し等で費用削減を図っている方も多いと思います。</p>
+<p>私の現場でも費用削減の一環として、先日Jenkinsで使用している<a target="_blank" rel="noopener" href="https://www.jenkins.io/blog/2020/06/18/terminology-update/">エージェントノード</a>(※1)をオンデマンドインスタンスからスポットインスタンスに移行しました。</p>
+<p>※1:昨今の<code>マスター</code>や<code>スレーブ</code>といったプログラミング用語置き換えの流れにより、Jenkinsもマスターノードをコントローラーノード、スレーブノードをエージェントノードへと改名したようです。</p>
+<p>今回は移行時に工夫した点を紹介いたします。</p>
+<h1 id="環境-x2F-構成"><a href="#環境-x2F-構成" class="headerlink" title="環境&#x2F;構成"></a>環境&#x2F;構成</h1><ul>
+<li>コントローラーノード<ul>
+<li>OS:CentOS Linux release 7.7.1908 (Core)</li>
+<li>Jenkins: 2.190</li>
+<li>EC2 Plugin: 1.50.3</li>
+</ul>
+</li>
+<li>エージェントノード<ul>
+<li>OS:CentOS Linux release 7.7.1908 (Core)</li>
+<li>openjdk:1.8.0_232</li>
+</ul>
+</li>
+</ul>
+<h1 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h1><p>まず、元々オンデマンドインスタンスで動かしていたジョブについて説明します。</p>
+<p>対象のジョブではプロジェクト開発支援のため日々ソースファイル解析が行われていました。<br>解析対象ソースはSubversionで管理されており、以下のような課題がありました。</p>
+<ul>
+<li>取得処理の課題<ul>
+<li>svnリポジトリが100超あり、65万ファイル、容量70GBと巨大</li>
+<li>ソース解析の中でファイル間の依存関係解決をするため、常に全量取得する必要がある</li>
+<li>ジョブはソースタイプ毎に分かれているため、ジョブ単位で取得するとストレージが肥大化する</li>
+</ul>
+</li>
+</ul>
+<p>そこで、処理短縮とストレージ節約を図るため、対および実現案を考えました。</p>
+<ul>
+<li>対策<ul>
+<li>svn checkoutしたワーキングディレクトリを保持してsvn updateにより差分で最新ソース取得し時間を短縮化させる</li>
+<li>svn checkout&#x2F;updateするジョブを1つに制限し、複数ジョブで1つのworkspaceを直接参照する</li>
+</ul>
+</li>
+<li>実現案<ol>
+<li><a target="_blank" rel="noopener" href="https://plugins.jenkins.io/shared-workspace/">Shared Workspace Plugin</a>(※2)を使って各ジョブで共有<ul>
+<li>※2:共有元ジョブのworkspaceををzipに固めてmasterノードに転送、共有先ジョブではmasterから転送してzip解凍するJenkinsプラグイン</li>
+</ul>
+</li>
+<li><a target="_blank" rel="noopener" href="https://plugins.jenkins.io/copyartifact/">Copy Artifact Plugin</a>(※3)を使ってworkspaceを成果物保存して各ジョブでコピー<ul>
+<li>※3:ジョブで作られたファイルを成果物としてmasterノードに転送、共有先ジョブではmasterから転送するJenkinsプラグイン</li>
+</ul>
+</li>
+<li>1つのsvn checkout&#x2F;updateジョブのworkspaceをs3に転送して永続化、次回実行時はs3から取得してsvn update実行</li>
+<li>エージェントノード（オンデマンドインスタンス）でsvn checkout状態をEBSに永続化<ul>
+<li>オンデマンドインスタンスはジョブ実行時のみ起動・停止</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+<p>1,2は大量ファイルの場合転送コストが大きく、ストレージもジョブごとに消費するためコストメリットがなく却下。</p>
+<p>3も1,2と同様転送コストが大きいことに加えSCMポーリングとの相性が悪いため却下。</p>
+<p>4のオンデマンドインスタンス方式を採用していました。</p>
+<h1 id="スポットインスタンスへの移行"><a href="#スポットインスタンスへの移行" class="headerlink" title="スポットインスタンスへの移行"></a>スポットインスタンスへの移行</h1><p>その後もオンデマンドインスタンスで運用していましたが、冒頭の通り費用削減の一環でスポットインスタンス移行を検討することとなりました。</p>
+<p>結果、費用削減の他にもメリットがあることを確認し、本格的に移行する流れとなりました。</p>
+<h2 id="主なメリット"><a href="#主なメリット" class="headerlink" title="主なメリット"></a>主なメリット</h2><h3 id="費用削減"><a href="#費用削減" class="headerlink" title="費用削減"></a>費用削減</h3><p>インスタンスクラスにもよりますが、オンデマンドインスタンスと比較して約70%の割引を受けることができます。<br>参考:<a target="_blank" rel="noopener" href="https://www.stylez.co.jp/columns/how_to_use_spot_instances_to_reduce_aws_costs/">AWSコスト削減のためのスポットインスタンス活用術</a></p>
+<p>また、オンデマンド・スポット共通ですが、高負荷な処理にエージェントノードを使うことでマスターノードのインスタンスタイプを小さくして運用することができます。</p>
+<p>つまり、コスト削減と高パフォーマンスの両取りが可能です。</p>
+<h3 id="構成のシンプル化"><a href="#構成のシンプル化" class="headerlink" title="構成のシンプル化"></a>構成のシンプル化</h3><p>現在の構成では起動&#x2F;停止ジョブでエージェントノード（オンデマンドインスタンス）を制御する必要がありました。</p>
+<p>しかし移行後の構成では<a target="_blank" rel="noopener" href="https://plugins.jenkins.io/ec2/">Amazon EC2 Plugin</a>(※4)でエージェントノード（スポットインスタンス）を制御できるため、構成がシンプルになりました。</p>
+<p>※4:ジョブ実行時に自動でEC2を作成し、エージェントノードとして使用できるようにするプラグイン。EC2はジョブ終了後に自動で終了される。</p>
+<ul>
+<li>現在の構成（ジョブによるエージェントノード制御）<img src="/images/20230315a/image.png" alt="image.png" width="1200" height="68" loading="lazy"></li>
+<li>移行後の構成（Amazon EC2 Pluginによるエージェントノード制御）<img src="/images/20230315a/image_2.png" alt="image.png" width="1154" height="154" loading="lazy"></li>
+</ul>
+<h3 id="リタイアメント対応が不要"><a href="#リタイアメント対応が不要" class="headerlink" title="リタイアメント対応が不要"></a>リタイアメント対応が不要</h3><p>スポットインスタンスはジョブ実行毎に作成&#x2F;終了されるため、オンデマンドインスタンスで意識する必要のあったEC2リタイアメント対応が不要となりました。</p>
+<p>参考:<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/instance-retirement.html">インスタンスのリタイア</a></p>
+<h1 id="実装のポイント"><a href="#実装のポイント" class="headerlink" title="実装のポイント"></a>実装のポイント</h1><p>checkout状態をEBSで永続化する構成のため、スポットインスタンスの場合は起動時にEBSをアタッチさせる必要があります。なお起動時のEBSアタッチについては起動テンプレートを使う方法がAWS公式から案内されています。</p>
+<p>参考：<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/premiumsupport/knowledge-center/ec2-linux-spot-instance-attach-ebs-volume/">起動時に永続的なセカンダリ EBS ボリュームを新しい EC2 Linux スポットインスタンスに自動的に添付するにはどうすればよいですか。</a></p>
+<p>当初、Amazon EC2 Pluginに起動テンプレートを指定してスポットインスタンスを動かせれば、と考えたのですが、<strong>プラグインが起動テンプレートに対応していませんでした。</strong></p>
+<p>そこで起動テンプレート以外の方法を探り、最終的に<strong>同プラグインのinit scriptにEBSアタッチ処理を組み込んで実現できるか</strong>確認することとしました。</p>
+<h2 id="init-scriptについて"><a href="#init-scriptについて" class="headerlink" title="init scriptについて"></a>init scriptについて</h2><p>init scriptではスポットインスタンス起動時に実行したい処理をshellで書くことができます。<br>今回は以下の通りとしました。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 初期化</span></span><br><span class="line">INSTANCE_ID=</span><br><span class="line">UUID=</span><br><span class="line"></span><br><span class="line"><span class="comment">## EBSアタッチ</span></span><br><span class="line">INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)</span><br><span class="line"><span class="keyword">if</span> [ -n <span class="variable">$&#123;INSTANCE_ID&#125;</span> ] ; <span class="keyword">then</span></span><br><span class="line">    aws ec2 attach-volume --volume-id &lt;ボリュームID&gt; --device /dev/sdb --instance-id <span class="variable">$&#123;INSTANCE_ID&#125;</span> --region ap-northeast-1</span><br><span class="line">    <span class="built_in">sleep</span> 10</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## /dataマウント</span></span><br><span class="line">UUID=$(lsblk -f | grep nvme1n1 | sed -e <span class="string">&#x27;s/ \+/ /g&#x27;</span> |<span class="built_in">cut</span> -f 3 -d <span class="string">&quot; &quot;</span>)</span><br><span class="line"><span class="keyword">if</span> [ -n <span class="variable">$&#123;UUID&#125;</span> ] ; <span class="keyword">then</span></span><br><span class="line">    sudo mount UUID=<span class="variable">$&#123;UUID&#125;</span> /data</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## マウント確認</span></span><br><span class="line"><span class="keyword">if</span> ! mountpoint /data; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+<p>順に解説します。</p>
+<ul>
+<li>EBSアタッチ処理<br><code>http://169.254.169.254/latest/meta-data/instance-id</code>(※5)でインスタンスIDを取得し、後続のEBSアタッチ処理に渡しています。<br>&lt;ボリュームID&gt;にはアタッチしたいEBSを指定します。また、sleep 10によりEBSアタッチが未完了のまま次処理に進むことを防いでいます。<br>  ※5:<code>169.254.169.254</code>はAWSインスタンスメタデータサービスの固定IPです。<br>参考：<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html">インスタンスメタデータの取得</a><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## EBSアタッチ</span></span><br><span class="line">INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)</span><br><span class="line"><span class="keyword">if</span> [ -n <span class="variable">$&#123;INSTANCE_ID&#125;</span> ] ; <span class="keyword">then</span></span><br><span class="line">    aws ec2 attach-volume --volume-id &lt;ボリュームID&gt; --device /dev/sdb --instance-id <span class="variable">$&#123;INSTANCE_ID&#125;</span> --region ap-northeast-1</span><br><span class="line">    <span class="built_in">sleep</span> 10</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></li>
+<li>EBSをjenkins_homeのパスにマウント<br>EBSのデバイス名には規則があり、追加順に<code>/dev/nvme[0-26]n1</code>で採番されていきます。<br>参考：<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/nvme-ebs-volumes.html">Linux インスタンスの Amazon EBS および NVMe</a><br>ルートボリュームのデバイス名は<code>/dev/nvme0n1</code>のため、今回のアタッチ分は<code>/dev/nvme1n1</code>となります。また、今回はjenkins_homeのパスを<code>/data/jenkins_home</code>としたいため、<code>/data</code>配下をマウントしました。<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## /dataマウント</span></span><br><span class="line">UUID=$(lsblk -f | grep nvme1n1 | sed -e <span class="string">&#x27;s/ \+/ /g&#x27;</span> |<span class="built_in">cut</span> -f 3 -d <span class="string">&quot; &quot;</span>)</span><br><span class="line"><span class="keyword">if</span> [ -n <span class="variable">$&#123;UUID&#125;</span> ] ; <span class="keyword">then</span></span><br><span class="line">    sudo mount UUID=<span class="variable">$&#123;UUID&#125;</span> /data</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## マウント確認</span></span><br><span class="line"><span class="keyword">if</span> ! mountpoint /data; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="スポットインスタンスへの変更"><a href="#スポットインスタンスへの変更" class="headerlink" title="スポットインスタンスへの変更"></a>スポットインスタンスへの変更</h1><p>実際にエージェントノードをスポットインスタンスに変更し、想定通りの動きとなるか確認しました。</p>
+<p>変更に伴い発生した作業を記載します。</p>
+<h2 id="AWS"><a href="#AWS" class="headerlink" title="AWS"></a>AWS</h2><h3 id="エージェントノード用のIAM-Role作成"><a href="#エージェントノード用のIAM-Role作成" class="headerlink" title="エージェントノード用のIAM Role作成"></a>エージェントノード用のIAM Role作成</h3><p>エージェントノード内でEBSのアタッチを行うため、ec2:AttachVolume権限を付与したIAM Roleを作成しました。</p>
+<h3 id="エージェントノード用のセキュリティグループ作成"><a href="#エージェントノード用のセキュリティグループ作成" class="headerlink" title="エージェントノード用のセキュリティグループ作成"></a>エージェントノード用のセキュリティグループ作成</h3><p>エージェントノード立ち上げ時、コントローラーノードからエージェントノードへssh接続する処理があるため、エージェントノードにSSH(22)を許可したセキュリティグループが必要となります。<br>今回は元々使用していたセキュリティグループを流用しました。</p>
+<h3 id="エージェントノード用のAMI作成"><a href="#エージェントノード用のAMI作成" class="headerlink" title="エージェントノード用のAMI作成"></a>エージェントノード用のAMI作成</h3><p>以下1~4を実施してAMIを作成しました。</p>
+<h4 id="1-Javaのインストール"><a href="#1-Javaのインストール" class="headerlink" title="1. Javaのインストール"></a>1. Javaのインストール</h4><p>エージェントノードは起動時にslave.jarを実行するためインストールしました。</p>
+<h4 id="2-AWS-CLIのインストール"><a href="#2-AWS-CLIのインストール" class="headerlink" title="2. AWS CLIのインストール"></a>2. AWS CLIのインストール</h4><p>AWS CLIコマンドでEBSをアタッチするためインストールしました。</p>
+<h4 id="3-ジョブ実行用ユーザ作成"><a href="#3-ジョブ実行用ユーザ作成" class="headerlink" title="3. ジョブ実行用ユーザ作成"></a>3. ジョブ実行用ユーザ作成</h4><p>デフォルトユーザ（例:AL2ならec2-user）が使えるため作成しなくても良いのですが、既存のエージェントノードでjenkinsという専用ユーザを用意していたため今回も踏襲して作成しました。</p>
+<h4 id="4-visudo編集"><a href="#4-visudo編集" class="headerlink" title="4. visudo編集"></a>4. visudo編集</h4><p>ジョブ実行ユーザがNOPASSWDでmountコマンドを実行できるようにするため設定しました。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jenkins    ALL=(ALL)       NOPASSWD: /usr/bin/mount</span><br></pre></td></tr></table></figure>
+
+<h2 id="Jenkins"><a href="#Jenkins" class="headerlink" title="Jenkins"></a>Jenkins</h2><h3 id="EC2-Pluginインストール"><a href="#EC2-Pluginインストール" class="headerlink" title="EC2 Pluginインストール"></a>EC2 Pluginインストール</h3><p>jenkinsにAmazon EC2 Pluginをインストールしておきます。</p>
+<h3 id="エージェントノードの起動設定"><a href="#エージェントノードの起動設定" class="headerlink" title="エージェントノードの起動設定"></a>エージェントノードの起動設定</h3><p>「Jenkinsの管理 → システムの設定」のクラウド項目で「Amazon EC2」を選択すると表示されます。<br>今回は意識して設定した項目を抜粋します。</p>
+<ul>
+<li><p><strong>AMI ID</strong></p>
+<ul>
+<li>上述の手順で作成したエージェント用のAMIを設定しました。</li>
+</ul>
+</li>
+<li><p><strong>Instance Type</strong></p>
+<ul>
+<li>エージェントを起動するインスタンスタイプを設定します。<br>今回は変更前と同タイプにしました。</li>
+</ul>
+</li>
+<li><p><strong>Use Spot Instance</strong></p>
+<ul>
+<li>スポットインスタンスで起動させるためチェックを入れました。</li>
+</ul>
+</li>
+<li><p><strong>Spot Max Bid Price</strong></p>
+<ul>
+<li>スポットインスタンス起動に許容できる最高価格を設定します。<br>今回はできるだけ中断のリスクを避けたかったためデフォルト（オンデマンドインスタンスの価格）としました。</li>
+</ul>
+</li>
+<li><p><strong>Security group names</strong></p>
+<ul>
+<li>エージェントノード用のセキュリティグループを設定しました。</li>
+</ul>
+</li>
+<li><p><strong>Remote FS root</strong></p>
+<ul>
+<li>エージェントノードのjenkins_homeとなるパスを設定します。<br>今回はアタッチするEBSを&#x2F;data配下にマウントするため、<code>/data/jenkins_home/</code>としました。</li>
+</ul>
+</li>
+<li><p><strong>Remote user</strong></p>
+<ul>
+<li>エージェントノードにログインするユーザを設定します。今回はjenkinsユーザとしました。</li>
+</ul>
+</li>
+<li><p><strong>Labels</strong></p>
+<ul>
+<li>一意なラベルを設定します。ここで指定したラベルを後述のジョブで設定します。</li>
+</ul>
+</li>
+<li><p><strong>Init script</strong></p>
+<ul>
+<li>EBSアタッチ処理を記載します。</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 初期化</span></span><br><span class="line">INSTANCE_ID=</span><br><span class="line">UUID=</span><br><span class="line"></span><br><span class="line"><span class="comment">## EBSアタッチ</span></span><br><span class="line">INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)</span><br><span class="line"><span class="keyword">if</span> [ -n <span class="variable">$&#123;INSTANCE_ID&#125;</span> ] ; <span class="keyword">then</span></span><br><span class="line">    aws ec2 attach-volume --volume-id &lt;ボリュームID&gt; --device /dev/sdb --instance-id <span class="variable">$&#123;INSTANCE_ID&#125;</span> --region ap-northeast-1</span><br><span class="line">    <span class="built_in">sleep</span> 10</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## /dataマウント</span></span><br><span class="line">UUID=$(lsblk -f | grep nvme1n1 | sed -e <span class="string">&#x27;s/ \+/ /g&#x27;</span> |<span class="built_in">cut</span> -f 3 -d <span class="string">&quot; &quot;</span>)</span><br><span class="line"><span class="keyword">if</span> [ -n <span class="variable">$&#123;UUID&#125;</span> ] ; <span class="keyword">then</span></span><br><span class="line">    sudo mount UUID=<span class="variable">$&#123;UUID&#125;</span> /data</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## マウント確認</span></span><br><span class="line"><span class="keyword">if</span> ! mountpoint /data; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></li>
+<li><p><strong>Number of Executors</strong></p>
+<ul>
+<li>ジョブの並列度を指定します。今回は変更前と同じとしています。</li>
+</ul>
+</li>
+<li><p><strong>IAM Instance Profile</strong></p>
+<ul>
+<li>エージェントノード用に作成したIAM Roleを設定しました。</li>
+</ul>
+</li>
+</ul>
+<h3 id="ジョブの設定"><a href="#ジョブの設定" class="headerlink" title="ジョブの設定"></a>ジョブの設定</h3><p>ジョブの設定 → 実行するノードを制限からさきほど設定したラベルを指定します。</p>
+<h2 id="動作確認"><a href="#動作確認" class="headerlink" title="動作確認"></a>動作確認</h2><p>スポットインスタンスがEBSアタッチされた状態でエージェントノードとして起動するかを確認します。<br>なお一部情報はマスクしています。</p>
+<ul>
+<li>まずログからスポットインスタンスが立ち上がることを確認します。<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">2 21, 2023 2:48:02 午後 情報 hudson.plugins.ec2.EC2Cloud<span class="variable">$1</span> call</span><br><span class="line">SlaveTemplate&#123;ami=<span class="string">&#x27;&lt;AMI ID&gt;&#x27;</span>, labels=<span class="string">&#x27;&lt;ラベル名&gt;&#x27;</span>&#125; Node EC2 (&lt;エージェントノード名&gt;) - &lt;インスタンス名&gt; (&lt;インスタンスID&gt;) moved to RUNNING state <span class="keyword">in</span> 5 seconds and is ready to be connected by Jenkins</span><br><span class="line">2 21, 2023 2:48:03 午後 情報 hudson.plugins.ec2.EC2RetentionStrategy start</span><br><span class="line">Start requested <span class="keyword">for</span> EC2 (&lt;エージェントノード名&gt;) - &lt;インスタンス名&gt; (&lt;インスタンスID&gt;)</span><br><span class="line">2 21, 2023 2:48:03 午後 情報 hudson.plugins.ec2.EC2Cloud <span class="built_in">log</span></span><br><span class="line">Launching instance: &lt;インスタンスID&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>立ち上がった段階ではルートボリュームのみ存在しています。<img src="/images/20230315a/2023-02-21_14h48_27.png" alt="2023-02-21_14h48_27.png" width="1200" height="325" loading="lazy"></li>
+<li>サーバ上でもルートボリューム（<code>/dev/nvme0n1p1</code>）のみであることが確認できます。<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[jenkins@&lt;インスタンス名&gt; ~]$ <span class="built_in">df</span> -h</span><br><span class="line">ファイルシス   サイズ  使用  残り 使用% マウント位置</span><br><span class="line">devtmpfs          16G     0   16G    0% /dev</span><br><span class="line">tmpfs             16G     0   16G    0% /dev/shm</span><br><span class="line">tmpfs             16G   17M   16G    1% /run</span><br><span class="line">tmpfs             16G     0   16G    0% /sys/fs/cgroup</span><br><span class="line">/dev/nvme0n1p1    30G   24G  6.1G   80% /</span><br><span class="line">tmpfs            3.1G     0  3.1G    0% /run/user/1101</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>SSH接続後、init scriptが実行されます。<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">2 21, 2023 2:48:18 午後 情報 hudson.plugins.ec2.EC2Cloud <span class="built_in">log</span></span><br><span class="line">Connected via SSH.</span><br><span class="line">2 21, 2023 2:48:18 午後 情報 hudson.plugins.ec2.EC2Cloud <span class="built_in">log</span></span><br><span class="line">Creating tmp directory (/tmp) <span class="keyword">if</span> it does not exist</span><br><span class="line">2 21, 2023 2:48:18 午後 情報 hudson.plugins.ec2.EC2Cloud <span class="built_in">log</span></span><br><span class="line">Executing init script</span><br></pre></td></tr></table></figure>
+<ul>
+<li>このタイミングで追加するEBSのアタッチを確認できます。<img src="/images/20230315a/2023-02-21_14h48_44.png" alt="2023-02-21_14h48_44.png" width="1200" height="355" loading="lazy"></li>
+<li>サーバ上でも追加したEBSがデバイス<code>/dev/nvme1n1</code>として<code>/data</code>にマウントされました。<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[jenkins@&lt;インスタンス名&gt; ~]$ <span class="built_in">df</span></span><br><span class="line">ファイルシス   1K-ブロック     使用   使用可 使用% マウント位置</span><br><span class="line">devtmpfs          16128016        0 16128016    0% /dev</span><br><span class="line">tmpfs             16152604        0 16152604    0% /dev/shm</span><br><span class="line">tmpfs             16152604    16940 16135664    1% /run</span><br><span class="line">tmpfs             16152604        0 16152604    0% /sys/fs/cgroup</span><br><span class="line">/dev/nvme0n1p1    31445996 25533000  5912996   82% /</span><br><span class="line">tmpfs              3230524        0  3230524    0% /run/user/1101</span><br><span class="line">tmpfs              3230524        0  3230524    0% /run/user/1301</span><br><span class="line">tmpfs              3230524        0  3230524    0% /run/user/0</span><br><span class="line">/dev/nvme1n1     104832000 62866356 41965644   60% /data</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>最後に<code>java  -jar /tmp/remoting.jar -workDir /data/jenkins_home/</code>が実行され、スポットインスタンスの起動を確認できました。<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">2 21, 2023 2:48:32 午後 情報 hudson.plugins.ec2.EC2Cloud <span class="built_in">log</span></span><br><span class="line">Copying remoting.jar to: /tmp</span><br><span class="line">2 21, 2023 2:48:32 午後 情報 hudson.plugins.ec2.EC2Cloud <span class="built_in">log</span></span><br><span class="line">Launching remoting agent (via SSH client process): ssh -o StrictHostKeyChecking=no -i /tmp/ec2_8484693589346546536.pem jenkins@&lt;エージェントノードIP&gt; -p 22  java  -jar /tmp/remoting.jar -workDir /data/jenkins_home/</span><br><span class="line">2 21, 2023 2:48:37 午後 情報 hudson.slaves.CommandLauncher launch</span><br><span class="line">agent launched <span class="keyword">for</span> EC2 (&lt;エージェントノード名&gt;) - &lt;インスタンス名&gt; (&lt;インスタンスID&gt;)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>Amazon EC2 Pluginはinit scriptで自由に構成を変えられるので、ベースとなるAMIが一つで済むのも強みだと思いました。</p>
+<p>また、今回は処理を直接init scriptに書きましたが、以下の方式にすれば処理内容をgitで管理することもできそうです。</p>
+<ol>
+<li>git管理している実行ファイルをgit clone</li>
+<li>git cloneした実行ファイルを呼び出す</li>
+</ol>
+<p>今回の検証を足掛かりにし、引き続き構成改善をしていこうと思います。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20230315a/&related=twitterapi%2Ctwitter&text=Jenkins%E3%81%AE%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E3%83%8E%E3%83%BC%E3%83%89%E3%82%92%E3%82%B9%E3%83%88%E3%83%AC%E3%83%BC%E3%82%B8%E3%82%92%E6%B0%B8%E7%B6%9A%E5%8C%96%E3%81%97%E3%81%AA%E3%81%8C%E3%82%89%E3%82%B9%E3%83%9D%E3%83%83%E3%83%88%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%81%A7%E9%81%8B%E7%94%A8%E3%81%99%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20230315a/&t=Jenkins%E3%81%AE%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E3%83%8E%E3%83%BC%E3%83%89%E3%82%92%E3%82%B9%E3%83%88%E3%83%AC%E3%83%BC%E3%82%B8%E3%82%92%E6%B0%B8%E7%B6%9A%E5%8C%96%E3%81%97%E3%81%AA%E3%81%8C%E3%82%89%E3%82%B9%E3%83%9D%E3%83%83%E3%83%88%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%81%A7%E9%81%8B%E7%94%A8%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20230315a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20230315a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2023.01.05</span><span class="snscount">&#9825;13</span><a href=/articles/20230105a/ title="この記事はフューチャー Advent Calendar 2022の14日目の記事です。PythonのWeb APIをLambdaにデプロイする方法について解説します。">Python Web APIをAWS Lambdaにデプロイ</a></li><li class="related-posts-item"><span>2022.10.20</span><span class="snscount">&#9825;32</span><a href=/articles/20221020a/ title="TIG DXユニットの真野です。タイトルに書いたままの内容の記事です。おそらくDynamoDB Streams について調べたことがある方の多くの人には自明な内容だと思います。サマリです。* DynamoDB Streamsの起動順序が保たれるのは 項目単位">DynamoDB Streamsは同一ハッシュキーでもソートキーが異なれば順序保証されない</a></li><li class="related-posts-item"><span>2022.08.10</span><span class="snscount">&#9825;8</span><a href=/articles/20220810a/ title="こんにちは！2021年入社、TIGメディアユニット所属の武田です。">【メディア業界】新聞社の編集業務とフューチャーの取組み</a></li><li class="related-posts-item"><span>2022.06.07</span><span class="snscount">&#9825;52</span><a href=/articles/20220607a/ title="失敗談をテーマにした連載の5本目です。AWS Lambdaで、予約済同時実行数を1に制限して使っていたときに、初期化処理と初期化タイミングの考慮不足により、はまったことがありました。本記事ではLambdaの初期化処理についておさらいした後、はまったケースの事例や原因、対応した方法を紹介します。">AWS Lambdaの初期化処理と初期化タイミングの考慮不足によるはまりどころ</a></li><li class="related-posts-item"><span>2022.06.06</span><span class="snscount">&#9825;15</span><a href=/articles/20220606a/ title="この記事ではクラウドインフラにはつきものの、インフラコストについての失敗談をご紹介します。ぜひご一読いただき、私の屍を乗り越えていく事で、悲劇の発生を未然に防いでいただければと思います。">RDSの自動再起動によるインフラコストの悲劇</a></li><li class="related-posts-item"><span>2022.05.16</span><span class="snscount">&#9825;35</span><a href=/articles/20220516a/ title="こんにちは。TIG DXチームの後藤です。2021年7月に新卒でフューチャーに入社しました。業務でAPIを通して数万～100万のデータのバッチ処理を行うLambdaの開発を行ったので、学びを共有したいと思います。　　">Lambda×Go並列処理で100万回APIを呼び出す</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%92%B0%E5%A2%83-x2F-%E6%A7%8B%E6%88%90"><span class="toc-text">環境&#x2F;構成</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E6%8F%90"><span class="toc-text">前提</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%B9%E3%83%9D%E3%83%83%E3%83%88%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%81%B8%E3%81%AE%E7%A7%BB%E8%A1%8C"><span class="toc-text">スポットインスタンスへの移行</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E3%81%AA%E3%83%A1%E3%83%AA%E3%83%83%E3%83%88"><span class="toc-text">主なメリット</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B2%BB%E7%94%A8%E5%89%8A%E6%B8%9B"><span class="toc-text">費用削減</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A7%8B%E6%88%90%E3%81%AE%E3%82%B7%E3%83%B3%E3%83%97%E3%83%AB%E5%8C%96"><span class="toc-text">構成のシンプル化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%AA%E3%82%BF%E3%82%A4%E3%82%A2%E3%83%A1%E3%83%B3%E3%83%88%E5%AF%BE%E5%BF%9C%E3%81%8C%E4%B8%8D%E8%A6%81"><span class="toc-text">リタイアメント対応が不要</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9F%E8%A3%85%E3%81%AE%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88"><span class="toc-text">実装のポイント</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#init-script%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">init scriptについて</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%B9%E3%83%9D%E3%83%83%E3%83%88%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%81%B8%E3%81%AE%E5%A4%89%E6%9B%B4"><span class="toc-text">スポットインスタンスへの変更</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#AWS"><span class="toc-text">AWS</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E3%83%8E%E3%83%BC%E3%83%89%E7%94%A8%E3%81%AEIAM-Role%E4%BD%9C%E6%88%90"><span class="toc-text">エージェントノード用のIAM Role作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E3%83%8E%E3%83%BC%E3%83%89%E7%94%A8%E3%81%AE%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3%E3%82%B0%E3%83%AB%E3%83%BC%E3%83%97%E4%BD%9C%E6%88%90"><span class="toc-text">エージェントノード用のセキュリティグループ作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E3%83%8E%E3%83%BC%E3%83%89%E7%94%A8%E3%81%AEAMI%E4%BD%9C%E6%88%90"><span class="toc-text">エージェントノード用のAMI作成</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-Java%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB"><span class="toc-text">1. Javaのインストール</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-AWS-CLI%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB"><span class="toc-text">2. AWS CLIのインストール</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E3%82%B8%E3%83%A7%E3%83%96%E5%AE%9F%E8%A1%8C%E7%94%A8%E3%83%A6%E3%83%BC%E3%82%B6%E4%BD%9C%E6%88%90"><span class="toc-text">3. ジョブ実行用ユーザ作成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-visudo%E7%B7%A8%E9%9B%86"><span class="toc-text">4. visudo編集</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jenkins"><span class="toc-text">Jenkins</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#EC2-Plugin%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB"><span class="toc-text">EC2 Pluginインストール</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%E3%83%8E%E3%83%BC%E3%83%89%E3%81%AE%E8%B5%B7%E5%8B%95%E8%A8%AD%E5%AE%9A"><span class="toc-text">エージェントノードの起動設定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%B8%E3%83%A7%E3%83%96%E3%81%AE%E8%A8%AD%E5%AE%9A"><span class="toc-text">ジョブの設定</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D"><span class="toc-text">動作確認</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (365)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (211)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (85)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (46)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (22)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (14)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (14)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (8)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
