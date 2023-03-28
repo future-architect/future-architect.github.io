@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>TerraCurl でProviderがサポートしていないリソースを作成する | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTerraformがv1.4のリリースおめでとうございます。Terraform連載2023 の2リソース目の記事です。 v1.4リリースとは関係ないですが、TerraCurlというツールが面白そうだったので触ってみました。TerraCurlは以下の2023.2.22 のHashiCorpさんのブログで紹介されています。  Writing Terraform for unsupporte">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TerraCurl でProviderがサポートしていないリソースを作成する | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20230328a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTerraformがv1.4のリリースおめでとうございます。Terraform連載2023 の2リソース目の記事です。 v1.4リリースとは関係ないですが、TerraCurlというツールが面白そうだったので触ってみました。TerraCurlは以下の2023.2.22 のHashiCorpさんのブログで紹介されています。  Writing Terraform for unsupporte">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20230328a/top.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230328a/kz_wk220322_02_MASK.jpg">
+<meta property="og:image" content="https://future-architect.github.io/images/20230328a/response.png">
+<meta property="article:published_time" content="2023-03-27T15:00:00.000Z">
+<meta property="article:modified_time" content="2023-03-28T02:30:52.307Z">
+<meta property="article:tag" content="Terraform">
+<meta property="article:tag" content="TerraCurl">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20230328a/top.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20230328a/">
+  <meta content="Terraform,TerraCurl" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">TerraCurl でProviderがサポートしていないリソースを作成する
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20230328a_TerraCurl_でProviderがサポートしていないリソースを作成する.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20230328a_TerraCurl_でProviderがサポートしていないリソースを作成する" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2023/" class="publish-date"><time datetime="2023-03-27T15:00:00.000Z" itemprop="datePublished">2023.03.28</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98" title="真野隼記さんの記事一覧へ" class="post-author">真野隼記</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Terraform/" title="Terraformタグの記事へ" class="tag-list-link">Terraform</a>
+  
+    
+    <a href="/tags/TerraCurl/" title="TerraCurlタグの記事へ" class="tag-list-link">TerraCurl</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20230328a/top.png" alt="" width="600" height="356" loading="lazy">
+
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>Terraformがv1.4のリリースおめでとうございます。<a href="/articles/20230327a/">Terraform連載2023</a> の2リソース目の記事です。</p>
+<p>v1.4リリースとは関係ないですが、<a target="_blank" rel="noopener" href="https://registry.terraform.io/providers/devops-rob/terracurl/latest/docs">TerraCurl</a>というツールが面白そうだったので触ってみました。TerraCurlは以下の2023.2.22 のHashiCorpさんのブログで紹介されています。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.hashicorp.com/blog/writing-terraform-for-unsupported-resources">Writing Terraform for unsupported resources - HashiCorp Blog</a></li>
+</ul>
+<p>リポジトリは<a target="_blank" rel="noopener" href="https://github.com/devops-rob/terraform-provider-terracurl">devops-rob&#x2F;terraform-provider-terracurl</a>です。</p>
+<h2 id="TerraCurlの使いどころ"><a href="#TerraCurlの使いどころ" class="headerlink" title="TerraCurlの使いどころ"></a>TerraCurlの使いどころ</h2><p>AWS、Google Cloud、Azureなど、日進月歩で新しいサービス、新機能が追加されています。例えば以下は <a target="_blank" rel="noopener" href="https://www.itmedia.co.jp/enterprise/articles/2103/08/news067.html">ITmediaさんのページ</a> から引用した、AWSの機能追加の推移ですがその勢いは加速しています。</p>
+<img src="/images/20230328a/kz_wk220322_02_MASK.jpg" alt="kz_wk220322_02_MASK.jpg" width="590" height="333" loading="lazy">
+
+<p>クラウドベンダー、SaaSサービス側の機能追加に合わせて、Terraform Provider側の開発が進むので、新しい機能を利用しようとしても、まだ対応していない、といった場面がまれに発生します。Provider側へPull Requestを出しOSSコントリビュートして推進に関与するというのがあるべきアプローチの1つだと思いますが、業務スケジュール上、できるだけ急ぎで対応したいということが多いでしょう。</p>
+<p>こういった場面で役立つのが今回紹介するTerraCurlです。</p>
+<h2 id="local-exec"><a href="#local-exec" class="headerlink" title="local-exec"></a>local-exec</h2><p>従来、Providerが対応していないとか、そもそもProviderが存在しないリソースを管理したい時、頼りにしていたのは <a target="_blank" rel="noopener" href="https://developer.hashicorp.com/terraform/language/resources/provisioners/local-exec#example-usage">local-exec</a> Provisioner でした。Provisionerというのは、Terraform側が用意した脱出ハッチのような仕組みで、任意のスクリプトをTerraformコマンド経由で呼び出せる機能です<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>。<a target="_blank" rel="noopener" href="https://developer.hashicorp.com/terraform/language/resources/provisioners/syntax#provisioners-are-a-last-resort">ドキュメント</a>にも a Last Resort（最終手段）と書いてある奥の手です。</p>
+<p>通常は <code>terraform apply</code>で呼ばれるスクリプトを定義できますが、 <code>when=destory</code> と合わせると <code>terraform destroy</code> に対応させることもできます。さらにがんばるなら <code>null_resource</code>の<code>triggers</code> で実行スクリプトなどのハッシュ値を管理しておくことで、実行スクリプトに更新をトリガーにすることもできます（もちろん、実行スクリプトは冪等に作る必要があります）。書き出してみると複雑に見えますが、大部分は <code>local-exec</code> で初期作成時に呼び出すスクリプトを作れば事足りることが多いため、こだわらず簡易的にリソースをTerraform管理下に置くときは、よく使われると思います。</p>
+<figure class="highlight sh"><figcaption><span>local-execイメージ</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;null_resource&quot;</span> <span class="string">&quot;my_custom_resource&quot;</span> &#123;</span><br><span class="line">  <span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line">  triggers = &#123;</span><br><span class="line">    my_custom_resource_id = <span class="string">&quot;<span class="variable">$&#123;sha256(file(&quot;my_custom_resource.sh&quot;))&#125;</span>&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  provisioner <span class="string">&quot;local-exec&quot;</span> &#123;</span><br><span class="line">    <span class="built_in">command</span> = <span class="string">&quot;./my_custom_resource.sh create&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  provisioner <span class="string">&quot;local-exec&quot;</span> &#123;</span><br><span class="line">    when    = destroy</span><br><span class="line">    <span class="built_in">command</span> = <span class="string">&quot;./my_custom_resource.sh destroy&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>私の観測上、よく見るやり方としては、<code>local-exec</code> で一時的にしのぎ（AWSであれば<code>awscli</code>をラップしたシェルスクリプトを用意して）、Providerが新機能の追加されたタイミングで <code>local-exec</code> から Providerが提供する機能に置き換えていくというものです。GUIや個別のスクリプトを用意する方法と違い、 <code>terraform apply</code> で書く環境にリリースできるため、CI&#x2F;CD定義もシンプルに、オペミスも減らせるということでした。</p>
+<p>今回紹介するTerraCurlも、上記で説明した脱出ハッチ的な <code>local-exec</code>の使い方と似たようなユースケースになります。ネイティブのProviderではサポートされていないけど、サービス側のAPIではサポートされている場合に利用します。Provider側ですでにリソース作成が提供されていればTerraCurlを使う必要はありません。</p>
+<h2 id="TerraCurlでAPI呼び出し"><a href="#TerraCurlでAPI呼び出し" class="headerlink" title="TerraCurlでAPI呼び出し"></a>TerraCurlでAPI呼び出し</h2><p><a target="_blank" rel="noopener" href="https://registry.terraform.io/providers/devops-rob/terracurl/latest/docs/resources/request">TerraCurlドキュメントのExcample</a> を元に、Qiita APIを用いてダミーの記事を作成しています。Qiita記事をTerraform管理する対象したいユースケースは皆無だと思います。TerraCurlを使うという1点のみが理由です。</p>
+<p>利用しているトークンは<a target="_blank" rel="noopener" href="https://qiita.com/settings/tokens/new">アクセストークンの発行</a>ページから取得します。<code>write_qiita</code> のスコープも必要です。</p>
+<p>取得したQiitaトークンは環境変数にセットして参照できるようにしておきます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> TF_VAR_qiita_token=xxxxxxxxxxxxxxx</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><figcaption><span>main.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">terraform &#123;</span><br><span class="line">  required_providers &#123;</span><br><span class="line">    terracurl = &#123;</span><br><span class="line">      <span class="built_in">source</span>  = <span class="string">&quot;devops-rob/terracurl&quot;</span></span><br><span class="line">      version = <span class="string">&quot;1.1.0&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">provider <span class="string">&quot;terracurl&quot;</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line">variable <span class="string">&quot;qiita_token&quot;</span> &#123;</span><br><span class="line">  <span class="built_in">type</span>      = string</span><br><span class="line">  sensitive = <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">&quot;terracurl_request&quot;</span> <span class="string">&quot;qiita_article&quot;</span> &#123;</span><br><span class="line">  name = <span class="string">&quot;qiita-article&quot;</span></span><br><span class="line"></span><br><span class="line">  url          = <span class="string">&quot;https://qiita.com/api/v2/items&quot;</span></span><br><span class="line">  method       = <span class="string">&quot;POST&quot;</span></span><br><span class="line">  request_body = &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">&#123;&quot;title&quot;:&quot;TerraCurl投稿テスト2023.3.27&quot;, &quot;body&quot;:&quot;# Example\nTerraCurlやってみた&quot;, &quot;private&quot;:true, &quot;tags&quot;:[&#123;&quot;name&quot;:&quot;TerraCurl&quot;&#125;]&#125;</span></span><br><span class="line"><span class="string">EOF</span></span><br><span class="line"></span><br><span class="line">  headers = &#123;</span><br><span class="line">    Authorization = <span class="string">&quot;Bearer <span class="variable">$&#123;var.qiita_token&#125;</span>&quot;</span></span><br><span class="line">    Content-Type  = <span class="string">&quot;application/json&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">  response_codes = [</span><br><span class="line">    201</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output <span class="string">&quot;qiita_article_response&quot;</span> &#123;</span><br><span class="line">  value = <span class="built_in">basename</span>(jsondecode(terracurl_request.qiita_article.response).url)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>実行すると最後に output の内容が表示されます。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">$ terraform apply</span><br><span class="line">2023-03-27T10:59:30.450+0900 [INFO]  Terraform version: 1.3.3</span><br><span class="line">2023-03-27T10:59:30.522+0900 [INFO]  Go runtime version: go1.19.1</span><br><span class="line">2023-03-27T10:59:30.527+0900 [INFO]  CLI args: []string&#123;<span class="string">&quot;terraform&quot;</span>, <span class="string">&quot;apply&quot;</span>&#125;</span><br><span class="line">(中略)</span><br><span class="line"></span><br><span class="line">Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:</span><br><span class="line">  + create</span><br><span class="line"></span><br><span class="line">Terraform will perform the following actions:</span><br><span class="line"></span><br><span class="line">  <span class="comment"># terracurl_request.qiita_article will be created</span></span><br><span class="line">  + resource <span class="string">&quot;terracurl_request&quot;</span> <span class="string">&quot;qiita_article&quot;</span> &#123;</span><br><span class="line">      + destroy_retry_interval = 10</span><br><span class="line">      + headers                = &#123;</span><br><span class="line">          + <span class="string">&quot;Authorization&quot;</span> = (sensitive)</span><br><span class="line">          + <span class="string">&quot;Content-Type&quot;</span>  = <span class="string">&quot;application/json&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">      + <span class="built_in">id</span>                     = (known after apply)</span><br><span class="line">      + method                 = <span class="string">&quot;POST&quot;</span></span><br><span class="line">      + name                   = <span class="string">&quot;qiita-article&quot;</span></span><br><span class="line">      + request_body           = jsonencode(</span><br><span class="line">            &#123;</span><br><span class="line">              + body    = &lt;&lt;-<span class="string">EOT</span></span><br><span class="line"><span class="string">                    # Example</span></span><br><span class="line"><span class="string">                    TerraCurlやってみた</span></span><br><span class="line"><span class="string">                EOT</span></span><br><span class="line">              + private = <span class="literal">true</span></span><br><span class="line">              + tags    = [</span><br><span class="line">                  + &#123;</span><br><span class="line">                      + name = <span class="string">&quot;TerraCurl&quot;</span></span><br><span class="line">                    &#125;,</span><br><span class="line">                ]</span><br><span class="line">              + title   = <span class="string">&quot;TerraCurl投稿テスト2023.3.27&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        )</span><br><span class="line">      + request_url_string     = (known after apply)</span><br><span class="line">      + response               = (known after apply)</span><br><span class="line">      + response_codes         = [</span><br><span class="line">          + <span class="string">&quot;201&quot;</span>,</span><br><span class="line">        ]</span><br><span class="line">      + retry_interval         = 10</span><br><span class="line">      + status_code            = (known after apply)</span><br><span class="line">      + url                    = <span class="string">&quot;https://qiita.com/api/v2/items&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">Plan: 1 to add, 0 to change, 0 to destroy.</span><br><span class="line"></span><br><span class="line">Changes to Outputs:</span><br><span class="line">  + qiita_article_response = (known after apply)</span><br><span class="line"></span><br><span class="line">Do you want to perform these actions?</span><br><span class="line">  Terraform will perform the actions described above.</span><br><span class="line">  Only <span class="string">&#x27;yes&#x27;</span> will be accepted to approve.</span><br><span class="line"></span><br><span class="line">  Enter a value: <span class="built_in">yes</span></span><br><span class="line"></span><br><span class="line">Apply complete! Resources: 1 added, 0 changed, 0 destroyed.</span><br><span class="line"></span><br><span class="line">Outputs:</span><br><span class="line"></span><br><span class="line">qiita_article_response = <span class="string">&quot;6410f22e585d0907005e&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>限定公開で記事を作成したのでブラウザで確認します。URLのIDが出力された値と一致していることがわかります。</p>
+<img src="/images/20230328a/response.png" alt="" width="1200" height="924" loading="lazy">
+
+<p>※URLまでキャプチャに載せていますが、テスト投稿した記事は削除済みです</p>
+<h2 id="Destoryする時どうするの？"><a href="#Destoryする時どうするの？" class="headerlink" title="Destoryする時どうするの？"></a>Destoryする時どうするの？</h2><p>Qiita APIの記事投稿に関して、IDは公開後に分かります（APIで指定すれば固定できるかも知れませんが）。そのため、以下のような <code>output</code> で取得した値を、<code>destory_url</code> に指定できると良いのですが、これは <code>terraform apply</code> に決定する値ですので、循環参照となり指定できません。このあたりはどうするか一工夫が必要そうです。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;terracurl_request&quot;</span> <span class="string">&quot;qiita_article&quot;</span> &#123;</span><br><span class="line">  <span class="comment"># 中略</span></span><br><span class="line"></span><br><span class="line">  destroy_url    = <span class="string">&quot;https://qiita.com/api/v2/items/<span class="variable">$&#123;output.qiita_article_response.value&#125;</span>&quot;</span> // ★これが使えたら良いが..</span><br><span class="line">  destroy_method = <span class="string">&quot;DELETE&quot;</span></span><br><span class="line">  destroy_headers = &#123;</span><br><span class="line">      Authorization = <span class="string">&quot;Bearer <span class="variable">$&#123;var.qiita_token&#125;</span>&quot;</span></span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="TerraCurl所感"><a href="#TerraCurl所感" class="headerlink" title="TerraCurl所感"></a>TerraCurl所感</h2><p>ドキュメントを見ると、相互TLS認証やリトライなど作り込みが良さそうな部分が見られ、フィットするのであれば非常に有用そうでした。</p>
+<p>一方で、ことAWSに関しては、 <code>awscli</code> が対応していない部分を探すのが難しく、<code>awscli</code> がサポートしているなら若干の移植性は下がるものの、 <code>local-exec</code> 経由で<code>awscli</code> を利用するほうが保守性が高まりそうだなと思いました。一方で、プラットフォーム側が意図的にサポートしない機能（ブログではVault Providerはあえて、クラスタのunsealコマンドをサポートしていないとある）の場合は、有用だなと思いました。</p>
+<p>また、前章のDestoryにも書きましたが作成時のレスポンスに含まれる値を保持したいときの取り扱いは面倒そうと思います。Createだけの限定された条件とか、Destory時のURLやパラメータが apply する前に分かるのであれば便利そうだという印象です。</p>
+<p>もし、上記に一致するような条件で、従来 <code>local-exec</code> で実行していたけど、内部的には <code>curl</code> コマンドだけだった場合には、 <code>tf</code> ファイルで完結するので素晴らしいツールだと思います。スクリプトを別途用意しなくてよいのは開発、保守的にも嬉しいと思います。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>TerraCurlを使ってみました。ツールの命名が素晴らしくcurlで済ませられるようなリソースに関してはシンデレラフィットしそうなProviderです。</p>
+<p>作成時のレスポンスの値を、Destory時などに使いまわしたい場合などは少し取り回しが難しそうなので、取り扱いに注意して導入したいと思います。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">他にも <code>file</code> や <code>remote-exec</code> のProvisionerがあります。過去にはChef、Habitat、Puppet、Salt Masterless のProvisionerがあったようですが、 Terraform v0.15.0で削除されたようです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20230328a/&related=twitterapi%2Ctwitter&text=TerraCurl%20%E3%81%A7Provider%E3%81%8C%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%E3%81%97%E3%81%A6%E3%81%84%E3%81%AA%E3%81%84%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20230328a/&t=TerraCurl%20%E3%81%A7Provider%E3%81%8C%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%E3%81%97%E3%81%A6%E3%81%84%E3%81%AA%E3%81%84%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20230328a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20230328a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2023.03.27</span><span class="snscount">&#9825;3</span><a href=/articles/20230327b/ title="Terraform 1.4.0のENHANCEMENTSで以下の機能が追加されました。backend/gcs: Add storage_custom_endpoint argument, to allow communication with the backend via a Private Service Connect endpoint. 内容はtfstateが保存されているGCSへのアクセスがインターネット経由ではなく..">Terraform 1.4 Update:Private Service Connectを利用したbackend/gcsへのアクセス<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.03.27</span><span class="snscount">&#9825;12</span><a href=/articles/20230327a/ title="Terraform連載のインデックス記事です。最近では当社も前提としてクラウドを利用する案件が増えてきました。その際に利用するツールとしては">Terraform連載2023を開始します<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.03.20</span><span class="snscount">&#9825;15</span><a href=/articles/20230320a/ title="桜のつぼみが芽吹く時期ですが、2022年の技術ブログ振り返りをお届けします。">数字と振り返るフューチャー技術ブログ（2022年）<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.03.14</span><span class="snscount">&#9825;6</span><a href=/articles/20230314a/ title="2023年に計画している、ブログ連載のスケジュールを紹介します。">2023年 フューチャー技術ブログ連載の企画スケジュール <span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.02.28</span><span class="snscount">&#9825;229</span><a href=/articles/20230228a/ title="今回取り上げる書籍は、多くのエンジニアが通過するであろう、リーダブルコード についてです。Terraformと絡めて書いていければと思います。私は、俗にいうプログラミング言語に対しては明るくない方なので、自分が理解できうるTerraformにおいて考えたらどうなるか、について地震の頭の整理、理解のためにも本記事を書いてみました。">「リーダブルコード」を読んでTerraformの可読性について考える<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.02.20</span><span class="snscount">&#9825;553</span><a href=/articles/20230220a/ title="単体テストの考え方/使い方を読みました。私が観測している範囲では非常に評判がよく、ソフトウェア設計品質全般に役立つといった声も聞こえてきます">単体テストの考え方/使い方 の感想文</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20230327a/ title="Terraform連載のインデックス記事です。最近では当社も前提としてクラウドを利用する案件が増えてきました。その際に利用するツールとしては">Terraform連載2023を開始します<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#TerraCurl%E3%81%AE%E4%BD%BF%E3%81%84%E3%81%A9%E3%81%93%E3%82%8D"><span class="toc-text">TerraCurlの使いどころ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#local-exec"><span class="toc-text">local-exec</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TerraCurl%E3%81%A7API%E5%91%BC%E3%81%B3%E5%87%BA%E3%81%97"><span class="toc-text">TerraCurlでAPI呼び出し</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Destory%E3%81%99%E3%82%8B%E6%99%82%E3%81%A9%E3%81%86%E3%81%99%E3%82%8B%E3%81%AE%EF%BC%9F"><span class="toc-text">Destoryする時どうするの？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TerraCurl%E6%89%80%E6%84%9F"><span class="toc-text">TerraCurl所感</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (367)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (215)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (85)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (46)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (31)</a></li>
+<li class=""><a href="/categories/DB/">DB (22)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (14)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (14)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Security/">Security (8)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://anchor.fm/futuretechcast/episodes/35-MLOps-e1qe4st" title="フューチャーがお届けするポッドキャストです。#35 MLOpsエンジニアって何やるの？（後編）" target="_blank" rel="noopener"> #35 MLOpsエンジニアって何やるの？（後編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/34-MLOps-e1polbj" title="フューチャーがお届けするポッドキャストです。#34 MLOpsエンジニアって何やるの？（前編）" target="_blank" rel="noopener"> #34 MLOpsエンジニアって何やるの？（前編）</a></li>
+<li><a href="https://anchor.fm/futuretechcast/episodes/33-IT-e1pcaon" title="フューチャーがお届けするポッドキャストです。#33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）" target="_blank" rel="noopener"> #33 ヘルスケアグループリーダーの中元さんと語る「医療業界におけるITコンサルとビジネスイノベーション」（後編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
