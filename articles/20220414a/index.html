@@ -47,11 +47,12 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20220414a/Enforcing_攻撃失敗確認.gif">
 <meta property="og:image" content="https://future-architect.github.io/images/20220414a/ES_KibanaAVCdenied_2022-03-29_153632.png">
 <meta property="article:published_time" content="2022-04-13T15:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-04T14:55:58.082Z">
+<meta property="article:modified_time" content="2023-04-19T02:29:29.225Z">
 <meta property="article:tag" content="Vuls">
 <meta property="article:tag" content="WordPress">
 <meta property="article:tag" content="脆弱性">
 <meta property="article:tag" content="FutureVuls">
+<meta property="article:tag" content="JVN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://future-architect.github.io/images/20220414a/攻撃仕組み4_2022-04-08_085527.png">
   
@@ -61,7 +62,7 @@
   <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
   <link rel="canonical" href="https://future-architect.github.io/articles/20220414a/">
-  <meta content="Vuls,WordPress,脆弱性,FutureVuls" name="keywords">
+  <meta content="Vuls,WordPress,脆弱性,FutureVuls,JVN" name="keywords">
   <meta content="八田奈子" name="author">
   <link rel="preload" as="image" href="/banner.jpg" />
   <link rel='manifest' href='/manifest.webmanifest'/>
@@ -125,6 +126,9 @@
     
     <a href="/tags/FutureVuls/" title="FutureVulsタグの記事へ" class="tag-list-link">FutureVuls</a>
   
+    
+    <a href="/tags/JVN/" title="JVNタグの記事へ" class="tag-list-link">JVN</a>
+  
 
 </li>
           </ul>
@@ -187,7 +191,9 @@
 <p>このように、非常に簡単にWordPressサーバ内のファイル配置や削除、変更が可能であることがわかります。<br>これを利用すれば、WordPress関連の設定ファイルの改ざんや悪意のあるスクリプトが記載されたファイルをアップロードするといった不正が行われてしまいます。</p>
 <h1 id="対策方法"><a href="#対策方法" class="headerlink" title="対策方法"></a>対策方法</h1><p>攻撃に対してどのように検知・防御できるかを検討しました。</p>
 <p>脆弱性に対する対策として、ソフトウェアのアップデートを行うことが最も効果的です。</p>
-<p>しかし、他のソフトウェアとの互換性がなくなってしまう、などの事情でアップデートできない場合も考えられます。そこで今回は、他に行うことができる対策として複数のセキュリティツールで対策を行う、多層防御を実施しました。<br><img src="/images/20220414a/対策図_2022-04-08_104452.png" alt="対策図_2022-04-08_104452" width="837" height="478" loading="lazy"></p>
+<p>しかし、他のソフトウェアとの互換性がなくなってしまう、などの事情でアップデートできない場合も考えられます。そこで今回は、他に行うことができる対策として複数のセキュリティツールで対策を行う、多層防御を実施しました。</p>
+<img src="/images/20220414a/対策図_2022-04-08_104452.png" alt="対策図_2022-04-08_104452" width="837" height="478" loading="lazy">
+
 <p>複数の層で対策をすることで、一か所の防御が破られても他のレイヤでカバーできセキュリティレベルが高まります。</p>
 <p>実際に行った対策は以下の通りです。</p>
 <ol>
@@ -202,7 +208,9 @@
 <p>Tripwireとはホスト型IDSで、あらかじめ作成したベースラインデータベースと現行システム上のファイル・ディレクトリの状態を照合（整合性チェック）することで、差分検知を行います。また、不正に改ざんされたり意図せず破損してしまったりした場合には元の状態に戻すこともできます。</p>
 <p>こちらを使って、実施した攻撃の一つのテストファイルの削除を検知しました。</p>
 <h3 id="検知の実施"><a href="#検知の実施" class="headerlink" title="検知の実施"></a>検知の実施</h3><p>差分検知には、監査対象および監査ルールを定義するポリシーファイルとベースラインデータベースの作成が必要です。まず、ポリシーファイルを作成します。<br>デフォルトのポリシーファイルの内容を今回の環境に最適化するため、ファイルを書き換えました。<br>新しいポリシーファイルを基にベースラインとなるデータベースを作成します。<br><code>tripwire -m i -s -c /etc/tripwire/tw.cfg</code></p>
-<p>データベースが作成できたら、攻撃クライアントから攻撃対象サーバ内のテストファイルを削除し、攻撃対象サーバで差分検知をします。<br><code>tripwire -m c -s -c /etc/tripwire/tw.cfg</code><br>レポートを見てみるとテストファイルがなくなっていることがわかります。<em>➀<br>また、Modifiedの欄にあるPHPファイルが攻撃クライアントから送られてきたものです。</em>➁（何度も攻撃しているのでModified欄に入っていますが、攻撃初回はAddedの欄に表示されると思います。）<br><img src="/images/20220414a/TWレポート_再_2022-04-01_102943_(4).png" alt="TWレポート_再" width="686" height="342" loading="lazy"></p>
+<p>データベースが作成できたら、攻撃クライアントから攻撃対象サーバ内のテストファイルを削除し、攻撃対象サーバで差分検知をします。<br><code>tripwire -m c -s -c /etc/tripwire/tw.cfg</code><br>レポートを見てみるとテストファイルがなくなっていることがわかります。<em>➀<br>また、Modifiedの欄にあるPHPファイルが攻撃クライアントから送られてきたものです。</em>➁（何度も攻撃しているのでModified欄に入っていますが、攻撃初回はAddedの欄に表示されると思います。）</p>
+<img src="/images/20220414a/TWレポート_再_2022-04-01_102943_(4).png" alt="TWレポート_再" width="686" height="342" loading="lazy">
+
 <p>今回は手動で差分検知を実施しましたが、cronで設定することで定期的な自動検知が可能となります。<br>また、ポリシーファイル内でEmailアドレスを設定すれば、ルール違反が発生した際に通知が送信されるので、更に管理が容易になり被害を抑える迅速な対応が可能となるでしょう。</p>
 <h2 id="2-脆弱性検知・管理"><a href="#2-脆弱性検知・管理" class="headerlink" title="2. 脆弱性検知・管理"></a>2. 脆弱性検知・管理</h2><p>日頃から自分が扱う環境に脆弱性が存在するか確認し、パッチを適用しておけば未然に被害を防ぐことができます。今回はFile Managerに潜む脆弱性の検知を行うためFutureVulsというサービスを使いました。</p>
 <p>FutureVulsとは、2016年にフューチャーの神戸氏が開発・公開し世界的に話題になった脆弱性検知ツールOSS Vulsの商用版です。<br>OSS Vulsは管理下のシステムに入っているOSパッケージやライブラリなどのソフトウェア情報を収集し、公開されている脆弱性データベースの情報と関連付け、自システムに内在する脆弱性情報のみをメールやSlack等で関係者に通知できます。OSS Vulsの導入により脆弱性管理を効率化できます。<br>また、商用版のFutureVulsは、スキャン結果をグラフィカルに表示するダッシュボード機能、検知した脆弱性を漏れなく管理できるチケット管理機能、複数の事業部での脆弱性管理が可能なグループ横断管理機能など、OSS Vulsと比較するとより運用・管理を意識した機能が充実しています。</p>
@@ -227,26 +235,38 @@
 <li>セキュリティログ監視</li>
 </ul>
 <p>本サービスは、エージェントを対象サーバに導入することで利用でき、ポータルサイトで結果を一括で管理できます。<br>また、脆弱性検知と管理を行うFutureVulsと連携が可能となっており、FutureVulsで検知した脆弱性情報をもとに関連する侵入防御ポリシーを適用することができます。</p>
-<h3 id="防御の実施"><a href="#防御の実施" class="headerlink" title="防御の実施"></a>防御の実施</h3><p>まず、攻撃対象サーバ上でCloud Oneのエージェント（ds_agent）のステータスがactiveになっていることを確認します。その後、攻撃クライアントから攻撃を仕掛けると、エラーが出て攻撃対象サーバに接続することができません。<br><img src="/images/20220414a/WS_攻撃失敗_2022-03-25_140743.png" alt="WS_攻撃失敗" width="1200" height="520" loading="lazy"></p>
-<p>Workload Securityのポータルサイトの侵入防御イベントを見てみると、不正なアクセスが検知されブロックしたことが確認できました。<em>➀　イベントを選択し関連する情報を見てみると、CVE-2020-25213の脆弱性を理由に侵入防御されていることがわかります。</em>➁<br><img src="/images/20220414a/WS_侵入防御イベント_2022-04-01_121633.png" alt="WS_侵入防御イベント" width="1200" height="633" loading="lazy"></p>
-<h2 id="4-アクセス制御"><a href="#4-アクセス制御" class="headerlink" title="4. アクセス制御"></a>4. アクセス制御</h2><p>次に、アクセス制御です。<br>今回の検証では、攻撃クライアントで入力したコマンドが対象サーバ&#x2F;var&#x2F;www&#x2F;html下のファイルやディレクトリに対して実行されてしまう、というものでした。幸いなことに、Linuxにはリソースへのアクセスが指定された条件通りかどうかを監視・制御するSELinuxという仕組みが存在するため、こちらを使用してアクセス制御を行ってみました。</p>
+<h3 id="防御の実施"><a href="#防御の実施" class="headerlink" title="防御の実施"></a>防御の実施</h3><p>まず、攻撃対象サーバ上でCloud Oneのエージェント（ds_agent）のステータスがactiveになっていることを確認します。その後、攻撃クライアントから攻撃を仕掛けると、エラーが出て攻撃対象サーバに接続することができません。</p>
+<img src="/images/20220414a/WS_攻撃失敗_2022-03-25_140743.png" alt="WS_攻撃失敗" width="1200" height="520" loading="lazy">
+
+<p>Workload Securityのポータルサイトの侵入防御イベントを見てみると、不正なアクセスが検知されブロックしたことが確認できました。<em>➀　イベントを選択し関連する情報を見てみると、CVE-2020-25213の脆弱性を理由に侵入防御されていることがわかります。</em>➁</p>
+<img src="/images/20220414a/WS_侵入防御イベント_2022-04-01_121633.png" alt="WS_侵入防御イベント" width="1200" height="633" loading="lazy">
+
+<h2 id="4-アクセス制御"><a href="#4-アクセス制御" class="headerlink" title="4. アクセス制御"></a>4. アクセス制御</h2><p>次に、アクセス制御です。</p>
+<p>今回の検証では、攻撃クライアントで入力したコマンドが対象サーバ&#x2F;var&#x2F;www&#x2F;html下のファイルやディレクトリに対して実行されてしまう、というものでした。幸いなことに、Linuxにはリソースへのアクセスが指定された条件通りかどうかを監視・制御するSELinuxという仕組みが存在するため、こちらを使用してアクセス制御を行ってみました。</p>
 <p>SELinuxにはaudit logへのログ記録のみが行えるPermissiveモードと、ログの記録に加えて不正アクセスをブロックするEnforcingモードがあります。ログに関しては次章で触れるので、ここではEnforcingモードでブロックをしてみたいと思います。</p>
 <h3 id="検知・防御の実施"><a href="#検知・防御の実施" class="headerlink" title="検知・防御の実施"></a>検知・防御の実施</h3><p>まず、現在設定されているモードを<code>getenforce</code>コマンドで確認し、Permissiveであれば<code>setenforce 1</code>でEnforcingモードに切り替えます。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# setenforce 1</span><br><span class="line">[root@localhost ~]# getenforce</span><br><span class="line">Enforcing</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># setenforce 1</span></span><br><span class="line">[root@localhost ~]<span class="comment"># getenforce</span></span><br><span class="line">Enforcing</span><br></pre></td></tr></table></figure>
+
 <p>これで準備ができたので、攻撃をしていきます。<br><img src="/images/20220414a/Enforcing_攻撃失敗確認.gif" alt="Enforcing_攻撃失敗確認" width="959" height="987" loading="lazy"><br>ファイルが削除されていないことが確認できました。<br>SELinuxのEnforcingモードを使うことによって、リモートからのコマンドを防御することができました。</p>
-<h2 id="5-ログの監視"><a href="#5-ログの監視" class="headerlink" title="5. ログの監視"></a>5. ログの監視</h2><p>前章ではSELinuxのEnforcingモードでルール違反のアクセスブロックを行いました。しかし、実際にはEnforcingモードを有効にすると正常なアクセスも拒否されることを懸念しPermissiveモードに留め、ログ記録のみ行っている環境も多いかと思います。ということで今回は、Permissiveモードで取得したログを攻撃防御に役立てるために、Elasticsearchというサービスを使用してログの集約・検索をしてみました。<br>出力されたログの監視を行うことで攻撃の早期発見・対応に繋げられ、結果的に被害の拡大を防ぐことができるでしょう。<br>Elasticsearchとは拡張性に優れた全文検索エンジンのことです。他Elastic製品と組み合わせることで、取得したログを集約、検索、分析、検知、アラート、通知、レポートなどに活用することができます。<br>Elasticsearchに関する用語の説明やインストール方法はこちらの記事で詳しく解説されています。</p>
+<h2 id="5-ログの監視"><a href="#5-ログの監視" class="headerlink" title="5. ログの監視"></a>5. ログの監視</h2><p>前章ではSELinuxのEnforcingモードでルール違反のアクセスブロックを行いました。しかし、実際にはEnforcingモードを有効にすると正常なアクセスも拒否されることを懸念しPermissiveモードに留め、ログ記録のみ行っている環境も多いかと思います。ということで今回は、Permissiveモードで取得したログを攻撃防御に役立てるために、Elasticsearchというサービスを使用してログの集約・検索をしてみました。</p>
+<p>出力されたログの監視を行うことで攻撃の早期発見・対応に繋げられ、結果的に被害の拡大を防ぐことができるでしょう。</p>
+<p>Elasticsearchとは拡張性に優れた全文検索エンジンのことです。他Elastic製品と組み合わせることで、取得したログを集約、検索、分析、検知、アラート、通知、レポートなどに活用することができます。<br>Elasticsearchに関する用語の説明やインストール方法はこちらの記事で詳しく解説されています。</p>
 <p><a href="https://future-architect.github.io/articles/20200623/">https://future-architect.github.io/articles/20200623/</a></p>
 <p>今回は検索を行うElasticsearch、データをグラフィカルに可視化するKibana、特定のログを収集するFilebeat Moduleを使用しaudit logおよびApacheのエラーログの確認を行いました。</p>
 <h3 id="検知・防御の実施-1"><a href="#検知・防御の実施-1" class="headerlink" title="検知・防御の実施"></a>検知・防御の実施</h3><p><code>setenforce 0</code> でSELinuxをPermissiveモードにしアクセス可否のログが記録されるようにしておきます。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# setenforce 0</span><br><span class="line">[root@localhost ~]# getenforce</span><br><span class="line">Permissive</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># setenforce 0</span></span><br><span class="line">[root@localhost ~]<span class="comment"># getenforce</span></span><br><span class="line">Permissive</span><br></pre></td></tr></table></figure>
 
 <p>攻撃クライアントから攻撃をし、テストファイルが削除されていることを確認後、ブラウザからKibanaへアクセスします。<br>Analytics → Dashboardと進み、検索から[Filebeat Auditd]Audit Events ECSのタイトルを選択します。</p>
 <p>SELinuxによるアクセス制御の動作はAVC(Access-Vector-Cache)というフィールドを見れば確認できます。<br>avcがdeniedとなっており、アクセス拒否のログが出力されたことがわかります。Permissiveなので実際にアクセスはブロックされずテストファイルは削除されています。<br><img src="/images/20220414a/ES_KibanaAVCdenied_2022-03-29_153632.png" alt="ES_KibanaAVCdenied" width="1200" height="609" loading="lazy"></p>
-<p>ちなみにEnforcingモードの場合は実際にアクセスをブロックするため、audit logに加えApacheのエラーログも出力されます。<br>Analytics → Dashboardより確認してみると、Apacheのエラーが出ていることがわかります。<br><img src="/images/20220414a/ES_Apacheerrorlogcheck_2022-03-30_114834.png" alt="ES_Apacheerrorlogcheck" width="1200" height="570" loading="lazy"></p>
+<p>ちなみにEnforcingモードの場合は実際にアクセスをブロックするため、audit logに加えApacheのエラーログも出力されます。<br>Analytics → Dashboardより確認してみると、Apacheのエラーが出ていることがわかります。</p>
+<img src="/images/20220414a/ES_Apacheerrorlogcheck_2022-03-30_114834.png" alt="ES_Apacheerrorlogcheck" width="1200" height="570" loading="lazy">
+
 <p>このように、Elasticsearch、Kibana、Filebeat Moduleを導入することによって、確認したいログをダッシュボードで視覚的に表示することができます。</p>
-<p>今回はKibanaでのログ確認のみを実施しましたが、章の冒頭で述べたようにPermissiveの設定の場合、不正な挙動の早期発見・対応を行うにはログを監視する必要があります。そこでおすすめなのが、X-Packという拡張機能です。<br>X-Packはアラート、モニタリング、レポートなどの機能を含むパッケージで、不正行為をリアルタイムに検知しアラート・通知させることができます。<br>例えば、今回収集した「audit logのavcの値がdeniedだった場合」「Apacheのエラーログが検出された場合」に「アラート・通知する」と設定しておけばすぐに攻撃に気づくことができるでしょう。</p>
+<p>今回はKibanaでのログ確認のみを実施しましたが、章の冒頭で述べたようにPermissiveの設定の場合、不正な挙動の早期発見・対応を行うにはログを監視する必要があります。そこでおすすめなのが、X-Packという拡張機能です。</p>
+<p>X-Packはアラート、モニタリング、レポートなどの機能を含むパッケージで、不正行為をリアルタイムに検知しアラート・通知させることができます。<br>例えば、今回収集した「audit logのavcの値がdeniedだった場合」「Apacheのエラーログが検出された場合」に「アラート・通知する」と設定しておけばすぐに攻撃に気づくことができるでしょう。</p>
 <h1 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h1><p>本記事では、WordPressプラグインの脆弱性への攻撃～対策を実施・解説しました。</p>
-<p>上記で示したように、アップデートができない場合でも、複数のツール・サービスを組み合わせて多層防御を行うことでより堅牢なセキュリティ対策が行えるため攻撃被害を軽減する可能性が高まります。例えば、ゼロデイ攻撃を受けた場合、Workload Securityでは未対応のため侵入防御できないことがありますが、ファイルの変更監視を行うTripwireを併せて使っていればゼロデイ攻撃への対応有無に関係なく検知ができ、不正ファイルの削除するなどの対応に繋げられます。<br>このように、一か所の対策が破られても他のものでカバーでき、甚大な被害を避けられる可能性が高まるため、異なる特徴をもつ対策を併用することをおすすめします。</p>
+<p>上記で示したように、アップデートができない場合でも、複数のツール・サービスを組み合わせて多層防御を行うことでより堅牢なセキュリティ対策が行えるため攻撃被害を軽減する可能性が高まります。例えば、ゼロデイ攻撃を受けた場合、Workload Securityでは未対応のため侵入防御できないことがありますが、ファイルの変更監視を行うTripwireを併せて使っていればゼロデイ攻撃への対応有無に関係なく検知ができ、不正ファイルの削除するなどの対応に繋げられます。</p>
+<p>このように、一か所の対策が破られても他のものでカバーでき、甚大な被害を避けられる可能性が高まるため、異なる特徴をもつ対策を併用することをおすすめします。</p>
 <p>また、有識者の方々に半年間根気強くサポートしていただけたおかげで、「Linuxって何？」なレベルから、仮想サーバ構築～セキュリティ対策までできるレベルに成長することができました。この記事で、「フューチャーにはチャレンジする者を応援する環境が整っている」ということが伝わっていれば幸いです。</p>
 <p>最後までお付き合い頂きありがとうございました！</p>
 
@@ -291,7 +311,7 @@
               <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
               
   <div class="widget">
-    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.12.23</span><span class="snscount">&#9825;16</span><a href=/articles/20221223a/ title="セキュリティに対して、きちんとお金をかけて対応すべきである、というのが近年の風潮です。そんな中、システム開発では多くのオープンソースのコンポーネントを組み合わせてシステムを構築するようになってきたため、使っている部品の脆弱性管理、というのがかなり大きな市場になってきました。当社にはOSSのVulsが有名ですね。">俺のシステムがこんなに脆弱性だらけのわけがない(linkedpackageの紹介)</a></li><li class="related-posts-item"><span>2021.06.09</span><span class="snscount">&#9825;44</span><a href=/articles/20210609a/ title="はじめまして、中岡と申します。現在はフューチャー発OSSのVuls開発をメインに、CSIGでアルバイトをしています。- ORMを触るときは発行されるクエリが意図したものか確認する">Vuls開発中に出会ったGORMあれこれ</a></li><li class="related-posts-item"><span>2020.10.27</span><span class="snscount">&#9825;2</span><a href=/articles/20201027/ title="私の所属するCSIGは、セキュリティ関連のコンサルティングや実装などを行っています。また、セキュリティスキャナである Vuls やその商用版であるFutureVulsを開発/運営しています。今回、「秋の読書週間として、読み物成分の多い記事を」という事なので、BlackHatなどでも取り上げられたVulsについて書こうと思います。">Vulsの歴史</a></li><li class="related-posts-item"><span>2017.03.27</span><span class="snscount">&#9825;16</span><a href=/articles/20170327/ title="2017/3/10〜11の2日間、オープンソースの祭典「オープンソースカンファレンス2017 Tokyo/Spring」にフューチャーアーキテクト有志で登壇＆ブース出展をしてきました。">オープンソースカンファレンス2017 Tokyo/Spring登壇＆ブース出展レポート</a></li><li class="related-posts-item"><span>2016.07.19</span><span class="snscount">&#9825;6</span><a href=/articles/20160719/ title="めんそーれ！！！インターネット系カンファレンスで日本最大規模であるJANOG38にて、ちまたで話題沸騰中のLinux/FreeBSD脆弱性スキャナVulsの発表を行いました。作者の神戸です。">JANOG38にてVulsの発表を行いました</a></li></ul>
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2023.04.19</span><span class="snscount">&#9825;0</span><a href=/articles/20230419a/ title="初めて脆弱性対応をする方に向けた記事を書いてみようと思います。この時期になると、部門移動等で情報システム部に移動し「何をやっていいのか分からない…」という話も時々聞きます。">初めてのセキュリティ情報収集（mjckeck4）<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2022.12.23</span><span class="snscount">&#9825;16</span><a href=/articles/20221223a/ title="セキュリティに対して、きちんとお金をかけて対応すべきである、というのが近年の風潮です。そんな中、システム開発では多くのオープンソースのコンポーネントを組み合わせてシステムを構築するようになってきたため、使っている部品の脆弱性管理、というのがかなり大きな市場になってきました。当社にはOSSのVulsが有名ですね。">俺のシステムがこんなに脆弱性だらけのわけがない(linkedpackageの紹介)</a></li><li class="related-posts-item"><span>2021.06.09</span><span class="snscount">&#9825;44</span><a href=/articles/20210609a/ title="はじめまして、中岡と申します。現在はフューチャー発OSSのVuls開発をメインに、CSIGでアルバイトをしています。- ORMを触るときは発行されるクエリが意図したものか確認する">Vuls開発中に出会ったGORMあれこれ</a></li><li class="related-posts-item"><span>2020.10.27</span><span class="snscount">&#9825;2</span><a href=/articles/20201027/ title="私の所属するCSIGは、セキュリティ関連のコンサルティングや実装などを行っています。また、セキュリティスキャナである Vuls やその商用版であるFutureVulsを開発/運営しています。今回、「秋の読書週間として、読み物成分の多い記事を」という事なので、BlackHatなどでも取り上げられたVulsについて書こうと思います。">Vulsの歴史</a></li><li class="related-posts-item"><span>2017.03.27</span><span class="snscount">&#9825;16</span><a href=/articles/20170327/ title="2017/3/10〜11の2日間、オープンソースの祭典「オープンソースカンファレンス2017 Tokyo/Spring」にフューチャーアーキテクト有志で登壇＆ブース出展をしてきました。">オープンソースカンファレンス2017 Tokyo/Spring登壇＆ブース出展レポート</a></li><li class="related-posts-item"><span>2016.07.19</span><span class="snscount">&#9825;6</span><a href=/articles/20160719/ title="めんそーれ！！！インターネット系カンファレンスで日本最大規模であるJANOG38にて、ちまたで話題沸騰中のLinux/FreeBSD脆弱性スキャナVulsの発表を行いました。作者の神戸です。">JANOG38にてVulsの発表を行いました</a></li></ul>
   </div>
             </section>
             <section class="reference-post margin-bottom-40 nav">
@@ -328,7 +348,7 @@
 <li class=""><a href="/categories/Management/">Management (14)</a></li>
 <li class=""><a href="/categories/VR/">VR (12)</a></li>
 <li class=""><a href="/categories/Design/">Design (11)</a></li>
-<li class=""><a href="/categories/Security/">Security (9)</a></li>
+<li class=""><a href="/categories/Security/">Security (10)</a></li>
 
   </ul>
 </div>
