@@ -29,16 +29,16 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   
-  <meta name="description" content="サービス間通信とIDL（インタフェース記述言語）連載の2日目のエントリーです。 本当はGraphQLネイティブなデータベースの紹介をしようとしたのですが、紹介しようとしていたものがまだベータでクライアントライブラリが公開されていない（空っぽのリポジトリしかない）みたいな感じで試せなかったので、急遽2022&#x2F;6&#x2F;1に公開されたばかりのgRPC関連のライブラリのConnect">
+  <meta name="description" content="サービス間通信とIDL（インタフェース記述言語）連載の2日目のエントリーです。 本当はGraphQLネイティブなデータベースの紹介をしようとしたのですが、紹介しようとしていたものがまだベータでクライアントライブラリが公開されていない（空っぽのリポジトリしかない）みたいな感じで試せなかったので、急遽2022&#x2F;6&#x2F;1に公開されたばかりのgRPC関連のライブラリのConnectを紹介することにしま">
 <meta property="og:type" content="article">
 <meta property="og:title" content="gRPCのGo実装の新星、Connect | フューチャー技術ブログ">
 <meta property="og:url" content="https://future-architect.github.io/articles/20220623a/index.html">
 <meta property="og:site_name" content="フューチャー技術ブログ">
-<meta property="og:description" content="サービス間通信とIDL（インタフェース記述言語）連載の2日目のエントリーです。 本当はGraphQLネイティブなデータベースの紹介をしようとしたのですが、紹介しようとしていたものがまだベータでクライアントライブラリが公開されていない（空っぽのリポジトリしかない）みたいな感じで試せなかったので、急遽2022&#x2F;6&#x2F;1に公開されたばかりのgRPC関連のライブラリのConnect">
+<meta property="og:description" content="サービス間通信とIDL（インタフェース記述言語）連載の2日目のエントリーです。 本当はGraphQLネイティブなデータベースの紹介をしようとしたのですが、紹介しようとしていたものがまだベータでクライアントライブラリが公開されていない（空っぽのリポジトリしかない）みたいな感じで試せなかったので、急遽2022&#x2F;6&#x2F;1に公開されたばかりのgRPC関連のライブラリのConnectを紹介することにしま">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20220623a/スクリーンショット_2022-06-22_21.04.jpg">
 <meta property="article:published_time" content="2022-06-22T15:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-04T14:55:58.162Z">
+<meta property="article:modified_time" content="2022-06-25T14:06:01.738Z">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="IDL">
 <meta property="article:tag" content="gRPC">
@@ -127,7 +127,7 @@
 
 
 <p><a href="/articles/20220622a/">サービス間通信とIDL（インタフェース記述言語）連載</a>の2日目のエントリーです。</p>
-<p>本当はGraphQLネイティブなデータベースの紹介をしようとしたのですが、紹介しようとしていたものがまだベータでクライアントライブラリが公開されていない（空っぽのリポジトリしかない）みたいな感じで試せなかったので、急遽2022&#x2F;6&#x2F;1に公開されたばかりのgRPC関連のライブラリの<a target="_blank" rel="noopener" href="https://connect.build/docs/introduction">Connect</a>を紹介することにしました。</p>
+<p>本当はGraphQLネイティブなデータベースの紹介をしようとしたのですが、紹介しようとしていたものがまだベータでクライアントライブラリが公開されていない（空っぽのリポジトリしかない）みたいな感じで試せなかったので、急遽2022/6/1に公開されたばかりのgRPC関連のライブラリの<a target="_blank" rel="noopener" href="https://connect.build/docs/introduction">Connect</a>を紹介することにしました。</p>
 <p>Connectの開発元が公開したブログは次のサイトにあります。</p>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://buf.build/blog/connect-a-better-grpc">Buf | Connect: A better gRPC</a></li>
@@ -143,15 +143,15 @@
 <p>Connectとは何者かというと、現時点では純正のgRPCのGoコードの別実装ということになります。あえて作ったのは既存の実装にいろいろ不満があるからということです。</p>
 <ul>
 <li>コメントを除いて100以上のパッケージで合計13万行ででかすぎる</li>
-<li>Go標準ではなく独自実装のHTTP&#x2F;2実装を使っていて、Goの標準的なミドルウェアなどが使えない</li>
+<li>Go標準ではなく独自実装のHTTP/2実装を使っていて、Goの標準的なミドルウェアなどが使えない</li>
 <li>ウェブから使うにはプロキシが必要</li>
 <li>デバッグ大変</li>
 <li>セマンティックバージョニングを使ってない</li>
 </ul>
-<p>Connectはこれに対して次のような特徴を備えたGoのgRPCサーバー&#x2F;クライアントフレームワークとなっています。</p>
+<p>Connectはこれに対して次のような特徴を備えたGoのgRPCサーバー/クライアントフレームワークとなっています。</p>
 <ul>
 <li>数千行のコードで、基本的なところは１パッケージにまとまっている。生成されたコードも少ない</li>
-<li>net&#x2F;httpのサーバー、クライアントともに、<code>http.Handler</code>、<code>http.Client</code>を利用しているため、サードパーティのライブラリを駆使しやすい</li>
+<li>net/httpのサーバー、クライアントともに、<code>http.Handler</code>、<code>http.Client</code>を利用しているため、サードパーティのライブラリを駆使しやすい</li>
 <li>gRPC、gRPC-Web、およびConnect独自のプロトコルの3つを最初からサポートしたサーバー、クライアントが作れる。プロキシは不要。Connect独自のプロトコルはREST APIになっていてcurlで簡単にテスト可能。もちろんgrpcurlも可能。</li>
 <li>1.0が出たらセマンティックバージョニングに準拠して後方互換性をきちんと守っていく宣言。</li>
 </ul>
@@ -173,7 +173,7 @@
 <p>で、このハンドラの枠組みに魂（実装）を込めて、ついでにサーバーまで起動してしまおうという欲張りなコードが次のコードです。サーバー実装はシンプルだし、<code>net/http</code>でHTTPサーバーを実装するのとコードの構造が大きく変わらないところが気に入りました。</p>
 <figure class="highlight go"><figcaption><span>/cmd/server/main.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;net/http&quot;</span></span><br><span class="line"></span><br><span class="line">	greetv1 <span class="string">&quot;connecttest/gen/greet/v1&quot;</span></span><br><span class="line">	<span class="string">&quot;connecttest/gen/greet/v1/greetv1connect&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/bufbuild/connect-go&quot;</span></span><br><span class="line">	<span class="string">&quot;golang.org/x/net/http2&quot;</span></span><br><span class="line">	<span class="string">&quot;golang.org/x/net/http2/h2c&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> GreetServer <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *GreetServer)</span></span> Greet(</span><br><span class="line">	ctx context.Context,</span><br><span class="line">	req *connect.Request[greetv1.GreetRequest],</span><br><span class="line">) (*connect.Response[greetv1.GreetResponse], <span class="type">error</span>) &#123;</span><br><span class="line">	log.Println(<span class="string">&quot;Request headers: &quot;</span>, req.Header())</span><br><span class="line">	res := connect.NewResponse(&amp;greetv1.GreetResponse&#123;</span><br><span class="line">		Greeting: fmt.Sprintf(<span class="string">&quot;Hello, %s!&quot;</span>, req.Msg.Name),</span><br><span class="line">	&#125;)</span><br><span class="line">	res.Header().Set(<span class="string">&quot;Greet-Version&quot;</span>, <span class="string">&quot;v1&quot;</span>)</span><br><span class="line">	<span class="keyword">return</span> res, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	greeter := &amp;GreetServer&#123;&#125;</span><br><span class="line">	mux := http.NewServeMux()</span><br><span class="line">	path, handler := greetv1connect.NewGreetServiceHandler(greeter)</span><br><span class="line">	mux.Handle(path, handler)</span><br><span class="line">	http.ListenAndServe(</span><br><span class="line">		<span class="string">&quot;localhost:8080&quot;</span>,</span><br><span class="line">		h2c.NewHandler(mux, &amp;http2.Server&#123;&#125;),</span><br><span class="line">	)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>なお、このサーバーではh2cを使ってラップしていますが、これはTLSを使わないHTTP&#x2F;2を実現するために使っているとのことです。それを除くと、ハンドラだけじゃなくてサーバー周辺もnet&#x2F;httpのお作法に従っていて好感が持てます。</p>
+<p>なお、このサーバーではh2cを使ってラップしていますが、これはTLSを使わないHTTP/2を実現するために使っているとのことです。それを除くと、ハンドラだけじゃなくてサーバー周辺もnet/httpのお作法に従っていて好感が持てます。</p>
 <h1 id="それ以外の機能"><a href="#それ以外の機能" class="headerlink" title="それ以外の機能"></a>それ以外の機能</h1><p>ドキュメントによると、<a target="_blank" rel="noopener" href="https://connect.build/docs/go/serialization-and-compression">独自シリアライズとか圧縮機能</a>であったりとか、gRPCの特徴である<a target="_blank" rel="noopener" href="https://connect.build/docs/go/interceptors">インターセプター</a>とか、<a target="_blank" rel="noopener" href="https://connect.build/docs/go/streaming">ストリーミング</a>とか、いろいろな機能が提供されています。結構作り込んだgRPCのサービスであっても、Connectへの置き換えもいける気がします。</p>
 <h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>gRPCはずっと使いたいと思ってちょくちょく学んでいたものの、前述のように生成されるコードの量が多くて実践投入はしてきませんでした。ですが、ConnectベースならOpenAPI（結局コードジェネレータをいじり始めたりおおごとになりがち）よりもいいのでは？と思ったり。また、JSONで簡単にアクセスできるなら、フロントは通常のJavaScriptとかでもいいわけですしね。REST APIの開発の裏でConnectを使うのも楽しそうです。</p>
 <p>なお、開発中のものとしては、TypeScript向けのコード生成のconnect-webやら、Express、Rails、Django、Laravelとかにも対応予定とのことで、楽しみですね。TypeScript向けが先行とのことです。connect-webでReactやらVueやらSvleteやらsolid.jsやらと一緒に使える日が楽しみですね。業務投入したいです。</p>
@@ -253,7 +253,7 @@
   <li class=""><a href="/categories/Programming/">Programming (375)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (231)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
-<li class=""><a href="/categories/DataScience/">DataScience (52)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (53)</a></li>
 <li class=""><a href="/categories/IoT/">IoT (32)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>

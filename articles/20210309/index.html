@@ -29,18 +29,18 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   
-  <meta name="description" content="はじめにTIG DXユニット真野です。 GCP連載2021の1日目です。2020年のGCP連載でもCloud Loggingネタでトップバッター、2021年も先陣を切ることができて光栄です。 本記事では2021年3月に発表されたCloud PubSubのメッセージスキーマを試します。  Creating and managing schemas  なお、2021&#x2F;03&#x2F;07時点">
+  <meta name="description" content="はじめにTIG DXユニット真野です。 GCP連載2021の1日目です。2020年のGCP連載でもCloud Loggingネタでトップバッター、2021年も先陣を切ることができて光栄です。 本記事では2021年3月に発表されたCloud PubSubのメッセージスキーマを試します。  Creating and managing schemas  なお、2021&#x2F;03&#x2F;07時点ではプレビューである">
 <meta property="og:type" content="article">
 <meta property="og:title" content="PubSubのメッセージスキーマを試してみる | フューチャー技術ブログ">
 <meta property="og:url" content="https://future-architect.github.io/articles/20210309/index.html">
 <meta property="og:site_name" content="フューチャー技術ブログ">
-<meta property="og:description" content="はじめにTIG DXユニット真野です。 GCP連載2021の1日目です。2020年のGCP連載でもCloud Loggingネタでトップバッター、2021年も先陣を切ることができて光栄です。 本記事では2021年3月に発表されたCloud PubSubのメッセージスキーマを試します。  Creating and managing schemas  なお、2021&#x2F;03&#x2F;07時点">
+<meta property="og:description" content="はじめにTIG DXユニット真野です。 GCP連載2021の1日目です。2020年のGCP連載でもCloud Loggingネタでトップバッター、2021年も先陣を切ることができて光栄です。 本記事では2021年3月に発表されたCloud PubSubのメッセージスキーマを試します。  Creating and managing schemas  なお、2021&#x2F;03&#x2F;07時点ではプレビューである">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20210309/cps_integration.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20210309/pubsub_schema.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20210309/image.png">
 <meta property="article:published_time" content="2021-03-08T15:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-04T14:47:53.269Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.587Z">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="GCP">
 <meta property="article:tag" content="PubSub">
@@ -127,16 +127,16 @@
 <ul>
 <li><a target="_blank" rel="noopener" href="https://cloud.google.com/pubsub/docs/schemas">Creating and managing schemas</a></li>
 </ul>
-<p>なお、2021&#x2F;03&#x2F;07時点では<strong>プレビュー</strong>であるのでご注意ください。今後フィードバックにより挙動なり設定方法が変更される可能性があります。</p>
+<p>なお、2021/03/07時点では<strong>プレビュー</strong>であるのでご注意ください。今後フィードバックにより挙動なり設定方法が変更される可能性があります。</p>
 <h1 id="Cloud-PubSubとは"><a href="#Cloud-PubSubとは" class="headerlink" title="Cloud PubSubとは"></a>Cloud PubSubとは</h1><img src="/images/20210309/cps_integration.png" loading="lazy">
 
 
 <p>公式ドキュメントから引用します。</p>
 <blockquote>
-<p>Pub&#x2F;Sub は、イベントを処理するサービスとイベントを生成するサービスを切り離す非同期メッセージング サービスです。メッセージング指向のミドルウェア（ストリーミング分析パイプラインにイベントの取り込みと配信を行う）として、Pub&#x2F;Sub を使用できます。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/pubsub/docs/overview">https://cloud.google.com/pubsub/docs/overview</a></p>
+<p>Pub/Sub は、イベントを処理するサービスとイベントを生成するサービスを切り離す非同期メッセージング サービスです。メッセージング指向のミドルウェア（ストリーミング分析パイプラインにイベントの取り込みと配信を行う）として、Pub/Sub を使用できます。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/pubsub/docs/overview">https://cloud.google.com/pubsub/docs/overview</a></p>
 </blockquote>
 <p>メッセージングということで、当然1:N（ファンアウト）、N:1（ファンイン）、N:Nなどの通信が可能です。書き込み側をPublisher、読み込み側をSubscriberと呼びます。あとはAt-Least-Onceな配信（つまりSubscriber側が重複したメッセージを受け取ってしまうことがある）であるといったことが重要事項でしょうか。</p>
-<p>この技術ブログでは、<a href="/articles/20191112/">Go Cloud#2 Pub&#x2F;Subの概要紹介</a>や、<a href="/articles/20191128/">Go Cloud#7 PubSubドライバー(pubだけ)を実装してみる</a> といった記事があります。</p>
+<p>この技術ブログでは、<a href="/articles/20191112/">Go Cloud#2 Pub/Subの概要紹介</a>や、<a href="/articles/20191128/">Go Cloud#7 PubSubドライバー(pubだけ)を実装してみる</a> といった記事があります。</p>
 <h1 id="PubSubのメッセージスキーマ機能とは"><a href="#PubSubのメッセージスキーマ機能とは" class="headerlink" title="PubSubのメッセージスキーマ機能とは"></a>PubSubのメッセージスキーマ機能とは</h1><p>PubSubのあるトピックに対してスキーマを紐付け、Publishする時に検証を行うことができるようになりました。（待望の機能ですね！）</p>
 <p>今のところは、以下のスキーマが利用できるとのこと。</p>
 <ol>
@@ -212,11 +212,11 @@
 <figure class="highlight bash"><figcaption><span>実行結果</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;go run main.go</span><br><span class="line">2021/03/07 16:55:04 rpc error: code = InvalidArgument desc = Request contains an invalid argument.</span><br></pre></td></tr></table></figure>
 
 <p>こちらもシンプルな例外メッセージですが、メッセージスキーマで不正なPublishを防ぐことに成功しています。</p>
-<h1 id="スキーママイグレーションについて"><a href="#スキーママイグレーションについて" class="headerlink" title="スキーママイグレーションについて"></a>スキーママイグレーションについて</h1><p>メッセージスキーマを付与した後に、アプリケーション要件の変化に併せてスキーマもアップデートしたいものです。2021&#x2F;03&#x2F;07時点では、一度作成したスキーマを変更する機能も、トピックに紐づくスキーマを変更する機能も存在しないようです。このあたりの機能追加や利用者側のナレッジも蓄積できると良いですね。</p>
-<p>また、現状はスキーマをPub&#x2F;Subの設定に紐付けるような形式なようです。スキーマはPublish&#x2F;Subscribeのどちらにも公開されるべきものなので、Schema Registryのマネージドサービスが待ち遠しいですね。現状はGCSにもスキーマファイルを配備するなど、一工夫の設計余地がありそうだなと思いました。</p>
-<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>Cloud Pub&#x2F;SubでメッセージスキーマでPublish時のペイロードの検証ができるようになりました。今の所、AvroとProtocol Buffersで定義可能で、エンコードJSONにすれば、テキストJSONも検証できます。</p>
-<p>スキーマファイルは今の所GCSなどの連携ができず、Pub&#x2F;Sub側に直接定義するようです。</p>
-<p>まだまだ発展途上な機能だと思いますが、不正なデータがPub&#x2F;Subトピックに混入されることを防ぐことができるのは画期的だと思いますので、ぜひ利用を検討したいと思います。</p>
+<h1 id="スキーママイグレーションについて"><a href="#スキーママイグレーションについて" class="headerlink" title="スキーママイグレーションについて"></a>スキーママイグレーションについて</h1><p>メッセージスキーマを付与した後に、アプリケーション要件の変化に併せてスキーマもアップデートしたいものです。2021/03/07時点では、一度作成したスキーマを変更する機能も、トピックに紐づくスキーマを変更する機能も存在しないようです。このあたりの機能追加や利用者側のナレッジも蓄積できると良いですね。</p>
+<p>また、現状はスキーマをPub/Subの設定に紐付けるような形式なようです。スキーマはPublish/Subscribeのどちらにも公開されるべきものなので、Schema Registryのマネージドサービスが待ち遠しいですね。現状はGCSにもスキーマファイルを配備するなど、一工夫の設計余地がありそうだなと思いました。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>Cloud Pub/SubでメッセージスキーマでPublish時のペイロードの検証ができるようになりました。今の所、AvroとProtocol Buffersで定義可能で、エンコードJSONにすれば、テキストJSONも検証できます。</p>
+<p>スキーマファイルは今の所GCSなどの連携ができず、Pub/Sub側に直接定義するようです。</p>
+<p>まだまだ発展途上な機能だと思いますが、不正なデータがPub/Subトピックに混入されることを防ぐことができるのは画期的だと思いますので、ぜひ利用を検討したいと思います。</p>
 <p>明日は市川さんの<a href="/articles/20210310/">20210310_本番データが急に欲しいアナタに贈る、CloudSQLのサーバレスエクスポートを試してみた</a>です。</p>
 
           
@@ -293,7 +293,7 @@
   <li class=""><a href="/categories/Programming/">Programming (375)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (231)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
-<li class=""><a href="/categories/DataScience/">DataScience (52)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (53)</a></li>
 <li class=""><a href="/categories/IoT/">IoT (32)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>

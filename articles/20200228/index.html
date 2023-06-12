@@ -29,16 +29,16 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   
-  <meta name="description" content="はじめにこんにちは、TIG DXユニット真野です。この技術ブログの運営もしています。 DynamoDB×Go連載の第3弾目です。今までは AWS SDK Go やそれをラップしたguregu&#x2F;dynamo について説明していましたが、 Go CDK（Go Cloud Development Kit） を用いたDynamoDB操作について説明します。 Go CDKとは？ Go CDKは2018&amp;">
+  <meta name="description" content="はじめにこんにちは、TIG DXユニット真野です。この技術ブログの運営もしています。 DynamoDB×Go連載の第3弾目です。今までは AWS SDK Go やそれをラップしたguregu&#x2F;dynamo について説明していましたが、 Go CDK（Go Cloud Development Kit） を用いたDynamoDB操作について説明します。 Go CDKとは？ Go CDKは2018&#x2F;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="DynamoDB×Go#3 Go CDKでどこまでいける？機能を調べてみた | フューチャー技術ブログ">
 <meta property="og:url" content="https://future-architect.github.io/articles/20200228/index.html">
 <meta property="og:site_name" content="フューチャー技術ブログ">
-<meta property="og:description" content="はじめにこんにちは、TIG DXユニット真野です。この技術ブログの運営もしています。 DynamoDB×Go連載の第3弾目です。今までは AWS SDK Go やそれをラップしたguregu&#x2F;dynamo について説明していましたが、 Go CDK（Go Cloud Development Kit） を用いたDynamoDB操作について説明します。 Go CDKとは？ Go CDKは2018&amp;">
+<meta property="og:description" content="はじめにこんにちは、TIG DXユニット真野です。この技術ブログの運営もしています。 DynamoDB×Go連載の第3弾目です。今までは AWS SDK Go やそれをラップしたguregu&#x2F;dynamo について説明していましたが、 Go CDK（Go Cloud Development Kit） を用いたDynamoDB操作について説明します。 Go CDKとは？ Go CDKは2018&#x2F;">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20200228/go-cdk-logo-gopherblue.png">
 <meta property="article:published_time" content="2020-02-28T01:13:26.000Z">
-<meta property="article:modified_time" content="2022-07-04T14:47:52.868Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.410Z">
 <meta property="article:tag" content="AWS">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="GoCDK">
@@ -136,7 +136,7 @@
 <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIG DXユニット<a target="_blank" rel="noopener" href="https://twitter.com/laqiiz">真野</a>です。この技術ブログの運営もしています。</p>
 <p><a href="/tags/DynamoDB%C3%97Go/">DynamoDB×Go連載</a>の第3弾目です。今までは <code>AWS SDK Go</code> やそれをラップした<code>guregu/dynamo</code> について説明していましたが、 <strong>Go CDK（Go Cloud Development Kit）</strong> を用いたDynamoDB操作について説明します。</p>
 <h1 id="Go-CDKとは？"><a href="#Go-CDKとは？" class="headerlink" title="Go CDKとは？"></a>Go CDKとは？</h1><blockquote>
-<p>Go CDKは2018&#x2F;07 に Google の Go チームが立ち上げたプロジェクトで、Go アプリケーションを各クラウド間でポータブルにすることを目指して、実装されています。</p>
+<p>Go CDKは2018/07 に Google の Go チームが立ち上げたプロジェクトで、Go アプリケーションを各クラウド間でポータブルにすることを目指して、実装されています。</p>
 </blockquote>
 <p>詳しくは <a href="/tags/GoCDK/">Go Cloud連載企画</a> で全7回に渡って概要から各トピックについて説明しています。特に<a href="/articles/20191111/">第1回目</a> の概要説明から読むことがオススメです。 DynamoDBを含むDocStoreについては<a href="/articles/20191113/">第3回目</a>の記事を確認ください。</p>
 <ul>
@@ -144,13 +144,13 @@
 <li><a href="/tags/GoCDK/">Go Cloud連載企画</a></li>
 </ul>
 <p>※名称の揺れについてはGo CDKの方が正式名称ですが、ググラビリティが悪いかなと思い（特にAWS CDKと似ている）、連載版は古い呼び方であるGo Cloudを使わせてもらっていました。</p>
-<h1 id="記事の趣旨"><a href="#記事の趣旨" class="headerlink" title="記事の趣旨"></a>記事の趣旨</h1><p>ご存じの通り、DynamoDBはKVSと言われているものの、非常に多くの機能が存在します。KVSと名前だけ見ると、PK(Primary Key)に対してGet&#x2F;Put&#x2F;Deleteなどの基礎的なCRUD処理や、せいぜいそのBatch操作くらいしかできないイメージがありますよね。</p>
+<h1 id="記事の趣旨"><a href="#記事の趣旨" class="headerlink" title="記事の趣旨"></a>記事の趣旨</h1><p>ご存じの通り、DynamoDBはKVSと言われているものの、非常に多くの機能が存在します。KVSと名前だけ見ると、PK(Primary Key)に対してGet/Put/Deleteなどの基礎的なCRUD処理や、せいぜいそのBatch操作くらいしかできないイメージがありますよね。</p>
 <p>しかし、実際のDynamoDBは遥かに高機能で <strong>Global Secondary Index</strong> や <strong>Local Secondary Index</strong> を用いたインデックスアクセスや、SortKeyを利用した範囲指定の<strong>スキャン</strong>、条件を指定した<strong>クエリ</strong>、<strong>ConditionExpression</strong> という用した既存レコードの有無といった条件付きの書き込み機能などが存在します。これらを組み合わせて<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/WorkingWithItems.html#WorkingWithItems.AtomicCounters">アトミックカウンターを作る参考記事</a> も公式からでていたり、条件付きではありますが<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/transaction-apis.html">トランザクション</a>を提供もしています。DynamoDBのクライアントアプリから直接操作することは少いでしょうが、DynamoDB StreamsやGlobal Tablesといった機能も便利ですよね。</p>
 <p>一方で、Go CDKはこういったプロダクト固有の機能を隠蔽化・抽象化したAPIを提供するドライバなため、他のデータストアに切り替えたときでも利用可能なAPIしか提供しない設計になっています（はずです）。しかし、それは <strong>DynamoDBの機能を100%使い切れないということと同義</strong> なため、直感的にはリスクを避けるべくなるべくAWS公式のSDKを利用しようと考える方も多いのでは無いでしょうか？そういう短絡的な判断を避けるために、 <strong>Go CDKが現時点でどこまで機能を網羅しているのか</strong> 我々は知る必要があるでしょう。それがわかれば、この案件のユースケースではGo CDKの提供する機能で十分なため、Go CDKを利用しベンダーロックインのリスク低減を図ったり、Go CDKの提供する<code>memdocstore</code> といったモック機能を享受しようというより有意義な判断ができるはずです。</p>
 <p>というわけで、どの程度DynamoDBの機能がGo CDKから利用できるのか調査していきます。なお、私はDynamoDBのプロフェッショナルではなくイチ開発者ですので色々漏れがあると思います。ぜひTwitterなどでフィードバックを頂ければと思います。</p>
 <h1 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h1><p>なお、Go CDKは進化が早いため今回対応していないと判断したものも、実は記事の公開後に実装されている可能性があります。差分については <a target="_blank" rel="noopener" href="https://github.com/google/go-cloud/releases">release-notes</a> などから適時確認ください。</p>
 <ul>
-<li>調査日: 2020&#x2F;02&#x2F;24</li>
+<li>調査日: 2020/02/24</li>
 <li>Go 1.13.4</li>
 <li>Go CDK v0.19.0</li>
 </ul>
@@ -236,7 +236,7 @@
 <p>この場合は <code>Actions</code> を用います。</p>
 <figure class="highlight go"><figcaption><span>バッチ登録</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create</span></span><br><span class="line">w1 := Item&#123;MyHashKey: <span class="string">&quot;00001&quot;</span>, MyRangeKey: <span class="number">1</span>, MyText: <span class="string">&quot;some text1...&quot;</span>&#125;</span><br><span class="line">w2 := Item&#123;MyHashKey: <span class="string">&quot;00001&quot;</span>, MyRangeKey: <span class="number">2</span>, MyText: <span class="string">&quot;some text2...&quot;</span>&#125;</span><br><span class="line">w3 := Item&#123;MyHashKey: <span class="string">&quot;00001&quot;</span>, MyRangeKey: <span class="number">3</span>, MyText: <span class="string">&quot;some text3...&quot;</span>&#125;</span><br><span class="line"><span class="keyword">if</span> err := coll.Actions().Create(&amp;w1).Create(&amp;w2).Create(&amp;w3).Do(ctx); err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatalf(<span class="string">&quot;actions: %v&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// (補足) バッチ登録した結果をgetすると以下の値が確認できる</span></span><br><span class="line"><span class="comment">// got: &#123;MyHashKey:00001 MyRangeKey:1 MyText:some text1...&#125;</span></span><br><span class="line"><span class="comment">// got: &#123;MyHashKey:00001 MyRangeKey:2 MyText:some text2...&#125;</span></span><br><span class="line"><span class="comment">// got: &#123;MyHashKey:00001 MyRangeKey:3 MyText:some text3...&#125;</span></span><br></pre></td></tr></table></figure>
 
-<p>ActionsはCreateだけではなく、Get&#x2F;Create&#x2F;Replace&#x2F;Put&#x2F;Update&#x2F;Delete の6つの操作を混在させて実行も可能です。</p>
+<p>ActionsはCreateだけではなく、Get/Create/Replace/Put/Update/Delete の6つの操作を混在させて実行も可能です。</p>
 <p>参考: <a target="_blank" rel="noopener" href="https://godoc.org/gocloud.dev/docstore#hdr-Actions">https://godoc.org/gocloud.dev/docstore#hdr-Actions</a></p>
 <p>今回は関数をチェーンで登録しましたが、Actionsで <code>ActionList</code> が取得できるので、もちろんforループと合わせて追加もできます。</p>
 <h2 id="3-条件付き書き込み"><a href="#3-条件付き書き込み" class="headerlink" title="3. 条件付き書き込み"></a>3. 条件付き書き込み</h2><p>Go CDKはドキュメントを読んだ限りは、条件付き書き込みはサポートされていないようです。しかし、Revisionsという機能があり、いわゆる楽観的ロックのような利用用途を公式でサポートされています。</p>
@@ -344,7 +344,7 @@
   <li class=""><a href="/categories/Programming/">Programming (375)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (231)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
-<li class=""><a href="/categories/DataScience/">DataScience (52)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (53)</a></li>
 <li class=""><a href="/categories/IoT/">IoT (32)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>

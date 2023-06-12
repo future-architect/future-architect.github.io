@@ -38,7 +38,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20220512a/CloudFunction_ETL.drawio_(1).png">
 <meta property="article:published_time" content="2022-05-11T15:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-04T14:55:58.113Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.824Z">
 <meta property="article:tag" content="ETL">
 <meta property="article:tag" content="GCP">
 <meta property="article:tag" content="CloudFunctions">
@@ -134,24 +134,24 @@
 <p>ログのサイズ感は、</p>
 <ul>
 <li>ファイルサイズは数MiB ~ 数GiB程度で、上限がある。</li>
-<li>ファイル数は約 ~1000件&#x2F;日</li>
-<li>データサイズは ~500GB&#x2F;日</li>
+<li>ファイル数は約 ~1000件/日</li>
+<li>データサイズは ~500GB/日</li>
 </ul>
 <p>ログファイルは、改行区切りテキストデータです。</p>
 <p>大量データをCloud Functionsで処理する場合、<a target="_blank" rel="noopener" href="https://cloud.google.com/functions/quotas?hl=ja">メモリ上限やタイムアウト上限</a>が制約になります。加えて<a target="_blank" rel="noopener" href="https://cloud.google.com/bigquery/quotas?hl=ja">BigQueryの一日あたりのロードジョブ数や、一回当たりの読み込みデータサイズの上限などの割り当て</a>も気にしなければなりません。</p>
 <h1 id="Cloud-FunctionsをファンアウトさせてETL処理"><a href="#Cloud-FunctionsをファンアウトさせてETL処理" class="headerlink" title="Cloud FunctionsをファンアウトさせてETL処理"></a>Cloud FunctionsをファンアウトさせてETL処理</h1><p>今回のETL処理の構成を説明していきます。</p>
-<p>Cloud Storageからログファイルを取ってきて、テキスト加工する処理は、Cloud FunctionsとPub&#x2F;Subを使ったファンアウト構成にしました。</p>
+<p>Cloud Storageからログファイルを取ってきて、テキスト加工する処理は、Cloud FunctionsとPub/Subを使ったファンアウト構成にしました。</p>
 <img src="/images/20220512a/CloudFunction_ETL.drawio_(1).png" alt="CloudFunction_ETL" width="616" height="301" loading="lazy">
 
 <ul>
-<li>左のCloud Functionsが、Cloud Storageに存在するログファイルのリストを1件ずつPub&#x2F;Subにpublishします。</li>
-<li>真ん中のCloud FunctionsはPub&#x2F;Subをトリガーにして並行に起動させ、ログファイルをダウンロードして加工し、別のCloud Storageにアップロードします。Cloud Functionsの最大同時実行数までスケールさせることができ、同時に多くのログファイルを処理できます。</li>
+<li>左のCloud Functionsが、Cloud Storageに存在するログファイルのリストを1件ずつPub/Subにpublishします。</li>
+<li>真ん中のCloud FunctionsはPub/Subをトリガーにして並行に起動させ、ログファイルをダウンロードして加工し、別のCloud Storageにアップロードします。Cloud Functionsの最大同時実行数までスケールさせることができ、同時に多くのログファイルを処理できます。</li>
 </ul>
 <p>今回はログファイルのサイズに上限がある前提なので、ファイル分割処理はしなくて済んでます。</p>
 <p>最近では、<a target="_blank" rel="noopener" href="https://cloud.google.com/functions/docs/2nd-gen/overview">Cloud Functions 第2世代</a>が発表され、より多くのメモリ（最大16GiB）、タイムアウト（イベントトリガーの場合10分）を設定できるようになりました。できることも広がりますね。</p>
-<p>BigQueryへの読み込みはCloud Storageからのバッチ読み込みにしました。Cloud Functionsで並行でBigQueryに書き込むと、処理するファイル数&#x3D;BigQueryロードジョブ数が多すぎて諸々のBigQueryの割り当てに引っかかる恐れがあったからです。</p>
-<h2 id="実用上の細かい作り込み"><a href="#実用上の細かい作り込み" class="headerlink" title="実用上の細かい作り込み"></a>実用上の細かい作り込み</h2><p>Pub&#x2F;Subはデフォルトでは<a target="_blank" rel="noopener" href="https://cloud.google.com/pubsub/docs/subscriber?hl=eg#at-least-once-delivery">at-least-once配信</a>、つまりpublishされたデータが複数回配信される可能性があるのですが、今回のジョブは単純なファイル加工処理で冪等なのでOKです。</p>
-<p>Cloud FunctionのETL処理の完了を、なんらかの方法で検知しなければならないという課題があります。<a target="_blank" rel="noopener" href="https://cloud.google.com/blog/ja/topics/developers-practitioners/celebrating-pi-day-cloud-functions">こちらのブログ</a>のように、並行実行されているジョブの完了や失敗を管理するテーブルを用意したり、<a target="_blank" rel="noopener" href="https://cloud.google.com/blog/ja/products/data-analytics/ingesting-data-into-bigquery-using-serverless-spark">こちらのブログ</a>のように失敗したジョブを別のPub&#x2F;Subに公開する、などの方法があるかなと思います。</p>
+<p>BigQueryへの読み込みはCloud Storageからのバッチ読み込みにしました。Cloud Functionsで並行でBigQueryに書き込むと、処理するファイル数=BigQueryロードジョブ数が多すぎて諸々のBigQueryの割り当てに引っかかる恐れがあったからです。</p>
+<h2 id="実用上の細かい作り込み"><a href="#実用上の細かい作り込み" class="headerlink" title="実用上の細かい作り込み"></a>実用上の細かい作り込み</h2><p>Pub/Subはデフォルトでは<a target="_blank" rel="noopener" href="https://cloud.google.com/pubsub/docs/subscriber?hl=eg#at-least-once-delivery">at-least-once配信</a>、つまりpublishされたデータが複数回配信される可能性があるのですが、今回のジョブは単純なファイル加工処理で冪等なのでOKです。</p>
+<p>Cloud FunctionのETL処理の完了を、なんらかの方法で検知しなければならないという課題があります。<a target="_blank" rel="noopener" href="https://cloud.google.com/blog/ja/topics/developers-practitioners/celebrating-pi-day-cloud-functions">こちらのブログ</a>のように、並行実行されているジョブの完了や失敗を管理するテーブルを用意したり、<a target="_blank" rel="noopener" href="https://cloud.google.com/blog/ja/products/data-analytics/ingesting-data-into-bigquery-using-serverless-spark">こちらのブログ</a>のように失敗したジョブを別のPub/Subに公開する、などの方法があるかなと思います。</p>
 <h1 id="Cloud-Functinonsの中身のGo実装"><a href="#Cloud-Functinonsの中身のGo実装" class="headerlink" title="Cloud Functinonsの中身のGo実装"></a>Cloud Functinonsの中身のGo実装</h1><p>Cloud FunctionsにはGoのソースをデプロイしました。並行で起動するCloud Functionsが、メモリを効率よく使いつつタイムアウト内に処理を終えるために考えたことを説明していきます。</p>
 <h2 id="ログファイルは1行ずつ読み込む"><a href="#ログファイルは1行ずつ読み込む" class="headerlink" title="ログファイルは1行ずつ読み込む"></a>ログファイルは1行ずつ読み込む</h2><p>ログファイルは改行区切りのテキストファイルなので、Cloud Storageから1行ずつ読み込んで加工し、1行ずつ書き込みます。これによってメモリにログファイル全量を展開せずに済みます。<br>Cloud Storageからの読み込み、書き込みに使う<a target="_blank" rel="noopener" href="https://pkg.go.dev/cloud.google.com/go/storage">storage.Reader, storage.Writer</a>はio.Reader, io.Writerを満たすので、ファイルへの読み書きと同じように扱えます。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;bufio&quot;</span></span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;cloud.google.com/go/storage&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> PubSubMessage <span class="keyword">struct</span> &#123;</span><br><span class="line">	Data []<span class="type">byte</span> <span class="string">`json:&quot;data&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">PubSubEntryPoint</span><span class="params">(ctx context.Context, m PubSubMessage)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">	logFilePath := <span class="type">string</span>(m.Data) <span class="comment">// Pub/Subからログファイルのパスがpushされてくる</span></span><br><span class="line"></span><br><span class="line">	client, err := storage.NewClient(ctx)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> client.Close()</span><br><span class="line"></span><br><span class="line">	storageReader, err := client.Bucket(LogBucket).Object(logFilePath).NewReader(ctx)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	storageWriter := client.Bucket(TmpBucket).Object(translatedLog).NewWriter(ctx)</span><br><span class="line"></span><br><span class="line">	s := bufio.NewScanner(storageReader)</span><br><span class="line">	<span class="keyword">for</span> s.Scan() &#123;</span><br><span class="line">		line := s.Text() <span class="comment">// 1行ずつ読み込む</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// なんらかの加工処理を行う</span></span><br><span class="line"></span><br><span class="line">		fmt.Fprintln(storageWriter, line) <span class="comment">// 1行ずつ書き込む</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := storageWriter.Close(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -231,7 +231,7 @@
   <li class=""><a href="/categories/Programming/">Programming (375)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (231)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
-<li class=""><a href="/categories/DataScience/">DataScience (52)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (53)</a></li>
 <li class=""><a href="/categories/IoT/">IoT (32)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>

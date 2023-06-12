@@ -39,7 +39,7 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20210129/EventHubs_logo.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20210129/azure_eventhubs_consumer_group.png">
 <meta property="article:published_time" content="2021-01-28T15:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-04T14:47:53.213Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.565Z">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="Azure">
 <meta name="twitter:card" content="summary">
@@ -130,7 +130,7 @@
 </ul>
 </li>
 </ul>
-<h2 id="Event-Hubs-とは"><a href="#Event-Hubs-とは" class="headerlink" title="Event Hubs とは"></a>Event Hubs とは</h2><p>Azure が提供している、大規模データを貯めて配信することが可能な Pub&#x2F;Sub モデルのマネージドサービスです。</p>
+<h2 id="Event-Hubs-とは"><a href="#Event-Hubs-とは" class="headerlink" title="Event Hubs とは"></a>Event Hubs とは</h2><p>Azure が提供している、大規模データを貯めて配信することが可能な Pub/Sub モデルのマネージドサービスです。</p>
 <p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/ja-jp/azure/event-hubs/event-hubs-about">Azure Event Hubs とは - ビッグ データ インジェスト サービス - Azure Event Hubs | Microsoft Docs</a></p>
 <p>Publisher からメッセージを受けて、 Subscriber(Consumer) へ配信する役割をします。<br>Event Hubs 構成としては、以下階層構造となっています。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">namespace</span><br><span class="line">└── event hub</span><br><span class="line">	└── partition</span><br></pre></td></tr></table></figure>
@@ -138,7 +138,7 @@
 <p>まず namespace を作成し、作成したnamespace 内にevent hub を作成、作成したevent hub 内は partition 分割されています。</p>
 <p>partition 数は <code>1 - 32</code> の間で指定します。</p>
 <p>Publisher は namespace と  event hub を指定して、メッセージを送信し、Subscriber も同様にして、メッセージを受信します。</p>
-<h2 id="Offset-管理"><a href="#Offset-管理" class="headerlink" title="Offset 管理"></a>Offset 管理</h2><p>Pub&#x2F;Sub 系のサービスの、Consumer 実装を行う際に、メッセージをどこまで取得したかを管理すること(&#x3D; offset 管理) が重要になります。<br>(アプリが突然止まったり、デプロイで停止したりと継続して取れ続けるとは限らないかなと思います。)<br>Event Hubs では offset は <code>Consumer group</code> の <code>partition</code> 単位で管理されます。</p>
+<h2 id="Offset-管理"><a href="#Offset-管理" class="headerlink" title="Offset 管理"></a>Offset 管理</h2><p>Pub/Sub 系のサービスの、Consumer 実装を行う際に、メッセージをどこまで取得したかを管理すること(= offset 管理) が重要になります。<br>(アプリが突然止まったり、デプロイで停止したりと継続して取れ続けるとは限らないかなと思います。)<br>Event Hubs では offset は <code>Consumer group</code> の <code>partition</code> 単位で管理されます。</p>
 <h3 id="Consumer-group"><a href="#Consumer-group" class="headerlink" title="Consumer group"></a>Consumer group</h3><p>Consumer group とは、複数の Consumer をまとめて扱う単位で、Event Hubs 側の設定で作成できます。Consumer group を設定する目的としては、複数の用途別にメッセージ取得をすることがあります。</p>
 <p>例えば、メール配信用とSlack配信用で同一 Event Hub から別々に受信処理をしたい場合は、Consumer group Mail と Consumer group Slack と分けて作成することで実現できます。その際、offset 管理を別々に実施しないとメッセージが欠けたり重複したりしてしまいます。</p>
 <p>そのため、offset の管理単位として Consumer group が利用されています。<br><img src="/images/20210129/azure_eventhubs_consumer_group.png" loading="lazy"></p>
@@ -151,12 +151,12 @@
 <h3 id="どういった実装になっているのか？"><a href="#どういった実装になっているのか？" class="headerlink" title="どういった実装になっているのか？"></a>どういった実装になっているのか？</h3><p>実装としては、 ownership と checkpoint の2つの考え方を利用しています。</p>
 <p>ownership は、各 Consumer がどの partition を担当するかを決める役割を担います。checkpoint は、 partition ごとにどの offset までメッセージを取得したかを保存する役割を担います。</p>
 <p>Azure SDK (Java) で提供されている実装は、Blob Storage のメタデータを保存先として利用した実装になっています。</p>
-<p><a target="_blank" rel="noopener" href="https://github.com/Azure/azure-sdk-for-java/blob/master/sdk/eventhubs/azure-messaging-eventhubs-checkpointstore-blob/src/main/java/com/azure/messaging/eventhubs/checkpointstore/blob/BlobCheckpointStore.java">azure-sdk-for-java&#x2F;BlobCheckpointStore.java at master · Azure&#x2F;azure-sdk-for-java</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Azure/azure-sdk-for-java/blob/master/sdk/eventhubs/azure-messaging-eventhubs-checkpointstore-blob/src/main/java/com/azure/messaging/eventhubs/checkpointstore/blob/BlobCheckpointStore.java">azure-sdk-for-java/BlobCheckpointStore.java at master · Azure/azure-sdk-for-java</a></p>
 <p>Blob Storage への Blob の配置先は以下の通りで、partition_id ごとに Blob が作成されます。</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ownership</span></span><br><span class="line">az://<span class="variable">$&#123;Blob名&#125;</span>/<span class="variable">$&#123;namespace&#125;</span>/<span class="variable">$&#123;event hub&#125;</span>/<span class="variable">$&#123;consumer group&#125;</span>/ownership/<span class="variable">$&#123;partition_id&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># checkpoint</span></span><br><span class="line">az://<span class="variable">$&#123;Blob名&#125;</span>/<span class="variable">$&#123;namespace&#125;</span>/<span class="variable">$&#123;event hub&#125;</span>/<span class="variable">$&#123;consumer group&#125;</span>/checkpoint/<span class="variable">$&#123;partition_id&#125;</span></span><br></pre></td></tr></table></figure>
 
 <p>ownership の担当者ID、 checkpoint の offset値 は Blob のメタデータとして管理されています。</p>
-<p>Azure SDK 内で、メタデータ値を参照&#x2F;更新することで、複数台のConsumer 間で連携して処理を行うことができるようになっています。Azure SDK 側で提供されている処理は Blob Storage を利用していますが、 <code>Checkpointstore</code> interface として切り出されているため、他の Storage (S3, GCS, インメモリ) でも実装することは可能です。<br><a target="_blank" rel="noopener" href="https://github.com/Azure/azure-sdk-for-java/blob/master/sdk/eventhubs/azure-messaging-eventhubs/src/main/java/com/azure/messaging/eventhubs/CheckpointStore.java">azure-sdk-for-java&#x2F;CheckpointStore.java at master · Azure&#x2F;azure-sdk-for-java</a></p>
+<p>Azure SDK 内で、メタデータ値を参照/更新することで、複数台のConsumer 間で連携して処理を行うことができるようになっています。Azure SDK 側で提供されている処理は Blob Storage を利用していますが、 <code>Checkpointstore</code> interface として切り出されているため、他の Storage (S3, GCS, インメモリ) でも実装することは可能です。<br><a target="_blank" rel="noopener" href="https://github.com/Azure/azure-sdk-for-java/blob/master/sdk/eventhubs/azure-messaging-eventhubs/src/main/java/com/azure/messaging/eventhubs/CheckpointStore.java">azure-sdk-for-java/CheckpointStore.java at master · Azure/azure-sdk-for-java</a></p>
 <h4 id="対応SDK"><a href="#対応SDK" class="headerlink" title="対応SDK"></a>対応SDK</h4><ul>
 <li>.NET Core</li>
 <li>Java</li>
@@ -174,7 +174,7 @@
 <h2 id="Apache-Kafka-との関係"><a href="#Apache-Kafka-との関係" class="headerlink" title="Apache Kafka との関係"></a>Apache Kafka との関係</h2><p>Event Hubs の実装は、 <strong>Kafka ではない</strong> とドキュメントに記載されています。</p>
 <p>(用途が似ており、実態はマネージド Kafka だと勘違いしてました。)</p>
 <p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/ja-jp/azure/event-hubs/apache-kafka-frequently-asked-questions">https://docs.microsoft.com/ja-jp/azure/event-hubs/apache-kafka-frequently-asked-questions</a></p>
-<p>ただ、Kafka API との互換性があるため、Pub&#x2F;Sub の実装は Kafka のソースコードを利用することができます。</p>
+<p>ただ、Kafka API との互換性があるため、Pub/Sub の実装は Kafka のソースコードを利用することができます。</p>
 <h2 id="接続プロトコル"><a href="#接続プロトコル" class="headerlink" title="接続プロトコル"></a>接続プロトコル</h2><p>複数のプロトコル(AMQP, Kafka, HTTPS)に対応していますが、Azure SDKを利用する場合は、AMQP を利用しています。</p>
 <p>AMQP 利用時は、ポート 5671 と 5672 を開く必要があります。</p>
 <p>参考: <a target="_blank" rel="noopener" href="https://docs.microsoft.com/ja-jp/azure/service-bus-messaging/service-bus-amqp-protocol-guide">Azure Service Bus と Event Hubs における AMQP 1.0 プロトコル ガイド - Azure Service Bus | Microsoft Docs</a></p>
@@ -257,7 +257,7 @@
   <li class=""><a href="/categories/Programming/">Programming (375)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (231)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
-<li class=""><a href="/categories/DataScience/">DataScience (52)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (53)</a></li>
 <li class=""><a href="/categories/IoT/">IoT (32)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>

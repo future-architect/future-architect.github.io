@@ -38,7 +38,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20210525a/carbon_go_code.png">
 <meta property="article:published_time" content="2021-05-24T15:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-04T14:47:53.402Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.644Z">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="設計">
 <meta name="twitter:card" content="summary">
@@ -128,10 +128,10 @@
 <p>内部にスライスやmap、ポインタなどの参照型な要素を持っていれば、基本的にポインタ型でのみ扱う構造体になります。これらの要素を持っていた場合、コピーしてしまうと、複数のインスタンスが、これらのフィールドのインスタンスを共有することになります。自分だけの要素だと思っていたのに変更が他のインスタンスにも影響を与えてしまう、となってしまいます。</p>
 <p>標準ライブラリだと、ロック状態がコピーされて変なエラーになってしまうsync.Mutexや、内部に可変長なバッファを含むbig.Intなどが該当します。これらの構造体は利用コード内ではポインタ型で取扱います。 <code>sync.Mutex</code> にはないですが、インスタンスを作成してポインタ型を返すファクトリー関数を用意すると良いでしょう。</p>
 <p>Goの文法を使った構造体のコピーを防ぐ方法としては<a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/8005#issuecomment-190753527">go vetに警告させる方法があるとissueにはある</a>のですが、<a target="_blank" rel="noopener" href="https://play.golang.org/p/wGiv-2VpYHK">手元でこの方法を試したところうまく動いておらず</a>・・・</p>
-<p><strong>5&#x2F;26追記</strong></p>
+<p><strong>5/26追記</strong></p>
 <p><a target="_blank" rel="noopener" href="https://twitter.com/orisano/status/1397022250381938689">@orisano</a>さんより、型のベースが構造体で、Unlockメソッドも定義されていることが条件と教えていただきました。</p>
 <p>実行時に防ぐ方法としては、このような実装を見かけたことはないのですが、作成したときのポインタ値を保持しておいて、メソッドを呼び出したときにエラーを出す方法があります。C言語などにあるassert機能がGoにはないので、実行時にコストがかかってしまう問題はありますが確実に発見できます。パッケージプライベートなフィールドに格納し、ファクトリー関数で設定することで確実にチェックできます。また、<code>nil</code> と比較すればファクトリー関数を使わないで初期化したケースも拾えるでしょう。</p>
-<p><strong>5&#x2F;26追記</strong></p>
+<p><strong>5/26追記</strong></p>
 <p><a target="_blank" rel="noopener" href="https://twitter.com/athos0220/status/1397076574118182918">@athos0220</a>さんより、strings.Builderの中でポインタ値を保持してコピーを検知する手法が実際に使われていると教えていただきました。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ポインタとしてのみ利用する構造体</span></span><br><span class="line"><span class="keyword">type</span> NoCopyStruct <span class="keyword">struct</span> &#123;</span><br><span class="line">	self  *NoCopyStruct</span><br><span class="line">	Value *<span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初期化時にポインタを保持しておく</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewNoCopyStruct</span><span class="params">(value <span class="type">string</span>)</span></span> *NoCopyStruct &#123;</span><br><span class="line">	r := &amp;NoCopyStruct&#123;</span><br><span class="line">		Value: &amp;value,</span><br><span class="line">	&#125;</span><br><span class="line">	r.self = r</span><br><span class="line">	<span class="keyword">return</span> r</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// メソッドの中でチェック</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(n *NoCopyStruct)</span></span> String() <span class="type">string</span> &#123;</span><br><span class="line">	<span class="keyword">if</span> n != n.self &#123;</span><br><span class="line">		<span class="built_in">panic</span>(<span class="string">&quot;should not copy NoCopyStruct instance without Copy() method&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> *n.Value</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -241,7 +241,7 @@
   <li class=""><a href="/categories/Programming/">Programming (375)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (231)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
-<li class=""><a href="/categories/DataScience/">DataScience (52)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (53)</a></li>
 <li class=""><a href="/categories/IoT/">IoT (32)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>

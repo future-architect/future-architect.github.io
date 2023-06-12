@@ -47,7 +47,7 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20200416/7.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20200416/8.png">
 <meta property="article:published_time" content="2020-04-16T12:30:49.000Z">
-<meta property="article:modified_time" content="2022-07-04T14:47:52.899Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.426Z">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="Terraform">
 <meta property="article:tag" content="ServiceNow">
@@ -152,7 +152,7 @@
 </ul>
 </li>
 </ul>
-<h1 id="ソリューションの概要"><a href="#ソリューションの概要" class="headerlink" title="ソリューションの概要"></a>ソリューションの概要</h1><p>上記のすべての問題を解決出来るわけではないですが、SNOW と Terraform を使った自動化の仕組みを例に取って、PoCレベルで組んでみます。各製品&#x2F;ツールの役割分担は以下です。</p>
+<h1 id="ソリューションの概要"><a href="#ソリューションの概要" class="headerlink" title="ソリューションの概要"></a>ソリューションの概要</h1><p>上記のすべての問題を解決出来るわけではないですが、SNOW と Terraform を使った自動化の仕組みを例に取って、PoCレベルで組んでみます。各製品/ツールの役割分担は以下です。</p>
 <ul>
 <li>SNOW：人の動き（リクエスト、承認フロー）を自動化する</li>
 <li>Terraform：インフラの構築を自動化する</li>
@@ -215,13 +215,13 @@
 
 <figure class="highlight plaintext"><figcaption><span>vars/filejoin.sh</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat *.tfvars &gt; ../terraform.tfvars</span><br></pre></td></tr></table></figure>
 
-<p>よって、Go は GCE, GCS のメニュー毎に対応する vars&#x2F; 配下の tfvars ファイルにだけ要素を追加し、filejoin.sh を叩けば Terraform 系のファイルは揃うという事になります。Go でファイル操作は頑張らない（笑）</p>
+<p>よって、Go は GCE, GCS のメニュー毎に対応する vars/ 配下の tfvars ファイルにだけ要素を追加し、filejoin.sh を叩けば Terraform 系のファイルは揃うという事になります。Go でファイル操作は頑張らない（笑）</p>
 <h1 id="4-FlowDesigner-からのリクエストを応じて-Terraform-を実行し、結果を返す-Terraform-Server"><a href="#4-FlowDesigner-からのリクエストを応じて-Terraform-を実行し、結果を返す-Terraform-Server" class="headerlink" title="4. FlowDesigner からのリクエストを応じて Terraform を実行し、結果を返す @ Terraform Server"></a>4. FlowDesigner からのリクエストを応じて Terraform を実行し、結果を返す @ Terraform Server</h1><p>さて、SNOW と Terraform の間をつなぐ API-SV の Go です。<br>処理を整理すると、以下です。</p>
 <ol>
 <li>SNOW(FlowDesigner)からの Rest API の受け口を作る。</li>
 <li>SNOW から受け取るパラメータは、Project名とインスタンス名だけである。（SNOW の CMDB を本格利用すればそうでもないですが、構成管理は Terraform でコード化されているから、SNOW ではやらない。フロントエンドに徹する。）</li>
 <li>Terraform の Project ディレクトリの GCE, GCS に対応する tfvars ファイルに受け取ったリソース名を書き込む。</li>
-<li>vars&#x2F;filejoin.sh を実行する。</li>
+<li>vars/filejoin.sh を実行する。</li>
 <li>terraform plan を実行し、結果を返す。</li>
 </ol>
 <p>始めに言い訳しておきますが、初めて Go を書いた関係で、あまりソースコードには自信がありません。<br>本質的に必要な部分だけを書いているので、エラー処理・認証・暗号化の処理も実装していないので、検証用途と割り切って見てください。</p>
@@ -232,7 +232,7 @@
 <figure class="highlight bash"><figcaption><span>tfapply.sh</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">terraform apply -auto-approve -no-color</span><br></pre></td></tr></table></figure>
 
 <p><code>-no-color</code> オプションで terraformコマンドの出力する特殊文字を無効化して、単純な文字列にしています。</p>
-<p>また、わざわざshを作り、それをGoで実行する様にしたのは、複数の引数指定でos&#x2F;execがうまく動作しなかったからです。<a target="_blank" rel="noopener" href="https://qiita.com/tng527/items/c44b943da93041a8355b">こちらの記事</a>の最後を参考にしました。</p>
+<p>また、わざわざshを作り、それをGoで実行する様にしたのは、複数の引数指定でos/execがうまく動作しなかったからです。<a target="_blank" rel="noopener" href="https://qiita.com/tng527/items/c44b943da93041a8355b">こちらの記事</a>の最後を参考にしました。</p>
 <h1 id="動作確認"><a href="#動作確認" class="headerlink" title="動作確認"></a>動作確認</h1><h3 id="ユーザの操作"><a href="#ユーザの操作" class="headerlink" title="ユーザの操作"></a>ユーザの操作</h3><p>Service Catalog のダッシュボードに、GCP infra の widget を追加すると、以下の様になります。<br><img src="/images/20200416/u1.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy"><br><img src="/images/20200416/u2.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy"></p>
 <p>画面ではGCSも追加しています。手順はGCEの時と全く同じです。<br><img src="/images/20200416/u3.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy"><br><img src="/images/20200416/u4.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy"></p>
 <p>Shoppingっぽくなっているのは、あんまり気にしないでください。SaaSで細部を気にし始めると工数が跳ね上がります。（※初期構築だけ考えるとそうでもないですが、保守や機能拡張を考えると雪だるま式に増えます。）</p>
@@ -268,7 +268,7 @@
 <li>DBのレコード変更をトリガに様々な処理を間に挟む処理を簡単に作れるプラットフォーム。最初のレコード変更がフロントエンドや API などで行われると、そこから他のテーブルへの CRUD や他の API を叩いて結果を導出するなどの仕組みを簡単に作れる。</li>
 </ul>
 <h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>今回、私にとって最も実装が簡単だったのはSNOWでした。逆に一番大変だったのがGoでの実装です。ただ、こういう製品と製品の間に落ちる部分の処理って、どうしてもカスタム実装が必要になるんですよね。なので、実際のサービス連携を考えた際も同じ様な比率になるんじゃないかと考えています。</p>
-<p>まだまだGithubやJenkinsなど課題は多々ありますが、まずは本質的なインフラ構築の自動化を中心に置いて実装してみました。今回利用した製品&#x2F;サービスは別に他のなんでも代替は可能だと思ってますので、考え方の1つとして捕えてもらえれば幸いです。</p>
+<p>まだまだGithubやJenkinsなど課題は多々ありますが、まずは本質的なインフラ構築の自動化を中心に置いて実装してみました。今回利用した製品/サービスは別に他のなんでも代替は可能だと思ってますので、考え方の1つとして捕えてもらえれば幸いです。</p>
 
           
         </div>
@@ -339,7 +339,7 @@
   <li class=""><a href="/categories/Programming/">Programming (375)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (231)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
-<li class=""><a href="/categories/DataScience/">DataScience (52)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (53)</a></li>
 <li class=""><a href="/categories/IoT/">IoT (32)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>

@@ -29,18 +29,18 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   
-  <meta name="description" content="はじめに夏の自由研究連載2021の4日目で、TIG DXユニット真野です。 この記事では みんな 個人的に大好きなフォワードプロキシの概要と、Goでの既存のOSSライブラリを利用した実装例をまとめました。このテーマに決めた理由は以下です。  Goのnet&#x2F;httpのクライアントは、https_proxy の環境変数で差し込める（標準のデフォルトクライアントをそのまま利用する前提です） 差">
+  <meta name="description" content="はじめに夏の自由研究連載2021の4日目で、TIG DXユニット真野です。 この記事では みんな 個人的に大好きなフォワードプロキシの概要と、Goでの既存のOSSライブラリを利用した実装例をまとめました。このテーマに決めた理由は以下です。  Goのnet&#x2F;httpのクライアントは、https_proxy の環境変数で差し込める（標準のデフォルトクライアントをそのまま利用する前提です） 差し込んだプ">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ローカルフォワードプロキシでHTTP要求時に機能横断な処理を差し込み | フューチャー技術ブログ">
 <meta property="og:url" content="https://future-architect.github.io/articles/20210826b/index.html">
 <meta property="og:site_name" content="フューチャー技術ブログ">
-<meta property="og:description" content="はじめに夏の自由研究連載2021の4日目で、TIG DXユニット真野です。 この記事では みんな 個人的に大好きなフォワードプロキシの概要と、Goでの既存のOSSライブラリを利用した実装例をまとめました。このテーマに決めた理由は以下です。  Goのnet&#x2F;httpのクライアントは、https_proxy の環境変数で差し込める（標準のデフォルトクライアントをそのまま利用する前提です） 差">
+<meta property="og:description" content="はじめに夏の自由研究連載2021の4日目で、TIG DXユニット真野です。 この記事では みんな 個人的に大好きなフォワードプロキシの概要と、Goでの既存のOSSライブラリを利用した実装例をまとめました。このテーマに決めた理由は以下です。  Goのnet&#x2F;httpのクライアントは、https_proxy の環境変数で差し込める（標準のデフォルトクライアントをそのまま利用する前提です） 差し込んだプ">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20210826b/ローカルフォワードプロキシ.drawio-ページ2.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20210826b/ローカルフォワードプロキシ.drawio-ページ3.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20210826b/ローカルフォワードプロキシ.drawio.png">
 <meta property="article:published_time" content="2021-08-25T15:00:01.000Z">
-<meta property="article:modified_time" content="2022-07-04T14:47:53.522Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.694Z">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="プロキシ">
 <meta name="twitter:card" content="summary">
@@ -120,7 +120,7 @@
             <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p><a href="/articles/20210823a/">夏の自由研究連載2021</a>の4日目で、TIG DXユニット真野です。</p>
 <p>この記事では <del>みんな</del> 個人的に大好きなフォワードプロキシの概要と、Goでの既存のOSSライブラリを利用した実装例をまとめました。このテーマに決めた理由は以下です。</p>
 <ul>
-<li>Goのnet&#x2F;httpのクライアントは、<code>https_proxy</code> の環境変数で差し込める（標準のデフォルトクライアントをそのまま利用する前提です）</li>
+<li>Goのnet/httpのクライアントは、<code>https_proxy</code> の環境変数で差し込める（標準のデフォルトクライアントをそのまま利用する前提です）</li>
 <li>差し込んだプロキシ側に、ロギングや認証やできればリトライを仕込めば色々役立つ事があるんじゃないかという調査<ul>
 <li>Goだとhttp.Clientは、RoundTripperというインタフェースを実装したTransportでカスタマイズ可能なので、実用だとこちらを利用したほうが良いと思います。</li>
 </ul>
@@ -140,8 +140,8 @@
 
 
 <p>もし同一プロセス内に組み込む場合は、実現させるためにはローカルでフォワードプロキシのgoroutineを起動すること、フォワードプロキシのプロトコル（HTTPのCONNECTメソッドなど）を守って実装する必要があり、利用できるOSSなどを調査します。</p>
-<p>リバースプロキシだと、net&#x2F;http&#x2F;httputil の <a target="_blank" rel="noopener" href="https://pkg.go.dev/net/http/httputil#ReverseProxy">ReverseProxy</a>を利用すればかなり楽できそうなのですが、繰り返しますが今回構築するのはフォワードプロキシなので異なります。</p>
-<h2 id="実装"><a href="#実装" class="headerlink" title="実装"></a>実装</h2><p>フォワードプロキシを実装するには、HTTP CONNECTメソッドなど所定のプロトコルを解釈させる必要があると思うのですが、<a target="_blank" rel="noopener" href="https://github.com/elazarl/goproxy">elazarl&#x2F;goproxy</a>など有名なプロダクトがすでに存在したのでそちらを利用します。</p>
+<p>リバースプロキシだと、net/http/httputil の <a target="_blank" rel="noopener" href="https://pkg.go.dev/net/http/httputil#ReverseProxy">ReverseProxy</a>を利用すればかなり楽できそうなのですが、繰り返しますが今回構築するのはフォワードプロキシなので異なります。</p>
+<h2 id="実装"><a href="#実装" class="headerlink" title="実装"></a>実装</h2><p>フォワードプロキシを実装するには、HTTP CONNECTメソッドなど所定のプロトコルを解釈させる必要があると思うのですが、<a target="_blank" rel="noopener" href="https://github.com/elazarl/goproxy">elazarl/goproxy</a>など有名なプロダクトがすでに存在したのでそちらを利用します。</p>
 <p>goproxyという名前は<a target="_blank" rel="noopener" href="https://golang.org/ref/mod#goproxy-protocol">go module側のプロキシサーバ</a>と勘違いしそうですが、それとは関係ないです。</p>
 <p>goproxyはカスタマイズ可能なHTTPプロキシライブラリを提供するとREADMEに書いている通り、内部で利用するTransportなどが公開されているので自由度が高い印象を受けました。プロキシ自体は <code>net/http</code>のハンドラーなので、コードもGoに慣れている人であれば比較的理解しやすいと思います。</p>
 <p>goporxyをまずmain関数内で呼び出すミニマムな実装で試してみます。</p>
@@ -266,7 +266,7 @@
   <li class=""><a href="/categories/Programming/">Programming (375)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (231)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
-<li class=""><a href="/categories/DataScience/">DataScience (52)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (53)</a></li>
 <li class=""><a href="/categories/IoT/">IoT (32)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>

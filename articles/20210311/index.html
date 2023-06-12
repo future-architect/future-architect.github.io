@@ -44,7 +44,7 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20210311/スクリーンショット_2021-03-06_10.41.02.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20210311/スクリーンショット_2021-03-06_10.26.38.png">
 <meta property="article:published_time" content="2021-03-10T15:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-04T14:47:53.273Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.589Z">
 <meta property="article:tag" content="Python">
 <meta property="article:tag" content="OpenCensus">
 <meta property="article:tag" content="OpenTelemetry">
@@ -169,13 +169,13 @@
 <p>あとは、Python 3.7じゃないとうまくいかなかったので3.7にしています。</p>
 <figure class="highlight dockerfile"><figcaption><span>Dockerfile</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> python:<span class="number">3.7</span>-buster as builder</span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /opt/app</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> pip3 install poetry</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> pyproject.toml poetry.lock /opt/app/</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> poetry <span class="built_in">export</span> -f requirements.txt &gt; requirements.txt</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> pip3 install -r requirements.txt</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> python:<span class="number">3.7</span>-slim-buster as runner</span><br><span class="line"><span class="keyword">ENV</span> PORT=<span class="number">8000</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /opt/app/</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=builder /usr/local/lib/python3.7/site-packages /usr/local/lib/python3.7/site-packages</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=builder /usr/local/bin/uvicorn /usr/local/bin/uvicorn</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> python_cloud_debug /opt/app/</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /opt/app/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ENV</span> PYTHONUNBUFFERED=TRUE</span><br><span class="line"><span class="keyword">CMD</span><span class="language-bash"> [ <span class="string">&quot;/bin/sh&quot;</span>, <span class="string">&quot;-c&quot;</span>, <span class="string">&quot;exec /usr/local/bin/uvicorn --host 0.0.0.0 --port <span class="variable">$PORT</span> main:app&quot;</span> ]</span></span><br></pre></td></tr></table></figure>
 
-<p>ローカルでビルドしてうまく動くことを確認したらpushします。リポジトリに入れてクラウドビルドをする方法も最近は使えます。とりあえず手元で動かしてプッシュしてみます。M1 macの場合は–platform linux&#x2F;amd64が必要です。</p>
+<p>ローカルでビルドしてうまく動くことを確認したらpushします。リポジトリに入れてクラウドビルドをする方法も最近は使えます。とりあえず手元で動かしてプッシュしてみます。M1 macの場合は–platform linux/amd64が必要です。</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ビルド</span></span><br><span class="line">$ docker build --platform linux/amd64 -t gcr.io/[プロジェクトID]/[プロジェクト名]:latest .</span><br><span class="line"><span class="comment"># ローカルで実行</span></span><br><span class="line">$ docker run --<span class="built_in">rm</span> -it -p 8000:8000 gcr.io/[プロジェクトID]/[プロジェクト名]:latest</span><br><span class="line"><span class="comment"># push</span></span><br><span class="line">$ docker push gcr.io/[プロジェクトID]/[プロジェクト名]:latest</span><br></pre></td></tr></table></figure>
 
 <p>これを使ってCloud Runに登録して実行してみても良いでしょう。アプリケーション名を入れて、このpushしたイメージ名を選択して外部公開してあげれば簡単に起動できます。それ以外にはリポジトリと連携してCloud Buildする方法も選べます。デバッガーではソースコードを別にpushしないといけないのでそっちの方がいいかも？</p>
 <img src="/images/20210311/スクリーンショット_2021-03-06_9.38.35.png" loading="lazy">
 
-<h1 id="デバッガーを使ってみる"><a href="#デバッガーを使ってみる" class="headerlink" title="デバッガーを使ってみる"></a>デバッガーを使ってみる</h1><p>それでは本題のGCPのAPIを使ってみます。必要なライブラリを足しつつ、先程のコードの<code>app = FastAPI()</code>の前に次の内容を入れます。ローカルでは外部依存なく気軽にテストしたいので、poetryの依存に入れず、実行イメージの中でのみ追加して、LOCAL&#x3D;trueという環境変数があればロードしないようにします。</p>
+<h1 id="デバッガーを使ってみる"><a href="#デバッガーを使ってみる" class="headerlink" title="デバッガーを使ってみる"></a>デバッガーを使ってみる</h1><p>それでは本題のGCPのAPIを使ってみます。必要なライブラリを足しつつ、先程のコードの<code>app = FastAPI()</code>の前に次の内容を入れます。ローカルでは外部依存なく気軽にテストしたいので、poetryの依存に入れず、実行イメージの中でのみ追加して、LOCAL=trueという環境変数があればロードしないようにします。</p>
 <p>pip3の行を次のように書き換えます。</p>
 <figure class="highlight dockerfile"><figcaption><span>Dockerfile</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="language-bash"> pip3 install poetry google-python-cloud-debugger</span></span><br></pre></td></tr></table></figure>
 
@@ -201,7 +201,7 @@
 <p>CPU時間のグラフはこんな感じです。きっとプログラムがヘビーになったら活躍してくれるはず。</p>
 <img src="/images/20210311/スクリーンショット_2021-03-06_10.26.38.png" loading="lazy">
 
-<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>StackdriverあらためCloud OperationsのDebuggerとProfilerを試してみました。Goサポートがまだだったり、Cloud Run対応がまだだったりとかはありますが、OpenCensus&#x2F;OpenTelemetryなみに頑張らなくてもちょっとmainのところにコードを足すだけで本番環境の中身を覗いたりプロファイルが取れるのは面白いですね。そのうち、ローカルのデバッグよりもリモートの方が簡単、みたいになってくれそうな気がしました。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>StackdriverあらためCloud OperationsのDebuggerとProfilerを試してみました。Goサポートがまだだったり、Cloud Run対応がまだだったりとかはありますが、OpenCensus/OpenTelemetryなみに頑張らなくてもちょっとmainのところにコードを足すだけで本番環境の中身を覗いたりプロファイルが取れるのは面白いですね。そのうち、ローカルのデバッグよりもリモートの方が簡単、みたいになってくれそうな気がしました。</p>
 <p>明日は村瀬さんの<a href="/articles/20210312/">Text To Speech</a>です。</p>
 
           
@@ -278,7 +278,7 @@
   <li class=""><a href="/categories/Programming/">Programming (375)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (231)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
-<li class=""><a href="/categories/DataScience/">DataScience (52)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (53)</a></li>
 <li class=""><a href="/categories/IoT/">IoT (32)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>
