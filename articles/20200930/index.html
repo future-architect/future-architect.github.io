@@ -41,7 +41,7 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20200930/image.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20200930/image_2.png">
 <meta property="article:published_time" content="2020-09-29T15:00:00.000Z">
-<meta property="article:modified_time" content="2022-06-09T01:03:49.518Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:53.124Z">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="Swagger">
 <meta property="article:tag" content="OpenAPI">
@@ -152,8 +152,8 @@
 <li>コンテナが実行できるOS機能</li>
 <li>システムにアクセスできる時間帯</li>
 </ul>
-<p>ポリシーエンジンと聞くと、なんとなくOK/NGだけ返すだけなのねと思いがちですが、OPAのAPIはクエリに対してレスポンスを返すような設計になっていて、JSONのような構造データを入出力することもできます。</p>
-<p>2020/09/27時点で CNCF projectsの <code>Incubating</code>、バージョンは <code>v0.23.2</code>が最新でした。</p>
+<p>ポリシーエンジンと聞くと、なんとなくOK&#x2F;NGだけ返すだけなのねと思いがちですが、OPAのAPIはクエリに対してレスポンスを返すような設計になっていて、JSONのような構造データを入出力することもできます。</p>
+<p>2020&#x2F;09&#x2F;27時点で CNCF projectsの <code>Incubating</code>、バージョンは <code>v0.23.2</code>が最新でした。</p>
 <h1 id="Policy-as-Code"><a href="#Policy-as-Code" class="headerlink" title="Policy as Code"></a>Policy as Code</h1><p>Policy as Codeの先駆けは自分が知る限り HashiCorp の <a target="_blank" rel="noopener" href="https://www.hashicorp.com/sentinel">Sentinel</a>だと認識しています。Terraformは Infrastructure as Codeを実現しますが、Sentinelのような Policy as Codeなツールと組み合わせ、インフラ構成全体のアクセスポリシーを設定することで、より安全にインフラ作成を自動化したり、不用意な破壊を防ぐことできるとされています。古いイメージを使わないといったセキュリティの観点や、あまり高すぎるインスタンスを立ち上げすぎないと言ったクラウド破産を防ぐといった使い方もよく聞きますよね。</p>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://www.publickey1.jp/blog/17/hashicorpsentinelpolicy_as_codehashiconf17.html">HashiCorp、インフラ変更全体にまたがるアクセス権を設定する「Sentinel」発表「Policy as Code」を実現するフレームワーク。HashiConf’17 - Publickey</a></li>
@@ -215,17 +215,17 @@
 <p>一方でこの手の規約は生み出してしまえば、チェックするのはLinterにやらせたいものです。上記の設計規約の一部をOPAで実装してみたいと思います。Open API SpecはYAML or JSONで記載するので入力としてはOPAにフィットすると思います。</p>
 <p>とりあえずルールは上から2つにしぼり、tagsとoperationIdについてのルールを書きます。</p>
 <ul>
-<li>paths/tags<ul>
+<li>paths&#x2F;tags<ul>
 <li>1URIで１つのタグのみ定義する</li>
 </ul>
 </li>
-<li>paths/operationId<ul>
+<li>paths&#x2F;operationId<ul>
 <li>{HTTPメソッド}{機能物理名}を記載する</li>
 <li>キャメルケース</li>
 </ul>
 </li>
 </ul>
-<h2 id="Rego設計"><a href="#Rego設計" class="headerlink" title="Rego設計"></a>Rego設計</h2><p>tagsの数=1を実現するためには<a target="_blank" rel="noopener" href="https://www.openpolicyagent.org/docs/latest/policy-reference/#built-in-functions">ビルトイン関数</a>である <code>count</code> を利用します。</p>
+<h2 id="Rego設計"><a href="#Rego設計" class="headerlink" title="Rego設計"></a>Rego設計</h2><p>tagsの数&#x3D;1を実現するためには<a target="_blank" rel="noopener" href="https://www.openpolicyagent.org/docs/latest/policy-reference/#built-in-functions">ビルトイン関数</a>である <code>count</code> を利用します。</p>
 <figure class="highlight prolog"><figcaption><span>tagsの数チェック</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">package test</span><br><span class="line"></span><br><span class="line">deny_tags_multiple[msg] &#123;</span><br><span class="line">    some path, method</span><br><span class="line">    count(input.paths[path][method].tags) != <span class="number">1</span>               # タグが複数設定</span><br><span class="line">    msg := sprintf(<span class="string">&quot;path(%v) method(%v) tags must keep only one&quot;</span>, [path, method])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">deny_tags_none[msg] &#123;</span><br><span class="line">    some path, method</span><br><span class="line">    object.get(input.paths[path][method], <span class="string">&quot;tags&quot;</span>, <span class="string">&quot;none&quot;</span>) == <span class="string">&quot;none&quot;</span> # タグが存在しない場合</span><br><span class="line">    msg := sprintf(<span class="string">&quot;path(%v) method(%v) tags must keep only one&quot;</span>, [path, method])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>operationIdのcamelCaseのチェック方法は、あまり良い手じゃないですが、snake_caseでないことと、最初の1文字が小文字であることだけチェックします（単語の区切りがムズカシイので）。他にも、<code>split</code>、<code>object.get</code> など多数の組み込み関数を利用しています。</p>
@@ -328,7 +328,7 @@
 <div class="widget">
   <ul class="nav sidebar-categories margin-bottom-40">
   
-  <li class=""><a href="/categories/Programming/">Programming (379)</a></li>
+  <li class=""><a href="/categories/Programming/">Programming (380)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (238)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
 <li class=""><a href="/categories/DataScience/">DataScience (53)</a></li>

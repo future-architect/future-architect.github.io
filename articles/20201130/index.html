@@ -29,12 +29,12 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   
-  <meta name="description" content="はじめにTIG&#x2F;DXユニットの棚井龍之介です。入社以来、Go × AWS でのバックエンド開発を担当しています。 AWSのDBといえば「RDS」が代表格ですが、近年のサーバレス普及に伴い「DynamoDB」が第一選択肢として選ばれる機会が増えています。私の所属するプロジェクトでは、API Gateway, Lambda, DynamoDBのAWSサーバレス3兄弟をメイン利用しているため、メンバ">
+  <meta name="description" content="はじめにTIG&#x2F;DXユニットの棚井龍之介です。入社以来、Go × AWS でのバックエンド開発を担当しています。 AWSのDBといえば「RDS」が代表格ですが、近年のサーバレス普及に伴い「DynamoDB」が第一選択肢として選ばれる機会が増えています。私の所属するプロジェクトでは、API Gateway, Lambda, DynamoDBのAWSサーバレス3兄弟をメイン利用しているた">
 <meta property="og:type" content="article">
 <meta property="og:title" content="DynamoDBのページング | フューチャー技術ブログ">
 <meta property="og:url" content="https://future-architect.github.io/articles/20201130/index.html">
 <meta property="og:site_name" content="フューチャー技術ブログ">
-<meta property="og:description" content="はじめにTIG&#x2F;DXユニットの棚井龍之介です。入社以来、Go × AWS でのバックエンド開発を担当しています。 AWSのDBといえば「RDS」が代表格ですが、近年のサーバレス普及に伴い「DynamoDB」が第一選択肢として選ばれる機会が増えています。私の所属するプロジェクトでは、API Gateway, Lambda, DynamoDBのAWSサーバレス3兄弟をメイン利用しているため、メンバ">
+<meta property="og:description" content="はじめにTIG&#x2F;DXユニットの棚井龍之介です。入社以来、Go × AWS でのバックエンド開発を担当しています。 AWSのDBといえば「RDS」が代表格ですが、近年のサーバレス普及に伴い「DynamoDB」が第一選択肢として選ばれる機会が増えています。私の所属するプロジェクトでは、API Gateway, Lambda, DynamoDBのAWSサーバレス3兄弟をメイン利用しているた">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20201130/Screen_Shot_2020-11-30_at_5.34.55.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20201130/Screen_Shot_2020-11-30_at_5.36.09.png">
@@ -43,7 +43,7 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20201130/Screen_Shot_2020-11-30_at_5.36.43.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20201130/Screen_Shot_2020-11-30_at_5.36.58.png">
 <meta property="article:published_time" content="2020-11-29T15:00:00.000Z">
-<meta property="article:modified_time" content="2022-06-09T01:03:49.548Z">
+<meta property="article:modified_time" content="2022-07-04T14:47:53.182Z">
 <meta property="article:tag" content="AWS">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="DynamoDB">
@@ -126,7 +126,7 @@
           
             <img src="/images/20201130/Screen_Shot_2020-11-30_at_5.34.55.png" loading="lazy">
 
-<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG/DXユニットの棚井龍之介です。入社以来、Go × AWS でのバックエンド開発を担当しています。</p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG&#x2F;DXユニットの棚井龍之介です。入社以来、Go × AWS でのバックエンド開発を担当しています。</p>
 <p>AWSのDBといえば「RDS」が代表格ですが、近年のサーバレス普及に伴い「DynamoDB」が第一選択肢として選ばれる機会が増えています。私の所属するプロジェクトでは、API Gateway, Lambda, DynamoDBのAWSサーバレス3兄弟をメイン利用しているため、メンバーによっては「研修はSQL地獄だったけど、配属後はNoSQLオンリーだ！」という人もいます。</p>
 <p>徐々に利用機会が増えているDynamoDBですが、いくつかの「初見殺し」があります。今回はその中での「ページング」について、DynamoDBのデータ格納状況と照らし合わせながら、基本的な仕組みを見ていこうと思います。</p>
 <p>DynamoDBの操作経験がある方を想定しているため、まだ一度も触ったことのない方や基本操作に不安のある方は、<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html">公式docs</a>や冨山さんの書かれた<a href="/articles/20200818/">入門記事</a>をご覧ください。</p>
@@ -146,11 +146,11 @@
 <p>このうち、ReadのScanとQueryは、一度のDynamoDB API操作では <strong>1MBが取得上限</strong> です。1MB以上のデータを抜き出したい場合は、ページング処理が必要です。ページング処理の対応実装はシンプルであり、1度誰かが書いたコードをコピペで利用できるため、中身を深く理解せずとも使えてしまいます。(Goのサンプルコードは最後に掲載します)</p>
 <p>しかし、詳細を理解しないコピペ実装だと、ちょっと手の込んだ実装などができなくなってしまうため、ページング処理を説明する前にDynamoDBのデータ格納方法を説明します。</p>
 <h1 id="DynamoDBのデータ格納方法"><a href="#DynamoDBのデータ格納方法" class="headerlink" title="DynamoDBのデータ格納方法"></a>DynamoDBのデータ格納方法</h1><p>DynamoDBのテーブルにItemを格納する場合、プライマリーキーによって格納場所が決まります。</p>
-<p>データ格納空間(Key Space)を00~FF、idをHash-Keyとした場合、各Itemは下図のように格納されます。プライマリーキーは重複できないため、新しいデータをid=1でPutItemした場合、データは上書きされます。</p>
+<p>データ格納空間(Key Space)を00~FF、idをHash-Keyとした場合、各Itemは下図のように格納されます。プライマリーキーは重複できないため、新しいデータをid&#x3D;1でPutItemした場合、データは上書きされます。</p>
 <p>table</p>
 <ul>
 <li>Hash-Table<br>key</li>
-<li> Hash-Key: id</li>
+<li>Hash-Key: id</li>
 </ul>
 <img src="/images/20201130/Screen_Shot_2020-11-30_at_5.36.09.png" loading="lazy">
 
@@ -281,7 +281,7 @@
 <div class="widget">
   <ul class="nav sidebar-categories margin-bottom-40">
   
-  <li class=""><a href="/categories/Programming/">Programming (379)</a></li>
+  <li class=""><a href="/categories/Programming/">Programming (380)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (238)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
 <li class=""><a href="/categories/DataScience/">DataScience (53)</a></li>
