@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Go1.21のgo/ast、go/buildあたりのマイナーチェンジ | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにGo1.21連載の2本目です。 取り上げるのは次のgo&#x2F;ast、go&#x2F;buildあたりの更新についてです。  go&#x2F;ast go&#x2F;build 関連してToolの互換性の話も含みます   go&#x2F;build&#x2F;constraint go&#x2F;token go&#x2F;types  go&#x2F;ast はGoコードの抽象構文木を表現">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go1.21のgo&#x2F;ast、go&#x2F;buildあたりのマイナーチェンジ | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20230801a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにGo1.21連載の2本目です。 取り上げるのは次のgo&#x2F;ast、go&#x2F;buildあたりの更新についてです。  go&#x2F;ast go&#x2F;build 関連してToolの互換性の話も含みます   go&#x2F;build&#x2F;constraint go&#x2F;token go&#x2F;types  go&#x2F;ast はGoコードの抽象構文木を表現">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20230801a/top.png">
+<meta property="article:published_time" content="2023-07-31T15:00:00.000Z">
+<meta property="article:modified_time" content="2023-08-04T04:04:38.392Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="静的解析">
+<meta property="article:tag" content="Go1.21">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20230801a/top.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20230801a/">
+  <meta content="Go,静的解析,Go1.21" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Go1.21のgo/ast、go/buildあたりのマイナーチェンジ
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20230801a_Go1.21のgo／ast、go／buildあたりのマイナーチェンジ.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20230801a_Go1.21のgo／ast、go／buildあたりのマイナーチェンジ" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2023/" class="publish-date"><time datetime="2023-07-31T15:00:00.000Z" itemprop="datePublished">2023.08.01</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98" title="真野隼記さんの記事一覧へ" class="post-author">真野隼記</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/静的解析/" title="静的解析タグの記事へ" class="tag-list-link">静的解析</a>
+  
+    
+    <a href="/tags/Go1-21/" title="Go1.21タグの記事へ" class="tag-list-link">Go1.21</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20230801a/top.png" alt="" width="700" height="338">
+
+<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p><a href="/articles/20230731a/">Go1.21連載</a>の2本目です。</p>
+<p>取り上げるのは次のgo&#x2F;ast、go&#x2F;buildあたりの更新についてです。</p>
+<ol>
+<li>go&#x2F;ast</li>
+<li>go&#x2F;build<ul>
+<li>関連してToolの互換性の話も含みます</li>
+</ul>
+</li>
+<li>go&#x2F;build&#x2F;constraint</li>
+<li>go&#x2F;token</li>
+<li>go&#x2F;types</li>
+</ol>
+<p><code>go/ast</code> はGoコードの抽象構文木を表現するパッケージで、<code>go/parser</code> パッケージでコード解析をすると取得できます。 <code>go/token</code> とか <code>go/types</code> は概ね解析した結果の型やトークンを表現するもので比較的セットで利用することが多いかと思います。</p>
+<p><code>go/build</code> パッケージはGoのビルド周りの情報を集めるパッケージです。今回のアップデートは <code>go/ast</code> と関連が強かったので、この記事でまとめて紹介します。</p>
+<p>バージョンは <code>Go 1.21rc4</code> であり、リリースまでに多少変更があるかも知れません。ご了承ください。</p>
+<h2 id="go-x2F-ast-の-IsGenerated"><a href="#go-x2F-ast-の-IsGenerated" class="headerlink" title="go&#x2F;ast の IsGenerated()"></a>go&#x2F;ast の IsGenerated()</h2><p><code>go/ast</code> パッケージに <code>IsGenerated()</code> というそのコードが自動生成されたかどうかを判定するためのヘルパー関数が追加されました。</p>
+<figure class="highlight go"><figcaption><span>go/astパッケージに追加されたヘルパー関数</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">IsGenerated</span><span class="params">(file *File)</span></span> <span class="type">bool</span></span><br></pre></td></tr></table></figure>
+
+<p>あるGoコードが自動生成されたかどうかは、<a target="_blank" rel="noopener" href="https://go.dev/s/generatedcode">cmd&#x2F;goパッケージのドキュメント</a>に記載がある通り、以下の行を含んでいる場合（ファイルの行頭じゃなくてもOK）に、判断できるとあります。 <code>IsGenerated()</code> でこの行を含んでいるかが判断できるようになりました。</p>
+<figure class="highlight go"><figcaption><span>自動生成を示すための一文</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">^<span class="comment">// Code generated .* DO NOT EDIT\.$</span></span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/28089">go&#x2F;ast: add func IsGenerated(*File) bool #28089</a> で議論されており、上記の自動生成の判定条件が現在広く受け入れられているのであれば、公式でAPIを提供したら便利ではという提案でした。</p>
+<p>これ以前は起票者が開発した <a target="_blank" rel="noopener" href="https://pkg.go.dev/github.com/shurcooL/go/generated">shurcooL&#x2F;go&#x2F;generated</a> というパッケージを利用したり、regexp パッケージを用いた正規表現でファイルの判定や、人によってはシェルスクリプトで判定していたようです。</p>
+<figure class="highlight sh"><figcaption><span>自動生成を判定用するシェルスクリプト</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -Exq <span class="string">&#x27;^// Code generated .* DO NOT EDIT\.$&#x27;</span> <span class="string">&quot;<span class="variable">$file</span>&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>IsGenerated()</code> の関数を新規に追加実装する箇所は、 <code>ast.File</code> や <code>build.Package</code> なども考えられたかと思いますが、互換性やフィールド追加は神経質に行いたいということで、ヘルパー関数となったようです。次の章で説明するGoVersionは <code>ast.File</code> へのフィールド追加なので、塩梅は分かるような分からないような。GoVersionは論理式が入って計算されるのでそれなりのロジックだけど、自動生成判定はシンプルなのでヘルパー関数になったんですかね、多分。</p>
+<p>追加された <code>IsGenerated()</code>を試してみます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;go/ast&quot;</span></span><br><span class="line">	<span class="string">&quot;go/parser&quot;</span></span><br><span class="line">	<span class="string">&quot;go/token&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">const</span> s = <span class="string">`// Code generated by My-Tool; DO NOT EDIT.</span></span><br><span class="line"><span class="string">package go121blog</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">import(</span></span><br><span class="line"><span class="string">  &quot;fmt&quot;</span></span><br><span class="line"><span class="string">)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">func Show() &#123;</span></span><br><span class="line"><span class="string">  fmt.Println(&quot;hello generated&quot;)</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">`</span></span><br><span class="line">	fset := token.NewFileSet()</span><br><span class="line">	f, err := parser.ParseFile(fset, <span class="string">&quot;&quot;</span>, s, parser.ParseComments)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(ast.IsGenerated(f)) <span class="comment">// true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意としては <code>ParseFile()</code> の引数に <code>parser.ParseComments</code> を渡さないと、コメントがフィールドに格納されないため、結果が <code>false</code> になります。ここは注意です。</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="deletion">-	f, err := parser.ParseFile(fset, &quot;&quot;, s, parser.ParseComments)</span></span><br><span class="line"><span class="addition">+ 	f, err := parser.ParseFile(fset, &quot;&quot;, s, 0) // ast.IsGenerated(f) が falseになる</span></span><br></pre></td></tr></table></figure>
+
+<p>上手く利用すれば、自動生成されたコードを除去してリントのルールを追加するなどが行いやすくなると感じました。</p>
+<p>ちなみに実装は <code>strings.CutPrefix()</code>、<code>strings.CutSuffix()</code> で判定しており、正規表現は利用していない愚直なコードでした。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/golang/go/blob/go1.21rc4/src/go/ast/ast.go#L1092">https://github.com/golang/go/blob/go1.21rc4/src/go/ast/ast.go#L1092</a></p>
+<h2 id="go-x2F-ast-の-File-GoVersion"><a href="#go-x2F-ast-の-File-GoVersion" class="headerlink" title="go&#x2F;ast の File.GoVersion"></a>go&#x2F;ast の File.GoVersion</h2><p><code>go/ast</code> パッケージの <code>File</code> に <code>GoVersion</code> というフィールドが追加されました。</p>
+<figure class="highlight diff"><figcaption><span>追加されたフィールド</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">type File struct &#123;</span><br><span class="line">	Doc     *CommentGroup // associated documentation; or nil</span><br><span class="line">	Package token.Pos     // position of &quot;package&quot; keyword</span><br><span class="line">	Name    *Ident        // package name</span><br><span class="line">	Decls   []Decl        // top-level declarations; or nil</span><br><span class="line"></span><br><span class="line">	FileStart, FileEnd token.Pos       // start and end of entire file</span><br><span class="line">	Scope              *Scope          // package scope (this file only)</span><br><span class="line">	Imports            []*ImportSpec   // imports in this file</span><br><span class="line">	Unresolved         []*Ident        // unresolved identifiers in this file</span><br><span class="line">	Comments           []*CommentGroup // list of all comments in the source file</span><br><span class="line"><span class="addition">+	GoVersion          string          // minimum Go version required by //go:build or // +build directives</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>GoVersion</code> が示す意味は、 <code>//go:build</code> や <code>// +build</code> のディレクティブで示した最小のGoバージョンが入るそうです。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/59033">go&#x2F;ast, go&#x2F;build&#x2F;constraint: support for per-file Go versions using &#x2F;&#x2F;go:build lines #59033</a> によると、Goの互換性は以下の方針です。直接的には2の対応のために追加されたようです。</p>
+<ol>
+<li>Go 1.21から go.mod にかかれた <code>go</code> のバージョンが、最小バージョン要件となる。例えば、Go 1.21がGo 1.22とかかれたgo.modファイルをビルドできない</li>
+<li>Goの最小バージョンが低くても、 <code>//go:build</code> タグに新しいバージョンを指定することを可能とする。また、逆に <code>//go:build</code> に古いバージョンを指定することも可能として、新しい機能をロックアウト（無効化）できるようにする。互換性のためダウングレードはGo 1.21以降のgo.mod に適用される</li>
+</ol>
+<p><code>//go:build</code> ディレクティブはGo1.17から導入された書き方で、従来は<code>// +build</code> でした。Build Constraintsと呼ばれ、例えば以下のように記載するとWindowsとLinux用のバイナリに対してビルド対象となります。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//go:build windows linux</span></span><br></pre></td></tr></table></figure>
+
+<p>OS名（windows, linux, solaris, darwinなど）やアーキテクチャ名（<code>386</code>, <code>arm</code>, <code>ard64</code>など）だけではなく、バージョンも指定できるようになったようですね。</p>
+<p><code>//go:build</code> ディレクティブに <code>(linux &amp;&amp; go1.20) || (windows &amp;&amp; go1.21)</code> を追加して動かしてみます。実行環境はWindowsなので、 <code>go1.20</code> が出力されます。</p>
+<figure class="highlight go"><figcaption><span>GoVersionの表示</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;go/parser&quot;</span></span><br><span class="line">	<span class="string">&quot;go/token&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">const</span> s = <span class="string">`//go:build (linux &amp;&amp; go1.20) || (windows &amp;&amp; go1.21)</span></span><br><span class="line"><span class="string">package go121blog</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">import(</span></span><br><span class="line"><span class="string">  &quot;fmt&quot;</span></span><br><span class="line"><span class="string">)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">func Show() &#123;</span></span><br><span class="line"><span class="string">  fmt.Println(&quot;hello goversion&quot;)</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">`</span></span><br><span class="line">	fset := token.NewFileSet()</span><br><span class="line">	f, err := parser.ParseFile(fset, <span class="string">&quot;&quot;</span>, s, parser.ParseComments)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(f.GoVersion) <span class="comment">// go1.20</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ディレクティブで指定されたGoバージョンも取得できるのはマニアックに感じます。それなりの規模と歴史を持つ、コードベースを解析するような上級者向けのアップデートかなと思いました。</p>
+<h2 id="Tools"><a href="#Tools" class="headerlink" title="Tools"></a>Tools</h2><p>Goは下位互換性を重視していて強みの1つとしています。<a target="_blank" rel="noopener" href="https://tip.golang.org/doc/go1compat">Go 1の互換性ポリシー</a>に従って破壊的変更は抑えられていますが（例えば公開されたインターフェースにメソッドを追加しないなど）、既存の実装がバグであり（既存のコードが古いアルゴリズムやバグのある動作に依存している場合）、それを修正すると、バグである挙動に依存したプログラムは壊れる可能性があるとのこと。対応としては前章にあるような <code>go.mod</code> などのgoバージョンを読み取るようになったり、GODEBUG環境変数の存在があります。</p>
+<p>具体的に互換性でどういう課題が出たんだろうと思いましたが、<a target="_blank" rel="noopener" href="https://go.googlesource.com/proposal/+/master/design/56986-godebug.md">Proposal: Extended backwards compatibility for Go
+</a> にいくつか例が書いてありました。Kubernetesチームでは平均で年1回ペースで問題が出たそうです。</p>
+<p>例えば以下のような事象があったそうです。</p>
+<ul>
+<li>Go 1.17 では、0127.0000.0000.0001 など、先頭にゼロが付いているアドレスを拒否するように net.ParseIP が変更（BSD派生システムでは8進数として解釈するが、Goでは複数のRFCに従い10進数として解釈）<ul>
+<li>Kubernetesクラスタは先頭ゼロのアドレスを保存している可能性があり、この変更によりノードアクセスができなくなる可能性があり、Go 1.17へのアップデートはブロックされた</li>
+</ul>
+</li>
+</ul>
+<p>上記のようなケースでもGODEBUG環境変数で過去の挙動になるように上書きしたり、 <code>go:debug</code> ディレクティブで個別に指定することを検討中だそうです。互換性にかける熱意が常に素晴らしいなと感じました。</p>
+<h2 id="go-x2F-build"><a href="#go-x2F-build" class="headerlink" title="go&#x2F;build"></a>go&#x2F;build</h2><p><code>//go:</code> で始まるビルドディレクティブを <a target="_blank" rel="noopener" href="https://pkg.go.dev/go/build@master#Package.Directives">Package</a>構造体の <code>Directives</code>, <code>TestDirectives</code>, <code>XTestDirectives</code> で参照できるようになりました。</p>
+<h2 id="go-x2F-build-x2F-constraint"><a href="#go-x2F-build-x2F-constraint" class="headerlink" title="go&#x2F;build&#x2F;constraint"></a>go&#x2F;build&#x2F;constraint</h2><p>ビルド時に指定された、Goの最小要件バージョンを返す、<code>GoVersion()</code> が新しく追加されました。ドキュメントに書かれた例がわかりやすいです。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">GoVersion(linux &amp;&amp; go1<span class="number">.22</span>) = <span class="string">&quot;go1.22&quot;</span></span><br><span class="line">GoVersion((linux &amp;&amp; go1<span class="number">.22</span>) || (windows &amp;&amp; go1<span class="number">.20</span>)) = <span class="string">&quot;go1.20&quot;</span> =&gt; go1<span class="number">.20</span></span><br><span class="line">GoVersion(linux) = <span class="string">&quot;&quot;</span></span><br><span class="line">GoVersion(linux || (windows &amp;&amp; go1<span class="number">.22</span>)) = <span class="string">&quot;&quot;</span></span><br><span class="line">GoVersion(!go1<span class="number">.22</span>) = <span class="string">&quot;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="go-x2F-token"><a href="#go-x2F-token" class="headerlink" title="go&#x2F;token"></a>go&#x2F;token</h2><p>ファイルの行番号を返す、 <code>File.Lines()</code> のメソッドが追加されました。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/57708">go&#x2F;token: add a (*File).Lines method #57708</a>で提案された内容です。中身を読むと、すでに <code>SetLines()</code> メソッドは存在しており、getter が存在しなかったとのこと。</p>
+<p>例としては、<a target="_blank" rel="noopener" href="https://pkg.go.dev/golang.org/x/tools/go/internal/gcimporter">internal&#x2F;gcimporter</a> というパッケージで利用したいということで、おそらく goplsとの連携でコード補完などで利用したいのかなと思います。</p>
+<h2 id="go-x2F-types"><a href="#go-x2F-types" class="headerlink" title="go&#x2F;types"></a>go&#x2F;types</h2><p><code>Package.GoVersion()</code> のメソッドが追加されました。中身は <code>go/ast.File.GoVersion()</code> と同じ。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/61175">go&#x2F;types: add Package.GoVersion method #61175</a> によると、ここのチェッカーが特定のパッケージに紐づいたGoバージョンを取得できると便利なため、追加する。厳密に言うとGo1.21には不要だが、Go 1.22では必要になるため（おそらくforループの変数の件だと思われる）、ツール作成者のためにも追加するとのこと。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><ul>
+<li>Go 1.21では自動生成したコードかどうかを判定するヘルパー関数が標準で追加されたので、自前で正規表現を書いたり、サードパーティのパッケージをインポートする必要がなくなったよ</li>
+<li>Go 1.21でビルド時のGoバージョンを <code>//go:build</code> ディレクティブで指定できるようになりました。</li>
+<li>ディレクティブで指定した内容は、 <code>go/ast</code> や <code>go/types</code> パッケージで合わせて取得できるようにあっているため、コード解析やツール作成者にも優しい変更です</li>
+</ul>
+<p>個人的には普段余り利用しない、意識しないパッケージだったので調べていて勉強になりました。最後まで読んでいただきありがとうございました。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20230801a/&related=twitterapi%2Ctwitter&text=Go1.21%E3%81%AEgo/ast%E3%80%81go/build%E3%81%82%E3%81%9F%E3%82%8A%E3%81%AE%E3%83%9E%E3%82%A4%E3%83%8A%E3%83%BC%E3%83%81%E3%82%A7%E3%83%B3%E3%82%B8%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20230801a/&t=Go1.21%E3%81%AEgo/ast%E3%80%81go/build%E3%81%82%E3%81%9F%E3%82%8A%E3%81%AE%E3%83%9E%E3%82%A4%E3%83%8A%E3%83%BC%E3%83%81%E3%82%A7%E3%83%B3%E3%82%B8" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20230801a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20230801a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;563</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2023.08.03</span><span class="snscount">&#9825;0</span><a href=/articles/20230803a/ title="Go 1.21 連載の記事を書きます。">Go 1.21 リリース連載 contextパッケージに追加されるWithoutCancelでクライアントとの切断に備えてみる<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.07.31</span><span class="snscount">&#9825;53</span><a href=/articles/20230731a/ title="恒例のGo 1.21連載が始まります。">Go 1.21連載始まります＆slogをどう使うべきか<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.01.25</span><span class="snscount">&#9825;79</span><a href=/articles/20230125a/ title="Go 1.20リリース連載の2本目はcontext についてです。Go 1.7で `context.Context`が入ってから、context界隈において久しぶりのアップデートです。">Go1.20リリース連載 contextパッケージのWithCancelCauseとCause</a></li><li class="related-posts-item"><span>2022.11.29</span><span class="snscount">&#9825;8</span><a href=/articles/20221129a/ title="ある緯度経度の座標を日本測地系から世界測地系へ変換する際に、everystreet/go-proj というパッケージを用いました。初めてのcgoを用いたライブラリ利用だったため、環境構築に少し悩んだので手順をまとめておきます。">go-projを用いて日本測地系/世界測地系の変換</a></li><li class="related-posts-item"><span>2022.10.04</span><span class="snscount">&#9825;26</span><a href=/articles/20221004a/ title="ACL、RBAC、ABACなどの様々なモデルでアクセス制御を行えるライブラリであるCasbinについて紹介します。">Casbinで始めるアクセス制御</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20230731a/ title="恒例のGo 1.21連載が始まります。">Go 1.21連載始まります＆slogをどう使うべきか<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#go-x2F-ast-%E3%81%AE-IsGenerated"><span class="toc-text">go&#x2F;ast の IsGenerated()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#go-x2F-ast-%E3%81%AE-File-GoVersion"><span class="toc-text">go&#x2F;ast の File.GoVersion</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tools"><span class="toc-text">Tools</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#go-x2F-build"><span class="toc-text">go&#x2F;build</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#go-x2F-build-x2F-constraint"><span class="toc-text">go&#x2F;build&#x2F;constraint</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#go-x2F-token"><span class="toc-text">go&#x2F;token</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#go-x2F-types"><span class="toc-text">go&#x2F;types</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (386)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (238)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (88)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (53)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (33)</a></li>
+<li class=""><a href="/categories/DB/">DB (23)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (15)</a></li>
+<li class=""><a href="/categories/Security/">Security (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Programing/">Programing (1)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
