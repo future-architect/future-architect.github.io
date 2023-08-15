@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Go 1.21 リリース連載 待望の組み込み関数min/maxと新パッケージcmpの挙動確認 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにGoを書き始めてから10年ほど経ちますが、最近は全然書けていない谷村です。久々にGoの新しいところに触れていこうと思いますのでお付き合いください。 本記事では、min&#x2F;max組み込み関数と、新設されたcmpパッケージについて触れます。「Goには何故min&#x2F;max関数が無いんだ」と嘆いた数々のGo初学者たちが救われるかもしれません。 ※本記事のコードリーディングおよび">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 1.21 リリース連載 待望の組み込み関数min&#x2F;maxと新パッケージcmpの挙動確認 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20230815a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにGoを書き始めてから10年ほど経ちますが、最近は全然書けていない谷村です。久々にGoの新しいところに触れていこうと思いますのでお付き合いください。 本記事では、min&#x2F;max組み込み関数と、新設されたcmpパッケージについて触れます。「Goには何故min&#x2F;max関数が無いんだ」と嘆いた数々のGo初学者たちが救われるかもしれません。 ※本記事のコードリーディングおよび">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20230815a/dice-568193_640.jpg">
+<meta property="article:published_time" content="2023-08-14T15:00:00.000Z">
+<meta property="article:modified_time" content="2023-08-15T05:09:09.266Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Go1.21">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20230815a/dice-568193_640.jpg">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20230815a/">
+  <meta content="Go,Go1.21" name="keywords">
+  <meta content="谷村元気" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Go 1.21 リリース連載 待望の組み込み関数min/maxと新パッケージcmpの挙動確認
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20230815a_Go_1.21_リリース連載_待望の組み込み関数min／maxと新パッケージcmpの挙動確認.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20230815a_Go_1.21_リリース連載_待望の組み込み関数min／maxと新パッケージcmpの挙動確認" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2023/" class="publish-date"><time datetime="2023-08-14T15:00:00.000Z" itemprop="datePublished">2023.08.15</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E8%B0%B7%E6%9D%91%E5%85%83%E6%B0%97" title="谷村元気さんの記事一覧へ" class="post-author">谷村元気</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/Go1-21/" title="Go1.21タグの記事へ" class="tag-list-link">Go1.21</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20230815a/dice-568193_640.jpg" alt="" width="640" height="427">
+
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>Goを書き始めてから10年ほど経ちますが、最近は全然書けていない谷村です。久々にGoの新しいところに触れていこうと思いますのでお付き合いください。</p>
+<p>本記事では、min&#x2F;max組み込み関数と、新設されたcmpパッケージについて触れます。「Goには何故min&#x2F;max関数が無いんだ」と嘆いた数々のGo初学者たちが救われるかもしれません。</p>
+<p>※本記事のコードリーディングおよび動作確認は、go1.21rc3で実施しました。</p>
+<h1 id="min-x2F-max-function"><a href="#min-x2F-max-function" class="headerlink" title="min&#x2F;max function"></a>min&#x2F;max function</h1><p><a target="_blank" rel="noopener" href="https://tip.golang.org/doc/go1.21">Go 1.21 Relase Notes</a>では以下のように述べられています。</p>
+<blockquote>
+<p>The new functions min and max compute the smallest (or largest, for max) value of a fixed number of given arguments. See the language spec for details.</p>
+</blockquote>
+<p>要は各リポジトリで以下のように書いていたものが、組み込み関数化された、と思って良さそうです。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">min</span><span class="params">(x, y <span class="type">int</span>)</span></span> <span class="type">int</span> &#123;</span><br><span class="line">	<span class="keyword">if</span> x &lt; y &#123;</span><br><span class="line">		<span class="keyword">return</span> x</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> y</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">min</span><span class="params">(nums []<span class="type">int</span>)</span></span> <span class="type">int</span> &#123;</span><br><span class="line">	min := nums[<span class="number">0</span>]</span><br><span class="line">	<span class="keyword">for</span> _, n := <span class="keyword">range</span> nums &#123;</span><br><span class="line">		<span class="keyword">if</span> n &lt; min &#123;</span><br><span class="line">			min = n</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> min</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="仕様詳細"><a href="#仕様詳細" class="headerlink" title="仕様詳細"></a>仕様詳細</h2><p><a target="_blank" rel="noopener" href="https://tip.golang.org/ref/spec#Min_and_max">Release NotesのDetails</a>に、いくつかの仕様詳細が記載されています。直感的ではない仕様や、記載がないけど気になる仕様もあるので、いくつか抜粋して紹介します。</p>
+<h3 id="受け入れ可能な型の組み合わせ"><a href="#受け入れ可能な型の組み合わせ" class="headerlink" title="受け入れ可能な型の組み合わせ"></a>受け入れ可能な型の組み合わせ</h3><blockquote>
+<p>The same type rules as for operators apply: for ordered arguments x and y, min(x, y) is valid if x + y is valid, and the type of min(x, y) is the type of x + y (and similarly for max). If all arguments are constant, the result is constant.</p>
+</blockquote>
+<p>受け入れ可能な変数型は複数あり、内部でGenericsを用いてることが予想されます。<br>受け入れ可能な型の組み合わせは、足し算(プラスオペレーター)が正しく実行されることが必要十分条件とのことです。min&#x2F;maxで返される型も足し算結果と同様ということです。</p>
+<h3 id="スライスの受入れ不可"><a href="#スライスの受入れ不可" class="headerlink" title="スライスの受入れ不可"></a>スライスの受入れ不可</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_ = min(s...)               <span class="comment">// invalid: slice arguments are not permitted</span></span><br></pre></td></tr></table></figure>
+
+<p>と記載があり、スライスは受け入れ不可とのことです。<br>Release Noteに記載を見つけられないのですが、今回から追加されたらしいslices pakcegeに、Min&#x2F;Maxが存在するからだと思われます。以下、利用サンプルです。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;slices&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	nums := []<span class="type">int</span>&#123;<span class="number">3</span>, <span class="number">4</span>, <span class="number">9</span>, <span class="number">4</span>, <span class="number">2</span>, <span class="number">10</span>&#125;</span><br><span class="line">	fmt.Println(slices.Min(nums))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>なお、公式サンプルにも記載されていますが、min&#x2F;maxは要素3つ以上でも受け入れ可能です。</p>
+<h3 id="文字列の受け入れ"><a href="#文字列の受け入れ" class="headerlink" title="文字列の受け入れ"></a>文字列の受け入れ</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">t := max(<span class="string">&quot;&quot;</span>, <span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>)  <span class="comment">// t == &quot;foo&quot; (string kind)</span></span><br></pre></td></tr></table></figure>
+
+<p>とあり、文字列も受け入れ可能とのことです。<br>これだけでは仕様の詳細がわからないため、手元でも動かしてみました。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := max(<span class="string">&quot;&quot;</span>, <span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>)</span><br><span class="line">	t2 := min(<span class="string">&quot;&quot;</span>, <span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>)</span><br><span class="line">	fmt.Println(t1)</span><br><span class="line">	fmt.Println(t2)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>実行結果は、以下の通り。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">foo</span><br><span class="line">(空文字)</span><br></pre></td></tr></table></figure>
+
+<p>アルファベット順に並べたときに後ろに来るものがmax、空文字は問答無用で最小扱いのようです。</p>
+<h3 id="冒頭のような独自関数との競合"><a href="#冒頭のような独自関数との競合" class="headerlink" title="冒頭のような独自関数との競合"></a>冒頭のような独自関数との競合</h3><p>色んな言語を渡り歩いていると、同一の変数名と関数名や、引数の異なる同名関数などの共存可否を忘れてしまいます。(私がそうでした)<br>既存コードにはmin&#x2F;maxの文字が溢れていると思われますが、golang1.20以前から1.21以降へのバージョンアップでこのへんは懸念になりうるのでしょうか。</p>
+<p>以下のようなコードでも動くので、既存コードへの影響はあまり考えなくても良いと思われます。<br>ただし、別pakcageに存在する独自のminと組み込みのminのどちらが優先されるかなど、状況によっては気にかける必要があるかもしれません。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	max := max(<span class="string">&quot;&quot;</span>, <span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>) <span class="comment">// 組み込み関数と同名変数の利用OK</span></span><br><span class="line">	min := min(<span class="string">&quot;&quot;</span>, <span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>)</span><br><span class="line">	fmt.Println(max)</span><br><span class="line">	fmt.Println(min)</span><br><span class="line"></span><br><span class="line">	fmt.Println(min(<span class="number">5</span>, <span class="number">3</span>)) <span class="comment">// 同package内の場合、独自関数が優先される</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">min</span><span class="params">(x, y <span class="type">int</span>)</span></span> <span class="type">int</span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">&quot;my function&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> x &lt; y &#123;</span><br><span class="line">		<span class="keyword">return</span> x</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> y</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="なぜライブラリではなく組み込みなのか"><a href="#なぜライブラリではなく組み込みなのか" class="headerlink" title="なぜライブラリではなく組み込みなのか"></a>なぜライブラリではなく組み込みなのか</h2><p>ポリシーによって唯一の正解はなさそうですが、この辺のコメントが決定打だったようです。<br>理由のうちの一つの「NaNの扱いの統一性」は、なるほど、と思いました。<br><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/59488#issuecomment-1548505279">https://github.com/golang/go/issues/59488#issuecomment-1548505279</a></p>
+<h2 id="実装の中身"><a href="#実装の中身" class="headerlink" title="実装の中身"></a>実装の中身</h2><p>最初は以下の <code>builtin.go</code> かなと思ったんですが、builtinのGoDocに</p>
+<blockquote>
+<p>The items documented here are not actually in package builtin but their descriptions here allow godoc to present documentation for the language’s special identifiers.</p>
+</blockquote>
+<p>と記載があり、実際にはビルドされないようです。実態はruntimeを参照しているものと思われます。</p>
+<figure class="highlight go"><figcaption><span>src/builtin/builtin.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// The max built-in function returns the largest value of a fixed number of</span></span><br><span class="line"><span class="comment">// arguments of [cmp.Ordered] types. There must be at least one argument.</span></span><br><span class="line"><span class="comment">// If T is a floating-point type and any of the arguments are NaNs,</span></span><br><span class="line"><span class="comment">// max will return NaN.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">max</span>[<span class="title">T</span> <span class="title">cmp</span>.<span class="title">Ordered</span>]<span class="params">(x T, y ...T)</span></span> T</span><br><span class="line"></span><br><span class="line"><span class="comment">// The min built-in function returns the smallest value of a fixed number of</span></span><br><span class="line"><span class="comment">// arguments of [cmp.Ordered] types. There must be at least one argument.</span></span><br><span class="line"><span class="comment">// If T is a floating-point type and any of the arguments are NaNs,</span></span><br><span class="line"><span class="comment">// min will return NaN.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">min</span>[<span class="title">T</span> <span class="title">cmp</span>.<span class="title">Ordered</span>]<span class="params">(x T, y ...T)</span></span> T</span><br></pre></td></tr></table></figure>
+
+<h1 id="cmp-package"><a href="#cmp-package" class="headerlink" title="cmp package"></a>cmp package</h1><p>golangでcmpといえば、<a target="_blank" rel="noopener" href="https://pkg.go.dev/github.com/google/go-cmp">go-cmp</a>ですよね！</p>
+<p>go-cmpはgoogle配下に存在していたので公式みたいなものだと思ってますが、Go本体に組み込まれたのが新しい、、、と思ってたのですが、全然違いました。</p>
+<blockquote>
+<p>The new cmp package defines the type constraint Ordered and two new generic functions Less and Compare that are useful with ordered types.</p>
+</blockquote>
+<p>Release Notesの説明では、上記のように記載があり、2つの何かを比較して返してくれるジェネリクス関数のようです。<br>ただ、これだけだとサッパリわかりません。<a target="_blank" rel="noopener" href="https://pkg.go.dev/cmp@master">godoc</a>を読んでみましょう。</p>
+<p><code>func Compare[T Ordered](x, y T) int</code> は以下のようなreturnをするそうです。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-1 if x is less than y,</span><br><span class="line"> 0 if x equals y,</span><br><span class="line">+1 if x is greater than y.</span><br></pre></td></tr></table></figure>
+
+<p><code>func Less[T Ordered](x, y T) bool</code> は以下のように、「第一引数が第二引数未満かどうか」をboolで返すようです。つまり、同一値であればfalseが返りそうです。</p>
+<blockquote>
+<p>whether x is less than y</p>
+</blockquote>
+<p>使える型が気になるところですが、以下のように単一の値であれば何でも使える仕様です。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Ordered <span class="keyword">interface</span> &#123;</span><br><span class="line">	~<span class="type">int</span> | ~<span class="type">int8</span> | ~<span class="type">int16</span> | ~<span class="type">int32</span> | ~<span class="type">int64</span> |</span><br><span class="line">		~<span class="type">uint</span> | ~<span class="type">uint8</span> | ~<span class="type">uint16</span> | ~<span class="type">uint32</span> | ~<span class="type">uint64</span> | ~<span class="type">uintptr</span> |</span><br><span class="line">		~<span class="type">float32</span> | ~<span class="type">float64</span> |</span><br><span class="line">		~<span class="type">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>structの比較定義を作ってそれに従って返してくれても良い気もしましたが、従来よりsort packageがありますし、単なる比較レベルなら個別実装で十分でしょう。</p>
+<h2 id="挙動確認"><a href="#挙動確認" class="headerlink" title="挙動確認"></a>挙動確認</h2><p>以下3観点の確認コードを用意しました。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;cmp&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	intx := <span class="type">int</span>(<span class="number">3</span>)</span><br><span class="line">	inty := <span class="type">int</span>(<span class="number">4</span>)</span><br><span class="line">	intz := <span class="type">int</span>(<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">	float64y := <span class="type">float64</span>(<span class="number">4.0</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 主要ケース確認</span></span><br><span class="line">	fmt.Println(cmp.Compare(intx, inty))</span><br><span class="line">	fmt.Println(cmp.Less(intx, inty))</span><br><span class="line">	<span class="comment">// 同一値の確認</span></span><br><span class="line">	fmt.Println(cmp.Compare(intx, intz))</span><br><span class="line">	fmt.Println(cmp.Less(intx, intz))</span><br><span class="line">	<span class="comment">// 型違いの比較</span></span><br><span class="line">	fmt.Println(cmp.Compare(intx, float64y))</span><br><span class="line">	fmt.Println(cmp.Less(intx, float64y))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>が、まずは型違いが以下コンパイルエラーでダメ。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./cmp.go:22:32: <span class="built_in">type</span> float64 of float64y does not match inferred <span class="built_in">type</span> int <span class="keyword">for</span> T</span><br><span class="line">./cmp.go:23:29: <span class="built_in">type</span> float64 of float64y does not match inferred <span class="built_in">type</span> int <span class="keyword">for</span> T</span><br></pre></td></tr></table></figure>
+
+<p>気を取り直して型違い比較の箇所を外して実行した結果は以下。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-1 // xがyより小さいので-1が返る</span><br><span class="line"><span class="literal">true</span> // xがyより小さいので<span class="literal">true</span>が返る</span><br><span class="line">0 // xとzが同一値なので0が返る</span><br><span class="line"><span class="literal">false</span> // xがz「未満ではない」ので<span class="literal">false</span>が返る</span><br></pre></td></tr></table></figure>
+
+<p>なんとも面白みもありませんが、読み取った仕様通りの挙動を確認できました。</p>
+<p>正直、 これらが無くても、自前実装で良いと思ったんですがどうなんでしょう…<br>実際の実装も以下のレベルですし。</p>
+<figure class="highlight go"><figcaption><span>src/cmp/cmp.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Compare returns</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//	-1 if x is less than y,</span></span><br><span class="line"><span class="comment">//	 0 if x equals y,</span></span><br><span class="line"><span class="comment">//	+1 if x is greater than y.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// For floating-point types, a NaN is considered less than any non-NaN,</span></span><br><span class="line"><span class="comment">// a NaN is considered equal to a NaN, and -0.0 is equal to 0.0.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Compare</span>[<span class="title">T</span> <span class="title">Ordered</span>]<span class="params">(x, y T)</span></span> <span class="type">int</span> &#123;</span><br><span class="line">	xNaN := isNaN(x)</span><br><span class="line">	yNaN := isNaN(y)</span><br><span class="line">	<span class="keyword">if</span> xNaN &amp;&amp; yNaN &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> xNaN || x &lt; y &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> yNaN || x &gt; y &#123;</span><br><span class="line">		<span class="keyword">return</span> +<span class="number">1</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight go"><figcaption><span>src/cmp/cmp.go</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Less reports whether x is less than y.</span></span><br><span class="line"><span class="comment">// For floating-point types, a NaN is considered less than any non-NaN,</span></span><br><span class="line"><span class="comment">// and -0.0 is not less than (is equal to) 0.0.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Less</span>[<span class="title">T</span> <span class="title">Ordered</span>]<span class="params">(x, y T)</span></span> <span class="type">bool</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> (isNaN(x) &amp;&amp; !isNaN(y)) || x &lt; y</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="既存影響"><a href="#既存影響" class="headerlink" title="既存影響"></a>既存影響</h2><p>広く使われている <code>go-cmp</code> のpackage名がcmpなので、既存コードと競合しそうだと思いました。(詳細未確認)</p>
+<p><code>go-cmp</code> を使ってるのは主にテストコードだと思われるので本番挙動には影響ないと思いますが、go versionを上げてテストが落ちたらココを疑っても良いかもしれません。(go-cmpに異なるaliasを付けてimportすることになりそうです…)</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>min&#x2F;maxも、slicesも、cmp.Compare&#x2F;cmp.Lessも、かゆいところに手が届くかもしれない関数だと感じました。</p>
+<p>sortやtime formatで当初はバリバリに尖っていたGoも、歳を重ねて丸くなってきたように感じます。初学者にとってわかりやすく、熟練者のタイプ数も減るのであればそれ以上のことは無いのかもしれません。</p>
+<p>次回はオチラルさんのmaps記事です。</p>
+<p>アイキャッチは<a target="_blank" rel="noopener" href="https://pixabay.com/ja/users/blickpixel-52945/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=568193">Michael Schwarzenberger</a>による<a target="_blank" rel="noopener" href="https://pixabay.com/ja//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=568193">Pixabay</a>からの画像です。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20230815a/&related=twitterapi%2Ctwitter&text=Go%201.21%20%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E9%80%A3%E8%BC%89%20%E5%BE%85%E6%9C%9B%E3%81%AE%E7%B5%84%E3%81%BF%E8%BE%BC%E3%81%BF%E9%96%A2%E6%95%B0min/max%E3%81%A8%E6%96%B0%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8cmp%E3%81%AE%E6%8C%99%E5%8B%95%E7%A2%BA%E8%AA%8D%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20230815a/&t=Go%201.21%20%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E9%80%A3%E8%BC%89%20%E5%BE%85%E6%9C%9B%E3%81%AE%E7%B5%84%E3%81%BF%E8%BE%BC%E3%81%BF%E9%96%A2%E6%95%B0min/max%E3%81%A8%E6%96%B0%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8cmp%E3%81%AE%E6%8C%99%E5%8B%95%E7%A2%BA%E8%AA%8D" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20230815a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20230815a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;563</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2023.08.03</span><span class="snscount">&#9825;58</span><a href=/articles/20230803a/ title="Go 1.21 連載の記事を書きます。">Go 1.21 リリース連載 contextパッケージに追加されるWithoutCancelでクライアントとの切断に備えてみる<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.08.01</span><span class="snscount">&#9825;3</span><a href=/articles/20230801a/ title="Go1.21連載の2本目です。取り上げるのは次のgo/ast、go/buildあたりの更新についてです。">Go1.21のgo/ast、go/buildあたりのマイナーチェンジ<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.07.31</span><span class="snscount">&#9825;58</span><a href=/articles/20230731a/ title="恒例のGo 1.21連載が始まります。">Go 1.21連載始まります＆slogをどう使うべきか<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.02.03</span><span class="snscount">&#9825;36</span><a href=/articles/20230203a/ title="Go 1.20 連載 7 記事目にして、最終回の本記事では、`go build`コマンドに新たに追加される`-cover`オプションについてお伝えします。せっかくなので実際に使ってみたレポートもお届けしようと思います。">Go 1.20 リリース連載 go build に追加される cover オプション（利用例付き）</a></li><li class="related-posts-item"><span>2023.02.02</span><span class="snscount">&#9825;14</span><a href=/articles/20230202a/ title="Go 1.20連載の6本目です。Goの標準ライブラリに組み込まれている、コンパイラによってキャッチされないエラーや懸念を検出し報告してくれるコードの静的解析ツールです。機能の詳細は本記事では割愛しますが、以下コマンドで利用可能なチェックの一覧を確認することができます。">Go 1.20 vetのアップデート</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#min-x2F-max-function"><span class="toc-text">min&#x2F;max function</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%95%E6%A7%98%E8%A9%B3%E7%B4%B0"><span class="toc-text">仕様詳細</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%97%E3%81%91%E5%85%A5%E3%82%8C%E5%8F%AF%E8%83%BD%E3%81%AA%E5%9E%8B%E3%81%AE%E7%B5%84%E3%81%BF%E5%90%88%E3%82%8F%E3%81%9B"><span class="toc-text">受け入れ可能な型の組み合わせ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%B9%E3%83%A9%E3%82%A4%E3%82%B9%E3%81%AE%E5%8F%97%E5%85%A5%E3%82%8C%E4%B8%8D%E5%8F%AF"><span class="toc-text">スライスの受入れ不可</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E5%AD%97%E5%88%97%E3%81%AE%E5%8F%97%E3%81%91%E5%85%A5%E3%82%8C"><span class="toc-text">文字列の受け入れ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%92%E9%A0%AD%E3%81%AE%E3%82%88%E3%81%86%E3%81%AA%E7%8B%AC%E8%87%AA%E9%96%A2%E6%95%B0%E3%81%A8%E3%81%AE%E7%AB%B6%E5%90%88"><span class="toc-text">冒頭のような独自関数との競合</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AA%E3%81%9C%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%81%A7%E3%81%AF%E3%81%AA%E3%81%8F%E7%B5%84%E3%81%BF%E8%BE%BC%E3%81%BF%E3%81%AA%E3%81%AE%E3%81%8B"><span class="toc-text">なぜライブラリではなく組み込みなのか</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9F%E8%A3%85%E3%81%AE%E4%B8%AD%E8%BA%AB"><span class="toc-text">実装の中身</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#cmp-package"><span class="toc-text">cmp package</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%99%E5%8B%95%E7%A2%BA%E8%AA%8D"><span class="toc-text">挙動確認</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%A2%E5%AD%98%E5%BD%B1%E9%9F%BF"><span class="toc-text">既存影響</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (387)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (238)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (88)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (53)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (33)</a></li>
+<li class=""><a href="/categories/DB/">DB (23)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (15)</a></li>
+<li class=""><a href="/categories/Security/">Security (13)</a></li>
+<li class=""><a href="/categories/VR/">VR (12)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+<li class=""><a href="/categories/Programing/">Programing (1)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
