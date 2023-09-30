@@ -47,9 +47,9 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20210413b/20210311_063536_RFkCB7QcO9e8.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20210413b/20210304_111712_yt9XAeY0BE7p.png">
 <meta property="article:published_time" content="2021-04-12T15:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-04T14:47:53.331Z">
-<meta property="article:tag" content="Redmine">
+<meta property="article:modified_time" content="2023-09-30T00:15:45.959Z">
 <meta property="article:tag" content="OSS">
+<meta property="article:tag" content="Redmine">
 <meta property="article:tag" content="コアテク">
 <meta property="article:tag" content="Slack">
 <meta name="twitter:card" content="summary">
@@ -63,7 +63,7 @@
   <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
   <link rel="canonical" href="https://future-architect.github.io/articles/20210413b/">
-  <meta content="Redmine,OSS,コアテク,Slack" name="keywords">
+  <meta content="OSS,Redmine,コアテク,Slack" name="keywords">
   <meta content="小松裕二" name="author">
   <link rel="preload" as="image" href="/banner.jpg" />
   <link rel='manifest' href='/manifest.webmanifest'/>
@@ -116,10 +116,10 @@
             <li class="blog-info-item">
   
     
-    <a href="/tags/Redmine/" title="Redmineタグの記事へ" class="tag-list-link">Redmine</a>
+    <a href="/tags/OSS/" title="OSSタグの記事へ" class="tag-list-link">OSS</a>
   
     
-    <a href="/tags/OSS/" title="OSSタグの記事へ" class="tag-list-link">OSS</a>
+    <a href="/tags/Redmine/" title="Redmineタグの記事へ" class="tag-list-link">Redmine</a>
   
     
     <a href="/tags/コアテク/" title="コアテクタグの記事へ" class="tag-list-link">コアテク</a>
@@ -156,12 +156,12 @@
 <li>指定したユーザのチケット更新を通知対象外として設定できます。</li>
 </ol>
 <h2 id="実装のポイント"><a href="#実装のポイント" class="headerlink" title="実装のポイント"></a>実装のポイント</h2><p>Google HangoutsとSlackではスレッドIDの管理方法が少々異なります。<br>Google Hangoutsは任意の値をスレッドIDとすることができるためRedmineチケットURLのハッシュ値をスレッドIDとしました。</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Google Hangouts通知のスレッドIDの設定部分抜粋</span></span><br><span class="line">thread_key = <span class="title class_">Digest</span><span class="symbol">:</span><span class="symbol">:MD5</span>.hexdigest(issue_url)</span><br><span class="line">thread_url = webhook_url + <span class="string">&quot;&amp;thread_key=&quot;</span> + thread_key</span><br><span class="line"></span><br><span class="line"><span class="comment"># Google Hangouts通知部分抜粋</span></span><br><span class="line">client.post_async url, &#123;<span class="symbol">:body</span> =&gt; data.to_json, <span class="symbol">:header</span> =&gt; &#123;<span class="string">&#x27;Content-Type&#x27;</span> =&gt; <span class="string">&#x27;application/json&#x27;</span>&#125;&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight ruby"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Google Hangouts通知のスレッドIDの設定部分抜粋</span></span><br><span class="line">thread_key = <span class="title class_">Digest</span><span class="symbol">:</span><span class="symbol">:MD5</span>.hexdigest(issue_url)</span><br><span class="line">thread_url = webhook_url + <span class="string">&quot;&amp;thread_key=&quot;</span> + thread_key</span><br><span class="line"></span><br><span class="line"><span class="comment"># Google Hangouts通知部分抜粋</span></span><br><span class="line">client.post_async url, &#123;<span class="symbol">:body</span> =&gt; data.to_json, <span class="symbol">:header</span> =&gt; &#123;<span class="string">&#x27;Content-Type&#x27;</span> =&gt; <span class="string">&#x27;application/json&#x27;</span>&#125;&#125;</span><br></pre></td></tr></table></figure>
 
 <p>一方SlackはスレッドIDをRedmine側から指定することができずSlack側で生成されたスレッドIDを取得する必要があります。</p>
 <p>そのためSlackApp(インストール方法は後述)からスレッドIDの戻り値を取得しRedmineチケットのカスタムフィールドでスレッドIDを管理することにしました。</p>
 <p>これによりチケット新規作成時はスレッドIDを取得するため同期http通信となりますがチケット更新時は非同期http通信でSlackへ連携することでパフォーマンスが落ちにくくなります。</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Slack通知部分抜粋</span></span><br><span class="line"><span class="keyword">if</span> thread_ts.blank?</span><br><span class="line">  res = client.post slack_api_url, &#123;<span class="symbol">:body</span> =&gt; data.to_json, <span class="symbol">:header</span> =&gt; header&#125;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">  client.post_async slack_api_url, &#123;<span class="symbol">:body</span> =&gt; data.to_json, <span class="symbol">:header</span> =&gt; header&#125;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># SlackスレッドID取得抜粋</span></span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">  res_body = <span class="variable constant_">JSON</span>.parse(res.http_body.content)</span><br><span class="line"><span class="keyword">rescue</span> <span class="title class_">Exception</span> =&gt; e</span><br><span class="line">  <span class="title class_">Rails</span>.logger.warn(<span class="string">&quot;Cannot parse JSON string: <span class="subst">#&#123;res.http_body.content&#125;</span>&quot;</span>)</span><br><span class="line">  <span class="title class_">Rails</span>.logger.warn(e)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">return</span> <span class="literal">nil</span> <span class="keyword">if</span> res_body.<span class="literal">nil</span>?</span><br><span class="line"><span class="keyword">return</span> res_body[<span class="string">&#x27;ts&#x27;</span>]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight ruby"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Slack通知部分抜粋</span></span><br><span class="line"><span class="keyword">if</span> thread_ts.blank?</span><br><span class="line">  res = client.post slack_api_url, &#123;<span class="symbol">:body</span> =&gt; data.to_json, <span class="symbol">:header</span> =&gt; header&#125;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">  client.post_async slack_api_url, &#123;<span class="symbol">:body</span> =&gt; data.to_json, <span class="symbol">:header</span> =&gt; header&#125;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># SlackスレッドID取得抜粋</span></span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">  res_body = <span class="variable constant_">JSON</span>.parse(res.http_body.content)</span><br><span class="line"><span class="keyword">rescue</span> <span class="title class_">Exception</span> =&gt; e</span><br><span class="line">  <span class="title class_">Rails</span>.logger.warn(<span class="string">&quot;Cannot parse JSON string: <span class="subst">#&#123;res.http_body.content&#125;</span>&quot;</span>)</span><br><span class="line">  <span class="title class_">Rails</span>.logger.warn(e)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">return</span> <span class="literal">nil</span> <span class="keyword">if</span> res_body.<span class="literal">nil</span>?</span><br><span class="line"><span class="keyword">return</span> res_body[<span class="string">&#x27;ts&#x27;</span>]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 <p>​</p>
 <h2 id="インストールと設定"><a href="#インストールと設定" class="headerlink" title="インストールと設定"></a>インストールと設定</h2><h3 id="1-インストール"><a href="#1-インストール" class="headerlink" title="1. インストール"></a>1. インストール</h3><p>​<br><a target="_blank" rel="noopener" href="https://github.com/future-architect/redmine_slack_integration/blob/master/README.md">README</a>を参照してください。</p>
 <p>(フューチャー社内連絡)利用の際はコンシェルジュで依頼ください</p>
@@ -343,11 +343,11 @@
 <div class="widget">
   <ul class="nav sidebar-categories margin-bottom-40">
   
-  <li class=""><a href="/categories/Programming/">Programming (403)</a></li>
+  <li class=""><a href="/categories/Programming/">Programming (402)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (241)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
 <li class=""><a href="/categories/DataScience/">DataScience (59)</a></li>
-<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (33)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/DevOps/">DevOps (21)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>

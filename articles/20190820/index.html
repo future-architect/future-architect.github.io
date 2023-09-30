@@ -38,15 +38,15 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20190820/photo_20190820_01.png">
 <meta property="article:published_time" content="2019-08-20T00:19:49.000Z">
-<meta property="article:modified_time" content="2022-07-04T14:47:52.754Z">
+<meta property="article:modified_time" content="2023-09-30T00:15:44.714Z">
 <meta property="article:tag" content="DB">
 <meta property="article:tag" content="Network">
 <meta property="article:tag" content="GCP">
 <meta property="article:tag" content="Kubernetes">
-<meta property="article:tag" content="環境構築">
 <meta property="article:tag" content="CIDR">
 <meta property="article:tag" content="トラブルシュート">
 <meta property="article:tag" content="設計">
+<meta property="article:tag" content="環境構築">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://future-architect.github.io/images/20190820/photo_20190820_01.png">
   
@@ -58,7 +58,7 @@
   <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
   <link rel="canonical" href="https://future-architect.github.io/articles/20190820/">
-  <meta content="DB,Network,GCP,Kubernetes,環境構築,CIDR,トラブルシュート,設計" name="keywords">
+  <meta content="DB,Network,GCP,Kubernetes,CIDR,トラブルシュート,設計,環境構築" name="keywords">
   <meta content="ghost" name="author">
   <link rel="preload" as="image" href="/banner.jpg" />
   <link rel='manifest' href='/manifest.webmanifest'/>
@@ -123,9 +123,6 @@
     <a href="/tags/Kubernetes/" title="Kubernetesタグの記事へ" class="tag-list-link">Kubernetes</a>
   
     
-    <a href="/tags/環境構築/" title="環境構築タグの記事へ" class="tag-list-link">環境構築</a>
-  
-    
     <a href="/tags/CIDR/" title="CIDRタグの記事へ" class="tag-list-link">CIDR</a>
   
     
@@ -133,6 +130,9 @@
   
     
     <a href="/tags/設計/" title="設計タグの記事へ" class="tag-list-link">設計</a>
+  
+    
+    <a href="/tags/環境構築/" title="環境構築タグの記事へ" class="tag-list-link">環境構築</a>
   
 
 </li>
@@ -187,7 +187,7 @@
 <p>デフォルトは下りが全てallowされているので、まずはCloudSQLのIP範囲にdenyをかけて、その上で接続するSQLインスタンスのみallowするという対応をしています。<br>Firewall Ruleの話だけで1記事くらいのボリュームになりそうなので詳細はまた別途書きます。</p>
 <h3 id="2-3-CloudSQL-のパスワードが有効では無かった"><a href="#2-3-CloudSQL-のパスワードが有効では無かった" class="headerlink" title="2-3. CloudSQL のパスワードが有効では無かった"></a>2-3. CloudSQL のパスワードが有効では無かった</h3><h4 id="原因-5"><a href="#原因-5" class="headerlink" title="原因"></a>原因</h4><p>Terraformでデプロイしていたが、その定義が不正だったため。<br>後述のサンプルだとインスタンス名が正しく紐づかない。GCPは関係なくTerraformの記述ミスが原因でした。</p>
 <h4 id="対応-8"><a href="#対応-8" class="headerlink" title="対応"></a>対応</h4><p>依存関係があるリソースは、ハードコードで名称を設定しない。<br>${xxxxx}を使用して実際に設定されている名称を取得する。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// インスタンスの作成</span></span><br><span class="line">resource <span class="string">&quot;google_sql_database_instance&quot;</span> <span class="string">&quot;db-instance-test&quot;</span> &#123;</span><br><span class="line">    name = <span class="string">&quot;test-instance&quot;</span></span><br><span class="line">    <span class="comment">/*省略*/</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// パスワード設定：NGパターン</span></span><br><span class="line">resource <span class="string">&quot;google_sql_user&quot;</span> <span class="string">&quot;test-postgres-user&quot;</span> &#123;</span><br><span class="line">    name = <span class="string">&quot;postgres&quot;</span></span><br><span class="line">    instance = <span class="string">&quot;test-instance&quot;</span></span><br><span class="line">    password = <span class="string">&quot;postgres&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// パスワード設定：OKパターン</span></span><br><span class="line">resource <span class="string">&quot;google_sql_user&quot;</span> <span class="string">&quot;test-postgres-user&quot;</span> &#123;</span><br><span class="line">    name = <span class="string">&quot;postgres&quot;</span></span><br><span class="line">    instance = <span class="string">&quot;$&#123;google_sql_database_instance.db-instance-test.name&#125;&quot;</span></span><br><span class="line">    password = <span class="string">&quot;postgres&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// インスタンスの作成</span></span><br><span class="line">resource <span class="string">&quot;google_sql_database_instance&quot;</span> <span class="string">&quot;db-instance-test&quot;</span> &#123;</span><br><span class="line">    name = <span class="string">&quot;test-instance&quot;</span></span><br><span class="line">    <span class="comment">/*省略*/</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// パスワード設定：NGパターン</span></span><br><span class="line">resource <span class="string">&quot;google_sql_user&quot;</span> <span class="string">&quot;test-postgres-user&quot;</span> &#123;</span><br><span class="line">    name = <span class="string">&quot;postgres&quot;</span></span><br><span class="line">    instance = <span class="string">&quot;test-instance&quot;</span></span><br><span class="line">    password = <span class="string">&quot;postgres&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// パスワード設定：OKパターン</span></span><br><span class="line">resource <span class="string">&quot;google_sql_user&quot;</span> <span class="string">&quot;test-postgres-user&quot;</span> &#123;</span><br><span class="line">    name = <span class="string">&quot;postgres&quot;</span></span><br><span class="line">    instance = <span class="string">&quot;$&#123;google_sql_database_instance.db-instance-test.name&#125;&quot;</span></span><br><span class="line">    password = <span class="string">&quot;postgres&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 
 <h3 id="2-4-CloudSqlProxyを使ってSQLインスタンスにつながらない"><a href="#2-4-CloudSqlProxyを使ってSQLインスタンスにつながらない" class="headerlink" title="2-4. CloudSqlProxyを使ってSQLインスタンスにつながらない"></a>2-4. CloudSqlProxyを使ってSQLインスタンスにつながらない</h3><h4 id="原因-6"><a href="#原因-6" class="headerlink" title="原因"></a>原因</h4><p>Cloud SQL Administration APIが有効化されていないため。<br>CloudSqlProxyを使う際は有効化する必要があります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/sql/docs/postgres/connect-external-app?hl=ja">https://cloud.google.com/sql/docs/postgres/connect-external-app?hl=ja</a></p>
@@ -296,11 +296,11 @@
 <div class="widget">
   <ul class="nav sidebar-categories margin-bottom-40">
   
-  <li class=""><a href="/categories/Programming/">Programming (403)</a></li>
+  <li class=""><a href="/categories/Programming/">Programming (402)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (241)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
 <li class=""><a href="/categories/DataScience/">DataScience (59)</a></li>
-<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (33)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/DevOps/">DevOps (21)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>

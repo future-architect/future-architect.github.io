@@ -41,7 +41,7 @@
 <meta property="og:image" content="https://future-architect.github.io/images/20200528/photo_20200528_03.png">
 <meta property="og:image" content="https://future-architect.github.io/images/20200528/photo_20200528_04.png">
 <meta property="article:published_time" content="2020-05-28T00:49:19.000Z">
-<meta property="article:modified_time" content="2022-07-04T14:47:52.946Z">
+<meta property="article:modified_time" content="2023-09-30T00:15:45.150Z">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="設計">
 <meta name="twitter:card" content="summary">
@@ -166,7 +166,7 @@
 <p>ハードコーディングされていない推奨の考え方としてはパッケージ名は1つの単語で熟語にはしない、というのがありますが、たまに他のルールとぶつかるので、ここは柔軟に対応すればいいと思います。</p>
 <h1 id="最小構成"><a href="#最小構成" class="headerlink" title="最小構成"></a>最小構成</h1><p>一番Goらしさが溢れる最小構成はこれだと思います。実行ファイルは<code>cmd</code>フォルダ内にさらにアプリケーション名のフォルダを作ります。そこの内部は<code>main</code>パッケージにして、<code>main</code>関数が含まれる<code>main.go</code>を置きます。</p>
 <p>必要であれば、<code>/docs</code>（ドキュメント）、<code>/testdata</code>などを足しましょう。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;projectroot&gt; (projectrootパッケージ)</span><br><span class="line"> + cmd</span><br><span class="line"> | + &lt;application1&gt; (mainパッケージ)</span><br><span class="line"> | |  + main.go</span><br><span class="line"> | + &lt;application2&gt; (mainパッケージ)</span><br><span class="line"> |    + main.go</span><br><span class="line"> + project.go</span><br><span class="line">   :</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;projectroot&gt; (projectrootパッケージ)</span><br><span class="line"> + cmd</span><br><span class="line"> | + &lt;application1&gt; (mainパッケージ)</span><br><span class="line"> | |  + main.go</span><br><span class="line"> | + &lt;application2&gt; (mainパッケージ)</span><br><span class="line"> |    + main.go</span><br><span class="line"> + project.go</span><br><span class="line">   :</span><br></pre></td></tr></table></figure>
 
 <p>cmdもなくして、全部をmainパッケージにしてしまうというさらにエクストリームな方法もありますが、起動部分とコアの部分を分けることは、再利用（そのまま呼ぶ）やテストのしやすさの観点では最低限守るべきラインかと思います。また、コードが育って大きくなったときに、mainの位置を変える、パッケージ名を変えるというのはコード全般に影響のある大きな変更になるので、仮に全部mainパッケージでおさまる程度の小さいコードであっても、大した手間ではないので、cmdフォルダを作ってその中でやる方が変更時の手間も削減できます。</p>
 <p>この構成の場合は、mainパッケージはなるべく薄くして、なるべくprojectのルートの方のmainではないパッケージにコードを寄せていく方が良いです。僕はコマンドライン引数のパースと起動時の条件確認ぐらいはmainパッケージでやりたいですが、<a target="_blank" rel="noopener" href="https://songmu.jp/riji/entry/2019-07-16-gocon-fukuoka.html">mainを究極まで薄くしたい派</a>の人もいますし、ここはお好みで。</p>
@@ -197,7 +197,7 @@
 <p>なお、同一DBテーブルを参照する場合にも、ドメイン間でimportしないで、全部コピーしてドメイン間の依存をなくすという過激派もいます。コードは重複しますが依存性やimport文のエイリアス問題は解決します。</p>
 <h2 id="あえてフォルダを分けるケース"><a href="#あえてフォルダを分けるケース" class="headerlink" title="あえてフォルダを分けるケース"></a>あえてフォルダを分けるケース</h2><p>このエントリーではフォルダをあまりわけない方向で話を進めていますが、明確にフォルダを切った方が良いケースもあります。</p>
 <p><a target="_blank" rel="noopener" href="https://gocloud.dev/">gocloud.dev</a>では、共通APIの下に、各クラウドサービスのアダプタのサブパッケージがあります。それぞれのパッケージは<code>import</code>するだけで<code>init()</code>が各アダプタをインストールして使えるようにします。<code>init()</code>の副作用があり、依存が大量についてまわるので、分けるほうが良いでしょう。GCPとAWSとAzureの全SDKをリンクすると、結構なバイナリサイズになってしまいますので。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> _ <span class="string">&quot;gocloud.dev/docstore/gcpfirestore&quot;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> _ <span class="string">&quot;gocloud.dev/docstore/gcpfirestore&quot;</span></span><br></pre></td></tr></table></figure>
 
 <p>OpenTelemetryは<code>init()</code>の副作用はなく、明示的に初期化が必要ですが、パッケージは別れています。連携先ごとにパッケージが独立したほうが、自分でプラグインを書いてみたい人が勉強するには単機能のコードだけがわかりやすく分離されているので学びやすいですね。<code>init()</code>はなくても、パッケージグローバルな変数定義とかで利用していない機能の依存が発生してしまう可能性はあるので、分ける方が安全といえば安全。</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/open-telemetry/opentelemetry-go">https://github.com/open-telemetry/opentelemetry-go</a></p>
@@ -207,7 +207,7 @@
 <p>Dockerfileの中で頑張るのか、docker buildの前にgo mod vendorを実行するようにするか、いっそのことgo mod vendorを実行した結果もリポジトリに入れてしまうか。どこをシンプルにしたいか次第かな、と思います。最近のGoもNode.jsみたいに依存使いまくる感じになってきてコンテキストのコピーの時間が増えているのでトレードオフはあります。</p>
 <h2 id="tools使う？"><a href="#tools使う？" class="headerlink" title="tools使う？"></a><code>tools</code>使う？</h2><p>コード生成等に使うスクリプトやツールなどの宣言場所として<code>tools</code>フォルダが好まれてきました。特にgo getして動くGo製アプリケーションを利用する場合、アプリケーションのルートのgo.modでツールを宣言してしまうと、go getする人が、ライブラリの利用では必ずしも必要がないツールまでダウンロードさせられてしまいます。みんな在宅で、家でNetflixとかを見まくって回線が輻輳して遅くなっている昨今では、余計なダウンロードをさせるのは邪悪な行為です。そのため、<code>tools</code>フォルダ内で<code>go mod init</code>して、開発者のみが利用するツールはそこで宣言するということが行われてきました。</p>
 <p>現在は、わざわざパッケージを作らなくても、<code>go:generate</code>に<code>go run</code>から書くことで、ダウンロードして実行まで一行で対応できます。ルートのgo.modに依存を書く必要はありません。Go製以外のツールを使う場合にはあってもいいと思いますが、Go製ツールだけなら今どきは不要と言えます。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//go:generate go run github.com/go-swagger/go-swagger/cmd/swagger generate server -f swagger.yaml --target=webapi --exclude-main</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">//go:generate go run github.com/go-swagger/go-swagger/cmd/swagger generate server -f swagger.yaml --target=webapi --exclude-main</span></span><br></pre></td></tr></table></figure>
 
 <h1 id="Standard-Go-Project-Layoutについて個人的に気になる点"><a href="#Standard-Go-Project-Layoutについて個人的に気になる点" class="headerlink" title="Standard Go Project Layoutについて個人的に気になる点"></a>Standard Go Project Layoutについて個人的に気になる点</h1><p>いろんなプロジェクトの最大公約数でしかないので、あんまり教条的にこれに従うとかは考えなくてもいいかなと思います。気になったフォルダのREADMEにはどのプロジェクトが使っているか、といったことが書かれているので、それを見て取り入れたいものだけを取り入れるスタイルでよいかと思います。個別に気になる点は以下の通り。</p>
 <ul>
@@ -291,11 +291,11 @@
 <div class="widget">
   <ul class="nav sidebar-categories margin-bottom-40">
   
-  <li class=""><a href="/categories/Programming/">Programming (403)</a></li>
+  <li class=""><a href="/categories/Programming/">Programming (402)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (241)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
 <li class=""><a href="/categories/DataScience/">DataScience (59)</a></li>
-<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (33)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/DevOps/">DevOps (21)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>

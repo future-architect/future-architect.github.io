@@ -38,7 +38,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20230724a/top.png">
 <meta property="article:published_time" content="2023-07-23T15:00:00.000Z">
-<meta property="article:modified_time" content="2023-07-24T01:21:20.991Z">
+<meta property="article:modified_time" content="2023-09-30T00:15:48.072Z">
 <meta property="article:tag" content="フロントエンド">
 <meta property="article:tag" content="DI">
 <meta property="article:tag" content="Angular">
@@ -138,7 +138,7 @@
 <p>ただ、これはES6 modulesなどが登場する前に、非同期にページごとのソースを読み込むといった高度な機能を実現するために生まれたものだと思いますが、ES6のモジュール管理と、さらに似たようなモジュール管理と2重の管理になってしまっているのが現状かと思います。今だと、ES6モジュールベースでバンドラーが賢くモジュール分割してくれたりするのが、それとは別にAngularモジュールの管理も必要ということで余計な作業が増えてしまっています。</p>
 <p>NgModulesで提供されている標準機能とかサードパーティの機能を利用するのはそのまま使えばよいのですが、Angular 14で入ったスタンドアローンコンポーネントを使っていくと、自分たちが作るアプリケーションに関してはもうモジュールの存在を気にしないでコードが書けます。</p>
 <p>詳しくは<a target="_blank" rel="noopener" href="https://angular.jp/guide/standalone-components">スタンドアローンコンポーネント</a>を見れば詳しく書いてあります。アプリケーションのひな型を作るといまだにモジュールを使うコードが生成されますが、以下のコマンドを実行するとモジュールを使わないコードに変更されます。起動するとメニューが出てくるので3つのコマンドを1つずつ実行すればモジュールを使わないコードができあがります。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ng generate @angular/core:standalone</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ng generate @angular/core:standalone</span><br></pre></td></tr></table></figure>
 
 <p>モジュールを使う場合、コンポーネントから使いたい部品があれば、すべて親のモジュールに登録してから使う必要がありますが、NgModuleがないすべてがスタンドアローンコンポーネントで構成されるアプリケーションであれば、自分が使いたいコンポーネントを.tsファイル内でES6 modulesのimportで取り込んで、デコレータに使いたいコンポーネントを足すだけになります。まあ、Options APIでVue.jsを使うぐらいの手間にはなったかな、と。</p>
 <p>日本語だとlacolacoさんのZennの書籍がテストのやり方も含めてかなり詳しく書かれています。</p>
@@ -170,11 +170,11 @@
 <p>Promiseが言語側で積極的に使いやすくサポートされている現状を踏まえると、当時と比べてRxJSを使うメリットよりも、今はデメリットの方が大きい気がします。機能が豊富ということは、その分、その機能をある程度頭に入れておかないと他の人のコードが読めないということにもなりますし。</p>
 <p>Angular 16から入った<a target="_blank" rel="noopener" href="https://angular.jp/guide/signals">シグナル</a>は、ReactのHooksから来ている超軽量(RxJSと比べて)リアクティブなツールで、effectやcomputeを使うことで、Reactなどと近いコーディングができます。RxJSのようなデータの流れをしっかり定義していくのとは対照的です。</p>
 <p>唯一、ちょっと惜しいなと思ったのは直接非同期なコードをシグナルで扱いにくいという点です。ただ、RxJSとの相互接続のヘルパーが用意されているので、それを使うと、シグナルと非同期を簡単につなげそうです。僕が作ってみたのはこんな感じです。</p>
-<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; toObservable, toSignal &#125; <span class="keyword">from</span> <span class="string">&#x27;@angular/core/rxjs-interop&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> asyncCompute&lt;T, U&gt;(<span class="attr">source</span>: <span class="title class_">Signal</span>&lt;T&gt;, <span class="attr">convert</span>: <span class="function">(<span class="params">input: T</span>) =&gt;</span> <span class="title class_">Promise</span>&lt;U&gt;, <span class="attr">initialValue</span>: U): <span class="title class_">Signal</span>&lt;U&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> result = <span class="keyword">new</span> <span class="title class_">Subject</span>&lt;U&gt;();</span><br><span class="line">  <span class="title function_">toObservable</span>(source).<span class="title function_">subscribe</span>(<span class="keyword">async</span> v =&gt; &#123;</span><br><span class="line">    result.<span class="title function_">next</span>(<span class="keyword">await</span> <span class="title function_">convert</span>(v));</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">toSignal</span>(result, &#123; initialValue &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; toObservable, toSignal &#125; <span class="keyword">from</span> <span class="string">&#x27;@angular/core/rxjs-interop&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> asyncCompute&lt;T, U&gt;(<span class="attr">source</span>: <span class="title class_">Signal</span>&lt;T&gt;, <span class="attr">convert</span>: <span class="function">(<span class="params">input: T</span>) =&gt;</span> <span class="title class_">Promise</span>&lt;U&gt;, <span class="attr">initialValue</span>: U): <span class="title class_">Signal</span>&lt;U&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> result = <span class="keyword">new</span> <span class="title class_">Subject</span>&lt;U&gt;();</span><br><span class="line">  <span class="title function_">toObservable</span>(source).<span class="title function_">subscribe</span>(<span class="keyword">async</span> v =&gt; &#123;</span><br><span class="line">    result.<span class="title function_">next</span>(<span class="keyword">await</span> <span class="title function_">convert</span>(v));</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">toSignal</span>(result, &#123; initialValue &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>こんな感じで何かしらのシグナルを入力に受け取って非同期で加工して結果を反映するシグナルを生成できますね。ユーザーIDを管理するシグナルを作って、サーバーにアクセスして、ユーザー情報を格納するシグナルに入れる、みたいなこともできます。</p>
 <p>これは入力をスリープしてちょっと遅らせて2倍するだけのコードですが。</p>
-<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">count = <span class="title function_">signal</span>(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">lazyCount = <span class="title function_">asyncCompute</span>(<span class="variable language_">this</span>.<span class="property">count</span>, <span class="keyword">async</span> (<span class="attr">input</span>: <span class="built_in">number</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">await</span> <span class="title function_">sleep</span>();</span><br><span class="line">  <span class="keyword">return</span> input * <span class="number">2</span>;</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line">count = <span class="title function_">signal</span>(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">lazyCount = <span class="title function_">asyncCompute</span>(<span class="variable language_">this</span>.<span class="property">count</span>, <span class="keyword">async</span> (<span class="attr">input</span>: <span class="built_in">number</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">await</span> <span class="title function_">sleep</span>();</span><br><span class="line">  <span class="keyword">return</span> input * <span class="number">2</span>;</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
 
 <p>あとでStack Overflowをみたら、<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/76571331/using-async-await-in-angular-computed-signal">effectを使う事例</a>もありました。</p>
 <h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>モジュールをやめて、DIをやめて、RxJSをやめると、Angularを始めたときに学ばないといけないこと、書かなければいけないコードが、他のフレームワーク同等になりそうだな、と思ったのでブログにしてみました。これにTailwind CSSも組み合わせれば、だいぶ楽にアプリが書けそうな気がします。Angular Materialというしっかり作られた公式のUI部品がある、というのはAngularのメリットだと思いますし。</p>
@@ -246,11 +246,11 @@
 <div class="widget">
   <ul class="nav sidebar-categories margin-bottom-40">
   
-  <li class=""><a href="/categories/Programming/">Programming (403)</a></li>
+  <li class=""><a href="/categories/Programming/">Programming (402)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (241)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
 <li class=""><a href="/categories/DataScience/">DataScience (59)</a></li>
-<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (33)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/DevOps/">DevOps (21)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>

@@ -38,7 +38,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20220805a/baner.png">
 <meta property="article:published_time" content="2022-08-04T15:00:00.000Z">
-<meta property="article:modified_time" content="2022-08-05T03:00:11.205Z">
+<meta property="article:modified_time" content="2023-09-30T00:15:47.267Z">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="ジェネリクス">
 <meta property="article:tag" content="Go1.19">
@@ -137,19 +137,19 @@
 <p>よってGo 1.20リリース予定の紹介という感じになります。</p>
 <h1 id="従来の問題点"><a href="#従来の問題点" class="headerlink" title="従来の問題点"></a>従来の問題点</h1><p>こちらのissueで問題提起されています。<br><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/51503">https://github.com/golang/go/issues/51503</a></p>
 <p>以下のコードが例として提示されています。</p>
-<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> T[T any] <span class="keyword">struct</span> &#123;&#125; <span class="comment">// OK</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(T[T])</span></span> Bar() &#123;&#125; <span class="comment">// error: T is not a generic type</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight golang"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> T[T any] <span class="keyword">struct</span> &#123;&#125; <span class="comment">// OK</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(T[T])</span></span> Bar() &#123;&#125; <span class="comment">// error: T is not a generic type</span></span><br></pre></td></tr></table></figure>
 
 <p>前者がOKなら後者もOKであるべきと議論されていました。</p>
 <h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><p>後者がビルドエラーとなる原因は以下のissueで説明されています。<br><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/52038">https://github.com/golang/go/issues/52038</a></p>
-<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(T[T])</span></span> Bar() &#123;&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight golang"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(T[T])</span></span> Bar() &#123;&#125;</span><br></pre></td></tr></table></figure>
 
 <p><code>[T]</code>の<code>T</code>が外側（左側）の<code>T</code>を参照しているため、エラーとなるようです。</p>
 <p>逆に外側を<code>T</code>以外にすればエラーにはなりません。</p>
-<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Hoge[T any] <span class="keyword">struct</span>&#123;&#125; <span class="comment">// OK</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(Hoge[T])</span></span> Bar() &#123;&#125; <span class="comment">// OK</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight golang"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> Hoge[T any] <span class="keyword">struct</span>&#123;&#125; <span class="comment">// OK</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(Hoge[T])</span></span> Bar() &#123;&#125; <span class="comment">// OK</span></span><br></pre></td></tr></table></figure>
 
 <p>後者の<code>Hoge</code>、<code>[T]</code>は前者の<code>Hoge</code>、<code>[T any]</code>をそれぞれ参照できているため問題ありません。</p>
 <p>もしくは<code>[T]</code>を別の文字に置き換えても大丈夫です。</p>
-<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> T[T any] <span class="keyword">struct</span>&#123;&#125; <span class="comment">// OK</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(T[Hoge])</span></span> Bar() &#123;&#125; <span class="comment">// OK</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight golang"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> T[T any] <span class="keyword">struct</span>&#123;&#125; <span class="comment">// OK</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(T[Hoge])</span></span> Bar() &#123;&#125; <span class="comment">// OK</span></span><br></pre></td></tr></table></figure>
 
 <h1 id="解決策"><a href="#解決策" class="headerlink" title="解決策"></a>解決策</h1><p>冒頭で引用したリリースノートの内容にすることで、これがエラーにならなくなります。<br>レシーバの中で宣言された型のスコープを関数名以降にします。<br>これによって、外側の<code>T</code>のスコープは関数名以降となり、<code>[T]</code>に適用されなくなります。</p>
 <h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>かなりマイナーアップデートですが、Golangがより洗練された言語になることは間違いないかと思います。<br>修正範囲が大きいということで惜しくもGo 1.19でのリリースは見送られることになりましたが、Go 1.20では修正されるということで期待したいと思います。</p>
@@ -224,11 +224,11 @@
 <div class="widget">
   <ul class="nav sidebar-categories margin-bottom-40">
   
-  <li class=""><a href="/categories/Programming/">Programming (403)</a></li>
+  <li class=""><a href="/categories/Programming/">Programming (402)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (241)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
 <li class=""><a href="/categories/DataScience/">DataScience (59)</a></li>
-<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (33)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/DevOps/">DevOps (21)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>

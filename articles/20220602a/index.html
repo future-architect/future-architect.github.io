@@ -38,7 +38,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20220602a/key-gd9783fabe_1280.jpg">
 <meta property="article:published_time" content="2022-06-01T15:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-04T14:55:58.133Z">
+<meta property="article:modified_time" content="2023-09-30T00:15:47.092Z">
 <meta property="article:tag" content="Go">
 <meta property="article:tag" content="GORM">
 <meta property="article:tag" content="失敗談">
@@ -133,9 +133,9 @@
 <h1 id="なぜ実装時に気づけなかったのか"><a href="#なぜ実装時に気づけなかったのか" class="headerlink" title="なぜ実装時に気づけなかったのか"></a>なぜ実装時に気づけなかったのか</h1><p>システム開発を行う際に、開発者が共通で利用する部品を作り込むと思いますが、<br>その部品の利用に問題がありました。</p>
 <p>私が参画しているプロジェクトは、全てのテーブルでサロゲートキーとシステムカラムを定義するという開発規約があるため、これらを表現する構造体を一つ定義しておき、構造体の埋め込みを利用して ORM を利用していました。また、サロゲートキーは ID という名称にするテーブル定義規約があり、ID はデータが insert されるたびに increment されるテーブル定義 (PostgreSQL の serial 型) となっています。</p>
 <p>上記をコードで表すと以下の通りとなります。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BaseColumns 共通カラムの構造体</span></span><br><span class="line"><span class="keyword">type</span> BaseColumns <span class="keyword">struct</span> &#123;</span><br><span class="line">	ID <span class="type">int32</span> <span class="string">`gorm:&quot;primary_key&quot;`</span></span><br><span class="line"></span><br><span class="line">	CreatedAt    time.Time <span class="string">`gorm:&quot;column:created_at&quot;`</span></span><br><span class="line">	UpdatedAt    time.Time <span class="string">`gorm:&quot;column:updated_at&quot;`</span></span><br><span class="line">	PatchedAt   *time.Time <span class="string">`gorm:&quot;column:patched_at&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// BaseColumns 共通カラムの構造体</span></span><br><span class="line"><span class="keyword">type</span> BaseColumns <span class="keyword">struct</span> &#123;</span><br><span class="line">	ID <span class="type">int32</span> <span class="string">`gorm:&quot;primary_key&quot;`</span></span><br><span class="line"></span><br><span class="line">	CreatedAt    time.Time <span class="string">`gorm:&quot;column:created_at&quot;`</span></span><br><span class="line">	UpdatedAt    time.Time <span class="string">`gorm:&quot;column:updated_at&quot;`</span></span><br><span class="line">	PatchedAt   *time.Time <span class="string">`gorm:&quot;column:patched_at&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CreateSampleModel SampleModel を DB に書き込む関数（利用例）</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">CreateSampleModel</span><span class="params">(ctx context.Context, userID <span class="type">string</span>)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">	s := &amp;SampleModel&#123;</span><br><span class="line">		UserID:        userID,</span><br><span class="line">		BaseColumns: BaseColumns&#123;&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	tx := GetTx(ctx)</span><br><span class="line">	err := tx.WithContext(ctx).Create(&amp;s).Error</span><br><span class="line">	<span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// CreateSampleModel SampleModel を DB に書き込む関数（利用例）</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">CreateSampleModel</span><span class="params">(ctx context.Context, userID <span class="type">string</span>)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">	s := &amp;SampleModel&#123;</span><br><span class="line">		UserID:        userID,</span><br><span class="line">		BaseColumns: BaseColumns&#123;&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	tx := GetTx(ctx)</span><br><span class="line">	err := tx.WithContext(ctx).Create(&amp;s).Error</span><br><span class="line">	<span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>このような規約がある中で実装を愚直に進めた結果、データ量に関する考慮漏れが発生し、<br>int32 のサロゲートキーを利用してしまい、数年でオーバーフローが見込まれる状況となってしまいました。</p>
 <p>今回はサロゲートキーのオーバフロー問題ということで下記に int32, int64 の最大値を示します。</p>
@@ -205,7 +205,7 @@
               
   <div class="card">
     <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
-    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220601a/ title="普段仕事している中での失敗談を集めた連載開始のインデックス記事となります。普段、仕事で開発などを進めているとき、そのときのレビューが通過したり、気づきにくい小さなミスなどがあるかと思います。そういった内容がちょっとずつ積もっていき、どこかで障害になったり、性能の劣化を引き起こします。はたまた...">失敗談連載2022を始めます</a></li><li class="reference-posts-item"><a href=/articles/20220601b/ title="失敗談をテーマにした連載ということで、ちょうどプロダクト開発的に良い区切りのタイミングでもあるため、振り返りがてら、DynamoDB,Go,AWS Lambdaの技術要素について自分自身の理解・見込みの甘さについて反省します。">GoとDynamoDBを用いた開発で反省していること</a></li></ul>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220601b/ title="失敗談をテーマにした連載ということで、ちょうどプロダクト開発的に良い区切りのタイミングでもあるため、振り返りがてら、DynamoDB,Go,AWS Lambdaの技術要素について自分自身の理解・見込みの甘さについて反省します。">GoとDynamoDBを用いた開発で反省していること</a></li><li class="reference-posts-item"><a href=/articles/20220601a/ title="普段仕事している中での失敗談を集めた連載開始のインデックス記事となります。普段、仕事で開発などを進めているとき、そのときのレビューが通過したり、気づきにくい小さなミスなどがあるかと思います。そういった内容がちょっとずつ積もっていき、どこかで障害になったり、性能の劣化を引き起こします。はたまた...">失敗談連載2022を始めます</a></li></ul>
   </div>
             </section>
           </aside>
@@ -227,11 +227,11 @@
 <div class="widget">
   <ul class="nav sidebar-categories margin-bottom-40">
   
-  <li class=""><a href="/categories/Programming/">Programming (403)</a></li>
+  <li class=""><a href="/categories/Programming/">Programming (402)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (241)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
 <li class=""><a href="/categories/DataScience/">DataScience (59)</a></li>
-<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (33)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/DevOps/">DevOps (21)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>
