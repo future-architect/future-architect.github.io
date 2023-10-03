@@ -37,11 +37,11 @@
 <meta property="og:description" content="はじめにTIG DXユニットの真野です。AWSのAPI Gateway+Lambda という構成でWebAPI開発を行う際、ちょっと便利に使える疎通方法をまとめます。 背景API GatewayですがPublicなエンドポイントがあれば curlコマンドやPostmanを用いての動作検証も容易だと思います。 一方でVPCエンドポイントを利用してプライベート APIとして構築されている場合は少し厄介">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20210924a/image.png">
-<meta property="og:image" content="https://future-architect.github.io/images/20210924a/%E3%82%AA%E3%83%BC%E3%82%BD%E3%83%A9%E3%82%A4%E3%82%B6%E3%83%BC.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210924a/オーソライザー.png">
 <meta property="article:published_time" content="2021-09-23T15:00:00.000Z">
-<meta property="article:modified_time" content="2023-09-30T00:15:46.522Z">
-<meta property="article:tag" content="Go">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.708Z">
 <meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Go">
 <meta property="article:tag" content="VPC">
 <meta property="article:tag" content="APIGateway">
 <meta name="twitter:card" content="summary">
@@ -55,14 +55,14 @@
   <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
   <link rel="canonical" href="https://future-architect.github.io/articles/20210924a/">
-  <meta content="Go,AWS,VPC,APIGateway" name="keywords">
+  <meta content="AWS,Go,VPC,APIGateway" name="keywords">
   <meta content="真野隼記" name="author">
   <link rel="preload" as="image" href="/banner.jpg" />
   <link rel='manifest' href='/manifest.webmanifest'/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
   <link rel="stylesheet" href="/metronic/assets/style.css">
   <link rel="stylesheet" href="/css/theme-styles.css">
-<meta name="generator" content="Hexo 6.3.0"></head>
+<meta name="generator" content="Hexo 5.4.2"></head>
 
 <body class="corporate">
   <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
@@ -108,10 +108,10 @@
             <li class="blog-info-item">
   
     
-    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
   
     
-    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
   
     
     <a href="/tags/VPC/" title="VPCタグの記事へ" class="tag-list-link">VPC</a>
@@ -135,7 +135,7 @@
 <p>こちらと同等の機能がawscliにも提供されています。<a target="_blank" rel="noopener" href="https://awscli.amazonaws.com/v2/documentation/api/latest/reference/apigateway/test-invoke-method.html">api gateway test-invoke-method</a>コマンドです。これを利用することでマネジメントコンソール上と同等のリクエストをコマンドラインから確認できます。</p>
 <p>つまりプライベートに構築されたAPI Gatewayに対しても、適切な権限があれば疎通確認ができるということです。</p>
 <p>実行例を載せます。レスポンスは少し大きなJSONだったので、<code>jq</code>コマンドでフィールドを、ステータスコード・応答ヘッダ・応答ボディに絞っています。profileやrest-api-id, resoruce-idは適時読み替えてください。</p>
-<figure class="highlight sh"><figcaption><span>test-invoke-methodの実行例</span></figcaption><table><tr><td class="code"><pre><span class="line">aws apigateway --profile &lt;my_profile&gt; test-invoke-method --rest-api-id &lt;1234123412&gt; --resource-id &lt;3gapai&gt; \</span><br><span class="line">  --http-method PGET --path-with-query-string /v1/health |  jq <span class="string">&#x27;.status, .headers, .body&#x27;</span></span><br><span class="line">200</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;Content-Type&quot;</span>: <span class="string">&quot;application/json&quot;</span>,</span><br><span class="line">  <span class="string">&quot;Vary&quot;</span>: <span class="string">&quot;Accept-Encoding&quot;</span>,</span><br><span class="line">  <span class="string">&quot;X-Amzn-Trace-Id&quot;</span>: <span class="string">&quot;Root=1-67891233-abcdef012345678912345678;Sampled=0&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="string">&quot;&#123;\&quot;message\&quot;:\&quot;OK\&quot;&#125;\n&quot;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><figcaption><span>test-invoke-methodの実行例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">aws apigateway --profile &lt;my_profile&gt; test-invoke-method --rest-api-id &lt;1234123412&gt; --resource-id &lt;3gapai&gt; \</span><br><span class="line">  --http-method PGET --path-with-query-string /v1/health |  jq <span class="string">&#x27;.status, .headers, .body&#x27;</span></span><br><span class="line">200</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;Content-Type&quot;</span>: <span class="string">&quot;application/json&quot;</span>,</span><br><span class="line">  <span class="string">&quot;Vary&quot;</span>: <span class="string">&quot;Accept-Encoding&quot;</span>,</span><br><span class="line">  <span class="string">&quot;X-Amzn-Trace-Id&quot;</span>: <span class="string">&quot;Root=1-67891233-abcdef012345678912345678;Sampled=0&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="string">&quot;&#123;\&quot;message\&quot;:\&quot;OK\&quot;&#125;\n&quot;</span></span><br></pre></td></tr></table></figure>
 
 <p>–rest-api-id と –resource-idの取得方法は<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/52446929/what-is-the-rest-api-id-and-resource-id-and-where-do-i-find-them">Stackoverflowの回答</a>がシンプルでした。こちらを参考に取得すると良いかなと思います。</p>
 <h2 id="API-GatewayにLambdaオーソライザーが設定されている場合"><a href="#API-GatewayにLambdaオーソライザーが設定されている場合" class="headerlink" title="API GatewayにLambdaオーソライザーが設定されている場合"></a>API GatewayにLambdaオーソライザーが設定されている場合</h2><p>API GatewayでLambdaオーソライザーが設定されている構成の場合があります。オーソライザー側についてはこのブログにも<a href="https://future-architect.github.io/articles/20210610a/">AWS APIGateway Custom Authorizer入門</a>という記事がありますのでぜひ参照ください。</p>
@@ -153,10 +153,10 @@
 <li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/sdk-for-go/api/service/apigateway/#APIGateway.TestInvokeMethod">https://docs.aws.amazon.com/sdk-for-go/api/service/apigateway/#APIGateway.TestInvokeMethod</a></li>
 </ul>
 <p>実装例を簡単に記載します。</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws/session&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/service/apigateway&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;net/http&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> apigw = apigateway.New(session.Must(session.NewSessionWithOptions(session.Options&#123;</span><br><span class="line">	Profile:           <span class="string">&quot;my_profile&quot;</span>, <span class="comment">// TODO 書き換え</span></span><br><span class="line">	SharedConfigState: session.SharedConfigEnable,</span><br><span class="line">&#125;,</span><br><span class="line">)))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	params := &amp;apigateway.TestInvokeMethodInput&#123;</span><br><span class="line">		RestApiId:           aws.String(<span class="string">&quot;1234123412&quot;</span>), <span class="comment">// TODO 書き換え</span></span><br><span class="line">		ResourceId:          aws.String(<span class="string">&quot;3gapai&quot;</span>),     <span class="comment">// TODO 書き換え</span></span><br><span class="line">		HttpMethod:          aws.String(http.MethodGet),</span><br><span class="line">		PathWithQueryString: aws.String(<span class="string">&quot;/v1/health&quot;</span>),</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	req, resp := apigw.TestInvokeMethodRequest(params)</span><br><span class="line">	<span class="keyword">if</span> err := req.Send(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;test invoke: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;%d\n%v\n%v\n&quot;</span>, *resp.Status, aws.StringValueMap(resp.Headers), *resp.Body)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/aws/session&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-sdk-go/service/apigateway&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;net/http&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> apigw = apigateway.New(session.Must(session.NewSessionWithOptions(session.Options&#123;</span><br><span class="line">	Profile:           <span class="string">&quot;my_profile&quot;</span>, <span class="comment">// TODO 書き換え</span></span><br><span class="line">	SharedConfigState: session.SharedConfigEnable,</span><br><span class="line">&#125;,</span><br><span class="line">)))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	params := &amp;apigateway.TestInvokeMethodInput&#123;</span><br><span class="line">		RestApiId:           aws.String(<span class="string">&quot;1234123412&quot;</span>), <span class="comment">// TODO 書き換え</span></span><br><span class="line">		ResourceId:          aws.String(<span class="string">&quot;3gapai&quot;</span>),     <span class="comment">// TODO 書き換え</span></span><br><span class="line">		HttpMethod:          aws.String(http.MethodGet),</span><br><span class="line">		PathWithQueryString: aws.String(<span class="string">&quot;/v1/health&quot;</span>),</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	req, resp := apigw.TestInvokeMethodRequest(params)</span><br><span class="line">	<span class="keyword">if</span> err := req.Send(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;test invoke: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;%d\n%v\n%v\n&quot;</span>, *resp.Status, aws.StringValueMap(resp.Headers), *resp.Body)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>これを実行すると、awscliコマンドで実行した結果と同等の応答を得られます。</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">&gt;go run sample.go</span><br><span class="line">200</span><br><span class="line">map[Content-Type:application/json Vary:Accept-Encoding X-Amzn-Trace-Id:Root=1-67891233-abcdef012345678912345678;Sampled=0]</span><br><span class="line">&#123;<span class="string">&quot;message&quot;</span>:<span class="string">&quot;OK&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;go run sample.go</span><br><span class="line">200</span><br><span class="line">map[Content-Type:application/json Vary:Accept-Encoding X-Amzn-Trace-Id:Root=1-67891233-abcdef012345678912345678;Sampled=0]</span><br><span class="line">&#123;<span class="string">&quot;message&quot;</span>:<span class="string">&quot;OK&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
 
 <p>awscli側のapigateway test-invoke-methodに慣れておけば、インターフェースで悩むことはほぼ無いと思います。<br>取得結果のステータスコードや応答ボディなどは <em>int64や</em>string でポインタなので一瞬戸惑うくらいでしょうか。</p>
 <h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>プライベートなAPI Gatewayだと開発環境の疎通レベルでも検証が面倒だと思ったときには、<code>test-invoke-method</code>コマンドを利用する選択もあるよという記事でした。</p>
@@ -228,11 +228,11 @@
 <div class="widget">
   <ul class="nav sidebar-categories margin-bottom-40">
   
-  <li class=""><a href="/categories/Programming/">Programming (402)</a></li>
+  <li class=""><a href="/categories/Programming/">Programming (404)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (241)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
 <li class=""><a href="/categories/DataScience/">DataScience (59)</a></li>
-<li class=""><a href="/categories/IoT/">IoT (33)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/DevOps/">DevOps (21)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>

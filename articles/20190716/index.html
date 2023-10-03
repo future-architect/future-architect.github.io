@@ -38,7 +38,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20190713/photo_20190713_01.png">
 <meta property="article:published_time" content="2019-07-16T00:12:58.000Z">
-<meta property="article:modified_time" content="2023-09-30T00:15:44.671Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.352Z">
 <meta property="article:tag" content="GCP">
 <meta property="article:tag" content="Kubernetes">
 <meta name="twitter:card" content="summary">
@@ -59,7 +59,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
   <link rel="stylesheet" href="/metronic/assets/style.css">
   <link rel="stylesheet" href="/css/theme-styles.css">
-<meta name="generator" content="Hexo 6.3.0"></head>
+<meta name="generator" content="Hexo 5.4.2"></head>
 
 <body class="corporate">
   <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
@@ -126,22 +126,22 @@
 <p>このツールを用いてGCPを利用しない時間帯を上手く指定することで、クラウドの運用費用を節約できます。</p>
 <h1 id="ツールの概要"><a href="#ツールの概要" class="headerlink" title="ツールの概要"></a>ツールの概要</h1><p><code>state-scheduler:true</code> というラベルがついた、GCE, SQL, GKEなどのインスタンスを停止します。<br>GKEの場合は、ノードプールを構成するインスタンスグループのサイズを0にすることで実現します。</p>
 <p>定期的なシャットダウンを避けたい場合は、<code>state-scheduler:false</code>と指定すれば、対象から除外させることもできます。</p>
-<p>構成は下図の通り、Pub&#x2F;SubトリガーのCloud Functionとして動作します。</p>
+<p>構成は下図の通り、Pub/SubトリガーのCloud Functionとして動作します。</p>
 <img src="/images/20190713/photo_20190713_01.png" loading="lazy">
 
 <p>起動タイミングはCloud Schedulerで制御する構成です。<br>そのため、「0 21 * * *」のようにCRON形式でスケジュールを定義すれば、毎日21時に停止させることができます。</p>
-<p>ちなみに、Cloud FunctionをHTTPトリガーにせずPub&#x2F;Subを挟んでいる理由は、認証を挟みたかったためです。 <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
+<p>ちなみに、Cloud FunctionをHTTPトリガーにせずPub/Subを挟んでいる理由は、認証を挟みたかったためです。 <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
 <h1 id="デプロイ方法"><a href="#デプロイ方法" class="headerlink" title="デプロイ方法"></a>デプロイ方法</h1><p>ツールのデプロイ手順を1~3の順に説明します。</p>
 <h2 id="1-ラベルの設定"><a href="#1-ラベルの設定" class="headerlink" title="1. ラベルの設定"></a>1. ラベルの設定</h2><p>停止したいインスタンスのラベルに <code>state-scheduler:true</code> を設定する必要があります。<br>ラベルの設定はもちろん管理コンソールから手動で行っても良いですし、下記のようなgcloudコマンドでも設定できます。</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># GCE</span></span><br><span class="line">gcloud compute instances update &lt;insntance-name&gt; \</span><br><span class="line">  --project &lt;project-id&gt; \</span><br><span class="line">  --update-labels state-scheduler=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Cloud SQL (master must be running)</span></span><br><span class="line">gcloud beta sql instances patch &lt;insntance-name&gt; \</span><br><span class="line">  --project &lt;project-id&gt; \</span><br><span class="line">  --update-labels state-scheduler=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># GKE</span></span><br><span class="line">gcloud container clusters update &lt;cluster-name&gt; \</span><br><span class="line">  --project &lt;project-id&gt; \</span><br><span class="line">  --zone &lt;cluster-master-node-zone&gt; \</span><br><span class="line">  --update-labels state-scheduler=<span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># GCE</span></span><br><span class="line">gcloud compute instances update &lt;insntance-name&gt; \</span><br><span class="line">  --project &lt;project-id&gt; \</span><br><span class="line">  --update-labels state-scheduler=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Cloud SQL (master must be running)</span></span><br><span class="line">gcloud beta sql instances patch &lt;insntance-name&gt; \</span><br><span class="line">  --project &lt;project-id&gt; \</span><br><span class="line">  --update-labels state-scheduler=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># GKE</span></span><br><span class="line">gcloud container clusters update &lt;cluster-name&gt; \</span><br><span class="line">  --project &lt;project-id&gt; \</span><br><span class="line">  --zone &lt;cluster-master-node-zone&gt; \</span><br><span class="line">  --update-labels state-scheduler=<span class="literal">true</span></span><br></pre></td></tr></table></figure>
 
 
 <h2 id="2-Cloud-Functionのデプロイ"><a href="#2-Cloud-Functionのデプロイ" class="headerlink" title="2. Cloud Functionのデプロイ"></a>2. Cloud Functionのデプロイ</h2><p>デプロイには <a target="_blank" rel="noopener" href="https://cloud.google.com/sdk/gcloud/">gcloud</a> が必要ですのでインストールしておきます。</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Download</span></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/future-architect/gcp-instance-scheduler.git</span><br><span class="line"><span class="built_in">cd</span> gcp-instance-scheduler</span><br><span class="line"></span><br><span class="line"><span class="comment"># Deploy Cloud Function</span></span><br><span class="line">gcloud <span class="built_in">functions</span> deploy ReceiveEvent --project &lt;project-id&gt; \</span><br><span class="line">  --runtime go111 \</span><br><span class="line">  --trigger-topic instance-scheduler-event</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Download</span></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/future-architect/gcp-instance-scheduler.git</span><br><span class="line"><span class="built_in">cd</span> gcp-instance-scheduler</span><br><span class="line"></span><br><span class="line"><span class="comment"># Deploy Cloud Function</span></span><br><span class="line">gcloud <span class="built_in">functions</span> deploy ReceiveEvent --project &lt;project-id&gt; \</span><br><span class="line">  --runtime go111 \</span><br><span class="line">  --trigger-topic instance-scheduler-event</span><br></pre></td></tr></table></figure>
 
 <h2 id="3-Cloud-Schedulerの設定"><a href="#3-Cloud-Schedulerの設定" class="headerlink" title="3. Cloud Schedulerの設定"></a>3. Cloud Schedulerの設定</h2><p>最後にスケジューラの設定を行います。</p>
 <p>今回は仮に、「毎日21時」に停止することにします。タイムゾーンをUTCにしたい場合は適時書き換えください。</p>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Create Cloud Scheduler Job</span></span><br><span class="line">gcloud beta scheduler <span class="built_in">jobs</span> create pubsub shutdown-workday \</span><br><span class="line">  --project &lt;project-id&gt; \</span><br><span class="line">  --schedule <span class="string">&#x27;0 21 * * *&#x27;</span> \</span><br><span class="line">  --topic instance-scheduler-event \</span><br><span class="line">  --message-body <span class="string">&#x27;&#123;&quot;command&quot;:&quot;stop&quot;&#125;&#x27;</span> \</span><br><span class="line">  --time-zone <span class="string">&#x27;Asia/Tokyo&#x27;</span> \</span><br><span class="line">  --description <span class="string">&#x27;automatically stop instances&#x27;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Create Cloud Scheduler Job</span></span><br><span class="line">gcloud beta scheduler <span class="built_in">jobs</span> create pubsub shutdown-workday \</span><br><span class="line">  --project &lt;project-id&gt; \</span><br><span class="line">  --schedule <span class="string">&#x27;0 21 * * *&#x27;</span> \</span><br><span class="line">  --topic instance-scheduler-event \</span><br><span class="line">  --message-body <span class="string">&#x27;&#123;&quot;command&quot;:&quot;stop&quot;&#125;&#x27;</span> \</span><br><span class="line">  --time-zone <span class="string">&#x27;Asia/Tokyo&#x27;</span> \</span><br><span class="line">  --description <span class="string">&#x27;automatically stop instances&#x27;</span></span><br></pre></td></tr></table></figure>
 
 <p>以上で適用できました。<br>これで、毎日21時に指定したインスタンスのシャットダウンが行われます。</p>
 <p>テキストでは長いですが、コマンド数として少ないので簡単に適用できると思います。</p>
@@ -175,7 +175,7 @@
     <!-- Facebook -->
     <li>
       <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20190716/&t=GCP%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%82%92%E8%87%AA%E5%8B%95%E3%81%A7%E5%81%9C%E6%AD%A2%E3%81%95%E3%81%9B%E3%82%8B%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E5%85%AC%E9%96%8B" rel="nofollow noopener">
-        <i></i><span class="social-btn-label">9</span>
+        <i></i><span class="social-btn-label">シェア</span>
       </a>
     </li>
     <!-- hatebu -->
@@ -200,7 +200,7 @@
               <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
               
   <div class="widget">
-    <ul class="nav related-post-link"><li class="related-posts-item"><span>2023.02.10</span><span class="snscount">&#9825;10</span><a href=/articles/20230210a/ title="こんにちは！筋肉エンジニアの渡邉です。最近はGCP/GKEについて勉強しています。今回はGitHubへのPushをトリガーにCloudBuildを起動し、プライベートエンドポイントのみのGKEへデプロイする基盤を作りましたので、共有したいと思います。GCPリソースはTerraformで作成しています。">CloudBuildを使ってプライベートエンドポイントのみのGKEへデプロイ</a></li><li class="related-posts-item"><span>2021.10.22</span><span class="snscount">&#9825;24</span><a href=/articles/20211022a/ title="Google DriveにアップロードされたExcelファイルを利用したちょっとしたジョブを実装する機会があり、処理を動かしたいのがAWSなど別のプラットフォームであったため、サービスアカウントを用いてGoogle Drive APIにアクセスするGoプログラムを作りました。">Google Drive API v3をサービスアカウトとGoから利用</a></li><li class="related-posts-item"><span>2021.03.19</span><span class="snscount">&#9825;33</span><a href=/articles/20210319/ title="Anthosは2019年にGoogleが発表した、「ハイブリッドクラウド・マルチクラウド環境に対応したアプリケーション管理プラットフォーム」です。発表から2年ほど経って、エンタープライズ向けのシステム構成を検討する際に名前が挙がることも増えてきている実感があります。そんなAnthosですが、構成要素が多くて中々全体像が掴みきれない人も多いのではないかと思います。">Anthosの話についていくための最低限の知識をまとめてみた</a></li><li class="related-posts-item"><span>2021.03.18</span><span class="snscount">&#9825;11</span><a href=/articles/20210318/ title="テーマは、2021年2月24日に公開されたGKE Autopilotです。この記事は、Kubernetesに触ったことがない方でもわかるように、最も簡単な構成で試してみました。Kubernetesを触ったことがない方にもみていただけるとありがたく思います。">GKE Autopilotを触ってみた</a></li><li class="related-posts-item"><span>2021.03.09</span><span class="snscount">&#9825;22</span><a href=/articles/20210309/ title="本記事では2021年3月に発表されたCloud PubSubのメッセージスキーマを試します。">PubSubのメッセージスキーマを試してみる</a></li><li class="related-posts-item"><span>2020.08.14</span><span class="snscount">&#9825;9</span><a href=/articles/20200814/ title="こんにちは、TIG所属の[村田]です。夏休みの自由研究連載10本目の記事です。今回は夏休みの自由研究企画ということで、Cloud RunのベースであるKnativeを触ってみたいと思います！利用したコンポーネントとバージョンは以下です。記事投稿時点（2020.08.14）での最新バージョンを利用しています。">ぼくのなつやすみ5 -Knativeを知ろう-</a></li></ul>
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2023.02.10</span><span class="snscount">&#9825;10</span><a href=/articles/20230210a/ title="こんにちは！筋肉エンジニアの渡邉です。最近はGCP/GKEについて勉強しています。今回はGitHubへのPushをトリガーにCloudBuildを起動し、プライベートエンドポイントのみのGKEへデプロイする基盤を作りましたので、共有したいと思います。GCPリソースはTerraformで作成しています。">CloudBuildを使ってプライベートエンドポイントのみのGKEへデプロイ</a></li><li class="related-posts-item"><span>2021.10.22</span><span class="snscount">&#9825;24</span><a href=/articles/20211022a/ title="Google DriveにアップロードされたExcelファイルを利用したちょっとしたジョブを実装する機会があり、処理を動かしたいのがAWSなど別のプラットフォームであったため、サービスアカウントを用いてGoogle Drive APIにアクセスするGoプログラムを作りました。">Google Drive API v3をサービスアカウトとGoから利用</a></li><li class="related-posts-item"><span>2021.03.19</span><span class="snscount">&#9825;35</span><a href=/articles/20210319/ title="Anthosは2019年にGoogleが発表した、「ハイブリッドクラウド・マルチクラウド環境に対応したアプリケーション管理プラットフォーム」です。発表から2年ほど経って、エンタープライズ向けのシステム構成を検討する際に名前が挙がることも増えてきている実感があります。そんなAnthosですが、構成要素が多くて中々全体像が掴みきれない人も多いのではないかと思います。">Anthosの話についていくための最低限の知識をまとめてみた</a></li><li class="related-posts-item"><span>2021.03.18</span><span class="snscount">&#9825;11</span><a href=/articles/20210318/ title="テーマは、2021年2月24日に公開されたGKE Autopilotです。この記事は、Kubernetesに触ったことがない方でもわかるように、最も簡単な構成で試してみました。Kubernetesを触ったことがない方にもみていただけるとありがたく思います。">GKE Autopilotを触ってみた</a></li><li class="related-posts-item"><span>2021.03.09</span><span class="snscount">&#9825;24</span><a href=/articles/20210309/ title="本記事では2021年3月に発表されたCloud PubSubのメッセージスキーマを試します。">PubSubのメッセージスキーマを試してみる</a></li><li class="related-posts-item"><span>2020.08.14</span><span class="snscount">&#9825;9</span><a href=/articles/20200814/ title="こんにちは、TIG所属の[村田]です。夏休みの自由研究連載10本目の記事です。今回は夏休みの自由研究企画ということで、Cloud RunのベースであるKnativeを触ってみたいと思います！利用したコンポーネントとバージョンは以下です。記事投稿時点（2020.08.14）での最新バージョンを利用しています。">ぼくのなつやすみ5 -Knativeを知ろう-</a></li></ul>
   </div>
             </section>
             <section class="reference-post margin-bottom-40 nav">
@@ -225,11 +225,11 @@
 <div class="widget">
   <ul class="nav sidebar-categories margin-bottom-40">
   
-  <li class=""><a href="/categories/Programming/">Programming (402)</a></li>
+  <li class=""><a href="/categories/Programming/">Programming (404)</a></li>
 <li class=""><a href="/categories/Infrastructure/">Infrastructure (241)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (88)</a></li>
 <li class=""><a href="/categories/DataScience/">DataScience (59)</a></li>
-<li class=""><a href="/categories/IoT/">IoT (33)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
 <li class=""><a href="/categories/DB/">DB (23)</a></li>
 <li class=""><a href="/categories/DevOps/">DevOps (21)</a></li>
 <li class=""><a href="/categories/Business/">Business (21)</a></li>
