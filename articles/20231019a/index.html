@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>VPC外からCloud SQL Auth Proxyを利用したPrivate IP Cloud SQLへの接続 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめに本記事では、Private IPしか持たないCloud SQLへ接続する方法として、Cloud SQL Auth Proxyを利用した接続方法について紹介致します。 Cloud SQLCloud SQLはMy SQL、PostgreSQL、SQL Server用のフルマネージドリレーショナルデータベースのサービスです。 Google Cloudには、AlloyDB、Spanner、Fire">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VPC外からCloud SQL Auth Proxyを利用したPrivate IP Cloud SQLへの接続 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20231019a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめに本記事では、Private IPしか持たないCloud SQLへ接続する方法として、Cloud SQL Auth Proxyを利用した接続方法について紹介致します。 Cloud SQLCloud SQLはMy SQL、PostgreSQL、SQL Server用のフルマネージドリレーショナルデータベースのサービスです。 Google Cloudには、AlloyDB、Spanner、Fire">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20231019a/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20231019a/image_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20231019a/image_3.png">
+<meta property="article:published_time" content="2023-10-18T15:00:00.000Z">
+<meta property="article:modified_time" content="2023-10-19T00:03:18.902Z">
+<meta property="article:tag" content="GCP">
+<meta property="article:tag" content="CloudSQL">
+<meta property="article:tag" content="CloudSQLAuthProxy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20231019a/image.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20231019a/">
+  <meta content="GCP,CloudSQL,CloudSQLAuthProxy" name="keywords">
+  <meta content="岸下優介" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">VPC外からCloud SQL Auth Proxyを利用したPrivate IP Cloud SQLへの接続
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20231019a_VPC外からCloud_SQL_Auth_Proxyを利用したPrivate_IP_Cloud_SQLへの接続.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20231019a_VPC外からCloud_SQL_Auth_Proxyを利用したPrivate_IP_Cloud_SQLへの接続" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2023/" class="publish-date"><time datetime="2023-10-18T15:00:00.000Z" itemprop="datePublished">2023.10.19</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%B2%B8%E4%B8%8B%E5%84%AA%E4%BB%8B" title="岸下優介さんの記事一覧へ" class="post-author">岸下優介</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/GCP/" title="GCPタグの記事へ" class="tag-list-link">GCP</a>
+  
+    
+    <a href="/tags/CloudSQL/" title="CloudSQLタグの記事へ" class="tag-list-link">CloudSQL</a>
+  
+    
+    <a href="/tags/CloudSQLAuthProxy/" title="CloudSQLAuthProxyタグの記事へ" class="tag-list-link">CloudSQLAuthProxy</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>本記事では、Private IPしか持たないCloud SQLへ接続する方法として、Cloud SQL Auth Proxyを利用した接続方法について紹介致します。</p>
+<h2 id="Cloud-SQL"><a href="#Cloud-SQL" class="headerlink" title="Cloud SQL"></a>Cloud SQL</h2><p><a target="_blank" rel="noopener" href="https://cloud.google.com/sql/docs/introduction?hl=ja">Cloud SQL</a>はMy SQL、PostgreSQL、SQL Server用のフルマネージドリレーショナルデータベースのサービスです。</p>
+<p>Google Cloudには、AlloyDB、Spanner、Firestore、Bigtableなど様々なデータベースサービスが存在しますが、Cloud SQLもその内の1つになります。たくさんあってどれ選べばいいのかわからない！という状況に陥った場合は、<a target="_blank" rel="noopener" href="https://cloud.google.com/blog/topics/developers-practitioners/your-google-cloud-database-options-explained?hl=en">Your Google Cloud database options, explained</a>からベストプラクティスを探るのが良いと思います。</p>
+<h3 id="Cloud-SQLへの接続方法"><a href="#Cloud-SQLへの接続方法" class="headerlink" title="Cloud SQLへの接続方法"></a>Cloud SQLへの接続方法</h3><p>Cloud SQLへは<code>mysql</code>や<code>psql</code>コマンドなどで接続でき、接続方法として以下の2つの方法が用意されています。</p>
+<ol>
+<li>プライベートIPアドレス<ul>
+<li>同一VPCから接続できる内部接続</li>
+</ul>
+</li>
+<li>パブリックIPアドレス<ul>
+<li>インターネット経由でアクセスできる外部接続</li>
+</ul>
+</li>
+</ol>
+<p>SQLインスタンスをインターネット上に晒したくないというセキュアな条件を満たしたい場合は、1のプライベートIPアドレスのみを利用するケースが多いかと思われます。但し、上記で記載した通り同一VPC内からの接続となるため、</p>
+<ol>
+<li>接続元となるPC・VMをそのVPC内に構築する必要</li>
+<li>もしくはそのVPC内へのアクセス経路を持つ必要</li>
+</ol>
+<p>があります。<br>1の場合は、Cloud SQLインスタンスのプライベートIPに対して直接接続できるので一番手っ取り早い方法かと思います。</p>
+<img src="/images/20231019a/image.png" alt="image.png" width="782" height="550" loading="lazy">
+
+
+<p>2の場合は、Cloud SQLが存在するVPC内へアクセス経路を持つ必要があるため、VPC PeeringやCloud VPN、Cloud Interconnectによって接続元が利用するVPCがお互いに経路を確保し、Cloud SQLのPrivate IPが広報される必要があります。<br>※本記事では<a target="_blank" rel="noopener" href="https://cloud.google.com/network-connectivity/docs/vpn/concepts/topologies?hl=ja">HA-VPN構成</a>を例に取り扱わせて頂きます。</p>
+<img src="/images/20231019a/image_2.png" alt="image.png" width="1200" height="394" loading="lazy">
+
+<p>但し、Cloud SQLのプライベートIPアドレスが既に割り振られている場合、広報先のVPC内でそのIPアドレスが既に使われている場合は多々あります。そのような状況で広報をしてしまうと、IPアドレスが被ってしまい広報することができない、もしくはネットワーク事故につながることになります。さて、この場合どうしましょう🤔</p>
+<h3 id="Cloud-SQL-Auth-Proxy"><a href="#Cloud-SQL-Auth-Proxy" class="headerlink" title="Cloud SQL Auth Proxy"></a>Cloud SQL Auth Proxy</h3><p>ここで出番となるのが、<a target="_blank" rel="noopener" href="https://cloud.google.com/sql/docs/postgres/sql-proxy?hl=ja">Cloud SQL Auth Proxy</a>です。公式では「Cloud SQL Auth Proxyは承認済みネットワークやSSLの構成を必要とせず、安全にインスタンスにアクセスできるCloud SQLコネクタです」とあり、Auth Proxy経由でCloud SQLインスタンスへ接続できるようになります。また、認可にIAM権限を利用することになるため、よりセキュアな接続となります。</p>
+<p>このCloud SQL Auth Proxyを利用して、Cloud SQLインスタンスが存在するVPC内外から接続経路を構築していきます。</p>
+<h2 id="Cloud-SQL-Auth-Proxyを利用した接続"><a href="#Cloud-SQL-Auth-Proxyを利用した接続" class="headerlink" title="Cloud SQL Auth Proxyを利用した接続"></a>Cloud SQL Auth Proxyを利用した接続</h2><img src="/images/20231019a/image_3.png" alt="image.png" width="1200" height="397" loading="lazy">
+
+<p>アーキテクチャ上で変わった部分としては黄色の箇所で、Cloud SQLインスタンスが存在するVPC-AにCloud SQL Auth Proxyを立てておくためのDB Bastion VMを構築しておく必要があります。また、Cloud SQLインスタンスは複数あることを想定しております。</p>
+<p>HA VPNの構築は公式のドキュメントにお任せします。公式がTerraformの例まで用意しているのは非常にありがたいですね。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/network-connectivity/docs/vpn/how-to/creating-ha-vpn2?hl=ja#create_an_additional_tunnel_on_a_single-tunnel_gateway">HA VPN ゲートウェイを作成して VPC ネットワークに接続する</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/network-connectivity/docs/vpn/how-to/automate-vpn-setup-with-terraform?hl=ja">HA VPN ゲートウェイ向けの Terraform の例</a></li>
+</ul>
+<p>HA VPN構築後、DB Bastionで利用するサブネットワークのIPアドレス範囲をVPC-B側に広報することを忘れないように気を付けましょう。</p>
+<p>また、VPC-B側のVMの構築、VPC-A側のCloud SQLの構築についても省略させて頂きます。<br>以下のTerraform公式が参考になると思います。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/compute_instance.html">Compute Engine</a></li>
+<li><a target="_blank" rel="noopener" href="https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/sql_database_instance#private-ip-instance">Cloud SQL - Private IP Instance</a></li>
+</ul>
+<p>DB Bastion VMについてですが、Startup ScriptにてCloud SQL Auth Proxyをsystemdとして起動するように設定しておくと、起動時に確実にAuth Proxyが起動され、更に状態を管理しやすくなります。</p>
+<p>以下にそのStartup Scriptを記載します。</p>
+<p>※<a target="_blank" rel="noopener" href="https://cloud.google.com/sql/docs/postgres/sql-proxy?hl=ja#install">最新ver.は公式からチェック</a>してください。</p>
+<figure class="highlight bash"><figcaption><span>cloudsql_auth_proxy_setup.sh</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># Define your variables</span></span><br><span class="line">PROJECT_ID=test_pj</span><br><span class="line"><span class="built_in">declare</span> -a INSTANCES=(<span class="string">&quot;test-db1&quot;</span> <span class="string">&quot;test-db2&quot;</span>)</span><br><span class="line"><span class="built_in">declare</span> -a REGIONS=(<span class="string">&quot;asia-northeast1&quot;</span> <span class="string">&quot;asia-northeast2&quot;</span>)</span><br><span class="line"><span class="built_in">declare</span> -a PORTS=(<span class="string">&quot;5432&quot;</span> <span class="string">&quot;5433&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Download Cloud SQL Auth Proxy from the bucket and isntall</span></span><br><span class="line">curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.6.1/cloud-sql-proxy.linux.amd64</span><br><span class="line"><span class="built_in">mv</span> cloud-sql-proxy /usr/local/bin/</span><br><span class="line"><span class="built_in">chmod</span> +x /usr/local/bin/cloud-sql-proxy</span><br><span class="line"></span><br><span class="line"><span class="comment"># Create systemd service for each Cloud SQL instance</span></span><br><span class="line"><span class="keyword">for</span> index <span class="keyword">in</span> <span class="variable">$&#123;!INSTANCES[*]&#125;</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">  instance=<span class="variable">$&#123;INSTANCES[$index]&#125;</span></span><br><span class="line">  region=<span class="variable">$&#123;REGIONS[$index]&#125;</span></span><br><span class="line">  port=<span class="variable">$&#123;PORTS[$index]&#125;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Create a systemd service file</span></span><br><span class="line">  sudo bash -c <span class="string">&quot;cat &lt;&lt;EOF &gt; /etc/systemd/system/cloud-sql-proxy-<span class="variable">$&#123;instance&#125;</span>.service</span></span><br><span class="line"><span class="string">[Unit]</span></span><br><span class="line"><span class="string">Description=Google Cloud SQL Auth Proxy <span class="variable">$&#123;instance&#125;</span></span></span><br><span class="line"><span class="string">After=network.target</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">[Service]</span></span><br><span class="line"><span class="string">ExecStart=/usr/local/bin/cloud-sql-proxy --address 0.0.0.0 --private-ip <span class="variable">$&#123;PROJECT_ID&#125;</span>:<span class="variable">$&#123;region&#125;</span>:<span class="variable">$&#123;instance&#125;</span> --port <span class="variable">$&#123;port&#125;</span></span></span><br><span class="line"><span class="string">Restart=always</span></span><br><span class="line"><span class="string">User=root</span></span><br><span class="line"><span class="string">Type=simple</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">[Install]</span></span><br><span class="line"><span class="string">WantedBy=multi-user.target</span></span><br><span class="line"><span class="string">EOF&quot;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Enable and start the service</span></span><br><span class="line">  sudo systemctl <span class="built_in">enable</span> cloud-sql-proxy-<span class="variable">$&#123;instance&#125;</span>.service</span><br><span class="line">  sudo systemctl start cloud-sql-proxy-<span class="variable">$&#123;instance&#125;</span>.service</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+<p>ここで気を付けたいのがCloud SQL Auth Proxyの実行コマンドで<code>--address</code>を指定する際に、<code>127.0.0.1</code>と指定してしまうとlocalhostからの接続しか受け付けなくなってしまいます。今回はDB Bastion外から接続を行う必要があるため、<code>0.0.0.0</code>で指定しております。</p>
+<p>作成したStartup scriptはDB Bastion VM構築時に<code>startup-script</code>として指定しましょう。<br>また、ネットワークタグ：<code>tags</code>も設定しておきます</p>
+<figure class="highlight sh"><figcaption><span>compute_instance.tf</span></figcaption><table><tr><td class="code"><pre><span class="line">resource <span class="string">&quot;google_compute_instance&quot;</span> <span class="string">&quot;db_bastion&quot;</span> &#123;</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line">    tags = [<span class="string">&quot;db-bastion&quot;</span>]</span><br><span class="line"><span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line">    metadata = &#123;</span><br><span class="line">        startup-script = <span class="string">&quot;startup-scripts/cloudsql_auth_proxy_setup.sh&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">#...</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>DB上のデータ外部持ち出しを防ぐためにDB BastionのEGRESSを全て拒否しているケースもあると思います。その場合、Cloud SQL Auth Proxy用に<strong>Cloud SQLインスタンスのプライベートIPアドレスに対してPort:3307を介したEGRESSを許可</strong>するFirewallを設定しておく必要があります。</p>
+<p>参考：<a target="_blank" rel="noopener" href="https://cloud.google.com/sql/docs/mysql/connect-auth-proxy?hl=ja#:~:text=%E9%80%81%E4%BF%A1%E3%83%95%E3%82%A1%E3%82%A4%E3%82%A2%E3%82%A6%E3%82%A9%E3%83%BC%E3%83%AB,%E3%83%87%E3%83%95%E3%82%A9%E3%83%AB%E3%83%88%20%E3%83%9D%E3%83%BC%E3%83%88%E3%81%A7%E3%81%99%E3%80%82">Cloud SQL Auth Proxyの接続経路</a></p>
+<figure class="highlight sh"><figcaption><span>compute_firewall.tf</span></figcaption><table><tr><td class="code"><pre><span class="line">resource <span class="string">&quot;google_compute_firewall&quot;</span> <span class="string">&quot;db_bastion2cloudsql&quot;</span> &#123;</span><br><span class="line">  name               = <span class="string">&quot;db-bastion2cloudsql&quot;</span></span><br><span class="line">  network            = &lt;YOUR_VPC_NAME&gt;</span><br><span class="line">  direction          = <span class="string">&quot;EGRESS&quot;</span></span><br><span class="line">  target_tags        = [<span class="string">&quot;db-bastion&quot;</span>]</span><br><span class="line">  destination_ranges = [</span><br><span class="line">    google_sql_database_instance.instance1.ip_address.0.ip_address,</span><br><span class="line">    google_sql_database_instance.instance2.ip_address.0.ip_address,</span><br><span class="line">  ]</span><br><span class="line"></span><br><span class="line">  allow &#123;</span><br><span class="line">    protocol = <span class="string">&quot;tcp&quot;</span></span><br><span class="line">    ports    = [<span class="string">&quot;3307&quot;</span>]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>※<code>google_sql_database_instance.instance1</code>, <code>google_sql_database_instance.instance2</code>というリソース名でCloud SQLインスタンスを構築していることを想定しております。</p>
+<p>また、Cloud SQL Auth Proxyのセクションでも述べましたがIAM権限を利用した認可となるため、以下の権限をDB BastionのService Accountへ設定する必要があります。</p>
+<ul>
+<li>roles&#x2F;cloudsql.client</li>
+</ul>
+<p>これで構築・設定は完了となります。試しにCloud SQLにPostgreSQLを設定し、VPC Bのインスタンスからpsqlコマンドで接続してみます。</p>
+<figure class="highlight bash"><figcaption><span>terminal</span></figcaption><table><tr><td class="code"><pre><span class="line">psql <span class="string">&quot;host=&lt;DB Bastion&#x27;s IP address&gt; port=5432 dbname=test_db sslmode=disable user=test_user password=****&quot;</span></span><br><span class="line">psql (12.15 (Ubuntu 12.15-0ubuntu0.20.04.1), server 13.10)</span><br><span class="line">WARNING: psql major version 12, server major version 13.</span><br><span class="line">         Some psql features might not work.</span><br><span class="line">Type <span class="string">&quot;help&quot;</span> <span class="keyword">for</span> <span class="built_in">help</span>.</span><br><span class="line">postgres=&gt;</span><br></pre></td></tr></table></figure>
+
+<p>無事に接続できました！</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>本記事ではプライベートIPしか持たないCloud SQLインスタンスに対して、インスタンスが存在するVPCの外からCloud SQL Auth Proxyを介して接続する方法を紹介しました。</p>
+<p>Cloud SQL Auth Proxy自体、全くキャッチアップなく簡単に使えて非常に便利なサービスです。<a target="_blank" rel="noopener" href="https://cloud.google.com/sql/docs/sqlserver/connect-docker?hl=ja">Cloud SQL Auth Proxy Docker イメージを使用した SQL サーバー クライアントの接続</a>で説明されているようにDockerとして起動することも可能なので、自身の要件に合わせて構成してみて下さい。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20231019a/&related=twitterapi%2Ctwitter&text=VPC%E5%A4%96%E3%81%8B%E3%82%89Cloud%20SQL%20Auth%20Proxy%E3%82%92%E5%88%A9%E7%94%A8%E3%81%97%E3%81%9FPrivate%20IP%20Cloud%20SQL%E3%81%B8%E3%81%AE%E6%8E%A5%E7%B6%9A%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20231019a/&t=VPC%E5%A4%96%E3%81%8B%E3%82%89Cloud%20SQL%20Auth%20Proxy%E3%82%92%E5%88%A9%E7%94%A8%E3%81%97%E3%81%9FPrivate%20IP%20Cloud%20SQL%E3%81%B8%E3%81%AE%E6%8E%A5%E7%B6%9A" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20231019a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20231019a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2023.10.18</span><span class="snscount">&#9825;0</span><a href=/articles/20231018a/ title="BigQueryは完全マネージドな、ペタバイトスケールかつコスパのよいデータウェアハウスとして知られております。便利なツールである一方、BigQueryで取り扱うデータには個人情報が含まれていることもあり、適切なアクセス制御が望まれます。Resource Managerのタグ機能を利用して…">タグを利用したBigQueryのアクセス制御<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.09.21</span><span class="snscount">&#9825;1</span><a href=/articles/20230921a/ title="これまで組織全体のGoogle Cloudプロジェクトを包括的に見る業務に携わっており、主にIAMやネットワークを含むGoogle Cloud環境上の治安維持のような仕事を担ってきました。今回はその経験値を測るべくProfessional Cloud Security Engineer認定資格を受けてきました。">【合格記】Google Cloud Professional Cloud Security Engineer認定資格を振り返る<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.09.15</span><span class="snscount">&#9825;1</span><a href=/articles/20230915a/ title="最近Data Engineeringを扱うプロジェクトへ異動したこともあり、Google CloudにおけるData Engineeringを網羅的に学びたく、Professional Data Engineer認定資格を受けてきました。">【合格記】Google Cloud Professional Data Engineer認定資格を振り返る【2023年度版】</a></li><li class="related-posts-item"><span>2023.03.31</span><span class="snscount">&#9825;20</span><a href=/articles/20230331a/ title="最近、Terraform内での機密情報の取り扱いについて触れることがあり、Terraformのv1.4のInteractive input for sensitive variables is now masked in the UI (#29520) についてのENHANCEMENTを取り上げつつ、Terraform環境上での機密情報の取り扱いについて..">Terraformでの機密情報の取り扱い on Google Cloud</a></li><li class="related-posts-item"><span>2023.01.19</span><span class="snscount">&#9825;10</span><a href=/articles/20230119a/ title="Google CloudのVPC Service Controlsを利用して、リソースへのアクセス制御を行う方法についてTerraformコード付きで紹介していきます。昨今では、個人情報漏洩のニュースが尽きません。少し古いデータではありますが...">VPC Service ControlでGoogle Cloud環境をガッチリ守る</a></li><li class="related-posts-item"><span>2022.09.30</span><span class="snscount">&#9825;13</span><a href=/articles/20220930a/ title="先日、Google Cloudの認定資格であるProfessional Machine Learning Engineer認定資格を受験し、取得することができました。また、今回はリモート試験にて受験をしてみました。この記事ではProfessional Machine Learning Engineer認定資格の合格に至った学習過程とリモート試験体験記について...">【合格記】Google Cloud Professional Machine Learning Engineer認定資格を振り返る</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Cloud-SQL"><span class="toc-text">Cloud SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Cloud-SQL%E3%81%B8%E3%81%AE%E6%8E%A5%E7%B6%9A%E6%96%B9%E6%B3%95"><span class="toc-text">Cloud SQLへの接続方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cloud-SQL-Auth-Proxy"><span class="toc-text">Cloud SQL Auth Proxy</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Cloud-SQL-Auth-Proxy%E3%82%92%E5%88%A9%E7%94%A8%E3%81%97%E3%81%9F%E6%8E%A5%E7%B6%9A"><span class="toc-text">Cloud SQL Auth Proxyを利用した接続</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (407)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (244)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (88)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (23)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Security/">Security (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
