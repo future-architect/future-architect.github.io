@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>設計ドキュメント腐る問題、Git管理で運用してみた結果 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTIG真野です。 秋のブログ週間2023 の3本目は、設計ドキュメントをGit管理して腐らせないようにがんばってみた話をします。 前段として6年前、「我々はいかにシステム開発におけるドキュメント腐る問題と戦えば良いのか」という記事を書いたのですが、その後の試行錯誤はどこにも残していないことに気づきました。普段のフューチャー技術ブログですとちょっと引け目を感じるテーマですが、秋の夜長を楽">
+<meta property="og:type" content="article">
+<meta property="og:title" content="設計ドキュメント腐る問題、Git管理で運用してみた結果 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20231101a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIG真野です。 秋のブログ週間2023 の3本目は、設計ドキュメントをGit管理して腐らせないようにがんばってみた話をします。 前段として6年前、「我々はいかにシステム開発におけるドキュメント腐る問題と戦えば良いのか」という記事を書いたのですが、その後の試行錯誤はどこにも残していないことに気づきました。普段のフューチャー技術ブログですとちょっと引け目を感じるテーマですが、秋の夜長を楽">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20231101a/document_kusaru.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20231101a/drawio.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20231101a/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20231101a/image_2.png">
+<meta property="article:published_time" content="2023-10-31T15:00:00.000Z">
+<meta property="article:modified_time" content="2023-11-01T05:54:22.162Z">
+<meta property="article:tag" content="設計">
+<meta property="article:tag" content="ドキュメント">
+<meta property="article:tag" content="Git">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20231101a/document_kusaru.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20231101a/">
+  <meta content="設計,ドキュメント,Git" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Culture/">Cultureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">設計ドキュメント腐る問題、Git管理で運用してみた結果
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20231101a_設計ドキュメント腐る問題、Git管理で運用してみた結果.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20231101a_設計ドキュメント腐る問題、Git管理で運用してみた結果" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2023/" class="publish-date"><time datetime="2023-10-31T15:00:00.000Z" itemprop="datePublished">2023.11.01</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98" title="真野隼記さんの記事一覧へ" class="post-author">真野隼記</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/設計/" title="設計タグの記事へ" class="tag-list-link">設計</a>
+  
+    
+    <a href="/tags/ドキュメント/" title="ドキュメントタグの記事へ" class="tag-list-link">ドキュメント</a>
+  
+    
+    <a href="/tags/Git/" title="Gitタグの記事へ" class="tag-list-link">Git</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20231101a/document_kusaru.png" alt="" width="353" height="502">
+
+<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>TIG真野です。</p>
+<p><a href="/articles/20231030a/">秋のブログ週間2023</a> の3本目は、設計ドキュメントをGit管理して腐らせないようにがんばってみた話をします。</p>
+<p>前段として6年前、「<a target="_blank" rel="noopener" href="https://medium.com/@laqiiz/%E6%88%91%E3%80%85%E3%81%AF%E3%81%84%E3%81%8B%E3%81%AB%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E9%96%8B%E7%99%BA%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E8%85%90%E3%82%8B%E5%95%8F%E9%A1%8C%E3%81%A8%E6%88%A6%E3%81%88%E3%81%B0%E8%89%AF%E3%81%84%E3%81%AE%E3%81%8B-7c7c3774689f">我々はいかにシステム開発におけるドキュメント腐る問題と戦えば良いのか</a>」という記事を書いたのですが、その後の試行錯誤はどこにも残していないことに気づきました。普段のフューチャー技術ブログですとちょっと引け目を感じるテーマですが、秋の夜長を楽しむため読み物成分を多めに書くというテーマのこのブログリレーにピッタリな気がするため、この機会をお借りします。</p>
+<p>ドキュメントも色々な種別があるかと思いますが、この記事では設計ドキュメントを指すことにします。設計ドキュメントは開発メンバーが参照するもので、ステークホルダーへの説明資料に引用して使うことはあれど、主目的は異なるという前提です。Design Docの場合もありますし、システム構成図、ERD、システム間連携I&#x2F;F定義書、開発規約、環境構築手順などを含みます。</p>
+<h2 id="ドキュメント腐る問題とは"><a href="#ドキュメント腐る問題とは" class="headerlink" title="ドキュメント腐る問題とは"></a>ドキュメント腐る問題とは</h2><p>ドキュメント腐る問題とは、設計時に作成した各種ドキュメントがGoogle Driveやファイルサーバ上で陳腐化してしまい、現状の正しい状態を指していない状態を指します。せっかく新規参画者がキャッチアップしようとしてもドキュメントが真実を示していないという、困った問題です。</p>
+<p>一部の界隈でこう読んでいる名称ですが、少なからず誰しもが経験してきたことでしょう。</p>
+<h2 id="設計ドキュメントをGit管理に寄せる"><a href="#設計ドキュメントをGit管理に寄せる" class="headerlink" title="設計ドキュメントをGit管理に寄せる"></a>設計ドキュメントをGit管理に寄せる</h2><p>対策としてここ4,5年ほど、コードと同期すべき設計ドキュメント全てをGit管理に寄せる方針を取ってきました。なるべくテキストベースで設計ドキュメントを記載し、コードと同じくPull Requestでレビューするフローです。<a href="/articles/20230417b/">markdownlintで設計書の品質を高める</a> の記事にも書いたように、以下のフォーマット&#x2F;ツールを使っています。</p>
+<ul>
+<li>Github-flavored Markdown<ul>
+<li>基本的にフォルダを切ってREADME.mdに書いていきます</li>
+<li>参照はGitHubなどのブランディングで見ることが多いです（ローカルのVS Codeなどで見ても良いですが）</li>
+<li><a target="_blank" rel="noopener" href="https://chrome.google.com/webstore/detail/widescreen-for-github/elikdceclccjilahimjfceoalhdbndan">Widescreen for GitHub</a> のChrome拡張はオススメです。横幅が広くなり視認性があがります</li>
+</ul>
+</li>
+<li>PlantUML<ul>
+<li>シーケンス図、業務フロー図はMarkdown中にPlantUMLで記載し、Markdownから<code>![xxx構成図](xxx_構成図.drawio.png)</code> などで画像参照しています</li>
+<li>参照はGitHub上からも見れるように、<a target="_blank" rel="noopener" href="https://chrome.google.com/webstore/detail/pegmatite/jegkfbnfbfnohncpcfcimepibmhlkldo">pegmatite</a> というChrome拡張を利用</li>
+<li>今ならMermaidを採用するかもしれませんが、ミンさんが作った<a href="https://future-architect.github.io/articles/20211108a/">PlantUMLのテーマ</a>を推したかったのもあり、継続して使っています</li>
+</ul>
+</li>
+<li>Diagrams.net<ul>
+<li>システム構成図はDiagrams.net（draw.io）で作成し、<code>.drawio.png</code> の拡張子でMarkdownから参照</li>
+<li>レビューが難しいような作り込んだ画像のケースは、Pull Request時に差分を赤丸で囲ったバージョンも用意してもらったり、テキストでポイントを書いてもらったりします</li>
+</ul>
+</li>
+<li>Web API定義<ul>
+<li>OpenAPI SpecのYAMLファイル</li>
+<li>参照はGitHub上からも見れるように、<a target="_blank" rel="noopener" href="https://chrome.google.com/webstore/detail/swagger-viewer/nfmkaonpdmaglhjjlggfhlndofdldfag">swagger-viewer</a> を利用していましたが、最近動かなくなって対策を検討中</li>
+</ul>
+</li>
+<li>ERD<ul>
+<li><a target="_blank" rel="noopener" href="https://a5m2.mmatsubara.com/index.html">A5:SQL Mk-2</a> の .a5er 拡張子のファイルをコミット</li>
+<li>ini形式のテキストファイルであるため、差分がわかりやすい</li>
+</ul>
+</li>
+<li>その他、DynamoDBなどのデータモデル<ul>
+<li>Markdown中に表形式で表現。A5:SQL Mk-2に寄せても良い気はしています</li>
+</ul>
+</li>
+</ul>
+<p>markdownlintの記事でも書いていますが、単体テストデータ管理や区分値管理など、一部Excelを利用する場面はありますが、このようなファイルを同時に複数のブランチで変更することは今の私の環境においては、あまりありません。したがって、Git上でConflictが発生するのはテキストファイルのみとなり、Conflictの解消に大きな手間はかかりません。</p>
+<h2 id="Git管理にしていない成果物"><a href="#Git管理にしていない成果物" class="headerlink" title="Git管理にしていない成果物"></a>Git管理にしていない成果物</h2><p>一方で以下のファイルは、Git対象外で管理することが多く、多くはスライドやスプレッドシートで作成しています。理由として、下記の資料は基本的にはワンショットでの作成で、何か状況が変化したとしても大本の資料を修正することはない（腐っても良いというかそれが当たり前）であるためです。</p>
+<ul>
+<li>ステークホルダーへの進捗報告、仕様相談など</li>
+<li>テスト計画、テストケース一覧、実施エビデンス</li>
+<li>チームの振り返り資料（KPT的な）</li>
+<li>障害調査、報告</li>
+</ul>
+<h2 id="フォルダ構成について"><a href="#フォルダ構成について" class="headerlink" title="フォルダ構成について"></a>フォルダ構成について</h2><p>アプリケーション開発と同一のリポジトリで <code>docs</code> フォルダを切って管理しています。</p>
+<p>イメージとしては次のようなフォルダ構成です。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">.                           <span class="comment"># リポジトリルート</span></span><br><span class="line">├── README.md               <span class="comment"># 全体のインデックス</span></span><br><span class="line">├── backend                 <span class="comment"># バックエンドのコード</span></span><br><span class="line">│   └── ...</span><br><span class="line">├── docs                    <span class="comment"># ドキュメント全般</span></span><br><span class="line">│   ├── 01. 業務ドメイン</span><br><span class="line">│   ├── 02. システム設計</span><br><span class="line">│   ├── 03. データモデル</span><br><span class="line">│   ├── 04. ProgramDesign</span><br><span class="line">│   ├── 05. システム間I/F</span><br><span class="line">│   ├── ...</span><br><span class="line">│   ├── 91. 環境構築</span><br><span class="line">│   └── ...</span><br><span class="line">├── frontend                 <span class="comment"># フロントエンドのコード</span></span><br><span class="line">│   └── ...</span><br><span class="line">├── infrastrucutre           <span class="comment"># Terraform, Ansibleなどの構成管理</span></span><br><span class="line">│   └── ...</span><br><span class="line">└── ...</span><br></pre></td></tr></table></figure>
+
+<p>ドキュメントのみを管理する独立したリポジトリを作成することも考えましたが、以下の理由でこの形に落ち着きました。</p>
+<ul>
+<li>私達のチーム特性やガバナンス上、基本的にはリポジトリの参照&#x2F;書き込みの権限は設計ドキュメントとコードで分ける必要はなかった</li>
+<li>あるアプリケーション開発で複数リポジトリのInviteするなどの管理が面倒</li>
+<li>リポジトリが別だと設計書とコードで同期をとったPull Requestも別になってしまうため、本当の意味での同期が難しくなるため</li>
+</ul>
+<h2 id="運用のコツ、やってみた感想"><a href="#運用のコツ、やってみた感想" class="headerlink" title="運用のコツ、やってみた感想"></a>運用のコツ、やってみた感想</h2><p>EditorConnfig、Prettierなどのフォーマットと、Markdownlintでのリント、CSpellなどのスペルチェックなどをCIに組み込んでといったテクニカル面の話はここでは割愛して、運用周りで感じたコツのようなものと感想をまとめていきます。あくまで私が経験した中で機能するなと感じた内容ですので、かいつまんで読んでいただければです。Tips的には、ドキュメントをコードから自動生成したり、ドキュメントからコードを自動生成するといったフローを踏むことで強制的に同期させることもありますが、これもテクニカル面が強くなるので割愛しています。</p>
+<h3 id="Wiki管理は高速で腐っていった"><a href="#Wiki管理は高速で腐っていった" class="headerlink" title="Wiki管理は高速で腐っていった"></a>Wiki管理は高速で腐っていった</h3><p>実は設計ドキュメントをGit管理する前に、数名の小さなチームでしたが一度Wikiで管理できないか試してみました。結果としては全くメンテナンスがされずで、下手をするとGoogle Drive（ファイルサーバ）時代より酷いありさまだった気がします。</p>
+<p>理由:</p>
+<ul>
+<li>Wikiだと、設計ドキュメントを作成&#x2F;更新する際のレビュープロセスを整えるのが厳しい<ul>
+<li>コードと同じようにPull Request上で議論して、より良い物にしていくフローができず、モチベーションが上がらなかったのかなと思いました</li>
+<li>逆に開発プロセスと同様の設計ドキュメントをPull Requestベースで行うのは、そのような開発フローに慣れていないメンバーでもそこまで違和感を感じていなかったように見えます</li>
+</ul>
+</li>
+<li>Issueに紐づけての管理が難しい<ul>
+<li>設計ドキュメントの陳腐化に気が付き、Issueだけ起票して対応のタイミングや担当者を別で管理したい場合でも、Wikiの場合は具体的にどのように直したか不明確になりがちでした</li>
+</ul>
+</li>
+</ul>
+<p>GitLab Handbookでも類似の話題があったと思います。同じ結論です。</p>
+<h3 id="設計ドキュメントを外部に共有したい時に困らないか？"><a href="#設計ドキュメントを外部に共有したい時に困らないか？" class="headerlink" title="設計ドキュメントを外部に共有したい時に困らないか？"></a>設計ドキュメントを外部に共有したい時に困らないか？</h3><p>正直なところ、面倒に思うときがしばしばあります。スライドで作成した場合は、そのURLや成果物ファイルを直接共有できますが、リポジトリ管理の場合は権限付与から実施しないとならないため、少し面倒です。適切な権限設定と、有効期間をどう考えるかは悩みです。</p>
+<p>ただし、ステークホルダー向けの資料は従来どおりスライドなどで作成しているため、常日頃からそれなりに適切に議題に出していれば、振り返ってみてもそこまで開発チーム向けの設計ドキュメントを渡す必要があるケースは少なかったです。記憶の中で情報提供で多いのは以下です。</p>
+<ul>
+<li>AWSインフラ構成図、ネットワーク構成図（どのサービスを利用するかのレビューや、監視運用などガバナンスチェックなど）</li>
+<li>API定義（これはOpenAPI Specを使っているため、そのままYAMLを渡したりHTMLを渡していました）</li>
+<li>ERD定義（A5:SQL Mk-2 はERDをPDF出力できるためそれを渡していました）</li>
+</ul>
+<h3 id="コードを修正したとき、どのドキュメントを一緒に直すか分からない問題"><a href="#コードを修正したとき、どのドキュメントを一緒に直すか分からない問題" class="headerlink" title="コードを修正したとき、どのドキュメントを一緒に直すか分からない問題"></a>コードを修正したとき、どのドキュメントを一緒に直すか分からない問題</h3><p>同期を取らないドキュメントを修正せず、コードだけ直してPull Requestに出しちゃう問題です。しばしば発生します。参画歴が浅いメンバーどころか、立ち上げからいる自分ですら見落とすときがあります。例えばバックエンドのWeb APIで、どのAPIがどのDBにCRUDするかを、プログラム詳細設計に書いていたとします。SQLに結合テーブルを追加してテストを直すので手一杯で、ドキュメントのアップデートが追いつかないと行ったケースです。</p>
+<p>対策としては次がありますが、自動化しない限りはレビュアー含めて全員でチェックする必要があります。がんばりましょう。</p>
+<ul>
+<li>SQLを解析してCRUD表を自動生成する&#x2F;チェックする</li>
+<li>Pull Requestのテンプレートに、設計ドキュメントも修正したみたいなチェックボックスを追加する</li>
+<li>開発規約の作業フローに、そういった同期を取るべきリソースを記載し、ルール化しておく</li>
+</ul>
+<h3 id="設計ドキュメントとコードを同じPull-Requestで出すのに慣れ過ぎると、設計レビューがおざなりになりがち"><a href="#設計ドキュメントとコードを同じPull-Requestで出すのに慣れ過ぎると、設計レビューがおざなりになりがち" class="headerlink" title="設計ドキュメントとコードを同じPull Requestで出すのに慣れ過ぎると、設計レビューがおざなりになりがち"></a>設計ドキュメントとコードを同じPull Requestで出すのに慣れ過ぎると、設計レビューがおざなりになりがち</h3><p>チームの開発規約をきっちり定義すれば防げるかと思いますが、設計書とコードを同期をとるために同じPull Requestでレビューするのに慣れると、粒度が大きい改修内容であっても、コードが実装された状態で設計ドキュメントもレビューすることになります。DBにカラムを1つ追加くらいで内容に議論の余地がなければその方が効率的ですが、設計レベルで手戻りがあるケースが何度か発生しました。</p>
+<p>そのため、以下のような方針が推奨であると、開発規約に以下の流れを推奨すると追記しました。</p>
+<ol>
+<li>設計ドキュメントのみのPull Requestを作成して、チーム内レビューを通すこと</li>
+<li>1が終わった後に、コード改修を実施したPull Requestを出すこと</li>
+</ol>
+<p>小さなものも含めて、全て設計ドキュメントレビューとコード改修のPRを分離すると、それはそれで不効率であるため、判断は各メンバーに委ねるレベルにしていますが、大規模開発になると一律分離するといった判断にも繋がってくるかなと思います。</p>
+<p>これの効果ですが、レビュアーとしても次の観点で有益でした。</p>
+<ul>
+<li>設計ドキュメントとコードが同じPull Requestに無いので、設計内容に集中してレビューできる</li>
+<li>設計上、必達ではないもののWANTで直して欲しい内容があっても、すでにコードが実装されていて手戻りになるため、スケジュールを盾にApproveせざるを得ない状況がある。最初に設計レビューだけすると、これらの不健全な状況を防ぐことができる</li>
+</ul>
+<p>ごく一般論ですし、言うまでもなく当たり前の話ですが、設計→レビュー→実装→レビュー のステップは分けましょうといった内容です。下手に全てGit管理なので、人によっては設計という行為が実装と概念が混ざってしまい、こういう必要な手順をスキップしてしまう人もでてくるんだなといった所感です。</p>
+<h3 id="結局人で管理する部分が残るのであれば、陳腐化しちゃいますよね"><a href="#結局人で管理する部分が残るのであれば、陳腐化しちゃいますよね" class="headerlink" title="結局人で管理する部分が残るのであれば、陳腐化しちゃいますよね"></a>結局人で管理する部分が残るのであれば、陳腐化しちゃいますよね</h3><p>はい、自動生成系、静的解析での整合性チェックを完全に整えない限りは、必ず設計ドキュメントは陳腐化します。ただ、改善するチャンスはいくつかあると思います。</p>
+<p>例えば、私は以下のタイミングで設計ドキュメントをよく修正します</p>
+<ol>
+<li>新規参画者向けにオンボーディングする場合</li>
+<li>自分が開発していた機能を、だれかに引き継いでもらうタイミング</li>
+<li>あるメンバーが開発していた機能を、自分などが引き継ぐタイミング</li>
+<li>だれかに機能仕様などの質問を受け、設計ドキュメントのURLだけ渡して終わらせたい場合</li>
+</ol>
+<p>1, 2, 4は自分自身がだれかに状況を説明すると思うのですが、その際に設計ドキュメントを使うようにします。そうすると、説明を通して過不足や話しにくい部分、陳腐化している部分に気がつくことができます。また、説明を受けているメンバーからの質問も、ドキュメントをアップデートするチャンスです。</p>
+<p>良いドキュメントの状態をキープできると、その後の開発生産性や開発者体験にプラスに働きますので、最初は直すべき部分が多くて大変かと思いますが、継続して良い状態になるよう手入れしてきましょう。</p>
+<p>「あとでドキュメントを直す時間を取ろう」は大体、そんな時間は来ません。直すべきは、直したほうが効率が上がるその都度のタイミングだと思いますので、ドキュメントを直すと自分も楽になる範囲内でキレイにしていきましょう。</p>
+<p>意識するのは、設計ドキュメントのURLを送るだけで説明できる余地を増やすことだと思います。これもGitLab Handbookの考え方に近しいと思います。</p>
+<h3 id="drawioで作るコツ"><a href="#drawioで作るコツ" class="headerlink" title="drawioで作るコツ"></a>drawioで作るコツ</h3><p><a href="/articles/20200116/">実践Drawio</a> 記事がおすすめです。個人的には「3.2. Lineジャンプ」は必ず設定して欲しいと思っています。</p>
+<p>レイヤー化はシンプルな図であれば不要かと思いますが、次の背景色は必ず設定したほうが良いと思います。これがないと構成図が透過になり、ダークモードのエディタなどで見る時に不便と感じる時がありました。（もちろん、出力時に背景を透明にするにチェックを入れなければ良いのですが..）</p>
+<img src="/images/20231101a/drawio.png" alt="" width="331" height="290" loading="lazy">
+
+<p>チームメンバー以外に作成した構成図などを共有することがほとんど無い資料に関しては、基本的にタイトル、作成者、作成日、更新者などのヘッダは不要かと思います。</p>
+<h3 id="PlantUML-vs-draw-io"><a href="#PlantUML-vs-draw-io" class="headerlink" title="PlantUML vs draw.io"></a>PlantUML vs draw.io</h3><p>シーケンス図などはどちらでも活用できるため、最初はどちらで書こうか迷うこともあるかもしれません。</p>
+<p>基本的にはPlantUMLで書けるものは、全てPlantUMLで書くべきだと思います。テキストベースであるため、おそらく少し慣れればdraw.ioより生産性が高いのと、細かいインデントなどの好みの違いが出にくいため、レビューもスムーズだと思います。何より、いったん作ってしまえばその後の改修での、git diffが見やすいため、レビューやトレーサビリティでも優位なためです。</p>
+<p>とはいえ、複雑度が高いものには余計に時間がかかるため、一点もの構成図などは素直にdraw.ioを使ったほうが良いかなと思います。</p>
+<h3 id="docs配下の画像でどれがdraw-ioで編集可能か分かるように"><a href="#docs配下の画像でどれがdraw-ioで編集可能か分かるように" class="headerlink" title="docs配下の画像でどれがdraw.ioで編集可能か分かるように"></a>docs配下の画像でどれがdraw.ioで編集可能か分かるように</h3><p>基本的には拡張子を <code>.drawio.png</code> や <code>.drawio.svg</code> にするようにしています。ときには報告資料で作成したスライドの図表をそのまま、設計図に転用したい場合もあります（xxxの会議での決定事項です、といった背景説明の時にゆうこうなため）。その場合は <code>xxx.png</code> といった拡張子にして、区別するようにしています。</p>
+<h3 id="チケットに記載した内容と設計ドキュメントで内容が重複する"><a href="#チケットに記載した内容と設計ドキュメントで内容が重複する" class="headerlink" title="チケットに記載した内容と設計ドキュメントで内容が重複する"></a>チケットに記載した内容と設計ドキュメントで内容が重複する</h3><p>しばしば、チケットに課題や背景、対応案などしっかり記載すると、設計ドキュメント側と重複する内容になりうることがあります。このケースだと、何かしら背景部分にアップデートが入ると、チケット・設計ドキュメントのダブルメンテになり、冗長です。</p>
+<p>この場合は、チケットのリンクを設計ドキュメントに貼って省略するでよいでしょう。もし、設計開発上、差分や注意事項があれば追記すると良いと思います。その対応が後日、別メンバーへの引き継ぎなどで困る場合は、改めてチケットの内容を振り下ろすなどすると良いと思います。これはその機能の粒度やニーズ（ユーザーの関心事が大きく、改修頻度が多いかどうか）にも依存してくると思います。</p>
+<h3 id="Markdownで表を作るのが面倒"><a href="#Markdownで表を作るのが面倒" class="headerlink" title="Markdownで表を作るのが面倒"></a>Markdownで表を作るのが面倒</h3><p>分かります。私は初回の表は、スプレッドシートで作成したのち、<a target="_blank" rel="noopener" href="https://www.tablesgenerator.com/markdown_tables">tablegenerator</a>というWebツールで、Markdown変換しています。</p>
+<p>業務システムだと列数がとにかく多くなってくるため、コツとしては絵文字などを上手く取り入れ、視認性が高く、楽しいドキュメントにすることだと思います。</p>
+<p>例えば、「参照可能&#x2F;参照不可」 といった内容をセルに書くのではなく、「✅、✔、✘、❌」 といったアイコンで代用できないか考えます（凡例をつければよいのです）。</p>
+<p>楽しく見せるというのは設計ドキュメントを維持管理する上で重要なモチベーションとなります。GitHubなどで有名なリポジトリのREADMEを見ると、各種バッチを付けたり、ターミナルの動画を駆使したり工夫が満載です。ぜひそういった技を取り入れていくと良いかなと思います。</p>
+<h3 id="ドキュメントのレビューで、表現が伝わる-x2F-伝わりにくいでやり取りのホップ数が増える"><a href="#ドキュメントのレビューで、表現が伝わる-x2F-伝わりにくいでやり取りのホップ数が増える" class="headerlink" title="ドキュメントのレビューで、表現が伝わる&#x2F;伝わりにくいでやり取りのホップ数が増える"></a>ドキュメントのレビューで、表現が伝わる&#x2F;伝わりにくいでやり取りのホップ数が増える</h3><p>設計ドキュメントをこまめにアップデートしていると、その表現だと伝わりにくいといったレビューコメントが発生します。どうしても差分だけ見てコメントするとそのような感想になりがちですが、全体を通して読むと文脈上は自明であることも多いため、そういったレビューコメントを付けられても困惑してしまうことが多いです。</p>
+<p>そのため、設計ドキュメントについても、できる限りsuggestionを用いることを徹底しています。コードより人それぞれの受け取り方が異なりやすいため、どう直してほしいかがダイレクトに伝わります。</p>
+<img src="/images/20231101a/image.png" alt="image.png" width="1172" height="295" loading="lazy">
+
+<h3 id="tocは腐る"><a href="#tocは腐る" class="headerlink" title="tocは腐る"></a>tocは腐る</h3><p>toc（Table of Contents）をREADMEに手動で書いてくれる人がいます。しかししばしば陳腐化して本文と同期が取れなくなった設計ドキュメントを見てきました。チームルールとして一律、書かないようにするのが良いと思います。</p>
+<p>もし、必要な場合は<a target="_blank" rel="noopener" href="https://dev.classmethod.jp/articles/auto-generate-toc-on-readme-by-actions/">[GitHub]README.mdの目次生成をAction「toc-generator」による自動化で楽しよう | DevelopersIO</a> のような仕組みで統一すると良いと思います。</p>
+<h3 id="気になったらすぐ直す習慣を"><a href="#気になったらすぐ直す習慣を" class="headerlink" title="気になったらすぐ直す習慣を"></a>気になったらすぐ直す習慣を</h3><p>1ファイルだけであれば、鉛筆マークから直接編集→Pull Requestまでブラウザで完結して作業できます。</p>
+<img src="/images/20231101a/image_2.png" alt="image.png" width="1058" height="338" loading="lazy">
+
+<p>おそらく、設計ドキュメントを参照する場合、大半はブラウザで参照していると思うので、エディタに切り替えなくて済むため、便利です。</p>
+<p>ドキュメント修正の敷居はなるべく高くせず気軽に直していく文化をチームで作れると良いと思います。</p>
+<h2 id="やってみた結果"><a href="#やってみた結果" class="headerlink" title="やってみた結果"></a>やってみた結果</h2><p>運用のコツや所感で書いたように、ナレッジはいくつかあるものの、基本的には設計ドキュメントをGit管理することのメリットは大きいように思えます。</p>
+<p>開発の制約として、テキストベースの設計書が許容できないなどといった前提がなければ、これからもこのような形式を採用すると思います。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>設計書をテキストファイルで作成し、Git管理することで、ドキュメントの陳腐化を防げないかトライしてみました。</p>
+<p>最終的には開発メンバー各々の意識に支えられる面もありますが、コードをレビューするのと同様に設計レビューを行えるため、フローに載せやすさはあります。</p>
+<p>自動生成、静的解析などCIでワークフローをより強化させやすい面も気に入っています。この方向で数年はドキュメント腐る問題にあらがってみたいと思います。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20231101a/&related=twitterapi%2Ctwitter&text=%E8%A8%AD%E8%A8%88%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E8%85%90%E3%82%8B%E5%95%8F%E9%A1%8C%E3%80%81Git%E7%AE%A1%E7%90%86%E3%81%A7%E9%81%8B%E7%94%A8%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F%E7%B5%90%E6%9E%9C%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20231101a/&t=%E8%A8%AD%E8%A8%88%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E8%85%90%E3%82%8B%E5%95%8F%E9%A1%8C%E3%80%81Git%E7%AE%A1%E7%90%86%E3%81%A7%E9%81%8B%E7%94%A8%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F%E7%B5%90%E6%9E%9C" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20231101a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20231101a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2023.07.25</span><span class="snscount">&#9825;47</span><a href=/articles/20230725a/ title="フューチャーの有志メンバーでSwagger（OpenAPI Specification Version 2.0）のコーディング規約を作りました。">フューチャーのSwagger（OpenAPI 2.0）規約の紹介</a></li><li class="related-posts-item"><span>2023.04.17</span><span class="snscount">&#9825;284</span><a href=/articles/20230417b/ title="Markdownで設計書を充実させようとすればするほど、設計書間やメンバー間のちょっとした揺れで、本質的なレビューがしにくく感じるようになりました。そこでMarkdownのLintツールを導入するモチベーションが高まりました。">markdownlintで設計書の品質を高める</a></li><li class="related-posts-item"><span>2021.05.24</span><span class="snscount">&#9825;74</span><a href=/articles/20210524a/ title="ユーザーストーリーマップがあると、全体像の認識をチーム全体で共有できて便利です。ユーザーストーリーマップは視覚的にわかりやすく、特殊な構造もしていないため共通理解しやすいことがポイントです。また、ユーザーストーリーマップはこれから何を作ろうかという要求定義の段階でも有効に感じます。この記事では要求の整理と理解のためにユーザーストーリーマップを使ってみたときの気がついた点や振り返りをまとめました">ユーザーストーリーマッピングで始める要求整理</a></li><li class="related-posts-item"><span>2021.05.18</span><span class="snscount">&#9825;523</span><a href=/articles/20210518a/ title="RESTfullとかRESTishな方針でWebAPIの横断検索を設計する際にチーム内で方針について議論したやり取りの備忘記事です。">HTTP検索条件、GETにするか？POSTにするか？</a></li><li class="related-posts-item"><span>2021.04.27</span><span class="snscount">&#9825;39</span><a href=/articles/20210427a/ title="TIG真野です。2021/3/19に「Future Tech Night #7 〜フューチャーの開発事例と共に学べるGo勉強会〜」を開催しました。トップバッターでGoの開発構成・アプリアーキテクチャについて話したので報告します。">Goのフラットパッケージについて登壇しました</a></li><li class="related-posts-item"><span>2020.11.09</span><span class="snscount">&#9825;204</span><a href=/articles/20201109/ title="1年弱ほどGo言語でWebAPIアプリケーション開発を行っていますが、かなり割り切った構成・テスト方針を採用しました。そろそろ1年弱になり機能開発も比較的落ち着き、保守運用フェーズの割合も徐々に増えてきた頃合いなので、やったこと・学び・反省といった振り返りを共有します。">GoのWebアプリ開発でフラットパッケージにした話</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E8%85%90%E3%82%8B%E5%95%8F%E9%A1%8C%E3%81%A8%E3%81%AF"><span class="toc-text">ドキュメント腐る問題とは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A8%AD%E8%A8%88%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E3%82%92Git%E7%AE%A1%E7%90%86%E3%81%AB%E5%AF%84%E3%81%9B%E3%82%8B"><span class="toc-text">設計ドキュメントをGit管理に寄せる</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Git%E7%AE%A1%E7%90%86%E3%81%AB%E3%81%97%E3%81%A6%E3%81%84%E3%81%AA%E3%81%84%E6%88%90%E6%9E%9C%E7%89%A9"><span class="toc-text">Git管理にしていない成果物</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%95%E3%82%A9%E3%83%AB%E3%83%80%E6%A7%8B%E6%88%90%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">フォルダ構成について</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%81%8B%E7%94%A8%E3%81%AE%E3%82%B3%E3%83%84%E3%80%81%E3%82%84%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F%E6%84%9F%E6%83%B3"><span class="toc-text">運用のコツ、やってみた感想</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Wiki%E7%AE%A1%E7%90%86%E3%81%AF%E9%AB%98%E9%80%9F%E3%81%A7%E8%85%90%E3%81%A3%E3%81%A6%E3%81%84%E3%81%A3%E3%81%9F"><span class="toc-text">Wiki管理は高速で腐っていった</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A8%AD%E8%A8%88%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E3%82%92%E5%A4%96%E9%83%A8%E3%81%AB%E5%85%B1%E6%9C%89%E3%81%97%E3%81%9F%E3%81%84%E6%99%82%E3%81%AB%E5%9B%B0%E3%82%89%E3%81%AA%E3%81%84%E3%81%8B%EF%BC%9F"><span class="toc-text">設計ドキュメントを外部に共有したい時に困らないか？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E4%BF%AE%E6%AD%A3%E3%81%97%E3%81%9F%E3%81%A8%E3%81%8D%E3%80%81%E3%81%A9%E3%81%AE%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E3%82%92%E4%B8%80%E7%B7%92%E3%81%AB%E7%9B%B4%E3%81%99%E3%81%8B%E5%88%86%E3%81%8B%E3%82%89%E3%81%AA%E3%81%84%E5%95%8F%E9%A1%8C"><span class="toc-text">コードを修正したとき、どのドキュメントを一緒に直すか分からない問題</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A8%AD%E8%A8%88%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E3%81%A8%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E5%90%8C%E3%81%98Pull-Request%E3%81%A7%E5%87%BA%E3%81%99%E3%81%AE%E3%81%AB%E6%85%A3%E3%82%8C%E9%81%8E%E3%81%8E%E3%82%8B%E3%81%A8%E3%80%81%E8%A8%AD%E8%A8%88%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E3%81%8C%E3%81%8A%E3%81%96%E3%81%AA%E3%82%8A%E3%81%AB%E3%81%AA%E3%82%8A%E3%81%8C%E3%81%A1"><span class="toc-text">設計ドキュメントとコードを同じPull Requestで出すのに慣れ過ぎると、設計レビューがおざなりになりがち</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B5%90%E5%B1%80%E4%BA%BA%E3%81%A7%E7%AE%A1%E7%90%86%E3%81%99%E3%82%8B%E9%83%A8%E5%88%86%E3%81%8C%E6%AE%8B%E3%82%8B%E3%81%AE%E3%81%A7%E3%81%82%E3%82%8C%E3%81%B0%E3%80%81%E9%99%B3%E8%85%90%E5%8C%96%E3%81%97%E3%81%A1%E3%82%83%E3%81%84%E3%81%BE%E3%81%99%E3%82%88%E3%81%AD"><span class="toc-text">結局人で管理する部分が残るのであれば、陳腐化しちゃいますよね</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#drawio%E3%81%A7%E4%BD%9C%E3%82%8B%E3%82%B3%E3%83%84"><span class="toc-text">drawioで作るコツ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#PlantUML-vs-draw-io"><span class="toc-text">PlantUML vs draw.io</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#docs%E9%85%8D%E4%B8%8B%E3%81%AE%E7%94%BB%E5%83%8F%E3%81%A7%E3%81%A9%E3%82%8C%E3%81%8Cdraw-io%E3%81%A7%E7%B7%A8%E9%9B%86%E5%8F%AF%E8%83%BD%E3%81%8B%E5%88%86%E3%81%8B%E3%82%8B%E3%82%88%E3%81%86%E3%81%AB"><span class="toc-text">docs配下の画像でどれがdraw.ioで編集可能か分かるように</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%81%E3%82%B1%E3%83%83%E3%83%88%E3%81%AB%E8%A8%98%E8%BC%89%E3%81%97%E3%81%9F%E5%86%85%E5%AE%B9%E3%81%A8%E8%A8%AD%E8%A8%88%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E3%81%A7%E5%86%85%E5%AE%B9%E3%81%8C%E9%87%8D%E8%A4%87%E3%81%99%E3%82%8B"><span class="toc-text">チケットに記載した内容と設計ドキュメントで内容が重複する</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Markdown%E3%81%A7%E8%A1%A8%E3%82%92%E4%BD%9C%E3%82%8B%E3%81%AE%E3%81%8C%E9%9D%A2%E5%80%92"><span class="toc-text">Markdownで表を作るのが面倒</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E3%81%AE%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E3%81%A7%E3%80%81%E8%A1%A8%E7%8F%BE%E3%81%8C%E4%BC%9D%E3%82%8F%E3%82%8B-x2F-%E4%BC%9D%E3%82%8F%E3%82%8A%E3%81%AB%E3%81%8F%E3%81%84%E3%81%A7%E3%82%84%E3%82%8A%E5%8F%96%E3%82%8A%E3%81%AE%E3%83%9B%E3%83%83%E3%83%97%E6%95%B0%E3%81%8C%E5%A2%97%E3%81%88%E3%82%8B"><span class="toc-text">ドキュメントのレビューで、表現が伝わる&#x2F;伝わりにくいでやり取りのホップ数が増える</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#toc%E3%81%AF%E8%85%90%E3%82%8B"><span class="toc-text">tocは腐る</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B0%97%E3%81%AB%E3%81%AA%E3%81%A3%E3%81%9F%E3%82%89%E3%81%99%E3%81%90%E7%9B%B4%E3%81%99%E7%BF%92%E6%85%A3%E3%82%92"><span class="toc-text">気になったらすぐ直す習慣を</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%84%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F%E7%B5%90%E6%9E%9C"><span class="toc-text">やってみた結果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (409)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (247)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (92)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (23)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Security/">Security (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
