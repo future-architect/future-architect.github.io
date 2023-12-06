@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Engineer Camp2021: Python の AST モジュールを使ってクラス構造を可視化する | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは、Future のインターン Engineer Camp に参加した空閑です。Python連載の9本目です。 今回のインターンではソースコード静的解析システムの開発に取り組みました。そこで本記事では、開発内容の一部である、Python の AST モジュールを使ったクラス構造の可視化について紹介します。 Python の環境構築については以下を参考にしました。  サーバーアプリ開">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Engineer Camp2021: Python の AST モジュールを使ってクラス構造を可視化する | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20211019a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、Future のインターン Engineer Camp に参加した空閑です。Python連載の9本目です。 今回のインターンではソースコード静的解析システムの開発に取り組みました。そこで本記事では、開発内容の一部である、Python の AST モジュールを使ったクラス構造の可視化について紹介します。 Python の環境構築については以下を参考にしました。  サーバーアプリ開">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20211019a/graph_sample.PNG">
+<meta property="og:image" content="https://future-architect.github.io/images/20211019a/graph_sample_pre.PNG">
+<meta property="og:image" content="https://future-architect.github.io/images/20211019a/graph_2.PNG">
+<meta property="og:image" content="https://future-architect.github.io/images/20211019a/image.png">
+<meta property="article:published_time" content="2021-10-18T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.728Z">
+<meta property="article:tag" content="インターン">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="コアテク">
+<meta property="article:tag" content="構文解析">
+<meta property="article:tag" content="インターン2021">
+<meta property="article:tag" content="静的解析">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20211019a/graph_sample.PNG">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20211019a/">
+  <meta content="インターン,Python,コアテク,構文解析,インターン2021,静的解析" name="keywords">
+  <meta content="空閑康太" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Engineer Camp2021: Python の AST モジュールを使ってクラス構造を可視化する
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20211019a_Python_の_AST_モジュールを使ってクラス構造を可視化する.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20211019a_Python_の_AST_モジュールを使ってクラス構造を可視化する" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-10-18T15:00:00.000Z" itemprop="datePublished">2021.10.19</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%A9%BA%E9%96%91%E5%BA%B7%E5%A4%AA" title="空閑康太さんの記事一覧へ" class="post-author">空閑康太</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/インターン/" title="インターンタグの記事へ" class="tag-list-link">インターン</a>
+  
+    
+    <a href="/tags/Python/" title="Pythonタグの記事へ" class="tag-list-link">Python</a>
+  
+    
+    <a href="/tags/コアテク/" title="コアテクタグの記事へ" class="tag-list-link">コアテク</a>
+  
+    
+    <a href="/tags/構文解析/" title="構文解析タグの記事へ" class="tag-list-link">構文解析</a>
+  
+    
+    <a href="/tags/インターン2021/" title="インターン2021タグの記事へ" class="tag-list-link">インターン2021</a>
+  
+    
+    <a href="/tags/静的解析/" title="静的解析タグの記事へ" class="tag-list-link">静的解析</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、Future のインターン Engineer Camp に参加した空閑です。<a href="/articles/20210927b/">Python連載</a>の9本目です。</p>
+<p>今回のインターンではソースコード静的解析システムの開発に取り組みました。そこで本記事では、開発内容の一部である、Python の AST モジュールを使ったクラス構造の可視化について紹介します。</p>
+<p>Python の環境構築については以下を参考にしました。</p>
+<ul>
+<li><a href="/articles/20210611a/">サーバーアプリ開発環境(Python／FastAPI) - Future Tech Blog</a></li>
+</ul>
+<p>また、本記事で出てくる AST については下記を参照ください。言語やパーサは違いますが基本的な考え方は同じです。</p>
+<ul>
+<li><a href="/articles/20200903/">ANTLRを業務で活用した話 - Future Tech Blog</a></li>
+</ul>
+<h1 id="Python-の-AST-モジュール"><a href="#Python-の-AST-モジュール" class="headerlink" title="Python の AST モジュール"></a>Python の AST モジュール</h1><p>Python では AST（抽象構文木）を扱うモジュールが<a target="_blank" rel="noopener" href="https://docs.python.org/ja/3/library/ast.html">標準ライブラリ</a>として提供されています。まずは試しに、適当なソースコードの AST を取得してみます。</p>
+<figure class="highlight py"><figcaption><span>target.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Button</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self.pushed = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">push</span>(<span class="params">self</span>):</span><br><span class="line">        self.pushed = <span class="keyword">not</span> self.pushed</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> ast</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;target.py&quot;</span>, <span class="string">&quot;r&quot;</span>, encoding=<span class="string">&quot;utf-8&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    source = f.read()</span><br><span class="line">    tree = ast.parse(source=source)</span><br><span class="line">    <span class="built_in">print</span>(ast.dump(tree, indent=<span class="number">4</span>))</span><br></pre></td></tr></table></figure>
+
+<details>
+  <summary>出力結果（長いので折り畳み）</summary>
+  <div>
+
+  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">Module(</span><br><span class="line">    body=[</span><br><span class="line">        ClassDef(</span><br><span class="line">            name=&#x27;Button&#x27;,</span><br><span class="line">            bases=[],</span><br><span class="line">            keywords=[],</span><br><span class="line">            body=[</span><br><span class="line">                FunctionDef(</span><br><span class="line">                    name=&#x27;__init__&#x27;,</span><br><span class="line">                    args=arguments(</span><br><span class="line">                        posonlyargs=[],</span><br><span class="line">                        args=[</span><br><span class="line">                            arg(arg=&#x27;self&#x27;)],</span><br><span class="line">                        kwonlyargs=[],</span><br><span class="line">                        kw_defaults=[],</span><br><span class="line">                        defaults=[]),</span><br><span class="line">                    body=[</span><br><span class="line">                        Assign(</span><br><span class="line">                            targets=[</span><br><span class="line">                                Attribute(</span><br><span class="line">                                    value=Name(id=&#x27;self&#x27;, ctx=Load()),</span><br><span class="line">                                    attr=&#x27;pushed&#x27;,</span><br><span class="line">                                    ctx=Store())],</span><br><span class="line">                            value=Constant(value=False))],</span><br><span class="line">                    decorator_list=[]),</span><br><span class="line">                FunctionDef(</span><br><span class="line">                    name=&#x27;push&#x27;,</span><br><span class="line">                    args=arguments(</span><br><span class="line">                        posonlyargs=[],</span><br><span class="line">                        args=[</span><br><span class="line">                            arg(arg=&#x27;self&#x27;)],</span><br><span class="line">                        kwonlyargs=[],</span><br><span class="line">                        kw_defaults=[],</span><br><span class="line">                        defaults=[]),</span><br><span class="line">                    body=[</span><br><span class="line">                        Assign(</span><br><span class="line">                            targets=[</span><br><span class="line">                                Attribute(</span><br><span class="line">                                    value=Name(id=&#x27;self&#x27;, ctx=Load()),</span><br><span class="line">                                    attr=&#x27;pushed&#x27;,</span><br><span class="line">                                    ctx=Store())],</span><br><span class="line">                            value=UnaryOp(</span><br><span class="line">                                op=Not(),</span><br><span class="line">                                operand=Attribute(</span><br><span class="line">                                    value=Name(id=&#x27;self&#x27;, ctx=Load()),</span><br><span class="line">                                    attr=&#x27;pushed&#x27;,</span><br><span class="line">                                    ctx=Load())))],</span><br><span class="line">                    decorator_list=[])],</span><br><span class="line">            decorator_list=[])],</span><br><span class="line">    type_ignores=[])</span><br></pre></td></tr></table></figure>
+
+  </div>
+</details>
+
+
+
+<p><code>ast.parse</code> にソースコードを渡すことで AST が得られます。実際には、ツリーの根を表すAST ノードを取得することになります。<code>ast.dump</code> は引数に AST ノードを取り、そのノードを根とするツリーを、フォーマットした文字列として返します。</p>
+<p>では次に、AST をたどって特定のノードに反応するコードを書いてみます。<code>ast.NodeVisitor</code> は AST をトラバースするための基底クラスで、このクラスを継承して独自の処理を追加します。これは Visitor パターンとなっているため、クラスごとに <code>visit_&#123;class_name&#125;</code> のメソッドを用意していきます。例えば、ソースコード内で定義されている関数名を列挙するためには、関数定義を表すノード <code>ast.FunctionDef</code> に反応する <code>visit_FunctionDef</code> メソッドを作成し、その中で関数名を表す <code>ast.FunctionDef.name</code> を参照します。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyNodeVisitor</span>(ast.NodeVisitor):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">visit_FunctionDef</span>(<span class="params">self, node: ast.FunctionDef</span>):</span><br><span class="line">        <span class="built_in">print</span>(node.name)</span><br><span class="line">        self.generic_visit(node)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;target.py&quot;</span>, <span class="string">&quot;r&quot;</span>, encoding=<span class="string">&quot;utf-8&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    source = f.read()</span><br><span class="line">    tree = ast.parse(source=source)</span><br><span class="line">    MyNodeVisitor().visit(tree)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">__init__</span><br><span class="line">push</span><br></pre></td></tr></table></figure>
+
+<p><code>visit_&#123;class_name&#125;</code> を定義することで、<code>ast.&#123;class_name&#125;</code> のノードを訪れたときのみ実行されるメソッドが作成できます。また、以下の引用のように <code>self.generic_visit()</code> を省略してしまうと、そのノードの子ノードは訪れることができないので注意してください。</p>
+<blockquote>
+<p>注意して欲しいのは、専用のビジター・メソッドを具えたノードの子ノードは、このビジターが generic_visit() を呼び出すかそれ自身で子ノードを訪れない限り訪れられないということです。<br><a target="_blank" rel="noopener" href="https://docs.python.org/ja/3/library/ast.html#ast.NodeVisitor.generic_visit">https://docs.python.org/ja/3/library/ast.html#ast.NodeVisitor.generic_visit</a></p>
+</blockquote>
+<h1 id="ツール概要"><a href="#ツール概要" class="headerlink" title="ツール概要"></a>ツール概要</h1><p>今回の目標は、パッケージ・モジュール・クラスをノードとする図のようなツリーの作成です。パッケージとモジュールはディレクトリ構造にしたがってつなぎ、モジュールの下にはその中で定義されているクラスをつなぎます。作成にあたり、モジュール違いの同名クラスなどが出現することに注意します。</p>
+<img src="/images/20211019a/graph_sample.PNG" alt="graph_sample.PNG" width="1036" height="661" loading="lazy">
+
+
+<p>AST はディレクトリ構造までは表現しないため、今回は以下の手順で解析を行います。</p>
+<ol>
+<li>Node 定義</li>
+<li>ディレクトリ構造解析</li>
+<li>クラス定義解析</li>
+<li>Graphviz で可視化</li>
+</ol>
+<h2 id="1-Node-定義"><a href="#1-Node-定義" class="headerlink" title="1. Node 定義"></a>1. Node 定義</h2><p>解析する前に準備として <code>Node</code> クラスを定義しておきます。これを可視化するツリーのノードと一対一で対応させます。そして <code>Node</code> を継承した <code>NodePackage</code>, <code>NodeModule</code>, <code>NodeClass</code> を定義し、可視化に必要な情報を保持しておきます。今回はノードの識別に最小限必要なパスおよびクラス名を保持しました。これらはグラフのラベル等に使用します。</p>
+<figure class="highlight py"><figcaption><span>node.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> annotations</span><br><span class="line"><span class="keyword">import</span> ast</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> <span class="type">Optional</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Node</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params"></span></span><br><span class="line"><span class="params">        self,</span></span><br><span class="line"><span class="params">        path: <span class="type">Optional</span>[<span class="built_in">str</span>] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">        parent: <span class="type">Optional</span>[Node] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">        obj_name: <span class="type">Optional</span>[<span class="built_in">str</span>] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">    </span>):</span><br><span class="line">        self.children: <span class="built_in">list</span>[Node] = []</span><br><span class="line">        self.parent: <span class="type">Optional</span>[Node] = parent</span><br><span class="line">        self.path: <span class="type">Optional</span>[<span class="built_in">str</span>] = path</span><br><span class="line">        <span class="comment"># Graphviz で可視化する際のラベル</span></span><br><span class="line">        self.obj_name: <span class="type">Optional</span>[<span class="built_in">str</span>] = obj_name</span><br><span class="line">        <span class="comment"># obj_name をルートノードから順にドットで連結したもの</span></span><br><span class="line">        <span class="keyword">if</span> parent <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            self.obj_name_full: <span class="type">Optional</span>[<span class="built_in">str</span>] = obj_name</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.obj_name_full = (</span><br><span class="line">                <span class="string">f&quot;<span class="subst">&#123;parent.obj_name_full&#125;</span>.<span class="subst">&#123;obj_name&#125;</span>&quot;</span></span><br><span class="line">                <span class="keyword">if</span> parent.obj_name_full <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span></span><br><span class="line">                <span class="keyword">else</span> obj_name</span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NodeRoot</span>(<span class="title class_ inherited__">Node</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NodePackage</span>(<span class="title class_ inherited__">Node</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;パッケージ情報を表現するノード&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params"></span></span><br><span class="line"><span class="params">        self,</span></span><br><span class="line"><span class="params">        path: <span class="built_in">str</span>,</span></span><br><span class="line"><span class="params">        parent: NodeRoot | NodePackage,</span></span><br><span class="line"><span class="params">    </span>):</span><br><span class="line">        <span class="comment"># obj_name はディレクトリ名</span></span><br><span class="line">        <span class="built_in">super</span>().__init__(path, parent, obj_name=os.path.basename(path))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NodeModule</span>(<span class="title class_ inherited__">Node</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;モジュール情報を表現するノード&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, path: <span class="built_in">str</span>, parent: NodePackage</span>):</span><br><span class="line">        <span class="comment"># obj_name はファイル名から拡張子を取り除いたもの</span></span><br><span class="line">        <span class="built_in">super</span>().__init__(</span><br><span class="line">            path, parent, obj_name=os.path.splitext(os.path.basename(path))[<span class="number">0</span>]</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NodeClass</span>(<span class="title class_ inherited__">Node</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;クラス情報を表現するノード&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, parent: NodeModule | NodeClass, node: ast.ClassDef</span>):</span><br><span class="line">        <span class="comment"># obj_name はクラス名</span></span><br><span class="line">        <span class="built_in">super</span>().__init__(path=parent.path, parent=parent, obj_name=node.name)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-ディレクトリ構造解析"><a href="#2-ディレクトリ構造解析" class="headerlink" title="2. ディレクトリ構造解析"></a>2. ディレクトリ構造解析</h2><p>探索対象のパス以下を再帰的に解析し、パッケージおよびモジュールのみのツリーを作成します。この時点では図のようなツリーが構築されています。</p>
+<img src="/images/20211019a/graph_sample_pre.PNG" alt="graph_sample_pre.PNG" width="665" height="421" loading="lazy">
+
+
+<figure class="highlight py"><figcaption><span>tree.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">create_module_tree</span>(<span class="params">search_path: <span class="built_in">str</span>, root: <span class="type">Optional</span>[NodeRoot] = <span class="literal">None</span></span>) -&gt; NodeRoot:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;パスを再帰的にたどり、パッケージ・モジュールのみのツリーを作成</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        search_path (str): 対象ファイル・ディレクトリのパス</span></span><br><span class="line"><span class="string">        root (NodeRoot, optional): ツリーのルート. Defaults to None.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Returns:</span></span><br><span class="line"><span class="string">        NodeRoot: ツリーのルート</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">dfs</span>(<span class="params">search_path: <span class="built_in">str</span>, parent_node: Node</span>):</span><br><span class="line">        <span class="comment"># 正規表現で検索</span></span><br><span class="line">        <span class="keyword">for</span> path <span class="keyword">in</span> glob.iglob(search_path):</span><br><span class="line">            <span class="comment"># 絶対パス</span></span><br><span class="line">            abspath = os.path.abspath(path)</span><br><span class="line">            <span class="comment"># パッケージ</span></span><br><span class="line">            <span class="keyword">if</span> os.path.isdir(path):</span><br><span class="line">                <span class="keyword">assert</span> <span class="built_in">isinstance</span>(parent_node, NodeRoot) <span class="keyword">or</span> <span class="built_in">isinstance</span>(</span><br><span class="line">                    parent_node, NodePackage</span><br><span class="line">                )</span><br><span class="line">                node_package = NodePackage(abspath, parent_node)</span><br><span class="line">                parent_node.children.append(node_package)</span><br><span class="line">                <span class="keyword">for</span> file <span class="keyword">in</span> os.listdir(path):</span><br><span class="line">                    dfs(<span class="string">f&quot;<span class="subst">&#123;path&#125;</span>/<span class="subst">&#123;file&#125;</span>&quot;</span>, node_package)</span><br><span class="line">            <span class="comment"># モジュール</span></span><br><span class="line">            <span class="keyword">elif</span> os.path.splitext(path)[<span class="number">1</span>] == <span class="string">&quot;.py&quot;</span>:</span><br><span class="line">                <span class="keyword">assert</span> <span class="built_in">isinstance</span>(parent_node, NodePackage)</span><br><span class="line">                node_module = NodeModule(abspath, parent_node)</span><br><span class="line">                parent_node.children.append(node_module)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> root <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        root = NodeRoot()</span><br><span class="line">    dfs(search_path, root)</span><br><span class="line">    <span class="keyword">return</span> root</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-クラス定義解析"><a href="#3-クラス定義解析" class="headerlink" title="3. クラス定義解析"></a>3. クラス定義解析</h2><p>各モジュールについて、クラス定義を解析していきます。<code>NodeModule</code> が指定するパスを読み込み、<code>visit_ClassDef</code> を実装した <code>ClassDefNodeVisitor</code> で処理します。また、<code>ClassDefNodeVisitor</code> には親ノードへのポインタを追加の情報として持たせています。<code>generic_visit</code> の前後で親ノードを入れ替えることで、クラス内クラスなども表現することができます。</p>
+<figure class="highlight py"><figcaption><span>tree.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">create_definition_tree</span>(<span class="params">root: NodeModule</span>) -&gt; <span class="literal">None</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;モジュール内のクラス定義のツリーを作成</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        root (NodeModule): モジュールノード</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Returns:</span></span><br><span class="line"><span class="string">        NodeRoot: ツリーのルート</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">assert</span> root.path <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>, <span class="string">&quot;to pass type check&quot;</span></span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(root.path, <span class="string">&quot;r&quot;</span>, encoding=<span class="string">&quot;utf-8-sig&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            source = f.read()</span><br><span class="line">            tree = ast.parse(source=source)</span><br><span class="line">            ClassDefNodeVisitor(root).visit(tree)</span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            <span class="built_in">print</span>(e, file=sys.stderr)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ClassDefNodeVisitor</span>(ast.NodeVisitor):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params"></span></span><br><span class="line"><span class="params">        self,</span></span><br><span class="line"><span class="params">        parent: NodeModule | NodeClass,</span></span><br><span class="line"><span class="params">    </span>) -&gt; <span class="literal">None</span>:</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line"></span><br><span class="line">        self.parent = parent</span><br><span class="line"></span><br><span class="line">    <span class="comment"># クラス定義ノード到達時の処理</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">visit_ClassDef</span>(<span class="params">self, node: ast.ClassDef</span>):</span><br><span class="line">        c_node = NodeClass(self.parent, node)</span><br><span class="line">        self.parent.children.append(c_node)</span><br><span class="line">        pre_parent = self.parent</span><br><span class="line">        self.parent = c_node</span><br><span class="line">        self.generic_visit(node)</span><br><span class="line">        self.parent = pre_parent</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-Graphviz-で可視化"><a href="#4-Graphviz-で可視化" class="headerlink" title="4. Graphviz で可視化"></a>4. Graphviz で可視化</h2><p>詳細な実装はここにはあげませんが、実際に作成したツリーをトラバースしながら辺を張っていきます。同じラベルのノードはひとまとめにされてしまうので、異なるノードは異なる ID を持つように注意します。今回の実装では <code>obj_name_full</code> を ID として使うことができます。また、ノードの種類ごとに色を付けるのも良いでしょう。</p>
+<h1 id="解析結果"><a href="#解析結果" class="headerlink" title="解析結果"></a>解析結果</h1><p>標準ライブラリの可視化結果を載せます。全体を載せるには大きすぎる（PDF で約 2 MB）ため、拡大しています。青がパッケージ、オレンジがモジュール、緑がクラスに対応しています。</p>
+<img src="/images/20211019a/graph_2.PNG" alt="graph_2.PNG" width="1200" height="187" loading="lazy">
+
+<p>図では <code>http</code> パッケージの下に、<code>server</code> モジュールがあり、その下にいくつかのクラスがあることが確認できます。実際、該当ディレクトリを見に行くと下図のようになっており、可視化できていることがわかります。<br><img src="/images/20211019a/image.png" alt="image.png" width="1200" height="643" loading="lazy"></p>
+<h1 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h1><p>今回は AST モジュールを使ってクラス構造を可視化しました。紹介した実装は静的解析の基礎となる部分であり、機能追加によって、メソッドノードの追加や型情報、コールグラフなど、より高度な情報を可視化できます。興味を持った方はぜひ、この記事から静的解析を始めていただければと思います。</p>
+<h1 id="インターンの感想"><a href="#インターンの感想" class="headerlink" title="インターンの感想"></a>インターンの感想</h1><p>今回のインターンでは、プロジェクトの一員として開発に取り組みました。したがって、ミーティングやドキュメントなど、普段の個人開発ではほとんど発生しない、コミュニケーションの部分が特に重要に感じました。コミュニケーションによって文脈を共有することで、後に発生する意思決定や軌道修正などがしやすくなっていた気がします。その点では、毎日のミーティングや Slack での議論など、ご協力いただいた受け入れ先のプロジェクトの方々に感謝しています。</p>
+<p>また、今回は静的解析ツールの開発に取り組みましたが、それでも linter や formatter など既存の静的解析ツールはかなり有用でした。デバッグにはもちろん、型ヒントやフォーマットを通してツール側からも文脈の共有が行えるため、コミュニケーションと併せてその重要性を感じました。今回のインターンは約一か月でしたが、より長期間で大規模なプロジェクトであれば、静的解析ツールはもはや必須といっても過言ではないと思います。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20211019a/&related=twitterapi%2Ctwitter&text=Engineer%20Camp2021:%20Python%20%E3%81%AE%20AST%20%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E3%82%AF%E3%83%A9%E3%82%B9%E6%A7%8B%E9%80%A0%E3%82%92%E5%8F%AF%E8%A6%96%E5%8C%96%E3%81%99%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">7</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20211019a/&t=Engineer%20Camp2021:%20Python%20%E3%81%AE%20AST%20%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E3%82%AF%E3%83%A9%E3%82%B9%E6%A7%8B%E9%80%A0%E3%82%92%E5%8F%AF%E8%A6%96%E5%8C%96%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20211019a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20211019a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">5</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.03.02</span><span class="snscount">&#9825;4</span><a href=/articles/20220302a/ title="Language Server Protocol の理解として、Pyright を LSP サーバとした自作クライアントの作成を行いました。その際、Pyright に解析を行わせるための初期化方法がドキュメントには書かれていなかったので、VSCode 拡張用のクライアントをトレースして調査することにしました">Pyright を LSP サーバとした自作 LSP クライアント（調査編）</a></li><li class="related-posts-item"><span>2022.03.01</span><span class="snscount">&#9825;33</span><a href=/articles/20220301a/ title="Mypy や Pyright は Python の静的解析ツールとして有名ですが、これら二つに解析情報でどのような違いがあるのかわからなかったので、実験することにしました。Pyright は Mypy に比べて後発のプロジェクトですが、性能面で優れているなどとして徐々に注目を集めています。">Mypy と Pyright の解析手法と型情報の比較</a></li><li class="related-posts-item"><span>2020.09.19</span><span class="snscount">&#9825;9</span><a href=/articles/20200919/ title="はじめまして。フューチャーのインターンEngineer Campに参加した中村と申します。この記事では、今回のインターンで私が取り組んだ内容を紹介します。今回のインターンで私は、SQLフォーマッタの作成に取り組みました。">Engineer Camp2020でSQLフォーマッタを開発しました</a></li><li class="related-posts-item"><span>2022.03.03</span><span class="snscount">&#9825;10</span><a href=/articles/20220303a/ title="Pyright を LSP  サーバとした自作クライアントを実装しますが、その前に経緯について説明します。アルバイトの前は、Future のインターン Engineer Camp で Python のソースコード解析に取り組んでいました。当時は Python の AST モジュールを活用する方針で、それ以外は自前で解析を行っていました。アルバイトでも引き続き解析に取り組んでいますが、次第に型推論などの技術が必要になってきており、全てを自前で実装することは困難な状況です。そこで現在は、既存のツールを拡張する方針を取っています。ツールの候補としては、Mypy および Pyright が挙がりましたが...">Pyright を LSP サーバとした自作 LSP クライアント（実装編）</a></li><li class="related-posts-item"><span>2021.10.18</span><span class="snscount">&#9825;5</span><a href=/articles/20211018a/ title="こんにちは。フューチャーの夏季インターンシップEngineer Camp 2021に参加した森下です。このインターンシップを通じて得た経験や学んだことをお話ししていきます。">Engineer Camp2021（スマートファクトリー）での学び</a></li><li class="related-posts-item"><span>2021.09.22</span><span class="snscount">&#9825;11</span><a href=/articles/20210922a/ title="こんにちは。2021年のフューチャーのサマーインターン「Engineer Camp」に参加いたしました、山本雄樹です。インターンの振り返りも兼ねて、このブログを読んだ方にインターンの内容や雰囲気を伝えられたらと考えています。インターン参加前のスキルセットとしては以下の通りです。バックエンドの技術を中心に学習していたのですが、めぼしい成果物などもなく、実務経験が一切ありませんでした。">Engineer Camp 2021（IoTプラットフォーム）に参加しました！</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220606b/ title="フューチャーのサマーインターン2022 Summer Engineer Camp🌞⛺🏃の募集が始まりました。フューチャーでは夏のインターンシップは2つのコースがあります。">フューチャー夏のインターンシップ2022（Engineer Camp）の募集を開始しました！</a></li><li class="reference-posts-item"><a href=/articles/20220303a/ title="Pyright を LSP  サーバとした自作クライアントを実装しますが、その前に経緯について説明します。アルバイトの前は、Future のインターン Engineer Camp で Python のソースコード解析に取り組んでいました。当時は Python の AST モジュールを活用する方針で、それ以外は自前で解析を行っていました。アルバイトでも引き続き解析に取り組んでいますが、次第に型推論などの技術が必要になってきており、全てを自前で実装することは困難な状況です。そこで現在は、既存のツールを拡張する方針を取っています。ツールの候補としては、Mypy および Pyright が挙がりましたが...">Pyright を LSP サーバとした自作 LSP クライアント（実装編）</a></li><li class="reference-posts-item"><a href=/articles/20210927b/ title="最近社内でも使う人が徐々に増えている？Pythonの連載記事を開始しようと思います。本エントリーではPythonドキュメントの日本語訳プロジェクトに参加してみた話を紹介します。">Python連載始まります＆Python翻訳プロジェクト</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Python-%E3%81%AE-AST-%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB"><span class="toc-text">Python の AST モジュール</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%84%E3%83%BC%E3%83%AB%E6%A6%82%E8%A6%81"><span class="toc-text">ツール概要</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Node-%E5%AE%9A%E7%BE%A9"><span class="toc-text">1. Node 定義</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E3%83%87%E3%82%A3%E3%83%AC%E3%82%AF%E3%83%88%E3%83%AA%E6%A7%8B%E9%80%A0%E8%A7%A3%E6%9E%90"><span class="toc-text">2. ディレクトリ構造解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E3%82%AF%E3%83%A9%E3%82%B9%E5%AE%9A%E7%BE%A9%E8%A7%A3%E6%9E%90"><span class="toc-text">3. クラス定義解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Graphviz-%E3%81%A7%E5%8F%AF%E8%A6%96%E5%8C%96"><span class="toc-text">4. Graphviz で可視化</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90%E7%B5%90%E6%9E%9C"><span class="toc-text">解析結果</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%95%E3%81%84%E3%81%94%E3%81%AB"><span class="toc-text">さいごに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%B3%E3%81%AE%E6%84%9F%E6%83%B3"><span class="toc-text">インターンの感想</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

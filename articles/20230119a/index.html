@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>VPC Service ControlでGoogle Cloud環境をガッチリ守る | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは、本記事ではGoogle CloudのVPC Service Controlsを利用して、リソースへのアクセス制御を行う方法についてTerraformコード付きで紹介していきたます。 昨今では、個人情報漏洩のニュースが尽きません。少し古いデータではありますが、2012年～2021年に漏洩・紛失した可能性のある個人情報は累計で1億1979万人分にのぼり、2022年を含めるともっと多">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VPC Service ControlでGoogle Cloud環境をガッチリ守る | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20230119a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、本記事ではGoogle CloudのVPC Service Controlsを利用して、リソースへのアクセス制御を行う方法についてTerraformコード付きで紹介していきたます。 昨今では、個人情報漏洩のニュースが尽きません。少し古いデータではありますが、2012年～2021年に漏洩・紛失した可能性のある個人情報は累計で1億1979万人分にのぼり、2022年を含めるともっと多">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20230119a/a864e1b2-7cd3-c69c-bf63-fe2b21622b6d.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230119a/d0b0a574-e85f-3509-49bc-263a2ec8b6f5.jpeg">
+<meta property="og:image" content="https://future-architect.github.io/images/20230119a/da83249a-b466-c2eb-8ea7-9e5fe5e9abfc.jpeg">
+<meta property="og:image" content="https://future-architect.github.io/images/20230119a/755d759c-cde1-42d1-c0c4-e62dc1425a89.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230119a/da83249a-b466-c2eb-8ea7-9e5fe5e9abfc_2.jpeg">
+<meta property="og:image" content="https://future-architect.github.io/images/20230119a/7f3f9c23-2e49-3aea-acaa-2e29d774582b.jpeg">
+<meta property="og:image" content="https://future-architect.github.io/images/20230119a/fbf4eb92-8842-ec33-9104-afeec96066bd.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230119a/b666ebc4-5fc7-cfee-b484-e523c7d96640.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230119a/0e0f69b8-fb59-c4a1-12b4-bb8e739f200f.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230119a/898b2891-6500-d523-2d73-a9ea1c6c24e4.png">
+<meta property="article:published_time" content="2023-01-18T15:00:00.000Z">
+<meta property="article:modified_time" content="2023-06-07T02:25:54.532Z">
+<meta property="article:tag" content="Network">
+<meta property="article:tag" content="GCP">
+<meta property="article:tag" content="VPC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20230119a/a864e1b2-7cd3-c69c-bf63-fe2b21622b6d.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20230119a/">
+  <meta content="Network,GCP,VPC" name="keywords">
+  <meta content="岸下優介" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Security/">Securityカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">VPC Service ControlでGoogle Cloud環境をガッチリ守る
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20230119a_VPC_Service_ControlでGoogle_Cloud環境をガッチリ守る.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20230119a_VPC_Service_ControlでGoogle_Cloud環境をガッチリ守る" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2023/" class="publish-date"><time datetime="2023-01-18T15:00:00.000Z" itemprop="datePublished">2023.01.19</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%B2%B8%E4%B8%8B%E5%84%AA%E4%BB%8B" title="岸下優介さんの記事一覧へ" class="post-author">岸下優介</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Network/" title="Networkタグの記事へ" class="tag-list-link">Network</a>
+  
+    
+    <a href="/tags/GCP/" title="GCPタグの記事へ" class="tag-list-link">GCP</a>
+  
+    
+    <a href="/tags/VPC/" title="VPCタグの記事へ" class="tag-list-link">VPC</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは、本記事ではGoogle CloudのVPC Service Controlsを利用して、リソースへのアクセス制御を行う方法についてTerraformコード付きで紹介していきたます。</p>
+<p>昨今では、個人情報漏洩のニュースが尽きません。少し古いデータではありますが、2012年～2021年に漏洩・紛失した可能性のある個人情報は累計で1億1979万人分にのぼり、2022年を含めるともっと多くなりそうです。<br><a target="_blank" rel="noopener" href="https://webtan.impress.co.jp/n/2022/03/22/42500#:~:text=%E6%9D%B1%E4%BA%AC%E5%95%86%E5%B7%A5%E3%83%AA%E3%82%B5%E3%83%BC%E3%83%81%E3%81%AF%E3%80%812021,%E3%82%82%E6%9C%80%E5%A4%9A%E8%A8%98%E9%8C%B2%E3%81%A0%E3%81%A8%E3%81%84%E3%81%86%E3%80%82">個人情報漏えい、10年間で日本の人口とほぼ同じ人数分が上場企業から流出・紛失【東京商工リサーチ調べ】</a></p>
+<p>セキュリティインシデントを起こさないためにも、基本的にはデータへのアクセスを拒否し、データにアクセスできる人を絞って穴あけするなど、しっかりとデータを守っておく必要があります。</p>
+<p>そんな要求に答えるのがVPC Service Controlsになります。</p>
+<h2 id="VPC-Service-Controlsとは"><a href="#VPC-Service-Controlsとは" class="headerlink" title="VPC Service Controlsとは"></a>VPC Service Controlsとは</h2><p><a target="_blank" rel="noopener" href="https://cloud.google.com/vpc-service-controls/docs/overview?hl=ja">VPC Service Controlsの概要</a></p>
+<p>VPC Service Controlsを利用することによって、Google Cloudのリソースへのアクセスに境界を作ることができます。</p>
+<p>例えば、BigQueryやCloud Storageに個人を特定することができる情報（例：身長、体重、性別、年齢）や画像が置かれている場合、VPC Service Controlsを利用することで<strong>それらのリソースに限られた人間のみがアクセス可能</strong>となります。</p>
+<p>また境界の内外におけるデータ移動を制御することが可能なため、データが境界の外へ持ち出されることも防ぎます（境界を超える通信はデフォルトでブロックされます）。</p>
+<img src="/images/20230119a/a864e1b2-7cd3-c69c-bf63-fe2b21622b6d.png" alt="" width="1200" height="640" loading="lazy">
+
+
+<p>こちらの画像のように、境界（Service Perimeter）内に存在するBigQueryは認証されたVPC、VM（GCE）からのみアクセス可能となり、認証されていないリソースからは境界内へのアクセス・境界外へのアクセス共に制限されることになります。</p>
+<p>現在、VPC Service Controlsがサポートしているリソースの一覧はこちらになります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/vpc-service-controls/docs/supported-products?hl=ja">VPC Service Controlでサポートされているプロダクトと制限事項</a></p>
+<h3 id="Cloud-IAMとは違うの？"><a href="#Cloud-IAMとは違うの？" class="headerlink" title="Cloud IAMとは違うの？"></a>Cloud IAMとは違うの？</h3><p>Cloud IAMもリソースへのアクセスを制限するためのサービスで、<strong>詳細なIDベースのアクセス制御を主</strong>としています。IDベースなので例えばログインしているアカウント、所属するグループ、サービスアカウントなどを基にアクセス制御を行います。</p>
+<p>VPC Service Controlsはそれに加えて、境界全体への上り（Ingress）・下り（Egress）データの制御など、<strong>コンテキストベースの境界セキュリティが可能</strong>となります。</p>
+<p>コンテキストベースは、例えば「どこ（IPアドレス）」、「だれ（ユーザーアカウント・サービスアカウント、<strong>グループは現在不可</strong>）」、「何で（OS）」などアクセス元の背景からリソースへのアクセス可否を判断します。</p>
+<p>どちらが良い・悪いというのは無く、併用することでより強固なセキュリティを築くことが可能となります。</p>
+<h2 id="BigQueryを使って挙動を確認"><a href="#BigQueryを使って挙動を確認" class="headerlink" title="BigQueryを使って挙動を確認"></a>BigQueryを使って挙動を確認</h2><h3 id="Organizationの設定が必要"><a href="#Organizationの設定が必要" class="headerlink" title="Organizationの設定が必要"></a>Organizationの設定が必要</h3><p>VPC Service Controlを始めるにはOrganizationが必要となります。Organizationの設定にはドメインが必要となるため、Google Domainなどで取得する（年間1200円～）必要があります。もし、既にドメインをお持ちの場合はサブドメインを作って、それをOrganizationへ適用することも可能です。</p>
+<p>Organizationの作成方法は以下を参考にするとよいです。<br><a target="_blank" rel="noopener" href="https://qiita.com/suzuyui/items/947867f52897417ee31b#1-%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3%E5%8F%96%E5%BE%97">GCP で組織を作成して共有 VPC 構築 - 1.ドメイン取得</a></p>
+<h3 id="アクセスポリシーを作成する"><a href="#アクセスポリシーを作成する" class="headerlink" title="アクセスポリシーを作成する"></a>アクセスポリシーを作成する</h3><p>アクセスポリシーは、以後出てくるアクセスレベルやサービス境界など、全てのAccess Context Managerリソースのコンテナ（箱）です。</p>
+<p>Organizationに対してOrganizationレベルのアクセスポリシーを作成し、組織内のフォルダとプロジェクトに対してスコープポリシーを作成します。</p>
+<figure class="highlight sh"><figcaption><span>access_context_manager_access_policy.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;google_access_context_manager_access_policy&quot;</span> <span class="string">&quot;access_policy&quot;</span> &#123;</span><br><span class="line">  parent = <span class="string">&quot;organizations/1234567890123&quot;</span></span><br><span class="line">  title  = <span class="string">&quot;Test access policy&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>parent</code>には自身のOrganization IDを入力する必要があり、<code>title</code>がOrganizationのアクセスポリシーの名前となります。</p>
+<p>作成すると、Organization→セキュリティ→VPC Service Controls上にアクセスポリシーが作成されていることが確認できます。</p>
+<img src="/images/20230119a/d0b0a574-e85f-3509-49bc-263a2ec8b6f5.jpeg" alt="" width="1120" height="334" loading="lazy">
+
+<h3 id="ID制御をやってみる"><a href="#ID制御をやってみる" class="headerlink" title="ID制御をやってみる"></a>ID制御をやってみる</h3><p>ID制御を行ってみます。<br>通常は画像のようにBigQueryのDataset, tableを見ることができます。</p>
+<img src="/images/20230119a/da83249a-b466-c2eb-8ea7-9e5fe5e9abfc.jpeg" alt="" width="894" height="396" loading="lazy">
+
+<p>これに対して、以下のようなBigQueryへの内向きのみを許可したサービス境界を設定してみます。</p>
+<img src="/images/20230119a/755d759c-cde1-42d1-c0c4-e62dc1425a89.png" alt="" width="930" height="348" loading="lazy">
+
+
+<h4 id="アクセスレベルを作成する"><a href="#アクセスレベルを作成する" class="headerlink" title="アクセスレベルを作成する"></a>アクセスレベルを作成する</h4><p><a target="_blank" rel="noopener" href="https://cloud.google.com/access-context-manager/docs/overview#access-levels">アクセスレベル</a>ではリソースへのアクセスを許可する条件を定義します。<br>例えば、IPアドレスやID（ユーザーアカウント、サービスアカウント）を用いたアクセス条件を<code>AND</code>や<code>OR</code>を使って定義することができ、この条件に適したユーザーのみがリソースへアクセス可能となります。<br>Terraformでは以下のようにアクセスレベルを作成します。</p>
+<figure class="highlight sh"><figcaption><span>access_context_manager_access_level.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;google_access_context_manager_access_level&quot;</span> <span class="string">&quot;id&quot;</span> &#123;</span><br><span class="line">  parent = <span class="string">&quot;accessPolicies/<span class="variable">$&#123;google_access_context_manager_access_policy.access_policy.name&#125;</span>&quot;</span></span><br><span class="line">  name   = <span class="string">&quot;accessPolicies/<span class="variable">$&#123;google_access_context_manager_access_policy.access_policy.name&#125;</span>/accessLevels/specified_id&quot;</span></span><br><span class="line">  title  = <span class="string">&quot;Specified ID&quot;</span></span><br><span class="line"></span><br><span class="line">  basic &#123;</span><br><span class="line">    conditions &#123;</span><br><span class="line">      // アクセスを許可する条件</span><br><span class="line">      // ここで気を付けたいのが、メールアドレスの前にuser:をつけること</span><br><span class="line">      // ServiceAccountの場合はserviceAccount:&#123;emailid&#125;</span><br><span class="line">      // また、グループはサポートされていない</span><br><span class="line">      members = [</span><br><span class="line">        <span class="string">&quot;user:xxx@yyy.com&quot;</span></span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h4 id="サービス境界を作成する"><a href="#サービス境界を作成する" class="headerlink" title="サービス境界を作成する"></a>サービス境界を作成する</h4><p>VPC Service Controlsの主役です。指定したサービスのリソースに対して外部アクセスから保護するための境界を作ります。</p>
+<p>以下のようにTerraformコードを作成し、サービス境界を作成します。</p>
+<figure class="highlight sh"><figcaption><span>access_context_manager_service_perimeters.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;google_access_context_manager_service_perimeter&quot;</span> <span class="string">&quot;service_perimeter_qiita&quot;</span> &#123;</span><br><span class="line">  parent = <span class="string">&quot;accessPolicies/<span class="variable">$&#123;google_access_context_manager_access_policy.access_policy.name&#125;</span>&quot;</span></span><br><span class="line">  name   = <span class="string">&quot;accessPolicies/<span class="variable">$&#123;google_access_context_manager_access_policy.access_policy.name&#125;</span>/servicePerimeters/restrict_bigquery&quot;</span></span><br><span class="line">  title  = <span class="string">&quot;restrict_bigquery&quot;</span></span><br><span class="line">  status &#123;</span><br><span class="line">    // 境界を作るサービスを列挙する</span><br><span class="line">    restricted_services = [</span><br><span class="line">      <span class="string">&quot;bigquery.googleapis.com&quot;</span>,</span><br><span class="line">    ]</span><br><span class="line">    // 境界を作るプロジェクト</span><br><span class="line">    resources = [</span><br><span class="line">      <span class="string">&quot;projects/123456789012&quot;</span> // Project IDで指定する</span><br><span class="line">    ]</span><br><span class="line">    // アクセスレベル</span><br><span class="line">    access_levels = [</span><br><span class="line">      google_access_context_manager_access_level.access_level_id.name</span><br><span class="line">    ]</span><br><span class="line">    // 内向きポリシー</span><br><span class="line">    ingress_policies &#123;</span><br><span class="line">      ingress_from &#123;</span><br><span class="line">        // IDタイプはidentitiesで指定するため、UNSPECIFIEDになる</span><br><span class="line">        identity_type = <span class="string">&quot;IDENTITY_TYPE_UNSPECIFIED&quot;</span></span><br><span class="line">        // 内向き元のID</span><br><span class="line">        identities = [</span><br><span class="line">          <span class="string">&quot;user:xxx@yyy.com&quot;</span> // メールアドレスで指定する</span><br><span class="line">        ]</span><br><span class="line">      &#125;</span><br><span class="line">      ingress_to &#123;</span><br><span class="line">        // 境界内のプロジェクトの内、アクセスするプロジェクト</span><br><span class="line">        resources = [<span class="string">&quot;*&quot;</span>]</span><br><span class="line">        // 許可する操作</span><br><span class="line">        operations &#123;</span><br><span class="line">          service_name = <span class="string">&quot;bigquery.googleapis.com&quot;</span></span><br><span class="line">          // 許可するメソッド（API）を指定する</span><br><span class="line">          // 今回は全てのメソッドを指定しているため、*になっている</span><br><span class="line">          method_selectors &#123;</span><br><span class="line">            method = <span class="string">&quot;*&quot;</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>アクセスレベルの<code>members</code>、サービス境界の<code>ingress_from</code>の<code>identities</code>、どちらもID<code>&quot;user:xxx@yyy.com&quot;</code>を設定しています。</p>
+<p>アクセスレベル側では<code>restricted_services</code>全体に対しての制御になります。今回はBigQueryのみしか入っておりませんが、Cloud Storageなど他のサービス入れることができ、<code>restricted_services</code>に入っているサービス全てにアクセスレベル側での<code>members</code>設定が適用されます。また、アクセスレベル側で許可されている場合はIngress&#x2F;Egress両方の操作が可能となります。</p>
+<p>サービス境界側の<code>identities</code>はTerraformコードの構成を見るとわかるように、内向き（Ingress）・外向き（Egress）で、尚且つAPI毎で適用されることになります。そのため、アクセスレベルですり抜けた場合にIngress&#x2F;Egressでのポリシーが適用されます。</p>
+<p>今回の場合だとBigQueryのみしかないので<code>identities</code>の指定は不要ですが、参考のために記載しております。</p>
+<h4 id="認証されたアカウントで確認してみる"><a href="#認証されたアカウントで確認してみる" class="headerlink" title="認証されたアカウントで確認してみる"></a>認証されたアカウントで確認してみる</h4><p>アクセスレベルで許可されたアカウントでBigQueryを見てみると先ほどと同じようにテーブルが表示されます。</p>
+<img src="/images/20230119a/da83249a-b466-c2eb-8ea7-9e5fe5e9abfc_2.jpeg" alt="" width="894" height="396" loading="lazy">
+
+<p>次に認証されていないプロジェクトからクエリを実行してみます。</p>
+<img src="/images/20230119a/7f3f9c23-2e49-3aea-acaa-2e29d774582b.jpeg" alt="" width="1200" height="223" loading="lazy">
+
+<p>右上に赤字で<code>VPC Service Controls: Request is prohibited by organization&#39;s policy. vpcServiceControlsUniqueIdentifier: -ZWUwU96cNc6_jcWbyKhbCfz9canAZcNkQjPcb4uEhOY00WbG64xVw.</code>と表示され、クエリが実行できなくなっています。<br>こちらの原因としては今回内向き（Ingress）のみしか許可していなかったため、サービス境界外へのデータ持ち出しが拒否されたことによるものです。</p>
+<img src="/images/20230119a/fbf4eb92-8842-ec33-9104-afeec96066bd.png" alt="" width="816" height="280" loading="lazy">
+
+<h5 id="少し寄り道：ポリシー違反のトラブルシューティング"><a href="#少し寄り道：ポリシー違反のトラブルシューティング" class="headerlink" title="少し寄り道：ポリシー違反のトラブルシューティング"></a>少し寄り道：ポリシー違反のトラブルシューティング</h5><p>ポリシー違反の理由を確認するために、Google CloudではVPC Service Controls のトラブルシューティングが用意されています。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/vpc-service-controls/docs/troubleshooter?hl=ja">VPC Service Controls のトラブルシューティングによる問題の診断</a></p>
+<p>上記のようにポリシー違反が発生した際、<code>vpcServiceControlsUniqueIdentifier:</code>以降の文字列をVPC Service Controls のトラブルシューティングに入力すると違反理由が確認できます。</p>
+<img src="/images/20230119a/b666ebc4-5fc7-cfee-b484-e523c7d96640.png" alt="" width="823" height="663" loading="lazy">
+
+<p>トラブルシューティングをすると、以下のように行われた動作と違反理由が表示されます。</p>
+<img src="/images/20230119a/0e0f69b8-fb59-c4a1-12b4-bb8e739f200f.png" alt="" width="949" height="463" loading="lazy">
+上記のポリシー違反理由は、サービス境界外で`tables.getData`が行われたことが原因のようです。
+また、このことからクエリ実行の際、コンソールの裏側ではAPI（`tables.getData`）がコールされていることもわかります。
+
+<h4 id="認証されていないアカウントで確認してみる"><a href="#認証されていないアカウントで確認してみる" class="headerlink" title="認証されていないアカウントで確認してみる"></a>認証されていないアカウントで確認してみる</h4><p>また、認証されていないアカウントで確認してみると以下のように表示されます。</p>
+<img src="/images/20230119a/898b2891-6500-d523-2d73-a9ea1c6c24e4.png" alt="" width="1200" height="287" loading="lazy">
+
+<p>データセットすら見えず、クエリを打とうとすると右上に赤字で<code>VPC Service Controls: Request is prohibited by organization&#39;s policy.</code>と表示されています。</p>
+<img src="/images/20230119a/263efca8-74e1-8ad3-3501-b668c6e69473.png" alt="" width="777" height="331" loading="lazy">
+
+<p>認証されていないアカウントで<code>bq</code>コマンドでも同様に確認してみます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ bq query --use_legacy_sql=<span class="literal">false</span> --project_id &lt;YOUR_PROJECT_ID&gt;  <span class="string">&#x27;select worker_id from `****-service-three.svc3_dataset.test_table`&#x27;</span></span><br><span class="line"></span><br><span class="line">BigQuery error <span class="keyword">in</span> query operation: VPC Service Controls: Request is prohibited by organization<span class="string">&#x27;s policy.</span></span><br><span class="line"><span class="string">vpcServiceControlsUniqueIdentifier: ***.</span></span><br></pre></td></tr></table></figure>
+
+<p><code>bq</code>コマンドでもデータにアクセスできないことが確認できました。<br>以上より、サービス境界が作られていることがわかりました。</p>
+<h3 id="IP制御を加えてみる"><a href="#IP制御を加えてみる" class="headerlink" title="IP制御を加えてみる"></a>IP制御を加えてみる</h3><p>アクセスレベルにGCEのVMに付与されたIPアドレスを指定し、先ほどと同様のサービス境界を作成します。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;google_access_context_manager_access_level&quot;</span> <span class="string">&quot;id_and_ip&quot;</span> &#123;</span><br><span class="line">  parent = <span class="string">&quot;accessPolicies/<span class="variable">$&#123;google_access_context_manager_access_policy.access_policy.name&#125;</span>&quot;</span></span><br><span class="line">  name   = <span class="string">&quot;accessPolicies/<span class="variable">$&#123;google_access_context_manager_access_policy.access_policy.name&#125;</span>/accessLevels/specified_id_and_ip&quot;</span></span><br><span class="line">  title  = <span class="string">&quot;Specified ID and IP&quot;</span></span><br><span class="line"></span><br><span class="line">  basic &#123;</span><br><span class="line">    <span class="comment"># combining_functionで各条件の組み合わせ条件を指定する</span></span><br><span class="line">    <span class="comment"># デフォルトはANDになる</span></span><br><span class="line">    combining_function = <span class="string">&quot;AND&quot;</span></span><br><span class="line">    conditions &#123;</span><br><span class="line">      members = [</span><br><span class="line">        <span class="string">&quot;user:xxx@yyy.com&quot;</span></span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">    conditions &#123;</span><br><span class="line">      ip_subnetworks = [</span><br><span class="line">        <span class="string">&quot;xx.xx.xx.xx/32&quot;</span></span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>先ほどアクセス可能だったアカウントからGoogle CloudコンソールのBigQueryへアクセスして、クエリを実行してみます。<br><img src="/images/20230119a/77f9a4f8-2a73-f0d1-400a-e306ffb1b765.png" alt="" width="1200" height="123" loading="lazy"></p>
+<p>アクセスできなくなったことが確認できます。</p>
+<img src="/images/20230119a/9de770bd-ea00-9238-2464-906a4bc2561a.png" alt="" width="795" height="320" loading="lazy">
+
+
+<p>次に指定されたIPアドレスのVMに認証済みのアカウントで<code>gcloud auth login</code>してから<code>bq</code>コマンドを打ってみます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">bq query --use_legacy_sql=<span class="literal">false</span> --project_id &lt;YOUR_PROJECT_ID&gt;  <span class="string">&#x27;select worker_id from `****-service-three.svc3_dataset.test_table`&#x27;</span></span><br><span class="line">+-----------+</span><br><span class="line">| worker_id |</span><br><span class="line">+-----------+</span><br><span class="line">|         1 |</span><br><span class="line">|         4 |</span><br><span class="line">|         3 |</span><br><span class="line">|         5 |</span><br><span class="line">|         2 |</span><br><span class="line">+-----------+</span><br></pre></td></tr></table></figure>
+
+<p>無事にクエリを実行することができました。</p>
+<img src="/images/20230119a/27b0c988-2a46-cf62-d7c1-910a171c2e00.png" alt="" width="925" height="338" loading="lazy">
+
+<p>このようにアクセスレベルでは個々のIPやアカウントを利用した細かい制御を行うことができます。<br>他にもOSの指定（有料）、スクリーンロックを要求するなどを設定することも可能です。</p>
+<h2 id="応用編"><a href="#応用編" class="headerlink" title="応用編"></a>応用編</h2><h3 id="Service-Perimeterで守られた2つのBigQuery間でテーブルをJOINする"><a href="#Service-Perimeterで守られた2つのBigQuery間でテーブルをJOINする" class="headerlink" title="Service Perimeterで守られた2つのBigQuery間でテーブルをJOINする"></a>Service Perimeterで守られた2つのBigQuery間でテーブルをJOINする</h3><p>2つのプロジェクトを用意し、各プロジェクトで以下のデータセットを用意します。</p>
+<figure class="highlight bash"><figcaption><span>ProjectA</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+---------------+-----------------+</span><br><span class="line">| department_id | department_name |</span><br><span class="line">+---------------+-----------------+</span><br><span class="line">|             3 | HR              |</span><br><span class="line">|             1 | Engineer        |</span><br><span class="line">|             5 | Marketing       |</span><br><span class="line">|             4 | BackOffice      |</span><br><span class="line">|             2 | Sales           |</span><br><span class="line">+---------------+-----------------+</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><figcaption><span>ProjectA</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+-----------+-----------+-----+---------------+</span><br><span class="line">| worker_id |   name    | age | department_id |</span><br><span class="line">+-----------+-----------+-----+---------------+</span><br><span class="line">|         1 | Tanaka    |  23 |             1 |</span><br><span class="line">|         4 | Kobayashi |  28 |             2 |</span><br><span class="line">|         3 | Yamada    |  56 |             2 |</span><br><span class="line">|         5 | Suzuki    |  44 |             3 |</span><br><span class="line">|         2 | Sasaki    |  34 |             5 |</span><br><span class="line">+-----------+-----------+-----+---------------+</span><br></pre></td></tr></table></figure>
+
+<p>そして、それぞれのBigQueryを以下のように別のサービス境界で守ります。</p>
+<img src="/images/20230119a/34000be3-c373-0fe1-47b6-fdae7b41ec73.png" alt="" width="1078" height="374" loading="lazy">
+
+
+<p>ではこの時、どのようにIngree&#x2F;Egressを設定すればよいのでしょうか？<br>正解は以下のようになります。</p>
+<img src="/images/20230119a/e43ce7a0-2d0e-6e65-a572-88d487eacd7b.png" alt="" width="928" height="489" loading="lazy">
+
+<p>アクセスレベルには先ほどと同様のIDとIPで指定したアクセスレベルを利用し、サービス境界のTerraformコードは以下になります。</p>
+<figure class="highlight sh"><figcaption><span>perimeter_project_a.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;google_access_context_manager_service_perimeter&quot;</span> <span class="string">&quot;projecta_perimeter&quot;</span> &#123;</span><br><span class="line">  parent = <span class="string">&quot;accessPolicies/<span class="variable">$&#123;google_access_context_manager_access_policy.access_policy.name&#125;</span>&quot;</span></span><br><span class="line">  name   = <span class="string">&quot;accessPolicies/<span class="variable">$&#123;google_access_context_manager_access_policy.access_policy.name&#125;</span>/servicePerimeters/projecta&quot;</span></span><br><span class="line">  title  = <span class="string">&quot;ProjectA&quot;</span></span><br><span class="line">  status &#123;</span><br><span class="line">    restricted_services = [</span><br><span class="line">      <span class="string">&quot;bigquery.googleapis.com&quot;</span>,</span><br><span class="line">    ]</span><br><span class="line">    resources = [</span><br><span class="line">      <span class="string">&quot;projects/111111111111&quot;</span>, <span class="comment"># ProjectA</span></span><br><span class="line">    ]</span><br><span class="line">    access_levels = [</span><br><span class="line">      google_access_context_manager_access_level.access_level_id_and_ip.name</span><br><span class="line">    ]</span><br><span class="line">    egress_policies &#123;</span><br><span class="line">      egress_from &#123;</span><br><span class="line">        identity_type = <span class="string">&quot;ANY_IDENTITY&quot;</span></span><br><span class="line">      &#125;</span><br><span class="line">      egress_to &#123;</span><br><span class="line">        resources = [</span><br><span class="line">          <span class="string">&quot;projects/222222222222&quot;</span> <span class="comment"># ProjectB</span></span><br><span class="line">          ]</span><br><span class="line">        operations &#123;</span><br><span class="line">          service_name = <span class="string">&quot;bigquery.googleapis.com&quot;</span></span><br><span class="line">          method_selectors &#123;</span><br><span class="line">            method = <span class="string">&quot;*&quot;</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><figcaption><span>perimeter_project_b.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;google_access_context_manager_service_perimeter&quot;</span> <span class="string">&quot;projecta_perimeter&quot;</span> &#123;</span><br><span class="line">  parent = <span class="string">&quot;accessPolicies/<span class="variable">$&#123;google_access_context_manager_access_policy.access_policy.name&#125;</span>&quot;</span></span><br><span class="line">  name   = <span class="string">&quot;accessPolicies/<span class="variable">$&#123;google_access_context_manager_access_policy.access_policy.name&#125;</span>/servicePerimeters/projectb&quot;</span></span><br><span class="line">  title  = <span class="string">&quot;ProjectB&quot;</span></span><br><span class="line">  status &#123;</span><br><span class="line">    restricted_services = [</span><br><span class="line">      <span class="string">&quot;bigquery.googleapis.com&quot;</span>,</span><br><span class="line">    ]</span><br><span class="line">    resources = [</span><br><span class="line">      <span class="string">&quot;projects/222222222222&quot;</span>, <span class="comment"># ProjectB</span></span><br><span class="line">    ]</span><br><span class="line">    access_levels = [</span><br><span class="line">      google_access_context_manager_access_level.access_level_id_and_ip.name</span><br><span class="line">    ]</span><br><span class="line">    egress_policies &#123;</span><br><span class="line">      egress_from &#123;</span><br><span class="line">        identity_type = <span class="string">&quot;ANY_IDENTITY&quot;</span></span><br><span class="line">      &#125;</span><br><span class="line">      egress_to &#123;</span><br><span class="line">        resources = [</span><br><span class="line">          <span class="string">&quot;projects/111111111111&quot;</span> <span class="comment"># ProjectA</span></span><br><span class="line">          ]</span><br><span class="line">        operations &#123;</span><br><span class="line">          service_name = <span class="string">&quot;bigquery.googleapis.com&quot;</span></span><br><span class="line">          method_selectors &#123;</span><br><span class="line">            method = <span class="string">&quot;*&quot;</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><figcaption><span>terminal</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">bq query --use_legacy_sql=<span class="literal">false</span>  <span class="string">&#x27;select name, age, department_name from `project-a.dataset.table1` as table1 join `project-b.dataset.table2` as table2 on table1.department_id=table2.department_id&#x27;</span></span><br><span class="line">+-----------+-----+-----------------+</span><br><span class="line">|   name    | age | department_name |</span><br><span class="line">+-----------+-----+-----------------+</span><br><span class="line">| Suzuki    |  44 | HR              |</span><br><span class="line">| Tanaka    |  23 | Engineer        |</span><br><span class="line">| Sasaki    |  34 | Marketing       |</span><br><span class="line">| Kobayashi |  28 | Sales           |</span><br><span class="line">| Yamada    |  56 | Sales           |</span><br><span class="line">+-----------+-----+-----------------+</span><br></pre></td></tr></table></figure>
+
+<p>お互いにEGRESSを許可することでJOINが可能になります。<br>結合処理を行うスロットに送られる際に、ProjectA側のテーブルとProjectB側のテーブルが<strong>外に持ち出される</strong>ことでEGRESSの穴あけが必要になるようです。</p>
+<h2 id="Shared-VPCでアクセス制御する"><a href="#Shared-VPCでアクセス制御する" class="headerlink" title="Shared VPCでアクセス制御する"></a>Shared VPCでアクセス制御する</h2><p>Shared VPCのプロジェクトでVPC Service Controlsを利用したい場合は、同じ境界内にVPCホストプロジェクトも含めないと、期待する動作にならない可能性があるみたいです。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/vpc-service-controls/docs/troubleshooting?hl=ja#shared_vpc">Shared VPCにおけるVPC Service Controls</a></p>
+<p>そのため、以下のように<code>resources</code>へVPCホストプロジェクトも含めるようにしましょう。</p>
+<figure class="highlight sh"><figcaption><span>perimeter_shared_pj.tf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">resource <span class="string">&quot;google_access_context_manager_service_perimeter&quot;</span> <span class="string">&quot;shared_pj_perimeter&quot;</span> &#123;</span><br><span class="line">  parent = <span class="string">&quot;accessPolicies/<span class="variable">$&#123;google_access_context_manager_access_policy.access_policy.name&#125;</span>&quot;</span></span><br><span class="line">  name   = <span class="string">&quot;accessPolicies/<span class="variable">$&#123;google_access_context_manager_access_policy.access_policy.name&#125;</span>/servicePerimeters/shared_pj_perimeter&quot;</span></span><br><span class="line">  title  = <span class="string">&quot;Shared PJ Perimeter&quot;</span></span><br><span class="line">  status &#123;</span><br><span class="line">    restricted_services = [</span><br><span class="line">      <span class="string">&quot;bigquery.googleapis.com&quot;</span>,</span><br><span class="line">    ]</span><br><span class="line">    // 境界を作るプロジェクトにホストプロジェクトも含める</span><br><span class="line">    resources = [</span><br><span class="line">      <span class="string">&quot;projects/333333333333&quot;</span>, <span class="comment"># shared-vpc-pj</span></span><br><span class="line">      <span class="string">&quot;projects/444444444444&quot;</span>, <span class="comment"># shared-vpc-host-pj</span></span><br><span class="line">    ]</span><br><span class="line">    access_levels = [</span><br><span class="line">      google_access_context_manager_access_level.access_level_id.name</span><br><span class="line">    ]</span><br><span class="line">    ingress_policies &#123;</span><br><span class="line">      ingress_from &#123;</span><br><span class="line">        identity_type = <span class="string">&quot;IDENTITY_TYPE_UNSPECIFIED&quot;</span></span><br><span class="line">        identities = [</span><br><span class="line">          <span class="string">&quot;user:xxx@yyy.com&quot;</span></span><br><span class="line">        ]</span><br><span class="line">      &#125;</span><br><span class="line">      ingress_to &#123;</span><br><span class="line">        resources = [<span class="string">&quot;*&quot;</span>]</span><br><span class="line">        operations &#123;</span><br><span class="line">          service_name = <span class="string">&quot;bigquery.googleapis.com&quot;</span></span><br><span class="line">          method_selectors &#123;</span><br><span class="line">            method = <span class="string">&quot;*&quot;</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>今回はBigQueryに対してVPC Service Controlsの機能を試してみました。</p>
+<p>VPC Service Controlsではデータのやり取りを内向き・外向きの細かいレベルで制御することが可能になります。</p>
+<p>Google Cloud上のデータを守るためにも、ぜひ利用してみて下さい。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20230119a/&related=twitterapi%2Ctwitter&text=VPC%20Service%20Control%E3%81%A7Google%20Cloud%E7%92%B0%E5%A2%83%E3%82%92%E3%82%AC%E3%83%83%E3%83%81%E3%83%AA%E5%AE%88%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20230119a/&t=VPC%20Service%20Control%E3%81%A7Google%20Cloud%E7%92%B0%E5%A2%83%E3%82%92%E3%82%AC%E3%83%83%E3%83%81%E3%83%AA%E5%AE%88%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20230119a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">4</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20230119a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2023.10.19</span><span class="snscount">&#9825;1</span><a href=/articles/20231019a/ title="Private IPしか持たないCloud SQLへ接続する方法として、Cloud SQL Auth Proxyを利用した接続方法について紹介致します。">VPC外からCloud SQL Auth Proxyを利用したPrivate IP Cloud SQLへの接続</a></li><li class="related-posts-item"><span>2023.10.18</span><span class="snscount">&#9825;1</span><a href=/articles/20231018a/ title="BigQueryは完全マネージドな、ペタバイトスケールかつコスパのよいデータウェアハウスとして知られております。便利なツールである一方、BigQueryで取り扱うデータには個人情報が含まれていることもあり、適切なアクセス制御が望まれます。Resource Managerのタグ機能を利用して…">タグを利用したBigQueryのアクセス制御</a></li><li class="related-posts-item"><span>2023.09.21</span><span class="snscount">&#9825;1</span><a href=/articles/20230921a/ title="これまで組織全体のGoogle Cloudプロジェクトを包括的に見る業務に携わっており、主にIAMやネットワークを含むGoogle Cloud環境上の治安維持のような仕事を担ってきました。今回はその経験値を測るべくProfessional Cloud Security Engineer認定資格を受けてきました。">【合格記】Google Cloud Professional Cloud Security Engineer認定資格を振り返る</a></li><li class="related-posts-item"><span>2023.09.15</span><span class="snscount">&#9825;1</span><a href=/articles/20230915a/ title="最近Data Engineeringを扱うプロジェクトへ異動したこともあり、Google CloudにおけるData Engineeringを網羅的に学びたく、Professional Data Engineer認定資格を受けてきました。">【合格記】Google Cloud Professional Data Engineer認定資格を振り返る【2023年度版】</a></li><li class="related-posts-item"><span>2023.03.31</span><span class="snscount">&#9825;20</span><a href=/articles/20230331a/ title="最近、Terraform内での機密情報の取り扱いについて触れることがあり、Terraformのv1.4のInteractive input for sensitive variables is now masked in the UI (#29520) についてのENHANCEMENTを取り上げつつ、Terraform環境上での機密情報の取り扱いについて..">Terraformでの機密情報の取り扱い on Google Cloud</a></li><li class="related-posts-item"><span>2022.09.30</span><span class="snscount">&#9825;13</span><a href=/articles/20220930a/ title="先日、Google Cloudの認定資格であるProfessional Machine Learning Engineer認定資格を受験し、取得することができました。また、今回はリモート試験にて受験をしてみました。この記事ではProfessional Machine Learning Engineer認定資格の合格に至った学習過程とリモート試験体験記について...">【合格記】Google Cloud Professional Machine Learning Engineer認定資格を振り返る</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20230921a/ title="これまで組織全体のGoogle Cloudプロジェクトを包括的に見る業務に携わっており、主にIAMやネットワークを含むGoogle Cloud環境上の治安維持のような仕事を担ってきました。今回はその経験値を測るべくProfessional Cloud Security Engineer認定資格を受けてきました。">【合格記】Google Cloud Professional Cloud Security Engineer認定資格を振り返る</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VPC-Service-Controls%E3%81%A8%E3%81%AF"><span class="toc-text">VPC Service Controlsとは</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Cloud-IAM%E3%81%A8%E3%81%AF%E9%81%95%E3%81%86%E3%81%AE%EF%BC%9F"><span class="toc-text">Cloud IAMとは違うの？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#BigQuery%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E6%8C%99%E5%8B%95%E3%82%92%E7%A2%BA%E8%AA%8D"><span class="toc-text">BigQueryを使って挙動を確認</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Organization%E3%81%AE%E8%A8%AD%E5%AE%9A%E3%81%8C%E5%BF%85%E8%A6%81"><span class="toc-text">Organizationの設定が必要</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B"><span class="toc-text">アクセスポリシーを作成する</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ID%E5%88%B6%E5%BE%A1%E3%82%92%E3%82%84%E3%81%A3%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">ID制御をやってみる</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E3%83%AC%E3%83%99%E3%83%AB%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B"><span class="toc-text">アクセスレベルを作成する</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E5%A2%83%E7%95%8C%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B"><span class="toc-text">サービス境界を作成する</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AA%8D%E8%A8%BC%E3%81%95%E3%82%8C%E3%81%9F%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E3%81%A7%E7%A2%BA%E8%AA%8D%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">認証されたアカウントで確認してみる</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AA%8D%E8%A8%BC%E3%81%95%E3%82%8C%E3%81%A6%E3%81%84%E3%81%AA%E3%81%84%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E3%81%A7%E7%A2%BA%E8%AA%8D%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">認証されていないアカウントで確認してみる</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IP%E5%88%B6%E5%BE%A1%E3%82%92%E5%8A%A0%E3%81%88%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">IP制御を加えてみる</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BF%9C%E7%94%A8%E7%B7%A8"><span class="toc-text">応用編</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Service-Perimeter%E3%81%A7%E5%AE%88%E3%82%89%E3%82%8C%E3%81%9F2%E3%81%A4%E3%81%AEBigQuery%E9%96%93%E3%81%A7%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E3%82%92JOIN%E3%81%99%E3%82%8B"><span class="toc-text">Service Perimeterで守られた2つのBigQuery間でテーブルをJOINする</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Shared-VPC%E3%81%A7%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E5%88%B6%E5%BE%A1%E3%81%99%E3%82%8B"><span class="toc-text">Shared VPCでアクセス制御する</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

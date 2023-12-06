@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>DynamoDB×Go連載#1 GoでDynamoDBでおなじみのguregu/dynamoを利用する | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは、村田です。Go言語でWebサーバを実装していた際にDynamoDBを扱うライブラリとしてGregさんの https:&#x2F;&#x2F;github.com&#x2F;guregu&#x2F;dynamo を使っていました。（2年ほど稼働していますが、特に問題も出ていません） 当時Go初心者だった私は「go dynamo」とすぐさまGoogle先生に問い合わせ、「guregu&#x2F;dynamoがオススメ」とのエントリ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DynamoDB×Go連載#1 GoでDynamoDBでおなじみのguregu&#x2F;dynamoを利用する | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200225/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、村田です。Go言語でWebサーバを実装していた際にDynamoDBを扱うライブラリとしてGregさんの https:&#x2F;&#x2F;github.com&#x2F;guregu&#x2F;dynamo を使っていました。（2年ほど稼働していますが、特に問題も出ていません） 当時Go初心者だった私は「go dynamo」とすぐさまGoogle先生に問い合わせ、「guregu&#x2F;dynamoがオススメ」とのエントリ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/ogp_techblog.jpg">
+<meta property="article:published_time" content="2020-02-25T01:32:43.000Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.408Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="DynamoDB">
+<meta property="article:tag" content="DynamoDB×Go">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/ogp_techblog.jpg">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20200225/">
+  <meta content="AWS,Go,DynamoDB,DynamoDB×Go" name="keywords">
+  <meta content="村田靖拓" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">DynamoDB×Go連載#1 GoでDynamoDBでおなじみのguregu/dynamoを利用する
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20200225-dynamodb-go1.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20200225-dynamodb-go1" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2020/" class="publish-date"><time datetime="2020-02-25T01:32:43.000Z" itemprop="datePublished">2020.02.25</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%9D%91%E7%94%B0%E9%9D%96%E6%8B%93" title="村田靖拓さんの記事一覧へ" class="post-author">村田靖拓</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/DynamoDB/" title="DynamoDBタグの記事へ" class="tag-list-link">DynamoDB</a>
+  
+    
+    <a href="/tags/DynamoDB×Go/" title="DynamoDB×Goタグの記事へ" class="tag-list-link">DynamoDB×Go</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、村田です。Go言語でWebサーバを実装していた際にDynamoDBを扱うライブラリとしてGregさんの <a target="_blank" rel="noopener" href="https://github.com/guregu/dynamo">https://github.com/guregu/dynamo</a> を使っていました。（2年ほど稼働していますが、特に問題も出ていません）</p>
+<p>当時Go初心者だった私は「go dynamo」とすぐさまGoogle先生に問い合わせ、「guregu/dynamoがオススメ」とのエントリーを多数発見しました。オブジェクトの取り回しが隠蔽化されていてとにかく実装が簡単だと記事にも書いてありましたし、私自身も実際そう感じました。</p>
+<p>すでにタイトルからお察しかと思いますが、本記事は連載第1回目です。時代の移ろいに合わせてDynamoDB×Go界隈の事情も刻一刻と変化しています。まずは私の利用していたSDK(guregu/dynamo)についてから本連載をスタートします。</p>
+<h1 id="SDK-guregu-dynamo-を使ってDynamoDBへアクセスする"><a href="#SDK-guregu-dynamo-を使ってDynamoDBへアクセスする" class="headerlink" title="SDK(guregu/dynamo)を使ってDynamoDBへアクセスする"></a>SDK(guregu/dynamo)を使ってDynamoDBへアクセスする</h1><h2 id="ローカルの検証環境を準備"><a href="#ローカルの検証環境を準備" class="headerlink" title="ローカルの検証環境を準備"></a>ローカルの検証環境を準備</h2><p>ソースコードに触る前にまずは環境の準備から。<br>DynamoDB LocalをDocker上で動かすのが楽なので今回はそちらを使います。</p>
+<figure class="highlight bash"><figcaption><span>DynamoDB-Localのインストール</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker pull amazon/dynamodb-local</span><br><span class="line">$ docker run -d --name dynamodb -p 8000:8000 amazon/dynamodb-local</span><br></pre></td></tr></table></figure>
+
+<p>DynamoDB Localへのアクセスはaws cliを利用するのでそちらも準備します。アクセス時はEndpointのURLを引数で指定してあげる必要があります。</p>
+<figure class="highlight bash"><figcaption><span>AWSCLIのテスト_失敗</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ aws dynamodb list-tables --endpoint-url http://localhost:8000 --region ap-northeast-1</span><br><span class="line">Unable to locate credentials. You can configure credentials by running <span class="string">&quot;aws configure&quot;</span>.</span><br></pre></td></tr></table></figure>
+
+<p>怒られちゃいました…<br>FakeでもいいのでCredentialを指定しなければならないので <code>aws configure</code> を使って指定します。</p>
+<figure class="highlight bash"><figcaption><span>デフォルトのProfile作成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ aws configure</span><br><span class="line">AWS Access Key ID [None]: fake</span><br><span class="line">AWS Secret Access Key [None]: fake</span><br><span class="line">Default region name [None]: ap-northeast-1</span><br><span class="line">Default output format [None]: json</span><br></pre></td></tr></table></figure>
+
+<p>…ということで気を取り直して、</p>
+<figure class="highlight bash"><figcaption><span>AWSCLIのテスト_成功</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ aws dynamodb list-tables --endpoint-url http://localhost:8000</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;TableNames&quot;</span>: []</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>OKそうですね。あとはテーブルを作成したら準備OKです。<br>今回は以下のようなスキーマでテーブルを作成します。</p>
+<ul>
+<li>テーブル名<ul>
+<li><code>MyFirstTable</code></li>
+</ul>
+</li>
+<li>HashKey<ul>
+<li><code>MyHashKey</code> - <code>S</code></li>
+</ul>
+</li>
+<li>RangeKey<ul>
+<li><code>MyRangeKey</code> - <code>N</code></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight bash"><figcaption><span>DynamoDBテーブル作成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">$ aws dynamodb create-table --endpoint-url http://localhost:8000 --table-name MyFirstTable --attribute-definitions AttributeName=MyHashKey,AttributeType=S AttributeName=MyRangeKey,AttributeType=N --key-schema AttributeName=MyHashKey,KeyType=HASH AttributeName=MyRangeKey,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;TableDescription&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;TableArn&quot;</span>: <span class="string">&quot;arn:aws:dynamodb:ddblocal:000000000000:table/MyFirstTable&quot;</span>,</span><br><span class="line">        <span class="string">&quot;AttributeDefinitions&quot;</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;AttributeName&quot;</span>: <span class="string">&quot;MyHashKey&quot;</span>,</span><br><span class="line">                <span class="string">&quot;AttributeType&quot;</span>: <span class="string">&quot;S&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;AttributeName&quot;</span>: <span class="string">&quot;MyRangeKey&quot;</span>,</span><br><span class="line">                <span class="string">&quot;AttributeType&quot;</span>: <span class="string">&quot;N&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">&quot;ProvisionedThroughput&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;NumberOfDecreasesToday&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;WriteCapacityUnits&quot;</span>: 1,</span><br><span class="line">            <span class="string">&quot;LastIncreaseDateTime&quot;</span>: 0.0,</span><br><span class="line">            <span class="string">&quot;ReadCapacityUnits&quot;</span>: 1,</span><br><span class="line">            <span class="string">&quot;LastDecreaseDateTime&quot;</span>: 0.0</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;TableSizeBytes&quot;</span>: 0,</span><br><span class="line">        <span class="string">&quot;TableName&quot;</span>: <span class="string">&quot;MyFirstTable&quot;</span>,</span><br><span class="line">        <span class="string">&quot;TableStatus&quot;</span>: <span class="string">&quot;ACTIVE&quot;</span>,</span><br><span class="line">        <span class="string">&quot;KeySchema&quot;</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;KeyType&quot;</span>: <span class="string">&quot;HASH&quot;</span>,</span><br><span class="line">                <span class="string">&quot;AttributeName&quot;</span>: <span class="string">&quot;MyHashKey&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;KeyType&quot;</span>: <span class="string">&quot;RANGE&quot;</span>,</span><br><span class="line">                <span class="string">&quot;AttributeName&quot;</span>: <span class="string">&quot;MyRangeKey&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">&quot;ItemCount&quot;</span>: 0,</span><br><span class="line">        <span class="string">&quot;CreationDateTime&quot;</span>: xxxxx</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>ちなみにですが、DynamoDB Localの場合は設定したCapacity Unitは考慮されないので適当な値を設定しても問題ありません。</p>
+<h2 id="ソースコード書いていきます"><a href="#ソースコード書いていきます" class="headerlink" title="ソースコード書いていきます"></a>ソースコード書いていきます</h2><p>※ソースは全て <a target="_blank" rel="noopener" href="https://github.com/mura123yasu/go-guregu-dynamo">https://github.com/mura123yasu/go-guregu-dynamo</a> にアップしているので適宜参考にしてください。</p>
+<h3 id="クライアントを準備"><a href="#クライアントを準備" class="headerlink" title="クライアントを準備"></a>クライアントを準備</h3><p>環境変数から諸々の値を取得するようにしつつ、クライアントを生成します。<br>テーブル名は先程作成した <code>MyFirstTable</code> を設定します。</p>
+<figure class="highlight go"><figcaption><span>クライアント生成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// クライアントの設定</span></span><br><span class="line">	dynamoDbRegion := os.Getenv(<span class="string">&quot;AWS_REGION&quot;</span>)</span><br><span class="line">	disableSsl := <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// DynamoDB Localを利用する場合はEndpointのURLを設定する</span></span><br><span class="line">	dynamoDbEndpoint := os.Getenv(<span class="string">&quot;DYNAMO_ENDPOINT&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(dynamoDbEndpoint) != <span class="number">0</span> &#123;</span><br><span class="line">		disableSsl = <span class="literal">true</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// デフォルトでは東京リージョンを指定</span></span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(dynamoDbRegion) == <span class="number">0</span> &#123;</span><br><span class="line">		dynamoDbRegion = <span class="string">&quot;ap-northeast-1&quot;</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	db := dynamo.New(session.New(), &amp;aws.Config&#123;</span><br><span class="line">		Region:     aws.String(dynamoDbRegion),</span><br><span class="line">		Endpoint:   aws.String(dynamoDbEndpoint),</span><br><span class="line">		DisableSSL: aws.Bool(disableSsl),</span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	table := db.Table(<span class="string">&quot;MyFirstTable&quot;</span>)</span><br><span class="line">	<span class="comment">// (以下略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="単純なCRUD"><a href="#単純なCRUD" class="headerlink" title="単純なCRUD"></a>単純なCRUD</h3><p>ここからはCRUD処理の実装を進めます。</p>
+<h4 id="Create"><a href="#Create" class="headerlink" title="Create"></a>Create</h4><p>Createで利用するメソッドは <code>Put</code> です。</p>
+<p>Put対象のitemを準備して渡すだけで簡単ですが1点注意事項があります。itemはPut先テーブルのKeyをすべて含むものでなければなりません。今回であれば <code>MyHashKey</code> と <code>MyRangeKey</code> です。</p>
+<figure class="highlight go"><figcaption><span>Create処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 単純なCRUD - Create</span></span><br><span class="line">	item := Item&#123;</span><br><span class="line">		MyHashKey:  <span class="string">&quot;MyHash&quot;</span>,</span><br><span class="line">		MyRangeKey: <span class="number">1</span>,</span><br><span class="line">		MyText:     <span class="string">&quot;My First Text&quot;</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := table.Put(item).Run(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;Failed to put item[%v]\n&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Read"><a href="#Read" class="headerlink" title="Read"></a>Read</h4><p>Readで利用するメソッドは <code>Get</code> です。他にも <code>Scan</code> も使えるので用途に合わせて色々試してみて下さい。</p>
+<p>私達が実装したWebサーバでは、DynamoDBに対するアクセスはキーアクセスのみに限定していたため、Getの利用で事足りました。</p>
+<figure class="highlight go"><figcaption><span>Read処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 単純なCRUD - Read</span></span><br><span class="line">	<span class="keyword">var</span> readResult Item</span><br><span class="line">	err = table.Get(<span class="string">&quot;MyHashKey&quot;</span>, item.MyHashKey).Range(<span class="string">&quot;MyRangeKey&quot;</span>, dynamo.Equal, item.MyRangeKey).One(&amp;readResult)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;Failed to get item[%v]\n&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Update"><a href="#Update" class="headerlink" title="Update"></a>Update</h4><p>利用するメソッドは <code>Update</code> です。</p>
+<p>少し余談にはなるのですが、Webサーバ実装時はUpdateは使いませんでした。常にPut処理を行っており、全体シーケンスを検討する中で冪等性を保つためにそのような設計にしていました。</p>
+<figure class="highlight go"><figcaption><span>Update処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 単純なCRUD - Update</span></span><br><span class="line">	<span class="keyword">var</span> updateResult Item</span><br><span class="line">	err = table.Update(<span class="string">&quot;MyHashKey&quot;</span>, item.MyHashKey).Range(<span class="string">&quot;MyRangeKey&quot;</span>, item.MyRangeKey).Set(<span class="string">&quot;MyText&quot;</span>, <span class="string">&quot;My Second Text&quot;</span>).Value(&amp;updateResult)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;Failed to update item[%v]\n&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Delete"><a href="#Delete" class="headerlink" title="Delete"></a>Delete</h4><p>利用するメソッドは <code>Delete</code> です。</p>
+<p>Keyさえ指定していれば問題ないのは他メソッドと変わりません。</p>
+<figure class="highlight go"><figcaption><span>Delete処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 単純なCRUD - Delete</span></span><br><span class="line">	err = table.Delete(<span class="string">&quot;MyHashKey&quot;</span>, item.MyHashKey).Range(<span class="string">&quot;MyRangeKey&quot;</span>, item.MyRangeKey).Run()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;Failed to delete item[%v]\n&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Conditional-Check"><a href="#Conditional-Check" class="headerlink" title="Conditional Check"></a>Conditional Check</h3><p>これはもうゴリゴリに使い倒しました。以下の例はとてもシンプルなものですが、実際には <code>If(&quot;MyText = ?&quot;, &quot;some word&quot;)</code> の部分に様々な条件を記載します。書き方は色々あるので必要に応じて確認してみてください。</p>
+<figure class="highlight go"><figcaption><span>ConditionalCheck処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Conditional Check</span></span><br><span class="line">	err = table.Delete(<span class="string">&quot;MyHashKey&quot;</span>, item.MyHashKey).Range(<span class="string">&quot;MyRangeKey&quot;</span>, item.MyRangeKey).If(<span class="string">&quot;MyText = ?&quot;</span>, <span class="string">&quot;some word&quot;</span>).Run()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;Failed to delete item with conditional check[%v]\n&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// (略)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要件を満たすためにほぼほぼマストで必要だったConditional Checkですが、しっかり設計しておかないと一番泣きを見ることになる部分になります。</p>
+<p>例えば、開発当時ロックの機構をこのConditional Checkで実現しており、ロック取得者以外がレコードを更新できないようになど制御をかけていたのですが、一連のシーケンスの中で予期しない割り込みが発生すると永遠に更新できないレコードが登場し…もちろん設計ミスによるものですが、とても苦しみました。（原因究明の時間は非常に楽しかった記憶もありますが笑）</p>
+<h3 id="一連のソースを実行してみる"><a href="#一連のソースを実行してみる" class="headerlink" title="一連のソースを実行してみる"></a>一連のソースを実行してみる</h3><p>さて、紹介してきた一連の動作を最後に実行してみましょう。DynamoDB Localを使用する場合は環境変数にて <code>DYNAMO_ENDPOINT</code> だけ指定してRunするだけ。簡単ですね。</p>
+<figure class="highlight sh"><figcaption><span>実行</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout https://github.com/mura123yasu/go-guregu-dynamo.git</span><br><span class="line">$ <span class="built_in">export</span> DYNAMO_ENDPOINT=http://localhost:8000</span><br><span class="line">$ go run main.go</span><br></pre></td></tr></table></figure>
+
+<p>※ちなみにコミットしているソースはConditional CheckのUpdateだけが失敗しますが、想定通りなので問題ありません。</p>
+<h1 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h1><p>連載初日の記事はいかがだったでしょうか？レベル的には初学者の方に向けた内容だったかなと思います。「まずはGo言語でDynamoDBをつついてみたい」という方が本記事を通じて簡単にチャレンジできたら幸いです。</p>
+<p><a href="/tags/DynamoDB%C3%97Go/">DynamoDB×Go連載企画</a> の1本目でした。次は武田さんの<a href="/articles/20200227/">AWS SDKによるDynamoDBの基本操作</a>です。</p>
+<p>DynamoDB×Go以外にも多くの連載企画があります。特にGo Cloud連載が今回のテーマに近いです。</p>
+<ul>
+<li><a href="/tags/GoCDK/">Go Cloud 連載</a></li>
+<li><a href="/tags/Auth0/">Auth0 連載</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200225/&related=twitterapi%2Ctwitter&text=DynamoDB%C3%97Go%E9%80%A3%E8%BC%89#1%20Go%E3%81%A7DynamoDB%E3%81%A7%E3%81%8A%E3%81%AA%E3%81%98%E3%81%BF%E3%81%AEguregu/dynamo%E3%82%92%E5%88%A9%E7%94%A8%E3%81%99%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200225/&t=DynamoDB%C3%97Go%E9%80%A3%E8%BC%89#1%20Go%E3%81%A7DynamoDB%E3%81%A7%E3%81%8A%E3%81%AA%E3%81%98%E3%81%BF%E3%81%AEguregu/dynamo%E3%82%92%E5%88%A9%E7%94%A8%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200225/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">6</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200225/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">13</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.02.28</span><span class="snscount">&#9825;4</span><a href=/articles/20200228/ title="DynamoDB×Go連載の第3弾目です。今までは AWS SDK Go やそれをラップしたguregu/dynamo について説明していましたが、 Go CDK（Go Cloud Development Kit） を用いたDynamoDB操作について説明します。">DynamoDB×Go#3 Go CDKでどこまでいける？機能を調べてみた</a></li><li class="related-posts-item"><span>2020.02.27</span><span class="snscount">&#9825;10</span><a href=/articles/20200227/ title="DynamoDB×Go連載企画の第2弾の記事となります。本記事ではサードパーティ製のライブラリを利用せずaws-sdkを素で利用した場合のDynamoDBの基本操作について見ていきましょう。">DynamoDB×Go連載#2 AWS SDKによるDynamoDBの基本操作</a></li><li class="related-posts-item"><span>2021.10.25</span><span class="snscount">&#9825;14</span><a href=/articles/20211025a/ title="DynamoDBをGoで操作することにかけては、[DynamoDB×Go連載] に参加するくらい関心があるのですが、AWS SDK for Goの公式ライブラリに含まれる、ヘルパーパッケージについて存在を今までスルーしていました。使ってみると業務的には利用一択だと思ったので今後使っていくぞという覚書としてまとめます。">AWS SDK for GoでDynamoDBの式を扱うヘルパーパッケージの使い方</a></li><li class="related-posts-item"><span>2021.01.22</span><span class="snscount">&#9825;13</span><a href=/articles/20210122/ title="DynamoDB Streamsは、DynamoDBに対する項目の追加、変更、削除をイベントとして検出できる機能です。テーブルの項目が変更されるとすぐに、新しいレコードがテーブルのストリームに表示されます">オレのDynamoDB Streamsが再着火しないわけがない</a></li><li class="related-posts-item"><span>2020.11.30</span><span class="snscount">&#9825;7</span><a href=/articles/20201130/ title="AWSのDBといえば「RDS」が代表格ですが、近年のサーバレス普及に伴い「DynamoDB」が第一選択肢として選ばれる機会が増えています。">DynamoDBのページング</a></li><li class="related-posts-item"><span>2020.07.22</span><span class="snscount">&#9825;8</span><a href=/articles/20200722/ title="昨今様々なシステムで利用さているAWSのLambdaですが、サーバレスということもあり何かのイベントをトリガに関数を起動させる方法が一般的かと思います。LambdaはAWSの様々なサービスをトリガとして起動することが可能で、自分たちの利用しているAWSサービスと組み合わせて実装するることでその真価を発揮します。AWSに少し詳しい人であればLambdaをAWSのサービストリガで起動させる事ができることは知っていると思いますが、いざ実装するとなると具体的にどういった手順で、なんの設定が必要かというところがわからないという人もいるのではないでしょうか。">AWSサービストリガによるLambda起動</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20200927/ title="こんにちは、TIGの辻です。業務アプリケーションのビジネスロジックをサーバーレスで実装することも増えてきました。[AWSサービストリガによるLambda関数起動]の記事にもあるようにAPI GatewayとLambda関数を組み合わせてHTTPサーバを提供することも容易にできます。バックエンドのWebAPIをLambda関数で動かすユースケースがよくあるパターンです。Lambda関数とアプリケーションロジックの実装は密結合になりやすいですが、HTTPサーバで動作するように実装して、Lambda関数として組み込むと、従来のHTTPサーバを実装するノウハウを活かしつつ、サーバレスで動作するバックエンドのWebAPIを構築できます。本記事ではGoを用いてサーバレスなWebAPIサーバをAWS上に1から構築するチュートリアルです。">LambdaとGoを使ったサーバーレスWebAPI開発実践入門</a></li><li class="reference-posts-item"><a href=/articles/20200818/ title="はじめまして。TIG DXユニットの富山です。2020年4月新卒入社です。夏休み自由研究連載の11本目の記事で公開された[Slack×GASの日報テンプレBOTを実務に導入してみた]の執筆者である仁木さんと同期です。私が参画しているプロジェクトでは、データベースにDynamoDBを採用しています。私は、RDBMSしか使用した経験がなかったので、NoSQLであるDynamoDBの理解にとても苦しみました。そこで今回の夏休み自由研究では理解した内容をまとめてみたいと思います！">【入門】私を苦しめたDynamoDB</a></li><li class="reference-posts-item"><a href=/articles/20200228/ title="DynamoDB×Go連載の第3弾目です。今までは AWS SDK Go やそれをラップしたguregu/dynamo について説明していましたが、 Go CDK（Go Cloud Development Kit） を用いたDynamoDB操作について説明します。">DynamoDB×Go#3 Go CDKでどこまでいける？機能を調べてみた</a></li><li class="reference-posts-item"><a href=/articles/20200227/ title="DynamoDB×Go連載企画の第2弾の記事となります。本記事ではサードパーティ製のライブラリを利用せずaws-sdkを素で利用した場合のDynamoDBの基本操作について見ていきましょう。">DynamoDB×Go連載#2 AWS SDKによるDynamoDBの基本操作</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SDK-guregu-dynamo-%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6DynamoDB%E3%81%B8%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E3%81%99%E3%82%8B"><span class="toc-text">SDK(guregu&#x2F;dynamo)を使ってDynamoDBへアクセスする</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E3%81%AE%E6%A4%9C%E8%A8%BC%E7%92%B0%E5%A2%83%E3%82%92%E6%BA%96%E5%82%99"><span class="toc-text">ローカルの検証環境を準備</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%B3%E3%83%BC%E3%83%89%E6%9B%B8%E3%81%84%E3%81%A6%E3%81%84%E3%81%8D%E3%81%BE%E3%81%99"><span class="toc-text">ソースコード書いていきます</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%AF%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88%E3%82%92%E6%BA%96%E5%82%99"><span class="toc-text">クライアントを準備</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%98%E7%B4%94%E3%81%AACRUD"><span class="toc-text">単純なCRUD</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Create"><span class="toc-text">Create</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Read"><span class="toc-text">Read</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Update"><span class="toc-text">Update</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Delete"><span class="toc-text">Delete</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Conditional-Check"><span class="toc-text">Conditional Check</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E9%80%A3%E3%81%AE%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%92%E5%AE%9F%E8%A1%8C%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">一連のソースを実行してみる</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%80%E5%BE%8C%E3%81%AB"><span class="toc-text">最後に</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

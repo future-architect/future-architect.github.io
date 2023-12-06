@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Go 1.20 リリース連載 go build に追加される cover オプション（利用例付き） | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは。TIG DX ユニット所属、金欠コンサルタントの藤井です。最近でもないですが、SwitchBot ロックと、キーパッド&#x2F;指紋認証パッドを買いました。我が家における IoT デバイスのカバレッジが着実に向上しており、快適な日々を過ごしています。 Go 1.20 連載 7 記事目にして、最終回の本記事では、go buildコマンドに新たに追加される-coverオプションに">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 1.20 リリース連載 go build に追加される cover オプション（利用例付き） | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20230203a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは。TIG DX ユニット所属、金欠コンサルタントの藤井です。最近でもないですが、SwitchBot ロックと、キーパッド&#x2F;指紋認証パッドを買いました。我が家における IoT デバイスのカバレッジが着実に向上しており、快適な日々を過ごしています。 Go 1.20 連載 7 記事目にして、最終回の本記事では、go buildコマンドに新たに追加される-coverオプションに">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20230203a/image.png">
+<meta property="article:published_time" content="2023-02-02T15:00:00.000Z">
+<meta property="article:modified_time" content="2023-06-07T02:25:54.540Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Go1.20">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20230203a/image.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20230203a/">
+  <meta content="Go,Go1.20" name="keywords">
+  <meta content="藤井亮佑" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Go 1.20 リリース連載 go build に追加される cover オプション（利用例付き）
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20230203a_Go_1.20_リリース連載_go_build_に追加される_cover_オプション（利用例付き）.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20230203a_Go_1.20_リリース連載_go_build_に追加される_cover_オプション（利用例付き）" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2023/" class="publish-date"><time datetime="2023-02-02T15:00:00.000Z" itemprop="datePublished">2023.02.03</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E8%97%A4%E4%BA%95%E4%BA%AE%E4%BD%91" title="藤井亮佑さんの記事一覧へ" class="post-author">藤井亮佑</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/Go1-20/" title="Go1.20タグの記事へ" class="tag-list-link">Go1.20</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは。TIG DX ユニット所属、金欠コンサルタントの藤井です。最近でもないですが、SwitchBot ロックと、キーパッド&#x2F;指紋認証パッドを買いました。我が家における IoT デバイスのカバレッジが着実に向上しており、快適な日々を過ごしています。</p>
+<p><a href="/articles/20230123a/">Go 1.20 連載</a> 7 記事目にして、最終回の本記事では、<code>go build</code>コマンドに新たに追加される<code>-cover</code>オプションについてお伝えします。せっかくなので実際に使ってみたレポートもお届けしようと思います。</p>
+<p>なお、公式でも詳細な説明を記したランディングページが用意されているので、本記事の後にこちらもご覧いただけると、より一層理解が深まると思います。</p>
+<p><a target="_blank" rel="noopener" href="https://go.dev/testing/coverage/">https://go.dev/testing/coverage/</a></p>
+<h2 id="cover-オプションとは"><a href="#cover-オプションとは" class="headerlink" title="cover オプションとは"></a>cover オプションとは</h2><h3 id="ビルド・実行手順"><a href="#ビルド・実行手順" class="headerlink" title="ビルド・実行手順"></a>ビルド・実行手順</h3><p><code>go build</code>コマンドは、作成したアプリケーションをビルドする際に利用しますが、そのオプションに新たに<code>-cover</code>オプションが追加されます。ざっくり書くと、ビルド後のアプリケーションに対し、テストを実行した際のテストカバレッジを取得できるようにするためのオプションです。</p>
+<p>使い方は簡単で、単に<code>go build -cover .</code>のように、いつもの build に<code>-cover</code>オプションを追加するだけです。</p>
+<p>このように、<code>-cover</code>以外のオプションをつけずに実行した場合、ローカルのパッケージのみがカバレッジの計測対象となり、（標準含む）外部パッケージは対象外となります。ローカルパッケージの一部をカバレッジ計測対象としたい場合や、外部パッケージも対象としたい場合は、<code>go build -cover -coverpkg=example.com,fmt,net/http .</code>のように、<code>-coverpkg</code>を用いて、明示的に対象パッケージを指定します。<code>-coverpkg</code>を用いた場合は、指定していないパッケージは（ローカル含む）全て対象外となります。</p>
+<p>あとはビルドされたバイナリを実行すればよいのですが、その際に<code>GOCOVERDIR</code>の環境変数に、カバレッジを記録したファイルの出力先を設定する必要があります。</p>
+<p>また、<code>GOCOVERDIR</code>で指定したディレクトリが存在しない場合は、カバレッジファイルは出力されません。ということで、ディレクトリを作成したうえで、<code>GOCOVERDIR=coverdir ./main</code>のようにして実行しましょう。すると、指定したディレクトリにそれぞれ<code>covmeta</code>と<code>covcounters</code>から始まるファイルが出力されます。<code>covmeta</code>はカバレッジ収集対象のソースコードの各種情報が記録されたファイル、<code>covcounters</code>の方は、カバレッジ等の情報が記録されたファイルです。</p>
+<p>前者は<code>meta-data files</code>と呼ばれており、何度実行しても（再ビルドされないかぎり）不変な値であるソースコードの情報が記録されているのみのため、初回実行時にのみ作成され、以後更新されません。</p>
+<p>一方、  後者は<code>counter data files</code>と呼ばれており、こちらは実行の都度変動し得る情報が記録されているため、実行の度に新規で作成されます。</p>
+<p>ちなみに、<code>GOCOVERDIR=coverdir go run -cover .</code>のように、<code>go run</code>でももちろん可能です。</p>
+<h3 id="カバレッジの確認手順"><a href="#カバレッジの確認手順" class="headerlink" title="カバレッジの確認手順"></a>カバレッジの確認手順</h3><p><code>GOCOVERDIR</code>に出力された 2 種類のファイルはバイナリのため、人間が閲覧できるものにはなっていません。</p>
+<p>これを確認するためには、<code>go tool</code>に新たに追加されたサブコマンド<code>covdata</code>を使用します。</p>
+<p>公式そのままの引用ですが、以下のように<code>percent</code>サブコマンドで<code>-i</code>オプションにカバレッジファイルの出力先を指定することで、パッケージごとのカバレッジが確認できます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">ls</span> somedata</span><br><span class="line">covcounters.c6de772f99010ef5925877a7b05db4cc.2424989.1670252383678349347</span><br><span class="line">covmeta.c6de772f99010ef5925877a7b05db4cc</span><br><span class="line">$ go tool covdata percent -i=somedata</span><br><span class="line">    main    coverage: 100.0% of statements</span><br><span class="line">    mydomain.com/greetings  coverage: 100.0% of statements</span><br><span class="line">$</span><br></pre></td></tr></table></figure>
+
+<p>また、<code>textfmt</code>サブコマンドにより、従来の<code>go test</code>コマンドと同様に、テキスト形式でカバレッジを保存することができます。</p>
+<p>これも公式の引用ですが、以下のように<code>go tool cover</code>に入力することで、<code>go test</code>と同様にカバレッジを確認できます。（<code>go tool cover -html=profile.txt -o profile.html</code>のように html 形式でのカバレッジ確認も当然可能です。）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">ls</span> somedata</span><br><span class="line">covcounters.c6de772f99010ef5925877a7b05db4cc.2424989.1670252383678349347</span><br><span class="line">covmeta.c6de772f99010ef5925877a7b05db4cc</span><br><span class="line">$ go tool covdata textfmt -i=somedata -o profile.txt</span><br><span class="line">$ <span class="built_in">cat</span> profile.txt</span><br><span class="line">mode: <span class="built_in">set</span></span><br><span class="line">mydomain.com/myprogram.go:10.13,12.2 1 1</span><br><span class="line">mydomain.com/greetings/greetings.go:3.23,5.2 1 1</span><br><span class="line">$ go tool cover -func=profile.txt</span><br><span class="line">mydomain.com/greetings/greetings.go:3:  Goodbye     100.0%</span><br><span class="line">mydomain.com/myprogram.go:10:       main        100.0%</span><br><span class="line">total:                  (statements)    100.0%</span><br><span class="line">$</span><br></pre></td></tr></table></figure>
+
+<h3 id="複数実行時のカバレッジ制御"><a href="#複数実行時のカバレッジ制御" class="headerlink" title="複数実行時のカバレッジ制御"></a>複数実行時のカバレッジ制御</h3><p>そのほかにも、<code>go tool covdata</code>には<code>merge</code>, <code>subtract</code>, <code>intersect</code>のサブコマンドが存在します。名前の通り、カバレッジを<code>結合</code>・<code>差分抽出</code>・<code>交差抽出</code>するためのサブコマンドです。</p>
+<p>どれも使い方は同じで、<code>go tool covdata merge|subtract|intersect -i=dir1,dir2 -o output</code>のように使います。（merge のみ<code>-i</code>に 3 つ以上のディレクトリを指定できますが、それ以外は 2 つのみ可能です。）</p>
+<p>ユースケースとしては以下などでしょうか。</p>
+<ul>
+<li><code>merge</code><ul>
+<li>異なる環境下での実行結果を結合し、環境依存を吸収した状態でのカバレッジを確認する（公式記載の例）</li>
+</ul>
+</li>
+<li><code>subtract</code><ul>
+<li>異なる環境下での実行結果の差分を抽出し、環境依存箇所を特定する</li>
+</ul>
+</li>
+<li><code>intersect</code><ul>
+<li>異なる環境下での実行結果の交差部分を抽出し、環境に依存しない箇所を特定する</li>
+<li>テストケースごとの実行結果の交差部分を抽出し、複数回実行されている（場合によっては無駄であり、テスト効率を下げている）箇所を特定する</li>
+</ul>
+</li>
+</ul>
+<p>パッと思いつく限りではありますが、有用なように見えます。</p>
+<p>ほかにも<code>-cpuprofile</code>や<code>-memprofile</code>など、<code>go test</code>でできていたことは大体可能なようです。</p>
+<h2 id="cover-オプションの利用例"><a href="#cover-オプションの利用例" class="headerlink" title="cover オプションの利用例"></a>cover オプションの利用例</h2><h3 id="想定されるユースケース"><a href="#想定されるユースケース" class="headerlink" title="想定されるユースケース"></a>想定されるユースケース</h3><p>さて、ざっくり概要をさらったところで、この<code>-cover</code>オプションのユースケースについて考えてみます。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/51430">proposal</a>には、<code>-cover</code>の導入経緯として、従来の<code>go test</code>の弱点が以下のように記載されています。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">A key weakness of the current implementation is that it does not scale well-- it</span><br><span class="line">is difficult or impossible to gather coverage data for applications as opposed</span><br><span class="line">to collections of packages, and for testing scenarios involving multiple</span><br><span class="line">runs/executions.</span><br></pre></td></tr></table></figure>
+
+<p>ざっくり、従来の<code>go test</code>はアプリケーション全体のテストや、繰り返し実行されるシナリオに対するテストを弱点としている、といった内容で、なるほど確かにと思う内容です。</p>
+<p>導入経緯を踏まえると、ユースケースとしては以下などが挙げられるかなと思います。</p>
+<ol>
+<li>DB・外部システム等との結合部分を含む、アプリケーション全体を通してのテスト品質分析</li>
+<li>複数環境下での実行結果差分の解析</li>
+<li>結合・シナリオテストの網羅性分析</li>
+</ol>
+<h3 id="REST-API-サーバを例に、cover-を利用したテストを試してみる"><a href="#REST-API-サーバを例に、cover-を利用したテストを試してみる" class="headerlink" title="REST API サーバを例に、cover を利用したテストを試してみる"></a>REST API サーバを例に、cover を利用したテストを試してみる</h3><p>ではせっかくなので、<code>-cover</code>を利用したテストを試してみようと思います。</p>
+<h4 id="試してみる内容"><a href="#試してみる内容" class="headerlink" title="試してみる内容"></a>試してみる内容</h4><p>現在私が携わっている案件では、Go を用いて REST API サーバを複数台構築しています。</p>
+<p>システム内のサーバ間通信に加え、外部システムとの通信等が発生することもあり、テストは API に対してリクエストを送り、レスポンス・DB 事後状態を検証する、E2E テストを実施しています。（システム全体ではフロントエンドも存在するため、厳密には End to End ではありませんが、API サーバ単独でも公開しているので、E2E と呼んでいます。）実際にテスト対象のサーバをローカル上に建て、別途 Go で書いたテストコードを<code>go test</code>で実行し、直接テスト対象サーバにリクエストを送っています。（他システムはモックサーバや実際のサーバを建てます。）</p>
+<p>しかしながら、この方法ではテスト対象サーバのテストカバレッジを取得することはできないため、自動テストのうま味が半減しています。テストの網羅性担保も人力レビューによるものとなってしまっており、かなりつらい状況です。メンバーからもたびたび「カバレッジ取得したいね」「でも E2E だから…」と嘆きの声が上がっています。</p>
+<p>というわけで，REST API の E2E テストのカバレッジ取得を試してみます。テスト用のコード（テストコード含む）は以下に配置してあります。</p>
+<p>今回のテスト用に突貫で雑に作ったので、このコードに対するツッコミはご容赦ください。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/shomuMatch/goCoverTest">https://github.com/shomuMatch/goCoverTest</a></p>
+<p>ところで、REST API サーバに対して、<code>-cover</code>を用いてテストする際に、一点注意点があります。</p>
+<p>それは、カバレッジファイルはプログラムが実行終了した（<code>os.Exit()</code>が呼ばれた・<code>main()</code>が正常に<code>return</code>した）タイミングで出力されるということです。つまり、テスト中に<code>panic</code>を起こして落ちてしまったり、外部から強制終了させてしまうと、カバレッジの取得ができません。今回は特に<code>panic</code>を起こした場合のことは考えていませんが、テスト終了時に外部から kill させる想定のため、サーバは Graceful にシャットダウンする必要があります。</p>
+<p>ここは渋川さんの記事を参考に書きました。<br><a href="https://future-architect.github.io/articles/20210212/">https://future-architect.github.io/articles/20210212/</a></p>
+<h4 id="試してみる"><a href="#試してみる" class="headerlink" title="試してみる"></a>試してみる</h4><p>少し話がそれましたが、上記テスト用コードにて、カバレッジ取得を試していきます。</p>
+<p>現時点で Go1.20 はリリースされていないため、正式版の<code>go</code>ではなく、<code>gotip</code>を使います。</p>
+<p><a target="_blank" rel="noopener" href="https://pkg.go.dev/golang.org/dl/gotip">https://pkg.go.dev/golang.org/dl/gotip</a></p>
+<p>未インストールの方は以下にてインストールいただければと思います。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ go install golang.org/dl/gotip@latest</span><br><span class="line">$ gotip download</span><br></pre></td></tr></table></figure>
+
+<p>それでは、カバレッジファイルの出力先を作成し、<code>-cover</code>をつけてビルド・実行してみましょう。特に普段と変わりなくサーバが立ち上がるはずです。</p>
+<p>また、この時点でカバレッジファイルの出力先に meta-data file が出力されているはずです。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">mkdir</span> coverdir</span><br><span class="line">$ gotip build -cover .</span><br><span class="line">$ GOCOVERDIR=coverdir ./goCoverTest</span><br><span class="line">start receiving at :8888</span><br></pre></td></tr></table></figure>
+
+<p>次に、（上記サーバをバックグラウンドとかコンテナで立てておくか）別のコンソールから、テストコードを実行しましょう。（ここは必ずしも<code>gotip</code>である必要はありません。）</p>
+<p>ユニットテストコードを一切書いていないので当然ですが、<code>[no test files]</code>になっており、カバレッジが取れていません。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ gotip <span class="built_in">test</span> github.com/shomuMatch/goCoverTest/... -cover -count=1</span><br><span class="line">?       github.com/shomuMatch/goCoverTest       [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/shomuMatch/goCoverTest/api   [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/shomuMatch/goCoverTest/api/path1     [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/shomuMatch/goCoverTest/api/path2     [no <span class="built_in">test</span> files]</span><br><span class="line">ok      github.com/shomuMatch/goCoverTest/test/e2e      0.005s  coverage: [no statements]</span><br></pre></td></tr></table></figure>
+
+<p>本題はここからです。まずはサーバをシャットダウンしましょう。</p>
+<p>シャットダウンが完了したタイミングで、カバレッジファイルの出力先に counter data file が出力されていればここまでは OK です。</p>
+<p>ではカバレッジを確認してみましょう。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ gotip tool covdata percent -i coverdir</span><br><span class="line">        github.com/shomuMatch/goCoverTest       coverage: 92.9% of statements</span><br><span class="line">        github.com/shomuMatch/goCoverTest/api   coverage: [no statements]</span><br><span class="line">        github.com/shomuMatch/goCoverTest/api/path1     coverage: 90.0% of statements</span><br><span class="line">        github.com/shomuMatch/goCoverTest/api/path2     coverage: 88.9% of statements</span><br></pre></td></tr></table></figure>
+
+<p>カバレッジが取れています！！</p>
+<p>確認のため、あえて 100%にならないようテストしているのですが、そこも正しく得られていそうです。</p>
+<p>せっかくなので html 形式でも確認してみましょう。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ gotip tool covdata textfmt -i coverdir -o profile.txt</span><br><span class="line">$ gotip tool cover -html=profile.txt -o profile.html</span><br></pre></td></tr></table></figure>
+
+<p>上記コマンドで出力された html を表示すると、以下のように通っていない行がハイライトされた状態で見ることができます。</p>
+<img src="/images/20230203a/image.png" alt="image.png" width="1200" height="1091" loading="lazy">
+
+<p>ということで、無事 REST API サーバの E2E テストのカバレッジ取得に成功しました。</p>
+<p>しかも既存のテストの仕組みをほとんど変えることなく対応ができており、実際に案件に導入することも不可能ではなさそうです。（Go のバージョンアップ対応は必要ですが。）</p>
+<h2 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h2><p>ということで、Go1.20 で新たに追加されるテストの仕組みである、<code>-cover</code>オプションについて見ながら触ってきました。</p>
+<p>当然ですがテストの品質はそのままプロダクトの品質に直結するもののため、こうして仕組みが強化されていくのはとても嬉しいですね。</p>
+<p>もう少し頑張ればフロントエンドも含めた E2E テストを全自動で実施し、カバレッジを取得する事もできそうなので、継続して活用していきたいと思います。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20230203a/&related=twitterapi%2Ctwitter&text=Go%201.20%20%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E9%80%A3%E8%BC%89%20go%20build%20%E3%81%AB%E8%BF%BD%E5%8A%A0%E3%81%95%E3%82%8C%E3%82%8B%20cover%20%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%EF%BC%88%E5%88%A9%E7%94%A8%E4%BE%8B%E4%BB%98%E3%81%8D%EF%BC%89%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">25</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20230203a/&t=Go%201.20%20%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E9%80%A3%E8%BC%89%20go%20build%20%E3%81%AB%E8%BF%BD%E5%8A%A0%E3%81%95%E3%82%8C%E3%82%8B%20cover%20%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%EF%BC%88%E5%88%A9%E7%94%A8%E4%BE%8B%E4%BB%98%E3%81%8D%EF%BC%89" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20230203a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20230203a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">9</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;566</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2023.08.03</span><span class="snscount">&#9825;63</span><a href=/articles/20230803a/ title="Go 1.21 連載の記事を書きます。">Go 1.21 リリース連載 contextパッケージに追加されるWithoutCancelでクライアントとの切断に備えてみる</a></li><li class="related-posts-item"><span>2023.02.02</span><span class="snscount">&#9825;14</span><a href=/articles/20230202a/ title="Go 1.20連載の6本目です。Goの標準ライブラリに組み込まれている、コンパイラによってキャッチされないエラーや懸念を検出し報告してくれるコードの静的解析ツールです。機能の詳細は本記事では割愛しますが、以下コマンドで利用可能なチェックの一覧を確認することができます。">Go 1.20 vetのアップデート</a></li><li class="related-posts-item"><span>2023.01.31</span><span class="snscount">&#9825;15</span><a href=/articles/20230131a/ title="- はじめに- 概要を確認- Proposal の内容と RFC の確認- 実際に動かしながら、Go1.19 と Go1.20 の違いを確認- まとめ">New ReverseProxy Rewrite hook を動かしながら理解する</a></li><li class="related-posts-item"><span>2023.01.28</span><span class="snscount">&#9825;96</span><a href=/articles/20230128a/ title="Go 1.20リリース連載の5本目はHTTP ResponseControllerのアップデートを紹介しますnet/httpパッケージに新しく esponseController型が追加されます">Go 1.20 HTTP ResponseController</a></li><li class="related-posts-item"><span>2023.01.27</span><span class="snscount">&#9825;66</span><a href=/articles/20230127a/ title="Go 1.20連載の4本目です。Minor changes to the libraryの`time`パッケージのアップデート4点について解説します。"">Go 1.20 timeパッケージのアップデート</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20230202a/ title="Go 1.20連載の6本目です。Goの標準ライブラリに組み込まれている、コンパイラによってキャッチされないエラーや懸念を検出し報告してくれるコードの静的解析ツールです。機能の詳細は本記事では割愛しますが、以下コマンドで利用可能なチェックの一覧を確認することができます。">Go 1.20 vetのアップデート</a></li><li class="reference-posts-item"><a href=/articles/20230123a/ title="フューチャーのテックブログ恒例のGoの新バージョンリリース記念のブログが始まります。この執筆時点でrc3が出ています。かつてこんな順調なことがあったでしょうか？">Go 1.20リリース連載が始まります＆メモリアリーナの紹介＆落ち穂拾い</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cover-%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%A8%E3%81%AF"><span class="toc-text">cover オプションとは</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%93%E3%83%AB%E3%83%89%E3%83%BB%E5%AE%9F%E8%A1%8C%E6%89%8B%E9%A0%86"><span class="toc-text">ビルド・実行手順</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%AB%E3%83%90%E3%83%AC%E3%83%83%E3%82%B8%E3%81%AE%E7%A2%BA%E8%AA%8D%E6%89%8B%E9%A0%86"><span class="toc-text">カバレッジの確認手順</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A4%87%E6%95%B0%E5%AE%9F%E8%A1%8C%E6%99%82%E3%81%AE%E3%82%AB%E3%83%90%E3%83%AC%E3%83%83%E3%82%B8%E5%88%B6%E5%BE%A1"><span class="toc-text">複数実行時のカバレッジ制御</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cover-%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E5%88%A9%E7%94%A8%E4%BE%8B"><span class="toc-text">cover オプションの利用例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%83%B3%E5%AE%9A%E3%81%95%E3%82%8C%E3%82%8B%E3%83%A6%E3%83%BC%E3%82%B9%E3%82%B1%E3%83%BC%E3%82%B9"><span class="toc-text">想定されるユースケース</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#REST-API-%E3%82%B5%E3%83%BC%E3%83%90%E3%82%92%E4%BE%8B%E3%81%AB%E3%80%81cover-%E3%82%92%E5%88%A9%E7%94%A8%E3%81%97%E3%81%9F%E3%83%86%E3%82%B9%E3%83%88%E3%82%92%E8%A9%A6%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">REST API サーバを例に、cover を利用したテストを試してみる</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A9%A6%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B%E5%86%85%E5%AE%B9"><span class="toc-text">試してみる内容</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A9%A6%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">試してみる</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

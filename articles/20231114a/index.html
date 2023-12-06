@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>CloudWatch Logsサブスクリプションフィルター・SQSを用いたログ監視 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにアルバイトとしてTIGに所属しております内田です。 当チームでは、従来はCloudWatch Logsに出力されたエラーや警告ログを数分毎にポーリング監視し、特定の文字列を検知することをトリガーにBacklogに起票することにより、いち早くエラーの対応ができるようにしていました。 しかし、監視対象のロググループなどは、そのログ監視ツールの環境変数に個別で設定する必要があり、デプロイするリソ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CloudWatch Logsサブスクリプションフィルター・SQSを用いたログ監視 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20231114a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにアルバイトとしてTIGに所属しております内田です。 当チームでは、従来はCloudWatch Logsに出力されたエラーや警告ログを数分毎にポーリング監視し、特定の文字列を検知することをトリガーにBacklogに起票することにより、いち早くエラーの対応ができるようにしていました。 しかし、監視対象のロググループなどは、そのログ監視ツールの環境変数に個別で設定する必要があり、デプロイするリソ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20231114a/fig.drawio.png">
+<meta property="article:published_time" content="2023-11-13T15:00:00.000Z">
+<meta property="article:modified_time" content="2023-11-14T03:28:53.594Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="SQS">
+<meta property="article:tag" content="ログ監視">
+<meta property="article:tag" content="CloudWatch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20231114a/fig.drawio.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20231114a/">
+  <meta content="AWS,SQS,ログ監視,CloudWatch" name="keywords">
+  <meta content="内田敦也" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/DevOps/">DevOpsカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">CloudWatch Logsサブスクリプションフィルター・SQSを用いたログ監視
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20231114a_CloudWatch_Logsサブスクリプションフィルター・SQSを用いたログ監視.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20231114a_CloudWatch_Logsサブスクリプションフィルター・SQSを用いたログ監視" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2023/" class="publish-date"><time datetime="2023-11-13T15:00:00.000Z" itemprop="datePublished">2023.11.14</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%86%85%E7%94%B0%E6%95%A6%E4%B9%9F" title="内田敦也さんの記事一覧へ" class="post-author">内田敦也</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/SQS/" title="SQSタグの記事へ" class="tag-list-link">SQS</a>
+  
+    
+    <a href="/tags/ログ監視/" title="ログ監視タグの記事へ" class="tag-list-link">ログ監視</a>
+  
+    
+    <a href="/tags/CloudWatch/" title="CloudWatchタグの記事へ" class="tag-list-link">CloudWatch</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>アルバイトとしてTIGに所属しております内田です。</p>
+<p>当チームでは、従来はCloudWatch Logsに出力されたエラーや警告ログを数分毎にポーリング監視し、特定の文字列を検知することをトリガーにBacklogに起票することにより、いち早くエラーの対応ができるようにしていました。</p>
+<p>しかし、監視対象のロググループなどは、そのログ監視ツールの環境変数に個別で設定する必要があり、デプロイするリソースが増えるたびにTerraform側の環境変数を追加するといった、同期を取る必要があり面倒でした。また、Backlog起票対象の文字列が存在しない場合もLambdaが着火し続けるため、コスト的にも問題がありました。</p>
+<p>これをCloudWatch LogsサブスクリプションフィルターとSQSを用いることにより、課題だった環境変数の個別指定をなくすように仕様に改修しました。</p>
+<p>この開発を通して得た、SQSとCloudWatchの連携についての知見を共有したいと思います。</p>
+<h1 id="構成"><a href="#構成" class="headerlink" title="構成"></a>構成</h1><img src="/images/20231114a/fig.drawio.png" alt="fig.drawio.png" width="941" height="467" loading="lazy">
+
+<p>サブスクリプションフィルターで抽出されたログを、Lambda関数経由でSQSに挿入します。</p>
+<p>Backlogに課題を追加するLambda関数は、一定時間おきにSQSに格納されているログを確認しに行き、全てのメッセージを読み込みます。</p>
+<p>読み込んだメッセージは、所定のフォーマットに従ってBacklogに追加します。</p>
+<h3 id="なぜSQSを経由させたのか？"><a href="#なぜSQSを経由させたのか？" class="headerlink" title="なぜSQSを経由させたのか？"></a>なぜSQSを経由させたのか？</h3><p>サブスクリプションフィルターの機能だけをみると、わざわざSQSを経由する必要はないように思えます。</p>
+<p>ところが、実際にSQSを使わないとログが出力される度に逐一Lambda関数が立ち上がり、Backlog APIのアクセス数が急劇に増えてしまう危険性があります。</p>
+<p>また、ログの各行に対して課題が起票されるため、ログの量によってはとんでもない数の課題が増えてしまいます。今回のBacklogの起票方針としては、1エラー（警告）文字列に付き1件ではなく、同一のエラー（警告）コードであれば、1つだけチケットを起票し、内容はそのチケット内になるべく追記していきたいという要件のため、逐次起動ではミスマッチでした。</p>
+<p>そこで、ログを一旦キューに保管し、ある程度時間が経った後に別のLambda関数に渡す設計にしています。</p>
+<h1 id="CloudWatch-Logsサブスクリプションフィルターの設定"><a href="#CloudWatch-Logsサブスクリプションフィルターの設定" class="headerlink" title="CloudWatch Logsサブスクリプションフィルターの設定"></a>CloudWatch Logsサブスクリプションフィルターの設定</h1><p>当然ですが、ログが出力されたらなんでもかんでもBacklogに通知すればよいというものではありません。</p>
+<p>状況にもよりますが、よくあるケースとしては、エラーや警告など対応が必要なものだけ通知したいケースが挙げられます。ここで、サブスクリプションフィルターにフィルターパターンを登録することにより、条件を満たしたログのみをトリガーにすることができます。</p>
+<p>当プロジェクトでは、<a target="_blank" rel="noopener" href="https://github.com/rs/zerolog">zerolog</a>というロギングライブラリを用いてログを出力しているため、ログは以下のようなjson形式であることが保証されています。</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;traceID&quot;</span><span class="punctuation">:</span> <span class="string">&quot;xxx-xxx-xxx&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span><span class="string">&quot;1970-01-01T00:00:00Z&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span> <span class="string">&quot;info&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span><span class="string">&quot;Hello, world!&quot;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>level</code>の値が<code>warn</code>、<code>error</code>、<code>fatal</code>の何れかのものを対象とするにはフィルターパターンを以下のように設定します。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">&#123;$.level = %warn|error|fatal%&#125;</span><br></pre></td></tr></table></figure>
+
+<p>正規表現を用いているため、状況によってより複雑な条件を指定することもできます。</p>
+<p>送信先はSQSにプッシュするLambda関数に設定します。</p>
+<h1 id="SQSのキューの種類"><a href="#SQSのキューの種類" class="headerlink" title="SQSのキューの種類"></a>SQSのキューの種類</h1><p>SQSには、「標準キュー」と「FIFOキュー」があり、違いは以下の通りです。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>標準キュー</th>
+<th>FIFOキュー</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>順序性</td>
+<td>順序の保証なし</td>
+<td>First In First Out</td>
+</tr>
+<tr>
+<td>メッセージの配信回 数</td>
+<td>1回以上（2回以上配信される場合も多い）</td>
+<td>1回のみ</td>
+</tr>
+<tr>
+<td>コスト</td>
+<td>USD 0.24~0.40 &#x2F; 100万回</td>
+<td>USD 0.35~0.50 &#x2F; 100万回</td>
+</tr>
+</tbody></table></div>
+<p>ここでは標準キューを採用しました。</p>
+<p>ログの重複に関しては、コード内で重複を削除すれば良いです。また、ログには時間が含まれているため、これを用いることによりログの順序が分かります。</p>
+<h1 id="メッセージを取得"><a href="#メッセージを取得" class="headerlink" title="メッセージを取得"></a>メッセージを取得</h1><p>AWS SDKで用意されている<code>ReceiveMessage</code>関数を用いればよいですが、1回あたり10件までしかメッセージを取得できないので、ループで回し続けます。</p>
+<p>Simple Queue Serviceという名前をしていますが、キューからメッセージを取得してもメッセージはすぐには消えません。メッセージ保持期間が過ぎるまでは、キュー内にメッセージは残り続けます。従って、別途削除する処理が必要です。</p>
+<p>削除するには、メッセージを取得した際にデータに含まれている<code>ReceiptHandle</code>を渡す必要があります。</p>
+<p>以下は一連の処理をまとめたものです。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">sqs := sqs.New(session.Must(session.NewSession()))</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> messages []*sqs.Message</span><br><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">    res, err := sqs.ReceiveMessage(&amp;sqs.ReceiveMessageInput&#123;</span><br><span class="line">        QueueUrl:            &amp;queueUrl,</span><br><span class="line">        MaxNumberOfMessages: aws.Int64(<span class="number">10</span>),</span><br><span class="line">        WaitTimeSeconds:     aws.Int64(<span class="number">0</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(res.Messages) == <span class="number">0</span> &#123;</span><br><span class="line">		<span class="keyword">break</span></span><br><span class="line">	&#125;</span><br><span class="line">	messages = <span class="built_in">append</span>(messages, res.Messages...)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _, message := <span class="keyword">range</span> messages &#123;</span><br><span class="line">    _, err := sqs.DeleteMessage(&amp;sqs.DeleteMessageInput&#123;</span><br><span class="line">        QueueUrl:      &amp;queueUrl,</span><br><span class="line">        ReceiptHandle: &amp;receiptHandle,</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> err</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>あとは、Backlog APIを用いて取得したデータを送信するだけです。</p>
+<h1 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h1><p>CloudWatch LogsサブスクリプションフィルターとSQSの連携について紹介いたしました。</p>
+<p>SQSに関しては、別途データを削除する処理が必要な点が初見だとわかりにくいところだったので、その点も含めて参考になれば幸いです。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20231114a/&related=twitterapi%2Ctwitter&text=CloudWatch%20Logs%E3%82%B5%E3%83%96%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%BC%E3%83%BBSQS%E3%82%92%E7%94%A8%E3%81%84%E3%81%9F%E3%83%AD%E3%82%B0%E7%9B%A3%E8%A6%96%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20231114a/&t=CloudWatch%20Logs%E3%82%B5%E3%83%96%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%BC%E3%83%BBSQS%E3%82%92%E7%94%A8%E3%81%84%E3%81%9F%E3%83%AD%E3%82%B0%E7%9B%A3%E8%A6%96" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20231114a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20231114a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.09.16</span><span class="snscount">&#9825;2</span><a href=/articles/20200916/ title="はじめまして、2017年新卒入社、TIG所属の出口です。今回は、GlyphFeedsの素材受信インターフェース構築を介してAmazon Simple Queue Service  の検証について紹介します。">素材受信インターフェースにSQSを活用してみた ～標準キュー vs FIFOキュー～</a></li><li class="related-posts-item"><span>2023.09.26</span><span class="snscount">&#9825;58</span><a href=/articles/20230926a/ title="S3バケットをtreeするCLIコマンドを紹介します。">stree：S3バケットをtreeするCLIコマンド</a></li><li class="related-posts-item"><span>2023.05.26</span><span class="snscount">&#9825;4</span><a href=/articles/20230526a/ title="AWS Kinesis Data StreamとAWS Lambdaを組み合わせたデータストリーミングを扱うシステムで、Lambdaが処理に失敗した場合のリカバリー運用を考える機会がありました。一般的に、Kinesisのようなメッセージングやイベント駆動型のシステムでは、DLQという仕組みを設けます。">AWS Kinesisから呼び出されるLambdaのリカバリー処理について</a></li><li class="related-posts-item"><span>2023.05.25</span><span class="snscount">&#9825;6</span><a href=/articles/20230525a/ title="Amazon OpenSearch Service  を触る機会があり、興味があったのでプレビューで公開されていたServerless版でいろいろ試していました">Amazon OpenSearch Serverless を触ってみた</a></li><li class="related-posts-item"><span>2023.05.09</span><span class="snscount">&#9825;2</span><a href=/articles/20230509a/ title="2023/03/07から一般提供が開始された新サービス「AWS Application Composer」を使ってみて、どんな人向けか、強み・弱みは何かというところを見ていきます。">AWS Application Composerを使ってみた！</a></li><li class="related-posts-item"><span>2023.04.11</span><span class="snscount">&#9825;3</span><a href=/articles/20230411a/ title="PostgreSQL を使用する際、最適な実行計画が選択されず、クエリの速度が遅くなることがあります。オプティマイザが最適な実行計画を選択できない理由はいくつかありますが、たとえばバッチ処理で大量のデータを投入した直後、統計情報と実データの乖離により、少ないデータに適した計画が大量のデータでは不適切になることがあります。このような場合、PostgreSQL の拡張モジュールである pg_hint_plan により実行計画を固定することで、チューニングが可能です。">RDS Proxy環境下でpg_hint_planを導入する際の注意点</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A7%8B%E6%88%90"><span class="toc-text">構成</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%81%AA%E3%81%9CSQS%E3%82%92%E7%B5%8C%E7%94%B1%E3%81%95%E3%81%9B%E3%81%9F%E3%81%AE%E3%81%8B%EF%BC%9F"><span class="toc-text">なぜSQSを経由させたのか？</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#CloudWatch-Logs%E3%82%B5%E3%83%96%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E5%AE%9A"><span class="toc-text">CloudWatch Logsサブスクリプションフィルターの設定</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SQS%E3%81%AE%E3%82%AD%E3%83%A5%E3%83%BC%E3%81%AE%E7%A8%AE%E9%A1%9E"><span class="toc-text">SQSのキューの種類</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E3%82%92%E5%8F%96%E5%BE%97"><span class="toc-text">メッセージを取得</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%95%E3%81%84%E3%81%94%E3%81%AB"><span class="toc-text">さいごに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

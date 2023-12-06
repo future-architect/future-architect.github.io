@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>AWS Glue Data CatalogでCSVを扱う | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにPython連載の5本目です。 当初テーマをPySparkで予定しておりましたが、そこから派生して、AWS Glueを題材にさせていただきます。 AWS Glue Data CatalogについてGlueといっても大きく下記の３種類、処理系をいれると4種類に分かれると思っていますが、それぞれ全く別のプロダクトという理解をしています。  AWS Glue Spark（実装はPython or">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS Glue Data CatalogでCSVを扱う | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20211006a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにPython連載の5本目です。 当初テーマをPySparkで予定しておりましたが、そこから派生して、AWS Glueを題材にさせていただきます。 AWS Glue Data CatalogについてGlueといっても大きく下記の３種類、処理系をいれると4種類に分かれると思っていますが、それぞれ全く別のプロダクトという理解をしています。  AWS Glue Spark（実装はPython or">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20211006a/名称未設定ファイル.drawio_(3).png">
+<meta property="og:image" content="https://future-architect.github.io/images/20211006a/スクリーンショット_2021-10-05_8.44.32.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20211006a/スクリーンショット_2021-10-05_8.44.23.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20211006a/スクリーンショット_2021-10-05_9.05.19.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20211006a/スクリーンショット_2021-10-05_14.54.17.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20211006a/スクリーンショット_2021-10-05_18.54.29.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20211006a/スクリーンショット_2021-10-05_18.59.15.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20211006a/スクリーンショット_2021-10-05_18.58.52.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20211006a/スクリーンショット_2021-10-05_18.58.58.png">
+<meta property="article:published_time" content="2021-10-05T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.717Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Glue">
+<meta property="article:tag" content="データカタログ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20211006a/名称未設定ファイル.drawio_(3).png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20211006a/">
+  <meta content="AWS,Python,Glue,データカタログ" name="keywords">
+  <meta content="山田勇一" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">AWS Glue Data CatalogでCSVを扱う
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20211006a_AWS_Glue_Data_CatalogでCSVを扱う.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20211006a_AWS_Glue_Data_CatalogでCSVを扱う" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-10-05T15:00:00.000Z" itemprop="datePublished">2021.10.06</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%B1%B1%E7%94%B0%E5%8B%87%E4%B8%80" title="山田勇一さんの記事一覧へ" class="post-author">山田勇一</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/Python/" title="Pythonタグの記事へ" class="tag-list-link">Python</a>
+  
+    
+    <a href="/tags/Glue/" title="Glueタグの記事へ" class="tag-list-link">Glue</a>
+  
+    
+    <a href="/tags/データカタログ/" title="データカタログタグの記事へ" class="tag-list-link">データカタログ</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p><a href="/articles/20210927b/">Python連載</a>の5本目です。</p>
+<p>当初テーマを<a target="_blank" rel="noopener" href="https://databricks.com/jp/glossary/pyspark">PySpark</a>で予定しておりましたが、そこから派生して、<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/glue/">AWS Glue</a>を題材にさせていただきます。</p>
+<h1 id="AWS-Glue-Data-Catalogについて"><a href="#AWS-Glue-Data-Catalogについて" class="headerlink" title="AWS Glue Data Catalogについて"></a>AWS Glue Data Catalogについて</h1><p>Glueといっても大きく下記の３種類、処理系をいれると4種類に分かれると思っていますが、それぞれ全く別のプロダクトという理解をしています。</p>
+<ul>
+<li>AWS Glue<ul>
+<li>Spark（実装はPython or scala）</li>
+<li>python shell (Pythonのみ)<ul>
+<li>python shellを利用る場合、<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/about-aws/whats-new/2019/01/introducing-python-shell-jobs-in-aws-glue/">1/16DPU</a>で動かせるため、時間制約のないサーバレス処理としても優秀に思えます。</li>
+<li>料金は<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/glue/pricing/">こちら</a>をご覧ください</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>AWS Glue Data Catalog<ul>
+<li>Hive MetaStore</li>
+</ul>
+</li>
+<li>AWS Glue DataBrew</li>
+</ul>
+<h1 id="CSVを利用する上での困りごと"><a href="#CSVを利用する上での困りごと" class="headerlink" title="CSVを利用する上での困りごと"></a>CSVを利用する上での困りごと</h1><h3 id="1-crawlerが利用できない"><a href="#1-crawlerが利用できない" class="headerlink" title="1. crawlerが利用できない"></a>1. crawlerが利用できない</h3><p>AWSが推奨する<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/athena/latest/ug/glue-best-practices.html">ベストプラクティス</a>では、「crawlerを利用することでデータをCatalog化し、多様や処理系で利用できる」とされていますが、’”’ダブルクォーテーションで囲まれたフィールドを持つCSV（TSVも同様）の場合、正しく読み込まれず（※）、AWS上の<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/athena/latest/ug/csv-serde.html">ドキュメント</a>でも対応が必要とされています。</p>
+<img src="/images/20211006a/名称未設定ファイル.drawio_(3).png" alt="クローラが利用できないイメージ図" width="689" height="209" loading="lazy">
+
+<h3 id="2-テーブルのデータ型を全てStringに設定する必要がある"><a href="#2-テーブルのデータ型を全てStringに設定する必要がある" class="headerlink" title="2. テーブルのデータ型を全てStringに設定する必要がある"></a>2. テーブルのデータ型を全てStringに設定する必要がある</h3><p>crawlerを利用できないこともシステム運用上の困りごとになりますが、それ以上にデータ型に問題があります。</p>
+<p>OpenCSVSerDeを利用したCatalogでは、データ型をStringに固定する必要があり、<a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/%E3%82%AB%E3%82%BF%E3%83%AD%E3%82%B0">Catalog</a>化のメリットが半減してしまいます。</p>
+<h1 id="CSVへの対応方法"><a href="#CSVへの対応方法" class="headerlink" title="CSVへの対応方法"></a>CSVへの対応方法</h1><h3 id="利用するCSVファイル"><a href="#利用するCSVファイル" class="headerlink" title="利用するCSVファイル"></a>利用するCSVファイル</h3><h5 id="データ"><a href="#データ" class="headerlink" title="データ"></a>データ</h5><figure class="highlight plaintext"><figcaption><span>sample.csv</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;ID&quot;,&quot;NAME&quot;,&quot;FLG&quot;,&quot;NUM&quot;,&quot;DATE&quot;,&quot;DATE TIME&quot;</span><br><span class="line">&quot;1&quot;,&quot;あいうえお&quot;,&quot;1&quot;,&quot;100000000.00000000&quot;,&quot;2021-10-01&quot;,&quot;2021-10-01 18:00:13.271231&quot;</span><br><span class="line">&quot;2&quot;,&quot;かきくけこ&quot;,&quot;0&quot;,&quot;100000000.00000000&quot;,&quot;2021-10-01&quot;,&quot;2021-10-02 19:01:13.271231&quot;</span><br><span class="line">&quot;3&quot;,&quot;さしすせそ&quot;,&quot;1&quot;,&quot;100000000.00000000&quot;,&quot;2021-10-01&quot;,&quot;2021-10-03 20:30:13.271231&quot;</span><br></pre></td></tr></table></figure>
+<h5 id="crawlerで読み込んだ直後の状態"><a href="#crawlerで読み込んだ直後の状態" class="headerlink" title="crawlerで読み込んだ直後の状態"></a>crawlerで読み込んだ直後の状態</h5><p>crawlerで読み込んだデータをAthenaより表示すると以下の状態となります。<br>データが欠損して表示されている事がわかります。<br><img src="/images/20211006a/スクリーンショット_2021-10-05_8.44.32.png" alt="Athenaで表示したデータ欠損の様子" width="1200" height="198" loading="lazy"></p>
+<p>同じく、Athenaのメニューより見たテーブル定義になります。<br>定義的には一見正しく見えますが、前述の通り正しく動かない状態になります。<br><img src="/images/20211006a/スクリーンショット_2021-10-05_8.44.23.png" alt="Athenaのメニューより見たテーブル定義" width="519" height="261" loading="lazy"></p>
+<h3 id="対応方法１：OpenCSVSerDeを利用する"><a href="#対応方法１：OpenCSVSerDeを利用する" class="headerlink" title="対応方法１：OpenCSVSerDeを利用する"></a>対応方法１：OpenCSVSerDeを利用する</h3><p>crawlerでCSVを読み込み、DDL化します。<br>このDDLを修正ます。</p>
+<figure class="highlight sql"><figcaption><span>ddl</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">EXTERNAL</span> <span class="keyword">TABLE</span> `sample`(</span><br><span class="line">  `id` <span class="type">bigint</span>,    <span class="comment">-- 型をstringに変更</span></span><br><span class="line">  `name` string,</span><br><span class="line">  `flg` <span class="type">bigint</span>,   <span class="comment">-- 型をstringに変更</span></span><br><span class="line">  `num` <span class="keyword">double</span>,   <span class="comment">-- 型をstringに変更</span></span><br><span class="line">  `<span class="type">date</span>` string,</span><br><span class="line">  `<span class="type">date</span> <span class="type">time</span>` string)</span><br><span class="line">PARTITIONED <span class="keyword">BY</span> (</span><br><span class="line">  `<span class="keyword">year</span>` string,</span><br><span class="line">  `<span class="keyword">month</span>` string,</span><br><span class="line">  `<span class="keyword">day</span>` string)</span><br><span class="line"><span class="comment">-- DELIMITEDを削除し、OpenCSVSerdeに置き換えます。</span></span><br><span class="line"><span class="type">ROW</span> FORMAT DELIMITED       <span class="comment">-- 削除</span></span><br><span class="line">  FIELDS TERMINATED <span class="keyword">BY</span> <span class="string">&#x27;,&#x27;</span> <span class="comment">-- 削除</span></span><br><span class="line"><span class="comment">-- ROW FORMAT SERDE</span></span><br><span class="line"><span class="comment">--   &#x27;org.apache.hadoop.hive.serde2.OpenCSVSerde&#x27;</span></span><br><span class="line"><span class="comment">-- WITH SERDEPROPERTIES (</span></span><br><span class="line"><span class="comment">--   &#x27;escapeChar&#x27;=&#x27;\\&#x27;,</span></span><br><span class="line"><span class="comment">--   &#x27;quoteChar&#x27;=&#x27;\&quot;&#x27;,</span></span><br><span class="line"><span class="comment">--   &#x27;separatorChar&#x27;=&#x27;,&#x27;)</span></span><br><span class="line">STORED <span class="keyword">AS</span> INPUTFORMAT</span><br><span class="line">  <span class="string">&#x27;org.apache.hadoop.mapred.TextInputFormat&#x27;</span></span><br><span class="line">OUTPUTFORMAT</span><br><span class="line">  <span class="string">&#x27;org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat&#x27;</span></span><br><span class="line">LOCATION</span><br><span class="line">  <span class="string">&#x27;s3://sample/work/sample/&#x27;</span></span><br><span class="line">TBLPROPERTIES (</span><br><span class="line">  <span class="string">&#x27;CrawlerSchemaDeserializerVersion&#x27;</span><span class="operator">=</span><span class="string">&#x27;1.0&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;CrawlerSchemaSerializerVersion&#x27;</span><span class="operator">=</span><span class="string">&#x27;1.0&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;UPDATED_BY_CRAWLER&#x27;</span><span class="operator">=</span><span class="string">&#x27;sample&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;areColumnsQuoted&#x27;</span><span class="operator">=</span><span class="string">&#x27;false&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;averageRecordSize&#x27;</span><span class="operator">=</span><span class="string">&#x27;66&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;classification&#x27;</span><span class="operator">=</span><span class="string">&#x27;csv&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;columnsOrdered&#x27;</span><span class="operator">=</span><span class="string">&#x27;true&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;compressionType&#x27;</span><span class="operator">=</span><span class="string">&#x27;none&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;delimiter&#x27;</span><span class="operator">=</span><span class="string">&#x27;,&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;objectCount&#x27;</span><span class="operator">=</span><span class="string">&#x27;1&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;recordCount&#x27;</span><span class="operator">=</span><span class="string">&#x27;4&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;sizeKey&#x27;</span><span class="operator">=</span><span class="string">&#x27;310&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;skip.header.line.count&#x27;</span><span class="operator">=</span><span class="string">&#x27;1&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;typeOfData&#x27;</span><span class="operator">=</span><span class="string">&#x27;file&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>修正後、全てのデータが表示できるようになります。<br>ただし、全てはString型として認識されているため、データは文字列として扱う必要があります。<br><img src="/images/20211006a/スクリーンショット_2021-10-05_9.05.19.png" alt="欠損がなくなったAthena実行結果" width="1200" height="196" loading="lazy"></p>
+<hr>
+<h3 id="対応方法２：crawlerのカスタム分類子（Grok）を利用する"><a href="#対応方法２：crawlerのカスタム分類子（Grok）を利用する" class="headerlink" title="対応方法２：crawlerのカスタム分類子（Grok）を利用する"></a>対応方法２：crawlerのカスタム分類子（Grok）を利用する</h3><p>正規表現を元にした、パーサーを自分で用意する形になります。<br>詳細は、AWSをの<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/glue/latest/dg/custom-classifier.html#classifier-builtin-patterns">公式</a>を見るのが良いと思いますが、抜粋、要約すると、フィールド単位にマッピング定義を作る方法となります。</p>
+<p><code>%&#123;PATTERN:field-name:data-type&#125;</code></p>
+<ul>
+<li>マッピング定義<ul>
+<li>PATTERN<br><a target="_blank" rel="noopener" href="https://github.com/hpcugent/logstash-patterns/blob/master/files/grok-patterns">Grokのデータ型</a>を指定します。</li>
+<li>field-name:<br>CSVのフィールドを指定します。</li>
+<li>data-type:<br>Catalogの<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/glue/latest/dg/aws-glue-api-common.html">データ型</a>を指定します。</li>
+</ul>
+</li>
+</ul>
+<p>今回のCSVでは、以下の形となります。<br><a target="_blank" rel="noopener" href="https://goodbyegangster.hatenablog.com/entry/2018/10/12/001644">こちら</a>がよく纏められており、見ながらやったのですが、どうしても読み込んでくれませんでした。。。</p>
+<p>なお、構文チェックはWebで可能です。</p>
+<ul>
+<li>構文チェック<ul>
+<li><a target="_blank" rel="noopener" href="http://grokconstructor.appspot.com/do/match">Grok Constructor</a></li>
+</ul>
+</li>
+<li>Grokパターン<ul>
+<li><code>&quot;%&#123;INT:ID:int&#125;&quot;, &quot;%&#123;DOUBLE_BYTE:NAME:STRING&#125;&quot;, &quot;%&#123;BASE16FLOAT:NUM:STRING&#125;, &quot;%&#123;DATE:DATE:DATE&#125;&quot;, &quot;%&#123;DATESTAMP:DATE TIME: TIMESTAMP&#125;&quot;</code></li>
+</ul>
+</li>
+<li>カスタムパターン<ul>
+<li><code>DOUBLE_BYTE [^\x01-\x7E]*</code></li>
+</ul>
+</li>
+<li>画面の入力例<ul>
+<li><img src="/images/20211006a/スクリーンショット_2021-10-05_14.54.17.png" alt="Grok入力例" width="755" height="1120" loading="lazy"></li>
+</ul>
+</li>
+</ul>
+<h3 id="対応方法３：CSVをparquestに変換して利用する"><a href="#対応方法３：CSVをparquestに変換して利用する" class="headerlink" title="対応方法３：CSVをparquestに変換して利用する"></a>対応方法３：CSVをparquestに変換して利用する</h3><p>システムとの親和性が最も高いparquestに変換後、crawlerでCatalog化します。<br>parquestへの変換では、元データに何も手を入れない形にします。</p>
+<figure class="highlight python"><figcaption><span>sample-csv-to-parquest.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> boto3</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> io</span><br><span class="line"></span><br><span class="line">s3 = boto3.resource(<span class="string">&#x27;s3&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># read s3</span></span><br><span class="line">csv = s3.Object(<span class="string">&#x27;$&#123;バケット&#125;&#x27;</span>, <span class="string">&#x27;work/sample/sample.csv&#x27;</span>).get()[<span class="string">&#x27;Body&#x27;</span>].read().decode(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">f = io.StringIO(csv)</span><br><span class="line"></span><br><span class="line"><span class="comment"># convert parquet</span></span><br><span class="line">pd.read_csv(f).to_parquet(<span class="string">&#x27;/tmp/sample.parquet&#x27;</span>, compression=<span class="string">&#x27;snappy&#x27;</span>)</span><br><span class="line"><span class="comment"># save s3</span></span><br><span class="line">s3.meta.client.upload_file(<span class="string">&#x27;/tmp/sample.parquet&#x27;</span>, <span class="string">&#x27;$&#123;バケット&#125;&#x27;</span>, <span class="string">&#x27;work/sample-parquest/sample.parquet&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>この変換処理をワークフローでcrawlerとつなげます。<br><img src="/images/20211006a/スクリーンショット_2021-10-05_18.54.29.png" alt="ワークフロー例" width="1200" height="364" loading="lazy"></p>
+<p>全ての成功を確認後、Athenaからデータを見てると、余計な一手間がいらずデータを参照でき、データ型もCatalogの範囲内でハンドリングされています。</p>
+<h3 id="実行結果"><a href="#実行結果" class="headerlink" title="実行結果"></a>実行結果</h3><img src="/images/20211006a/スクリーンショット_2021-10-05_18.59.15.png" alt="実行結果" width="1200" height="395" loading="lazy">
+
+<h3 id="データプレビュー"><a href="#データプレビュー" class="headerlink" title="データプレビュー"></a>データプレビュー</h3><img src="/images/20211006a/スクリーンショット_2021-10-05_18.58.52.png" alt="データプレビュー" width="1200" height="209" loading="lazy">
+
+<h3 id="テーブル定義"><a href="#テーブル定義" class="headerlink" title="テーブル定義"></a>テーブル定義</h3><img src="/images/20211006a/スクリーンショット_2021-10-05_18.58.58.png" alt="テーブル定義" width="384" height="212" loading="lazy">
+
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>データ型を認識でき、手軽に実行できる<code>対応方法３：CSVをparquestに変換して利用する</code>を基本方針として考える形で良いと思いました。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20211006a/&related=twitterapi%2Ctwitter&text=AWS%20Glue%20Data%20Catalog%E3%81%A7CSV%E3%82%92%E6%89%B1%E3%81%86%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">4</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20211006a/&t=AWS%20Glue%20Data%20Catalog%E3%81%A7CSV%E3%82%92%E6%89%B1%E3%81%86" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20211006a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20211006a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2021.10.11</span><span class="snscount">&#9825;16</span><a href=/articles/20211011a/ title="PySparkを使用したGlueジョブ開発のお話をします。ETLツールとして使用されるAWS Glueですが、業務バッチで行うような複雑な処理も実行できます。また、処理はGlueジョブとして、Apache Spark分散・並列処理のジョブフローに簡単に乗せることができます！">AWS Glueで複雑な処理を開発するときのTips</a></li><li class="related-posts-item"><span>2021.05.21</span><span class="snscount">&#9825;14</span><a href=/articles/20210521a/ title="Glueの環境構築は以前の記事（[AWS Glueの単体テスト環境の構築手順、AWS Glueの開発エンドポイントがそこそこお高いのでローカル開発環境を用意しました）にあるのですが、公式のDocker imageが案内されているので改めて、構築してみます。なお、Glueの公式イメージでもJupyter Notebookは利用できるのですが、使い勝手を考慮し、Jupyterlabに差し替えています。">AWS Glueの開発環境の構築(2021)</a></li><li class="related-posts-item"><span>2019.12.06</span><span class="snscount">&#9825;10</span><a href=/articles/20191206/ title="当記事では、AWS Glue をローカル環境で単体テストするための環境構築方法についてまとめました。">AWS Glueの単体テスト環境の構築手順</a></li><li class="related-posts-item"><span>2022.04.28</span><span class="snscount">&#9825;9</span><a href=/articles/20220428a/ title="2021年の記事でもAWSの公式のDockerイメージを使って環境構築をする内容の記事があるのですが、Glue3.0の公式のDockerイメージがリリースされていたので、そちらを使って再度Glueのローカルでの開発環境構築の記事を書いてみようと思います。せっかくなので昨年の記事と少しコードを変えようと思い、AWSの公式ドキュメント[^2]に書かれたコードを基に解説します。">AWS Glueの開発環境の構築(2022)</a></li><li class="related-posts-item"><span>2021.04.03</span><span class="snscount">&#9825;12</span><a href=/articles/20210403/ title="DynamoDBを頻繁に利用しており、連日DynamoDBコンソール画面と睨めっこをしています。DynamoDBのコンソール画面は特定のデータをピンポイントで探すには優秀ですが、データ集計には全く向いていません。">DynamoDBをS3へExportして、Glue+AthenaでSQLを実行する</a></li><li class="related-posts-item"><span>2020.12.06</span><span class="snscount">&#9825;6</span><a href=/articles/20201206/ title="AWS マネージド Airflow  が 2020/11/24 にリリースされました。 [Introducing Amazon Managed Workflows for Apache Airflow サービスを利用するにあたって知りたかったことを調査し、FAQ ベースで整理しましたので公開します。">AWSマネージドAirflow(MWAA)についてのFAQ</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20211011a/ title="PySparkを使用したGlueジョブ開発のお話をします。ETLツールとして使用されるAWS Glueですが、業務バッチで行うような複雑な処理も実行できます。また、処理はGlueジョブとして、Apache Spark分散・並列処理のジョブフローに簡単に乗せることができます！">AWS Glueで複雑な処理を開発するときのTips</a></li><li class="reference-posts-item"><a href=/articles/20210927b/ title="最近社内でも使う人が徐々に増えている？Pythonの連載記事を開始しようと思います。本エントリーではPythonドキュメントの日本語訳プロジェクトに参加してみた話を紹介します。">Python連載始まります＆Python翻訳プロジェクト</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#AWS-Glue-Data-Catalog%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">AWS Glue Data Catalogについて</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#CSV%E3%82%92%E5%88%A9%E7%94%A8%E3%81%99%E3%82%8B%E4%B8%8A%E3%81%A7%E3%81%AE%E5%9B%B0%E3%82%8A%E3%81%94%E3%81%A8"><span class="toc-text">CSVを利用する上での困りごと</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-crawler%E3%81%8C%E5%88%A9%E7%94%A8%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><span class="toc-text">1. crawlerが利用できない</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E3%81%AE%E3%83%87%E3%83%BC%E3%82%BF%E5%9E%8B%E3%82%92%E5%85%A8%E3%81%A6String%E3%81%AB%E8%A8%AD%E5%AE%9A%E3%81%99%E3%82%8B%E5%BF%85%E8%A6%81%E3%81%8C%E3%81%82%E3%82%8B"><span class="toc-text">2. テーブルのデータ型を全てStringに設定する必要がある</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#CSV%E3%81%B8%E3%81%AE%E5%AF%BE%E5%BF%9C%E6%96%B9%E6%B3%95"><span class="toc-text">CSVへの対応方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E3%81%99%E3%82%8BCSV%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB"><span class="toc-text">利用するCSVファイル</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C%E6%96%B9%E6%B3%95%EF%BC%91%EF%BC%9AOpenCSVSerDe%E3%82%92%E5%88%A9%E7%94%A8%E3%81%99%E3%82%8B"><span class="toc-text">対応方法１：OpenCSVSerDeを利用する</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C%E6%96%B9%E6%B3%95%EF%BC%92%EF%BC%9Acrawler%E3%81%AE%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0%E5%88%86%E9%A1%9E%E5%AD%90%EF%BC%88Grok%EF%BC%89%E3%82%92%E5%88%A9%E7%94%A8%E3%81%99%E3%82%8B"><span class="toc-text">対応方法２：crawlerのカスタム分類子（Grok）を利用する</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C%E6%96%B9%E6%B3%95%EF%BC%93%EF%BC%9ACSV%E3%82%92parquest%E3%81%AB%E5%A4%89%E6%8F%9B%E3%81%97%E3%81%A6%E5%88%A9%E7%94%A8%E3%81%99%E3%82%8B"><span class="toc-text">対応方法３：CSVをparquestに変換して利用する</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9F%E8%A1%8C%E7%B5%90%E6%9E%9C"><span class="toc-text">実行結果</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%87%E3%83%BC%E3%82%BF%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC"><span class="toc-text">データプレビュー</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E5%AE%9A%E7%BE%A9"><span class="toc-text">テーブル定義</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

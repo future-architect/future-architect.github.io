@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Auth0でADをユーザDBにし、SalesforceとのSSOを確認する | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="エンタープライズの領域ではAD認証が多く利用されており、また同時にCRMとしてSalesforceが導入されているケースが多くあります。この場合、社内システムにおける「統合認証」の要件として、これらを繋げてログインする必要が出てきます。 これらの要求に対応するため、以下2点を確認し、Active Directory（以降AD）を中心とした統合認証を試してみます。  Auth0のApplicatio">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Auth0でADをユーザDBにし、SalesforceとのSSOを確認する | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210302/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="エンタープライズの領域ではAD認証が多く利用されており、また同時にCRMとしてSalesforceが導入されているケースが多くあります。この場合、社内システムにおける「統合認証」の要件として、これらを繋げてログインする必要が出てきます。 これらの要求に対応するため、以下2点を確認し、Active Directory（以降AD）を中心とした統合認証を試してみます。  Auth0のApplicatio">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210222/top.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2021-02-24_10.03.37.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2021-02-24_10.06.35.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2020-09-11_17.49.51.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2020-09-11_9.36.28.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2021-02-22_18.59.51.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2020-09-11_15.33.11.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2020-09-11_17.59.05.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2020-09-11_15.38.32.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210302/スクリーンショット_2020-09-11_15.38.48.png">
+<meta property="article:published_time" content="2021-03-01T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.582Z">
+<meta property="article:tag" content="Auth0">
+<meta property="article:tag" content="Auth0Rules">
+<meta property="article:tag" content="SSO">
+<meta property="article:tag" content="Salesforce">
+<meta property="article:tag" content="ActiveDirectory">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210222/top.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210302/">
+  <meta content="Auth0,Auth0Rules,SSO,Salesforce,ActiveDirectory" name="keywords">
+  <meta content="山田勇一" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可カテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Auth0でADをユーザDBにし、SalesforceとのSSOを確認する
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210302_Auth0でADをユーザDBにし、SalesforceとのSSOを確認する.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210302_Auth0でADをユーザDBにし、SalesforceとのSSOを確認する" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-03-01T15:00:00.000Z" itemprop="datePublished">2021.03.02</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%B1%B1%E7%94%B0%E5%8B%87%E4%B8%80" title="山田勇一さんの記事一覧へ" class="post-author">山田勇一</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Auth0/" title="Auth0タグの記事へ" class="tag-list-link">Auth0</a>
+  
+    
+    <a href="/tags/Auth0Rules/" title="Auth0Rulesタグの記事へ" class="tag-list-link">Auth0Rules</a>
+  
+    
+    <a href="/tags/SSO/" title="SSOタグの記事へ" class="tag-list-link">SSO</a>
+  
+    
+    <a href="/tags/Salesforce/" title="Salesforceタグの記事へ" class="tag-list-link">Salesforce</a>
+  
+    
+    <a href="/tags/ActiveDirectory/" title="ActiveDirectoryタグの記事へ" class="tag-list-link">ActiveDirectory</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p>エンタープライズの領域ではAD認証が多く利用されており、また同時にCRMとしてSalesforceが導入されているケースが多くあります。<br>この場合、社内システムにおける「統合認証」の要件として、これらを繋げてログインする必要が出てきます。</p>
+<p>これらの要求に対応するため、以下2点を確認し、Active Directory（以降AD）を中心とした統合認証を試してみます。</p>
+<ol>
+<li>Auth0のApplicationsでAD認証ができることを確認</li>
+<li>SalesforceのSSO機能を利用し、Auth0経由でAD認証かつSSOができることを確認</li>
+</ol>
+<h1 id="Auth0とは？"><a href="#Auth0とは？" class="headerlink" title="Auth0とは？"></a>Auth0とは？</h1><img src="/images/20210222/top.png" class="img-middle-size" loading="lazy">
+
+<p><a href="/articles/20200122/">Auth0導入編</a>をぜひ参照ください。他にも<a href="/tags/Auth0/">Auth0関連</a>の記事があります。</p>
+<h1 id="Auth0に「Active-Directory-LDAP」Connectorを追加"><a href="#Auth0に「Active-Directory-LDAP」Connectorを追加" class="headerlink" title="Auth0に「Active Directory / LDAP」Connectorを追加"></a>Auth0に「Active Directory / LDAP」Connectorを追加</h1><h3 id="設定追加"><a href="#設定追加" class="headerlink" title="設定追加"></a>設定追加</h3><p><code>メニュー　-&gt; Connections -&gt; Enterprise -&gt; Active Directory / LDAP -&gt; CREATE CONNECTION</code><br>メニューからConnectorを追加し、今回は2つのオプションを有効にしています</p>
+<ul>
+<li>Use Windows Integrated Auth (Kerberos)<br>Auth0はWindows統合認証（Kerberos認証）に対応しており、WindowsでAD認証でログインしており、かつ <code>IP Ranges</code> のIPでログインすると認証をスキップできます。</li>
+<li>Sync user profile attributes at each login<br>こちらはシンプルに認証時に最新のプロファイルをADから取得できる設定となっています。</li>
+</ul>
+<img src="/images/20210302/スクリーンショット_2021-02-24_10.03.37.png"  style="border:solid 1px #000000" loading="lazy">
+
+
+<h1 id="ADサーバーの設定"><a href="#ADサーバーの設定" class="headerlink" title="ADサーバーの設定"></a>ADサーバーの設定</h1><h3 id="Connector設定確認"><a href="#Connector設定確認" class="headerlink" title="Connector設定確認"></a>Connector設定確認</h3><p>追加済みのConnectorより、「Setup」タブを確認し <code>Ticket Url</code> を控えておきます。<br><strong>この<code>Ticket Url</code>がADサーバーの設定に必要となります。</strong></p>
+<img src="/images/20210302/スクリーンショット_2021-02-24_10.06.35.png"  style="border:solid 1px #000000" loading="lazy">
+
+
+<h3 id="ADサーバーにAD-LDAP-Connectorをインストール"><a href="#ADサーバーにAD-LDAP-Connectorをインストール" class="headerlink" title="ADサーバーにAD LDAP Connectorをインストール"></a>ADサーバーにAD LDAP Connectorをインストール</h3><p><a target="_blank" rel="noopener" href="https://auth0.com/docs/extensions/ad-ldap-connector/install-configure-ad-ldap-connector">インストール手順</a>を参考に、ウィザードに従ってインストールしてください。<br>インストール時に前述の手順で控えた<code>Ticket Url</code>が必要になります。</p>
+<h3 id="AD-LDAP-Connectorの設定を変更"><a href="#AD-LDAP-Connectorの設定を変更" class="headerlink" title="AD LDAP Connectorの設定を変更"></a>AD LDAP Connectorの設定を変更</h3><p>Auht0らしく、AD LDAP Connectorの設定をスクリプトで変更できる部分があります。<br>ProfileMapper（ADのユーザプロファイルとAuth0のユーザプロファイルのマッピング）のタブが、スクリプトで記載できる設定になっており、今回は詰められる情報を最大まで詰めてみました。<br>ここで設定したプロファイルがログイン時にAuth0に送信される情報となります。</p>
+<img src="/images/20210302/スクリーンショット_2020-09-11_17.49.51.png"  style="border:solid 1px #000000" loading="lazy">
+
+
+<h3 id="ADとAuth0が接続できていることを確認"><a href="#ADとAuth0が接続できていることを確認" class="headerlink" title="ADとAuth0が接続できていることを確認"></a>ADとAuth0が接続できていることを確認</h3><p>Auth0側の<code>Connections</code>の表示が、<code>Offline</code>から<code>Online</code>に変化します。</p>
+<img src="/images/20210302/スクリーンショット_2020-09-11_9.36.28.png"  style="border:solid 1px #000000" loading="lazy">
+
+
+<h1 id="Applicationsでログイン確認"><a href="#Applicationsでログイン確認" class="headerlink" title="Applicationsでログイン確認"></a>Applicationsでログイン確認</h1><h3 id="Applicationsの設定変更"><a href="#Applicationsの設定変更" class="headerlink" title="Applicationsの設定変更"></a>Applicationsの設定変更</h3><h3 id="ApplicationsでConnectionsを有効化"><a href="#ApplicationsでConnectionsを有効化" class="headerlink" title="ApplicationsでConnectionsを有効化"></a>Applicationsで<code>Connections</code>を有効化</h3><p>Applicationsの設定で<code>Connections</code>タブを開き、設定済みのADを有効化します。</p>
+<img src="/images/20210302/スクリーンショット_2021-02-22_18.59.51.png"  style="border:solid 1px #000000" loading="lazy">
+
+
+<h3 id="ログインを確認"><a href="#ログインを確認" class="headerlink" title="ログインを確認"></a>ログインを確認</h3><p>サンプルアプリケーションを利用し、ログイン後のプロファイルを確認します。<br>ここで、ADで設定済みのプロファイルが見えれば連携成功です。</p>
+<img src="/images/20210302/スクリーンショット_2020-09-11_15.33.11.png"  style="border:solid 1px #000000" loading="lazy">
+
+<h3 id="プロファイルが取れるか確認"><a href="#プロファイルが取れるか確認" class="headerlink" title="プロファイルが取れるか確認"></a>プロファイルが取れるか確認</h3><p>Auth0のRulesでプロファイルの取得を入れ込み、結果を見ます。</p>
+<img src="/images/20210302/スクリーンショット_2020-09-11_17.59.05.png"  style="border:solid 1px #000000" loading="lazy">
+
+
+<p>ADサーバーのAD LDAP Connectorで指定した情報が取れていることがわかります。<br>なお、ここまで確認できればAuth0上でユーザ情報を自由に扱えそうだと判断できます。<br>例えば、ログイン時にADからユーザ情報を透過的に移行するなどの対応も考えられます。</p>
+<img src="/images/20210302/スクリーンショット_2020-09-11_15.38.32.png" loading="lazy">
+
+
+<img src="/images/20210302/スクリーンショット_2020-09-11_15.38.48.png" loading="lazy">
+
+<h1 id="Salesforceの外部認証にAuth0を設定"><a href="#Salesforceの外部認証にAuth0を設定" class="headerlink" title="Salesforceの外部認証にAuth0を設定"></a>Salesforceの外部認証にAuth0を設定</h1><h3 id="Salesforceのアカウント準備"><a href="#Salesforceのアカウント準備" class="headerlink" title="Salesforceのアカウント準備"></a>Salesforceのアカウント準備</h3><p>SSOの前提として、Auth0のドメイン設定を行う必要があります。</p>
+<h3 id="Salesforce側にADとSSOさせたいユーザを作成"><a href="#Salesforce側にADとSSOさせたいユーザを作成" class="headerlink" title="Salesforce側にADとSSOさせたいユーザを作成"></a>Salesforce側にADとSSOさせたいユーザを作成</h3><p><strong>SalesforceのSSOでは、Salesforce側に事前にSSOしたユーザの登録が必要です。</strong><br>また、SSOさせる場合にSalesforceのユーザとADのユーザで、SSOに利用する属性情報を一致させる必要があります。<br>とはいえ、Auth0のログイン画面を使う場合、ADとSalesforceで一致させる属性はEmailが最善です。<br>今回はこの青枠ユーザをSSOで利用します。</p>
+<img src="/images/20210302/スクリーンショット_2021-02-22_19.33.57.png"  style="border:solid 1px #000000" loading="lazy">
+
+
+
+<h3 id="Saleforceのドメイン設定"><a href="#Saleforceのドメイン設定" class="headerlink" title="Saleforceのドメイン設定"></a>Saleforceのドメイン設定</h3><p><a target="_blank" rel="noopener" href="https://help.salesforce.com/articleView?id=sf.domain_name_overview.htm&type=5">SSOにはドメイン設定が必要になるため、設定しておきます。</a><br>ここでAuth0に移ります。</p>
+<h3 id="auth0にSalesforce用のSSO設定を追加"><a href="#auth0にSalesforce用のSSO設定を追加" class="headerlink" title="auth0にSalesforce用のSSO設定を追加"></a>auth0にSalesforce用のSSO設定を追加</h3><p><code>SSO Integrations</code>から<code>CREATE SSO INTEGRATION</code>を選択し、SalesforceのSSO設定を追加します<br>Salesforce側のドメインが必要になるので、<a target="_blank" rel="noopener" href="https://auth0.com/docs/protocols/saml-configuration-options/configure-salesforce-as-saml-identity-provider">Auth0の設定ページ</a>を確認しつつSalesforceから情報を取得してください。</p>
+<img src="/images/20210302/スクリーンショット_2021-02-22_18.59.24.png"  style="border:solid 1px #000000" loading="lazy">
+
+
+<p>Salesforceのドメインに<code>https://</code>をつけたものが<code>Entity ID</code>になります。</p>
+<img src="/images/20210302/スクリーンショット_2021-02-22_18.59.45.png"  style="border:solid 1px #000000" loading="lazy">
+
+
+<p>追加設定として、認証先をADに変更します。</p>
+<img src="/images/20210302/スクリーンショット_2021-02-22_18.59.51_2.png"  style="border:solid 1px #000000" loading="lazy">
+
+
+<p>ここで、Salesforceに移ります。</p>
+<h3 id="SaleforceのSSO設定追加"><a href="#SaleforceのSSO設定追加" class="headerlink" title="SaleforceのSSO設定追加"></a>SaleforceのSSO設定追加</h3><p>メニューの<code>ID-&gt;シングルサインオン設定</code>を選択し、<code>新規</code>から接続設定を作ります。</p>
+<img src="/images/20210302/スクリーンショット_2021-02-22_19.09.12.png" loading="lazy">
+
+
+<p>Auth0のSalesforce設定ページにチュートリアルページあるので、手順に従い必須項目を埋めます。<br><code>IDはattribute要素にあります</code>を選択し、<code>email</code>を入力することを忘れないでください。<br>設定した<code>email</code>が、ADとSalesforceでSSOさせるユーザの一致属性となります。</p>
+<img src="/images/20210302/スクリーンショット_2021-02-22_19.44.06.png"  style="border:solid 1px #000000" loading="lazy">
+
+<h3 id="SSOの確認"><a href="#SSOの確認" class="headerlink" title="SSOの確認"></a>SSOの確認</h3><p>これでようやく設定完了です。<br>追加したSSOのログインボタンが現れますので、自ドメインの認証画面からSSOユーザでログインしてください。</p>
+<img src="/images/20210302/スクリーンショット_2020-09-14_12.52.42.png" loading="lazy">
+
+
+<p>ログインできれば成功です。<br>お疲れ様でした。</p>
+<ul>
+<li><a href="/articles/20210222/">Auth0で認証成功後に任意のWebページを表示させたい | フューチャー技術ブログ</a></li>
+<li><a href="/articles/20200123/">Auth0 EmailまたはSMSを使ったパスワードレス認証を設定する | フューチャー技術ブログ</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210302/&related=twitterapi%2Ctwitter&text=Auth0%E3%81%A7AD%E3%82%92%E3%83%A6%E3%83%BC%E3%82%B6DB%E3%81%AB%E3%81%97%E3%80%81Salesforce%E3%81%A8%E3%81%AESSO%E3%82%92%E7%A2%BA%E8%AA%8D%E3%81%99%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210302/&t=Auth0%E3%81%A7AD%E3%82%92%E3%83%A6%E3%83%BC%E3%82%B6DB%E3%81%AB%E3%81%97%E3%80%81Salesforce%E3%81%A8%E3%81%AESSO%E3%82%92%E7%A2%BA%E8%AA%8D%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210302/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210302/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2021.11.10</span><span class="snscount">&#9825;11</span><a href=/articles/20211110a/ title="私が参画した案件で、Auth0に登録されているエンドユーザ向けのアカウントを用いてShopifyにSSOする検証を行ったので、今回はその方法をご紹介します。">Auth0アカウントでShopifyにSSOする</a></li><li class="related-posts-item"><span>2021.08.12</span><span class="snscount">&#9825;13</span><a href=/articles/20210812b/ title="2021年7月21日にFuture Tech Night #14～認証認可（IDaaS）勉強会～で発表させてもらいました。元々は、Rails Devise+cancancan、Cognito User Pools（5年前）、Auth0の開発経験があり、改めてOSSも加えて学んでみたかったのが、テーマを決めた背景になります。">Future Tech Night #14〜IDaaS/OSS/Managed比較〜</a></li><li class="related-posts-item"><span>2021.03.08</span><span class="snscount">&#9825;9</span><a href=/articles/20210308/ title="案件で認証プラットフォームである[Auth0]を利用していますが、Auth0の機能の中でもRulesと呼ばれるユーザ認証時にJavaScriptの関数を走らせる事が出来る機能は非常に強力で様々なニーズに対応することが可能になります。その中でJavaScriptの関数で書けるRulesに対して、ユニットテストを書く事が出来れば、Ruleの質も担保出来ます。">Auth0 Rulesのユニットテストを書きたい</a></li><li class="related-posts-item"><span>2021.02.22</span><span class="snscount">&#9825;5</span><a href=/articles/20210222/ title="とある案件で、ユーザがログインした後に任意のページを表示させたいニーズがありました。こういった時はアプリ側でやってあげれなくもないのですが、複数のアプリが Auth0 で認証している場合には、アプリの数だけ改修が発生してしまいます。今回は context.redirect という Auth0 のユニークな機能を使って、改修を最小限に抑える方法を紹介します。">Auth0で認証成功後に任意のWebページを表示させたい</a></li><li class="related-posts-item"><span>2020.11.24</span><span class="snscount">&#9825;1</span><a href=/articles/20201124/ title="Auth0さんより、クローズドの電子書籍出版記念にご招待いただき、Futureより3名で出席してまいりました。- マンガでわかる！Auth0誕生の秘密とは...">Auth0の出版記念に行ってきました！</a></li><li class="related-posts-item"><span>2020.03.17</span><span class="snscount">&#9825;2</span><a href=/articles/20200317/ title="プロジェクトでTableauダッシュボードを組み込んだSPAを開発しています。その際にPoCを実施したので、こちらで簡単にお試しできる手順を共有させていただきます。">SPA + Tableau Online + Auth0 SSO</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Auth0%E3%81%A8%E3%81%AF%EF%BC%9F"><span class="toc-text">Auth0とは？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Auth0%E3%81%AB%E3%80%8CActive-Directory-LDAP%E3%80%8DConnector%E3%82%92%E8%BF%BD%E5%8A%A0"><span class="toc-text">Auth0に「Active Directory &#x2F; LDAP」Connectorを追加</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A8%AD%E5%AE%9A%E8%BF%BD%E5%8A%A0"><span class="toc-text">設定追加</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#AD%E3%82%B5%E3%83%BC%E3%83%90%E3%83%BC%E3%81%AE%E8%A8%AD%E5%AE%9A"><span class="toc-text">ADサーバーの設定</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Connector%E8%A8%AD%E5%AE%9A%E7%A2%BA%E8%AA%8D"><span class="toc-text">Connector設定確認</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AD%E3%82%B5%E3%83%BC%E3%83%90%E3%83%BC%E3%81%ABAD-LDAP-Connector%E3%82%92%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB"><span class="toc-text">ADサーバーにAD LDAP Connectorをインストール</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AD-LDAP-Connector%E3%81%AE%E8%A8%AD%E5%AE%9A%E3%82%92%E5%A4%89%E6%9B%B4"><span class="toc-text">AD LDAP Connectorの設定を変更</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AD%E3%81%A8Auth0%E3%81%8C%E6%8E%A5%E7%B6%9A%E3%81%A7%E3%81%8D%E3%81%A6%E3%81%84%E3%82%8B%E3%81%93%E3%81%A8%E3%82%92%E7%A2%BA%E8%AA%8D"><span class="toc-text">ADとAuth0が接続できていることを確認</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Applications%E3%81%A7%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3%E7%A2%BA%E8%AA%8D"><span class="toc-text">Applicationsでログイン確認</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Applications%E3%81%AE%E8%A8%AD%E5%AE%9A%E5%A4%89%E6%9B%B4"><span class="toc-text">Applicationsの設定変更</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Applications%E3%81%A7Connections%E3%82%92%E6%9C%89%E5%8A%B9%E5%8C%96"><span class="toc-text">ApplicationsでConnectionsを有効化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3%E3%82%92%E7%A2%BA%E8%AA%8D"><span class="toc-text">ログインを確認</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%97%E3%83%AD%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%8C%E5%8F%96%E3%82%8C%E3%82%8B%E3%81%8B%E7%A2%BA%E8%AA%8D"><span class="toc-text">プロファイルが取れるか確認</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Salesforce%E3%81%AE%E5%A4%96%E9%83%A8%E8%AA%8D%E8%A8%BC%E3%81%ABAuth0%E3%82%92%E8%A8%AD%E5%AE%9A"><span class="toc-text">Salesforceの外部認証にAuth0を設定</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Salesforce%E3%81%AE%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E6%BA%96%E5%82%99"><span class="toc-text">Salesforceのアカウント準備</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Salesforce%E5%81%B4%E3%81%ABAD%E3%81%A8SSO%E3%81%95%E3%81%9B%E3%81%9F%E3%81%84%E3%83%A6%E3%83%BC%E3%82%B6%E3%82%92%E4%BD%9C%E6%88%90"><span class="toc-text">Salesforce側にADとSSOさせたいユーザを作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Saleforce%E3%81%AE%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3%E8%A8%AD%E5%AE%9A"><span class="toc-text">Saleforceのドメイン設定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#auth0%E3%81%ABSalesforce%E7%94%A8%E3%81%AESSO%E8%A8%AD%E5%AE%9A%E3%82%92%E8%BF%BD%E5%8A%A0"><span class="toc-text">auth0にSalesforce用のSSO設定を追加</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Saleforce%E3%81%AESSO%E8%A8%AD%E5%AE%9A%E8%BF%BD%E5%8A%A0"><span class="toc-text">SaleforceのSSO設定追加</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SSO%E3%81%AE%E7%A2%BA%E8%AA%8D"><span class="toc-text">SSOの確認</span></a></li></ol></li></ol></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

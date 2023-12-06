@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Vuls開発中に出会ったGORMあれこれ | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="Vuls開発中に出会ったGORMあれこれはじめまして、中岡(@MaineK00n)と申します。 2021年6月の現在はフューチャー発OSSのVuls開発をメインに、CSIG1でアルバイトをしています。 TL;DR ORM(Object-relational mapping)を触るときは発行されるクエリが意図したものか確認する 推測するな、計測せよ  GORMを触る、Vuls#1202本題に入る前に">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vuls開発中に出会ったGORMあれこれ | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210609a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="Vuls開発中に出会ったGORMあれこれはじめまして、中岡(@MaineK00n)と申します。 2021年6月の現在はフューチャー発OSSのVuls開発をメインに、CSIG1でアルバイトをしています。 TL;DR ORM(Object-relational mapping)を触るときは発行されるクエリが意図したものか確認する 推測するな、計測せよ  GORMを触る、Vuls#1202本題に入る前に">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210609a/query_count.png">
+<meta property="article:published_time" content="2021-06-08T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.653Z">
+<meta property="article:tag" content="Vuls">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="ORM">
+<meta property="article:tag" content="GORM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210609a/query_count.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210609a/">
+  <meta content="Vuls,Go,ORM,GORM" name="keywords">
+  <meta content="MaineK00n" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Vuls開発中に出会ったGORMあれこれ
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210609a_Vuls開発中に出会ったGORMあれこれ.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210609a_Vuls開発中に出会ったGORMあれこれ" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-06-08T15:00:00.000Z" itemprop="datePublished">2021.06.09</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/MaineK00n" title="MaineK00nさんの記事一覧へ" class="post-author">MaineK00n</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Vuls/" title="Vulsタグの記事へ" class="tag-list-link">Vuls</a>
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/ORM/" title="ORMタグの記事へ" class="tag-list-link">ORM</a>
+  
+    
+    <a href="/tags/GORM/" title="GORMタグの記事へ" class="tag-list-link">GORM</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="Vuls開発中に出会ったGORMあれこれ"><a href="#Vuls開発中に出会ったGORMあれこれ" class="headerlink" title="Vuls開発中に出会ったGORMあれこれ"></a>Vuls開発中に出会ったGORMあれこれ</h1><p>はじめまして、中岡(<a target="_blank" rel="noopener" href="https://twitter.com/MaineK00n">@MaineK00n</a>)と申します。</p>
+<p>2021年6月の現在はフューチャー発OSSの<a target="_blank" rel="noopener" href="https://github.com/future-architect/vuls">Vuls</a>開発をメインに、CSIG<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>でアルバイトをしています。</p>
+<h1 id="TL-DR"><a href="#TL-DR" class="headerlink" title="TL;DR"></a>TL;DR</h1><ul>
+<li>ORM(Object-relational mapping)を触るときは発行されるクエリが意図したものか確認する</li>
+<li>推測するな、計測せよ</li>
+</ul>
+<h1 id="GORMを触る、Vuls-1202"><a href="#GORMを触る、Vuls-1202" class="headerlink" title="GORMを触る、Vuls#1202"></a>GORMを触る、Vuls#1202</h1><p>本題に入る前に、Vulsのスキャンについて簡単に説明します。</p>
+<p>Vulsでは、以下のようにsqlite3などの形式で保存されたVulnerability DBからCVE情報を集めて、スキャン先の脆弱性を解析しています。</p>
+<p>FYI: Vulsのスキャンアーキテクチャは<a target="_blank" rel="noopener" href="https://vuls.io/docs/en/architecture-fast-deep.html">こちら</a>に詳しく書かれています。</p>
+<p>&lt;img src=”/images/20210609a/vuls-arch.png” alt=”Vulsアーキテクチャ図” loading=”lazy”</p>
+<p>Reference: <a target="_blank" rel="noopener" href="https://github.com/future-architect/vuls">future-architect/vuls</a></p>
+<p>さて，GORMを触るきっかけは、このPR(<a target="_blank" rel="noopener" href="https://github.com/future-architect/Vuls/pull/1202">Vuls#1202</a>)です。このPRは、VulsでDebianをスキャンしたとき、CVE情報のベースをOVALからDebian Security Trackerへ変更しようというものです。実装してみると、変更前はスキャン時間の90%ileが3.37sだったのですが、変更後は11.15sまで増加してしまいました。</p>
+<p>原因を調査すると、Vulsと連携してDebian Security Trackerの情報を取り扱うgost(<a target="_blank" rel="noopener" href="https://github.com/knqyf263/gost">knqyf263/gost</a>)にあることが分かりました。詳しくは、追加された機能(<a target="_blank" rel="noopener" href="https://github.com/knqyf263/gost/pull/47">gost#47</a>)によってDBに保存したDebianに関するCVE情報を取得する部分が増加したことでした。</p>
+<p>パフォーマンスを改善しなければ、この機能は導入できないということになりました。そのため、EXPLAINしてINDEXを確認したりなどをして、解決策を色々探していました</p>
+<p>その中で、2020年8月にGORM 2.0がリリースされていることを思い出しました。Release Noteによると、GORM v2はフルスクラッチされており、パフォーマンスが改善されているそうなのです。</p>
+<p>まず、私はGORM v2をサポートして、どれくらい改善するかを検証することにしました(<a target="_blank" rel="noopener" href="https://github.com/knqyf263/gost/pull/60">gost#60</a>)。</p>
+<h2 id="期待のGORM-v2、そのパフォーマンス"><a href="#期待のGORM-v2、そのパフォーマンス" class="headerlink" title="期待のGORM v2、そのパフォーマンス"></a>期待のGORM v2、そのパフォーマンス</h2><p>GORMをv1からv2にしたところ、発行されるクエリは大きく変わっていませんでした。<br>それでは、簡易なパフォーマンス測定をやってみることにします。</p>
+<h3 id="検証-Package-expat"><a href="#検証-Package-expat" class="headerlink" title="検証(Package: expat)"></a>検証(Package: expat)</h3><p>Debian busterのPackage: expatに関するunfixed/fixedなCVE情報を検索することを100回繰り返して、レスポンスにかかる時間の90%ileを取ってみました。</p>
+<ul>
+<li>unfixed cves</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">発行クエリ数</th>
+<th align="center">90%ile</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">GORM v1</td>
+<td align="center">4</td>
+<td align="center">0.006682</td>
+</tr>
+<tr>
+<td align="center">GORM v2</td>
+<td align="center">4</td>
+<td align="center">0.010948</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>fixed cves</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">発行クエリ数</th>
+<th align="center">90%ile</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">GORM v1</td>
+<td align="center">46</td>
+<td align="center">0.023047</td>
+</tr>
+<tr>
+<td align="center">GORM v2</td>
+<td align="center">46</td>
+<td align="center">0.015868</td>
+</tr>
+</tbody></table></div>
+<h3 id="検証-Package-linux"><a href="#検証-Package-linux" class="headerlink" title="検証(Package: linux)"></a>検証(Package: linux)</h3><p>もしかして発行されるクエリ数が少なすぎるかなと思って、Package: linuxに関するunfixed/fixedなCVE情報でも検証してみました。</p>
+<p>すると、この場合はGORM v2にすることによるはっきりとしたパフォーマンスの向上が確認できました。</p>
+<ul>
+<li>unfixed cves</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">発行クエリ数</th>
+<th align="center">90%ile</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">GORM v1</td>
+<td align="center">298</td>
+<td align="center">0.035935</td>
+</tr>
+<tr>
+<td align="center">GORM v2</td>
+<td align="center">307</td>
+<td align="center">0.027996</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>fixed cves</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">発行クエリ数</th>
+<th align="center">90%ile</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">GORM v1</td>
+<td align="center">4930</td>
+<td align="center">0.43754</td>
+</tr>
+<tr>
+<td align="center">GORM v2</td>
+<td align="center">4945</td>
+<td align="center">0.298629</td>
+</tr>
+</tbody></table></div>
+<p>ちなみに、GORM v2をサポートした状態でのVulsによるスキャン時間は11.5sから9.17sになりました。<br>まだまだ高速化が必要です😢</p>
+<h2 id="さらなる高速化に向けて"><a href="#さらなる高速化に向けて" class="headerlink" title="さらなる高速化に向けて"></a>さらなる高速化に向けて</h2><p>発行されるクエリのうち、ボトルネックになっていたのはJOIN句が入ったこのクエリです。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    debian_cve_id</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    `debian_releases`</span><br><span class="line">    <span class="keyword">join</span></span><br><span class="line">        debian_packages</span><br><span class="line">    <span class="keyword">on</span>  debian_releases.debian_package_id <span class="operator">=</span> debian_packages.id</span><br><span class="line">    <span class="keyword">AND</span> debian_packages.package_name <span class="operator">=</span> &quot;expat&quot;</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">    `debian_releases`.`product_name` <span class="operator">=</span> &quot;buster&quot;</span><br><span class="line"><span class="keyword">AND</span> `debian_releases`.`status` <span class="operator">=</span> &quot;open&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>JOIN句を使わずに同様の検索が出来ないかを考え、クエリをチューニングしました(<a target="_blank" rel="noopener" href="https://github.com/knqyf263/gost/pull/61">gost#61</a>)。<br>クエリチューニング版では、以下のように、JOIN句をやめ、シンプルに<code>debian_packages</code>から<code>debian_cve_id</code> を求め、軽いクエリを多く実行することにしました。</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">SELECT</span><br><span class="line">    debian_cve_id</span><br><span class="line"><span class="deletion">- FROM</span></span><br><span class="line"><span class="deletion">-     `debian_releases`</span></span><br><span class="line"><span class="deletion">-     join</span></span><br><span class="line"><span class="deletion">-         debian_packages</span></span><br><span class="line"><span class="deletion">-     on  debian_releases.debian_package_id = debian_packages.id</span></span><br><span class="line"><span class="deletion">-     AND debian_packages.package_name = &quot;expat&quot;</span></span><br><span class="line"><span class="deletion">- WHERE</span></span><br><span class="line"><span class="deletion">-     `debian_releases`.`product_name` = &quot;buster&quot;</span></span><br><span class="line"><span class="deletion">- AND `debian_releases`.`status` = &quot;open&quot;;</span></span><br><span class="line"><span class="addition">+ FROM</span></span><br><span class="line"><span class="addition">+     `debian_packages`</span></span><br><span class="line"><span class="addition">+ WHERE</span></span><br><span class="line"><span class="addition">+     package_name = &quot;expat&quot;;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="検証-クエリチューニング"><a href="#検証-クエリチューニング" class="headerlink" title="検証(クエリチューニング)"></a>検証(クエリチューニング)</h3><p>先程と同様に、Debian busterにあるPackage: expat、linuxに関するunfixed/fixedなCVE情報を検索することを100回繰り返して、レスポンスにかかる時間の90%ileでクエリチューニングの効果を評価したいと思います。</p>
+<ul>
+<li>expat unfixes cves</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">発行クエリ数</th>
+<th align="center">90%ile</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">GORM v1</td>
+<td align="center">4</td>
+<td align="center">0.006682</td>
+</tr>
+<tr>
+<td align="center">GORM v2</td>
+<td align="center">4</td>
+<td align="center">0.010948</td>
+</tr>
+<tr>
+<td align="center">GORM v2 + query tuning</td>
+<td align="center">49</td>
+<td align="center">0.003467</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>expat fixes cves</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">発行クエリ数</th>
+<th align="center">90%ile</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">GORM v1</td>
+<td align="center">46</td>
+<td align="center">0.023047</td>
+</tr>
+<tr>
+<td align="center">GORM v2</td>
+<td align="center">46</td>
+<td align="center">0.015868</td>
+</tr>
+<tr>
+<td align="center">GORM v2 + query tuning</td>
+<td align="center">49</td>
+<td align="center">0.003759</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>linux unfixes cves</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">発行クエリ数</th>
+<th align="center">90%ile</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">GORM v1</td>
+<td align="center">298</td>
+<td align="center">0.035935</td>
+</tr>
+<tr>
+<td align="center">GORM v2</td>
+<td align="center">307</td>
+<td align="center">0.027996</td>
+</tr>
+<tr>
+<td align="center">GORM v2 + query tuning</td>
+<td align="center">5287</td>
+<td align="center">0.267383</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>linux fixes cves</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">発行クエリ数</th>
+<th align="center">90%ile</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">GORM v1</td>
+<td align="center">4930</td>
+<td align="center">0.43754</td>
+</tr>
+<tr>
+<td align="center">GORM v2</td>
+<td align="center">4945</td>
+<td align="center">0.298629</td>
+</tr>
+<tr>
+<td align="center">GORM v2 + query tuning</td>
+<td align="center">5287</td>
+<td align="center">0.280019</td>
+</tr>
+</tbody></table></div>
+<p>結果としては、クエリチューニングをすることで、発行されるクエリ数は増えていますが、linux unfixed cvesの場合以外、高速化できているように見えます。</p>
+<p>執筆時(2021/05/27)では、gostにおいて、CVE情報を検索可能なDebianのパッケージは3059件あり、それらのパッケージに対してfixed/unfixesなCVE情報を検索したとき、発行されるクエリ数はどのように分布するのかを調べてみました。<br>すると、ほとんどの検索の場合、0-499個のクエリしか発行しないことが分かりました。<br>つまり、linux unfixes cvesの場合のように、<code>GORM v2 + query tuning</code>のクエリ数だけがとても増加して、検索にかかる時間が大きくなる事象によるロスより、それ以外の場合による高速化が大きく現れやすいということです。</p>
+<img src="/images/20210609a/query_count.png" alt="クエリ発行数" loading="lazy">
+
+<p>これが、Vulsのスキャン時間にどれくらいの影響を与えるかを、スキャン時間の90%ileで見てみます。<br>スキャン先のDebianにはパッケージが218個インストールされています。<br>参考に、追加機能が導入されてないVuls v0.15.10も追加しました。<br>結果より、GORM v1, GORM v2の時点では、機能を導入に対するトレードオフとしては見合わなかったのですが、クエリチューニングをすることによって、追加機能がないものより高速にスキャンできるようになりました🎉</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th align="center">baseline(Vuls v0.15.10)</th>
+<th align="center">GORM v1</th>
+<th align="center">GORM v2</th>
+<th align="center">GORM v2 + query tuning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">3.37</td>
+<td align="center">11.5</td>
+<td align="center">9.17</td>
+<td align="center">2.49</td>
+</tr>
+</tbody></table></div>
+<h1 id="Gost、Ubuntuサポートをする"><a href="#Gost、Ubuntuサポートをする" class="headerlink" title="Gost、Ubuntuサポートをする"></a>Gost、Ubuntuサポートをする</h1><p>gostはUbuntuをサポートしていなかったので(TODOにはあった)、ついでと思ってUbuntuのサポートをしました(<a target="_blank" rel="noopener" href="https://github.com/knqyf263/gost/pull/62">gost#62</a>)。</p>
+<p>これをもとにして、VulsでUbuntuをスキャンするときにgostからのCVE情報が追加される予定です(<a target="_blank" rel="noopener" href="https://github.com/future-architect/Vuls/pull/1243">Vuls#1243</a>)。</p>
+<p>執筆時点（2021/05/27）では、gostでGORM v2をサポートするPRはまだMergeされてませんので、最初はDebianでのクエリチューニングを基にして、GORM v1で対応しました。gostの対応はサクッと終わったので、続いてVulsとの連携を実装しました。</p>
+<p>さて、Vulsとの連携も実装できたので、Vulsのスキャン先を用意します。スキャン先として用意したUbuntu環境にインストールされているパッケージは2662個です。</p>
+<p>この環境に対してVulsでスキャンをすると、スキャン時間が5m38sと遅い……(機能導入前であれば2sぐらい)</p>
+<p>そこで、他のPRでGORM v2をサポートするので、Ubuntuサポート版もGORM v2に対応しました。</p>
+<p>さて、GORM v2にしたときのVulsのスキャン速度は……？</p>
+<p><strong>7s</strong></p>
+<p>約48倍も速くなりました！！！一応、実際に発行されるクエリを見てみましたが、発行されるクエリに差分は、ほぼありませんでした。</p>
+<p>約48倍も速くなった要因は、スキャン先にインストールされているパッケージ数がDebianの場合よりも多く、GORM v2にアップデートすることによるパフォーマンスの向上が顕著に現れたと考えています。</p>
+<h2 id="GORM-v1とGORM-v2におけるPreloadの挙動"><a href="#GORM-v1とGORM-v2におけるPreloadの挙動" class="headerlink" title="GORM v1とGORM v2におけるPreloadの挙動"></a>GORM v1とGORM v2におけるPreloadの挙動</h2><p>さて、GORM v1で実装していて、テストをしていると、Debianの場合はRDBとRedisでレスポンスを比較して、差分は出ないのですが、UbuntuではあるパッケージにGETリクエストを投げたときのレスポンスがRDBとRedisで異なることに気が付きました。</p>
+<p>とりあえず、Preloadの順番を変更すると、レスポンスが正しく返ってきました。</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">    err := r.conn.</span><br><span class="line"><span class="deletion">-           Preload(&quot;Patches.ReleasePatches&quot;, &quot;release_name = ? AND status IN (?)&quot;, codeName, fixStatus).</span></span><br><span class="line">	        Preload(&quot;Patches&quot;, &quot;package_name = ?&quot;, pkgName).</span><br><span class="line"><span class="addition">+	        Preload(&quot;Patches.ReleasePatches&quot;, &quot;release_name = ? AND status IN (?)&quot;, codeName, fixStatus).</span></span><br><span class="line">	        Where(&amp;models.UbuntuCVE&#123;ID: res.UbuntuCveID&#125;).</span><br><span class="line">	        First(&amp;cve).Error</span><br></pre></td></tr></table></figure>
+
+<p>そして、GORM v2にアップデートした後、GORM v1のときに変更したPreloadの順番ってGORM v2でも同様の挙動をするのかが気になりました🤔</p>
+<p>Preloadを調整したcommitをrevertして、レスポンスをチェックすると、アレレ？ちゃんと正しいレスポンスが返ってきていました……</p>
+<p>しかし、どうして正しいレスポンスが返ってくるようになったのでしょうか。</p>
+<p>私、気になります！</p>
+<p>そこで、Preload調整前のGORM v1とPreload調整後のGORM v1、Preload調整後のGORM v2、Preload調整をrevertしたGORM v2の4つが発行するクエリの一部を比較しました。</p>
+<p>結果としては、今回の場合、GORM v1においては、Preloadの順を変更すると、<code>WHERE IN</code>に影響を及ぼすようです。GORM v2になると、Preloadの順番に左右されない挙動をしていました。</p>
+<ul>
+<li>GORM v1, Preload調整前</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    &quot;ubuntu_release_patches&quot;</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">    (&quot;ubuntu_patch_id&quot; <span class="keyword">IN</span>(<span class="number">133652</span>, <span class="number">133653</span>)) <span class="comment">-- Preloadの順番がここに影響する</span></span><br><span class="line"><span class="keyword">AND</span> (</span><br><span class="line">        release_name <span class="operator">=</span> <span class="string">&#x27;focal&#x27;</span></span><br><span class="line">    <span class="keyword">AND</span> status <span class="keyword">IN</span>(<span class="string">&#x27;needed&#x27;</span>, <span class="string">&#x27;pending&#x27;</span>)</span><br><span class="line">    )</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span></span><br><span class="line">    &quot;ubuntu_release_patches&quot;.&quot;id&quot; <span class="keyword">ASC</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>GORM v1, Preload調整後</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    &quot;ubuntu_release_patches&quot;</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">    (&quot;ubuntu_patch_id&quot; <span class="keyword">IN</span>(<span class="number">133653</span>))</span><br><span class="line"><span class="keyword">AND</span> (</span><br><span class="line">        release_name <span class="operator">=</span> <span class="string">&#x27;focal&#x27;</span></span><br><span class="line">    <span class="keyword">AND</span> status <span class="keyword">IN</span>(<span class="string">&#x27;needed&#x27;</span>, <span class="string">&#x27;pending&#x27;</span>)</span><br><span class="line">    )</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span></span><br><span class="line">    &quot;ubuntu_release_patches&quot;.&quot;id&quot; <span class="keyword">ASC</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>GORM v2, Preload調整後</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    `ubuntu_release_patches`</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">    `ubuntu_release_patches`.`ubuntu_patch_id` <span class="operator">=</span> <span class="number">133653</span></span><br><span class="line"><span class="keyword">AND</span> (</span><br><span class="line">        release_name <span class="operator">=</span> &quot;focal&quot;</span><br><span class="line">    <span class="keyword">AND</span> status <span class="keyword">IN</span>(&quot;needed&quot;, &quot;pending&quot;)</span><br><span class="line">    );</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>GORM v2, revert Preload調整</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    `ubuntu_release_patches`</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">    `ubuntu_release_patches`.`ubuntu_patch_id` <span class="operator">=</span> <span class="number">133653</span></span><br><span class="line"><span class="keyword">AND</span> (</span><br><span class="line">        release_name <span class="operator">=</span> &quot;focal&quot;</span><br><span class="line">    <span class="keyword">AND</span> status <span class="keyword">IN</span>(&quot;needed&quot;, &quot;pending&quot;)</span><br><span class="line">    );</span><br></pre></td></tr></table></figure>
+
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>自戒の念を込めて。</p>
+<p>ORMを使うのはいいですが、ちゃんと意図したクエリ、レスポンスになっているかはちゃんと確認したほうが良いです。</p>
+<p>そして、パフォーマンスの改善をするときは、ちゃんとボトルネックを色々な角度から測定して、トータルで改善することを確認してから実行すると良いでしょう。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">CSIG(CyberSecurityInnovationGroup)は、セキュリティ関連のコンサルティングや実装などを行っています</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210609a/&related=twitterapi%2Ctwitter&text=Vuls%E9%96%8B%E7%99%BA%E4%B8%AD%E3%81%AB%E5%87%BA%E4%BC%9A%E3%81%A3%E3%81%9FGORM%E3%81%82%E3%82%8C%E3%81%93%E3%82%8C%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">40</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210609a/&t=Vuls%E9%96%8B%E7%99%BA%E4%B8%AD%E3%81%AB%E5%87%BA%E4%BC%9A%E3%81%A3%E3%81%9FGORM%E3%81%82%E3%82%8C%E3%81%93%E3%82%8C" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210609a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210609a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2021.07.29</span><span class="snscount">&#9825;32</span><a href=/articles/20210729a/ title="GoのORマッパー連載の4日目の記事です。GORM の v1 と v2 の実装を比較して、何が変わっているのかを調査してみました。">GORM v1 と v2 のソースコードリーディングしてみた</a></li><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;566</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2019.09.26</span><span class="snscount">&#9825;30</span><a href=/articles/20190926/ title="GoのDBレイヤーライブラリとして有名な、GORM,SQLBoiler,XORMの三つについて違いと評価をまとめてみました。">Go言語のDBレイヤーライブラリの評価</a></li><li class="related-posts-item"><span>2022.11.28</span><span class="snscount">&#9825;367</span><a href=/articles/20221128a/ title="私たちのチームでは、バッチ処理が中心的な業務システム開発において Go の ORM に sqlc を採用しました。素の SQL を書いていくチームの開発方針[^1]とマッチし、開発体験は非常に良かったです。">業務システム開発でsqlcを導入して良かった点とハマった点</a></li><li class="related-posts-item"><span>2022.06.02</span><span class="snscount">&#9825;14</span><a href=/articles/20220602a/ title="Go の ORM（Object-relational mapping）である `gorm` 利用時の構造体にて、サロゲートキーの型が `int32`であることに起因して、当該フィールドが数年でオーバーフローしそうだった件について、なぜ実装時に気づけなかったのか、記載いたします。">int32 のサロゲートキーが数年でオーバーフローしそうになった件</a></li><li class="related-posts-item"><span>2022.05.31</span><span class="snscount">&#9825;5</span><a href=/articles/20220531a/ title="TIG 多賀です。 2022/5/19 に開催された golang.tokyo #32 に登壇しましたので報告させていただきます。「自作ライブラリ、ソフトウェアGo自慢大会」ということで、OSS 活動の一環で作成したfuture-architect/go-twowaysqlについて紹介してきました。">golang.tokyo #32 で go-twowaysql について紹介しました</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20210726a/ title="7/26（月）～8/3（水）の平日にかけて、GoでRDBに対してアクセスライブラリ（ORMとクエリビルダー）をテーマにした連載を始めます。">GoのORマッパー連載を始めます</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Vuls%E9%96%8B%E7%99%BA%E4%B8%AD%E3%81%AB%E5%87%BA%E4%BC%9A%E3%81%A3%E3%81%9FGORM%E3%81%82%E3%82%8C%E3%81%93%E3%82%8C"><span class="toc-text">Vuls開発中に出会ったGORMあれこれ</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TL-DR"><span class="toc-text">TL;DR</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#GORM%E3%82%92%E8%A7%A6%E3%82%8B%E3%80%81Vuls-1202"><span class="toc-text">GORMを触る、Vuls#1202</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%9F%E5%BE%85%E3%81%AEGORM-v2%E3%80%81%E3%81%9D%E3%81%AE%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9"><span class="toc-text">期待のGORM v2、そのパフォーマンス</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC-Package-expat"><span class="toc-text">検証(Package: expat)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC-Package-linux"><span class="toc-text">検証(Package: linux)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%95%E3%82%89%E3%81%AA%E3%82%8B%E9%AB%98%E9%80%9F%E5%8C%96%E3%81%AB%E5%90%91%E3%81%91%E3%81%A6"><span class="toc-text">さらなる高速化に向けて</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC-%E3%82%AF%E3%82%A8%E3%83%AA%E3%83%81%E3%83%A5%E3%83%BC%E3%83%8B%E3%83%B3%E3%82%B0"><span class="toc-text">検証(クエリチューニング)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Gost%E3%80%81Ubuntu%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%E3%82%92%E3%81%99%E3%82%8B"><span class="toc-text">Gost、Ubuntuサポートをする</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#GORM-v1%E3%81%A8GORM-v2%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8BPreload%E3%81%AE%E6%8C%99%E5%8B%95"><span class="toc-text">GORM v1とGORM v2におけるPreloadの挙動</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

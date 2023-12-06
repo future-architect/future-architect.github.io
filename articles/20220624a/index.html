@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>grpc-gatewayでgRPCとREST両対応のサーバを作る | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTIGの関です。サービス間通信とIDL（インタフェース記述言語）連載の3本目です。 昨日に続き、gRPCネタです。この記事では次のネタを扱います。  gRPCの概観 gRPCとWebブラウザの関係性 grpc-gatewayとは何か？ gRPCとその周辺ツールを使ったサーバ開発の流れ  gRPC概観gRPCは、HTTP2をベースにしたRPC（リモートプロシージャコール）フレームワークです。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="grpc-gatewayでgRPCとREST両対応のサーバを作る | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20220624a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIGの関です。サービス間通信とIDL（インタフェース記述言語）連載の3本目です。 昨日に続き、gRPCネタです。この記事では次のネタを扱います。  gRPCの概観 gRPCとWebブラウザの関係性 grpc-gatewayとは何か？ gRPCとその周辺ツールを使ったサーバ開発の流れ  gRPC概観gRPCは、HTTP2をベースにしたRPC（リモートプロシージャコール）フレームワークです。">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20220624a/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220624a/image_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220624a/image_3.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220624a/image_4.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220624a/image_5.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220624a/image_6.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220624a/image_7.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220624a/image_8.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220624a/image_9.png">
+<meta property="article:published_time" content="2022-06-23T15:00:00.000Z">
+<meta property="article:modified_time" content="2023-10-30T06:08:41.454Z">
+<meta property="article:tag" content="IDL">
+<meta property="article:tag" content="gRPC">
+<meta property="article:tag" content="grpc-gateway">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20220624a/image.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20220624a/">
+  <meta content="IDL,gRPC,grpc-gateway" name="keywords">
+  <meta content="関靖秀" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">grpc-gatewayでgRPCとREST両対応のサーバを作る
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20220624a_grpc-gatewayでgRPCとREST両対応のサーバを作る.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20220624a_grpc-gatewayでgRPCとREST両対応のサーバを作る" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-06-23T15:00:00.000Z" itemprop="datePublished">2022.06.24</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E9%96%A2%E9%9D%96%E7%A7%80" title="関靖秀さんの記事一覧へ" class="post-author">関靖秀</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/IDL/" title="IDLタグの記事へ" class="tag-list-link">IDL</a>
+  
+    
+    <a href="/tags/gRPC/" title="gRPCタグの記事へ" class="tag-list-link">gRPC</a>
+  
+    
+    <a href="/tags/grpc-gateway/" title="grpc-gatewayタグの記事へ" class="tag-list-link">grpc-gateway</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIGの関です。<a href="/articles/20220622a/">サービス間通信とIDL（インタフェース記述言語）連載</a>の3本目です。</p>
+<p>昨日に続き、gRPCネタです。この記事では次のネタを扱います。</p>
+<ul>
+<li>gRPCの概観</li>
+<li>gRPCとWebブラウザの関係性</li>
+<li>grpc-gatewayとは何か？</li>
+<li>gRPCとその周辺ツールを使ったサーバ開発の流れ</li>
+</ul>
+<h1 id="gRPC概観"><a href="#gRPC概観" class="headerlink" title="gRPC概観"></a>gRPC概観</h1><p>gRPCは、HTTP2をベースにしたRPC（リモートプロシージャコール）フレームワークです。</p>
+<p>テキストベースのJSONを用いた一般的なREST APIに対して、gRPCは高効率にデータのやりとりをできたり、双方向の通信ができたり、ストリーミングにも対応していたりといった特長があります。このため、gRPCは現状では主にバックエンドサーバ間の通信に利用されています。</p>
+<h2 id="gRPCとProtocol-Buffers"><a href="#gRPCとProtocol-Buffers" class="headerlink" title="gRPCとProtocol Buffers"></a>gRPCとProtocol Buffers</h2><p>gRPCはProtocol Buffersのツールチェーンを活用すると便利であり、多くの場合下記の流れに沿ってプログラムを作ることになります。</p>
+<ol>
+<li>Protocol BuffersというIDLを使ってRPCの定義をprotoファイルとして記述する。</li>
+<li>前述のprotoファイルをコンパイラ（protoc）+プラグインにかけてライブラリを生成する。</li>
+<li>生成されたライブラリに定義されている関数を使って、サーバ、クライアントを実装する。</li>
+</ol>
+<p>コンパイラのprotocは、Protocol Buffersを解析して、その結果をコード生成用の別のプログラムに渡す役目をします。コード生成用のプログラムのことを”プラグイン”とよび、プラグインを使い分けることで様々な言語やツールに対応します。プラグインは<code>protoc-gen-&#123;プラグイン種別&#125;</code>という名前でPATHに配置しておけば、protocにオプションを渡すだけで利用することができます。同じ解析結果を一度に複数のプラグインに渡すこともできます。</p>
+<p>protocはC++で実装されていますが、各言語用プラグインは別の言語で実装することができ、プラグインを自作することで関連ツールを作ることもできます。</p>
+<h2 id="gRPCとWebブラウザの関係"><a href="#gRPCとWebブラウザの関係" class="headerlink" title="gRPCとWebブラウザの関係"></a>gRPCとWebブラウザの関係</h2><p>Webブラウザの持つ制約のため、2022年6月現在、gRPCはブラウザからの直接利用はできません。このため、ブラウザから利用するには何らかのプロトコル変換が必要になります。現状、次の2つの方法があります。</p>
+<ul>
+<li>gRPC Webに対応させる。</li>
+<li>何らかの手段で、HTTP APIにマッピングする。</li>
+</ul>
+<h3 id="gRPC-Web"><a href="#gRPC-Web" class="headerlink" title="gRPC Web"></a>gRPC Web</h3><p>gRPC Webは大雑把にいうと、一部機能に制約をかけることでgRPCをブラウザからもアクセスできるようにしたプロトコルです。Content-Typeは<code>application/grpc-web</code>もしくは<code>application/grpc-web-text</code>になっています。実際に流れるデータフォーマットはProtocol BuffersやJSONなど複数のフォーマットに対応しているため、送信側が明示することになっています。</p>
+<p>クライアント、つまりブラウザ側から利用するには、上述のprotocとgRPC Web用のプラグインを使って生成したクライアントライブラリを用います。</p>
+<p>gRPCサーバ側をgRPC Webに対応させるには、プロトコル変換を行うリバースプロキシを配置するか、同一コードでgRPC Webにも対応するサーバを作成するかのどちらかです。リバースプロキシとしてはenvoyとnginxが候補になりますが、envoyが人気のようです。昨日紹介された<a target="_blank" rel="noopener" href="https://connect.build/docs/introduction/">Connect</a>はプロキシなしでgRPCとgRPC Webに両対応するコードを生成するプラグインになります。</p>
+<h3 id="HTTP-APIへのマッピング"><a href="#HTTP-APIへのマッピング" class="headerlink" title="HTTP APIへのマッピング"></a>HTTP APIへのマッピング</h3><p>HTTP APIにマッピングする方法はさらに2つに分けられ、RPC定義からルールベースで自動マッピングする方法と自力でマッピングする方法とがあります。</p>
+<p>昨日紹介されたConnectの独自プロトコルはルールベースのマッピングです。HTTPのPOSTメソッドのみ利用し、Unary RPCであればContent-Typeが<code>application/json</code>であるため、気軽に試せます。</p>
+<p>一方で、自力でマッピングする方法としては、”grpc-gateway”があります。protoファイルや設定ファイルにどのようにマッピングをするか記述しておき、grpc-gatewayのプラグインを使ってライブラリを生成、それを使ってリバースプロキシとして動作するプログラムを作ります。ルールベースの方法に比べるとPOST以外のメソッドにも対応するなど柔軟にマッピングでき、OpenAPIのv2に対応して仕様書を出力することもできます。このため、既存のOpen API系のツールやノウハウを活用することができます。</p>
+<p>細かい制御を行わないのであれば、実際にプログラマが書くのは関数呼出程度で、大半の苦労はどのようにマッピングするか設計するところにあります。</p>
+<p>この記事ではgrpc-gatewayを取り扱います。</p>
+<h1 id="grpc-gatewayとその使い方"><a href="#grpc-gatewayとその使い方" class="headerlink" title="grpc-gatewayとその使い方"></a>grpc-gatewayとその使い方</h1><h2 id="grpc-gatewayとは？"><a href="#grpc-gatewayとは？" class="headerlink" title="grpc-gatewayとは？"></a>grpc-gatewayとは？</h2><p>前述の通り、protoファイルに記述されたgRPCのRPC定義をHTTP APIにマッピングするためのprotocのプラグインです。</p>
+<p>次の図のように、protoファイルよりproxy用のコードを生成し、それを利用したリバースプロキシを実装することで、gRPCサーバにREST APIとしてのインターフェースを設けることが可能です。</p>
+<img src="/images/20220624a/image.png" alt="image.png" width="1200" height="813" loading="lazy">
+
+<p>※図は <a target="_blank" rel="noopener" href="https://github.com/grpc-ecosystem/grpc-gateway">公式リポジトリ</a> より引用</p>
+<p>また、公式に次のような記述があり、安定性を売りにしているようです。</p>
+<blockquote>
+<p>We use the gRPC-Gateway to serve millions of API requests per day, and have been since 2018 and through all of that, we have never had any issues with it.</p>
+<ul>
+<li>William Mill, Ad Hoc</li>
+</ul>
+</blockquote>
+<p>HTTP APIへのマッピングにはprotoファイルにマッピングのためのオプションを記述していく方法と、protoファイルとは別に追加の設定ファイルを作る方法があります。この記事で取り扱うのは、protoファイルにオプションを記述する方法です。</p>
+<p>ちなみにですが、実はルールベースの自動マッピングもできるようです。</p>
+<h2 id="grpc-gatewayの利用時に参考になるサイト"><a href="#grpc-gatewayの利用時に参考になるサイト" class="headerlink" title="grpc-gatewayの利用時に参考になるサイト"></a>grpc-gatewayの利用時に参考になるサイト</h2><h3 id="grpc-gateway公式"><a href="#grpc-gateway公式" class="headerlink" title="grpc-gateway公式"></a>grpc-gateway公式</h3><p>以下はgrpc-gatewayの公式サイトです。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/grpc-ecosystem/grpc-gateway">公式リポジトリ</a></li>
+<li><a target="_blank" rel="noopener" href="https://grpc-ecosystem.github.io/grpc-gateway/">公式ドキュメント</a></li>
+</ul>
+<h3 id="Google-API"><a href="#Google-API" class="headerlink" title="Google API"></a>Google API</h3><p>grpc-gatewayの利用有無を問わず、gRPCを使ったシステムを作る際に参考にできるものとして、Google APIがあります。</p>
+<p>gRPCの設計について述べた書籍や記事はREST APIに比べると少ないですが、設計ガイドも公開されており、参考にすることができます。また、このガイドに沿って作られた大量のprotoファイルが公開されてます。これは、設計サンプルとして活用することができます。grpc-gatewayで利用するマッピングはGoogle APIと同じものを利用するので、マッピングの具体例としても利用できます。</p>
+<p>以下はGoogle APIの公式サイトです。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/googleapis/googleapis">Google API公式リポジトリ</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/apis/design?hl=ja">API設計ガイド</a></li>
+</ul>
+<h2 id="grpc-gatewayを使った開発の流れ"><a href="#grpc-gatewayを使った開発の流れ" class="headerlink" title="grpc-gatewayを使った開発の流れ"></a>grpc-gatewayを使った開発の流れ</h2><h3 id="リポジトリ"><a href="#リポジトリ" class="headerlink" title="リポジトリ"></a>リポジトリ</h3><p><a target="_blank" rel="noopener" href="https://github.com/sayshu-7s/grpc-gateway-example/tree/v0.0.0">grpc-gateway-example</a>として公開しました。</p>
+<p>このリポジトリに含まれるプログラムが大まかにどんな動きをするのか軽く紹介しておきます。<br>このリポジトリはDockerさえインストールしていれば、gRPCとgrpc-gatewayの動きを体験することができます。</p>
+<p>protoファイルからserviceの部分を抜き出したのがこれです。<br>ExampleMessageというシンプルなデータをGet, Create, Delete, BatchGetすることができます。<br>BatchGetだけはstreamにしてますが、他は全てUnary RPCです。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// API for grpc-gateway trial.</span></span><br><span class="line">service ExampleApi &#123;</span><br><span class="line">  <span class="comment">// Gets a single message.</span></span><br><span class="line">  rpc <span class="title function_">GetMessage</span><span class="params">(GetMessageRequest)</span> returns (ExampleMessage) &#123;</span><br><span class="line">    option (google.api.http) = &#123;</span><br><span class="line">      get: <span class="string">&quot;/example-messages/&#123;id&#125;&quot;</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Gets multiple Messages.</span></span><br><span class="line">  rpc <span class="title function_">BatchGetMessages</span><span class="params">(BatchGetMessagesRequest)</span></span><br><span class="line">      returns (stream BatchGetMessagesResponse) &#123;</span><br><span class="line">    option (google.api.http) = &#123;</span><br><span class="line">      post: <span class="string">&quot;/example-messages:batchGet&quot;</span></span><br><span class="line">      body: <span class="string">&quot;*&quot;</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Creates a new message.</span></span><br><span class="line">  rpc <span class="title function_">CreateMessage</span><span class="params">(CreateMessageRequest)</span> returns (ExampleMessage) &#123;</span><br><span class="line">    option (google.api.http) = &#123;</span><br><span class="line">      post: <span class="string">&quot;/example-messages&quot;</span></span><br><span class="line">      body: <span class="string">&quot;*&quot;</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Deletes a message.</span></span><br><span class="line">  rpc <span class="title function_">DeleteMessage</span><span class="params">(DeleteMessageRequest)</span> returns (google.protobuf.Empty) &#123;</span><br><span class="line">    option (google.api.http) = &#123;</span><br><span class="line">      delete: <span class="string">&quot;/example-message/&#123;id&#125;&quot;</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>まずは、ビルドと起動を行います。<br>Makefileにショートカットを記述してあるので、makeが入っているなら使うと楽です。ないならMakefileの中身を見るとコマンドが書いてあります。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># docker-composeを使ったビルドとコンテナ起動を行う.</span></span><br><span class="line">make build</span><br><span class="line">make up</span><br></pre></td></tr></table></figure>
+
+<p>docker-composeでコンテナを起動すると、次の4つのコンテナが立ち上がります。</p>
+<ul>
+<li>コンパイラやデバッグツールを実行するための開発用コンテナ</li>
+<li>grpcサーバ</li>
+<li>swagger-uiでAPI仕様を閲覧するためのWebサーバ</li>
+<li>grpc-gatewayを使ったリバースプロキシサーバ</li>
+</ul>
+<p>gRPCはバイナリプロトコルなので必要なツールが多くなる傾向があります。また、コード生成を行う関係で、バージョン差分などが発生するとコードレビューの際に面倒です。ツール群をインストールした開発用コンテナを作ると便利です。Dockerfileにインストール手順を記載することで、ツールのインストール方法の参考例としても使え、リポ外でいろいろ試したりする際にも重宝します。<br>このリポジトリの開発用コンテナには、下記のツール群を入れてあります。</p>
+<ul>
+<li>コンパイラ: protoc</li>
+<li>プラグイン類<ul>
+<li>protoc-gen-go</li>
+<li>protoc-gengo-grpc</li>
+<li>protoc-gen-grpc-gateway</li>
+<li>protoc-gen-openapiv2</li>
+</ul>
+</li>
+<li>お試し用gRPCクライアント: evans</li>
+</ul>
+<p>まずは、grpcとして動作することを見るために開発用コンテナに入りevansでgrpcサーバにアクセスしてみましょう。<br>次のショートカットで開発用コンテナ内で対話的シェルを使えます。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># docker-compose execでdevコンテナ内で対話的シェルを使う.</span></span><br><span class="line">make dev</span><br></pre></td></tr></table></figure>
+
+<p>次に、evansを使ってサーバとやりとりしてみましょう。evansは対話的なクライアントとして利用することができ、それには次のコマンドを使います。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">evans --host grpc-server --port 50051 --path proto,include example/example.proto</span><br></pre></td></tr></table></figure>
+
+<p>ホスト名grpc-serverのポート50051で動作するgrpcサーバに接続します。protoファイルを指定することで、それに記述されたRPC定義のクライアントとして動作します。–pathオプションに指定しているのはprotoファイルが含まれるディレクトリです。このリポジトリでは独自定義のものを<code>proto</code>ディレクトリに、サードパーティからコピーしてきたものを<code>include</code>ディレクトリに配置しています。</p>
+<p>コマンドを打つと次のような表示がされます。<br><img src="/images/20220624a/image_2.png" alt="Evans more expressive universal gRPC client" width="1200" height="334" loading="lazy"></p>
+<p><code>call</code>と打つと補完候補が表示され、タブキーで選択できます。試しにGetしてみましょう。id&#x3D;1はプログラムにハードコードしているのでCreateしなくても取れます。</p>
+<img src="/images/20220624a/image_3.png" alt="call GetMessage" width="1200" height="334" loading="lazy">
+
+<p>リクエストのidフィールドに設定する値をプロンプトで聞かれるので、1を入力しエンターを押下します。</p>
+<img src="/images/20220624a/image_4.png" alt="id (TYPE_INT64) => 1 {...}" width="1200" height="334" loading="lazy">
+
+<p>返ってきましたね。ちなみに存在しない値を入力すると次のようなエラーになります。</p>
+<img src="/images/20220624a/image_5.png" alt="command call: rpc error: code = NotFound desc = Not Found" width="1200" height="334" loading="lazy">
+
+
+
+<p>次にREST APIを見てみましょう。</p>
+<p>ブラウザから<code>http://localhost:8080/docs</code>にアクセスします。すると次のようにswagger-uiで仕様の確認ができます。上のprotoファイルの記述からコメントを抜き出して反映されているのがわかるでしょう。</p>
+<img src="/images/20220624a/image_6.png" alt="Swagger example/example.proto Excample Api" width="1200" height="1033" loading="lazy">
+
+
+
+<p>このページはdocker-compose.ymlの中では<code>docs-server</code>コンテナがホストしていますが、ブラウザからのリクエストは<code>gateway-server</code>コンテナ経由でアクセスしています。このようにしたのは<code>gateway-server</code>コンテナをリバースプロキシとして扱うことで、同一オリジンにして、swagger-ui上から試せるようにしたかったからです。</p>
+<p>さて、POSTでExampleMessageを作ってみます。swagger-ui上で値を入力できます。</p>
+<img src="/images/20220624a/image_7.png" alt="body Edit value" width="1200" height="1033" loading="lazy">
+
+<p>Executeすると、レスポンスが返ってきて、これもui上で確認できます。</p>
+<img src="/images/20220624a/image_8.png" alt="Response" width="1200" height="1033" loading="lazy">
+
+
+
+<p>Evansから見てみましょう。<br><img src="/images/20220624a/image_9.png" alt="call GetMessageによるJSON結果" width="1200" height="334" loading="lazy"></p>
+<p>先ほどエラーだった値を入力して返却されており、ちゃんと反映されてますね。REST APIで作成したリソースがgRPCでも取得でき、同一サーバで動いていることがわかります。</p>
+<h3 id="コードの解説"><a href="#コードの解説" class="headerlink" title="コードの解説"></a>コードの解説</h3><p>さて、コードとその作成方法の解説に入ります。</p>
+<h3 id="構成"><a href="#構成" class="headerlink" title="構成"></a>構成</h3><p>構成は↓のようになっています。</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line">.</span><br><span class="line">├── Dockerfile</span><br><span class="line">├── Makefile</span><br><span class="line">├── README.md</span><br><span class="line">├── cmd</span><br><span class="line">│   ├── gateway</span><br><span class="line">│   │   └── main.go</span><br><span class="line">│   └── server</span><br><span class="line">│       └── main.go</span><br><span class="line">├── docker-compose.yml</span><br><span class="line">├── gen</span><br><span class="line">│   ├── go</span><br><span class="line">│   │   └── example</span><br><span class="line">│   │       ├── example.pb.go</span><br><span class="line">│   │       ├── example.pb.gw.go</span><br><span class="line">│   │       └── example_grpc.pb.go</span><br><span class="line">│   └── openapiv2</span><br><span class="line">│       └── apidocs.swagger.json</span><br><span class="line">├── go.mod</span><br><span class="line">├── go.sum</span><br><span class="line">├── include</span><br><span class="line">│   └── google</span><br><span class="line">│       └── api</span><br><span class="line">│           ├── annotations.proto</span><br><span class="line">│           ├── field_behavior.proto</span><br><span class="line">│           ├── http.proto</span><br><span class="line">│           └── http_body.proto</span><br><span class="line">├── proto</span><br><span class="line">│   └── example</span><br><span class="line">│       └── example.proto</span><br><span class="line">├── server</span><br><span class="line">│   └── server.go</span><br><span class="line">└── tools</span><br><span class="line">    └── gen.sh</span><br></pre></td></tr></table></figure>
+
+<p>protoディレクトリにはserverがホストするRPCの定義が書かれたprotoファイルが格納されています。このprotoファイルを元にして、protocとそのプラグインでgen配下にコードを生成します。このリポジトリでは、goのファイルとOpenAPI v2のAPI仕様を生成します。<br>includeディレクトリにもprotoファイルがありますが、これは外部のリポジトリからコピーしてきたものです。ひとまず、grpc-gatewayを使ったmappingに必要なものを導入しています。</p>
+<p>genに生成されたライブラリを使って、serverディレクトリに実際の処理を実装するserver本体を実装します。詳しくは後述します。</p>
+<p>cmdにあるserver, gatewayはそれぞれgRPCサーバとgatewayのエントリーポイントです。gatewayの実装でやることはあまりないので、main.goに全て書きました。</p>
+<h3 id="実装の流れ"><a href="#実装の流れ" class="headerlink" title="実装の流れ"></a>実装の流れ</h3><h4 id="protoファイルの作成"><a href="#protoファイルの作成" class="headerlink" title="protoファイルの作成"></a>protoファイルの作成</h4><p>まずは、protoファイルを作ります。このリポジトリでは、protoディレクトリ配下に自信が提供するRPCを定義したprotoファイルを格納しています。先ほど記載したものを再掲です。</p>
+<p>Getメソッドを例にして解説します。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// API for grpc-gateway trial.</span></span><br><span class="line">service ExampleApi &#123;</span><br><span class="line">  <span class="comment">// Gets a single message.</span></span><br><span class="line">  rpc <span class="title function_">GetMessage</span><span class="params">(GetMessageRequest)</span> returns (ExampleMessage) &#123;</span><br><span class="line">    option (google.api.http) = &#123;</span><br><span class="line">      get: <span class="string">&quot;/example-messages/&#123;id&#125;&quot;</span></span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 省略</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// The request for ExampleApi.GetMessage.</span></span><br><span class="line">message GetMessageRequest &#123;</span><br><span class="line">  <span class="comment">// The id of the message.</span></span><br><span class="line">  <span class="type">int64</span> <span class="variable">id</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// An ExampleMessage for ExampleApi.</span></span><br><span class="line">message ExampleMessage &#123;</span><br><span class="line">  <span class="comment">// The id of the message.</span></span><br><span class="line">  <span class="type">int64</span> <span class="variable">id</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// The string type example field of the message.</span></span><br><span class="line">  <span class="type">string</span> <span class="variable">example_field</span> <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>GetMessageメソッドは、GetMessageRequestを受け取り、単一ExampleMessageを返却するRPCです。optionとして書かれているのがHTTPマッピングです。この場合、<code>/example-messages/&#123;id&#125;</code>のGETメソッドにマッピングします。パスパラメータの{id}は、GetMessageRequestのidフィールドのことです。例えば、<code>/example-messages/3</code>にGETでアクセスすると、idフィールドが3にセットされたGetMessageRequestでRPCをコールしたことになります。レスポンスはExampleMessageをそのままJSON化したものになります。</p>
+<p>実はProtocol Buffersは<a target="_blank" rel="noopener" href="https://developers.google.com/protocol-buffers/docs/proto3#json">JSONへのマッピング方法</a>がLanguage Guideに規定されており、JSON化はそれに従って行われます。このため、HTTPマッピングが必要なのは、エンドポイントの設計とリクエストの各フィールドをパスパラメータ、HTTPボディ、クエリパラメータのどこに入れるのかが大半です。</p>
+<h4 id="コードの生成"><a href="#コードの生成" class="headerlink" title="コードの生成"></a>コードの生成</h4><p>さて、protoファイルを作ったら次はprotocとプラグインを使ったコード生成です。tools&#x2F;gen.shを実行すれば生成できるようにしています。が実コマンドは下記の感じになります。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">find <span class="string">&#x27;proto&#x27;</span> -name <span class="string">&#x27;*.proto&#x27;</span> -print0 \</span><br><span class="line">  | xargs -0 protoc -I <span class="string">&#x27;proto&#x27;</span> -I <span class="string">&#x27;include&#x27;</span> \</span><br><span class="line">  --go_out=<span class="string">&#x27;gen/go&#x27;</span> \</span><br><span class="line">  --go_opt=module=<span class="string">&#x27;github.com/sayshu-7s/grpc-gateway-example/gen/go&#x27;</span> \</span><br><span class="line">  --go-grpc_out=<span class="string">&#x27;gen/go&#x27;</span> \</span><br><span class="line">  --go-grpc_opt=module=<span class="string">&#x27;github.com/sayshu-7s/grpc-gateway-example/gen/go&#x27;</span> \</span><br><span class="line">  --grpc-gateway_out=<span class="string">&#x27;gen/go&#x27;</span> \</span><br><span class="line">  --grpc-gateway_opt=module=<span class="string">&#x27;github.com/sayshu-7s/grpc-gateway-example/gen/go&#x27;</span> \</span><br><span class="line">  --openapiv2_out=<span class="string">&#x27;gen/openapiv2&#x27;</span> \</span><br><span class="line">  --openapiv2_opt=allow_merge=<span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p>このコマンドでは、protoファイルがprotoディレクトリとincludeディレクトリに入っているものとして、protoディレクトリ配下の拡張子がprotoになっているファイルを対象にprotocを実行します。</p>
+<p>このコマンドでは、protocの解析結果を、<code>protoc-gen-go</code>, <code>protoc-gen-go-grpc</code>, <code>protoc-gen-grpc-gateway</code>, <code>protoc-gen-openapiv2</code>の4つのプラグインに渡しています。</p>
+<p>具体例を用いてオプションの意味を説明します。<code>protoc-gen-go</code>使いたい場合、protoc-genを除いたgoのついたオプションをprotocに渡します。<code>--go_out</code>が出力先を表し、<code>--go_opt</code>がprotoc-gen-goに対するオプションの指定です。同様に、protoc-gen-grpc-gatewayというプラグインを使う場合は、<code>--grpc-gateway_out</code>で出力先を指定し、<code>--grpc-gateway_opt</code>でオプションを指定します。</p>
+<p>プラグインに対して指定できるオプションはプラグインにより異なりますが、各言語用のプラグインはProtocol Buffersの公式リファレンスにあります。Goだと<a target="_blank" rel="noopener" href="https://developers.google.com/protocol-buffers/docs/reference/go-generated#invocation">Go Generated Code</a>にあります。</p>
+<p>protocと一緒についてくるプラグイン以外は、必要に応じてインストールが必要です。上記4つとも全てインストールが必要で、その方法はDockerfileに記載されています。</p>
+<h4 id="サーバの実装"><a href="#サーバの実装" class="headerlink" title="サーバの実装"></a>サーバの実装</h4><p>コードを作ったら次はサーバ実装です。基本的な流れは、コード生成先のpackageで、<code>UnimplementedExampleApi</code>みたいな構造体があるので、これを埋め込んだ構造体を↓のように作ります。この埋め込みは前方互換性を担保するためにMustで行う必要があります。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> ExampleAPIServer <span class="keyword">struct</span> &#123;</span><br><span class="line">    nextID <span class="type">int64</span> <span class="comment">// Createメソッドで使うフィールド</span></span><br><span class="line">	msgs   <span class="keyword">map</span>[<span class="type">int64</span>]*example.ExampleMessage <span class="comment">// インメモリでExampleMessageを保存する先のマップ</span></span><br><span class="line">	example.UnimplementedExampleApiServer</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>また、生成先packageに、<code>ExampleApiServer</code>のようなサーバのインターフェースがあるので、これを実装します。<br>Getメソッドだけ示すと↓のようになります。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s ExampleAPIServer)</span></span> GetMessage(ctx context.Context, r *example.GetMessageRequest) (*example.ExampleMessage, <span class="type">error</span>) &#123;</span><br><span class="line">	msg, ok := s.msgs[r.GetId()]</span><br><span class="line">	<span class="keyword">if</span> !ok &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, status.Error(codes.NotFound, codes.NotFound.String())</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> msg, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>フィールドにアクセスするときはGetterを使います。こうするとnil関連のpanicが起こらなくなり、直接アクセスするより堅牢なプログラムを作れます。</p>
+<p>エラーを返却するときには、<code>google.golang.org/grpc/status</code>で定義された<code>status.Error</code>系の関数を使います。上記の例だと、NotFoundというHTTPの404相当のコードを返却していることになります。詳しくは、公式の<a target="_blank" rel="noopener" href="https://www.grpc.io/docs/guides/error/">Error handling</a>や<a target="_blank" rel="noopener" href="https://github.com/avinassh/grpc-errors">gRPC Errors - A handy guide to gRPC errors.</a>や<a target="_blank" rel="noopener" href="https://avi.im/grpc-errors/">クイックガイド</a>を参照してください。</p>
+<p>最後に、main関数でインスタンス化して起動します。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;net&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/sayshu-7s/grpc-gateway-example/gen/go/example&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/sayshu-7s/grpc-gateway-example/server&quot;</span></span><br><span class="line">	<span class="string">&quot;google.golang.org/grpc&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// Serveメソッドを持つ構造体. これのServeメソッドを呼ぶとRPCサーバがListenした状態になる.</span></span><br><span class="line">	srv := grpc.NewServer()</span><br><span class="line">	<span class="comment">// ↓が先ほど実装したserver. 担当するリクエストを実際に処理する構造体.</span></span><br><span class="line">	api, err := server.NewExampleAPIServer()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(<span class="string">&quot;failed to new ExampleAPIServer&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// protoファイルのserviceごとに登録用の関数が生成されているので、これを使って登録する.</span></span><br><span class="line">	<span class="comment">// この実装例ではこれ1つだが, protoファイルに複数serviceを作ったらその分登録する必要がある。</span></span><br><span class="line">	example.RegisterExampleApiServer(srv, api)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 普通のnet.Lisnerを作って</span></span><br><span class="line">	lis, err := net.Listen(<span class="string">&quot;tcp&quot;</span>, <span class="string">&quot;:50051&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;failed to listen(tcp, :50051)&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Serveメソッドに渡す.</span></span><br><span class="line">	<span class="keyword">if</span> err := srv.Serve(lis); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;err has occured while serving: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>*grpc.Server</code>型には、グレースフルシャットダウン用の<code>GracefulStop</code>メソッドや強制停止用の<code>Stop</code>メソッドもあるので、必要に応じて呼び出しましょう。</p>
+<p>さて、ここまでで、gRPCサーバが実装できました。</p>
+<h4 id="gatewayの実装"><a href="#gatewayの実装" class="headerlink" title="gatewayの実装"></a>gatewayの実装</h4><p>次は、gatewayの実装です。こちらは、一度作れば追加作業はあまりないです。</p>
+<p>前述のように、gRPCサーバへのリバースプロキシとしても、swagger-uiをホストするコンテナへのリバースプロキシとしても動作するようにしています。マッピング自体は自動生成されたコード内で行われるため、docsの部分を除くと関数呼び出し程度しかやっていません。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;net/http&quot;</span></span><br><span class="line">	<span class="string">&quot;net/http/httputil&quot;</span></span><br><span class="line">	<span class="string">&quot;net/url&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/grpc-ecosystem/grpc-gateway/v2/runtime&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/sayshu-7s/grpc-gateway-example/gen/go/example&quot;</span></span><br><span class="line">	<span class="string">&quot;google.golang.org/grpc&quot;</span></span><br><span class="line">	<span class="string">&quot;google.golang.org/grpc/credentials/insecure&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> grpcServerAddress = <span class="string">&quot;grpc-server:50051&quot;</span></span><br><span class="line"><span class="keyword">const</span> docsServerAddress = <span class="string">&quot;http://docs-server:8080&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// gateway用のhttp.Handler</span></span><br><span class="line">	grpcGateway := runtime.NewServeMux()</span><br><span class="line">	opts := []grpc.DialOption&#123;</span><br><span class="line">		grpc.WithTransportCredentials(insecure.NewCredentials()),</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Handlerに, アドレス指定でアップストリームgRPCサーバの場所を教える.</span></span><br><span class="line">	<span class="comment">// このHandlerはリクエストを受け取ったらgRPCのリクエストに詰め替えてサーバとやり取りする.</span></span><br><span class="line">	<span class="keyword">if</span> err := example.RegisterExampleApiHandlerFromEndpoint(context.Background(), grpcGateway, grpcServerAddress, opts); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(<span class="string">&quot;failed to register grpc-server&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// ↓はswager-uiをブラウザから使えるようにするためのリバースプロキシ.</span></span><br><span class="line">	docsURL, err := url.Parse(docsServerAddress)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;failed to parse docsServerAddress=%v&quot;</span>, docsServerAddress)</span><br><span class="line">	&#125;</span><br><span class="line">	docsProxy := httputil.NewSingleHostReverseProxy(docsURL)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 両者をマージして共用できるようにする.</span></span><br><span class="line">	mux := http.NewServeMux()</span><br><span class="line">	mux.Handle(<span class="string">&quot;/docs/&quot;</span>, docsProxy)</span><br><span class="line">	mux.Handle(<span class="string">&quot;/&quot;</span>, grpcGateway)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// HandlerができたのであとはListenするだけ.</span></span><br><span class="line">	<span class="keyword">if</span> err := http.ListenAndServe(<span class="string">&quot;:8080&quot;</span>, mux); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(<span class="string">&quot;err&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>gatewayは基本的にhttpパッケージのHanlderになっているので、このように機能追加なども比較的簡単に行えます。</p>
+<p>gRPCサーバもgatewayも、起点となるServerやServMuxを生成し、それらに実際の処理を行う構造体やエンドポイントを”登録”するような流れであることがわかるでしょう。</p>
+<h1 id="補足-streamはどのような扱いになるのか？"><a href="#補足-streamはどのような扱いになるのか？" class="headerlink" title="補足: streamはどのような扱いになるのか？"></a>補足: streamはどのような扱いになるのか？</h1><p>grpcは双方向のストリーム処理をサポートします。grpc-gatewayではサポートされるのでしょうか？また、されるとしたらどのようにサポートされるのでしょうか？</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/grpc-ecosystem/grpc-gateway#features">公式リポジトリ</a>によれば、双方向通信はサポートせず、streamはnewline-delimited JSON（NDJSON）にマッピングするとあります。</p>
+<p>試してみましょう。ExampleApi.BatchGetメソッドがstream APIになっています。サーバからのレスポンスのみストリームになります。</p>
+<p>次のリクエストをcurlで叩きます。（※swagger-uiでは「JSONをパースできなかった」というエラーが出るのでcurlでやります。）</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">curl -v -X POST <span class="string">&quot;http://localhost:8080/example-messages:batchGet&quot;</span> -H <span class="string">&quot;Content-Type: application/json&quot;</span> -d <span class="string">&quot;&#123; \&quot;ids\&quot;: [ \&quot;1\&quot;, \&quot;2\&quot;, \&quot;3\&quot; ]&#125;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>すると次のようなレスポンスが返ってきます。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">&lt; HTTP/1.1 200 OK</span><br><span class="line">&lt; Content-Type: application/json</span><br><span class="line">&lt; Grpc-Metadata-Content-Type: application/grpc</span><br><span class="line">&lt; Date: Thu, 23 Jun 2022 17:39:33 GMT</span><br><span class="line">&lt; Transfer-Encoding: chunked</span><br><span class="line">&lt;</span><br><span class="line">&#123;<span class="string">&quot;result&quot;</span>:&#123;<span class="string">&quot;found&quot;</span>:&#123;<span class="string">&quot;id&quot;</span>:<span class="string">&quot;1&quot;</span>,<span class="string">&quot;exampleField&quot;</span>:<span class="string">&quot;example&quot;</span>&#125;&#125;&#125;</span><br><span class="line">&#123;<span class="string">&quot;result&quot;</span>:&#123;<span class="string">&quot;found&quot;</span>:&#123;<span class="string">&quot;id&quot;</span>:<span class="string">&quot;2&quot;</span>,<span class="string">&quot;exampleField&quot;</span>:<span class="string">&quot;example2&quot;</span>&#125;&#125;&#125;</span><br><span class="line">&#123;<span class="string">&quot;result&quot;</span>:&#123;<span class="string">&quot;missing&quot;</span>:<span class="string">&quot;3&quot;</span>&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Transfer-Encoding: chunked</code>とあるように、レスポンス内容が確定する前からチャンクでデータを流していることがわかります。<br>少し気になるのは<code>Content-Type: application/json</code>となっていることです。NDJSONのMIME Typeは<code>application/x-ndjson</code>のはずなので、これは不正な気がします。まだ調べてないですが、なんらか対処が必要かもしれません。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>grpcについての概観をみた後、grpc-gatewayを使ってgRPC, REST APIの両方に対応するサーバを実装する流れを説明しました。gRPCに加えてProtocol Buffers関連の知識も必要なので最初は少し大変かもしれませんが、高効率で双方向通信をサポートしていることは魅力的な特長です。REST APIに比べるとやや敷居が高いgRPCですが、大まかな流れはそこまで複雑ではなかったのではないでしょうか。自分も学習しつつ開発を進めているところです。</p>
+<p>余談ですが、gRPCは最初のデプロイに苦労する印象があります。ローカルで開発進めて、DBやら別のサービスやらにあれこれ結合してインターセプタやらなんやらを大量に組み込んだ後、ドカンとデプロイしようとすると、何が悪いのかわからないまま疎通すらできずに時間が溶けていきます。機能がほとんどないHello World的状態で早めにデプロイのパイプラインを作り、少しずつ育てていくのがおすすめです。</p>
+<p>また、gRPC WebとConnectについてはまだ使ったことがないので、どこかで試してみたいなと思っています。</p>
+<p>次は原木さんの<a href="/articles/20220629a/">スキーマのバージョン管理</a>です。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20220624a/&related=twitterapi%2Ctwitter&text=grpc-gateway%E3%81%A7gRPC%E3%81%A8REST%E4%B8%A1%E5%AF%BE%E5%BF%9C%E3%81%AE%E3%82%B5%E3%83%BC%E3%83%90%E3%82%92%E4%BD%9C%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">6</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20220624a/&t=grpc-gateway%E3%81%A7gRPC%E3%81%A8REST%E4%B8%A1%E5%AF%BE%E5%BF%9C%E3%81%AE%E3%82%B5%E3%83%BC%E3%83%90%E3%82%92%E4%BD%9C%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20220624a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">5</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20220624a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">21</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.06.23</span><span class="snscount">&#9825;496</span><a href=/articles/20220623a/ title="6/1に公開されたばかりのgRPC関連のライブラリの[Connect]を紹介することにしました。">gRPCのGo実装の新星、Connect</a></li><li class="related-posts-item"><span>2022.06.22</span><span class="snscount">&#9825;15</span><a href=/articles/20220622a/ title="IDLやエコシステム、サービス間の通信（何かしらのRPC関連の技術）をテーマにした連載を始めます。IDL（インターフェース記述言語: Interface Definition Language）と聞けば...">サービス間通信とIDL（インタフェース記述言語）連載を始めます</a></li><li class="related-posts-item"><span>2023.07.14</span><span class="snscount">&#9825;3</span><a href=/articles/20230714a/ title="2023年6月16日に発売された、Software Design 2023年7月号の特集である、「gRPCで始めるWeb API開発」の3章をフューチャーメンバーである、渋川、武田、真野の3名で寄稿させていただきました。">Software Design 2023年7月号 gRPCで始めるWeb API開発 3章を寄稿しました</a></li><li class="related-posts-item"><span>2022.08.19</span><span class="snscount">&#9825;1410</span><a href=/articles/20220819a/ title="サービス間通信とIDL（インタフェース記述言語）連載の中でご紹介したgRPCのGo実装の新星、Connectのアップデートについて紹介します。Go 1.19が出たらconnect-goは1.0にして以後後方互換性を守るよ、connect-webを出すよという2点です。">gRPCがフロントエンド通信の第一の選択肢になる時代がやってきたかも？</a></li><li class="related-posts-item"><span>2022.06.29</span><span class="snscount">&#9825;111</span><a href=/articles/20220629a/ title="スキーマのバージョン管理と互換性について話します。一般的にスキーマのバージョン管理という話が出た場合、次のどちらかを想像する人が多いのではないでしょうか。">スキーマのバージョン管理と互換性の話</a></li><li class="related-posts-item"><span>2022.06.22</span><span class="snscount">&#9825;49</span><a href=/articles/20220622b/ title="Open APIは2022.6.21時点では3.1.0が最新です。これまでリリースノートすらウォッチしていなかったので気になったことを調べてまとめました。">Open API Specification 3.1と気になる仕様策定</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220629a/ title="スキーマのバージョン管理と互換性について話します。一般的にスキーマのバージョン管理という話が出た場合、次のどちらかを想像する人が多いのではないでしょうか。">スキーマのバージョン管理と互換性の話</a></li><li class="reference-posts-item"><a href=/articles/20220623a/ title="6/1に公開されたばかりのgRPC関連のライブラリの[Connect]を紹介することにしました。">gRPCのGo実装の新星、Connect</a></li><li class="reference-posts-item"><a href=/articles/20220622a/ title="IDLやエコシステム、サービス間の通信（何かしらのRPC関連の技術）をテーマにした連載を始めます。IDL（インターフェース記述言語: Interface Definition Language）と聞けば...">サービス間通信とIDL（インタフェース記述言語）連載を始めます</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#gRPC%E6%A6%82%E8%A6%B3"><span class="toc-text">gRPC概観</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#gRPC%E3%81%A8Protocol-Buffers"><span class="toc-text">gRPCとProtocol Buffers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gRPC%E3%81%A8Web%E3%83%96%E3%83%A9%E3%82%A6%E3%82%B6%E3%81%AE%E9%96%A2%E4%BF%82"><span class="toc-text">gRPCとWebブラウザの関係</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#gRPC-Web"><span class="toc-text">gRPC Web</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP-API%E3%81%B8%E3%81%AE%E3%83%9E%E3%83%83%E3%83%94%E3%83%B3%E3%82%B0"><span class="toc-text">HTTP APIへのマッピング</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#grpc-gateway%E3%81%A8%E3%81%9D%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9"><span class="toc-text">grpc-gatewayとその使い方</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#grpc-gateway%E3%81%A8%E3%81%AF%EF%BC%9F"><span class="toc-text">grpc-gatewayとは？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#grpc-gateway%E3%81%AE%E5%88%A9%E7%94%A8%E6%99%82%E3%81%AB%E5%8F%82%E8%80%83%E3%81%AB%E3%81%AA%E3%82%8B%E3%82%B5%E3%82%A4%E3%83%88"><span class="toc-text">grpc-gatewayの利用時に参考になるサイト</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#grpc-gateway%E5%85%AC%E5%BC%8F"><span class="toc-text">grpc-gateway公式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Google-API"><span class="toc-text">Google API</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#grpc-gateway%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%9F%E9%96%8B%E7%99%BA%E3%81%AE%E6%B5%81%E3%82%8C"><span class="toc-text">grpc-gatewayを使った開発の流れ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA"><span class="toc-text">リポジトリ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E8%A7%A3%E8%AA%AC"><span class="toc-text">コードの解説</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A7%8B%E6%88%90"><span class="toc-text">構成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9F%E8%A3%85%E3%81%AE%E6%B5%81%E3%82%8C"><span class="toc-text">実装の流れ</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#proto%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E4%BD%9C%E6%88%90"><span class="toc-text">protoファイルの作成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E7%94%9F%E6%88%90"><span class="toc-text">コードの生成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%82%B5%E3%83%BC%E3%83%90%E3%81%AE%E5%AE%9F%E8%A3%85"><span class="toc-text">サーバの実装</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#gateway%E3%81%AE%E5%AE%9F%E8%A3%85"><span class="toc-text">gatewayの実装</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A3%9C%E8%B6%B3-stream%E3%81%AF%E3%81%A9%E3%81%AE%E3%82%88%E3%81%86%E3%81%AA%E6%89%B1%E3%81%84%E3%81%AB%E3%81%AA%E3%82%8B%E3%81%AE%E3%81%8B%EF%BC%9F"><span class="toc-text">補足: streamはどのような扱いになるのか？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

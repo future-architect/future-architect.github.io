@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Amazon OpenSearch Serverless を触ってみた | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="春の入門連載2023、17日ぶり2回目の寄稿、23日目を担当します齊藤です。よろしくお願いします。運良く2個目の記事をアップできることになりました！(やったね) 業務でAmazon OpenSearch Service (Serviceのほう) を触る機会があり、興味があったのでプレビューで公開されていたServerless版でいろいろ試しました。 触っていた内容を入門向けにまとめて、ぜひ参考にし">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Amazon OpenSearch Serverless を触ってみた | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20230525a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="春の入門連載2023、17日ぶり2回目の寄稿、23日目を担当します齊藤です。よろしくお願いします。運良く2個目の記事をアップできることになりました！(やったね) 業務でAmazon OpenSearch Service (Serviceのほう) を触る機会があり、興味があったのでプレビューで公開されていたServerless版でいろいろ試しました。 触っていた内容を入門向けにまとめて、ぜひ参考にし">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20230525a/Black_Belt_Amazon_OpenSearch_Serverless_27スライド.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230525a/サーバーレス版へのアクセス.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230525a/サーバーレスダッシュボード.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230525a/Add_new_collection.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230525a/encryption.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230525a/network_access.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230525a/Configure_data_access_1.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230525a/Configure_data_access_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230525a/Configure_data_access_2-1.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20230525a/image.png">
+<meta property="article:published_time" content="2023-05-24T15:00:00.000Z">
+<meta property="article:modified_time" content="2023-06-07T02:25:54.601Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="入門">
+<meta property="article:tag" content="OpenSearch">
+<meta property="article:tag" content="全文検索">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20230525a/Black_Belt_Amazon_OpenSearch_Serverless_27スライド.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20230525a/">
+  <meta content="AWS,入門,OpenSearch,全文検索" name="keywords">
+  <meta content="齊藤英比古" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Amazon OpenSearch Serverless を触ってみた
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20230525a_Amazon_OpenSearch_Serverless_を触ってみた.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20230525a_Amazon_OpenSearch_Serverless_を触ってみた" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2023/" class="publish-date"><time datetime="2023-05-24T15:00:00.000Z" itemprop="datePublished">2023.05.25</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E9%BD%8A%E8%97%A4%E8%8B%B1%E6%AF%94%E5%8F%A4" title="齊藤英比古さんの記事一覧へ" class="post-author">齊藤英比古</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/入門/" title="入門タグの記事へ" class="tag-list-link">入門</a>
+  
+    
+    <a href="/tags/OpenSearch/" title="OpenSearchタグの記事へ" class="tag-list-link">OpenSearch</a>
+  
+    
+    <a href="/tags/全文検索/" title="全文検索タグの記事へ" class="tag-list-link">全文検索</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p><a href="/articles/20230417a">春の入門連載2023</a>、17日ぶり2回目の寄稿、23日目を担当します齊藤です。よろしくお願いします。<br>運良く2個目の記事をアップできることになりました！(やったね)</p>
+<p>業務でAmazon OpenSearch Service (Serviceのほう) を触る機会があり、興味があったのでプレビューで公開されていたServerless版でいろいろ試しました。</p>
+<p>触っていた内容を入門向けにまとめて、ぜひ参考にしつつ入門していただければです。</p>
+<p>Black Belt の資料が大変参考になりました。こちらを適宜引用しています。<br><a target="_blank" rel="noopener" href="https://pages.awscloud.com/rs/112-TZM-766/images/AWS-Black-Belt_2023_AmazonOpenSearchServerless_0131_v1.pdf">AWS BLACK BELT ONLINE SEMINAR Amazon OpenSearch Serverless</a><br>引用：[AWS Black Belt Online Seminar 2023&#x2F;01] Amazon OpenSearch Serverless</p>
+<p><strong>注意！</strong><br>Serverless版は、無料利用枠がないため、入門のために少し触るだけでも費用がかかります。</p>
+<p>参考までに自分の場合は、5,6回コレクションを作成したり消したりAPI叩いたりで、800円くらいの請求でした。無料枠で OpenSearch を試したい場合は、Service版を使ってください。</p>
+<p>いくらかかかってもいいけどとりあえず触って感触掴みたい！みたいな方はServerless版をどうぞ。</p>
+<h1 id="Amazon-OpenSearch-Serverless"><a href="#Amazon-OpenSearch-Serverless" class="headerlink" title="Amazon OpenSearch Serverless"></a>Amazon OpenSearch Serverless</h1><p>プレビュー版から一般提供開始にかわりました。</p>
+<p><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/about-aws/whats-new/2023/01/amazon-opensearch-serverless-available/">https://aws.amazon.com/jp/about-aws/whats-new/2023/01/amazon-opensearch-serverless-available/</a></p>
+<h2 id="そもそも-OpenSearch-とは？"><a href="#そもそも-OpenSearch-とは？" class="headerlink" title="そもそも OpenSearch とは？"></a>そもそも OpenSearch とは？</h2><blockquote>
+<p>OpenSearch は、リアルタイムのアプリケーションモニタリング、ログ分析、ウェブサイト検索などの幅広いユースケースにご利用いただける分散型、コミュニティ主導型、Apache 2.0 ライセンス、100% オープンソースの検索および分析スイートです。</p>
+<p>引用：[AWS公式] OpenSearch とは <a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/what-is/opensearch/">https://aws.amazon.com/jp/what-is/opensearch/</a></p>
+</blockquote>
+<p>検索・分析ができる、いわゆる全文検索エンジンと呼ばれるものになります。</p>
+<p>次に出てくる、全文検索とは何か？</p>
+<blockquote>
+<p>全文検索（ぜんぶんけんさく、英: Full text search）とは、コンピュータにおいて、複数の文書（ファイル）から特定の文字列を検索すること。「ファイル名検索」や「単一ファイル内の文字列検索」と異なり、「複数文書にまたがって、文書に含まれる全文を対象とした検索」という意味で使用される。</p>
+<p>引用：[ウィキペディア (Wikipedia): フリー百科事典] 全文検索（2023年5月24日取得，<a target="_blank" rel="noopener" href="https://ja.wikipedia.org/w/index.php?title=%E5%85%A8%E6%96%87%E6%A4%9C%E7%B4%A2&amp;oldid=94342252%EF%BC%89">https://ja.wikipedia.org/w/index.php?title=全文検索&amp;oldid=94342252）</a></p>
+</blockquote>
+<p>OpenSearch では、引用元のページにも出てくる「転置インデックス」を使っています。<br>詳しく知りたい方は、以下を参照ください。<br><a target="_blank" rel="noopener" href="https://catalog.us-east-1.prod.workshops.aws/workshops/26c005b2-b387-454a-b201-9b8f37f92f92/ja-JP/opensearch-concepts/basic-concepts/index">[Amazon OpenSearch Service Intro Workshop] 逐次検索と転置インデックス</a></p>
+<p>とりあえず触りたい人向けに個人的にまとめると、全文検索というSQLのLike句よりめっちゃ速く文字列を検索できるというもの。その速さを活かして、例えば、アプリケーションが出す大量のログからエラーを検知させたり、ユーザーの動向を調べたり、といった分析とその結果のレポート出力などなど周りの機能も提供しているという印象。</p>
+<p>補足<br>他にも有名な全文検索エンジンで「Elasticsearch」があります。<br>元々は、「Amazon Elasticsearch Service」として「オープンソースのElasticsearch」がAWS上でマネージドサービスとして提供されていましたが、バージョン7.10以降において別のライセンス体系となりAWS上でこれまで通り利用できなくなることから「オープンソースのElasticsearch」から派生し「OpenSearch」が作られました。この成り立ちにより「Elasticsearch」と「OpenSearch」は類似点が多くあります。実際にバージョン7.10までは互換性がありAWS側では当該バージョンまではサポートする旨が記載されています。しかし、それ以降のバージョンについては、互換性が保証されておらず、別のソフトウェアとして位置付けられているため、互換性や機能有無についてはご注意ください。<br>(上記にはライセンス変更や名称変更には背景があるのですが……何があったのか気になる方は、このあたりの記事から色々見てみてください……)</p>
+<p><a target="_blank" rel="noopener" href="https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-infringement-lawsuit">https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-infringement-lawsuit</a></p>
+<h2 id="Amazon-OpenSearch-Serverless-概要"><a href="#Amazon-OpenSearch-Serverless-概要" class="headerlink" title="Amazon OpenSearch Serverless 概要"></a>Amazon OpenSearch Serverless 概要</h2><ul>
+<li>Amazon OpenSearch Service のサーバーレス版</li>
+<li>クライアントは Amazon OpenSearch Service と同様の方法で操作可能</li>
+<li>OpenSearch のクラスタのスケーリングなどの管理が不要<br>データの投入や検索の負荷増大に合わせて勝手にスケールアウトしてくれるらしい</li>
+<li>少しの手順、数分で構築が可能 (入門におすすめの理由)</li>
+<li>Hot node、UltraWarm node とノードに種類があり、時系列コレクションの場合に直近24時間のデータはHot nodeにいれ、それ以降はUltraWarm nodeにいれることでノードの増大を防ぐ (Serverless版のいいところと思われ)</li>
+</ul>
+<img src="/images/20230525a/Black_Belt_Amazon_OpenSearch_Serverless_27スライド.png" alt="Black_Belt_Amazon_OpenSearch_Serverless_27スライド" width="1200" height="679" loading="lazy">
+[引用元 2023/01 [AWS Black Belt Online Seminar] Amazon OpenSearch Serverless 27スライド目](https://pages.awscloud.com/rs/112-TZM-766/images/AWS-Black-Belt_2023_AmazonOpenSearchServerless_0131_v1.pdf)
+
+<h3 id="公式ページはこちら"><a href="#公式ページはこちら" class="headerlink" title="公式ページはこちら"></a>公式ページはこちら</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/opensearch-service/features/serverless/">https://aws.amazon.com/jp/opensearch-service/features/serverless/</a></li>
+</ul>
+<p>公式ページでは、以下の情報がまとまっています</p>
+<h4 id="リソース"><a href="#リソース" class="headerlink" title="リソース"></a>リソース</h4><ul>
+<li>ポッドキャスト<ul>
+<li>Amazon OpenSearch Serverless の紹介</li>
+</ul>
+</li>
+<li>ワークショップ<ul>
+<li>Amazon OpenSearch Serverless を実際に体験する</li>
+</ul>
+</li>
+<li>ブログ<ul>
+<li>Amazon OpenSearch Serverless の簡単な方法によるログ分析</li>
+</ul>
+</li>
+<li>動画<ul>
+<li>re:Invent 2022: Provision and scale OpenSearch resources with serverless</li>
+<li>デモ: Searching with Amazon OpenSearch Serverless</li>
+<li>デモ: Log analytics with Amazon OpenSearch Service</li>
+</ul>
+</li>
+</ul>
+<h2 id="お試し"><a href="#お試し" class="headerlink" title="お試し"></a>お試し</h2><ol>
+<li><strong>Amazon OpenSearch Serverless の TOP</strong><ul>
+<li>Amazon OpenSearch Service のトップにサーバーレスのメニューが追加されておりそこからサーバーレス版にアクセスができる<br>※画像のオレンジ枠が該当箇所<img src="/images/20230525a/サーバーレス版へのアクセス.png" alt="サーバーレス版へのアクセス" width="1200" height="599" loading="lazy"></li>
+</ul>
+</li>
+<li><strong>インデックスを格納するのはコレクション</strong><ul>
+<li>インデックスというのは、RDBで言うところのテーブルのようなもの。OpenSearch Service では、EC2インスタンスに対しインデックスを格納する</li>
+<li>OpenSearch Serverlessでは、コレクションという単位で作成しコレクションに対しインデックスを作成する<img src="/images/20230525a/サーバーレスダッシュボード.png" alt="サーバーレスダッシュボード" width="1200" height="532" loading="lazy"></li>
+</ul>
+</li>
+<li><strong>コレクションを作成してみる</strong><ul>
+<li>コレクションの名前、説明、コレクションタイプの設定ができる。コレクションタイプは、時系列と検索の2種類から選べる。<br>名前と説明はいい感じのものを入れて、コレクションタイプは検索を選びましょう。<br>(時系列を選ぶと、前述の通り直近24時間分のデータしか検索対象とならない)<img src="/images/20230525a/Add_new_collection.png" alt="Add_new_collection" width="921" height="637" loading="lazy"></li>
+<li>暗号化<br>初学者の方は、「AWS 所有キーを使用する」でAWSにおまかせしましょう。自前で用意したい方は、もう一つの方で。<img src="/images/20230525a/encryption.png" alt="encryption" width="905" height="410" loading="lazy"></li>
+<li>ネットワークアクセス<br>今回はアクセスタイプにVPCは使わずにパブリックを利用します。 <del>VPCの説明までするとめんどくさいので</del> OpenSearch に絞って学べるようパブリックです。後ほどアクセスポリシー内でIAMユーザーでのアクセスとするので、誰でも触れる！というわけではないので安心してください。<br>※説明でAPIのエンドポイントとダッシュボードのエンドポイントで異なるネットワーク設定をできるような記述があるが、注釈の方で同じ設定にするよう記載がある<img src="/images/20230525a/network_access.png" alt="network_access" width="909" height="521" loading="lazy"></li>
+<li>データのアクセスポリシー<br>データへのアクセス権のルールを作成できます。<br>わかりやすくビジュアルエディタで作成していきます。<img src="/images/20230525a/Configure_data_access_1.png" alt="Configure_data_access_1" width="945" height="367" loading="lazy"></li>
+<li>テンプレートやインデックス、ドキュメントに対し権限を付与できます<br>「エイリアスとテンプレートの許可」「インデックスの許可」どちらもすべてチェックします。<img src="/images/20230525a/Configure_data_access_2.png" alt="Configure_data_access_2" width="937" height="669" loading="lazy"></li>
+<li>プリンシパルにはIAMとSAMLを選択できる。<img src="/images/20230525a/Configure_data_access_2-1.png" alt="Configure_data_access_2-1" width="938" height="203" loading="lazy"></li>
+<li>「IAM ユーザーとロール」を選択するとダイアログが開かれます<img src="/images/20230525a/image.png" alt="image.png" width="820" height="253" loading="lazy"></li>
+<li>「ユーザー」を選択すると……<img src="/images/20230525a/image_2.png" alt="image.png" width="819" height="253" loading="lazy"></li>
+<li>IAMユーザーの一覧が表示されるので、そこから選んでください<br><img src="/images/20230525a/image_3.png" alt="image.png" width="823" height="288" loading="lazy"><br><br>ビジュアルエディタの場合、最後にアクセス権のルールに名前をつける模様。あとから名前を変えたり、削除したりできるので「新しいデータアクセスポリシーとして作成する」を選択し、いい感じのアクセスポリシー名をつけてください。<img src="/images/20230525a/Configure_data_access_3.png" alt="Configure_data_access_3" width="940" height="651" loading="lazy">
+最後に確認画面が出るので、「送信」ボタンを押して続行！数分でステータスがアクティブになり、あちこちにダッシュボードへのリンクが表示されました。</li>
+</ul>
+</li>
+<li><strong>作成したコレクションのOpenSearchダッシュボードにアクセスする</strong><ul>
+<li>ダッシュボードにアクセス<br>オレンジ枠の各所をクリックしましたが、画面が表示されず……<br>青枠のURLをコピーして「https:&#x2F;&#x2F;xxxxxxxxxxxxxxxxxxxx.ap-northeast-1.aoss.amazonaws.com&#x2F;_dashboards」とURLの末尾に「&#x2F;_dashboards」をつけることでアクセスできました。<img src="/images/20230525a/image_4.png" alt="image.png" width="1200" height="486" loading="lazy">
+こんな感じでOpenSearchダッシュボードが表示されます。
+(以前はログイン画面が出ていたのですが、AWSにログインしていると自動でログインされました。便利)
+<img src="/images/20230525a/image_5.png" alt="image.png" width="1200" height="500" loading="lazy"><br></li>
+</ul>
+</li>
+<li><strong>Dev Tools から OpenSearch API を実行する</strong><ul>
+<li>DevToolsからAPI実行<br>先程のOpenSearchダッシュボードの画面にて、右上の「Dev tools」のリンクをクリックします。<br><img src="/images/20230525a/image_6.png" alt="image.png" width="1200" height="382" loading="lazy"><br><br>DevToolsの画面が開くので好きにAPIを実行しちゃってください。<br><img src="/images/20230525a/image_7.png" alt="image.png" width="1200" height="275" loading="lazy"><br></li>
+<li>試しに<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/opensearch-service/latest/developerguide/serverless-getting-started.html#serverless-gsg-index">デベロッパーガイドのチュートリアル</a>の「ステップ3: データをアップロードして検索する」にならってインデックスの作成を行う<br>以下を入力し、列の右側に再生ボタンのようなアイコンが出るのでクリック<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PUT movies-index/_doc/<span class="number">1</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;title&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Shawshank Redemption&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;genre&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Drama&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;year&quot;</span><span class="punctuation">:</span> <span class="number">1994</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+作成できた旨のメッセージが出ます。<img src="/images/20230525a/image_8.png" alt="image.png" width="1200" height="283" loading="lazy"></li>
+<li><code>GET /movies-index/_doc/1</code> を入力、実行してデータが登録できることを確認<img src="/images/20230525a/image_9.png" alt="image.png" width="1200" height="309" loading="lazy">
+いい感じですね。</li>
+</ul>
+</li>
+<li><strong>あとかたづけ</strong><ul>
+<li>作ったコレクションの削除<br>削除は簡単で、AWS コンソールの画面に戻りトップにある削除ボタンから押し確認ダイアログで削除すれば完了！<br><font color="red">アカウントとパスワードで制御されておりアクセスできないとは言え、インターネット上に公開状態のままなのは良くないため、不要であれば必ず消しましょう。</font><img src="/images/20230525a/image_10.png" alt="image.png" width="1200" height="138" loading="lazy"></li>
+</ul>
+</li>
+</ol>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>個人的に、ぱっとOpenSearchが使えるので入門で使うにはちょうどいいのでは？と思っており、まとめられて非常に満足です。</p>
+<p>サービス自体としては、OpenSearchダッシュボードがそのまま使えたり、VPC経由ではService版と同様にコンソールアクセスが可能とのことで、移行はスムーズに行えそう。</p>
+<p>中でも勝手にスケールアウトしてくれるのは場合により大変楽になるのではと期待しています。例えば、これまでEBSボリュームを度々拡張しなければいけないような運用をしていた場合にもろもろの作業が減るのは幸せですね(本番環境触るの怖い)</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20230525a/&related=twitterapi%2Ctwitter&text=Amazon%20OpenSearch%20Serverless%20%E3%82%92%E8%A7%A6%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20230525a/&t=Amazon%20OpenSearch%20Serverless%20%E3%82%92%E8%A7%A6%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20230525a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20230525a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">5</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;566</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2023.05.08</span><span class="snscount">&#9825;18</span><a href=/articles/20230508b/ title="齊藤です。よろしくお願いします。[春の入門連載2023]の12日目になります。まず、私が新人の時に出会いたかった本というのは、こちらになります。">新人の時に出会いたかった本の紹介</a></li><li class="related-posts-item"><span>2020.09.27</span><span class="snscount">&#9825;24</span><a href=/articles/20200927/ title="こんにちは、TIGの辻です。業務アプリケーションのビジネスロジックをサーバーレスで実装することも増えてきました。[AWSサービストリガによるLambda関数起動]の記事にもあるようにAPI GatewayとLambda関数を組み合わせてHTTPサーバを提供することも容易にできます。バックエンドのWebAPIをLambda関数で動かすユースケースがよくあるパターンです。Lambda関数とアプリケーションロジックの実装は密結合になりやすいですが、HTTPサーバで動作するように実装して、Lambda関数として組み込むと、従来のHTTPサーバを実装するノウハウを活かしつつ、サーバレスで動作するバックエンドのWebAPIを構築できます。本記事ではGoを用いてサーバレスなWebAPIサーバをAWS上に1から構築するチュートリアルです。">LambdaとGoを使ったサーバーレスWebAPI開発実践入門</a></li><li class="related-posts-item"><span>2020.08.18</span><span class="snscount">&#9825;80</span><a href=/articles/20200818/ title="はじめまして。TIG DXユニットの富山です。2020年4月新卒入社です。夏休み自由研究連載の11本目の記事で公開された[Slack×GASの日報テンプレBOTを実務に導入してみた]の執筆者である仁木さんと同期です。私が参画しているプロジェクトでは、データベースにDynamoDBを採用しています。私は、RDBMSしか使用した経験がなかったので、NoSQLであるDynamoDBの理解にとても苦しみました。そこで今回の夏休み自由研究では理解した内容をまとめてみたいと思います！">【入門】私を苦しめたDynamoDB</a></li><li class="related-posts-item"><span>2019.08.16</span><span class="snscount">&#9825;21</span><a href=/articles/20190816/ title="これからTerraformを触っていきたいといった方にもわかるようにまずはTerraformの事始めから説明していきます。">はじめてのTerraform 0.12 ～環境構築～</a></li><li class="related-posts-item"><span>2023.11.21</span><span class="snscount">&#9825;6</span><a href=/articles/20231121a/ title="中山心太氏の最新作、高校生だけじゃもったいない　仕事に役立つ新・必修科目「情報Ⅰ」のレビューに参加し、お礼に献本をいただきました。">高校生だけじゃもったいない　仕事に役立つ新・必修科目「情報Ⅰ」のレビューに参加しました<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20230524a/ title="CIについてあまり知らない自分が、プロジェクトにCIを導入したいと思い、実際に調べてみた・試したことをまとめたいと思います。">iOSアプリのCI入門</a></li><li class="reference-posts-item"><a href=/articles/20230417a/ title="春の入門連載とは、4年連続の開催となるリレー形式で行う技術ブログの連載で、テーマは以下の3つに寄稿者を募っております。">春の入門祭り2023</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Amazon-OpenSearch-Serverless"><span class="toc-text">Amazon OpenSearch Serverless</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%9D%E3%82%82%E3%81%9D%E3%82%82-OpenSearch-%E3%81%A8%E3%81%AF%EF%BC%9F"><span class="toc-text">そもそも OpenSearch とは？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Amazon-OpenSearch-Serverless-%E6%A6%82%E8%A6%81"><span class="toc-text">Amazon OpenSearch Serverless 概要</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AC%E5%BC%8F%E3%83%9A%E3%83%BC%E3%82%B8%E3%81%AF%E3%81%93%E3%81%A1%E3%82%89"><span class="toc-text">公式ページはこちら</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9"><span class="toc-text">リソース</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%8A%E8%A9%A6%E3%81%97"><span class="toc-text">お試し</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

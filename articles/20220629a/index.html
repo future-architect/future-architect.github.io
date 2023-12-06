@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>スキーマのバージョン管理と互換性の話 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにはじめまして、TIGの原木です。サービス間通信とIDL（インタフェース記述言語）連載の4本目です。 気が付けば、バージョンの話0ばかりしています。この記事ではスキーマのバージョン管理と互換性について話します。 “スキーマ”が指し示す言葉と課題一般的にスキーマのバージョン管理という話が出た場合、次のどちらかを想像する人が多いのではないでしょうか。  データベースのスキーマ(DB内のデータ構造">
+<meta property="og:type" content="article">
+<meta property="og:title" content="スキーマのバージョン管理と互換性の話 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20220629a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにはじめまして、TIGの原木です。サービス間通信とIDL（インタフェース記述言語）連載の4本目です。 気が付けば、バージョンの話0ばかりしています。この記事ではスキーマのバージョン管理と互換性について話します。 “スキーマ”が指し示す言葉と課題一般的にスキーマのバージョン管理という話が出た場合、次のどちらかを想像する人が多いのではないでしょうか。  データベースのスキーマ(DB内のデータ構造">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20220629a/Drawing_2022-06-26_15.48.58.excalidraw_(1).png">
+<meta property="article:published_time" content="2022-06-28T15:00:00.000Z">
+<meta property="article:modified_time" content="2023-06-07T02:25:54.456Z">
+<meta property="article:tag" content="CUE">
+<meta property="article:tag" content="データリネージュ">
+<meta property="article:tag" content="バージョン管理">
+<meta property="article:tag" content="IDL">
+<meta property="article:tag" content="Thema">
+<meta property="article:tag" content="vgo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20220629a/Drawing_2022-06-26_15.48.58.excalidraw_(1).png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20220629a/">
+  <meta content="CUE,データリネージュ,バージョン管理,IDL,Thema,vgo" name="keywords">
+  <meta content="原木翔" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">スキーマのバージョン管理と互換性の話
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20220629a_スキーマのバージョン管理と互換性の話.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20220629a_スキーマのバージョン管理と互換性の話" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-06-28T15:00:00.000Z" itemprop="datePublished">2022.06.29</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%8E%9F%E6%9C%A8%E7%BF%94" title="原木翔さんの記事一覧へ" class="post-author">原木翔</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/CUE/" title="CUEタグの記事へ" class="tag-list-link">CUE</a>
+  
+    
+    <a href="/tags/データリネージュ/" title="データリネージュタグの記事へ" class="tag-list-link">データリネージュ</a>
+  
+    
+    <a href="/tags/バージョン管理/" title="バージョン管理タグの記事へ" class="tag-list-link">バージョン管理</a>
+  
+    
+    <a href="/tags/IDL/" title="IDLタグの記事へ" class="tag-list-link">IDL</a>
+  
+    
+    <a href="/tags/Thema/" title="Themaタグの記事へ" class="tag-list-link">Thema</a>
+  
+    
+    <a href="/tags/vgo/" title="vgoタグの記事へ" class="tag-list-link">vgo</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>はじめまして、TIGの原木です。<a href="/articles/20220624a/">サービス間通信とIDL（インタフェース記述言語）連載</a>の4本目です。</p>
+<p>気が付けば、バージョンの話<sup id="fnref:0"><a href="#fn:0" rel="footnote">0</a></sup>ばかりしています。<br>この記事ではスキーマのバージョン管理と互換性について話します。</p>
+<h1 id="“スキーマ”が指し示す言葉と課題"><a href="#“スキーマ”が指し示す言葉と課題" class="headerlink" title="“スキーマ”が指し示す言葉と課題"></a>“スキーマ”が指し示す言葉と課題</h1><p>一般的にスキーマのバージョン管理という話が出た場合、次のどちらかを想像する人が多いのではないでしょうか。</p>
+<ul>
+<li>データベースのスキーマ(DB内のデータ構造)の変更をどうやってバージョン管理していくか</li>
+<li>サービス間通信で使用するデータフォーマット(ex. gRPCのprotobuf)をどうやってバージョン管理していくか</li>
+</ul>
+<p>データ構造が変わったことによりソフトウェアの改修が発生するとわかった瞬間、この問題に直面して「どうしよう…」と悩まれた経験を持つ方は数知れずいらっしゃるかなと思います。</p>
+<p>両者において、スキーマのバージョン管理が課題だと意識するタイミングにさほどの違いはありません。しかし、両者において何を問題として捉えているのか？そして解決に向けたアプローチ方法は？とみると異なるようです。</p>
+<h1 id="データベースのスキーマのバージョン管理"><a href="#データベースのスキーマのバージョン管理" class="headerlink" title="データベースのスキーマのバージョン管理"></a>データベースのスキーマのバージョン管理</h1><p>データベースのスキーマのバージョン管理といった文脈では、通常、<strong>DBマイグレーションツール</strong><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>がセットで語られます。なぜなら、データベースのスキーマを変更するためにはデータの構造を示す定義情報を変更すると共にその中身であるデータそのものを変えていく必要があるからです。</p>
+<p>データ定義の変更には必ず中身のデータ移行(マイグレーション)が伴います。ここに、データベースのスキーマのバージョン管理の課題に繋がる難しさがあります。例を挙げてみました。</p>
+<ul>
+<li>データベースのスキーマの変更管理をどうやって行うか？<ul>
+<li>例: 「カナリーリリース予定の新機能についてテーブルの変更が必要だって聞いて対応した後で、その変更が要らなくなってしまった。切り戻す？放置する？」</li>
+</ul>
+</li>
+<li>データベースのスキーマの変更に伴う影響をどうやって正確に見積もるか？<ul>
+<li>例: 「データベースのテーブルのカラムを一部増やす対応を行うって聞いたけど、そのテーブルを参照している他業務システムが結構あるんだよね。影響調査よろしくー」</li>
+</ul>
+</li>
+<li>スキーマの変更に伴い、データ移行をどうやって行うか？<ul>
+<li>例: 「データベースをダウンタイムゼロで移行しなければならないのだが、自動化できてない。つらい。」</li>
+</ul>
+</li>
+</ul>
+<p>「データベースのバージョン管理に困っている」といった話が持ち上がった場合、注意が必要です。データベースのスキーマ変更に伴う業務アプリケーション側の影響を気にされているのか。それともデータベースの更新に伴うデータ移行と運用の重さを気にされているのか。立場上、気にするポイントが全然異なるからです。</p>
+<p>前者の業務アプリケーション側の影響に主眼を置いた解決策の一つとして、かつてデータベースとユーザーとの間に抽象化レイヤーを設けることで、データ構造の見た目と実体を自在に切り離すことで解決しようといった試みが繰り返されていました。(“Data Virtualization”等で検索)</p>
+<p>しかし、この手法は主流となっておりません。なぜなら、そういった問題がそもそも生じる理由として境界付けられたコンテキストに従った適切なデータ分割を行っていないことが考えられるからです。</p>
+<p>ここまでくると、データベースという要素技術ではなく、業務サービスに紐づく組織づくりやシステムアーキテクチャといった俯瞰的な視点から解決せざるを得ません。</p>
+<p>この辺りは「<a target="_blank" rel="noopener" href="https://www.oreilly.co.jp/books/9784873119823/">ソフトウェアアーキテクチャの基礎</a>」の続編にあたる「Software Architecture: The Hard Parts」にて詳しく説明されています(翻訳待ってます)。</p>
+<p>後者の、運用におけるデータベースの影響に着目した解決策についても、ベストといえる解は残念ながらありません。データベースの変更自体は、DBマイグレーションツールにより差分を吸収しつつ移行の自動化が可能ではあります。しかし、システム全体の運用を鑑みた場合、解決策は1つのツールで成しえないからです。</p>
+<p>データベースのバージョン管理に困った場合、そのソリューションは結局DBに留まらない話が多いんだとわかったところで、もう一つの課題であるサービス間通信で使用するデータフォーマットのバージョン管理の話に移ります。</p>
+<h1 id="データフォーマットのバージョン管理"><a href="#データフォーマットのバージョン管理" class="headerlink" title="データフォーマットのバージョン管理"></a>データフォーマットのバージョン管理</h1><p>サービス間通信で使用するデータフォーマットというと固く聞こえますが、要はgRPCで使われているprotobufのスキーマの仕様だったり、OpenAPIで書かれたAPIの仕様書から起こしたJSON Schemaのことです。これらのデータフォーマットにバージョン管理が必要となるユースケースはいったいどういった場面が想定されるでしょうか。</p>
+<p>例えば、APIの仕様書が変わったときに生まれそうな課題を想像してみました。</p>
+<ul>
+<li>API仕様書とAPIサーバーレスポンスのギャップをどうやって防ぐか？</li>
+<li>API仕様書の変更に伴い、APIクライアント側の影響をどうやって見積もるか?</li>
+</ul>
+<p>これらの課題に対して、それぞれ解決策を検討します。</p>
+<h1 id="データスキーマの仕様書と実データのギャップ"><a href="#データスキーマの仕様書と実データのギャップ" class="headerlink" title="データスキーマの仕様書と実データのギャップ"></a>データスキーマの仕様書と実データのギャップ</h1><p>ソフトウェアの開発において、仕様書と実装がずれるという事象は決して起きてはなりませんが、現実にはままあることです。そんなギャップを防ぐ手法の一つとして、スキーマファーストデザイン、あるいはコントラクトファーストデザインといわれる開発手法があります。</p>
+<img src="/images/20220629a/image.png" alt="" width="709" height="381" loading="lazy">
+
+<p>「コードから仕様書を生成」するのではなく、「仕様書からコードを生成」することで、サービス間で交換されるデータの仕様を先に決めて仕様と実装のギャップを防ぎます。</p>
+<p>詳細は、多賀さんが話された<a href="https://future-architect.github.io/articles/20210427c/">GoにおけるAPIドキュメントベースのWeb API開発について登壇しました </a>にて説明されていますのでご参照ください。</p>
+<p>上記のような取り組みを行い、Git上にあるデータスキーマの仕様書と実際に送信されるデータとの間の溝を埋めていっても、データスキーマのバージョン更新に伴う課題はまだまだ解決しません。データベーススキーマでも出てきましたが、スキーマの変更に伴う影響調査です。</p>
+<h1 id="データスキーマの変更に振り回されながら"><a href="#データスキーマの変更に振り回されながら" class="headerlink" title="データスキーマの変更に振り回されながら"></a>データスキーマの変更に振り回されながら</h1><p>データスキーマの変更を変更する際に、その影響が大きいのはたいていデータの送り手ではなく受け手です。変更したことでどのような影響が出てくるのか？①変更したデータスキーマが互換性を持つか②その情報を誰がどこで連携するか<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>、自分はこの辺りを気にしています。</p>
+<p>①については特に<strong>スキーマの進化</strong>(Schema evolution)&#x3D;開発によって変わり続けるスキーマをどうやって変更管理しようかという文脈で検討されることが多い問題です。名著<a target="_blank" rel="noopener" href="https://www.oreilly.co.jp/books/9784873118703/">データ指向アプリケーションデザイン</a>でも第四章「エンコーディングと進化」にて詳しく取り扱われています。</p>
+<p>そもそも、”データ”とは何でしょうか。サービス間通信の文脈では、大きく二種類の扱われ方をしています。</p>
+<ol>
+<li>コンピューターがメモリ内で取り扱うためのデータ構造(インメモリの表現)</li>
+<li>サービス間で情報を交換するためのデータ構造(バイナリデータ)</li>
+</ol>
+<p>これら、インメモリの表現とバイナリデータを相互に変換することで、</p>
+<ul>
+<li>人が読みやすい、直感的にわかるデータとして扱いたいときはインメモリの表現</li>
+<li>送受信する情報量を圧縮することで、より効率的に情報交換したいときはバイナリデータ<br>という風に、利用シーンに応じてデータの様態を変えることができます。</li>
+</ul>
+<img src="/images/20220629a/Drawing_2022-06-26_16.50.55.excalidraw.png" alt="" width="369" height="338" loading="lazy">
+
+<p>このインメモリの表現、メモリ上のデータ構造を<strong>スキーマ</strong>として記述することで人間にもわかりやすくするために開発されたのが、本ブログの連載テーマであるIDL（インターフェース記述言語: Interface Definition Language）です。普段良く耳にするXMLやJSON Schema、ブログの連載でもたびたび取り上げられたgRPC内で使われているprotobufやcuelang等が代表例です。</p>
+<p>これらIDLでスキーマを描画する際に問題となるのが、スキーマの進化に伴う、データスキーマ同士の互換性です。</p>
+<p>例えば、あるバージョンのIDLに従って作成したバイナリデータ、また別のバージョンのIDLに従って作成したバイナリデータはどこまで同じなのでしょうか？あるいは、バイナリデータを作成したときとは異なるバージョンのIDLを使ってバイナリデータを人が読める形に戻せるのでしょうか？</p>
+<p>IDLの一つ、<a target="_blank" rel="noopener" href="https://avro.apache.org/">Apache Avro</a>では、言語の設計時から互換性を念頭に考えられていました。</p>
+<p>例えば、Kafka等のメッセージング駆動によるシステム連携において、Producer(データを流す側)とConsumer(データを受け取る側)でデータを送るケースを考えてみましょう。</p>
+<img src="/images/20220629a/Drawing_2022-06-25_20.17.41.excalidraw.png" alt="" width="1200" height="740" loading="lazy">
+
+<p>メッセージング駆動アーキテクチャではデータの連携はキューを介して行われており、両者の関係は緩やかにつながっています。ここでProducer側で送信するデータスキーマを変更したときに、逐一Consumer側で対応しないとうまく動かないシステムだったら運用の負担が非常に大きいですよね。そうした課題への回答の一つとして、Apache AvroはIDLの言語仕様として、フィールド値の動的な変更に追随して自動的にマッピングを行いつつ、互換性にも可能な限り応えることができます。</p>
+<p>Apache KafkaのManaged ServiceであるConfluentが提供するConfluent Schema Registryにはこの言語仕様を元に互換性の”強度”に基づいてvalidationの処理を変えられるユニークな機能があります。</p>
+<div class="note info" style="background: #e5f8e2; padding: 16px;">
+  <span class="fa fa-fw fa-check-circle"></span>
+  <p>諸事情により、Confluentの画面は出せないのですが、想像しながら読み進めてください。</p>
+  <p>参考: <a target="_blank" rel="noopener" href="https://docs.confluent.io/ja-jp/platform/7.0.1/schema-registry/avro.html">https://docs.confluent.io/ja-jp/platform/7.0.1/schema-registry/avro.html</a></p>
+</div>
+
+
+<p>例えば、BACKWARD(後方互換性モード)で、Confluent Schema Registryに次のApache Avroの形式のスキーマ情報を登録してみましょう。後方互換性とは、version1のフォーマットがversion2でも使用できることを意味します。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;doc&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Sample schema to help you get started.&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;doc&quot;</span><span class="punctuation">:</span> <span class="string">&quot;The int type is a 32-bit signed integer.&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;my_field1&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;int&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;sampleRecord&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;namespace&quot;</span><span class="punctuation">:</span> <span class="string">&quot;com.mycorp.mynamespace&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;record&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>しかし、32bitだと値が小さすぎるということで、int型をlong型に変える必要が出てきました。<br>my_field1の型をint型からlong型に変更して再登録します。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 中略</span></span><br><span class="line"><span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">  <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;doc&quot;</span><span class="punctuation">:</span> <span class="string">&quot;The long type is a 64-bit signed integer.&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;my_field1&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;long&quot;</span> <span class="comment">// ⇐ここを変更</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<p>登録できました。int型のデータはlong型に代入しても問題ないからです。ここでさらに文字列型数字、たとえば先頭が0から始まる値を扱う必要が出てきました。long型をさらにstring型にしてみます。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">  <span class="comment">// 中略</span></span><br><span class="line">  <span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;doc&quot;</span><span class="punctuation">:</span> <span class="string">&quot;The string type&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;my_field1&quot;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;string&quot;</span> <span class="comment">// ⇐ここを変更</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"></span><br><span class="line">エラーメッセージ<span class="punctuation">:</span> `Schema being registered is incompatible with an earlier schema for the subject.`</span><br></pre></td></tr></table></figure>
+
+<p>エラーになりました。long型とstring型には互換性がないためです。ここで互換性モードを変更し、制限を緩くしてみます。</p>
+<p>Compatibility settingsを選択して <code>Backward</code> から <code>None</code>に変更して、先ほど失敗したスキーマを入力して、再度登録ボタンを押してみましょう…登録することができました。</p>
+<p>この状態ではスキーマは以前のバージョンとの互換性が完全にないため、Consumer側(データを受け取る側)はこのスキーマに基づいたメッセージをそのまま受け取ることができません。通常は新規スキーマを切り直すユースケースですが、あえて登録してみました。</p>
+<p>互換性の強度に応じた細かいvalidationチェックにより、破壊的な変更を防ぐConfluent Schema Registryの機能紹介でした。</p>
+<h1 id="Thema-スキーマのバージョン管理の行く先"><a href="#Thema-スキーマのバージョン管理の行く先" class="headerlink" title="Thema: スキーマのバージョン管理の行く先"></a>Thema: スキーマのバージョン管理の行く先</h1><p>スキーマの変更に伴い、破壊的な変更が生じたときに自動的にvalidateする仕組みは、Confluent Schema Registryのような便利機能でなくてもスキーマファーストデザインを採用している開発現場であれば、CI&#x2F;CDの一部としてチェックする別の機構(E2Eテスト)があると思います。しかし、スキーマの進化が頻繁に行われるような環境下では、validateするだけではなく、次のような仕組みが欲しくなってくるでしょう。</p>
+<ul>
+<li>既存データをスキーマバージョンによって動的に変更する機能(いわゆるmutate機能)</li>
+<li>ソースコードのリポジトリ管理でよくあるような、スキーマの”変更履歴”を可視化する機能</li>
+<li>マージ操作による違うスキーマ同士の接合機能</li>
+</ul>
+<p>このあたりの課題感を解決する仕組みとして、現在開発中の<a target="_blank" rel="noopener" href="https://github.com/grafana/thema">Thema - grafana&#x2F;thema</a>が非常に参考になるでしょう。</p>
+<p>Themaはcuelangをベースとした、スキーマを作成するためのフレームワークです。</p>
+<p>Themaが目指す姿はずばり <strong>抽象化によるスキーマのバージョン管理</strong> (“schema versioning by abstraction”)です。cuelangで記載した <strong>リネージ(系譜)</strong> を用いて、スキーマの進化を安全に行える世界を目指しています。</p>
+<div class="note info" style="background: #e5f8e2; padding: 16px;">
+  <span class="fa fa-fw fa-check-circle"></span>
+  <p>ここから、どうやってcuelangでスキーマのバージョン管理を実現しているのかThemaの詳細について説明しますが、その前に少しだけThemaの開発のモチベーションについて代弁させてください(モチベーションシートが見当たらなかったので)。</p>
+  <p>Themaは主にGrafanaに所属しているSam Boyer氏によって開発されているOSSです。どうして彼はThemaを開発することにしたのでしょうか？そのモチベーションを辿ると二つのイベントにたどり着きます。2018年にGo言語に入った仕様、そしてGrafanaが直近進めているDashboard as Codeの中で導入されたPrometheus monitoring mixinです。</p>
+  <p>2018年初頭、Go言語界隈は揺れていました。現在のGo言語のバージョン管理(dep)を続けるのか、それともそれを捨てて新しいバージョン管理とパッケージ管理システム(vgo)を再構築するのか。Russ Cox氏が中心となってまとめられたvgoの検討会にSam Boyer氏もいました。</p>
+  <p><a target="_blank" rel="noopener" href="https://web.archive.org/web/20180222100213/https://sdboyer.io/blog/vgo-and-dep/">https://web.archive.org/web/20180222100213/https://sdboyer.io/blog/vgo-and-dep/</a></p>
+  <p>vgo、<a target="_blank" rel="noopener" href="https://research.swtch.com/vgo">Versioned Go</a>は、Go言語を最近使うようになった方にはまったく馴染みがない言葉だと思います。vgoは検討段階で消えてしまったのでしょうか？ 実は、Go1.11に導入する際に名前が変わりました。その名は <code>Go Modules</code> です。</p>
+  <p>彼がGo言語のバージョニングとパッケージ管理について最も造詣が深い一人であることは言うまでもないでしょう。これは余談ですが、全然異なる文脈でThemaを知った自分はこの人どこかで見たことあるんだけどな...って気持ちで軽く来歴を調べて鳥肌が立ちました。全てはバージョン管理に戻ってくるのです。</p>
+  <p>そしてもう一つが、<code>Monitoring Mixin</code> にまつわる課題です。近年では従来の運用監視システムの対象者がSREやDevOpsの普及によって開発者にまで広がったこと、マイクロサービスの普及により爆発的に監視対象が増えたことなどから、Observabilityの三つの柱であるメトリクス、トレーシング、ログを横断的に確認できる需要が高まっています。それを支えるための仕組みの一つに、<code>Monitoring Mixin</code>というプロジェクトがあります。</p>
+  <p>↓こちらの方が詳しく解説されています。</p>
+  <p><a target="_blank" rel="noopener" href="https://kobtea.net/posts/2021/08/29/monitoring-mixins/">https://kobtea.net/posts/2021/08/29/monitoring-mixins/</a></p>
+  <p><blockquote>Monitoring MixinsはPrometheus rule, Grafana dashboardといった監視設定のPackagingを目指すプロジェクトです。ExporterのMetricsだけではなく、それを使って何を観測し可視化するかという知見を共有するのが目的です。Out-of-the-boxでいい感じのアラート設定とダッシュボードがほしい、そんな需要に答えます。コードはJsonnetとパッケージングツールのjsonnet-bundlerで管理されます。</blockquote>
+</p>
+  <p>という、いわば運用監視設定の欲張りセットなのですが、Sam Boyer氏はMonitoring Mixinsのスキーマとして使われるjsonnetの寄せ集めゆえの扱いづらさについて触れて、もっと改善する仕組みを考えていることを過去に仄めかしています。
+</p>
+  <p><a target="_blank" rel="noopener" href="https://grafana.com/blog/2021/01/14/how-prometheus-monitoring-mixins-can-make-effective-observability-strategies-accessible-to-all/">https://grafana.com/blog/2021/01/14/how-prometheus-monitoring-mixins-can-make-effective-observability-strategies-accessible-to-all/</a>
+</p>
+  <p>旧名scuemata、Themaはこうした背景を踏まえた上で誕生しました。</p>
+</div>
+
+<p>リネージとは、ざっくりいえばスキーマの進化表です。一つのオブジェクトに対する全てのスキーマの履歴を含む、”レンズ”(後述で解説します)でリンクされたシーケンスの順序付きリストを示します。元々familiyって呼んでいましたがリネージに名前を改めました。</p>
+<p>リネージの中身( <a target="_blank" rel="noopener" href="https://github.com/grafana/thema/blob/main/docs/ship.cue"><code>ship.cue</code></a> )を実際に見てみましょう。</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ship.cue</span></span><br><span class="line"><span class="keyword">package</span> thema_example</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;github.com/grafana/thema&quot;</span></span><br><span class="line"></span><br><span class="line">lin: thema.#Lineage</span><br><span class="line">lin: name: <span class="string">&quot;Ship&quot;</span></span><br><span class="line">lin: seqs: [</span><br><span class="line">    &#123;</span><br><span class="line">        schemas: [</span><br><span class="line">            &#123; <span class="comment">// 0.0</span></span><br><span class="line">                firstfield: <span class="type">string</span></span><br><span class="line">            &#125;,</span><br><span class="line">        ]</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        schemas: [</span><br><span class="line">            &#123; <span class="comment">// 1.0</span></span><br><span class="line">                firstfield: <span class="type">string</span></span><br><span class="line">                secondfield: <span class="type">int</span></span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line"></span><br><span class="line">        lens: forward: &#123;</span><br><span class="line">            from: seqs[<span class="number">0</span>].schemas[<span class="number">0</span>]</span><br><span class="line">            to: seqs[<span class="number">1</span>].schemas[<span class="number">0</span>]</span><br><span class="line">            rel: &#123;</span><br><span class="line">                firstfield: from.firstfield</span><br><span class="line">                secondfield: <span class="number">-1</span></span><br><span class="line">            &#125;</span><br><span class="line">            lacunas: [</span><br><span class="line">                thema.#Lacuna &amp; &#123;</span><br><span class="line">                    targetFields: [&#123;</span><br><span class="line">                        path: <span class="string">&quot;secondfield&quot;</span></span><br><span class="line">                        value: to.secondfield</span><br><span class="line">                    &#125;]</span><br><span class="line">                    message: <span class="string">&quot;-1 used as a placeholder value - replace with a real value before persisting!&quot;</span></span><br><span class="line">                    <span class="keyword">type</span>: thema.#LacunaTypes.Placeholder</span><br><span class="line">                &#125;</span><br><span class="line">            ]</span><br><span class="line">            translated: to &amp; rel</span><br><span class="line">        &#125;</span><br><span class="line">        lens: reverse: &#123;</span><br><span class="line">            from: seqs[<span class="number">1</span>].schemas[<span class="number">0</span>]</span><br><span class="line">            to: seqs[<span class="number">0</span>].schemas[<span class="number">0</span>]</span><br><span class="line">            rel: &#123;</span><br><span class="line">                <span class="comment">// Map the first field back</span></span><br><span class="line">                firstfield: from.firstfield</span><br><span class="line">            &#125;</span><br><span class="line">            translated: to &amp; rel</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>このリネージを図示化したものが次の図になります。</p>
+<img src="/images/20220629a/Drawing_2022-06-26_15.48.58.excalidraw_(1).png" alt="Schemeバージョン0.0から1.0には明示的なLens（レンズ）で変換。スキーマ1.0からインスタンスを生成。また0.0から1.0で欠落したフィールドはLacuna（欠落）と呼ぶ" width="1009" height="424" loading="lazy">
+
+<p>それぞれの役割について説明していきましょう。</p>
+<p>まず、リネージには二つのスキーマバージョンがあり、それぞれ <strong>Sequence(シーケンス)</strong> という単位でグルーピングされています(図の黄色と赤色のエリア)。Sequenceは「スキーマの順序付きリスト」であり、<strong>同じSequenceであれば、一つ前のスキーマとの後方互換性を保証します</strong>(今回は一つのSequenceに一つのスキーマしかないのでここは検証しません)。</p>
+<p>そして、Sequence同士を結ぶ重要な役割として <strong>Lens(レンズ)</strong> があります。レンズは「あるシーケンスにおける最後のスキーマと、別のシーケンスにおける最初のスキーマとの間の双方向のマッピング」であり、<strong>互換性を持たないシーケンスどうしの変換</strong>、糊付けのような役割を果たします。リネージをよく見ると、 <code>lens: forward</code> と <code>lens: reverse</code> という役割があり、それぞれレンズを通過した際に、スキーマの変更に合わせてどのようにデータを変換すればいいか記述されています。</p>
+<p>ここで忘れてはならないのが <strong>Lacuna(ラクーナ、欠落)</strong> です。ラクーナは「レンズのマッピングロジックにおけるギャップ、つまり、<strong>そのレンズを通過した特定のインスタンスが何らかの意味上の欠落を持つこと</strong>」を表します。テーブルのカラムの追加、削除を思い浮かべるのが手っ取り早いのではないでしょうか。リネージではSchema1.0からSchema0.0に変換する際に、secondfieldが消えることを説明しています。</p>
+<p>最後に<strong>インスタンス</strong>です。これはスキーマというテンプレートにしたがって作成されたデータの実体を表しています。</p>
+<p>さて、Themaの概念を説明したところで、これをどうやって活用するか説明しましょう。<a target="_blank" rel="noopener" href="https://github.com/grafana/thema/blob/main/docs/authoring.md">Themaのチュートリアル</a>では、Theamaを組み込んだGo言語のプログラミングを例にスキーマの進化に合わせて、自動的にインスタンスを変換できる処理を掘り下げて説明しています。</p>
+<p>ここではその内容に従ってできることを一つのテストコードにまとめてみました。<br><a target="_blank" rel="noopener" href="https://github.com/hodagi/learning-thema/blob/main/main_test.go#L53-L85">https://github.com/hodagi/learning-thema/blob/main/main_test.go#L53-L85</a></p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// version0.0のスキーマに従って作成されたJSONデータを読み込み、cuelangデータに変換する</span></span><br><span class="line">   <span class="comment">// この段階ではthemaはどのバージョンのデータか本当は知りません。それは次の処理です。</span></span><br><span class="line">cue00 := dataAsValue(lib)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 1. cuelangデータが、リネージ(ship.cue)で定義されたいずれかのスキーマバージョンであることを自動的に確認する</span></span><br><span class="line">   <span class="comment">// 2. 確認後、推測したスキーマに合わせてオートマッピングする</span></span><br><span class="line">inst00 := shiplin.ValidateAny(cue00)</span><br><span class="line"><span class="keyword">if</span> inst00 == <span class="literal">nil</span> &#123;</span><br><span class="line">	t.Fatal(<span class="string">&quot;expected input data to validate against schema 0.0&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> ship00 Ship00</span><br><span class="line">inst00.UnwrapCUE().Decode(&amp;ship00)</span><br><span class="line">fmt.Printf(<span class="string">&quot;version&quot;</span>+inst00.Schema().Version().String()+<span class="string">&quot;:%+v\n&quot;</span>, ship00) <span class="comment">// &quot;&#123;Firstfield:foo&#125;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 3. 0.0バージョンのデータを1.0バージョンに変換する</span></span><br><span class="line"><span class="keyword">var</span> ship10 Ship10</span><br><span class="line">inst10, lacunas := inst00.Translate(targetVersion)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 先ほどのバージョンにはなかったSecondfieldができていることがわかる</span></span><br><span class="line">inst10.UnwrapCUE().Decode(&amp;ship10)</span><br><span class="line">fmt.Printf(<span class="string">&quot;version&quot;</span>+inst10.Schema().Version().String()+<span class="string">&quot;:%+v\n&quot;</span>, ship10) <span class="comment">// &quot;&#123;Firstfield:foo Secondfield:-1&#125;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// バージョン0.0~&gt;1.0に上げた際に&quot;欠落&quot;した(デフォルトとして補った)情報を確認する</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;Lacuna(欠落したフィールド情報)\n&quot;</span>)</span><br><span class="line"><span class="keyword">for</span> _, s := <span class="keyword">range</span> lacunas.AsList() &#123;</span><br><span class="line">	fmt.Println(s) <span class="comment">// &#123;[] [&#123;secondfield &lt;nil&gt;&#125;] 0 -1 used as a placeholder value - replace with a real value before persisting!&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>この処理で重要なのは1.バリデーションチェック、2. スキーマの推測 3. バージョン変換です。これらの処理をリネージに従って行うことで、スキーマの進化に伴ったデータ変換を安全に行うことができます。</p>
+<h1 id="振り返り"><a href="#振り返り" class="headerlink" title="振り返り"></a>振り返り</h1><p>スキーマのバージョン管理と互換性に関する話をしました。</p>
+<p>サービス間通信とIDLというお題からするとデータベースの話は蛇足ではありますが、テーブルをデータ構造とそのIFと見なした時に、スキーマの進化が抱えている問題と同根であると思ったので、説明いたしました。個人的には、データベースにおいて分散データベースという文脈から “コンピューティングとストレージの分離” ってテーマが流行っていますが、この辺が課題解決につながりそうな気がしています。</p>
+<p>Themaは絶賛開発中ですが、目指そうとする姿に共感したのでご紹介させていただきました。宜しければ一度触ってみてください。</p>
+<p>次は武田さんのOpen API Specification 規約の話です。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:0"><span style="vertical-align: top; padding-right: 10px;">0.</span><span style="vertical-align: top;"><a href="https://future-architect.github.io/articles/20220426a/">https://future-architect.github.io/articles/20220426a/</a></span><a href="#fnref:0" rev="footnote"> ↩</a></li><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;"><a target="_blank" rel="noopener" href="https://flywaydb.org/">Flyway</a>や<a target="_blank" rel="noopener" href="https://github.com/liquibase/liquibase">Liquibase</a>がよく知られています。</span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="vertical-align: top; padding-right: 10px;">2.</span><span style="vertical-align: top;">この話、<a target="_blank" rel="noopener" href="https://backstage.io/">Backstage</a>という推しツールのpluginを使ったエコシステムで実現できるのですが、これについてはまたどこかでお話しできればと思っています。</span><a href="#fnref:2" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20220629a/&related=twitterapi%2Ctwitter&text=%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%AE%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E7%AE%A1%E7%90%86%E3%81%A8%E4%BA%92%E6%8F%9B%E6%80%A7%E3%81%AE%E8%A9%B1%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">36</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20220629a/&t=%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%AE%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E7%AE%A1%E7%90%86%E3%81%A8%E4%BA%92%E6%8F%9B%E6%80%A7%E3%81%AE%E8%A9%B1" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20220629a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">41</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20220629a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">34</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.04.26</span><span class="snscount">&#9825;39</span><a href=/articles/20220426a/ title="バージョンという言葉を身近に聞いたり、体感することは多いのではないでしょうか？ソフトウェア開発においてもバージョンは決して避けて通ることはできません。しかし、プログラムにバージョンをつける側に立ってみると、そもそもバージョンとは何なのでしょうか？ふわっと考え出すとわりときりがないと思います。">ソフトウェアのバージョンと開発スタイルの関係について</a></li><li class="related-posts-item"><span>2023.11.07</span><span class="snscount">&#9825;1</span><a href=/articles/20231107a/ title="小学校を卒業して云十年。この年になって[100マス計算のドリル]を毎日1問解いているTIGの原木です。念のため、100マス計算を知らない方に説明すると">エッセイ: 小学2X年生、計算ドリルをしている<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.06.22</span><span class="snscount">&#9825;7</span><a href=/articles/20230622a/ title="CNCFのホスト対象にCloudサービスに関係するプロジェクトは多いですが、全てではありません。オンプレミス環境に関するプロダクトも数多く存在します。今回はそんなオンプレミス環境向けのCNCF sandboxプロジェクトの1つ、Tinkerbellを紹介します。">Tinkerbellについて</a></li><li class="related-posts-item"><span>2023.05.26</span><span class="snscount">&#9825;4</span><a href=/articles/20230526a/ title="AWS Kinesis Data StreamとAWS Lambdaを組み合わせたデータストリーミングを扱うシステムで、Lambdaが処理に失敗した場合のリカバリー運用を考える機会がありました。一般的に、Kinesisのようなメッセージングやイベント駆動型のシステムでは、DLQという仕組みを設けます。">AWS Kinesisから呼び出されるLambdaのリカバリー処理について</a></li><li class="related-posts-item"><span>2023.05.18</span><span class="snscount">&#9825;8</span><a href=/articles/20230518b/ title="SLOconfという、Nobl9社が主催する、サービスレベル目標（SLO）に特化したカンファレンスがあります。今までオンラインでやってきたのですが、三回目になる今回、初めてオフラインで開催&世界各地でローカルなコミュニティイベントを同時開催する運びになりました。">SLOconf Tokyo 2023というコミュニティイベントに参加しました</a></li><li class="related-posts-item"><span>2023.02.21</span><span class="snscount">&#9825;197</span><a href=/articles/20230221a/ title="「実践Redis入門」は、2023年現在AWSのAmazon EMR開発チーム、システム開発エンジニアとして働いている林 昌吾さんという方が書かれた『Redisの基礎から、実践、運用や調査に役立つ仕様などの詳細について解説した入門書です。』入門書とありますが、単なる機能紹介にとどまらず...">「実践Redis入門」所感 ~「E.G.コンバット」の観点から語る~</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220624a/ title="TIGの関です。[サービス間通信とIDL（インタフェース記述言語）連載]の3本目です。昨日に続き、gRPCネタです。この記事では次のネタを扱います。- gRPCの概観- gRPCとWebブラウザの関係性">grpc-gatewayでgRPCとREST両対応のサーバを作る</a></li><li class="reference-posts-item"><a href=/articles/20220622a/ title="IDLやエコシステム、サービス間の通信（何かしらのRPC関連の技術）をテーマにした連載を始めます。IDL（インターフェース記述言語: Interface Definition Language）と聞けば...">サービス間通信とIDL（インタフェース記述言語）連載を始めます</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E2%80%9C%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E2%80%9D%E3%81%8C%E6%8C%87%E3%81%97%E7%A4%BA%E3%81%99%E8%A8%80%E8%91%89%E3%81%A8%E8%AA%B2%E9%A1%8C"><span class="toc-text">“スキーマ”が指し示す言葉と課題</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E3%81%AE%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%AE%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E7%AE%A1%E7%90%86"><span class="toc-text">データベースのスキーマのバージョン管理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%87%E3%83%BC%E3%82%BF%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88%E3%81%AE%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E7%AE%A1%E7%90%86"><span class="toc-text">データフォーマットのバージョン管理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%87%E3%83%BC%E3%82%BF%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%AE%E4%BB%95%E6%A7%98%E6%9B%B8%E3%81%A8%E5%AE%9F%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AE%E3%82%AE%E3%83%A3%E3%83%83%E3%83%97"><span class="toc-text">データスキーマの仕様書と実データのギャップ</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%87%E3%83%BC%E3%82%BF%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%AE%E5%A4%89%E6%9B%B4%E3%81%AB%E6%8C%AF%E3%82%8A%E5%9B%9E%E3%81%95%E3%82%8C%E3%81%AA%E3%81%8C%E3%82%89"><span class="toc-text">データスキーマの変更に振り回されながら</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Thema-%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%AE%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E7%AE%A1%E7%90%86%E3%81%AE%E8%A1%8C%E3%81%8F%E5%85%88"><span class="toc-text">Thema: スキーマのバージョン管理の行く先</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8C%AF%E3%82%8A%E8%BF%94%E3%82%8A"><span class="toc-text">振り返り</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

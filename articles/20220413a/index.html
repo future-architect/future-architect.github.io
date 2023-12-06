@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>cuDNN の CUDA API の紹介 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは、2021年新卒入社の SAIG 松崎功也です。Tech Blog 初投稿です。 NVIDIA 社が提供するディープラーニング用の GPGPU ライブラリ「cuDNN」の CUDA API を紹介します。 cuDNN は TensorFlow や Keras で学習や推論を高速化するためのバックエンドとしてよく使われていますが、CUDA API を直接たたいたことがある方は少ない">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cuDNN の CUDA API の紹介 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20220413a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、2021年新卒入社の SAIG 松崎功也です。Tech Blog 初投稿です。 NVIDIA 社が提供するディープラーニング用の GPGPU ライブラリ「cuDNN」の CUDA API を紹介します。 cuDNN は TensorFlow や Keras で学習や推論を高速化するためのバックエンドとしてよく使われていますが、CUDA API を直接たたいたことがある方は少ない">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20220413a/ファイル名.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220413a/0cda6e32-95a9-385b-22fb-726db27156b6.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220413a/ファイル名_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220413a/ファイル名_3.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220413a/バイアス.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20220413a/ファイル名_4.png">
+<meta property="article:published_time" content="2022-04-12T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.811Z">
+<meta property="article:tag" content="CUDA">
+<meta property="article:tag" content="GPGPU">
+<meta property="article:tag" content="cuDNN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20220413a/ファイル名.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20220413a/">
+  <meta content="CUDA,GPGPU,cuDNN" name="keywords">
+  <meta content="松崎功也" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/DataScience/">DataScienceカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">cuDNN の CUDA API の紹介
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20220413a_cuDNN_の_CUDA_API_の紹介.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20220413a_cuDNN_の_CUDA_API_の紹介" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-04-12T15:00:00.000Z" itemprop="datePublished">2022.04.13</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%9D%BE%E5%B4%8E%E5%8A%9F%E4%B9%9F" title="松崎功也さんの記事一覧へ" class="post-author">松崎功也</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/CUDA/" title="CUDAタグの記事へ" class="tag-list-link">CUDA</a>
+  
+    
+    <a href="/tags/GPGPU/" title="GPGPUタグの記事へ" class="tag-list-link">GPGPU</a>
+  
+    
+    <a href="/tags/cuDNN/" title="cuDNNタグの記事へ" class="tag-list-link">cuDNN</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、2021年新卒入社の SAIG 松崎功也です。Tech Blog 初投稿です。</p>
+<p>NVIDIA 社が提供するディープラーニング用の GPGPU ライブラリ「cuDNN」の CUDA API を紹介します。</p>
+<p>cuDNN は TensorFlow や Keras で学習や推論を高速化するためのバックエンドとしてよく使われていますが、CUDA API を直接たたいたことがある方は少ないのではないでしょうか？</p>
+<p>個人的に作成したアプリケーションで CUDA API を叩く機会があり、社内の技術勉強会で紹介したところ好評だったため、こちらにも寄稿します。</p>
+<img src="/images/20220413a/ファイル名.png" alt="システム概念図" width="1200" height="591" loading="lazy">
+
+
+<h1 id="cuDNN-を叩くことになったきっかけ"><a href="#cuDNN-を叩くことになったきっかけ" class="headerlink" title="cuDNN を叩くことになったきっかけ"></a>cuDNN を叩くことになったきっかけ</h1><p>私はレトロゲームを遊ぶことが多いのですが、解像度が低いため 4K ディスプレイだと拡大した際に非常に粗が目立ってしまいます。これをなんとかしたかったのがきっかけです。<br>最終的には以下の手法で解決することにしました。</p>
+<ol>
+<li>Windows API でゲームウィンドウをキャプチャ</li>
+<li><a href="%22https://github.com/nagadomi/waifu2x%22">waifu2x</a> という CNN の超解像モデルでキレイに拡大</li>
+<li>ウィンドウをもう一枚作り、拡大後の画像を表示</li>
+</ol>
+<p>この一連のフローをリアルタイムで行います。Python でもできないことはないのですが、今回はパフォーマンスチューニングのしやすさを考慮して CUDA を選択しました。</p>
+<p>この記事では、1., 3. の部分の説明は行いません。3. において使用した cuDNN API にのみ焦点を当てて紹介します。</p>
+<h1 id="cuDNN-で畳込みを行う流れ"><a href="#cuDNN-で畳込みを行う流れ" class="headerlink" title="cuDNN で畳込みを行う流れ"></a>cuDNN で畳込みを行う流れ</h1><p>流れは以下の通りです。</p>
+<p>次の章で、1項目ずつコードと一緒に紹介していきます。なお、コードは正確に書くと量が多くなりすぎるためある程度端折って掲載しています。そのため、単純にコピペしてつなげても動きませんのでご了承ください。</p>
+<ol>
+<li>cuDNN ライブラリの初期化</li>
+<li>モデルのフィルタの重みをRAM（ホスト）に読み込む</li>
+<li>RAM（ホスト）に読み込んだフィルタの重みを VRAM へ転送する</li>
+<li>フィルタ記述子（フィルターのサイズなどを定義）の準備</li>
+<li>バイアス記述子の準備</li>
+<li>畳込み記述子（パディング、ストライドなどを定義）の準備</li>
+<li>活性化関数の記述子（ReLU, Swish などの係数を含めて定義）の準備</li>
+<li>畳込みの内部アルゴリズムを設定する</li>
+<li>拡大したい画像データをRAM（ホスト）→ VRAM へ転送</li>
+<li>畳込みを行う</li>
+</ol>
+<h2 id="1-cuDNN-ライブラリの初期化"><a href="#1-cuDNN-ライブラリの初期化" class="headerlink" title="1. cuDNN ライブラリの初期化"></a>1. cuDNN ライブラリの初期化</h2><p>ライブラリの初期化は以下のように行います。</p>
+<figure class="highlight c++"><figcaption><span>cuDNN の初期化</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ハンドルを表す変数を用意</span></span><br><span class="line">cudnnHandle_t cudnn_handle = <span class="literal">nullptr</span>;</span><br><span class="line"><span class="comment">// ハンドルのポインタを渡してハンドルを受け取る</span></span><br><span class="line"><span class="built_in">cudnnCreate</span>(&amp;cudnn_handle);</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-モデルのフィルタの重みをRAM（ホスト）に読み込む"><a href="#2-モデルのフィルタの重みをRAM（ホスト）に読み込む" class="headerlink" title="2. モデルのフィルタの重みをRAM（ホスト）に読み込む"></a>2. モデルのフィルタの重みをRAM（ホスト）に読み込む</h2><p>今回は JSON 形式で保存されているモデルのフィルタの重みを、<a href="%22https://github.com/kazuho/picojson%22">picojson</a> で読込みました。</p>
+<img src="/images/20220413a/0cda6e32-95a9-385b-22fb-726db27156b6.png" alt="モデルをRAMに読み込む概念図" width="1089" height="523" loading="lazy">
+
+<figure class="highlight c++"><figcaption><span>重みの読込み</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// picojson で kernels に JSON ファイルを読込んでおく　</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; layer.nOutputPlane_; i++) &#123;</span><br><span class="line">    <span class="keyword">auto</span>&amp; kernel = kernels[i].<span class="built_in">get</span>&lt;picojson::array&gt;();</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; layer.nInputPlane_; j++) &#123;</span><br><span class="line">        <span class="keyword">auto</span>&amp; mat = kernel[j].<span class="built_in">get</span>&lt;picojson::array&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> k = <span class="number">0</span>; k &lt; layer.kH_; k++) &#123;</span><br><span class="line">            <span class="keyword">auto</span>&amp; row = mat[k].<span class="built_in">get</span>&lt;picojson::array&gt;();</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> l = <span class="number">0</span>; l &lt; layer.kW_; l++) &#123;</span><br><span class="line">                layer.host_weight_[</span><br><span class="line">                    i * (layer.nInputPlane_ * layer.kH_ * layer.kW_)</span><br><span class="line">                        + j * (layer.kH_ * layer.kW_)</span><br><span class="line">                        + k * layer.kW_</span><br><span class="line">                        + l</span><br><span class="line">                ] = row[l].<span class="built_in">get</span>&lt;<span class="type">double</span>&gt;();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-RAM（ホスト）に読み込んだフィルタの重みを-VRAM-へ転送する"><a href="#3-RAM（ホスト）に読み込んだフィルタの重みを-VRAM-へ転送する" class="headerlink" title="3. RAM（ホスト）に読み込んだフィルタの重みを VRAM へ転送する"></a>3. RAM（ホスト）に読み込んだフィルタの重みを VRAM へ転送する</h2><p>VRAM のメモリを確保して、読み込んだモデルのフィルタを VRAM へ転送します。<br>メモリ管理はスマートポインタで行っているので、それに合わせたラッパーを自作し使用しています（cuda_memory_allocate）。<br><img src="/images/20220413a/ファイル名_2.png" alt="VRAMへ転送する" width="1200" height="454" loading="lazy"></p>
+<figure class="highlight c++"><figcaption><span>VRAM へ重みを転送する</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// VRAM のメモリを確保</span></span><br><span class="line">layer.device_weight_ptr_ = <span class="built_in">cuda_memory_allocate</span>(<span class="built_in">sizeof</span>(<span class="type">float</span>) * layer.host_weight_.<span class="built_in">size</span>());</span><br><span class="line"></span><br><span class="line"><span class="comment">// RAM（ホスト）のデータを VRAM へ転送する。転送の方向は引数の最後で指定する。</span></span><br><span class="line"><span class="built_in">cudaMemcpy</span>(layer.device_weight_ptr_.<span class="built_in">get</span>(), layer.host_weight_.<span class="built_in">data</span>(),</span><br><span class="line">           <span class="built_in">sizeof</span>(<span class="type">float</span>) * layer.host_weight_.<span class="built_in">size</span>(), cudaMemcpyKind::cudaMemcpyHostToDevice);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><figcaption><span>cuda_memory_allocate（自作のメモリ確保ラッパー）</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 解放処理</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">cuda_device_memory_delete</span> &#123;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">void</span>* ptr)</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">        <span class="built_in">cudaFree</span>(ptr);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// C++11 のスマートポインタを使ってみる</span></span><br><span class="line"><span class="keyword">using</span> device_unique_ptr = std::unique_ptr&lt;<span class="type">void</span>, cuda_device_memory_delete&gt;;</span><br><span class="line"></span><br><span class="line"><span class="function">device_unique_ptr <span class="title">cuda_memory_allocate</span><span class="params">(<span class="type">size_t</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="type">void</span>* ptr = <span class="literal">nullptr</span>;</span><br><span class="line">    <span class="built_in">cudaMalloc</span>(&amp;ptr, n);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">device_unique_ptr</span>(ptr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="4-フィルタ記述子（フィルターのサイズなどを定義）の準備"><a href="#4-フィルタ記述子（フィルターのサイズなどを定義）の準備" class="headerlink" title="4. フィルタ記述子（フィルターのサイズなどを定義）の準備"></a>4. フィルタ記述子（フィルターのサイズなどを定義）の準備</h2><p>フィルタ記述子では、フィルタの枚数やサイズなどを設定します。<br><img src="/images/20220413a/ファイル名_3.png" alt="フィルタ記述子" width="1200" height="577" loading="lazy"></p>
+<figure class="highlight c++"><figcaption><span>フィルタ記述子の準備</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 生のフィルタ記述子を作成</span></span><br><span class="line">cudnnFilterDescriptor_t temp_filter_desc;</span><br><span class="line"><span class="built_in">cudnnCreateFilterDescriptor</span>(&amp;temp_filter_desc);</span><br><span class="line"></span><br><span class="line"><span class="comment">// スマートポインタに移管</span></span><br><span class="line">filter_desc_.<span class="built_in">reset</span>(temp_filter_desc);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2番目以降の引数は、「データ型」、「データの配置順番」、「出力枚数」、「入力枚数」、「フィルターのサイズ」</span></span><br><span class="line"><span class="built_in">cudnnSetFilter4dDescriptor</span>(filter_desc_.<span class="built_in">get</span>(), CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, nOutputPlane_, nInputPlane_, kH_, kW_);</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-バイアス記述子の準備"><a href="#5-バイアス記述子の準備" class="headerlink" title="5. バイアス記述子の準備"></a>5. バイアス記述子の準備</h2><p>畳込み処理後に加算するバイアスの準備を行います。バイアスは1次元ベクトルなので、テンソルの記述子を流用します。</p>
+<img src="/images/20220413a/バイアス.png" alt="バイアス" width="1200" height="409" loading="lazy">
+
+<figure class="highlight c++"><figcaption><span>バイアス記述子の準備</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 生のテンソル記述子の準備</span></span><br><span class="line">cudnnTensorDescriptor_t temp_bias_desc;</span><br><span class="line">(<span class="built_in">cudnnCreateTensorDescriptor</span>(&amp;temp_bias_desc);</span><br><span class="line"></span><br><span class="line"><span class="comment">// スマートポインタに移管</span></span><br><span class="line">bias_desc_.<span class="built_in">reset</span>(temp_bias_desc);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 1次元ベクトルとして、バイアスを設定する</span></span><br><span class="line"><span class="built_in">cudnnSetTensor4dDescriptor</span>(bias_desc_.<span class="built_in">get</span>(), CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, <span class="number">1</span>, nOutputPlane, <span class="number">1</span>, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-畳込み記述子（パディング、ストライドなどを定義）の準備"><a href="#6-畳込み記述子（パディング、ストライドなどを定義）の準備" class="headerlink" title="6. 畳込み記述子（パディング、ストライドなどを定義）の準備"></a>6. 畳込み記述子（パディング、ストライドなどを定義）の準備</h2><p>畳込み記述子では、フィルタの動かし方（パディング、ストライド、ディレーションなど）を設定します。</p>
+<figure class="highlight c++"><figcaption><span>畳込み記述子の準備</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 生の畳込み記述子を作成</span></span><br><span class="line">cudnnConvolutionDescriptor_t temp_conv_desc;</span><br><span class="line">(<span class="built_in">cudnnCreateConvolutionDescriptor</span>(&amp;temp_conv_desc);</span><br><span class="line"></span><br><span class="line"><span class="comment">// スマートポインタに移管</span></span><br><span class="line">conv_desc_.<span class="built_in">reset</span>(temp_conv_desc);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2番目以降の引数は、「パディング」、「ストライド」、「ディレーション」、「畳込みのタイプ」、「データ型」</span></span><br><span class="line"><span class="built_in">cudnnSetConvolution2dDescriptor</span>(conv_desc_.<span class="built_in">get</span>(), padH, padW, dH, dW, <span class="number">1</span>, <span class="number">1</span>, cudnnConvolutionMode_t::CUDNN_CONVOLUTION, cudnnDataType_t::CUDNN_DATA_FLOAT);</span><br></pre></td></tr></table></figure>
+
+<h2 id="7-活性化関数の記述子の準備"><a href="#7-活性化関数の記述子の準備" class="headerlink" title="7. 活性化関数の記述子の準備"></a>7. 活性化関数の記述子の準備</h2><p>cuDNN ではデフォルトで ReLU や Swish などの活性化関数が準備されています（<a href="%22https://docs.nvidia.com/deeplearning/cudnn/api/index.html#cudnnActivationMode_t%22">提供されている活性化関数の一覧</a>）。</p>
+<p>ただ、waifu2x で使用されている leakyReLU は cuDNN では提供されていないため、自前で準備する必要があります。</p>
+<p>そのため、活性化関数には IDENTITY（何もしない恒等関数）を指定し、CUDA で leakyReLU を実装しました。</p>
+<img src="/images/20220413a/ファイル名_4.png" alt="活性化関数の記述子" width="1200" height="679" loading="lazy">
+
+<figure class="highlight c++"><figcaption><span>活性化関数の記述子の準備</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 生の活性化関数の記述子を作成</span></span><br><span class="line">cudnnActivationDescriptor_t temp_activation_desc;</span><br><span class="line"><span class="built_in">cudnnCreateActivationDescriptor</span>(&amp;temp_activation_desc);</span><br><span class="line"></span><br><span class="line"><span class="comment">//スマートポインタに移管</span></span><br><span class="line">activation_desc_.<span class="built_in">reset</span>(temp_activation_desc);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2番目以降の引数は、「活性化関数」、「NaN を伝播させるかどうか」、「活性化関数の係数」（無い場合は適当な数値を入れておけばOK）</span></span><br><span class="line"><span class="built_in">cudnnSetActivationDescriptor</span>(activation_desc_.<span class="built_in">get</span>(), cudnnActivationMode_t::CUDNN_ACTIVATION_IDENTITY,, cudnnNanPropagation_t::CUDNN_PROPAGATE_NAN, <span class="number">0.0</span>);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><figcaption><span>leakyReLU.cu</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">__global__ <span class="type">void</span> <span class="title">leakyRelu_</span><span class="params">(<span class="type">float</span>* vec, <span class="type">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> i = blockIdx.x * blockDim.x + threadIdx.x;</span><br><span class="line">    <span class="keyword">if</span> (i &lt; n)</span><br><span class="line">        vec[i] = <span class="number">0.1f</span> * <span class="built_in">fminf</span>(vec[i], <span class="number">0.f</span>) + <span class="built_in">fmaxf</span>(vec[i], <span class="number">0.f</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="8-畳込みの内部アルゴリズムを設定する"><a href="#8-畳込みの内部アルゴリズムを設定する" class="headerlink" title="8. 畳込みの内部アルゴリズムを設定する"></a>8. 畳込みの内部アルゴリズムを設定する</h2><p>cuDNN では畳込みの内部アルゴリズムがいくつか用意されていて、それぞれメモリ使用量や計算速度にトレードオフがあります（<a href="%22https://docs.nvidia.com/deeplearning/cudnn/api/index.html#cudnnConvolutionFwdAlgo_t%22">提供されている内部アルゴリズムの一覧</a>）。</p>
+<p>これまで設定してきたフィルタ記述子や畳込み記述子の情報を使用して、cuDNN に自動で選択させることもできます。</p>
+<p>ただ、同じ記述子を使用した場合でも、実行のたびに自動選択されるアルゴリズムが異なることがありました。そのため、使用するメモリ使用量や処理時間に再現性が欲しい場合は自分で指定するのが吉です。</p>
+<figure class="highlight c++"><figcaption><span>畳込みの内部アルゴリズムの設定</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 内部アルゴリズムを自動で設定する場合</span></span><br><span class="line"><span class="built_in">cudnnFindConvolutionForwardAlgorithm</span>(handle, src, filter_desc_.<span class="built_in">get</span>(), conv_desc_.<span class="built_in">get</span>(), dst, <span class="number">1</span>, &amp;nAlgos, &amp;forward_algo_);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 内部アルゴリズムを手動で設定する場合</span></span><br><span class="line">forward_algo_.algo = cudnnConvolutionFwdAlgo_t::CUDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_PRECOMP_GEMM;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 内部アルゴリズムの作業領域のサイズを計算する</span></span><br><span class="line"><span class="built_in">cudnnGetConvolutionForwardWorkspaceSize</span>(handle, src, filter_desc_.<span class="built_in">get</span>(), conv_desc_.<span class="built_in">get</span>(), dst, forward_algo_.algo, &amp;workspace_size);</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="9-拡大したい画像データをRAM（ホスト）→-VRAM-へ転送"><a href="#9-拡大したい画像データをRAM（ホスト）→-VRAM-へ転送" class="headerlink" title="9. 拡大したい画像データをRAM（ホスト）→ VRAM へ転送"></a>9. 拡大したい画像データをRAM（ホスト）→ VRAM へ転送</h2><p>あともう一息です。</p>
+<p>拡大したい画像データを VRAM へ転送します。</p>
+<figure class="highlight c++"><figcaption><span>画像の転送</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// VRAM を確保</span></span><br><span class="line"><span class="keyword">auto</span> image0 = <span class="built_in">cuda_memory_allocate</span>(image_size);</span><br><span class="line"></span><br><span class="line"><span class="comment">// image_float にはウィンドウをキャプチャしたデータが入っている</span></span><br><span class="line"><span class="built_in">cudaMemcpy</span>(image0.<span class="built_in">get</span>(), image_float.<span class="built_in">data</span>(), <span class="built_in">sizeof</span>(<span class="type">float</span>) * image_float.<span class="built_in">size</span>(), cudaMemcpyKind::cudaMemcpyHostToDevice);</span><br></pre></td></tr></table></figure>
+
+<h2 id="10-畳込みを行う"><a href="#10-畳込みを行う" class="headerlink" title="10. 畳込みを行う"></a>10. 畳込みを行う</h2><p>最後にここまで設定してきた記述子を元に、VRAM へコピーした画像データに畳込み処理を行います。<br>関数名から分かるように、畳込み、バイアスの加算、活性化関数の適用を一気に行います。</p>
+<figure class="highlight c++"><figcaption><span>畳込みを行う</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cudnnConvolutionBiasActivationForward</span>(</span><br><span class="line">        handle,</span><br><span class="line">        &amp;one, src, src_data,</span><br><span class="line">        filter_desc_.<span class="built_in">get</span>(), device_weight_ptr_.<span class="built_in">get</span>(),</span><br><span class="line">        conv_desc_.<span class="built_in">get</span>(), forward_algo_.algo,</span><br><span class="line">        workspace, workspace_size,</span><br><span class="line">        &amp;zero, dst, dst_data,</span><br><span class="line">        bias_desc_.<span class="built_in">get</span>(), device_bias_ptr_.<span class="built_in">get</span>(),</span><br><span class="line">        activation_desc_.<span class="built_in">get</span>(),</span><br><span class="line">        dst, dst_data</span><br><span class="line">        );</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h1><p>cuDNN の CUDA API による畳込みの流れを紹介しました。</p>
+<p>普段なかなか見ることのないバックエンド側の API でしたが、興味を持ってもらえるきっかけになればうれしいです。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20220413a/&related=twitterapi%2Ctwitter&text=cuDNN%20%E3%81%AE%20CUDA%20API%20%E3%81%AE%E7%B4%B9%E4%BB%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">7</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20220413a/&t=cuDNN%20%E3%81%AE%20CUDA%20API%20%E3%81%AE%E7%B4%B9%E4%BB%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20220413a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20220413a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              <p class="related-posts-none">No related post.</p>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#cuDNN-%E3%82%92%E5%8F%A9%E3%81%8F%E3%81%93%E3%81%A8%E3%81%AB%E3%81%AA%E3%81%A3%E3%81%9F%E3%81%8D%E3%81%A3%E3%81%8B%E3%81%91"><span class="toc-text">cuDNN を叩くことになったきっかけ</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#cuDNN-%E3%81%A7%E7%95%B3%E8%BE%BC%E3%81%BF%E3%82%92%E8%A1%8C%E3%81%86%E6%B5%81%E3%82%8C"><span class="toc-text">cuDNN で畳込みを行う流れ</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-cuDNN-%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%81%AE%E5%88%9D%E6%9C%9F%E5%8C%96"><span class="toc-text">1. cuDNN ライブラリの初期化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E3%83%A2%E3%83%87%E3%83%AB%E3%81%AE%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%81%AE%E9%87%8D%E3%81%BF%E3%82%92RAM%EF%BC%88%E3%83%9B%E3%82%B9%E3%83%88%EF%BC%89%E3%81%AB%E8%AA%AD%E3%81%BF%E8%BE%BC%E3%82%80"><span class="toc-text">2. モデルのフィルタの重みをRAM（ホスト）に読み込む</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-RAM%EF%BC%88%E3%83%9B%E3%82%B9%E3%83%88%EF%BC%89%E3%81%AB%E8%AA%AD%E3%81%BF%E8%BE%BC%E3%82%93%E3%81%A0%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%81%AE%E9%87%8D%E3%81%BF%E3%82%92-VRAM-%E3%81%B8%E8%BB%A2%E9%80%81%E3%81%99%E3%82%8B"><span class="toc-text">3. RAM（ホスト）に読み込んだフィルタの重みを VRAM へ転送する</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E8%A8%98%E8%BF%B0%E5%AD%90%EF%BC%88%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%BC%E3%81%AE%E3%82%B5%E3%82%A4%E3%82%BA%E3%81%AA%E3%81%A9%E3%82%92%E5%AE%9A%E7%BE%A9%EF%BC%89%E3%81%AE%E6%BA%96%E5%82%99"><span class="toc-text">4. フィルタ記述子（フィルターのサイズなどを定義）の準備</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E3%83%90%E3%82%A4%E3%82%A2%E3%82%B9%E8%A8%98%E8%BF%B0%E5%AD%90%E3%81%AE%E6%BA%96%E5%82%99"><span class="toc-text">5. バイアス記述子の準備</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E7%95%B3%E8%BE%BC%E3%81%BF%E8%A8%98%E8%BF%B0%E5%AD%90%EF%BC%88%E3%83%91%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%80%81%E3%82%B9%E3%83%88%E3%83%A9%E3%82%A4%E3%83%89%E3%81%AA%E3%81%A9%E3%82%92%E5%AE%9A%E7%BE%A9%EF%BC%89%E3%81%AE%E6%BA%96%E5%82%99"><span class="toc-text">6. 畳込み記述子（パディング、ストライドなどを定義）の準備</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E6%B4%BB%E6%80%A7%E5%8C%96%E9%96%A2%E6%95%B0%E3%81%AE%E8%A8%98%E8%BF%B0%E5%AD%90%E3%81%AE%E6%BA%96%E5%82%99"><span class="toc-text">7. 活性化関数の記述子の準備</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E7%95%B3%E8%BE%BC%E3%81%BF%E3%81%AE%E5%86%85%E9%83%A8%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0%E3%82%92%E8%A8%AD%E5%AE%9A%E3%81%99%E3%82%8B"><span class="toc-text">8. 畳込みの内部アルゴリズムを設定する</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E6%8B%A1%E5%A4%A7%E3%81%97%E3%81%9F%E3%81%84%E7%94%BB%E5%83%8F%E3%83%87%E3%83%BC%E3%82%BF%E3%82%92RAM%EF%BC%88%E3%83%9B%E3%82%B9%E3%83%88%EF%BC%89%E2%86%92-VRAM-%E3%81%B8%E8%BB%A2%E9%80%81"><span class="toc-text">9. 拡大したい画像データをRAM（ホスト）→ VRAM へ転送</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E7%95%B3%E8%BE%BC%E3%81%BF%E3%82%92%E8%A1%8C%E3%81%86"><span class="toc-text">10. 畳込みを行う</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%95%E3%81%84%E3%81%94%E3%81%AB"><span class="toc-text">さいごに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

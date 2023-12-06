@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>DynamoDB×Go#3 Go CDKでどこまでいける？機能を調べてみた | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは、TIG DXユニット真野です。この技術ブログの運営もしています。 DynamoDB×Go連載の第3弾目です。今までは AWS SDK Go やそれをラップしたguregu&#x2F;dynamo について説明していましたが、 Go CDK（Go Cloud Development Kit） を用いたDynamoDB操作について説明します。 Go CDKとは？ Go CDKは2018&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DynamoDB×Go#3 Go CDKでどこまでいける？機能を調べてみた | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20200228/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、TIG DXユニット真野です。この技術ブログの運営もしています。 DynamoDB×Go連載の第3弾目です。今までは AWS SDK Go やそれをラップしたguregu&#x2F;dynamo について説明していましたが、 Go CDK（Go Cloud Development Kit） を用いたDynamoDB操作について説明します。 Go CDKとは？ Go CDKは2018&#x2F;">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20200228/go-cdk-logo-gopherblue.png">
+<meta property="article:published_time" content="2020-02-28T01:13:26.000Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.410Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="GoCDK">
+<meta property="article:tag" content="DynamoDB">
+<meta property="article:tag" content="DynamoDB×Go">
+<meta property="article:tag" content="バッチ処理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20200228/go-cdk-logo-gopherblue.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20200228/">
+  <meta content="AWS,Go,GoCDK,DynamoDB,DynamoDB×Go,バッチ処理" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">DynamoDB×Go#3 Go CDKでどこまでいける？機能を調べてみた
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20200228-dynamodb-go-3.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20200228-dynamodb-go-3" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2020/" class="publish-date"><time datetime="2020-02-28T01:13:26.000Z" itemprop="datePublished">2020.02.28</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98" title="真野隼記さんの記事一覧へ" class="post-author">真野隼記</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/GoCDK/" title="GoCDKタグの記事へ" class="tag-list-link">GoCDK</a>
+  
+    
+    <a href="/tags/DynamoDB/" title="DynamoDBタグの記事へ" class="tag-list-link">DynamoDB</a>
+  
+    
+    <a href="/tags/DynamoDB×Go/" title="DynamoDB×Goタグの記事へ" class="tag-list-link">DynamoDB×Go</a>
+  
+    
+    <a href="/tags/バッチ処理/" title="バッチ処理タグの記事へ" class="tag-list-link">バッチ処理</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20200228/go-cdk-logo-gopherblue.png" class="img-middle-size" loading="lazy">
+
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、TIG DXユニット<a target="_blank" rel="noopener" href="https://twitter.com/laqiiz">真野</a>です。この技術ブログの運営もしています。</p>
+<p><a href="/tags/DynamoDB%C3%97Go/">DynamoDB×Go連載</a>の第3弾目です。今までは <code>AWS SDK Go</code> やそれをラップした<code>guregu/dynamo</code> について説明していましたが、 <strong>Go CDK（Go Cloud Development Kit）</strong> を用いたDynamoDB操作について説明します。</p>
+<h1 id="Go-CDKとは？"><a href="#Go-CDKとは？" class="headerlink" title="Go CDKとは？"></a>Go CDKとは？</h1><blockquote>
+<p>Go CDKは2018/07 に Google の Go チームが立ち上げたプロジェクトで、Go アプリケーションを各クラウド間でポータブルにすることを目指して、実装されています。</p>
+</blockquote>
+<p>詳しくは <a href="/tags/GoCDK/">Go Cloud連載企画</a> で全7回に渡って概要から各トピックについて説明しています。特に<a href="/articles/20191111/">第1回目</a> の概要説明から読むことがオススメです。 DynamoDBを含むDocStoreについては<a href="/articles/20191113/">第3回目</a>の記事を確認ください。</p>
+<ul>
+<li>Go CDK（公式）  <a target="_blank" rel="noopener" href="https://gocloud.dev/">https://gocloud.dev/</a></li>
+<li><a href="/tags/GoCDK/">Go Cloud連載企画</a></li>
+</ul>
+<p>※名称の揺れについてはGo CDKの方が正式名称ですが、ググラビリティが悪いかなと思い（特にAWS CDKと似ている）、連載版は古い呼び方であるGo Cloudを使わせてもらっていました。</p>
+<h1 id="記事の趣旨"><a href="#記事の趣旨" class="headerlink" title="記事の趣旨"></a>記事の趣旨</h1><p>ご存じの通り、DynamoDBはKVSと言われているものの、非常に多くの機能が存在します。KVSと名前だけ見ると、PK(Primary Key)に対してGet/Put/Deleteなどの基礎的なCRUD処理や、せいぜいそのBatch操作くらいしかできないイメージがありますよね。</p>
+<p>しかし、実際のDynamoDBは遥かに高機能で <strong>Global Secondary Index</strong> や <strong>Local Secondary Index</strong> を用いたインデックスアクセスや、SortKeyを利用した範囲指定の<strong>スキャン</strong>、条件を指定した<strong>クエリ</strong>、<strong>ConditionExpression</strong> という用した既存レコードの有無といった条件付きの書き込み機能などが存在します。これらを組み合わせて<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/WorkingWithItems.html#WorkingWithItems.AtomicCounters">アトミックカウンターを作る参考記事</a> も公式からでていたり、条件付きではありますが<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/transaction-apis.html">トランザクション</a>を提供もしています。DynamoDBのクライアントアプリから直接操作することは少いでしょうが、DynamoDB StreamsやGlobal Tablesといった機能も便利ですよね。</p>
+<p>一方で、Go CDKはこういったプロダクト固有の機能を隠蔽化・抽象化したAPIを提供するドライバなため、他のデータストアに切り替えたときでも利用可能なAPIしか提供しない設計になっています（はずです）。しかし、それは <strong>DynamoDBの機能を100%使い切れないということと同義</strong> なため、直感的にはリスクを避けるべくなるべくAWS公式のSDKを利用しようと考える方も多いのでは無いでしょうか？そういう短絡的な判断を避けるために、 <strong>Go CDKが現時点でどこまで機能を網羅しているのか</strong> 我々は知る必要があるでしょう。それがわかれば、この案件のユースケースではGo CDKの提供する機能で十分なため、Go CDKを利用しベンダーロックインのリスク低減を図ったり、Go CDKの提供する<code>memdocstore</code> といったモック機能を享受しようというより有意義な判断ができるはずです。</p>
+<p>というわけで、どの程度DynamoDBの機能がGo CDKから利用できるのか調査していきます。なお、私はDynamoDBのプロフェッショナルではなくイチ開発者ですので色々漏れがあると思います。ぜひTwitterなどでフィードバックを頂ければと思います。</p>
+<h1 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h1><p>なお、Go CDKは進化が早いため今回対応していないと判断したものも、実は記事の公開後に実装されている可能性があります。差分については <a target="_blank" rel="noopener" href="https://github.com/google/go-cloud/releases">release-notes</a> などから適時確認ください。</p>
+<ul>
+<li>調査日: 2020/02/24</li>
+<li>Go 1.13.4</li>
+<li>Go CDK v0.19.0</li>
+</ul>
+<h1 id="調査結果"><a href="#調査結果" class="headerlink" title="調査結果"></a>調査結果</h1><p>調査観点は以下としました。それぞれ○が一通りの機能が利用できる、△が一部利用可能、☓は機能提供がされていないということを示しています。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Case</th>
+<th>AWS SDK</th>
+<th>Go CDK</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>基本的なCRUD</td>
+<td>○</td>
+<td>○</td>
+<td>使いやすいAPIであるし、ハッシュキー、ソートキーともに利用できる</td>
+</tr>
+<tr>
+<td>2</td>
+<td>バッチ処理のCRUD</td>
+<td>○</td>
+<td>○</td>
+<td>バッチ登録、バッチ検索など様々可能</td>
+</tr>
+<tr>
+<td>3</td>
+<td>条件付き書き込み</td>
+<td>○</td>
+<td>△</td>
+<td>楽観的ロックを用いたデータ操作が可能</td>
+</tr>
+<tr>
+<td>4</td>
+<td>クエリ</td>
+<td>○</td>
+<td>○</td>
+<td>WhereやOrderbyやLimitを実行できる</td>
+</tr>
+</tbody></table></div>
+<p>詳細を説明していきます。</p>
+<h1 id="実証コード"><a href="#実証コード" class="headerlink" title="実証コード"></a>実証コード</h1><p>それぞれGoのコードベースで記載方法をまとめていきます。</p>
+<p>第1回の記事同様 DynamoDB Local を利用してローカル環境を準備します。<br><a href="https://future-architect.github.io/articles/20200225/">https://future-architect.github.io/articles/20200225/</a></p>
+<h2 id="0-事前準備"><a href="#0-事前準備" class="headerlink" title="0. 事前準備"></a>0. 事前準備</h2><h3 id="SDKのセットアップ"><a href="#SDKのセットアップ" class="headerlink" title="SDKのセットアップ"></a>SDKのセットアップ</h3><p>セッション及びDynamoDBを操作するクライアントを生成します。</p>
+<figure class="highlight go"><figcaption><span>クライアントの生成</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create session.</span></span><br><span class="line">sess := session.Must(session.NewSessionWithOptions(session.Options&#123;</span><br><span class="line">	SharedConfigState: session.SharedConfigEnable,</span><br><span class="line">&#125;))</span><br><span class="line"></span><br><span class="line"><span class="comment">// Create DynamoDB client</span></span><br><span class="line">db := dynamodb.New(sess, &amp;aws.Config&#123;Endpoint: aws.String(<span class="string">&quot;http://localhost:8000&quot;</span>)&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Open Collection via Go CDK</span></span><br><span class="line">coll, err := awsdynamodb.OpenCollection(db, <span class="string">&quot;MyFirstTable&quot;</span>, <span class="string">&quot;MyHashKey&quot;</span>, <span class="string">&quot;MyRangeKey&quot;</span>, <span class="literal">nil</span>)</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatal(err)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">defer</span> coll.Close()</span><br></pre></td></tr></table></figure>
+
+<p>オプションの <code>SharedConfigState</code> に <code>SharedConfigEnable</code> を設定することで <code>~/.aws/config</code> 内を参照してくれるようになります。</p>
+<p>DynamoDB clientを生成するまでは、公式SDK通りの手順となります。最後にテーブル名、ハッシュキー、ソートキーを指定して <code>OpenCollection</code> を呼ぶことで、Go CDK経由でドキュメントのCRUD操作を行える用になります。</p>
+<p>この時、<strong>ハッシュキー</strong> と <strong>ソートキー</strong> の両方を指定していますが、もしソートキーが無ければ空文字を指定すればOKです。</p>
+<h3 id="レコードを表現する構造体の定義"><a href="#レコードを表現する構造体の定義" class="headerlink" title="レコードを表現する構造体の定義"></a>レコードを表現する構造体の定義</h3><figure class="highlight go"><figcaption><span>構造体定義</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Item <span class="keyword">struct</span> &#123;</span><br><span class="line">	MyHashKey  <span class="type">string</span> <span class="string">`docstore:&quot;MyHashKey&quot;`</span></span><br><span class="line">	MyRangeKey <span class="type">int</span>    <span class="string">`docstore:&quot;MyRangeKey&quot;`</span></span><br><span class="line">	MyText     <span class="type">string</span> <span class="string">`docstore:&quot;MyText&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>docstore</code> というというタグを利用することで、DynamoDBのキーを指定して構造体とマッピングすることができます。省略した場合は構造体のキー名がそのまま利用されます</p>
+<p>ほぼ、AWS SDKと同じですね。</p>
+<h2 id="1-基本的なCRUD"><a href="#1-基本的なCRUD" class="headerlink" title="1. 基本的なCRUD"></a>1. 基本的なCRUD</h2><h3 id="Create"><a href="#Create" class="headerlink" title="Create"></a>Create</h3><p>利用するメソッドは <code>Create</code> です。</p>
+<figure class="highlight go"><figcaption><span>Create処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">write := Item&#123;MyHashKey: <span class="string">&quot;00001&quot;</span>, MyRangeKey: <span class="number">1</span>, MyText: <span class="string">&quot;some text...&quot;</span>&#125;</span><br><span class="line"><span class="keyword">if</span> err := coll.Create(ctx, &amp;write); err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatalf(<span class="string">&quot;create: %v&quot;</span>, err)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>直感的だと思います。</p>
+<h3 id="Read"><a href="#Read" class="headerlink" title="Read"></a>Read</h3><p>利用するメソッドは <code>Get</code>です。</p>
+<figure class="highlight go"><figcaption><span>Read処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">read := Item&#123;MyHashKey: <span class="string">&quot;00001&quot;</span>, MyRangeKey: <span class="number">1</span>&#125;</span><br><span class="line"><span class="keyword">if</span> err := coll.Get(ctx, &amp;read); err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatalf(<span class="string">&quot;get: %v&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line">fmt.Printf(<span class="string">&quot;got: %+v\n&quot;</span>, read)</span><br><span class="line"><span class="comment">// =&gt; get: &#123;MyHashKey:00001 MyRangeKey:1 MyText:some text...&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>これも直感的です。</p>
+<h3 id="Update"><a href="#Update" class="headerlink" title="Update"></a>Update</h3><p>これはやや特殊です。<code>Update</code> を用いますが、更新する差分を <code>docstore.Mods</code> というmapに値をもたせます。</p>
+<figure class="highlight go"><figcaption><span>Update処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">updateKey := Item&#123;MyHashKey: <span class="string">&quot;00001&quot;</span>, MyRangeKey: <span class="number">1</span>&#125;</span><br><span class="line"><span class="keyword">if</span> err := coll.Update(ctx, &amp;updateKey, docstore.Mods&#123;<span class="string">&quot;MyText&quot;</span>:<span class="string">&quot;update text&quot;</span>&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatalf(<span class="string">&quot;update: %v&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// (補足) もう一度getすると以下のように書き換わっている</span></span><br><span class="line"><span class="comment">// &#123;MyHashKey:00001 MyRangeKey:1 MyText:update text&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>Go CDKのUpdateは <code>Patch</code> のような動きをするので注意が必要です。もし、ドキュメント全体を置換したい場合は後述する <code>Replace</code> を利用します。</p>
+<p><code>Update</code> は存在しないレコードに対して行うとエラーになります。</p>
+<figure class="highlight go"><figcaption><span>Update失敗</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">notFoundKey := Item&#123;MyHashKey: <span class="string">&quot;99999&quot;</span>, MyRangeKey: <span class="number">1</span>&#125;</span><br><span class="line"><span class="keyword">if</span> err := coll.Update(ctx, &amp;notFoundKey, docstore.Mods&#123;<span class="string">&quot;MyText&quot;</span>: <span class="string">&quot;update text&quot;</span>&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatalf(<span class="string">&quot;not found: %v&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// not found: docstore (code=FailedPrecondition):  ConditionalCheckFailedException: The conditional request failed</span></span><br><span class="line"><span class="comment">// status code: 400, request id: ab4aaa27-303a-4090-a457-94f42950d0bd</span></span><br></pre></td></tr></table></figure>
+
+<p>エラーメッセージから推測すると、Go CDKのUpdateはDynamoDBのConditional Expressionsを利用していることがわかりますね。</p>
+<h2 id="Replace"><a href="#Replace" class="headerlink" title="Replace"></a>Replace</h2><p>項目全体を置き換える場合です。存在しない場合はエラーになります。</p>
+<figure class="highlight go"><figcaption><span>置換処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">replace := Item&#123;MyHashKey: <span class="string">&quot;00001&quot;</span>, MyRangeKey: <span class="number">1</span>, MyText: <span class="string">&quot;replace&quot;</span>&#125;</span><br><span class="line"><span class="keyword">if</span> err := coll.Replace(ctx, &amp;replace); err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatalf(<span class="string">&quot;replace: %v&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// (補足)もう一度getすると以下のように置換されている</span></span><br><span class="line"><span class="comment">// &#123;MyHashKey:00001 MyRangeKey:1 MyText:replace&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>簡単ですね。</p>
+<p>もし、存在しない場合は <code>Create</code>, 存在する場合は <code>Replace</code> をしたい場合は <code>Put</code> を使うようです。今回はあまりにコードがそのままなので省略します。</p>
+<h3 id="Delete"><a href="#Delete" class="headerlink" title="Delete"></a>Delete</h3><p>利用するメソッドは <code>Delete</code> です。</p>
+<figure class="highlight go"><figcaption><span>Delete処理</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">deleteKey := Item&#123;MyHashKey: <span class="string">&quot;00001&quot;</span>, MyRangeKey: <span class="number">1</span>&#125;</span><br><span class="line"><span class="keyword">if</span> err := coll.Delete(ctx, &amp;deleteKey); err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatalf(<span class="string">&quot;delete: %v&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// (補足)もう一度getすると、not foundになる</span></span><br></pre></td></tr></table></figure>
+
+<p>ここまでで一通りのCRUD操作ができることを確認できました。</p>
+<h2 id="2-バッチ処理のCRUD"><a href="#2-バッチ処理のCRUD" class="headerlink" title="2. バッチ処理のCRUD"></a>2. バッチ処理のCRUD</h2><p>大量データを扱う場合は、1件1件データを登録するのではなくバッチ登録を行いたいケースは多いのでは無いでしょうか？</p>
+<p>この場合は <code>Actions</code> を用います。</p>
+<figure class="highlight go"><figcaption><span>バッチ登録</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create</span></span><br><span class="line">w1 := Item&#123;MyHashKey: <span class="string">&quot;00001&quot;</span>, MyRangeKey: <span class="number">1</span>, MyText: <span class="string">&quot;some text1...&quot;</span>&#125;</span><br><span class="line">w2 := Item&#123;MyHashKey: <span class="string">&quot;00001&quot;</span>, MyRangeKey: <span class="number">2</span>, MyText: <span class="string">&quot;some text2...&quot;</span>&#125;</span><br><span class="line">w3 := Item&#123;MyHashKey: <span class="string">&quot;00001&quot;</span>, MyRangeKey: <span class="number">3</span>, MyText: <span class="string">&quot;some text3...&quot;</span>&#125;</span><br><span class="line"><span class="keyword">if</span> err := coll.Actions().Create(&amp;w1).Create(&amp;w2).Create(&amp;w3).Do(ctx); err != <span class="literal">nil</span> &#123;</span><br><span class="line">	log.Fatalf(<span class="string">&quot;actions: %v&quot;</span>, err)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// (補足) バッチ登録した結果をgetすると以下の値が確認できる</span></span><br><span class="line"><span class="comment">// got: &#123;MyHashKey:00001 MyRangeKey:1 MyText:some text1...&#125;</span></span><br><span class="line"><span class="comment">// got: &#123;MyHashKey:00001 MyRangeKey:2 MyText:some text2...&#125;</span></span><br><span class="line"><span class="comment">// got: &#123;MyHashKey:00001 MyRangeKey:3 MyText:some text3...&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>ActionsはCreateだけではなく、Get/Create/Replace/Put/Update/Delete の6つの操作を混在させて実行も可能です。</p>
+<p>参考: <a target="_blank" rel="noopener" href="https://godoc.org/gocloud.dev/docstore#hdr-Actions">https://godoc.org/gocloud.dev/docstore#hdr-Actions</a></p>
+<p>今回は関数をチェーンで登録しましたが、Actionsで <code>ActionList</code> が取得できるので、もちろんforループと合わせて追加もできます。</p>
+<h2 id="3-条件付き書き込み"><a href="#3-条件付き書き込み" class="headerlink" title="3. 条件付き書き込み"></a>3. 条件付き書き込み</h2><p>Go CDKはドキュメントを読んだ限りは、条件付き書き込みはサポートされていないようです。しかし、Revisionsという機能があり、いわゆる楽観的ロックのような利用用途を公式でサポートされています。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://godoc.org/gocloud.dev/docstore#hdr-Revisions">https://godoc.org/gocloud.dev/docstore#hdr-Revisions</a></li>
+</ul>
+<p>内容は リビジョンフィールド (デフォルト: <code>DocstoreRevision</code>) を設定すると、このフィールドを用いてバージョンを確認し、<code> Put</code>、<code>Replace</code>、<code>Update</code>、<code>Delete</code> の操作を安全に行うことができます。</p>
+<p>最初に定義した構造体にフィールドを追加します。</p>
+<figure class="highlight go"><figcaption><span>リビジョンフィールドを追加した構造体</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Item <span class="keyword">struct</span> &#123;</span><br><span class="line">	MyHashKey        <span class="type">string</span>       <span class="string">`docstore:&quot;MyHashKey&quot;`</span></span><br><span class="line">	MyRangeKey       <span class="type">int</span>          <span class="string">`docstore:&quot;MyRangeKey&quot;`</span></span><br><span class="line">	MyText           <span class="type">string</span>       <span class="string">`docstore:&quot;MyText&quot;`</span></span><br><span class="line">	DocstoreRevision <span class="keyword">interface</span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これを用いて、楽観的ロックを行ってロックが行われているか確認します。どちらも同じドキュメントにUpdateし続けて様子を見てみます。</p>
+<figure class="highlight go"><figcaption><span>楽観的ロック検出テスト</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// 別のgoroutineでも無限書き込み</span></span><br><span class="line">	<span class="keyword">go</span> UpdateLoop()</span><br><span class="line">	<span class="comment">// メインスレッドでも無限書き込み</span></span><br><span class="line">	UpdateLoop()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// =&gt; optimistic locking: docstore (code=FailedPrecondition):</span></span><br><span class="line">	<span class="comment">// ConditionalCheckFailedException: The conditional request failed</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">UpdateLoop</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// (DynamoDB Clientを生成処理)</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> &#123; <span class="comment">// 無限にドキュメントを更新する処理</span></span><br><span class="line">		read := Item&#123;MyHashKey: <span class="string">&quot;00001&quot;</span>, MyRangeKey: <span class="number">1</span>&#125;</span><br><span class="line">		<span class="keyword">if</span> err := coll.Get(ctx, &amp;read); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Fatalf(<span class="string">&quot;get: %v&quot;</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> err := coll.Update(ctx, &amp;read, docstore.Mods&#123;<span class="string">&quot;MyText&quot;</span>: <span class="string">&quot;update text: &quot;</span> + time.Now().String()&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">if</span> gcerrors.Code(err) == gcerrors.FailedPrecondition &#123;</span><br><span class="line">				log.Fatalf(<span class="string">&quot;optimistic locking: %v&quot;</span>, err)</span><br><span class="line">			&#125;</span><br><span class="line">			log.Fatalf(<span class="string">&quot;update: %v&quot;</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>すると、実行結果が <code>optimistic locking: docstore (code=FailedPrecondition): ConditionalCheckFailedException: The conditional request failed</code> が発生し、getしてupdateするまでの間に別のgoroutineが同じドキュメントを更新したことが検知できました。</p>
+<p>DynamoDBのConditional Expressionsほど万能では無いですが、多くのユースケースはロックを実現したいことが多いと思うので、これで事足りるケースも多いのではないでしょうか？</p>
+<p>ちなみに、Revisionフィールドですが、awscliでテーブルを検索すると、UUIDで実現されていました。最初はロック番号のような形式で実装されていると思ったので意外です</p>
+<p>もし、更新回数などをアプリケーションとして持ちたい場合は、自分で属性を持つ必要があるのでご注意ください。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&gt;aws dynamodb scan --endpoint-url http://localhost:8000 --table-name MyFirstTable</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;Items&quot;</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">&quot;DocstoreRevision&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;S&quot;</span>: <span class="string">&quot;3e38649b-d82c-46ab-a0fe-621f98104f75&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">&quot;MyHashKey&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;S&quot;</span>: <span class="string">&quot;00001&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">&quot;MyText&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;S&quot;</span>: <span class="string">&quot;update text: 2020-02-28 09:45:27.725097 +0900 JST m=+0.090001301&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">&quot;MyRangeKey&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;N&quot;</span>: <span class="string">&quot;1&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">&quot;Count&quot;</span>: 1,</span><br><span class="line">    <span class="string">&quot;ScannedCount&quot;</span>: 1,</span><br><span class="line">    <span class="string">&quot;ConsumedCapacity&quot;</span>: null</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="4-クエリ"><a href="#4-クエリ" class="headerlink" title="4. クエリ"></a>4. クエリ</h2><p><a href="/articles/20191113/">Go Cloud#3 Go CloudのDocStoreを使う</a> の記事で説明されているように、Go CDKはクエリもサポートされています。<code>Where()</code>、<code>OrderBy()</code>、<code>Limit()</code> で、 Whereの演算子は <code>=</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code> の5種類です。ほとんどやりたいことはできるのではないでしょうか？</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><ul>
+<li>使ってみた感想としてGo CDKのDocStoreは非常にリッチな機能を持っており、ベーシックなAWS SDKと遜色なく利用できました。Condition Expressionsで複雑な条件を利用しないなど、限られたユースケースであればむしろ生産性が高まるのではないでしょうか</li>
+<li>Go CDKを用いればドライバ切り替えでmemstoreというモック切り替えも可能ですし、テスタビリティとしても有用です</li>
+</ul>
+<p>機能上はGo CDKもかなりガンバっていると感じます。DynamoDBアクセスする際の有力な選択肢となりうるのではないでしょうか？ぜひ、私達のチームでも機を見て実戦投入してみてチャレンジしてみたいと思います。</p>
+<hr>
+<p><a href="/tags/DynamoDB%C3%97Go/">DynamoDB×Go連載企画</a>以外にも多くの連載企画があります。特にGo Cloud連載が今回のテーマに近いです。</p>
+<ul>
+<li><a href="/tags/GoCDK/">Go Cloud 連載</a></li>
+<li><a href="/articles/20200202/">GCP 連載</a></li>
+<li><a href="/tags/Auth0/">Auth0 連載</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20200228/&related=twitterapi%2Ctwitter&text=DynamoDB%C3%97Go#3%20Go%20CDK%E3%81%A7%E3%81%A9%E3%81%93%E3%81%BE%E3%81%A7%E3%81%84%E3%81%91%E3%82%8B%EF%BC%9F%E6%A9%9F%E8%83%BD%E3%82%92%E8%AA%BF%E3%81%B9%E3%81%A6%E3%81%BF%E3%81%9F%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20200228/&t=DynamoDB%C3%97Go#3%20Go%20CDK%E3%81%A7%E3%81%A9%E3%81%93%E3%81%BE%E3%81%A7%E3%81%84%E3%81%91%E3%82%8B%EF%BC%9F%E6%A9%9F%E8%83%BD%E3%82%92%E8%AA%BF%E3%81%B9%E3%81%A6%E3%81%BF%E3%81%9F" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20200228/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20200228/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2021.10.25</span><span class="snscount">&#9825;14</span><a href=/articles/20211025a/ title="DynamoDBをGoで操作することにかけては、[DynamoDB×Go連載] に参加するくらい関心があるのですが、AWS SDK for Goの公式ライブラリに含まれる、ヘルパーパッケージについて存在を今までスルーしていました。使ってみると業務的には利用一択だと思ったので今後使っていくぞという覚書としてまとめます。">AWS SDK for GoでDynamoDBの式を扱うヘルパーパッケージの使い方</a></li><li class="related-posts-item"><span>2021.01.22</span><span class="snscount">&#9825;13</span><a href=/articles/20210122/ title="DynamoDB Streamsは、DynamoDBに対する項目の追加、変更、削除をイベントとして検出できる機能です。テーブルの項目が変更されるとすぐに、新しいレコードがテーブルのストリームに表示されます">オレのDynamoDB Streamsが再着火しないわけがない</a></li><li class="related-posts-item"><span>2020.05.15</span><span class="snscount">&#9825;31</span><a href=/articles/20200515/ title="AWS StepFunctionsとLambdaを活用してバッチ処理を行う記事です。">Serverless連載6: AWSのStep FunctionsとLambdaでServelessなBatch処理を実現する</a></li><li class="related-posts-item"><span>2020.03.27</span><span class="snscount">&#9825;173</span><a href=/articles/20200327/ title="クラウドサービスが充実してくるにつれて、サーバーレスではいろいろなことができるようになっています。HTTPサーバーは動きますし、RDBやNoSQLなストレージも使えますし、PubSubみたいなサービスも利用できます。これらを駆使するとそこそこ複雑な処理も記述できます。一方で、上から下までサーバーレスにしようとするとできないものもいくつかあります。例えば、RDBも使えるといっても制約があり、LambdaやCloud ...">Serverless連載3: Goでサーバーレス用の検索エンジンwatertowerを作ってみました</a></li><li class="related-posts-item"><span>2020.02.27</span><span class="snscount">&#9825;10</span><a href=/articles/20200227/ title="DynamoDB×Go連載企画の第2弾の記事となります。本記事ではサードパーティ製のライブラリを利用せずaws-sdkを素で利用した場合のDynamoDBの基本操作について見ていきましょう。">DynamoDB×Go連載#2 AWS SDKによるDynamoDBの基本操作</a></li><li class="related-posts-item"><span>2020.02.25</span><span class="snscount">&#9825;20</span><a href=/articles/20200225/ title="Go言語でWebサーバを実装していた際にDynamoDBを扱うライブラリとしてGregさんの https://github.com/guregu/dynamo を使っていました。当時Go初心者だった私は「go dynamo」とすぐさまGoogle先生に問い合わせ、「guregu/dynamoがオススメ」とのエントリーを多数発見しました。オブジェクトの取り回しが隠蔽化されていてとにかく実装が簡単だと記事にも書いてありましたし、私自身も実際そう感じました。">DynamoDB×Go連載#1 GoでDynamoDBでおなじみのguregu/dynamoを利用する</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20220601b/ title="失敗談をテーマにした連載ということで、ちょうどプロダクト開発的に良い区切りのタイミングでもあるため、振り返りがてら、DynamoDB,Go,AWS Lambdaの技術要素について自分自身の理解・見込みの甘さについて反省します。">GoとDynamoDBを用いた開発で反省していること</a></li><li class="reference-posts-item"><a href=/articles/20201109/ title="1年弱ほどGo言語でWebAPIアプリケーション開発を行っていますが、かなり割り切った構成・テスト方針を採用しました。そろそろ1年弱になり機能開発も比較的落ち着き、保守運用フェーズの割合も徐々に増えてきた頃合いなので、やったこと・学び・反省といった振り返りを共有します。">GoのWebアプリ開発でフラットパッケージにした話</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Go-CDK%E3%81%A8%E3%81%AF%EF%BC%9F"><span class="toc-text">Go CDKとは？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A8%98%E4%BA%8B%E3%81%AE%E8%B6%A3%E6%97%A8"><span class="toc-text">記事の趣旨</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E6%8F%90"><span class="toc-text">前提</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AA%BF%E6%9F%BB%E7%B5%90%E6%9E%9C"><span class="toc-text">調査結果</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9F%E8%A8%BC%E3%82%B3%E3%83%BC%E3%83%89"><span class="toc-text">実証コード</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#0-%E4%BA%8B%E5%89%8D%E6%BA%96%E5%82%99"><span class="toc-text">0. 事前準備</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SDK%E3%81%AE%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97"><span class="toc-text">SDKのセットアップ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%AC%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E8%A1%A8%E7%8F%BE%E3%81%99%E3%82%8B%E6%A7%8B%E9%80%A0%E4%BD%93%E3%81%AE%E5%AE%9A%E7%BE%A9"><span class="toc-text">レコードを表現する構造体の定義</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%9F%BA%E6%9C%AC%E7%9A%84%E3%81%AACRUD"><span class="toc-text">1. 基本的なCRUD</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Create"><span class="toc-text">Create</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Read"><span class="toc-text">Read</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Update"><span class="toc-text">Update</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Replace"><span class="toc-text">Replace</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Delete"><span class="toc-text">Delete</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E3%83%90%E3%83%83%E3%83%81%E5%87%A6%E7%90%86%E3%81%AECRUD"><span class="toc-text">2. バッチ処理のCRUD</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%9D%A1%E4%BB%B6%E4%BB%98%E3%81%8D%E6%9B%B8%E3%81%8D%E8%BE%BC%E3%81%BF"><span class="toc-text">3. 条件付き書き込み</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E3%82%AF%E3%82%A8%E3%83%AA"><span class="toc-text">4. クエリ</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

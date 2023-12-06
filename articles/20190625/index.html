@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Amazon Redshiftの仕様を調べてみた | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="クラウド環境におけるDWHの選択肢として、Redshiftはもはや珍しいものではなくなりましたが、弊社内の採用実績はそれほど多くはありませんでした。本記事は元々そのような社内向けに、Redshiftの基本的な仕様をなるべく網羅的に理解できるようまとめたものです。 筆者について新卒でフューチャーに入社し、今年で8年目になります。入社後は一貫して技術畑、オンプレミスのインフラに始まり、直近ではアプリケ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Amazon Redshiftの仕様を調べてみた | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20190625/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="クラウド環境におけるDWHの選択肢として、Redshiftはもはや珍しいものではなくなりましたが、弊社内の採用実績はそれほど多くはありませんでした。本記事は元々そのような社内向けに、Redshiftの基本的な仕様をなるべく網羅的に理解できるようまとめたものです。 筆者について新卒でフューチャーに入社し、今年で8年目になります。入社後は一貫して技術畑、オンプレミスのインフラに始まり、直近ではアプリケ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/ogp_techblog.jpg">
+<meta property="article:published_time" content="2019-06-25T00:00:00.000Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.347Z">
+<meta property="article:tag" content="AWS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/ogp_techblog.jpg">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20190625/">
+  <meta content="AWS" name="keywords">
+  <meta content="大貫武彦" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Amazon Redshiftの仕様を調べてみた
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20190625-redshift.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20190625-redshift" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2019/" class="publish-date"><time datetime="2019-06-25T00:00:00.000Z" itemprop="datePublished">2019.06.25</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%A4%A7%E8%B2%AB%E6%AD%A6%E5%BD%A6" title="大貫武彦さんの記事一覧へ" class="post-author">大貫武彦</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p>クラウド環境におけるDWHの選択肢として、Redshiftはもはや珍しいものではなくなりましたが、弊社内の採用実績はそれほど多くはありませんでした。<br>本記事は元々そのような社内向けに、Redshiftの基本的な仕様をなるべく網羅的に理解できるようまとめたものです。</p>
+<h1 id="筆者について"><a href="#筆者について" class="headerlink" title="筆者について"></a>筆者について</h1><p>新卒でフューチャーに入社し、今年で8年目になります。<br>入社後は一貫して技術畑、オンプレミスのインフラに始まり、直近ではアプリケーションまで含めたプロジェクトの技術統括を担当しています。</p>
+<p>私もかつては社内有数のAWSエンジニアを自負していましたが、最近は別の仕事のため少し遠ざかっており、クラウドの世界は日進月歩なこともあり知識をアップデートする必要を感じています。<br>※この記事の準備中にもElastic Resizeがリリースされました。</p>
+<p>本記事は私のリハビリも兼ね、ドキュメントのまとめだけでなく、実際に手を動かして振る舞いを確認した箇所も含んでいます。</p>
+<h1 id="Amazon-Redshift"><a href="#Amazon-Redshift" class="headerlink" title="Amazon Redshift"></a>Amazon Redshift</h1><p>RedshiftはカラムナーストレージとMPP(Massively Parallel Processing)に基づくDWH向けデータベースサービスです。<br>次の順番でそれぞれまとめていきます。</p>
+<ol>
+<li>ノード構成</li>
+<li>ネットワーク</li>
+<li>メンテナンス</li>
+<li>パラメータグループ</li>
+<li>ワークロード管理</li>
+<li>ユーザーとグループ</li>
+<li>監査ログ</li>
+<li>テーブル設計</li>
+<li>データのロードとアンロード・バキューム</li>
+<li>ラッシュパフォーマンス</li>
+<li>Redshift Spectrum</li>
+<li>参考資料</li>
+</ol>
+<h2 id="1-ノード構成"><a href="#1-ノード構成" class="headerlink" title="1. ノード構成"></a>1. ノード構成</h2><h3 id="1-1-概要"><a href="#1-1-概要" class="headerlink" title="1-1. 概要"></a>1-1. 概要</h3><p>Amazon Redshiftクラスターは1つの<strong>リーダーノード</strong>と、複数の<strong>コンピューティングノード</strong>から構成されます。<br>それぞれの役割の概要を次にまとめます。</p>
+<ul>
+<li>リーダーノード<ul>
+<li>クライアントアプリケーションからクエリを受け取ってクエリを解析し、クエリ実行プランを作成する</li>
+<li>コンピューティングノードに対するこれらのプランの並列実行を調整し、コンピューティングノードから得た中間結果を集計してから、最終的にクライアントアプリケーションに結果を返す</li>
+</ul>
+</li>
+<li>コンピューティングノード<ul>
+<li>クエリ実行プランを実行し、これらのクエリを処理するためにデータをコンピューティングノード間で伝送する(再分散)</li>
+<li>集計の中間結果は、クライアントアプリケーションに送り返される前にリーダーノードに送り返される</li>
+</ul>
+</li>
+</ul>
+<h3 id="1-2-選べるノードタイプ"><a href="#1-2-選べるノードタイプ" class="headerlink" title="1-2. 選べるノードタイプ"></a>1-2. 選べるノードタイプ</h3><p><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/redshift/pricing/">ノードタイプと料金</a>はこちら。</p>
+<ul>
+<li>リーダーノードは無料<ul>
+<li>コンピューティングノードを一つにした場合、リーダーノード=コンピューティングノードのシングルノード構成となる</li>
+<li>通常運用する場合は、コンピューティングノードを複数にするが、この場合リーダーノードが別に1ノード作成される。課金対象となるのはコンピューティングノードのみである</li>
+</ul>
+</li>
+<li><a target="_blank" rel="noopener" href="http://docs.aws.amazon.com/ja_jp/redshift/latest/mgmt/purchase-reserved-node-instance.html">リザーブドインスタンス</a>が購入できる</li>
+</ul>
+<h3 id="1-3-リージョンとアベイラビリティ"><a href="#1-3-リージョンとアベイラビリティ" class="headerlink" title="1-3. リージョンとアベイラビリティ"></a>1-3. リージョンとアベイラビリティ</h3><p>すべてのクラスターノードが同じAZにプロビジョニングされ、<strong>Multi-AZ構成は選択不可能</strong> です。</p>
+<blockquote>
+<p>Amazon Redshift ではデータウェアハウスクラスター内の障害ノードが自動的に検知され、障害ノードの交換が行われます。データウェアハウスクラスターは代替ノードがプロビジョニングされてデータベースに追加されるまで、クエリと更新を行うことはできません。Amazon Redshift では代替ノードが即座に利用可能となり、まず最も高い頻度でアクセスされるデータが S3 からロードされます。こうすることで、可能な限り速やかにクエリの実行が再開できるようになります。単一ノードのクラスターは、データのレプリケーションをサポートしません。ドライブに障害が発生した場合、S3 のスナップショットからクラスターを復元する必要があります。実稼働には少なくとも 2 つのノードを使用することをお勧めします。<br><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/redshift/faqs/">https://aws.amazon.com/jp/redshift/faqs/</a></p>
+</blockquote>
+<p>実際にどれくらいの時間で復旧するのかは未調査です。</p>
+<h2 id="2-ネットワーク"><a href="#2-ネットワーク" class="headerlink" title="2. ネットワーク"></a>2. ネットワーク</h2><h3 id="2-1-クラスターサブネットグループ"><a href="#2-1-クラスターサブネットグループ" class="headerlink" title="2-1. クラスターサブネットグループ"></a>2-1. クラスターサブネットグループ</h3><p>RDSのデータベースサブネットグループと同じようなもので、別途作成する必要があります。</p>
+<h3 id="2-2-拡張されたVPCのルーティング-Enhanced-VPC-Routing"><a href="#2-2-拡張されたVPCのルーティング-Enhanced-VPC-Routing" class="headerlink" title="2-2. 拡張されたVPCのルーティング(Enhanced VPC Routing)"></a>2-2. 拡張されたVPCのルーティング(Enhanced VPC Routing)</h3><p>拡張されたVPCのルーティングを有効にすると、Amazon Redshiftはクラスターとデータリポジトリ間のすべてのCOPYとUNLOADトラフィックがAmazon VPCを通るよう強制します。</p>
+<ul>
+<li>S3との通信はVPC Endpointを作ればOK。ただしRedshift SpectrumはGlueカタログを利用するため、インターネット経由でGlueにアクセスできる必要があり、NATゲートウェイ等の利用が必要となる。※PoCでは確認できていない</li>
+<li>DynamoDBは未検証だが、おそらくVPC Endpoint経由であれば問題ないはずである</li>
+<li>EMRクラスターは未検証だが、VPC内で通信できれば支障はないはずである</li>
+</ul>
+<p>拡張されたVPCルーティングが有効でない場合、Amazon RedshiftはAWSネットワークにおけるその他のサービスへのトラフィックを含むトラフィックをインターネット経由でルーティングします。</p>
+<h2 id="3-メンテナンス"><a href="#3-メンテナンス" class="headerlink" title="3. メンテナンス"></a>3. メンテナンス</h2><h3 id="3-1-リサイズ"><a href="#3-1-リサイズ" class="headerlink" title="3-1. リサイズ"></a>3-1. リサイズ</h3><p>リサイズは以下1~4のプロセスで実行され、気軽に実行できるものではないです。</p>
+<ol>
+<li>新しいクラスターを作成する</li>
+<li>ソースクラスターを読み取り専用モードで再起動する。既存のコネクションは全て切断され、実行中のトランザクションはロールバックされる</li>
+<li>ソースクラスターから新しいクラスターへデータをコピーする</li>
+<li>エンドポイントを新しいクラスターへ変更する</li>
+</ol>
+<p>クラスターの<strong>サイズ変更にかかる時間</strong>は、各ノードのデータ量に依存します。</p>
+<ul>
+<li>通常、サイズ変更処理には数時間から1日かかる</li>
+<li>データ量が多いクラスターではさらに時間がかかることもある</li>
+</ul>
+<p>Amazon Redshiftは<strong>サイズ変更の操作中、テーブルをソートしません</strong>。</p>
+<ul>
+<li>クラスターのサイズを変更すると、Amazon Redshiftは分散方式に基づいてデータベースのテーブルを新しいコンピューティングノードに分散し、ANALYZEを実行して統計を更新する</li>
+<li>削除のマークが付いた行は転送されないため、テーブルを再ソートする必要がある場合のみVACUUMを実行する必要がある</li>
+</ul>
+<p>リサイズ後の<strong>IPアドレス</strong>について以下の特徴があります。</p>
+<ul>
+<li>クラスターがパブリックであり、VPC 内に存在する場合、サイズ変更後もリーダーノードの elastic IP アドレス（EIP）は変更されない</li>
+<li>クラスターがプライベートであり、VPC 内に存在する場合、サイズ変更後もリーダーノードのプライベート IP アドレスは変更されない</li>
+<li>クラスターがVPC内に存在しない場合、サイズ変更オペレーションの一部として、新しいパブリック IP アドレスがリーダーノードに割り当てられる</li>
+</ul>
+<h3 id="3-2-Elastic-Resize"><a href="#3-2-Elastic-Resize" class="headerlink" title="3-2. Elastic Resize"></a>3-2. Elastic Resize</h3><p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/mgmt/rs-resize-tutorial.html">伸縮自在なサイズ変更</a>がサポートされました。</p>
+<p>既存のクラスターにあるノードを追加または削除し、自動的にデータを新しいノードに再分散する。以下1~4のイベントが記録されます。</p>
+<ol>
+<li>リサイズリクエスト受付</li>
+<li>リサイズ開始</li>
+<li>リサイズ完了</li>
+<li>再分散完了</li>
+</ol>
+<p>Elastic Resizeは新しいクラスターを作成しないため、伸縮自在なサイズ変更オペレーションは通常のリサイズに比べて素早く完了します。実測したところ、確かに速かった(～5分以内)です。</p>
+<p>ちなみに、「<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/mgmt/rs-resize-tutorial.html#elastic-resize">バックグラウンドでデータが再分配されているとき、一部のクエリの実行時間がわずかに増加するのに気付くかも知れません。</a>」とありますが、差を確認することはできなかったです。</p>
+<p>その他、留意したほうが良さそうな点をまとめました。</p>
+<ul>
+<li>一時的に使用不可な時間が発生するが、セッションは切断されず、クエリはキューに溜まる<ul>
+<li>2ノードから4ノードへの変更時に40秒程度クエリが発行できない時間が発生した</li>
+<li>その後、クエリの実行時間が大きく増大する時間が60秒程度発生した<ul>
+<li>2ノードで600msec程度のクエリに4sec～13sec</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>ノード数を2倍にするか、半分にするかのどちらかしか選べない。また、一度ノード数を増やしてしまうとスライス数が増えるため、2倍にしてから半分にする(元に戻す)とスライス数が過剰になってしまう</li>
+</ul>
+<h3 id="3-3-スナップショット"><a href="#3-3-スナップショット" class="headerlink" title="3-3. スナップショット"></a>3-3. スナップショット</h3><p>スナップショットは<strong>自動</strong>または<strong>手動</strong>を選択できます。</p>
+<ul>
+<li>自動スナップショット<ul>
+<li>自動スナップショットは、クラスターを作成するときデフォルトで有効になる</li>
+<li>通常は、8時間ごとまたはノードあたり5GBのデータ変更ごと (あるいはそのいずれか早い方) に作成される</li>
+</ul>
+</li>
+<li>手動スナップショット<ul>
+<li>手動スナップショットはいつでも取得できる</li>
+<li>デフォルトでは、手動スナップショットは、クラスターを削除した後も、無限に保持される。手動スナップショットを作成するときに保持期間を指定できる</li>
+</ul>
+</li>
+</ul>
+<p>また、次のような特徴があります。</p>
+<ul>
+<li>テーブル定義に<code>BACKUP NO</code>を加えると、バックアップ対象外になる</li>
+<li>クラスター全体を復元する代わりに、スナップショットから単一のテーブルを復元できる</li>
+<li>別アカウントへ共有可能。※RDSと同様</li>
+<li>復元する際に(コンソールから実行する限りは)監査設定とIAMロールが外れるので注意が必要。ユーザー側で再設定する必要がある</li>
+</ul>
+<h3 id="3-4-メンテナンスウィンドウ"><a href="#3-4-メンテナンスウィンドウ" class="headerlink" title="3-4. メンテナンスウィンドウ"></a>3-4. メンテナンスウィンドウ</h3><p>Amazon Redshiftは定期的にメンテナンスを実行して、クラスターにアップグレードを適用します。更新中は Amazon Redshiftクラスターで通常の操作を実行することはできません。</p>
+<p>また、特に抑えておきたい内容に以下のような項目があります。</p>
+<ul>
+<li>メンテナンスウィンドウは30分以上、24時間以内で指定可能<ul>
+<li>クラスター作成時は指定できず、自動で設定される。※コンソール使用時</li>
+</ul>
+</li>
+<li>メンテナンスがスケジュールされた場合、最長45日までは延期可能。</li>
+</ul>
+<h2 id="4-パラメータグループ"><a href="#4-パラメータグループ" class="headerlink" title="4. パラメータグループ"></a>4. パラメータグループ</h2><p>使用できるパラメータのリストは、パラメータグループが属しているパラメータグループファミリーによって異なります。</p>
+<p>これはRedshiftのエンジンバージョン毎に異なるパラメータのリストが使われる(新しいバージョンでないと設定できないパラメータやサポートされないパラメータがある)ということですが、2019年5月時点ではエンジンバージョンは一つ(<code>redshift-1.0</code>)しかないので現時点では気にしなくても良さそうです。</p>
+<p>反映する場合は <strong>再起動が必要</strong>です。ただしWLM(後述)のうち一部のパラメータは動的変更可能です。</p>
+<p>パラメータ一覧</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>auto_analyze</td>
+<td>自動ANALYZEを有効にするか。データ更新がバッチのみなら手動ANALYZEのみにした方が制御しやすい</td>
+</tr>
+<tr>
+<td>datestyle</td>
+<td>‘ISO, YMD’が無難</td>
+</tr>
+<tr>
+<td>enable_user_activity_logging</td>
+<td>データベースで実行される前に各クエリを記録する</td>
+</tr>
+<tr>
+<td>extra_float_digits</td>
+<td>浮動小数点値 (float4 と float8 を含みます) の表示桁数を設定する</td>
+</tr>
+<tr>
+<td>max_concurrency_scaling_clusters</td>
+<td>同時実行スケーリングで起動されるクラスター数上限を設定する</td>
+</tr>
+<tr>
+<td>max_cursor_result_set_size</td>
+<td>設定は可能だが、廃止されている</td>
+</tr>
+<tr>
+<td>query_group</td>
+<td>ワークロード管理で利用するが、パラメータグループで設定することはまずないと思われる</td>
+</tr>
+<tr>
+<td>require_ssl</td>
+<td>tls接続を使用する</td>
+</tr>
+<tr>
+<td>use_fips_ssl</td>
+<td>FIPS 準拠の SSL モードを有効にする</td>
+</tr>
+<tr>
+<td>search_path</td>
+<td>検索パス(PostgreSQLと同じもの)</td>
+</tr>
+<tr>
+<td>statement_timeout</td>
+<td>指定されたミリ秒数以上かかっているステートメントを中止する。0に設定すれば制限なし</td>
+</tr>
+</tbody></table></div>
+<p>セッション内でのみ変更可能なパラメータもあります。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>analyze_threshold_percent</code></td>
+<td><code>ANALYZE</code>を実行する際のしきい値を設定する。<code>analyze_threshold_percent</code>の指定よりも変更された行の割合が低いテーブルの分析は省略される。デフォルトは10(パーセント)</td>
+</tr>
+<tr>
+<td><code>describe_field_name_in_uppercase</code></td>
+<td><code>SELECT</code>で返却される列名を大文字にする。デフォルトはオフ</td>
+</tr>
+<tr>
+<td><code>timezone</code></td>
+<td>セッションのタイムゾーンを設定する。デフォルトはUTC。パラメータグループでは設定できない。デフォルト設定した場合はユーザーのデフォルトセッションパラメータに設定する</td>
+</tr>
+<tr>
+<td><code>wlm_query_slot_count</code></td>
+<td><a href="#WLM%E8%A8%AD%E5%AE%9A">WLM設定</a>参照</td>
+</tr>
+</tbody></table></div>
+<h2 id="5-ワークロード管理"><a href="#5-ワークロード管理" class="headerlink" title="5. ワークロード管理"></a>5. ワークロード管理</h2><p>Amazon Redshift では、**ワークロード管理(WLM)**を使用して、使用可能なクエリキューの数と、処理するためにクエリをそれらのキューにルーティングする方法を定義します。</p>
+<p>デフォルトのWLM設定には、<strong>最大5つのクエリを同時に実行できる1つのキュー</strong>が含まれ、<strong>最大で8個のキューを定義</strong>できます。</p>
+<h3 id="5-1-スーパーユーザーキュー"><a href="#5-1-スーパーユーザーキュー" class="headerlink" title="5.1 スーパーユーザーキュー"></a>5.1 スーパーユーザーキュー</h3><p>スーパーユーザーキューは、スーパーユーザー専用に予約されており、設定することはできません。</p>
+<p>このキューは、システムに影響を与えるクエリを実行する必要があるときや、トラブルシューティング目的でのみ使用することが想定されています。</p>
+<p>スーパーユーザーキューでクエリを実行するには、ユーザーはスーパーユーザーとしてログインし、事前定義された <code>superuser</code>クエリグループを使用してクエリを実行する必要があります。</p>
+<h3 id="5-2-WLM設定"><a href="#5-2-WLM設定" class="headerlink" title="5.2 WLM設定"></a>5.2 WLM設定</h3><p>WLMは<code>wlm_json_configuration</code>パラメータで制御すします。<code>wlm_json_configuration</code>はJSON(キューに対応するオブジェクトの配列)として定義します。キューに名前を付けられないのでわかりにくいですね。</p>
+<p>プロパティは動的/静的があります。動的はクラスターを再起動することなく適用でき、静的プロパティはクラスターの再起動が必要です。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>種別</th>
+<th>説明</th>
+<th>備考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>query_concurrency</code></td>
+<td>動的</td>
+<td>キューの同時実行クエリ数。キューが同時実行レベルに達すると、後続のクエリを処理するリソースが利用可能になるまでそれらのクエリはキューで待機する。</td>
+<td>定義可能な範囲は1～50だが、全てのキューを合計して15までが推奨値</td>
+</tr>
+<tr>
+<td><code>max_execution_time</code></td>
+<td>動的</td>
+<td>クエリが実行されて始めてからキャンセルされるまでの最大時間（ミリ秒単位）。COPY ステートメントと、ANALYZE や VACUUM などのメンテナンスオペレーションは、WLM タイムアウトの対象にはならない</td>
+<td></td>
+</tr>
+<tr>
+<td><code>memory_percent_to_use</code></td>
+<td>動的</td>
+<td>キューに割り当てるメモリの割合。すべてのキューに割り当てられたメモリの合計が100パーセントを下回る場合、未割り当てのメモリはサービスによって管理され、処理用に追加メモリをリクエストするキューに一時的に付与できる。クエリスロットに割り当てられるメモリ量は、キューに割り当てられたメモリをスロットカウントで割った割合と同じ。</td>
+<td>デフォルトは各ユーザー定義キューへ均等に割り当て。100%になるような割り当てが無難。<code>Superuser</code>キューは独自に割り当てられているメモリがあるため変更負荷</td>
+</tr>
+<tr>
+<td><code>user_group</code></td>
+<td>静的</td>
+<td>ユーザーグループ名のカンマ区切りリスト。ユーザーグループのメンバーがデータベースでクエリを実行すると、そのメンバーのクエリはユーザーグループに関連付けられたキューにルーティングされる</td>
+<td></td>
+</tr>
+<tr>
+<td><code>user_group_wild_card</code></td>
+<td>静的</td>
+<td>ユーザーグループでワイルドカードを有効にするかどうかを示すブール値。ワイルドカードが有効な場合、「+」または「?」を使用し、クエリを実行するときに複数のユーザーグループを指定できる</td>
+<td>0:無効 1:有効</td>
+</tr>
+<tr>
+<td><code>query_group</code></td>
+<td>静的</td>
+<td>クエリグループのカンマ区切りリスト。クエリグループのメンバーがデータベースでクエリを実行すると、そのメンバーのクエリはクエリグループに関連付けられたキューにルーティングされる</td>
+<td></td>
+</tr>
+<tr>
+<td><code>query_group_wild_card</code></td>
+<td>静的</td>
+<td>クエリグループでワイルドカードを有効にするかどうかを示すブール値。ワイルドカードが有効な場合、「+」または「?」を使用し、クエリを実行するときに複数のクエリグループを指定できる</td>
+<td>0:無効 1:有効</td>
+</tr>
+</tbody></table></div>
+<p>以下、キューとルーティングについて追記します。</p>
+<ul>
+<li>ルーティングについて<ul>
+<li><code>query group</code>を使ってルーティングする場合<ul>
+<li>ユーザーのデフォルトセッションパラメータで<code>query_group</code>を定義することも出来るので、変えたい時だけ<code>SET</code>する運用が可能である</li>
+<li>ex. <code>set query_group to &#39;priority-high&#39;; xxx; reset query_group;</code></li>
+</ul>
+</li>
+<li><code>user_group</code>をつかってルーティングする場合<ul>
+<li>アプリケーションによってワークロードが変わる場合は、アプリケーションごとにユーザーを作成することで、異なるキューを割り当てることができる</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>キュー割り当てルール<ol>
+<li>user = <code>Superuser</code> and Query Group = <code>superuser</code>, then <code>Superuser queue</code></li>
+<li>Matching user group, then user group</li>
+<li>Matching query group, then query group</li>
+<li>default queue</li>
+</ol>
+</li>
+<li>VACUUMのルーティング<ul>
+<li>VACUUMのルーティングはテーブルの所有者権限(またはスーパーユーザー権限)を持っていないと実行できないため、所有者が含まれる<code>user_group</code>でキュー定義していると<code>VACUUM</code>がそのキューに行ってしまう。<code>user_group</code>ではなく<code>query_group</code>でルーティングするようにした方が良い</li>
+<li>例えばテーブルAの所有者ユーザーAがグループAに所属していた場合、グループAに対して定義されたキューがあると、ユーザーAが発行する<code>SELECT</code>と<code>VACUUM</code>がどちらの同じキューへルーティングされる</li>
+</ul>
+</li>
+<li>キューの分割パターン<ul>
+<li>スループット重視で並列度を管理可能な夜間バッチ<ul>
+<li>実行されるクエリが予測できるので、タイムアウトはさせない</li>
+<li>夜間バッチ前後にWLM設定を変更し、日中クエリにメモリを明け渡すことも検討する</li>
+</ul>
+</li>
+<li>リクエスト数が多いが、定型的でキャッシュヒットしやすいクエリ(ダッシュボード等)<ul>
+<li>実行されるクエリが予測できるので、タイムアウトはさせない</li>
+<li>同時実行スケーリングを有効にする</li>
+</ul>
+</li>
+<li>実行されるクエリが予め予測できないアドホッククエリ<ul>
+<li>メモリを使いすぎないように、メモリ上限を少なめにしておく</li>
+<li>タイムアウトを設定する</li>
+<li><a href="%E3%82%AF%E3%82%A8%E3%83%AA%E3%83%A2%E3%83%8B%E3%82%BF%E3%83%AA%E3%83%B3%E3%82%B0">クエリモニタリング</a>を設定する</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="キューの確認方法"><a href="#キューの確認方法" class="headerlink" title="キューの確認方法"></a>キューの確認方法</h4><p><code>service_class</code>がわかりにくいですが…</p>
+<ul>
+<li>1, 2, 3, 4はシステム用</li>
+<li>5がスーパーユーザーキュー</li>
+<li>6～13までユーザー定義キュー</li>
+<li>14が <a href="#short-query-acceleration">SQA</a> 用のキュー</li>
+</ul>
+<figure class="highlight sql"><figcaption><span>キューの確認方法</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> service_class, num_query_tasks, query_working_mem, name <span class="keyword">from</span> stv_wlm_service_class_config;</span><br></pre></td></tr></table></figure>
+
+<p>キューとクエリのマッピング方法</p>
+<figure class="highlight sql"><figcaption><span>キュートクエリのマッピング</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">    wq.queue_start_time</span><br><span class="line">,   wq.service_class</span><br><span class="line">,   wq.total_exec_time</span><br><span class="line">,   q.label</span><br><span class="line">,   q.concurrency_scaling_status</span><br><span class="line">,   <span class="built_in">trim</span>(q.querytxt) <span class="keyword">as</span> query_text</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">    stl_wlm_query wq</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span></span><br><span class="line">    stl_query q</span><br><span class="line"><span class="keyword">on</span>  wq.query <span class="operator">=</span> q.query</span><br><span class="line"><span class="keyword">where</span> <span class="number">1</span><span class="operator">=</span><span class="number">1</span></span><br><span class="line"><span class="keyword">and</span> wq.service_class <span class="operator">&gt;</span> <span class="number">5</span></span><br><span class="line"><span class="keyword">and</span> wq.final_state <span class="operator">=</span> <span class="string">&#x27;Completed&#x27;</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span></span><br><span class="line">    q.query <span class="keyword">desc</span></span><br><span class="line">limit <span class="number">20</span></span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-クエリモニタリング"><a href="#5-3-クエリモニタリング" class="headerlink" title="5.3 クエリモニタリング"></a>5.3 クエリモニタリング</h3><p>リソース消費が激しいクエリや、検索件数が多すぎるクエリなど、滅茶苦茶なクエリを監視することができます。</p>
+<p>また、基準に抵触した場合に、<strong>ログ</strong>・<strong>ホップ</strong>・<strong>キャンセル</strong>を選ぶことができます。</p>
+<ul>
+<li>ログ: ログ出力するのみ</li>
+<li>ホップ: 実行状態を保ったままキューを移動させる</li>
+<li>キャンセル: クエリをキャンセルする</li>
+</ul>
+<h3 id="5-4-クエリホッピング"><a href="#5-4-クエリホッピング" class="headerlink" title="5.4 クエリホッピング"></a>5.4 クエリホッピング</h3><p>WLMタイムアウトした場合・クエリモニタリングでホップした場合、次の有効なキューに移されます。この場合は一度キャンセルされるわけではなく、実行状態を保ったままキューを移動します。</p>
+<p>これにより低レイテンシ用のキューで予期せず長時間かかるクエリが実行された場合に、長時間クエリ用のキューへ移動することが可能になります。</p>
+<h2 id="6-ユーザー・グループ"><a href="#6-ユーザー・グループ" class="headerlink" title="6. ユーザー・グループ"></a>6. ユーザー・グループ</h2><p>現在のPostgreSQLではRoleに統合されているが、Redshiftでは分かれています。<br>わかりにくいのでユーザーとグループで同じ名前を使わないようにすべきでしょう。</p>
+<ul>
+<li>グループの使い道<ul>
+<li>権限設定</li>
+<li>WLMキューの振り分け</li>
+</ul>
+</li>
+<li>全てのユーザーが暗黙的に<code>PUBLIC</code>グループに所属しています。<ul>
+<li><code>PUBLIC</code>グループに対して<code>public</code>スキーマの<code>CREATE</code>と<code>USAGE</code>が付与されているので、<code>public</code>スキーマを使用しない場合は<code>REVOKE</code>しておくか、<code>search_path</code>を設定しておくと良いでしょう。</li>
+</ul>
+</li>
+<li>通常のデータベースユーザーも<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/mgmt/generating-user-credentials.html">IAM認証</a>も可能です。</li>
+<li>ユーザーのパスワードを無効にするには<code>DISABLE</code>を指定します。パスワードを無効にしてもIAM認証は可能です。</li>
+<li><code>CREATEUSER</code>オプションを使用すると、<code>CREATE USER</code>を含め、データベースに関するすべての権限を持つスーパーユーザーが作成されます。</li>
+<li><code>SYSLOG ACCESS UNRESTRICTED</code>を指定すると、別のユーザーによって生成された行を含む、ユーザーが表示可能なシステムテーブルとビューのすべての行を表示できます。ただし、スーパーユーザーのみが表示可能なテーブルへのアクセス権は与えられません。デフォルトは<code>RESTRICTED</code>です。なお、STV_RECENTS および SVV_TRANSACTIONS のすべての行は、すべてのユーザーに表示されます。</li>
+<li><code>CONNECTION LIMIT</code>を指定すると、ユーザーが同時に開けるデータベース接続の最大数を指定できます。デフォルトは<code>UNLIMITED</code>であり、クラスターの同時接続制限数は500です。</li>
+<li><code>ALTER USER username SET parameter TO value</code>でセッションパラメータのデフォルト値を設定できます。<ul>
+<li>ユーザーレベルで設定するのは<code>search_path</code>と<code>statement_timeout</code>くらいでしょうか。</li>
+</ul>
+</li>
+</ul>
+<p>ユーザーとグループのマッピング確認は以下の通りです。</p>
+<figure class="highlight sql"><figcaption><span>ユーザとグループのマッピング確認</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">    grp.groname</span><br><span class="line">,   usr.usename</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">    pg_group grp</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span></span><br><span class="line">    pg_user usr</span><br><span class="line"><span class="keyword">on</span> usr.usesysid <span class="operator">=</span> <span class="keyword">ANY</span>(grp.grolist)</span><br><span class="line"><span class="keyword">where</span> <span class="number">1</span><span class="operator">=</span><span class="number">1</span></span><br><span class="line"><span class="comment">--    pg_group.groname=&#x27;&lt;YOUR_GROUP_NAME&gt;&#x27;</span></span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+
+<h2 id="7-監査ログ"><a href="#7-監査ログ" class="headerlink" title="7. 監査ログ"></a>7. 監査ログ</h2><p><strong>接続ログ</strong>・<strong>ユーザーログ</strong>・<strong>ユーザーアクティビティログ</strong>が収集可能です。</p>
+<ul>
+<li>接続ログ<ul>
+<li>認証の試みと、接続および切断を記録する</li>
+<li>自動でシステムテーブル(STL_CONNECTION_LOG）に出力されるが、S3に出力することも可能</li>
+</ul>
+</li>
+<li>ユーザーログ<ul>
+<li>データベースのユーザー定義への変更に関する情報を記録する</li>
+<li>自動でシステムテーブル(STL_USERLOG）に出力されるが、S3に出力することも可能</li>
+</ul>
+</li>
+<li>ユーザーアクティビティログ<ul>
+<li>データベースで実行される前に各クエリを記録する</li>
+<li>S3へのログ出力を有効化したうえでパラメータ <code>enable_user_activity_logging</code> の設定が必要</li>
+</ul>
+</li>
+</ul>
+<p>ただし、S3出力時には権限設定が必要で、ELBと同様にRedshiftがS3に書き込めるよう特定のアカウントIDからのアクセス許可（<code>s3:GetBucketAcl</code>, <code>s3:PutObject</code>）を付与します。<br>検証したところ、有効にしてからログが配信されるまで1時間くらいかかりました。</p>
+<h2 id="8-テーブル設計"><a href="#8-テーブル設計" class="headerlink" title="8. テーブル設計"></a>8. テーブル設計</h2><h3 id="8-1-実行計画"><a href="#8-1-実行計画" class="headerlink" title="8-1. 実行計画"></a>8-1. 実行計画</h3><h4 id="テーブル結合"><a href="#テーブル結合" class="headerlink" title="テーブル結合"></a>テーブル結合</h4><p>性能観点では、<strong>Merge Join</strong>が最適で、次点が<strong>Hash Join</strong>で<strong>Nested Loop</strong>の順。</p>
+<p>しかし、Merge Joinが選択されるためには、分散キー/ソートキーで結合される必要があります。分散キーとソートキーは同じカラムでないといけないので、ファクトとディメンジョンの結合ではまずならないです。また。ソートキーは<a href="#%E3%82%BD%E3%83%BC%E3%83%88%E3%82%AD%E3%83%BC"><code>compound sort key</code></a>である必要があります。[分散スタイル](#8-2. 分散スタイル)は両テーブルとも<code>KEY</code>である必要があります。<code>ALL</code>では(必要なデータはローカルにあるはずだが)Merge Joinが選択されません。</p>
+<p>上記の制約もありMerge Joinが使えるケースは希少だと思うので、基本的にHash Joinを使うように考えた方が良さそうです。高速化する場合は分割並列化し、分割キーで(可能なら)ソートキーを作る、あるいは複合キーに加えます。</p>
+<p>また、Nested Loopを選ばないためには、結合は等価結合でないとダメです。</p>
+<p>【参考】<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/r_EXPLAIN.html">ステップ概要</a>・<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/c_data_redistribution.html">クエリプランの評価</a></p>
+<h4 id="クエリの実行"><a href="#クエリの実行" class="headerlink" title="クエリの実行"></a>クエリの実行</h4><p>開発者ガイドの<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/c-query-planning.html">クエリプランと実行ワークフロー</a>によると、実際にはSQLがそのまま実行されるのではなく、C++コードに変換された後コンパイルされて実行されます。</p>
+<p>コンパイルに秒単位の時間がかかるため、初回の検索に時間がかかりますが、実行計画が同じクエリであればコンパイル結果が再利用されます。</p>
+<h4 id="設計方針"><a href="#設計方針" class="headerlink" title="設計方針"></a>設計方針</h4><ul>
+<li>最終的にはERではなくクエリパタンに基づき実行計画を設計して、分散スタイルとソートキーを設定する</li>
+<li>とはいえ、ERがないとクエリが設計できないので、下記のガイドに従って仮決めする。</li>
+<li>大雑把に言えばレイテンシーに影響があるのはソートキーと圧縮で、スループットに影響があるのは圧縮キー<ul>
+<li>それでもレイテンシーが足りなければデータマートやサマリテーブルを検討する</li>
+</ul>
+</li>
+</ul>
+<h3 id="8-2-分散スタイル"><a href="#8-2-分散スタイル" class="headerlink" title="8-2. 分散スタイル"></a>8-2. 分散スタイル</h3><p>テーブルを作成する場合は<code>EVEN</code>/<code>ALL</code>/<code>KEY</code>/<code>AUTO</code>(デフォルト)のいずれかの分散スタイルを指定します。</p>
+<ul>
+<li><code>EVEN</code>: ラウンドロビン方式で各スライスへ行を分散する</li>
+<li><code>ALL</code>: テーブル全体のコピーが全てのノードに分散される<ul>
+<li>サイズが小さいテーブルに適しているようにも思えるが、更新コストが増える割に再分散コストが低いため、大きなメリットは得られない。また、結合しない場合は各スライスの検索結果をUNIONすることになるため、むしろ遅くなる。</li>
+<li>更新頻度が低く、更新範囲が広くないテーブルに適している</li>
+<li>結合する際に内部表となる場合に有効。実行計画が<code>DS_DIST_ALL_NONE</code>となる</li>
+</ul>
+</li>
+<li><code>KEY</code>: 特定の列に含まれている値に従って、複数の一致する値を同じノードスライスに配置する<ul>
+<li>指定できる分散キーは一つだけ。複合キーにはできない</li>
+<li>where句で指定されるカラムは不向き。クエリが分散しなくなってしまうため。ただし、分散キーをソートに指定することも出来る</li>
+</ul>
+</li>
+<li><code>AUTO</code>: テーブルサイズに応じて<code>EVEN</code>か<code>ALL</code>か自動的に判定する</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://aws.typepad.com/sajp/2016/12/amazon-redshift-engineerings-advanced-table-design-playbook-distribution-styles-and-distribution-keys.html">Amazon Redshift テーブル設計詳細ガイド:Part 2 分散スタイルと分散キー</a>に最適な分散スタイルと分散キーを選ぶ方法論が紹介されています。以下に簡単にまとめます。</p>
+<ul>
+<li>適切なDistKeyの特定<ul>
+<li>列のデータが均一に分散しているか？<ul>
+<li>DistKeyの値を同じくするレコード数がどれも同じくらいか？</li>
+</ul>
+</li>
+<li>列のカーディナリティが高いか？<ul>
+<li>スライス数を大きく上回る(10倍以上)のユニーク値を持つか？</li>
+<li>少ないとスライスごとにデータサイズがばらつく</li>
+</ul>
+</li>
+<li>クエリは選択的フィルターを実行するか？<ul>
+<li>実行しないのであれば、分散キーの有力候補</li>
+<li>実行するのであれば、まず第一ソートキーになり得るか確認する<ul>
+<li>加えて同じキーで分散・ソートが設定してあるテーブルと結合するならMerge Joinになるので、分散キーの有力候補</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>分散スタイルの選択<ul>
+<li>結合しないテーブルの場合<ul>
+<li>適切なDistKeyがあればKey分散を選択する</li>
+<li>なければEVEN分散になる。ALL分散は採用しない</li>
+</ul>
+</li>
+<li>結合するテーブルの場合、まずALL分散を検討する<ul>
+<li>以下の条件を全て満たせばALL分散を採用する<ul>
+<li>小さいテーブルである。全ノードへコピーするためストレージ使用量が増えてしまう</li>
+<li>更新頻度の低いテーブルである。全ノードで重複データを持つため、全ノードにレプリケートされるまで書き込みが終わらなくなる</li>
+<li>駆動表にならない。駆動表となった場合に、全ノードで同一データをスキャンするため非効率</li>
+<li>適切な分散キーが見つからない</li>
+</ul>
+</li>
+<li>採用できない場合、結合しないテーブルにおける検討に従ってKey分散ないしEVEN分散とする</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="8-3-ソートキー"><a href="#8-3-ソートキー" class="headerlink" title="8-3. ソートキー"></a>8-3. ソートキー</h3><ul>
+<li>ソートキーを指定することでスキャン範囲を制限することができる。<ul>
+<li>index scanというよりも、パーティションプルーニングに近い。</li>
+</ul>
+</li>
+<li>なるべくprefixのついていない文字列を選ぶ(先頭8バイトしかソートに使われない)</li>
+<li>where句で指定されるカラム(indexと同じ使い方)か、結合キーになるカラムを指定する<ul>
+<li>分散キー・ソートキーで結合する場合にMerge Joinが選択され、Redshiftでは最適な結合プランになる。結合キーだからソートキーにするのではなく、Merge Joinを狙う場合に指定する</li>
+</ul>
+</li>
+<li>ソートキーの種類(<a target="_blank" rel="noopener" href="https://aws.typepad.com/sajp/2016/12/amazon-redshift-engineerings-advanced-table-design-playbook-compound-and-interleaved-sort-keys.html">Compound and Interleaved Sort Keys</a>)<ul>
+<li>compoundは複数のソートキーを指定した場合に、指定順にソートされる。interleavedは多次元のゾーンマップが構成されるので指定順に関係なし</li>
+<li>Merge Joinを狙うか？YESならcompound<ul>
+<li>Merge Joinとなる条件は結合条件に分散キーとソートキーが含まれること<ul>
+<li>Key分散しているテーブル同士でないとMege Joinにはならない。ソートキーが一致していてもKey分散とALL分散ではMerge Joinが選択されない</li>
+</ul>
+</li>
+<li>Hash Joinの方が速いケースもある。結合よりも抽出を高速にした方が良い場合は抽出条件をソートキーにした方が良い</li>
+</ul>
+</li>
+<li>ソートはゾーンマップを改善するか？クエリはゾーンマップを利用するか？<ul>
+<li>ゾーンマップは、1MBブロック毎に、ブロック内の最小値と最大値をメモリー内にメタデータとして保存します<ul>
+<li>各スライス事にゾーンマップを管理する。最低限、カラムデータサイズがスライス数x1MBを超えないと意味がない</li>
+</ul>
+</li>
+<li>FunctionやCAST(暗黙CASTも含むので注意)では利用されない。PostgreSQLのパーティションキーと同じ</li>
+<li>抽出条件指定でcompoundかinterleavedか選択する<ul>
+<li>compoundの場合、第一ソートキーが指定されないと無意味</li>
+<li>とはいえ、vacuum reindexのコストが高いため、interleavedは選びにくい。マート専用か</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>ソートは実行時のソート処理を削減するか？YESならcompound<ul>
+<li>ORDER BY、GROUP BY,　Window関数内のPARTITION BY, ORDER BYなど</li>
+<li>ソートを高速化したいケースでは大概ゾーンマップを利用したくなるはずなので、これだけを理由とするケースはあまり想像できない</li>
+<li><code>where col_a = &#39;a&#39; group by col_b</code>のようなケースでソートキー<code>col_a, col_b</code>が有効かどうか</li>
+</ul>
+</li>
+<li>どれもNOならソートキーにしない</li>
+</ul>
+</li>
+<li>メンテナンス<ul>
+<li>compound<ul>
+<li><code>vacuum delete only</code>はバックグラウンドで実行されるため、バッチの中で<code>vacuum sort only</code>を実行するのは有用かも</li>
+<li>未ソート領域が大きい場合はVACUUMよりもディープコピーを行う</li>
+</ul>
+</li>
+<li>interleaved<ul>
+<li>COPYまたはCTASを使用して空テーブルにロードすると、自動的にインデックスが作成される。INSERTを使用してロードした場合はVACUUM REINDEXの実行が必要</li>
+<li>VACUUM REINDEXのコストが高い。まるごとCTASで作り直す設計にし、VACUUM REINDEXを実行しないことを第一に考えるべき<ul>
+<li>ただしCTASだと圧縮エンコーディングが指定できず、自動設定される</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>compound sortkeyの状態確認</li>
+</ul>
+<figure class="highlight sql"><figcaption><span>compound sortkeyの状態確認</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">    sti.schema</span><br><span class="line">,   stp.name</span><br><span class="line">,   stp.sorted_rows</span><br><span class="line">,   stp.rows</span><br><span class="line">,   round(<span class="number">100.0</span> <span class="operator">*</span> stp.sorted_rows <span class="operator">/</span> (stp.rows <span class="operator">+</span> <span class="number">0.0000001</span>), <span class="number">2</span>) <span class="keyword">as</span> sort_percentage</span><br><span class="line"><span class="keyword">from</span> (</span><br><span class="line">    <span class="keyword">select</span></span><br><span class="line">        id</span><br><span class="line">    ,   name</span><br><span class="line">    ,   <span class="built_in">sum</span>(sorted_rows) <span class="keyword">as</span> sorted_rows</span><br><span class="line">    ,   <span class="built_in">sum</span>(<span class="keyword">rows</span>) <span class="keyword">as</span> <span class="keyword">rows</span></span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">        stv_tbl_perm</span><br><span class="line">    <span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">        id, name</span><br><span class="line">    ) stp</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> svv_table_info sti</span><br><span class="line">    <span class="keyword">on</span> stp.id <span class="operator">=</span> sti.table_id</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">    sti.sortkey_num <span class="operator">&gt;</span> <span class="number">0</span></span><br><span class="line"><span class="keyword">and</span> stp.rows <span class="operator">&gt;</span> <span class="number">0</span></span><br><span class="line"><span class="keyword">and</span> stp.sorted_rows <span class="operator">&lt;&gt;</span> stp.rows</span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span></span><br><span class="line">    sort_percentage</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>interleaved sortkeyの状態確認</li>
+</ul>
+<figure class="highlight sql"><figcaption><span>interleaved sortkeyの状態確認</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">    tbl <span class="keyword">as</span> tbl_id</span><br><span class="line">,   stv_tbl_perm.name <span class="keyword">as</span> table_name</span><br><span class="line">,   col</span><br><span class="line">,   interleaved_skew</span><br><span class="line">,   last_reindex</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">    svv_interleaved_columns</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> stv_tbl_perm</span><br><span class="line">    <span class="keyword">on</span>  svv_interleaved_columns.tbl <span class="operator">=</span> stv_tbl_perm.id</span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="8-4-キー"><a href="#8-4-キー" class="headerlink" title="8-4. キー"></a>8-4. キー</h3><p><code>UNIQUE</code>・<code>PRIMARY KEY</code>・<code>References</code>・<code>FOREIGN KEY</code>はプランナが利用するものの、システムに強制されない(制約にならない)です。</p>
+<h3 id="8-5-データ型"><a href="#8-5-データ型" class="headerlink" title="8-5. データ型"></a>8-5. データ型</h3><ul>
+<li>数値<ul>
+<li>数値データ型には、整数型、10 進数型、および浮動小数点数型などがあります。</li>
+</ul>
+</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>型</th>
+<th>備考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SMALLINT</code>/<code>INT2</code></td>
+<td>符号付き2バイト整数</td>
+</tr>
+<tr>
+<td><code>INTEGER</code>/<code>INT</code>/<code>INT4</code></td>
+<td>符号付き4バイト整数</td>
+</tr>
+<tr>
+<td><code>BIGINT</code>/<code>INT8</code></td>
+<td>符号付き8バイト整数</td>
+</tr>
+<tr>
+<td><code>DECIMAL</code>/<code>NUMERIC</code></td>
+<td>任意精度</td>
+</tr>
+<tr>
+<td><code>REAL</code>/<code>FLOAT4</code></td>
+<td>単精度浮動小数点数</td>
+</tr>
+<tr>
+<td><code>DOUBLE PRECISION</code>/<code>FLOAT</code>/<code>FLOAT8</code></td>
+<td>倍精度浮動小数点数</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>文字列<ul>
+<li><code>CHAR</code>/<code>VARCHAR</code>は最大長を宣言する代わりに<code>MAX</code>キーワードが使用可能です。</li>
+</ul>
+</li>
+</ul>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>型</th>
+<th>備考</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>CHAR</code></td>
+<td><strong>バイトセマンティクス</strong>で4096バイト。シングルバイト文字のみ</td>
+</tr>
+<tr>
+<td><code>VARCHAR</code></td>
+<td><strong>バイトセマンティクス</strong>で65535バイト。マルチバイト文字がサポートされており、対応している文字コードはUTF-8、1～4バイト文字まで利用可</td>
+</tr>
+<tr>
+<td><code>TEXT</code></td>
+<td><code>VARCHAR(256)</code>の別名</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>日付と時刻<ul>
+<li>日付は<code>DATE</code>、日付時刻には<code>TIMESTAMP</code>と<code>TIMESTAMPTZ</code>がある</li>
+<li>クラスタのタイムゾーンはUTC固定だが、セッションパラメータを変更することは可能</li>
+</ul>
+</li>
+<li>真偽値<ul>
+<li>論理ブール演算型 (true/false)として<code>BOOLEAN</code>/<code>BOOL</code>がある</li>
+</ul>
+</li>
+<li>その他<ul>
+<li>配列・JSONはサポートされていない</li>
+</ul>
+</li>
+</ul>
+<h3 id="8-6-圧縮エンコード"><a href="#8-6-圧縮エンコード" class="headerlink" title="8-6. 圧縮エンコード"></a>8-6. 圧縮エンコード</h3><ul>
+<li><code>ANALYZE COMPRESSION</code>を実行して圧縮率を評価できる<ul>
+<li><code>ANALYZE COMPRESSION</code>は排他的テーブルロックを取得し、テーブルに対する同時読み取り書き込みがブロックされる。<code>ANALYZE COMPRESSION</code>コマンドは、テーブルがアイドル状態になっている場合にのみ実行する。</li>
+</ul>
+</li>
+<li>圧縮エンコードの選択。基本的にはデータドメインで定まる。以下に記載のないエンコーディングは有効なユースケースが不明なので、<code>ANALYZE COMPRESSION</code>で提示されたら検討すると良いと思います。<ul>
+<li>ソートキーカラムは非圧縮(<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/c_Raw_encoding.html"><code>RAW</code></a>)にする</li>
+<li>区分値はバイトディクショナリエンコード(<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/c_Byte_dictionary_encoding.html"><code>BYTEDICT</code></a>)<ul>
+<li>ディクショナリサイズ: 1MB</li>
+<li>キーサイズ: 1バイト. 最大256個</li>
+<li>列のデータドメインが一意の値 256 個未満である場合に最適</li>
+</ul>
+</li>
+<li>汎用で使われるエンコードは<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/lzo-encoding.html"><code>LZO</code></a>と<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/zstd-encoding.html"><code>ZSTD</code></a>。<code>ZSTD</code>の方が優れているが、後発であるためか圧縮エンコードを指定しない場合のデフォルトは<code>LZO</code>になる<ul>
+<li>LZO(<code>LZO</code>)<ul>
+<li><code>LZO</code>エンコードは、非常に長い文字列を格納する<code>CHAR</code>および<code>VARCHAR</code>列、特に製品説明、ユーザーコメント、JSON文字列などの自由形式テキストに適している</li>
+<li><code>LZO</code>は、ソートキー、および<code>BOOLEAN</code>、<code>REAL</code>、または<code>DOUBLE PRECISION</code>データ型として定義された列として指定された列以外のエンコードのデフォルトとされている</li>
+</ul>
+</li>
+<li>Zstandard(<code>ZSTD</code>)<ul>
+<li>Zstandard (<code>ZSTD</code>) エンコーディングは、多様なデータセット間で非常にパフォーマンスのいい高圧縮比率を提供します。<code>ZSTD</code> は、製品説明、ユーザーのコメント、ログ、JSON 文字列など、長さがさまざまな文字列を保存する<code>CHAR</code>および<code>VARCHAR</code>列に対して、特に効果を発揮します</li>
+<li>ZSTD では、Amazon Redshift のすべてのデータ型がサポートされています</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>ランレングスエンコード(<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/c_Runlength_encoding.html"><code>RUNLENGTH</code></a>)<ul>
+<li>連続して繰り返される値を、値と連続発生数 (実行の長さ) から成るトークンに置き換えます</li>
+<li>ソートキーに関係従属するカラムに使えるかと思いましたが、実測したところ<code>ZSTD</code>の方が高圧縮でした。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>カラム毎に使用しているブロック数は以下のSQLで確認できます。圧縮の効果が確認できます。</p>
+<figure class="highlight sql"><figcaption><span>利用ブロック数の確認</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">    t.schema</span><br><span class="line">,   t.table</span><br><span class="line">,   c.column_name</span><br><span class="line">,   <span class="built_in">max</span>(b.blocknum)</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">    stv_blocklist b</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span></span><br><span class="line">    svv_table_info t</span><br><span class="line">        <span class="keyword">on</span> b.tbl <span class="operator">=</span> t.table_id</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span></span><br><span class="line">    svv_columns c</span><br><span class="line">        <span class="keyword">on</span> t.schema <span class="operator">=</span> c.table_schema</span><br><span class="line">        <span class="keyword">and</span> t.table <span class="operator">=</span> c.table_name</span><br><span class="line">        <span class="keyword">and</span> b.col <span class="operator">=</span> c.ordinal_position <span class="number">-1</span></span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">    t.table <span class="operator">=</span> <span class="string">&#x27;xxx&#x27;</span></span><br><span class="line"><span class="keyword">and</span> c.column_name <span class="operator">=</span> <span class="string">&#x27;yyy&#x27;</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="9-データのロードとアンロード・バキューム"><a href="#9-データのロードとアンロード・バキューム" class="headerlink" title="9. データのロードとアンロード・バキューム"></a>9. データのロードとアンロード・バキューム</h2><h3 id="9-1-データロード"><a href="#9-1-データロード" class="headerlink" title="9-1. データロード"></a>9-1. データロード</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/r_COPY.html">COPY</a>コマンドを使用して、Amazon S3 バケット、Amazon EMR クラスター、リモート ホスト (SSH 接続を使用)、または Amazon DynamoDB テーブルからデータをロードできる</li>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/copy-usage_notes-access-permissions.html#copy-usage_notes-iam-permissions">COPY、UNLOAD、CREATE LIBRARY のための IAM のアクセス許可</a></li>
+<li>データソース<ul>
+<li>Amazon S3 からの COPY<ul>
+<li>オブジェクトプリフィックス(<code>/</code>終わりでなくても良い)</li>
+<li>マニフェストファイルパス</li>
+</ul>
+</li>
+<li>Amazon EMR からの COPY</li>
+<li>リモートホスト (SSH) からの COPY</li>
+<li>Amazon DynamoDB からの COPY</li>
+</ul>
+</li>
+<li>データ形式<ul>
+<li><code>CSV [ QUOTE [AS] &#39;quote_character&#39; ] [DELIMITER [AS] &#39;delimiter_char&#39;]</code><ul>
+<li>デフォルトの引用文字は二重引用符 ( “ ) だが、<code>QUOTE</code>オプションを使用して別の引用文字を指定できる</li>
+<li>デフォルトの区切り記号はカンマ (,) だが、<code>DELIMITER</code>パラメータを使用して別の区切り記号を指定できる</li>
+</ul>
+</li>
+<li><code>DATE</code>列と<code>TIMESTAMP</code>列をロードする場合、日付の場合は <code>YYYY-MM-DD</code>で、タイムスタンプの場合は<code>YYYY-MM-DD HH:MI:SS</code>がデフォルトの形式となる。デードデータでデフォルトの形式が使用されていない場合、<code>DATEFORMAT</code>と<code>TIMEFORMAT</code>を使用して形式を指定できる</li>
+</ul>
+</li>
+<li>ファイル圧縮<ul>
+<li><code>BZIP2</code>/<code>GZIP</code>/<code>LZOP</code>/<code>ZSTD</code></li>
+<li><code>LZOP</code>形式では<code>UNLOAD</code>できない。<code>BZIP2</code>は時間がかかるので、<code>GZIP</code>が無難</li>
+<li><code>ZSTD</code>はAmazon S3からCOPYを使用する場合のみサポートされる</li>
+</ul>
+</li>
+<li>その他パラメータ(通常は<code>STATUPDATE ON</code>だけ指定する運用で良いと思われる)<ul>
+<li><code>COMPROWS numrows</code>: 圧縮分析のサンプルサイズ(スライス合計)として使用される行数を指定する。<code>COMPROWS</code>を指定しない場合、サンプルサイズはデフォルトでスライスごとに100,000になる。<code>COMPROWS</code>の値がスライスごとに100,000行のデフォルト値より小さい場合、自動的にデフォルト値にアップグレードされる。ただし、ロードされるデータの量が有意のサンプルとしては不十分な場合、自動圧縮は実行されない</li>
+<li><code>COMPUPDATE [ &#123; ON | TRUE &#125; | &#123; OFF | FALSE &#125; ]</code>: <code>COMPUPDATE</code>を省略した場合、ターゲットテーブルが空であり、テーブルのすべての列に<code>RAW</code>エンコードがあるかまったくエンコードがないときにのみ、<code>COPY</code>は自動圧縮を適用する。<code>COMPUPDATE ON</code>(または<code>TRUE</code>)の場合、テーブル列に<code>RAW</code>以外のエンコードがある場合も、テーブルが空であれば<code>COPY</code>は自動圧縮を適用します。<code>COMPUPDATE OFF</code>(または<code>FALSE</code>)の場合、自動圧縮は無効になる。</li>
+<li><code>MAXERROR AS error_count</code>: ロードのエラー数が<em>error_count</em>以上である場合、ロードは失敗する。ロードのエラーがそれより少ない場合、処理は続行される(正常データのみロードされる)</li>
+<li><code>NOLOAD</code>: データを実際にロードせずにデータファイルの有効性をチェックする</li>
+<li><code>STATUPDATE [ &#123; ON | TRUE &#125; | &#123; OFF | FALSE &#125; ]</code>: <code>ON</code>(または<code>TRUE</code>)の場合、テーブルが最初に空であるかどうかに関係なく、統計は自動的に更新される。<code>STATUPDATE</code>パラメータを使用しない場合、テーブルが最初は空ならば、統計は自動的に更新される</li>
+</ul>
+</li>
+<li><code>ALTER TABLE RENAME</code>はトランザクション内で実行できるので、TMPにロード-&gt; TAB RENAME TO BK-&gt;TMP RENAME TABのような入れかえができる</li>
+</ul>
+<h3 id="9-2-データアンロード"><a href="#9-2-データアンロード" class="headerlink" title="9-2. データアンロード"></a>9-2. データアンロード</h3><p>参考: <a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/r_UNLOAD.html">UNLOAD</a></p>
+<ul>
+<li>出力可能な形式<ul>
+<li>固定長(<code>FIXWIDTH</code>)</li>
+<li>Character Separated Values(<code>DELIMITER</code>)<ul>
+<li>基本的に<code>ESCAPE</code>オプションを付けておいた方が無難<ul>
+<li>エスケープ文字は<code>\</code></li>
+<li>ラインフィード・キャリッジリターン・区切り文字・エスケープ文字・引用符(<code>ADDQUOTES</code>を指定した場合)がエスケープされる</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>クエリで<code>ORDER BY</code>句を指定してソート順にデータをアンロードしておくと、データの再ロード時にデータをソートするために必要な時間を節約できる<ul>
+<li><code>TOP</code>は <code>SELECT</code>句ではサポートされていない。代わりに<code>LIMIT</code>を使用する</li>
+<li><code>SELECT</code>クエリは、外部の<code>SELECT</code>で<code>LIMIT</code>句を使用することはできない<ul>
+<li>ネストするか、別テーブルにデータを移してからUNLOADする</li>
+<li><code>select ... limit 10</code>はダメで、<code>select ... from (select ... limit 10)</code>はOKということ</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>クエリの中に引用符 (たとえば、リテラル値を囲むため) またはバックスラッシュ (<code>\</code>) がある場合は、クエリテキスト内でバックスラッシュでエスケープする必要がある</li>
+<li>書き込み先にマニフェストファイルを指定する場合(<code>MANIFEST</code>オプションを指定する場合)、「manifest」サフィックスが自動的に付与されるため、<code>name_prefix</code>には含めない</li>
+<li>マニフェストファイルを指定しない場合の出力フォーマットは<code>&lt;object-path&gt;/&lt;name-prefix&gt;&lt;slice-number&gt;_part_&lt;part-number&gt;</code></li>
+<li>ヘッダー出力する場合は<code>HEADER</code>オプション。固定長では出力できない</li>
+<li>圧縮する場合は<code>BZIP2</code>オプションか<code>GZIP</code>オプションを付与する</li>
+<li>デフォルトでは既存ファイルの上書きは行わない。上書きする場合は<code>ALLOWOVERWRITE</code>オプションを付与する</li>
+<li>デフォルトではスライス数に応じて複数ファイルに並列書き込みを行う。オフにする場合は<code>PARALLEL OFF</code></li>
+<li>ファイルサイズ上限を指定すると1ファイルあたりのサイズ上限が指定できる。デフォルトでは6.2GB.</li>
+</ul>
+<h3 id="9-3-VACUUM"><a href="#9-3-VACUUM" class="headerlink" title="9-3. VACUUM"></a>9-3. VACUUM</h3><p>参考: <a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/r_VACUUM_command.html">VACUUM</a></p>
+<ul>
+<li>テーブルの所有者またはスーパーユーザーのみがテーブルにバキューム処理を実行できる</li>
+<li><code>VACUUM</code>にはサブコマンドで指定される以下のモードがある<ul>
+<li><code>SORT ONLY</code>: ソートのみ。<code>Compound Sort Key</code>のメンテナンス<ul>
+<li>デフォルトではテーブルの行の95パーセント以上がすでにソートされているテーブルのソートフェーズをスキップする。実行時に<code>TO threshold PERCENT</code>オプションを指定することでしきい値を変更できる</li>
+</ul>
+</li>
+<li><code>DELETE ONLY</code>: 削除のみ。バックグラウンドで自動的にDELETE ONLY Vacuumを実行するため、手動実行する必要は通常ない<ul>
+<li>デフォルトでは残りの行の少なくとも95パーセントが削除対象としてマークされていない領域を再利用する。実行時に<code>TO threshold PERCENT</code>オプションを指定することでしきい値を変更できる</li>
+<li>ユーザーが<code>ALTER TABLE</code>などのデータ定義言語 (DDL) 操作を実行すると、自動バキューム操作は一時停止する</li>
+</ul>
+</li>
+<li><code>FULL</code>(デフォルト): ソート＋削除。<code>TO threshold PERCENT</code>オプションを指定すると、ソートと削除の両方にしきい値が適用される</li>
+<li><code>REINDEX</code>: <code>Interleaved Sort Key</code>のメンテナンス。<code>VACUUM FULL</code>よりも大幅に実行時間が長くなる</li>
+</ul>
+</li>
+<li>排他制御<ul>
+<li>トランザクションブロック内で<code>VACUUM</code>は実行できない</li>
+<li><code>VACUUM</code>開始時にテーブルへの一時的な排他アクセスが必要になる</li>
+<li>ユーザーは、バキューム処理中のテーブルにアクセスできる。バキューム処理中のテーブルにクエリおよび書き込み操作を実行できるが、データ操作言語 (DML) コマンドおよびバキュームを同時に実行すると両方の処理時間が長くなる可能性がある。バキューム処理中に<code>UPDATE</code>および<code>DELETE</code>ステートメントを実行する場合は、システムのパフォーマンスが低減する場合がある。<code>VACUUM DELETE</code>は、更新操作と削除操作を一時的にブロックする</li>
+</ul>
+</li>
+<li>一度にクラスターで実行できる<code>VACUUM</code>コマンドは1つだけ<ul>
+<li>vacuum専用のキューを作るのが簡単か</li>
+</ul>
+</li>
+<li><code>VACUUM</code>では<code>ANALYZE</code>はされない</li>
+</ul>
+<h2 id="10-ラッシュパフォーマンス"><a href="#10-ラッシュパフォーマンス" class="headerlink" title="10. ラッシュパフォーマンス"></a>10. ラッシュパフォーマンス</h2><p>RedshiftのWLMにおける推奨同時クエリ実行数は15です。<br>これまでこの点を根拠として大量の参照クエリを受け付けるワークロードには不向きと考えられてきました。<br>しかしながら最近の機能アップデートにより、大量の参照クエリを処理する仕組みがRedshiftにも備わっています。</p>
+<h3 id="10-1-Result-Caching"><a href="#10-1-Result-Caching" class="headerlink" title="10-1. Result Caching"></a>10-1. Result Caching</h3><ul>
+<li>リーダーノード内のメモリにクエリ結果をキャッシュする。受け付けたクエリに対応する結果がキャッシュに含まれている場合、コンピュートノード上での処理を伴わずに結果が返却される</li>
+<li><code>select limit 1000</code>でキャッシュされた結果は<code>limit 100</code>でも有効</li>
+<li>コメントが違うだけのSQLであればキャッシュが使われる</li>
+<li>JDBCでPreparedStatementを使用した場合、ログ上は同じSQLのように見えるが、バインド値が同じでないとキャッシュヒットしないし、同じあればヒットする</li>
+<li>セッションレベルでは<code>enable_result_cache_for_session = off</code>で無効化できる</li>
+</ul>
+<p>キャッシュヒットしたクエリの確認</p>
+<figure class="highlight sql"><figcaption><span>キャッシュヒットしたクエリ</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">    userid</span><br><span class="line">,   query</span><br><span class="line">,   starttime</span><br><span class="line">,   endtime</span><br><span class="line">,   elapsed</span><br><span class="line">,   substring</span><br><span class="line">,   source_query</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">    svl_qlog</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">    source_query <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">null</span></span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+
+<p>キャッシュヒット率の確認</p>
+<figure class="highlight sql"><figcaption><span>キャッシュヒット率確認</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">    <span class="built_in">count</span>(<span class="number">1</span>)</span><br><span class="line">,   <span class="built_in">count</span>(source_query)</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">    svl_qlog q</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">    q.userid <span class="operator">=</span> <span class="number">103</span></span><br><span class="line"><span class="keyword">and</span> q.starttime <span class="operator">&gt;</span> <span class="string">&#x27;2019-04-12 9:07:00&#x27;</span></span><br><span class="line"><span class="keyword">and</span> q.endtime <span class="operator">&lt;</span> <span class="string">&#x27;2019-04-12 9:08:00&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="10-2-Short-Query-Acceleration"><a href="#10-2-Short-Query-Acceleration" class="headerlink" title="10-2. Short Query Acceleration"></a>10-2. Short Query Acceleration</h3><ul>
+<li>実行時間が短いと判定された一部のクエリを、実行時間が長いクエリよりも優先する</li>
+<li>SQAでは実行時間が短いクエリを専用領域で実行する。SQA用のWLMキューを事前定義する必要はない</li>
+<li>SQAは実行時間が短く、ユーザー定義のキュー内にあるクエリのみを優先する。デフォルトキューでは無効</li>
+<li>クエリのパターンをSQAが学習するため、時間が経つほど予測精度は向上する</li>
+<li>対象クエリは<code>CTAS</code>と<code>SELECT</code>(正確には読み取り専用クエリ)</li>
+</ul>
+<p>サービスクエリ別クエリ統計。SQAクエリはサービスクラス14を使用する。</p>
+<figure class="highlight sql"><figcaption><span>サービスクエリ別クエリ統計</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> final_state, service_class, <span class="built_in">count</span>(<span class="operator">*</span>), <span class="built_in">avg</span>(total_exec_time),</span><br><span class="line"><span class="built_in">percentile_cont</span>(<span class="number">0.9</span>) <span class="keyword">within</span> <span class="keyword">group</span> (<span class="keyword">order</span> <span class="keyword">by</span> total_queue_time), <span class="built_in">avg</span>(total_queue_time)</span><br><span class="line"><span class="keyword">from</span> stl_wlm_query <span class="keyword">where</span> userid <span class="operator">&gt;=</span> <span class="number">100</span> <span class="keyword">group</span> <span class="keyword">by</span> <span class="number">1</span>,<span class="number">2</span> <span class="keyword">order</span> <span class="keyword">by</span> <span class="number">2</span>,<span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>SQA によって選択され正常に完了したクエリの特定</p>
+<figure class="highlight sql"><figcaption><span>SQAによって選択され正常に完了したクエリの特定</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.queue_start_time, a.total_exec_time, label, <span class="built_in">trim</span>(querytxt)</span><br><span class="line"><span class="keyword">from</span> stl_wlm_query a, stl_query b</span><br><span class="line"><span class="keyword">where</span> a.query <span class="operator">=</span> b.query <span class="keyword">and</span> a.service_class <span class="operator">=</span> <span class="number">14</span> <span class="keyword">and</span> a.final_state <span class="operator">=</span> <span class="string">&#x27;Completed&#x27;</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> b.query <span class="keyword">desc</span> limit <span class="number">5</span>;</span><br></pre></td></tr></table></figure>
+
+<p>SQA で選択されたがタイムアウトしたクエリの特定</p>
+<figure class="highlight sql"><figcaption><span>SQAで選択されたがタイムアウトしたクエリの特定</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.queue_start_time, a.total_exec_time, label, <span class="built_in">trim</span>(querytxt)</span><br><span class="line"><span class="keyword">from</span> stl_wlm_query a, stl_query b</span><br><span class="line"><span class="keyword">where</span> a.query <span class="operator">=</span> b.query <span class="keyword">and</span> a.service_class <span class="operator">=</span> <span class="number">14</span> <span class="keyword">and</span> a.final_state <span class="operator">=</span> <span class="string">&#x27;Evicted&#x27;</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> b.query <span class="keyword">desc</span> limit <span class="number">5</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="10-3-同時実行スケーリング"><a href="#10-3-同時実行スケーリング" class="headerlink" title="10-3. 同時実行スケーリング"></a>10-3. 同時実行スケーリング</h3><ul>
+<li>詳しくは<a target="_blank" rel="noopener" href="https://www.slideshare.net/AmazonWebServices/modern-cloud-data-warehousing-ft-intuit-optimize-analytics-practices-ant202r1-aws-reinvent-2018">Modern Cloud Data Warehousing ft. Intuit: Optimize Analytics Practices (ANT202-R1) - AWS re:Invent 2018</a></li>
+<li>参照系クエリ専用のノードが自動的に起動される<ul>
+<li><code>Concurrency Scaling Mode</code>を<code>auto</code>に設定したキューで滞留が発生すると起動される<ul>
+<li>ただし、短時間(3秒未満くらい)のクエリが滞留しても起動されなかった。仕様なのか不明</li>
+<li>WLMキューを増やしても起動されなくなった。ある程度さばけていると判定されると起動しないのか</li>
+<li>滞留だけでなくスループット等もトリガーにしていると思われるが、不明</li>
+</ul>
+</li>
+<li>実測してみると負荷投入後、速ければ数秒遅くとも数十秒程度のラグで起動した</li>
+<li>滞留しないように必要なだけのクラスタが<code>max_concurrency_scaling_clusters</code>の範囲内で起動される。クラスタ一つあたりの並列度を指定することはできなかった</li>
+</ul>
+</li>
+<li>24時間毎に1時間分のクレジットが最大30時間まで与えられる</li>
+<li>利用できるクエリは以下の制約を満たす必要がある<ul>
+<li>Read Only</li>
+<li>interleaved sort keyを設定したテーブルを参照しない</li>
+<li>Redshift Spectrumを参照しない</li>
+<li>テンポラリテーブルを参照しない</li>
+</ul>
+</li>
+</ul>
+<p>メインクラスターと同時実行クラスターとで実行されたクエリの統計</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> w.service_class <span class="keyword">AS</span> queue</span><br><span class="line">     , q.concurrency_scaling_status</span><br><span class="line">     , <span class="built_in">COUNT</span>( <span class="operator">*</span> ) <span class="keyword">AS</span> queries</span><br><span class="line">     , <span class="built_in">SUM</span>( q.aborted )  <span class="keyword">AS</span> aborted</span><br><span class="line">     , <span class="built_in">SUM</span>( ROUND( total_queue_time::<span class="type">NUMERIC</span> <span class="operator">/</span> <span class="number">1000000</span>,<span class="number">2</span> ) ) <span class="keyword">AS</span> queue_secs</span><br><span class="line">     , <span class="built_in">SUM</span>( ROUND( total_exec_time::<span class="type">NUMERIC</span> <span class="operator">/</span> <span class="number">1000000</span>,<span class="number">2</span> ) )  <span class="keyword">AS</span> exec_secs</span><br><span class="line"><span class="keyword">FROM</span> stl_query q</span><br><span class="line">     <span class="keyword">JOIN</span> stl_wlm_query w</span><br><span class="line">          <span class="keyword">USING</span> (userid,query)</span><br><span class="line"><span class="keyword">WHERE</span> q.userid <span class="operator">=</span> <span class="number">103</span></span><br><span class="line"><span class="keyword">AND</span> q.starttime <span class="operator">&gt;</span> <span class="string">&#x27;2019-04-12 7:20:00&#x27;</span></span><br><span class="line"><span class="keyword">AND</span> q.endtime <span class="operator">&lt;</span> <span class="string">&#x27;2019-04-12 7:45:00&#x27;</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> <span class="number">1</span>,<span class="number">2</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="number">1</span>,<span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="11-Redshift-Spectrum"><a href="#11-Redshift-Spectrum" class="headerlink" title="11. Redshift Spectrum"></a>11. Redshift Spectrum</h2><h3 id="11-1-料金"><a href="#11-1-料金" class="headerlink" title="11-1. 料金"></a>11-1. 料金</h3><p>Redshiftそれ自体と異なり、スキャンされたデータ1TBにつき5USDの課金となります。<br>クエリ単位で10MB以下のスキャンは切り上げられます。</p>
+<h3 id="11-2-準備"><a href="#11-2-準備" class="headerlink" title="11-2. 準備"></a>11-2. 準備</h3><p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/c-spectrum-iam-policies.html">Amazon Redshift Spectrum 用の IAM ポリシー</a> が必要です。</p>
+<h3 id="11-3-ファイルフォーマット"><a href="#11-3-ファイルフォーマット" class="headerlink" title="11-3. ファイルフォーマット"></a>11-3. ファイルフォーマット</h3><p>多くの形式(PARQUESTかORCが無難.AWSのドキュメントではORCよりもParquestを推奨しているように見受けられます)に対応しています。</p>
+<ul>
+<li>AVRO</li>
+<li>PARQUET</li>
+<li>TEXTFILE</li>
+<li>SEQUENCEFILE</li>
+<li>RCFILE</li>
+<li>RegexSerDe</li>
+<li>ORC</li>
+<li>Grok</li>
+<li>OpenCSV</li>
+<li>Ion</li>
+<li>JSON</li>
+</ul>
+<p>圧縮(PARQUEST/ORCは圧縮込みのフォーマット)は以下に対応しています。</p>
+<ul>
+<li>gzip: 普通</li>
+<li>Snappy: 高速</li>
+<li>bzip2: 高圧縮</li>
+</ul>
+<p>ファイルは64MB以上で均等に分割されます。</p>
+<h3 id="11-4-パーティション"><a href="#11-4-パーティション" class="headerlink" title="11-4. パーティション"></a>11-4. パーティション</h3><p>パーティション表に追加できる数(<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/mgmt/amazon-redshift-limits.html">Amazon Redshift における制限</a>)があります。</p>
+<ul>
+<li>テーブルあたりのパーティション数の上限: 1,000,000</li>
+<li>アカウントあたりのパーティション数の上限: 10,000,000</li>
+</ul>
+<p>参考: <a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/c-spectrum-external-tables.html#c-spectrum-external-tables-partitioning">Redshift Spectrum 外部テーブルのパーティション化</a></p>
+<h3 id="11-5-注意"><a href="#11-5-注意" class="headerlink" title="11-5. 注意"></a>11-5. 注意</h3><p>統計情報の設定(<code>TABLE PROPERTIES (numRows&#39;=&#39;row_count&#39;)</code>)は必須です。設定されていないとプランが崩れます。</p>
+<h3 id="11-6-使いどころ"><a href="#11-6-使いどころ" class="headerlink" title="11-6. 使いどころ"></a>11-6. 使いどころ</h3><ul>
+<li>スキャンや集約インテンシブなワークロードを並行で実行するようなユースケース<ul>
+<li>S3に対する検索はユーザーが予約しているリーダーノード・コンピュートノードとは別のリソースが使われるため、Redshift Spectrumだけを利用するのであれば、コンピュートノードには負荷がかかりません</li>
+<li>フィルタ(<code>where</code>)や集約(<code>group by</code>)はRedshift Spectrum層で処理されます</li>
+<li>結果的に同時実行性能が大きく向上します</li>
+</ul>
+</li>
+<li>結合する際はRedshiftにデータをもった方が有利です。結合する場合はRedshift Spectrumの検索結果がコンピュートノードへ分散される。例えばRedshift Spectrumのファクトを抽出・集約してデータ量を減らしてから、Redshiftのディメンジョンと結合するようなクエリは有効に作用すると期待されます</li>
+<li>古いデータはS3に追い出して、ビュー(<code>create view with no schema binding</code>)でRedshiftのテーブルと連結(<code>union all</code>)することで、ビューに対して検索すると、RedshiftのテーブルとRedshift Spectrumの両方を透過的に検索できます<ul>
+<li>上記のような使い方を考えたくなるのですが、別テーブルと結合した際の実行計画がまったく最適化されないので、基本的に結合するような使い方はダメなようなです<ul>
+<li>(A UNION ALL B) JOIN CのようなケースでA JOIN C とB JOIN Cに分解されないため、分散スタイルが有効に使えません。</li>
+</ul>
+</li>
+<li>フィルタや集約はRedshift Spectrum層で処理されるため、有効です。</li>
+</ul>
+</li>
+</ul>
+<h2 id="12-参考資料"><a href="#12-参考資料" class="headerlink" title="12. 参考資料"></a>12. 参考資料</h2><h3 id="12-1-AWS公式"><a href="#12-1-AWS公式" class="headerlink" title="12-1. AWS公式"></a>12-1. AWS公式</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/redshift/latest/dg/c_loading-data-best-practices.html">Amazon Redshift のデータロードのベストプラクティス</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.slideshare.net/AmazonWebServicesJapan/amazon-redshiftamazon-quicksightdwh">Amazon RedshiftとAmazon QuickSightで実現する、長く使えるDWH作り</a></li>
+<li><a target="_blank" rel="noopener" href="https://aws.typepad.com/sajp/2015/12/top-10-performance-tuning-techniques-for-amazon-redshift.html">Amazon Redshiftのパフォーマンスチューニングテクニック Top 10</a></li>
+<li><a target="_blank" rel="noopener" href="https://aws.typepad.com/sajp/2016/12/amazon-redshift-engineerings-advanced-table-design-playbook-preamble-prerequisites-and-prioritization.html">Amazon Redshift テーブル設計詳細ガイド:Part 1 序文、事前準備、優先順位付け</a></li>
+<li><a target="_blank" rel="noopener" href="https://aws.typepad.com/sajp/2016/12/amazon-redshift-engineerings-advanced-table-design-playbook-distribution-styles-and-distribution-keys.html">Amazon Redshift テーブル設計詳細ガイド:Part 2 分散スタイルと分散キー</a></li>
+<li><a target="_blank" rel="noopener" href="https://aws.typepad.com/sajp/2016/12/amazon-redshift-engineerings-advanced-table-design-playbook-compound-and-interleaved-sort-keys.html">Amazon Redshift テーブル設計詳細ガイド:Part 3 Compound and Interleaved Sort Keys（Compound と Interleaved ソートキー）</a></li>
+<li><a target="_blank" rel="noopener" href="https://aws.typepad.com/sajp/2016/12/amazon-redshift-engineerings-advanced-table-design-playbook-compression-encodings.html">Amazon Redshift テーブル設計詳細ガイド:Part 4 圧縮エンコーディング</a></li>
+<li><a target="_blank" rel="noopener" href="https://aws.typepad.com/sajp/2016/12/amazon-redshift-engineerings-advanced-table-design-playbook-table-data-durability.html">Amazon Redshift テーブル設計詳細ガイド:Part 5 テーブルデータの永続性</a></li>
+<li><a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/blogs/big-data/10-best-practices-for-amazon-redshift-spectrum/">Twelve Best Practices for Amazon Redshift Spectrum</a><ul>
+<li>和訳が<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/blogs/news/10-best-practices-for-amazon-redshift-spectrum/">Amazon Redshift Spectrum 10 のベストプラクティス</a>にありますが、内容が少し異なるようです。</li>
+</ul>
+</li>
+<li><a target="_blank" rel="noopener" href="https://www.slideshare.net/AmazonWebServicesJapan/20190122-aws-black-belt-online-seminar-amazon-redshift-update">20190122 AWS Black Belt Online Seminar Amazon Redshift Update</a></li>
+</ul>
+<h3 id="12-2-他社事例"><a href="#12-2-他社事例" class="headerlink" title="12-2. 他社事例"></a>12-2. 他社事例</h3><ul>
+<li><a target="_blank" rel="noopener" href="http://www.slideshare.net/mineroaoki/at-aws-summit-tokyo-2014">Amazon Redshiftによるリアルタイム分析サービスの構築</a></li>
+<li><a target="_blank" rel="noopener" href="https://hack.nikkei.com/blog/hundred_users_redshift/">Redshiftを数百人で使うためのコツ（クラスター構成編）</a></li>
+</ul>
+<h3 id="12-3-要素技術"><a href="#12-3-要素技術" class="headerlink" title="12-3. 要素技術"></a>12-3. 要素技術</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://qiita.com/nishemon/items/818cc64dc2f8577edd87">2016年のOSS圧縮ツール選択カタログ</a></li>
+<li><a target="_blank" rel="noopener" href="https://engineer.retty.me/entry/columnar-storage-format">カラムナフォーマットのきほん 〜データウェアハウスを支える技術〜</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20190625/&related=twitterapi%2Ctwitter&text=Amazon%20Redshift%E3%81%AE%E4%BB%95%E6%A7%98%E3%82%92%E8%AA%BF%E3%81%B9%E3%81%A6%E3%81%BF%E3%81%9F%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20190625/&t=Amazon%20Redshift%E3%81%AE%E4%BB%95%E6%A7%98%E3%82%92%E8%AA%BF%E3%81%B9%E3%81%A6%E3%81%BF%E3%81%9F" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20190625/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">11</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20190625/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">21</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2023.11.14</span><span class="snscount">&#9825;3</span><a href=/articles/20231114a/ title="当チームでは、出力されたエラーや警告ログを適宜Backlogに起票することにより、いち早くエラーの対応ができるようにしております。CloudWatch LogsサブスクリプションフィルターとSQSを用いることにより、CloudWatchの特定のログをトリガーとして監視ジョブを立ち上げる仕様に改修しました。">CloudWatch Logsサブスクリプションフィルター・SQSを用いたログ監視<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.09.26</span><span class="snscount">&#9825;58</span><a href=/articles/20230926a/ title="S3バケットをtreeするCLIコマンドを紹介します。">stree：S3バケットをtreeするCLIコマンド</a></li><li class="related-posts-item"><span>2023.05.26</span><span class="snscount">&#9825;4</span><a href=/articles/20230526a/ title="AWS Kinesis Data StreamとAWS Lambdaを組み合わせたデータストリーミングを扱うシステムで、Lambdaが処理に失敗した場合のリカバリー運用を考える機会がありました。一般的に、Kinesisのようなメッセージングやイベント駆動型のシステムでは、DLQという仕組みを設けます。">AWS Kinesisから呼び出されるLambdaのリカバリー処理について</a></li><li class="related-posts-item"><span>2023.05.25</span><span class="snscount">&#9825;6</span><a href=/articles/20230525a/ title="Amazon OpenSearch Service  を触る機会があり、興味があったのでプレビューで公開されていたServerless版でいろいろ試していました">Amazon OpenSearch Serverless を触ってみた</a></li><li class="related-posts-item"><span>2023.05.09</span><span class="snscount">&#9825;2</span><a href=/articles/20230509a/ title="2023/03/07から一般提供が開始された新サービス「AWS Application Composer」を使ってみて、どんな人向けか、強み・弱みは何かというところを見ていきます。">AWS Application Composerを使ってみた！</a></li><li class="related-posts-item"><span>2023.04.11</span><span class="snscount">&#9825;3</span><a href=/articles/20230411a/ title="PostgreSQL を使用する際、最適な実行計画が選択されず、クエリの速度が遅くなることがあります。オプティマイザが最適な実行計画を選択できない理由はいくつかありますが、たとえばバッチ処理で大量のデータを投入した直後、統計情報と実データの乖離により、少ないデータに適した計画が大量のデータでは不適切になることがあります。このような場合、PostgreSQL の拡張モジュールである pg_hint_plan により実行計画を固定することで、チューニングが可能です。">RDS Proxy環境下でpg_hint_planを導入する際の注意点</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20210419b/ title="今回はIT初学者の私が入社してから1年間学んできたIT分野のなかで、特に楽しかった技術を抜粋してご紹介させていただければと思います。今後私のようにIT初学者で、エンジニア、ITコンサルタントを志望している皆さんの楽しい社会人生活のキャリアを描く一助となれたら嬉しく思います！">IT初学者がカラムナデータベースを勉強してみた</a></li><li class="reference-posts-item"><a href=/articles/20201127/ title="フューチャー技術ブログの2020年を数値で振り返りたいと思います。投稿数、カテゴリ割合、PV、人気の記事ランキングなどを大公開します">数字で振り返るフューチャー技術ブログ（2020）</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AD%86%E8%80%85%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">筆者について</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Amazon-Redshift"><span class="toc-text">Amazon Redshift</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E3%83%8E%E3%83%BC%E3%83%89%E6%A7%8B%E6%88%90"><span class="toc-text">1. ノード構成</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E6%A6%82%E8%A6%81"><span class="toc-text">1-1. 概要</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E9%81%B8%E3%81%B9%E3%82%8B%E3%83%8E%E3%83%BC%E3%83%89%E3%82%BF%E3%82%A4%E3%83%97"><span class="toc-text">1-2. 選べるノードタイプ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E3%83%AA%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E3%81%A8%E3%82%A2%E3%83%99%E3%82%A4%E3%83%A9%E3%83%93%E3%83%AA%E3%83%86%E3%82%A3"><span class="toc-text">1-3. リージョンとアベイラビリティ</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF"><span class="toc-text">2. ネットワーク</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%82%B5%E3%83%96%E3%83%8D%E3%83%83%E3%83%88%E3%82%B0%E3%83%AB%E3%83%BC%E3%83%97"><span class="toc-text">2-1. クラスターサブネットグループ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E6%8B%A1%E5%BC%B5%E3%81%95%E3%82%8C%E3%81%9FVPC%E3%81%AE%E3%83%AB%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0-Enhanced-VPC-Routing"><span class="toc-text">2-2. 拡張されたVPCのルーティング(Enhanced VPC Routing)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E3%83%A1%E3%83%B3%E3%83%86%E3%83%8A%E3%83%B3%E3%82%B9"><span class="toc-text">3. メンテナンス</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E3%83%AA%E3%82%B5%E3%82%A4%E3%82%BA"><span class="toc-text">3-1. リサイズ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-Elastic-Resize"><span class="toc-text">3-2. Elastic Resize</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E3%82%B9%E3%83%8A%E3%83%83%E3%83%97%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88"><span class="toc-text">3-3. スナップショット</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-%E3%83%A1%E3%83%B3%E3%83%86%E3%83%8A%E3%83%B3%E3%82%B9%E3%82%A6%E3%82%A3%E3%83%B3%E3%83%89%E3%82%A6"><span class="toc-text">3-4. メンテナンスウィンドウ</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E3%83%91%E3%83%A9%E3%83%A1%E3%83%BC%E3%82%BF%E3%82%B0%E3%83%AB%E3%83%BC%E3%83%97"><span class="toc-text">4. パラメータグループ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%AD%E3%83%BC%E3%83%89%E7%AE%A1%E7%90%86"><span class="toc-text">5. ワークロード管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E3%82%B9%E3%83%BC%E3%83%91%E3%83%BC%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E3%82%AD%E3%83%A5%E3%83%BC"><span class="toc-text">5.1 スーパーユーザーキュー</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-WLM%E8%A8%AD%E5%AE%9A"><span class="toc-text">5.2 WLM設定</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%82%AD%E3%83%A5%E3%83%BC%E3%81%AE%E7%A2%BA%E8%AA%8D%E6%96%B9%E6%B3%95"><span class="toc-text">キューの確認方法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E3%82%AF%E3%82%A8%E3%83%AA%E3%83%A2%E3%83%8B%E3%82%BF%E3%83%AA%E3%83%B3%E3%82%B0"><span class="toc-text">5.3 クエリモニタリング</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-%E3%82%AF%E3%82%A8%E3%83%AA%E3%83%9B%E3%83%83%E3%83%94%E3%83%B3%E3%82%B0"><span class="toc-text">5.4 クエリホッピング</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E3%83%BB%E3%82%B0%E3%83%AB%E3%83%BC%E3%83%97"><span class="toc-text">6. ユーザー・グループ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E7%9B%A3%E6%9F%BB%E3%83%AD%E3%82%B0"><span class="toc-text">7. 監査ログ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E8%A8%AD%E8%A8%88"><span class="toc-text">8. テーブル設計</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-%E5%AE%9F%E8%A1%8C%E8%A8%88%E7%94%BB"><span class="toc-text">8-1. 実行計画</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E7%B5%90%E5%90%88"><span class="toc-text">テーブル結合</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%82%AF%E3%82%A8%E3%83%AA%E3%81%AE%E5%AE%9F%E8%A1%8C"><span class="toc-text">クエリの実行</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A8%AD%E8%A8%88%E6%96%B9%E9%87%9D"><span class="toc-text">設計方針</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-%E5%88%86%E6%95%A3%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%AB"><span class="toc-text">8-2. 分散スタイル</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-3-%E3%82%BD%E3%83%BC%E3%83%88%E3%82%AD%E3%83%BC"><span class="toc-text">8-3. ソートキー</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-4-%E3%82%AD%E3%83%BC"><span class="toc-text">8-4. キー</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-5-%E3%83%87%E3%83%BC%E3%82%BF%E5%9E%8B"><span class="toc-text">8-5. データ型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-6-%E5%9C%A7%E7%B8%AE%E3%82%A8%E3%83%B3%E3%82%B3%E3%83%BC%E3%83%89"><span class="toc-text">8-6. 圧縮エンコード</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AE%E3%83%AD%E3%83%BC%E3%83%89%E3%81%A8%E3%82%A2%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%E3%83%BB%E3%83%90%E3%82%AD%E3%83%A5%E3%83%BC%E3%83%A0"><span class="toc-text">9. データのロードとアンロード・バキューム</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-1-%E3%83%87%E3%83%BC%E3%82%BF%E3%83%AD%E3%83%BC%E3%83%89"><span class="toc-text">9-1. データロード</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-%E3%83%87%E3%83%BC%E3%82%BF%E3%82%A2%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89"><span class="toc-text">9-2. データアンロード</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-3-VACUUM"><span class="toc-text">9-3. VACUUM</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E3%83%A9%E3%83%83%E3%82%B7%E3%83%A5%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9"><span class="toc-text">10. ラッシュパフォーマンス</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#10-1-Result-Caching"><span class="toc-text">10-1. Result Caching</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-2-Short-Query-Acceleration"><span class="toc-text">10-2. Short Query Acceleration</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-3-%E5%90%8C%E6%99%82%E5%AE%9F%E8%A1%8C%E3%82%B9%E3%82%B1%E3%83%BC%E3%83%AA%E3%83%B3%E3%82%B0"><span class="toc-text">10-3. 同時実行スケーリング</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-Redshift-Spectrum"><span class="toc-text">11. Redshift Spectrum</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#11-1-%E6%96%99%E9%87%91"><span class="toc-text">11-1. 料金</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-2-%E6%BA%96%E5%82%99"><span class="toc-text">11-2. 準備</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-3-%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88"><span class="toc-text">11-3. ファイルフォーマット</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-4-%E3%83%91%E3%83%BC%E3%83%86%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%B3"><span class="toc-text">11-4. パーティション</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-5-%E6%B3%A8%E6%84%8F"><span class="toc-text">11-5. 注意</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-6-%E4%BD%BF%E3%81%84%E3%81%A9%E3%81%93%E3%82%8D"><span class="toc-text">11-6. 使いどころ</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-%E5%8F%82%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-text">12. 参考資料</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#12-1-AWS%E5%85%AC%E5%BC%8F"><span class="toc-text">12-1. AWS公式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#12-2-%E4%BB%96%E7%A4%BE%E4%BA%8B%E4%BE%8B"><span class="toc-text">12-2. 他社事例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#12-3-%E8%A6%81%E7%B4%A0%E6%8A%80%E8%A1%93"><span class="toc-text">12-3. 要素技術</span></a></li></ol></li></ol></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

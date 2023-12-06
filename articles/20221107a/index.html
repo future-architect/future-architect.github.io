@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>SREの探究 - Spotifyの事例：Ops-in-Squads | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは、TIG 岸下です。秋のブログ週間の5本目になります。 最近、Netflixで配信中のSpotify創業ドキュメンタリー：The Playlistを見ました。創業ドキュメンタリーは鳥肌モノが多く、なんだかパワー貰える感じがして自分も頑張ろうと思わせてくれるので非常にオススメです1。 そんなわけでSpotify熱が高まっていたこと、自分がプロジェクトの方でSRE活動に関わってい">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SREの探究 - Spotifyの事例：Ops-in-Squads | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20221107a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、TIG 岸下です。秋のブログ週間の5本目になります。 最近、Netflixで配信中のSpotify創業ドキュメンタリー：The Playlistを見ました。創業ドキュメンタリーは鳥肌モノが多く、なんだかパワー貰える感じがして自分も頑張ろうと思わせてくれるので非常にオススメです1。 そんなわけでSpotify熱が高まっていたこと、自分がプロジェクトの方でSRE活動に関わってい">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20221107a/teamwork-7423957_640.png">
+<meta property="article:published_time" content="2022-11-06T15:00:00.000Z">
+<meta property="article:modified_time" content="2023-06-07T02:25:54.507Z">
+<meta property="article:tag" content="SRE">
+<meta property="article:tag" content="Spotify">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20221107a/teamwork-7423957_640.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20221107a/">
+  <meta content="SRE,Spotify" name="keywords">
+  <meta content="岸下優介" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">SREの探究 - Spotifyの事例：Ops-in-Squads
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20221107a_SREの探究_-_Spotifyの事例：Ops-in-Squads.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20221107a_SREの探究_-_Spotifyの事例：Ops-in-Squads" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2022/" class="publish-date"><time datetime="2022-11-06T15:00:00.000Z" itemprop="datePublished">2022.11.07</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%B2%B8%E4%B8%8B%E5%84%AA%E4%BB%8B" title="岸下優介さんの記事一覧へ" class="post-author">岸下優介</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/SRE/" title="SREタグの記事へ" class="tag-list-link">SRE</a>
+  
+    
+    <a href="/tags/Spotify/" title="Spotifyタグの記事へ" class="tag-list-link">Spotify</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20221107a/teamwork-7423957_640.png" alt="" width="640" height="427">
+
+<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは、TIG 岸下です。<br><a href="/articles/20221031a/">秋のブログ週間</a>の5本目になります。</p>
+<p>最近、Netflixで配信中のSpotify創業ドキュメンタリー：<a target="_blank" rel="noopener" href="https://www.netflix.com/title/81186296">The Playlist</a>を見ました。創業ドキュメンタリーは鳥肌モノが多く、なんだかパワー貰える感じがして自分も頑張ろうと思わせてくれるので非常にオススメです<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>。</p>
+<p>そんなわけでSpotify熱が高まっていたこと、自分がプロジェクトの方でSRE活動に関わっていることもあり、<a target="_blank" rel="noopener" href="https://www.oreilly.co.jp/books/9784873119618/">SREの探究：7章「SREのいないSRE：Spotifyのケーススタディ」</a>を読んでみました。</p>
+<h2 id="そもそもSREって？"><a href="#そもそもSREって？" class="headerlink" title="そもそもSREって？"></a>そもそもSREって？</h2><p>恥ずかしながら、自分も現在のプロジェクトに配属されるまでSREの存在を知りませんでした。</p>
+<p>SREはSite Reliability Engineeringの略で、サービスの信頼性をソフトウェアエンジニアリングの力で高めていこうぜ！というGoogle発祥の試みになります。</p>
+<p>もはや、試みという枠組みからは抜け出していて一種の<strong>文化</strong>です。</p>
+<p>詳しく知りたい人はオライリーの<a target="_blank" rel="noopener" href="https://www.oreilly.co.jp/books/9784873117911/">SRE本</a>が有名どころです。<br>が、かなり分厚くて読むのが辛い人もいると思うのでTopotal社がやっているPodcast：<a target="_blank" rel="noopener" href="https://open.spotify.com/show/1PUdFj8hXIZdyFat3nk3Af?si=2aaef285b25a4220">もう一度読むSRE</a>をオススメします。</p>
+<p>SRE活動の例として、</p>
+<ul>
+<li>標準化<ul>
+<li>開発に使うツールやクラウドサービスの設定標準を決めておく</li>
+</ul>
+</li>
+<li>エラーバジェット<ul>
+<li>あるサービスの許容できるエラーの量を数値で決めてしまって、機能開発のリリース可否を定性的に判断しよう</li>
+</ul>
+</li>
+<li>自動化<ul>
+<li>人間が手作業でデプロイするといつか事故るから、できるだけ自動化しよう</li>
+</ul>
+</li>
+<li>アラートの改善<ul>
+<li>多すぎるアラートはノイズにしかならないから、利用ユーザーの機会損失となるようなバグだけアラートを飛ばそう</li>
+</ul>
+</li>
+</ul>
+<p>などの活動になります。<br>SREは文化なので、SRE活動はSREの伝道師となってエンジニアリングチームに対して、恒常的にサービスの信頼性を維持・向上させる文化を醸成していきます。<br>以下の記事も参考にしてみてください。</p>
+<ul>
+<li><a href="https://future-architect.github.io/articles/20220518a/">TIG 原木さんの記事：OpenSLOについて</a></li>
+<li><a target="_blank" rel="noopener" href="https://engineering.mercari.com/blog/entry/20220225-cdb2b6deff/">メルカリ社：SRE伝道師としてMicroservices SRE チームが取り組んでいる事例</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.youtube.com/channel/UChvqB_M4qllXCJOW9nNB-Cw">SRE NEXT 2022: 登壇資料</a></li>
+</ul>
+<h2 id="SpotifyのSRE：Ops-in-Squads"><a href="#SpotifyのSRE：Ops-in-Squads" class="headerlink" title="SpotifyのSRE：Ops-in-Squads"></a>SpotifyのSRE：Ops-in-Squads</h2><p>この章のタイトルでは「SREのいないSRE」と書いていますが、SpotifyにSREが居ないわけではありません。<br>Spotifyではプロダクトリリース前から<strong>運用に重きを置いた開発</strong>を行っており、例えば</p>
+<ul>
+<li>プロダクトリリース前の段階で開発メンバーの中に運用エンジニアを組み込む<ul>
+<li>開発に関する議論の中で運用の健全性を対等なテーマとして扱う社風の醸成</li>
+</ul>
+</li>
+<li>ベータ版時点で、運用をソリューションのライフサイクルに組み込む<ul>
+<li>スケーラビリティ、信頼性、保守性など運用上の品質を早い段階で議論</li>
+</ul>
+</li>
+<li>運用の責任をそのノウハウのあるところ、開発者の近くに移す<ul>
+<li>自分で構築したものは自分で実行・運用</li>
+</ul>
+</li>
+</ul>
+<p>などの試みによって文化を根付かせていたそうです。</p>
+<p>また、Spotifyのバックエンドは創業当初から多くの小さなサービスで構成、現代で言えば<strong>マイクロサービスパターン</strong>を採用することを構想しており、これらを組み合わせることでSpotifyのクライアントにコンテンツを提供しています。</p>
+<p>これら2つの文化・構想が現在の<strong>Ops-in-Squads</strong>という運用体型を生み出しました。<br>直訳すればOpsはOperations（運用）、Squadsは分隊で、運用を細かく分けられた分隊が行う形態となります。<br>つまり、Ops-in-Squadsは各サービスの開発チーム側でデプロイから運用までの世話を見る、つまり開発チーム側でサービスの信頼性の担保に責任を持とうぜという文化になります。</p>
+<h2 id="Ops-in-Squads確立までの道のり"><a href="#Ops-in-Squads確立までの道のり" class="headerlink" title="Ops-in-Squads確立までの道のり"></a>Ops-in-Squads確立までの道のり</h2><p>では、どういう経緯でOps-in-Squadsが確立されていったのでしょうか？<br>ざっくりではありますが、その経緯を要約します。</p>
+<h3 id="ベータ版リリースとユーザー数の急激な増加（2007年～2010年）"><a href="#ベータ版リリースとユーザー数の急激な増加（2007年～2010年）" class="headerlink" title="ベータ版リリースとユーザー数の急激な増加（2007年～2010年）"></a>ベータ版リリースとユーザー数の急激な増加（2007年～2010年）</h3><p>場所はスウェーデン、時はインターネットが民主化し皆がエンタメコンテンツを渇望するような時代で、一世を風靡していたファイル共有サイト：パイレートベイ（<a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/%E3%83%91%E3%82%A4%E3%83%AC%E3%83%BC%E3%83%88%E3%83%BB%E3%83%99%E3%82%A4">Wiki</a>）が問題視され、遂に閉鎖されたという背景があります。<br>そんな中、音楽コンテンツ配信の新生児Spotifyがベータ版リリースということでスウェーデン中の元パイレートベイユーザーがSpotifyへどっと流れ込みました。<br>詳しくは<a target="_blank" rel="noopener" href="https://www.netflix.com/title/81186296">The Playlist</a>のエピソード1～2を御覧ください。</p>
+<p>ユーザーの急激な増加はプロダクトに深刻な問題を発生させます。稀にしか起こらない、ほとんど理論上の問題点が大規模に顕在化したわけです。<br>具体的には</p>
+<ul>
+<li>ピーク時間帯にバックエンドサービスでサービス障害</li>
+<li>使用率の高い状況で重要なデータを扱っているサーバーが反応しなくなる</li>
+<li>サーバーのラックへの格納と積み重ねの日々</li>
+</ul>
+<p>などが本書で挙げられています。</p>
+<p>利用ユーザーの多いサービスに関わったことのない自分としてはどれぐらいのつらみだったのか想像し難いのですが、<br><strong>「プロダクトの成功とは、負荷との格闘で今にも落ちそうになるシステムを手作業で何とか動かし続けるために、ノートPCを前にして過ごす数え切れないほどの夜という犠牲の上に成り立つのだ」</strong> という名言から、想像を絶する感があります😇</p>
+<p>これに対して、</p>
+<ul>
+<li>スケーラビリティと信頼性を全面に打ち出す<ul>
+<li>運用を重視する文化から、運用チームだけでなく開発チームも率先して運用の問題解決に協力</li>
+</ul>
+</li>
+<li>スプリント期間中に開発チームのメンバーに「システム所有者デー」を設ける<ul>
+<li>この日は主に各自のサービスのメンテナンス、アップグレード、一般的な改善強化に専念する時間が与えられる</li>
+</ul>
+</li>
+<li>コアサービスの定式化<ul>
+<li>（当時は）様々なバックエンドサービスが依存しあっており、あるサービスが別のサービスを救うための犠牲になることがあった</li>
+<li>これによって、（睡眠不足の）運用エンジニアの意思決定に常に迷いを生じさせてしまっていた</li>
+<li>そこで、コアサービスをユーザーに音楽コンテンツを届けるプロセスと定義し、他のサービスから依存関係を分離した</li>
+</ul>
+</li>
+<li>ゴールキーパーの導入<ul>
+<li>曜日毎などで、運用に関する問い合わせの一次受付の人間を決めておき、コンテキストスイッチが起こる人間の数を最小限に留めておく</li>
+</ul>
+</li>
+</ul>
+<p>などによって、この苦難を乗り越えていきました。</p>
+<p>私が所属するプロジェクトでも曜日毎でゴールキーパー役が決まっており、その曜日以外は問い合わせを気にしなくて済むのでタスクに集中できる環境を作り出し、非常に良い試みだと思います。</p>
+<h3 id="手作業の行き詰まり（2012年）"><a href="#手作業の行き詰まり（2012年）" class="headerlink" title="手作業の行き詰まり（2012年）"></a>手作業の行き詰まり（2012年）</h3><p>今日では、CI&#x2F;CDなど自動化の取り組みが一般化しつつありますが、2012年後半に100万ユーザーを突破したSpotifyは未だ手作業でのデプロイを行っていました。<br>デプロイ方法はというと、社内チャットで <strong>「～～ DEPLOY!」と叫ぶことで他のユーザーが別のデプロイ作業を行わないように排他制御を確保</strong> してから、手作業でスクリプトを実行するやり方を取っていたそうです。<br>まさに人間的排他制御…！2012年時点で100万ユーザーを抱えていたサービスがこのデプロイ方法を取っていたのは驚きです😮</p>
+<p>手作業によるデプロイに加え、新規サーバーの購買と設置、インフラの変更に対するレビューとマージ、アラートの設定など運用チームの負担がどんどん増え、新しい機能や改良した機能をデリバリする能力はどんどん低下していきました。</p>
+<p>バックエンドのアーキテクチャは初期の段階からスケールできるような設計が議論されておりスケールアップに対応済みでしたが、<strong>それに合わせた運用業務のスケールアップは集中型の運用SREチームでは対応できない</strong>ことに気づかされ、Ops-in-Squads（分隊型運用）を確立させる動きが始まるのでした。</p>
+<h3 id="分隊型運用の導入（2013～2015年）"><a href="#分隊型運用の導入（2013～2015年）" class="headerlink" title="分隊型運用の導入（2013～2015年）"></a>分隊型運用の導入（2013～2015年）</h3><p>まずは運用チームの負担を減らすための大きな変革として、</p>
+<ul>
+<li>Jiraチケットで起票することで、新規サーバーのプロビジョニング自動化</li>
+<li>サーバー用のDNSレコードの追加・デプロイを自動化</li>
+<li>内製ツールを用いたDNS SRVレコードに関するテストとデプロイの自動化<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></li>
+<li>デプロイ権限を運用チームから開発チームへ移譲<ul>
+<li>他の誰かからApproveを貰えた場合はセルフマージ可</li>
+</ul>
+</li>
+</ul>
+<p>などの自動化が導入されました。<br>ただ、これらの導入によって一時的に解決の兆しが見えたと思いきや、新たな問題が生まれます。<br>これまでは運用チームが行っていた「サニティーチェック」が取り除かれたことによって、バックエンドのカオス化を生み出してしまいました。<br>また、オンコール担当の運用エンジニアも「プロダクションで何が実行されているか」という対処に必要な理解を欠いていたりする事例が目立つようにもなりました。<br>運用チームの作業負担を減らすための自動化によって、今度は運用チームが全てを把握できなくなってしまい、全ての運用の面倒を見ることができなくなってしまったわけです。</p>
+<p>そんなこんなでOps-in-Squads、つまりサービスに対するオンコールと運用の責任を開発チームが負うスタイルを形成する運びとなりました。<br>ただ、いきなり「運用チームはもう面倒見きれないから、サービスの面倒は自分たちで見てね」と言われても反発は必至です。<br>そこで、運用チームから運用エンジニアを開発チームに派遣することで <strong>「運用の地ならし」</strong> を行い、徐々にオンコールと運用の責任を開発チームへ移譲していくことでOps-in-Squadsを確立させていったようです。</p>
+<p>この活動は当にEnabling SREで、中央のSREチームのメンバーが伝道師となり、他の開発チームでSREができる（Enabling）ように文化を根付かせていったわけですね🧐<br>Enabling SREに関しては以下の記事が参考になります。<br>参考：<a target="_blank" rel="noopener" href="https://moneyforward.com/engineers_blog/2022/02/24/enabling-sre/">Money Forwad社：組織にSREの文化を作り上げていくEnabling SRE</a></p>
+<h2 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h2><p>今回、本書を読みながら感想記事を執筆したことでエンジニアリング（主に運用）の側面で見たSpotifyの成長とその運用形態であるOps-in-Squadsの成り立ちを学ぶことができました。組織に文化を根付かせる＝組織の人の意識を変えさせることになるので、本当に労力と根気のいる作業だと改めて思いました。</p>
+<p>昨今ではマイクロサービスパターンが流行っていることもあり、規模の大きいサービスではOps-in-Squadsも1つの選択肢としてポジションを確立させていくのかなと思いました。<br>各サービス・機能の運用は各分隊に任せて、中央のSREチームは各分隊が運用コストを下げられるためのツール開発や新しい技術の標準化を進めていくスタイルとなりそうです。</p>
+<p>また、本書では泥臭ストーリーが包み隠さず書かれており、更に事前に<a target="_blank" rel="noopener" href="https://www.netflix.com/title/81186296">The Playlist</a>を見ていたこともあって、脳内に情景を浮かぶような解像度で読むことができました。<br>詳細なストーリーを読みたい方、他の事例を読みたい方は是非本書を手に取ってみてください。<br>自分もこの話を励みに、プロジェクトでの活動を邁進していきたいと思います。</p>
+<p>アイキャッチは<a target="_blank" rel="noopener" href="https://pixabay.com/ja/users/roszie-6000120/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=7423957">Rosy - The world is worth thousands of pictures</a>による<a target="_blank" rel="noopener" href="https://pixabay.com/ja//?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=7423957">Pixabay</a>からの画像を利用させていただきました。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">スペースXドキュメンタリー：<a target="_blank" rel="noopener" href="https://www.netflix.com/title/81111324">Return to space</a>はイーロン・マスクの気迫に鳥肌が立ちました。</span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="vertical-align: top; padding-right: 10px;">2.</span><span style="vertical-align: top;"><a target="_blank" rel="noopener" href="https://github.com/spotify/rspec-dns">https://github.com/spotify/rspec-dns</a></span><a href="#fnref:2" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20221107a/&related=twitterapi%2Ctwitter&text=SRE%E3%81%AE%E6%8E%A2%E7%A9%B6%20-%20Spotify%E3%81%AE%E4%BA%8B%E4%BE%8B%EF%BC%9AOps-in-Squads%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">5</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20221107a/&t=SRE%E3%81%AE%E6%8E%A2%E7%A9%B6%20-%20Spotify%E3%81%AE%E4%BA%8B%E4%BE%8B%EF%BC%9AOps-in-Squads" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20221107a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">3</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20221107a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2023.10.30</span><span class="snscount">&#9825;450</span><a href=/articles/20231030b/ title="腰が痛くて仕事にならない、プログラマーこそが天職なのにこの痛みと一生付き合っていかないといけないのか…と思っている方は結構多いのではないでしょうか？">腰痛と闘うプログラマー</a></li><li class="related-posts-item"><span>2023.10.19</span><span class="snscount">&#9825;1</span><a href=/articles/20231019a/ title="Private IPしか持たないCloud SQLへ接続する方法として、Cloud SQL Auth Proxyを利用した接続方法について紹介致します。">VPC外からCloud SQL Auth Proxyを利用したPrivate IP Cloud SQLへの接続</a></li><li class="related-posts-item"><span>2023.10.18</span><span class="snscount">&#9825;1</span><a href=/articles/20231018a/ title="BigQueryは完全マネージドな、ペタバイトスケールかつコスパのよいデータウェアハウスとして知られております。便利なツールである一方、BigQueryで取り扱うデータには個人情報が含まれていることもあり、適切なアクセス制御が望まれます。Resource Managerのタグ機能を利用して…">タグを利用したBigQueryのアクセス制御</a></li><li class="related-posts-item"><span>2023.09.21</span><span class="snscount">&#9825;1</span><a href=/articles/20230921a/ title="これまで組織全体のGoogle Cloudプロジェクトを包括的に見る業務に携わっており、主にIAMやネットワークを含むGoogle Cloud環境上の治安維持のような仕事を担ってきました。今回はその経験値を測るべくProfessional Cloud Security Engineer認定資格を受けてきました。">【合格記】Google Cloud Professional Cloud Security Engineer認定資格を振り返る</a></li><li class="related-posts-item"><span>2023.09.15</span><span class="snscount">&#9825;1</span><a href=/articles/20230915a/ title="最近Data Engineeringを扱うプロジェクトへ異動したこともあり、Google CloudにおけるData Engineeringを網羅的に学びたく、Professional Data Engineer認定資格を受けてきました。">【合格記】Google Cloud Professional Data Engineer認定資格を振り返る【2023年度版】</a></li><li class="related-posts-item"><span>2023.06.27</span><span class="snscount">&#9825;10</span><a href=/articles/20230627a/ title="業務では主にCIとしてJenkinsを利用しているのですが、前々から気になっていたArgo CDを本連載を機に体感してみたいと思います。">Argo CDを体感してみる</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20221031a/ title="秋のブログ週間の開始しますという報告です。2022年で3回目です。">秋のブログ週間2022を始めます</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%9D%E3%82%82%E3%81%9D%E3%82%82SRE%E3%81%A3%E3%81%A6%EF%BC%9F"><span class="toc-text">そもそもSREって？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spotify%E3%81%AESRE%EF%BC%9AOps-in-Squads"><span class="toc-text">SpotifyのSRE：Ops-in-Squads</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Ops-in-Squads%E7%A2%BA%E7%AB%8B%E3%81%BE%E3%81%A7%E3%81%AE%E9%81%93%E3%81%AE%E3%82%8A"><span class="toc-text">Ops-in-Squads確立までの道のり</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%99%E3%83%BC%E3%82%BF%E7%89%88%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E3%81%A8%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E6%95%B0%E3%81%AE%E6%80%A5%E6%BF%80%E3%81%AA%E5%A2%97%E5%8A%A0%EF%BC%882007%E5%B9%B4%EF%BD%9E2010%E5%B9%B4%EF%BC%89"><span class="toc-text">ベータ版リリースとユーザー数の急激な増加（2007年～2010年）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%8B%E4%BD%9C%E6%A5%AD%E3%81%AE%E8%A1%8C%E3%81%8D%E8%A9%B0%E3%81%BE%E3%82%8A%EF%BC%882012%E5%B9%B4%EF%BC%89"><span class="toc-text">手作業の行き詰まり（2012年）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E9%9A%8A%E5%9E%8B%E9%81%8B%E7%94%A8%E3%81%AE%E5%B0%8E%E5%85%A5%EF%BC%882013%EF%BD%9E2015%E5%B9%B4%EF%BC%89"><span class="toc-text">分隊型運用の導入（2013～2015年）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

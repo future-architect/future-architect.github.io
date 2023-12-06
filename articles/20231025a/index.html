@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Rundeck(Community版)を触ってみた | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにRundeckというジョブ管理ソフトウェアを用いて、IaCツールを運用フェーズでの利用促進を図れないか、検証してみます。本検証はAWS環境を用いて行っております。 何か調査や検証事項に不備・誤りがあれば、X（旧Twitter）などで連絡ください。タイトルの右上の鉛筆マークからPull Request形式で直接依頼も行うことができます。 経緯システムの構築フェーズではAnsibleやTerr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Rundeck(Community版)を触ってみた | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20231025a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにRundeckというジョブ管理ソフトウェアを用いて、IaCツールを運用フェーズでの利用促進を図れないか、検証してみます。本検証はAWS環境を用いて行っております。 何か調査や検証事項に不備・誤りがあれば、X（旧Twitter）などで連絡ください。タイトルの右上の鉛筆マークからPull Request形式で直接依頼も行うことができます。 経緯システムの構築フェーズではAnsibleやTerr">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20231025a/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20231025a/image_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20231025a/image_3.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20231025a/image_4.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20231025a/image_5.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20231025a/image_6.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20231025a/image_7.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20231025a/image_8.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20231025a/image_9.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20231025a/image_10.png">
+<meta property="article:published_time" content="2023-10-24T15:00:00.000Z">
+<meta property="article:modified_time" content="2023-10-24T12:38:27.399Z">
+<meta property="article:tag" content="IaC">
+<meta property="article:tag" content="保守運用">
+<meta property="article:tag" content="rundeck">
+<meta property="article:tag" content="クラウドリフト">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20231025a/image.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20231025a/">
+  <meta content="IaC,保守運用,rundeck,クラウドリフト" name="keywords">
+  <meta content="都筑博紀" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Rundeck(Community版)を触ってみた
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20231025a_Rundeck(Community版)を触ってみた.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20231025a_Rundeck(Community版)を触ってみた" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2023/" class="publish-date"><time datetime="2023-10-24T15:00:00.000Z" itemprop="datePublished">2023.10.25</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E9%83%BD%E7%AD%91%E5%8D%9A%E7%B4%80" title="都筑博紀さんの記事一覧へ" class="post-author">都筑博紀</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/IaC/" title="IaCタグの記事へ" class="tag-list-link">IaC</a>
+  
+    
+    <a href="/tags/保守運用/" title="保守運用タグの記事へ" class="tag-list-link">保守運用</a>
+  
+    
+    <a href="/tags/rundeck/" title="rundeckタグの記事へ" class="tag-list-link">rundeck</a>
+  
+    
+    <a href="/tags/クラウドリフト/" title="クラウドリフトタグの記事へ" class="tag-list-link">クラウドリフト</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>Rundeckというジョブ管理ソフトウェアを用いて、IaCツールを運用フェーズでの利用促進を図れないか、検証してみます。本検証はAWS環境を用いて行っております。</p>
+<p>何か調査や検証事項に不備・誤りがあれば、X（旧Twitter）などで連絡ください。タイトルの右上の鉛筆マークからPull Request形式で直接依頼も行うことができます。</p>
+<h2 id="経緯"><a href="#経緯" class="headerlink" title="経緯"></a>経緯</h2><p>システムの構築フェーズではAnsibleやTerraformといったIaC関連のツールを利用したものの、運用フェーズでは生かされないことを、しばしば見てきました。品質管理の重要な要素として５Ｗ１Ｈ思考が求められますが、インフラ運用での変更はアプリケーションのインシデント(更改、障害など)に基づいて<strong>受動的</strong>に発生することが多く、そのマインドセットが失われてしまうことがあるように感じます。例えば、変更履歴はアプリケーション変更側で管理されるが、その変更内容がインフラ変更に紐づけられていない、あるいはインシデントへの対応を急ぐあまり、個別のサーバソースに無秩序に直接手を加えてしまうといった対応が挙げられます。</p>
+<p><strong>インシデントに対して、いかに早急に対応するかということが最優先のミッションになる。</strong>それはインフラ運用管理者としての責任感に基づくものであり否定されるものではありませんが、構成管理上は望ましい結果を生み出さないでしょう。</p>
+<p>インフラの運用は比較的少人数で数多くのサーバ管理を行っていることは多いです。数百台のサーバを10人に満たない人数で管理していることがあります。そのためインフラ変更は属人化された変更手法が暗黙に承認されている状況が多々あります。いかにサーバソースを直接の編集を防ぐか、実施履歴、変更内容(変更前、変更後ソース)を残すか。アプリケーション運用でも同様のことが言えますが、アプリケーション運用ではCI&#x2F;CDにより統制された運用が行われているケースが多く見受けられます。</p>
+<p>CI&#x2F;CDではアプリケーションのデプロイ手法を画一されたワークフローに取り込めており、ソースコードを直接編集・置き換えるといったことが<strong>ご法度</strong>であるというマインドセットが形成されているという部分が大きいと考えてられます。</p>
+<p>インフラ構築で利用されたIaCツールは仕様書・手順書といったドキュメントベースので引き継いでいるでしょう。これをCI&#x2F;CDと同じようにワークフローツールを用い変更手法を具現化したものと合わせて引き継ぐことで運用フェーズでの構成管理(品質均一化、構成管理)が向上するのではないかと考えてみました。</p>
+<p>ワークフローツールについて、モノリシックなシステムでは、ジョブ管理システムに商用ソフトウェアを採用することは多いです。安定性もあり、運用主管部門が既知のツールで習熟度が高い場面ではすべからく採用となります。ただしジョブ数も少なく、実装するワークフローも単純な構成が予定されている案件においてはもう少しライトな構成の選択肢（つまり、Rundeck）があってよいとも思われます。</p>
+<h2 id="Rundeckとは"><a href="#Rundeckとは" class="headerlink" title="Rundeckとは"></a>Rundeckとは</h2><ul>
+<li>PagerDuty, Inc.によって開発されたジョブ管理ソフトウェア</li>
+<li>Javaで動作</li>
+<li>オープンソース版の「Rundeck Community」と、有償のエンタープライズ版の「Rundeck Enterprise」がある</li>
+</ul>
+<p>Community版とEnterprise版の違い<br><a target="_blank" rel="noopener" href="https://www.rundeck.com/community-vs-enterprise">https://www.rundeck.com/community-vs-enterprise</a></p>
+<p>この検証では、Community版のRundeckを利用しています。</p>
+<ul>
+<li>Rundeck Community：BUILD:4.17.0-20230925</li>
+</ul>
+<h2 id="構成"><a href="#構成" class="headerlink" title="構成"></a>構成</h2><p>Rundeckを構築するにあたりいくつかの構成を試してみました。結果としてCommunity版ではあまり意味のない構成も含まれます。</p>
+<ol>
+<li>シングルインスタンス構成</li>
+<li>シングルインスタンス構成 + 外部データベース</li>
+<li>デュアルインスタンス構成 + 外部データベース + ELB</li>
+<li>シングルコンテナ構成 + 外部データベース</li>
+<li>シングルコンテナ構成 + 外部データベース + シングルノード</li>
+<li>伝統的なクラスタ構成(クラスタウェア＋ミラーディスクによるHAクラスタ)</li>
+</ol>
+<h3 id="1-シングルインスタンス構成"><a href="#1-シングルインスタンス構成" class="headerlink" title="1. シングルインスタンス構成"></a>1. シングルインスタンス構成</h3><p>最も基本的な構成です。</p>
+<p>サポートされているサーバOSにJavaとRundeckをインストールすればすぐに利用でき、データベースにH2DB(H2 Database Engine)が組み込まれているようで、手軽に活用できます。</p>
+<p>Rundeckのジョブ管理の使用感などを試したいのであれば最も適しています。</p>
+<img src="/images/20231025a/image.png" alt="" width="264" height="258" loading="lazy">
+
+
+<h3 id="2-シングルインスタンス構成-＋-外部データベース"><a href="#2-シングルインスタンス構成-＋-外部データベース" class="headerlink" title="2. シングルインスタンス構成　＋　外部データベース"></a>2. シングルインスタンス構成　＋　外部データベース</h3><p>シングルインスタンス構成からデータベースのみを外部のRDBに配置したものです。</p>
+<p>検証ではEC2上に作成したmariadbを利用しましたがRDSを用いることも可能です。基本構成からデータベースの堅牢性向上を狙ったものです。</p>
+<img src="/images/20231025a/image_2.png" alt="" width="583" height="236" loading="lazy">
+
+<h3 id="3-デュアルインスタンス構成-＋-外部データベース-＋-ELB"><a href="#3-デュアルインスタンス構成-＋-外部データベース-＋-ELB" class="headerlink" title="3. デュアルインスタンス構成　＋　外部データベース　＋　ELB"></a>3. デュアルインスタンス構成　＋　外部データベース　＋　ELB</h3><p>Rundeckサービスを冗長構成としたものです。</p>
+<p>データベースの他、ジョブスクリプトやログも共有する必要があるためS3を利用してます。ログのS3化はプラグインが利用できます。スクリプトに関してはジョブ定義のスクリプトパスをURLで指定できるので、S3にウェブサイトアクセス許可を設定することで可能となります。</p>
+<p><strong>結果としてはCommunity版では可用性の向上は計れませんでした。</strong>ジョブ実行に関してはジョブ実行指示を行ったサーバを識別(rundeck.server.uuid)していて特定のインスタンスで実行されてしまうようです。Enterprise版ではクラスタ関連機能(High Availability Clusters、Auto Takeover)が利用でき排他的に複数のサーバで実行可能となるようです。</p>
+<img src="/images/20231025a/image_3.png" alt="" width="874" height="361" loading="lazy">
+
+<h3 id="4-シングルコンテナ構成-＋-外部データベース"><a href="#4-シングルコンテナ構成-＋-外部データベース" class="headerlink" title="4. シングルコンテナ構成　＋　外部データベース"></a>4. シングルコンテナ構成　＋　外部データベース</h3><p>Rundeckはコンテナ環境でも利用可能です。基本構成としてはシングルインスタンス構成と同等です。</p>
+<p>コンテナは揮発性であることからデータは外部に配置しております。</p>
+<p>コンテナ化によってRundeckそのものの構成管理が容易になります。</p>
+<img src="/images/20231025a/image_4.png" alt="" width="757" height="269" loading="lazy">
+
+<h3 id="5-シングルコンテナ構成-＋-外部データベース-＋-ノード"><a href="#5-シングルコンテナ構成-＋-外部データベース-＋-ノード" class="headerlink" title="5. シングルコンテナ構成　＋　外部データベース　＋　ノード"></a>5. シングルコンテナ構成　＋　外部データベース　＋　ノード</h3><p>ジョブ実行環境をノードとして登録しジョブを実行させることが可能です。Jenkinsのslaveノードや商用SWのエージェントと同じような利用方法でしょうか。ノードは先に紹介したいずれの構成でも利用可能です。</p>
+<p>ジョブの実行環境をRundeckから排除することでRundeck側のSW構成が簡素化できます。RundeckからノードはSSH接続ができればよいです。</p>
+<img src="/images/20231025a/image_5.png" alt="" width="895" height="278" loading="lazy">
+
+<h3 id="6-伝統的なクラスタ構成-クラスタウェア＋ミラーディスクによるHAクラスタ"><a href="#6-伝統的なクラスタ構成-クラスタウェア＋ミラーディスクによるHAクラスタ" class="headerlink" title="6. 伝統的なクラスタ構成(クラスタウェア＋ミラーディスクによるHAクラスタ)"></a>6. 伝統的なクラスタ構成(クラスタウェア＋ミラーディスクによるHAクラスタ)</h3><p>商用ジョブ管理ソフトウェアではしばしば用いられる冗長構成です。</p>
+<p>Actinve&#x2F;StandbyのHAクラスタリング方式。パブリッククラウド環境ではストレージミラーリング機能を用いて実装することは一般的だと思います。クラスタソフトウェアが必要になるためRundeck構成が複雑になりがちです。データベースを同居させるか否かでも構成が変わってきます。</p>
+<img src="/images/20231025a/image_6.png" alt="" width="830" height="396" loading="lazy">
+
+<h3 id="構成検証における考察"><a href="#構成検証における考察" class="headerlink" title="構成検証における考察"></a>構成検証における考察</h3><ul>
+<li>基本構成<ul>
+<li>インストールも容易ですぐに利用できます。Rundeckの利用を検討される場合はまずはこれで十分だと思います</li>
+<li>開発環境やテスト環境などで本番環境のジョブ管理システムが利用できないケースなど、一時的にジョブワークフローを利用したい場合などでの用途もあると考えます</li>
+<li>利用できるジョブ管理ツールがなく、複数のサーバ上でcronなどを用いて実行している非ミッションクリティカルなジョブを統制管理するために利用するといった用途にもよいかもしれません</li>
+</ul>
+</li>
+<li>データ保全性を重視する構成<ul>
+<li>Rundeckにおいて一定の耐久性(データ保全性)を必要とするのであればデータベースは外部データベース(RDB)を利用するべきでしょう</li>
+<li>Enterprise版にあるクラスタ関連機能が利用できないため可用性の向上は難しいですが、データベースをRDB化することでデータ保全性は大きく向上させることが可能です</li>
+</ul>
+</li>
+<li>可用性を重視する場合<ul>
+<li>ミッションクリティカルな業務ジョブを想定する場合は、Enterprise版の検討を行うことがよいと考えます。非ミッションクリティカルな運用であっても可用性を高めたい場合はインスタンス&#x2F;コンテナのAutorecovery機能をを検討することがよいと思います。そのためにRundeckは常にシンプルな構成を維持する(データ外出し)ことが望まれます</li>
+</ul>
+</li>
+<li>非推奨な構成<ul>
+<li>伝統的なHAクラスタアーキテクチャはActive&#x2F;Standby構成であることが多く、その場合はサーバサイジングを負荷ピークで考えるためオーバースペックが生じたり、Standbyノードのリソースが平常に無駄に課金されることが生じてしまいます。パブリッククラウド環境では個人的にはあまり望ましい構成ではないと考えます。(Rundeckに限らずですが。。。)</li>
+</ul>
+</li>
+<li>コンテナ化<ul>
+<li>システムプラットフォームとしてコンテナアーキテクチャをすでに採用している場面であれば、Rundeckもコンテナ化することで低コストのジョブ管理システムを構成できます。コンテナ化することでRundeck構成の簡素化を維持継続しやすく障害時の回復も高速に実施できるでしょう。コンテナ化によって環境ごと(JT、ST、STG、PRD等)に個別コンテナを作成し、必要時のみ起動するといった運用も低コストで実現可能です</li>
+</ul>
+</li>
+</ul>
+<h2 id="ジョブ定義"><a href="#ジョブ定義" class="headerlink" title="ジョブ定義"></a>ジョブ定義</h2><h3 id="Community版での制約"><a href="#Community版での制約" class="headerlink" title="Community版での制約"></a>Community版での制約</h3><p>Community版ではEnterprise版で実装されている多くの機能が利用できません。その中でも業務アプリ運用で影響の大きいと思われる機能を紹介します。</p>
+<ul>
+<li><strong>Job Queuing</strong>: ジョブキューイング機能が実装されていません。同一ジョブを連続実行する場合などは考慮が必要です</li>
+<li><strong>Failed Job Resume</strong>: ジョブステップでの再実行ができません。ジョブのリカバリポイントをジョブ単位で構成することが必要です</li>
+<li><strong>Workflow Visualization、Ruleset Workflow Strategy Plugin</strong>: 商用ソフトウェアでは通常実装されているジョブワークフローのグラフィカルな表示・修正ができません。複雑なジョブ構築・修正は困難です</li>
+<li><strong>Blackout Calendaring</strong>: カレンダー設定がありません。祝日など特殊な営業日の対応が難しいです</li>
+</ul>
+<h3 id="複雑なジョブワークフロー"><a href="#複雑なジョブワークフロー" class="headerlink" title="複雑なジョブワークフロー"></a>複雑なジョブワークフロー</h3><p>前述の制約事項でも記載した通り、RundeckのCommunity版では複雑なジョブワークフローを作成するのは難しいです。</p>
+<p>基本的には実行単位はジョブであり、そのなかでステップに分割することで複数のタスクを実行します。ジョブネットという概念が見つけられませんでした。ジョブステップから別のジョブをトリガーしてつなげることは可能です。</p>
+<p>リカバリポイントを加味した並列ジョブワークフローを作成してみました。</p>
+<img src="/images/20231025a/image_7.png" alt="" width="1153" height="629" loading="lazy">
+
+<p>もう少しうまいやり方があるかもしれません。ご存知の方がいらっしゃればコメントをいただければです。</p>
+<h4 id="ジョブ定義に関する考察"><a href="#ジョブ定義に関する考察" class="headerlink" title="ジョブ定義に関する考察"></a>ジョブ定義に関する考察</h4><p>複雑なジョブワークフローが要求される場合、Community版のRundeckを利用することは難しいです。</p>
+<p>複雑なジョブフローを実装するためのツールがなく、実装する場合は構築工数のコストが大きくなることが想定されます。またジョブ障害時のリカバリ操作も難しくなります。</p>
+<p>Community版を利用する場合のジョブフローとしては、直列に順列で実行するようはワークフローであったり、並列処理においても後続タスクに複数のジョブディペンデンシーを用いないジョブ構成が望ましいものと考えます。</p>
+<h2 id="IaCワークフロー"><a href="#IaCワークフロー" class="headerlink" title="IaCワークフロー"></a>IaCワークフロー</h2><p>RundeckにはいくつかのIaC関連ツールへのプラグインが実装されており、Community版でも利用できるものがあります。先述したようにIaCツールを運用フェーズで利用促進するにはワークフローが必要と考えておりました。</p>
+<p>モノリシックな構成では、システムの変更余地が高く、またそのために変更された内容が検出しづらいです。システム更改などの際、システム規模によっては現状調査に多大な工数が発生します。業務システムとしてはマイクロサービス化が進んでいますが、オンプレミス環境・パブリッククラウド環境で依然モノリシックなシステム環境は多数存在してします。</p>
+<p>変更管理がきちんと行われている環境であっても、変更履歴はあるものの、それがサーバ構成管理ときっちり紐づけられている環境は多くはありません。オンプレミスの環境ではサーバ構成管理はHW構成(CPU,RAM,DISK等)のみであったりすることもあります。それをそのままパブリッククラウドに展開してしまうと、インスタンスの管理はインスタンスタイプやEBSサイズといったもののみになってしまいます。そのためサーバ内部の構成管理(SW,各パラメータなど)は疎かになりがちです。</p>
+<p>また変更管理のトリガーは業務インシデント(更改、障害など)であることがほとんどであり、その結果としてインシデントのクローズで完了となり、サーバ構成変更として履歴として損なわれる状態になるといったこともあると感じております。</p>
+<p>インフラへの変更をジョブワークフローとして生成しログとして残すことで各サーバへの変更履歴を明確化し、かつ、AnsibleやTerraformのコードが変更内容として外部に保存されることがワークフロー管理ツールを用いることで比較的容易に実現できると考えています。</p>
+<h3 id="IaCワークフロー検証構成"><a href="#IaCワークフロー検証構成" class="headerlink" title="IaCワークフロー検証構成"></a>IaCワークフロー検証構成</h3><ul>
+<li>RundeckとAnsibleをインストールしたコンテナを作成</li>
+<li>Terraformをインストールしたコンテナを作成</li>
+<li>TerraformコンテナをRundeckのノードとして追加</li>
+</ul>
+<img src="/images/20231025a/image_8.png" alt="" width="1131" height="629" loading="lazy">
+
+<h3 id="IaCワークフロー操作"><a href="#IaCワークフロー操作" class="headerlink" title="IaCワークフロー操作"></a>IaCワークフロー操作</h3><ol>
+<li>IaC実行ユーザはS3バケットに実行するスクリプト類を格納(追加・修正)<ul>
+<li>Terraformで構築するためのtfファイル、ジョブスクリプト、Ansible-playbookを格納</li>
+</ul>
+</li>
+<li>Rundeckにジョブを登録<ul>
+<li>Terraformでインフラ環境を構築ジョブ</li>
+<li>Ansiblleでサービスパッケージの導入及びコンフィグレーヨンジョブ</li>
+</ul>
+</li>
+</ol>
+<img src="/images/20231025a/image_9.png" alt="" width="977" height="449" loading="lazy">
+
+<h4 id="IaCワークフロージョブ例"><a href="#IaCワークフロージョブ例" class="headerlink" title="IaCワークフロージョブ例"></a>IaCワークフロージョブ例</h4><ol>
+<li>Terraform<ul>
+<li>S3からtfファイル(providers.tf,backend.tf,各種tfファイル)ダウンロード</li>
+<li>Terraform init</li>
+<li>Terraform validate、Terraform apply</li>
+</ul>
+</li>
+<li>Ansible<ul>
+<li>S3からAnsible-playbookファイル(inventory,task,file,template)ダウンロード</li>
+<li>パッケージインストール</li>
+<li>パッケージ設定ファイル配布</li>
+<li>サービス起動</li>
+</ul>
+</li>
+</ol>
+<p><strong>※実運用では、terraform planやAnsible dryrunなどで実行前に検証を行いますが、実行検証のため省略しております。</strong></p>
+<img src="/images/20231025a/image_10.png" alt="" width="1116" height="412" loading="lazy">
+
+<h3 id="IaCワークフロー環境でのコンテナ化のメリット"><a href="#IaCワークフロー環境でのコンテナ化のメリット" class="headerlink" title="IaCワークフロー環境でのコンテナ化のメリット"></a>IaCワークフロー環境でのコンテナ化のメリット</h3><h4 id="運用コスト"><a href="#運用コスト" class="headerlink" title="運用コスト"></a>運用コスト</h4><p>既にコンテナ環境が整備されているのであれば、IaCワークフローで利用する場合はコンテナで運用することがおすすめです。</p>
+<p>IaCリクエストは常時必要であることは稀で必要な時だけ起動できればよいことが多いと思われます。かつコンテナ化することでRundeck自体もリポジトリを利用することで低コストで変更管理できます。</p>
+<h5 id="ノイズの防止"><a href="#ノイズの防止" class="headerlink" title="ノイズの防止"></a>ノイズの防止</h5><p>IaCの運用において実施過程で生じる不用意な修正が品質を大きく損なうケースがあります。</p>
+<p>一時的に行ってしまった誤ったtfファイルやAnsible-playbookの修正が既設の構成状態との乖離を発生してしまい、同期した状態に回復することに多大な工数が生じてしまう、あるいは最悪運用が破綻してしまう場合があります。以前に実行したファイルが不要となったにもかかわらず、そのまま配置されていて意図しない修正が発生していまったなどということもありえなくはありません。</p>
+<p>ユーザがサーバ上でtfファイルやAnsible-playbookなど設定ファイルの直接変更を防ぐことや、設定ファイルをSCM(S3やSubversionなど)で版管理することはIaCを維持するためには重要だと考えます。</p>
+<p>コンテナの揮発性の性質は、ノイズの防止には都合のよいことだと考えます。</p>
+<h5 id="セキュリティ"><a href="#セキュリティ" class="headerlink" title="セキュリティ"></a>セキュリティ</h5><p>環境ごと(開発環境、テスト環境、ステージング環境、本番環境など)それぞれにコンテナを用意しセキュリティ制限を設けることで環境間での誤った更新を防ぐといった点も便利かと思います。むろんサーバで分離することも可能ですが、コスト面や環境維持の観点でコンテナの方がメリット大きいと思われます。</p>
+<p>セキュリティ制限とは、AWS環境でいえば各環境のコンテナごとにIAMロールやセキュリティーグループを設定し意図しない環境へのアクセスをブロックといった制御を指しております。</p>
+<p>データベースは各環境ごとに作成するとコストが大きいため、１つのインスタンス上にデータベース・スキーマ等で分離することで十分であると考えます。IaCワークフローではジョブの実行多重度は多くなく、DB負荷は低いものと想定されるため環境ごとにDBインスタンスを用意するのは費用対効果が悪く感じます。</p>
+<h4 id="IaCワークフローに関する考察"><a href="#IaCワークフローに関する考察" class="headerlink" title="IaCワークフローに関する考察"></a>IaCワークフローに関する考察</h4><p>IaCワークフローでの活用では、Rundeckでなければならないというものではありません。コンテナ化が容易であることやIaC関連のプラグインが存在することなどはRundeckのメリットではありますが、他のツールでも実現は可能かと思います。</p>
+<p>Rundeckはそれを比較的容易にIaCワークフロー構築できるツールの一つであるということだと考えます。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><ul>
+<li>ジョブ管理ツールとして、Rundeck Community版はミッションクリティカルな状況下において可用性・運用性の観点から採用は困難。ミッションクリティカル環境でRundeckの特性(豊富な他ツールとのプラグインなど)を利用したい場合はEnterprise版を検討する</li>
+<li>Rundeck Community版は導入が容易であることから、非ミッションクリティカルな状況では利用価値はある。開発・テスト環境でのジョブワークフロー、非ミッションクリティカルなcronジョブの統制、CI&#x2F;CD、IaCワークフローツールとしてなど</li>
+<li>IaCワークフローにおいてRundeckは有効なツールの一つとなりえる</li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20231025a/&related=twitterapi%2Ctwitter&text=Rundeck(Community%E7%89%88)%E3%82%92%E8%A7%A6%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20231025a/&t=Rundeck(Community%E7%89%88)%E3%82%92%E8%A7%A6%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20231025a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20231025a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">1</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2023.05.02</span><span class="snscount">&#9825;8</span><a href=/articles/20230502a/ title="cf-terraformingは、Cloudflareにて開発されているOSSで、その名前の通り、Cloudflare上のリソースをHCL化し、出力されたソースを利用してTerraformのState管理下にすることができるツールです">cf-terraformingで入門するCloudflare</a></li><li class="related-posts-item"><span>2023.04.26</span><span class="snscount">&#9825;10</span><a href=/articles/20230426a/ title="春の入門ということで、改めてIaCのメリット・デメリットについて整理してみました。また、PulumiというIaCツールに入門してみたので、皆さんと一緒にPulumiについて理解していきたいと思います。">Pulumiで始めるIaC入門</a></li><li class="related-posts-item"><span>2021.10.29</span><span class="snscount">&#9825;301</span><a href=/articles/20211029a/ title="ここ最近はほぼ1からコード設計をして運用まで持っていくこともあり、「より腐りにくい、より息の長いコード」というものを考えるようになりました。Terraformだからこその「定期メンテを簡易にするためには」「より簡単に変更するためには」をひたすら突き詰めていった結果、アツい気持ちが生まれ、今回は筆を取っています。">Terraformerとしてコードを書いて思うこと</a></li><li class="related-posts-item"><span>2021.06.08</span><span class="snscount">&#9825;7</span><a href=/articles/20210608a/ title="「オンコール通知も全自動で! AWS + Datadog + PagerDuty で作る運用監視基盤」 というテーマでお話しました。監視 に関連するOSSやSaaSが乱立する昨今、Futureではとある案件で DatadogとPagerDutyをフル活用した運用監視基盤を一から構築しました。運用監視基盤に求められた要件とその設計、システムからDatadog/PagerDutyへの具体的な連携アーキテクチャ、運用してみての嬉しみ/辛み等を惜しみなくお話しました。">Future Tech Night #9「オンコール通知も全自動で! AWS + Datadog + PagerDuty で作る運用監視基盤」</a></li><li class="related-posts-item"><span>2021.05.31</span><span class="snscount">&#9825;15</span><a href=/articles/20210531b/ title="「Kinesis+Lambda構成」でのメトリクス監視について取り上げます。データ流入量が徐々に増加する見込みのとき、各リソースのどのメトリクスを重点チェックすべきか。また、メトリクスがリソースの制限にぶつかった場合やアラート検知された場合にどのような対応アクションを取るべきか。KinesisやLambdaのリソース監視設定から得た知見を、本ブログに整理しました。そもそもの「サーバレスって、何が便利なんだっけ？」から整理したい勉強熱心なエンジニアは、[AWS公式のグラレコ解説記事]をご覧ください。">Kinesis+Lambda構成での、処理遅延を監視する</a></li><li class="related-posts-item"><span>2021.05.27</span><span class="snscount">&#9825;64</span><a href=/articles/20210527a/ title="こんにちは。TIG村瀬です。2021/4/21を開催しました。私は、運用まで考慮したクラウドアーキテクチャ設計できていますか？というタイトルでお話させていただきました。発表資料は...">Future Tech Night #9 ～運用で後悔しないためのAWS設計術～　を開催しました。</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%8C%E7%B7%AF"><span class="toc-text">経緯</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Rundeck%E3%81%A8%E3%81%AF"><span class="toc-text">Rundeckとは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A7%8B%E6%88%90"><span class="toc-text">構成</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E6%A7%8B%E6%88%90"><span class="toc-text">1. シングルインスタンス構成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E6%A7%8B%E6%88%90-%EF%BC%8B-%E5%A4%96%E9%83%A8%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9"><span class="toc-text">2. シングルインスタンス構成　＋　外部データベース</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E3%83%87%E3%83%A5%E3%82%A2%E3%83%AB%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E6%A7%8B%E6%88%90-%EF%BC%8B-%E5%A4%96%E9%83%A8%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9-%EF%BC%8B-ELB"><span class="toc-text">3. デュアルインスタンス構成　＋　外部データベース　＋　ELB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%A7%8B%E6%88%90-%EF%BC%8B-%E5%A4%96%E9%83%A8%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9"><span class="toc-text">4. シングルコンテナ構成　＋　外部データベース</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%A7%8B%E6%88%90-%EF%BC%8B-%E5%A4%96%E9%83%A8%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9-%EF%BC%8B-%E3%83%8E%E3%83%BC%E3%83%89"><span class="toc-text">5. シングルコンテナ構成　＋　外部データベース　＋　ノード</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E4%BC%9D%E7%B5%B1%E7%9A%84%E3%81%AA%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E6%A7%8B%E6%88%90-%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%82%A6%E3%82%A7%E3%82%A2%EF%BC%8B%E3%83%9F%E3%83%A9%E3%83%BC%E3%83%87%E3%82%A3%E3%82%B9%E3%82%AF%E3%81%AB%E3%82%88%E3%82%8BHA%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF"><span class="toc-text">6. 伝統的なクラスタ構成(クラスタウェア＋ミラーディスクによるHAクラスタ)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A7%8B%E6%88%90%E6%A4%9C%E8%A8%BC%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E8%80%83%E5%AF%9F"><span class="toc-text">構成検証における考察</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%B8%E3%83%A7%E3%83%96%E5%AE%9A%E7%BE%A9"><span class="toc-text">ジョブ定義</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Community%E7%89%88%E3%81%A7%E3%81%AE%E5%88%B6%E7%B4%84"><span class="toc-text">Community版での制約</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A4%87%E9%9B%91%E3%81%AA%E3%82%B8%E3%83%A7%E3%83%96%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC"><span class="toc-text">複雑なジョブワークフロー</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%82%B8%E3%83%A7%E3%83%96%E5%AE%9A%E7%BE%A9%E3%81%AB%E9%96%A2%E3%81%99%E3%82%8B%E8%80%83%E5%AF%9F"><span class="toc-text">ジョブ定義に関する考察</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IaC%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC"><span class="toc-text">IaCワークフロー</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#IaC%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC%E6%A4%9C%E8%A8%BC%E6%A7%8B%E6%88%90"><span class="toc-text">IaCワークフロー検証構成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IaC%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC%E6%93%8D%E4%BD%9C"><span class="toc-text">IaCワークフロー操作</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IaC%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%96%E4%BE%8B"><span class="toc-text">IaCワークフロージョブ例</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IaC%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC%E7%92%B0%E5%A2%83%E3%81%A7%E3%81%AE%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E5%8C%96%E3%81%AE%E3%83%A1%E3%83%AA%E3%83%83%E3%83%88"><span class="toc-text">IaCワークフロー環境でのコンテナ化のメリット</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%81%8B%E7%94%A8%E3%82%B3%E3%82%B9%E3%83%88"><span class="toc-text">運用コスト</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#IaC%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC%E3%81%AB%E9%96%A2%E3%81%99%E3%82%8B%E8%80%83%E5%AF%9F"><span class="toc-text">IaCワークフローに関する考察</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

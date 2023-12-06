@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>近傍探索で用いられるtopKのソートアルゴリズム | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="こんにちは！SAIGの金子です。普段はフューチャーのAIグループで開発を行っている他、nadareというハンドルネームでデータ分析コンペティションに参加しています。 アルゴリズムとデータ構造連載の1本目となる今回はアルゴリズムをテーマとして、faissを題材にソートされたTopKを取得するために使われているソートアルゴリズムについて紹介したいと思います。 faissとは  https:&#x2F;&#x2F;gith">
+<meta property="og:type" content="article">
+<meta property="og:title" content="近傍探索で用いられるtopKのソートアルゴリズム | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210628b/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="こんにちは！SAIGの金子です。普段はフューチャーのAIグループで開発を行っている他、nadareというハンドルネームでデータ分析コンペティションに参加しています。 アルゴリズムとデータ構造連載の1本目となる今回はアルゴリズムをテーマとして、faissを題材にソートされたTopKを取得するために使われているソートアルゴリズムについて紹介したいと思います。 faissとは  https:&#x2F;&#x2F;gith">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210628b/faiss.png">
+<meta property="article:published_time" content="2021-06-27T15:00:01.000Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.663Z">
+<meta property="article:tag" content="アルゴリズム">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210628b/faiss.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210628b/">
+  <meta content="アルゴリズム" name="keywords">
+  <meta content="金子剛士" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">近傍探索で用いられるtopKのソートアルゴリズム
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210628b_近傍探索で用いられるtopKのソートアルゴリズム.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210628b_近傍探索で用いられるtopKのソートアルゴリズム" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-06-27T15:00:01.000Z" itemprop="datePublished">2021.06.28</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E9%87%91%E5%AD%90%E5%89%9B%E5%A3%AB" title="金子剛士さんの記事一覧へ" class="post-author">金子剛士</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/アルゴリズム/" title="アルゴリズムタグの記事へ" class="tag-list-link">アルゴリズム</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p>こんにちは！SAIGの金子です。<br>普段はフューチャーのAIグループで開発を行っている他、nadareというハンドルネームでデータ分析コンペティションに参加しています。</p>
+<p><a href="/articles/20210628a/">アルゴリズムとデータ構造連載</a>の1本目となる今回はアルゴリズムをテーマとして、faissを題材にソートされたTopKを取得するために使われているソートアルゴリズムについて紹介したいと思います。</p>
+<h1 id="faissとは"><a href="#faissとは" class="headerlink" title="faissとは"></a>faissとは</h1><img src="/images/20210628b/faiss.png" alt="faissロゴ" width="197" height="83">
+
+<p><a target="_blank" rel="noopener" href="https://github.com/facebookresearch/faiss">https://github.com/facebookresearch/faiss</a></p>
+<p>faissはFacebook AI Researchによって開発されている近傍探索のライブラリです。近傍探索はベクトル同士の類似度(ユークリッド距離やコサイン類似度)を計算することで似たベクトルを取得します。主に文章や画像をベクトル化し類似アイテムやクエリに合ったものを検索することに応用されます。</p>
+<h1 id="TopKを取得するのに最適なアルゴリズムは？"><a href="#TopKを取得するのに最適なアルゴリズムは？" class="headerlink" title="TopKを取得するのに最適なアルゴリズムは？"></a>TopKを取得するのに最適なアルゴリズムは？</h1><p>faissは大量のベクトル(1M, 1G, 1P単位)から類似ベクトルを取得する際に活用されます。一般的なケースでは全てのベクトルとの類似度とその順位を正確に知る必要はなく、最も近いベクトルかあるいはTop100程度を知ることができればうれしい場合が多いです。そのため、faiss内ではTopKを取得するために基本的には<a target="_blank" rel="noopener" href="https://github.com/facebookresearch/faiss/blob/7559cf5c5bf181942ed706fd8914e77a5c4bfb9b/faiss/utils/distances.cpp#L316">ヒープソートが用いられています</a>。</p>
+<h1 id="ヒープソートについて"><a href="#ヒープソートについて" class="headerlink" title="ヒープソートについて"></a>ヒープソートについて</h1><p>ヒープソートは二分木を用いたソート方法です。N個のアイテムについてクエリとの類似度を計算してTopKを得たい場合を考えるとします。</p>
+<p>ヒープソートでは</p>
+<ul>
+<li>まず容量Kのヒープを用意します.</li>
+<li>N個のアイテムについて順に類似度を計算しヒープに追加しヒープ内でソートを行います。</li>
+<li>ソート後は順位がKより大きいものをヒープから削除します。</li>
+</ul>
+<p>一回の追加につきヒープのソートにかかる時間はlogKで、これをN回繰り返すため計算量はO(NlogK)になります。K &lt;&lt; Nであるため、普通のソートのO(NlogN)と比べても計算時間が改善することが多いです。</p>
+<h1 id="ヒープキューvs他のソート"><a href="#ヒープキューvs他のソート" class="headerlink" title="ヒープキューvs他のソート"></a>ヒープキューvs他のソート</h1><p>内積やユークリッド距離で近傍を取得する際はヒープキューを基本的には用いるのですが、ハミング距離で近傍探索を行う場合、faissではバケットソートも選択することができます。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/facebookresearch/faiss/blob/7559cf5c5bf181942ed706fd8914e77a5c4bfb9b/faiss/IndexBinaryFlat.cpp">IndexBinaryFlat</a>にてuse_heapをfalseにするとバケットソートによるtopKの取得ができます。私のPCの環境で2e6件のレコードに対し, 2e5回256bitのハミング距離を計算しtop1000を取得するコードをを実行したところ、ヒープソートで3分10秒、バケットソートで3分20秒とヒープソートの方が早かったです。バケットソートはO(N)なので意外ですが、各バケットに最低でもtopKの容量を用意する必要があり効率が良くなかったのではと考えられます。</p>
+<p>余談ですが、上記の256bitのバイナリベクトルは300次元のベクトルをハッシュ化したもので、300次元のベクトル同士の内積計算を256bitのハミング距離の計算で近似しようとしたのですが、同様の条件で計算したところ6~8倍ほどしか高速化できませんでした。おそらく距離の計算を高速化してもソートの部分がボトルネックになったためこのような結果になったのだと思われます。</p>
+<h1 id="締め"><a href="#締め" class="headerlink" title="締め"></a>締め</h1><p>ソートアルゴリズムはたいていの場合はクイックソートが使われがちですが、条件次第ではその他のソートの方が便利なことがあります。faissのコードは専門家によって高度にチューニングされており、学べる点がとても多いため読んでみると面白いと思います。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210628b/&related=twitterapi%2Ctwitter&text=%E8%BF%91%E5%82%8D%E6%8E%A2%E7%B4%A2%E3%81%A7%E7%94%A8%E3%81%84%E3%82%89%E3%82%8C%E3%82%8BtopK%E3%81%AE%E3%82%BD%E3%83%BC%E3%83%88%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210628b/&t=%E8%BF%91%E5%82%8D%E6%8E%A2%E7%B4%A2%E3%81%A7%E7%94%A8%E3%81%84%E3%82%89%E3%82%8C%E3%82%8BtopK%E3%81%AE%E3%82%BD%E3%83%BC%E3%83%88%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210628b/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210628b/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.09.07</span><span class="snscount">&#9825;13</span><a href=/articles/20220907a/ title="2021年のクリスマスで発表したフューチャー Advent Calendar 2021で話した、汎用的にパズルのソルバーを実装してみたの後編として、パズルの解をどう効率的に保存する方法についての検討です。">効率的にツイスティパズルの結果を保存する方法の探求</a></li><li class="related-posts-item"><span>2022.07.20</span><span class="snscount">&#9825;56</span><a href=/articles/20220720a/ title="先日Kaggleで開催された「Foursquare - Location Matching」コンペ(以下4sqコンペ)に社外の知人共にチームで参加し、1083チーム中7位をとりました。（初の金メダルでKaggle Competitions Masterになりました！)本記事では参加記として以下の内容を紹介します。">Foursquare - Location Matching 参加記 (7th / 1083)</a></li><li class="related-posts-item"><span>2022.06.13</span><span class="snscount">&#9825;11</span><a href=/articles/20220613a/ title="Future Tech Night #17「embeddingの活用」と「MLOps」のAI勉強会を開催し、「embeddingを用いた分析・検索・推薦の技術」というタイトルで発表しました。当日の勉強会の様子は[YouTubeで公開しており...">Future Tech Night #17 embeddingを用いた分析・検索・推薦の技術</a></li><li class="related-posts-item"><span>2022.06.02</span><span class="snscount">&#9825;20</span><a href=/articles/20220602b/ title="Strategic AI Group所属の金子です。普段は推薦に関連する実装やデータ分析を行っています。先日Kaggleで開催された[H&M Personalized Fashion Recommendations]コンペに単独で参加し、2952チーム中46位をとりました。今回の参加記では以下の内容を紹介します。">H&M Personalized Fashion Recommendations 参加記 (46th/2952)</a></li><li class="related-posts-item"><span>2021.12.01</span><span class="snscount">&#9825;235</span><a href=/articles/20211201a/ title="SAIGアルバイトの後藤です。業務では、アルゴリズムの知識を用いた既存処理の高速化やスケジュールの自動作成による業務の効率化を行っています。配送計画問題など、最適化問題に属する社会課題は、部分問題に巡回セールスマン問題。TSPにおいて特に良いとされているILSには次の2つがあります。">巡回セールスマン問題(TSP)の基本的な解き方(ILS)</a></li><li class="related-posts-item"><span>2021.09.01</span><span class="snscount">&#9825;70</span><a href=/articles/20210901a/ title="こんにちは！Strategic AI Groupの金子です。夏の自由研究ブログ連載2021として医薬品副作用データベースにWord2Vecを適用し性能を評価、医薬品-原疾患-有害事象の可視化を行いました。本記事で作成したプログラムは医薬品の情報を扱っていますが、医療機器には該当せず人の疾病の診断、治療、予防を目的としておりません。本記事の内容に基づいて医学的判断は行わないようお願いします。">医薬品副作用データベースから医薬品同士の関係を学習・評価・可視化する</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20210628a/ title="6/28~7/5にかけて、アルゴリズムとデータ構造をテーマにしたブログ連載を始めます。若手～中堅～ベテランまで幅広い執筆陣によって構成されるので、多くの人が楽しめるのではないかなと思います。">アルゴリズムとデータ構造がテーマの連載を始めます</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#faiss%E3%81%A8%E3%81%AF"><span class="toc-text">faissとは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TopK%E3%82%92%E5%8F%96%E5%BE%97%E3%81%99%E3%82%8B%E3%81%AE%E3%81%AB%E6%9C%80%E9%81%A9%E3%81%AA%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0%E3%81%AF%EF%BC%9F"><span class="toc-text">TopKを取得するのに最適なアルゴリズムは？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%92%E3%83%BC%E3%83%97%E3%82%BD%E3%83%BC%E3%83%88%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">ヒープソートについて</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%92%E3%83%BC%E3%83%97%E3%82%AD%E3%83%A5%E3%83%BCvs%E4%BB%96%E3%81%AE%E3%82%BD%E3%83%BC%E3%83%88"><span class="toc-text">ヒープキューvs他のソート</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B7%A0%E3%82%81"><span class="toc-text">締め</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

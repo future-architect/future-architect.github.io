@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>コンテナイメージ内の実行ファイルをupxで圧縮するべきか | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="コンテナイメージ内の実行ファイルをupxで圧縮するべきか福田（@knqyf263）と申します。過去にフューチャー発OSSのVuls開発を手伝っていましたが、現在はフューチャーで働いているわけでもなく完全に部外者です。今回は社員の澁川さんの推薦もあり、ブログの寄稿をさせて頂くことになりました。 背景その理由の前に少し背景を説明しますが、自分はTrivyというOSSの脆弱性スキャナーのメンテナをやって">
+<meta property="og:type" content="article">
+<meta property="og:title" content="コンテナイメージ内の実行ファイルをupxで圧縮するべきか | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210520b/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="コンテナイメージ内の実行ファイルをupxで圧縮するべきか福田（@knqyf263）と申します。過去にフューチャー発OSSのVuls開発を手伝っていましたが、現在はフューチャーで働いているわけでもなく完全に部外者です。今回は社員の澁川さんの推薦もあり、ブログの寄稿をさせて頂くことになりました。 背景その理由の前に少し背景を説明しますが、自分はTrivyというOSSの脆弱性スキャナーのメンテナをやって">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210520b/Slack___tsuda_knqyf263___Cyber_Security_Innovation_Group.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210520b/Untitled.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210520b/Untitled1.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210520b/Untitled2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210520b/Untitled3.png">
+<meta property="article:published_time" content="2021-05-19T15:00:01.000Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.642Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="コンテナビルド">
+<meta property="article:tag" content="upx">
+<meta property="article:tag" content="外部寄稿">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210520b/Slack___tsuda_knqyf263___Cyber_Security_Innovation_Group.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210520b/">
+  <meta content="Go,Docker,コンテナビルド,upx,外部寄稿" name="keywords">
+  <meta content="福田鉄平" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">コンテナイメージ内の実行ファイルをupxで圧縮するべきか
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210520b_コンテナイメージ内の実行ファイルをupxで圧縮するべきか.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210520b_コンテナイメージ内の実行ファイルをupxで圧縮するべきか" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-05-19T15:00:01.000Z" itemprop="datePublished">2021.05.20</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%A6%8F%E7%94%B0%E9%89%84%E5%B9%B3" title="福田鉄平さんの記事一覧へ" class="post-author">福田鉄平</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/Docker/" title="Dockerタグの記事へ" class="tag-list-link">Docker</a>
+  
+    
+    <a href="/tags/コンテナビルド/" title="コンテナビルドタグの記事へ" class="tag-list-link">コンテナビルド</a>
+  
+    
+    <a href="/tags/upx/" title="upxタグの記事へ" class="tag-list-link">upx</a>
+  
+    
+    <a href="/tags/外部寄稿/" title="外部寄稿タグの記事へ" class="tag-list-link">外部寄稿</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="コンテナイメージ内の実行ファイルをupxで圧縮するべきか"><a href="#コンテナイメージ内の実行ファイルをupxで圧縮するべきか" class="headerlink" title="コンテナイメージ内の実行ファイルをupxで圧縮するべきか"></a>コンテナイメージ内の実行ファイルをupxで圧縮するべきか</h1><p>福田（<a target="_blank" rel="noopener" href="https://twitter.com/knqyf263">@knqyf263</a>）と申します。過去にフューチャー発OSSのVuls開発を手伝っていましたが、現在はフューチャーで働いているわけでもなく完全に部外者です。今回は社員の澁川さんの推薦もあり、ブログの寄稿をさせて頂くことになりました。</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>その理由の前に少し背景を説明しますが、自分はTrivyというOSSの脆弱性スキャナーのメンテナをやっていまして先日Goバイナリの脆弱性検知をする機能をリリースしました。</p>
+<iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fknqyf263.hatenablog.com%2Fentry%2F2021%2F04%2F30%2F061147" style="border: 0; width: 100%; height: 190px;" allowfullscreen scrolling="no"></iframe>
+
+<p>例えばコンテナイメージ内にGoでビルドしたバイナリを1つだけ置いている場合などにも検知が出来るためとても便利です（自画自賛）。stripなどでシンボルを落としていてもセクションヘッダにモジュール情報が残っているため検知は動作するのですが、upxでバイナリを圧縮している場合には動きません。</p>
+<p>upxというのは実行ファイルを圧縮するためのツールで色々なOSのファイル形式に対応しており展開も高速なので広く使われています。多くのプラットフォームで内部的にLZMAを利用しており圧縮率もzip/gzipより高いと謳っています。</p>
+<p><a href="hhttps://github.com/upx/upx/blob/8d42b12117130b944023335cc2b76072c145db4d/doc/upx.pod" alt="upx/upx"><img src="https://gh-card.dev/repos/upx/upx.svg" loading="lazy"></a></p>
+<p>実行時にupxが自分で自分を展開してそのまま実行してくれるので、ユーザの方で一度展開してから実行するといった処理は必要ありません。単にバイナリのサイズが小さくなるイメージです。</p>
+<p>実行ファイルのサイズが小さければダウンロードも速いですしいくつかの利点が得られるため、こういった圧縮ツールを使っている人も多いかと思います。ではコンテナイメージ内に置くような実行ファイルでも圧縮するべきかどうか、というのが今回のブログのネタです。</p>
+<p>コンテナイメージのサイズは小さい方が良い、というのは聞いたことがある人が多いと思うので当然圧縮するべきだろうと思うかもしれませんが、コンテナイメージはレイヤー単位でgzipで圧縮されDocker Hubなどのコンテナレジストリに格納されます。単にイメージのサイズだけで考えるのではなく実際にpullする時にどう影響が出るのかについて考えるほうが良さそうであるというのは以前雑に述べていたりしました。</p>
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">自分もデバッグ大変になるの嫌なのであまりまとめないことが多いです。ただイメージサイズ変わらなくてもpullする時はlayer単位でtar.gzになるのでまとめると圧縮が効いてかなり小さくなるとかはありますかね。一方で並列度が上がる利点もありますが。<a target="_blank" rel="noopener" href="https://t.co/KqEVsDwxDJ">https://t.co/KqEVsDwxDJ</a></p>&mdash; イスラエルいくべぇ (@knqyf263) <a target="_blank" rel="noopener" href="https://twitter.com/knqyf263/status/1352123800784142336?ref_src=twsrc%5Etfw">January 21, 2021</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>というような雑談をSlackでしていたところ、フューチャー社員の渋川さん（ @shibu_jp ）からupxでサイズ小さくすることにどのぐらいの意味があるのか？という疑問が出ました。</p>
+<img src="/images/20210520b/Slack___tsuda_knqyf263___Cyber_Security_Innovation_Group.png" alt="Slack___tsuda_knqyf263___Cyber_Security_Innovation_Group.png" loading="lazy">
+
+<p>ちなみに渋川さんはフューチャー技術ブログで数多くの素晴らしいブログを執筆されています。</p>
+<ul>
+<li><a href="/authors/%E6%BE%81%E5%B7%9D%E5%96%9C%E8%A6%8F/">澁川喜規 | フューチャー技術ブログ</a></li>
+</ul>
+<p>確かにレイヤーをgzipで圧縮したらupxによる圧縮と差はそこまで大きくならないんじゃないか、という気がしたので検証してみました。upxの方は圧縮したあとに再度gzipで圧縮することになるので二度目のgzip圧縮率はかなり低いと考えられます。渋川さんから出た疑問だったのでフューチャーのブログに載せようということで今回寄稿することになりました。</p>
+<h1 id="検証（macho）"><a href="#検証（macho）" class="headerlink" title="検証（macho）"></a>検証（macho）</h1><p>upxは様々なOSの実行ファイル形式に対応していますが、自分はmacOSを使っているためまずmachoで試してみます。</p>
+<h2 id="upxで圧縮しない場合"><a href="#upxで圧縮しない場合" class="headerlink" title="upxで圧縮しない場合"></a>upxで圧縮しない場合</h2><p>まずは普通にupxせずにDockerイメージを作ってみます。</p>
+<h3 id="バイナリのビルド"><a href="#バイナリのビルド" class="headerlink" title="バイナリのビルド"></a>バイナリのビルド</h3><p>TrivyをmacOS上でビルドしてみます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ go build -o trivy cmd/trivy/main.go</span><br><span class="line">$ <span class="built_in">du</span> -bh trivy</span><br><span class="line">41M     trivy</span><br></pre></td></tr></table></figure>
+
+<p>バイナリのサイズは41MBでした。今回は <code>ldflags &#39;-w -s&#39;</code>などのオプションは付けていないためDWARFやシンボルテーブルは残っています。</p>
+<h3 id="イメージのbuild-push"><a href="#イメージのbuild-push" class="headerlink" title="イメージのbuild/push"></a>イメージのbuild/push</h3><p>レジストリに置いたらどのぐらいのサイズなのか？というのは実際にpushしてしまうほうが早いと思うので、buildしてレジストリにpushします。まずビルドします。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ docker build -t knqyf263/trivy:macho-nonupx .</span><br><span class="line">Sending build context to Docker daemon  49.69MB</span><br><span class="line">Step 1/5 : FROM alpine:3.13</span><br><span class="line"> ---&gt; 6dbb9cc54074</span><br><span class="line">Step 2/5 : RUN apk --no-cache add ca-certificates git</span><br><span class="line"> ---&gt; Using cache</span><br><span class="line"> ---&gt; 079d3d306dcd</span><br><span class="line">Step 3/5 : COPY trivy /usr/local/bin/trivy</span><br><span class="line"> ---&gt; 98973bc45fe2</span><br><span class="line">Step 4/5 : COPY contrib/*.tpl contrib/</span><br><span class="line"> ---&gt; e09be4486dd5</span><br><span class="line">Step 5/5 : ENTRYPOINT [<span class="string">&quot;trivy&quot;</span>]</span><br><span class="line"> ---&gt; Running <span class="keyword">in</span> 9bc4e9b607c9</span><br><span class="line">Removing intermediate container 9bc4e9b607c9</span><br><span class="line"> ---&gt; 1be57dd63281</span><br><span class="line">Successfully built 1be57dd63281</span><br><span class="line">Successfully tagged knqyf263/trivy:macho-upx</span><br></pre></td></tr></table></figure>
+
+<p>Step 3を見てもらえば分かりますが、単にホスト側にあるバイナリをCOPYで置いています。machoのバイナリをコピーしているせいで動かないのですがサイズの検証なので気にせず進めていきます。</p>
+<p>そしてこのイメージをpushします。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ docker push knqyf263/trivy:macho-nonupx</span><br><span class="line">The push refers to repository [docker.io/knqyf263/trivy]</span><br><span class="line">27289a563633: Pushed</span><br><span class="line">f8edd4bba8b2: Pushed</span><br><span class="line">464f5bb1fc11: Layer already exists</span><br><span class="line">b2d5eeeaba3a: Layer already exists</span><br><span class="line">macho-nonupx: digest: sha256:5fc7352ecd65e3f2eada6f251ef91c721c685d61046c2c948ebfabfec52f8582 size: 1159</span><br></pre></td></tr></table></figure>
+
+<p>無事にpushできました。</p>
+<h3 id="レイヤーサイズの確認"><a href="#レイヤーサイズの確認" class="headerlink" title="レイヤーサイズの確認"></a>レイヤーサイズの確認</h3><p>ではレジストリにあるレイヤーのサイズを確認してみます。craneというツールを使います。Googleのgo-containerregistryというライブラリに付随しているCLIツールになります。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/google/go-containerregistry/tree/main/cmd/crane">https://github.com/google/go-containerregistry/tree/main/cmd/crane</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">$ crane manifest knqyf263/trivy:macho-nonupx</span><br><span class="line">&#123;</span><br><span class="line">   <span class="string">&quot;schemaVersion&quot;</span>: 2,</span><br><span class="line">   <span class="string">&quot;mediaType&quot;</span>: <span class="string">&quot;application/vnd.docker.distribution.manifest.v2+json&quot;</span>,</span><br><span class="line">   <span class="string">&quot;config&quot;</span>: &#123;</span><br><span class="line">      <span class="string">&quot;mediaType&quot;</span>: <span class="string">&quot;application/vnd.docker.container.image.v1+json&quot;</span>,</span><br><span class="line">      <span class="string">&quot;size&quot;</span>: 2264,</span><br><span class="line">      <span class="string">&quot;digest&quot;</span>: <span class="string">&quot;sha256:3b2add278b7f6df5e72f0d6592ece9cbb22c859fc01e6d8932e036d335f6074c&quot;</span></span><br><span class="line">   &#125;,</span><br><span class="line">   <span class="string">&quot;layers&quot;</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">         <span class="string">&quot;mediaType&quot;</span>: <span class="string">&quot;application/vnd.docker.image.rootfs.diff.tar.gzip&quot;</span>,</span><br><span class="line">         <span class="string">&quot;size&quot;</span>: 2811969,</span><br><span class="line">         <span class="string">&quot;digest&quot;</span>: <span class="string">&quot;sha256:540db60ca9383eac9e418f78490994d0af424aab7bf6d0e47ac8ed4e2e9bcbba&quot;</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">         <span class="string">&quot;mediaType&quot;</span>: <span class="string">&quot;application/vnd.docker.image.rootfs.diff.tar.gzip&quot;</span>,</span><br><span class="line">         <span class="string">&quot;size&quot;</span>: 6664328,</span><br><span class="line">         <span class="string">&quot;digest&quot;</span>: <span class="string">&quot;sha256:8e566f9a0cb95716b962ba9e17b0c0e3f1b970c51424032dcb7c660dce3d5ee6&quot;</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">         <span class="string">&quot;mediaType&quot;</span>: <span class="string">&quot;application/vnd.docker.image.rootfs.diff.tar.gzip&quot;</span>,</span><br><span class="line">         <span class="string">&quot;size&quot;</span>: 18900731,</span><br><span class="line">         <span class="string">&quot;digest&quot;</span>: <span class="string">&quot;sha256:cdcee5fd7ec2508ee27e439924a888be100e6f2cd08e8a9c89ee43911c2dd655&quot;</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">         <span class="string">&quot;mediaType&quot;</span>: <span class="string">&quot;application/vnd.docker.image.rootfs.diff.tar.gzip&quot;</span>,</span><br><span class="line">         <span class="string">&quot;size&quot;</span>: 4052,</span><br><span class="line">         <span class="string">&quot;digest&quot;</span>: <span class="string">&quot;sha256:cbcc716d57451836029ade124851f09b7474aee4ca711741086cd54194d73102&quot;</span></span><br><span class="line">      &#125;</span><br><span class="line">   ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下から二番目のレイヤーがバイナリを置いたレイヤーなので18.03MB（ <code>=18900731/(1024*1024)</code> )になっています。</p>
+<h3 id="Docker-Hubで確認"><a href="#Docker-Hubで確認" class="headerlink" title="Docker Hubで確認"></a>Docker Hubで確認</h3><p>念のためDocker HubのUIでも確認します。</p>
+<img src="/images/20210520b/Untitled.png" alt="Docker HubのUI" loading="lazy">
+
+<p>確かに18.03MBになっています。一応リンクも貼っておきます。</p>
+<p><a target="_blank" rel="noopener" href="https://hub.docker.com/layers/knqyf263/trivy/macho-nonupx/images/sha256-5fc7352ecd65e3f2eada6f251ef91c721c685d61046c2c948ebfabfec52f8582?context=repo">https://hub.docker.com/layers/knqyf263/trivy/macho-nonupx/images/sha256-5fc7352ecd65e3f2eada6f251ef91c721c685d61046c2c948ebfabfec52f8582?context=repo</a></p>
+<h3 id="サイズ比較"><a href="#サイズ比較" class="headerlink" title="サイズ比較"></a>サイズ比較</h3><p>ということで上記の結果をまとめると以下のようになります。</p>
+<ul>
+<li>バイナリのサイズ：41MB</li>
+<li>レイヤーのサイズ：18.03MB</li>
+</ul>
+<p>バイナリのサイズは41MBもあったのにレイヤーに置いてgzipすると18MBまで減っています。</p>
+<h2 id="upxで圧縮する場合"><a href="#upxで圧縮する場合" class="headerlink" title="upxで圧縮する場合"></a>upxで圧縮する場合</h2><p>先程ビルドしたバイナリがあるのでこれをupxで圧縮します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ upx ./trivy</span><br><span class="line">                       Ultimate Packer <span class="keyword">for</span> eXecutables</span><br><span class="line">                          Copyright (C) 1996 - 2020</span><br><span class="line">UPX 3.96        Markus Oberhumer, Laszlo Molnar &amp; John Reiser   Jan 23rd 2020</span><br><span class="line"></span><br><span class="line">        File size         Ratio      Format      Name</span><br><span class="line">   --------------------   ------   -----------   -----------</span><br><span class="line">  42502160 -&gt;  19062800   44.85%   macho/amd64   trivy</span><br><span class="line"></span><br><span class="line">Packed 1 file.</span><br></pre></td></tr></table></figure>
+
+<p>upxは圧縮レベルが1から10まであり、512 KiB以下だと8が使われて大きいサイズだと7が使われるようです。10も試してみたのですが（厳密には <code>--best</code>）、今回の検証ではあまりサイズが変わらなかったのでとりあえず7の結果について書いています。</p>
+<p>上のupxの出力で19MBぐらいになってサイズが44.85%になったと書いてあります。念のため確認しておきます。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">du</span> -h trivy</span><br><span class="line">19M     trivy</span><br></pre></td></tr></table></figure>
+
+<p>やはり19MBです。</p>
+<h3 id="イメージのbuild-push-1"><a href="#イメージのbuild-push-1" class="headerlink" title="イメージのbuild/push"></a>イメージのbuild/push</h3><p>ここは先程と同様にイメージのbuild/pushをします。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ docker build -t knqyf263/trivy:macho-upx .</span><br><span class="line">$ docker push knqyf263/trivy:macho-upx</span><br><span class="line">The push refers to repository [docker.io/knqyf263/trivy]</span><br><span class="line">d2fb9e0dd8ea: Pushed</span><br><span class="line">d9a3ad8f3256: Pushed</span><br><span class="line">464f5bb1fc11: Layer already exists</span><br><span class="line">b2d5eeeaba3a: Layer already exists</span><br><span class="line">macho-upx: digest: sha256:de09d822301411eb563b0e1b6fd014a0b1017eac941bb62e7bc159012b4732de size: 1159</span><br></pre></td></tr></table></figure>
+
+<h3 id="レイヤーサイズの確認-1"><a href="#レイヤーサイズの確認-1" class="headerlink" title="レイヤーサイズの確認"></a>レイヤーサイズの確認</h3><p>先程同様に確認します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">$ ./crane manifest knqyf263/trivy:macho-upx</span><br><span class="line">&#123;</span><br><span class="line">   <span class="string">&quot;schemaVersion&quot;</span>: 2,</span><br><span class="line">   <span class="string">&quot;mediaType&quot;</span>: <span class="string">&quot;application/vnd.docker.distribution.manifest.v2+json&quot;</span>,</span><br><span class="line">   <span class="string">&quot;config&quot;</span>: &#123;</span><br><span class="line">      <span class="string">&quot;mediaType&quot;</span>: <span class="string">&quot;application/vnd.docker.container.image.v1+json&quot;</span>,</span><br><span class="line">      <span class="string">&quot;size&quot;</span>: 2267,</span><br><span class="line">      <span class="string">&quot;digest&quot;</span>: <span class="string">&quot;sha256:ea6eb68a192d77914019c840ab46e9e56ea69f8aa8eef27befbaca5a623bbb39&quot;</span></span><br><span class="line">   &#125;,</span><br><span class="line">   <span class="string">&quot;layers&quot;</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">         <span class="string">&quot;mediaType&quot;</span>: <span class="string">&quot;application/vnd.docker.image.rootfs.diff.tar.gzip&quot;</span>,</span><br><span class="line">         <span class="string">&quot;size&quot;</span>: 2811969,</span><br><span class="line">         <span class="string">&quot;digest&quot;</span>: <span class="string">&quot;sha256:540db60ca9383eac9e418f78490994d0af424aab7bf6d0e47ac8ed4e2e9bcbba&quot;</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">         <span class="string">&quot;mediaType&quot;</span>: <span class="string">&quot;application/vnd.docker.image.rootfs.diff.tar.gzip&quot;</span>,</span><br><span class="line">         <span class="string">&quot;size&quot;</span>: 6664328,</span><br><span class="line">         <span class="string">&quot;digest&quot;</span>: <span class="string">&quot;sha256:8e566f9a0cb95716b962ba9e17b0c0e3f1b970c51424032dcb7c660dce3d5ee6&quot;</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">         <span class="string">&quot;mediaType&quot;</span>: <span class="string">&quot;application/vnd.docker.image.rootfs.diff.tar.gzip&quot;</span>,</span><br><span class="line">         <span class="string">&quot;size&quot;</span>: 18719684,</span><br><span class="line">         <span class="string">&quot;digest&quot;</span>: <span class="string">&quot;sha256:d1471d88b38fce964464adabe62c9e2819cf66c62d0683567b9fcc090de76055&quot;</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">         <span class="string">&quot;mediaType&quot;</span>: <span class="string">&quot;application/vnd.docker.image.rootfs.diff.tar.gzip&quot;</span>,</span><br><span class="line">         <span class="string">&quot;size&quot;</span>: 4080,</span><br><span class="line">         <span class="string">&quot;digest&quot;</span>: <span class="string">&quot;sha256:2fe2f7d7b9e2e83ce09db2a8599908864a8d9d3433bcfb8dce7aed35138ca3f4&quot;</span></span><br><span class="line">      &#125;</span><br><span class="line">   ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>今回は17.85MBになっています。</p>
+<h3 id="Docker-Hubで確認-1"><a href="#Docker-Hubで確認-1" class="headerlink" title="Docker Hubで確認"></a>Docker Hubで確認</h3><p>やはりサイズは17.85MBです。</p>
+<img src="/images/20210520b/Untitled1.png" alt="Docker HubのUI" loading="lazy">
+
+<p><a target="_blank" rel="noopener" href="https://hub.docker.com/layers/knqyf263/trivy/macho-upx/images/sha256-de09d822301411eb563b0e1b6fd014a0b1017eac941bb62e7bc159012b4732de?context=repo">https://hub.docker.com/layers/knqyf263/trivy/macho-upx/images/sha256-de09d822301411eb563b0e1b6fd014a0b1017eac941bb62e7bc159012b4732de?context=repo</a></p>
+<h3 id="サイズ比較-1"><a href="#サイズ比較-1" class="headerlink" title="サイズ比較"></a>サイズ比較</h3><p>上記の結果をまとめると以下になります。</p>
+<ul>
+<li>バイナリサイズ：19MB</li>
+<li>レイヤーサイズ：17.85MB</li>
+</ul>
+<h2 id="サイズ比較まとめ"><a href="#サイズ比較まとめ" class="headerlink" title="サイズ比較まとめ"></a>サイズ比較まとめ</h2><p>ではupxによって圧縮した場合としない場合のサイズを比べてみます。</p>
+<ul>
+<li>upx圧縮しない場合<ul>
+<li>バイナリサイズ：41MB</li>
+<li>レイヤーサイズ：18.03MB</li>
+</ul>
+</li>
+<li>upx圧縮した場合<ul>
+<li>バイナリサイズ：19MB</li>
+<li>レイヤーサイズ：17.85MB</li>
+</ul>
+</li>
+</ul>
+<p>ということで差は0.18MB程度になりました。予想通り、upxによる圧縮はレイヤー圧縮と比較して著しく効果があるわけではなさそうです。ELFでも検証してみます。</p>
+<h1 id="検証（ELF）"><a href="#検証（ELF）" class="headerlink" title="検証（ELF）"></a>検証（ELF）</h1><p>Linuxでコンテナイメージを使うケースが大多数だと思うので、ELF形式の場合の検証もしてみます。</p>
+<h2 id="upxで圧縮しない場合-1"><a href="#upxで圧縮しない場合-1" class="headerlink" title="upxで圧縮しない場合"></a>upxで圧縮しない場合</h2><h3 id="バイナリのビルド-1"><a href="#バイナリのビルド-1" class="headerlink" title="バイナリのビルド"></a>バイナリのビルド</h3><p>linux/amd64向けにビルドします。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ GOOS=linux GOARCH=amd64 go build -o trivy cmd/trivy/main.go</span><br><span class="line">$ <span class="built_in">du</span> -h trivy</span><br><span class="line">41M     trivy</span><br></pre></td></tr></table></figure>
+
+<p>machoの時と同じく41MBでした。</p>
+<h3 id="Docker-Hubで確認-2"><a href="#Docker-Hubで確認-2" class="headerlink" title="Docker Hubで確認"></a>Docker Hubで確認</h3><p>machoの時と同じくイメージをbuild/pushし、今回は直接Docker Hubで確認してみます。</p>
+<img src="/images/20210520b/Untitled2.png" alt="Docker HubのUI" loading="lazy">
+
+<p>18.25MBでした。</p>
+<p><a target="_blank" rel="noopener" href="https://hub.docker.com/layers/knqyf263/trivy/elf-nonupx/images/sha256-cea16479687eaa610bf0bfec96e415f791aea1ca19e7e26fa6240ed5a8448b75?context=repo">https://hub.docker.com/layers/knqyf263/trivy/elf-nonupx/images/sha256-cea16479687eaa610bf0bfec96e415f791aea1ca19e7e26fa6240ed5a8448b75?context=repo</a></p>
+<h2 id="サイズ比較-2"><a href="#サイズ比較-2" class="headerlink" title="サイズ比較"></a>サイズ比較</h2><ul>
+<li>バイナリのサイズ：41MB</li>
+<li>レイヤーのサイズ：18.25MB</li>
+</ul>
+<h2 id="upxで圧縮する場合-1"><a href="#upxで圧縮する場合-1" class="headerlink" title="upxで圧縮する場合"></a>upxで圧縮する場合</h2><h3 id="バイナリのビルド-2"><a href="#バイナリのビルド-2" class="headerlink" title="バイナリのビルド"></a>バイナリのビルド</h3><p>upxで圧縮します。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ upx ./trivy</span><br><span class="line">                       Ultimate Packer <span class="keyword">for</span> eXecutables</span><br><span class="line">                          Copyright (C) 1996 - 2020</span><br><span class="line">UPX 3.96        Markus Oberhumer, Laszlo Molnar &amp; John Reiser   Jan 23rd 2020</span><br><span class="line"></span><br><span class="line">        File size         Ratio      Format      Name</span><br><span class="line">   --------------------   ------   -----------   -----------</span><br><span class="line">  42878967 -&gt;  20087380   46.85%   linux/amd64   trivy</span><br><span class="line"></span><br><span class="line">Packed 1 file.</span><br><span class="line">$ <span class="built_in">du</span> -h ./trivy</span><br><span class="line">20M     ./trivy</span><br></pre></td></tr></table></figure>
+
+<p>20MBになりました。</p>
+<h3 id="Docker-Hubで確認-3"><a href="#Docker-Hubで確認-3" class="headerlink" title="Docker Hubで確認"></a>Docker Hubで確認</h3><p>18.64MBでした。</p>
+<img src="/images/20210520b/Untitled3.png" alt="Docker HubのUI" loading="lazy">
+
+<h3 id="サイズ比較-3"><a href="#サイズ比較-3" class="headerlink" title="サイズ比較"></a>サイズ比較</h3><p>ELFバイナリをupxした場合のサイズ比較は以下になります。</p>
+<ul>
+<li>バイナリのサイズ：20MB</li>
+<li>レイヤーのサイズ：18.64MB</li>
+</ul>
+<h2 id="サイズ比較まとめ-1"><a href="#サイズ比較まとめ-1" class="headerlink" title="サイズ比較まとめ"></a>サイズ比較まとめ</h2><ul>
+<li>upx圧縮しない場合<ul>
+<li>バイナリサイズ：41MB</li>
+<li>レイヤーサイズ：18.25MB</li>
+</ul>
+</li>
+<li>upx圧縮した場合<ul>
+<li>バイナリサイズ：20MB</li>
+<li>レイヤーサイズ：18.64MB</li>
+</ul>
+</li>
+</ul>
+<p>恐ろしいことが起きています。サイズが逆転しました。upx圧縮した場合のほうが、0.39MBもレイヤーサイズが増えています。先程machoで削減したのが0.18MBだったことを考えるとかなり増えている印象です。</p>
+<p>upxは内部でLZMAを使っておりgzipよりも圧縮率が高いことを謳っているので、なぜこんな事が起きるのかと思いますがupxは実行ファイル形式を保つために展開プログラムもバイナリに埋め込んでいるため、単純なgzipと比較すると大きくなってしまうことがあるのかもしれません。レイヤーは丸ごとgzipされ展開されてから利用される前提で、upxは実行ファイルのまま圧縮して実行時に展開する想定なので戦っている土俵が違う感じがあります。レイヤーgzipの場合は展開プログラムはレイヤーの外にあります。実行時に展開できる形でgzipを使うとupxに劣るという意味で、gzipよりも圧縮率が高いと言っているのかもしれません。あくまで推測なので厳密なところは分かっていません。</p>
+<h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>今回はupxで圧縮した実行ファイルをコンテナイメージに置いた場合のサイズ削減率について検証しました。元からコンテナイメージはレイヤー単位でgzip圧縮されるため、upxで圧縮してもそこまで大きなサイズの削減は得られませんでした。</p>
+<p>これはもちろんプラットフォームやアーキテクチャによっても異なると思いますしプロジェクトによっても異なります。TrivyのELFの例では増えてしまいましたが、フューチャーが提供しているVulsというOSSではELFでも0.1MB程度サイズが小さくなりました。stripしたりldflagsを付けたりすることで結果が変わってくる可能性もあります。</p>
+<p>レイヤーに他のバイナリが存在したらgzipがさらに有利になる可能性もありますし、Goのバイナリ以外は検証していないのでupxの方が有利になる可能性もあります。</p>
+<p>サイズの比較だけをしてきましたが、upxは当然実行時の展開コストもあります。以下は古いCPUにおける値なので今はもっと速いと思いますが、それでもバイナリが大きくなれば展開コストはある程度大きくなってきます。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- very fast decompression: about 10 MiB/sec on an ancient Pentium 133,</span><br><span class="line">    about 200 MiB/sec on an Athlon XP 2000+.</span><br></pre></td></tr></table></figure>
+
+<p>他にもイメージビルド時に圧縮の時間もかかるためCI/CDの時間は増加します。 <code>--best</code> をつけるとTrivyの41MBのELF実行ファイルをupxで圧縮するのに5分かかりました。イメージビルドの時間を5分増加させて0.1MBの削減だった場合にそれが見合っているのかどうかは考える必要があると思います。5分増加させた挙げ句にサイズも増えていると最悪です。</p>
+<p>そもそもupxの導入にかかるコストもあります。Dockerfileを修正したりCI/CDの設定をしたりが必要になってきます。</p>
+<p>今回のブログでは必ずupxするべきだ、絶対にupxするべきではない、ということは言っていません。ただ盲目的にupxで圧縮しておけば良いわけではないことを知ってもらえればと思い書いています。もし本当にイメージサイズを削減したいならきちんと検証して比較することをおすすめします。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210520b/&related=twitterapi%2Ctwitter&text=%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B8%E5%86%85%E3%81%AE%E5%AE%9F%E8%A1%8C%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%82%92upx%E3%81%A7%E5%9C%A7%E7%B8%AE%E3%81%99%E3%82%8B%E3%81%B9%E3%81%8D%E3%81%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">96</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210520b/&t=%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B8%E5%86%85%E3%81%AE%E5%AE%9F%E8%A1%8C%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%82%92upx%E3%81%A7%E5%9C%A7%E7%B8%AE%E3%81%99%E3%82%8B%E3%81%B9%E3%81%8D%E3%81%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210520b/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">6</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210520b/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">6</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;566</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2021.12.20</span><span class="snscount">&#9825;140</span><a href=/articles/20211220a/ title="Javaアドベントカレンダーにエントリーした記事になります。Javaのイメージを作る上で、どのDockerイメージをベースに選べばいいのか、というのを軽く調べ始めたら、選択肢がたくさんでてきたので、ちょっと突っ込んで調べてみました。">JavaのDockerイメージ何選ぶ？</a></li><li class="related-posts-item"><span>2021.09.14</span><span class="snscount">&#9825;40</span><a href=/articles/20210914a/ title="普段からAWS Lambdaにはお世話になっているのですが、初めてカスタムランタイムを動かす仕事が舞い込んできました。AWS Lambdaでは下記のランタイムがサポートされています。">LambdaをカスタムDockerランタイムで開発する方法</a></li><li class="related-posts-item"><span>2021.06.04</span><span class="snscount">&#9825;165</span><a href=/articles/20210604a/ title="巨大な学習済みの機械学習モデルとか、検索用インデックスをデプロイする場合に、どうやってデプロイするか、というのは色々選択肢があります。以前、ちょびっとだけ「どうやってデプロイしましょうかね」というのを悩んだ時期があったのですが、今回、こんな方式が考えられるんじゃないか、というのを改めて調べてリストアップしてみました。">続・サーバーレス検索エンジン：巨大な静的ファイルを扱うケースについて考える</a></li><li class="related-posts-item"><span>2021.04.27</span><span class="snscount">&#9825;17</span><a href=/articles/20210427b/ title="Future Tech Night #7で「GoでDockerのAPIを叩いてみる」という発表をしてきました。近年、コンテナの利用はますます増えています。実行環境としても、クラウドサービスでコンテナをホストするサービスは増えています。コンテナを動かすサービスもあれば、K8Sの利用も増えています。Kubernetesも最小のビルディングブロックはコンテナです。K8SのKnativeベースのGCP Cloud Runが僕の最近のお気に入りです。AWS Lambdaもコンテナを実行できるようになりました">GoでDockerのAPIを叩いてみる</a></li><li class="related-posts-item"><span>2021.01.21</span><span class="snscount">&#9825;182</span><a href=/articles/20210121/ title="ソフトウェアの世界では、ツールや言語の進歩があって、もはや古い知識になっているにも関わらず、古い知識がベストプラクティスと呼ばれて蔓延し続けている例があります。Dockerだと「RUNをまとめよう」というのがそうです。かつては...">DockerでRUNをまとめた方が良いとは限らない</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B8%E5%86%85%E3%81%AE%E5%AE%9F%E8%A1%8C%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%82%92upx%E3%81%A7%E5%9C%A7%E7%B8%AE%E3%81%99%E3%82%8B%E3%81%B9%E3%81%8D%E3%81%8B"><span class="toc-text">コンテナイメージ内の実行ファイルをupxで圧縮するべきか</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC%EF%BC%88macho%EF%BC%89"><span class="toc-text">検証（macho）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#upx%E3%81%A7%E5%9C%A7%E7%B8%AE%E3%81%97%E3%81%AA%E3%81%84%E5%A0%B4%E5%90%88"><span class="toc-text">upxで圧縮しない場合</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%90%E3%82%A4%E3%83%8A%E3%83%AA%E3%81%AE%E3%83%93%E3%83%AB%E3%83%89"><span class="toc-text">バイナリのビルド</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AEbuild-push"><span class="toc-text">イメージのbuild&#x2F;push</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%AC%E3%82%A4%E3%83%A4%E3%83%BC%E3%82%B5%E3%82%A4%E3%82%BA%E3%81%AE%E7%A2%BA%E8%AA%8D"><span class="toc-text">レイヤーサイズの確認</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Docker-Hub%E3%81%A7%E7%A2%BA%E8%AA%8D"><span class="toc-text">Docker Hubで確認</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%B5%E3%82%A4%E3%82%BA%E6%AF%94%E8%BC%83"><span class="toc-text">サイズ比較</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#upx%E3%81%A7%E5%9C%A7%E7%B8%AE%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88"><span class="toc-text">upxで圧縮する場合</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B8%E3%81%AEbuild-push-1"><span class="toc-text">イメージのbuild&#x2F;push</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%AC%E3%82%A4%E3%83%A4%E3%83%BC%E3%82%B5%E3%82%A4%E3%82%BA%E3%81%AE%E7%A2%BA%E8%AA%8D-1"><span class="toc-text">レイヤーサイズの確認</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Docker-Hub%E3%81%A7%E7%A2%BA%E8%AA%8D-1"><span class="toc-text">Docker Hubで確認</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%B5%E3%82%A4%E3%82%BA%E6%AF%94%E8%BC%83-1"><span class="toc-text">サイズ比較</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%B5%E3%82%A4%E3%82%BA%E6%AF%94%E8%BC%83%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">サイズ比較まとめ</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC%EF%BC%88ELF%EF%BC%89"><span class="toc-text">検証（ELF）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#upx%E3%81%A7%E5%9C%A7%E7%B8%AE%E3%81%97%E3%81%AA%E3%81%84%E5%A0%B4%E5%90%88-1"><span class="toc-text">upxで圧縮しない場合</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%90%E3%82%A4%E3%83%8A%E3%83%AA%E3%81%AE%E3%83%93%E3%83%AB%E3%83%89-1"><span class="toc-text">バイナリのビルド</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Docker-Hub%E3%81%A7%E7%A2%BA%E8%AA%8D-2"><span class="toc-text">Docker Hubで確認</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%B5%E3%82%A4%E3%82%BA%E6%AF%94%E8%BC%83-2"><span class="toc-text">サイズ比較</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#upx%E3%81%A7%E5%9C%A7%E7%B8%AE%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88-1"><span class="toc-text">upxで圧縮する場合</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%90%E3%82%A4%E3%83%8A%E3%83%AA%E3%81%AE%E3%83%93%E3%83%AB%E3%83%89-2"><span class="toc-text">バイナリのビルド</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Docker-Hub%E3%81%A7%E7%A2%BA%E8%AA%8D-3"><span class="toc-text">Docker Hubで確認</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%B5%E3%82%A4%E3%82%BA%E6%AF%94%E8%BC%83-3"><span class="toc-text">サイズ比較</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%B5%E3%82%A4%E3%82%BA%E6%AF%94%E8%BC%83%E3%81%BE%E3%81%A8%E3%82%81-1"><span class="toc-text">サイズ比較まとめ</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

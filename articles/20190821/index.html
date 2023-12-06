@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>システム開発で得たRedis利用ノウハウ | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="こんにちは。初投稿です。2012年新卒入社の竹内です。入社当時を振り返るとOracle10g,11gを良く利用していおり、データモデリングなどテーブル設計が好きで、2018年4月ぐらいまでRDBとバッチに浸ってました。 さて、現在プロジェクトでRedisを使っているのですが、いままでRDB人間だっただけにKVSやRedisならではの特徴に四苦八苦してます。 苦しんだ分、色々な知見を得ることができて">
+<meta property="og:type" content="article">
+<meta property="og:title" content="システム開発で得たRedis利用ノウハウ | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20190821/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="こんにちは。初投稿です。2012年新卒入社の竹内です。入社当時を振り返るとOracle10g,11gを良く利用していおり、データモデリングなどテーブル設計が好きで、2018年4月ぐらいまでRDBとバッチに浸ってました。 さて、現在プロジェクトでRedisを使っているのですが、いままでRDB人間だっただけにKVSやRedisならではの特徴に四苦八苦してます。 苦しんだ分、色々な知見を得ることができて">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/ogp_techblog.jpg">
+<meta property="article:published_time" content="2019-08-20T23:53:57.000Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.360Z">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="KVS">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/ogp_techblog.jpg">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20190821/">
+  <meta content="Java,KVS,Redis" name="keywords">
+  <meta content="竹内洋介" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/DB/">DBカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">システム開発で得たRedis利用ノウハウ
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20190821-redis.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20190821-redis" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2019/" class="publish-date"><time datetime="2019-08-20T23:53:57.000Z" itemprop="datePublished">2019.08.21</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%AB%B9%E5%86%85%E6%B4%8B%E4%BB%8B" title="竹内洋介さんの記事一覧へ" class="post-author">竹内洋介</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Java/" title="Javaタグの記事へ" class="tag-list-link">Java</a>
+  
+    
+    <a href="/tags/KVS/" title="KVSタグの記事へ" class="tag-list-link">KVS</a>
+  
+    
+    <a href="/tags/Redis/" title="Redisタグの記事へ" class="tag-list-link">Redis</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p>こんにちは。初投稿です。<br>2012年新卒入社の竹内です。入社当時を振り返るとOracle10g,11gを良く利用していおり、データモデリングなどテーブル設計が好きで、2018年4月ぐらいまでRDBとバッチに浸ってました。</p>
+<p>さて、現在プロジェクトでRedisを使っているのですが、いままでRDB人間だっただけにKVSやRedisならではの特徴に四苦八苦してます。</p>
+<p>苦しんだ分、色々な知見を得ることができているので、その内容をご紹介します！</p>
+<h2 id="対象者"><a href="#対象者" class="headerlink" title="対象者"></a>対象者</h2><ul>
+<li>Redisの業務システム導入を検討している方</li>
+<li>RDBとRedisの違いを知りたい方</li>
+<li>現場的なRedisの利用方法を知りたい方</li>
+</ul>
+<h2 id="書いてないこと"><a href="#書いてないこと" class="headerlink" title="書いてないこと"></a>書いてないこと</h2><ul>
+<li>データ型やコマンドなど、HelloWorld的に公式ドキュメントを見て得られる情報</li>
+<li>インストールなど、Redisを利用できるまでの手順</li>
+<li>フェイルオーバーやバックアップをはじめとする運用に関する内容</li>
+<li>データ永続化に関する内容</li>
+</ul>
+<h2 id="書いてること"><a href="#書いてること" class="headerlink" title="書いてること"></a>書いてること</h2><ul>
+<li>設計・実装に関わる以下の内容<ul>
+<li>公式ドキュメントに書いてあるけど、よく読まなきゃ見落としてしまうような落とし穴</li>
+<li>公式ドキュメントに書いてある内容から一歩踏み込んだ挙動（「それってつまりどういうこと？」）</li>
+<li>と、それに対する私の考え（「じゃあどうすればいい？」）</li>
+</ul>
+</li>
+</ul>
+<h2 id="検証用サーバ情報"><a href="#検証用サーバ情報" class="headerlink" title="検証用サーバ情報"></a>検証用サーバ情報</h2><ul>
+<li>redis_version:4.0.10</li>
+<li>redis_mode:standalone</li>
+<li>os:Amazon ElastiCache</li>
+<li>マスタ・スレーブ構成（スレーブ１つ）</li>
+</ul>
+<h2 id="目次"><a href="#目次" class="headerlink" title="目次"></a>目次</h2><ul>
+<li><ol start="0">
+<li>Redisとは（教科書的なサマリ）</li>
+</ol>
+</li>
+<li><ol>
+<li>シングルスレッド</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>Transaction の実現方法</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>Hash型はMultiGetできない</li>
+</ol>
+</li>
+<li><ol start="4">
+<li>KEYSは怖い</li>
+</ol>
+</li>
+<li><ol start="5">
+<li>おまけ：データ量試算時の注意</li>
+</ol>
+</li>
+<li><ol start="6">
+<li>今後試したいこと</li>
+</ol>
+</li>
+<li><ol start="7">
+<li>所感</li>
+</ol>
+</li>
+<li><ol start="8">
+<li>ためになるサイト</li>
+</ol>
+</li>
+</ul>
+<h2 id="0-Redisとは（教科書的なサマリ）"><a href="#0-Redisとは（教科書的なサマリ）" class="headerlink" title="0. Redisとは（教科書的なサマリ）"></a>0. Redisとは（教科書的なサマリ）</h2><ul>
+<li>Redis はキーと５種類の値型の対応関係を格納する非リレーショナルデータベース(NoSQL)。</li>
+<li>メモリ上にデータを持つインメモリDBのため、非常に高速。</li>
+</ul>
+<h2 id="1-シングルスレッド"><a href="#1-シングルスレッド" class="headerlink" title="1. シングルスレッド"></a>1. シングルスレッド</h2><p>Redisサーバはシングルスレッド <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>で動作します。（厳密には他にもスレッドあるがクエリ処理をするスレッドは1つ）</p>
+<p>..これだと、「あっそうなんだ」で終わっちゃいますよね。<br>しかしながら、以下の点に注意してください。</p>
+<ul>
+<li><strong>Keysのような重いクエリは本番運用禁止！</strong><ul>
+<li>高速なはずのRedisで簡単に待ちが発生します。詳細・対策は後述</li>
+</ul>
+</li>
+<li><strong>性能検証でCPU使用率余裕♪と思いきや…</strong><ul>
+<li>あなたのRedisサーバは何コアですか？</li>
+<li>4コア？それなら性能計測した <strong>RedisのCPU使用率はその4倍</strong> として考える必要があります。</li>
+</ul>
+</li>
+</ul>
+<p>AWSでは<strong>EngineCPUUtilization</strong>というメトリクスを使えば、上記を加味したCPU使用率が見れます。性能検証等で測定する際は<a target="_blank" rel="noopener" href="https://aws.amazon.com/jp/about-aws/whats-new/2018/04/amazon-elastiCache-for-redis-introduces-new-cpu-utilization-metric-for-better-visibility-into-redis-workloads/">こちらの指標</a>を使いましょう。</p>
+<h2 id="2-トランザクションの実現方法"><a href="#2-トランザクションの実現方法" class="headerlink" title="2. トランザクションの実現方法"></a>2. トランザクションの実現方法</h2><p>トランザクション中は、クエリをQueueに溜めます。</p>
+<ul>
+<li>RDBでいうCommitのタイミングでそのクエリを順に(FIFOで)実行します（<code>EXEC</code>）</li>
+<li>RDBでいうRollbackはQueueを取り消すことで実現しています（<code>DISCARD</code>）</li>
+</ul>
+<p>…これも、「あっそうなんだ」と思いますよね。<br>しかしながら、以下の点に注意してください。</p>
+<ul>
+<li><strong>Commit前のデータはRDBと異なり自分のトランザクション中で取得できない</strong><ul>
+<li>Queueに溜めているだけなので、Redisのデータは一切更新されていないです</li>
+<li><code>INCR</code>というValueを+1してその結果をReturnするコマンドがありますが、トランザクション中に実行するとNULLがReturnされます。トランザクションを使わない場合は更新後の値が取得できます</li>
+</ul>
+</li>
+<li><strong>Commitするまで実行されない＝実行順注意</strong><ul>
+<li>例えば、Javaで実装した1~4の作り替え処理で、データが作成されない事象が発生しました。</li>
+</ul>
+</li>
+</ul>
+<p>1．Transaction開始<br>2．Redisのデータを複数DELETE<br>3．Redisのデータを作成（並列処理） ←並列処理でDELETEが入ったQueue以外のQueueが作成<br>4．Transaction終了</p>
+<p>並列処理で新たなQueueが作られた結果、トランザクション終了のタイミングでDELETE処理を含んでいないQueue、DELETE処理を含んでいるQueueを同時に<code>EXEC</code>。<br>同時に動いた結果、3の登録が先に処理されあとで2のDELETEで消されたデータがいたようです。並列化をやめることで解消しました。</p>
+<p>RDBでは都度データを書き換えに行くため、実行順の入替は起こりません。</p>
+<h2 id="3-Hash型はMultiGetできない"><a href="#3-Hash型はMultiGetできない" class="headerlink" title="3. Hash型はMultiGetできない"></a>3. Hash型はMultiGetできない</h2><p>Hash型はKeyの中に複数のFieldとValueを持てるため、RDB慣れしているとついつい使いたくなります。<br>ここに落とし穴があります。</p>
+<p>Hash型はString型のデータと違い複数レコードを一括取得するメソッドが提供されていません。</p>
+<p>複数レコードを取得して表示しようとすると1件ずつループ処理で取得することになり、NWのオーバーヘッドでとたんに遅いという性能問題になりかねません <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>。</p>
+<h3 id="回避策"><a href="#回避策" class="headerlink" title="回避策"></a>回避策</h3><p>自分達もハマり、色々悩んだのでいくつか回避策を紹介します。</p>
+<h4 id="3-1-Hashを捨てる！"><a href="#3-1-Hashを捨てる！" class="headerlink" title="3-1. Hashを捨てる！"></a>3-1. Hashを捨てる！</h4><p>潔くHashを捨てます。以下のようにString型で持つことで複数キーを一括で取得する<code>MGET</code>が使えるようになります。Hashとして考えていたまとまりの概念はRedisにアクセスするEntityや、RedisのデータをGETするAPIが吸収すれば、大きな影響はないと思います。</p>
+<figure class="highlight json"><figcaption><span>Hashイメージ.json</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;key&quot;</span><span class="punctuation">:</span> <span class="string">&quot;sales:111&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;value&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">     <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;REDBULL&quot;</span><span class="punctuation">,</span></span><br><span class="line">     <span class="attr">&quot;amount&quot;</span><span class="punctuation">:</span> <span class="string">&quot;200&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight json"><figcaption><span>Hashを捨てたイメージ.json</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span>  <span class="attr">&quot;key&quot;</span><span class="punctuation">:</span> <span class="string">&quot;sales:111:name&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;value&quot;</span><span class="punctuation">:</span> <span class="string">&quot;REDBULL&quot;</span><span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#123;</span>  <span class="attr">&quot;key&quot;</span><span class="punctuation">:</span> <span class="string">&quot;sales:111:amount&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;value&quot;</span><span class="punctuation">:</span> <span class="string">&quot;200&quot;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2-HashのMultiGetを実装する！"><a href="#3-2-HashのMultiGetを実装する！" class="headerlink" title="3-2. HashのMultiGetを実装する！"></a>3-2. HashのMultiGetを実装する！</h4><p>標準機能ではないようですが、以下2つの方法でHashの一括取得を実装できます。</p>
+<h5 id="実装方法1-Luaスクリプト"><a href="#実装方法1-Luaスクリプト" class="headerlink" title="実装方法1. Luaスクリプト"></a>実装方法1. Luaスクリプト</h5><p>RDBには、複数クエリ実行やIF文・ループ処理などの一連の手続きを一回のクエリでRDB上で実行できるストアドプロシージャやストアドファンクションというものがあります。Luaスクリプトを使えばRedisでもそれと同様のことができます。</p>
+<p>実際にHash型のKeyを一度に複数渡して処理できるスクリプトを作ってみました。試したところ、検証サーバでは1件7msかかってたHGETALLでしたが、10000件一括取得で400msぐらいでデータ取得できました。注意ですが、Luaスクリプトもクエリ処理用のスレッド（シングルスレッド）で動作するため、重い処理は避けるべきです。</p>
+<p>※Javaから実行する方法は<a target="_blank" rel="noopener" href="https://blog.kakakikikeke.com/2015/01/javaluaredis.html">こちら</a>を参考ください。</p>
+<p>luaスクリプト</p>
+<figure class="highlight lua"><figcaption><span>hmgetall.lua</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- param1: hmgetallで取得したいkeyの数 param2~: 取得したいkey（半角スペース区切りで複数可能）</span></span><br><span class="line"><span class="keyword">local</span> result = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> i = <span class="number">1</span>, KEYS[<span class="number">1</span>] <span class="keyword">do</span></span><br><span class="line">  result[i] = &#123;<span class="string">&#x27;&quot;key&quot;&#x27;</span>, KEYS[i+<span class="number">1</span>] ,redis.call(<span class="string">&#x27;HGETALL&#x27;</span>, KEYS[i + <span class="number">1</span>])&#125;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> result</span><br></pre></td></tr></table></figure>
+
+<p>使い方</p>
+<figure class="highlight shell"><figcaption><span>hmgetall.sh</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -h $&#123;REDIS_HOST&#125; -p $&#123;PORT&#125; --eval ./hmgetall.lua 2 sales:111 sales:222</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment"># Return　Data</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment"># 1) 1) &quot;\&quot;key\&quot;&quot;</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">#    2) &quot;sales:111&quot;</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">#    3)  1) &quot;\&quot;name\&quot;&quot;</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">#        2) &quot;REDBULL&quot;</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">#        3) &quot;\&quot;amount\&quot;&quot;</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">#        4) &quot;200&quot;</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment"># 2) 1) &quot;\&quot;key\&quot;&quot;</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">#    2) &quot;sales:222&quot;</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">#    3)  1) &quot;\&quot;name\&quot;&quot;</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">#        2) &quot;MILK&quot;</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">#        3) &quot;\&quot;amount\&quot;&quot;</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">#        4) &quot;165&quot;</span></span></span><br></pre></td></tr></table></figure>
+
+<h5 id="実装方法2-syncAndReturnAll"><a href="#実装方法2-syncAndReturnAll" class="headerlink" title="実装方法2. syncAndReturnAll"></a>実装方法2. syncAndReturnAll</h5><p>Redisのライブラリによっては、1件ずつ同期的に処理するのではなく、<strong>「Queueに詰めて一括で実行して、その結果をまとめて取得する」ってことができるようです</strong>（JavaはJedisでできることを確認済）。使用する言語でいいライブラリがあればLuaスクリプトよりもこちらの方がよいと思います。</p>
+<p>Queueに詰めた実行順でレスポンスも返ってくるので、Keyとのマッピングもできます。keyがない場合も空のMapが返るのでマッピング順がずれることはないです。<br><a target="_blank" rel="noopener" href="http://tool.oschina.net/uploads/apidocs/jedis-2.1.0/redis/clients/jedis/Pipeline.html#syncAndReturnAll%28%29">http://tool.oschina.net/uploads/apidocs/jedis-2.1.0/redis/clients/jedis/Pipeline.html#syncAndReturnAll%28%29</a></p>
+<figure class="highlight java"><figcaption><span>hMGetAll.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">  <span class="type">Jedis</span> <span class="variable">jedis</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Jedis</span> (host, port );</span><br><span class="line">  <span class="type">Pipeline</span> <span class="variable">pipe</span> <span class="operator">=</span> jedis.pipelined();</span><br><span class="line">  pipe.hgetAll(<span class="string">&quot;sales:111&quot;</span>);</span><br><span class="line">  pipe.hgetAll(<span class="string">&quot;sales:222&quot;</span>);</span><br><span class="line">  pipe.hgetAll(<span class="string">&quot;sales:NotExist&quot;</span>);</span><br><span class="line">  List&lt;Object&gt; result=  pipe.syncAndReturnAll();</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">結果</span></span><br><span class="line"><span class="comment">result= &#123;ArrayList@14772&#125;  size = 3</span></span><br><span class="line"><span class="comment"> 0 = &#123;HashMap@14777&#125;  size = 2</span></span><br><span class="line"><span class="comment">  &quot;&quot;name&quot;&quot; -&gt; &quot;REDBULL&quot;</span></span><br><span class="line"><span class="comment">  &quot;&quot;amount&quot;&quot; -&gt; &quot;200&quot;</span></span><br><span class="line"><span class="comment"> 1 = &#123;HashMap@14778&#125;  size = 2</span></span><br><span class="line"><span class="comment">  &quot;&quot;name&quot;&quot; -&gt; &quot;MILK&quot;</span></span><br><span class="line"><span class="comment">  &quot;&quot;amount&quot;&quot; -&gt; &quot;165&quot;</span></span><br><span class="line"><span class="comment"> 2 = &#123;HashMap@14779&#125;  size = 0</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-KEYSは怖い"><a href="#4-KEYSは怖い" class="headerlink" title="4. KEYSは怖い"></a>4. KEYSは怖い</h2><p>ここで、Redisに登録されたKey一覧を取得する<code>KEYS</code>というコマンドをご紹介します。</p>
+<p>例えば <code>KEYS &quot;sales:*&quot;</code> と実行すれば正規表現（※）でkey検索できます。</p>
+<p>keysの正規表現は機能に制限があり以下だけです。<br>? ・・・ 任意の1文字<br>* ・・・ 任意の文字列<br>[ ] ・・・ 角カッコ内の文字のどれか1文字</p>
+<p>なんとなく便利そうな気、しますよね。</p>
+<p>しかしながら、以下の点に注意してください。</p>
+<ul>
+<li>この<code>KEYS</code>はRDBのINDEXを用いた前方一致での効率的な検索をしません。O(N)となりめっちゃ遅いです<ul>
+<li>計測時は約9百万の中から10件検索するようなクエリで1秒かかりました</li>
+</ul>
+</li>
+<li>その間のRedisはシングルスレッドでクエリ捌くため、他のリクエストを捌けません。ReadもWriteの両方ともさばけません。</li>
+</ul>
+<p>Jedis（Java用ライブラリ）だとデフォルトtimeoutが2秒なので、2，3人がkeysを2発ぐらい実行するとそれだけでtimeoutエラーが出たりします。公式でもWARNINGって書いてます。<a target="_blank" rel="noopener" href="https://redis.io/commands/keys">https://redis.io/commands/keys</a></p>
+<blockquote>
+<p>While the time complexity for this operation is O(N), the constant times are fairly low. For example, Redis running on an entry level laptop can scan a 1 million key database in 40 milliseconds.<br>Warning: consider KEYS as a command that should only be used in production environments with extreme care. It may ruin performance when it is executed against large databases. This command is intended for debugging and special operations, such as changing your keyspace layout. Don’t use KEYS in your regular application code. If you’re looking for a way to find keys in a subset of your keyspace, consider using SCAN or sets.</p>
+</blockquote>
+<br>
+
+<h3 id="KEYSの代替方法"><a href="#KEYSの代替方法" class="headerlink" title="KEYSの代替方法"></a>KEYSの代替方法</h3><p>「今の設計には<code>KEYS</code>が必要なんだ！」っていうことありますよね。代替方法、そろえてます。<br><br></p>
+<h4 id="RDBから取得"><a href="#RDBから取得" class="headerlink" title="RDBから取得"></a>RDBから取得</h4><p>一定の条件が揃えば使える方法。例えば販売のトランザクションデータはRDBでその日の商品別のサマリデータはRedisという時です。<br>RDBから販売トランや商品マスタを<code>SELECT DISTINCT</code>すれば…<br><br></p>
+<h4 id="Sets型利用"><a href="#Sets型利用" class="headerlink" title="Sets型利用"></a>Sets型利用</h4><p>Redisのデータ型には、Sets型という同じデータは無視する「重複なしリスト型」が存在します。</p>
+<p>これに保持しているKey情報を登録しておくようにします。</p>
+<p>例えば販売のサマリデータを作成・更新する際に、Sets型にデータ追加のコマンド（<code>SADD</code>）を都度発行します。※Redisの登録は高速（Pipeline処理で計測時は0.01ms程度）なので追加の<code>SADD</code>処理の性能影響は無視できるものと考えてます。</p>
+<figure class="highlight shell"><figcaption><span>redis_sets_command.sh</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Sets型のデータ登録</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment"># データ登録</span></span></span><br><span class="line">redis-cli -h $&#123;REDIS_HOST&#125; -p $&#123;PORT&#125; SADD sales:keys sales:111</span><br><span class="line">redis-cli -h $&#123;REDIS_HOST&#125; -p $&#123;PORT&#125; SADD sales:keys sales:222</span><br><span class="line">redis-cli -h $&#123;REDIS_HOST&#125; -p $&#123;PORT&#125; SADD sales:keys sales:111</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment"># データ取得</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">## 全件取得</span></span></span><br><span class="line">redis-cli -h $&#123;REDIS_HOST&#125; -p $&#123;PORT&#125; SMEMBERS sales:keys    #sales:111 とsales:222が返ってくる</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">## カーソル的に一定件数ずつ取得することも可能</span></span></span><br><span class="line">redis-cli -h $&#123;REDIS_HOST&#125; -p $&#123;PORT&#125; SSCAN sales:keys 0 COUNT 1000</span><br></pre></td></tr></table></figure>
+<br>
+
+<h4 id="抜け道：KEYSは使う。負荷を下げる。"><a href="#抜け道：KEYSは使う。負荷を下げる。" class="headerlink" title="抜け道：KEYSは使う。負荷を下げる。"></a>抜け道：KEYSは使う。負荷を下げる。</h4><p>今更変えられないよ！抜け道ないの！？ということでこれも検討しました。<br>設計・実装変えれないときの最終手段に近い位置づけです。最初から選択すべき内容ではないです。</p>
+<br>
+
+<h5 id="DBを分ける"><a href="#DBを分ける" class="headerlink" title="DBを分ける"></a>DBを分ける</h5><p><code>KEYS</code>の検索対象はRedisの同一DBの範囲に閉じられています。DBを分けて、<code>KEYS</code>の対象減らすことで負荷を下げることができます。ただし、DBごとにスレッドが分かれるわけではないです。別DBへのクエリも同じシングルスレッドで処理されます。<br><br></p>
+<h5 id="参照用レプリカ使用"><a href="#参照用レプリカ使用" class="headerlink" title="参照用レプリカ使用"></a>参照用レプリカ使用</h5><p>DBではなく別インスタンスを使おう、<code>KEYS</code>専用にレプリカ使おうっていう考えです。</p>
+<p>この方法はDB分けとは違い、インスタンスが分かれるので、<code>KEYS</code>実行中にもマスター側でクエリを処理することが可能です。</p>
+<br>
+
+<h4 id="視点を変える-本当にKEYSが必要？-処理方式を見直そう"><a href="#視点を変える-本当にKEYSが必要？-処理方式を見直そう" class="headerlink" title="視点を変える:本当にKEYSが必要？ ~ 処理方式を見直そう ~"></a>視点を変える:本当にKEYSが必要？ ~ 処理方式を見直そう ~</h4><p>RDB脳だった自分にはなかなか思いつかなかった設計方式を記載しておきます。</p>
+<h5 id="CASE1-Redisは毎日リセットしたい。対象データを一括で消したい。"><a href="#CASE1-Redisは毎日リセットしたい。対象データを一括で消したい。" class="headerlink" title="CASE1: Redisは毎日リセットしたい。対象データを一括で消したい。"></a>CASE1: Redisは毎日リセットしたい。対象データを一括で消したい。</h5><p>一括で消すには、<code>KEYS</code>で一覧取得が必要。なんてとき。</p>
+<ul>
+<li>見直し検討1:flushdbの利用<ul>
+<li>一括で消したい単位でDBを分けておけば、<code>FLUSHDB</code>の1コマンドで削除できます</li>
+</ul>
+</li>
+<li>見直し検討2:データ有効期間の設定<ul>
+<li><code>EXPIRE</code>でデータに有効期限を設定できます。期限切れになると自動削除されます</li>
+</ul>
+</li>
+</ul>
+<h5 id="CASE2-数値を合計するためにKEYSで対象データがほしい。"><a href="#CASE2-数値を合計するためにKEYSで対象データがほしい。" class="headerlink" title="CASE2: 数値を合計するためにKEYSで対象データがほしい。"></a>CASE2: 数値を合計するためにKEYSで対象データがほしい。</h5><p>「店舗商品別データの売上金額」から、「店舗合計の売上金額」を取得するために、該当店舗のkey一覧取得→それぞれのデータをGETしてサマリしよう。なんてとき。</p>
+<p><strong>見直し検討:最初から店舗合計のデータを作成する</strong><br>一括処理（更新・取得）はRDBの得意領域。細かく持って集計してっていうバッチ処理はRDB的考え方です。<br>Redisは数件を書き込む・読み込むことが高速。販売がある度に、店舗別に商品別のデータと、店舗合計のデータを更新すればいいじゃない。Redisの更新は速いので。数値の更新時は<code>INCR</code>を使えば、事前にロックとか考えずに数値を+-できます。</p>
+<br>
+
+<h2 id="5-おまけ：データ量試算時の注意"><a href="#5-おまけ：データ量試算時の注意" class="headerlink" title="5. おまけ：データ量試算時の注意"></a>5. おまけ：データ量試算時の注意</h2><p><strong>Hash型でデータを持たせた場合、HashのField名も含めることを忘れずに。</strong><br>RDBのテーブルのレコードのイメージでHash型を使うと、うっかりカラム名の試算を忘れがちなので注意です。<br>Valueが数値だったりすると、主にField名で容量喰いますｗ</p>
+<br>
+
+<h2 id="6-今後試したいこと"><a href="#6-今後試したいこと" class="headerlink" title="6. 今後試したいこと"></a>6. 今後試したいこと</h2><h3 id="Sets型を使ってRedisだけでKey検索も行う"><a href="#Sets型を使ってRedisだけでKey検索も行う" class="headerlink" title="Sets型を使ってRedisだけでKey検索も行う"></a>Sets型を使ってRedisだけでKey検索も行う</h3><p>業務システムでは「条件によって絞り込んで一覧表示する」ということが多いでしょう。</p>
+<p>属性情報を元に該当するKeyを調べるため、RDBのマスタにアクセスすることになるかと思いますが、このKey検索もRedisだけで実現したいという内容です。</p>
+<p>Sets型和集合(Union)、積集合(Intersection)、差集合(Difference)をサポートしてるので、属性情報に応じたKeyの検索も実装できそうです。例えば、飲み物のSets、今日売れたものSetsがあれば、積集合で「今日売れた飲み物」のキー一覧を取得できます。</p>
+<p>…ここまでやるかって内容ですね。</p>
+<h3 id="Hash型で列指向でデータを持たせる。"><a href="#Hash型で列指向でデータを持たせる。" class="headerlink" title="Hash型で列指向でデータを持たせる。"></a>Hash型で列指向でデータを持たせる。</h3><p>ついつい行指向で考えがち。数値情報を扱いたい場合、列指向で持たせると <code>HGETALL</code> で一度にまとめて取得できるので、列指向で持たせる方がいいかもしれません。<br>※<code>HSCAN</code>っていうカーソル的にデータ取得できるコマンドあるぐらいなのでそっちを想定しているのかも。<br>※同じKey内でフィールドの重複許さないので、列指向的な持ち方だとSets型 + String型の要素を足した扱い方ができますね。Sets型のような集合演算はできませんが。</p>
+<h2 id="7-所感"><a href="#7-所感" class="headerlink" title="7. 所感"></a>7. 所感</h2><p>正直、RDBだとこんなの簡単にできるのにーと思うことが多々あり、最初はRedisを嫌いになりかけました。しかしRedisはKVSの中でもかなりRDBの人達に歩み寄ってくれてると感じます（Sets型やHash型はすごく好感持てます）。色々な可能性が見えてきて、今では気になる存在です。</p>
+<p>この記事を読んでRedisを気にする仲間が増えればめちゃ嬉しいですー。</p>
+<h2 id="8-ためになるサイト"><a href="#8-ためになるサイト" class="headerlink" title="8. ためになるサイト"></a>8. ためになるサイト</h2><ul>
+<li>データイメージがわかりやすいサイト：<a target="_blank" rel="noopener" href="http://redisgate.jp/redis/command/commands.php">http://redisgate.jp/redis/command/commands.php</a></li>
+<li>トランザクション：<a target="_blank" rel="noopener" href="https://redis-documentasion-japanese.readthedocs.io/ja/latest/topics/transactions.html">https://redis-documentasion-japanese.readthedocs.io/ja/latest/topics/transactions.html</a></li>
+<li>spring での設定系（記事古め）：<a target="_blank" rel="noopener" href="http://fits.hatenablog.com/entry/2015/08/27/205539">http://fits.hatenablog.com/entry/2015/08/27/205539</a></li>
+<li>RedisサーバのCPU負荷対策パターン：<a target="_blank" rel="noopener" href="https://blog.yuuk.io/entry/redis-cpu-load">https://blog.yuuk.io/entry/redis-cpu-load</a></li>
+<li>Luaスクリプトは書き方ここに載ってます：<a target="_blank" rel="noopener" href="https://redis.io/commands/eval">https://redis.io/commands/eval</a><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">厳密には、バックグラウンドプロセス等は別スレッドで動くため、完全なシングルスレッドというわけではないです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="vertical-align: top; padding-right: 10px;">2.</span><span style="vertical-align: top;">検証サーバで計測したときは、1件取得で7ms程度かかりました。1000件取得するとなると7秒かかりますね...</span><a href="#fnref:2" rev="footnote"> ↩</a></li></ol></div></div></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20190821/&related=twitterapi%2Ctwitter&text=%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E9%96%8B%E7%99%BA%E3%81%A7%E5%BE%97%E3%81%9FRedis%E5%88%A9%E7%94%A8%E3%83%8E%E3%82%A6%E3%83%8F%E3%82%A6%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">2</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20190821/&t=%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E9%96%8B%E7%99%BA%E3%81%A7%E5%BE%97%E3%81%9FRedis%E5%88%A9%E7%94%A8%E3%83%8E%E3%82%A6%E3%83%8F%E3%82%A6" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20190821/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">292</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20190821/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">147</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;566</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2023.11.06</span><span class="snscount">&#9825;2</span><a href=/articles/20231106a/ title="新人研修の期間で先輩社員の方に薦めていただいた「プロになるためのWeb技術入門」を読んだ感想を書いていきます。特にIT未経験の同期の中で評判が良く、読んでいる人が多い書籍です。">「プロになるためのWeb技術入門」を新人が読んでみた</a></li><li class="related-posts-item"><span>2023.08.25</span><span class="snscount">&#9825;3</span><a href=/articles/20230825a/ title="テスティングフレームワークには大きく2つの流派があります。ひとつはJUnit、あるいはその祖先の　SUnitをベースにしたTDDスタイルものです。TDDスタイルはテスト関数、もしくはメソッドを実行します。">Playwrightのテストランナーを他のテストライブラリと比較する</a></li><li class="related-posts-item"><span>2023.03.08</span><span class="snscount">&#9825;59</span><a href=/articles/20230308a/ title="JavaでWebサービス開発というと、SpringBoot、という時代が長く続いていますが、Javaの世界もいろいろ進歩があるよ、ということで、MicroProfileというのを教えてもらいました。豆蔵さんの技術ブログや、masatarouさんのJJUGのレポートが詳しいです。">今どきJavaのウェブ開発体験(Helidon)</a></li><li class="related-posts-item"><span>2023.02.27</span><span class="snscount">&#9825;9</span><a href=/articles/20230227a/ title="スッキリわかる Java 入門 実践編 第 3 版。「実践編」の内容については 実践というワードからも「まだ自分には早いのでは？」感があり、「配属後に必要となったら購入しよう」→「購入せずのまま」の流れにいる方も多いのではと思います">「スッキリわかるJava入門 実践編 第3版」の読書感想文</a></li><li class="related-posts-item"><span>2023.02.21</span><span class="snscount">&#9825;197</span><a href=/articles/20230221a/ title="「実践Redis入門」は、2023年現在AWSのAmazon EMR開発チーム、システム開発エンジニアとして働いている林 昌吾さんという方が書かれた『Redisの基礎から、実践、運用や調査に役立つ仕様などの詳細について解説した入門書です。』入門書とありますが、単なる機能紹介にとどまらず...">「実践Redis入門」所感 ~「E.G.コンバット」の観点から語る~</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20210419b/ title="今回はIT初学者の私が入社してから1年間学んできたIT分野のなかで、特に楽しかった技術を抜粋してご紹介させていただければと思います。今後私のようにIT初学者で、エンジニア、ITコンサルタントを志望している皆さんの楽しい社会人生活のキャリアを描く一助となれたら嬉しく思います！">IT初学者がカラムナデータベースを勉強してみた</a></li><li class="reference-posts-item"><a href=/articles/20200203/ title="現在所属しているプロジェクトではWebAPIやバッチ処理の設計の一環としてPlantUMLを利用しています。効率よく品質高くアウトプットを出すためには、プログラミング言語に対してコーディング規約があるように、UMLに対してもチームで設計するにあたり一定のルールを決める必要があります。そこでプロジェクト内のPlantUMLを使用するうえでのガイドラインやルールをまとめる機会があり、せっかくなのでそれを記事化します。">チームで機能設計するためのPlantUML標準化</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%BE%E8%B1%A1%E8%80%85"><span class="toc-text">対象者</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B8%E3%81%84%E3%81%A6%E3%81%AA%E3%81%84%E3%81%93%E3%81%A8"><span class="toc-text">書いてないこと</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B8%E3%81%84%E3%81%A6%E3%82%8B%E3%81%93%E3%81%A8"><span class="toc-text">書いてること</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC%E7%94%A8%E3%82%B5%E3%83%BC%E3%83%90%E6%83%85%E5%A0%B1"><span class="toc-text">検証用サーバ情報</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%AE%E6%AC%A1"><span class="toc-text">目次</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0-Redis%E3%81%A8%E3%81%AF%EF%BC%88%E6%95%99%E7%A7%91%E6%9B%B8%E7%9A%84%E3%81%AA%E3%82%B5%E3%83%9E%E3%83%AA%EF%BC%89"><span class="toc-text">0. Redisとは（教科書的なサマリ）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E3%82%B9%E3%83%AC%E3%83%83%E3%83%89"><span class="toc-text">1. シングルスレッド</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E3%83%88%E3%83%A9%E3%83%B3%E3%82%B6%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E5%AE%9F%E7%8F%BE%E6%96%B9%E6%B3%95"><span class="toc-text">2. トランザクションの実現方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Hash%E5%9E%8B%E3%81%AFMultiGet%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84"><span class="toc-text">3. Hash型はMultiGetできない</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9E%E9%81%BF%E7%AD%96"><span class="toc-text">回避策</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-Hash%E3%82%92%E6%8D%A8%E3%81%A6%E3%82%8B%EF%BC%81"><span class="toc-text">3-1. Hashを捨てる！</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-Hash%E3%81%AEMultiGet%E3%82%92%E5%AE%9F%E8%A3%85%E3%81%99%E3%82%8B%EF%BC%81"><span class="toc-text">3-2. HashのMultiGetを実装する！</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-KEYS%E3%81%AF%E6%80%96%E3%81%84"><span class="toc-text">4. KEYSは怖い</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#KEYS%E3%81%AE%E4%BB%A3%E6%9B%BF%E6%96%B9%E6%B3%95"><span class="toc-text">KEYSの代替方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#RDB%E3%81%8B%E3%82%89%E5%8F%96%E5%BE%97"><span class="toc-text">RDBから取得</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Sets%E5%9E%8B%E5%88%A9%E7%94%A8"><span class="toc-text">Sets型利用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8A%9C%E3%81%91%E9%81%93%EF%BC%9AKEYS%E3%81%AF%E4%BD%BF%E3%81%86%E3%80%82%E8%B2%A0%E8%8D%B7%E3%82%92%E4%B8%8B%E3%81%92%E3%82%8B%E3%80%82"><span class="toc-text">抜け道：KEYSは使う。負荷を下げる。</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A6%96%E7%82%B9%E3%82%92%E5%A4%89%E3%81%88%E3%82%8B-%E6%9C%AC%E5%BD%93%E3%81%ABKEYS%E3%81%8C%E5%BF%85%E8%A6%81%EF%BC%9F-%E5%87%A6%E7%90%86%E6%96%B9%E5%BC%8F%E3%82%92%E8%A6%8B%E7%9B%B4%E3%81%9D%E3%81%86"><span class="toc-text">視点を変える:本当にKEYSが必要？ ~ 処理方式を見直そう ~</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E3%81%8A%E3%81%BE%E3%81%91%EF%BC%9A%E3%83%87%E3%83%BC%E3%82%BF%E9%87%8F%E8%A9%A6%E7%AE%97%E6%99%82%E3%81%AE%E6%B3%A8%E6%84%8F"><span class="toc-text">5. おまけ：データ量試算時の注意</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E4%BB%8A%E5%BE%8C%E8%A9%A6%E3%81%97%E3%81%9F%E3%81%84%E3%81%93%E3%81%A8"><span class="toc-text">6. 今後試したいこと</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Sets%E5%9E%8B%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6Redis%E3%81%A0%E3%81%91%E3%81%A7Key%E6%A4%9C%E7%B4%A2%E3%82%82%E8%A1%8C%E3%81%86"><span class="toc-text">Sets型を使ってRedisだけでKey検索も行う</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Hash%E5%9E%8B%E3%81%A7%E5%88%97%E6%8C%87%E5%90%91%E3%81%A7%E3%83%87%E3%83%BC%E3%82%BF%E3%82%92%E6%8C%81%E3%81%9F%E3%81%9B%E3%82%8B%E3%80%82"><span class="toc-text">Hash型で列指向でデータを持たせる。</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E6%89%80%E6%84%9F"><span class="toc-text">7. 所感</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E3%81%9F%E3%82%81%E3%81%AB%E3%81%AA%E3%82%8B%E3%82%B5%E3%82%A4%E3%83%88"><span class="toc-text">8. ためになるサイト</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>

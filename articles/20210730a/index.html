@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>SQLBoiler（とoapi-codegen）でつくるREST APIサーバ | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="ライブリッツの筒井です。 GoのORマッパー連載、折り返して5日目です。 SQLBoilerを使用したDBスキーマ駆動なREST APIサーバの開発ワークフローを紹介します。 なぜSQLBoilerを選ぶのか?自分たちのチームでは、REST APIサーバを開発する際にはまずデータベースのテーブル設計から始めることが多いです。その次にAPI定義の設計へ入るのですが、既にテーブル定義は出来上がっている">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SQLBoiler（とoapi-codegen）でつくるREST APIサーバ | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20210730a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="ライブリッツの筒井です。 GoのORマッパー連載、折り返して5日目です。 SQLBoilerを使用したDBスキーマ駆動なREST APIサーバの開発ワークフローを紹介します。 なぜSQLBoilerを選ぶのか?自分たちのチームでは、REST APIサーバを開発する際にはまずデータベースのテーブル設計から始めることが多いです。その次にAPI定義の設計へ入るのですが、既にテーブル定義は出来上がっている">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20210730a/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20210730a/sqlboiler.png">
+<meta property="article:published_time" content="2021-07-29T15:00:00.000Z">
+<meta property="article:modified_time" content="2022-06-09T01:03:49.677Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="OpenAPI">
+<meta property="article:tag" content="ORM">
+<meta property="article:tag" content="コード生成">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20210730a/image.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20210730a/">
+  <meta content="Go,OpenAPI,ORM,コード生成" name="keywords">
+  <meta content="筒井悠平" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">SQLBoiler（とoapi-codegen）でつくるREST APIサーバ
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20210730a_SQLBoiler（とoapi-codegen）でつくるREST_APIサーバ.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20210730a_SQLBoiler（とoapi-codegen）でつくるREST_APIサーバ" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2021/" class="publish-date"><time datetime="2021-07-29T15:00:00.000Z" itemprop="datePublished">2021.07.30</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%AD%92%E4%BA%95%E6%82%A0%E5%B9%B3" title="筒井悠平さんの記事一覧へ" class="post-author">筒井悠平</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/OpenAPI/" title="OpenAPIタグの記事へ" class="tag-list-link">OpenAPI</a>
+  
+    
+    <a href="/tags/ORM/" title="ORMタグの記事へ" class="tag-list-link">ORM</a>
+  
+    
+    <a href="/tags/コード生成/" title="コード生成タグの記事へ" class="tag-list-link">コード生成</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p>ライブリッツの筒井です。</p>
+<p><a href="/articles/20210726a/">GoのORマッパー連載</a>、折り返して5日目です。</p>
+<p>SQLBoilerを使用したDBスキーマ駆動なREST APIサーバの開発ワークフローを紹介します。</p>
+<h2 id="なぜSQLBoilerを選ぶのか"><a href="#なぜSQLBoilerを選ぶのか" class="headerlink" title="なぜSQLBoilerを選ぶのか?"></a>なぜSQLBoilerを選ぶのか?</h2><p>自分たちのチームでは、REST APIサーバを開発する際にはまずデータベースのテーブル設計から始めることが多いです。その次にAPI定義の設計へ入るのですが、既にテーブル定義は出来上がっているため、<strong>なんとなくSQL文が頭に思い浮かんだ状態</strong>でAPIのRequest / Responseを考えることになります。</p>
+<p>ゆえにORMに一番に求めるのは、「<strong>いかにストレスなく思い描いていたSQL文を実行し、Goの文脈に持ち込めるか</strong>」ということです。</p>
+<p>この基準を元に、次のような観点からSQLBoilerを選定しています。</p>
+<h3 id="複雑なSELECT文でDSLに苦悩したくない"><a href="#複雑なSELECT文でDSLに苦悩したくない" class="headerlink" title="複雑なSELECT文でDSLに苦悩したくない"></a>複雑なSELECT文でDSLに苦悩したくない</h3><p>前述の通り、我々の頭の中にはなんとなくのSELECT文が既に浮かんでいます。このSELECT文を組み立てるために、ORM特有のDSLに悪戦苦闘することは避けたいものです。</p>
+<p>SQLBoilerのクエリビルダはSQLの基本的な構文と大きく違わないため、直感的に使用することができました。またGoのコードが生成されているため、カラム名、テーブル名を指定する際にコード補完が効くのも嬉しいポイントです。</p>
+<p>相関サブクエリを使った集計などはクエリ相当複雑になってしまいますが、Raw SQLの実行、StructへのBindも容易なので、「複雑なクエリはSQLをそのまま実行」というアプローチが取れます。</p>
+<p>（これについては <a target="_blank" rel="noopener" href="http://jmoiron.github.io/sqlx/">jmoiron/sqlx</a> も同様です）</p>
+<h3 id="INSERT-UPDATE-DELETEはSQLを書きたくない"><a href="#INSERT-UPDATE-DELETEはSQLを書きたくない" class="headerlink" title="INSERT, UPDATE, DELETEはSQLを書きたくない"></a>INSERT, UPDATE, DELETEはSQLを書きたくない</h3><p>SELECT文が複雑になることは多々ありますが、INSERT, UPDATE, DELETEはそうでもありません。</p>
+<p>これらのDMLはORMに乗っかり、Type Safeに書きたいところです。</p>
+<p>SQLBoilerでは、INSERT, UPDATE, DELETEはStructのメソッドとしてコードが生成されます。JSONからUnmarshalしてInsertといった処理が簡単に書けます。</p>
+<h3 id="Schema-Migrationはいらない"><a href="#Schema-Migrationはいらない" class="headerlink" title="Schema Migrationはいらない"></a>Schema Migrationはいらない</h3><p>これには「データベースの寿命 &gt; アプリケーションの寿命」という前提があります。</p>
+<p>Migration機能も含め、データベースをアプリケーションからは独立した1サービスとして扱う、という考え方をとっています。</p>
+<p>一方「データベースの寿命 == アプリケーションの寿命」とできる場合は、ActiveRecordのようにデータベースをアプリケーションの1機能として扱えたほうが開発効率は上がるでしょう。</p>
+<p>SQLBoilerにはSchema Migration機能は含まれておらず、既存のデータベースからコードを生成するアプローチを取っています。</p>
+<p>別ツール  (<a target="_blank" rel="noopener" href="https://flywaydb.org/">Flyway</a>を使うことが多いです) でSchemaを管理している自分たちにはピッタリでした。</p>
+<h2 id="SQLBoilerの使い方"><a href="#SQLBoilerの使い方" class="headerlink" title="SQLBoilerの使い方"></a>SQLBoilerの使い方</h2><p>プロジェクトのセットアップについては<a target="_blank" rel="noopener" href="https://github.com/volatiletech/sqlboiler">公式ドキュメント</a>に詳しいため割愛します。</p>
+<h3 id="テーブル定義"><a href="#テーブル定義" class="headerlink" title="テーブル定義"></a>テーブル定義</h3><p>今回使用するテーブル定義です。<br>ユーザ、イベント、イベント参加ユーザの3テーブルで、イベント・ユーザ間は <code>1 : 0...N</code> の関係です。</p>
+<img src="/images/20210730a/image.png" alt="テーブル定義" width="403" height="283" loading="lazy">
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> &quot;user&quot; (</span><br><span class="line">    &quot;id&quot; uuid <span class="keyword">not</span> <span class="keyword">null</span> <span class="keyword">default</span> gen_random_uuid()</span><br><span class="line">    , &quot;name&quot; <span class="type">varchar</span>(<span class="number">200</span>) <span class="keyword">not</span> <span class="keyword">null</span></span><br><span class="line">    , &quot;created_at&quot; <span class="type">timestamp</span> <span class="keyword">not</span> <span class="keyword">null</span> <span class="keyword">default</span> now()</span><br><span class="line">);</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> &quot;user&quot; <span class="keyword">add</span> <span class="keyword">primary</span> key (&quot;id&quot;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> &quot;event&quot; (</span><br><span class="line">    &quot;id&quot; uuid <span class="keyword">not</span> <span class="keyword">null</span> <span class="keyword">default</span> gen_random_uuid()</span><br><span class="line">    , &quot;name&quot; <span class="type">varchar</span>(<span class="number">200</span>) <span class="keyword">not</span> <span class="keyword">null</span></span><br><span class="line">    , &quot;date&quot; <span class="type">date</span> <span class="keyword">not</span> <span class="keyword">null</span></span><br><span class="line">    , &quot;created_at&quot; <span class="type">timestamp</span> <span class="keyword">not</span> <span class="keyword">null</span> <span class="keyword">default</span> now()</span><br><span class="line">);</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> &quot;event&quot; <span class="keyword">add</span> <span class="keyword">primary</span> key (&quot;id&quot;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> &quot;event_user&quot; (</span><br><span class="line">    &quot;event_id&quot; uuid <span class="keyword">not</span> <span class="keyword">null</span></span><br><span class="line">    , &quot;user_id&quot; uuid <span class="keyword">not</span> <span class="keyword">null</span></span><br><span class="line">    , &quot;registered_at&quot; <span class="type">timestamp</span> <span class="keyword">not</span> <span class="keyword">null</span> <span class="keyword">default</span> now()</span><br><span class="line">    , &quot;created_at&quot; <span class="type">timestamp</span> <span class="keyword">not</span> <span class="keyword">null</span> <span class="keyword">default</span> now()</span><br><span class="line">);</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> &quot;event_user&quot; <span class="keyword">add</span> <span class="keyword">primary</span> key (&quot;event_id&quot;, &quot;user_id&quot;);</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> &quot;event_user&quot; <span class="keyword">add</span> <span class="keyword">foreign</span> key (&quot;event_id&quot;) <span class="keyword">references</span> &quot;event&quot; (&quot;id&quot;);</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> &quot;event_user&quot; <span class="keyword">add</span> <span class="keyword">foreign</span> key (&quot;user_id&quot;) <span class="keyword">references</span> &quot;user&quot; (&quot;id&quot;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="シンプルなINSERT-SELECT"><a href="#シンプルなINSERT-SELECT" class="headerlink" title="シンプルなINSERT, SELECT"></a>シンプルなINSERT, SELECT</h3><p>まずはユーザ作成処理を考えます。<br>先にコードを掲載します。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">CreateUser</span><span class="params">(ctx context.Context, b []<span class="type">byte</span>)</span></span> (*boiler.User, <span class="type">error</span>) &#123;</span><br><span class="line">	u := &amp;boiler.User&#123;&#125;</span><br><span class="line">	<span class="keyword">if</span> err := json.Unmarshal(b, u); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	err := u.Insert(ctx, db, boil.Infer())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> u, err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>boiler.User</code> は、SQLBoilerによって生成された <code>user</code> テーブルに対応するStructです。<br>カラムに設定したコメントが反映されているのが地味に便利なポイントです。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// User is an object representing the database table.</span></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	ID <span class="type">string</span> <span class="string">`boil:&quot;id&quot; json:&quot;id&quot; toml:&quot;id&quot; yaml:&quot;id&quot;`</span></span><br><span class="line">	<span class="comment">// 所属する組織ID</span></span><br><span class="line">	OrganizationID <span class="type">string</span> <span class="string">`boil:&quot;organization_id&quot; json:&quot;organizationID&quot; toml:&quot;organizationID&quot; yaml:&quot;organizationID&quot;`</span></span><br><span class="line">	<span class="comment">// ユーザ名</span></span><br><span class="line">	Name      <span class="type">string</span>    <span class="string">`boil:&quot;name&quot; json:&quot;name&quot; toml:&quot;name&quot; yaml:&quot;name&quot;`</span></span><br><span class="line">	CreatedAt time.Time <span class="string">`boil:&quot;created_at&quot; json:&quot;-&quot; toml:&quot;-&quot; yaml:&quot;-&quot;`</span></span><br><span class="line"></span><br><span class="line">	R *userR <span class="string">`boil:&quot;-&quot; json:&quot;-&quot; toml:&quot;-&quot; yaml:&quot;-&quot;`</span></span><br><span class="line">	L userL  <span class="string">`boil:&quot;-&quot; json:&quot;-&quot; toml:&quot;-&quot; yaml:&quot;-&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>実行結果は次の通りです。<br>DB側で採番されたIDがStructにセットされています。便利ですね。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestCreateUser</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="comment">// DB接続Helper</span></span><br><span class="line">	testConfigureDatabase(t)</span><br><span class="line">	d := <span class="string">`&#123;&quot;organizationID&quot;:&quot;00000001-0000-0000-0000-000000000000&quot;,&quot;name&quot;:&quot;Emmett Brown&quot;&#125;`</span></span><br><span class="line">	got, err := CreateUser(context.TODO(), []<span class="type">byte</span>(d))</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		t.Errorf(<span class="string">&quot;CreateUser() error = %v&quot;</span>, err)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// JSONでログ出力するHelper</span></span><br><span class="line">	logJson(t, got)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;54629dbd-2c32-4e71-8592-be66be0a5385&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;organizationID&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00000001-0000-0000-0000-000000000000&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Emmett Brown&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>次にユーザ一覧を取得する処理を考えます。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> organization_id <span class="operator">=</span> $<span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>Goのコードは次の通りです。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">var db <span class="operator">*</span>sql.DB</span><br><span class="line"></span><br><span class="line">func ListUsers(ctx context.Context, orgID string) ([]<span class="operator">*</span>boiler.User, error) &#123;</span><br><span class="line">	users, err :<span class="operator">=</span> boiler.Users(</span><br><span class="line">		qm.Where(&quot;organization_id = ?&quot;, orgID),</span><br><span class="line">	).<span class="keyword">All</span>(ctx, db)</span><br><span class="line">	if err <span class="operator">!=</span> nil &#123;</span><br><span class="line">		<span class="keyword">return</span> nil, err</span><br><span class="line">	&#125;</span><br><span class="line">	if users <span class="operator">=</span><span class="operator">=</span> nil &#123;</span><br><span class="line">		users <span class="operator">=</span> []<span class="operator">*</span>boiler.User&#123;&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> users, nil</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>この程度のシンプルなクエリであれば自動生成コードで簡単に実装可能です。</p>
+<p>実行結果は次のようになります。<code>json</code> タグもSQLBoilerが付けてくれているので、サクッとSerializeが可能です。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestListUsers</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="comment">// DB接続するHelper</span></span><br><span class="line">    testConfigureDatabase(t)</span><br><span class="line">	orgID := <span class="string">&quot;00000001-0000-0000-0000-000000000000&quot;</span></span><br><span class="line">	got, err := ListUsers(context.TODO(), orgID)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		t.Errorf(<span class="string">&quot;ListUsers() error = %v&quot;</span>, err)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">    <span class="comment">// JSON形式でログ出力するHelper</span></span><br><span class="line">	logJson(t, got)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00000001-0001-0000-0000-000000000000&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;organizationID&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00000001-0000-0000-0000-000000000000&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ユーザ01&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00000001-0002-0000-0000-000000000000&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;organizationID&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00000001-0000-0000-0000-000000000000&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ユーザ02&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="中間テーブルのJOINを含むSELECT"><a href="#中間テーブルのJOINを含むSELECT" class="headerlink" title="中間テーブルのJOINを含むSELECT"></a>中間テーブルのJOINを含むSELECT</h3><p>イベントとその主催者ユーザ、参加者ユーザ一覧を取得する処理を考えます。</p>
+<p>SQLで書くならば次のようになるでしょう。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> &quot;event&quot;.<span class="operator">*</span>, &quot;participant&quot;.<span class="operator">*</span></span><br><span class="line"><span class="keyword">from</span> &quot;event&quot;</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> &quot;event_user&quot; r1 <span class="keyword">on</span> r1.event_id <span class="operator">=</span> event.id</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> &quot;user&quot; participant <span class="keyword">on</span> participant.id <span class="operator">=</span> r1.user_id</span><br></pre></td></tr></table></figure>
+
+<p>SQLBoilerで実装する場合、Eager Loadingによって結合先テーブルを読み込む形になります。Eager Loadingのコードも、SQLBoilerが外部キー制約を読み取って自動生成してくれています。</p>
+<p>クエリ時に <code>qm.Load()</code> で結合先テーブルを読み込んでおけば、<code>FromTable.R.JoinTable</code> の形式でGoからアクセス可能です。</p>
+<p>JoinのJoinも、ドット区切りで結合先テーブルを記述すると読み込み可能です。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Event <span class="keyword">struct</span> &#123;</span><br><span class="line">	*boiler.Event</span><br><span class="line">	<span class="comment">// イベント参加者</span></span><br><span class="line">	ParticipantUsers []*boiler.User <span class="string">`json:&quot;participantUsers&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ListEvents</span><span class="params">(ctx context.Context)</span></span> ([]*Event, <span class="type">error</span>) &#123;</span><br><span class="line">	es, err := boiler.Events(</span><br><span class="line">		qm.OrderBy(boiler.EventColumns.Date+<span class="string">&quot; desc&quot;</span>),</span><br><span class="line">		qm.Load(fmt.Sprintf(<span class="string">&quot;%s.%s&quot;</span>, boiler.EventRels.EventUsers, boiler.EventUserRels.User)),</span><br><span class="line">	).All(ctx, db)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	res := <span class="built_in">make</span>([]*Event, <span class="built_in">len</span>(es))</span><br><span class="line">	<span class="keyword">for</span> i, e := <span class="keyword">range</span> es &#123;</span><br><span class="line">		ps := <span class="built_in">make</span>([]*boiler.User, <span class="built_in">len</span>(e.R.EventUsers))</span><br><span class="line">		<span class="keyword">for</span> j, u := <span class="keyword">range</span> e.R.EventUsers &#123;</span><br><span class="line">			ps[j] = u.R.User</span><br><span class="line">		&#125;</span><br><span class="line">		res[i] = &amp;Event&#123;</span><br><span class="line">			Event:            e,</span><br><span class="line">			ParticipantUsers: ps,</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> res, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>実行結果は次の通りです。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00000000-0000-0000-0000-000000000001&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;イベント01&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;date&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2015-10-21T00:00:00Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;participants&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">            <span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00000001-0002-0000-0000-000000000000&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;organizationID&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00000001-0000-0000-0000-000000000000&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ユーザ02&quot;</span></span><br><span class="line">            <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00000001-0003-0000-0000-000000000000&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;organizationID&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00000001-0000-0000-0000-000000000000&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ユーザ03&quot;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<p>実行されたSQLは次の3つでした。Eager Loadingがきちんと効いていますね。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> event <span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="type">date</span> <span class="keyword">desc</span>;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> event_user <span class="keyword">WHERE</span> (event_user.event_id <span class="keyword">IN</span> ($<span class="number">1</span>));</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> (user.id <span class="keyword">IN</span> ($<span class="number">1</span>,$<span class="number">2</span>));</span><br></pre></td></tr></table></figure>
+
+<h3 id="集計を含むSELECT"><a href="#集計を含むSELECT" class="headerlink" title="集計を含むSELECT"></a>集計を含むSELECT</h3><p>参加者数の多いイベントを取得する処理を考えます。</p>
+<p>SQLは次の通りです。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> event.<span class="operator">*</span>, <span class="built_in">coalesce</span>(r1.participants, <span class="number">0</span>) <span class="keyword">as</span> participants</span><br><span class="line"><span class="keyword">from</span> event</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (</span><br><span class="line">    <span class="keyword">select</span> event_id <span class="keyword">as</span> id, <span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">as</span> participants</span><br><span class="line">    <span class="keyword">from</span> event_user</span><br><span class="line">    <span class="keyword">group</span> <span class="keyword">by</span> event_id</span><br><span class="line">    <span class="keyword">order</span> <span class="keyword">by</span> participants <span class="keyword">desc</span></span><br><span class="line">    limit <span class="number">10</span></span><br><span class="line">) r1 <span class="keyword">on</span> event.id <span class="operator">=</span> r1.id</span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> participants <span class="keyword">desc</span></span><br></pre></td></tr></table></figure>
+
+<p>ここまで来るとクエリビルダに頭を悩ませるのも大変なので、SQLをそのまま実行させます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> EventPopularity <span class="keyword">struct</span> &#123;</span><br><span class="line">	boiler.Event <span class="string">`boil:&quot;,bind&quot;`</span></span><br><span class="line">	Participants <span class="type">int</span> <span class="string">`boil:&quot;participants&quot; json:&quot;participants&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ListPopularEvents</span><span class="params">(ctx context.Context)</span></span> ([]*EventPopularity, <span class="type">error</span>) &#123;</span><br><span class="line">	r := []*EventPopularity&#123;&#125;</span><br><span class="line">	queries.Raw(<span class="string">`</span></span><br><span class="line"><span class="string">		select event.*, coalesce(r1.participants, 0) as participants</span></span><br><span class="line"><span class="string">		from event</span></span><br><span class="line"><span class="string">		left join (</span></span><br><span class="line"><span class="string">			select event_id as id, count(*) as participants</span></span><br><span class="line"><span class="string">			from event_user</span></span><br><span class="line"><span class="string">			group by event_id</span></span><br><span class="line"><span class="string">			order by participants desc</span></span><br><span class="line"><span class="string">			limit 10</span></span><br><span class="line"><span class="string">		) r1 on event.id = r1.id</span></span><br><span class="line"><span class="string">		order by participants desc</span></span><br><span class="line"><span class="string">	`</span>).Bind(ctx, db, &amp;r)</span><br><span class="line">	<span class="keyword">return</span> r, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>実行結果は次の通りです。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;00000000-0000-0000-0000-000000000001&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;イベント01&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;date&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2015-10-21T00:00:00Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;participants&quot;</span><span class="punctuation">:</span> <span class="number">2</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="SQLBoilerのつらいところ"><a href="#SQLBoilerのつらいところ" class="headerlink" title="SQLBoilerのつらいところ"></a>SQLBoilerのつらいところ</h2><h3 id="Bulk-Insertが出来ない"><a href="#Bulk-Insertが出来ない" class="headerlink" title="Bulk Insertが出来ない"></a>Bulk Insertが出来ない</h3><p>SQLBoilerで生成されたコードにBulk InsertのAPIは含まれていません。複数件のInsertを行うためにはfor文を使う、などの対応となります。</p>
+<p>ただ、テンプレートを追加することでBulk Insertのコードを生成している方もいるようです。<br>参考: <a target="_blank" rel="noopener" href="https://qiita.com/touyu/items/4b25fbf12804f12778b7">https://qiita.com/touyu/items/4b25fbf12804f12778b7</a></p>
+<h3 id="テーブル設計に若干の制約が生じる"><a href="#テーブル設計に若干の制約が生じる" class="headerlink" title="テーブル設計に若干の制約が生じる"></a>テーブル設計に若干の制約が生じる</h3><p>主な制約は以下の2つです。</p>
+<ul>
+<li>関連するテーブルには外部キー制約を設定する必要がある</li>
+<li>中間テーブルには結合先2テーブルの主キーを使った複合主キーを設定する必要がある<ul>
+<li>上記例の <code>event_user</code> テーブルでは、複合主キー <code>(event_id, user_id)</code> を設定することが<strong>必須</strong>です。</li>
+</ul>
+</li>
+</ul>
+<p>これらの制約は主にEager Loadingのためのもので、クリアできない場合には各テーブルを手動でJoinする必要が出てきます。</p>
+<p>プロジェクトによっては「外部キー制約は使わない」という設計ポリシーを取っていることもあるかと思いますので要注意ポイントです。</p>
+<h3 id="そもそもデータベースが無いと開発が進まない"><a href="#そもそもデータベースが無いと開発が進まない" class="headerlink" title="そもそもデータベースが無いと開発が進まない"></a>そもそもデータベースが無いと開発が進まない</h3><p>これはSQLBoilerが悪いわけではありません。</p>
+<p>ただ「データベースを元にコードを生成する」というアプローチ上、<br>開発初期で頻繁にテーブル設計を変更するようなシーンで煩わしさを覚えてしまうのは致し方ありません。</p>
+<p>このようなシーンが頻発するのであれば、Migration機能を持つGORMなどのほうが適任かもしれません。</p>
+<h2 id="SQLBoilerとoapi-codegenによるREST-APIサーバ開発"><a href="#SQLBoilerとoapi-codegenによるREST-APIサーバ開発" class="headerlink" title="SQLBoilerとoapi-codegenによるREST APIサーバ開発"></a>SQLBoilerとoapi-codegenによるREST APIサーバ開発</h2><p>タイトル回収です。SQLBoilerと<a target="_blank" rel="noopener" href="https://github.com/deepmap/oapi-codegen">oapi-codegen</a>によるコード生成を活用したREST APIの開発フローを紹介します。</p>
+<p>oapi-codegenの詳細はここでは割愛します。以下記事を御覧ください。<br>c.f. <a href="https://future-architect.github.io/articles/20200701/">Go の Open API 3.0 のジェネレータ oapi-codegen を試してみた</a></p>
+<p>まず、設計書としてデータベースのDDL、API定義のopenapi.ymlが用意されている前提です。<br>これを元に、DBアクセスを担うパッケージ <code>boiler</code> と、ルーティング他を担う <code>restapi</code> を生成します。</p>
+<p>我々が開発するのは、上記2パッケージのグルーコード、ビジネスロジックを担う <code>app.go</code> です。</p>
+<img src="/images/20210730a/sqlboiler.png" alt="ddlとopenapi.ymlを駆動としたコード生成とアプリ開発のフロー図" width="800" height="320" loading="lazy">
+
+
+<h3 id="開発例"><a href="#開発例" class="headerlink" title="開発例"></a>開発例</h3><p>今回は例として次のようなOpenAPI定義を用意しました。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">openapi:</span> <span class="number">3.0</span><span class="number">.0</span></span><br><span class="line"><span class="attr">paths:</span></span><br><span class="line">  <span class="string">/user:</span></span><br><span class="line">    <span class="attr">get:</span></span><br><span class="line">      <span class="attr">description:</span> <span class="string">Returns</span> <span class="string">an</span> <span class="string">array</span> <span class="string">of</span> <span class="string">User</span></span><br><span class="line">      <span class="attr">operationId:</span> <span class="string">listUsers</span></span><br><span class="line">      <span class="attr">responses:</span></span><br><span class="line">        <span class="attr">&#x27;200&#x27;:</span></span><br><span class="line">          <span class="attr">content:</span></span><br><span class="line">            <span class="attr">application/json:</span></span><br><span class="line">              <span class="attr">schema:</span></span><br><span class="line">                <span class="attr">type:</span> <span class="string">array</span></span><br><span class="line">                <span class="attr">items:</span></span><br><span class="line">                  <span class="string">$ref:</span> <span class="string">&#x27;#/components/schemas/User&#x27;</span></span><br><span class="line"><span class="attr">components:</span></span><br><span class="line">  <span class="attr">schemas:</span></span><br><span class="line">    <span class="attr">User:</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">object</span></span><br><span class="line">      <span class="attr">required:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">id</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">name</span></span><br><span class="line">      <span class="attr">properties:</span></span><br><span class="line">        <span class="attr">id:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">          <span class="attr">format:</span> <span class="string">uuid</span></span><br><span class="line">        <span class="attr">name:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">          <span class="attr">example:</span> <span class="string">&quot;Emmett Brown&quot;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>この定義を元にoapi-codegenを実行すると、次のようなStructが出来ます。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> model</span><br><span class="line"></span><br><span class="line"><span class="comment">// User defines model for User.</span></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">        Id   <span class="type">string</span> <span class="string">`json:&quot;id&quot;`</span></span><br><span class="line">        Name <span class="type">string</span> <span class="string">`json:&quot;name&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>このStructに、<a target="_blank" rel="noopener" href="https://github.com/fatih/gomodifytags">gomodifytags</a> によって <code>boil</code> タグを追加します。<br><code>openapi.yml</code> の <code>x-oapi-codegen-extra-tags</code> を利用すると任意のタグを付与することも可能ですが、ひとつひとつのフィールドに追加するのは漏れが出そうだったので、gomodifytagsを使っています。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> model</span><br><span class="line"></span><br><span class="line"><span class="comment">// User defines model for User.</span></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	Id   <span class="type">string</span> <span class="string">`json:&quot;id&quot; boil:&quot;id&quot;`</span></span><br><span class="line">	Name <span class="type">string</span> <span class="string">`json:&quot;name&quot; boil:&quot;name&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>あとはSQLの実行結果をこのStructにBindすれば完成です。</p>
+<p>この例ではAPI定義の <code>User</code> のフィールドはすべてテーブル定義の <code>User</code> に含まれているため、SQLBoilerで生成されたSelect文から直接Bindが可能です。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ListUser</span><span class="params">(ctx context.Context)</span></span> ([]*model.User, <span class="type">error</span>) &#123;</span><br><span class="line">	res := []*model.User&#123;&#125;</span><br><span class="line">	err := boiler.Users().Bind(ctx, db, &amp;res)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> res, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参考までに、コード生成のためのMakefileを掲載します。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="keyword">.PHONY</span>: generate</span></span><br><span class="line"><span class="section">generate: boiler restapi/types.go</span></span><br><span class="line"><span class="section">boiler:</span></span><br><span class="line">	sqlboiler psql</span><br><span class="line"><span class="section">restapi:</span></span><br><span class="line">	mkdir -p <span class="variable">$@</span></span><br><span class="line"><span class="section">restapi/types.go: openapi.yml restapi</span></span><br><span class="line">	oapi-codegen -generate types -package restapi -o <span class="variable">$@</span>.tmp <span class="variable">$&lt;</span></span><br><span class="line">	gomodifytags -all -add-tags boil -transform snakecase -all -file <span class="variable">$@</span>.tmp &gt; <span class="variable">$@</span></span><br><span class="line">	rm -f <span class="variable">$@</span>.tmp</span><br></pre></td></tr></table></figure>
+
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>SQLBoilerの使い方と、これを使ったREST APIサーバの開発フローを紹介させていただきました。</p>
+<p>私は過去約3年ほど、数プロジェクトでSQLBoilerを採用しています。</p>
+<p>この間Goは1.10から1.16となり、SQLBoilerはv2からv4に（主にGo modules対応で破壊的変更はありませんでした）進化しています。</p>
+<p>その性質上うまくハマらないプロジェクトもあるかと思いますが、うまくハマればとても使いやすいライブラリと感じています。</p>
+<p>なお、今回利用したコード、プロジェクトは<a target="_blank" rel="noopener" href="https://github.com/uhey22e/sqlboiler-restapi-example">こちらのリポジトリ</a>にまとめてあります。</p>
+<p>次は伊藤真彦さんの<a href="/articles/20210802a/">SQLビルダーgoquの使い方</a>です。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20210730a/&related=twitterapi%2Ctwitter&text=SQLBoiler%EF%BC%88%E3%81%A8oapi-codegen%EF%BC%89%E3%81%A7%E3%81%A4%E3%81%8F%E3%82%8BREST%20API%E3%82%B5%E3%83%BC%E3%83%90%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">21</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20210730a/&t=SQLBoiler%EF%BC%88%E3%81%A8oapi-codegen%EF%BC%89%E3%81%A7%E3%81%A4%E3%81%8F%E3%82%8BREST%20API%E3%82%B5%E3%83%BC%E3%83%90" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20210730a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">47</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20210730a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">31</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2021.09.16</span><span class="snscount">&#9825;21</span><a href=/articles/20210916a/ title="GoのORマッパー連載、おまけ記事です。特に示し合わせた訳では無いのですが、RDBは全員がPostgreSQLを使っていましたね。さて、今回の連載記事のいくつかでも言及されていた、jackc/pgx について簡単に紹介します。">lib/pq から jackc/pgx への移行</a></li><li class="related-posts-item"><span>2021.08.04</span><span class="snscount">&#9825;234</span><a href=/articles/20210804a/ title="本記事では `sqlc` を紹介します。早速ですが、結論から行きましょう。- SQLファイルからデータベースにアクセスできる型安全なGoのコードを生成するライブラリ  - 構造体のモデルの手書き実装不要  - 複数テーブルをJOINしたときのマッパー実装不要">SQLファイルから型安全なコードを生成するsqlc</a></li><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;566</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2022.11.28</span><span class="snscount">&#9825;367</span><a href=/articles/20221128a/ title="私たちのチームでは、バッチ処理が中心的な業務システム開発において Go の ORM に sqlc を採用しました。素の SQL を書いていくチームの開発方針[^1]とマッチし、開発体験は非常に良かったです。">業務システム開発でsqlcを導入して良かった点とハマった点</a></li><li class="related-posts-item"><span>2022.05.31</span><span class="snscount">&#9825;5</span><a href=/articles/20220531a/ title="TIG 多賀です。 2022/5/19 に開催された golang.tokyo #32 に登壇しましたので報告させていただきます。「自作ライブラリ、ソフトウェアGo自慢大会」ということで、OSS 活動の一環で作成したfuture-architect/go-twowaysqlについて紹介してきました。">golang.tokyo #32 で go-twowaysql について紹介しました</a></li><li class="related-posts-item"><span>2021.08.03</span><span class="snscount">&#9825;10</span><a href=/articles/20210803a/ title="こんにちは。2021年4月入社の本田です。本記事では私が当社でアルバイトをしていたときに作成したtwowaysqlというツールについて紹介させていただきます。JavaではuroboroSQLなど広く使われている2WaySQLライブラリが存在しますが、Goでこれがデファクトスタンダートというものは現在のところ存在しません。従って、Go言語でtwowaysqlという2WaySQLライブラリを実装することにしました。">Go言語で2WaySQL</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20210729a/ title="GoのORマッパー連載の4日目の記事です。GORM の v1 と v2 の実装を比較して、何が変わっているのかを調査してみました。">GORM v1 と v2 のソースコードリーディングしてみた</a></li><li class="reference-posts-item"><a href=/articles/20210726a/ title="7/26（月）～8/3（水）の平日にかけて、GoでRDBに対してアクセスライブラリ（ORMとクエリビルダー）をテーマにした連載を始めます。">GoのORマッパー連載を始めます</a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AA%E3%81%9CSQLBoiler%E3%82%92%E9%81%B8%E3%81%B6%E3%81%AE%E3%81%8B"><span class="toc-text">なぜSQLBoilerを選ぶのか?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A4%87%E9%9B%91%E3%81%AASELECT%E6%96%87%E3%81%A7DSL%E3%81%AB%E8%8B%A6%E6%82%A9%E3%81%97%E3%81%9F%E3%81%8F%E3%81%AA%E3%81%84"><span class="toc-text">複雑なSELECT文でDSLに苦悩したくない</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#INSERT-UPDATE-DELETE%E3%81%AFSQL%E3%82%92%E6%9B%B8%E3%81%8D%E3%81%9F%E3%81%8F%E3%81%AA%E3%81%84"><span class="toc-text">INSERT, UPDATE, DELETEはSQLを書きたくない</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Schema-Migration%E3%81%AF%E3%81%84%E3%82%89%E3%81%AA%E3%81%84"><span class="toc-text">Schema Migrationはいらない</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SQLBoiler%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9"><span class="toc-text">SQLBoilerの使い方</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E5%AE%9A%E7%BE%A9"><span class="toc-text">テーブル定義</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%B7%E3%83%B3%E3%83%97%E3%83%AB%E3%81%AAINSERT-SELECT"><span class="toc-text">シンプルなINSERT, SELECT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%AD%E9%96%93%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E3%81%AEJOIN%E3%82%92%E5%90%AB%E3%82%80SELECT"><span class="toc-text">中間テーブルのJOINを含むSELECT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9B%86%E8%A8%88%E3%82%92%E5%90%AB%E3%82%80SELECT"><span class="toc-text">集計を含むSELECT</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SQLBoiler%E3%81%AE%E3%81%A4%E3%82%89%E3%81%84%E3%81%A8%E3%81%93%E3%82%8D"><span class="toc-text">SQLBoilerのつらいところ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Bulk-Insert%E3%81%8C%E5%87%BA%E6%9D%A5%E3%81%AA%E3%81%84"><span class="toc-text">Bulk Insertが出来ない</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%86%E3%83%BC%E3%83%96%E3%83%AB%E8%A8%AD%E8%A8%88%E3%81%AB%E8%8B%A5%E5%B9%B2%E3%81%AE%E5%88%B6%E7%B4%84%E3%81%8C%E7%94%9F%E3%81%98%E3%82%8B"><span class="toc-text">テーブル設計に若干の制約が生じる</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%81%9D%E3%82%82%E3%81%9D%E3%82%82%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E3%81%8C%E7%84%A1%E3%81%84%E3%81%A8%E9%96%8B%E7%99%BA%E3%81%8C%E9%80%B2%E3%81%BE%E3%81%AA%E3%81%84"><span class="toc-text">そもそもデータベースが無いと開発が進まない</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SQLBoiler%E3%81%A8oapi-codegen%E3%81%AB%E3%82%88%E3%82%8BREST-API%E3%82%B5%E3%83%BC%E3%83%90%E9%96%8B%E7%99%BA"><span class="toc-text">SQLBoilerとoapi-codegenによるREST APIサーバ開発</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%96%8B%E7%99%BA%E4%BE%8B"><span class="toc-text">開発例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (416)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (250)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (97)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (34)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (20)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2023 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
