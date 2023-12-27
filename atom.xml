@@ -6,10 +6,43 @@
   <link href="https://future-architect.github.io/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2023-12-26T00:26:29.176Z</updated>
+  <updated>2023-12-27T07:19:15.807Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Entra IDを使うウェブサービスのバックエンドのテスト</title>
+    <link href="https://future-architect.github.io/articles/20231227a/"/>
+    <id>https://future-architect.github.io/articles/20231227a/</id>
+    <published>2023-12-26T15:00:00.000Z</published>
+    <updated>2023-12-27T07:19:15.807Z</updated>
+    
+    <content type="html"><![CDATA[<p>Entra ID（旧名Azure AD）は企業での利用の割合が高く、社内システムを作る場合はこれを使って認証して欲しいという要件が積まれることがほとんどでしょう。とはいえ、現物を使ってテストを作るのは都合がよくないこともあったりします。例えば処理時間が延びる（大量のE2Eテストを走らせる場合）とか、たくさんのユーザーのバリエーションを作る場合にそれだけユーザーを登録しないといけないとか、多要素認証の認証をどうするかとか。そんな感じのウェブサービスの単体テストを簡略化する方法について検討して組み込んだので紹介します。</p><h1 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h1><p>Entra IDを組み込む方法については以前のエントリーで紹介しています。</p><ul><li><a href="https://future-architect.github.io/articles/20221118a/">MSAL.jsを使ってウェブフロントエンドだけでAzureAD認証する</a></li><li><a href="https://future-architect.github.io/articles/20221122a/">AzureAD＋MSAL for Goでバッチコマンドの認証</a></li></ul><p>後者は他の認証基盤でもだいたい同じですが、前者は、MSAL.jsのおかげでフロントエンドのみで認証が完了するということを紹介しました。多くの場合はサーバーにもコールバックがきたりとか、サーバーもログイン処理の一部に入っているのですが、そこが不要となっています。そのため、バックエンドとしては有効なJWTがリクエストについてきて、その署名の検証だけすればOKという状態となっています。</p><p>問題はその署名入りのJWTトークンをどうつくるか、という一点に絞られます。</p><p>ちなみに、JWTのTがトークンでJWTトークンと書くと「JSONウェブトークン・トークン」となってしまうのですが、毎回JWTをロングで書くのも面倒ですし、JWTだけだと不親切かと思いますJWTトークンにしています。江戸川や利根川を英語に翻訳するときに「エドガワーリバー」とか「トネガワリバー」とかになるのと同じようなものだと思っていただければ。</p><h1 id="自前で署名とJWTトークンを作る"><a href="#自前で署名とJWTトークンを作る" class="headerlink" title="自前で署名とJWTトークンを作る"></a>自前で署名とJWTトークンを作る</h1><p>Entra IDの場合、 <code>https://login.microsoftonline.com/&#123;テナントID&#125;/v2.0/.well-known/openid-configuration</code> にアクセスし、その中の <code>jwks_uri</code>というキーを見ると、署名検証のためのJWKの公開鍵が手に入ります。おそらくは<code>https://login.microsoftonline.com/&#123;テナントID&#125;/discovery/v2.0/keys</code>というURLのはずですが。ですが、この公開鍵はEntra IDが内部で保持している秘密鍵を使った署名の検証にしか使えないため、テスト用のJWTトークンを作る場合はこの鍵は使えません。そのため、まずはローカルの公開鍵と暗号鍵のペアを作ります。以下のサイトを使うのが簡単でしょう。</p><ul><li><a href="https://mkjwk.org/">https://mkjwk.org/</a></li></ul><p>RSAタブを開き以下のように入れるとEntra IDっぽくなります。KeyIDは任意です。</p><ul><li>Key Size(鍵のビット数): 2048</li><li>Key Use(鍵の用途): Signature</li><li>Algorithm(アルゴリズム): RS256</li><li>Key ID(鍵の識別子): “for test”</li><li>Show X.509(): No</li></ul><p>生成されたら、一番左と一番右をそれぞれJWTトークン作成用に保存しておきます。真ん中はサーバーで利用するのに便利な情報なのでこれも保存しておきます。</p><img src="/images/20231227a/image.png" alt="image.png" width="1200" height="986" loading="lazy"><h1 id="JWTトークンを作成"><a href="#JWTトークンを作成" class="headerlink" title="JWTトークンを作成"></a>JWTトークンを作成</h1><p>次にJWTを作ります。テナントIDとアプリケーションIDはテスト環境のEntraIDで生成したものと同じものを使う、あるいは独自に作るでもどちらでもよいですが決めておきます。UUIDの型式です。このサンプルではテナントIDを0000000-0000-0000-0000-000000000000、アプリケーションIDを1111111-1111-1111-1111-111111111111とします。</p><p>Entra ID相当のトークンを作りたいので、こんな感じのclaimを用意します。重要な項目は以下の通りです。</p><ul><li>tid: テナントIDとする</li><li>aud: クライアントID＝アプリケーションID</li><li>iss: <a href="https://login.microsoftonline.com/(%E3%83%86%E3%83%8A%E3%83%B3%E3%83%88ID)/v2.0">https://login.microsoftonline.com/(テナントID)/v2.0</a></li><li>exp: 有効日時(2035年にしてある)</li><li>iat&#x2F;nbf: ログイン日時</li><li>exp: 有効期限</li><li>sub: ユーザーのキー</li></ul><figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;aud&quot;</span><span class="punctuation">:</span> <span class="string">&quot;1111111-1111-1111-1111-111111111111&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;iss&quot;</span><span class="punctuation">:</span> <span class="string">&quot;https://login.microsoftonline.com/0000000-0000-0000-0000-000000000000/v2.0&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;iat&quot;</span><span class="punctuation">:</span> <span class="number">1671015703</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;nbf&quot;</span><span class="punctuation">:</span> <span class="number">1671015703</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;exp&quot;</span><span class="punctuation">:</span> <span class="number">2071019603</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;idp&quot;</span><span class="punctuation">:</span> <span class="string">&quot;https://sts.windows.net/3eca0868-d511-4342-8659-e88a2e3bf9fe/&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Test User(テストユーザー)&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;nonce&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ce3fd167-0e5a-43ae-bb8b-11d8d003d8c6&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;oid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;daf6a6c6-d549-4421-bf71-3b59fd74d531&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;preferred_username&quot;</span><span class="punctuation">:</span> <span class="string">&quot;test.user@example.co.jp&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;rh&quot;</span><span class="punctuation">:</span> <span class="string">&quot;0.AWoA733wxZg0tkymktoZGQzOJ_1Ryon2gERMsUs1n-XnFcpqAFQ.&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;sub&quot;</span><span class="punctuation">:</span> <span class="string">&quot;oXxd31705vfpTnrSPcdVCdAoalq7ZgQ_gx7Msq7OBzY&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;tid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;0000000-0000-0000-0000-000000000000&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;uti&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Fw7ZoF0z1UCipEF8hfwZAA&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;ver&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2.0&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure><p>subはユーザーを表すユニークなキーとされていますが、Entra ID上のこのsubと、実際のシステム上のユーザーの対応付けは別途決めておく必要があります。Entra IDとHRのシステムの同期をきちんととっておくのであればこのsubを使ってユーザーを決められますが、そうでない場合はマニフェストを変更してユーザーコード相当の情報を登録したり、preferred_usernameを使うといったことが必要になります。そのあたりはサーバー側の方針に合わせて上記のclaimは修正してください。</p><p>次にjwt.ioを開きます。</p><p><a href="https://jwt.io/">https://jwt.io/</a></p><p>アルゴリズムをRS256に変更し、PAYLOADに上記のclaimを、その下の署名欄の上の公開鍵にはmkjwk.orgで作った公開鍵を、その下の秘密鍵にはmkjwk.orgで作った秘密鍵を貼り付けます。</p><p>これで左側にJWTが生成されます。</p><img src="/images/20231227a/image_2.png" alt="image.png" width="1200" height="1334" loading="lazy"><p>これはmkjws.orgで作成したjwks.orgの証明書を使って署名の確認が行えます。サーバー側でJWTトークンの検証を行うときは、Entra IDの秘密鍵ではなく、mkjwk.orgで生成した秘密鍵（真ん中のPublic and Private Keypair Setが同じ形式なので扱いやすい）を使って署名の検証が行えます。任意のユーザー情報を作ってトークンを量産できますし、実際のログインは不要なのでテストでも扱いやすいでしょう。このトークンを使えばcurlでもなんでも自由にリクエストが飛ばせるようになります。</p>]]></content>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;Entra ID（旧名Azure</summary>
+        
+      
+    
+    
+    
+    <category term="認証認可" scheme="https://future-architect.github.io/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/"/>
+    
+    
+    <category term="テスト" scheme="https://future-architect.github.io/tags/%E3%83%86%E3%82%B9%E3%83%88/"/>
+    
+    <category term="AzureAD" scheme="https://future-architect.github.io/tags/AzureAD/"/>
+    
+    <category term="EntraID" scheme="https://future-architect.github.io/tags/EntraID/"/>
+    
+    <category term="JWT" scheme="https://future-architect.github.io/tags/JWT/"/>
+    
+  </entry>
   
   <entry>
     <title>【合格体験記】Google Cloudの入門試験：Cloud Digital Leader</title>
@@ -812,39 +845,6 @@
     <category term="書評" scheme="https://future-architect.github.io/tags/%E6%9B%B8%E8%A9%95/"/>
     
     <category term="自在化身体論" scheme="https://future-architect.github.io/tags/%E8%87%AA%E5%9C%A8%E5%8C%96%E8%BA%AB%E4%BD%93%E8%AB%96/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>土地勘に頼らずに地の利がある場所をみつける方法</title>
-    <link href="https://future-architect.github.io/articles/20231108a/"/>
-    <id>https://future-architect.github.io/articles/20231108a/</id>
-    <published>2023-11-07T15:00:00.000Z</published>
-    <updated>2023-11-09T00:35:47.375Z</updated>
-    
-    <content type="html"><![CDATA[<img src="/images/20231108a/top.jpeg" alt="" width="640" height="640" loading="lazy"><p>本記事は「<a href="/articles/20231030a/">秋のブログ週間2023</a>」2週目の記事です。</p><h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>旅行をするときや引っ越しをするとき、周辺の商業地域や、観光地にアクセスのよい「地の利」のある場所を探したいですよね？</p><p>「地の利」がある場所を探すには、インターネットで調べるか、長らくその地域に住んでいて土地勘のある人に聞くのが一般的ではないでしょうか。</p><p>今回は、<strong>数理的なアプローチで「地の利」の良い場所を見つける方法</strong>を紹介します。</p><ul><li><input checked="" disabled="" type="checkbox"> 「地の利」とは”地形や土地の位置が、ある事をするために有利な条件を備えていること”です（引用:<a href="https://kotobank.jp/word/%E5%9C%B0%E3%81%AE%E5%88%A9-566283">コトバンク</a>）。<strong>本記事では単純に、他の場所へ行きやすい「アクセスが良い場所」のような意味で使っております</strong>。</li></ul><p>本記事は<strong>都市と地域を数理的に分析する楽しさ</strong>を伝えたいという気持ちと、共著『<a href="https://amzn.asia/d/aUFog4S">スマートモビリティ時代の地域とクルマ</a>』を手にとってくれる方が一人でも増えるといいなという邪な気持ちで書いております。</p><h1 id="地利値とは"><a href="#地利値とは" class="headerlink" title="地利値とは"></a>地利値とは</h1><p>アクセシビリティは、電車などのモビリティの発達や、山や川などの自然環境に左右されますが、今回は汎用的な議論を可能にするため、シンプルに<strong>地域と地域の隣接関係</strong>のみに着目します。</p><p>例えば、下図のような３つの隣り合うまちがあるときを考えます。</p><img src="/images/20231108a/例１.png" alt="例１" width="400" height="211" loading="lazy"><p>「この３つのまちから住む場所を選んでください」と命令された場合、真ん中のＢ市がなんとなく「地の利」がある気がしませんか？</p><p>この「なんとなく地の利あるが気がする感覚」を定量化するために「地利値」という概念を用います。詳細は省きますが、下図のような基礎的な<a href="https://ja.wikipedia.org/wiki/%E3%82%B0%E3%83%A9%E3%83%95%E7%90%86%E8%AB%96">グラフ理論</a>で算出できます。</p><img src="/images/20231108a/これが地利値_(1).png" alt="これが地利値_(1).png" width="768" height="547" loading="lazy"><p>例で示した３つの隣り合うまちの場合、B市の地利値が「1.0」で最も高く、地の利のある場所であることが分かります。</p><img src="/images/20231108a/例１の地利値.png" alt="例１の地利値.png" width="400" height="272" loading="lazy"><p>参考として、他の単純な例も示します。</p><img src="/images/20231108a/例2.png" alt="例2.png" width="400" height="138" loading="lazy"><p><del>このように、あるまち（＝交通の結節点）を頂点、まちをつなぐ道を辺としたグラフの隣接行列の最大固有値に属する固有ベクトルを地利値といいます。</del> 今回は難しいことは考えずに、いろいろな地域の地利値を算出して遊んでみましょう。</p><h1 id="地利値で遊んでみる"><a href="#地利値で遊んでみる" class="headerlink" title="地利値で遊んでみる"></a>地利値で遊んでみる</h1><p>それでは実際の地域に地利値を当てはめてみます。例えば、私の卒業した大学がある<strong>茨城県の市町村</strong>で考えると、地利値の高い市はどこになるでしょうか？県庁所在地の水戸市でしょうか？</p><img src="/images/20231108a/茨城県の地利値_(1).png" alt="茨城県の地利値_(1).png" width="768" height="466" loading="lazy"><p>上図のように茨城県で地利値がもっとも高い市は<strong>つくば市</strong>となりました。</p><p>つくば市は2023年の調査では人口増加率が全国トップの2.30%という数字でした<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>。東京へのアクセスが良いつくばエクスプレスの駅周辺に子育て世帯が継続的に転入していることが理由のひとつだと思われます。</p><p>地利値を算出するのに鉄道網や経済指標などは加味していませんが、土地勘のある人にとってもある程度納得できる結果なのではないでしょうか？</p><p>他の地域でも地利値を見てみます。例えば私の地元、岩手県。</p><img src="/images/20231108a/岩手県.png" alt="岩手県.png" width="283" height="400" loading="lazy"><p>県庁所在地である<strong>盛岡市</strong>の地利値がもっとも大きくなります。盛岡市は県央に位置しており、周辺市町村からたくさんの人が働きにくる都市です。</p><img src="/images/20231108a/岩手県と秋田県.png" alt="岩手県と秋田県.png" width="282" height="400" loading="lazy"><p>秋田県と並べてみても<strong>盛岡市</strong>の地利値が一番大きいです。西側が海に面している秋田市と比べて地の利があるのは盛岡市なのかもしれません。</p><p>九州に飛んで長崎県ではどうでしょう？</p><img src="/images/20231108a/長崎県.png" alt="長崎県.png" width="282" height="400" loading="lazy"><p><strong>佐世保市</strong>です。Googleで検索すると、県庁所在地である長崎市との対決をあおる記事<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>が複数出てきますので、佐世保市が長崎市に並んで住みやすい市であるという感覚があるようです。</p><img src="/images/20231108a/九州.png" alt="九州.png" width="282" height="400" loading="lazy"><p>九州地方で地利値がもっとも高い場所は<strong>福岡県飯塚市</strong>です。これだけだと少し感覚と外れるかもしれませんが、九州全体でみると<strong>地利値が高い地域は福岡県に集中</strong>しており、政令指定都市2市が位置する福岡県の地の利が読み取れます。</p><p>最後に、全国の市町村で比べてみた時、最も地利値が大きい場所はどこでしょうか？</p><img src="/images/20231108a/長野県松本市_(1).png" alt="長野県松本市_(1).png" width="768" height="386" loading="lazy"><p>ぐちゃっとしていて分かりづらいですが、<strong>長野県松本市</strong>です。松本市と言えば、松本城がありますが、日本で最も地の利がある市と言われてもピンと来ないかもしれません。</p><p>気になる方は松本市の地利値が最も高くなる理由を考えてみてください（投げっぱなし）。</p><h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>本記事では、土地勘に頼らずに地の利がある場所をみつけられる「<strong>地利値</strong>」という概念を紹介しました。</p><p>グラフの中心性を図る尺度は他にも様々ありますし<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>、グラフ理論に限らない他のアプローチでも定量的に「地の利」がある場所を探すことが出来るかもしれません。</p><p>地図は眺めたり、分析したりすることで、いつも新しい発見を得られます。本記事を読んで興味を持った方はぜひ探求してみてください。</p><p>共著『<a href="https://amzn.asia/d/aUFog4S">スマートモビリティ時代の地域とクルマ</a>』では、（地利値は出てきませんが）都市と地域の課題を数理的アプローチで分析&#x2F;解決しています。秋の読書候補におすすめです。</p><p>また、本記事冒頭のイラストはBingのImage Creatorによって生成したものです。</p><p>次は森さんの<a href="/articles/20231109a/">「自在化身体論」の読書感想文</a>です。</p><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.jstage.jst.go.jp/article/aija/60/470/60_KJ00004221154/_article/-char/ja/">野田 洋:街路網の形態的特性に基づく定量的地利値の導入とその基礎的考察化</a><br><a href="https://www.jstage.jst.go.jp/article/aija/73/633/73_633_2417/_article/-char/ja/">大澤 義明, 林 利充:隣接グラフと地利値最大化</a><br><a href="https://amzn.asia/d/1JA9leO">R.J. ウィルソン:グラフ理論入門</a></p><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;"><a href="https://www.soumu.go.jp/main_sosiki/jichi_gyousei/daityo/jinkou_jinkoudoutai-setaisuu.html">総務省：住民基本台帳に基づく人口、人口動態及び世帯数</a></span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="vertical-align: top; padding-right: 10px;">2.</span><span style="vertical-align: top;">例えばこちらの記事：<a href="https://www.miraidiver.com/series/buzzpro50_nagasakivssasebo">【長崎市VS佐世保市】どっちが魅力的な街なのか！？はっきりさせたい出身者の学生同士がガチバトル！！ - 未来ダイバー</a></span><a href="#fnref:2" rev="footnote"> ↩</a></li><li id="fn:3"><span style="vertical-align: top; padding-right: 10px;">3.</span><span style="vertical-align: top;">こちらの記事が分かりやすいです。：<a href="https://www.ajimatics.com/entry/2018/01/30/133238">日本の中心はどの県だ？グラフ理論（ネットワーク）の基本的な諸概念</a></span><a href="#fnref:3" rev="footnote"> ↩</a></li></ol></div></div>]]></content>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;img src=&quot;/images/20231108a/top.jpeg&quot; alt=&quot;&quot; width=&quot;640&quot; height=&quot;640&quot; loading=&quot;lazy&quot;&gt;
-
-&lt;p&gt;本記事は「&lt;a</summary>
-        
-      
-    
-    
-    
-    <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
-    
-    
-    <category term="GIS" scheme="https://future-architect.github.io/tags/GIS/"/>
-    
-    <category term="地図" scheme="https://future-architect.github.io/tags/%E5%9C%B0%E5%9B%B3/"/>
-    
-    <category term="数理" scheme="https://future-architect.github.io/tags/%E6%95%B0%E7%90%86/"/>
     
   </entry>
   
