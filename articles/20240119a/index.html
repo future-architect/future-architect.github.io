@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>リリース直前にライブラリのインストールエラーが発生した際にどのように対応したか | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="(DALL-E3 で生成) 概要先日、本番リリースを控えたシステムで OSS ライブラリのインストール起因のエラーが発生しました。実際に起きた事象と、どのように検討して対応したのかを残すべく、ポストモーテムの形式で当記事を書きました。 ポストモーテム発生日2023&#x2F;12&#x2F;30 サマリAWS Glue (PythonShell)を起動する際に、awswrangler ライブラ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="リリース直前にライブラリのインストールエラーが発生した際にどのように対応したか | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240119a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="(DALL-E3 で生成) 概要先日、本番リリースを控えたシステムで OSS ライブラリのインストール起因のエラーが発生しました。実際に起きた事象と、どのように検討して対応したのかを残すべく、ポストモーテムの形式で当記事を書きました。 ポストモーテム発生日2023&#x2F;12&#x2F;30 サマリAWS Glue (PythonShell)を起動する際に、awswrangler ライブラ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240119a/d6788854-dfac-4797-979e-3f40531a1eee.jpeg">
+<meta property="og:image" content="https://future-architect.github.io/images/20240119a/image.png">
+<meta property="article:published_time" content="2024-01-18T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-01-19T05:57:12.747Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="Glue">
+<meta property="article:tag" content="トラブルシュート">
+<meta property="article:tag" content="ポストモーテム">
+<meta property="article:tag" content="awswrangler">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240119a/d6788854-dfac-4797-979e-3f40531a1eee.jpeg">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240119a/">
+  <meta content="AWS,Glue,トラブルシュート,ポストモーテム,awswrangler" name="keywords">
+  <meta content="多賀聡一朗" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">リリース直前にライブラリのインストールエラーが発生した際にどのように対応したか
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240119a_リリース直前にライブラリのインストールエラーが発生した際にどのように対応したか.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240119a_リリース直前にライブラリのインストールエラーが発生した際にどのように対応したか" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-01-18T15:00:00.000Z" itemprop="datePublished">2024.01.19</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%A4%9A%E8%B3%80%E8%81%A1%E4%B8%80%E6%9C%97" title="多賀聡一朗さんの記事一覧へ" class="post-author">多賀聡一朗</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/Glue/" title="Glueタグの記事へ" class="tag-list-link">Glue</a>
+  
+    
+    <a href="/tags/トラブルシュート/" title="トラブルシュートタグの記事へ" class="tag-list-link">トラブルシュート</a>
+  
+    
+    <a href="/tags/ポストモーテム/" title="ポストモーテムタグの記事へ" class="tag-list-link">ポストモーテム</a>
+  
+    
+    <a href="/tags/awswrangler/" title="awswranglerタグの記事へ" class="tag-list-link">awswrangler</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20240119a/d6788854-dfac-4797-979e-3f40531a1eee.jpeg" alt="" width="1024" height="1024" loading="lazy">
+
+<p>(DALL-E3 で生成)</p>
+<h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>先日、本番リリースを控えたシステムで OSS ライブラリのインストール起因のエラーが発生しました。<br>実際に起きた事象と、どのように検討して対応したのかを残すべく、ポストモーテムの形式で当記事を書きました。</p>
+<h2 id="ポストモーテム"><a href="#ポストモーテム" class="headerlink" title="ポストモーテム"></a>ポストモーテム</h2><h3 id="発生日"><a href="#発生日" class="headerlink" title="発生日"></a>発生日</h3><p>2023&#x2F;12&#x2F;30</p>
+<h3 id="サマリ"><a href="#サマリ" class="headerlink" title="サマリ"></a>サマリ</h3><p>AWS Glue (PythonShell)を起動する際に、<a target="_blank" rel="noopener" href="https://pypi.org/project/awswrangler/">awswrangler</a> ライブラリをインストールする工程で、依存関係にある <a target="_blank" rel="noopener" href="https://pypi.org/project/lxml/">lxml</a> のインストールに失敗しました。その結果、Glue ジョブの起動に失敗しエラーとなりました。</p>
+<h4 id="バージョン"><a href="#バージョン" class="headerlink" title="バージョン"></a>バージョン</h4><div class="scroll"><table>
+<thead>
+<tr>
+<th>システム&#x2F;ライブラリ</th>
+<th>バージョン</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AWS Glue PythonShell</td>
+<td>Glue version&#x3D;3.0 <br>Python version&#x3D;Python3.9<br>DPU&#x3D;0.0625</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://pypi.org/project/awswrangler/">awswrangler</a></td>
+<td>1.5.2</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://pypi.org/project/lxml/">lxml</a></td>
+<td>5.0.0</td>
+</tr>
+</tbody></table></div>
+<h3 id="インパクト"><a href="#インパクト" class="headerlink" title="インパクト"></a>インパクト</h3><p>AWS Glue PythonShell の Libraries 設定に、  </p>
+<p>wheel 形式で <a target="_blank" rel="noopener" href="https://pypi.org/project/awswrangler/">awswrangler</a>  を指定<br>or<br>wheel形式で <a target="_blank" rel="noopener" href="https://pypi.org/project/awswrangler/">awswrangler</a> に依存しているライブラリを指定</p>
+<p>している Glue ジョブが全て実行エラーとなりました。</p>
+<h3 id="根本原因"><a href="#根本原因" class="headerlink" title="根本原因"></a>根本原因</h3><p><a target="_blank" rel="noopener" href="https://pypi.org/project/awswrangler/">awswrangler</a> が依存している、<a target="_blank" rel="noopener" href="https://pypi.org/project/lxml/">lxml</a> ライブラリの最新バージョン <code>5.0.0</code> のインストール時に、以下 2種類のエラーが発生しました。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># wheel パッケージで lxml のインストールに失敗</span></span><br><span class="line"></span><br><span class="line">Using legacy <span class="string">&#x27;setup.py install&#x27;</span> <span class="keyword">for</span> lxml, since package <span class="string">&#x27;wheel&#x27;</span> is not installed.</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># setup.py でインストール時に、</span></span><br><span class="line"><span class="comment"># gcc で src/lxml/etree.c をコンパイルする際に、out of memory エラーが発生</span></span><br><span class="line"></span><br><span class="line">× Running setup.py install <span class="keyword">for</span> lxml did not run successfully.  </span><br><span class="line">│ <span class="built_in">exit</span> code: 1  </span><br><span class="line">╰─&gt; [112 lines of output]</span><br><span class="line">(省略)</span><br><span class="line">    gcc -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -fPIC -DCYTHON_CLINE_IN_TRACEBACK=0 -I/usr/include/libxml2 -Isrc -Isrc/lxml/includes -I/.pyenv/versions/python39_loaded/include -I/.pyenv/versions/3.9.10/include/python3.9 -c src/lxml/etree.c -o build/temp.linux-x86_64-3.9/src/lxml/etree.o -w  </span><br><span class="line">      </span><br><span class="line">    cc1: out of memory allocating 65536 bytes after a total of 31883264 bytes  </span><br><span class="line">    Compile failed: <span class="built_in">command</span> <span class="string">&#x27;/usr/bin/gcc&#x27;</span> failed with <span class="built_in">exit</span> code 1  </span><br><span class="line">    creating tmp  </span><br><span class="line">    cc -I/usr/include/libxml2 -I/usr/include/libxml2 -c /tmp/xmlXPathInit3c3vwixm.c -o tmp/xmlXPathInit3c3vwixm.o  </span><br><span class="line">    cc tmp/xmlXPathInit3c3vwixm.o -lxml2 -o a.out  </span><br><span class="line">    error: <span class="built_in">command</span> <span class="string">&#x27;/usr/bin/gcc&#x27;</span> failed with <span class="built_in">exit</span> code 1  </span><br><span class="line">    [end of output]  </span><br><span class="line">  </span><br><span class="line">note: This error originates from a subprocess, and is likely not a problem with pip.  </span><br><span class="line">error: legacy-install-failure</span><br><span class="line">× Encountered error <span class="keyword">while</span> trying to install package.  </span><br><span class="line">╰─&gt; lxml</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="発生要因"><a href="#発生要因" class="headerlink" title="発生要因"></a>発生要因</h3><p><a target="_blank" rel="noopener" href="https://pypi.org/project/lxml/">lxml</a> 最新バージョン <code>5.0.0</code> が、<a target="_blank" rel="noopener" href="https://pypi.org/project/lxml/5.0.0/">2023&#x2F;12&#x2F;30 05:29 (JST)</a> にリリースされたためです。</p>
+<h3 id="検出"><a href="#検出" class="headerlink" title="検出"></a>検出</h3><p>Glue ジョブの実行時に、 <code>Internal service error</code> 、タイムアウトエラー、もしくは以下のエラーが発生しました。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">CommandFailedException: /tmp/glue-python-libs-XXXX/&lt;ライブラリ&gt;.whl installation failed after 2th retry due to exception: CalledProcessError</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="対応"><a href="#対応" class="headerlink" title="対応"></a>対応</h3><h4 id="対応案の検討"><a href="#対応案の検討" class="headerlink" title="対応案の検討"></a>対応案の検討</h4><p>以下の A と B、 2 つの対応案を検討しました。</p>
+<h5 id="A-awswrangler-を-AWS-Glue-PythonShell-で事前にパッケージ済みのライブラリ利用へ変更"><a href="#A-awswrangler-を-AWS-Glue-PythonShell-で事前にパッケージ済みのライブラリ利用へ変更" class="headerlink" title="A. awswrangler を AWS Glue PythonShell で事前にパッケージ済みのライブラリ利用へ変更"></a>A. <a target="_blank" rel="noopener" href="https://pypi.org/project/awswrangler/">awswrangler</a> を AWS Glue PythonShell で事前にパッケージ済みのライブラリ利用へ変更</h5><p>今回利用していた <code>awswrangler==1.5.2</code> は、AWS Glue PythonShell において事前にパッケージ済みのライブラリセットに含まれています。</p>
+<p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/glue/latest/dg/add-job-python.html">参考: AWS Glueでの Python シェルジョブ - AWS Glue (amazon.com)</a></p>
+<p>そのため、 <code>awswrangler</code> を明示的にインストールせずとも利用することが可能であるため、<br>AWS Glue ジョブの Libraries 設定から awswrangler の指定を削除することで、起動時のインストールを防ぎ、ライブラリの利用継続を行う案です。</p>
+<p>メリット</p>
+<ul>
+<li>AWS 側で用意されたライブラリが利用でき、一般に利用できることから、ライブラリの状態は枯れている</li>
+<li>起動時のインストール処理が省略され、実処理を実行するまでの時間が早くなり、全体的な処理速度向上が見込める<ul>
+<li>※ 最大30秒程度の短縮であるため、全体のジョブ実行時間次第で支配的かどうか判断する</li>
+</ul>
+</li>
+</ul>
+<p>デメリット</p>
+<ul>
+<li>単体テスト&#x2F;結合テスト時にインストールしていたバージョンと、 <code>awswrangler==1.5.2</code> に依存する他パッケージのバージョンに差異が生まれる可能性がある</li>
+</ul>
+<h5 id="B-Glue-ジョブ設定の、DPU-x3D-0-0625-から-DPU-x3D-1-へ設定変更"><a href="#B-Glue-ジョブ設定の、DPU-x3D-0-0625-から-DPU-x3D-1-へ設定変更" class="headerlink" title="B. Glue ジョブ設定の、DPU&#x3D;0.0625 から DPU&#x3D;1 へ設定変更"></a>B. Glue ジョブ設定の、DPU&#x3D;0.0625 から DPU&#x3D;1 へ設定変更</h5><p>根本原因にて記載した通り、<a target="_blank" rel="noopener" href="https://pypi.org/project/lxml/">lxml</a>を setup.py にてインストールする際に、<code>out of memory</code> エラーが発生していました。<br>そのため、マシンスペックを上げることで解消できないかと推測し、検証環境にて DPU&#x3D;0.0625 → DPU&#x3D;1 へ変更して実行したところ、正常に処理が完了しました。</p>
+<p>メリット</p>
+<ul>
+<li>エラーが発生する前のライブラリのバージョン状態に近い環境で、Glue ジョブを動作させることができる<ul>
+<li><a target="_blank" rel="noopener" href="https://pypi.org/project/awswrangler/">awswrangler</a>に依存するライブラリのバージョンをエラー直前の成功したバージョンに近い状態とできる<ul>
+<li>※ 近いという表現は、設定次第で依存する他のライブラリバージョンも変更される可能性があることに由来する(後述するが、そもそも実行時にバージョンが揺れること自体が本当の根本原因である)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>デメリット</p>
+<ul>
+<li>ビルドして作成する必要があり、wheel でのインストールに失敗する <a target="_blank" rel="noopener" href="https://pypi.org/project/lxml/">lxml</a>のバージョンが利用される</li>
+<li>DPU 値を上げるため、金銭的なコストが増加する</li>
+</ul>
+<h4 id="対応案の選択"><a href="#対応案の選択" class="headerlink" title="対応案の選択"></a>対応案の選択</h4><p>結論、対応案 A を選択しました。</p>
+<p>判断基準として、”不具合を追加で発生させないこと” を置きました。<br>システム性質上、本番環境での継続的な実行ではなく、数回の実行を安定して行うことが求められていました。その結果、ライブラリの最新バージョン追従よりも、成熟し安定したバージョンでの実行を優先しました。</p>
+<p>リスク評価としては、インストールエラーが発生した、最新の <a target="_blank" rel="noopener" href="https://pypi.org/project/lxml/">lxml</a> により発生する不具合リスクと、<a target="_blank" rel="noopener" href="https://pypi.org/project/awswrangler/">awswrangler</a>に依存するライブラリのバージョンが下がることで発生する不具合のリスクを考慮し、定量的ではないですが後者のほうがより発生するリスクが低いと判断しました。</p>
+<p>ただ、どちらにせよリスクは発生するため、単体テストと AWS 環境上での結合テストを再度実行し、動作保証の上で本番稼働を行いました。</p>
+<h4 id="修正事項"><a href="#修正事項" class="headerlink" title="修正事項"></a>修正事項</h4><p>AWS Glue ジョブの Libraries 設定に指定している wheel ライブラリ内で、<a target="_blank" rel="noopener" href="https://pypi.org/project/awswrangler/">awswrangler</a> をインストールしない設定へ修正しました。<br>具体的には、 <code>poetry build -f wheel</code> で独自ライブラリを wheel ファイルへビルドしていたため、<a target="_blank" rel="noopener" href="https://pypi.org/project/awswrangler/">awswrangler</a> を <code>poertry</code> における <code>dev group</code>   の依存へ変更しました。</p>
+<p>before</p>
+<figure class="highlight toml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># pyproject.toml</span></span><br><span class="line"></span><br><span class="line"><span class="section">[tool.poetry.dependencies]</span></span><br><span class="line"><span class="attr">awswrangler</span> = <span class="string">&quot;2.15.1&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="section">[tool.poetry.group.dev.dependencies]</span></span><br></pre></td></tr></table></figure>
+
+<p>after</p>
+<figure class="highlight toml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># pyproject.toml</span></span><br><span class="line"></span><br><span class="line"><span class="section">[tool.poetry.dependencies]</span></span><br><span class="line"></span><br><span class="line"><span class="section">[tool.poetry.group.dev.dependencies]</span></span><br><span class="line"><span class="attr">awswrangler</span> = <span class="string">&quot;2.15.1&quot;</span> <span class="comment"># dev group へ変更</span></span><br></pre></td></tr></table></figure>
+
+
+<h3 id="学び"><a href="#学び" class="headerlink" title="学び"></a>学び</h3><h4 id="うまくいったこと"><a href="#うまくいったこと" class="headerlink" title="うまくいったこと"></a>うまくいったこと</h4><p>幸いなことに、単体テスト&#x2F;結合テストにて追加の問題が発生せず、本番環境での実行も安定していました。</p>
+<h4 id="振り返り"><a href="#振り返り" class="headerlink" title="振り返り"></a>振り返り</h4><p>後から振り返ると、リスク判断において正確な要素を抽出できていなかった点がありました。<br>その点は、<a target="_blank" rel="noopener" href="https://pypi.org/project/lxml/">lxml</a> に対して実際に依存している処理があったのか否かです。<a target="_blank" rel="noopener" href="https://pypi.org/project/lxml/">lxml</a>への依存は、<a target="_blank" rel="noopener" href="https://pypi.org/project/awswrangler/">awswrangler</a> (正確には、内部で利用している <code>pandas</code> )内の処理のため、ライブラリの実装を読む必要がありましたが、正確なリスク評価としては必要だったのではと思いました。<br>時間的余裕次第ですが、調査をする選択肢をもっておくべきでした。</p>
+<p>また、案の比較時に、インストールエラーが発生した <a target="_blank" rel="noopener" href="https://pypi.org/project/lxml/">lxml</a> を利用すること自体が心理的障壁となり、選択時にバイアスがかかってしまったという点もありました。これは、エラーが発生したバージョンを使いたくないという感情から来るものでした。<br>客観的な判断で、より正確にリスク評価ができるとより良かったなと感じています。</p>
+<h4 id="そもそもの話"><a href="#そもそもの話" class="headerlink" title="そもそもの話"></a>そもそもの話</h4><p>根本的には、実行時のライブラリのバージョンが固定されていないことが発生の要因です。<br>バージョンが固定 “されている”・”されていない” (※1) で少しメリット・デメリットを考えてみると、<br>メリットとしては、設定次第ではありますが最新のバージョンに近いバージョンが選択されることで、脆弱性の修正や性能向上等のバージョンアップによる改善を取り込むことができます。<br>デメリットとしては、当事象のようにバージョンが揺れることで、テスト時に発生していなかった不具合が突然発生するリスクが生まれます。</p>
+<p>ケースバイケースではありますが、安定して運用することが第一である場合はデメリットは許容できないことが多い印象です。<br>そのため、ライブラリのバージョンを lock ファイル等を利用して固定の上で安定運用しつつ、もし継続して利用されるシステムの場合、適切にメンテナンスして如何にバージョンを上げていくかを考えることになるのかなと思います。(余談ですが、メンテナンスが検討できておらず、塩漬けにされて、いざ大きめの脆弱性が発見され、いきなり対応できないといった問題はありがちな気がします。)</p>
+<p>ちなみに、AWS Glue の追加ライブラリにおいて、lock ファイル利用したライブラリのバージョン固定を行う方法は現時点ではわかりませんでした。</p>
+<p><strong>※1 <code>バージョンが固定されていない</code> とは、ライブラリに対する依存ライブラリ設定に沿っている上という前提になります。</strong></p>
+<p>例えば、<a target="_blank" rel="noopener" href="https://github.com/aws/aws-sdk-pandas/blob/9d5c1a67af3f5e7e8d7aa506da1b97277d3e3bd6/pyproject.toml#L28">pyproject.toml - awswrangler</a> の設定を参考にすると、以下の通りです。</p>
+<ul>
+<li>boto3 は <code>1.20.32</code> 以上のバージョンに依存</li>
+<li>pandas の場合<ul>
+<li>python version が 3.9 より小さい場合は、 <code>1.2.0 &lt;= version &lt; 2.1.0</code> の間のバージョンに依存</li>
+<li>python version が 3.9 以上の場合は、 <code>1.2.0 &lt;= version &lt; 3.0.0</code> の間のバージョンに依存</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight toml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 参考: https://github.com/aws/aws-sdk-pandas/blob/9d5c1a67af3f5e7e8d7aa506da1b97277d3e3bd6/pyproject.toml#L28</span></span><br><span class="line"></span><br><span class="line"><span class="section">[tool.poetry.dependencies]</span></span><br><span class="line"><span class="attr">python</span> = <span class="string">&quot;&gt;=3.8, &lt;4.0&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Required</span></span><br><span class="line"><span class="attr">boto3</span> = <span class="string">&quot;^1.20.32&quot;</span></span><br><span class="line"><span class="attr">botocore</span> = <span class="string">&quot;^1.23.32&quot;</span></span><br><span class="line"><span class="attr">pandas</span> = [</span><br><span class="line">    &#123; version = <span class="string">&quot;&gt;=1.2.0,&lt;2.1.0&quot;</span>, markers = <span class="string">&quot;python_version &lt; \&quot;3.9\&quot;&quot;</span> &#125;,</span><br><span class="line">    &#123; version = <span class="string">&quot;&gt;=1.2.0,&lt;3.0.0&quot;</span>, markers = <span class="string">&quot;python_version &gt;= \&quot;3.9\&quot;&quot;</span> &#125;,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>上記設定のため、boto3 であれば実行時に <code>1.20.32</code> 以上のバージョン (最新バージョン) が利用され、pandas もバージョン指定内の最新バージョンが利用される可能性があります。</p>
+<h2 id="補足"><a href="#補足" class="headerlink" title="補足"></a>補足</h2><h3 id="lxml-の-wheel-インストールエラー自体の解消"><a href="#lxml-の-wheel-インストールエラー自体の解消" class="headerlink" title="lxml の wheel インストールエラー自体の解消"></a><a target="_blank" rel="noopener" href="https://pypi.org/project/lxml/">lxml</a> の wheel インストールエラー自体の解消</h3><p>バージョン 5.0.1 と 5.1.0 にて、解消されたバージョンがリリースされています。</p>
+<p>参考: <a target="_blank" rel="noopener" href="https://lxml.de/5.1/changes-5.1.0.html">lxml changelog</a><br><img src="/images/20240119a/image.png" alt="image.png" width="1200" height="358" loading="lazy"></p>
+<h3 id="wheel-とは"><a href="#wheel-とは" class="headerlink" title="wheel とは"></a>wheel とは</h3><p><a target="_blank" rel="noopener" href="https://peps.python.org/pep-0427/">PEP 427</a> で定義された Python のパッケージファイルフォーマットを指します。拡張子は <code>.whl</code> であり、中身としては ZIP 形式のアーカイブです。</p>
+<p>フォルダ構成は、ZIP 解凍をすることでわかりますが、以下の通りです。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">├─ &lt;ライブラリディレクトリ&gt;</span><br><span class="line">   ├─ ...</span><br><span class="line">└─ &lt;ライブラリ名&gt;.dist-info</span><br><span class="line">   ├─ METADATA</span><br><span class="line">   ├─ RECORD</span><br><span class="line">   └─ WHEEL</span><br></pre></td></tr></table></figure>
+
+
+<p>当事象に関連する内容としては、 <code>.dist-info</code> 以下の <code>METADATA</code> に依存するライブラリのバージョンが記載されています。<br><code>pip</code> で <code>wheel</code> ファイルを指定してインストールした際に、<code>Requires-Dist</code> に記載されているライブラリがインストールされます。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">Metadata-Version: 2.1</span><br><span class="line">Name: &lt;ライブラリ名&gt;</span><br><span class="line">Version: 1.0.0</span><br><span class="line">Summary: </span><br><span class="line">Author: XXX</span><br><span class="line">Requires-Python: &gt;=3.9.10,&lt;3.11</span><br><span class="line">Classifier: Programming Language :: Python :: 3</span><br><span class="line">Classifier: Programming Language :: Python :: 3.10</span><br><span class="line">Requires-Dist: boto3 (==1.28.64)</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">Description-Content-Type: text/markdown</span><br><span class="line"></span><br><span class="line">(README.md の内容が記載)</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="所感"><a href="#所感" class="headerlink" title="所感"></a>所感</h2><p>ポストモーテムとして、振り返りをまとめてみました。<br>数年に一回あるかないかの問題ではありますが、同様の問題が発生した際に判断の参考になれば良いなと思います。</p>
+<h2 id="参考情報"><a href="#参考情報" class="headerlink" title="参考情報"></a>参考情報</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://qiita.com/an_sony/items/0565ad980f9097c76d11#fn1">ポストモーテムを理解する #運用 - Qiita</a></li>
+<li><a target="_blank" rel="noopener" href="https://lxml.de/5.1/changes-5.1.0.html">lxml changelog</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20240119a/&related=twitterapi%2Ctwitter&text=%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E7%9B%B4%E5%89%8D%E3%81%AB%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E3%82%A8%E3%83%A9%E3%83%BC%E3%81%8C%E7%99%BA%E7%94%9F%E3%81%97%E3%81%9F%E9%9A%9B%E3%81%AB%E3%81%A9%E3%81%AE%E3%82%88%E3%81%86%E3%81%AB%E5%AF%BE%E5%BF%9C%E3%81%97%E3%81%9F%E3%81%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240119a/&t=%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E7%9B%B4%E5%89%8D%E3%81%AB%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E3%82%A8%E3%83%A9%E3%83%BC%E3%81%8C%E7%99%BA%E7%94%9F%E3%81%97%E3%81%9F%E9%9A%9B%E3%81%AB%E3%81%A9%E3%81%AE%E3%82%88%E3%81%86%E3%81%AB%E5%AF%BE%E5%BF%9C%E3%81%97%E3%81%9F%E3%81%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240119a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240119a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2019.12.06</span><span class="snscount">&#9825;10</span><a href=/articles/20191206/ title="当記事では、AWS Glue をローカル環境で単体テストするための環境構築方法についてまとめました。">AWS Glueの単体テスト環境の構築手順</a></li><li class="related-posts-item"><span>2022.04.28</span><span class="snscount">&#9825;9</span><a href=/articles/20220428a/ title="2021年の記事でもAWSの公式のDockerイメージを使って環境構築をする内容の記事があるのですが、Glue3.0の公式のDockerイメージがリリースされていたので、そちらを使って再度Glueのローカルでの開発環境構築の記事を書いてみようと思います。せっかくなので昨年の記事と少しコードを変えようと思い、AWSの公式ドキュメント[^2]に書かれたコードを基に解説します。">AWS Glueの開発環境の構築(2022)</a></li><li class="related-posts-item"><span>2022.01.11</span><span class="snscount">&#9825;33</span><a href=/articles/20220111a/ title="TIG 所属の多賀です。AWS 上でのワークフロー構築のため、Step Functions を直近で導入しました。 ">Step Functions を利用して感じた Airflow との比較</a></li><li class="related-posts-item"><span>2021.10.26</span><span class="snscount">&#9825;29</span><a href=/articles/20211026a/ title="DynamoDBやKinesis Data Streamsなどを利用するサービスをそれなりの期間で稼働させているとポツポツ下記のようなエラーが発生することが分かりました。RequestError: send request failedcaused by: Post ...: read tcp 169.254.0.1:55638->3.113.218.4:443: read: connection reset by peer">AWS利用時に read: connection reset by peer が出たときのリトライ検討</a></li><li class="related-posts-item"><span>2021.10.11</span><span class="snscount">&#9825;16</span><a href=/articles/20211011a/ title="PySparkを使用したGlueジョブ開発のお話をします。ETLツールとして使用されるAWS Glueですが、業務バッチで行うような複雑な処理も実行できます。また、処理はGlueジョブとして、Apache Spark分散・並列処理のジョブフローに簡単に乗せることができます！">AWS Glueで複雑な処理を開発するときのTips</a></li><li class="related-posts-item"><span>2021.10.06</span><span class="snscount">&#9825;7</span><a href=/articles/20211006a/ title="PySparkで予定しておりましたが、PySpark関連として、Glueを題材にさせていただきます。Glueといっても大きく下記の３種類、処理系をいれると4種類に分かれると思っていますが、それぞれ全く別のプロダクトという理解をしています。">AWS Glue Data CatalogでCSVを扱う</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%A6%81"><span class="toc-text">概要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%9D%E3%82%B9%E3%83%88%E3%83%A2%E3%83%BC%E3%83%86%E3%83%A0"><span class="toc-text">ポストモーテム</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%99%BA%E7%94%9F%E6%97%A5"><span class="toc-text">発生日</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%B5%E3%83%9E%E3%83%AA"><span class="toc-text">サマリ</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3"><span class="toc-text">バージョン</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%A4%E3%83%B3%E3%83%91%E3%82%AF%E3%83%88"><span class="toc-text">インパクト</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B9%E6%9C%AC%E5%8E%9F%E5%9B%A0"><span class="toc-text">根本原因</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%99%BA%E7%94%9F%E8%A6%81%E5%9B%A0"><span class="toc-text">発生要因</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A4%9C%E5%87%BA"><span class="toc-text">検出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C"><span class="toc-text">対応</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C%E6%A1%88%E3%81%AE%E6%A4%9C%E8%A8%8E"><span class="toc-text">対応案の検討</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BE%E5%BF%9C%E6%A1%88%E3%81%AE%E9%81%B8%E6%8A%9E"><span class="toc-text">対応案の選択</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%AD%A3%E4%BA%8B%E9%A0%85"><span class="toc-text">修正事項</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%A6%E3%81%B3"><span class="toc-text">学び</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%81%86%E3%81%BE%E3%81%8F%E3%81%84%E3%81%A3%E3%81%9F%E3%81%93%E3%81%A8"><span class="toc-text">うまくいったこと</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8C%AF%E3%82%8A%E8%BF%94%E3%82%8A"><span class="toc-text">振り返り</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%81%9D%E3%82%82%E3%81%9D%E3%82%82%E3%81%AE%E8%A9%B1"><span class="toc-text">そもそもの話</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A3%9C%E8%B6%B3"><span class="toc-text">補足</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#lxml-%E3%81%AE-wheel-%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB%E3%82%A8%E3%83%A9%E3%83%BC%E8%87%AA%E4%BD%93%E3%81%AE%E8%A7%A3%E6%B6%88"><span class="toc-text">lxml の wheel インストールエラー自体の解消</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#wheel-%E3%81%A8%E3%81%AF"><span class="toc-text">wheel とは</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%80%E6%84%9F"><span class="toc-text">所感</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%83%85%E5%A0%B1"><span class="toc-text">参考情報</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (420)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (253)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (98)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (60)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (35)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
