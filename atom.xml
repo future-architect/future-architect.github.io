@@ -6,10 +6,47 @@
   <link href="https://future-architect.github.io/atom.xml" rel="self"/>
   
   <link href="https://future-architect.github.io/"/>
-  <updated>2024-01-22T04:50:11.153Z</updated>
+  <updated>2024-01-24T04:04:38.378Z</updated>
   <id>https://future-architect.github.io/</id>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>ぼくのかんがえたさいきょうのキャッシュ戦略</title>
+    <link href="https://future-architect.github.io/articles/20240124a/"/>
+    <id>https://future-architect.github.io/articles/20240124a/</id>
+    <published>2024-01-23T15:00:00.000Z</published>
+    <updated>2024-01-24T04:04:38.378Z</updated>
+    
+    <content type="html"><![CDATA[<img src="/images/20240124a/キャッシュ.png" alt="" width="1200" height="686" loading="lazy"><h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIG村瀬です。</p><p>動作が遅いサービスはストレスがたまるので利用したくないですよね。</p><p>例えばネットショッピングする際に商品ページの表示が遅かったり検索してもすぐに結果が表示されないとそのサービスを利用するのをやめてしまいたくなります。</p><p>ページの表示や検索結果を高速化する手段の一つとしてキャッシュがあります。ということで今回はぼくのかんがえたさいきょうのキャッシュ戦略に関して解説します。</p><h1 id="キャッシュとは"><a href="#キャッシュとは" class="headerlink" title="キャッシュとは"></a>キャッシュとは</h1><p>キャッシュとは現金を意味するcashではなく、cacheであり、</p><p><code>一度読み込んだ情報を一時的に保存しておき、次回参照する際に素早く読み込めるようにする仕組み</code></p><p>です。</p><h1 id="なぜキャッシュを使うのか"><a href="#なぜキャッシュを使うのか" class="headerlink" title="なぜキャッシュを使うのか"></a>なぜキャッシュを使うのか</h1><p>大別して3つ理由があります。</p><ol><li>システムにおける処理高速化のため</li><li>RDBなどの負荷軽減のため</li><li>コスト削減のため</li></ol><h2 id="1-システムにおける処理高速化のため"><a href="#1-システムにおける処理高速化のため" class="headerlink" title="1.システムにおける処理高速化のため"></a>1.システムにおける処理高速化のため</h2><p>冒頭でも軽く説明した通り、何らかの処理の遅いサービスを高速化したい場合に、そのサービスを提供するために裏で動作しているシステムを高速化する必要があります。高速化の方法は一度処理した情報をキャッシュに保存し、次回参照する際に素早く読み込めるようにすることであり、書き込みや一度目の計算処理が高速化するわけではないのでそれを意識した上で設計することになります。</p><h2 id="2-RDBなどの負荷軽減のため"><a href="#2-RDBなどの負荷軽減のため" class="headerlink" title="2.RDBなどの負荷軽減のため"></a>2.RDBなどの負荷軽減のため</h2><p>よくあるシステムの構成としてバックエンドではRDBが利用されていることでしょう。RDBを利用していないシステムにおいては何か負荷の高い処理をするサーバと読み替えてください。システム全体においては、大量データを保持し、計算処理を実行するRDBの負荷が大きくなるかと思います。</p><p>負荷が大きくなると処理が遅延し、許容時間内にレスポンスが返却できなくなったり、ハングアップしてしまうことでしょう。システムの心臓部とも言えるRDBがこのような状態になってしまうとサービスの提供が困難になります。</p><p>サービスを提供し続ける為、計算済みの結果は一定時間キャッシュに保持し、計算済みの結果がある場合はRDBにアクセスすることなくキャッシュから結果を取得することでRDBに掛かる負荷を軽減することが可能です。</p><h2 id="3-コスト削減"><a href="#3-コスト削減" class="headerlink" title="3.コスト削減"></a>3.コスト削減</h2><p>クラウドサービスを利用している場合、コンピューティングリソースを利用した分だけコストが掛かる料金体系になっているかと思います。</p><p>その場合にコストを低減するためにはコンピューティングに要する時間を短縮するのが効果的です。RDBの処理時間が長くクライアント側が待たされるようであれば、キャッシュにアクセスし短時間でレスポンスを受けられるようにすることでコスト削減が期待できます。</p><p>クラウドサービスを利用しキャッシュを実現するのであればそのキャッシュ自体のコストも考慮すべきではありますが、中・大規模システムであればまずキャッシュ自体のコストよりも削減できるコストやメリットの方が大きいことでしょう。</p><h1 id="キャッシュするデータ"><a href="#キャッシュするデータ" class="headerlink" title="キャッシュするデータ"></a>キャッシュするデータ</h1><p>キャッシュするデータに相応しいのはどのようなものでしょうか？</p><p>キャッシュの特性と利用用途を踏まえると以下のようなものをキャッシュするのが良いでしょう。</p><ol><li>変更がリアルタイムに必要ではないもの</li><li>計算処理に時間を要するもの</li><li>変更が発生しないまたは滅多に発生しないもの</li><li>参照頻度が高いもの</li></ol><h1 id="どこにキャッシュを配置すべきか"><a href="#どこにキャッシュを配置すべきか" class="headerlink" title="どこにキャッシュを配置すべきか"></a>どこにキャッシュを配置すべきか</h1><p>よくある構成を元にどこにキャッシュを配置すべきかを検討していきます。</p><img src="/images/20240124a/キャッシュ_構成.png" alt="キャッシュ_構成.png" width="867" height="165" loading="lazy"><h2 id="クライアント"><a href="#クライアント" class="headerlink" title="クライアント"></a>クライアント</h2><img src="/images/20240124a/キャッシュ_構成_クライアント.png" alt="キャッシュ_構成_クライアント.png" width="860" height="151" loading="lazy"><p>速度を最優先に考えた場合、クライアントにキャッシュを設けるのが最も効果的です。</p><p>クライアントにキャッシュがある場合にはネットワーク通信が不要のため、高速に結果を取り出すことが可能です。クライアントが何で構成されているかにもよりますが、Webブラウザベースの構成でない限り、キャッシュ機能を何らかの形で用意する必要があり、キャッシュを用意しない場合と比較すると開発コストは増加します。</p><p>データをどれぐらいの期間保持するかのルールはWeb APIにてデータを取得する場合はHTTPにおけるCache-Controlに倣った保持期間するのがデファクトスタンダードかと思います。</p><p>常にキャッシュを表示するのではなく、ユーザによる簡単な操作(※)でクライアントのキャッシュを破棄し、最新情報を取得できるようにすると良いでしょう。</p><p>※スマホアプリであれば、更新ボタンのタップやリストを下にスワイプするなど</p><h2 id="Web-APIバックエンド"><a href="#Web-APIバックエンド" class="headerlink" title="Web APIバックエンド"></a>Web APIバックエンド</h2><p>Web APIバックエンドにキャッシュを配置する場合、サーバの内、外の2パターンあるので分けて説明します。</p><h3 id="Web-APIサーバ内"><a href="#Web-APIサーバ内" class="headerlink" title="Web APIサーバ内"></a>Web APIサーバ内</h3><img src="/images/20240124a/キャッシュ_構成_webapi1.png" alt="キャッシュ_構成_webapi1.png" width="847" height="153" loading="lazy"><p>代表的なサービスとしてはMemcachedやRedisがあります。</p><p>Web APIサーバと同一のサーバ内に設けるパターン。Web APIサーバからキャッシュまでのアクセスにおいてネットワークを介さないため高速にキャッシュから結果を取り出すことが可能です。</p><p>しかしながら一方で同一サーバ内に設けるため、Web APIサーバが複数存在する場合にキャッシュを共有できません。Web APIサーバが1台の構成であれば効率よく動作しますが、可用性を考慮すると進んで採用したい構成ではありません。またナウでヤングなコンテナを利用したい場合、コンテナの原則である1コンテナ1プロセスから逸脱するためおすすめできません。</p><h3 id="Web-APIサーバ外"><a href="#Web-APIサーバ外" class="headerlink" title="Web APIサーバ外"></a>Web APIサーバ外</h3><img src="/images/20240124a/キャッシュ_構成_webapi2.png" alt="キャッシュ_構成_webapi2.png" width="850" height="205" loading="lazy"><p>Web APIサーバ外にキャッシュを設ける王道パターン。Web APIが複数台ある場合にキャッシュを共用できます。</p><p>他のキャッシュ配置と比較してキャッシュのコントロールが容易であり、例えばキーを指定した一部データの削除が行えます。</p><p>システムにキャッシュを配置するとなった際に一番最初に思いつくのがこのパターンかと思います。MemcachedやRedisが利用でき、Web APIの開発チームがキャッシュをコントロールしたい場合に最適です。</p><h2 id="RDB"><a href="#RDB" class="headerlink" title="RDB"></a>RDB</h2><img src="/images/20240124a/キャッシュ_構成_rdb.png" alt="キャッシュ_構成_rdb.png" width="856" height="153" loading="lazy"><p>大抵のRDBではキャッシュを内蔵しています。これにより初回のアクセスよりも二回目以降のアクセスの方がレスポンスを素早く返すことがあります。キャッシュのコントロールはRDB外からはできないため、キャッシュ設定はONにするけれど過信はしないようにしましょう。</p><h2 id="CDN"><a href="#CDN" class="headerlink" title="CDN"></a>CDN</h2><img src="/images/20240124a/キャッシュ_構成_CDN.png" alt="キャッシュ_構成_CDN.png" width="851" height="155" loading="lazy"><p>クライアントでキャッシュを持たない場合に最も近い場所でキャッシュを提供できます。</p><p>サーバサイドとクライアントサイドを別のチームが開発する場合、サーバサイドのチームからするとクライアントサイドでキャッシュしてくれる保証はありません。クライアントサイドで適切なキャッシュがなされず、サーバサイドへのアクセス量が多くなることを想定するとCDNでキャッシュするのが有効です。</p><p>CDNの後方に位置するサーバサイドをクラウドサービスを利用して構築している場合、クラウドサービスに対するアクセスを低減でき、その結果クラウドサービスのコンピューティングリソースの利用量を低減できます。利用量が低減されるということはクラウドサービスのコストが低減できます。</p><p>一方でキャッシュキーに関しては慎重に取り扱う必要があり、Web APIにおいてどのキーの値が同一であれば同一のキャッシュキーとするか詳細に設計する必要があります。CDNのキャッシュは細かなコントロールが出来ず、一部のデータを削除できないのが大半かと思います。</p><h2 id="で結局どこに配置すれば良いの？"><a href="#で結局どこに配置すれば良いの？" class="headerlink" title="で結局どこに配置すれば良いの？"></a>で結局どこに配置すれば良いの？</h2><p>複数の選択肢の中から一つのみ選択する必要はなく、適切な箇所を必要な分だけ選択するのが良いと思います。選択の際にはサービスの特性、費用対効果、開発者が調達できるかなど複数の観点で検討が必要になります。</p><p>複数個所にキャッシュを配置した場合、エンドユーザからするとストレスなく利用できるため嬉しい一方で運用者は大変になるかと思います。万能なものはありません。トレードオフを考慮し決定しましょう。</p><h1 id="キャッシュアルゴリズムの選択"><a href="#キャッシュアルゴリズムの選択" class="headerlink" title="キャッシュアルゴリズムの選択"></a>キャッシュアルゴリズムの選択</h1><p>キャッシュは保持期間を指定するため、保持期間を過ぎると削除されていきますが、保持期間内であってもキャッシュ可能なサイズを超えた場合はキャッシュアルゴリズムに従い、何れかのデータが削除されます。</p><p>代表的なキャッシュアルゴリズムは以下の通りです。</p><ul><li>FIFO（First-In, First-Out）: 最初にキャッシュされたデータを最初に削除する。</li><li>LFU（Least Frequently Used）: 最も使用頻度が低いデータを削除する。</li><li>LIFO（Last-In, First-Out）: 最後にキャッシュされたデータを最初に削除する。</li><li>LRU（Least Recently Used）: 最も長い間、使用されていないデータを削除する。</li></ul><p>システムの特性を踏まえて選択すべきですが、一般的にはLFU（Least Frequently Used）かLRU（Least Recently Used）を選択するのが良いと思います。</p><p>コストとの兼ね合い次第ですが必要なデータが全て保存可能なサイズのキャッシュを用意できるのがキャッシュヒット率の観点では理想です。</p><h1 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h1><p>キャッシュを利用する上で注意すべき点があります。</p><ul><li>何らかの理由でキャッシュを全て削除した際にRDBに対する負荷が集中することになります。サービス停止にならないよう流量制御するなどの対策が必要になるかもしれません。</li><li>初回アクセス(正確に言うとキャッシュが作成されるまでの間に実行されたアクセス)はキャッシュにデータがないので遅くなります。最初にアクセスしたユーザはストレスに感じるかもしれません。ユーザにストレスを与えないようにキャッシュにデータを用意する仕組みが有効かもしれません。</li><li>変更が発生しないと思われるデータでも無期限にキャッシュするのはおすすめしません。設計当初は変更が発生しないと考えられるものであっても後々変更が発生したり、誤ってキャッシュしてしまった際に削除が困難にならないよう保持期間を設けましょう。最長でも1日とかで様子を見るところからスタートするのがよろしいかと思います。</li><li>個人情報のキャッシュは慎重に扱う必要があります。ユーザ自身の名前や電話番号などの情報はRDBから取得するにしても計算処理時間は短いためキャッシュしなくても良いでしょう。一方でネットショッピングであれば購入履歴など計算処理に時間を要するものがありキャッシュしたくなります。CDNの仕様理解不足などにより誤って他者に閲覧可能な状態になると個人情報漏洩インシデントになりかねません。キャッシュするのであればクライアントにキャッシュすることを優先的に検討したいところです。とはいえCDNの仕様理解不足によりCDNに意図せずキャッシュされてしまったり、Web APIの不具合により他者の情報を誤って返却してしまうことがありえます。システム全体で複数人で同時期にアクセスした際に非機能要件面だけではなく機能要件面でのテストを十分実施することで個人情報漏洩リスクを低減できることでしょう。</li></ul><h1 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h1><p>性能要件が緩いサービスであればキャッシュを設けない方がシンプルな設計となり、開発や保守も楽でしょう。しかしながら高い性能要件が求められるサービスになると話が別です。</p><p>Amazonの調査によると、サイト表示が0.1秒遅くなると、売り上げが1%減少し、1秒高速化すると10%の売上が向上するとのことなのでクライアントへ如何に早く表示するか・レスポンスを返すかが重要となり、その対応の一つとしてキャッシュが必要となります。</p><p>冒頭で、キャッシュとは現金を意味するcashではなく、cacheであると言う説明をしましたが、cacheを利用することでcashを増やすことが可能です。この記事を参考にしていただき、世の中から遅いサービスが減り、ユーザのストレスが低減できれば幸いです。</p><p>以上、ぼくのかんがえたさいきょうのキャッシュ戦略でした。</p>]]></content>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;img src=&quot;/images/20240124a/キャッシュ.png&quot; alt=&quot;&quot; width=&quot;1200&quot; height=&quot;686&quot; loading=&quot;lazy&quot;&gt;
+
+&lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Programming" scheme="https://future-architect.github.io/categories/Programming/"/>
+    
+    
+    <category term="設計" scheme="https://future-architect.github.io/tags/%E8%A8%AD%E8%A8%88/"/>
+    
+    <category term="Redis" scheme="https://future-architect.github.io/tags/Redis/"/>
+    
+    <category term="CDN" scheme="https://future-architect.github.io/tags/CDN/"/>
+    
+    <category term="キャッシュ" scheme="https://future-architect.github.io/tags/%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B7%E3%83%A5/"/>
+    
+    <category term="memcached" scheme="https://future-architect.github.io/tags/memcached/"/>
+    
+  </entry>
   
   <entry>
     <title>人工知能学会ビジネス・インフォマティクス研究会で登壇しました。</title>
@@ -818,41 +855,6 @@
     <category term="書評" scheme="https://future-architect.github.io/tags/%E6%9B%B8%E8%A9%95/"/>
     
     <category term="Python Distilled" scheme="https://future-architect.github.io/tags/Python-Distilled/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>アプリエンジニアがコンテナ開発の基本を読んで学ぶ</title>
-    <link href="https://future-architect.github.io/articles/20231115a/"/>
-    <id>https://future-architect.github.io/articles/20231115a/</id>
-    <published>2023-11-14T15:00:00.000Z</published>
-    <updated>2023-11-16T00:07:03.536Z</updated>
-    
-    <content type="html"><![CDATA[<img src="/images/20231115a/image.png" alt="" width="520" height="663" loading="lazy"><h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。HealthCare Innovation Group(HIG)<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>所属の清水です。</p><p><a href="/articles/20231030a/">秋のブログ週間2023</a>、3週目・12本目の記事です。</p><p>Kubernetesクラスタ上で構築された学習基盤<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>を業務で利用することをきっかけに、「<a href="https://book.impress.co.jp/books/1120101031">Dockerコンテナ開発・環境構築の基本</a>」という書籍を読んでみました。</p><p><a href="https://book.impress.co.jp/books/1120101031">https://book.impress.co.jp/books/1120101031</a></p><p>これまでDocker・Kubernetesをあまり触ったことがないエンジニアが、書籍を読んだ感想を書いていきます。</p><div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">  <span class="fa fa-fw fa-check-circle"></span><p><a href="https://ja.wikipedia.org/wiki/Kubernetes">Wikipedia</a>によると、「クバネティス&#x2F;クバネテス&#x2F;クーべネティス」と読まれているようです。<br>「クーベネティス」だと予測変換にKubernetesが出てくる（手元のiOS、macOS）ため、「クーベネティス」と打っています。</p></div><h1 id="感想"><a href="#感想" class="headerlink" title="感想"></a>感想</h1><p>本書は、Dockerをベースにコンテナ技術の理解・実践からKubernetesクラスタ上でアプリケーションを稼働させる仕組みを解説した書籍です。<br>サンプルのソースコード付きで、書籍の中でも概要の説明→コマンドで実現する方法という流れで分かりやすかったです。<br>各コマンドで何をしているのか、コマンドの書式付きで解説があったので初心者にも理解しやすい内容になっていました。</p><p>読む前は、Docker・Kubernetesのコマンドを調べて業務を進めることはできるものの、理解が浅いためコンテナを利用して開発を進める際に抵抗感がありました。<br>書籍を通して、普段使っているコマンドの中でどんなことを実現しているか・マニフェストを用意する上で考慮すべきことを理解したことで、気持ちの問題ですが臆せず開発できるようになりました。</p><p>また、実行環境の統一のため、使用した実行環境がローカルPCではなくGoogle Cloud Platform（以降GCP）であったのが普段ほぼローカルで開発している私にとっては印象的でした。<br>Docker・Kubernetesの勉強になったのはもちろん、サンプル中にTrivy<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>やGitHub Actionsを使うシーンもあり、名前は知っているけどまだ使ったことない技術に触れたのもいい機会でした。</p><h1 id="概要と気になった内容"><a href="#概要と気になった内容" class="headerlink" title="概要と気になった内容"></a>概要と気になった内容</h1><h2 id="コンテナアプリケーション開発について（第1章）"><a href="#コンテナアプリケーション開発について（第1章）" class="headerlink" title="コンテナアプリケーション開発について（第1章）"></a>コンテナアプリケーション開発について（第1章）</h2><p>既存のアプリケーション開発及び仮想化の仕組みについて説明した上で、コンテナアプリケーション開発におけるサイクルを説明されています。</p><p>本章では、主に以下の点を解説されています。</p><ul><li>仮想マシンとコンテナイメージの違い</li><li>コンテナイメージの構造</li></ul><p>「アプリを動かす土台を共有して、その土台の上でアプリを動かすことで環境差異を減らす」というイメージは元々ありましたが、<br>上記2点を押さえることで、仕組みやメリットの理解が深まりました。</p><p>また、コンテナ技術を利用することによるメリットだけではなく、コンテナアプリケーション開発スタイルが「銀の弾丸ではない」ことを、章の最後に触れていたことが印象的です。</p><h2 id="コンテナアプリケーション開発のライフサイクル（第2章・第3章）"><a href="#コンテナアプリケーション開発のライフサイクル（第2章・第3章）" class="headerlink" title="コンテナアプリケーション開発のライフサイクル（第2章・第3章）"></a>コンテナアプリケーション開発のライフサイクル（第2章・第3章）</h2><p>GCPを用いてにDocker環境をセットアップして、実際に動かしながらコンテナアプリケーション開発におけるライフサイクル「Build・Ship・Run」を説明されています。</p><p>「Build・Ship・Run」はそれぞれ、</p><ol><li>Build: 実行ファイル及びそれを動かすために必要なOS・ライブラリをパッケージ化</li><li>Ship: Buildしたコンテナイメージの配布及び共有</li><li>Run: Shipしたコンテナイメージの起動と操作</li></ol><p>を指します。</p><p>本章を読むことで、以下の気になっていたことがすっきり分かりました！</p><ul><li>Dockerfileで、ローカルのファイルなどをコンテナイメージに含める<code>ADD</code>と<code>COPY</code>の使い分け</li><li>Dockerfileで、<code>&amp;&amp;</code>で結合した<code>RUN</code>命令が多い理由</li><li>コンテナとコンテナホスト（Dockerを動かしているマシン）間でのデータのやり取り</li></ul><h2 id="Kubernetesの仕組みと利用の流れ（第4章・第5章）"><a href="#Kubernetesの仕組みと利用の流れ（第4章・第5章）" class="headerlink" title="Kubernetesの仕組みと利用の流れ（第4章・第5章）"></a>Kubernetesの仕組みと利用の流れ（第4章・第5章）</h2><p>Kubernetesの概要から<code>kubectl</code>コマンドを利用してコンテナアプリケーションを動かす流れを説明されています。</p><p>本章では、以下の点が記載されています。</p><ul><li>なぜコンテナオーケストラレータが必要か</li><li>Kubernetesにおける自動修復（セルフヒーリング）の仕組み</li><li>Kubernetesのリソースとマニフェスト（コンテナアプリケーションを実行するための手順を記載したyamlファイル）の結びつき</li></ul><p>第4章では主に説明を、第5章では実際に手を動かす部分を主に記載しています。<br>第5章で実際に手を動かしつつ、第4章に戻って確認することで仕組みがどう実現されているか理解が深まりました。</p><h2 id="ローカル開発とCI-x2F-CD（第6章・第7章）"><a href="#ローカル開発とCI-x2F-CD（第6章・第7章）" class="headerlink" title="ローカル開発とCI&#x2F;CD（第6章・第7章）"></a>ローカル開発とCI&#x2F;CD（第6章・第7章）</h2><p>ローカル開発を効率的にするツールの紹介及びコンテナアプリケーション開発におけるCI&#x2F;CDについて説明されています。</p><p>本章では、以下の点を学ぶことができます。</p><ul><li>DokcerfileやKubernetesのマニフェストを加味したCI&#x2F;CD</li><li>CIOpsとは？GitOpsとは？</li><li>GitHub Actionsを利用したコンテナアプリケーション開発のCI&#x2F;CD</li></ul><p>普段、業務ではGitLabを利用しているため、GitHub Actionsワークフローの作成と実行が丁寧に記載あって助かりました。</p><h1 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h1><p>Docker・Kubernetesに関する基礎を固めるためには、とても良い書籍だと思いました。<br>サンプル付きで、<code>docker</code>コマンドや<code>kubectl</code>コマンドとコンテナ技術の仕組みを結びつけながら理解することができました。<br>DockerやKubernetesを少し触ったことがあり、もう一歩理解したい方におすすめです。</p><p>次は澁川さんの<a href="/articles/20231116a/">Python Distillesは幅広い人にPythonの基礎を叩き込む本</a>です。</p><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">医療・ヘルスケア分野での案件や新規ビジネス創出を担う、2020年に誕生した事業部です。設立エピソードは、以下記事をご覧ください。<a href="https://note.future.co.jp/n/n8b57d4bf4604">&quot;新規事業の立ち上げ　フューチャーの知られざる医療・ヘルスケアへの挑戦&quot;</a></span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="vertical-align: top; padding-right: 10px;">2.</span><span style="vertical-align: top;">学習基盤に関する記事は、以下記事をご覧ください。<a href="https://future-architect.github.io/articles/20210115/">MLOpsことはじめ ～実験管理導入と学習基盤の構築～</a></span><a href="#fnref:2" rev="footnote"> ↩</a></li><li id="fn:3"><span style="vertical-align: top; padding-right: 10px;">3.</span><span style="vertical-align: top;">Trivy. Dockerイメージの脆弱性を検知するOSS<a href="https://github.com/aquasecurity/trivy">https://github.com/aquasecurity/trivy</a></span><a href="#fnref:3" rev="footnote"> ↩</a></li></ol></div></div>]]></content>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;img src=&quot;/images/20231115a/image.png&quot; alt=&quot;&quot; width=&quot;520&quot; height=&quot;663&quot; loading=&quot;lazy&quot;&gt;
-
-&lt;h1 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot;</summary>
-        
-      
-    
-    
-    
-    <category term="Infrastructure" scheme="https://future-architect.github.io/categories/Infrastructure/"/>
-    
-    
-    <category term="Kubernetes" scheme="https://future-architect.github.io/tags/Kubernetes/"/>
-    
-    <category term="Docker" scheme="https://future-architect.github.io/tags/Docker/"/>
-    
-    <category term="書評" scheme="https://future-architect.github.io/tags/%E6%9B%B8%E8%A9%95/"/>
-    
-    <category term="Dockerコンテナ開発・環境構築の基本" scheme="https://future-architect.github.io/tags/Docker%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E9%96%8B%E7%99%BA%E3%83%BB%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89%E3%81%AE%E5%9F%BA%E6%9C%AC/"/>
     
   </entry>
   

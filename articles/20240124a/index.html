@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>ぼくのかんがえたさいきょうのキャッシュ戦略 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは。TIG村瀬です。 動作が遅いサービスはストレスがたまるので利用したくないですよね。 例えばネットショッピングする際に商品ページの表示が遅かったり検索してもすぐに結果が表示されないとそのサービスを利用するのをやめてしまいたくなります。 ページの表示や検索結果を高速化する手段の一つとしてキャッシュがあります。ということで今回はぼくのかんがえたさいきょうのキャッシュ戦略に関して解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ぼくのかんがえたさいきょうのキャッシュ戦略 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240124a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは。TIG村瀬です。 動作が遅いサービスはストレスがたまるので利用したくないですよね。 例えばネットショッピングする際に商品ページの表示が遅かったり検索してもすぐに結果が表示されないとそのサービスを利用するのをやめてしまいたくなります。 ページの表示や検索結果を高速化する手段の一つとしてキャッシュがあります。ということで今回はぼくのかんがえたさいきょうのキャッシュ戦略に関して解">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240124a/キャッシュ.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240124a/キャッシュ_構成.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240124a/キャッシュ_構成_クライアント.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240124a/キャッシュ_構成_webapi1.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240124a/キャッシュ_構成_webapi2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240124a/キャッシュ_構成_rdb.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240124a/キャッシュ_構成_CDN.png">
+<meta property="article:published_time" content="2024-01-23T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-01-24T04:04:38.378Z">
+<meta property="article:tag" content="設計">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="CDN">
+<meta property="article:tag" content="キャッシュ">
+<meta property="article:tag" content="memcached">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240124a/キャッシュ.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240124a/">
+  <meta content="設計,Redis,CDN,キャッシュ,memcached" name="keywords">
+  <meta content="村瀬善則" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">ぼくのかんがえたさいきょうのキャッシュ戦略
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240124a_ぼくのかんがえたさいきょうのキャッシュ戦略.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240124a_ぼくのかんがえたさいきょうのキャッシュ戦略" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-01-23T15:00:00.000Z" itemprop="datePublished">2024.01.24</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%9D%91%E7%80%AC%E5%96%84%E5%89%87" title="村瀬善則さんの記事一覧へ" class="post-author">村瀬善則</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/設計/" title="設計タグの記事へ" class="tag-list-link">設計</a>
+  
+    
+    <a href="/tags/Redis/" title="Redisタグの記事へ" class="tag-list-link">Redis</a>
+  
+    
+    <a href="/tags/CDN/" title="CDNタグの記事へ" class="tag-list-link">CDN</a>
+  
+    
+    <a href="/tags/キャッシュ/" title="キャッシュタグの記事へ" class="tag-list-link">キャッシュ</a>
+  
+    
+    <a href="/tags/memcached/" title="memcachedタグの記事へ" class="tag-list-link">memcached</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20240124a/キャッシュ.png" alt="" width="1200" height="686" loading="lazy">
+
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIG村瀬です。</p>
+<p>動作が遅いサービスはストレスがたまるので利用したくないですよね。</p>
+<p>例えばネットショッピングする際に商品ページの表示が遅かったり検索してもすぐに結果が表示されないとそのサービスを利用するのをやめてしまいたくなります。</p>
+<p>ページの表示や検索結果を高速化する手段の一つとしてキャッシュがあります。ということで今回はぼくのかんがえたさいきょうのキャッシュ戦略に関して解説します。</p>
+<h1 id="キャッシュとは"><a href="#キャッシュとは" class="headerlink" title="キャッシュとは"></a>キャッシュとは</h1><p>キャッシュとは現金を意味するcashではなく、cacheであり、</p>
+<p><code>一度読み込んだ情報を一時的に保存しておき、次回参照する際に素早く読み込めるようにする仕組み</code></p>
+<p>です。</p>
+<h1 id="なぜキャッシュを使うのか"><a href="#なぜキャッシュを使うのか" class="headerlink" title="なぜキャッシュを使うのか"></a>なぜキャッシュを使うのか</h1><p>大別して3つ理由があります。</p>
+<ol>
+<li>システムにおける処理高速化のため</li>
+<li>RDBなどの負荷軽減のため</li>
+<li>コスト削減のため</li>
+</ol>
+<h2 id="1-システムにおける処理高速化のため"><a href="#1-システムにおける処理高速化のため" class="headerlink" title="1.システムにおける処理高速化のため"></a>1.システムにおける処理高速化のため</h2><p>冒頭でも軽く説明した通り、何らかの処理の遅いサービスを高速化したい場合に、そのサービスを提供するために裏で動作しているシステムを高速化する必要があります。高速化の方法は一度処理した情報をキャッシュに保存し、次回参照する際に素早く読み込めるようにすることであり、書き込みや一度目の計算処理が高速化するわけではないのでそれを意識した上で設計することになります。</p>
+<h2 id="2-RDBなどの負荷軽減のため"><a href="#2-RDBなどの負荷軽減のため" class="headerlink" title="2.RDBなどの負荷軽減のため"></a>2.RDBなどの負荷軽減のため</h2><p>よくあるシステムの構成としてバックエンドではRDBが利用されていることでしょう。RDBを利用していないシステムにおいては何か負荷の高い処理をするサーバと読み替えてください。システム全体においては、大量データを保持し、計算処理を実行するRDBの負荷が大きくなるかと思います。</p>
+<p>負荷が大きくなると処理が遅延し、許容時間内にレスポンスが返却できなくなったり、ハングアップしてしまうことでしょう。システムの心臓部とも言えるRDBがこのような状態になってしまうとサービスの提供が困難になります。</p>
+<p>サービスを提供し続ける為、計算済みの結果は一定時間キャッシュに保持し、計算済みの結果がある場合はRDBにアクセスすることなくキャッシュから結果を取得することでRDBに掛かる負荷を軽減することが可能です。</p>
+<h2 id="3-コスト削減"><a href="#3-コスト削減" class="headerlink" title="3.コスト削減"></a>3.コスト削減</h2><p>クラウドサービスを利用している場合、コンピューティングリソースを利用した分だけコストが掛かる料金体系になっているかと思います。</p>
+<p>その場合にコストを低減するためにはコンピューティングに要する時間を短縮するのが効果的です。RDBの処理時間が長くクライアント側が待たされるようであれば、キャッシュにアクセスし短時間でレスポンスを受けられるようにすることでコスト削減が期待できます。</p>
+<p>クラウドサービスを利用しキャッシュを実現するのであればそのキャッシュ自体のコストも考慮すべきではありますが、中・大規模システムであればまずキャッシュ自体のコストよりも削減できるコストやメリットの方が大きいことでしょう。</p>
+<h1 id="キャッシュするデータ"><a href="#キャッシュするデータ" class="headerlink" title="キャッシュするデータ"></a>キャッシュするデータ</h1><p>キャッシュするデータに相応しいのはどのようなものでしょうか？</p>
+<p>キャッシュの特性と利用用途を踏まえると以下のようなものをキャッシュするのが良いでしょう。</p>
+<ol>
+<li>変更がリアルタイムに必要ではないもの</li>
+<li>計算処理に時間を要するもの</li>
+<li>変更が発生しないまたは滅多に発生しないもの</li>
+<li>参照頻度が高いもの</li>
+</ol>
+<h1 id="どこにキャッシュを配置すべきか"><a href="#どこにキャッシュを配置すべきか" class="headerlink" title="どこにキャッシュを配置すべきか"></a>どこにキャッシュを配置すべきか</h1><p>よくある構成を元にどこにキャッシュを配置すべきかを検討していきます。</p>
+<img src="/images/20240124a/キャッシュ_構成.png" alt="キャッシュ_構成.png" width="867" height="165" loading="lazy">
+
+
+
+
+<h2 id="クライアント"><a href="#クライアント" class="headerlink" title="クライアント"></a>クライアント</h2><img src="/images/20240124a/キャッシュ_構成_クライアント.png" alt="キャッシュ_構成_クライアント.png" width="860" height="151" loading="lazy">
+
+
+<p>速度を最優先に考えた場合、クライアントにキャッシュを設けるのが最も効果的です。</p>
+<p>クライアントにキャッシュがある場合にはネットワーク通信が不要のため、高速に結果を取り出すことが可能です。クライアントが何で構成されているかにもよりますが、Webブラウザベースの構成でない限り、キャッシュ機能を何らかの形で用意する必要があり、キャッシュを用意しない場合と比較すると開発コストは増加します。</p>
+<p>データをどれぐらいの期間保持するかのルールはWeb APIにてデータを取得する場合はHTTPにおけるCache-Controlに倣った保持期間するのがデファクトスタンダードかと思います。</p>
+<p>常にキャッシュを表示するのではなく、ユーザによる簡単な操作(※)でクライアントのキャッシュを破棄し、最新情報を取得できるようにすると良いでしょう。</p>
+<p>※スマホアプリであれば、更新ボタンのタップやリストを下にスワイプするなど</p>
+<h2 id="Web-APIバックエンド"><a href="#Web-APIバックエンド" class="headerlink" title="Web APIバックエンド"></a>Web APIバックエンド</h2><p>Web APIバックエンドにキャッシュを配置する場合、サーバの内、外の2パターンあるので分けて説明します。</p>
+<h3 id="Web-APIサーバ内"><a href="#Web-APIサーバ内" class="headerlink" title="Web APIサーバ内"></a>Web APIサーバ内</h3><img src="/images/20240124a/キャッシュ_構成_webapi1.png" alt="キャッシュ_構成_webapi1.png" width="847" height="153" loading="lazy">
+
+<p>代表的なサービスとしてはMemcachedやRedisがあります。</p>
+<p>Web APIサーバと同一のサーバ内に設けるパターン。Web APIサーバからキャッシュまでのアクセスにおいてネットワークを介さないため高速にキャッシュから結果を取り出すことが可能です。</p>
+<p>しかしながら一方で同一サーバ内に設けるため、Web APIサーバが複数存在する場合にキャッシュを共有できません。Web APIサーバが1台の構成であれば効率よく動作しますが、可用性を考慮すると進んで採用したい構成ではありません。またナウでヤングなコンテナを利用したい場合、コンテナの原則である1コンテナ1プロセスから逸脱するためおすすめできません。</p>
+<h3 id="Web-APIサーバ外"><a href="#Web-APIサーバ外" class="headerlink" title="Web APIサーバ外"></a>Web APIサーバ外</h3><img src="/images/20240124a/キャッシュ_構成_webapi2.png" alt="キャッシュ_構成_webapi2.png" width="850" height="205" loading="lazy">
+
+
+<p>Web APIサーバ外にキャッシュを設ける王道パターン。Web APIが複数台ある場合にキャッシュを共用できます。</p>
+<p>他のキャッシュ配置と比較してキャッシュのコントロールが容易であり、例えばキーを指定した一部データの削除が行えます。</p>
+<p>システムにキャッシュを配置するとなった際に一番最初に思いつくのがこのパターンかと思います。MemcachedやRedisが利用でき、Web APIの開発チームがキャッシュをコントロールしたい場合に最適です。</p>
+<h2 id="RDB"><a href="#RDB" class="headerlink" title="RDB"></a>RDB</h2><img src="/images/20240124a/キャッシュ_構成_rdb.png" alt="キャッシュ_構成_rdb.png" width="856" height="153" loading="lazy">
+
+
+<p>大抵のRDBではキャッシュを内蔵しています。これにより初回のアクセスよりも二回目以降のアクセスの方がレスポンスを素早く返すことがあります。キャッシュのコントロールはRDB外からはできないため、キャッシュ設定はONにするけれど過信はしないようにしましょう。</p>
+<h2 id="CDN"><a href="#CDN" class="headerlink" title="CDN"></a>CDN</h2><img src="/images/20240124a/キャッシュ_構成_CDN.png" alt="キャッシュ_構成_CDN.png" width="851" height="155" loading="lazy">
+
+
+<p>クライアントでキャッシュを持たない場合に最も近い場所でキャッシュを提供できます。</p>
+<p>サーバサイドとクライアントサイドを別のチームが開発する場合、サーバサイドのチームからするとクライアントサイドでキャッシュしてくれる保証はありません。クライアントサイドで適切なキャッシュがなされず、サーバサイドへのアクセス量が多くなることを想定するとCDNでキャッシュするのが有効です。</p>
+<p>CDNの後方に位置するサーバサイドをクラウドサービスを利用して構築している場合、クラウドサービスに対するアクセスを低減でき、その結果クラウドサービスのコンピューティングリソースの利用量を低減できます。利用量が低減されるということはクラウドサービスのコストが低減できます。</p>
+<p>一方でキャッシュキーに関しては慎重に取り扱う必要があり、Web APIにおいてどのキーの値が同一であれば同一のキャッシュキーとするか詳細に設計する必要があります。CDNのキャッシュは細かなコントロールが出来ず、一部のデータを削除できないのが大半かと思います。</p>
+<h2 id="で結局どこに配置すれば良いの？"><a href="#で結局どこに配置すれば良いの？" class="headerlink" title="で結局どこに配置すれば良いの？"></a>で結局どこに配置すれば良いの？</h2><p>複数の選択肢の中から一つのみ選択する必要はなく、適切な箇所を必要な分だけ選択するのが良いと思います。選択の際にはサービスの特性、費用対効果、開発者が調達できるかなど複数の観点で検討が必要になります。</p>
+<p>複数個所にキャッシュを配置した場合、エンドユーザからするとストレスなく利用できるため嬉しい一方で運用者は大変になるかと思います。万能なものはありません。トレードオフを考慮し決定しましょう。</p>
+<h1 id="キャッシュアルゴリズムの選択"><a href="#キャッシュアルゴリズムの選択" class="headerlink" title="キャッシュアルゴリズムの選択"></a>キャッシュアルゴリズムの選択</h1><p>キャッシュは保持期間を指定するため、保持期間を過ぎると削除されていきますが、保持期間内であってもキャッシュ可能なサイズを超えた場合はキャッシュアルゴリズムに従い、何れかのデータが削除されます。</p>
+<p>代表的なキャッシュアルゴリズムは以下の通りです。</p>
+<ul>
+<li>FIFO（First-In, First-Out）: 最初にキャッシュされたデータを最初に削除する。</li>
+<li>LFU（Least Frequently Used）: 最も使用頻度が低いデータを削除する。</li>
+<li>LIFO（Last-In, First-Out）: 最後にキャッシュされたデータを最初に削除する。</li>
+<li>LRU（Least Recently Used）: 最も長い間、使用されていないデータを削除する。</li>
+</ul>
+<p>システムの特性を踏まえて選択すべきですが、一般的にはLFU（Least Frequently Used）かLRU（Least Recently Used）を選択するのが良いと思います。</p>
+<p>コストとの兼ね合い次第ですが必要なデータが全て保存可能なサイズのキャッシュを用意できるのがキャッシュヒット率の観点では理想です。</p>
+<h1 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h1><p>キャッシュを利用する上で注意すべき点があります。</p>
+<ul>
+<li>何らかの理由でキャッシュを全て削除した際にRDBに対する負荷が集中することになります。サービス停止にならないよう流量制御するなどの対策が必要になるかもしれません。</li>
+<li>初回アクセス(正確に言うとキャッシュが作成されるまでの間に実行されたアクセス)はキャッシュにデータがないので遅くなります。最初にアクセスしたユーザはストレスに感じるかもしれません。ユーザにストレスを与えないようにキャッシュにデータを用意する仕組みが有効かもしれません。</li>
+<li>変更が発生しないと思われるデータでも無期限にキャッシュするのはおすすめしません。設計当初は変更が発生しないと考えられるものであっても後々変更が発生したり、誤ってキャッシュしてしまった際に削除が困難にならないよう保持期間を設けましょう。最長でも1日とかで様子を見るところからスタートするのがよろしいかと思います。</li>
+<li>個人情報のキャッシュは慎重に扱う必要があります。ユーザ自身の名前や電話番号などの情報はRDBから取得するにしても計算処理時間は短いためキャッシュしなくても良いでしょう。一方でネットショッピングであれば購入履歴など計算処理に時間を要するものがありキャッシュしたくなります。CDNの仕様理解不足などにより誤って他者に閲覧可能な状態になると個人情報漏洩インシデントになりかねません。キャッシュするのであればクライアントにキャッシュすることを優先的に検討したいところです。とはいえCDNの仕様理解不足によりCDNに意図せずキャッシュされてしまったり、Web APIの不具合により他者の情報を誤って返却してしまうことがありえます。システム全体で複数人で同時期にアクセスした際に非機能要件面だけではなく機能要件面でのテストを十分実施することで個人情報漏洩リスクを低減できることでしょう。</li>
+</ul>
+<h1 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h1><p>性能要件が緩いサービスであればキャッシュを設けない方がシンプルな設計となり、開発や保守も楽でしょう。しかしながら高い性能要件が求められるサービスになると話が別です。</p>
+<p>Amazonの調査によると、サイト表示が0.1秒遅くなると、売り上げが1%減少し、1秒高速化すると10%の売上が向上するとのことなのでクライアントへ如何に早く表示するか・レスポンスを返すかが重要となり、その対応の一つとしてキャッシュが必要となります。</p>
+<p>冒頭で、キャッシュとは現金を意味するcashではなく、cacheであると言う説明をしましたが、cacheを利用することでcashを増やすことが可能です。この記事を参考にしていただき、世の中から遅いサービスが減り、ユーザのストレスが低減できれば幸いです。</p>
+<p>以上、ぼくのかんがえたさいきょうのキャッシュ戦略でした。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20240124a/&related=twitterapi%2Ctwitter&text=%E3%81%BC%E3%81%8F%E3%81%AE%E3%81%8B%E3%82%93%E3%81%8C%E3%81%88%E3%81%9F%E3%81%95%E3%81%84%E3%81%8D%E3%82%87%E3%81%86%E3%81%AE%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B7%E3%83%A5%E6%88%A6%E7%95%A5%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240124a/&t=%E3%81%BC%E3%81%8F%E3%81%AE%E3%81%8B%E3%82%93%E3%81%8C%E3%81%88%E3%81%9F%E3%81%95%E3%81%84%E3%81%8D%E3%82%87%E3%81%86%E3%81%AE%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B7%E3%83%A5%E6%88%A6%E7%95%A5" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240124a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240124a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2023.11.01</span><span class="snscount">&#9825;656</span><a href=/articles/20231101a/ title="設計ドキュメントをGit管理して腐らせないようにがんばってみた話をします">設計ドキュメント腐る問題、Git管理で運用してみた結果</a></li><li class="related-posts-item"><span>2023.07.25</span><span class="snscount">&#9825;48</span><a href=/articles/20230725a/ title="フューチャーの有志メンバーでSwagger（OpenAPI Specification Version 2.0）のコーディング規約を作りました。">フューチャーのSwagger（OpenAPI 2.0）規約の紹介</a></li><li class="related-posts-item"><span>2023.06.29</span><span class="snscount">&#9825;140</span><a href=/articles/20230629a/ title="前回のエントリーで、コンポーネント単位のステートをがちゃがちゃ更新していくという、オブジェクト指向型（オブジェクトの境界がコンポーネント）の考え方から、より小さな状態のインタラクションになっていくよ、という話を紹介しました。ビジネスロジックのアーキテクチャとしては、DDD本には以下の2つが書かれています。">リアクティブプログラミングについて考える</a></li><li class="related-posts-item"><span>2023.06.16</span><span class="snscount">&#9825;261</span><a href=/articles/20230616a/ title="オライリージャパンから「ソフトウェア設計のトレードオフと誤り」の翻訳をフューチャーのメンバーと一緒に出版いたしました。好評なようで、発売一カ月ほどで増刷も決定いたしました。">ソフトウェア設計のトレードオフと誤りを出版しました</a></li><li class="related-posts-item"><span>2023.04.27</span><span class="snscount">&#9825;239</span><a href=/articles/20230427a/ title="私は、通常の業務とは別に社員有志で集まるクラウド勉強会に参加しています。まだ経験が浅い（2022年10月新卒入社）こともあり、クラウド勉強会では入門的な内容を中心に発表しています。私がクラウド勉強会で発表した CDN の入門とエッジロケーションでのアプリケーション実行について説明します。">CDN 入門とエッジでのアプリケーション実行</a></li><li class="related-posts-item"><span>2023.03.17</span><span class="snscount">&#9825;447</span><a href=/articles/20230317a/ title="ソフトウェアの中身を大きく2つに分解すると、プログラムとデータに分かれます。データの表現にもいくつもの方針があって、それによるトレードオフがあるな、というのはもやもやと考えていたので、その考えをまとめて文章にしてみました">データライフサイクルとトレードオフ</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B7%E3%83%A5%E3%81%A8%E3%81%AF"><span class="toc-text">キャッシュとは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AA%E3%81%9C%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B7%E3%83%A5%E3%82%92%E4%BD%BF%E3%81%86%E3%81%AE%E3%81%8B"><span class="toc-text">なぜキャッシュを使うのか</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E5%87%A6%E7%90%86%E9%AB%98%E9%80%9F%E5%8C%96%E3%81%AE%E3%81%9F%E3%82%81"><span class="toc-text">1.システムにおける処理高速化のため</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-RDB%E3%81%AA%E3%81%A9%E3%81%AE%E8%B2%A0%E8%8D%B7%E8%BB%BD%E6%B8%9B%E3%81%AE%E3%81%9F%E3%82%81"><span class="toc-text">2.RDBなどの負荷軽減のため</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E3%82%B3%E3%82%B9%E3%83%88%E5%89%8A%E6%B8%9B"><span class="toc-text">3.コスト削減</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B7%E3%83%A5%E3%81%99%E3%82%8B%E3%83%87%E3%83%BC%E3%82%BF"><span class="toc-text">キャッシュするデータ</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%A9%E3%81%93%E3%81%AB%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B7%E3%83%A5%E3%82%92%E9%85%8D%E7%BD%AE%E3%81%99%E3%81%B9%E3%81%8D%E3%81%8B"><span class="toc-text">どこにキャッシュを配置すべきか</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%AF%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88"><span class="toc-text">クライアント</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Web-API%E3%83%90%E3%83%83%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%89"><span class="toc-text">Web APIバックエンド</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Web-API%E3%82%B5%E3%83%BC%E3%83%90%E5%86%85"><span class="toc-text">Web APIサーバ内</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Web-API%E3%82%B5%E3%83%BC%E3%83%90%E5%A4%96"><span class="toc-text">Web APIサーバ外</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RDB"><span class="toc-text">RDB</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CDN"><span class="toc-text">CDN</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%A7%E7%B5%90%E5%B1%80%E3%81%A9%E3%81%93%E3%81%AB%E9%85%8D%E7%BD%AE%E3%81%99%E3%82%8C%E3%81%B0%E8%89%AF%E3%81%84%E3%81%AE%EF%BC%9F"><span class="toc-text">で結局どこに配置すれば良いの？</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%AD%E3%83%A3%E3%83%83%E3%82%B7%E3%83%A5%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0%E3%81%AE%E9%81%B8%E6%8A%9E"><span class="toc-text">キャッシュアルゴリズムの選択</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="toc-text">注意点</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%95%E3%81%84%E3%81%94%E3%81%AB"><span class="toc-text">さいごに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (421)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (253)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (98)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (61)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (35)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
