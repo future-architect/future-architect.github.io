@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Go 1.22 リリース連載 encoding, encoding/json | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにCSIGの棚井です。 本ブログは、Go 1.22 Release Notes の内容を紹介する「フューチャー技術ブログ Go 1.22リリース連載」の4本目の記事です。 今回は encoding のアップデートを取り上げます。  encoding&#x2F;base32,base64,hex encoding&#x2F;json  また、本ブログは release-branch.go1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 1.22 リリース連載 encoding, encoding&#x2F;json | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240201a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにCSIGの棚井です。 本ブログは、Go 1.22 Release Notes の内容を紹介する「フューチャー技術ブログ Go 1.22リリース連載」の4本目の記事です。 今回は encoding のアップデートを取り上げます。  encoding&#x2F;base32,base64,hex encoding&#x2F;json  また、本ブログは release-branch.go1">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240201a/top.png">
+<meta property="article:published_time" content="2024-01-31T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-01T00:43:51.212Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Go1.22">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240201a/top.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240201a/">
+  <meta content="Go,Go1.22" name="keywords">
+  <meta content="RuyPKG" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Go 1.22 リリース連載 encoding, encoding/json
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240201a_Go_1.22_リリース,_encoding,_encoding／json.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240201a_Go_1.22_リリース,_encoding,_encoding／json" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-01-31T15:00:00.000Z" itemprop="datePublished">2024.02.01</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/RuyPKG" title="RuyPKGさんの記事一覧へ" class="post-author">RuyPKG</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/Go1-22/" title="Go1.22タグの記事へ" class="tag-list-link">Go1.22</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20240201a/top.png" alt="" width="1000" height="672">
+
+<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>CSIGの棚井です。</p>
+<p>本ブログは、<a target="_blank" rel="noopener" href="https://tip.golang.org/doc/go1.22">Go 1.22 Release Notes</a> の内容を紹介する「<a href="/articles/20240129a/">フューチャー技術ブログ Go 1.22リリース連載</a>」の4本目の記事です。</p>
+<p>今回は <code>encoding</code> のアップデートを取り上げます。</p>
+<ul>
+<li>encoding&#x2F;base32,base64,hex</li>
+<li>encoding&#x2F;json</li>
+</ul>
+<p>また、本ブログは <a target="_blank" rel="noopener" href="https://github.com/golang/go/tree/release-branch.go1.22">release-branch.go1.22</a> での動作をベースとしています。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ go version</span><br><span class="line">go version go1.22rc2 linux/amd64</span><br></pre></td></tr></table></figure>
+
+<h2 id="encoding-x2F-base32-base64-hex"><a href="#encoding-x2F-base32-base64-hex" class="headerlink" title="encoding&#x2F;base32, base64, hex"></a>encoding&#x2F;base32, base64, hex</h2><h3 id="TL-DR-1"><a href="#TL-DR-1" class="headerlink" title="TL;DR(1)"></a>TL;DR(1)</h3><ul>
+<li>encoding&#x2F;base32, encoding&#x2F;64, encoding&#x2F;hex に、byte slice を利用したエンコード関数とデコード関数が追加されまし<ul>
+<li>エンコード関数: AppendEncode</li>
+<li>デコード関数: AppendDecode</li>
+</ul>
+</li>
+<li>base32.Encoding と base64.Encoding の Padding に「マイナスの値」を指定すると、panic を起こすようになりました<ul>
+<li>1.21 以前は「文字化け」していたので、今回の 1.22 で fix されました</li>
+</ul>
+</li>
+</ul>
+<h3 id="アップデート内容-1"><a href="#アップデート内容-1" class="headerlink" title="アップデート内容(1)"></a>アップデート内容(1)</h3><p>Go 1.22 のリリースノート原文には、以下の説明があります。</p>
+<blockquote>
+<p>The new methods AppendEncode and AppendDecode added to each of the Encoding types in the packages encoding&#x2F;base32, encoding&#x2F;base64, and encoding&#x2F;hex simplify encoding and decoding from and to byte slices by taking care of byte slice buffer management.</p>
+</blockquote>
+<p>該当する issue は「<a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/53693">encoding: provide append-like variants #53693</a>」です。issue には、以下のような説明があります。</p>
+<ul>
+<li>最近は、Append ライクな API が提供されるようになっている<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/47609">unicode&#x2F;utf8: add AppendRune #47609</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/47579">fmt: add Append, Appendf, Appendln #47579</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/50601">encoding&#x2F;binary: add AppendByteOrder #50601</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/51644">encoding&#x2F;binary: add AppendUvarint and AppendVarint #51644</a></li>
+</ul>
+</li>
+<li>というのも、Put ライクな API では、予め「バッファのサイズ」を確認した上で、適切なバッファを用意してから、Put 操作を呼び出す必要があるから</li>
+<li>encoding&#x2F;hex, encoding&#x2F;base32, encoding&#x2F;base64 には、まだ Append ライクな API がないので追加しましょう</li>
+</ul>
+<p>ちなみに、今回追加された Append ライクなエンコード関数とデコード関数の追加は、こちらのコミット（<a target="_blank" rel="noopener" href="https://github.com/golang/go/commit/469d9e26eec76341da8ebc4ef9cedb5bdb32ce73">encoding: add AppendEncode and AppendDecode</a>）にて確認できます。</p>
+<p><code>base32</code>, <code>base64</code>, <code>hex</code> のそれぞれに同じ機能の関数が追加されているので、今回は <code>base32</code> での処理内容をメインに、<code>AppendEncode</code> と <code>AppendDecode</code> を見ていきます。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// AppendEncode appends the base32 encoded src to dst</span></span><br><span class="line"><span class="comment">// and returns the extended buffer.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(enc *Encoding)</span></span> AppendEncode(dst, src []<span class="type">byte</span>) []<span class="type">byte</span> &#123;</span><br><span class="line"> n := enc.EncodedLen(<span class="built_in">len</span>(src))</span><br><span class="line"> dst = slices.Grow(dst, n)</span><br><span class="line"> enc.Encode(dst[<span class="built_in">len</span>(dst):][:n], src)</span><br><span class="line"> <span class="keyword">return</span> dst[:<span class="built_in">len</span>(dst)+n]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// AppendDecode appends the base32 decoded src to dst</span></span><br><span class="line"><span class="comment">// and returns the extended buffer.</span></span><br><span class="line"><span class="comment">// If the input is malformed, it returns the partially decoded src and an error.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(enc *Encoding)</span></span> AppendDecode(dst, src []<span class="type">byte</span>) ([]<span class="type">byte</span>, <span class="type">error</span>) &#123;</span><br><span class="line"> n := enc.DecodedLen(<span class="built_in">len</span>(src))</span><br><span class="line"> dst = slices.Grow(dst, n)</span><br><span class="line"> n, err := enc.Decode(dst[<span class="built_in">len</span>(dst):][:n], src)</span><br><span class="line"> <span class="keyword">return</span> dst[:<span class="built_in">len</span>(dst)+n], err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="base32-変換について"><a href="#base32-変換について" class="headerlink" title="base32 変換について"></a>base32 変換について</h3><p>Go での <code>base32</code> のエンコード・デコード処理は、もちろんソースコード内に実装されています。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/golang/go/blob/master/src/encoding/base32/base32.go#L111-L187">Encode</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/golang/go/blob/master/src/encoding/base32/base32.go#L291-L398">Decode</a></li>
+</ul>
+<p>私の場合、実装コードとテストコードを眺めるだけでは、いまいち処理内容がつかめなかったので、base32 のエンコード・デコード処理を「手計算」で実施してみました。</p>
+<p>以下、「Hello」という文字列を、base32 の値にエンコードするまでの流れです。</p>
+<h4 id="①「Hello」を-Ascii-コードに変換する"><a href="#①「Hello」を-Ascii-コードに変換する" class="headerlink" title="①「Hello」を Ascii コードに変換する"></a>①「Hello」を Ascii コードに変換する</h4><p>まず、「Hello」の文字列を、1つずつ <a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/ASCII">Asciiコード</a> に変換します。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th></th>
+<th>H</th>
+<th>e</th>
+<th>l</th>
+<th>l</th>
+<th>o</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10進数</td>
+<td>72</td>
+<td>101</td>
+<td>108</td>
+<td>108</td>
+<td>111</td>
+</tr>
+<tr>
+<td>16進数</td>
+<td>0x48</td>
+<td>0x65</td>
+<td>0x6c</td>
+<td>0x6c</td>
+<td>0x6f</td>
+</tr>
+</tbody></table></div>
+<h4 id="②-8-ビットのバイナリに変換する"><a href="#②-8-ビットのバイナリに変換する" class="headerlink" title="② 8 ビットのバイナリに変換する"></a>② 8 ビットのバイナリに変換する</h4><p>続いて、IP アドレスやサブネットマスクで見慣れた「2進数、バイナリ値」に変換します。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th></th>
+<th>H</th>
+<th>e</th>
+<th>l</th>
+<th>l</th>
+<th>o</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10進数</td>
+<td>72</td>
+<td>101</td>
+<td>108</td>
+<td>108</td>
+<td>111</td>
+</tr>
+<tr>
+<td>16進数</td>
+<td>0x48</td>
+<td>0x65</td>
+<td>0x6c</td>
+<td>0x6c</td>
+<td>0x6f</td>
+</tr>
+<tr>
+<td>binary</td>
+<td>01001000</td>
+<td>01100101</td>
+<td>01101100</td>
+<td>01101100</td>
+<td>01101111</td>
+</tr>
+</tbody></table></div>
+<h4 id="③-バイナリ値を連結する"><a href="#③-バイナリ値を連結する" class="headerlink" title="③ バイナリ値を連結する"></a>③ バイナリ値を連結する</h4><p>②で変換したバイナリ値を連結すると、8 × 5 &#x3D; 40 ビットのバイナリストリームができあがります。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th></th>
+<th>H</th>
+<th>e</th>
+<th>l</th>
+<th>l</th>
+<th>o</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>binary</td>
+<td>01001000</td>
+<td>01100101</td>
+<td>01101100</td>
+<td>01101100</td>
+<td>01101111</td>
+</tr>
+</tbody></table></div>
+<p>↓</p>
+<p>0100100001100101011011000110110001101111</p>
+<h4 id="④-バイナリストリームを-5ビットごとに区切る"><a href="#④-バイナリストリームを-5ビットごとに区切る" class="headerlink" title="④ バイナリストリームを 5ビットごとに区切る"></a>④ バイナリストリームを 5ビットごとに区切る</h4><p>0と1で連結された文字列を、5つごとに区切ります。</p>
+<p>0100100001100101011011000110110001101111</p>
+<p>↓</p>
+<p>01001, 00001, 10010, 10110, 11000, 11011, 00011, 01111</p>
+<h4 id="⑤-5ビットの値ごとに、10進数へと変換する"><a href="#⑤-5ビットの値ごとに、10進数へと変換する" class="headerlink" title="⑤ 5ビットの値ごとに、10進数へと変換する"></a>⑤ 5ビットの値ごとに、10進数へと変換する</h4><p>2進数の値を10進数に変換します。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>binary per 5 bits</th>
+<th>01001</th>
+<th>00001</th>
+<th>10010</th>
+<th>10110</th>
+<th>11000</th>
+<th>11011</th>
+<th>00011</th>
+<th>01111</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10進数</td>
+<td>9</td>
+<td>1</td>
+<td>18</td>
+<td>22</td>
+<td>24</td>
+<td>27</td>
+<td>3</td>
+<td>31</td>
+</tr>
+</tbody></table></div>
+<h4 id="⑥-10進数を-base32-変換する"><a href="#⑥-10進数を-base32-変換する" class="headerlink" title="⑥ 10進数を base32 変換する"></a>⑥ 10進数を base32 変換する</h4><p>10進数の値それぞれを、1つずつ <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Base32">base32</a> で変換（エンコード）します。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>binary per 5 bits</th>
+<th>01001</th>
+<th>00001</th>
+<th>10010</th>
+<th>10110</th>
+<th>11000</th>
+<th>11011</th>
+<th>00011</th>
+<th>01111</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10進数</td>
+<td>9</td>
+<td>1</td>
+<td>18</td>
+<td>22</td>
+<td>24</td>
+<td>27</td>
+<td>3</td>
+<td>31</td>
+</tr>
+<tr>
+<td>base32</td>
+<td>J</td>
+<td>B</td>
+<td>S</td>
+<td>W</td>
+<td>Y</td>
+<td>3</td>
+<td>D</td>
+<td>P</td>
+</tr>
+</tbody></table></div>
+<p>エンコードされたそれぞれの文字を結合してできる文字列が、最終的な base32変換された値となります。</p>
+<figure class="highlight txt"><table><tr><td class="code"><pre><span class="line"># 元の文字列 -&gt; base32エンコード後の文字列</span><br><span class="line"></span><br><span class="line">Hello -&gt; JBSWY3DP</span><br></pre></td></tr></table></figure>
+
+<p>検証用に、以下の Go コードを動かしてみると、base32 変換後の値が一致することも確認できます。</p>
+<figure class="highlight go"><figcaption><span>base32_encode.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">        <span class="string">&quot;encoding/base32&quot;</span></span><br><span class="line">        <span class="string">&quot;fmt&quot;</span></span><br><span class="line">        <span class="string">&quot;os&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(os.Args) &lt; <span class="number">2</span> &#123;</span><br><span class="line">                fmt.Println(<span class="string">&quot;Usage: go run main.go [String to encode]&quot;</span>)</span><br><span class="line">                <span class="keyword">return</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        src := []<span class="type">byte</span>(os.Args[<span class="number">1</span>])</span><br><span class="line">        enc := base32.StdEncoding.EncodeToString(src)</span><br><span class="line">        fmt.Println(enc)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ go run base32_encode.go <span class="string">&quot;Hello&quot;</span></span><br><span class="line">JBSWY3DP</span><br></pre></td></tr></table></figure>
+
+<p>また、base32は「5バイト（40ビット）」ごとに分割して、5バイトからの不足分は「<code>=</code>」によりパディングするルールがあります。</p>
+<ul>
+<li>1バイト不足 -&gt; 「<code>=</code>」を1つパディング</li>
+<li>2バイト不足 -&gt; 「<code>=</code>」を3つパディング</li>
+<li>3バイト不足 -&gt; 「<code>=</code>」を4つパディング</li>
+<li>4バイト不足 -&gt; 「<code>=</code>」を6つパディング</li>
+<li>不足なし -&gt; パディングなし</li>
+</ul>
+<p>例えば「Golang」の文字列であれば、  </p>
+<p>8bit × 6文字<br>&#x3D; 48 bit<br>&#x3D; 6 byte<br>&#x3D; 5 byte + 1 byte<br>&#x3D; 5 byte + (5 byte - 4 byte) ← 4バイト不足</p>
+<p>なので、「<code>=</code>」は6つ追加されます。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ go run base32_encode.go <span class="string">&quot;Golang&quot;</span></span><br><span class="line">I5XWYYLOM4======</span><br></pre></td></tr></table></figure>
+
+<p>ちなみに、「Hello」の文字列はちょうど5バイトなので、パディングは発生しません。</p>
+<h3 id="AppendEncode-AppendDecode-を動かしてみる"><a href="#AppendEncode-AppendDecode-を動かしてみる" class="headerlink" title="AppendEncode, AppendDecode を動かしてみる"></a>AppendEncode, AppendDecode を動かしてみる</h3><p>それでは、今回追加されたエンコード関数とデコード関数を動かしてみます。</p>
+<figure class="highlight go"><figcaption><span>append_encode_decode.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">        <span class="string">&quot;encoding/base32&quot;</span></span><br><span class="line">        <span class="string">&quot;fmt&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">        src := []<span class="type">byte</span>(<span class="string">&quot;Hello&quot;</span>)</span><br><span class="line">        dst := []<span class="type">byte</span>(<span class="string">&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line">        enc := base32.StdEncoding</span><br><span class="line"></span><br><span class="line">        dst = enc.AppendEncode(dst, src)</span><br><span class="line">        fmt.Println(<span class="string">&quot;Encode: &quot;</span>, <span class="type">string</span>(dst))</span><br><span class="line"></span><br><span class="line">        dec := []<span class="type">byte</span>(<span class="string">&quot;&quot;</span>)</span><br><span class="line">        dec, err := enc.AppendDecode(dec, dst)</span><br><span class="line">        <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">                fmt.Println(<span class="string">&quot;Error: &quot;</span>, err)</span><br><span class="line">        &#125;</span><br><span class="line">        fmt.Println(<span class="string">&quot;Decode: &quot;</span>, <span class="type">string</span>(dec))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Output</span></span><br><span class="line"><span class="comment">// Encode:  JBSWY3DP</span></span><br><span class="line"><span class="comment">// Decode:  Hello</span></span><br></pre></td></tr></table></figure>
+
+<p>提案元の issue に記載されているように「Append ライク」な動作ということなので、関数の呼び出し側でバッファを意識せずとも「Append」が可能です。  </p>
+<p>以下のサンプルコードは、こちらの「<a target="_blank" rel="noopener" href="https://github.com/golang/go/blob/master/src/encoding/base32/base32_test.go#L60-L61">テストコード</a>」をもとに作成しました。</p>
+<figure class="highlight go"><figcaption><span>append_encode.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">        <span class="string">&quot;encoding/base32&quot;</span></span><br><span class="line">        <span class="string">&quot;fmt&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">        src := []<span class="type">byte</span>(<span class="string">&quot;Hello&quot;</span>)</span><br><span class="line">        dst := []<span class="type">byte</span>(<span class="string">&quot;lead&quot;</span>)</span><br><span class="line"></span><br><span class="line">        enc := base32.StdEncoding</span><br><span class="line"></span><br><span class="line">        dst = enc.AppendEncode(dst, src)</span><br><span class="line">        fmt.Println(<span class="type">string</span>(dst))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Output</span></span><br><span class="line"><span class="comment">// leadJBSWY3DP</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="パディング値に「negative-value」を代入してみる"><a href="#パディング値に「negative-value」を代入してみる" class="headerlink" title="パディング値に「negative value」を代入してみる"></a>パディング値に「negative value」を代入してみる</h3><p>こちらのコミット（<a target="_blank" rel="noopener" href="https://github.com/golang/go/commit/243c8c0eec20d981d8e76a3aac82f97cca991571">encoding: require unique alphabet for base32 and base64</a>）で修正された「パディングの受け取る値」について、以前のバージョンでの挙動と比較しながら確認してみます。</p>
+<p>base32 エンコードでは、5バイトごとに分割した際の「不足分」が、「<code>=</code>」によりパディングされるというルールがありました。<br>Go の実装では、パディングの値は「<a target="_blank" rel="noopener" href="https://github.com/golang/go/blob/release-branch.go1.22/src/encoding/base32/base32.go#L28-L31">こちら</a>」で定義されています。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line"> StdPadding <span class="type">rune</span> = <span class="string">&#x27;=&#x27;</span> <span class="comment">// Standard padding character</span></span><br><span class="line"> NoPadding  <span class="type">rune</span> = <span class="number">-1</span>  <span class="comment">// No padding</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>パディングの値を「<code>$</code>」に指定すると、base32エンコードの結果が以下のようになります。</p>
+<figure class="highlight go"><figcaption><span>change_padding.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">        <span class="string">&quot;encoding/base32&quot;</span></span><br><span class="line">        <span class="string">&quot;fmt&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">        src := []<span class="type">byte</span>(<span class="string">&quot;Golang&quot;</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> padding <span class="type">rune</span> = <span class="string">&#x27;$&#x27;</span></span><br><span class="line">        enc := base32.StdEncoding.WithPadding(padding).EncodeToString(src)</span><br><span class="line"></span><br><span class="line">        fmt.Println(<span class="type">string</span>(enc))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Output</span></span><br><span class="line"><span class="comment">// I5XWYYLOM4$$$$$$</span></span><br></pre></td></tr></table></figure>
+
+<p>リリースノートには以下の記載があります。</p>
+<blockquote>
+<p>The methods base32.Encoding.WithPadding and base64.Encoding.WithPadding now panic if the padding argument is a negative value other than NoPadding.</p>
+</blockquote>
+<p>試しに <code>WithPadding</code> へ <code>-2</code> を代入して動かしてみます。</p>
+<figure class="highlight go"><figcaption><span>invalid_padding.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">        <span class="string">&quot;encoding/base32&quot;</span></span><br><span class="line">        <span class="string">&quot;fmt&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">        src := []<span class="type">byte</span>(<span class="string">&quot;Golang&quot;</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> padding <span class="type">rune</span> = <span class="number">-2</span></span><br><span class="line">        enc := base32.StdEncoding.WithPadding(padding).EncodeToString(src)</span><br><span class="line"></span><br><span class="line">        fmt.Println(<span class="type">string</span>(enc))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ go build -trimpath -o invalid_padding invalid_padding.go</span><br><span class="line">$ ./invalid_padding</span><br><span class="line">panic: invalid padding</span><br><span class="line"></span><br><span class="line">goroutine 1 [running]:</span><br><span class="line">encoding/base32.Encoding.WithPadding(...)</span><br><span class="line">        encoding/base32/base32.go:103</span><br><span class="line">main.main()</span><br><span class="line">        ./with_padding.go:12 +0x2a</span><br></pre></td></tr></table></figure>
+
+<p>Go 1.22 で動かすと、リリースノートの記載通り panic が起きました。</p>
+<p>比較検証として、Go 1.21 で動かしてみると、panic にはならず「パディングの値が文字化けして」表示されました。<br>このバグを踏むケースがあまりイメージできませんが、1.22 で回避されるようになりました。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ go run invalid_padding.go</span><br><span class="line">I5XWYYLOM4������</span><br></pre></td></tr></table></figure>
+
+<h2 id="encoding-x2F-json"><a href="#encoding-x2F-json" class="headerlink" title="encoding&#x2F;json"></a>encoding&#x2F;json</h2><h3 id="TL-DR-2"><a href="#TL-DR-2" class="headerlink" title="TL;DR(2)"></a>TL;DR(2)</h3><ul>
+<li>これまでのマーシャリングとエンコードでは、<code>&#39;\b&#39;</code> と <code>&#39;\f&#39;</code> はそれぞれ、<code>\u0008</code> と <code>\u000c</code> に変換されていました</li>
+<li>Go 1.22 から、<code>&#39;\b&#39;</code> は <code>\b</code> に、<code>&#39;\f&#39;</code> は <code>\f</code> に変換されるようになりました</li>
+<li>これにより、<code>RFC 8259</code> で定義された5つの制御文字全てへの対応が完了しました</li>
+</ul>
+<h3 id="アップデート内容-2"><a href="#アップデート内容-2" class="headerlink" title="アップデート内容(2)"></a>アップデート内容(2)</h3><p>リリースノートには、1行だけ説明があります。</p>
+<blockquote>
+<p>Marshaling and encoding functionality now escapes ‘\b’ and ‘\f’ characters as \b and \f instead of \u0008 and \u000c.</p>
+</blockquote>
+<p>本アップデートは、こちらの「コミットログ（<a target="_blank" rel="noopener" href="https://github.com/golang/go/commit/2763146099384e320e2d1c0fc41b3b3906050652">encoding&#x2F;json: encode \b and \f as ‘\b’ and ‘\f’ in JSON strings</a>）」に詳しい説明があります。</p>
+<p><code>EFC 8259</code> には5つの制御文字があり、</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://go.dev/cl/4678046">https://go.dev/cl/4678046</a> で <code>\r</code> と <code>n</code> に対応</li>
+<li><a target="_blank" rel="noopener" href="https://go.dev/cl/162340043">https://go.dev/cl/162340043</a> で <code>\t</code> に対応</li>
+</ul>
+<p>する中で、残りの <code>\b</code> と <code>\f</code> に対応したのが今回のアップデートのようです。</p>
+<p>また、コミットログには以下の記載があります。</p>
+<blockquote>
+<p>This change is to prepare the path forward for a potential v2 “json” package, which has more consistent encoding of JSON strings.</p>
+</blockquote>
+<p>「v2 json package への準備」とのことなので、今回のリリースにて <a target="_blank" rel="noopener" href="https://tip.golang.org/doc/go1.22#math_rand_v2">math&#x2F;rand&#x2F;v2</a> が追加されたこともり、今後のアップデートが楽しみだなと思いました。</p>
+<h2 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h2><p>本ブログでは、<code>encoding</code> パッケージへの追加機能、bugfix 内容を紹介しました。<br>今回の連載記事の内容を調べるなかで「アップデートの背景を、issue を通して知る」ことの面白さに気付きました。</p>
+<p>コードを読む中で、以外と小さな単位のコミットがマージされているケースも見つかりましたので、私もできるところから OSSにコミットしていきたいなと思いました。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20240201a/&related=twitterapi%2Ctwitter&text=Go%201.22%20%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E9%80%A3%E8%BC%89%20encoding,%20encoding/json%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240201a/&t=Go%201.22%20%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E9%80%A3%E8%BC%89%20encoding,%20encoding/json" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240201a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240201a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;566</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2024.01.31</span><span class="snscount">&#9825;3</span><a href=/articles/20240131a/ title="Go 1.22のマイナーアップデートのうち、ファイルなどの入出力に関連しそうな  archive/tar ・ archive/zip ・ bufio ・ io を取り上げて紹介します。">Go 1.22リリース連載 archive/tar, archive/zip, bufio, io<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.01.30</span><span class="snscount">&#9825;4</span><a href=/articles/20240130a/ title="TIGの辻です。Go1.22連載の2本目です。この記事では、マイナーアップデートから slices パッケージを取り上げて紹介します。">Go 1.22 リリース連載 slicesのマイナーアップデート<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.01.29</span><span class="snscount">&#9825;33</span><a href=/articles/20240129a/ title="Future Tech Blog恒例のGoリリース連載が始まります。">Go 1.22リリース連載始まります & ループの変化とTinyGo 0.31<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.10.24</span><span class="snscount">&#9825;24</span><a href=/articles/20231024a/ title="PostgreSQLには timestamp with time zone型が存在します。一見、タイムゾーン付きで日時データを保持してくれそうな名称ですが、そうではないよという話をさせてください。">PostgreSQLのtimestamp with time zone型とGoのtime.Location</a></li><li class="related-posts-item"><span>2023.10.20</span><span class="snscount">&#9825;25</span><a href=/articles/20231020a/ title="Google Go Coding Guideで紹介されていたgoogle/subcommandsについて理解を深めて行こうと思います。">超薄いGoのCLI作成パッケージ google/subcommands 入門</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20240129a/ title="Future Tech Blog恒例のGoリリース連載が始まります。">Go 1.22リリース連載始まります & ループの変化とTinyGo 0.31<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#encoding-x2F-base32-base64-hex"><span class="toc-text">encoding&#x2F;base32, base64, hex</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#TL-DR-1"><span class="toc-text">TL;DR(1)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%A2%E3%83%83%E3%83%97%E3%83%87%E3%83%BC%E3%83%88%E5%86%85%E5%AE%B9-1"><span class="toc-text">アップデート内容(1)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#base32-%E5%A4%89%E6%8F%9B%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"><span class="toc-text">base32 変換について</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E2%91%A0%E3%80%8CHello%E3%80%8D%E3%82%92-Ascii-%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AB%E5%A4%89%E6%8F%9B%E3%81%99%E3%82%8B"><span class="toc-text">①「Hello」を Ascii コードに変換する</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E2%91%A1-8-%E3%83%93%E3%83%83%E3%83%88%E3%81%AE%E3%83%90%E3%82%A4%E3%83%8A%E3%83%AA%E3%81%AB%E5%A4%89%E6%8F%9B%E3%81%99%E3%82%8B"><span class="toc-text">② 8 ビットのバイナリに変換する</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E2%91%A2-%E3%83%90%E3%82%A4%E3%83%8A%E3%83%AA%E5%80%A4%E3%82%92%E9%80%A3%E7%B5%90%E3%81%99%E3%82%8B"><span class="toc-text">③ バイナリ値を連結する</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E2%91%A3-%E3%83%90%E3%82%A4%E3%83%8A%E3%83%AA%E3%82%B9%E3%83%88%E3%83%AA%E3%83%BC%E3%83%A0%E3%82%92-5%E3%83%93%E3%83%83%E3%83%88%E3%81%94%E3%81%A8%E3%81%AB%E5%8C%BA%E5%88%87%E3%82%8B"><span class="toc-text">④ バイナリストリームを 5ビットごとに区切る</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E2%91%A4-5%E3%83%93%E3%83%83%E3%83%88%E3%81%AE%E5%80%A4%E3%81%94%E3%81%A8%E3%81%AB%E3%80%8110%E9%80%B2%E6%95%B0%E3%81%B8%E3%81%A8%E5%A4%89%E6%8F%9B%E3%81%99%E3%82%8B"><span class="toc-text">⑤ 5ビットの値ごとに、10進数へと変換する</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E2%91%A5-10%E9%80%B2%E6%95%B0%E3%82%92-base32-%E5%A4%89%E6%8F%9B%E3%81%99%E3%82%8B"><span class="toc-text">⑥ 10進数を base32 変換する</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AppendEncode-AppendDecode-%E3%82%92%E5%8B%95%E3%81%8B%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">AppendEncode, AppendDecode を動かしてみる</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%91%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E5%80%A4%E3%81%AB%E3%80%8Cnegative-value%E3%80%8D%E3%82%92%E4%BB%A3%E5%85%A5%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">パディング値に「negative value」を代入してみる</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#encoding-x2F-json"><span class="toc-text">encoding&#x2F;json</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#TL-DR-2"><span class="toc-text">TL;DR(2)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%A2%E3%83%83%E3%83%97%E3%83%87%E3%83%BC%E3%83%88%E5%86%85%E5%AE%B9-2"><span class="toc-text">アップデート内容(2)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (425)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (253)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (98)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (61)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (35)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
