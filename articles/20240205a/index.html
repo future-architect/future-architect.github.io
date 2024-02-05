@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Go 1.22リリース連載 vet, log/slog, testing/slogtest | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTIG 真野です。Go1.22連載の7本目です。 Go 1.22のアップデートのツーリングのうち Vet と、ライブラリのマイナーアップデートである log&#x2F;slog, testing&#x2F;slogtest を取り上げて紹介します。 アップデートサマリ Vetでループ変数の変数キャプチャを検知しなくなった #63888 Vetで slice1 &#x3D; append(slice1) の操作を検知">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 1.22リリース連載 vet, log&#x2F;slog, testing&#x2F;slogtest | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240205a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIG 真野です。Go1.22連載の7本目です。 Go 1.22のアップデートのツーリングのうち Vet と、ライブラリのマイナーアップデートである log&#x2F;slog, testing&#x2F;slogtest を取り上げて紹介します。 アップデートサマリ Vetでループ変数の変数キャプチャを検知しなくなった #63888 Vetで slice1 &#x3D; append(slice1) の操作を検知">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240205a/top.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240205a/image.png">
+<meta property="article:published_time" content="2024-02-04T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-05T06:05:51.873Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Linter">
+<meta property="article:tag" content="Go1.22">
+<meta property="article:tag" content="slog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240205a/top.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240205a/">
+  <meta content="Go,Linter,Go1.22,slog" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Go 1.22リリース連載 vet, log/slog, testing/slogtest
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240205a_Go_1.22リリース連載_vet,_log／slog,_testing／slogtest.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240205a_Go_1.22リリース連載_vet,_log／slog,_testing／slogtest" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-02-04T15:00:00.000Z" itemprop="datePublished">2024.02.05</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98" title="真野隼記さんの記事一覧へ" class="post-author">真野隼記</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/Linter/" title="Linterタグの記事へ" class="tag-list-link">Linter</a>
+  
+    
+    <a href="/tags/Go1-22/" title="Go1.22タグの記事へ" class="tag-list-link">Go1.22</a>
+  
+    
+    <a href="/tags/slog/" title="slogタグの記事へ" class="tag-list-link">slog</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20240205a/top.png" alt="" width="900" height="601">
+
+<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>TIG 真野です。<a href="/articles/20240129a/">Go1.22連載</a>の7本目です。</p>
+<p>Go 1.22のアップデートのツーリングのうち <code>Vet</code> と、ライブラリのマイナーアップデートである <code>log/slog</code>, <code>testing/slogtest</code> を取り上げて紹介します。</p>
+<h2 id="アップデートサマリ"><a href="#アップデートサマリ" class="headerlink" title="アップデートサマリ"></a>アップデートサマリ</h2><ul>
+<li><code>Vet</code>でループ変数の変数キャプチャを検知しなくなった <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/63888">#63888</a></li>
+<li><code>Vet</code>で <code>slice1 = append(slice1)</code> の操作を検知するようになりました <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/60448">#63888</a></li>
+<li><code>Vet</code>で <code>defer</code> で <code>time.Since()</code> が呼ぶ操作を検知するようになりました <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/60048">#60448</a></li>
+<li><code>Vet</code>で不正な <code>log/slog</code> なキーと値のペアを検知するようになりました <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/59407">#59407</a></li>
+<li><code>log/slog</code> で <code>SetLogLoggerLevel()</code>が追加されました <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/62418">#62418</a></li>
+<li><code>testing/slogtest</code>で <code>Run()</code> 関数が追加されサブテストの制御がしやすくなりました <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/61758">#61758</a></li>
+</ul>
+<h2 id="Vet-ループ変数の変数キャプチャ-63888"><a href="#Vet-ループ変数の変数キャプチャ-63888" class="headerlink" title="Vet ループ変数の変数キャプチャ #63888"></a>Vet ループ変数の変数キャプチャ <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/63888">#63888</a></h2><p><a href="https://future-architect.github.io/articles/20240129a/#%E3%83%AB%E3%83%BC%E3%83%97%E3%81%AE%E5%A4%89%E5%8C%96-1">Go 1.22リリース連載始まります &amp; ループの変化とTinyGo 0.31</a>で説明されている通り、Goのループ変数は単なる参照だったためgoroutineにループ変数を渡すときにはいくつかのお作法がありました。go vetではありがちなミスを検知してくれていました。</p>
+<figure class="highlight go"><figcaption><span>よくありがちな例</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">const</span> N = <span class="number">4</span></span><br><span class="line">	<span class="keyword">var</span> wg sync.WaitGroup</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; N; i++ &#123;</span><br><span class="line">		wg.Add(<span class="number">1</span>)</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; <span class="keyword">defer</span> wg.Done(); fmt.Println(i) &#125;()</span><br><span class="line">	&#125;</span><br><span class="line">	wg.Wait()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>go1.21以前ですと、次のように0から4の値を出力するはずが、全く直感と反する挙動です。go vetコマンドでその間違いを検知してくれました。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">&gt;go run main.go</span><br><span class="line">4</span><br><span class="line">4</span><br><span class="line">4</span><br><span class="line">3</span><br><span class="line"></span><br><span class="line">&gt;go vet</span><br><span class="line">main.go:13:44: loop variable i captured by func literal</span><br></pre></td></tr></table></figure>
+
+<p>go1.22以降では、goroutine起動なので順序制御はされないものの（これは想定通りですね）、ループ変数が1つずつgoroutineに渡っていることが分かります。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">go run vetloop.go </span><br><span class="line">3</span><br><span class="line">0</span><br><span class="line">1</span><br><span class="line">2</span><br></pre></td></tr></table></figure>
+
+<p>正しく動いたので、go vetも検知しないようになりました。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">go vet                   </span><br><span class="line">.\main.go:13:44: loop variable i captured by func literal</span><br></pre></td></tr></table></figure>
+
+<p>…ってあれ、変わらないですね。なんででしょう。試したのは <code>go1.22rc2</code> です。まだ作業中なのかも知れません。後で調査したいと思います。</p>
+<h2 id="Vet-Sliceの意味のないappend-63888"><a href="#Vet-Sliceの意味のないappend-63888" class="headerlink" title="Vet Sliceの意味のないappend #63888"></a>Vet Sliceの意味のないappend <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/60448">#63888</a></h2><p>みなさんは知っていましたでしょうか？ <code>append()</code> が引数を取らなくても文法上は有効なことを。例えば次のようなコードはコンパイルもでき実行できます。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	sli1 := []<span class="type">string</span>&#123;<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>&#125;</span><br><span class="line">	sli2 := <span class="built_in">make</span>([]<span class="type">string</span>, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, v := <span class="keyword">range</span> sli1 &#123;</span><br><span class="line">		fmt.Println(v)</span><br><span class="line">		sli2 = <span class="built_in">append</span>(sli2) <span class="comment">// ★ポイント</span></span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(sli2) <span class="comment">// []</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>本来の想定は <code>sli2 = append(sli2, v)</code> だと思いますが、手違いで上記のようなコードが生まれると、良くて混乱の元、通常はバグの元なので、go vetで検知する事になりました。</p>
+<p>さて、Vetに追加するには<a target="_blank" rel="noopener" href="https://github.com/golang/go/blob/go1.21.6/src/cmd/vet/README#L18-L23">ポリシー</a>に沿っているかが重要です。ポリシーは次のようなものです。</p>
+<ul>
+<li>Vetは利用頻度が高く、実行時間が重要</li>
+<li>バグである可能性が高い静的解析であっても、既存リポジトリで該当が少ないのであれば追加しない</li>
+</ul>
+<p>今回のチェック内容ですが、<a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/60448#issuecomment-1577418105">約 276,000 の Go プロジェクトのうち650 のプロジェクトで 727 の問題を検知した</a>ようです。これは数が少ないので基準を満たしていない？といったコメントもありました。<a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/60448#issuecomment-1582993504">検知した内容でモジュールの利用頻度でソートしたトップ20を提示して</a>、どうするかをディスカッションしています。</p>
+<img src="/images/20240205a/image.png" alt="image.png" width="1200" height="607" loading="lazy">
+
+<p>これで流れが決まり、Vetに含まれることになりました。空中戦にならず集計調査を実施しファクトから判断する流れは気持ちが良いですね。</p>
+<p>ちなみにですが、このチェック内容、<a target="_blank" rel="noopener" href="https://staticcheck.dev/docs/checks/#SA4021">StaticCheckにはすでに入っている</a> ということで、それを使っている方や、StaticCheckはgolangci-lintのデフォルトリンターでもあるので、golangci-lintをカスタマイズせずに使っている方は、この変更で追加で検知されることは多分無いです。ええええ、残念。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/golang/go/blob/go1.21.6/src/cmd/vet/README#L18-L23">https://github.com/golang/go/blob/go1.21.6/src/cmd/vet/README#L18-L23</a></p>
+<h2 id="Vet-deferで-time-Since-の呼び出し-60048"><a href="#Vet-deferで-time-Since-の呼び出し-60048" class="headerlink" title="Vet deferで time.Since() の呼び出し #60048"></a>Vet deferで time.Since() の呼び出し <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/60048">#60048</a></h2><p><code>time.Since()</code> のユースケースは何かしらの時間を計測するときに用いられます。例えば、処理性能をロギングしたい場合は次のように書きがちです。</p>
+<figure class="highlight go"><figcaption><span>time.Sinceの誤用例</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	start := time.Now()</span><br><span class="line">	<span class="keyword">defer</span> fmt.Println(time.Since(start))</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 何かしらの処理の代わりに、1秒スリープする</span></span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これを実行すると <code>0s</code> が出力されます。</p>
+<p>正しくは以下です。</p>
+<figure class="highlight diff"><figcaption><span>正しい例</span></figcaption><table><tr><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">	&quot;fmt&quot;</span><br><span class="line">	&quot;time&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">	start := time.Now()</span><br><span class="line"><span class="deletion">-	defer fmt.Println(time.Since(start))</span></span><br><span class="line"><span class="addition">+	defer func() &#123; fmt.Println(time.Since(start)) &#125;()</span></span><br><span class="line"></span><br><span class="line">	// 何かしらの処理の代わりに、1秒スリープする</span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>実行すると <code>1.0081377s</code> などと想定通りの結果となります。</p>
+<p><code>defer</code> へ渡された関数の呼び出しは、元の関数がreturnするタイミングですが、その関数に渡した <strong>引数は即時評価</strong>されるためです。 <code>defer\ [^&#123;]*time.Since</code> などで検索すると、<code>GoogleCloudPlatform/prometheus</code>　など大物リポジトリでもヒット、他にも多数該当するリポジトリがあるということで、Vet入りが決まりました。</p>
+<p>検知されると次のようなメッセージが出力されます。分かりやすいですね。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">&gt;go vet</span><br><span class="line">main.go:11:20: call to time.Since is not deferred</span><br></pre></td></tr></table></figure>
+
+<h2 id="Vet-log-x2F-slogで不正なキーと値のペア-59407"><a href="#Vet-log-x2F-slogで不正なキーと値のペア-59407" class="headerlink" title="Vet log&#x2F;slogで不正なキーと値のペア #59407"></a>Vet log&#x2F;slogで不正なキーと値のペア <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/59407">#59407</a></h2><p>slogのキーと値のペアのうち、以下の2条件で検知してくれるようになりました。</p>
+<ol>
+<li>キーがstringでもslog.Attrでもない</li>
+<li>最後のキーが見つからない（ペアになっていない）</li>
+</ol>
+<p>簡単な例です。この実装では <code>2</code> が本来キー名に当たるのですが、数値型となり不正です。</p>
+<figure class="highlight go"><figcaption><span>1のパターン</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;log/slog&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	slog.Info(<span class="string">&quot;&quot;</span>, <span class="string">&quot;key1&quot;</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, slog.String(<span class="string">&quot;attr1&quot;</span>, <span class="string">&quot;b&quot;</span>)) <span class="comment">// key1=1 !BADKEY=2 !BADKEY=3 attr1=b</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>run</code> と <code>vet</code> の結果は次の通りです。vetでは<code>2</code> が <code>string</code> か <code>slog.Attr</code> にしろと教えてくれますね。便利。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">&gt;go run main.go</span><br><span class="line">2024/01/30 11:16:35 INFO  key1=1 !BADKEY=2 !BADKEY=3 attr1=b</span><br><span class="line"></span><br><span class="line">&gt;go vet</span><br><span class="line">.\main.go:6:27: slog.Info arg <span class="string">&quot;2&quot;</span> should be a string or a slog.Attr (possible missing key or value)</span><br></pre></td></tr></table></figure>
+
+<p>しかし、<code>...</code> を利用したスプレッド構文で渡した場合は検知できません。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;log/slog&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	args := []any&#123;<span class="string">&quot;key1&quot;</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, slog.String(<span class="string">&quot;attr1&quot;</span>, <span class="string">&quot;b&quot;</span>)&#125;</span><br><span class="line">	slog.Info(<span class="string">&quot;&quot;</span>, args...)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上記は次のように、 <code>run</code> では正しく無いレイアウトでありますが、 <code>vet</code> では検知されません。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">&gt;go run main.go</span><br><span class="line">2024/01/30 11:23:01 INFO  key1=1 !BADKEY=2 !BADKEY=3 attr1=b</span><br><span class="line"></span><br><span class="line">&gt;go vet</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>この点はプロポーサルでも触れられており、スプレッド構文は一律NGとしてはどうか、という話もありましたが、こちらは誤検知が考えられ、vetのポリシーから外れるとして棄却されていました。方針と対応が一貫しており、有無を言わさない感じがGoぽいと思いました。</p>
+<h2 id="log-x2F-slog-SetLogLoggerLevel-の追加-62418"><a href="#log-x2F-slog-SetLogLoggerLevel-の追加-62418" class="headerlink" title="log&#x2F;slog SetLogLoggerLevel()の追加 #62418"></a>log&#x2F;slog SetLogLoggerLevel()の追加 <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/62418">#62418</a></h2><p>slog繋がりで <code>log/slog</code> アップデートです。</p>
+<p><code>SetLogLoggerLevel()</code> 関数の新規追加されました。<code>SetLogLoggerLevel()</code> でデフォルトlogパッケージ側のログレベルを変更することができます（現状はINFO固定だと思います）。</p>
+<p>本当にレベルを変えて出力したい場合は、標準の<code>log.Printf()</code>などではなく、<code>slog.Warn()</code> などを使えば良いので、悪くないデフォルト値だと思いますが、プロポーサルでは、デフォルト <code>log</code> パッケージはデフォルトで <code>stderr</code>に出力するため、ログレベルを変更できたほうが便利だろう、という提案です。 </p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SetLogLoggerLevel</span><span class="params">(level Level)</span></span> (oldLevel Level)</span><br></pre></td></tr></table></figure>
+
+<p>この関数ですが、<code>slog.SetDefault()</code> が呼ばれる前と後で、<code>slog.Debug()</code> など、slog経由のロギングにも影響します。業務などでは <code>slog.SetDefault()</code> をおそらくmainのエントリーポイントに近い場所で呼び出すと思うため、通常は細かい挙動の差を意識しなくても良いと思います。繰り返しますが本来の意図としては、標準のlogパッケージのログレベルを変更するためのものです。</p>
+<p>…と言いながらもも <code>slog.SetDefault()</code> を呼び出さず、<br><code>SetLogLoggerLevel()</code> を呼んで、slogと標準のlogパッケージで挙動がどう変わるか試します。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;log/slog&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	log.Println(<span class="string">&quot;========デフォルトのログレベルはINFO=========&quot;</span>)</span><br><span class="line">	log.Print(<span class="string">&quot;log debug🐛&quot;</span>)   <span class="comment">// log debug</span></span><br><span class="line">	slog.Debug(<span class="string">&quot;slog debug🐛&quot;</span>) <span class="comment">// ★no output</span></span><br><span class="line">	slog.Info(<span class="string">&quot;slog info🔍&quot;</span>)   <span class="comment">// INFO info</span></span><br><span class="line"></span><br><span class="line">	log.Println(<span class="string">&quot;========ログレベルをDEBUGに変更=========&quot;</span>)</span><br><span class="line">	slog.SetLogLoggerLevel(slog.LevelDebug)</span><br><span class="line">	log.Print(<span class="string">&quot;log debug🐛&quot;</span>)   <span class="comment">// log debug</span></span><br><span class="line">	slog.Debug(<span class="string">&quot;slog debug🐛&quot;</span>) <span class="comment">// ★「DEBUG debug」となり出力されるようになる</span></span><br><span class="line">	slog.Info(<span class="string">&quot;slog info🔍&quot;</span>)   <span class="comment">// INFO info</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt;go run main.go</span><br><span class="line">2024/01/30 12:53:14 ========デフォルトのログレベルはINFO=========</span><br><span class="line">2024/01/30 12:53:14 log debug🐛</span><br><span class="line">2024/01/30 12:53:14 INFO slog info🔍</span><br><span class="line">2024/01/30 12:53:14 ========ログレベルをDEBUGに変更=========</span><br><span class="line">2024/01/30 12:53:14 log debug🐛</span><br><span class="line">2024/01/30 12:53:14 DEBUG slog debug🐛</span><br><span class="line">2024/01/30 12:53:14 INFO slog info🔍</span><br></pre></td></tr></table></figure>
+
+<p>動きを見ると、<code>slog.SetLogLoggerLevel(slog.LevelDebug)</code> を呼び出すと、<code>slog.Debug()</code> が出力されるようになったことが分かります。<code>slog.SetDefault()</code>を呼び出さない前提だと、<code>slog</code> パッケージ経由のログ出力を、ログレベルでフィルターするような挙動となります。</p>
+<p>次に、 <code>slog.SetDefault()</code> でlogパッケージで用いるロガーをslog形式に変更した場合に、<code>slog.SetLogLoggerLevel()</code> がどう影響するか試します。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;log/slog&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	slog.SetLogLoggerLevel(slog.LevelError)</span><br><span class="line">	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, <span class="literal">nil</span>)))</span><br><span class="line"></span><br><span class="line">	slog.Info(<span class="string">&quot;slog info: go1.22 blog series🔍&quot;</span>)</span><br><span class="line">	slog.Warn(<span class="string">&quot;slog warn: go1.22 blog series⚠️&quot;</span>)</span><br><span class="line">	slog.Error(<span class="string">&quot;slog error: go1.22 blog series🚨&quot;</span>)</span><br><span class="line"></span><br><span class="line">	log.Print(<span class="string">&quot;log print: go1.22 blog series📝&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これを実行すると次のように、logパッケージ経由の出力も、ログレベルがERRORで出力されることがわかります。このケースですと、ややこしいですがslog側のERROR未満のログは抑制されません。</p>
+<figure class="highlight plaintext"><figcaption><span>出力結果</span></figcaption><table><tr><td class="code"><pre><span class="line">&gt;go run main2.go</span><br><span class="line">&#123;&quot;time&quot;:&quot;2024-01-30T13:02:46.9325009+09:00&quot;,&quot;level&quot;:&quot;INFO&quot;,&quot;msg&quot;:&quot;slog info: go1.22 blog series🔍&quot;&#125;</span><br><span class="line">&#123;&quot;time&quot;:&quot;2024-01-30T13:02:46.9659968+09:00&quot;,&quot;level&quot;:&quot;WARN&quot;,&quot;msg&quot;:&quot;slog warn: go1.22 blog series⚠️&quot;&#125;</span><br><span class="line">&#123;&quot;time&quot;:&quot;2024-01-30T13:02:46.966573+09:00&quot;,&quot;level&quot;:&quot;ERROR&quot;,&quot;msg&quot;:&quot;slog error: go1.22 blog series🚨&quot;&#125;</span><br><span class="line">&#123;&quot;time&quot;:&quot;2024-01-30T13:02:46.966573+09:00&quot;,&quot;level&quot;:&quot;ERROR&quot;,&quot;msg&quot;:&quot;log print: go1.22 blog series📝&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>少しややこしいですが、 <code>slog.SetLogLoggerLevel()</code> は <code>slog.SetDefault()</code> の呼び出し有無で、 <code>slog.Debug()</code>や<code>slog.Info()</code> などを制御するモードが変わると思った方が理解しやすいです。</p>
+<p>ちなみに、次のように、 <code>slog.SetLogLoggerLevel()</code> ではERRORレベル、 <code>slog.SetDefault()</code> にわたすHandlerのログレベルにWARNを渡しても、 標準の<code>log</code> パッケージの出力はERRORレベルで出力されます。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;log/slog&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	slog.SetLogLoggerLevel(slog.LevelError) <span class="comment">// ERROR</span></span><br><span class="line">	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &amp;slog.HandlerOptions&#123;</span><br><span class="line">		Level: slog.LevelWarn, <span class="comment">//WARN</span></span><br><span class="line">	&#125;)))</span><br><span class="line">	log.Print(<span class="string">&quot;log print: go1.22 blog series🐙&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight json"><figcaption><span>出力結果</span></figcaption><table><tr><td class="code"><pre><span class="line">&gt; go run main.go</span><br><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;time&quot;</span><span class="punctuation">:</span><span class="string">&quot;2024-01-30T13:20:15.5788942+09:00&quot;</span><span class="punctuation">,</span><span class="attr">&quot;level&quot;</span><span class="punctuation">:</span><span class="string">&quot;ERROR&quot;</span><span class="punctuation">,</span><span class="attr">&quot;msg&quot;</span><span class="punctuation">:</span><span class="string">&quot;log print: go1.22 blog series🐙&quot;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>逆に、<code>slog.SetLogLoggerLevel()</code> ではINFOレベルに返ると出力されません。logパッケージのログレベルがINFO、デフォルトロガーのレベルがWARNのため、WARN未満である <code>log.Print()</code> の内容は出力されません。</p>
+<figure class="highlight diff"><table><tr><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">	&quot;log&quot;</span><br><span class="line">	&quot;log/slog&quot;</span><br><span class="line">	&quot;os&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line"><span class="deletion">-	slog.SetLogLoggerLevel(slog.LevelError) // ERROR</span></span><br><span class="line"><span class="addition">+	slog.SetLogLoggerLevel(slog.LevelInfo) // INFO</span></span><br><span class="line">	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &amp;slog.HandlerOptions&#123;</span><br><span class="line">		Level: slog.LevelWarn, //WARN</span><br><span class="line">	&#125;)))</span><br><span class="line">	log.Print(&quot;log print: go1.22 blog series🐙&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt;go run main.go</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>理にかなった挙動に見えますが、それぞれにしたログレベル値によっては、<code>log</code>, <code>slog</code> どちらも併用すると混乱しそうですね。</p>
+<h2 id="testing-x2F-slogtest-Run-の追加-61758"><a href="#testing-x2F-slogtest-Run-の追加-61758" class="headerlink" title="testing&#x2F;slogtest Run()の追加 #61758"></a>testing&#x2F;slogtest Run()の追加 <a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/61758">#61758</a></h2><p>slogは <code>slog.Handler</code> インターフェースを満たすことで、最終的な出力レイアウトを切り替える仕組みがあります。さきほどの <code>slog.NewJSONHandler()</code> はJSONで出力するHandlerでしたよね。調べると<a target="_blank" rel="noopener" href="https://github.com/go-slog/awesome-slog">go-slog&#x2F;awesome-slog</a> のようなAwesomeなリポジトリも見つかるほど、多くのHandlerが存在することが分かります。</p>
+<p>Go1.21のslogの登場とともに、Handlerをテストする <code>testing/slogtest</code> というパッケージが追加されましたが、そこにRun()関数が追加されました。</p>
+<p>まずslogtestパッケージってなに？ってことですが、簡単にいうと予め準備されたslogのテストケースを呼び出すテストヘルパーです。どのようなケースかと言いますと、<a target="_blank" rel="noopener" href="https://tip.golang.org/src/testing/slogtest/slogtest.go">slogtest.go</a> のcases変数を見ると分かります。</p>
+<figure class="highlight go"><figcaption><span>slogtestのテストケース</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> cases = []testCase&#123;</span><br><span class="line">	&#123;</span><br><span class="line">		name:        <span class="string">&quot;built-ins&quot;</span>,</span><br><span class="line">		explanation: withSource(<span class="string">&quot;this test expects slog.TimeKey, slog.LevelKey and slog.MessageKey&quot;</span>),</span><br><span class="line">		f: <span class="function"><span class="keyword">func</span><span class="params">(l *slog.Logger)</span></span> &#123;</span><br><span class="line">			l.Info(<span class="string">&quot;message&quot;</span>)</span><br><span class="line">		&#125;,</span><br><span class="line">		checks: []check&#123;</span><br><span class="line">			hasKey(slog.TimeKey),</span><br><span class="line">			hasKey(slog.LevelKey),</span><br><span class="line">			hasAttr(slog.MessageKey, <span class="string">&quot;message&quot;</span>),</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;,</span><br><span class="line">	&#123;</span><br><span class="line">		name:        <span class="string">&quot;attrs&quot;</span>,</span><br><span class="line">		explanation: withSource(<span class="string">&quot;a Handler should output attributes passed to the logging function&quot;</span>),</span><br><span class="line">		f: <span class="function"><span class="keyword">func</span><span class="params">(l *slog.Logger)</span></span> &#123;</span><br><span class="line">			l.Info(<span class="string">&quot;message&quot;</span>, <span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>)</span><br><span class="line">		&#125;,</span><br><span class="line">		checks: []check&#123;</span><br><span class="line">			hasAttr(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>),</span><br><span class="line"><span class="comment">//以下略</span></span><br></pre></td></tr></table></figure>
+
+<p>GoDocの<a target="_blank" rel="noopener" href="https://pkg.go.dev/testing/slogtest@master">Example</a>に書いてある使い方としては、テスト対象のslog.Handlerを引数に渡して、 <code>slogtest.TestHandler(h, results)</code> のように呼び出すと、上記であげたテストケースが実行されます。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;bytes&quot;</span></span><br><span class="line">	<span class="string">&quot;encoding/json&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;log/slog&quot;</span></span><br><span class="line">	<span class="string">&quot;testing/slogtest&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestMySlogHandler</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> buf bytes.Buffer</span><br><span class="line">	h := slog.NewJSONHandler(&amp;buf, <span class="literal">nil</span>)</span><br><span class="line"></span><br><span class="line">	results := <span class="function"><span class="keyword">func</span><span class="params">()</span></span> []<span class="keyword">map</span>[<span class="type">string</span>]any &#123;</span><br><span class="line">		<span class="keyword">var</span> ms []<span class="keyword">map</span>[<span class="type">string</span>]any</span><br><span class="line">		<span class="keyword">for</span> _, line := <span class="keyword">range</span> bytes.Split(buf.Bytes(), []<span class="type">byte</span>&#123;<span class="string">&#x27;\n&#x27;</span>&#125;) &#123;</span><br><span class="line">			<span class="keyword">if</span> <span class="built_in">len</span>(line) == <span class="number">0</span> &#123;</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">var</span> m <span class="keyword">map</span>[<span class="type">string</span>]any</span><br><span class="line">			<span class="keyword">if</span> err := json.Unmarshal(line, &amp;m); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				t.Fatal(err) <span class="comment">// JSONに変換できない場合は失敗扱い</span></span><br><span class="line">			&#125;</span><br><span class="line">			ms = <span class="built_in">append</span>(ms, m)</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> ms</span><br><span class="line">	&#125;</span><br><span class="line">	err := slogtest.TestHandler(h, results)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		t.Errorf(<span class="string">&quot;report from testing/slogtest.TestHandler: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>この課題ですが、<a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/61758#issue-1836738770">プロポーサル</a>に記載されているように、TestSlogHandler という1つのフラットな関数でテストが実行されるため、どこか1ケースが落ちた際に切り分けがしにくいということが上げられていました。そこで<code>go test -run TestSlogHandler/ignore.an.empty.Attr</code> のように各1ケースごとサブテストで動かすことを行う <code>Run()</code> 関数が追加されました。</p>
+<p>slog.Handlerを作る人は要チェックだと思います。作り方は<a target="_blank" rel="noopener" href="https://github.com/golang/example/blob/master/slog-handler-guide/README.md">ガイドライン</a>もあるようなので、併せて確認すると良さそうです。</p>
+<h2 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h2><p>実はGo1.22の2本目です。プロポーサルやそのやり取りを見るのが楽しくて2枠いただきました。</p>
+<p>Vetは好きで、<a href="/articles/20231005a/">go vet に含まれないスタンドアロンな静的解析ツールたち </a>記事を書いたり、日々golangci-lintのenableとするLinterを増やす活動を行い徳を積んでいます。</p>
+<p>slogは実践導入ができていないですが、これを機会にチャレンジしていきたいです。</p>
+<p>引き続きフューチャー技術ブログをよろしくお願いします。Go言語で開発できる仲間を募集しています。キャリア採用での応募を待っています。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20240205a/&related=twitterapi%2Ctwitter&text=Go%201.22%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E9%80%A3%E8%BC%89%20vet,%20log/slog,%20testing/slogtest%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240205a/&t=Go%201.22%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E9%80%A3%E8%BC%89%20vet,%20log/slog,%20testing/slogtest" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240205a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240205a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2024.01.31</span><span class="snscount">&#9825;6</span><a href=/articles/20240131a/ title="Go 1.22のマイナーアップデートのうち、ファイルなどの入出力に関連しそうな  archive/tar ・ archive/zip ・ bufio ・ io を取り上げて紹介します。">Go 1.22リリース連載 archive/tar, archive/zip, bufio, io<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.10.05</span><span class="snscount">&#9825;12</span><a href=/articles/20231005a/ title="go vetと付随する（という表現が正しいか不明ですが）ツール群についてまとめます。知っておくと似たようなツールを作ってしまうことを防げるかなという点と、類似のチェックを行いたい場合に参考にしたいこと、ユースケースが合えば…">go vet に含まれないスタンドアロンな静的解析ツールたち</a></li><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;566</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2024.02.02</span><span class="snscount">&#9825;45</span><a href=/articles/20240202a/ title="Goの標準ライブラリである net/http の ServeMux におけるルーティング周りの強化について取り上げます。">Go1.22 リリース連載 HTTPルーティングの強化<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.02.01</span><span class="snscount">&#9825;12</span><a href=/articles/20240201a/ title="Go 1.22 Release Notesの4本目です。encoding のアップデートを取り上げます。">Go 1.22 リリース連載 encoding, encoding/json<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.01.30</span><span class="snscount">&#9825;4</span><a href=/articles/20240130a/ title="TIGの辻です。Go1.22連載の2本目です。この記事では、マイナーアップデートから slices パッケージを取り上げて紹介します。">Go 1.22 リリース連載 slicesのマイナーアップデート<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20240129a/ title="Future Tech Blog恒例のGoリリース連載が始まります。">Go 1.22リリース連載始まります & ループの変化とTinyGo 0.31<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%A2%E3%83%83%E3%83%97%E3%83%87%E3%83%BC%E3%83%88%E3%82%B5%E3%83%9E%E3%83%AA"><span class="toc-text">アップデートサマリ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vet-%E3%83%AB%E3%83%BC%E3%83%97%E5%A4%89%E6%95%B0%E3%81%AE%E5%A4%89%E6%95%B0%E3%82%AD%E3%83%A3%E3%83%97%E3%83%81%E3%83%A3-63888"><span class="toc-text">Vet ループ変数の変数キャプチャ #63888</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vet-Slice%E3%81%AE%E6%84%8F%E5%91%B3%E3%81%AE%E3%81%AA%E3%81%84append-63888"><span class="toc-text">Vet Sliceの意味のないappend #63888</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vet-defer%E3%81%A7-time-Since-%E3%81%AE%E5%91%BC%E3%81%B3%E5%87%BA%E3%81%97-60048"><span class="toc-text">Vet deferで time.Since() の呼び出し #60048</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vet-log-x2F-slog%E3%81%A7%E4%B8%8D%E6%AD%A3%E3%81%AA%E3%82%AD%E3%83%BC%E3%81%A8%E5%80%A4%E3%81%AE%E3%83%9A%E3%82%A2-59407"><span class="toc-text">Vet log&#x2F;slogで不正なキーと値のペア #59407</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#log-x2F-slog-SetLogLoggerLevel-%E3%81%AE%E8%BF%BD%E5%8A%A0-62418"><span class="toc-text">log&#x2F;slog SetLogLoggerLevel()の追加 #62418</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#testing-x2F-slogtest-Run-%E3%81%AE%E8%BF%BD%E5%8A%A0-61758"><span class="toc-text">testing&#x2F;slogtest Run()の追加 #61758</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%95%E3%81%84%E3%81%94%E3%81%AB"><span class="toc-text">さいごに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (427)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (253)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (98)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (61)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (35)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
