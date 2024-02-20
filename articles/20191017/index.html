@@ -38,7 +38,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20191017/1.png">
 <meta property="article:published_time" content="2019-10-16T23:02:12.000Z">
-<meta property="article:modified_time" content="2022-06-09T01:03:49.372Z">
+<meta property="article:modified_time" content="2024-02-20T05:41:28.713Z">
 <meta property="article:tag" content="Network">
 <meta property="article:tag" content="GCP">
 <meta property="article:tag" content="Kubernetes">
@@ -157,26 +157,26 @@
 <p>引用文そのままですが、限定公開クラスタの設定を行うと、各GKEノードにPublic IPを付与せずGKEクラスタを構築することができます。セキュリティ要件からこちらの設定が必須となりました。</p>
 <h2 id="GKEクラスタの制約"><a href="#GKEクラスタの制約" class="headerlink" title="GKEクラスタの制約"></a>GKEクラスタの制約</h2><ol>
 <li>共有VPC上にGKEクラスタ構築する制約<br>クラスタの<strong>ポッド</strong>と<strong>サービス</strong>に使用するサブネットとセカンダリCIDRを指定する必要があります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#verify_usable_subnets">https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#verify_usable_subnets</a></li>
-<li>パブリックエンドポイントへのアクセスが制限された限定公開クラスタによる制約<br>クラスタ<strong>マスター</strong>が使用する /28 分の RFC 1918 アドレス範囲を指定する必要があります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#public_master">https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#public_master</a></li>
-<li>セカンダリCIDRの上限によるクラスタ数の制約<br>ポッドとサービスに対して割り当てるセカンダリCIDRですが、1サブネット内に設定可能なセカンダリCIDR数に上限があり、この上限数/2が構築可能なクラスタ数になります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#notes_about_secondary_ranges">https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#notes_about_secondary_ranges</a><br>私が構築した時点ではセカンダリCIDRの上限は5つだったためクラスタの上限は2つでしたが、現在はセカンダリCIDRの上限は30まで拡張されており15クラスタまで作成可能なのでさほど設計上の制約にはならないかもしれません。<br>※日本語ドキュメントはまだ5のままにですが英語では30になっています。（2019/10/17時点）</li>
+<li>パブリックエンドポイントへのアクセスが制限された限定公開クラスタによる制約<br>クラスタ<strong>マスター</strong>が使用する &#x2F;28 分の RFC 1918 アドレス範囲を指定する必要があります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#public_master">https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#public_master</a></li>
+<li>セカンダリCIDRの上限によるクラスタ数の制約<br>ポッドとサービスに対して割り当てるセカンダリCIDRですが、1サブネット内に設定可能なセカンダリCIDR数に上限があり、この上限数&#x2F;2が構築可能なクラスタ数になります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#notes_about_secondary_ranges">https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc#notes_about_secondary_ranges</a><br>私が構築した時点ではセカンダリCIDRの上限は5つだったためクラスタの上限は2つでしたが、現在はセカンダリCIDRの上限は30まで拡張されており15クラスタまで作成可能なのでさほど設計上の制約にはならないかもしれません。<br>※日本語ドキュメントはまだ5のままにですが英語では30になっています。（2019&#x2F;10&#x2F;17時点）</li>
 </ol>
 <h1 id="実際に設計してみる"><a href="#実際に設計してみる" class="headerlink" title="実際に設計してみる"></a>実際に設計してみる</h1><p>本編です。</p>
 <p>前項の制約から1GKEクラスタに対して <strong>3つのCIDR(ポッド、サービス、マスター)を割り当てる必要</strong> が出てきました。またこれらは <strong>同一の共有VPC上に構築するため構築される全てのプロジェクトをまたいで全てのCIDRが被ってはいけない</strong> という制約もあります。</p>
 <p>この辺りに注意してCIDR設計したいと思います。</p>
 <h2 id="1-全体の設計方針"><a href="#1-全体の設計方針" class="headerlink" title="1. 全体の設計方針"></a>1. 全体の設計方針</h2><p>設定上はプロジェクトが異なればポッドやサービスのCIDRは全く異なる範囲や体系で設定可能です。<br>ですが、各プロジェクト（環境）毎に設計のポリシーを合わせるために全プロジェクトに対してポッド、サービス、マスタ別にCIDRを概念的に割り当て、そこから各プロジェクトごとに実際のCIDRを割り当てるといった設計方針をとりました。</p>
-<h2 id="2-ポッド＆サービスCIDR"><a href="#2-ポッド＆サービスCIDR" class="headerlink" title="2. ポッド＆サービスCIDR"></a>2. ポッド＆サービスCIDR</h2><h3 id="2-1-共有VPC上の全プロジェクトに対するCIDR"><a href="#2-1-共有VPC上の全プロジェクトに対するCIDR" class="headerlink" title="2.1. 共有VPC上の全プロジェクトに対するCIDR"></a>2.1. 共有VPC上の全プロジェクトに対するCIDR</h3><p>こちらは172.16.0.0/12（クラスB）を概念的に割り当てました。<br>GKEのポッド＆サービスに割り当て可能なCIDRはRFC 1918 ブロック（10.0.0.0/8、172.16.0.0/12、または 192.168.0.0/16）の制約があります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/routes-based-cluster#pod_address_range">https://cloud.google.com/kubernetes-engine/docs/how-to/routes-based-cluster#pod_address_range</a></p>
-<p>10.0.0.0/8はGCP環境以外も含めたシステム全体で利用しているのと、192.168.0.0/16は後述のマスタのアドレス範囲に利用するためクラスB（172.16.0.0/12）を選択しました。</p>
+<h2 id="2-ポッド＆サービスCIDR"><a href="#2-ポッド＆サービスCIDR" class="headerlink" title="2. ポッド＆サービスCIDR"></a>2. ポッド＆サービスCIDR</h2><h3 id="2-1-共有VPC上の全プロジェクトに対するCIDR"><a href="#2-1-共有VPC上の全プロジェクトに対するCIDR" class="headerlink" title="2.1. 共有VPC上の全プロジェクトに対するCIDR"></a>2.1. 共有VPC上の全プロジェクトに対するCIDR</h3><p>こちらは172.16.0.0&#x2F;12（クラスB）を概念的に割り当てました。<br>GKEのポッド＆サービスに割り当て可能なCIDRはRFC 1918 ブロック（10.0.0.0&#x2F;8、172.16.0.0&#x2F;12、または 192.168.0.0&#x2F;16）の制約があります。<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/routes-based-cluster#pod_address_range">https://cloud.google.com/kubernetes-engine/docs/how-to/routes-based-cluster#pod_address_range</a></p>
+<p>10.0.0.0&#x2F;8はGCP環境以外も含めたシステム全体で利用しているのと、192.168.0.0&#x2F;16は後述のマスタのアドレス範囲に利用するためクラスB（172.16.0.0&#x2F;12）を選択しました。</p>
 <p>なお基本的にはクラスBの範囲を使うことができますが、公式ドキュメントには<code>172.17.0.0/16</code>を利用することができない旨の記載があります。<br>該当範囲を指定してもクラスタ構築時にエラーとなるわけではないのでご注意下さい。</p>
 <blockquote>
-<p>Restrictions<br>Private clusters have the following restrictions:<br>You cannot use a cluster master, node, Pod, or Service IP range that overlaps with 172.17.0.0/16.<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#restrictions">https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#restrictions</a></p>
+<p>Restrictions<br>Private clusters have the following restrictions:<br>You cannot use a cluster master, node, Pod, or Service IP range that overlaps with 172.17.0.0&#x2F;16.<br><a target="_blank" rel="noopener" href="https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#restrictions">https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#restrictions</a></p>
 </blockquote>
 <h3 id="2-2-各プロジェクトにおけるCIDR"><a href="#2-2-各プロジェクトにおけるCIDR" class="headerlink" title="2.2. 各プロジェクトにおけるCIDR"></a>2.2. 各プロジェクトにおけるCIDR</h3><p>こちらに対してはさらに3段階の概念でCIDRを設計しました。</p>
 <ul>
 <li>プロジェクト毎のCIDR</li>
-<li>ポッド/サービス毎のCIDR</li>
+<li>ポッド&#x2F;サービス毎のCIDR</li>
 <li>クラスタ毎のCIDR</li>
 </ul>
-<p>まずプロジェクトごとのCIDRですが、全体でいくつのプロジェクトを作成するかを設計します。<br>本番、ステージングはよくある環境ですが、他に非機能テスト、開発時の機能検証用を想定すると4面、これに加えて実データ使ったデモ環境、並行して動かす別バージョン環境・・などを考慮し最大7断面を想定しました。<br>これによって172.16.0.0/12以下に3bit加えて以下のCIDRが割当たります。</p>
+<p>まずプロジェクトごとのCIDRですが、全体でいくつのプロジェクトを作成するかを設計します。<br>本番、ステージングはよくある環境ですが、他に非機能テスト、開発時の機能検証用を想定すると4面、これに加えて実データ使ったデモ環境、並行して動かす別バージョン環境・・などを考慮し最大7断面を想定しました。<br>これによって172.16.0.0&#x2F;12以下に3bit加えて以下のCIDRが割当たります。</p>
 <div class="scroll"><table>
 <thead>
 <tr>
@@ -186,23 +186,23 @@
 </thead>
 <tbody><tr>
 <td align="left">本番</td>
-<td align="left">172.18.0.0/15</td>
+<td align="left">172.18.0.0&#x2F;15</td>
 </tr>
 <tr>
 <td align="left">ステージング</td>
-<td align="left">172.20.0.0/15</td>
+<td align="left">172.20.0.0&#x2F;15</td>
 </tr>
 <tr>
 <td align="left">非機能</td>
-<td align="left">172.22.0.0/15</td>
+<td align="left">172.22.0.0&#x2F;15</td>
 </tr>
 <tr>
 <td align="left">・・・</td>
 <td align="left">・・・</td>
 </tr>
 </tbody></table></div>
-<p>※172.16.0.0/15は前述の172.17.0.0/16を含むため利用しませんでした。</p>
-<p>次にポッド/サービスですが、これは2値のため次の1bitを割り当てます</p>
+<p>※172.16.0.0&#x2F;15は前述の172.17.0.0&#x2F;16を含むため利用しませんでした。</p>
+<p>次にポッド&#x2F;サービスですが、これは2値のため次の1bitを割り当てます</p>
 <div class="scroll"><table>
 <thead>
 <tr>
@@ -214,39 +214,39 @@
 </thead>
 <tbody><tr>
 <td align="left">本番</td>
-<td align="left">172.16.0.0/15</td>
+<td align="left">172.16.0.0&#x2F;15</td>
 <td align="left">ポッド</td>
-<td align="left">172.18.0.0/16</td>
+<td align="left">172.18.0.0&#x2F;16</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">サービス</td>
-<td align="left">172.19.0.0/16</td>
+<td align="left">172.19.0.0&#x2F;16</td>
 </tr>
 <tr>
 <td align="left">ステージング</td>
-<td align="left">172.18.0.0/15</td>
+<td align="left">172.18.0.0&#x2F;15</td>
 <td align="left">ポッド</td>
-<td align="left">172.20.0.0/16</td>
+<td align="left">172.20.0.0&#x2F;16</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">サービス</td>
-<td align="left">172.21.0.0/16</td>
+<td align="left">172.21.0.0&#x2F;16</td>
 </tr>
 <tr>
 <td align="left">非機能</td>
-<td align="left">172.20.0.0/15</td>
+<td align="left">172.20.0.0&#x2F;15</td>
 <td align="left">ポッド</td>
-<td align="left">172.22.0.0/16</td>
+<td align="left">172.22.0.0&#x2F;16</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">サービス</td>
-<td align="left">172.23.0.0/16</td>
+<td align="left">172.23.0.0&#x2F;16</td>
 </tr>
 <tr>
 <td align="left">・・・</td>
@@ -269,11 +269,11 @@
 </thead>
 <tbody><tr>
 <td align="left">本番</td>
-<td align="left">172.16.0.0/15</td>
+<td align="left">172.16.0.0&#x2F;15</td>
 <td align="left">ポッド</td>
-<td align="left">172.18.0.0/16</td>
+<td align="left">172.18.0.0&#x2F;16</td>
 <td align="left">クラスタA</td>
-<td align="left"><strong>172.18.0.0/18</strong></td>
+<td align="left"><strong>172.18.0.0&#x2F;18</strong></td>
 </tr>
 <tr>
 <td align="left"></td>
@@ -281,15 +281,15 @@
 <td align="left">ポッド</td>
 <td align="left"></td>
 <td align="left">クラスタB</td>
-<td align="left"><strong>172.18.64.0/18</strong></td>
+<td align="left"><strong>172.18.64.0&#x2F;18</strong></td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">サービス</td>
-<td align="left">172.19.0.0/16</td>
+<td align="left">172.19.0.0&#x2F;16</td>
 <td align="left">クラスタA</td>
-<td align="left"><strong>172.19.0.0/18</strong></td>
+<td align="left"><strong>172.19.0.0&#x2F;18</strong></td>
 </tr>
 <tr>
 <td align="left"></td>
@@ -297,15 +297,15 @@
 <td align="left">サービス</td>
 <td align="left"></td>
 <td align="left">クラスタB</td>
-<td align="left"><strong>172.19.64.0/18</strong></td>
+<td align="left"><strong>172.19.64.0&#x2F;18</strong></td>
 </tr>
 <tr>
 <td align="left">ステージング</td>
-<td align="left">172.18.0.0/15</td>
+<td align="left">172.18.0.0&#x2F;15</td>
 <td align="left">ポッド</td>
-<td align="left">172.20.0.0/16</td>
+<td align="left">172.20.0.0&#x2F;16</td>
 <td align="left">クラスタA</td>
-<td align="left"><strong>172.20.0.0/18</strong></td>
+<td align="left"><strong>172.20.0.0&#x2F;18</strong></td>
 </tr>
 <tr>
 <td align="left"></td>
@@ -313,15 +313,15 @@
 <td align="left">ポッド</td>
 <td align="left"></td>
 <td align="left">クラスタB</td>
-<td align="left"><strong>172.20.64.0/18</strong></td>
+<td align="left"><strong>172.20.64.0&#x2F;18</strong></td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">サービス</td>
-<td align="left">172.21.0.0/16</td>
+<td align="left">172.21.0.0&#x2F;16</td>
 <td align="left">クラスタA</td>
-<td align="left"><strong>172.21.0.0/18</strong></td>
+<td align="left"><strong>172.21.0.0&#x2F;18</strong></td>
 </tr>
 <tr>
 <td align="left"></td>
@@ -329,15 +329,15 @@
 <td align="left">サービス</td>
 <td align="left"></td>
 <td align="left">クラスタB</td>
-<td align="left"><strong>172.21.64.0/18</strong></td>
+<td align="left"><strong>172.21.64.0&#x2F;18</strong></td>
 </tr>
 <tr>
 <td align="left">非機能</td>
-<td align="left">172.20.0.0/15</td>
+<td align="left">172.20.0.0&#x2F;15</td>
 <td align="left">ポッド</td>
-<td align="left">172.22.0.0/16</td>
+<td align="left">172.22.0.0&#x2F;16</td>
 <td align="left">クラスタA</td>
-<td align="left"><strong>172.22.0.0/18</strong></td>
+<td align="left"><strong>172.22.0.0&#x2F;18</strong></td>
 </tr>
 <tr>
 <td align="left"></td>
@@ -345,15 +345,15 @@
 <td align="left">ポッド</td>
 <td align="left"></td>
 <td align="left">クラスタB</td>
-<td align="left"><strong>172.22.64.0/18</strong></td>
+<td align="left"><strong>172.22.64.0&#x2F;18</strong></td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">サービス</td>
-<td align="left">172.23.0.0/16</td>
+<td align="left">172.23.0.0&#x2F;16</td>
 <td align="left">クラスタA</td>
-<td align="left"><strong>172.23.0.0/18</strong></td>
+<td align="left"><strong>172.23.0.0&#x2F;18</strong></td>
 </tr>
 <tr>
 <td align="left"></td>
@@ -361,7 +361,7 @@
 <td align="left">サービス</td>
 <td align="left"></td>
 <td align="left">クラスタB</td>
-<td align="left"><strong>172.23.64.0/18</strong></td>
+<td align="left"><strong>172.23.64.0&#x2F;18</strong></td>
 </tr>
 <tr>
 <td align="left">・・・</td>
@@ -372,7 +372,7 @@
 <td align="left">・・・</td>
 </tr>
 </tbody></table></div>
-<p>なお前述の1環境2クラスタの制限（2019/10/17時点では制約が緩和され15クラスタまで可能なはず）から以下のような切り方も出来たのですが、</p>
+<p>なお前述の1環境2クラスタの制限（2019&#x2F;10&#x2F;17時点では制約が緩和され15クラスタまで可能なはず）から以下のような切り方も出来たのですが、</p>
 <div class="scroll"><table>
 <thead>
 <tr>
@@ -386,11 +386,11 @@
 </thead>
 <tbody><tr>
 <td align="left">本番</td>
-<td align="left">172.16.0.0/15</td>
+<td align="left">172.16.0.0&#x2F;15</td>
 <td align="left">ポッド</td>
-<td align="left">172.16.0.0/16</td>
+<td align="left">172.16.0.0&#x2F;16</td>
 <td align="left">クラスタA</td>
-<td align="left"><strong>172.18.0.0/17</strong></td>
+<td align="left"><strong>172.18.0.0&#x2F;17</strong></td>
 </tr>
 <tr>
 <td align="left"></td>
@@ -398,15 +398,15 @@
 <td align="left">ポッド</td>
 <td align="left"></td>
 <td align="left">クラスタB</td>
-<td align="left"><strong>172.18.128.0/17</strong></td>
+<td align="left"><strong>172.18.128.0&#x2F;17</strong></td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">サービス</td>
-<td align="left">172.17.0.0/16</td>
+<td align="left">172.17.0.0&#x2F;16</td>
 <td align="left">クラスタA</td>
-<td align="left"><strong>172.19.0.0/17</strong></td>
+<td align="left"><strong>172.19.0.0&#x2F;17</strong></td>
 </tr>
 <tr>
 <td align="left"></td>
@@ -414,7 +414,7 @@
 <td align="left">サービス</td>
 <td align="left"></td>
 <td align="left">クラスタB</td>
-<td align="left"><strong>172.19.128.0/17</strong></td>
+<td align="left"><strong>172.19.128.0&#x2F;17</strong></td>
 </tr>
 <tr>
 <td align="left">・・・</td>
@@ -425,24 +425,24 @@
 <td align="left">・・・</td>
 </tr>
 </tbody></table></div>
-<p>以下の理由で/18のアドレス範囲としました。</p>
+<p>以下の理由で&#x2F;18のアドレス範囲としました。</p>
 <ul>
 <li>今後制約が緩んだ時の拡張性を持たせる<ul>
 <li>クラスタ再作成を覚悟すれば、後で拡張可能であろうという前提です</li>
 </ul>
 </li>
-<li>/18で切ったアドレス範囲内でポッドとサービスの数は十分足りる</li>
+<li>&#x2F;18で切ったアドレス範囲内でポッドとサービスの数は十分足りる</li>
 </ul>
 <h3 id="2-3-アドレスに対する意味付け"><a href="#2-3-アドレスに対する意味付け" class="headerlink" title="2.3. アドレスに対する意味付け"></a>2.3. アドレスに対する意味付け</h3><p>ここまでのアドレス設計と並行して、アドレスから容易に環境や用途を判断できるように考慮しました。<br>今回のアドレス設計ではアドレスの２か所に意味を持たせています。</p>
-<p>アドレス体系：172.<strong>XXX.YYY</strong>.0/18</p>
+<p>アドレス体系：172.<strong>XXX.YYY</strong>.0&#x2F;18</p>
 <ul>
 <li><strong>XXX</strong>の箇所で環境を表す<br>本番（18,19）、ステージング（20,21）・・・</li>
 <li><strong>XXX</strong>の箇所で種別を表す<br>偶数がポッド、奇数がサービスとなっています。</li>
 <li><strong>YYY</strong>の箇所にはクラスタ。<br>クラスタA（0）、クラスタB（64）</li>
 </ul>
-<h2 id="3-マスターCIDR"><a href="#3-マスターCIDR" class="headerlink" title="3. マスターCIDR"></a>3. マスターCIDR</h2><h3 id="3-1-共有VPC上の全プロジェクトに対するCIDR"><a href="#3-1-共有VPC上の全プロジェクトに対するCIDR" class="headerlink" title="3.1. 共有VPC上の全プロジェクトに対するCIDR"></a>3.1. 共有VPC上の全プロジェクトに対するCIDR</h3><p>こちらは192.168.0.0/16（クラスC）を概念的に割り当てました。</p>
-<p>これは10.0.0.0/8（クラスA）の一部をプライマリCIDRで利用していたのと172.16.0.0/12（クラスB）をポッドとサービスのセカンダリCDIRで利用していたためです。</p>
-<p>また制約上/28のCDIRを割り当てればよいため、クラスCのアドレス範囲で十分と判断しました。</p>
+<h2 id="3-マスターCIDR"><a href="#3-マスターCIDR" class="headerlink" title="3. マスターCIDR"></a>3. マスターCIDR</h2><h3 id="3-1-共有VPC上の全プロジェクトに対するCIDR"><a href="#3-1-共有VPC上の全プロジェクトに対するCIDR" class="headerlink" title="3.1. 共有VPC上の全プロジェクトに対するCIDR"></a>3.1. 共有VPC上の全プロジェクトに対するCIDR</h3><p>こちらは192.168.0.0&#x2F;16（クラスC）を概念的に割り当てました。</p>
+<p>これは10.0.0.0&#x2F;8（クラスA）の一部をプライマリCIDRで利用していたのと172.16.0.0&#x2F;12（クラスB）をポッドとサービスのセカンダリCDIRで利用していたためです。</p>
+<p>また制約上&#x2F;28のCDIRを割り当てればよいため、クラスCのアドレス範囲で十分と判断しました。</p>
 <h3 id="3-2-各プロジェクトにおけるCIDR"><a href="#3-2-各プロジェクトにおけるCIDR" class="headerlink" title="3.2. 各プロジェクトにおけるCIDR"></a>3.2. 各プロジェクトにおけるCIDR</h3><p>こちらに対しては2段階の概念でアドレス範囲を設定しました。</p>
 <ul>
 <li>プロジェクト毎のCIDR</li>
@@ -460,32 +460,32 @@
 <tbody><tr>
 <td align="left">本番</td>
 <td align="left">クラスタA</td>
-<td align="left">192.168.16.0/28</td>
+<td align="left">192.168.16.0&#x2F;28</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left">クラスタB</td>
-<td align="left">192.168.17.0/28</td>
+<td align="left">192.168.17.0&#x2F;28</td>
 </tr>
 <tr>
 <td align="left">ステージング</td>
 <td align="left">クラスタA</td>
-<td align="left">192.168.32.0/28</td>
+<td align="left">192.168.32.0&#x2F;28</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left">クラスタB</td>
-<td align="left">192.168.33.0/28</td>
+<td align="left">192.168.33.0&#x2F;28</td>
 </tr>
 <tr>
 <td align="left">非機能</td>
 <td align="left">クラスタA</td>
-<td align="left">192.168.48.0/28</td>
+<td align="left">192.168.48.0&#x2F;28</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left">クラスタB</td>
-<td align="left">192.168.49.0/28</td>
+<td align="left">192.168.49.0&#x2F;28</td>
 </tr>
 <tr>
 <td align="left">・・・</td>
@@ -494,7 +494,7 @@
 </tr>
 </tbody></table></div>
 <h3 id="3-3-アドレスに対する意味付け"><a href="#3-3-アドレスに対する意味付け" class="headerlink" title="3.3. アドレスに対する意味付け"></a>3.3. アドレスに対する意味付け</h3><p>ここでもアドレスから容易に環境や用途を判断できるように考慮しました。<br>今回のアドレス設計ではアドレスの２か所に意味を持たせています。</p>
-<p>アドレス体系：192.168.<strong>XXX</strong>.0/28</p>
+<p>アドレス体系：192.168.<strong>XXX</strong>.0&#x2F;28</p>
 <ul>
 <li><strong>XXX</strong>の箇所で環境を表す<br>本番（16,17）、ステージング（32,33）・・・</li>
 <li><strong>XXX</strong>の箇所でクラスタを表す<br>偶数がクラスタA、奇数がクラスタBとなっています。</li>
@@ -513,73 +513,73 @@
 <td align="left">本番</td>
 <td align="left">クラスタA</td>
 <td align="left">ポッド</td>
-<td align="left">172.18.0.0/18</td>
+<td align="left">172.18.0.0&#x2F;18</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">サービス</td>
-<td align="left">172.19.0.0/18</td>
+<td align="left">172.19.0.0&#x2F;18</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">マスター</td>
-<td align="left">192.168.16.0/28</td>
+<td align="left">192.168.16.0&#x2F;28</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left">クラスタB</td>
 <td align="left">ポッド</td>
-<td align="left">172.18.64.0/18</td>
+<td align="left">172.18.64.0&#x2F;18</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">サービス</td>
-<td align="left">172.19.64.0/18</td>
+<td align="left">172.19.64.0&#x2F;18</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">マスター</td>
-<td align="left">192.168.17.0/28</td>
+<td align="left">192.168.17.0&#x2F;28</td>
 </tr>
 <tr>
 <td align="left">ステージング</td>
 <td align="left">クラスタA</td>
 <td align="left">ポッド</td>
-<td align="left">172.20.0.0/18</td>
+<td align="left">172.20.0.0&#x2F;18</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">サービス</td>
-<td align="left">172.21.0.0/18</td>
+<td align="left">172.21.0.0&#x2F;18</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">マスター</td>
-<td align="left">192.168.32.0/28</td>
+<td align="left">192.168.32.0&#x2F;28</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left">クラスタB</td>
 <td align="left">ポッド</td>
-<td align="left">172.20.64.0/18</td>
+<td align="left">172.20.64.0&#x2F;18</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">サービス</td>
-<td align="left">172.21.64.0/18</td>
+<td align="left">172.21.64.0&#x2F;18</td>
 </tr>
 <tr>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">マスター</td>
-<td align="left">192.168.33.0/28</td>
+<td align="left">192.168.33.0&#x2F;28</td>
 </tr>
 <tr>
 <td align="left">・・・</td>
@@ -661,7 +661,7 @@
   <ul class="nav sidebar-categories margin-bottom-40">
   
   <li class=""><a href="/categories/Programming/">Programming (431)</a></li>
-<li class=""><a href="/categories/Infrastructure/">Infrastructure (254)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (255)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (98)</a></li>
 <li class=""><a href="/categories/DataScience/">DataScience (61)</a></li>
 <li class=""><a href="/categories/IoT/">IoT (35)</a></li>
@@ -684,9 +684,7 @@
   <div class="class="widget-wrap">
   <div class="widget">
     <ul class="nav techcast">
-      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
-<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
-<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+      
     </ul>
   </div>
   </div>

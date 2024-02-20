@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>社内LANで必要かもしれないLocalstackへのカスタムCA証明書ダウンロード手順 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTIG 真野です。 2023年3月31日にリリースされたLocalStack v2.0.0から、LocalStackのイメージ構成に変更が入りました。利用する環境によってはKinesis Data Streamsなど一部のサービスを利用するときにカスタムCA証明書をダウンロードする必要がありました（後述する通り、Kinesis Data Streamsに関しては現在のバージョンでは対応">
+<meta property="og:type" content="article">
+<meta property="og:title" content="社内LANで必要かもしれないLocalstackへのカスタムCA証明書ダウンロード手順 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240220a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIG 真野です。 2023年3月31日にリリースされたLocalStack v2.0.0から、LocalStackのイメージ構成に変更が入りました。利用する環境によってはKinesis Data Streamsなど一部のサービスを利用するときにカスタムCA証明書をダウンロードする必要がありました（後述する通り、Kinesis Data Streamsに関しては現在のバージョンでは対応">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240220a/localstack.png">
+<meta property="article:published_time" content="2024-02-19T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-20T06:40:10.938Z">
+<meta property="article:tag" content="LocalStack">
+<meta property="article:tag" content="プロキシ">
+<meta property="article:tag" content="OpenSSL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240220a/localstack.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240220a/">
+  <meta content="LocalStack,プロキシ,OpenSSL" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">社内LANで必要かもしれないLocalstackへのカスタムCA証明書ダウンロード手順
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240220a_社内LANで必要かもしれないLocalstackへのカスタムCA証明書ダウンロード手順.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240220a_社内LANで必要かもしれないLocalstackへのカスタムCA証明書ダウンロード手順" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-02-19T15:00:00.000Z" itemprop="datePublished">2024.02.20</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98" title="真野隼記さんの記事一覧へ" class="post-author">真野隼記</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/LocalStack/" title="LocalStackタグの記事へ" class="tag-list-link">LocalStack</a>
+  
+    
+    <a href="/tags/プロキシ/" title="プロキシタグの記事へ" class="tag-list-link">プロキシ</a>
+  
+    
+    <a href="/tags/OpenSSL/" title="OpenSSLタグの記事へ" class="tag-list-link">OpenSSL</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20240220a/localstack.png" alt="" width="800" height="400">
+
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>TIG 真野です。</p>
+<p>2023年3月31日にリリースされたLocalStack <a target="_blank" rel="noopener" href="https://github.com/localstack/localstack/releases/tag/v2.0.0">v2.0.0</a>から、LocalStackのイメージ構成に変更が入りました。利用する環境によってはKinesis Data Streamsなど一部のサービスを利用するときにカスタムCA証明書をダウンロードする必要がありました（後述する通り、Kinesis Data Streamsに関しては現在のバージョンでは対応不要ですので安心ください）。</p>
+<p>この記事では、DockerのマルチステージビルドでOpenSSLを使って証明書をダウンロードして、LocalStackのカスタムイメージを作成する流れをまとめます。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/localstack/localstack/issues/8782">#8782</a>のIssueを見つけて対応を考えている人や、<code>installation of kinesis-mock failed</code>といったエラーログが出ていて困っている場合、おそらくこの記事が参考になります。</p>
+<p>ただし、少なくてもKinesis Data Streamsに関しては、<code>v2.3.0</code> からアップデートが入り本記事の対応が不要になりました。LocalStackのその他サービスでハマった場合にこの記事を確認いただくと良いかなと思います。エラーログでこの記事を見つけた方は、LocalStackのバージョンを上げることで解決することもあるようですので、まずバージョンアップを試してみることを推奨します。</p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>LocalStackは様々なAWSサービスをローカルやCI環境で再現してくれるエミュレータです。こういったサービスの難しいポイントの1つは、AWSのサービスや機能はどんどん増え豊富になっていくため、追随するためにはイメージサイズが肥大化しいくことでしょう。</p>
+<p>そのため、v2.0.0からは起動時に一度だけ外部からサービスが必要とするパッケージ読み込みキャッシュ。それにより、開発者の利用しないサービスが依存するパッケージは元のイメージから取り除き、容量削減を狙う方式になりました。</p>
+<p>少しばかり複雑な手順を踏んでいる気がしますが、イメージサイズと利用勝手のバランスを取った賢いやり方に思えます。CIで利用するユーザにとってはイメージのpull時間の節約、しいては費用削減となるため嬉しい施策出ると思います。</p>
+<p>一方でこれにより、DynammoDBなどでは<a target="_blank" rel="noopener" href="https://github.com/localstack/localstack/pull/8194">色々と問題</a>が多かったらしく、利用頻度が高いサービス（Issueではトップ15と書かれていますが今のところは数種類）が再びプリインストールする方向にするよという話も出ていました。</p>
+<p>v3.1.0では、Dockerfileを見る限り、DynamoDBとLambdaはプリインストール方式に戻っていました（DynamoDBは（多分）DynamoDB LocalのJAR増加で、47MB程度イメージサイズが増えたようです）。</p>
+<figure class="highlight dockerfile"><figcaption><span>https://github.com/localstack/localstack/blob/v3.1.0/Dockerfile#L184-L191</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># Install packages which should be shipped by default</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> --mount=<span class="built_in">type</span>=cache,target=/root/.cache \</span></span><br><span class="line"><span class="language-bash">    --mount=<span class="built_in">type</span>=cache,target=/var/lib/localstack/cache \</span></span><br><span class="line"><span class="language-bash">    <span class="built_in">source</span> .venv/bin/activate &amp;&amp; \</span></span><br><span class="line"><span class="language-bash">    python -m localstack.cli.lpm install \</span></span><br><span class="line"><span class="language-bash">      lambda-runtime \</span></span><br><span class="line"><span class="language-bash">      dynamodb-local &amp;&amp; \</span></span><br><span class="line"><span class="language-bash">    <span class="built_in">chown</span> -R localstack:localstack /usr/lib/localstack &amp;&amp; \</span></span><br><span class="line"><span class="language-bash">    <span class="built_in">chmod</span> -R 777 /usr/lib/localstack</span></span><br></pre></td></tr></table></figure>
+
+<p>Kinesis Data StreamsなどもDynamoDBと同じようにプリインストールできないかという要望も<a target="_blank" rel="noopener" href="https://github.com/localstack/localstack/issues/8300">#8300</a>で上げられましたが、やはりイメージサイズとのバランス問題で棄却されています。何かしらプリインストールしないと困るユースケースが無いと追加はされないような雰囲気があります。</p>
+<h2 id="Installation-of-kinesis-mock-failed"><a href="#Installation-of-kinesis-mock-failed" class="headerlink" title="Installation of kinesis-mock failed"></a>Installation of kinesis-mock failed</h2><p>LocalStackでKinesis Data Streamsのストリームを作成しようとした場合に、<code>Installation of kinesis-mock failed</code> というエラーが出るケースについて話します。ログ内容としては次のようなものです。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">localstack-1  | SERVICES variable is ignored <span class="keyword">if</span> EAGER_SERVICE_LOADING=0.</span><br><span class="line">localstack-1  |</span><br><span class="line">localstack-1  | LocalStack version: 2.0.2</span><br><span class="line">localstack-1  | LocalStack Docker container <span class="built_in">id</span>: ed6628bad076</span><br><span class="line">localstack-1  | LocalStack build <span class="built_in">date</span>: 2023-04-17</span><br><span class="line">localstack-1  | LocalStack build git <span class="built_in">hash</span>: 6b436786</span><br><span class="line">localstack-1  |</span><br><span class="line">localstack-1  | 2024-02-18T08:40:45.683  WARN --- [-functhread3] hypercorn.error            : ASGI Framework Lifespan error, continuing without Lifespan support</span><br><span class="line">localstack-1  | 2024-02-18T08:40:45.683  WARN --- [-functhread3] hypercorn.error            : ASGI Framework Lifespan error, continuing without Lifespan support</span><br><span class="line">localstack-1  | 2024-02-18T08:40:45.695  INFO --- [-functhread3] hypercorn.error            : Running on https://0.0.0.0:4566 (CTRL + C to quit)</span><br><span class="line">localstack-1  | 2024-02-18T08:40:45.695  INFO --- [-functhread3] hypercorn.error            : Running on https://0.0.0.0:4566 (CTRL + C to quit)</span><br><span class="line">localstack-1  | Ready.</span><br><span class="line">localstack-1  | 2024-02-18T08:40:51.233  INFO --- [   asgi_gw_0] l.s.k.kinesis_mock_server  : Creating kinesis backend <span class="keyword">for</span> account 000000000000</span><br><span class="line">localstack-1  | 2024-02-18T08:40:52.044 ERROR --- [   asgi_gw_0] l.aws.handlers.logging     : exception during call chain: Installation of kinesis-mock failed.</span><br><span class="line">localstack-1  | 2024-02-18T08:40:52.050  INFO --- [   asgi_gw_0] localstack.request.aws     : AWS kinesis.CreateStream =&gt; 500 (InternalError)</span><br><span class="line">localstack-1  | 2024-02-18T08:40:52.779  INFO --- [   asgi_gw_0] l.s.k.kinesis_mock_server  : Creating kinesis backend <span class="keyword">for</span> account 000000000000</span><br><span class="line">localstack-1  | 2024-02-18T08:40:53.108 ERROR --- [   asgi_gw_0] l.aws.handlers.logging     : exception during call chain: Installation of kinesis-mock failed.</span><br><span class="line">localstack-1  | 2024-02-18T08:40:53.113  INFO --- [   asgi_gw_0] localstack.request.aws     : AWS kinesis.CreateStream =&gt; 500 (InternalError)</span><br><span class="line">localstack-1  | 2024-02-18T08:40:54.306  INFO --- [   asgi_gw_0] l.s.k.kinesis_mock_server  : Creating kinesis backend <span class="keyword">for</span> account 000000000000</span><br><span class="line">localstack-1  | 2024-02-18T08:40:54.384 ERROR --- [   asgi_gw_0] l.aws.handlers.logging     : exception during call chain: Installation of kinesis-mock failed.</span><br><span class="line">localstack-1  | 2024-02-18T08:40:54.387  INFO --- [   asgi_gw_0] localstack.request.aws     : AWS kinesis.CreateStream =&gt; 500 (InternalError)</span><br><span class="line">localstack-1  | 2024-02-18T08:40:55.627  INFO --- [   asgi_gw_0] l.s.k.kinesis_mock_server  : Creating kinesis backend <span class="keyword">for</span> account 000000000000</span><br><span class="line">localstack-1  | 2024-02-18T08:40:55.694 ERROR --- [   asgi_gw_0] l.aws.handlers.logging     : exception during call chain: Installation of kinesis-mock failed.</span><br><span class="line">localstack-1  | 2024-02-18T08:40:55.697  INFO --- [   asgi_gw_0] localstack.request.aws     : AWS kinesis.CreateStream =&gt; 500 (InternalError)</span><br><span class="line">localstack-1  | 2024-02-18T08:41:01.931  INFO --- [   asgi_gw_0] l.s.k.kinesis_mock_server  : Creating kinesis backend <span class="keyword">for</span> account 000000000000</span><br><span class="line">localstack-1  | 2024-02-18T08:41:02.086 ERROR --- [   asgi_gw_0] l.aws.handlers.logging     : exception during call chain: Installation of kinesis-mock failed.</span><br><span class="line">localstack-1  | 2024-02-18T08:41:02.089  INFO --- [   asgi_gw_0] localstack.request.aws     : AWS kinesis.CreateStream =&gt; 500 (InternalError)</span><br><span class="line">localstack-1  |</span><br><span class="line">localstack-1  | An error occurred (InternalError) when calling the CreateStream operation (reached max retries: 4): exception <span class="keyword">while</span> calling kinesis.CreateStream: Installation of kinesis-mock failed.</span><br></pre></td></tr></table></figure>
+
+<p>公式ドキュメント<a target="_blank" rel="noopener" href="https://docs.localstack.cloud/references/custom-tls-certificates/">Custom TLS certificates</a>にも触れられています。非標準の TLS 証明書を使用するプロキシサーバーを利用する場合に発生するようです。原因はプロキシ、慣れたものです。</p>
+<p>ドキュメントにDockerfileを拡張して証明書をインストールする手順があり、<a target="_blank" rel="noopener" href="https://shihaowey.medium.com/installation-of-kinesis-mock-failed-in-localstack-8c4bcb8a3b20">Installation of kinesis-mock failed in LocalStack</a>の記事では、<code>https://api.github.com</code>のCA 証明書にアクセスして取得する例が書かれています。</p>
+<p>しかし、チームメンバー全員にこの手順を行ってもらうのは手間ですし、証明書をGit管理にもしたくないでしょう。ファイルサーバやGoogle Driveのようなコラボレーションツール上にも、こういった手順は廃れがちであるため、あまり配備したくない場合が多いでしょう。</p>
+<h2 id="Dockerfile上で対応する"><a href="#Dockerfile上で対応する" class="headerlink" title="Dockerfile上で対応する"></a>Dockerfile上で対応する</h2><p>サーバからTLS証明書をダウンロードするために、OpenSSLを利用します。</p>
+<p><a target="_blank" rel="noopener" href="https://www.shellhacks.com/get-ssl-certificate-from-server-site-url-export-download/">Get SSL Certificate from Server (Site URL) – Export &amp; Download</a> という記事が参考になります。</p>
+<p>さきほどの <code>https://api.github.com</code> から証明書を取得するのであれば次のようなコマンドです。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">echo | openssl s_client -servername api.github.com -connect api.github.com:443 | sed -ne &#x27;/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p&#x27; &gt; custom-ca.cer</span><br></pre></td></tr></table></figure>
+
+<p>取得した <code>custom-ca.cer</code> を公式ドキュメント通り、 <code>CURL_CA_BUNDLE</code>、 <code>REQUESTS_CA_BUNDLE</code>、<code>NODE_EXTRA_CA_CERTS</code> の環境変数にセットしたイメージを作れば対応完了です。</p>
+<p>Dockerfileのマルチステージビルドを利用すると次のようになると思います。</p>
+<figure class="highlight dockerfile"><figcaption><span>localstack/Dockerfile</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">FROM</span> alpine/openssl:<span class="number">3.1</span>.<span class="number">3</span> AS build</span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> <span class="built_in">echo</span> | openssl s_client -servername api.github.com -connect api.github.com:443 | sed -ne <span class="string">&#x27;/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p&#x27;</span> &gt; custom-ca.cer</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> localstack/localstack:<span class="number">3.1</span>.<span class="number">0</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=build custom-ca.cer /usr/local/share/ca-certificates/cert-bundle.crt</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> update-ca-certificates</span></span><br><span class="line"><span class="keyword">ENV</span> CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt</span><br><span class="line"><span class="keyword">ENV</span> REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt</span><br><span class="line"><span class="keyword">ENV</span> NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt</span><br></pre></td></tr></table></figure>
+
+<p>docker-compose経由で起動したいので、次のようなYAMLファイルを準備します。</p>
+<figure class="highlight yaml"><figcaption><span>docker-compose.yaml</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&quot;3.8&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">localstack:</span></span><br><span class="line">    <span class="attr">build:</span></span><br><span class="line">      <span class="attr">context:</span> <span class="string">.</span></span><br><span class="line">      <span class="attr">dockerfile:</span> <span class="string">localstack/Dockerfile</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;127.0.0.1:4566:4566/tcp&quot;</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">SERVICES=kinesis</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;$&#123;LOCALSTACK_VOLUME_DIR:-./volume&#125;:/var/lib/localstack&quot;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;/var/run/docker.sock:/var/run/docker.sock&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>docker-compose up localstack</code> などで起動すると、Kinesis Data Streamsのリソース作成ができるようになっていると思います。3つのほどストリームを作成してみたときのログです。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">localstack-1  |</span><br><span class="line">localstack-1  | LocalStack version: 3.1.0</span><br><span class="line">localstack-1  | LocalStack Docker container <span class="built_in">id</span>: 16f65452edc8</span><br><span class="line">localstack-1  | LocalStack build <span class="built_in">date</span>: 2024-01-25</span><br><span class="line">localstack-1  | LocalStack build git <span class="built_in">hash</span>: d48ada8a</span><br><span class="line">localstack-1  |</span><br><span class="line">localstack-1  | 2024-02-17T06:13:47.737  INFO --- [-functhread4] hypercorn.error            : Running on https://0.0.0.0:4566 (CTRL + C to quit)</span><br><span class="line">localstack-1  | 2024-02-17T06:13:47.737  INFO --- [-functhread4] hypercorn.error            : Running on https://0.0.0.0:4566 (CTRL + C to quit)</span><br><span class="line">localstack-1  | Ready.</span><br><span class="line">localstack-1  | 2024-02-17T06:13:48.375  INFO --- [   asgi_gw_0] l.s.k.kinesis_mock_server  : Creating kinesis backend <span class="keyword">for</span> account 000000000000</span><br><span class="line">localstack-1  | 2024-02-17T06:13:48.705  INFO --- [-functhread7] l.s.k.kinesis_mock_server  : [info] kinesis.mock.KinesisMockService$ 2024-02-17T06:13:48.695706Z contextId=6f22bed3-15b2-4a68-b292-f31016e5e8dc, cacheConfig=&#123;<span class="string">&quot;awsAccountId&quot;</span>:<span class="string">&quot;000000000000&quot;</span>,<span class="string">&quot;awsRegion&quot;</span>:<span class="string">&quot;us-east-1&quot;</span>,<span class="string">&quot;createStreamDuration&quot;</span>:&#123;<span class="string">&quot;length&quot;</span>:500,<span class="string">&quot;unit&quot;</span>:<span class="string">&quot;MILLISECONDS&quot;</span>&#125;,<span class="string">&quot;deleteStreamDuratio</span></span><br><span class="line"><span class="string">n&quot;</span>:&#123;<span class="string">&quot;length&quot;</span>:500,<span class="string">&quot;unit&quot;</span>:<span class="string">&quot;MILLISECONDS&quot;</span>&#125;,<span class="string">&quot;deregisterStreamConsumerDuration&quot;</span>:&#123;<span class="string">&quot;length&quot;</span>:500,<span class="string">&quot;unit&quot;</span>:<span class="string">&quot;MILLISECONDS&quot;</span>&#125;,<span class="string">&quot;initializeStreams&quot;</span>:null,<span class="string">&quot;logLevel&quot;</span>:<span class="string">&quot;INFO&quot;</span>,<span class="string">&quot;mergeShardsDuration&quot;</span>:&#123;<span class="string">&quot;length&quot;</span>:500,<span class="string">&quot;unit&quot;</span>:<span class="string">&quot;MILLISECONDS&quot;</span>&#125;,<span class="string">&quot;onDemandStreamCountLimit&quot;</span>:10,<span class="string">&quot;persistConfig&quot;</span>:&#123;<span class="string">&quot;fileName&quot;</span>:<span class="string">&quot;000000000000.json&quot;</span>,<span class="string">&quot;interval&quot;</span>:&#123;<span class="string">&quot;length&quot;</span>:5,<span class="string">&quot;unit&quot;</span>:<span class="string">&quot;SECONDS&quot;</span>&#125;,<span class="string">&quot;loadIfExists&quot;</span>:<span class="literal">true</span>,<span class="string">&quot;pat</span></span><br><span class="line"><span class="string">h&quot;</span>:<span class="string">&quot;../../../tmp/localstack/state/kinesis&quot;</span>,<span class="string">&quot;shouldPersist&quot;</span>:<span class="literal">true</span>&#125;,<span class="string">&quot;registerStreamConsumerDuration&quot;</span>:&#123;<span class="string">&quot;length&quot;</span>:500,<span class="string">&quot;unit&quot;</span>:<span class="string">&quot;MILLISECONDS&quot;</span>&#125;,<span class="string">&quot;shardLimit&quot;</span>:100,<span class="string">&quot;splitShardDuration&quot;</span>:&#123;<span class="string">&quot;length&quot;</span>:500,<span class="string">&quot;unit&quot;</span>:<span class="string">&quot;MILLISECONDS&quot;</span>&#125;,<span class="string">&quot;startStreamEncryptionDuration&quot;</span>:&#123;<span class="string">&quot;length&quot;</span>:500,<span class="string">&quot;unit&quot;</span>:<span class="string">&quot;MILLISECONDS&quot;</span>&#125;,<span class="string">&quot;stopStreamEncryptionDuration&quot;</span>:&#123;<span class="string">&quot;length&quot;</span>:500,<span class="string">&quot;unit&quot;</span>:<span class="string">&quot;MILLISECONDS&quot;</span>&#125;,<span class="string">&quot;updateSha</span></span><br><span class="line"><span class="string">rdCountDuration&quot;</span>:&#123;<span class="string">&quot;length&quot;</span>:500,<span class="string">&quot;unit&quot;</span>:<span class="string">&quot;MILLISECONDS&quot;</span>&#125;&#125; Logging Cache Config</span><br><span class="line">localstack-1  | 2024-02-17T06:13:48.828  INFO --- [-functhread7] l.s.k.kinesis_mock_server  : [info] kinesis.mock.KinesisMockService$ 2024-02-17T06:13:48.827840Z  Starting Kinesis TLS Mock Service on port 39987</span><br><span class="line">localstack-1  | 2024-02-17T06:13:48.828  INFO --- [-functhread7] l.s.k.kinesis_mock_server  : [info] kinesis.mock.KinesisMockService$ 2024-02-17T06:13:48.828511Z  Starting Kinesis Plain Mock Service on port 41755</span><br><span class="line">localstack-1  | 2024-02-17T06:13:48.836  INFO --- [-functhread7] l.s.k.kinesis_mock_server  : [info] kinesis.mock.KinesisMockService$ 2024-02-17T06:13:48.835677Z contextId=e05f1b29-e4a3-4bf7-a3d3-3861c68c7e95 Starting persist data loop</span><br><span class="line">localstack-1  | 2024-02-17T06:13:49.026  INFO --- [   asgi_gw_0] localstack.request.aws     : AWS kinesis.CreateStream =&gt; 200</span><br><span class="line">localstack-1  | 2024-02-17T06:13:49.472  INFO --- [   asgi_gw_0] localstack.request.aws     : AWS kinesis.CreateStream =&gt; 200</span><br><span class="line">localstack-1  | 2024-02-17T06:13:49.936  INFO --- [   asgi_gw_0] localstack.request.aws     : AWS kinesis.CreateStream =&gt; 200</span><br></pre></td></tr></table></figure>
+
+<p>動的にパッケージを取得し、Kinesisのストリームが上手く作成されていることが分かります。</p>
+<h2 id="LocalStack側でアップデートが入ったのか、Kinesis-Data-Streamsに対しては対応が不要になったようです"><a href="#LocalStack側でアップデートが入ったのか、Kinesis-Data-Streamsに対しては対応が不要になったようです" class="headerlink" title="LocalStack側でアップデートが入ったのか、Kinesis Data Streamsに対しては対応が不要になったようです"></a>LocalStack側でアップデートが入ったのか、Kinesis Data Streamsに対しては対応が不要になったようです</h2><p>この記事を書くにあたり、元のエラーログを発生させようとしていて気がついたのですが、<code>v2.3.0</code> でアップデートが入ったようで、Kinesis Data Streamsについては対応が不要です。</p>
+<ul>
+<li><code>v2.0.2</code> →✘ エラー発生</li>
+<li><code>v2.1.0</code> →✘</li>
+<li><code>v2.2.0</code> →✘</li>
+<li><code>v2.3.0</code> →✅ 正常動作</li>
+<li><code>v3.0.0</code> →✅</li>
+<li><code>v3.1.0</code> →✅</li>
+</ul>
+<p>おそらく、Kinesisのモックをバイナリからscala.js版に入れ替えた <a target="_blank" rel="noopener" href="https://github.com/etspaceman/kinesis-mock/pull/531">Use scala.js for executable and docker image #531</a> で解消されたのかなと予測しますが、詳細は未調査です。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>LocalStack v2からイメージの構成が変わって、起動時に動的にパッケージをインストールするケースがあります。その場合にネットワーク環境によっては外部リソースの取得に失敗するため、CA証明書の設定が必要。OpenSSLで自動化すると楽になるかもしれない、という記事でした。</p>
+<p>みんなハマっていないのかな？と思っていましたが、NGだった期間は <code>v2.0.0</code> が公開されたときから、<code>v2.3.0</code> が公開された <code>2023.3.31</code> ～ <code>2023.9.29</code> と半年足らずだったので、レアな経験だったのかもしれません。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20240220a/&related=twitterapi%2Ctwitter&text=%E7%A4%BE%E5%86%85LAN%E3%81%A7%E5%BF%85%E8%A6%81%E3%81%8B%E3%82%82%E3%81%97%E3%82%8C%E3%81%AA%E3%81%84Localstack%E3%81%B8%E3%81%AE%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0CA%E8%A8%BC%E6%98%8E%E6%9B%B8%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%E6%89%8B%E9%A0%86%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240220a/&t=%E7%A4%BE%E5%86%85LAN%E3%81%A7%E5%BF%85%E8%A6%81%E3%81%8B%E3%82%82%E3%81%97%E3%82%8C%E3%81%AA%E3%81%84Localstack%E3%81%B8%E3%81%AE%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0CA%E8%A8%BC%E6%98%8E%E6%9B%B8%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%E6%89%8B%E9%A0%86" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240220a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240220a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.08.29</span><span class="snscount">&#9825;65</span><a href=/articles/20220829a/ title="夏休み自由研究連載の5本目です。go-fuse でLocalStackでローカル環境にエミュレートされるS3バケットをマウントするツールを開発しました。">S3 on LocalStackをGoとFUSEを使ってMountする（WSL2）</a></li><li class="related-posts-item"><span>2021.08.26</span><span class="snscount">&#9825;14</span><a href=/articles/20210826b/ title="この記事では個人的に大好きなフォワードプロキシの概要と、Goでの既存のOSSライブラリを利用した実装例をまとめました。このテーマに決めた理由は以下です。">ローカルフォワードプロキシでHTTP要求時に機能横断な処理を差し込み</a></li><li class="related-posts-item"><span>2019.11.15</span><span class="snscount">&#9825;10</span><a href=/articles/20191115/ title="本記事ではGo Cloud経由でAWSのローカルモック環境であるLocalStackに接続してみたいと思います。">Go Cloud#5 AWSのローカルモック環境であるLocalStackを活用する</a></li><li class="related-posts-item"><span>2024.02.14</span><span class="snscount">&#9825;34</span><a href=/articles/20240214a/ title="Go 1.22 ライブラリのマイナーアップデートである net, net/http, net/netip を取り上げます。">Go 1.22リリース連載 net, net/http, net/netip<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.02.05</span><span class="snscount">&#9825;9</span><a href=/articles/20240205a/ title="Go 1.22のアップデートのツーリングのうち Vet と、ライブラリのマイナーアップデートである log/slog, testing/slogtest を取り上げます。">Go 1.22リリース連載 vet, log/slog, testing/slogtest<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.01.31</span><span class="snscount">&#9825;9</span><a href=/articles/20240131a/ title="Go 1.22のマイナーアップデートのうち、ファイルなどの入出力に関連しそうな  archive/tar ・ archive/zip ・ bufio ・ io を取り上げて紹介します。">Go 1.22リリース連載 archive/tar, archive/zip, bufio, io<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Installation-of-kinesis-mock-failed"><span class="toc-text">Installation of kinesis-mock failed</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dockerfile%E4%B8%8A%E3%81%A7%E5%AF%BE%E5%BF%9C%E3%81%99%E3%82%8B"><span class="toc-text">Dockerfile上で対応する</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LocalStack%E5%81%B4%E3%81%A7%E3%82%A2%E3%83%83%E3%83%97%E3%83%87%E3%83%BC%E3%83%88%E3%81%8C%E5%85%A5%E3%81%A3%E3%81%9F%E3%81%AE%E3%81%8B%E3%80%81Kinesis-Data-Streams%E3%81%AB%E5%AF%BE%E3%81%97%E3%81%A6%E3%81%AF%E5%AF%BE%E5%BF%9C%E3%81%8C%E4%B8%8D%E8%A6%81%E3%81%AB%E3%81%AA%E3%81%A3%E3%81%9F%E3%82%88%E3%81%86%E3%81%A7%E3%81%99"><span class="toc-text">LocalStack側でアップデートが入ったのか、Kinesis Data Streamsに対しては対応が不要になったようです</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (431)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (255)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (98)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (61)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (35)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
