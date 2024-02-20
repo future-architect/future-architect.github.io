@@ -38,7 +38,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content="https://future-architect.github.io/images/20220721a/Logo-redis.png">
 <meta property="article:published_time" content="2022-07-20T15:00:00.000Z">
-<meta property="article:modified_time" content="2023-06-07T02:25:54.463Z">
+<meta property="article:modified_time" content="2024-02-20T05:41:28.753Z">
 <meta property="article:tag" content="Redis">
 <meta property="article:tag" content="ジオメトリ">
 <meta name="twitter:card" content="summary">
@@ -145,7 +145,7 @@
 </ul>
 <p>Redisのドキュメントから持ってきたサンプルは以下の通りです。</p>
 <p>このサンプルのSicilyというのはsorted setの名前です。地球の座標系、火星の座標系など、複数のスペースを分けて使います。GEOADDは複数の要素を一括で入れられて、緯度・経度・キーをセットで入れます。GEODISTは登録したメンバー同士の距離を返す機能で、GEORADIUSは特定の座標から一定距離内のメンバー一覧を返しています。</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">redis:6379&gt; GEOADD Sicily 13.361389 38.115556 <span class="string">&quot;Palermo&quot;</span> 15.087269 37.502669 <span class="string">&quot;Catania&quot;</span></span><br><span class="line">(<span class="built_in">integer</span>) 2</span><br><span class="line">redis:6379&gt; GEODIST Sicily Palermo Catania</span><br><span class="line"><span class="string">&quot;166274.1516&quot;</span></span><br><span class="line">redis:6379&gt; GEORADIUS Sicily 15 37 100 km</span><br><span class="line">1) <span class="string">&quot;Catania&quot;</span></span><br><span class="line">redis:6379&gt; GEORADIUS Sicily 15 37 200 km</span><br><span class="line">1) <span class="string">&quot;Palermo&quot;</span></span><br><span class="line">2) <span class="string">&quot;Catania&quot;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">redis:6379&gt; GEOADD Sicily 13.361389 38.115556 <span class="string">&quot;Palermo&quot;</span> 15.087269 37.502669 <span class="string">&quot;Catania&quot;</span></span><br><span class="line">(<span class="built_in">integer</span>) 2</span><br><span class="line">redis:6379&gt; GEODIST Sicily Palermo Catania</span><br><span class="line"><span class="string">&quot;166274.1516&quot;</span></span><br><span class="line">redis:6379&gt; GEORADIUS Sicily 15 37 100 km</span><br><span class="line">1) <span class="string">&quot;Catania&quot;</span></span><br><span class="line">redis:6379&gt; GEORADIUS Sicily 15 37 200 km</span><br><span class="line">1) <span class="string">&quot;Palermo&quot;</span></span><br><span class="line">2) <span class="string">&quot;Catania&quot;</span></span><br></pre></td></tr></table></figure>
 
 <h1 id="GeoHash"><a href="#GeoHash" class="headerlink" title="GeoHash"></a>GeoHash</h1><p>このジオメトリ機能の肝は<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Geohash">GeoHash</a>です。パブリックドメインなアルゴリズムです。たとえば、13.361389 38.115556という座標は<code>sqc8b49rny0</code>というキーになります。</p>
 <p>Redisは経度としては±180度、緯度は±85.05112878度までをサポートしています。北極点、南極点から555kmの範囲は表現できなそうですね。</p>
@@ -234,7 +234,7 @@
 <p>GeoHashがすごいのは、文字列長さによって精度が変わることと、1次元にマッピングしていること。つまり、探したい座標と範囲が分かれば先頭一致で要素が絞れます。2次元を1次元で表現する方法は昔考えたことがあるものの、なかなか思いつかなかったのですが、コンピューターサイエンスの勝利というか、久々に胸が熱くなるものを見つけました。あらかじめQuadTreeの深さとかパラメータを調整する必要もないですしね。<a href="https://future-architect.github.io/articles/20210701a/">LOUDS</a>みたいなデータ構造との相性も良いですしね。夢が広がります。</p>
 <h1 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h1><p>こちらの機能としてはウェブサービスを作る時とかに便利に使えそうですよね。座標はブラウザの機能とか使えば簡単にとれます。Redis側にあらかじめいろんな場所情報を入れてあげて、ブラウザから取得した座標を投げ込めば簡単に近隣のスポットを探す、というサービスが作れそうです。</p>
 <p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API">https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API</a></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">navigator.<span class="property">geolocation</span>. <span class="title function_">getCurrentPosition</span>(<span class="function">(<span class="params">pos: GeolocationPosition</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(pos.<span class="property">coords</span>);</span><br><span class="line">    <span class="comment">// &#123;latitude: 35.0, longitude: 135.0, altitude: null&#125;</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">navigator.<span class="property">geolocation</span>. <span class="title function_">getCurrentPosition</span>(<span class="function">(<span class="params">pos: GeolocationPosition</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(pos.<span class="property">coords</span>);</span><br><span class="line">    <span class="comment">// &#123;latitude: 35.0, longitude: 135.0, altitude: null&#125;</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 
 <p>SQLiteでマスターを配布するような感じで、Redisも読み込み専用で使ってあげるとかも面白い気がします。ビジネス利用がいろいろ考えられますね。</p>
 <p>今回はRedisを調べただけですが、座標周りのロジックにはいろいろあります。</p>
@@ -287,7 +287,7 @@
               <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
               
   <div class="widget">
-    <ul class="nav related-post-link"><li class="related-posts-item"><span>2024.02.15</span><span class="snscount">&#9825;431</span><a href=/articles/20240215a/ title="僕自身は龍が如くシリーズは、クロヒョウ2、極1、極2、０、3、4、5、6、0とやって、7はRPGだし主人公違うしなぁと思って、買うだけ買って後でやろうと積んでいたところ、CEDECのすごいテストの話を聞いて...">龍が如く7のすごいテストをなぜ我々は採用できないのか<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.02.08</span><span class="snscount">&#9825;11</span><a href=/articles/20240208a/ title="Reactでは、画面に関わる表示の制御はかならず何かしらのステート管理を行いそれで行います。ダイアログの場合は開閉をuseStateで作ったフラグで管理するみたいな感じです。たとえば...">ダイアログもアラートも、Reactで子コンポーネントの開閉管理を実装する<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.01.29</span><span class="snscount">&#9825;47</span><a href=/articles/20240129a/ title="Future Tech Blog恒例のGoリリース連載が始まります。">Go 1.22リリース連載始まります & ループの変化とTinyGo 0.31<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.01.24</span><span class="snscount">&#9825;8</span><a href=/articles/20240124a/ title="動作が遅いサービスはストレスがたまるので利用したくないですよね。例えばネットショッピングする際に商品ページの表示が遅かったり検索してもすぐに結果が表示されないとそのサービスを利用するのをやめてしまいたくなります。">ぼくのかんがえたさいきょうのキャッシュ戦略<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.12.27</span><span class="snscount">&#9825;8</span><a href=/articles/20231227a/ title="Entra ID（旧名Azure AD）は企業での利用の割合が高く、社内システムを作る場合はこれを使って認証して欲しいという要件が積まれることがほとんどでしょう。とはいえ、現物を使ってテストを作るのは都合がよくないこともあったりします。">Entra IDを使うウェブサービスのバックエンドのテスト</a></li><li class="related-posts-item"><span>2023.12.14</span><span class="snscount">&#9825;13</span><a href=/articles/20231214a/ title="Next.jsの最近の大きな目玉機能はReact Server Componentです。パフォーマンスアップに有効だったり、gRPCだRESTだGraphQLだ論争を終わりにするServer Actionsなど盛りだくさんです。一方で、サーバーコンポーネントはコーディング上の制約がいろいろあります。">React Server ComponentでもContextで状態を共有する</a></li></ul>
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2024.02.15</span><span class="snscount">&#9825;432</span><a href=/articles/20240215a/ title="僕自身は龍が如くシリーズは、クロヒョウ2、極1、極2、０、3、4、5、6、0とやって、7はRPGだし主人公違うしなぁと思って、買うだけ買って後でやろうと積んでいたところ、CEDECのすごいテストの話を聞いて...">龍が如く7のすごいテストをなぜ我々は採用できないのか<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.02.08</span><span class="snscount">&#9825;12</span><a href=/articles/20240208a/ title="Reactでは、画面に関わる表示の制御はかならず何かしらのステート管理を行いそれで行います。ダイアログの場合は開閉をuseStateで作ったフラグで管理するみたいな感じです。たとえば...">ダイアログもアラートも、Reactで子コンポーネントの開閉管理を実装する<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.01.29</span><span class="snscount">&#9825;47</span><a href=/articles/20240129a/ title="Future Tech Blog恒例のGoリリース連載が始まります。">Go 1.22リリース連載始まります & ループの変化とTinyGo 0.31<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.01.24</span><span class="snscount">&#9825;8</span><a href=/articles/20240124a/ title="動作が遅いサービスはストレスがたまるので利用したくないですよね。例えばネットショッピングする際に商品ページの表示が遅かったり検索してもすぐに結果が表示されないとそのサービスを利用するのをやめてしまいたくなります。">ぼくのかんがえたさいきょうのキャッシュ戦略<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.12.27</span><span class="snscount">&#9825;8</span><a href=/articles/20231227a/ title="Entra ID（旧名Azure AD）は企業での利用の割合が高く、社内システムを作る場合はこれを使って認証して欲しいという要件が積まれることがほとんどでしょう。とはいえ、現物を使ってテストを作るのは都合がよくないこともあったりします。">Entra IDを使うウェブサービスのバックエンドのテスト</a></li><li class="related-posts-item"><span>2023.12.14</span><span class="snscount">&#9825;13</span><a href=/articles/20231214a/ title="Next.jsの最近の大きな目玉機能はReact Server Componentです。パフォーマンスアップに有効だったり、gRPCだRESTだGraphQLだ論争を終わりにするServer Actionsなど盛りだくさんです。一方で、サーバーコンポーネントはコーディング上の制約がいろいろあります。">React Server ComponentでもContextで状態を共有する</a></li></ul>
   </div>
             </section>
             <section class="reference-post margin-bottom-40 nav">
@@ -317,7 +317,7 @@
   <ul class="nav sidebar-categories margin-bottom-40">
   
   <li class=""><a href="/categories/Programming/">Programming (431)</a></li>
-<li class=""><a href="/categories/Infrastructure/">Infrastructure (254)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (255)</a></li>
 <li class=""><a href="/categories/Culture/">Culture (98)</a></li>
 <li class=""><a href="/categories/DataScience/">DataScience (61)</a></li>
 <li class=""><a href="/categories/IoT/">IoT (35)</a></li>
@@ -340,9 +340,7 @@
   <div class="class="widget-wrap">
   <div class="widget">
     <ul class="nav techcast">
-      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
-<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
-<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+      
     </ul>
   </div>
   </div>
