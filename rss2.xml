@@ -15,8 +15,42 @@
     <atom:link href="https://future-architect.github.io/rss2.xml" rel="self" type="application/rss+xml"/>
     
     <description>フューチャーの開発者による公式技術ブログです。業務で利用している技術を幅広く紹介します。</description>
-    <pubDate>Thu, 22 Feb 2024 01:11:50 GMT</pubDate>
+    <pubDate>Mon, 26 Feb 2024 03:09:43 GMT</pubDate>
     <generator>http://hexo.io/</generator>
+    
+    <item>
+      <title>AWS Lambdaのランタイムを provided.al2023 に更新する際、2バイナリをzipして対応してみた</title>
+      <link>https://future-architect.github.io/articles/20240226a/</link>
+      <guid>https://future-architect.github.io/articles/20240226a/</guid>
+      <pubDate>Sun, 25 Feb 2024 15:00:00 GMT</pubDate>
+      
+        
+        
+          
+          
+      <description>&lt;h2 id=&quot;はじめに&quot;&gt;&lt;a href=&quot;#はじめに&quot; class=&quot;headerlink&quot; title=&quot;はじめに&quot;&gt;&lt;/a&gt;はじめに&lt;/h2&gt;&lt;p&gt;TIG真野です。&lt;/p&gt;
+&lt;p&gt;2023年末にAWS Lambda界隈で話題だった「AWS LambdaのGo</description>
+          
+        
+      
+      
+      
+      <content:encoded><![CDATA[<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>TIG真野です。</p><p>2023年末にAWS Lambda界隈で話題だった「AWS LambdaのGo 1.xランタイムのサポートが2023年12月31日で終了する」への対応を、あまりネットに無い特殊なやり方を採用して行ったので、考え方や実施メモを残します。</p><p>すでに大半のAWS LambdaのGoユーザの方は対応している時期かと思いますが、ご容赦ください。</p><h2 id="AWS-LambdaのGo-1-xランタイムのサポート終了について"><a href="#AWS-LambdaのGo-1-xランタイムのサポート終了について" class="headerlink" title="AWS LambdaのGo 1.xランタイムのサポート終了について"></a>AWS LambdaのGo 1.xランタイムのサポート終了について</h2><p>この影響で、AWS Lambdaにおいて <code>Go 1.x</code> のランタイムから <code>al2023</code> などに変更し、zipで固めるバイナリ名も <code>bootstrap</code> にする必要があります。</p><p>以下の記事が参考になります。</p><ul><li><a href="https://dev.classmethod.jp/articles/how-to-migrate-aws-sam-go-lambda-application/">AWS SAMのGo言語Lambdaアプリケーションのランタイムを更新してみた | DevelopersIO</a></li><li><a href="https://aws.amazon.com/jp/blogs/compute/migrating-aws-lambda-functions-from-the-go1-x-runtime-to-the-custom-runtime-on-amazon-linux-2/">Migrating AWS Lambda functions from the Go1.x runtime to the custom runtime on Amazon Linux 2 | AWS Compute Blog</a></li></ul><p>ちなみに、更新先は <code>provided.al2</code> と <code>provided.al2023</code> とで少し悩みましたが、より新しく保守期間も長い、<code>provided.al2023</code> を選択しています。作業を年末のギリギリまで引っ張ったメリットかもしれません。AWSのドキュメントも気がつけば <code>provided.al2023</code> 推しに変わっていました。</p><p>この更新作業の内容自体は通常、 <code>lambda</code>（今回のプロダクトで使っていたバイナリ名） を <code>bootstrap</code> という名称に変えて、TerraformのLambdaリソースの設定値を書き換えておしまいであるため、さほど難しく無いでしょう。</p><h2 id="課題"><a href="#課題" class="headerlink" title="課題"></a>課題</h2><p>しかし私が担当していたプロダクトでは、数十のLambdaが、Kinesis Data Streams、DynamoDB Streamsなどのイベント着火し、それもそれぞれが24&#x2F;365で停止タイムがないというものです。</p><p>本来であればイベントソースマッピングを無効にし、その間にLambdaランタイムを更新し、イベントソースマッピング再び有効に戻すという手順が必要です。それをせず、直接アプリデプロイ or ランタイム更新すると、そのタイミングでリクエストが来た場合に処理が失敗し、データロストを誘発してしまいかねません。</p><p>しかし、上記の方法では以下の面倒臭さがありました。</p><ul><li>前提として、鮮度が高くデータを処理する必要があり、disableにする時間をなるべく短くする必要がある</li><li>disableしてからアプリ更新、またenableに戻すというような運用順書とその検証する必要がある</li><li>そのような時間制約があるような神経質な作業を年末にやりたくないという、心理的なハードル（※年末に関しては、他の優先度タスクがあり移行作業を後ろ回しにした私の責任です）</li></ul><h2 id="対応方針"><a href="#対応方針" class="headerlink" title="対応方針"></a>対応方針</h2><p>幸い、対象のLambdaリソースを一括デプロイするための、Makefileをテンプレートベースで生成するツールが整えられていたため、これを改修して、<code>make deploy-prod</code> するだけでLambdaランタイムのアップデートを行えるようにすることを目指しました。</p><p>今回思いついた手段ですが、 Go 1.x で動く<code>lambda</code> と <code>provided.al2023</code> で動く <code>bootstrap</code> という2種類のバイナリをzipで同梱するという方法を取ることにしました。</p><p>手はずとしては、次のとおりです。</p><ol><li>作業前は <code>lambda</code> とうバイナリだけで動く</li><li>移行ステップ1で、<code>lambda</code>, <code>bootstrap</code> の2つのバイナリをデプロイする<ul><li>このとき、ランタイムは <code>Go 1.x</code> のままである</li><li>利用されるハンドラは <code>lambda</code> のままであり、 <code>bootstarp</code> は呼ばれない</li></ul></li><li>移行ステップ2で、ランタイムを <code>provided.al2023</code> に更新する<ul><li>そのタイミングで利用されるハンドは <code>bootstrap</code> になり切り替わる</li></ul></li><li>移行ステップ3では、動作が問題なければ、利用しなくなった <code>lambda</code> というバイナリはなくして、 <code>bootstrap</code> のみのzipに絞る。これは後々の対応で問題ない</li></ol><img src="/images/20240226a/lambda_runtime更新.drawio_(2).png" alt="lambda_runtime更新.drawio_(2).png" width="1200" height="1044" loading="lazy"><p>ポイントとして、zipに2つのバイナリを同梱しちゃっても、Lambdaとしては問題なく動く（zip時の50MBサイズ上限はありますが、利用するハンドラ以外のバイナリを渡しても問題ありませんでした）。それにより、Lambdaランタイム更新をコマンドで行っても、上モノのzipには新旧両方のランタイムで動くバイナリが存在するため、ダウンタイム無しで切り替え可能になったということです。</p><h2 id="デプロイスクリプト"><a href="#デプロイスクリプト" class="headerlink" title="デプロイスクリプト"></a>デプロイスクリプト</h2><p>今回は上記の方針を、Makefileで実施するようにしました。</p><p>ビルド、デプロイの流れは次のような流れです。</p><figure class="highlight makefile"><figcaption><span>移行時の特殊対応版</span></figcaption><table><tr><td class="code"><pre><span class="line">SHELL := /bin/bash</span><br><span class="line">.SHELLFLAGS := -eu -o pipefail -c</span><br><span class="line"></span><br><span class="line"><span class="comment"># build でlambda, bootstrapの2種類のバイナリを作成</span></span><br><span class="line"><span class="section">build:</span></span><br><span class="line">@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags=<span class="string">&quot;-s -w -buildid=&quot;</span> -trimpath -o bin/lambda cmd/lambda/lambda.go</span><br><span class="line">@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags=<span class="string">&quot;-s -w -buildid=&quot;</span> -trimpath -tags lambda.norpc -o bin/bootstrap cmd/lambda/lambda.go</span><br><span class="line"></span><br><span class="line"><span class="comment"># zip で lambda, bootstrapを lambda.zip に同梱する</span></span><br><span class="line"><span class="section">zip: build</span></span><br><span class="line">@touch -t 202401010000 bin/lambda bin/bootstrap</span><br><span class="line">@zip -j -q bin/lambda.zip bin/lambda bin/bootstrap</span><br><span class="line"></span><br><span class="line"><span class="comment"># deploy-prod では最初に lambda.zip でアプリ更新、その次にランタイムを更新する</span></span><br><span class="line"><span class="comment"># wait function-updated でアプリ更新を待たないとconfigurationが落ちるケースがある</span></span><br><span class="line"><span class="section">deploy-prod: zip</span></span><br><span class="line">aws lambda --profile our_prod update-function-code --function-name prod-example-api \</span><br><span class="line">      --zip-file fileb://bin/lambda.zip | jq -c &#x27;&#123;FunctionName, Runtime, Handler, LastModified&#125;&#x27;</span><br><span class="line">aws lambda --profile our_prod wait function-updated --function-name prod-example-api</span><br><span class="line">aws lambda --profile our_prod update-function-configuration --function-name prod-example-api \</span><br><span class="line">      --runtime provided.al2023 --handler bootstrap | jq -c &#x27;&#123;FunctionName, Runtime, Handler, LastModified&#125;&#x27;</span><br></pre></td></tr></table></figure><p>Makefile中のコメント通りですが、いくつか補足します。</p><ul><li><code>build</code> ターゲット<ul><li><code>go build</code> で <code>lambda</code>, <code>bootstrap</code> の2種類のバイナリを作成します</li><li><code>-tags lambda.norpc</code> は <code>provided.al2</code> などで動かす場合にビルドサイズを下げることができるオプションです。このオプションを無視して、 <code>go build</code> を1度だけ呼び出し、コピー＋リネームで対応しても良かったかもしれません</li></ul></li><li><code>zip</code> ターゲット<ul><li>2バイナリを同梱し <code>lambda.zip</code> を作っています</li><li><code>touch</code> でバイナリの最終更新日時を固定して、zipのコードハッシュが変化しないようにしています</li></ul></li><li><code>deploy-prod</code> ターゲット<ul><li>1つ目の処理で、 <code>lambda.zip</code> をデプロイしています</li><li>2つ目の処理でアップデート完了までwaitします</li><li>3つ目の処理で、Lambdaランタイム更新とハンドラをbootstrapに更新しています</li><li>Lambdaランタイム更新のコマンドは、何度実行してもエラーにならないので、この形式のまま何度かアプリリリースしても問題ありません</li></ul></li></ul><p>上記の切り替えは1度だけ動かせば、Lambdaランタイムが切り替わるので、その後は次のように記述を戻してOKです。</p><figure class="highlight makefile"><figcaption><span>移行時の特殊対応を取り除いた例</span></figcaption><table><tr><td class="code"><pre><span class="line">SHELL := /bin/bash</span><br><span class="line">.SHELLFLAGS := -eu -o pipefail -c</span><br><span class="line"></span><br><span class="line"><span class="section">build:</span></span><br><span class="line">@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags=<span class="string">&quot;-s -w -buildid=&quot;</span> -trimpath -tags lambda.norpc -o bin/bootstrap cmd/lambda/lambda.go</span><br><span class="line"></span><br><span class="line"><span class="section">zip: build</span></span><br><span class="line">@touch -t 202401010000 bin/bootstrap</span><br><span class="line">@zip -j -q bin/lambda.zip bin/bootstrap</span><br><span class="line"></span><br><span class="line"><span class="section">deploy-prod: zip</span></span><br><span class="line">aws lambda --profile our_prod update-function-code --function-name prod-example-api \</span><br><span class="line">      --zip-file fileb://bin/lambda.zip | jq -c &#x27;&#123;FunctionName, LastModified&#125;&#x27;</span><br></pre></td></tr></table></figure><h2 id="移行してみて"><a href="#移行してみて" class="headerlink" title="移行してみて"></a>移行してみて</h2><p>作業手順としては <code>make deploy-prod</code> を実行するだけ（※数十のLambdaリソースを一括デプロイするラッパーのようなツールがあったため）ですので、非常に楽でした。慣れた手順で、ダウンタイム無しで切り替えられるため安心感があり、この手順を採用して良かったと思いました。</p><p>なお本題ではないですが、Go 1.x からのランタイム切り替えに際して、次のコード書き換えが1点必要でした。</p><p>一部のコードで次のようにタイムゾーンを読み込んでいる処理がありました。</p><figure class="highlight go"><table><tr><td class="code"><pre><span class="line">jst, _ = time.LoadLocation(<span class="string">&quot;Asia/Tokyo&quot;</span>)</span><br></pre></td></tr></table></figure><p>これが次のようなエラーでてしまいました。</p><figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;level&quot;</span><span class="punctuation">:</span><span class="string">&quot;error&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;time&quot;</span><span class="punctuation">:</span><span class="string">&quot;2023-12-26T09:54:01Z&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span><span class="string">&quot;panic catch: time: missing Location in call to Time.Ingoroutine （略）&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure><p><code>provided.al2023</code> ですとタイムゾーン情報をファイルから取れないのですね。対応としては、利用しているタイムゾーンがJSTのみだったため、<code>jst := time.FixedZone(&quot;Asia/Tokyo&quot;, 9*60*60)</code> と単純に書き換えてしのぎました。</p><p>この事象がなぜ発生したかは本記事のテーマとは少し外れるため、詳細は <a href="https://tutuz-tech.hatenablog.com/entry/2021/01/30/192956">辻さんの記事</a> などを参照ください。</p><p>それ以外、これといって課題は出ておらず安定しています。</p><h2 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h2><p>切り替え作業ですが、慣れた手順をそのままで中身のみを拡張するような方式だと、作業中のプレッシャーが格段に減り手順書も作る必要がないほどでしたので非常に楽ができました。zipに2つのバイナリを同梱するのはトリッキーであり、あまり聞かないやり方な気がしますが、覚えておくと今後もなにかの役に立つかもしれません。</p><p>本当は<code>amd64</code> から <code>arm64</code> に切り替えたかったのですが、これについては持ち越し（今回の手順だと対応もできないです）となりました。その場合は、イベントマッピングを無効化するといった手順が必要そうで、少し大変だと感じています。良い切り替えアイデアは絶賛募集中です。</p>]]></content:encoded>
+      
+      
+      <category domain="https://future-architect.github.io/categories/Programming/">Programming</category>
+      
+      
+      <category domain="https://future-architect.github.io/tags/AWS/">AWS</category>
+      
+      <category domain="https://future-architect.github.io/tags/Lambda/">Lambda</category>
+      
+      <category domain="https://future-architect.github.io/tags/Makefile/">Makefile</category>
+      
+      
+      <comments>https://future-architect.github.io/articles/20240226a/#disqus_thread</comments>
+      
+    </item>
     
     <item>
       <title>MacをWindows/Linux風な操作感にする、Hammerspoonで始める環境構築</title>
@@ -873,40 +907,6 @@
       
       
       <comments>https://future-architect.github.io/articles/20231214a/#disqus_thread</comments>
-      
-    </item>
-    
-    <item>
-      <title>とちぎRuby 200回目をお祝いしてきた</title>
-      <link>https://future-architect.github.io/articles/20231213a/</link>
-      <guid>https://future-architect.github.io/articles/20231213a/</guid>
-      <pubDate>Tue, 12 Dec 2023 15:00:00 GMT</pubDate>
-      
-        
-        
-          
-          
-      <description>&lt;p&gt;とちぎRubyは月に1回の読書会形式で、今月でちょうど200回目とのことで、有給をとって行ってきました。200回ということは16年8ヶ月ほど続いている計算になります。&lt;/p&gt;
-&lt;p&gt;僕の前々職は栃木の芳賀工業団地にある本田技術研究所でした。当時から趣味で使う第一言語はPyt</description>
-          
-        
-      
-      
-      
-      <content:encoded><![CDATA[<p>とちぎRubyは月に1回の読書会形式で、今月でちょうど200回目とのことで、有給をとって行ってきました。200回ということは16年8ヶ月ほど続いている計算になります。</p><p>僕の前々職は栃木の芳賀工業団地にある本田技術研究所でした。当時から趣味で使う第一言語はPythonだったのですが、栃木県にはPythonのコミュニティなどはなく、活発なコミュニティといえばとちぎRubyだったので人付き合いを求めてとちぎRubyに片道2時間ぐらいかけて下道で通っていました。最後に参加したのはホンダを辞める直前の2010年12月でちょうど13年前です。2-3年は通っていたと思うのでほぼ最初の年からは参加していたのかな、というところですかね。</p><p>僕が本田労組の職場委員なぞやっていたころの宇都宮市長選挙で争点になっていて、開通したら乗りたい！と思っていたLRTも1区間往復で乗ってきました。かっこいいし快適でした。これで通勤したかったな。</p><img src="/images/20231213a/IMG_3436.JPG" alt="" width="800" height="600" loading="lazy"><p>場所はいつもの西那須野公民館です。名札は作り直されたのか新しいですね。</p><img src="/images/20231213a/IMG_3439.JPG" alt="" width="800" height="600" loading="lazy"><img src="/images/20231213a/IMG_3440.JPG" alt="" width="800" height="600" loading="lazy"><p>残念ながら、本日はスタート時からのメンバーの半数がお休みということで、読書会は中止になって急遽食事会になってしまいましたが、その分じっくりお話ができました。</p><p>200回目ということではありますが、特に特別なことは企画しておらず、いつも通りの読書会の予定だったとのことです。とくにがんばらず、完全に習慣化して「そういえば第一水曜日だから行こう」ぐらい肩肘張らずにやる、また、今読んでいる研鑽Rubyもあと来年1年ぐらいはかかるだろう、みたいに話されていて、あせらずじっくりのんびりというのも良いですね。このあたりがここまで継続している秘訣ですね。思えば、本家Ruby会議に行っても、出張版とかいっていつもの読書会をそのままやるようなコミュニティでした。</p><p>発起人の一人の池澤さん（お休みでしたが）も、僕がいたころにはすでに還暦になられて、それから10年以上たつのですが、こういう刺激を定例化するのは自分が高齢になったあとのことを考えると素敵だな、真似したいなと思いますね。</p><p>トラディショナルでカラメルソースたっぷりの硬いプリンはとちぎRubyを祝うのに最高の料理でした（みんな車なのでお酒は飲めない）。今回はお会いできなかった方々もいたので、また近日中に、拡大版torubyかとちぎRuby会議あたりを狙ってまた来たいですね。</p><img src="/images/20231213a/IMG_3444.JPG" alt="" width="600" height="800" loading="lazy"><p>あとは会食ではリモートワークかオフラインか、というのも話題になりました。オフラインは確かに情報量が多く早いフィードバックで速度が出せるのだろうな、というのを聞いて思ったのですが、オフラインだったとしても、ウォーターフォール式の必ず仕様書などを書いてから会話、というのではその速度は出ないし、ミーティングだらけでなかなか顔を見る時間が少ないとそのオフラインのメリットは完全には出ないんだろうな、というのは思いました。</p><p>オフラインになってもストレスがあまりない、という状況自体、遅いことに慣れてしまっているということなのかな、と。もちろん個人ごとにとかうまくタスク分割がうまくいっているということもあるかもしれませんが。</p>]]></content:encoded>
-      
-      
-      <category domain="https://future-architect.github.io/categories/Programming/">Programming</category>
-      
-      
-      <category domain="https://future-architect.github.io/tags/%E5%8F%82%E5%8A%A0%E3%83%AC%E3%83%9D%E3%83%BC%E3%83%88/">参加レポート</category>
-      
-      <category domain="https://future-architect.github.io/tags/Ruby/">Ruby</category>
-      
-      <category domain="https://future-architect.github.io/tags/%E3%81%A8%E3%81%A1%E3%81%8ERuby/">とちぎRuby</category>
-      
-      
-      <comments>https://future-architect.github.io/articles/20231213a/#disqus_thread</comments>
       
     </item>
     
