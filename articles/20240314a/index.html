@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Terraform連載2024 Stateを統合してみる | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="Terraform 連載2024の4本目です。 はじめにはじめまして。Technology Inovation Group (TIG) の原田と申します。 私が所属しているチームではTerraformでAWSリソースを管理しており、tfstateを統合する機会があったので、その経験をもとに記事を書きます。 環境Terraform バージョン 1.5.7 ことの経緯私が所属しているチームでは、サービ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Terraform連載2024 Stateを統合してみる | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240314a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="Terraform 連載2024の4本目です。 はじめにはじめまして。Technology Inovation Group (TIG) の原田と申します。 私が所属しているチームではTerraformでAWSリソースを管理しており、tfstateを統合する機会があったので、その経験をもとに記事を書きます。 環境Terraform バージョン 1.5.7 ことの経緯私が所属しているチームでは、サービ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240314a/terraform_merge.drawio.png">
+<meta property="article:published_time" content="2024-03-13T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-14T00:29:14.399Z">
+<meta property="article:tag" content="Terraform">
+<meta property="article:tag" content="tfstate-merge">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240314a/terraform_merge.drawio.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240314a/">
+  <meta content="Terraform,tfstate-merge" name="keywords">
+  <meta content="原田達也" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Terraform連載2024 Stateを統合してみる
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240314a_Terraform連載2024_Stateを統合してみる.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240314a_Terraform連載2024_Stateを統合してみる" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-03-13T15:00:00.000Z" itemprop="datePublished">2024.03.14</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%8E%9F%E7%94%B0%E9%81%94%E4%B9%9F" title="原田達也さんの記事一覧へ" class="post-author">原田達也</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Terraform/" title="Terraformタグの記事へ" class="tag-list-link">Terraform</a>
+  
+    
+    <a href="/tags/tfstate-merge/" title="tfstate-mergeタグの記事へ" class="tag-list-link">tfstate-merge</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p><a href="/articles/20240311a/">Terraform 連載2024</a>の4本目です。</p>
+<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>はじめまして。Technology Inovation Group (TIG) の原田と申します。</p>
+<p>私が所属しているチームではTerraformでAWSリソースを管理しており、tfstateを統合する機会があったので、その経験をもとに記事を書きます。</p>
+<h3 id="環境"><a href="#環境" class="headerlink" title="環境"></a>環境</h3><p>Terraform バージョン 1.5.7</p>
+<h2 id="ことの経緯"><a href="#ことの経緯" class="headerlink" title="ことの経緯"></a>ことの経緯</h2><p>私が所属しているチームでは、サービスごとに複数のtfstateでリソースを管理していました。</p>
+<p>ただ、プロダクトが成熟してきて、リリース頻度が非常に低い&amp;リリースをしたとしても複数サービスが同じタイミングでリリースされることが多くなりました。</p>
+<p>そういった理由から、成熟しきったStateを統合しようという機運が高まりました。</p>
+<h2 id="方針"><a href="#方針" class="headerlink" title="方針"></a>方針</h2><p>ゴールは、移行元のtfstate(a.tfstate)を移行先のtfstate(b.tfstate)にマージしてb.tfstateですべてのAWSリソースを管理できる状態です。</p>
+<p>そのための作業パターンとして大きく2つの案を考えました。</p>
+<h2 id="二つの作業パターン"><a href="#二つの作業パターン" class="headerlink" title="二つの作業パターン"></a>二つの作業パターン</h2><h3 id="パターン①「import-removeコマンド」"><a href="#パターン①「import-removeコマンド」" class="headerlink" title="パターン①「import &amp; removeコマンド」"></a>パターン①「import &amp; removeコマンド」</h3><p>手順:</p>
+<ol>
+<li>統合元のStateで <code>remove</code> コマンド</li>
+<li>統合先のStateで <code>import</code> コマンド</li>
+<li>Terraform のコードを統合</li>
+<li><code>plan</code> にて差分が発生しないことを確認</li>
+</ol>
+<p>お手軽ですね。Terraform直々に提供している機能ということもあって、安心感もあります。</p>
+<p>1. 統合元のStateで <code>remove</code> コマンド</p>
+<figure class="highlight sh"><figcaption><span>s3の場合</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># 統合元のStateにて</span></span><br><span class="line">$ terraform state <span class="built_in">rm</span> aws_s3_bucket.s3</span><br></pre></td></tr></table></figure>
+
+<p>2. 統合先のStateで <code>import</code> コマンド</p>
+<figure class="highlight sh"><figcaption><span>s3の場合</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># 統合先のStateにて</span></span><br><span class="line">$ terraform state import aws_s3_bucket.s3 バケット名</span><br></pre></td></tr></table></figure>
+<p>Terraformのバージョンが1.5以上の場合はimport ブロックを使用するのもよいでしょう。</p>
+<p><a target="_blank" rel="noopener" href="https://developer.hashicorp.com/terraform/language/import">https://developer.hashicorp.com/terraform/language/import</a></p>
+<p>3. Terraform のコードを統合<br>コピペでいいですね。リソースが多い場合はかなり根気が要ります。</p>
+<p>4. <code>plan</code> にて差分が発生しないことを確認</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ terraform plan</span><br><span class="line"></span><br><span class="line">==(略)==</span><br><span class="line"></span><br><span class="line">No changes. Your infrastructure matches the configuration.</span><br></pre></td></tr></table></figure>
+
+<p>お疲れ様でした。</p>
+<p>お気づきの方もいらっしゃるかと思いますが、管理リソースが多い場合はかなり作業コストが高いです。リソースごとに、import・removed・コードの修正が必要になります。</p>
+<p>私のチームでは100を優に超えるAWSリソースを管理していたため、この方法は現実的ではありませんでした。</p>
+<h3 id="パターン②「Stateを編集」"><a href="#パターン②「Stateを編集」" class="headerlink" title="パターン②「Stateを編集」"></a>パターン②「Stateを編集」</h3><p>Stateを直接操作することはあまり推奨されないですが、今回はこの選択をとりました。</p>
+<p>操作イメージとしては以下のような手順です</p>
+<img src="/images/20240314a/terraform_merge.drawio.png" alt="terraform_merge.drawio.png" width="427" height="429" loading="lazy">
+
+<p>手順:</p>
+<ol>
+<li>ローカルにtfstateをローカルに取得</li>
+<li>二つのStateファイルをマージ</li>
+<li>マージしたtfstateファイルを統合先にpush</li>
+<li>Terraform のコードを統合</li>
+<li><code>plan</code> にて差分が発生しないことを確認</li>
+</ol>
+<p>パターン①よりステップが一つ多くなっているように見えますが、ちょっと待ってください。詳しく見ていきましょう。</p>
+<p>1. ローカルにtfstateをローカルに取得</p>
+<figure class="highlight sh"><figcaption><span>作業例</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># 統合元のStateにて</span></span><br><span class="line">$ terraform state pull &gt; a.tfstate</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><figcaption><span>作業例</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># 統合先のStateにて</span></span><br><span class="line">$ terraform state pull &gt; b.tfstate</span><br></pre></td></tr></table></figure>
+
+<p>2. 二つのStateファイルをマージ</p>
+<p>ここが今回の作業のキモです。頑張って手作業でStateファイルをマージしていきましょう。</p>
+<p>…というのは危険なので、今回は<a target="_blank" rel="noopener" href="https://github.com/fujiwara">fujiwara</a>さんが開発された、便利なツールを利用させていただきましょう。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/fujiwara/tfstate-merge">https://github.com/fujiwara/tfstate-merge</a></p>
+<p>コマンド一撃でtfstateファイルをマージしてくれる、何ともありがたいツールです。</p>
+<p>ある程度のバリデーション機能も実装されているので、手動でマージするより、格段に安心して作業できます。</p>
+<p>こちらで作者であるfujiwaraさんの解説があるので、詳細に関してはそちらをぜひご覧ください。</p>
+<p><a target="_blank" rel="noopener" href="https://sfujiwara.hatenablog.com/entry/tfstate-merge">https://sfujiwara.hatenablog.com/entry/tfstate-merge</a></p>
+<figure class="highlight sh"><figcaption><span>作業例</span></figcaption><table><tr><td class="code"><pre><span class="line">$ tfstate-merge b.tfstate a.tfstate &gt; b<span class="string">&#x27;.tfstate</span></span><br></pre></td></tr></table></figure>
+
+<p>3. マージしたtfstateファイルを統合先にpush</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">terraform state push b<span class="string">&#x27;.tfstate</span></span><br></pre></td></tr></table></figure>
+
+<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
+  <span class="fa fa-fw fa-check-circle"></span>
+tfstateファイルは必ずバックアップを取っておくようにしましょう
+
+</div>
+
+<p>4. Terraform のコードを統合</p>
+<p>ここはパターン①と同様、根気よく作業していきましょう。<br>git の 差分の増減などを確認するもよいでしょう。</p>
+<p>5. <code>plan</code> にて差分が発生しないことを確認</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ terraform plan</span><br><span class="line"></span><br><span class="line">==(略)==</span><br><span class="line"></span><br><span class="line">No changes. Your infrastructure matches the configuration.</span><br></pre></td></tr></table></figure>
+
+<p>お疲れ様でした。</p>
+<p>こちらのパターンの利点は作業の負担が圧倒的に少ないです。ただ、<code>terraform state push</code>というかなり危険なコマンドを使用するので実行には細心の注意を払いましょう。</p>
+<h2 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h2><p>tfstateを統合した経験について書きました。</p>
+<p>Stateの統廃合や、moduleへの移行など、Terraformのリファクタには様々な手札がありますが、エンジニアたるもの日常的により良いコードを目指していきたいですね。これは自身への戒めでもあります。</p>
+<p>新卒でIT業界に飛び込み、もうすぐ2年が過ぎようとしていますが、自身の経験を発信していくことは良い刺激になりました。<a href="/articles/20240311a/">Terraform 連載2024</a>の一環として執筆させていただきましたが、非常に興味深いトピックが目白押しなので、ぜひ他の記事もご覧ください！</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20240314a/&related=twitterapi%2Ctwitter&text=Terraform%E9%80%A3%E8%BC%892024%20State%E3%82%92%E7%B5%B1%E5%90%88%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240314a/&t=Terraform%E9%80%A3%E8%BC%892024%20State%E3%82%92%E7%B5%B1%E5%90%88%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240314a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240314a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2024.03.13</span><span class="snscount">&#9825;2</span><a href=/articles/20240313a/ title="Terraformにおける変数を、構築するインフラの要件に合わせてどのように制御していくかについてお話していきたいと思います。Terraformにおける変数制御は、構築するインフラの要件を明確化させる上で重要になってきます。そこで今回はどんな変数制御があるか、ユースケースを踏まえて見ていきたいと思います。">Terraform連載2024 Terraformにおける変数の制御について<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.03.12</span><span class="snscount">&#9825;3</span><a href=/articles/20240312a/ title="Terraformファイルをコード生成するため、hclwriteというGoパッケージの使い方を調べました。">Terraform連載2024 hclwriteを用いたtfコード生成入門<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.03.11</span><span class="snscount">&#9825;10</span><a href=/articles/20240311a/ title="Terraform連載を開始します。">Terraform連載2024を開始します & TerraformにおけるDR戦略を考える<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.10.16</span><span class="snscount">&#9825;4</span><a href=/articles/20231016a/ title="10/14に開催されたCloudflare Meetup Naganoに登壇したので発表内容のサマリとイベントのレポートです。">Cloudflare R2でTerraformのStateを管理する方法: Cloudflare Meetup Nagano Vol.2 に登壇しました</a></li><li class="related-posts-item"><span>2023.05.02</span><span class="snscount">&#9825;8</span><a href=/articles/20230502a/ title="cf-terraformingは、Cloudflareにて開発されているOSSで、その名前の通り、Cloudflare上のリソースをHCL化し、出力されたソースを利用してTerraformのState管理下にすることができるツールです">cf-terraformingで入門するCloudflare</a></li><li class="related-posts-item"><span>2023.04.07</span><span class="snscount">&#9825;12</span><a href=/articles/20230407a/ title="Terraformのv1.0が出て約2年弱、ついにv1.4までやってきました。Terraformのv1.4のリリースノートの、ENHANCEMENTのうち、私個人が特に気になった機能を見つつ、ユースケースが考えられるものについて探れればと思います。">Terraform v1.4のリリースノートを眺める</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20240311a/ title="Terraform連載を開始します。">Terraform連載2024を開始します & TerraformにおけるDR戦略を考える<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%92%B0%E5%A2%83"><span class="toc-text">環境</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%93%E3%81%A8%E3%81%AE%E7%B5%8C%E7%B7%AF"><span class="toc-text">ことの経緯</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B9%E9%87%9D"><span class="toc-text">方針</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%81%A4%E3%81%AE%E4%BD%9C%E6%A5%AD%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3"><span class="toc-text">二つの作業パターン</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3%E2%91%A0%E3%80%8Cimport-remove%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%80%8D"><span class="toc-text">パターン①「import &amp; removeコマンド」</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3%E2%91%A1%E3%80%8CState%E3%82%92%E7%B7%A8%E9%9B%86%E3%80%8D"><span class="toc-text">パターン②「Stateを編集」</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (435)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (262)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (98)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (61)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (35)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
