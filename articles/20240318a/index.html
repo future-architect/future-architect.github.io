@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>cfn-guardを使ってTerraformをポリシーチェックしようとした話 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="Terraform連載2024を の6本目です。 導入インフラエンジニアとして働いているTIGの原木です。 cfn-guardを使用してTerraformをポリシーチェックしようとした話をします。 cfn-guardとは？cfn-guardのcfnとはAWSのCloudFormation(AWSのIaCソリューションのこと)の略称です。 このツールはCloudFormationを使ってAWSのリソ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cfn-guardを使ってTerraformをポリシーチェックしようとした話 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240318a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="Terraform連載2024を の6本目です。 導入インフラエンジニアとして働いているTIGの原木です。 cfn-guardを使用してTerraformをポリシーチェックしようとした話をします。 cfn-guardとは？cfn-guardのcfnとはAWSのCloudFormation(AWSのIaCソリューションのこと)の略称です。 このツールはCloudFormationを使ってAWSのリソ">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240318a/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240318a/image_2.png">
+<meta property="article:published_time" content="2024-03-17T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-18T04:40:03.505Z">
+<meta property="article:tag" content="Terraform">
+<meta property="article:tag" content="cfn-guard">
+<meta property="article:tag" content="Policy-as-Cod">
+<meta property="article:tag" content="CloudFormation">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240318a/image.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240318a/">
+  <meta content="Terraform,cfn-guard,Policy-as-Cod,CloudFormation" name="keywords">
+  <meta content="原木翔" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">cfn-guardを使ってTerraformをポリシーチェックしようとした話
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240318a_cfn-guardを使ってTerraformをポリシーチェックしようとした話.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240318a_cfn-guardを使ってTerraformをポリシーチェックしようとした話" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-03-17T15:00:00.000Z" itemprop="datePublished">2024.03.18</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%8E%9F%E6%9C%A8%E7%BF%94" title="原木翔さんの記事一覧へ" class="post-author">原木翔</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Terraform/" title="Terraformタグの記事へ" class="tag-list-link">Terraform</a>
+  
+    
+    <a href="/tags/cfn-guard/" title="cfn-guardタグの記事へ" class="tag-list-link">cfn-guard</a>
+  
+    
+    <a href="/tags/Policy-as-Cod/" title="Policy-as-Codタグの記事へ" class="tag-list-link">Policy-as-Cod</a>
+  
+    
+    <a href="/tags/CloudFormation/" title="CloudFormationタグの記事へ" class="tag-list-link">CloudFormation</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p><a href="/articles/20240311a/">Terraform連載2024を</a> の6本目です。</p>
+<h2 id="導入"><a href="#導入" class="headerlink" title="導入"></a>導入</h2><p>インフラエンジニアとして働いているTIGの原木です。</p>
+<p>cfn-guardを使用してTerraformをポリシーチェックしようとした話をします。</p>
+<h2 id="cfn-guardとは？"><a href="#cfn-guardとは？" class="headerlink" title="cfn-guardとは？"></a>cfn-guardとは？</h2><p>cfn-guardのcfnとはAWSのCloudFormation(AWSのIaCソリューションのこと)の略称です。</p>
+<p>このツールはCloudFormationを使ってAWSのリソースをデプロイするときにその内容をチェックするポリシーチェックツールとしてよく使われています。</p>
+<p>しかし、cfn-guardはその名前に反して、CloudFormationに限らず、JSON&#x2F;YAMLファイルに対する汎用的なポリシーチェックツールとしても使用することができます。</p>
+<p>READMEの記載にも、次の通り説明があります。</p>
+<blockquote>
+<p>Guard offers a policy-as-code domain-specific language (DSL) to write rules and validate JSON- and YAML-formatted data such as CloudFormation Templates, K8s configurations, and Terraform JSON plans&#x2F;configurations against those rules.</p>
+<p>Guardは、CloudFormationテンプレート、K8sコンフィグレーション、TerraformのJSONプラン&#x2F;コンフィグレーションなどのJSONやYAMLフォーマットのデータに対して、ルールを記述し検証するためのPolicy as Codeなドメイン固有言語(DSL)を提供します。</p>
+</blockquote>
+<p>AWS Certified Securityの勉強をしていて本ツールの名前を知り、READMEを見て、自分は興味を持ちました。</p>
+<h2 id="cfn-guardでTerraformをチェックしようとしたモチベーション"><a href="#cfn-guardでTerraformをチェックしようとしたモチベーション" class="headerlink" title="cfn-guardでTerraformをチェックしようとしたモチベーション"></a>cfn-guardでTerraformをチェックしようとしたモチベーション</h2><p>Terraformのポリシーチェックとしては、過去にFuture技術ブログで紹介したtflintやterraform validator<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>、tfsec<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>等すでに様々なツールがあります。</p>
+<p>その中でなぜあえて、cfn-guardをTerraform planをチェックしようとしたのか？</p>
+<p>それはcfn-guardに読み込ませるルール表となるCFn Guard DSLとAWSマネージドサービスの力を借りてインフラをデプロイする前から後まで一貫したポリシーチェックができるのではないか。と考えたためです。</p>
+<p>一度CFn Guard DSL(ポリシールール)を書くことで二度おいしいメリットがあると考えました。</p>
+<ul>
+<li>Terraformのコーディング中に、cfn-guardによりユニットテストを動かす感覚でポリシーチェックを随時できるようになります</li>
+<li>Terraformを使ってAWSインフラを構築後、意図しない形でリソースが変更されてもAWS ConfigによりトリガーされたCFn Guardルールのスキャンによってインフラのドリフトを検知できるようになります</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://speakerdeck.com/ohmura/policy-as-code-with-cloudformation-guard?slide=7">CloudFormation Guard で Policy as Code！ 実際どうよ？ &#x2F; Policy as Code with CloudFormation Guard</a>のスライドをお借りすると次のようなイメージです。</p>
+<img src="/images/20240318a/image.png" alt="image.png" width="1200" height="682" loading="lazy">
+
+<p>このような <strong>青写真</strong> を描きました。</p>
+<p>このブログでは、cfn-guardを検証し…そして、思ってたのと違った!!という話をしたいと思います。</p>
+<h2 id="なにはともあれ実践してみよう"><a href="#なにはともあれ実践してみよう" class="headerlink" title="なにはともあれ実践してみよう"></a>なにはともあれ実践してみよう</h2><p>一番基礎的な使い方として、S3ファイルをデプロイするterraformのファイルをチェックする方法について書きたいと思います。</p>
+<p>前提として、cfn-guardはHCLファイル(要は.tfファイル)を直接チェックできず、JSON&#x2F;YAMLファイルを読み込ませないといけないので、 <code>terraform plan</code> の実行結果からJSONファイルを作成する必要があります。</p>
+<p>下記のようにS3バケットを作成するHCLファイルがあったとしましょう。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># provider等は省略します</span></span><br><span class="line">resource <span class="string">&quot;aws_s3_bucket&quot;</span> <span class="string">&quot;my_bucket&quot;</span> &#123;</span><br><span class="line">  bucket = <span class="string">&quot;my-bucket&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">&quot;aws_s3_bucket_public_access_block&quot;</span> <span class="string">&quot;my_bucket&quot;</span> &#123;</span><br><span class="line">  bucket = aws_s3_bucket.my_bucket.id</span><br><span class="line"></span><br><span class="line">  block_public_acls       = <span class="literal">true</span></span><br><span class="line">  block_public_policy     = <span class="literal">true</span></span><br><span class="line">  ignore_public_acls      = <span class="literal">true</span></span><br><span class="line">  restrict_public_buckets = <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>このファイルがまだ未作成の場合、次のようにコマンドを実行することで<br>作成後に想定されるリソース構成をJSONファイルで出力することができます。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">terraform plan -out tfplan.bin</span><br><span class="line">terraform show --json tfplan.bin &gt; tfplan.json</span><br></pre></td></tr></table></figure>
+
+<p><code>tfplan.json</code> のファイル構造を分解して中身を見てみましょう。<br>※そのままだと見づらいのでJSONファイルをサブセットであるYAMLファイルに変換して表示します。<br>※YAMLファイルでも素のJSONファイルでもcfn-guardは動かすことができます。</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">format_version:</span> <span class="string">&quot;1.2&quot;</span></span><br><span class="line"><span class="attr">terraform_version:</span> <span class="number">1.6</span><span class="number">.1</span></span><br><span class="line"><span class="attr">planned_values:</span></span><br><span class="line">  <span class="string">//</span> <span class="string">terraformがplanしたリソースの最終的な構成情報</span></span><br><span class="line">  <span class="attr">root_module:</span></span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">address:</span> <span class="string">aws_s3_bucket.my_bucket</span></span><br><span class="line">        <span class="attr">mode:</span> <span class="string">managed</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">aws_s3_bucket</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">my_bucket</span></span><br><span class="line">        <span class="attr">provider_name:</span> <span class="string">registry.terraform.io/hashicorp/aws</span></span><br><span class="line">        <span class="attr">schema_version:</span> <span class="number">0</span></span><br><span class="line">        <span class="attr">values:</span></span><br><span class="line">          <span class="attr">bucket:</span> <span class="string">my-bucket1</span></span><br><span class="line">          <span class="attr">force_destroy:</span> <span class="literal">false</span></span><br><span class="line">          <span class="attr">tags:</span> <span class="literal">null</span></span><br><span class="line">          <span class="attr">tags_all:</span></span><br><span class="line">            <span class="attr">env:</span> <span class="string">dev</span></span><br><span class="line">          <span class="attr">timeouts:</span> <span class="literal">null</span></span><br><span class="line">        <span class="attr">sensitive_values:</span></span><br><span class="line">          <span class="attr">cors_rule:</span> []</span><br><span class="line">          <span class="attr">grant:</span> []</span><br><span class="line">          <span class="attr">lifecycle_rule:</span> []</span><br><span class="line">          <span class="attr">logging:</span> []</span><br><span class="line">          <span class="attr">object_lock_configuration:</span> []</span><br><span class="line">          <span class="attr">replication_configuration:</span> []</span><br><span class="line">          <span class="attr">server_side_encryption_configuration:</span> []</span><br><span class="line">          <span class="attr">tags_all:</span> &#123;&#125;</span><br><span class="line">          <span class="attr">versioning:</span> []</span><br><span class="line">          <span class="attr">website:</span> []</span><br><span class="line">      <span class="bullet">-</span> <span class="attr">address:</span> <span class="string">aws_s3_bucket_public_access_block.my_bucket</span></span><br><span class="line">        <span class="attr">mode:</span> <span class="string">managed</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">aws_s3_bucket_public_access_block</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">my_bucket</span></span><br><span class="line">        <span class="attr">provider_name:</span> <span class="string">registry.terraform.io/hashicorp/aws</span></span><br><span class="line">        <span class="attr">schema_version:</span> <span class="number">0</span></span><br><span class="line">        <span class="attr">values:</span></span><br><span class="line">          <span class="attr">block_public_acls:</span> <span class="literal">true</span></span><br><span class="line">          <span class="attr">block_public_policy:</span> <span class="literal">true</span></span><br><span class="line">          <span class="attr">ignore_public_acls:</span> <span class="literal">true</span></span><br><span class="line">          <span class="attr">restrict_public_buckets:</span> <span class="literal">true</span></span><br><span class="line">        <span class="attr">sensitive_values:</span> &#123;&#125;</span><br><span class="line"><span class="attr">resource_changes:</span></span><br><span class="line">  <span class="string">//</span> <span class="string">既存リソースに対する変更内容</span></span><br><span class="line">  <span class="string">//</span> <span class="string">省略</span></span><br><span class="line"><span class="attr">configuration:</span></span><br><span class="line">  <span class="string">//</span> <span class="string">元の状態に適用される構成のこと</span></span><br><span class="line">  <span class="string">//</span> <span class="string">省略</span></span><br><span class="line"><span class="attr">relevant_attributes:</span></span><br><span class="line">  <span class="string">//</span> <span class="string">変更されたリソースの関連属性</span></span><br><span class="line">  <span class="string">//</span> <span class="string">省略</span></span><br><span class="line"><span class="attr">timestamp:</span> <span class="string">&quot;2024-03-17T05:58:17Z&quot;</span></span><br><span class="line"><span class="attr">errored:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+<p>上記リソースをチェックするためのリソースポリシーを書いてみます。</p>
+<p>よくあるリソースポリシーとして</p>
+<ul>
+<li>S3のバケット名が特定の命名規則にしたがっていること</li>
+<li>リソースに特定の環境を示すタグが入っていること</li>
+</ul>
+<p>をチェックしたいと思います。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">let</span> aws_s3_bucket_resources = planned_values.root_module.resources[<span class="built_in">type</span> == <span class="string">&quot;aws_s3_bucket&quot;</span>]</span><br><span class="line"></span><br><span class="line">rule aws_s3_bucket_rule when %aws_s3_bucket_resources !empty &#123;</span><br><span class="line">  <span class="comment"># バケット名は &quot;test-&quot; で始まる必要があります</span></span><br><span class="line">  %aws_s3_bucket_resources.values.bucket == /^<span class="built_in">test</span>-.*/</span><br><span class="line"></span><br><span class="line">  <span class="comment"># &quot;env&quot; タグが必ず含まれること</span></span><br><span class="line">  <span class="built_in">let</span> required_tags = %aws_s3_bucket_resources.values.tags_all[ </span><br><span class="line">      Key == <span class="string">&#x27;env&#x27;</span> ] </span><br><span class="line">  %required_tags[*] &#123;</span><br><span class="line">      Value IN [<span class="string">&#x27;dev&#x27;</span>, <span class="string">&#x27;stg&#x27;</span>, <span class="string">&#x27;prod&#x27;</span>, <span class="string">&#x27;demo&#x27;</span>]</span><br><span class="line">      &lt;&lt;<span class="string">Tag must have a permitted value&gt;&gt;</span></span><br><span class="line"><span class="string">  &#125;</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>このルールに従っているか実際に <code>cfn-guard</code> を動かし、チェックしてみましょう。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">cfn-guard validate -r s3_template_example.guard -d infrastructure/tfplan1.json -o yaml</span></span><br><span class="line">tfplan1.json Status = FAIL</span><br><span class="line">FAILED rules</span><br><span class="line">s3_template_example.guard/aws_s3_bucket_rule                    FAIL</span><br><span class="line">---</span><br><span class="line">name: tfplan1.json</span><br><span class="line">metadata: &#123;&#125;</span><br><span class="line">status: FAIL</span><br><span class="line">not_compliant:</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">出力内容はわかりやすくするために途中端折ってます</span></span><br><span class="line">- Rule:</span><br><span class="line">    name: aws_s3_bucket_rule</span><br><span class="line">    checks:</span><br><span class="line">    - Clause:</span><br><span class="line">        Binary:</span><br><span class="line">          context: &#x27; %aws_s3_bucket_resources[*].values.bucket EQUALS  &quot;/^test-.*/&quot;&#x27;</span><br><span class="line">          messages:</span><br><span class="line">            custom_message: &#x27;&#x27;</span><br><span class="line">            error_message: Check was not compliant as property value [Path=/planned_values/root_module/resources/0/values/bucket[L:0,C:286] Value=&quot;my-bucket&quot;] not equal to value [Path=[L:0,C:0] Value=&quot;/^test-.*/&quot;].</span><br><span class="line">          check:</span><br><span class="line">            Resolved:</span><br><span class="line">              from:</span><br><span class="line">                path: /planned_values/root_module/resources/0/values/bucket</span><br><span class="line">                value: my-bucket</span><br><span class="line">              to:</span><br><span class="line">                path: &#x27;&#x27;</span><br><span class="line">                value: /^test-.*/</span><br><span class="line">              comparison:</span><br><span class="line">              - Eq</span><br><span class="line">              - false</span><br></pre></td></tr></table></figure>
+
+<p>エラーになりました。contextを確認すると、 <code>context: &#39; %aws_s3_bucket_resources[*].values.bucket EQUALS  &quot;/^test-.*/&quot;&#39;</code> とあるようにバケットの命名規則がルールに従っていないことがわかります。</p>
+<p>そこでバケット名を修正し、再度 <code>cfn-guard</code> にかけてみます。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">修正したs3.tf及びyamlファイルは割愛</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">cfn-guard validate -r s3_template_example.guard -d infrastructure/tfplan2.json -o yaml</span></span><br><span class="line">name: tfplan2.json</span><br><span class="line">metadata: &#123;&#125;</span><br><span class="line">status: PASS</span><br><span class="line">not_compliant: []</span><br><span class="line">not_applicable: []</span><br><span class="line">compliant:</span><br><span class="line">- aws_s3_bucket_rule</span><br><span class="line">- public_access_block_resources_rule</span><br></pre></td></tr></table></figure>
+
+<p>今度は通りました。</p>
+<p>序の口ではありますが、cfn-guardを使ったチェック方法について、雰囲気は掴めたのではないかと思います。しかし、ここから先、cfn-guardを深掘りするうちにギャップが広がっていくことに気づきました。</p>
+<h2 id="ここが思ってたのと違ってたよという話"><a href="#ここが思ってたのと違ってたよという話" class="headerlink" title="ここが思ってたのと違ってたよという話"></a>ここが思ってたのと違ってたよという話</h2><p>当初の自分の妄想では、cfn-guardとは、AWSのリソースAPIにアクセスしていい感じにチェックするツールなのかなとふわっと思ってました。ですが、実践例にあるように実態はどうでしょうか？</p>
+<p>カンの良い方はすぐに気づかれたかもしれません。</p>
+<p>CloudFormationを例に先ほどと同じことをしてみましょう。</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">AWSTemplateFormatVersion:</span> <span class="number">2010-09-09</span></span><br><span class="line"><span class="attr">Resources:</span></span><br><span class="line">  <span class="attr">MyS3Bucket4646DF6F:</span></span><br><span class="line">    <span class="attr">Type:</span> <span class="string">AWS::S3::Bucket</span></span><br><span class="line">    <span class="attr">Properties:</span></span><br><span class="line">      <span class="attr">BucketName:</span> <span class="string">my-bucket</span></span><br><span class="line">    <span class="attr">UpdateReplacePolicy:</span> <span class="string">Delete</span></span><br><span class="line">    <span class="attr">DeletionPolicy:</span> <span class="string">Delete</span></span><br><span class="line">    <span class="attr">Metadata:</span></span><br><span class="line">      <span class="attr">aws:cdk:path:</span> <span class="string">CdkAppStack/MyS3Bucket/Resource</span></span><br></pre></td></tr></table></figure>
+
+<p>というファイルに対してS3のバケット名の命名規則をチェックします。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">let</span> buckets = Resources.*[ Type == <span class="string">&#x27;AWS::S3::Bucket&#x27;</span> ]</span><br><span class="line"></span><br><span class="line">rule BucketEncryption when %buckets !empty &#123;</span><br><span class="line">  %buckets.Properties &#123;</span><br><span class="line">    BucketName == /^<span class="built_in">test</span>-.*/</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>別物やんけ。</p>
+<p>その通りです。なぜなら、CloudFormationとTerraform planではファイルの構造が全然異なりますので。</p>
+<p>cfn-guardの実態は、CFn Guard DSLに基づきJSONやYAMLなどの構造型データを検査する、ある意味シンプルな構文解析ツールです。</p>
+<p>したがって、ポリシーファイルについてCloudFormation向けはCloudFormation向け、Terraform plan向けはTerraform plan向けに書く必要があります。そして後者のTerraform plan向けのポリシーファイルは、当然AWS Config上で動きません。</p>
+<p>ここに当初の構想はからくも崩れたのでした。</p>
+<p>ECSのTask Definitionのようにインラインで文字列化したJSONファイルをいい感じにパースする方法が見つからなかった、tagチェックでtagsとtags_allを別々にチェックする必要があった、そもそも構文エラー時説明してるようで何も説明してくれないエラーログ等、細かいことを言い出すときりがない不満があり、最終的に自分はおとなしくtflintに戻りました。</p>
+<h2 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h2><p>Terraformユーザーには、cfn-guardの扱いは少々難しいところがあるという話でした。</p>
+<p>ポリシールール等の設定について最近はChatGPT先生に下書きをお願いすることが多いのですが、彼女に自由に書かせたら、明らかにAWS CloudFormationテンプレート向けのguardファイルをTerraformと言い張ったのは悲しかったです。</p>
+<p>WHY?と聞いたら次の通り開き直った回答が返ってきました。<br><img src="/images/20240318a/image_2.png" alt="" width="1200" height="1142" loading="lazy"></p>
+<p>しかし、AWS CDKを使ってCloufFormationのテンプレートファイルを生成し、AWSリソースのデプロイを行っているユーザーにとって強力なポリシーチェックツールなのは間違いありません。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/aws-cloudformation/aws-guard-rules-registry">CFn Guard Rules Registry</a>には、ルールの実装例が多数掲載されております。<br>Amazon Web Services’ Well-Architected Framework Reliability Pillar等、インフラエンジニアが非機能要件を考える時のベストプラクティスを実装したポリシーファイル等もあり、痒い所に手が届く例となっています。</p>
+<p>以上、参考になれば幸いです。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">現在は <code>gcloud beta terraform vet</code> として提供中</span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="vertical-align: top; padding-right: 10px;">2.</span><span style="vertical-align: top;">現在は <code>trivyの1機能</code> として提供中</span><a href="#fnref:2" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20240318a/&related=twitterapi%2Ctwitter&text=cfn-guard%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6Terraform%E3%82%92%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%81%97%E3%82%88%E3%81%86%E3%81%A8%E3%81%97%E3%81%9F%E8%A9%B1%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240318a/&t=cfn-guard%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6Terraform%E3%82%92%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%81%97%E3%82%88%E3%81%86%E3%81%A8%E3%81%97%E3%81%9F%E8%A9%B1" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240318a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240318a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2024.03.15</span><span class="snscount">&#9825;3</span><a href=/articles/20240315a/ title="IaCを利用してインフラを構成することで、構築忘れや設定ミスといったイージーなミスが減らせるようになりました。とはいえ、展開していく範囲が増えれば増えるほどコードの量も増えていくので、このリソースはどこで作ったっけ…みたいなことが起きてしまいます。">サービスの多国展開を支えるTerraform構成<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.03.14</span><span class="snscount">&#9825;3</span><a href=/articles/20240314a/ title="tfstateを統合する機会があったので、その経験をもとにまとめます。">Terraform連載2024 Stateを統合してみる<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.03.13</span><span class="snscount">&#9825;6</span><a href=/articles/20240313a/ title="Terraformにおける変数を、構築するインフラの要件に合わせてどのように制御していくかについてお話していきたいと思います。Terraformにおける変数制御は、構築するインフラの要件を明確化させる上で重要になってきます。そこで今回はどんな変数制御があるか、ユースケースを踏まえて見ていきたいと思います。">Terraform連載2024 Terraformにおける変数の制御について<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.03.12</span><span class="snscount">&#9825;4</span><a href=/articles/20240312a/ title="Terraformファイルをコード生成するため、hclwriteというGoパッケージの使い方を調べました。">Terraform連載2024 hclwriteを用いたtfコード生成入門<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.03.11</span><span class="snscount">&#9825;11</span><a href=/articles/20240311a/ title="Terraform連載を開始します。">Terraform連載2024を開始します & TerraformにおけるDR戦略を考える<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2023.11.07</span><span class="snscount">&#9825;1</span><a href=/articles/20231107a/ title="小学校を卒業して云十年。この年になって[100マス計算のドリル]を毎日1問解いているTIGの原木です。念のため、100マス計算を知らない方に説明すると">エッセイ: 小学2X年生、計算ドリルをしている</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20240311a/ title="Terraform連載を開始します。">Terraform連載2024を開始します & TerraformにおけるDR戦略を考える<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8E%E5%85%A5"><span class="toc-text">導入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cfn-guard%E3%81%A8%E3%81%AF%EF%BC%9F"><span class="toc-text">cfn-guardとは？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cfn-guard%E3%81%A7Terraform%E3%82%92%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%81%97%E3%82%88%E3%81%86%E3%81%A8%E3%81%97%E3%81%9F%E3%83%A2%E3%83%81%E3%83%99%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3"><span class="toc-text">cfn-guardでTerraformをチェックしようとしたモチベーション</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AA%E3%81%AB%E3%81%AF%E3%81%A8%E3%82%82%E3%81%82%E3%82%8C%E5%AE%9F%E8%B7%B5%E3%81%97%E3%81%A6%E3%81%BF%E3%82%88%E3%81%86"><span class="toc-text">なにはともあれ実践してみよう</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%93%E3%81%93%E3%81%8C%E6%80%9D%E3%81%A3%E3%81%A6%E3%81%9F%E3%81%AE%E3%81%A8%E9%81%95%E3%81%A3%E3%81%A6%E3%81%9F%E3%82%88%E3%81%A8%E3%81%84%E3%81%86%E8%A9%B1"><span class="toc-text">ここが思ってたのと違ってたよという話</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%BE%8C%E3%81%AB"><span class="toc-text">最後に</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (435)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (264)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (98)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (61)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (35)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
