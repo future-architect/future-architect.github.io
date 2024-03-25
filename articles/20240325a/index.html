@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Azure環境Terraform実行におけるリソースプロバイダーについて | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="Terraform連載2024を の8本目です。 はじめにこんにちは、SAIG(Strategic AI Group)の真鍋です。 昨今のOpenAI需要によって、Azure環境の利用を本格的に始める方も多いかと思います。 Azure環境でTerraformを利用する際、裏で動いているリソースプロバイダーについてご紹介します。 Terraform実行時に踏んだエラー利用中のAzure環境にて">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Azure環境Terraform実行におけるリソースプロバイダーについて | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240325a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="Terraform連載2024を の8本目です。 はじめにこんにちは、SAIG(Strategic AI Group)の真鍋です。 昨今のOpenAI需要によって、Azure環境の利用を本格的に始める方も多いかと思います。 Azure環境でTerraformを利用する際、裏で動いているリソースプロバイダーについてご紹介します。 Terraform実行時に踏んだエラー利用中のAzure環境にて">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240325a/top.png">
+<meta property="article:published_time" content="2024-03-24T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-25T03:53:19.175Z">
+<meta property="article:tag" content="Terraform">
+<meta property="article:tag" content="Azure">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240325a/top.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240325a/">
+  <meta content="Terraform,Azure" name="keywords">
+  <meta content="真鍋優" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Azure環境Terraform実行におけるリソースプロバイダーについて
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240325a_Azure環境Terraform実行におけるリソースプロバイダーについて.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240325a_Azure環境Terraform実行におけるリソースプロバイダーについて" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-03-24T15:00:00.000Z" itemprop="datePublished">2024.03.25</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%8D%8B%E5%84%AA" title="真鍋優さんの記事一覧へ" class="post-author">真鍋優</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Terraform/" title="Terraformタグの記事へ" class="tag-list-link">Terraform</a>
+  
+    
+    <a href="/tags/Azure/" title="Azureタグの記事へ" class="tag-list-link">Azure</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20240325a/top.png" alt="" width="800" height="515">
+
+
+<p><a href="/articles/20240311a/">Terraform連載2024を</a> の8本目です。</p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは、SAIG(Strategic AI Group)の真鍋です。</p>
+<p>昨今のOpenAI需要によって、Azure環境の利用を本格的に始める方も多いかと思います。</p>
+<p>Azure環境でTerraformを利用する際、裏で動いているリソースプロバイダーについてご紹介します。</p>
+<h1 id="Terraform実行時に踏んだエラー"><a href="#Terraform実行時に踏んだエラー" class="headerlink" title="Terraform実行時に踏んだエラー"></a>Terraform実行時に踏んだエラー</h1><p>利用中のAzure環境にて<code>terraform plan</code>を実行した際に、下記エラーが発生しました。</p>
+<p>見やすいように改行等追加しています。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">Original Error: Cannot register providers: </span><br><span class="line">Microsoft.ServiceBus,</span><br><span class="line">Microsoft.DBforPostgreSQL,</span><br><span class="line">(中略)...</span><br><span class="line">Microsoft.TimeSeriesInsights.</span><br><span class="line">Errors were:</span><br><span class="line">Cannot register provider Microsoft.ServiceBus with Azure Resource Manager:</span><br><span class="line">unexpected status 403 with error:</span><br><span class="line">AuthorizationFailed:</span><br><span class="line">The client &#x27;xxx.xxx.xxx@exapmle.co.jp&#x27; with object id &#x27;xxxxx-xxxx-xxxx-xxxx-xxxx&#x27;</span><br><span class="line">does not have authorization to perform action &#x27;Microsoft.ServiceBus/register/action&#x27;</span><br><span class="line">over scope &#x27;/subscriptions/xxxx-xxxx-xxxx-xxxx&#x27; or the scope is invalid.</span><br><span class="line">If access was recently granted, please refresh your credentials..</span><br></pre></td></tr></table></figure>
+
+<p>Terraformコード上はVMやStorage Account等、作成権限が確認できているリソースしか記載していませんでしたが、providerなるものを追加する際に権限不足で失敗したとのことです。</p>
+<p>ちなみに利用するAzure環境は他チームから払い出された環境であり、Terraform実行時に認証した個人アカウントは権限が絞られています。</p>
+<h1 id="リソースプロバイダーとは"><a href="#リソースプロバイダーとは" class="headerlink" title="リソースプロバイダーとは"></a>リソースプロバイダーとは</h1><p>今回遭遇したエラーのproviderはリソースプロバイダーといい、<a target="_blank" rel="noopener" href="https://learn.microsoft.com/ja-jp/azure/azure-resource-manager/management/azure-services-resource-providers">Azure サービスのリソース プロバイダーとは何か</a>に説明があります。</p>
+<p>概要について抜粋します。</p>
+<blockquote>
+<p>リソース プロバイダーは、Azure サービスの機能を実現する REST 操作のコレクションです。 各リソース プロバイダーには、company-name.service-label という形式の名前空間があります。</p>
+</blockquote>
+<p>例えばAzureストレージについては、<code>Microsoft.Storage</code>という名前空間で表現されます。</p>
+<p>REST APIへリクエストを送信した際にAzureリソースマネージャーがそれを受け取りますが、実際の操作はリソースプロバイダーによって実施します。</p>
+<p>下記ページが分かりやすくまとめられています。<br><a target="_blank" rel="noopener" href="https://milestone-of-se.nesuke.com/sv-advanced/azure/resource-manager-provider/">【図解】初心者向けリソースマネージャーとリソースプロバイダー</a></p>
+<p>リソースプロバイダーは既定で登録されているものもありますが、手動で登録する場合や、Azureポータルにおいてリソースを作ることで自動登録される場合もあります。</p>
+<p>今回のエラーは、Terraformプロバイダーの一つであるAzureRM利用時にリソースプロバイダーを登録しようとして発生しました。</p>
+<h1 id="Terraform実行時におけるリソースプロバイダー"><a href="#Terraform実行時におけるリソースプロバイダー" class="headerlink" title="Terraform実行時におけるリソースプロバイダー"></a>Terraform実行時におけるリソースプロバイダー</h1><p>AzureにおけるTerraformプロバイダーとしては下記が用意されています。</p>
+<ul>
+<li>AzureRM</li>
+<li>AzureAD</li>
+<li>AzureDevops</li>
+<li>AzAPI</li>
+<li>AzureStack</li>
+</ul>
+<p>今回はVMやStorage Account等を管理するため、AzureRMを利用していました。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform-provider-azurerm/blob/main/internal/resourceproviders/required.go">terraform-provider-azurerm&#x2F;internal&#x2F;resourceproviders</a>のページによると、AzureRMでは複数のリソースプロバイダーを自動で登録するとのことです。</p>
+<p>リソースプロバイダーの登録ですが、providerブロックに<code>skip_provider_registration = true</code>とすることで無効化できます。</p>
+<p>あるいは環境変数<code>ARM_SKIP_PROVIDER_REGISTRATION</code>を設定することも可能とのことです。</p>
+<figure class="highlight sh"><figcaption><span>terraform</span></figcaption><table><tr><td class="code"><pre><span class="line">provider <span class="string">&quot;azurerm&quot;</span> &#123;</span><br><span class="line">  skip_provider_registration = <span class="literal">true</span></span><br><span class="line">  features &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#skip_provider_registration">Azure Provider#skip_provider_registration</a></p>
+<h1 id="解決法"><a href="#解決法" class="headerlink" title="解決法"></a>解決法</h1><p>今回発生したエラーの解決には下記1,2の方法が考えられます。</p>
+<ol>
+<li>Terraform実行ユーザにリソースプロバイダー関連の権限を付与する</li>
+<li>事前に手動でリソースプロバイダーを登録し、Terraformのリソースプロバイダー登録を無効化する</li>
+</ol>
+<p>1つ目の方法ですが、サブスクリプション全体に対するリソースごとの<code>company-name.service-label/register/action</code>等の権限を付与する形です。権限を付与し<code>terraform plan</code>を実行したタイミングでリソースプロバイダーが登録されます。</p>
+<p>2つ目の方法は、手動でリソースプロバイダーを登録しておき、Terraform実行時には<code>skip_provider_registration</code>の記載や環境変数でリソースプロバイダー登録をスキップする方法です。手動でリソースプロバイダーを登録する場合は、Azureポータルのサブスクリプションからリソースプロバイダーを選択し、該当リソースプロバイダーを登録します。</p>
+<p>私たちは、リソースプロバイダーの登録をより上位の管理者に依頼して実施するフローを作成した上で、2つ目の方法を採用しました。同一サブスクリプション内で複数チームがそれぞれTerraform実行するようなケースにおいて、利用可能なリソースを制限する場合等に採り得る方法なのかと思います。</p>
+<h1 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h1><p>これまで強い権限でTerraformを操作していたためリソースプロバイダーを意識することは無かったのですが、今回はチームの運用ポリシーとして権限が制限されていたため改めて調査しました。</p>
+<p>リソースプロバイダーの登録を必要最低限にすることで、不要なリソースをサブスクリプション内で作成されないようにすることが可能です。リソースプロバイダー登録の権限を分離することで、より厳格にAzure環境を運用できます。</p>
+<p>より良い運用方法について、今後も考えていきたいと思います。</p>
+<p>また、今回の記事で扱ったリソースプロバイダーについての調査は、同チームの戸井田さんにご協力いただきました。ありがとうございました！</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20240325a/&related=twitterapi%2Ctwitter&text=Azure%E7%92%B0%E5%A2%83Terraform%E5%AE%9F%E8%A1%8C%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%83%97%E3%83%AD%E3%83%90%E3%82%A4%E3%83%80%E3%83%BC%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240325a/&t=Azure%E7%92%B0%E5%A2%83Terraform%E5%AE%9F%E8%A1%8C%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%83%97%E3%83%AD%E3%83%90%E3%82%A4%E3%83%80%E3%83%BC%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240325a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240325a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2024.03.21</span><span class="snscount">&#9825;9</span><a href=/articles/20240321a/ title="Terraform を使ってクラウド環境とか構築する人は多くいると思います。その中で毎回のようにどうやってテストをやるべきなのかなーとか悩んで、結果大したことも出来ずにリリースまで来てしまったということはないでしょうか。今回は、その悩みを少しでも払拭できないかと思い、Terraform v1.6 とv1.7 で提供されたtestsに触れていきたいと思います。">Terraform連載2024 テストとモックを使ってみる<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.03.18</span><span class="snscount">&#9825;2</span><a href=/articles/20240318a/ title="cfn-guardを使用してTerraformをポリシーチェックしようとした話をします。">cfn-guardを使ってTerraformをポリシーチェックしようとした話<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.03.15</span><span class="snscount">&#9825;3</span><a href=/articles/20240315a/ title="IaCを利用してインフラを構成することで、構築忘れや設定ミスといったイージーなミスが減らせるようになりました。とはいえ、展開していく範囲が増えれば増えるほどコードの量も増えていくので、このリソースはどこで作ったっけ…みたいなことが起きてしまいます。">サービスの多国展開を支えるTerraform構成<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.03.14</span><span class="snscount">&#9825;3</span><a href=/articles/20240314a/ title="tfstateを統合する機会があったので、その経験をもとにまとめます。">Terraform連載2024 Stateを統合してみる<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.03.13</span><span class="snscount">&#9825;6</span><a href=/articles/20240313a/ title="Terraformにおける変数を、構築するインフラの要件に合わせてどのように制御していくかについてお話していきたいと思います。Terraformにおける変数制御は、構築するインフラの要件を明確化させる上で重要になってきます。そこで今回はどんな変数制御があるか、ユースケースを踏まえて見ていきたいと思います。">Terraform連載2024 Terraformにおける変数の制御について<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.03.12</span><span class="snscount">&#9825;4</span><a href=/articles/20240312a/ title="Terraformファイルをコード生成するため、hclwriteというGoパッケージの使い方を調べました。">Terraform連載2024 hclwriteを用いたtfコード生成入門<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20240311a/ title="Terraform連載を開始します。">Terraform連載2024を開始します & TerraformにおけるDR戦略を考える<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Terraform%E5%AE%9F%E8%A1%8C%E6%99%82%E3%81%AB%E8%B8%8F%E3%82%93%E3%81%A0%E3%82%A8%E3%83%A9%E3%83%BC"><span class="toc-text">Terraform実行時に踏んだエラー</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%83%97%E3%83%AD%E3%83%90%E3%82%A4%E3%83%80%E3%83%BC%E3%81%A8%E3%81%AF"><span class="toc-text">リソースプロバイダーとは</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Terraform%E5%AE%9F%E8%A1%8C%E6%99%82%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%83%97%E3%83%AD%E3%83%90%E3%82%A4%E3%83%80%E3%83%BC"><span class="toc-text">Terraform実行時におけるリソースプロバイダー</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A7%A3%E6%B1%BA%E6%B3%95"><span class="toc-text">解決法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%95%E3%81%84%E3%81%94%E3%81%AB"><span class="toc-text">さいごに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (437)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (265)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (98)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (61)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (35)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
