@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Terraformの実装コードを、動かしながら読む | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="Terraform連載2024 の10本目記事です。 はじめにこんにちは。CSIG（Cyber Security Innovation Group）の棚井です。 Terraform 連載ということで  そういえば、実装コードは Go で書かれていたな コマンドの使い方はインフラエンジニアの皆様が書いてくれるはずなので、コードリーディングしようかな  との考えに至り、ソースコードリーディング自体">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Terraformの実装コードを、動かしながら読む | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240326a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="Terraform連載2024 の10本目記事です。 はじめにこんにちは。CSIG（Cyber Security Innovation Group）の棚井です。 Terraform 連載ということで  そういえば、実装コードは Go で書かれていたな コマンドの使い方はインフラエンジニアの皆様が書いてくれるはずなので、コードリーディングしようかな  との考えに至り、ソースコードリーディング自体">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240326a/top.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240326a/disc.png">
+<meta property="article:published_time" content="2024-03-25T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-26T00:49:16.622Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Terraform">
+<meta property="article:tag" content="CodeReading">
+<meta property="article:tag" content="Copilot">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240326a/top.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240326a/">
+  <meta content="Go,Terraform,CodeReading,Copilot" name="keywords">
+  <meta content="棚井龍之介" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Terraformの実装コードを、動かしながら読む
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240326a_Terraformの実装コードを、動かしながら読む.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240326a_Terraformの実装コードを、動かしながら読む" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-03-25T15:00:00.000Z" itemprop="datePublished">2024.03.26</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%A3%9A%E4%BA%95%E9%BE%8D%E4%B9%8B%E4%BB%8B" title="棚井龍之介さんの記事一覧へ" class="post-author">棚井龍之介</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/Terraform/" title="Terraformタグの記事へ" class="tag-list-link">Terraform</a>
+  
+    
+    <a href="/tags/CodeReading/" title="CodeReadingタグの記事へ" class="tag-list-link">CodeReading</a>
+  
+    
+    <a href="/tags/Copilot/" title="Copilotタグの記事へ" class="tag-list-link">Copilot</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <img src="/images/20240326a/top.png" alt="" width="800" height="539">
+
+<p><a href="/articles/20240311a/">Terraform連載2024</a> の10本目記事です。</p>
+<h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。CSIG（Cyber Security Innovation Group）の棚井です。</p>
+<p>Terraform 連載ということで</p>
+<ul>
+<li>そういえば、実装コードは Go で書かれていたな</li>
+<li>コマンドの使い方はインフラエンジニアの皆様が書いてくれるはずなので、コードリーディングしようかな</li>
+</ul>
+<p>との考えに至り、ソースコードリーディング自体をブログ化しました。<br>参考になる点が1つでもあれば幸いです。</p>
+<h1 id="エディタの準備"><a href="#エディタの準備" class="headerlink" title="エディタの準備"></a>エディタの準備</h1><p>今回のコードリーディングでは VSCode を利用します。</p>
+<p>Go のコードジャンプやテスト実行のため、以下の拡張機能を追加します。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=golang.go">Go</a></li>
+<li><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=766b.go-outliner">Go Outliner</a></li>
+<li><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=premparihar.gotestexplorer">Go Test Explorer</a></li>
+</ul>
+<p>また、コードリーディングのお供として「GitHub Copilot」も追加します。<br>GitHub アカウントで Copilot を有効化する方法や、VSCode の拡張機能とリンクする方法については、ネット上に多数情報がありますのでそちらをご参照ください。（ex. <a target="_blank" rel="noopener" href="https://docs.github.com/ja/copilot">GitHub Copilot のドキュメント</a>）</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=GitHub.copilot">GitHub Copilot</a></li>
+<li><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat">GitHub Copilot Chat</a></li>
+</ul>
+<p>「コードリーディングで生成系AIを使うの？」という疑問を持たれた方向けへの回答として、GitHub Copilotには「コード生成機能」以外に、「コードの説明機能」があります。</p>
+<p>使い方としては、</p>
+<ol>
+<li>解説して欲しいコードをハイライトする</li>
+<li><code>Ctrl + i</code> によりCopilotのポップアップを表示する</li>
+<li><code>/explain</code>を入力する</li>
+</ol>
+<p>の3ステップで利用可能です。</p>
+<p>VSCodeで表示されている実コードベースで解説してくれますので、途中に詰まる部分があったとしても、Copilotのサポートにより大抵は独力で解決可能です。OSSのコードリーディングでは、まさにこの解説機能が非常に便利だと感じています。</p>
+<h1 id="実行環境の準備"><a href="#実行環境の準備" class="headerlink" title="実行環境の準備"></a>実行環境の準備</h1><p>コードリーディング中には「実際に動かしてみないと、イメージがつきにくい処理」が見つかります。いざという時にローカル環境で動かせるように、Terraformのビルド、動作検証が可能な環境を準備します。</p>
+<p>ソースコードはこちらの <a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/tree/main">hashicorp&#x2F;terraform</a> リポジトリに公開されています。<br>Goのバージョンを確認したところ、トップディレクトリ配下の <a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/.go-version"><code>.go-version</code></a> に <code>1.22.1</code>（執筆時点）と記載されていることを確認しました。</p>
+<p>執筆時点での <a target="_blank" rel="noopener" href="https://go.dev/dl/">Go All releases</a> も <code>1.22.1</code> なので、最新のGoバージョンに対応していることが分かります。</p>
+<blockquote>
+<p>&#x3D;&#x3D; 宣伝 &#x3D;&#x3D;<br>FutureではGoリリース連載を実施しております。<br><a href="https://future-architect.github.io/articles/20240129a/">Go 1.22リリース連載始まります</a><br><a href="https://future-architect.github.io/articles/20240307a/">Goリリースノートから技術ブログを書く流れ基礎</a></p>
+</blockquote>
+<p>リポジトリ側でGoのバージョンが指定されているので、ローカル環境もそれに合わせて構築します。</p>
+<p>ちなみに、私は <a target="_blank" rel="noopener" href="https://asdf-vm.com/">asdf</a> を利用して開発言語のバージョン管理を行っています。asdf の利用方法は、左記の公式ドキュメント、および、こちらの解説記事（<a target="_blank" rel="noopener" href="https://qiita.com/RuyPKG/items/d4ea8baab1e0a17ae927">asdf で開発言語と利用ツールのバージョン管理</a>）をご覧ください。</p>
+<p><code>$ go version</code> 実行時に、<code>1.22.1</code> が表示されていれば、実行環境の準備は完了です。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ go version</span><br><span class="line">go version go1.22.1 linux/amd64</span><br></pre></td></tr></table></figure>
+
+<h1 id="リポジトリの取得、テスト実行"><a href="#リポジトリの取得、テスト実行" class="headerlink" title="リポジトリの取得、テスト実行"></a>リポジトリの取得、テスト実行</h1><p>それではさっそく、Terraform のソースコードを取得していきます。<br>といっても、ここでは <a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/tree/main">hashicorp&#x2F;terraform</a> リポジトリをクローンするだけです。</p>
+<p>クローンに成功したら、まずはテストに通過するかを確認します。</p>
+<details>
+<summary>テスト実行ログ</summary><div>
+
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> terraform/</span><br><span class="line"></span><br><span class="line">$ go <span class="built_in">test</span> ./...</span><br><span class="line">?       github.com/hashicorp/terraform/internal/backend [no <span class="built_in">test</span> files]</span><br><span class="line">ok      github.com/hashicorp/terraform  0.065s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/addrs   0.030s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/backend/backendbase     0.007s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/backend/backendrun      0.009s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/backend/init    0.051s</span><br><span class="line">?       github.com/hashicorp/terraform/internal/cloudplugin/cloudproto1 [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/cloudplugin/mock_cloudproto1    [no <span class="built_in">test</span> files]</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/backend/local   6.211s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/backend/remote  4.009s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/backend/remote-state/http       7.266s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/backend/remote-state/inmem      0.010s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/builtin/providers/terraform     0.150s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/builtin/provisioners/file       0.008s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/builtin/provisioners/local-exec 0.196s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/builtin/provisioners/remote-exec        2.050s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/checks  0.060s</span><br><span class="line">?       github.com/hashicorp/terraform/internal/command/jsonformat/collections  [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/command/jsonformat/computed     [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/command/jsonformat/jsondiff     [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/command/jsonformat/structured   [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/command/testing [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/e2e     [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/experiments     [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/getmodules      [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/grpcwrap        [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/lang/langrefs   [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/lang/marks      [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/lang/types      [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/modsdir [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/plans/planproto [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/plugin/mock_proto       [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/plugin6/mock_proto      [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/provider-simple [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/provider-simple/main    [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/provider-simple-v6      [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/provider-simple-v6/main [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/provider-terraform/main [no <span class="built_in">test</span> files]</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/cloud   36.011s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/cloud/cloudplan 0.111s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/cloud/e2e       8.538s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/cloudplugin     0.239s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/cloudplugin/cloudplugin1        0.029s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/collections     0.013s</span><br><span class="line">?       github.com/hashicorp/terraform/internal/providers/testing       [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/provisioner-local-exec/main     [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/provisioners    [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/registry/test   [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/replacefile     [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/rpcapi/dynrpcserver     [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/rpcapi/dynrpcserver/generator   [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/rpcapi/terraform1       [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/stacks/stackconfig/stackconfigtypes     [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/stacks/stackconfig/typeexpr     [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/schemarepo/loadschemas  [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/schemarepo      [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/stacks/stackaddrs       [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/stacks/stackruntime/hooks       [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/stacks/stackruntime/testing     [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/stacks/stackutils       [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/tfplugin5       [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/internal/tfplugin6       [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/tools/loggraphdiff       [no <span class="built_in">test</span> files]</span><br><span class="line">?       github.com/hashicorp/terraform/tools/protobuf-compile   [no <span class="built_in">test</span> files]</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command 88.238s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/arguments       0.014s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/cliconfig       0.027s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/clistate        0.010s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/e2etest 30.692s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/format  0.010s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/jsonchecks      0.009s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/jsonconfig      0.013s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/jsonformat      0.111s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/jsonformat/computed/renderers   0.035s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/jsonformat/differ       0.058s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/jsonformat/structured/attribute_path    0.014s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/jsonfunction    0.019s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/jsonplan        0.028s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/jsonprovider    0.024s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/jsonstate       0.036s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/views   3.473s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/views/json      0.053s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/webbrowser      0.016s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/command/workdir 0.029s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/communicator    1.049s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/communicator/remote     0.010s [no tests to run]</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/communicator/shared     0.005s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/communicator/ssh        3.183s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/communicator/winrm      0.045s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/configs 7.155s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/configs/configload      0.888s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/configs/configschema    0.038s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/configs/configtesting   0.004s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/configs/hcl2shim        0.036s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/copy    0.012s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/dag     2.168s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/depsfile        0.214s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/didyoumean      0.012s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/genconfig       0.051s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/getmodules/moduleaddrs  0.063s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/getproviders    4.428s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/getproviders/providerreqs       0.101s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/helper/slowmessage      0.105s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/httpclient      0.020s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/initwd  0.312s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/instances       0.019s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/ipaddr  0.026s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/lang    0.250s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/lang/blocktoattr        0.016s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/lang/funcs      0.792s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/lang/globalref  0.326s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/logging 0.004s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/moduledeps      0.021s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/moduletest      0.203s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/moduletest/config       0.028s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/moduletest/hcl  0.045s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/moduletest/mocking      0.025s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/namedvals       0.010s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/plans   0.018s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/plans/deferring 0.010s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/plans/objchange 0.115s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/plans/planfile  0.331s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/plugin  0.040s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/plugin/convert  0.027s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/plugin/discovery        0.013s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/plugin6 0.028s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/plugin6/convert 0.022s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/promising       0.041s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/providercache   0.232s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/providers       0.012s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/refactoring     0.261s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/registry        3.826s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/registry/regsrc 0.008s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/registry/response       0.010s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/releaseauth     0.167s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/repl    0.096s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/rpcapi  0.263s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/stacks/stackconfig      0.017s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/stacks/stackplan        0.029s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/stacks/stackruntime     0.484s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/stacks/stackruntime/internal/stackeval  1.489s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/stacks/stackstate       0.022s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/stacks/stackstate/statekeys     0.028s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/stacks/tfstackdata1     0.017s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/states  0.018s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/states/remote   0.032s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/states/statefile        0.070s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/states/statemgr 5.951s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/terminal        0.005s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/terraform       8.988s</span><br><span class="line">ok      github.com/hashicorp/terraform/internal/tfdiags 0.012s</span><br><span class="line">ok      github.com/hashicorp/terraform/version  0.003s</span><br></pre></td></tr></table></figure>
+
+</div></details>
+
+<p>テストを実行してみたところ、<code>[no test files]</code> が多数見つかりました。<br>少し気になりますので、テストのカバレッジを見てみます。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ go <span class="built_in">test</span> -cover</span><br><span class="line">Terraform has no <span class="built_in">command</span> named <span class="string">&quot;bar&quot;</span>.</span><br><span class="line"></span><br><span class="line">To see all of Terraform<span class="string">&#x27;s top-level commands, run:</span></span><br><span class="line"><span class="string">  terraform -help</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">PASS</span></span><br><span class="line"><span class="string">coverage: 36.7% of statements</span></span><br><span class="line"><span class="string">ok      github.com/hashicorp/terraform  0.049s</span></span><br></pre></td></tr></table></figure>
+
+<p>上記ログには</p>
+<blockquote>
+<p>coverage: 36.7% of statements</p>
+</blockquote>
+<p>とありますので、Terraform 実装コードのテストカバレッジ率は <code>36.7%</code> です。<br>数字の是非はさておいて、テストが通過することは確認できました。</p>
+<h1 id="ビルドして動かしてみる"><a href="#ビルドして動かしてみる" class="headerlink" title="ビルドして動かしてみる"></a>ビルドして動かしてみる</h1><p><code>terraform</code> がコマンドの1つである以上、「ビルドして動かせる」はずなので、実際に試してみます。</p>
+<p>Go言語では王道の <a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/Makefile">Makefile</a> を見たところ、<code>go build</code> に相当しそうなコマンドは見つかりません。<br>ただし、いくつかのコマンドが <code>$(CURDIR)/scripts/</code> 配下のシェルスクリプトを参照していますので、当該ディレクトリにお目当てのファイルがないかを確認します。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">ls</span> -l scripts/</span><br><span class="line">total 40</span><br><span class="line">-rwxr-xr-x 1 blog-user blog-user 2853 Mar 25 05:19 build.sh</span><br><span class="line">-rwxr-xr-x 1 blog-user blog-user  958 Mar 24 22:52 changelog-links.sh</span><br><span class="line">-rwxr-xr-x 1 blog-user blog-user  610 Mar 24 22:52 copyright.sh</span><br><span class="line">-rwxr-xr-x 1 blog-user blog-user 1171 Mar 24 22:52 debug-terraform</span><br><span class="line">-rwxr-xr-x 1 blog-user blog-user  344 Mar 24 22:52 exhaustive.sh</span><br><span class="line">-rwxr-xr-x 1 blog-user blog-user  401 Mar 24 22:52 gofmtcheck.sh</span><br><span class="line">-rwxr-xr-x 1 blog-user blog-user  351 Mar 24 22:52 gogetcookie.sh</span><br><span class="line">-rwxr-xr-x 1 blog-user blog-user 2730 Mar 24 22:52 goimportscheck.sh</span><br><span class="line">-rwxr-xr-x 1 blog-user blog-user  666 Mar 24 22:52 staticcheck.sh</span><br><span class="line">-rwxr-xr-x 1 blog-user blog-user 1096 Mar 24 22:52 syncdeps.sh</span><br></pre></td></tr></table></figure>
+
+<p><code>scripts/</code> 配下に、<a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/scripts/build.sh"><code>build.sh</code></a> というシェルスクリプトが見つかりました。<br>また、VSCode で <code>Ctrl + Shift + f</code> を実行して <code>build.sh</code> を検索すると、<a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/Dockerfile#L23">Dockerfile</a> の中でこのシェルスクリプトが呼ばれていることも確認できます。</p>
+<p>シェル冒頭に以下の記載があり、<code>bash</code> によリコールされた後、1つ上のディレクトリでビルドプロセスを動かしていることが分かります。</p>
+<figure class="highlight sh"><figcaption><span>build.sh</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># Get the parent directory of where this script is.</span></span><br><span class="line">SOURCE=<span class="string">&quot;<span class="variable">$&#123;BASH_SOURCE[0]&#125;</span>&quot;</span></span><br><span class="line"><span class="keyword">while</span> [ -h <span class="string">&quot;<span class="variable">$SOURCE</span>&quot;</span> ] ; <span class="keyword">do</span> SOURCE=<span class="string">&quot;<span class="subst">$(readlink <span class="string">&quot;<span class="variable">$SOURCE</span>&quot;</span>)</span>&quot;</span>; <span class="keyword">done</span></span><br><span class="line">DIR=<span class="string">&quot;<span class="subst">$( cd -P <span class="string">&quot;<span class="subst">$( dirname <span class="string">&quot;<span class="variable">$SOURCE</span>&quot;</span> )</span>/..&quot;</span> &amp;&amp; pwd )</span>&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>上記を踏まえて、さっそくビルドしてみます。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ /usr/bin/bash build.sh</span><br><span class="line">==&gt; Removing old directory...</span><br><span class="line">==&gt; Installing gox...</span><br><span class="line">==&gt; Building...</span><br><span class="line">Number of parallel builds: 11</span><br><span class="line"></span><br><span class="line">--&gt;   solaris/amd64: github.com/hashicorp/terraform</span><br><span class="line">--&gt;   windows/amd64: github.com/hashicorp/terraform</span><br><span class="line">--&gt;     freebsd/arm: github.com/hashicorp/terraform</span><br><span class="line">--&gt;     openbsd/386: github.com/hashicorp/terraform</span><br><span class="line">--&gt;   openbsd/amd64: github.com/hashicorp/terraform</span><br><span class="line">--&gt;       linux/arm: github.com/hashicorp/terraform</span><br><span class="line">--&gt;       linux/386: github.com/hashicorp/terraform</span><br><span class="line">--&gt;     freebsd/386: github.com/hashicorp/terraform</span><br><span class="line">--&gt;     linux/amd64: github.com/hashicorp/terraform</span><br><span class="line">--&gt;   freebsd/amd64: github.com/hashicorp/terraform</span><br><span class="line">--&gt;     windows/386: github.com/hashicorp/terraform</span><br></pre></td></tr></table></figure>
+
+<p>計11個のビルドプロセスが並列で動いています。</p>
+<p>このまましばらく放置していれば、11環境分すべての <code>terraform</code> 実行バイナリが作成されるのですが、私のPC環境では以下の問題が発生しました。</p>
+<img src="/images/20240326a/disc.png" alt="disc.png" width="544" height="170" loading="lazy">
+
+<p>リポジトリからクローンしたソースコード全体と、ビルドで生成した実行バイナリのダブルパンチにより、ローカル PC が悲鳴を上げていました。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">du</span> -h terraform/bin/terraform</span><br><span class="line">119M    terraform</span><br><span class="line"></span><br><span class="line">$ <span class="built_in">du</span> -h terraform/</span><br><span class="line">...</span><br><span class="line">820M    terraform/</span><br></pre></td></tr></table></figure>
+
+<p>何とかならないか？と <code>build.sh</code> を読み進めたところ、環境変数 <code>TF_DEV</code> に値を設定すれば、ビルド環境だけの実行バイナリを生成してくれるとありました。</p>
+<figure class="highlight sh"><figcaption><span>build.sh</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># If its dev mode, only build for ourself</span></span><br><span class="line"><span class="keyword">if</span> [[ -n <span class="string">&quot;<span class="variable">$&#123;TF_DEV&#125;</span>&quot;</span> ]]; <span class="keyword">then</span></span><br><span class="line">    XC_OS=$(go <span class="built_in">env</span> GOOS)</span><br><span class="line">    XC_ARCH=$(go <span class="built_in">env</span> GOARCH)</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+<p>また、<code>TF_DEV</code> を設定しない場合には、ビルドした実行バイナリのパッケージ化が行われるとの記載も見つかりました。</p>
+<figure class="highlight sh"><figcaption><span>build.sh</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> [ <span class="string">&quot;<span class="variable">$&#123;TF_DEV&#125;</span>x&quot;</span> = <span class="string">&quot;x&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="comment"># Zip and copy to the dist dir</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;==&gt; Packaging...&quot;</span></span><br><span class="line">    <span class="keyword">for</span> PLATFORM <span class="keyword">in</span> $(find ./pkg -mindepth 1 -maxdepth 1 -<span class="built_in">type</span> d); <span class="keyword">do</span></span><br><span class="line">        OSARCH=$(<span class="built_in">basename</span> <span class="variable">$&#123;PLATFORM&#125;</span>)</span><br><span class="line">        <span class="built_in">echo</span> <span class="string">&quot;--&gt; <span class="variable">$&#123;OSARCH&#125;</span>&quot;</span></span><br><span class="line"></span><br><span class="line">        <span class="built_in">pushd</span> <span class="variable">$PLATFORM</span> &gt;/dev/null 2&gt;&amp;1</span><br><span class="line">        zip ../<span class="variable">$&#123;OSARCH&#125;</span>.zip ./*</span><br><span class="line">        <span class="built_in">popd</span> &gt;/dev/null 2&gt;&amp;1</span><br><span class="line">    <span class="keyword">done</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+<p>今回はローカル環境でのみビルド、動作検証ができれば十分ですので、環境変数 <code>TF_DEV</code> を設定し再ビルドします。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">export</span> TF_DEV=<span class="built_in">yes</span></span><br><span class="line">$ <span class="built_in">echo</span> <span class="variable">$TF_DEV</span></span><br><span class="line"><span class="built_in">yes</span></span><br><span class="line"></span><br><span class="line">$ go <span class="built_in">env</span> GOOS</span><br><span class="line">linux</span><br><span class="line"></span><br><span class="line">$ go <span class="built_in">env</span> GOARCH</span><br><span class="line">amd64</span><br><span class="line"></span><br><span class="line">$ /usr/bin/bash build.sh</span><br><span class="line">==&gt; Removing old directory...</span><br><span class="line">==&gt; Building...</span><br><span class="line">Number of parallel builds: 11</span><br><span class="line"></span><br><span class="line">--&gt;     linux/amd64: github.com/hashicorp/terraform</span><br><span class="line">==&gt; Creating GOPATH/bin directory...</span><br><span class="line"></span><br><span class="line">==&gt; Results:</span><br><span class="line">total 119M</span><br><span class="line">-rwxr-xr-x 1 blog-user blog-user 119M Mar 25 03:45 terraform</span><br></pre></td></tr></table></figure>
+
+<p>無事に、<code>linux/amd64</code> 分のビルドに成功しました。<br>実行バイナリは、以下2つのディレクトリに出力されています。</p>
+<ul>
+<li>terraform&#x2F;bin</li>
+<li>GOPATH&#x2F;bin</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ ./terraform/bin/terraform version</span><br><span class="line">Terraform v1.9.0-dev</span><br><span class="line">on linux_amd64</span><br></pre></td></tr></table></figure>
+
+<p>ここまでの操作により、ソースコードのビルドから、コマンドの実行手順まで確認できました。</p>
+<p>続いて、コードに手を加えた場合には、ビルド後のコマンド中身に反映されていることを検証してみます。</p>
+<p>サブコマンドの <code>version</code> が分かりやすいので、以下のログを追加します。<br>（<a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/internal/command/version.go#L81-L84">対応箇所</a>）</p>
+<figure class="highlight go"><figcaption><span>version.go</span></figcaption><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line">fmt.Fprintf(&amp;versionString, <span class="string">&quot;Terraform v%s&quot;</span>, c.Version)</span><br><span class="line"><span class="keyword">if</span> c.VersionPrerelease != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line"> fmt.Fprintf(&amp;versionString, <span class="string">&quot;-%s&quot;</span>, c.VersionPrerelease)</span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>↓</p>
+<figure class="highlight go"><figcaption><span>version.go</span></figcaption><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line">fmt.Println(<span class="string">&quot;バージョン確認コマンドを実行してみた。&quot;</span>) <span class="comment">// 追加</span></span><br><span class="line">fmt.Fprintf(&amp;versionString, <span class="string">&quot;Terraform v%s&quot;</span>, c.Version)</span><br><span class="line"><span class="keyword">if</span> c.VersionPrerelease != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line"> fmt.Fprintf(&amp;versionString, <span class="string">&quot;-%s&quot;</span>, c.VersionPrerelease)</span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>この1行が追記された状態で実行バイナリをビルドすると、コマンドのログ出力が増えていることを確認できます。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ /usr/bin/bash ./terraform/scripts/build.sh</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">$ ./terraform/bin/terraform version</span><br><span class="line">バージョン確認コマンドを実行してみた。</span><br><span class="line">Terraform v1.9.0-dev</span><br><span class="line">on linux_amd64</span><br></pre></td></tr></table></figure>
+
+<h1 id="エントリーポイントから見ていく"><a href="#エントリーポイントから見ていく" class="headerlink" title="エントリーポイントから見ていく"></a>エントリーポイントから見ていく</h1><p>ここまでが事前準備です。<br>さっそく、Terraform の実コードを見ていきます。</p>
+<p>まずはプログラムの始まりとなる「エントリーポイント」を探します。</p>
+<p>Go であれば</p>
+<ul>
+<li>main.go</li>
+<li>func main() {…}</li>
+</ul>
+<p>がプログラムのエントリーポイントです。<br>トップディレクトリ配下の「<a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/main.go#L63-L65">terraform&#x2F;main.go</a>」に以下の記述が見つかりました。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"> os.Exit(realMain())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>初手、<code>main()</code> の中で <code>realMain()</code>（直訳すると「本当のmain」）を呼び出しているようです。<br>呼び出し先の関数を見ると、今度は defer で <code>logging.PanicHandler()</code> を呼び出しているようなので、この関数の中身を見てみます。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">realMain</span><span class="params">()</span></span> <span class="type">int</span> &#123;</span><br><span class="line"> <span class="keyword">defer</span> logging.PanicHandler()</span><br><span class="line"> ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>VSCode のコードジャンプが有効となっていれば、Ctrl を押しながら対象関数を左クリックすることにより、関数の定義元にジャンプすることができます。</p>
+<h2 id="PanicHandler"><a href="#PanicHandler" class="headerlink" title="PanicHandler()"></a><code>PanicHandler()</code></h2><p>「<a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/internal/logging/panic.go#L41">PanicHandler()の実装</a>」を見ますと、<strong>TERRAFORM CRASH</strong> という仰々しい言葉が沢山の <code>!</code> で囲まれていることが分かります。<br>通常のインフラ構築、運用保守作業にてこのようなメッセージをお目にかかることは、まずないと思います。私は今回、初めてこんなメッセージが仕込まれていることを知りました。</p>
+<p>メッセージ内容を日本語訳しますと「Terraform が壊れたよ！ 公式リポジトリの issue に記票して」とありますので、さっそく、壊してみます。</p>
+<p>panic 発生時に <strong>TERRAFORM CRASH</strong> が表示されるようなので、エントリーポイントの直後で強制的に panic を起こす1行を入れます。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">realMain</span><span class="params">()</span></span> <span class="type">int</span> &#123;</span><br><span class="line"> <span class="keyword">defer</span> logging.PanicHandler()</span><br><span class="line"> <span class="built_in">panic</span>(<span class="string">&quot;バルス！&quot;</span>)</span><br><span class="line"> ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>また、<code>terraform</code> のビルド時に渡される <code>GOFLAGS</code> を「<a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/scripts/build.sh#L41-L42">リポジトリのコード</a>」のまま利用した場合、ビルド環境のフルパスが表示されてしまいますので、以下の <code>-trimpath</code> フラグを追加します。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> GOFLAGS=<span class="string">&quot;-mod=readonly&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>↓</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> GOFLAGS=<span class="string">&quot;-mod=readonly -trimpath&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>この状態でソースコードのビルド、及び、コマンドの実行を試してみます。</p>
+<p>サブコマンドを与えずに <code>terraform</code> を実行した場合、本来ならば <code>help</code> が表示されますが、無事に「壊す」ことができました。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">$ ./terraform</span><br><span class="line"></span><br><span class="line">!!!!!!!!!!!!!!!!!!!!!!!!!!! TERRAFORM CRASH !!!!!!!!!!!!!!!!!!!!!!!!!!!!</span><br><span class="line"></span><br><span class="line">Terraform crashed! This is always indicative of a bug within Terraform.</span><br><span class="line">Please report the crash with Terraform[1] so that we can fix this.</span><br><span class="line"></span><br><span class="line">When reporting bugs, please include your terraform version, the stack trace</span><br><span class="line">shown below, and any additional information <span class="built_in">which</span> may <span class="built_in">help</span> replicate the issue.</span><br><span class="line"></span><br><span class="line">[1]: https://github.com/hashicorp/terraform/issues</span><br><span class="line"></span><br><span class="line">!!!!!!!!!!!!!!!!!!!!!!!!!!! TERRAFORM CRASH !!!!!!!!!!!!!!!!!!!!!!!!!!!!</span><br><span class="line"></span><br><span class="line">panic: バルス！</span><br><span class="line">goroutine 1 [running]:</span><br><span class="line">runtime/debug.Stack()</span><br><span class="line">        runtime/debug/stack.go:24 +0x5e</span><br><span class="line">github.com/hashicorp/terraform/internal/logging.PanicHandler()</span><br><span class="line">        github.com/hashicorp/terraform/internal/logging/panic.go:84 +0x18b</span><br><span class="line">panic(&#123;0x1ade400?, 0x249fc00?&#125;)</span><br><span class="line">        runtime/panic.go:770 +0x132</span><br><span class="line">main.realMain()</span><br><span class="line">        github.com/hashicorp/terraform/main.go:69 +0x47</span><br><span class="line">main.main()</span><br><span class="line">        github.com/hashicorp/terraform/main.go:64 +0x13</span><br></pre></td></tr></table></figure>
+
+<p><code>terraform</code> コマンドの実行時、何らかの理由により panic が起きてしまった場合には、<strong>TERRAFORM CRASH</strong> のメッセージ表示と issue の起票催促、デバックトレースが表示されることを確認できました。</p>
+<p>それでは、意図的に仕込んだ panic の1行を削除して、再ビルドまで完了したら、次の処理を見ていきます。</p>
+<h2 id="openTelemetryInit"><a href="#openTelemetryInit" class="headerlink" title="openTelemetryInit()"></a><code>openTelemetryInit()</code></h2><p>次の実装として、Open Telemetry を扱う処理が見つかります。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> err <span class="type">error</span></span><br><span class="line"></span><br><span class="line">err = openTelemetryInit()</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">  <span class="comment">// openTelemetryInit can only fail if Terraform was run with an</span></span><br><span class="line">  <span class="comment">// explicit environment variable to enable telemetry collection,</span></span><br><span class="line">  <span class="comment">// so in typical use we cannot get here.</span></span><br><span class="line">  Ui.Error(fmt.Sprintf(<span class="string">&quot;Could not initialize telemetry: %s&quot;</span>, err)) </span><br><span class="line">  Ui.Error(fmt.Sprintf(<span class="string">&quot;Unset environment variable %s if you don&#x27;t intend to collect telemetry from Terraform.&quot;</span>, openTelemetryExporterEnvVar))</span><br><span class="line">  <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> ctx context.Context</span><br><span class="line"><span class="keyword">var</span> otelSpan trace.Span</span><br><span class="line">&#123;</span><br><span class="line">  <span class="comment">// At minimum we emit a span covering the entire command execution.</span></span><br><span class="line">  _, displayArgs := shquot.POSIXShellSplit(os.Args)</span><br><span class="line">  ctx, otelSpan = tracer.Start(context.Background(), fmt.Sprintf(<span class="string">&quot;terraform %s&quot;</span>, displayArgs))</span><br><span class="line">  <span class="keyword">defer</span> otelSpan.End()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>openTelemetryInit()</code> の定義元にコードジャンプしますと、トップディレクトリ配下の「<a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/telemetry.go#L56-L63">terraform&#x2F;telemetry.go</a>」にて詳細内容が説明されています。</p>
+<p>まず、実装コードのコメントには以下の記載があります。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// If this environment variable is set to &quot;otlp&quot; when running Terraform CLI</span></span><br><span class="line"><span class="comment">// then we&#x27;ll enable an experimental OTLP trace exporter.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// BEWARE! This is not a committed external interface.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Everything about this is experimental and subject to change in future</span></span><br><span class="line"><span class="comment">// releases. Do not depend on anything about the structure of this output.</span></span><br><span class="line"><span class="comment">// This mechanism might be removed altogether if a different strategy seems</span></span><br><span class="line"><span class="comment">// better based on experience with this experiment.</span></span><br><span class="line"><span class="keyword">const</span> openTelemetryExporterEnvVar = <span class="string">&quot;OTEL_TRACES_EXPORTER&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>Terraform の実行環境にて、環境変数として以下を設定した場合のみ、Open Telemetry 機能が有効となるようです。<br><code>otlp</code> 以外の値（値ナシも含む）が設定された場合には、この機能は有効化されずに関数の呼び出し元へ戻ります。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> OTEL_TRACES_EXPORTER=otlp</span><br></pre></td></tr></table></figure>
+
+<p>コメントには「<a target="_blank" rel="noopener" href="https://opentelemetry.io/docs/specs/otel/protocol/exporter/#configuration-options">OpenTelemetry Protocol Exporter Configuration Options</a>」へのリンクが添付されています。</p>
+<p>ただし、Open Telemetry について本記事では立ち入りません。<br>気になる方は、以下の公式ドキュメント・日本語記事・翻訳書籍をご参照ください。</p>
+<ul>
+<li>公式ドキュメント<ul>
+<li><a target="_blank" rel="noopener" href="https://opentelemetry.io/docs/what-is-opentelemetry/">What is OpenTelemetry?</a></li>
+</ul>
+</li>
+<li>日本語記事<ul>
+<li><a target="_blank" rel="noopener" href="https://zenn.dev/yuta28/articles/what-is-opentelemetry">OpenTelemetryに触れてみた</a></li>
+</ul>
+</li>
+<li>翻訳書籍<ul>
+<li><a target="_blank" rel="noopener" href="https://www.oreilly.co.jp/books/9784814400126/">オブザーバビリティ・エンジニアリング</a></li>
+</ul>
+</li>
+</ul>
+<p>ここでは、実装コードを参照する中で、Terraform には「環境変数の <code>OTEL_TRACES_EXPORTER</code> に <code>otlp</code> を与えることで、Open Telemetry が有効化される」ことが分かりました。</p>
+<p>このような知識はもちろん公式ドキュメントを漁れば見つかるのだとは思いますが、自分で探索して見つけたときの「自力で発見できた感覚」を味わえるのが、OSS コードリーディングの面白さだと私は感じております。少々、蛇足に過ぎましたので、元のコードに戻ります。</p>
+<h2 id="tmpLogPath"><a href="#tmpLogPath" class="headerlink" title="tmpLogPath"></a><code>tmpLogPath</code></h2><p>続いて、<code>tmpLogPath</code> という「一時的なログファイルの出力先」になりそうな変数が見つかりました。<br>適切な変数名は「適切なメンタルモデル」を脳内に作るために重要なので、こういった側面においても、OSS のコードリーディングでは書籍からは得られない実践知が詰っていると感じます。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">tmpLogPath := os.Getenv(envTmpLogPath)</span><br><span class="line"><span class="keyword">if</span> tmpLogPath != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">  f, err := os.OpenFile(tmpLogPath, os.O_RDWR|os.O_APPEND, <span class="number">0666</span>)</span><br><span class="line">  <span class="keyword">if</span> err == <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="keyword">defer</span> f.Close()</span><br><span class="line"></span><br><span class="line">    log.Printf(<span class="string">&quot;[DEBUG] Adding temp file log sink: %s&quot;</span>, f.Name())</span><br><span class="line">    logging.RegisterSink(f)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    log.Printf(<span class="string">&quot;[ERROR] Could not open temp log file: %v&quot;</span>, err)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ここの実装では、環境変数の <code>TF_TEMP_LOG_PATH</code> で指定したファイルに、ログを追記する処理が定義されています。<br>それでは、ログの出力先を指定して、出力ログと実装コードの対応を確認していきます。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># ログの出力先を /tmp/tf.log に指定</span></span><br><span class="line"><span class="built_in">export</span> TF_TEMP_LOG_PATH=<span class="string">&quot;/tmp/tf.log&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>ログ出力先の環境変数を設定してから任意の <code>terraform</code> コマンドを実行すると、ファイルには以下のログが追記されます。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">2024-03-25T05:07:16.800+0900 [INFO]  Terraform version: 1.9.0 dev</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] using github.com/hashicorp/go-tfe v1.41.0</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] using github.com/hashicorp/hcl/v2 v2.20.0</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] using github.com/zclconf/go-cty v1.14.3</span><br><span class="line">2024-03-25T05:07:16.800+0900 [INFO]  Go runtime version: go1.22.1</span><br><span class="line">2024-03-25T05:07:16.800+0900 [INFO]  CLI args: []string&#123;&quot;./terraform&quot;, &quot;version&quot;&#125;</span><br><span class="line">2024-03-25T05:07:16.800+0900 [TRACE] Stdout is a terminal of width 125</span><br><span class="line">2024-03-25T05:07:16.800+0900 [TRACE] Stderr is a terminal of width 125</span><br><span class="line">2024-03-25T05:07:16.800+0900 [TRACE] Stdin is a terminal</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] Attempting to open CLI config file: /home/blog-user/.terraformrc</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] File doesn&#x27;t exist, but doesn&#x27;t need to. Ignoring.</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] ignoring non-existing provider search directory terraform.d/plugins</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] ignoring non-existing provider search directory /home/blog-user/.terraform.d/plugins</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] ignoring non-existing provider search directory /home/blog-user/.local/share/terraform/plugins</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] ignoring non-existing provider search directory /usr/local/share/terraform/plugins</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] ignoring non-existing provider search directory /usr/share/terraform/plugins</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] ignoring non-existing provider search directory /var/lib/snapd/desktop/terraform/plugins</span><br><span class="line">2024-03-25T05:07:16.801+0900 [INFO]  CLI command args: []string&#123;&quot;version&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>これらのログと実装コードの対応を見ますと、<code>TF_TEMP_LOG_PATH</code> を設定した「<a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/main.go#L103-L134">直後の処理内容</a>」が、そのままログとして格納されていることが分かります。</p>
+<p>例えば、<code>version.InterestingDependencies()</code> により取得された「<a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/version/dependencies.go#L11-L16">依存モジュールのバージョン情報</a>」は、以下のように記録されています。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] using github.com/hashicorp/go-tfe v1.41.0</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] using github.com/hashicorp/hcl/v2 v2.20.0</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1</span><br><span class="line">2024-03-25T05:07:16.800+0900 [DEBUG] using github.com/zclconf/go-cty v1.14.3</span><br></pre></td></tr></table></figure>
+
+<p>ログの対応を1つ1つ、実装コードと突き合わせてみますと、以下に対応するログが出力されていないことが分かります。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> ExperimentsAllowed() &#123;</span><br><span class="line">  log.Printf(<span class="string">&quot;[INFO] This build of Terraform allows using experimental features&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>ExperimentsAllowed()</code> の定義にコードジャンプすると、「<a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/experiments.go#L25">terraform&#x2F;experiments.go</a>」のコメントとして、この関数を有効化する方法（返り値がtrueにする方法）が記載されています。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// experimentsAllowed can be set to any non-empty string using Go linker</span></span><br><span class="line"><span class="comment">// arguments in order to enable the use of experimental features for a</span></span><br><span class="line"><span class="comment">// particular Terraform build:</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//   go install -ldflags=&quot;-X &#x27;main.experimentsAllowed=yes&#x27;&quot;</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// By default this variable is initialized as empty, in which case</span></span><br><span class="line"><span class="comment">// experimental features are not available.</span></span><br></pre></td></tr></table></figure>
+
+<p>コメントの内容に従うと、<code>terraform</code> のビルド時に</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">go install -ldflags=<span class="string">&quot;-X &#x27;main.experimentsAllowed=yes&#x27;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>を混ぜ込むことにより、<code>experiments</code>（実験的機能）を有効化できるようです。</p>
+<p>「<a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/scripts/build.sh">scripts&#x2F;build.sh</a>」を確認すると、<code>-ldflags</code> に渡される値は以下のように定義されていることが分かります。<code>TF_RELEASE</code> に値を設定した場合のみ、<code>gox -ldflags &quot;&quot;$&#123;LD_FLAGS&#125;&quot;&quot;</code> が「<a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/scripts/build.sh#L44-L62">ビルド時に追加</a>」されています。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># In release mode we don&#x27;t want debug information in the binary and we don&#x27;t</span></span><br><span class="line"><span class="comment"># want the -dev version marker</span></span><br><span class="line"><span class="keyword">if</span> [[ -n <span class="string">&quot;<span class="variable">$&#123;TF_RELEASE&#125;</span>&quot;</span> ]]; <span class="keyword">then</span></span><br><span class="line">    LD_FLAGS=<span class="string">&quot;-s -w -X &#x27;github.com/hashicorp/terraform/version.dev=no&#x27;&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+<p>今回は <code>TF_RELEASE</code> を利用しないので、以下の分岐を追加します。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> [[ -n <span class="string">&quot;<span class="variable">$&#123;TF_RELEASE&#125;</span>&quot;</span> ]]; <span class="keyword">then</span></span><br><span class="line">    LD_FLAGS=<span class="string">&quot;-s -w -X &#x27;github.com/hashicorp/terraform/version.dev=no&#x27;&quot;</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    LD_FLAGS=<span class="string">&quot;-X &#x27;main.experimentsAllowed=yes&#x27;&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+<p>この状態で実行バイナリをビルドし、任意の <code>terraform</code> コマンドを実行すると、ログファイルに以下の1文が追記されることを確認できます。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line">[INFO]  This build of Terraform allows using experimental features</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p><code>experiments</code> を有効化することにより、何かしらの実験的コマンドが利用可能となったのだと思います。しかし、ここまでのコードリーディングの範囲では「どのような機能が有効化されたのか？」についての情報に遭遇していないため、<code>ExperimentsAllowed()</code> の探索はここまでとします。</p>
+<h2 id="terminal-Init"><a href="#terminal-Init" class="headerlink" title="terminal.Init()"></a><code>terminal.Init()</code></h2><p>コードリーディングとしては、ログ後半に注目してみます。<br>ここでは、ターミナルを初期化しているような <code>terminal.Init()</code> という関数と、その関数の返り値を利用して</p>
+<ul>
+<li>標準入力</li>
+<li>標準出力</li>
+<li>標準エラー出力</li>
+</ul>
+<p>のそれぞれに対して、<code>IsXXX()</code> の方式で「ターミナルであるか、否か」を判断している以下の実装が見つかります。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">streams, err := terminal.Init()</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">  Ui.Error(fmt.Sprintf(<span class="string">&quot;Failed to configure the terminal: %s&quot;</span>, err))</span><br><span class="line">  <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> streams.Stdout.IsTerminal() &#123;</span><br><span class="line">  log.Printf(<span class="string">&quot;[TRACE] Stdout is a terminal of width %d&quot;</span>, streams.Stdout.Columns())</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  log.Printf(<span class="string">&quot;[TRACE] Stdout is not a terminal&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> streams.Stderr.IsTerminal() &#123;</span><br><span class="line">  log.Printf(<span class="string">&quot;[TRACE] Stderr is a terminal of width %d&quot;</span>, streams.Stderr.Columns())</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  log.Printf(<span class="string">&quot;[TRACE] Stderr is not a terminal&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> streams.Stdin.IsTerminal() &#123;</span><br><span class="line">  log.Printf(<span class="string">&quot;[TRACE] Stdin is a terminal&quot;</span>)</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  log.Printf(<span class="string">&quot;[TRACE] Stdin is not a terminal&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>terminal.Init()</code> の定義元にコードジャンプすると、こちらも「<a target="_blank" rel="noopener" href="https://github.com/hashicorp/terraform/blob/main/internal/terminal/streams.go#L4-L17">長文コメント</a>」で実装内容、実装意図が説明されています。</p>
+<p>コマンドの実行環境は <code>terraform</code> が正しく入力・出力を扱える環境なのか、この terminal パッケージ内にて確認処理を行っています。普段、ツールやコマンドを取得する際には <code>Requirements</code> を確認してインストールしますが、コマンドの実行プロセス内においても、実行環境の確認を行っていることが確認できました。</p>
+<p>…</p>
+<p>本ブログでのコードリーディングは一旦ここまでとします。<br><code>func main() &#123;...&#125;</code> から読み始め、進捗行数としては70行程度です。ただし、途中でコードジャンプやシェルスクリプトの確認が入ったため、単純に「<code>main()</code> からの進捗行数 &#x3D; コードリーディング行数」というカウントにはなりません。「実際に動かしながらのコードリーディング」のスピードを実感いただけたでしょうか。</p>
+<h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>本ブログでは、「Terraform の実装コードを、動かしながら読む」という目標を掲げ、実行バイナリのビルドやコードの改造を取り入れながら、OSS のコードリーディングを行いました。前半の環境準備に原稿の多くが割かれているため、実際のコードリーディング行数は100行未満ではないかと思います。OSS コードリーディングの面白さは「各自が、自分の好き勝手に読めること」にあると思いますので、私ならどのように読むか？を詳しく解説してきました。</p>
+<p>ここまで長文にお付き合いいただき、ありがとうございました。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20240326a/&related=twitterapi%2Ctwitter&text=Terraform%E3%81%AE%E5%AE%9F%E8%A3%85%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E3%80%81%E5%8B%95%E3%81%8B%E3%81%97%E3%81%AA%E3%81%8C%E3%82%89%E8%AA%AD%E3%82%80%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240326a/&t=Terraform%E3%81%AE%E5%AE%9F%E8%A3%85%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E3%80%81%E5%8B%95%E3%81%8B%E3%81%97%E3%81%AA%E3%81%8C%E3%82%89%E8%AA%AD%E3%82%80" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240326a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240326a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.11.13</span><span class="snscount">&#9825;106</span><a href=/articles/20201113/ title="- ローカル環境に立ち上げた localstack に向けて、terraform plan/apply/destroy を実行するFutureの棚井龍之介ですTIGグループのDXユニットに所属しています">LocalStackに向けてTerraformを実行する</a></li><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;565</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2019.07.12</span><span class="snscount">&#9825;1</span><a href=/articles/20190712/ title="アルバイトの視点から見た「Future ってこんな会社なんだ」について紹介いたします。">アルバイト生から見たフューチャーのTIG DXユニット</a></li><li class="related-posts-item"><span>2024.03.12</span><span class="snscount">&#9825;4</span><a href=/articles/20240312a/ title="Terraformファイルをコード生成するため、hclwriteというGoパッケージの使い方を調べました。">Terraform連載2024 hclwriteを用いたtfコード生成入門<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.02.06</span><span class="snscount">&#9825;14</span><a href=/articles/20240206a/ title="range over integer にフォーカスして取り上げていきます">30種類のプログラミング言語で、ループ処理を書いてみた</a></li><li class="related-posts-item"><span>2024.02.01</span><span class="snscount">&#9825;15</span><a href=/articles/20240201a/ title="Go 1.22 Release Notesの4本目です。encoding のアップデートを取り上げます。">Go 1.22 リリース連載 encoding, encoding/json</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%A8%E3%83%87%E3%82%A3%E3%82%BF%E3%81%AE%E6%BA%96%E5%82%99"><span class="toc-text">エディタの準備</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9F%E8%A1%8C%E7%92%B0%E5%A2%83%E3%81%AE%E6%BA%96%E5%82%99"><span class="toc-text">実行環境の準備</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA%E3%81%AE%E5%8F%96%E5%BE%97%E3%80%81%E3%83%86%E3%82%B9%E3%83%88%E5%AE%9F%E8%A1%8C"><span class="toc-text">リポジトリの取得、テスト実行</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%93%E3%83%AB%E3%83%89%E3%81%97%E3%81%A6%E5%8B%95%E3%81%8B%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">ビルドして動かしてみる</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%82%A8%E3%83%B3%E3%83%88%E3%83%AA%E3%83%BC%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88%E3%81%8B%E3%82%89%E8%A6%8B%E3%81%A6%E3%81%84%E3%81%8F"><span class="toc-text">エントリーポイントから見ていく</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#PanicHandler"><span class="toc-text">PanicHandler()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#openTelemetryInit"><span class="toc-text">openTelemetryInit()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tmpLogPath"><span class="toc-text">tmpLogPath</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#terminal-Init"><span class="toc-text">terminal.Init()</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (438)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (265)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (98)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (61)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (35)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
