@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>手動運用しているCloudflareをTerraformでInfrastructure as Codeする | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこの記事は、Terraform連載2024の10記事目です。 みなさんこんにちは。TIG所属の大岩潤矢( @920OJ ) です。 本記事ではCloudflareで管理しているドメインのDNS設定やCloudflare Pages等のサービスの設定を、Terraform管理に移行した際の手順などを記載します。 背景私は個人開発や自身のポートフォリオWebサイトの公開のために、 920oj.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="手動運用しているCloudflareをTerraformでInfrastructure as Codeする | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240327a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこの記事は、Terraform連載2024の10記事目です。 みなさんこんにちは。TIG所属の大岩潤矢( @920OJ ) です。 本記事ではCloudflareで管理しているドメインのDNS設定やCloudflare Pages等のサービスの設定を、Terraform管理に移行した際の手順などを記載します。 背景私は個人開発や自身のポートフォリオWebサイトの公開のために、 920oj.">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240327a/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240327a/image_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240327a/image_3.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240327a/image_4.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240327a/image_5.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240327a/image_6.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240327a/image_7.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240327a/image_8.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240327a/image_9.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240327a/image_10.png">
+<meta property="article:published_time" content="2024-03-26T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-27T01:19:23.558Z">
+<meta property="article:tag" content="IaC">
+<meta property="article:tag" content="Terraform">
+<meta property="article:tag" content="Cloudflare">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240327a/image.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240327a/">
+  <meta content="IaC,Terraform,Cloudflare" name="keywords">
+  <meta content="大岩潤矢" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">手動運用しているCloudflareをTerraformでInfrastructure as Codeする
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240327a_手動運用しているCloudflareをTerraformでInfrastructure_as_Codeする.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240327a_手動運用しているCloudflareをTerraformでInfrastructure_as_Codeする" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-03-26T15:00:00.000Z" itemprop="datePublished">2024.03.27</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%A4%A7%E5%B2%A9%E6%BD%A4%E7%9F%A2" title="大岩潤矢さんの記事一覧へ" class="post-author">大岩潤矢</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/IaC/" title="IaCタグの記事へ" class="tag-list-link">IaC</a>
+  
+    
+    <a href="/tags/Terraform/" title="Terraformタグの記事へ" class="tag-list-link">Terraform</a>
+  
+    
+    <a href="/tags/Cloudflare/" title="Cloudflareタグの記事へ" class="tag-list-link">Cloudflare</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>この記事は、<a href="/articles/20240311a/">Terraform連載2024</a>の10記事目です。</p>
+<p>みなさんこんにちは。TIG所属の大岩潤矢( <a target="_blank" rel="noopener" href="https://x.com/920OJ">@920OJ</a> ) です。</p>
+<p>本記事ではCloudflareで管理しているドメインのDNS設定やCloudflare Pages等のサービスの設定を、Terraform管理に移行した際の手順などを記載します。</p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>私は個人開発や自身のポートフォリオWebサイトの公開のために、 <code>920oj.net</code> というドメインを所持しています。このドメインはGoogle Domainsで取得し、ネームサーバを変更してCloudflare上でDNSレコードを管理しています。</p>
+<p>また、自身の <a target="_blank" rel="noopener" href="https://920oj.net/">ポートフォリオサイトWebサイト</a> はCloudflare Pagesでホスティングしています。転送量無制限で月500ビルドまで無料というのはお財布に優しくありがたいです。</p>
+<p>一方で、Webの管理画面からCloudflareでのドメイン管理や各種設定を変更する際、バージョン履歴を表示する機能がないため、一度変更してしまったものは元に戻すことができません。例えばDNS設定を更新する際、間違えた値に更新してしまった場合、元の値を記憶していない限りは戻せなくなってしまいます。<a target="_blank" rel="noopener" href="https://developers.cloudflare.com/version-management/">バージョニング機能</a>はあるものの、Enterpriseプランのみでしか使えないようです。</p>
+<p>そこで利用したいと思い立ったのがTerraformです。CloudflareをTerrafromで構築し、そのコードをGit等で管理することにより、変更をバージョン管理できます。記事タイトルにある通り、「Infrastructure as Codeする」ということです。</p>
+<p>一方でCloudflareはすでに利用中であるため、これまで手作業で実施してきた設定をTerraformへimportして管理することになります。</p>
+<p>今回移行するものは、各ドメインのDNSレコードと、Cloudflare Pagesでホスティングしているプロジェクトの2つとします。</p>
+<h2 id="CloudflareをTerraformで管理するための前準備"><a href="#CloudflareをTerraformで管理するための前準備" class="headerlink" title="CloudflareをTerraformで管理するための前準備"></a>CloudflareをTerraformで管理するための前準備</h2><p>早速、既存リソースをTerraformで管理するための手順を紹介します。まずは下準備として、以下を実施します。</p>
+<ul>
+<li>tfstate管理用のR2バケットを作成</li>
+<li>APIトークンの発行</li>
+<li>環境変数の設定</li>
+</ul>
+<h3 id="Cloudflare-R2へtfstate管理用のバケットを作成する"><a href="#Cloudflare-R2へtfstate管理用のバケットを作成する" class="headerlink" title="Cloudflare R2へtfstate管理用のバケットを作成する"></a>Cloudflare R2へtfstate管理用のバケットを作成する</h3><p>CloudflareにはR2というS3互換のストレージサービスがあり、tfstateはこのR2の中で管理する方針とします。R2でtfstateを管理する方法については、すでにこのテックブログで記事があるので、これを参考にします。</p>
+<p><a href="https://future-architect.github.io/articles/20231016a/">https://future-architect.github.io/articles/20231016a/</a></p>
+<p>まずはCloudflareの管理画面にログインし、R2を選択→「Add R2 subscription to my account」を押下します。</p>
+<img src="/images/20240327a/image.png" alt="Add R2 subscription to my accountをクリック" width="1200" height="615" loading="lazy">
+
+<p>「Create bucket」 を押下します。</p>
+<img src="/images/20240327a/image_2.png" alt="Create bucketをクリック" width="965" height="405" loading="lazy">
+
+<p>バケット名を入力し、Locationは「Automatic」を選択します。最後に「Create bucket」を押下すれば、バケットが出来上がります。</p>
+<img src="/images/20240327a/image_3.png" alt="oj-cf-tfstateというバケット名を入力" width="952" height="832" loading="lazy">
+
+<img src="/images/20240327a/image_4.png" alt="Automaticのチェックボックスを選択" width="1200" height="612" loading="lazy">
+
+<h3 id="APIトークンを発行する"><a href="#APIトークンを発行する" class="headerlink" title="APIトークンを発行する"></a>APIトークンを発行する</h3><p>CloudflareをTerraform管理、すなわちAPIで操作する場合、APIトークンの発行が必須です。</p>
+<p>右上ユーザアイコンより「My Profile」を押下→左メニューからAPI Tokensを選び、「Create Token」を押下します。</p>
+<img src="/images/20240327a/image_5.png" alt="Cretate Tokenをクリック" width="1200" height="615" loading="lazy">
+
+<p>Create Custom Tokenの「Get started」を押下します。</p>
+<img src="/images/20240327a/image_6.png" alt="Get startedボタンをクリック" width="866" height="217" loading="lazy">
+
+<p>各種設定値を入力します。</p>
+<ul>
+<li>Token name: 任意の名前を入力</li>
+<li>Permissions: Terraform経由で操作するサービスを選び、それぞれEditの権限を指定する<ul>
+<li>どのサービスで何の権限が必要かは<a target="_blank" rel="noopener" href="https://developers.cloudflare.com/fundamentals/api/reference/permissions/">ドキュメント</a>にまとまっているので参照のこと</li>
+</ul>
+</li>
+<li>Account Resources: 自分が権限を持っているアカウント（メールアドレス）を選択可能。ここではAll accountsとしたが、複数のアカウントがある場合はここで絞っておくことが好ましい</li>
+<li>Zone Resources: アカウントの中のドメインを選択できる。ここではAll zonesとしたが、操作できるドメインを絞りたいときはここで指定する</li>
+<li>Client IP Address Filtering: 仮に操作されるIPアドレスが決まっている場合はここで指定する。何も入力しなければ、すべてのIPアドレスからアクセスを許容する</li>
+<li>すべて入力できたら「Continue to summary」を押下</li>
+</ul>
+<img src="/images/20240327a/image_7.png" alt="" width="1200" height="764" loading="lazy">
+
+<img src="/images/20240327a/image_8.png" alt="" width="1136" height="784" loading="lazy">
+
+<p>設定内容が表示されるので、問題なければ「Create Token」を押下します。</p>
+<img src="/images/20240327a/image_9.png" alt="Create Tokneをクリック" width="1155" height="561" loading="lazy">
+
+<p>APIトークンが表示されますが、このままではR2のAccess KeyおよびSecretが表示されないため、再度作り直します。このページでのコピーは不要です。</p>
+<img src="/images/20240327a/image_10.png" alt="ima" width="1200" height="550" loading="lazy">
+
+<p>R2の管理ページを開き、右側メニューより「Manage R2 API Tokens」を選びます。</p>
+<img src="/images/20240327a/image_11.png" alt="" width="1200" height="615" loading="lazy">
+
+<p>先ほど作成したトークンの「・・・」を押下し、「Roll」を選択。注意書きを読み、「Roll」を押下します。</p>
+<img src="/images/20240327a/image_12.png" alt="" width="1200" height="404" loading="lazy">
+
+<img src="/images/20240327a/image_13.png" alt="" width="775" height="540" loading="lazy">
+
+<p>「API Token」「Access Key ID」「Secret Access Key」「R2のエンドポイント」が表示されるので、これらをすべてコピーしておきましょう。</p>
+<img src="/images/20240327a/image_14.png" alt="" width="1200" height="680" loading="lazy">
+
+<h3 id="環境変数の設定"><a href="#環境変数の設定" class="headerlink" title="環境変数の設定"></a>環境変数の設定</h3><p>ここからは操作するPCでの作業となります。まずはターミナルを開き、環境変数をセットします。</p>
+<p>先ほどコピーしたAPIトークン等認証情報を、環境変数としてセットします。セットするキーと値は以下のとおりです。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>No.</th>
+<th>環境変数名</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>AWS_ACCOUNT_ID</td>
+<td>CloudflareのアカウントID</td>
+</tr>
+<tr>
+<td>2</td>
+<td>AWS_ACCESS_KEY_ID</td>
+<td>APIトークンで払い出したアクセスキーID</td>
+</tr>
+<tr>
+<td>3</td>
+<td>AWS_SECRET_ACCESS_KEY</td>
+<td>APIトークンで払い出したシークレットアクセスキー</td>
+</tr>
+<tr>
+<td>4</td>
+<td>CLOUDFLARE_ACCOUNT_ID</td>
+<td>CloudflareのアカウントID</td>
+</tr>
+<tr>
+<td>5</td>
+<td>CLOUDFLARE_API_TOKEN</td>
+<td>アクセスキー、シークレットアクセスキーと共に払い出したトークン</td>
+</tr>
+</tbody></table></div>
+<p>1、4については管理画面より確認できます。2、3、5については前項でコピーしたものをセットしましょう。</p>
+<p>以下のようにシェルスクリプトにまとめて、 <code>source set-env.sh</code> のコマンドで設定できるようにすると楽です。</p>
+<figure class="highlight bash"><figcaption><span>set-env.sh</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> AWS_ACCOUNT_ID=xxxxxxxxxxxxxxx</span><br><span class="line"><span class="built_in">export</span> AWS_ACCESS_KEY_ID=xxxxxxxxxxxxxxx</span><br><span class="line"><span class="built_in">export</span> AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxx</span><br><span class="line"><span class="built_in">export</span> CLOUDFLARE_ACCOUNT_ID=xxxxxxxxxxxxxxx</span><br><span class="line"><span class="built_in">export</span> CLOUDFLARE_API_TOKEN=xxxxxxxxxxxxxxx</span><br></pre></td></tr></table></figure>
+
+<h2 id="CloudflareをTerraform管理する"><a href="#CloudflareをTerraform管理する" class="headerlink" title="CloudflareをTerraform管理する"></a>CloudflareをTerraform管理する</h2><p>ここからが本題で、いよいよCloudflare上にあるリソースをTerraform管理にするため、インポート等の作業を実施していきます。</p>
+<h3 id="ディレクトリ構成"><a href="#ディレクトリ構成" class="headerlink" title="ディレクトリ構成"></a>ディレクトリ構成</h3><p>任意の場所にCloudflareのTerraform管理用のディレクトリを作成します。これをgit管理とし、その配下のディレクトリ構造・ファイル構成は以下の形とします。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">.</span><br><span class="line">├── domains</span><br><span class="line">│   └── 920oj-net</span><br><span class="line">│       ├── local.tf</span><br><span class="line">│       ├── record.tf</span><br><span class="line">│       └── setup.tf</span><br><span class="line">└── global</span><br><span class="line">    └── pages</span><br><span class="line">        └── 920oj-net</span><br><span class="line">            ├── local.tf</span><br><span class="line">            ├── pages_domain.tf</span><br><span class="line">            ├── pages_project.tf</span><br><span class="line">            └── setup.tf</span><br><span class="line"></span><br><span class="line">5 directories, 7 files</span><br></pre></td></tr></table></figure>
+
+<p>ドメイン（ゾーン）管理は <code>domains/</code> 配下で実施し、利用するドメインごとにフォルダを切り、それぞれでtfstateを分ける形とします。</p>
+<p>Cloudflare Pagesはアカウントでグローバルに管理するため、 <code>global/</code> 配下で管理し、 <code>pages</code> ディレクトリを切り、さらにプロジェクトごとにディレクトリを分ける形式とします。</p>
+<h3 id="各ディレクトリのセットアップ"><a href="#各ディレクトリのセットアップ" class="headerlink" title="各ディレクトリのセットアップ"></a>各ディレクトリのセットアップ</h3><p>Terraformのバージョン情報やプロパイダの設定、tfstateの配置場所等の初期設定に必要なファイルは、 <code>setup.tf</code> にまとめて、各ディレクトリに配置します。</p>
+<p><code>key</code> はディレクトリごとに分けておき、tfstateが分けられるようにします。自分は以下のようなルールで運用しています。</p>
+<ul>
+<li>ドメイン: <code>domains/ドメイン名.tfstate</code></li>
+<li>Pages: <code>global/pages/プロジェクト名.tfstate</code></li>
+<li>Workers: <code>global/workers/プロジェクト名.tfstate</code></li>
+</ul>
+<figure class="highlight sh"><figcaption><span>setup.tf</span></figcaption><table><tr><td class="code"><pre><span class="line">terraform &#123;</span><br><span class="line">  // terraformのバージョン設定</span><br><span class="line">  required_version = <span class="string">&quot;~&gt; 1.7.5&quot;</span></span><br><span class="line"></span><br><span class="line">  // cloudflareプロバイダを利用</span><br><span class="line">  required_providers &#123;</span><br><span class="line">    cloudflare = &#123;</span><br><span class="line">      <span class="built_in">source</span>  = <span class="string">&quot;cloudflare/cloudflare&quot;</span></span><br><span class="line">      version = <span class="string">&quot;~&gt; 4.26.0&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  // tfstateの保存先の設定。R2 Storageを使用する</span><br><span class="line">  backend <span class="string">&quot;s3&quot;</span> &#123;</span><br><span class="line">    endpoints = &#123;</span><br><span class="line">      s3 = <span class="string">&quot;https://&lt;アカウントID&gt;.r2.cloudflarestorage.com&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    bucket                      = <span class="string">&quot;oj-cf-tfstate&quot;</span> <span class="comment"># ここでバケット名を指定</span></span><br><span class="line">    key                         = <span class="string">&quot;domains/920oj-net.tfstate&quot;</span> <span class="comment"># ディレクトリごとにキーを変更</span></span><br><span class="line">    region                      = <span class="string">&quot;us-east-1&quot;</span> <span class="comment"># 任意の値でOK</span></span><br><span class="line">    skip_credentials_validation = <span class="literal">true</span></span><br><span class="line">    skip_requesting_account_id  = <span class="literal">true</span></span><br><span class="line">    skip_s3_checksum            = <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">provider <span class="string">&quot;cloudflare&quot;</span> &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>backend の設定で、 <code>skip_credentials_validation</code> と <code>skip_requesting_account_id</code> 、 <code>skip_s3_checksum</code> の3つを <code>true</code> にする必要があります。</p>
+<h3 id="ドメインのDNSレコードをimportする"><a href="#ドメインのDNSレコードをimportする" class="headerlink" title="ドメインのDNSレコードをimportする"></a>ドメインのDNSレコードをimportする</h3><p>Cloudflareのimportには、Terraform公式で用意されているimportコマンドを利用するほか、Cloudflareが独自に提供している <a target="_blank" rel="noopener" href="https://github.com/cloudflare/cf-terraforming">cf-terraforming</a> というツールを利用することができます。</p>
+<p>cf-terraformingについては、これまた伊藤さんが書かれている記事があるので、こちらも読んでみてください。</p>
+<p><a href="https://future-architect.github.io/articles/20230502a/">https://future-architect.github.io/articles/20230502a/</a></p>
+<p>実際に現在の設定をimportしてみましょう。</p>
+<h4 id="generate"><a href="#generate" class="headerlink" title="generate"></a>generate</h4><p>まずは現在の設定をTerraformの記述に落とし込んでくれる <code>generate</code> コマンドを試します。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cf-terraforming generate --resource-type <span class="string">&quot;cloudflare_record&quot;</span> --zone <span class="string">&quot;ゾーンID&quot;</span> </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>--resource-type</code> オプションで取得したいリソースを指定します。今回はDNS設定を取得してみるので、 <code>cloudflare_record</code> を指定します。<ul>
+<li>取得できるリソース一覧はドキュメントに無かったので、<a target="_blank" rel="noopener" href="https://github.com/cloudflare/cf-terraforming/blob/master/internal/app/cf-terraforming/cmd/generate.go">ソースコード</a>を参照します。</li>
+</ul>
+</li>
+<li><code>--zone</code> オプションで取得したいzoneのIDを指定します。</li>
+</ul>
+<p>実行してみたところ、以下のエラーが出ました。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">FATA[0000] --account and --zone are mutually exclusive, support <span class="keyword">for</span> both is deprecated </span><br></pre></td></tr></table></figure>
+
+<p>どうやら先程セットした環境変数 <code>CLOUDFLARE_ACCOUNT_ID</code> がセットされていると正常に動いてくれなさそうなので、一旦 <code>unset CLOUDFLARE_ACCOUNT_ID</code> コマンドで環境変数を外しておきます。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">% cf-terraforming generate --resource-type <span class="string">&quot;cloudflare_record&quot;</span> --zone <span class="string">&quot;ゾーンID&quot;</span> </span><br><span class="line">resource <span class="string">&quot;cloudflare_record&quot;</span> <span class="string">&quot;terraform_managed_resource_xxxxxxxxxxx&quot;</span> &#123;</span><br><span class="line">  name    = <span class="string">&quot;920oj.net&quot;</span></span><br><span class="line">  proxied = <span class="literal">true</span></span><br><span class="line">  ttl     = 1</span><br><span class="line">  <span class="built_in">type</span>    = <span class="string">&quot;CNAME&quot;</span></span><br><span class="line">  value   = <span class="string">&quot;920oj-net.pages.dev&quot;</span></span><br><span class="line">  zone_id = <span class="string">&quot;ゾーンID&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resource <span class="string">&quot;cloudflare_record&quot;</span> <span class="string">&quot;terraform_managed_resource_yyyyyyyyyyy&quot;</span> &#123;</span><br><span class="line">  name     = <span class="string">&quot;920oj.net&quot;</span></span><br><span class="line">  priority = 10</span><br><span class="line">  proxied  = <span class="literal">false</span></span><br><span class="line">  ttl      = 1</span><br><span class="line">  <span class="built_in">type</span>     = <span class="string">&quot;MX&quot;</span></span><br><span class="line">  value    = <span class="string">&quot;example.com&quot;</span></span><br><span class="line">  zone_id  = <span class="string">&quot;ゾーンID&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>問題なければ、先程のコマンドの末尾に <code>&gt;&gt; record.tf</code> をつけてファイルに書き出しましょう。</p>
+<p>このままだとリソース名がランダムなものになっているので、わかりやすいように名前を変えると管理しやすいです。</p>
+<ul>
+<li>例: ルートドメインのCNAMEレコード: <code>cname_root</code></li>
+<li>例: <code>hoge</code> という名前のAレコード: <code>a_hoge</code></li>
+</ul>
+<p>また、zone_idやルートドメイン名は何度か記述することになるので、local変数に定義しておくとミスが減ります。</p>
+<figure class="highlight sh"><figcaption><span>local.tf</span></figcaption><table><tr><td class="code"><pre><span class="line">locals &#123;</span><br><span class="line">  zone_id = <span class="string">&quot;ゾーンID&quot;</span></span><br><span class="line">  root_domain = <span class="string">&quot;920oj.net&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><figcaption><span>record.tf</span></figcaption><table><tr><td class="code"><pre><span class="line">resource <span class="string">&quot;cloudflare_record&quot;</span> <span class="string">&quot;cname_root&quot;</span> &#123;</span><br><span class="line">  name    = local.root_domain</span><br><span class="line">  proxied = <span class="literal">true</span></span><br><span class="line">  ttl     = 1</span><br><span class="line">  <span class="built_in">type</span>    = <span class="string">&quot;CNAME&quot;</span></span><br><span class="line">  value   = <span class="string">&quot;920oj-net.pages.dev&quot;</span></span><br><span class="line">  zone_id = local.zone_id</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">...以下略</span><br></pre></td></tr></table></figure>
+
+<h4 id="import"><a href="#import" class="headerlink" title="import"></a>import</h4><p>このままでは新規追加した分がそのまま新規として認識されてしまうので、すでに作成されているリソースについてはimportしてtfstateへ反映させる必要があります。</p>
+<p>importするためのコマンドはcf-terraformingを利用して出力することができます。ただし今回はリソース名をわかりやすく変更したため、コマンドを修正します。</p>
+<p>まずはcf-terraformingを利用してコマンドを出力してみましょう。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"> % cf-terraforming import --resource-type &quot;cloudflare_record&quot; --zone &quot;ゾーンID&quot;</span><br><span class="line">terraform import cloudflare_record.terraform_managed_resource_xxxxxxxxxx ゾーンID/xxxxxxxxxx</span><br><span class="line">terraform import cloudflare_record.terraform_managed_resource_yyyyyyyyyy ゾーンID/yyyyyyyyyy</span><br></pre></td></tr></table></figure>
+
+<p>出力されたコマンドをもとに、リソース名を変更した上で、シェルスクリプトファイルとして保存します。</p>
+<figure class="highlight bash"><figcaption><span>import.sh</span></figcaption><table><tr><td class="code"><pre><span class="line">terraform import cloudflare_record.terraform_managed_resource_cname_root ゾーンID/xxxxxxxxxx</span><br><span class="line">terraform import cloudflare_record.terraform_managed_resource_mx_root ゾーンID/yyyyyyyyyy</span><br></pre></td></tr></table></figure>
+
+<p>これを実行してみましょう。 Import successful! と表示されれば、インポート完了です。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"> % ./import.sh                  </span><br><span class="line">cloudflare_record.cname_root: Importing from ID <span class="string">&quot;ゾーンID/xxxxxxxxxx&quot;</span>...</span><br><span class="line">cloudflare_record.cname_root: Import prepared!</span><br><span class="line">  Prepared cloudflare_record <span class="keyword">for</span> import</span><br><span class="line">cloudflare_record.cname_root: Refreshing state... [<span class="built_in">id</span>=xxxxxxxxxxxxxxxxxxxxxx]</span><br><span class="line"></span><br><span class="line">・・・中略・・・</span><br><span class="line"></span><br><span class="line">Import successful!</span><br><span class="line"></span><br><span class="line">The resources that were imported are shown above. These resources are now <span class="keyword">in</span></span><br><span class="line">your Terraform state and will henceforth be managed by Terraform.</span><br></pre></td></tr></table></figure>
+
+<p>ここで <code>terraform plan</code> を実行してみましょう。先ほどimportしたものが表示され、最後にNo chanegsと表示されれば、無事反映に成功しています。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"> % terraform plan</span><br><span class="line">cloudflare_record.cname_root: Refreshing state... [<span class="built_in">id</span>=xxxxxxxxxxxxxxxxxxxxxx]</span><br><span class="line">cloudflare_record.mx_root: Refreshing state... [<span class="built_in">id</span>=xxxxxxxxxxxxxxxxxxxxxx]</span><br><span class="line">・・・中略・・・</span><br><span class="line"></span><br><span class="line">No changes. Your infrastructure matches the configuration.</span><br><span class="line"></span><br><span class="line">Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed.</span><br></pre></td></tr></table></figure>
+
+<h3 id="Cloudflare-Pagesのimport"><a href="#Cloudflare-Pagesのimport" class="headerlink" title="Cloudflare Pagesのimport"></a>Cloudflare Pagesのimport</h3><p>続いてはCloudflare PagesをTerraform管理下となるよう設定します。</p>
+<p>Pagesはドメイン（ゾーン）単位でなくアカウント単位での管理となるため、先ほどunsetした <code>CLOUDFLARE_ACCOUNT_ID</code> を再セットします。</p>
+<p>また、Cloudflare Pagesはcf-terraformingが対応していないため、Terraform v1.5から追加されたImportブロックを利用してインポートします。</p>
+<h4 id="importブロックの作成"><a href="#importブロックの作成" class="headerlink" title="importブロックの作成"></a>importブロックの作成</h4><p>自分の場合、 <code>920oj.net</code> のドメインで、プロジェクト <code>920oj-net</code> を設定しています。これをインポートしてみましょう。</p>
+<img src="/images/20240327a/image_15.png" alt="image.png" width="873" height="200" loading="lazy">
+
+<p>Cloudflare Pagesは、 <code>cloudflare_pages_domain</code> リソースと <code>cloudflarepages_project</code> リソースから構築されます。</p>
+<p>まずは <code>import.tf</code> を作成し、importブロックを記載します。 <code>local.account_id</code> でアカウントIDが呼び出せるようにしています。</p>
+<p><code>cloudflare_pages_domain</code> のインポートでは、<code>to</code> にはimportする対象のリソース名を、 <code>id</code> には <code>&lt;アカウントID&gt;/&lt;プロジェクト名&gt;/&lt;設定しているドメイン名&gt;</code> を記載します。</p>
+<p><code>cloudflare_pages_project</code> のインポートでは、 <code>to</code> にはimportする対象のリソース名を、 <code>id</code> には <code>&lt;アカウントID&gt;/&lt;プロジェクト名&gt;</code> を記載します。</p>
+<figure class="highlight sh"><figcaption><span>import.tf</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># cloudflare_pages_domain のインポート</span></span><br><span class="line">import &#123;</span><br><span class="line">  to = cloudflare_pages_domain.domain-920oj-net  <span class="comment"># 対象のリソース名</span></span><br><span class="line">  <span class="built_in">id</span> = <span class="string">&quot;<span class="variable">$&#123;local.account_id&#125;</span>/920oj-net/920oj.net&quot;</span> <span class="comment"># ドメイン名</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># cloudflare_pages_project のインポート</span></span><br><span class="line">import &#123;</span><br><span class="line">  to = cloudflare_pages_project.project-920oj-net <span class="comment"># 対象のリソース名</span></span><br><span class="line">  <span class="built_in">id</span> = <span class="string">&quot;<span class="variable">$&#123;local.account_id&#125;</span>/920oj-net&quot;</span>            <span class="comment"># プロジェクト名</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="HCLコードの自動生成"><a href="#HCLコードの自動生成" class="headerlink" title="HCLコードの自動生成"></a>HCLコードの自動生成</h4><p>この状態で <code>terraform plan -generate-config-out=generate.tf</code> コマンドを実行します。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">% terraform plan -generate-config-out=generate.tf</span><br><span class="line">cloudflare_pages_domain.domain-920oj-net: Preparing import... [<span class="built_in">id</span>=xxxxxxxxxxxxxxx/920oj-net/920oj.net]</span><br><span class="line">cloudflare_pages_project.project-920oj-net: Preparing import... [<span class="built_in">id</span>=xxxxxxxxxxxxxxx/920oj-net]</span><br><span class="line">cloudflare_pages_domain.domain-920oj-net: Refreshing state... [<span class="built_in">id</span>=xxxxxxxxxxxxxxxxxxxxx]</span><br><span class="line">cloudflare_pages_project.project-920oj-net: Refreshing state... [<span class="built_in">id</span>=920oj-net]</span><br><span class="line"></span><br><span class="line">Terraform will perform the following actions:</span><br><span class="line"></span><br><span class="line">  <span class="comment"># cloudflare_pages_domain.domain-920oj-net will be imported</span></span><br><span class="line">    resource <span class="string">&quot;cloudflare_pages_domain&quot;</span> <span class="string">&quot;domain-920oj-net&quot;</span> &#123;</span><br><span class="line">        account_id   = <span class="string">&quot;xxxxxxxxxxxxxxxxxxxxxxx&quot;</span></span><br><span class="line">        domain       = <span class="string">&quot;920oj.net&quot;</span></span><br><span class="line">        <span class="built_in">id</span>           = <span class="string">&quot;xxxxxxxxxxxxxxxxxxxxxxx&quot;</span></span><br><span class="line">        project_name = <span class="string">&quot;920oj-net&quot;</span></span><br><span class="line">        status       = <span class="string">&quot;active&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment"># cloudflare_pages_project.project-920oj-net will be imported</span></span><br><span class="line">  <span class="comment"># (config will be generated)</span></span><br><span class="line">    resource <span class="string">&quot;cloudflare_pages_project&quot;</span> <span class="string">&quot;project-920oj-net&quot;</span> &#123;</span><br><span class="line">        account_id        = <span class="string">&quot;xxxxxxxxxxxxxxxxxxxxxxx&quot;</span></span><br><span class="line">        created_on        = <span class="string">&quot;2023-03-18T15:44:28Z&quot;</span></span><br><span class="line">        domains           = [</span><br><span class="line">            <span class="string">&quot;920oj-net.pages.dev&quot;</span>,</span><br><span class="line">            <span class="string">&quot;920oj.net&quot;</span>,</span><br><span class="line">        ]</span><br><span class="line">        <span class="built_in">id</span>                = <span class="string">&quot;920oj-net&quot;</span></span><br><span class="line">        name              = <span class="string">&quot;920oj-net&quot;</span></span><br><span class="line">        production_branch = <span class="string">&quot;main&quot;</span></span><br><span class="line">        subdomain         = <span class="string">&quot;920oj-net.pages.dev&quot;</span></span><br><span class="line"></span><br><span class="line">        build_config &#123;</span><br><span class="line">            build_caching   = <span class="literal">false</span></span><br><span class="line">            build_command   = <span class="string">&quot;npm run build&quot;</span></span><br><span class="line">            destination_dir = <span class="string">&quot;build&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">・・・中略</span><br><span class="line"></span><br><span class="line">Plan: 2 to import, 0 to add, 0 to change, 0 to destroy.</span><br></pre></td></tr></table></figure>
+
+<p>設定値が読み取られ、出力されています。また、指定したファイル <code>generate.tf</code> に同様の設定値が記載されています！</p>
+<p>内容が正しいか確認するのと、コメントを消したり、local変数に置き換えたりして体裁を整えましょう。また、ファイルもリソースごとに分けておきましょう。</p>
+<figure class="highlight sh"><figcaption><span>pages_domain.tf</span></figcaption><table><tr><td class="code"><pre><span class="line">resource <span class="string">&quot;cloudflare_pages_domain&quot;</span> <span class="string">&quot;domain-920oj-net&quot;</span> &#123;</span><br><span class="line">  account_id   = local.account_id</span><br><span class="line">  domain       = <span class="string">&quot;920oj.net&quot;</span></span><br><span class="line">  project_name = <span class="string">&quot;920oj-net&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><figcaption><span>generate.tf</span></figcaption><table><tr><td class="code"><pre><span class="line">resource <span class="string">&quot;cloudflare_pages_project&quot;</span> <span class="string">&quot;project-920oj-net&quot;</span> &#123;</span><br><span class="line">  account_id        = local.account_id</span><br><span class="line">  name              = local.project_name</span><br><span class="line">  production_branch = <span class="string">&quot;main&quot;</span></span><br><span class="line">  build_config &#123;</span><br><span class="line">    build_caching       = <span class="literal">false</span></span><br><span class="line">    build_command       = <span class="string">&quot;npm run build&quot;</span></span><br><span class="line">    destination_dir     = <span class="string">&quot;build&quot;</span></span><br><span class="line">    root_dir            = null</span><br><span class="line">    web_analytics_tag   = null</span><br><span class="line">    web_analytics_token = null</span><br><span class="line">  &#125;</span><br><span class="line">  deployment_configs &#123;</span><br><span class="line">    preview &#123;</span><br><span class="line">      always_use_latest_compatibility_date = <span class="literal">false</span></span><br><span class="line">      compatibility_date                   = <span class="string">&quot;2023-03-18&quot;</span></span><br><span class="line">      compatibility_flags                  = []</span><br><span class="line">      d1_databases                         = &#123;&#125;</span><br><span class="line">      durable_object_namespaces            = &#123;&#125;</span><br><span class="line">      environment_variables = &#123;</span><br><span class="line">        GTAG_ID      = <span class="string">&quot;XXXXXXX&quot;</span></span><br><span class="line">        NODE_VERSION = <span class="string">&quot;XXXXXXX&quot;</span></span><br><span class="line">      &#125;</span><br><span class="line">      fail_open     = <span class="literal">true</span></span><br><span class="line">      kv_namespaces = &#123;&#125;</span><br><span class="line">      r2_buckets    = &#123;&#125;</span><br><span class="line">      secrets       = null <span class="comment"># sensitive</span></span><br><span class="line">      usage_model   = <span class="string">&quot;standard&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    production &#123;</span><br><span class="line">      always_use_latest_compatibility_date = <span class="literal">false</span></span><br><span class="line">      compatibility_date                   = <span class="string">&quot;2023-03-18&quot;</span></span><br><span class="line">      compatibility_flags                  = []</span><br><span class="line">      d1_databases                         = &#123;&#125;</span><br><span class="line">      durable_object_namespaces            = &#123;&#125;</span><br><span class="line">      environment_variables = &#123;</span><br><span class="line">        GTAG_ID      = <span class="string">&quot;XXXXXXXXXX&quot;</span></span><br><span class="line">        NODE_VERSION = <span class="string">&quot;XXXXXXXXXX&quot;</span></span><br><span class="line">      &#125;</span><br><span class="line">      fail_open     = <span class="literal">true</span></span><br><span class="line">      kv_namespaces = &#123;&#125;</span><br><span class="line">      r2_buckets    = &#123;&#125;</span><br><span class="line">      secrets       = null <span class="comment"># sensitive</span></span><br><span class="line">      usage_model   = <span class="string">&quot;standard&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">source</span> &#123;</span><br><span class="line">    <span class="built_in">type</span> = <span class="string">&quot;github&quot;</span></span><br><span class="line">    config &#123;</span><br><span class="line">      deployments_enabled           = <span class="literal">true</span></span><br><span class="line">      owner                         = <span class="string">&quot;920oj&quot;</span></span><br><span class="line">      pr_comments_enabled           = <span class="literal">true</span></span><br><span class="line">      preview_branch_excludes       = []</span><br><span class="line">      preview_branch_includes       = [<span class="string">&quot;*&quot;</span>]</span><br><span class="line">      preview_deployment_setting    = <span class="string">&quot;all&quot;</span></span><br><span class="line">      production_branch             = <span class="string">&quot;main&quot;</span></span><br><span class="line">      production_deployment_enabled = <span class="literal">true</span></span><br><span class="line">      repo_name                     = <span class="string">&quot;920oj-net&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="importの実行"><a href="#importの実行" class="headerlink" title="importの実行"></a>importの実行</h4><p>コードの記載は済んだので、tfstateへ取り込みましょう。</p>
+<p>先ほどのimportブロックは残したままで、 <code>terraform plan</code> を実行します。 <code>Plan: 2 to import, 0 to add, 0 to change, 0 to destroy.</code> が出ていれば、インポートの準備ができていることがわかります。</p>
+<p>次に、 <code>terraform apply</code> を実行します。差分がないことを確認して、yesとタイプしましょう。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">Plan: 2 to import, 0 to add, 0 to change, 0 to destroy.</span><br><span class="line"></span><br><span class="line">Do you want to perform these actions?</span><br><span class="line">  Terraform will perform the actions described above.</span><br><span class="line">  Only <span class="string">&#x27;yes&#x27;</span> will be accepted to approve.</span><br><span class="line"></span><br><span class="line">  Enter a value: <span class="built_in">yes</span></span><br></pre></td></tr></table></figure>
+
+<p><code>Apply complete! Resources: 2 imported, 0 added, 0 changed, 0 destroyed.</code> が出たらOKです。</p>
+<p>このあと <code>terraform plan</code> を実行してみて、差分が出ていなければ問題なしです。</p>
+<p>先ほどインポートに利用したimport.tfは削除しても構いません。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"> % terraform plan</span><br><span class="line">cloudflare_pages_domain.domain-920oj-net: Refreshing state... [<span class="built_in">id</span>=xxxxxxxxxx]</span><br><span class="line">cloudflare_pages_project.project-920oj-net: Refreshing state... [<span class="built_in">id</span>=xxxxxxxxxx]</span><br><span class="line"></span><br><span class="line">No changes. Your infrastructure matches the configuration.</span><br><span class="line"></span><br><span class="line">Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed.</span><br></pre></td></tr></table></figure>
+
+<p>これにて、Cloudflareで管理しているドメインのDNSレコードとCloudflare Pagesのリソースを、Terraformにて管理できるようになりました！</p>
+<h2 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h2><p>これでCloudflareを操作する際の不安が軽減できるようになり、自分の個人開発モチベも（わずかながら）高まった気がします。また、Terraformのエコシステムや本体の機能の充実さも改めて実感しました。</p>
+<p>ぜひ皆さんもCloudflareをTerraform管理してみましょう！</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20240327a/&related=twitterapi%2Ctwitter&text=%E6%89%8B%E5%8B%95%E9%81%8B%E7%94%A8%E3%81%97%E3%81%A6%E3%81%84%E3%82%8BCloudflare%E3%82%92Terraform%E3%81%A7Infrastructure%20as%20Code%E3%81%99%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240327a/&t=%E6%89%8B%E5%8B%95%E9%81%8B%E7%94%A8%E3%81%97%E3%81%A6%E3%81%84%E3%82%8BCloudflare%E3%82%92Terraform%E3%81%A7Infrastructure%20as%20Code%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240327a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240327a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2023.05.02</span><span class="snscount">&#9825;8</span><a href=/articles/20230502a/ title="cf-terraformingは、Cloudflareにて開発されているOSSで、その名前の通り、Cloudflare上のリソースをHCL化し、出力されたソースを利用してTerraformのState管理下にすることができるツールです">cf-terraformingで入門するCloudflare</a></li><li class="related-posts-item"><span>2023.10.16</span><span class="snscount">&#9825;4</span><a href=/articles/20231016a/ title="10/14に開催されたCloudflare Meetup Naganoに登壇したので発表内容のサマリとイベントのレポートです。">Cloudflare R2でTerraformのStateを管理する方法: Cloudflare Meetup Nagano Vol.2 に登壇しました</a></li><li class="related-posts-item"><span>2023.04.06</span><span class="snscount">&#9825;25</span><a href=/articles/20230406a/ title="初心者がTerraformを扱う際に気をつけるべきポイントについて、自分が1ヶ月間みっちりTerraformを触った経験をもとに紹介したいと思います。">Terraformに入門して1ヶ月経ったので、初心者が気をつけるべきポイントを書いてみる</a></li><li class="related-posts-item"><span>2021.10.29</span><span class="snscount">&#9825;301</span><a href=/articles/20211029a/ title="ここ最近はほぼ1からコード設計をして運用まで持っていくこともあり、「より腐りにくい、より息の長いコード」というものを考えるようになりました。Terraformだからこその「定期メンテを簡易にするためには」「より簡単に変更するためには」をひたすら突き詰めていった結果、アツい気持ちが生まれ、今回は筆を取っています。">Terraformerとしてコードを書いて思うこと</a></li><li class="related-posts-item"><span>2020.08.05</span><span class="snscount">&#9825;13</span><a href=/articles/20200805/ title="TIG/DX所属のインフラエンジニア兼カメラマンの[伊藤太斉]です。今回のアイキャッチは私が昨年撮ったひまわり畑にしました。Infrastructure as Codeでキャッチアップやインフラのリリースができることに越したことはありません。この記事では、Terraformの数多くの機能を使って他のIaCツールと可能な限り代用したり、Terraformの世界でリソース作成を完結させるために使い方を改めて突き詰めた内容になります">Terraformで楽をしたい</a></li><li class="related-posts-item"><span>2020.06.24</span><span class="snscount">&#9825;29</span><a href=/articles/20200624/ title="Infrastructure as Code(IaC)のツールとしてはAWSからはCloudFormation、GCPからはDeployment Managerが出ています。Terraformは単一ツールで複数クラウドのリソースをコードで管理することができる、ということが大きなメリットであることは世に出ている他の記事でも言われています。">Terraform 101</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20240311a/ title="Terraform連載を開始します。">Terraform連載2024を開始します & TerraformにおけるDR戦略を考える<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Cloudflare%E3%82%92Terraform%E3%81%A7%E7%AE%A1%E7%90%86%E3%81%99%E3%82%8B%E3%81%9F%E3%82%81%E3%81%AE%E5%89%8D%E6%BA%96%E5%82%99"><span class="toc-text">CloudflareをTerraformで管理するための前準備</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Cloudflare-R2%E3%81%B8tfstate%E7%AE%A1%E7%90%86%E7%94%A8%E3%81%AE%E3%83%90%E3%82%B1%E3%83%83%E3%83%88%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B"><span class="toc-text">Cloudflare R2へtfstate管理用のバケットを作成する</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#API%E3%83%88%E3%83%BC%E3%82%AF%E3%83%B3%E3%82%92%E7%99%BA%E8%A1%8C%E3%81%99%E3%82%8B"><span class="toc-text">APIトークンを発行する</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%92%B0%E5%A2%83%E5%A4%89%E6%95%B0%E3%81%AE%E8%A8%AD%E5%AE%9A"><span class="toc-text">環境変数の設定</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Cloudflare%E3%82%92Terraform%E7%AE%A1%E7%90%86%E3%81%99%E3%82%8B"><span class="toc-text">CloudflareをTerraform管理する</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%87%E3%82%A3%E3%83%AC%E3%82%AF%E3%83%88%E3%83%AA%E6%A7%8B%E6%88%90"><span class="toc-text">ディレクトリ構成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%84%E3%83%87%E3%82%A3%E3%83%AC%E3%82%AF%E3%83%88%E3%83%AA%E3%81%AE%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97"><span class="toc-text">各ディレクトリのセットアップ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3%E3%81%AEDNS%E3%83%AC%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92import%E3%81%99%E3%82%8B"><span class="toc-text">ドメインのDNSレコードをimportする</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#generate"><span class="toc-text">generate</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#import"><span class="toc-text">import</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cloudflare-Pages%E3%81%AEimport"><span class="toc-text">Cloudflare Pagesのimport</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#import%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%E3%81%AE%E4%BD%9C%E6%88%90"><span class="toc-text">importブロックの作成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HCL%E3%82%B3%E3%83%BC%E3%83%89%E3%81%AE%E8%87%AA%E5%8B%95%E7%94%9F%E6%88%90"><span class="toc-text">HCLコードの自動生成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#import%E3%81%AE%E5%AE%9F%E8%A1%8C"><span class="toc-text">importの実行</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (438)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (266)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (98)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (62)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (35)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
