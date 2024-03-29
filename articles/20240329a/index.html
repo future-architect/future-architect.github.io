@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>GoでAWS Lambdaのミドルウェアをジェネリクスを用いて実装する | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにTIG真野です。 AWS SDK for Goを用いてAWS Lambdaを実装する際に、共通的に行いたいミドルウェア的な処理をデコレータで実装する方法を説明します。内容的には http.HandlerFunc に対してミドルウェアを作るのとほぼ同義です。 前提知識AWS SDK for GoでLambdaを実装するにあたり、関数ハンドラは複数のシグネチャを許容して、そのうち引数に con">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GoでAWS Lambdaのミドルウェアをジェネリクスを用いて実装する | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240329a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにTIG真野です。 AWS SDK for Goを用いてAWS Lambdaを実装する際に、共通的に行いたいミドルウェア的な処理をデコレータで実装する方法を説明します。内容的には http.HandlerFunc に対してミドルウェアを作るのとほぼ同義です。 前提知識AWS SDK for GoでLambdaを実装するにあたり、関数ハンドラは複数のシグネチャを許容して、そのうち引数に con">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240329a/godecorator.drawio.png">
+<meta property="article:published_time" content="2024-03-28T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-03-29T01:56:47.173Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Lambda">
+<meta property="article:tag" content="Decorator">
+<meta property="article:tag" content="共通処理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240329a/godecorator.drawio.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240329a/">
+  <meta content="Go,Lambda,Decorator,共通処理" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">GoでAWS Lambdaのミドルウェアをジェネリクスを用いて実装する
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240329a_GoでAWS_Lambdaのミドルウェアをジェネリクスを用いて実装する.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240329a_GoでAWS_Lambdaのミドルウェアをジェネリクスを用いて実装する" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-03-28T15:00:00.000Z" itemprop="datePublished">2024.03.29</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98" title="真野隼記さんの記事一覧へ" class="post-author">真野隼記</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/Lambda/" title="Lambdaタグの記事へ" class="tag-list-link">Lambda</a>
+  
+    
+    <a href="/tags/Decorator/" title="Decoratorタグの記事へ" class="tag-list-link">Decorator</a>
+  
+    
+    <a href="/tags/共通処理/" title="共通処理タグの記事へ" class="tag-list-link">共通処理</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>TIG真野です。</p>
+<p>AWS SDK for Goを用いてAWS Lambdaを実装する際に、共通的に行いたいミドルウェア的な処理をデコレータで実装する方法を説明します。内容的には <code>http.HandlerFunc</code> に対してミドルウェアを作るのとほぼ同義です。</p>
+<h2 id="前提知識"><a href="#前提知識" class="headerlink" title="前提知識"></a>前提知識</h2><p>AWS SDK for GoでLambdaを実装するにあたり、<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/golang-handler.html">関数ハンドラは複数のシグネチャを許容</a>して、そのうち引数に <code>context.Context</code> を取るのは以下の4パターンです。この記事では便宜的に1~4で採番してパターン名を入れています</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// No.1 プレーンパターン</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(context.Context)</span></span> <span class="type">error</span></span><br><span class="line"><span class="comment">// No2 TInパターン</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(context.Context, TIn)</span></span> <span class="type">error</span></span><br><span class="line"><span class="comment">// No3 TOutパターン</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(context.Context)</span></span> (TOut, <span class="type">error</span>)</span><br><span class="line"><span class="comment">// No4 TInToutパターン</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(context.Context, TIn)</span></span> (TOut, <span class="type">error</span>)</span><br></pre></td></tr></table></figure>
+
+<p>例えば、「No.1 プレーンパターン」は<code>main.go</code> から、 <code>plain</code> パッケージの <code>Handle()</code> 関数を呼び出すように実装します。そうすると、SDK側で任意のトリガーでLambdaを起動するようハンドリングしてくれます。この例では2ファイルに分割していますが、このような技術的な制約は無いです。後の説明の都合で最初から分離しています。</p>
+<figure class="highlight go"><figcaption><span>cmd/lambda/main.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/lambda&quot;</span></span><br><span class="line">    <span class="string">&quot;github.com/myproject/myapp/plain&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(plain.Handle)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight go"><figcaption><span>plain/handler.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> plain</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Handle</span><span class="params">(ctx context.Context)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">	<span class="comment">// アプリケーションのロジックなど</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>さきほど提示したLambda関数ハンドラに登場する <code>TIn</code>, <code>TOut</code> は any型でどのような型をとっても良いため、ジェネリクス以前はデコレータ的な共通的な処理を書くためには、リフレクションに頼るか、イベント種別ごとに個別に作成する必要がありました。後者もTOutの場合はうまく扱うことができず最終的にはリフレクションに頼っていたと思います。</p>
+<p><a href="/articles/20220209a/">Go 1.18から入ったジェネリクス</a>を用いてリフレクション無しで、上記の関数ハンドラをデコレータの設計でラップした実装を考えます。</p>
+<p>前提知識をもう少し細かく知りたい人は次の記事もお勧めです。</p>
+<ul>
+<li>TIn, TOutの挙動については<a href="/articles/20200326/">AWS Lambda×Goの開発Tips</a> に言及があります</li>
+<li>AWS SDK for Goが守るべきシグネチャを違反していないかのチェックは、辻さんの<a href="/articles/20210603a/">静的解析によるInvalidなAWS Lambda関数シグネチャの検知</a>で紹介する静的解析ツールで行えます</li>
+<li>デレコータについては<a href="/articles/20221021a/">CSV処理における共通処理をDecoratorパターンで実現する</a>も言及があります</li>
+</ul>
+<h2 id="共通で行いたい処理をデコレータで扱うの意"><a href="#共通で行いたい処理をデコレータで扱うの意" class="headerlink" title="共通で行いたい処理をデコレータで扱うの意"></a>共通で行いたい処理をデコレータで扱うの意</h2><p>例えば、次のような処理は機能横断的（ある機能の閉じず、サービス全体に統制を図って適用したい）に実現したいことが多いです。</p>
+<ul>
+<li>panicのキャプチャ</li>
+<li>errorがnilでない場合のエラーハンドリング</li>
+<li>実行時間の遅延監視</li>
+<li>トランザクション管理</li>
+</ul>
+<p>扱うLambdaの数が少なければあまり気にしなくても良いですが、チーム規模が増え、開発規模もLambda関数が数十程度になってくると何かしら統制を図りたくなってくるものです。</p>
+<p>デコレータの処理イメージですが、次のようなイメージです。先ほどの <code>plain/handler.go</code> で実装した <code>Handle()</code> 関数が真ん中のビジネスロジックの部分で、外側を1つ以上の共通処理でラップするようなことを行います。</p>
+<img src="/images/20240329a/godecorator.drawio.png" alt="godecorator.drawio.png" width="1030" height="459" loading="lazy">
+
+<p>次の章からは具体的に実装例を紹介していきます。</p>
+<h2 id="No1-プレーンパターンのデコレータ実装"><a href="#No1-プレーンパターンのデコレータ実装" class="headerlink" title="No1. プレーンパターンのデコレータ実装"></a>No1. プレーンパターンのデコレータ実装</h2><p>まず <code>func (context.Context) error</code> の共通処理を書きます。このケースはジェネリクスの利用無しで対応できます。</p>
+<p>次のように <code>LambdaFunc</code> を型定義します。<code>LambdaFunc</code>を引数と戻り値にした<code>Do()</code> 関数を作ります。これがデコレーターの本体（エントリーポイント）です。</p>
+<figure class="highlight go"><figcaption><span>lambdamiddleware/lambda_middleware.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> lambdamiddleware</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;runtime/debug&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/rs/zerolog/log&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// プレーンパターンのLambda関数をデコレートするための型定義</span></span><br><span class="line"><span class="keyword">type</span> LambdaFunc <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context)</span></span> <span class="type">error</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// デコレート処理の本体</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Do</span><span class="params">(fn LambdaFunc)</span></span> LambdaFunc &#123;</span><br><span class="line">	<span class="keyword">return</span> errCheck(fn)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 共通処理の一例（ここではエラーハンドリング）。これもデコレータ</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">errCheck</span><span class="params">(fn LambdaFunc)</span></span> LambdaFunc &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">		<span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; <span class="comment">// パニックのキャプチャ</span></span><br><span class="line">			<span class="keyword">if</span> err := <span class="built_in">recover</span>(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				log.Error().Msgf(<span class="string">&quot;panic catch: %v\n%v&quot;</span>, err, <span class="type">string</span>(debug.Stack()))</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;()</span><br><span class="line"></span><br><span class="line">		err := fn(ctx)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Error().Msgf(<span class="string">&quot;%v&quot;</span>, err) <span class="comment">// 共通的なエラーハンドリング（ここではエラーログを出したい）</span></span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>errCheck</code> では拡張したい共通処理を実装して、先ほどの <code>Do()</code> 内で <code>fn</code> に被せます。デコレートぽいですね。</p>
+<p>さて、これをmain.goに適用すると、次のように下の <code>plain.Handle</code> を <code>lambdamiddleware.Do()</code> でラップしたような変更となります。</p>
+<figure class="highlight diff"><figcaption><span>cmd/lambda/main.go</span></figcaption><table><tr><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">	&quot;context&quot;</span><br><span class="line"></span><br><span class="line">	&quot;github.com/aws/aws-lambda-go/lambda&quot;</span><br><span class="line">    &quot;github.com/myproject/myapp/plain&quot;</span><br><span class="line"><span class="addition">+   &quot;github.com/myproject/myapp/lambdamiddleware&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line"><span class="deletion">-	lambda.Start(plain.Handle)</span></span><br><span class="line"><span class="addition">+	lambda.Start(lambdamiddleware.Do(plain.Handle))</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>挙動としては <code>plain.Handle</code> が <code>lambdamiddleware.Do()</code> に渡され、 <code>errCheck()</code> で呼び出されます。 <code>errCheck()</code> は <code>func(ctx context.Context) error</code> という関数を返す、というところがポイントです。</p>
+<p>この手の実装は慣れないと困惑する人もいそうですが、Goだと HTTP Middlewareを作るために、<code>http.HandlerFunc</code> で同様の設計をよく見かけます。</p>
+<p>辻さんの<a target="_blank" rel="noopener" href="https://tutuz-tech.hatenablog.com/entry/2020/03/23/220326">HTTP Middleware の作り方と使い方</a> を始め、参考になる情報が沢山あります。</p>
+<h2 id="No2-TInパターンのデコレータ実装"><a href="#No2-TInパターンのデコレータ実装" class="headerlink" title="No2. TInパターンのデコレータ実装"></a>No2. TInパターンのデコレータ実装</h2><p>No1と異なり、<code>TIn</code> は任意の型なので、ジェネリクスが登場します。型定義でジェネリクスを用いる場合は、 <code>type LambdaTInFunc[TI any] func(ctx context.Context, e TI) error</code> といった順序で宣言します。構造は同じです。</p>
+<figure class="highlight go"><figcaption><span>lambdamiddleware/lambda_tin_middleware.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> lambdamiddleware</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;runtime/debug&quot;</span></span><br><span class="line">	</span><br><span class="line">	<span class="string">&quot;github.com/rs/zerolog/log&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> LambdaTInFunc[TI any] <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, e TI)</span></span> <span class="type">error</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">DoTin</span>[<span class="title">TI</span> <span class="title">any</span>]<span class="params">(fn LambdaTInFunc[TI])</span></span> LambdaTInFunc[TI] &#123;</span><br><span class="line">	<span class="keyword">return</span> errLogTIn(fn)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">errLogTIn</span>[<span class="title">TI</span> <span class="title">any</span>]<span class="params">(fn LambdaTInFunc[TI])</span></span> LambdaTInFunc[TI] &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, e TI)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">		<span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="keyword">if</span> err := <span class="built_in">recover</span>(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				log.Error().Msgf(<span class="string">&quot;panic catch: %v\n%v&quot;</span>, err, <span class="type">string</span>(debug.Stack()))</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;()</span><br><span class="line"></span><br><span class="line">		err := fn(ctx, e)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Error().Msgf(<span class="string">&quot;%v&quot;</span>, err)</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>呼び出し方も、次のように同様です。先ほどと異なり、Handle()関数には、 <code>events.DynamoDBEvent</code> という引数がありますが、ジェネリクスを用いているためどのような型でも受け止めることができます。</p>
+<figure class="highlight go"><figcaption><span>cmd/tinlambda/main.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/lambda&quot;</span></span><br><span class="line">    <span class="string">&quot;github.com/myproject/myapp/tin&quot;</span></span><br><span class="line">    <span class="string">&quot;github.com/myproject/myapp/lambdamiddleware&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(lambdamiddleware.DoTin(tin.Handle))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight go"><figcaption><span>tin/handler.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Handle</span><span class="params">(ctx context.Context, e events.DynamoDBEvent)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">	<span class="comment">// アプリケーションのロジックなど</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="No3-TOutパターンのデコレータ実装"><a href="#No3-TOutパターンのデコレータ実装" class="headerlink" title="No3. TOutパターンのデコレータ実装"></a>No3. TOutパターンのデコレータ実装</h2><p>TOutパターンもほぼ同じです。1点補足すると <code>var zero TO</code> で初期値を生成している部分でしょうか。これもerr が not nil である状態ですので、 <code>return tout, err</code> としても挙動として問題ないため、好みに近いところです。</p>
+<figure class="highlight go"><figcaption><span>lambdamiddleware/lambda_tout_middleware.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> lambdamiddleware</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;runtime/debug&quot;</span></span><br><span class="line">	</span><br><span class="line">	<span class="string">&quot;github.com/rs/zerolog/log&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> LambdaTOutFunc[TO any] <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context)</span></span> (TO, <span class="type">error</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">DoTout</span>[<span class="title">TO</span> <span class="title">any</span>]<span class="params">(fn LambdaTOutFunc[TO])</span></span> LambdaTOutFunc[TO] &#123;</span><br><span class="line">	<span class="keyword">return</span> errLogTOut(fn)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">errLogTOut</span>[<span class="title">TO</span> <span class="title">any</span>]<span class="params">(fn LambdaTOutFunc[TO])</span></span> LambdaTOutFunc[TO] &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context)</span></span> (TO, <span class="type">error</span>) &#123;</span><br><span class="line">		<span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="keyword">if</span> err := <span class="built_in">recover</span>(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				log.Error().Msgf(<span class="string">&quot;panic catch: %v\n%v&quot;</span>, err, <span class="type">string</span>(debug.Stack()))</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;()</span><br><span class="line"></span><br><span class="line">		tout, err := fn(ctx)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Error().Msgf(<span class="string">&quot;%v&quot;</span>, err)</span><br><span class="line">			<span class="keyword">var</span> zero TO <span class="comment">// ゼロ値</span></span><br><span class="line">			<span class="keyword">return</span> zero, err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> tout, <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>呼び出され型はNo2, No4と類似になるため、割愛します。</p>
+<h2 id="No4-TInTOutパターンのデコレータ実装"><a href="#No4-TInTOutパターンのデコレータ実装" class="headerlink" title="No4. TInTOutパターンのデコレータ実装"></a>No4. TInTOutパターンのデコレータ実装</h2><p>Tin, TOutパターンの組み合わせです。構造は同じです。</p>
+<figure class="highlight go"><figcaption><span>lambdamiddleware/lambda_tintout_middleware.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> lambdamiddleware</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;runtime/debug&quot;</span></span><br><span class="line">	</span><br><span class="line">	<span class="string">&quot;github.com/rs/zerolog/log&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> LambdaTInTOutFunc[TI, TO any] <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, e TI)</span></span> (TO, <span class="type">error</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">DoTinTout</span>[<span class="title">TI</span>, <span class="title">TO</span> <span class="title">any</span>]<span class="params">(fn LambdaTInTOutFunc[TI, TO])</span></span> LambdaTInTOutFunc[TI, TO] &#123;</span><br><span class="line">	<span class="keyword">return</span> errLogTInTOut(fn)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">errLogTInTOut</span>[<span class="title">TI</span>, <span class="title">TO</span> <span class="title">any</span>]<span class="params">(fn LambdaTInTOutFunc[TI, TO])</span></span> LambdaTInTOutFunc[TI, TO] &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, e TI)</span></span> (TO, <span class="type">error</span>) &#123;</span><br><span class="line">		<span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="keyword">if</span> err := <span class="built_in">recover</span>(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				log.Error().Msgf(<span class="string">&quot;panic catch: %v\n%v&quot;</span>, err, <span class="type">string</span>(debug.Stack()))</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;()</span><br><span class="line"></span><br><span class="line">		tout, err := fn(ctx, e)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Error().Msgf(<span class="string">&quot;%v&quot;</span>, err)</span><br><span class="line">			<span class="keyword">var</span> zero TO</span><br><span class="line">			<span class="keyword">return</span> zero, err</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> tout, <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>呼び出し方も特筆すべきことは無いです。引数、戻り値ともに任意の型（この例ではCloudWatchEvent経由で起動し、独自定義の構造体を返す）を扱えていることに着目ください。</p>
+<figure class="highlight go"><figcaption><span>cmd/tintoutlambda/main.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/aws/aws-lambda-go/lambda&quot;</span></span><br><span class="line">    <span class="string">&quot;github.com/myproject/myapp/tin&quot;</span></span><br><span class="line">    <span class="string">&quot;github.com/myproject/myapp/lambdamiddleware&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lambda.Start(lambdatintoutmiddleware.DoTinTOut(tintout.Handle))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight go"><figcaption><span>tintout/handler.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Handle</span><span class="params">(ctx context.Context, e events.CloudWatchEvent)</span></span>(MyStruct, <span class="type">error</span>) &#123;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">	<span class="comment">// アプリケーションのロジックなど</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="別の共通処理を追加したい"><a href="#別の共通処理を追加したい" class="headerlink" title="別の共通処理を追加したい"></a>別の共通処理を追加したい</h2><p>ミドルウェアを拡張したい場合も紹介します。</p>
+<p>例えば、Lambdaのタイムアウト100ms前にエラーログを出したいとします。最後のTinTouに追加すると次のように <code>delayCheckTInTOut()</code> を追加し、<code>DoTinTout()</code> にそれを追加して呼び出すことで対応できます。</p>
+<figure class="highlight diff"><table><tr><td class="code"><pre><span class="line">func DoTinTOut[TI, TO any](fn LambdaTInTOutFunc[TI, TO]) LambdaTInTOutFunc[TI, TO] &#123;</span><br><span class="line"><span class="deletion">-	return errLogTInTOut(fn)</span></span><br><span class="line"><span class="addition">+	return delayCheckTInTOut(errLogTInTOut(fn))</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="addition">+func delayCheckTInTOut[TI, TO any](fn LambdaTInTOutFunc[TI, TO]) LambdaTInTOutFunc[TI, TO] &#123;</span></span><br><span class="line"><span class="addition">+	return func(ctx context.Context, e TI) (TO, error) &#123;</span></span><br><span class="line"><span class="addition">+		deadline, _ := ctx.Deadline()</span></span><br><span class="line"><span class="addition">+		deadlineTerm := time.Until(deadline.Add(-100 * time.Millisecond))</span></span><br><span class="line"><span class="addition">+</span></span><br><span class="line"><span class="addition">+		errTime := time.AfterFunc(deadlineTerm, func() &#123;</span></span><br><span class="line"><span class="addition">+			log.Error().Msgf(&quot;job process time error: %s sec has passed&quot;, deadlineTerm.String())</span></span><br><span class="line"><span class="addition">+		&#125;)</span></span><br><span class="line"><span class="addition">+		defer errTime.Stop()</span></span><br><span class="line"><span class="addition">+</span></span><br><span class="line"><span class="addition">+		return fn(ctx, e)</span></span><br><span class="line"><span class="addition">+	&#125;</span></span><br><span class="line"><span class="addition">+&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>同様の処理を、<code>lambda_middleware.go</code>、<code>lambda_tin_middleware.go</code>、<code>lambda_tout_middleware.go</code> に追加すれば完成です。</p>
+<p>呼び出し側の <code>cmd/tintoutlambda/main.go</code> などには影響せずに横断的な遅延チェックを行えます。</p>
+<h2 id="シグネチャが異なるミドルウェアを呼び出してしまった場合"><a href="#シグネチャが異なるミドルウェアを呼び出してしまった場合" class="headerlink" title="シグネチャが異なるミドルウェアを呼び出してしまった場合"></a>シグネチャが異なるミドルウェアを呼び出してしまった場合</h2><p>例えば、本来lambdatintoutmiddleware.DoTinTOut()を呼び出すべきはずが、誤って <code>lambdatintoutmiddleware.DoOut()</code> を呼び出してしまったとします。</p>
+<p>この場合、コンパイルエラーにすることができます。</p>
+<figure class="highlight diff"><figcaption><span>cmd/tintoutlambda/main.go</span></figcaption><table><tr><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line"><span class="deletion">-	lambda.Start(lambdatintoutmiddleware.DoTinTOut(tintout.Handle))</span></span><br><span class="line"><span class="addition">+	lambda.Start(lambdatintoutmiddleware.DoOut(tintout.Handle)) // コンパイルエラー(Cannot infer TI)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>リフレクションでゆるふわ対応していたときは、実行時で検知（あるいは静的解析でがんばるか）だったので、レビュー時なども安心感があります。</p>
+<h2 id="運用してみて"><a href="#運用してみて" class="headerlink" title="運用してみて"></a>運用してみて</h2><p>今の私のチームは数十のLambdaがあり、Lambdaを追加するたびに共通的な処理が行えているかレビューするのは大変でした。また、共通的な処理がLambdaによって微妙に進化し始めるなど危険な状態でした。それらは完全に解消し、コード数も減ってハッピーな状態です。</p>
+<p>ミドルウェアの呼び出しの使い分けはさほど難しくもなく、コンパイルエラーで誤りにはすぐ気がつくことができるためか、チームメンバーからも特に問い合わせが無く、今のところ何か困ったことにはなっていません。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>AWS Lambdaの関数ハンドラのミドルウェアを、http.HandlerFuncのようにして作ってみました。Lambda関数ハンドラのシグネチャは、http.HandlerFuncより窓口が広いので、ジェネリクスを用いるとスッキリするよという話でした。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20240329a/&related=twitterapi%2Ctwitter&text=Go%E3%81%A7AWS%20Lambda%E3%81%AE%E3%83%9F%E3%83%89%E3%83%AB%E3%82%A6%E3%82%A7%E3%82%A2%E3%82%92%E3%82%B8%E3%82%A7%E3%83%8D%E3%83%AA%E3%82%AF%E3%82%B9%E3%82%92%E7%94%A8%E3%81%84%E3%81%A6%E5%AE%9F%E8%A3%85%E3%81%99%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240329a/&t=Go%E3%81%A7AWS%20Lambda%E3%81%AE%E3%83%9F%E3%83%89%E3%83%AB%E3%82%A6%E3%82%A7%E3%82%A2%E3%82%92%E3%82%B8%E3%82%A7%E3%83%8D%E3%83%AA%E3%82%AF%E3%82%B9%E3%82%92%E7%94%A8%E3%81%84%E3%81%A6%E5%AE%9F%E8%A3%85%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240329a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240329a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2022.10.21</span><span class="snscount">&#9825;67</span><a href=/articles/20221021a/ title="システム間のデータ連携として、他システムが出力した CSV ファイルを Go で読み込んでリレーショナルデータベースにファイルのデータを保存する、という処理がありました。CSV の値をデコードしたあとに共通的な処理を差し込みたいユースケースで Decorator パターンを使って実装をしました。">CSV処理における共通処理をDecoratorパターンで実現する</a></li><li class="related-posts-item"><span>2022.05.10</span><span class="snscount">&#9825;54</span><a href=/articles/20220510a/ title="2022/04/06にGAになったと発表された、Lambda Function URLsは、AWS Lambdaに直接HTTPSエンドポイントを追加できるというもので、API Gateway（やALB）無しでWeb APIやサイトを構築できると話題になりました。">Lambda Function URLs をGoでお試し。実行時間の上限（タイムアウト）やWeb API構築周りで気になること</a></li><li class="related-posts-item"><span>2020.07.27</span><span class="snscount">&#9825;9</span><a href=/articles/20200727/ title="[サーバレス連載企画]の8回目です。TIG DXユニットの真野です。ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。[工場をハックするための基本知識] の記事を書いた棚井さんと同じチームに所属しています。[サーバレス連載企画] の第8弾目として、Serverlessの代表格であるAWS LambdaでGoを用いてKinesisに対するKPL/KCL相当の処理についてまとめていきます。">GoからAWS KinesisのAggregationFormatを利用する</a></li><li class="related-posts-item"><span>2020.06.30</span><span class="snscount">&#9825;155</span><a href=/articles/20200630/ title="業務でヘビーユーズしているgo-swaggerについての開発Tipsをまとめました。">go-swaggerを用いたWebアプリケーション開発Tips19選</a></li><li class="related-posts-item"><span>2020.03.26</span><span class="snscount">&#9825;8</span><a href=/articles/20200326/ title="サーバレス連載の第2弾はLambdaアプリをGoで開発する中で調べた内容や、Tipsを紹介します。">Serverless連載2: AWS Lambda×Goの開発Tips</a></li><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;565</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E6%8F%90%E7%9F%A5%E8%AD%98"><span class="toc-text">前提知識</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B1%E9%80%9A%E3%81%A7%E8%A1%8C%E3%81%84%E3%81%9F%E3%81%84%E5%87%A6%E7%90%86%E3%82%92%E3%83%87%E3%82%B3%E3%83%AC%E3%83%BC%E3%82%BF%E3%81%A7%E6%89%B1%E3%81%86%E3%81%AE%E6%84%8F"><span class="toc-text">共通で行いたい処理をデコレータで扱うの意</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#No1-%E3%83%97%E3%83%AC%E3%83%BC%E3%83%B3%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3%E3%81%AE%E3%83%87%E3%82%B3%E3%83%AC%E3%83%BC%E3%82%BF%E5%AE%9F%E8%A3%85"><span class="toc-text">No1. プレーンパターンのデコレータ実装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#No2-TIn%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3%E3%81%AE%E3%83%87%E3%82%B3%E3%83%AC%E3%83%BC%E3%82%BF%E5%AE%9F%E8%A3%85"><span class="toc-text">No2. TInパターンのデコレータ実装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#No3-TOut%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3%E3%81%AE%E3%83%87%E3%82%B3%E3%83%AC%E3%83%BC%E3%82%BF%E5%AE%9F%E8%A3%85"><span class="toc-text">No3. TOutパターンのデコレータ実装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#No4-TInTOut%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3%E3%81%AE%E3%83%87%E3%82%B3%E3%83%AC%E3%83%BC%E3%82%BF%E5%AE%9F%E8%A3%85"><span class="toc-text">No4. TInTOutパターンのデコレータ実装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A5%E3%81%AE%E5%85%B1%E9%80%9A%E5%87%A6%E7%90%86%E3%82%92%E8%BF%BD%E5%8A%A0%E3%81%97%E3%81%9F%E3%81%84"><span class="toc-text">別の共通処理を追加したい</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%B7%E3%82%B0%E3%83%8D%E3%83%81%E3%83%A3%E3%81%8C%E7%95%B0%E3%81%AA%E3%82%8B%E3%83%9F%E3%83%89%E3%83%AB%E3%82%A6%E3%82%A7%E3%82%A2%E3%82%92%E5%91%BC%E3%81%B3%E5%87%BA%E3%81%97%E3%81%A6%E3%81%97%E3%81%BE%E3%81%A3%E3%81%9F%E5%A0%B4%E5%90%88"><span class="toc-text">シグネチャが異なるミドルウェアを呼び出してしまった場合</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%81%8B%E7%94%A8%E3%81%97%E3%81%A6%E3%81%BF%E3%81%A6"><span class="toc-text">運用してみて</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (440)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (267)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (98)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (62)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (35)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
