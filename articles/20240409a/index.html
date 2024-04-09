@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Testcontainersを用いてテスト実行前の docker compose up を無くし、Goで並列テストする | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="春の入門祭り2024の1記事目です。 はじめにTIG真野です。 Testcontainers を用いて、単体テスト実行前に docker compose up -d 無しで、PostgreSQLにアクセスする単体テストを行う、入門記事です。 恩恵は次のような開発者体感の向上が個人的にあります。  テストを実行するうえで、別プロセスのサービスを起動しておく必要があるといった前提条件を考えなくても済む">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Testcontainersを用いてテスト実行前の docker compose up を無くし、Goで並列テストする | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240409a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="春の入門祭り2024の1記事目です。 はじめにTIG真野です。 Testcontainers を用いて、単体テスト実行前に docker compose up -d 無しで、PostgreSQLにアクセスする単体テストを行う、入門記事です。 恩恵は次のような開発者体感の向上が個人的にあります。  テストを実行するうえで、別プロセスのサービスを起動しておく必要があるといった前提条件を考えなくても済む">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240409a/test-workflow.png">
+<meta property="article:published_time" content="2024-04-08T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-04-09T11:59:58.036Z">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="テスト">
+<meta property="article:tag" content="Testcontainers">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240409a/test-workflow.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240409a/">
+  <meta content="Go,テスト,Testcontainers" name="keywords">
+  <meta content="真野隼記" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Programming/">Programmingカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Testcontainersを用いてテスト実行前の docker compose up を無くし、Goで並列テストする
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240409a_Testcontainersを用いてテスト実行前の_docker_compose_up_を無くし、Goで並列テストする.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240409a_Testcontainersを用いてテスト実行前の_docker_compose_up_を無くし、Goで並列テストする" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-04-08T15:00:00.000Z" itemprop="datePublished">2024.04.09</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98" title="真野隼記さんの記事一覧へ" class="post-author">真野隼記</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Go/" title="Goタグの記事へ" class="tag-list-link">Go言語</a>
+  
+    
+    <a href="/tags/テスト/" title="テストタグの記事へ" class="tag-list-link">テスト</a>
+  
+    
+    <a href="/tags/Testcontainers/" title="Testcontainersタグの記事へ" class="tag-list-link">Testcontainers</a>
+  
+
+</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p><a href="/articles/20240408a/">春の入門祭り2024</a>の1記事目です。</p>
+<h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>TIG真野です。</p>
+<p>Testcontainers を用いて、単体テスト実行前に <code>docker compose up -d</code> 無しで、PostgreSQLにアクセスする単体テストを行う、入門記事です。</p>
+<p>恩恵は次のような開発者体感の向上が個人的にあります。</p>
+<ul>
+<li>テストを実行するうえで、別プロセスのサービスを起動しておく必要があるといった前提条件を考えなくても済むため、テストを行うビジネスロジックに集中できる<ul>
+<li><code>docker compose up -d</code> 打たないだけだが、テストに必要なコンテナを考慮しなくても済む</li>
+<li>停止し忘れて、別のリポジトリの開発するときに混乱しなくても済む</li>
+</ul>
+</li>
+<li>並列テストしやすくなるので、テストの実行速度が向上する<ul>
+<li>Goにおいて、複数のパッケージを同時にテストするとき、 <code>-p 1</code> で絞らずに済む</li>
+</ul>
+</li>
+</ul>
+<h2 id="Testcontainers-とは"><a href="#Testcontainers-とは" class="headerlink" title="Testcontainers とは"></a>Testcontainers とは</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://testcontainers.com/">https://testcontainers.com/</a></li>
+</ul>
+<p>テストコード上で任意のコンテナを起動・停止できるドライバのようなライブラリです。Java, Go, Python, Rustなど様々な言語でをサポートしています。次はGoでredisを起動するコードです。Dockerfileで記載されていた内容を、Goの構造体に渡するとコンテナが起動しそうだということが分かると思います。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest&#123;</span><br><span class="line">    ContainerRequest: testcontainers.ContainerRequest&#123;</span><br><span class="line">        Image:        <span class="string">&quot;redis:5.0.3-alpine&quot;</span>,</span><br><span class="line">        ExposedPorts: []<span class="type">string</span>&#123;<span class="string">&quot;6379/tcp&quot;</span>&#125;,</span><br><span class="line">        WaitingFor:   wait.ForLog(<span class="string">&quot;Ready to accept connections&quot;</span>),</span><br><span class="line">    &#125;,</span><br><span class="line">    Started:          <span class="literal">true</span>,</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>TestcontainersのAPIとしてはDockerfileを読み込んで起動させることもできます。</p>
+<p>テストコードとの組み合わせは、<a target="_blank" rel="noopener" href="https://testcontainers.com/getting-started/">getting-started</a>にかかれていた図が分かりやすいです。</p>
+<p>「Set Up」にてTestcontainers経由でコンテナを取り上げ、テストでそれら立ち上げたサービスにアクセスし、テスト終了後にコンテナを削除する、という流れです。</p>
+<img src="/images/20240409a/test-workflow.png" alt="test-workflow.png" width="820" height="326" loading="lazy">
+
+<p>テストコード上でコンテナを起動するという発想がない場合は、手動でコンテナを起動したり、テストスクリプト上（MakefileやTaskfile）に記載していたかと思いますが、単なる起動はともかく、コンテナの破棄を含めたライフサイクル管理は少し手間でした。また、よくありがちなミスは、コンテナは起動したけど、必要なリソースリソース（例えばRDBだとテーブル、S3だとバケットなど）の作成が終わっていないのに、テストが実行されてFailになってしまうというミスも私はやりがちです。</p>
+<p>Testcontainersはそれらの負荷を低減してくれます。</p>
+<h2 id="PostgreSQLを利用する"><a href="#PostgreSQLを利用する" class="headerlink" title="PostgreSQLを利用する"></a>PostgreSQLを利用する</h2><p>RDB（PostgreSQL）をテストで用いるときに、必要となるテーブルは作成されている前提が多いでしょう。例えば次のように schema ディレクトリ配下にCREATE文のSQLファイルが存在しているとします。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">.</span><br><span class="line">├── schema  <span class="comment"># DDL</span></span><br><span class="line">│   ├── create_m_xxx_xxx_1.sql</span><br><span class="line">│   ├── create_m_xxx_xxx_2.sql</span><br><span class="line">│   ├── ...</span><br><span class="line">│   └── create_m_xxx_xxx_9.sql</span><br><span class="line">│</span><br><span class="line">├── app    <span class="comment"># 各アプリ（パッケージ名をID管理する大人な管理をしているとします）</span></span><br><span class="line">│   ├── bl01</span><br><span class="line">│   |     ├── ...</span><br><span class="line">|   |     └── handler_test.go <span class="comment"># テストコード</span></span><br><span class="line">│   ├── bl02</span><br><span class="line">│   ├── bl03</span><br><span class="line">│   └── ...</span><br><span class="line">└── ...</span><br></pre></td></tr></table></figure>
+
+<p>PostgreSQLのオフィシャルイメージでは、<a target="_blank" rel="noopener" href="https://hub.docker.com/_/postgres#:~:text=and%20POSTGRES_DB.-,Initialization%20scripts,-If%20you%20would"><code>/docker-entrypoint-initdb.d/</code> 配下にSQLファイルをコピーすると、起動時にSQLを実行してくれます</a>。これをTestcontainersを用いてDDL実行済みのPostgreSQLを起動します。</p>
+<h2 id="moduleの利用"><a href="#moduleの利用" class="headerlink" title="moduleの利用"></a>moduleの利用</h2><p>Testcontainers にはDockerfileで指定できる内容を実現するAPIが揃っているため、自分なりに細かくチューニングしても良いかと思いますが、一般的には「モジュール」と呼ばれる、良い感じに実装されたヘルパー関数のようなパッケージを経由して利用することが多いようです。このモジュールの中には、各プロダクトのベンダーと提携して作られた公式と呼ばれるものもあり、クオリティが高く保たれているため、基本的にここにある＋利用したい言語で存在するのであればモジュール経由でTestcontainersを利用することを私も推奨します。低レベルのAPIの利用を最初は試していましたが、イマイチ上手く動かせなかったところを、モジュールを利用するとすぐに解消されたことが何度かありました。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://testcontainers.com/modules/">https://testcontainers.com/modules/</a></li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://testcontainers.com/modules/postgresql/">PostgreSQLモジュール</a>はGo対応もしていますのでそのまま利用できます。</p>
+<p>今回は複数のテストコードでコンテナを呼び出したいので、ヘルパーとして <code>testonly/testcontainers.go</code> のファイルを作ります。</p>
+<p><code>/docker-entrypoint-initdb.d/</code> の起動スクリプトですが、PostgreSQLのモジュールでは、ディレクトリごとコピーはできないため、ファイルの一覧を取得して、 <code>postgres.WithInitScripts(scripts...)</code> で渡しています。</p>
+<p>次のポイントとして、<code>testcontainers.WithWaitStrategy()</code> の部分ですが、これは起動スクリプトで作成したテーブルが存在するまでWaitさせるという指示です。他にもコンテナが起動するまでWaitするなど様々な指定ができますが、この例では <code>m_xxx_xxx_1 </code> テーブルが存在するまで確認させるようにしています。これで、必要なテーブルが作成されないまま、テストで検証するアプリコードが動いてしまうことを防ぎます。</p>
+<figure class="highlight go"><figcaption><span>testcontainers.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> testonly</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;net&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;testing&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/go-connections/nat&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/testcontainers/testcontainers-go&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/testcontainers/testcontainers-go/modules/postgres&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/testcontainers/testcontainers-go/wait&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> PostgresContainer <span class="keyword">struct</span> &#123;</span><br><span class="line">	postgres.PostgresContainer</span><br><span class="line">	ConnectionString <span class="type">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c PostgresContainer)</span></span> Down() &#123;</span><br><span class="line">	<span class="keyword">if</span> err := c.Terminate(context.Background()); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Printf(<span class="string">&quot;Could not stop postgres: %s\n&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SetupDB</span><span class="params">(t *testing.T)</span></span> *PostgresContainer &#123;</span><br><span class="line">	t.Helper()</span><br><span class="line">	ctx := context.Background()</span><br><span class="line"></span><br><span class="line">	entries, err := os.ReadDir(<span class="string">&quot;../../schema&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		t.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	scripts := <span class="built_in">make</span>([]<span class="type">string</span>, <span class="number">0</span>, <span class="built_in">len</span>(entries))</span><br><span class="line">	<span class="keyword">for</span> _, e := <span class="keyword">range</span> entries &#123;</span><br><span class="line">		scripts = <span class="built_in">append</span>(scripts, <span class="string">&quot;../../schema&quot;</span>+e.Name())</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	pgContainer, err := postgres.RunContainer(ctx,</span><br><span class="line">		testcontainers.WithImage(<span class="string">&quot;postgres:15.5&quot;</span>),</span><br><span class="line">		postgres.WithInitScripts(scripts...),</span><br><span class="line">		postgres.WithDatabase(<span class="string">&quot;postgres&quot;</span>),</span><br><span class="line">		postgres.WithUsername(<span class="string">&quot;local&quot;</span>),</span><br><span class="line">		postgres.WithPassword(<span class="string">&quot;pass&quot;</span>),</span><br><span class="line">		testcontainers.WithWaitStrategy(</span><br><span class="line">			wait.ForSQL(<span class="string">&quot;5432&quot;</span>, <span class="string">&quot;postgres&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(host <span class="type">string</span>, port nat.Port)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">				<span class="keyword">return</span> fmt.Sprintf(<span class="string">&quot;postgres://local:pass@%s/postgres?sslmode=disable&quot;</span>, net.JoinHostPort(host, port.Port()))</span><br><span class="line">			&#125;).WithQuery(<span class="string">&quot;select 1 from m_xxx_xxx_9 limit 1&quot;</span>).WithPollInterval(<span class="number">1</span>*time.Second).WithStartupTimeout(<span class="number">10</span>*time.Second)),</span><br><span class="line">	)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;postgres run container: %s&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	connStr, err := pgContainer.ConnectionString(ctx, <span class="string">&quot;sslmode=disable&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		t.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> &amp;PostgresContainer&#123;</span><br><span class="line">		PostgresContainer: pgContainer,</span><br><span class="line">		ConnectionString:  connStr,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上記のようなヘルパー関数を、テストコードから呼び出します。</p>
+<p>ポイントは、接続文字列を<code>pgContainer.ConnectionString</code> から取得しているところです。理由ですがTestcontainersを用いると、ホスト側で利用するポートはランダムに決定します。そのため5432で決め打ちではなく、TestcontainersのPostgreSQLモジュールが割り当てた値を利用する必要があります。</p>
+<figure class="highlight go"><figcaption><span>handler_test.go</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestHandler_GetXxxXxx</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	pgContainer := testonly.SetupDB(t) <span class="comment">// PostgreSQL起動</span></span><br><span class="line">	t.Cleanup(pgContainer.Down)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// この例ではjackc/pgx/v4 を利用してコネクション接続</span></span><br><span class="line">	pool, err := pgxpool.Connect(context.Background(), pgContainer.ConnectionString)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		t.Fatalf(<span class="string">&quot;connect db for test ,dsn = %s: %v&quot;</span>, dsn, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 個別のテスト</span></span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Testcontainers-を用いると-Goのパッケージ構成は-package-by-feature-がマッチする？"><a href="#Testcontainers-を用いると-Goのパッケージ構成は-package-by-feature-がマッチする？" class="headerlink" title="Testcontainers を用いると Goのパッケージ構成は package by feature がマッチする？"></a>Testcontainers を用いると Goのパッケージ構成は package by feature がマッチする？</h2><p>Testcontainersを用いると、例えば bl01, bl02間で共通するDBテーブルが存在したとしても、利用するコンテナが別になるため、当たり前ですが、特段の工夫無しで並列にテストを動かせるようになります。モックの利用を無しにそれを簡単に行えるのは素敵だと感じます。</p>
+<p>この恩恵を得やすくするためには、 <code>package by feature</code>、つまり機能ごとのパッケージで作っておくとよいでしょう。機能単位に並列でテストができ、機能単位ゆえそれなりにテスト実行時間がならされていると思うので、テスト実行時間の短縮が見込みやすいと考えられるためです。</p>
+<p>逆に、<code>package by layer</code>、つまりDBアクセスするコントローラ層（controller, usecase, handlerなど）でパッケージを切って、その配下に <code>xxx_handler.go</code>, <code>yyy_handler.go</code> などをフラットに並べて配置をしない方が良いと思いました（<code>handler</code> パッケージの配下に、サブパッケージを作れば別ですが、それはしないとします）。この場合はRDBなどのリソースにアクセスするため、おそらく最も時間がかかるcontrollerのようなパッケージのテストを分割実行しにくいためです。これはテストポリシーとして、リポジトリのようなDB層単体のテストコードも書くといった、レイヤーごとにテストサイズMediumのテストを実行するケース（個人的に出会ったことがないですが、ライブラリなどはありえる？）には当てはまらないと思いますので、ここに書いていない前提が色々入った上での意見になっていると思います。</p>
+<h2 id="使ってみての所感"><a href="#使ってみての所感" class="headerlink" title="使ってみての所感"></a>使ってみての所感</h2><p>Testcontainers経由での起動ですが、DDLが20ファイルほどでだいたい3~5秒程度の起動時間がかかります。これをどう見るかですが、個人的には複数のパッケージを並列でテスト実行できるというメリットがあり、受け入れられると感じています。</p>
+<p>DBのような外部プロセスのサービスを、全テストで共有していた場合は、同じテーブルを複数のテストで書き換え競合してテストが落ちることを回避するために、同時実行数を1に抑えるため、<code>go test</code> に <code>-p 1</code> オプションを加えていましたが、これを無くせるのは嬉しいです。</p>
+<p>Testcontainersを利用する前は、ローカル実行用の、Dockerfile, compose.yaml とTestcontainersのコードとのダブルメンテが嫌だなと感じていましたが、上記の利便性が大きいのでいつの間にか素直に受け入れられています。Testcontainersにも<a target="_blank" rel="noopener" href="https://golang.testcontainers.org/features/build_from_dockerfile/">Dockerfileやcompose.yaml を利用するAPI</a>があるので、工夫すればダブルメンテ無しでメリットを享受することもできるかもしれませんが、私は未検証です。</p>
+<p>また、テスト毎にコンテナを起動するメリットは、他のパッケージのテストが副作用を起こし、まれにテストが落ちるパターンのフレーキーテスト（Flaky Test：実行結果が不安定なテストのこと）を発生させにくくするメリットもあるかと思います。例えば、テスト実行前に、前提とするマスタデータが別のパッケージのテスト（特に自分以外の開発者の作業で行われた場合）で書き換えられていたりして、地味にハマるケースは回避できるでしょう。</p>
+<h2 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h2><p>Testcontainersを用いてPostgreSQLにアクセスするGoのテストの書き方を紹介しました。</p>
+<p>今回は割愛しましたが、私は <code>docker compose up</code> にて手動で起動済みの場合は、Testcontainers経由で起動せず、起動中のコンテナをそのままテストで利用するといった実装を入れています。そうすると、テスト実行後のDBの状態を見たいときと、単にテストを動かしたいだけのケースを棲み分けができ、開発時の切り分けがとても便利になりました。</p>
+<p>上記のようなややトリッキーな制御も、Testcontainersだと比較的容易に実現でき、名前の通りテストコードとの統合性は高いと感じます。今後は他の案件にも横展開していこうと思います。オススメです。</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/share?url=https://future-architect.github.io/articles/20240409a/&related=twitterapi%2Ctwitter&text=Testcontainers%E3%82%92%E7%94%A8%E3%81%84%E3%81%A6%E3%83%86%E3%82%B9%E3%83%88%E5%AE%9F%E8%A1%8C%E5%89%8D%E3%81%AE%20docker%20compose%20up%20%E3%82%92%E7%84%A1%E3%81%8F%E3%81%97%E3%80%81Go%E3%81%A7%E4%B8%A6%E5%88%97%E3%83%86%E3%82%B9%E3%83%88%E3%81%99%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240409a/&t=Testcontainers%E3%82%92%E7%94%A8%E3%81%84%E3%81%A6%E3%83%86%E3%82%B9%E3%83%88%E5%AE%9F%E8%A1%8C%E5%89%8D%E3%81%AE%20docker%20compose%20up%20%E3%82%92%E7%84%A1%E3%81%8F%E3%81%97%E3%80%81Go%E3%81%A7%E4%B8%A6%E5%88%97%E3%83%86%E3%82%B9%E3%83%88%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240409a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240409a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.03.11</span><span class="snscount">&#9825;565</span><a href=/articles/20200311/ title="Java to Go in-depth tutorialの日本語訳です。原文の著者に許諾を得て翻訳・公開いたします。このチュートリアルは、JavaプログラマーがすばやくGo言語にキャッチアップできるようにすることを目的としています。">JavaプログラマーのためのGo言語入門</a></li><li class="related-posts-item"><span>2024.03.29</span><span class="snscount">&#9825;5</span><a href=/articles/20240329a/ title="AWS SDK for Goを用いてAWS Lambdaを実装する際に、共通的に行いたいミドルウェア的な処理をデコレータで実装する方法を説明します">GoでAWS Lambdaのミドルウェアをジェネリクスを用いて実装する<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.03.12</span><span class="snscount">&#9825;4</span><a href=/articles/20240312a/ title="Terraformファイルをコード生成するため、hclwriteというGoパッケージの使い方を調べました。">Terraform連載2024 hclwriteを用いたtfコード生成入門<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.03.07</span><span class="snscount">&#9825;36</span><a href=/articles/20240307a/ title="単なる翻訳ではなく自分たちならではの付加価値を提供するための執筆のフローや秘訣を、初心者向けにまとめます">Goリリースノートから技術ブログを書く流れ基礎</a></li><li class="related-posts-item"><span>2024.02.14</span><span class="snscount">&#9825;34</span><a href=/articles/20240214a/ title="Go 1.22 ライブラリのマイナーアップデートである net, net/http, net/netip を取り上げます。">Go 1.22リリース連載 net, net/http, net/netip</a></li><li class="related-posts-item"><span>2024.02.05</span><span class="snscount">&#9825;10</span><a href=/articles/20240205a/ title="Go 1.22のアップデートのツーリングのうち Vet と、ライブラリのマイナーアップデートである log/slog, testing/slogtest を取り上げます。">Go 1.22リリース連載 vet, log/slog, testing/slogtest</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+  <div class="card">
+    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
+    <ul class="reference-post-link"><li class="reference-posts-item"><a href=/articles/20240408a/ title="春の入門連載2024のインデックス記事です。">春の入門連載2024を始めます<span class="newitem">NEW</span></a></li></ul>
+  </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Testcontainers-%E3%81%A8%E3%81%AF"><span class="toc-text">Testcontainers とは</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PostgreSQL%E3%82%92%E5%88%A9%E7%94%A8%E3%81%99%E3%82%8B"><span class="toc-text">PostgreSQLを利用する</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#module%E3%81%AE%E5%88%A9%E7%94%A8"><span class="toc-text">moduleの利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Testcontainers-%E3%82%92%E7%94%A8%E3%81%84%E3%82%8B%E3%81%A8-Go%E3%81%AE%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8%E6%A7%8B%E6%88%90%E3%81%AF-package-by-feature-%E3%81%8C%E3%83%9E%E3%83%83%E3%83%81%E3%81%99%E3%82%8B%EF%BC%9F"><span class="toc-text">Testcontainers を用いると Goのパッケージ構成は package by feature がマッチする？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%A6%E3%81%AE%E6%89%80%E6%84%9F"><span class="toc-text">使ってみての所感</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%95%E3%81%84%E3%81%94%E3%81%AB"><span class="toc-text">さいごに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (446)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (267)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (100)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (62)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (35)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
