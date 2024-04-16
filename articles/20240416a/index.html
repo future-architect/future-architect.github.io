@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>MLflow上でOptunaによって生成される大量のrunを整理する | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは、SAIG&#x2F;MLOpsチームでアルバイトをしている齋藤です。 MLflowは機械学習の管理を扱うツールとして、Optunaはハイパーパラメータを自動調整するツールとしてともに広く使用されているツールです。MLflowとOptunaを同時に利用した際に、Optunaが複数回試行することによってMLflow上にrunが大量に生成され、MLflow上で試行結果が見づらくなりま">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MLflow上でOptunaによって生成される大量のrunを整理する | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240416a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは、SAIG&#x2F;MLOpsチームでアルバイトをしている齋藤です。 MLflowは機械学習の管理を扱うツールとして、Optunaはハイパーパラメータを自動調整するツールとしてともに広く使用されているツールです。MLflowとOptunaを同時に利用した際に、Optunaが複数回試行することによってMLflow上にrunが大量に生成され、MLflow上で試行結果が見づらくなりま">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240416a/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240416a/image_2.png">
+<meta property="article:published_time" content="2024-04-15T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-04-16T05:02:04.656Z">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="MLOps">
+<meta property="article:tag" content="MLflow">
+<meta property="article:tag" content="Optuna">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240416a/image.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240416a/">
+  <meta content="Python,MLOps,MLflow,Optuna" name="keywords">
+  <meta content="齋藤智和" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/DataScience/">DataScienceカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">MLflow上でOptunaによって生成される大量のrunを整理する
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240416a_MLflow上でOptunaによって生成される大量のrunを整理する.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240416a_MLflow上でOptunaによって生成される大量のrunを整理する" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-04-15T15:00:00.000Z" itemprop="datePublished">2024.04.16</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E9%BD%8B%E8%97%A4%E6%99%BA%E5%92%8C" title="齋藤智和さんの記事一覧へ" class="post-author">齋藤智和</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/Python/" title="Pythonタグの記事へ" class="tag-list-link">Python</a>
+  
+    
+    <a href="/tags/MLOps/" title="MLOpsタグの記事へ" class="tag-list-link">MLOps</a>
+  
+    
+    <a href="/tags/MLflow/" title="MLflowタグの記事へ" class="tag-list-link">MLflow</a>
+  
+    
+    <a href="/tags/Optuna/" title="Optunaタグの記事へ" class="tag-list-link">Optuna</a>
+  
+
+</li>
+            <li class="blog-info-item">100 View</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h2 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h2><p>こんにちは、SAIG&#x2F;MLOpsチームでアルバイトをしている齋藤です。</p>
+<p><a target="_blank" rel="noopener" href="https://mlflow.org/">MLflow</a>は機械学習の管理を扱うツールとして、<a target="_blank" rel="noopener" href="https://www.preferred.jp/ja/projects/optuna/">Optuna</a>はハイパーパラメータを自動調整するツールとしてともに広く使用されているツールです。MLflowとOptunaを同時に利用した際に、Optunaが複数回試行することによってMLflow上にrunが大量に生成され、MLflow上で試行結果が見づらくなります。</p>
+<p>本記事では、大量に生成されるrunに親のrunを付与することで、MLflowのWebUIから見やすくする方法を提示します。</p>
+<h2 id="課題"><a href="#課題" class="headerlink" title="課題"></a>課題</h2><p>Optunaは事前に指定した範囲の中からハイパーパラメータの組み合わせを自動的に選択してモデルを学習して評価するという試行を繰り返すことで、良いハイパーパラメータを探索するツールであり、これにより手作業でハイパーパラメータを調整するのを省けます。</p>
+<p>MLflowは機械学習の管理について幅広く扱うツールであり、例えば各実験に使用されたハイパーパラメータや性能の記録などが出来るため、実験の再現などに役立ちます。</p>
+<p>これらは大変便利なツールなのですが、これらを組み合わせて使用した際、画像のようにMLflow上で結果を見た際に大量のrunが生成されて、結果一覧が見づらくなります。特に、条件を変化させてOptunaによる最適化を実行させた場合に、前回までのOptunaによって生成されたrunと今回分のrunの見分けが付けにくくなるという問題が発生します。</p>
+<img src="/images/20240416a/image.png" alt="image.png" width="1200" height="421" loading="lazy">
+
+<h2 id="課題の解決"><a href="#課題の解決" class="headerlink" title="課題の解決"></a>課題の解決</h2><h3 id="方針"><a href="#方針" class="headerlink" title="方針"></a>方針</h3><p>MLflowではrun毎にタグを設定できますが、その中でも<a target="_blank" rel="noopener" href="https://mlflow.org/docs/latest/tracking/tracking-api.html#system-tags">システムタグ</a>と呼ばれるタグがあり、MLflowの中で特殊な意味を持ちます。<br><code>mlflow.parentRunId</code>というタグはシステムタグの一つで、このタグに親のrunのIDを設定すると、WebUI上で親子のrunがネストした形で表示されるようになります。</p>
+<p>そのため…</p>
+<ol>
+<li>MLflowで空のrunを実行する。</li>
+<li>1で実行したrunを目的関数の中で親のrunとして設定する。</li>
+</ol>
+<p>…という2つの手順を踏めば、Optunaによって生成される大量のrunを一つの親runに結び付けることができます。</p>
+<h3 id="実装"><a href="#実装" class="headerlink" title="実装"></a>実装</h3><h4 id="1-MLflowで空のrunを実行する"><a href="#1-MLflowで空のrunを実行する" class="headerlink" title="1. MLflowで空のrunを実行する"></a>1. MLflowで空のrunを実行する</h4><p>まずMLflowで親のrunとなる空のrunを実行します。</p>
+<p>この時のrun_idは次に必要になるため保存しておきます。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">with</span> mlflow.start_run(experiment_id=<span class="number">0</span>) <span class="keyword">as</span> run:</span><br><span class="line">    parent_run_id = run.info.run_id</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-1で実行したrunを目的関数の中で親のrunとして設定する"><a href="#2-1で実行したrunを目的関数の中で親のrunとして設定する" class="headerlink" title="2. 1で実行したrunを目的関数の中で親のrunとして設定する"></a>2. 1で実行したrunを目的関数の中で親のrunとして設定する</h4><p>runにタグを設定するには<code>mlflow.set_tag</code>関数を使用すれば出来ます。</p>
+<p>sklearnのSGDClassifierの最適化を例にすると、目的関数は次のようになります。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">objective</span>(<span class="params">trial</span>) -&gt; <span class="built_in">float</span>:</span><br><span class="line">    <span class="keyword">with</span> mlflow.start_run(experiment_id=<span class="number">0</span>) <span class="keyword">as</span> run:</span><br><span class="line">        mlflow.set_tag(<span class="string">&quot;mlflow.parentRunId&quot;</span>, parent_run_id) <span class="comment"># start_runの直後に実行する</span></span><br><span class="line"></span><br><span class="line">        alpha = trial.suggest_float(<span class="string">&quot;alpha&quot;</span>, <span class="number">1e-5</span>, <span class="number">1e-1</span>, log=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">        wine = sklearn.datasets.load_wine()</span><br><span class="line">        classes = <span class="built_in">list</span>(<span class="built_in">set</span>(wine.target))</span><br><span class="line"></span><br><span class="line">        train_x, valid_x, train_y, valid_y = sklearn.model_selection.train_test_split(</span><br><span class="line">            wine.data, wine.target, test_size=<span class="number">0.25</span>, random_state=<span class="number">0</span></span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        clf = sklearn.linear_model.SGDClassifier(alpha=alpha)</span><br><span class="line">        clf.fit(train_x, train_y)</span><br><span class="line"></span><br><span class="line">        score = clf.score(valid_x, valid_y)</span><br><span class="line"></span><br><span class="line">        mlflow.log_param(<span class="string">&quot;alpha&quot;</span>, alpha)</span><br><span class="line">        mlflow.log_metric(<span class="string">&quot;accuracy&quot;</span>, score)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> score</span><br></pre></td></tr></table></figure>
+
+<p>実装全体として次のようになります。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> mlflow</span><br><span class="line"><span class="keyword">import</span> optuna</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sklearn</span><br><span class="line"><span class="keyword">import</span> sklearn.datasets</span><br><span class="line"><span class="keyword">import</span> sklearn.linear_model</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">objective</span>(<span class="params">trial</span>) -&gt; <span class="built_in">float</span>:</span><br><span class="line">    <span class="keyword">with</span> mlflow.start_run(experiment_id=<span class="number">0</span>) <span class="keyword">as</span> run:</span><br><span class="line">        mlflow.set_tag(<span class="string">&quot;mlflow.parentRunId&quot;</span>, parent_run_id) <span class="comment"># start_runの直後に実行する</span></span><br><span class="line"></span><br><span class="line">        alpha = trial.suggest_float(<span class="string">&quot;alpha&quot;</span>, <span class="number">1e-5</span>, <span class="number">1e-1</span>, log=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">        wine = sklearn.datasets.load_wine()</span><br><span class="line">        classes = <span class="built_in">list</span>(<span class="built_in">set</span>(wine.target))</span><br><span class="line"></span><br><span class="line">        train_x, valid_x, train_y, valid_y = sklearn.model_selection.train_test_split(</span><br><span class="line">            wine.data, wine.target, test_size=<span class="number">0.25</span>, random_state=<span class="number">0</span></span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        clf = sklearn.linear_model.SGDClassifier(alpha=alpha)</span><br><span class="line">        clf.fit(train_x, train_y)</span><br><span class="line"></span><br><span class="line">        score = clf.score(valid_x, valid_y)</span><br><span class="line"></span><br><span class="line">        mlflow.log_param(<span class="string">&quot;alpha&quot;</span>, alpha)</span><br><span class="line">        mlflow.log_metric(<span class="string">&quot;accuracy&quot;</span>, score)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> score</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    <span class="keyword">with</span> mlflow.start_run(experiment_id=<span class="number">0</span>) <span class="keyword">as</span> run:</span><br><span class="line">        parent_run_id = run.info.run_id</span><br><span class="line"></span><br><span class="line">    study = optuna.create_study()</span><br><span class="line">    study.optimize(objective, n_trials=<span class="number">30</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="結果"><a href="#結果" class="headerlink" title="結果"></a>結果</h2><p>上のコードを実行すると、Optunaによって実行された全ての試行がMLflowに送信されます。</p>
+<p>WebUI上では画像のように表示され、Optunaの実行単位ごとにrunがネストして表示されるので見やすくなりました。</p>
+<img src="/images/20240416a/image_2.png" alt="image.png" width="1200" height="391" loading="lazy">
+
+<h2 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h2><p>以上、<code>mlflow.parentRunId</code>というシステムタグにrunIDを設定するとWebUI上でrunがネストして表示されることを利用して、自動生成されるrunをUI上で整理して表示させるという話でした。</p>
+<p>MLflowのシステムタグはmlflow.parentRunId以外にも存在するので、それらを利用するとUI上で更なる恩恵が得られるかもしれません。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://mlflow.org/docs/latest/tracking/tracking-api.html#system-tags">https://mlflow.org/docs/latest/tracking/tracking-api.html#system-tags</a></li>
+<li><a target="_blank" rel="noopener" href="https://mlflow.org/">https://mlflow.org/</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.preferred.jp/ja/projects/optuna/">https://www.preferred.jp/ja/projects/optuna/</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/intent/tweet?url=https://future-architect.github.io/articles/20240416a/&related=twitterapi%2Ctwitter&text=MLflow%E4%B8%8A%E3%81%A7Optuna%E3%81%AB%E3%82%88%E3%81%A3%E3%81%A6%E7%94%9F%E6%88%90%E3%81%95%E3%82%8C%E3%82%8B%E5%A4%A7%E9%87%8F%E3%81%AErun%E3%82%92%E6%95%B4%E7%90%86%E3%81%99%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240416a/&t=MLflow%E4%B8%8A%E3%81%A7Optuna%E3%81%AB%E3%82%88%E3%81%A3%E3%81%A6%E7%94%9F%E6%88%90%E3%81%95%E3%82%8C%E3%82%8B%E5%A4%A7%E9%87%8F%E3%81%AErun%E3%82%92%E6%95%B4%E7%90%86%E3%81%99%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240416a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240416a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2020.06.26</span><span class="snscount">&#9825;73</span><a href=/articles/20200626/ title="今回は、機械学習の実験管理入門をテーマにMLflowについてご紹介させていただきます。">MLflowで実験管理入門</a></li><li class="related-posts-item"><span>2023.12.12</span><span class="snscount">&#9825;8</span><a href=/articles/20231212a/ title="Dev ContainersのPython環境を作っていきます。">Dev Containersの始め方(2) : Python環境</a></li><li class="related-posts-item"><span>2023.11.16</span><span class="snscount">&#9825;137</span><a href=/articles/20231116a/ title="Python Distilledという本がオライリーから出版されました。作者のDave Beazleyはかなり昔からPythonを使い込んでいる人ですので、この本には信頼しかない、と思い読んでみました">Python Distilledは幅広い人にPythonの基礎を叩き込む本</a></li><li class="related-posts-item"><span>2023.09.14</span><span class="snscount">&#9825;2</span><a href=/articles/20230914a/ title="LLMの実験管理ツール候補として、TruLens-Evalを検証しました。合わせて、LLMの実験管理についてまとめてみました。">【LLMOps】LLMの実験管理にTruLens-Evalを使ってみた</a></li><li class="related-posts-item"><span>2023.09.13</span><span class="snscount">&#9825;67</span><a href=/articles/20230913a/ title="「LLM開発のためにMLOpsチームがやるべきこと」というテーマで、従来のMLOpsとの違い・ツール・構成例等について調査・整理しました。LLMとはLarge Launguage Model（大規模言語モデル）の略であり..">LLM開発のためにMLOpsチームがやるべきこと</a></li><li class="related-posts-item"><span>2023.07.27</span><span class="snscount">&#9825;5</span><a href=/articles/20230727a/ title="エキスパートPythonプログラミング改訂4版が本屋に並び始めました。電子版も購入できます。改訂というと「ちょっと追加されたところを翻訳するだけで丸儲けやんけ」と思われる方もいるかもしれませんが、過去の中で一番大きく改訂されており、新規に一冊訳すのとほぼ変わらない、大変な翻訳作業になりました。">エキスパートPythonプログラミング改訂4版が発売されました</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AA%B2%E9%A1%8C"><span class="toc-text">課題</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AA%B2%E9%A1%8C%E3%81%AE%E8%A7%A3%E6%B1%BA"><span class="toc-text">課題の解決</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E9%87%9D"><span class="toc-text">方針</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9F%E8%A3%85"><span class="toc-text">実装</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-MLflow%E3%81%A7%E7%A9%BA%E3%81%AErun%E3%82%92%E5%AE%9F%E8%A1%8C%E3%81%99%E3%82%8B"><span class="toc-text">1. MLflowで空のrunを実行する</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1%E3%81%A7%E5%AE%9F%E8%A1%8C%E3%81%97%E3%81%9Frun%E3%82%92%E7%9B%AE%E7%9A%84%E9%96%A2%E6%95%B0%E3%81%AE%E4%B8%AD%E3%81%A7%E8%A6%AA%E3%81%AErun%E3%81%A8%E3%81%97%E3%81%A6%E8%A8%AD%E5%AE%9A%E3%81%99%E3%82%8B"><span class="toc-text">2. 1で実行したrunを目的関数の中で親のrunとして設定する</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E6%9E%9C"><span class="toc-text">結果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-text">参考</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (449)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (268)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (100)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (63)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (35)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
