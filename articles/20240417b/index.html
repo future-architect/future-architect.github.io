@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>Prometheus/Grafanaを使ってみる | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="こんにちは。TIGの伊藤です。 春の入門連載7日目です。 新しいこと、始めたい、知りたい普段、私の仕事はTerraformを主としたIaCを書いてインフラを作ったり管理することなのですが、ふと考えると、IaC以外の部分に対して取り組むきっかけがなく今までやってきていたような気もしてきました。とはいえ、いきなり全然違うことをするのでもなく、自分の裾野を少し広げる方向で考えていたところ、こちらの勉強会">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Prometheus&#x2F;Grafanaを使ってみる | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240417b/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="こんにちは。TIGの伊藤です。 春の入門連載7日目です。 新しいこと、始めたい、知りたい普段、私の仕事はTerraformを主としたIaCを書いてインフラを作ったり管理することなのですが、ふと考えると、IaC以外の部分に対して取り組むきっかけがなく今までやってきていたような気もしてきました。とはいえ、いきなり全然違うことをするのでもなく、自分の裾野を少し広げる方向で考えていたところ、こちらの勉強会">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240417b/prom_architecture.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240417b/スクリーンショット_2024-04-17_1.01.38.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240417b/スクリーンショット_2024-04-17_1.10.32.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240417b/スクリーンショット_2024-04-17_1.19.48.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240417b/スクリーンショット_2024-04-17_11.52.25.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240417b/スクリーンショット_2024-04-17_12.00.23.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240417b/スクリーンショット_2024-04-17_12.03.30.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240417b/スクリーンショット_2024-04-17_12.06.32.png">
+<meta property="article:published_time" content="2024-04-16T15:00:01.000Z">
+<meta property="article:modified_time" content="2024-04-17T04:03:45.500Z">
+<meta property="article:tag" content="prometheus">
+<meta property="article:tag" content="grafana">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240417b/prom_architecture.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240417b/">
+  <meta content="prometheus,grafana" name="keywords">
+  <meta content="伊藤太斉," name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Infrastructure/">Infrastructureカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">Prometheus/Grafanaを使ってみる
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240417b_Prometheus／Grafanaを使ってみる.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240417b_Prometheus／Grafanaを使ってみる" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-04-16T15:00:01.000Z" itemprop="datePublished">2024.04.17</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E4%BC%8A%E8%97%A4%E5%A4%AA%E6%96%89," title="伊藤太斉,さんの記事一覧へ" class="post-author">伊藤太斉,</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/prometheus/" title="prometheusタグの記事へ" class="tag-list-link">prometheus</a>
+  
+    
+    <a href="/tags/grafana/" title="grafanaタグの記事へ" class="tag-list-link">grafana</a>
+  
+
+</li>
+            <li class="blog-info-item">100 View</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <p>こんにちは。TIGの伊藤です。</p>
+<p><a href="/articles/20240408a/">春の入門連載</a>7日目です。</p>
+<h2 id="新しいこと、始めたい、知りたい"><a href="#新しいこと、始めたい、知りたい" class="headerlink" title="新しいこと、始めたい、知りたい"></a>新しいこと、始めたい、知りたい</h2><p>普段、私の仕事はTerraformを主としたIaCを書いてインフラを作ったり管理することなのですが、ふと考えると、IaC以外の部分に対して取り組むきっかけがなく今までやってきていたような気もしてきました。とはいえ、いきなり全然違うことをするのでもなく、自分の裾野を少し広げる方向で考えていたところ、こちらの勉強会を見つけました。</p>
+<p><a target="_blank" rel="noopener" href="https://grafana-meetup-japan.connpass.com/event/314500/">https://grafana-meetup-japan.connpass.com/event/314500/</a></p>
+<p>知り合いが告知していたことや、登壇される方々に興味を持って参加しました。しかし、「Grafanaほぼ触ったことない」の丸腰で行っても得るものが少なくなりそうなので、せっかくならと記事を書いています。</p>
+<p>動機としては上に書いた通りですが、監視システムとして同時に持ち上がってくるPrometheusもちょっとだけ入門して、取り組んでいきます。</p>
+<h2 id="今回のサンプル"><a href="#今回のサンプル" class="headerlink" title="今回のサンプル"></a>今回のサンプル</h2><p>今回のサンプルは以下に置いてあるので、このブログを読んで試してみたい方はぜひ使ってみてください。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/kaedemalu/prometheus-grafana-blog">https://github.com/kaedemalu/prometheus-grafana-blog</a></p>
+<h2 id="Prometheus"><a href="#Prometheus" class="headerlink" title="Prometheus"></a>Prometheus</h2><p>PrometheusはSoundCloud社によって開発されたオープンソースの監視ソフトウェアです。GoogleでKubernetesの前身となったBorgという分散システムがあり、これらを監視しているシステムであるBorgmonからも大いにインスパイアを受けており、いずれも分散システムのモニタリングに最適化されています。</p>
+<p>現在ではCloudNative Computing Foundation（CNCF）のGraduatedプロジェクトとしており、多くのユーザを持つOSSとなりました。</p>
+<p>仕組みとしては、従来の監視システムでよく使われるZabbixをはじめとしてエージェントを利用してメトリクスを取得、監視するものではなく、管理サーバ側が指定されたサーバに対しメトリクスを取得するPull型となっているのが大きな違いでしょう。<br>(今回の話では、だいたい下半分くらいが対象の記事となっています。）</p>
+<img src="/images/20240417b/prom_architecture.png" alt="prom_architecture.png" width="1200" height="721" loading="lazy">
+
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://prometheus.io/docs/introduction/overview/">Prometheus Overview</a>より引用</p>
+</blockquote>
+<p>EC2などのIaaSレベルでは、EC2本体のメトリクスを取得して、サーバ自体のリソース監視を行えますが、コンテナアプリであればコンテナアプリから取得される必要があります。この時にPrometheusであればコンテナ自体のメトリクスを取得することが可能になります。エージェントレスであることで従来EC2にインストールしていたエージェント分のリソースを減らすことができます。</p>
+<h3 id="アプリケーションを動かしてみる"><a href="#アプリケーションを動かしてみる" class="headerlink" title="アプリケーションを動かしてみる"></a>アプリケーションを動かしてみる</h3><p>実際にアプリケーションから取れるメトリクスをPrometheusで見てみましょう。</p>
+<p>今回、アプリケーションの言語はPythonを使用し、簡易なAPIサーバを立てるためにFastAPIを用いました。</p>
+<p>アプリケーションは以下のようにヘルスチェックパスとPrometheusで<code>/metrics</code>のパスから情報を取得できるようにしました。</p>
+<figure class="highlight py"><figcaption><span>app.py</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> fastapi <span class="keyword">import</span> FastAPI</span><br><span class="line"><span class="keyword">from</span> prometheus_fastapi_instrumentator <span class="keyword">import</span> Instrumentator</span><br><span class="line"></span><br><span class="line">app = FastAPI()</span><br><span class="line"></span><br><span class="line">Instrumentator(</span><br><span class="line">    excluded_handlers=[<span class="string">&quot;/metrics&quot;</span>],</span><br><span class="line">).instrument(app).expose(app=app, endpoint=<span class="string">&quot;/metrics&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.get(<span class="params"><span class="string">&quot;/health&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">health</span>():</span><br><span class="line">    response = &#123;</span><br><span class="line">        <span class="string">&#x27;status&#x27;</span>: <span class="string">&#x27;up&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> response</span><br></pre></td></tr></table></figure>
+
+<p>FastAPIでPrometheusのメトリクスを取得可能にするため、以下のライブラリを使用しています。今回はカスタマイズをかけていないですが、がっつり使い込むことを考えるとさらに作り込める余地はありそうです。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/trallnag/prometheus-fastapi-instrumentator">https://github.com/trallnag/prometheus-fastapi-instrumentator</a></p>
+<p>これでコンテナを起動させ、<code>/metrics</code>にcURLを実行すると以下のようにたくさん情報が出てきます。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ curl http://localhost:8080/metrics</span><br><span class="line"></span><br><span class="line"><span class="comment"># HELP python_gc_objects_collected_total Objects collected during gc</span></span><br><span class="line"><span class="comment"># TYPE python_gc_objects_collected_total counter</span></span><br><span class="line">python_gc_objects_collected_total&#123;generation=<span class="string">&quot;0&quot;</span>&#125; 2396.0</span><br><span class="line">python_gc_objects_collected_total&#123;generation=<span class="string">&quot;1&quot;</span>&#125; 8411.0</span><br><span class="line">python_gc_objects_collected_total&#123;generation=<span class="string">&quot;2&quot;</span>&#125; 2168.0</span><br><span class="line"><span class="comment"># HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC</span></span><br><span class="line"><span class="comment"># TYPE python_gc_objects_uncollectable_total counter</span></span><br><span class="line">python_gc_objects_uncollectable_total&#123;generation=<span class="string">&quot;0&quot;</span>&#125; 0.0</span><br><span class="line">python_gc_objects_uncollectable_total&#123;generation=<span class="string">&quot;1&quot;</span>&#125; 0.0</span><br><span class="line">python_gc_objects_uncollectable_total&#123;generation=<span class="string">&quot;2&quot;</span>&#125; 0.0</span><br><span class="line"><span class="comment"># HELP python_gc_collections_total Number of times this generation was collected</span></span><br><span class="line"><span class="comment"># TYPE python_gc_collections_total counter</span></span><br><span class="line">python_gc_collections_total&#123;generation=<span class="string">&quot;0&quot;</span>&#125; 141.0</span><br><span class="line">python_gc_collections_total&#123;generation=<span class="string">&quot;1&quot;</span>&#125; 12.0</span><br><span class="line">python_gc_collections_total&#123;generation=<span class="string">&quot;2&quot;</span>&#125; 1.0</span><br><span class="line"></span><br><span class="line">...(中略)...</span><br><span class="line"></span><br><span class="line">http_request_duration_highr_seconds_bucket&#123;le=<span class="string">&quot;10.0&quot;</span>&#125; 1.0</span><br><span class="line">http_request_duration_highr_seconds_bucket&#123;le=<span class="string">&quot;30.0&quot;</span>&#125; 1.0</span><br><span class="line">http_request_duration_highr_seconds_bucket&#123;le=<span class="string">&quot;60.0&quot;</span>&#125; 1.0</span><br><span class="line">http_request_duration_highr_seconds_bucket&#123;le=<span class="string">&quot;+Inf&quot;</span>&#125; 1.0</span><br><span class="line">http_request_duration_highr_seconds_count 1.0</span><br><span class="line">http_request_duration_highr_seconds_sum 0.0015817060047993436</span><br><span class="line"><span class="comment"># HELP http_request_duration_highr_seconds_created Latency with many buckets but no API specific labels. Made for more accurate percentile calculations.</span></span><br><span class="line"><span class="comment"># TYPE http_request_duration_highr_seconds_created gauge</span></span><br><span class="line">http_request_duration_highr_seconds_created 1.7132794545039835e+09</span><br><span class="line"><span class="comment"># HELP http_request_duration_seconds Latency with only few buckets by handler. Made to be only used if aggregation by handler is important.</span></span><br><span class="line"><span class="comment"># TYPE http_request_duration_seconds histogram</span></span><br><span class="line">http_request_duration_seconds_bucket&#123;handler=<span class="string">&quot;/health&quot;</span>,le=<span class="string">&quot;0.1&quot;</span>,method=<span class="string">&quot;GET&quot;</span>&#125; 1.0</span><br><span class="line">http_request_duration_seconds_bucket&#123;handler=<span class="string">&quot;/health&quot;</span>,le=<span class="string">&quot;0.5&quot;</span>,method=<span class="string">&quot;GET&quot;</span>&#125; 1.0</span><br><span class="line">http_request_duration_seconds_bucket&#123;handler=<span class="string">&quot;/health&quot;</span>,le=<span class="string">&quot;1.0&quot;</span>,method=<span class="string">&quot;GET&quot;</span>&#125; 1.0</span><br><span class="line">http_request_duration_seconds_bucket&#123;handler=<span class="string">&quot;/health&quot;</span>,le=<span class="string">&quot;+Inf&quot;</span>,method=<span class="string">&quot;GET&quot;</span>&#125; 1.0</span><br><span class="line">http_request_duration_seconds_count&#123;handler=<span class="string">&quot;/health&quot;</span>,method=<span class="string">&quot;GET&quot;</span>&#125; 1.0</span><br><span class="line">http_request_duration_seconds_sum&#123;handler=<span class="string">&quot;/health&quot;</span>,method=<span class="string">&quot;GET&quot;</span>&#125; 0.0015817060047993436</span><br><span class="line"><span class="comment"># HELP http_request_duration_seconds_created Latency with only few buckets by handler. Made to be only used if aggregation by handler is important.</span></span><br><span class="line"><span class="comment"># TYPE http_request_duration_seconds_created gauge</span></span><br><span class="line">http_request_duration_seconds_created&#123;handler=<span class="string">&quot;/health&quot;</span>,method=<span class="string">&quot;GET&quot;</span>&#125; 1.7132806219318378e+09</span><br></pre></td></tr></table></figure>
+<p>それぞれメトリクスがさし示している情報が何なのかを示してくれていて、わかりやすさを感じました。</p>
+<p>次にPrometheus自体の設定です。Prometheusの設定には<code>prometheus.yml</code>を用いて読み込ませる必要があります。</p>
+<p>今回使用したYAMLファイルは以下です。</p>
+<figure class="highlight yml"><figcaption><span>prometheus.yml</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="attr">global:</span></span><br><span class="line">  <span class="attr">scrape_interval:</span> <span class="string">15s</span></span><br><span class="line"></span><br><span class="line"><span class="attr">scrape_configs:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">job_name:</span> <span class="string">&#x27;prometheus&#x27;</span></span><br><span class="line">    <span class="attr">scrape_interval:</span> <span class="string">5s</span></span><br><span class="line">    <span class="attr">static_configs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">targets:</span> [<span class="string">&#x27;localhost:9090&#x27;</span>]</span><br><span class="line"></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">job_name:</span> <span class="string">&#x27;fastapi-app&#x27;</span></span><br><span class="line">    <span class="attr">scrape_interval:</span> <span class="string">5s</span></span><br><span class="line">    <span class="attr">metrics_path:</span> <span class="string">&#x27;/metrics&#x27;</span></span><br><span class="line">    <span class="attr">static_configs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">targets:</span> [<span class="string">&#x27;app:8080&#x27;</span>]</span><br></pre></td></tr></table></figure>
+
+<p><code>job_name</code>以下でメトリクスを取得する対象や取得するためのパスを指定しています。</p>
+<p>ソースレベルの設定、確認はここまでで、具体的にPrometheusの設定をしていきましょう。<br>コンテナを立ち上げた状態で <code>http://localhost:9090/graph</code>にアクセスすると、以下のような画面になります。</p>
+<img src="/images/20240417b/スクリーンショット_2024-04-17_1.01.38.png" alt="" width="1192" height="797" loading="lazy">
+
+<p>そして、検索バーにFastAPIのコンテナの<code>/health</code>に対して受けたパスの合計が出力される <code>http_requests_total</code>を入れてみてみましょう。</p>
+<img src="/images/20240417b/スクリーンショット_2024-04-17_1.10.32.png" alt="" width="1200" height="950" loading="lazy">
+
+<p>手打ちでcURLを実行してはいますが、リクエストした数だけグラフが上がってきていることがわかります。</p>
+<p>このようにアプリケーションから出力されたメトリクスを取得することができました。</p>
+<h2 id="Grafana"><a href="#Grafana" class="headerlink" title="Grafana"></a>Grafana</h2><p>GrafanaはGrafana Labsによって開発されている可視化ツールであり、ダッシュボードの作成はもちろんのことながら前述したPrometheusで実行したクエリをGrafanaでも同等にサポートしています。</p>
+<p>PrometheusでできることはわざわざGrafanaでまたやらなくていいのでは？と思いましたが、そこは一旦飲み込んで試してみることにします。</p>
+<h3 id="メトリクスの取得を行う"><a href="#メトリクスの取得を行う" class="headerlink" title="メトリクスの取得を行う"></a>メトリクスの取得を行う</h3><p>アプリケーションなどは先ほど使っていたものをそのまま利用します。</p>
+<p>コンテナを立ち上げたあと　<code>http://localhost:3000/login</code>にアクセスすると、ログイン画面になるので、初期ユーザ&#x2F;パスワードである admin &#x2F; adminを打ち込んで、ログインしましょう。(そのあと、初期パスワードの変更を求められますが、今回の検証の本題からは外れるので割愛します）</p>
+<img src="/images/20240417b/スクリーンショット_2024-04-17_1.19.48.png" alt="" width="1200" height="950" loading="lazy">
+
+<p>さて、ログインまでできたので、次はGrafanaからPrometheusを参照できるようにしましょう。サイドバーにある Connections &gt; Add new connection を押下しましょう。たくさんのツールをデータソースにできることがわかります。今回は検索バーにPrometheusと入力し、必要なものを選択しましょう。</p>
+<img src="/images/20240417b/スクリーンショット_2024-04-17_11.52.25.png" alt="" width="1200" height="459" loading="lazy">
+
+<p>Promehteusを選択し、Add new data sourceを押下してホストの設定をしましょう。Prometheus Server URLに <code>http://prometheus:9090</code>を入力して画面下部にある　Save &amp; testを押下して保存しましょう。</p>
+<p>保存ができたら、今度はサイドバーにある、Dashboardsを押下し、Create Dashboard &gt; Add visualization からダッシュボードを作りましょう。ここで、先ほど登録したデータソースが使えるようになります。メトリクスの追加ですが、下のスクリーンショットのように入力できる欄があるので、Metricに先ほどPrometheusでも利用した <code>http_requests_total</code>を入力して　Run queriesを押してみましょう。</p>
+<img src="/images/20240417b/スクリーンショット_2024-04-17_12.00.23.png" alt="" width="793" height="280" loading="lazy">
+
+<p>そうすると、こちらでもグラフを表示することができました。（先ほどと概形が異なるのは取得時間が異なるためです。）</p>
+<img src="/images/20240417b/スクリーンショット_2024-04-17_12.03.30.png" alt="" width="793" height="351" loading="lazy">
+
+<p>Metricの欄では、Prometheusが取得可能なすべてのメトリクスが使えるので、ものによっては2つ以上取得できるものがありますが、これは Label filtersで絞ることが可能です。</p>
+<p>そして、右上の Apply を押下してダッシュボード化しましょう。</p>
+<img src="/images/20240417b/スクリーンショット_2024-04-17_12.06.32.png" alt="" width="1200" height="588" loading="lazy">
+
+
+<h3 id="どんなことに使えそうか"><a href="#どんなことに使えそうか" class="headerlink" title="どんなことに使えそうか"></a>どんなことに使えそうか</h3><p>Grafanaはデータソースの一覧からわかるように多様なソースをサポートしています。今回試したPrometheus以外にもPostgreSQLなどのRDB、各クラウドの監視ツールとの連携、Google Analyticsなどの可視化も行えます。それぞれで可視化の部分はサポートされているとは思いますが、可視化ツールの一元管理、という意味ではGrafanaに多様なデータソースを束ねるというのは良いのかもしれません。<br>参考）<a target="_blank" rel="noopener" href="https://grafana.com/docs/grafana/latest/datasources/#built-in-core-data-sources">Grafana data sources &gt; Built-in core data sources</a></p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>監視・可視化ツールであるPrometheus、Grafanaを触って動かし、知るきっかけに十分なりました。</p>
+<p>今いるプロジェクトではGrafanaのデータソースとして使えるOpenSearchを利用しているので、継続して導入タイミングを伺いながら知見を貯めていきます！</p>
+<h2 id="参考書籍"><a href="#参考書籍" class="headerlink" title="参考書籍"></a>参考書籍</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://booth.pm/ja/items/3907516">Prometheus実践ガイド: クラウドネイティブな監視システムの構築</a></li>
+</ul>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/intent/tweet?url=https://future-architect.github.io/articles/20240417b/&related=twitterapi%2Ctwitter&text=Prometheus/Grafana%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%82%8B%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240417b/&t=Prometheus/Grafana%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%82%8B" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240417b/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240417b/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              <p class="related-posts-none">No related post.</p>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B0%E3%81%97%E3%81%84%E3%81%93%E3%81%A8%E3%80%81%E5%A7%8B%E3%82%81%E3%81%9F%E3%81%84%E3%80%81%E7%9F%A5%E3%82%8A%E3%81%9F%E3%81%84"><span class="toc-text">新しいこと、始めたい、知りたい</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8A%E5%9B%9E%E3%81%AE%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB"><span class="toc-text">今回のサンプル</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prometheus"><span class="toc-text">Prometheus</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E5%8B%95%E3%81%8B%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B"><span class="toc-text">アプリケーションを動かしてみる</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Grafana"><span class="toc-text">Grafana</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%A1%E3%83%88%E3%83%AA%E3%82%AF%E3%82%B9%E3%81%AE%E5%8F%96%E5%BE%97%E3%82%92%E8%A1%8C%E3%81%86"><span class="toc-text">メトリクスの取得を行う</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%81%A9%E3%82%93%E3%81%AA%E3%81%93%E3%81%A8%E3%81%AB%E4%BD%BF%E3%81%88%E3%81%9D%E3%81%86%E3%81%8B"><span class="toc-text">どんなことに使えそうか</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-text">まとめ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%9B%B8%E7%B1%8D"><span class="toc-text">参考書籍</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (449)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (270)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (100)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (63)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (35)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (23)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Business/">Business (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      <li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/38-AIAI-e22h1v0" title="フューチャーがお届けするポッドキャストです。#38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」" target="_blank" rel="noopener"> #38 AIグループリーダー加藤さんに聞く「AIチームのミッションと展望」</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/37-e227p84" title="フューチャーがお届けするポッドキャストです。#37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）" target="_blank" rel="noopener"> #37 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（後編）</a></li>
+<li><a href="https://podcasters.spotify.com/pod/show/futuretechcast/episodes/36-e1rdbcu" title="フューチャーがお届けするポッドキャストです。#36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）" target="_blank" rel="noopener"> #36 自然言語処理を使った文書検索エンジンシステム開発と新規サービス検討（前編）</a></li>
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
