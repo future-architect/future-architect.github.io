@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>RDS DBインスタンスのアカウント間複製をGitHub Actionsで自動化 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは。Strategic AI Group所属の太田寛明です。 ある環境A（例えば本番環境）のAmazon RDS DBインスタンスを別アカウントB（例えば検証環境）にバックアップ&amp;リストアする作業を自動化する機会があったので、その手法について紹介します。 自動化する方法は様々1あると思いますが、今回はGitHub Actionsを利用しました。複数のAWS CLIコマンドを">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RDS DBインスタンスのアカウント間複製をGitHub Actionsで自動化 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240507a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは。Strategic AI Group所属の太田寛明です。 ある環境A（例えば本番環境）のAmazon RDS DBインスタンスを別アカウントB（例えば検証環境）にバックアップ&amp;リストアする作業を自動化する機会があったので、その手法について紹介します。 自動化する方法は様々1あると思いますが、今回はGitHub Actionsを利用しました。複数のAWS CLIコマンドを">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240507a/5536e69e-3965-4ca2-8a0b-2573659b5f8f.png">
+<meta property="article:published_time" content="2024-05-06T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-05-07T05:54:57.187Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="IAM">
+<meta property="article:tag" content="CI&#x2F;CD">
+<meta property="article:tag" content="GitHubActions">
+<meta property="article:tag" content="ShellScript">
+<meta property="article:tag" content="RDS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240507a/5536e69e-3965-4ca2-8a0b-2573659b5f8f.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240507a/">
+  <meta content="AWS,IAM,CI/CD,GitHubActions,ShellScript,RDS" name="keywords">
+  <meta content="太田寛明" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/DevOps/">DevOpsカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">RDS DBインスタンスのアカウント間複製をGitHub Actionsで自動化
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240507a_RDS_DBインスタンスのアカウント間複製をGitHub_Actionsで自動化.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240507a_RDS_DBインスタンスのアカウント間複製をGitHub_Actionsで自動化" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-05-06T15:00:00.000Z" itemprop="datePublished">2024.05.07</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E5%A4%AA%E7%94%B0%E5%AF%9B%E6%98%8E" title="太田寛明さんの記事一覧へ" class="post-author">太田寛明</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/IAM/" title="IAMタグの記事へ" class="tag-list-link">IAM</a>
+  
+    
+    <a href="/tags/CI-CD/" title="CI/CDタグの記事へ" class="tag-list-link">CI/CD</a>
+  
+    
+    <a href="/tags/GitHubActions/" title="GitHubActionsタグの記事へ" class="tag-list-link">GitHubActions</a>
+  
+    
+    <a href="/tags/ShellScript/" title="ShellScriptタグの記事へ" class="tag-list-link">ShellScript</a>
+  
+    
+    <a href="/tags/RDS/" title="RDSタグの記事へ" class="tag-list-link">RDS</a>
+  
+
+</li>
+            <li class="blog-info-item">100 View</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。Strategic AI Group所属の太田寛明です。</p>
+<p>ある環境A（例えば本番環境）のAmazon RDS DBインスタンスを別アカウントB（例えば検証環境）にバックアップ&amp;リストアする作業を自動化する機会があったので、その手法について紹介します。</p>
+<p>自動化する方法は様々<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>あると思いますが、今回はGitHub Actionsを利用しました。複数のAWS CLIコマンドを各アカウントごとに日次で定期実行します。</p>
+<h1 id="バックアップリストアの実装"><a href="#バックアップリストアの実装" class="headerlink" title="バックアップリストアの実装"></a>バックアップリストアの実装</h1><p>RDS DBインスタンスをアカウント間でバックアップリストアする方法に関しては、AWSの公式ドキュメントに記載があります。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/patterns/migrate-an-amazon-rds-db-instance-to-another-vpc-or-account.html">Amazon RDS DB インスタンスを別の VPC またはアカウントに移行する</a><br>別の AWS アカウントに移行<br>次の図は、Amazon RDS DB インスタンスを別の AWS アカウントに移行するワークフローを示しています。<br><img src="/images/20240507a/5536e69e-3965-4ca2-8a0b-2573659b5f8f.png" alt="5536e69e-3965-4ca2-8a0b-2573659b5f8f.png" width="1200" height="520" loading="lazy"></p>
+</blockquote>
+<p>この手法を踏まえて、本番環境のDBを別アカウントの検証環境にコピーしたい場合は、次のプロセスを踏むことになります。</p>
+<ol>
+<li>環境AのDBのスナップショットを作成（上図の①②）</li>
+<li>スナップショットを環境Bのアカウントに共有（上図の③）</li>
+<li>共有されたスナップショットから検証環境上でDBを復元（上図の④⑤）</li>
+</ol>
+<p>これらのプロセスは、AWS Management Console、AWS CLI、RDS APIのいずれを用いても実現することが可能です。</p>
+<p>今回はAWS CLIコマンド<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>を用いた実装を自動化したので、この実装に基づいて各プロセスをもう少し詳しく紹介していきます。</p>
+<h2 id="1-本番環境のDBのスナップショットを作成"><a href="#1-本番環境のDBのスナップショットを作成" class="headerlink" title="1. 本番環境のDBのスナップショットを作成"></a>1. 本番環境のDBのスナップショットを作成</h2><p>Amazon RDSのスナップショットには自動スナップショットと手動スナップショットの2種類が存在します。</p>
+<p>基本的に自動スナップショットをもとにDBを復元すればいいわけですが、今回は別アカウントにスナップショットを共有する必要があるため、以下に従って手動スナップショットを作成する必要があります。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_ShareSnapshot.html">DB スナップショットの共有</a><br>自動 DB スナップショットを共有するには、自動 DB スナップショットをコピーしてそのコピーを共有することで、手動スナップショットを作成します。</p>
+</blockquote>
+<p>実装例は次のようになります。</p>
+<p>ここで、初めにスナップショットを削除しているのは、同一名称のものが既に存在する場合には新しくスナップショットを作成できないからです。</p>
+<p>過去分のスナップショットは、基本的に自動スナップショットという形で別途保持されていると思うので、手動スナップショットの名称は毎回固定で問題ないかと思います。</p>
+<figure class="highlight sh"><figcaption><span>backup_prod.sh（前半）</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># スナップショット削除</span></span><br><span class="line">aws rds delete-db-snapshot \</span><br><span class="line">    --db-snapshot-identifier <span class="variable">$&#123;【本番】手動スナップショット識別子&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># スナップショット削除完了確認</span></span><br><span class="line">aws rds <span class="built_in">wait</span> db-snapshot-deleted \</span><br><span class="line">    --db-snapshot-identifier <span class="variable">$&#123;【本番】手動スナップショット識別子&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># バックアップ対象DBの自動スナップショット識別子取得</span></span><br><span class="line"><span class="comment">## 以下では最新の自動スナップショットを取得しています。</span></span><br><span class="line">【本番】自動スナップショット識別子=$(</span><br><span class="line">    aws rds describe-db-snapshots \</span><br><span class="line">        --db-instance-identifier <span class="variable">$&#123;バックアップ対象のDBインスタンス識別子&#125;</span> \</span><br><span class="line">        --snapshot-type automated \</span><br><span class="line">        --query <span class="string">&#x27;reverse(sort_by(DBSnapshots, &amp;SnapshotCreateTime)[].DBSnapshotIdentifier)[0]&#x27;</span>　\</span><br><span class="line">        | <span class="built_in">tr</span> -d <span class="string">&#x27;&quot;&#x27;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># スナップショット複製</span></span><br><span class="line"><span class="comment">## 今回は手動スナップショットをAWS KMSで暗号化しています。</span></span><br><span class="line"><span class="comment">## KMS キーのタイプは、カスタマーマネージドキーである必要があります。（後述）</span></span><br><span class="line">aws rds copy-db-snapshot \</span><br><span class="line">    --source-db-snapshot-identifier <span class="variable">$&#123;【本番】自動スナップショット識別子&#125;</span> \</span><br><span class="line">    --target-db-snapshot-identifier <span class="variable">$&#123;【本番】手動スナップショット識別子&#125;</span> \</span><br><span class="line">    --kms-key-id <span class="variable">$&#123;【本番】KMSキーの識別子&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># スナップショット複製完了確認</span></span><br><span class="line">aws rds <span class="built_in">wait</span> db-snapshot-available \</span><br><span class="line">    --db-snapshot-identifier <span class="variable">$&#123;【本番】手動スナップショット識別子&#125;</span> \</span><br><span class="line">    --snapshot-type manual</span><br></pre></td></tr></table></figure>
+
+<p>参照（公式ドキュメント）</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_DeleteSnapshot.html">DB スナップショットの削除</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_CopySnapshot.html">DB スナップショットのコピー</a></li>
+</ul>
+<h2 id="2-スナップショットを検証環境のアカウントに共有"><a href="#2-スナップショットを検証環境のアカウントに共有" class="headerlink" title="2. スナップショットを検証環境のアカウントに共有"></a>2. スナップショットを検証環境のアカウントに共有</h2><p>本番環境で作成した手動スナップショットを検証環境のアカウントでも参照できるように共有します。</p>
+<p>実装例は次のようになります。</p>
+<figure class="highlight sh"><figcaption><span>backup_prod.sh（後半）</span></figcaption><table><tr><td class="code"><pre><span class="line">aws rds modify-db-snapshot-attribute \</span><br><span class="line">    --db-snapshot-identifier <span class="variable">$&#123;【本番】手動スナップショット識別子&#125;</span> \</span><br><span class="line">    --attribute-name restore \</span><br><span class="line">    --values-to-add <span class="variable">$&#123;共有先（検証環境）のAWSアカウントID&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>参照（公式ドキュメント）</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_ShareSnapshot.html">DB スナップショットの共有</a></li>
+</ul>
+<h2 id="3-共有されたスナップショットから検証環境上でDBを復元"><a href="#3-共有されたスナップショットから検証環境上でDBを復元" class="headerlink" title="3. 共有されたスナップショットから検証環境上でDBを復元"></a>3. 共有されたスナップショットから検証環境上でDBを復元</h2><p>いよいよDBの復元ですが、AWS KMSによる暗号化を行った際、一つ注意点があります。<br>以下の制限により、カスタマーマネージドキーを使用してスナップショットを暗号化する必要がありました。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_ShareSnapshot.html#share-encrypted-snapshot">暗号化されたスナップショットの共有</a><br>スナップショットを共有した AWS アカウント のデフォルト KMSキーを使用して暗号化されたスナップショットを共有することはできません。<br>…<br>デフォルトの KMS キーの問題を回避するには、次のタスクを実行します。</p>
+<ol>
+<li>カスタマーマネージドキーを作成し、そのキーへのアクセス権を付与する</li>
+<li>ソースアカウントからスナップショットをコピーして共有する</li>
+<li>ターゲットアカウントに共有したスナップショットをコピーします</li>
+</ol>
+</blockquote>
+<p>このため、他アカウントから共有された暗号化済みの手動スナップショットを利用してDBインスタンスを復元したい場合は、指示された回避策に従って再びスナップショットのコピーを作成し、それをもとにDBインスタンスの復元を行う必要があります。</p>
+<h3 id="共有されたスナップショットのコピー"><a href="#共有されたスナップショットのコピー" class="headerlink" title="共有されたスナップショットのコピー"></a>共有されたスナップショットのコピー</h3><p>前述した通り、まずは本番環境から共有された暗号化済みのスナップショットを検証環境上でコピーします。</p>
+<p>実装例は次のようになります。</p>
+<p>ここで、コマンド<code>copy-db-snapshot</code>のオプション<code>--source-db-snapshot-identifier</code>について、以下制約が存在するため、共有されたスナップショット識別子はARNとして取得しています。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/cli/latest/reference/rds/copy-db-snapshot.html">copy-db-snapshot</a><br><code>--source-db-snapshot-identifier</code> (string)<br>…<br>If you are copying from a shared manual DB snapshot, this parameter must be the Amazon Resource Name (ARN) of the shared DB snapshot.</p>
+</blockquote>
+<figure class="highlight sh"><figcaption><span>restore_stg.sh（前半）</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># スナップショット削除</span></span><br><span class="line">aws rds delete-db-snapshot \</span><br><span class="line">    --db-snapshot-identifier <span class="variable">$&#123;【検証】手動スナップショット識別子&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># スナップショット削除完了確認</span></span><br><span class="line">aws rds <span class="built_in">wait</span> db-snapshot-deleted \</span><br><span class="line">    --db-snapshot-identifier <span class="variable">$&#123;【検証】手動スナップショット識別子&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 共有されたスナップショット識別子(ARN)取得</span></span><br><span class="line"><span class="comment">## 以下では共有された最新のスナップショットを取得しています。</span></span><br><span class="line">共有されたスナップショット識別子=$(</span><br><span class="line">    aws rds describe-db-snapshots \</span><br><span class="line">        --include-shared \</span><br><span class="line">        --snapshot-type shared \</span><br><span class="line">        --query <span class="string">&#x27;reverse(sort_by(DBSnapshots, &amp;SnapshotCreateTime)[].DBSnapshotArn)[0]&#x27;</span> \</span><br><span class="line">        | <span class="built_in">tr</span> -d <span class="string">&#x27;&quot;&#x27;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># スナップショット複製</span></span><br><span class="line"><span class="comment">## ここでも手動スナップショットをAWS KMSで暗号化しています。</span></span><br><span class="line">aws rds copy-db-snapshot \</span><br><span class="line">    --source-db-snapshot-identifier <span class="variable">$&#123;共有されたスナップショット識別子&#125;</span> \</span><br><span class="line">    --target-db-snapshot-identifier <span class="variable">$&#123;【検証】手動スナップショット識別子&#125;</span> \</span><br><span class="line">    --kms-key-id <span class="variable">$&#123;【検証】KMSキーの識別子&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># スナップショット複製完了確認</span></span><br><span class="line">aws rds <span class="built_in">wait</span> db-snapshot-available \</span><br><span class="line">    --db-snapshot-identifier <span class="variable">$&#123;【検証】手動スナップショット識別子&#125;</span> \</span><br><span class="line">    --snapshot-type manual</span><br></pre></td></tr></table></figure>
+
+<p>参照（公式ドキュメント）</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_DeleteSnapshot.html">DB スナップショットの削除</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_CopySnapshot.html">DB スナップショットのコピー</a></li>
+</ul>
+<h3 id="スナップショットからDBインスタンスを復元"><a href="#スナップショットからDBインスタンスを復元" class="headerlink" title="スナップショットからDBインスタンスを復元"></a>スナップショットからDBインスタンスを復元</h3><p>続いて検証環境上でコピーしたスナップショットをもとに、DBインスタンスを復元します。</p>
+<p>実装例は次のようになります。</p>
+<figure class="highlight sh"><figcaption><span>restore_stg.sh（後半）</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment"># DBインスタンス削除</span></span><br><span class="line"><span class="comment">## 自動バックアップも削除し、最終スナップショットも作成しません。</span></span><br><span class="line">aws rds delete-db-instance \</span><br><span class="line">    --db-instance-identifier <span class="variable">$&#123;DBインスタンス識別子&#125;</span> \</span><br><span class="line">    --skip-final-snapshot \</span><br><span class="line">    --delete-automated-backups</span><br><span class="line"></span><br><span class="line"><span class="comment"># DBインスタンス削除完了確認</span></span><br><span class="line">aws rds <span class="built_in">wait</span> db-instance-deleted \</span><br><span class="line">    --db-instance-identifier <span class="variable">$&#123;DBインスタンス識別子&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># DBインスタンス復元</span></span><br><span class="line"><span class="comment">## DBインスタンスの設定オプションは各自のDB要件に応じて設定してください。</span></span><br><span class="line"><span class="comment">## 以下では&quot;パブリックアクセス禁止&quot;のみ設定しています。</span></span><br><span class="line">aws rds restore-db-instance-from-db-snapshot \</span><br><span class="line">    --db-instance-identifier <span class="variable">$&#123;DBインスタンス識別子&#125;</span> \</span><br><span class="line">    --db-snapshot-identifier <span class="variable">$&#123;【検証】手動スナップショット識別子&#125;</span> \</span><br><span class="line">    --no-publicly-accessible</span><br><span class="line"></span><br><span class="line"><span class="comment"># DBインスタンス復元完了確認</span></span><br><span class="line">aws rds <span class="built_in">wait</span> db-instance-available \</span><br><span class="line">    --db-instance-identifier <span class="variable">$&#123;DBインスタンス識別子&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>参照（公式ドキュメント）</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_DeleteInstance.html">DB インスタンスを削除する</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_RestoreFromSnapshot.html">DB スナップショットからの復元</a></li>
+</ul>
+<h1 id="バックアップリストアの自動化"><a href="#バックアップリストアの自動化" class="headerlink" title="バックアップリストアの自動化"></a>バックアップリストアの自動化</h1><p>さて、<a href="#%E3%83%90%E3%83%83%E3%82%AF%E3%82%A2%E3%83%83%E3%83%97%E3%83%AA%E3%82%B9%E3%83%88%E3%82%A2%E3%81%AE%E5%AE%9F%E8%A3%85">バックアップリストアの実装</a>で作成したファイル達を各アカウントでそれぞれ手動実行することで、検証環境上に本番環境のDBを復元できるようになりました。</p>
+<p>いよいよ本題のGitHub Actionsでの自動化です。<br><code>aws-actions/configure-aws-credentials</code>を使用すれば、指定したIAMロールでAWS CLIコマンドを実行できるので、ここでは<a href="#%E3%83%90%E3%83%83%E3%82%AF%E3%82%A2%E3%83%83%E3%83%97%E3%83%AA%E3%82%B9%E3%83%88%E3%82%A2%E3%81%AE%E5%AE%9F%E8%A3%85">バックアップリストアの実装</a>で作成したファイル達を実行するために必要なIAMロールの設定について説明しようと思います。</p>
+<p>一般的に<code>aws-actions/configure-aws-credentials</code>を使用してAWS CLIコマンドを実行するために必要な設定については、<a href="https://future-architect.github.io/articles/20230405a/">Terraform とGitHub Actions</a>等を参考にしてみてください。</p>
+<h2 id="必要なIAMロールの設定"><a href="#必要なIAMロールの設定" class="headerlink" title="必要なIAMロールの設定"></a>必要なIAMロールの設定</h2><p><a href="#%E3%83%90%E3%83%83%E3%82%AF%E3%82%A2%E3%83%83%E3%83%97%E3%83%AA%E3%82%B9%E3%83%88%E3%82%A2%E3%81%AE%E5%AE%9F%E8%A3%85">バックアップリストアの実装</a>で作成したファイル達が正常に実行されるためには、以下ポリシーがIAMロールに付与されており、アクセスが許可されている必要があります。</p>
+<ul>
+<li>AWS CLIコマンド実行のために必要なポリシー</li>
+<li>検証環境上での本番環境のAWS KMSキーの使用に必要なポリシー</li>
+</ul>
+<p>一つずつ見ていきましょう。</p>
+<h3 id="AWS-CLIコマンド実行のために必要なポリシー"><a href="#AWS-CLIコマンド実行のために必要なポリシー" class="headerlink" title="AWS CLIコマンド実行のために必要なポリシー"></a>AWS CLIコマンド実行のために必要なポリシー</h3><p><a href="#%E3%83%90%E3%83%83%E3%82%AF%E3%82%A2%E3%83%83%E3%83%97%E3%83%AA%E3%82%B9%E3%83%88%E3%82%A2%E3%81%AE%E5%AE%9F%E8%A3%85">バックアップリストアの実装</a>を踏まえると、本番&#x2F;検証環境で以下AWS CLIコマンド群を実行できるようにする必要があると分かります。</p>
+<ul>
+<li>スナップショットの削除と複製（本番環境と検証環境の両方）<ul>
+<li><code>delete-db-snapshot</code></li>
+<li><code>wait db-snapshot-deleted</code></li>
+<li><code>describe-db-snapshots</code></li>
+<li><code>copy-db-snapshot</code></li>
+<li><code>wait db-snapshot-available</code></li>
+</ul>
+</li>
+<li>スナップショットの共有（本番環境のみ）<ul>
+<li><code>modify-db-snapshot-attribute</code></li>
+</ul>
+</li>
+<li>DBインスタンスの削除復元（検証環境のみ）<ul>
+<li><code>delete-db-instance</code></li>
+<li><code>wait db-instance-deleted</code></li>
+<li><code>restore-db-instance-from-db-snapshot</code></li>
+<li><code>wait db-instance-available</code></li>
+</ul>
+</li>
+</ul>
+<p>以下では、それぞれのコマンド群の実行に必要なポリシーの実装例を挙げています。<br>要件によっては、さらに細かくカスタマイズする必要もあると思うので参考程度に留めて役立ててもらえればと思います。<br>また、本番&#x2F;検証環境のそれぞれのアカウントごとに、実行すべきコマンド群が異なるので注意して設定してください。</p>
+<h4 id="スナップショットの削除複製に必要なポリシーの実装例"><a href="#スナップショットの削除複製に必要なポリシーの実装例" class="headerlink" title="スナップショットの削除複製に必要なポリシーの実装例"></a>スナップショットの削除複製に必要なポリシーの実装例</h4><p>本番環境と検証環境の両方のアカウントで必要になります。</p>
+<figure class="highlight json"><figcaption><span>スナップショットの削除複製に必要なポリシーの実装例.json</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;Version&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2012-10-17&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Statement&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Sid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;VisualEditor0&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Effect&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Allow&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Action&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                <span class="string">&quot;rds:AddTagsToResource&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;rds:DescribeDBSnapshots&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;rds:CopyDBSnapshot&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;rds:DeleteDBSnapshot&quot;</span></span><br><span class="line">            <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Resource&quot;</span><span class="punctuation">:</span> <span class="string">&quot;*&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="スナップショットの共有に必要なポリシーの設定例"><a href="#スナップショットの共有に必要なポリシーの設定例" class="headerlink" title="スナップショットの共有に必要なポリシーの設定例"></a>スナップショットの共有に必要なポリシーの設定例</h4><p>本番環境のアカウントでのみ必要になります。</p>
+<figure class="highlight json"><figcaption><span>スナップショットの共有に必要なポリシーの設定例.json</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;Version&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2012-10-17&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Statement&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Sid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;VisualEditor0&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Effect&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Allow&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Action&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                <span class="string">&quot;rds:ModifyDBSnapshotAttribute&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;rds:DescribeDBSnapshotAttributes&quot;</span></span><br><span class="line">            <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Resource&quot;</span><span class="punctuation">:</span> <span class="string">&quot;*&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="DBインスタンスの削除復元に必要なポリシーの設定例"><a href="#DBインスタンスの削除復元に必要なポリシーの設定例" class="headerlink" title="DBインスタンスの削除復元に必要なポリシーの設定例"></a>DBインスタンスの削除復元に必要なポリシーの設定例</h4><p>検証環境のアカウントでのみ必要になります。</p>
+<figure class="highlight json"><figcaption><span>DBインスタンスの削除復元に必要なポリシーの設定例.json</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;Version&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2012-10-17&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Statement&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Sid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;VisualEditor0&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Effect&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Allow&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Action&quot;</span><span class="punctuation">:</span> <span class="string">&quot;iam:PassRole&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Resource&quot;</span><span class="punctuation">:</span> <span class="string">&quot;*&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Condition&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;StringLike&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">                    <span class="attr">&quot;iam:PassedToService&quot;</span><span class="punctuation">:</span> <span class="string">&quot;rds.amazonaws.com&quot;</span></span><br><span class="line">                <span class="punctuation">&#125;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Sid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;VisualEditor1&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Effect&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Allow&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Action&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                <span class="string">&quot;rds:AddTagsToResource&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;rds:RestoreDBInstanceFromDBSnapshot&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;rds:DescribeDBInstances&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;rds:DeleteTenantDatabase&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;rds:CreateTenantDatabase&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;rds:DeleteDBInstance&quot;</span></span><br><span class="line">            <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Resource&quot;</span><span class="punctuation">:</span> <span class="string">&quot;*&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="検証環境上での本番環境のAWS-KMSキーの使用に必要なポリシー"><a href="#検証環境上での本番環境のAWS-KMSキーの使用に必要なポリシー" class="headerlink" title="検証環境上での本番環境のAWS KMSキーの使用に必要なポリシー"></a>検証環境上での本番環境のAWS KMSキーの使用に必要なポリシー</h3><h4 id="本番環境での設定"><a href="#本番環境での設定" class="headerlink" title="本番環境での設定"></a>本番環境での設定</h4><p>スナップショットの暗号化に使用したカスタマーマネージドキーのKMSキーポリシーにて、共有先の検証環境のアカウントをキーユーザーに指定することで、検証環境上でそのKMSキーへのアクセスを許可することができるようになります。</p>
+<p>具体的には次の2つのステートメントについて、検証環境のアカウントにKMSキーへのアクセス許可を与える必要があります。</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;Sid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Allow use of the key&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Effect&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Allow&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Principal&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;AWS&quot;</span><span class="punctuation">:</span> $<span class="punctuation">&#123;</span>【検証】アカウント識別子(ARN)<span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Action&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;kms:Encrypt&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;kms:Decrypt&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;kms:ReEncrypt*&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;kms:GenerateDataKey*&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;kms:DescribeKey&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Resource&quot;</span><span class="punctuation">:</span> <span class="string">&quot;*&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;Sid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Allow attachment of persistent resources&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Effect&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Allow&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Principal&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;AWS&quot;</span><span class="punctuation">:</span> $<span class="punctuation">&#123;</span>【検証】アカウント識別子(ARN)<span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Action&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;kms:CreateGrant&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;kms:ListGrants&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;kms:RevokeGrant&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Resource&quot;</span><span class="punctuation">:</span> <span class="string">&quot;*&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Condition&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;Bool&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;kms:GrantIsForAWSResource&quot;</span><span class="punctuation">:</span> <span class="string">&quot;true&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>参照（公式ドキュメント）</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/kms/latest/developerguide/key-policy-modifying-external-accounts.html#cross-account-console">他のアカウントのユーザーに KMS キーの使用を許可する#他のアカウントで使用できる KMS キーを作成する</a></li>
+</ul>
+<h4 id="検証環境での設定"><a href="#検証環境での設定" class="headerlink" title="検証環境での設定"></a>検証環境での設定</h4><p>上記設定により本番環境側は、このKMSキーに対するアクセス許可を検証環境に与えました。<br>しかし実際に検証環境上でKMSキーを使用できるようにするためには、このKMSキーを使用するロールに対して検証環境側からアクセス許可を与える必要もあります。</p>
+<p>具体的には以下ポリシーを作成し、IAMロールに付与する必要があります。<br>これによってようやく、本番環境から共有されたスナップショットを検証環境上にコピーすることができるようになります。</p>
+<figure class="highlight json"><figcaption><span>本番環境のKMSキーの使用に必要なポリシーの実装例.json</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;Version&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2012-10-17&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;Statement&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Sid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;VisualEditor0&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Effect&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Allow&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Action&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                <span class="string">&quot;kms:Decrypt&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;kms:Encrypt&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;kms:DescribeKey&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;kms:ReEncrypt*&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;kms:GenerateDataKey*&quot;</span></span><br><span class="line">            <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Resource&quot;</span><span class="punctuation">:</span> $<span class="punctuation">&#123;</span>【本番】KMSキー識別子(ARN)<span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Sid&quot;</span><span class="punctuation">:</span> <span class="string">&quot;VisualEditor1&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Effect&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Allow&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Action&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                <span class="string">&quot;kms:CreateGrant&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;kms:ListGrants&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="string">&quot;kms:RevokeGrant&quot;</span></span><br><span class="line">            <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Resource&quot;</span><span class="punctuation">:</span> $<span class="punctuation">&#123;</span>【本番】KMSキー識別子(ARN)<span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Condition&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;Bool&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">                    <span class="attr">&quot;kms:GrantIsForAWSResource&quot;</span><span class="punctuation">:</span> <span class="string">&quot;true&quot;</span></span><br><span class="line">                <span class="punctuation">&#125;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>参照（公式ドキュメント）</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/ja_jp/kms/latest/developerguide/key-policy-modifying-external-accounts.html">他のアカウントのユーザーに KMS キーの使用を許可する</a></li>
+</ul>
+<h2 id="GitHub-Actions-ワークフローを作成する"><a href="#GitHub-Actions-ワークフローを作成する" class="headerlink" title="GitHub Actions ワークフローを作成する"></a>GitHub Actions ワークフローを作成する</h2><p>必要なIAMロールを設定できたので、あとはGitHub Actionsのワークフローを作成すればバックアップリストア作業を自動化できます。</p>
+<p>アカウントごとに適切なIAMロールを<code>aws-actions/configure-aws-credentials</code>で指定した後に、次の二つのシェルスクリプトを、対応するアカウントごとに順次実行します。</p>
+<ul>
+<li><code>backup_prod.sh</code>：本番環境で実行<ul>
+<li><a href="#1-%E6%9C%AC%E7%95%AA%E7%92%B0%E5%A2%83%E3%81%AEdb%E3%81%AE%E3%82%B9%E3%83%8A%E3%83%83%E3%83%97%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%E3%82%92%E4%BD%9C%E6%88%90">1. 本番環境のDBのスナップショットを作成</a></li>
+<li><a href="#2-%E3%82%B9%E3%83%8A%E3%83%83%E3%83%97%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%E3%82%92%E6%A4%9C%E8%A8%BC%E7%92%B0%E5%A2%83%E3%81%AE%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E3%81%AB%E5%85%B1%E6%9C%89">2. スナップショットを検証環境のアカウントに共有</a></li>
+</ul>
+</li>
+<li><code>restore_stg.sh</code>：検証環境で実行（ただし、<code>backup_prod.sh</code>の実行完了後）<ul>
+<li><a href="#3-%E5%85%B1%E6%9C%89%E3%81%95%E3%82%8C%E3%81%9F%E3%82%B9%E3%83%8A%E3%83%83%E3%83%97%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%E3%81%8B%E3%82%89%E6%A4%9C%E8%A8%BC%E7%92%B0%E5%A2%83%E4%B8%8A%E3%81%A7db%E3%82%92%E5%BE%A9%E5%85%83">3. 共有されたスナップショットから検証環境上でDBを復元</a></li>
+</ul>
+</li>
+</ul>
+<p>実装例は以下の通りです。</p>
+<figure class="highlight yaml"><figcaption><span>実装例.yaml</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">restore-rds-stg-from-prod</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 実行スケジュールをcron形式で記載してください。</span></span><br><span class="line"><span class="comment"># 以下例では毎日15:00(UTC)に実行されます。</span></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">schedule:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">cron:</span> <span class="string">&#x27;0 15 * * *&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">backup_prod:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">permissions:</span></span><br><span class="line">      <span class="attr">id-token:</span> <span class="string">write</span></span><br><span class="line">      <span class="attr">contents:</span> <span class="string">read</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/checkout@v4</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Configure</span> <span class="string">AWS</span> <span class="string">Credentials</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">aws-actions/configure-aws-credentials@v4</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">aws-region:</span> <span class="string">ap-northeast-1</span></span><br><span class="line">          <span class="attr">role-to-assume:</span> <span class="string">$&#123;本番環境用のIAMロール&#125;</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Create</span> <span class="string">and</span> <span class="string">Share</span> <span class="string">Snapshot</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">sh</span> <span class="string">backup_prod.sh</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">restore_stg:</span></span><br><span class="line">    <span class="attr">needs:</span> <span class="string">backup_prod</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">permissions:</span></span><br><span class="line">      <span class="attr">id-token:</span> <span class="string">write</span></span><br><span class="line">      <span class="attr">contents:</span> <span class="string">read</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/checkout@v4</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Configure</span> <span class="string">AWS</span> <span class="string">Credentials</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">aws-actions/configure-aws-credentials@v4</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">aws-region:</span> <span class="string">ap-northeast-1</span></span><br><span class="line">          <span class="attr">role-to-assume:</span> <span class="string">$&#123;検証環境用のIAMロール&#125;</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Restore</span> <span class="string">RDS</span> <span class="string">from</span> <span class="string">Snapshot</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">sh</span> <span class="string">restore_stg.sh</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="さいごに"><a href="#さいごに" class="headerlink" title="さいごに"></a>さいごに</h1><p>今回は、RDS DBインスタンスをアカウント間でバックアップリストアする方法とGitHub Actionsを用いた自動化の方法を紹介させていただきました。もしRDS DBのバックアップ方法に悩んでいる方がいれば試してみてください。</p>
+<p>また、今回紹介した方法は、同一リージョン内でバックアップリストアする方法です。リージョン間のコピーは少し複雑性が増すらしく、少しカスタマイズする必要があるかもしれませんので注意してください。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="vertical-align: top; padding-right: 10px;">1.</span><span style="vertical-align: top;">他にもAWS CodeBuildを用いたりする方法等があります。一方でAWS Lambdaは時間的制約がシビアであるため、DBのバックアップリストアには不向きです。</span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="vertical-align: top; padding-right: 10px;">2.</span><span style="vertical-align: top;">RDSに関するAWS CLIコマンドの一覧は以下を参照してください。
+<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/cli/latest/reference/rds">https://docs.aws.amazon.com/cli/latest/reference/rds</a></span><a href="#fnref:2" rev="footnote"> ↩</a></li></ol></div></div>
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/intent/tweet?url=https://future-architect.github.io/articles/20240507a/&related=twitterapi%2Ctwitter&text=RDS%20DB%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%81%AE%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E9%96%93%E8%A4%87%E8%A3%BD%E3%82%92GitHub%20Actions%E3%81%A7%E8%87%AA%E5%8B%95%E5%8C%96%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240507a/&t=RDS%20DB%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%81%AE%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E9%96%93%E8%A4%87%E8%A3%BD%E3%82%92GitHub%20Actions%E3%81%A7%E8%87%AA%E5%8B%95%E5%8C%96" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240507a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240507a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2023.04.05</span><span class="snscount">&#9825;13</span><a href=/articles/20230405a/ title="こんにちは。TIG DX チームのゆるふわエンジニアの前原です。今までは、GitLab でTerraform を利用する機会が多かったのですが、今回は、GitHub Actions を利用することになりました。そこで実施した内容をこの記事に書いていきたいと思います。">Terraform とGitHub Actions</a></li><li class="related-posts-item"><span>2023.04.11</span><span class="snscount">&#9825;3</span><a href=/articles/20230411a/ title="PostgreSQL を使用する際、最適な実行計画が選択されず、クエリの速度が遅くなることがあります。オプティマイザが最適な実行計画を選択できない理由はいくつかありますが、たとえばバッチ処理で大量のデータを投入した直後、統計情報と実データの乖離により、少ないデータに適した計画が大量のデータでは不適切になることがあります。このような場合、PostgreSQL の拡張モジュールである pg_hint_plan により実行計画を固定することで、チューニングが可能です。">RDS Proxy環境下でpg_hint_planを導入する際の注意点</a></li><li class="related-posts-item"><span>2023.04.03</span><span class="snscount">&#9825;18</span><a href=/articles/20230403a/ title="Terraform x GitOps ということで、いつかちゃんと調べておきたいなと思いながらなかなかできていなかったことについて調査していこうかなーと思います。そもそも Terraform x GitOps とはなんぞやということからですが。">Terraform x GitOps</a></li><li class="related-posts-item"><span>2022.06.06</span><span class="snscount">&#9825;16</span><a href=/articles/20220606a/ title="この記事ではクラウドインフラにはつきものの、インフラコストについての失敗談をご紹介します。ぜひご一読いただき、私の屍を乗り越えていく事で、悲劇の発生を未然に防いでいただければと思います。">RDSの自動再起動によるインフラコストの悲劇</a></li><li class="related-posts-item"><span>2021.04.26</span><span class="snscount">&#9825;9</span><a href=/articles/20210426a/ title="AWSのIAMユーザのセキュリティ上、IAMユーザにMFAを導入するケースがあります。MFAを有効にしているIAMユーザでGUI経由でログインする場合は、ログイン時に認証情報が求められて、MFAデバイスが出力するトークンを入力することでログインできます。一方AWS CLIを用いてリソースにアクセス場合はコマンド発行時に認証情報は求められません。代わりに以下のような記事にかかれているような...">AWS CLIで用いるMFAをちょっとだけ便利に扱えるツールを公開しました</a></li><li class="related-posts-item"><span>2020.01.15</span><span class="snscount">&#9825;42</span><a href=/articles/20200115/ title="つらい打鍵テストをCIで回して、テスト結果をWebダッシュボードでチーム内に共有しようというお話です。">打鍵テストをCIで回す：Cypress on GitHub Actions</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+            <section class="career-counseling article-entry margin-bottom-40 nav">
+              <h2 id="career"><a href="#career-counseling" class="headerlink" title="キャリア相談"></a>We're hiring</h2>
+              <p>フューチャーで一緒に働く仲間を大募集しています！</p>
+              <p>フューチャーで働くうえでのキャリア、会社紹介や事業内容の説明など相談会を実施中です！</p>
+
+              <div class="row article-card">
+                <a target="_blank" rel="noopener" href="https://open.talentio.com/r/1/c/future/pages/91866" title="フューチャーキャリア相談会 | open.talentio.com" class="col-sm-4 col-md-4 img_wrap">
+                  <img src="/career.jpg" class="img-responsive margin-bottom-20" alt="" width="200" height="135" loading="lazy">
+                </a>
+                <div class="col-sm-8 col-md-8 margin-bottom-40">
+                    <a target="_blank" rel="noopener" href="https://open.talentio.com/r/1/c/future/pages/91866"><div style="font-weight:bold;">フューチャーキャリア相談会 | open.talentio.com</div></a>
+                    <div class="lede">ご希望に応じてフューチャーの会社紹介や事業内容の説明も可能です。</div>
+                </div>
+              </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%90%E3%83%83%E3%82%AF%E3%82%A2%E3%83%83%E3%83%97%E3%83%AA%E3%82%B9%E3%83%88%E3%82%A2%E3%81%AE%E5%AE%9F%E8%A3%85"><span class="toc-text">バックアップリストアの実装</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%9C%AC%E7%95%AA%E7%92%B0%E5%A2%83%E3%81%AEDB%E3%81%AE%E3%82%B9%E3%83%8A%E3%83%83%E3%83%97%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%E3%82%92%E4%BD%9C%E6%88%90"><span class="toc-text">1. 本番環境のDBのスナップショットを作成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E3%82%B9%E3%83%8A%E3%83%83%E3%83%97%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%E3%82%92%E6%A4%9C%E8%A8%BC%E7%92%B0%E5%A2%83%E3%81%AE%E3%82%A2%E3%82%AB%E3%82%A6%E3%83%B3%E3%83%88%E3%81%AB%E5%85%B1%E6%9C%89"><span class="toc-text">2. スナップショットを検証環境のアカウントに共有</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%85%B1%E6%9C%89%E3%81%95%E3%82%8C%E3%81%9F%E3%82%B9%E3%83%8A%E3%83%83%E3%83%97%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%E3%81%8B%E3%82%89%E6%A4%9C%E8%A8%BC%E7%92%B0%E5%A2%83%E4%B8%8A%E3%81%A7DB%E3%82%92%E5%BE%A9%E5%85%83"><span class="toc-text">3. 共有されたスナップショットから検証環境上でDBを復元</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B1%E6%9C%89%E3%81%95%E3%82%8C%E3%81%9F%E3%82%B9%E3%83%8A%E3%83%83%E3%83%97%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%E3%81%AE%E3%82%B3%E3%83%94%E3%83%BC"><span class="toc-text">共有されたスナップショットのコピー</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%82%B9%E3%83%8A%E3%83%83%E3%83%97%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%E3%81%8B%E3%82%89DB%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%82%92%E5%BE%A9%E5%85%83"><span class="toc-text">スナップショットからDBインスタンスを復元</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%83%90%E3%83%83%E3%82%AF%E3%82%A2%E3%83%83%E3%83%97%E3%83%AA%E3%82%B9%E3%83%88%E3%82%A2%E3%81%AE%E8%87%AA%E5%8B%95%E5%8C%96"><span class="toc-text">バックアップリストアの自動化</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BF%85%E8%A6%81%E3%81%AAIAM%E3%83%AD%E3%83%BC%E3%83%AB%E3%81%AE%E8%A8%AD%E5%AE%9A"><span class="toc-text">必要なIAMロールの設定</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AWS-CLI%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E5%AE%9F%E8%A1%8C%E3%81%AE%E3%81%9F%E3%82%81%E3%81%AB%E5%BF%85%E8%A6%81%E3%81%AA%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC"><span class="toc-text">AWS CLIコマンド実行のために必要なポリシー</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%82%B9%E3%83%8A%E3%83%83%E3%83%97%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%E3%81%AE%E5%89%8A%E9%99%A4%E8%A4%87%E8%A3%BD%E3%81%AB%E5%BF%85%E8%A6%81%E3%81%AA%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%81%AE%E5%AE%9F%E8%A3%85%E4%BE%8B"><span class="toc-text">スナップショットの削除複製に必要なポリシーの実装例</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%82%B9%E3%83%8A%E3%83%83%E3%83%97%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%E3%81%AE%E5%85%B1%E6%9C%89%E3%81%AB%E5%BF%85%E8%A6%81%E3%81%AA%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%81%AE%E8%A8%AD%E5%AE%9A%E4%BE%8B"><span class="toc-text">スナップショットの共有に必要なポリシーの設定例</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#DB%E3%82%A4%E3%83%B3%E3%82%B9%E3%82%BF%E3%83%B3%E3%82%B9%E3%81%AE%E5%89%8A%E9%99%A4%E5%BE%A9%E5%85%83%E3%81%AB%E5%BF%85%E8%A6%81%E3%81%AA%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%81%AE%E8%A8%AD%E5%AE%9A%E4%BE%8B"><span class="toc-text">DBインスタンスの削除復元に必要なポリシーの設定例</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC%E7%92%B0%E5%A2%83%E4%B8%8A%E3%81%A7%E3%81%AE%E6%9C%AC%E7%95%AA%E7%92%B0%E5%A2%83%E3%81%AEAWS-KMS%E3%82%AD%E3%83%BC%E3%81%AE%E4%BD%BF%E7%94%A8%E3%81%AB%E5%BF%85%E8%A6%81%E3%81%AA%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC"><span class="toc-text">検証環境上での本番環境のAWS KMSキーの使用に必要なポリシー</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%AC%E7%95%AA%E7%92%B0%E5%A2%83%E3%81%A7%E3%81%AE%E8%A8%AD%E5%AE%9A"><span class="toc-text">本番環境での設定</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A4%9C%E8%A8%BC%E7%92%B0%E5%A2%83%E3%81%A7%E3%81%AE%E8%A8%AD%E5%AE%9A"><span class="toc-text">検証環境での設定</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GitHub-Actions-%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B"><span class="toc-text">GitHub Actions ワークフローを作成する</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%95%E3%81%84%E3%81%94%E3%81%AB"><span class="toc-text">さいごに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (453)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (274)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (100)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (63)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (36)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (25)</a></li>
+<li class=""><a href="/categories/Business/">Business (22)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
