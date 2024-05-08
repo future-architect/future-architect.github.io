@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  
+  <title>予測モデルを扱うプロジェクトの進め方 | フューチャー技術ブログ</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+  <meta name="description" content="はじめにこんにちは。TIGの村上です。 私のプロジェクトではライフライン系の案件を扱っています。燃料（灯油や軽油など）を配送するために、なくなりそうなタイミングを知りたいという需要があるため、エネルギー使用量の予測モデルを開発し、運用しています。 本記事では、予測モデルの開発から運用まで手掛けるにあたって、重要なことやノウハウをご共有しようと思います。 ※ 本記事では、「電気」、「灯油」、「ガス」">
+<meta property="og:type" content="article">
+<meta property="og:title" content="予測モデルを扱うプロジェクトの進め方 | フューチャー技術ブログ">
+<meta property="og:url" content="https://future-architect.github.io/articles/20240508a/index.html">
+<meta property="og:site_name" content="フューチャー技術ブログ">
+<meta property="og:description" content="はじめにこんにちは。TIGの村上です。 私のプロジェクトではライフライン系の案件を扱っています。燃料（灯油や軽油など）を配送するために、なくなりそうなタイミングを知りたいという需要があるため、エネルギー使用量の予測モデルを開発し、運用しています。 本記事では、予測モデルの開発から運用まで手掛けるにあたって、重要なことやノウハウをご共有しようと思います。 ※ 本記事では、「電気」、「灯油」、「ガス」">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://future-architect.github.io/images/20240508a/image.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240508a/image_2.png">
+<meta property="og:image" content="https://future-architect.github.io/images/20240508a/image_3.png">
+<meta property="article:published_time" content="2024-05-07T15:00:00.000Z">
+<meta property="article:modified_time" content="2024-05-08T00:14:16.187Z">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="アルゴリズム">
+<meta property="article:tag" content="データ分析">
+<meta property="article:tag" content="予測モデル">
+<meta property="article:tag" content="ヒストグラム">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://future-architect.github.io/images/20240508a/image.png">
+  
+  <link rel="alternate" href="/atom.xml" title="フューチャー技術ブログ" type="application/atom+xml">
+  
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="https://future-architect.github.io/articles/20240508a/">
+  <meta content="AWS,アルゴリズム,データ分析,予測モデル,ヒストグラム" name="keywords">
+  <meta content="村上知優" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="corporate">
+  <div class="wrap" itemscope itemtype="https://schema.org/TechArticle">
+  <!-- BEGIN HEADER -->
+<header class="header">
+	<div class="header-overlay">
+		<div class="header-menu"></div>
+		<div class="header-title"><a href="/">Future Tech Blog</a></div>
+		<div class="header-title-sub">フューチャー技術ブログ</div>
+	</div>
+</header>
+<!-- Header END -->
+
+  <div class="container">
+  <ul class="breadcrumb">
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles/">Blog</a></li>
+    <li class="active">Post</li>
+  </ul>
+  <section id="main" class="margin-top-30">
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/DataScience/">DataScienceカテゴリ</a>
+  </div>
+
+
+    <h2 itemprop="name" class="article-title">予測モデルを扱うプロジェクトの進め方
+  
+  <a target="_blank" rel="noopener" href="https://github.com/future-architect/tech-blog/edit/master/source/_posts/20240508a_予測モデルを扱うプロジェクトの進め方.md" title="Suggest Edits" class="github-edit"><i class="github-edit-icon"></i></a>
+  
+</h2>
+
+    <div class="row">
+  <main class="col-md-9 blog-posts">
+    <article id="post-20240508a_予測モデルを扱うプロジェクトの進め方" class="article article-type-post blog-item" itemscope itemprop="blogPost">
+      <div class="article-inner">
+        
+        <header class="article-header">
+          <ul class="blog-info">
+            <li class="blog-info-item"><a href="/articles/2024/" class="publish-date"><time datetime="2024-05-07T15:00:00.000Z" itemprop="datePublished">2024.05.08</time></a>
+</li>
+            <li class="blog-info-item"><li><a href="/authors/%E6%9D%91%E4%B8%8A%E7%9F%A5%E5%84%AA" title="村上知優さんの記事一覧へ" class="post-author">村上知優</a></li></li>
+            <li class="blog-info-item">
+  
+    
+    <a href="/tags/AWS/" title="AWSタグの記事へ" class="tag-list-link">AWS</a>
+  
+    
+    <a href="/tags/アルゴリズム/" title="アルゴリズムタグの記事へ" class="tag-list-link">アルゴリズム</a>
+  
+    
+    <a href="/tags/データ分析/" title="データ分析タグの記事へ" class="tag-list-link">データ分析</a>
+  
+    
+    <a href="/tags/予測モデル/" title="予測モデルタグの記事へ" class="tag-list-link">予測モデル</a>
+  
+    
+    <a href="/tags/ヒストグラム/" title="ヒストグラムタグの記事へ" class="tag-list-link">ヒストグラム</a>
+  
+
+</li>
+            <li class="blog-info-item">100 View</li>
+          </ul>
+          </header>
+        
+        <div class="article-entry" itemprop="articleBody">
+          
+            <h1 id="はじめに"><a href="#はじめに" class="headerlink" title="はじめに"></a>はじめに</h1><p>こんにちは。TIGの村上です。</p>
+<p>私のプロジェクトではライフライン系の案件を扱っています。燃料（灯油や軽油など）を配送するために、なくなりそうなタイミングを知りたいという需要があるため、エネルギー使用量の予測モデルを開発し、運用しています。</p>
+<p>本記事では、予測モデルの開発から運用まで手掛けるにあたって、重要なことやノウハウをご共有しようと思います。</p>
+<p>※ 本記事では、「電気」、「灯油」、「ガス」、「水」などのライフラインに関わるものを、「エネルギー」とひとくくりに呼称します。</p>
+<h2 id="大まかな流れ"><a href="#大まかな流れ" class="headerlink" title="大まかな流れ"></a>大まかな流れ</h2><p>リリースまでの大まかな流れは以下のようになります。</p>
+<ol>
+<li>アルゴリズムの考案</li>
+<li>アルゴリズムの評価と関係者との合意</li>
+<li>プロダクト版の開発、テスト、リリース</li>
+<li>リリース後の性能評価</li>
+</ol>
+<p>今回は私の実際の経験をもとに各フェーズについて説明します。</p>
+<h1 id="1-アルゴリズムの考案"><a href="#1-アルゴリズムの考案" class="headerlink" title="1. アルゴリズムの考案"></a>1. アルゴリズムの考案</h1><p>予測モデルを考える過程でとくに重要なのは、「予測精度」、「説明性」、「運用コスト」になります。これらがそれぞれ、どの程度求められるのかをよく考えながらアルゴリズムを練っていきます。</p>
+<h2 id="モデルの種類"><a href="#モデルの種類" class="headerlink" title="モデルの種類"></a>モデルの種類</h2><p>一般的に予測モデルを構築する場合、以下のようなモデルの種類を考えます。</p>
+<ul>
+<li>a. 線形予測モデル</li>
+<li>b. 非線形予測モデル</li>
+<li>c. ルールベースモデル</li>
+</ul>
+<p>各モデルの特徴をしっかりと把握し、運用まで行えるかを吟味した上で、アルゴリズムの詳細を考えていく必要があります。</p>
+<h3 id="a-線形予測モデル"><a href="#a-線形予測モデル" class="headerlink" title="a. 線形予測モデル"></a>a. 線形予測モデル</h3><p>線形予測モデルは、単純かつ説明性も高い方法です。線形回帰で十分な予測精度が出る場合もあります。運用コストも問題になることはあまりないと思われます。社会実装の例も数多く存在するため、選択肢としてかなり上位に来ます。</p>
+<p>一方で、シンプル過ぎる（というか古典的すぎる）がゆえに、現代の機械学習などのイメージとはギャップが大きく、関係者（特にプロダクトオーナーやエグゼクティブ層）にはウケが悪いことがしばしばあります。「こんなのモデルじゃない！」とか「ディープラーニングはどこ？」みたな反応が返ってきたりします。このような場面もあるため、そのモデルの優位性などを慎重に、丁寧に説明することも、プロジェクトを円滑に進める上で重要になります。</p>
+<h3 id="b-非線形予測モデル"><a href="#b-非線形予測モデル" class="headerlink" title="b. 非線形予測モデル"></a>b. 非線形予測モデル</h3><p>非線形予測モデルは、決定木やニューラルネットワークなどの機械学習を用いた方法がメジャーだと思います。これらは人間には捉えられないような未知の特徴を、機械が自動的に抽出し、卓越した予測精度を発揮する可能性があります。</p>
+<p>一方で、説明性が低く、なぜそのような結果が出力されたのかを解明したくても、諦めざるをおえない状態になることが多々あります（決定木はこの点、かなりましではあります）。また、学習や推論を行うときに膨大な計算機リソースが必要になり、運用時のコストも膨大になる可能性があります。</p>
+<p>ちなみに世間一般でいうところの最新のAIとは、全てディープラーニングのことを指します。経営者なども頭の中では「AI &#x3D; ディープラーニング」となっている印象があります。視野が狭くなりがちな部分なので、プロジェクトを進める上で注意が必要です。</p>
+<h3 id="c-ルールベースモデル"><a href="#c-ルールベースモデル" class="headerlink" title="c. ルールベースモデル"></a>c. ルールベースモデル</h3><p>ルールベースモデルは、人間が頑張ってルールを決めてそれに基づいて出力を行うため、関係者間でのアルゴリズムの納得度は最も高いものになると思います。また、説明性の観点でも優れており、少なくともアルゴリズムの開発者であれば、必ずなぜそのような出力になったのかを解明することができます。</p>
+<p>一方で、高次元データを扱うことは現実的に難しくなります。また、数学的な根拠に乏しくなりがちというデメリットがあり、いわゆる職人技のような側面が出てしまいます。このため、予測精度は良くも悪くも開発者次第になります。運用コストは上記3モデルの中では最も小さくなると思われます。</p>
+<p>また、ここまでで紹介した3種類のモデルの中で、最も近年のAIのイメージとの乖離が大きいモデルになります。平たく言うと、<strong>ロマン</strong>に欠けます。AIに夢見がちな状態の人にルールベースモデルを提案すると、そのギャップからがっかりされることもしばしばあります。プロジェクトを円滑に進めるためにも、事前に十分な説明が必要です。</p>
+<h2 id="データセットの性質"><a href="#データセットの性質" class="headerlink" title="データセットの性質"></a>データセットの性質</h2><p>ここまで各モデルの特徴についてみてきましたが、肝心の予測精度の観点では、予測の元となるデータセットの性質を理解することがとても重要になります。</p>
+<p>この世界のデータは以下の2種類に分けられます。</p>
+<ul>
+<li>a. 非時系列データ</li>
+<li>b. 時系列データ</li>
+</ul>
+<p>これら2種類の違いを理解し、適切なアルゴリズムを考える必要があります。</p>
+<p>また、実世界のデータ処理について、当ブログに記事がありますので、こちらも合わせてご覧ください。</p>
+<p><a href="https://future-architect.github.io/articles/20210423b/">https://future-architect.github.io/articles/20210423b/</a></p>
+<h3 id="a-非時系列データ"><a href="#a-非時系列データ" class="headerlink" title="a. 非時系列データ"></a>a. 非時系列データ</h3><p>データに時間的な相関関係がないものです。例えば犬猫の写真を分類する問題を考える場合、いつ撮影した写真なのかは関係ありません。非時系列データの問題を解くことは比較的簡単になりつつあり、特に近年の機械学習技術を用いることで卓越したパフォーマンスを得られる可能性があります。</p>
+<h3 id="b-時系列データ"><a href="#b-時系列データ" class="headerlink" title="b. 時系列データ"></a>b. 時系列データ</h3><p>データに時間的な相関関係があるものです。今回の予測モデルはこちらに該当します。というのも、エネルギー使用量は過去の実績が非常に参考になるためです。例えば、「今日、電気を7[kWh]使ったから明日も7[kWh]くらい使うだろう。明日は少し気温が下がるみたいだから、エアコンを使いそうなので8[kWh]くらいを予測値としておくか。」といったことが考えられます。</p>
+<p>一方で、一般的に時系列データは機械学習をもってしても予測が難しいことで知られています。それは以下の3点によるものが大きいと考えています。</p>
+<ul>
+<li>時系列的な相関に着目して特徴量を抽出できるアルゴリズムが発展途上である</li>
+<li>データを集めることが難しい</li>
+<li>データの分布が時間とともに変化する</li>
+</ul>
+<h4 id="時系列的な特徴を抽出するアルゴリズム"><a href="#時系列的な特徴を抽出するアルゴリズム" class="headerlink" title="時系列的な特徴を抽出するアルゴリズム"></a>時系列的な特徴を抽出するアルゴリズム</h4><p>時系列データ向けのアルゴリズムは古くから研究されてきた背景があります。従来はARIMAモデルなどが活躍し、近年は2017年に誕生した<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1706.03762">Transformer</a>が最先端技術として用いられています。Transformerは主に自然言語処理の分野で用いられ、ChatGPTなどの代表的な製品の基礎アルゴリズムとなっています。これによって、自然言語の時系列的特徴量の抽出については大きな飛躍を遂げましたが、他の分野の時系列データに関してはもう一押し進歩が欲しいような状況です。</p>
+<h4 id="データ収集"><a href="#データ収集" class="headerlink" title="データ収集"></a>データ収集</h4><p>時系列データはその性質上、その時にそのデータを観測する必要があります。今日発生したデータを1年前に発生したものとして扱うことは原則できません。従って、膨大なデータを集めるためには、日々コツコツとデータを蓄積させておく必要があります。</p>
+<h4 id="データ分布が変化する"><a href="#データ分布が変化する" class="headerlink" title="データ分布が変化する"></a>データ分布が変化する</h4><p>現代のデータサイエンス、特に機械学習は、学習に使ったデータセットの分布が今後変わらないことが前提となります。例えば犬猫の分類問題を解く場合は、多様な犬猫データを大量に用意して学習すれば、1年後もそのモデルで精度の高い予測ができます。これは、犬や猫の姿およびその写真データが1年ではほとんど変化しないためです。</p>
+<p>分析結果を関係者と議論し、合意が得られればプロダクト版の実装に着手します。</p>
+<p>一方で、時系列データは1年後のデータは学習データとは大きく異なっている可能性があります。明日のデータ分布がかなり違うことだって十分考えられます。また、一定周期で定常性が確認できればまだ良いのですが、非定常の場合は最悪です。このように、時系列データはその性質上、非時系列データのように高精度な予測を行うことは困難になります。</p>
+<h2 id="エネルギー使用量データの分析"><a href="#エネルギー使用量データの分析" class="headerlink" title="エネルギー使用量データの分析"></a>エネルギー使用量データの分析</h2><p>まずはエネルギー使用量データがどのように発生するのかを考えます。当然ですが、人間がエネルギーを使用すると、使用量データが0より大きい値として得られるため、未来の使用量を予測するには、人間にどのようなエネルギーのユースケースがあるのかを考える必要があります。</p>
+<p>例： 風呂、料理、暖房、農業、畜産業 etc…</p>
+<p>ここで重要なポイントが2つあります。</p>
+<ul>
+<li>その人のライフスタイルによってユースケースが異なる</li>
+<li>一般家庭と事業所で使い方やその規模が異なる</li>
+</ul>
+<p>それぞれについて深く考察していきます。</p>
+<h3 id="ライフスタイルによる違い"><a href="#ライフスタイルによる違い" class="headerlink" title="ライフスタイルによる違い"></a>ライフスタイルによる違い</h3><p>エネルギーをどれくらい使うかは、その人のライフスタイルにかなり依存します。例えばお風呂が好きな人は、何時間も風呂に入り、おいだきもするかもしれません。一方で、別の人は自宅の風呂は一切使わず、銭湯やジムでシャワーなどで済ませる人もいます。料理をするかどうかも人によって大きく分かれるところです。</p>
+<p>さらに、これらのライフスタイルは時とともに変化したり、その日の「気分」によって変化する可能性があります。このように、その人のライフスタイルに依存する部分が大きいことに起因して、使用量データに非定常性が現れていると考えられます。</p>
+<h3 id="一般家庭と事業所の違い"><a href="#一般家庭と事業所の違い" class="headerlink" title="一般家庭と事業所の違い"></a>一般家庭と事業所の違い</h3><p>これも広義にはライフスタイルの違いに包含できるかもしれませんが、事業所の方が膨大なエネルギーを使うということと、定休日や年末年始休業など、事業所ならではの特徴があります。</p>
+<p>また、事業所ではエネルギーの利用用途を2つに分けて考えることができます。</p>
+<ul>
+<li>事業所で働く人間のために使う</li>
+<li>製品を作るために使う</li>
+</ul>
+<p>このように分けると、前者は一般家庭と同じような使われ方になると考えるのが自然かと思います。一方で後者は、完全にその事業所の都合に依存します。これが大きな不確定要素であり、使用量のボラティリティとスケールが、事業所で特に大きくなる要因だと考えらえます。</p>
+<h2 id="エネルギー使用量予測モデル"><a href="#エネルギー使用量予測モデル" class="headerlink" title="エネルギー使用量予測モデル"></a>エネルギー使用量予測モデル</h2><p>上記の内容を踏まえて、エネルギー使用量予測モデルにはルールベースモデルを採用しました。主な理由は以下になります。</p>
+<ul>
+<li>エネルギー使用量を予測することは難しい</li>
+<li>予測精度も大事だが、エネルギーが底をついたり、灯油などのエネルギー源を配送しすぎることを避けられれば問題ない</li>
+<li>業務上、予測値の計算結果に高い説明性が求められる</li>
+<li>使える特徴量は少ない</li>
+</ul>
+<p>また、モデルは一般家庭と事業所で分けて構築します。それぞれに別々のアルゴリズムを適用し、予測値を計算します。さらに、人それぞれのライフスタイルに依存することから、できるだけその人自身のデータのみを利用して予測を行います。</p>
+<h1 id="2-アルゴリズムの評価と関係者との合意"><a href="#2-アルゴリズムの評価と関係者との合意" class="headerlink" title="2. アルゴリズムの評価と関係者との合意"></a>2. アルゴリズムの評価と関係者との合意</h1><p>モデルを実装出来たらその予測精度を評価します。この時、目的を改めてはっきりと確認することが大切です。</p>
+<p>例えば今回の場合は「エネルギーが底をついたり、灯油などのエネルギー源を配送しすぎないこと」でした。つまり、「予測値は実際の使用量より大きすぎても小さすぎてもダメ」という制約が付きます。従って、どれくらいの誤差まで許容できるのかを考えた上で、どれくらいの誤差がどのような頻度で発生するのかを確認し、あらかじめリスクを把握しておく必要があります。</p>
+<p>例えば以下のように、誤差をヒストグラムにplotするのはとても有効な方法です。</p>
+<img src="/images/20240508a/image.png" alt="image.png" width="1200" height="920" loading="lazy">
+
+<p>ヒストグラムから許容できない誤差がどれくらいの割合で発生しそうかを見積ります。また、外れ値のデータはどのような理由から発生したのかを分析します。</p>
+<p>分析結果を関係者と議論し、合意が得られればプロダクト版の実装に着手します。</p>
+<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
+  <span class="fa fa-fw fa-check-circle"></span>
+
+<p>評価データとして、アルゴリズムを調整する際に用いたデータ（学習データ）と同じデータを用いてはいけません。これは機械学習でよく言われる過学習を回避するためです。<br>加えて、学習データよりも未来のデータで評価を行う必要があります。これは上記で説明した、時系列データは分布が変化することに起因します。評価データを学習データよりも未来のデータにすることで、分布の変化に対する頑健性も同時に確認します。ここで未来のデータに対する予測が全くできていない場合は、アルゴリズムを根本的に見直す必要があります。</p>
+</div>
+
+<h1 id="3-プロダクト版の開発、テスト、リリース"><a href="#3-プロダクト版の開発、テスト、リリース" class="headerlink" title="3. プロダクト版の開発、テスト、リリース"></a>3. プロダクト版の開発、テスト、リリース</h1><p>モデルの予測結果に合意が得られたら、プロダクト版を開発します。</p>
+<p>大量のデータを処理する必要があるため、例として、私の所属していたプロジェクトでは、インフラ構成を以下のようにしました。</p>
+<img src="/images/20240508a/image_2.png" alt="image.png" width="1200" height="791" loading="lazy">
+
+<p>ECSではデータの前処理を担当し、Glueで計算対象の全配送先のエネルギー使用量予測値を計算し、RDSに書き込みます。</p>
+<p>予測値を利用したい外部システムから、予測値を返すAPIを呼び出す仕組みです。また、モデルのハイパーパラメータは運用していく過程で変更される可能性があるため、定数を管理する用のファイルに切り出したり、DBで管理するなどの工夫をするのがおすすめです。</p>
+<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
+  <span class="fa fa-fw fa-check-circle"></span>
+
+<p>Glueではデータ量によっては多くの計算時間が必要になります。特にRDSからデータを読み込む際に多くの時間を要することがあるため、注意が必要です。</p>
+</div>
+
+<p>開発が終わったらテストを行います。通常の動作確認に加えて、プロダクト版の予測精度が、事前の評価と乖離していないかを確認することも重要なポイントになります。</p>
+<p>ここで大きな乖離があった場合は、プロダクト版と事前検証したアルゴリズムに大きな違いがあることになります。入力データが想定と違っていたり、実装ミスなどの可能性があるため、注意深く検証を進める必要があります。また、時系列データであることから、できるだけ長い期間、実際のデータで検証を行った後、リリース判断を行うのが無難です。</p>
+<h1 id="4-リリース後の性能評価"><a href="#4-リリース後の性能評価" class="headerlink" title="4. リリース後の性能評価"></a>4. リリース後の性能評価</h1><p>リリースした後、一定期間の予測実績が得られた時点で実際の性能評価を行います。リリース前後の決定的な違いは、実際にそのモデルの出力した予測値に基づいて業務が行われることです。</p>
+<p>例えば今回のプロジェクトですと、実際に出力された予測値に基づいてエネルギーの残量を計算し、配送を行うため、実環境との相互作用が発生します。この時、<strong>得られるエネルギー使用量データの分布が変わる可能性があります。</strong> これはどういうことか、以下のようなエネルギー使用傾向を持った人物を想定して考えてみたいと思います。</p>
+<ul>
+<li>主に部屋や風呂を温めるために灯油を使う</li>
+<li>灯油が配送されてからしばらくすると、灯油が底をつくのが不安になり、節約するようになる</li>
+<li>節約志向になってくると、風呂のおいだきをしなくなる</li>
+</ul>
+<img src="/images/20240508a/image_3.png" alt="image.png" width="1200" height="663" loading="lazy">
+
+<p>この人の場合、注目すべきポイントは、灯油の残量が灯油の使用量に影響を与えるということです。</p>
+<p>この時、予測モデルが予測値を実際よりも大きめに出力する傾向がある場合、この人が灯油を節約しようと思う段階へ入る前に、灯油が配送される可能性があります。その場合、この人からは、節約を頑張った結果である少ない灯油の使用量データが得られなくなります。従って、リリース前とリリース後で得られるデータの分布が異なることになります。</p>
+<p>リリース後の性能評価には、このような実環境との相互作用も織り込んだ結果が現れるため、最終的な評価結果として重要な意味を持ちます。最悪の場合、実環境との相互作用が、激しいデータ分布の変化を引き起こし、モデルが使い物にならなくなる可能性もあるので注意が必要です。逆に、この最終的な評価で納得のいく結果が得られた場合、今後も安定した運用が続けられる可能性が高いと考えられます。</p>
+<h1 id="おわりに"><a href="#おわりに" class="headerlink" title="おわりに"></a>おわりに</h1><p>最後まで読んでいただき、ありがとうございました！</p>
+<p>データサイエンスは数学的なバックグラウンドや高度な専門知識が必要な分野ではありますが、その分とても面白くてやりがいがあると思います。加えて、プロジェクトとしてデータサイエンスを取り入れる場合は、関係者への丁寧な説明など、コミュニケーション面でも重要なポイントが多々あります。</p>
+<p>昨今もChatGPTなどの登場によってAIの社会実装が次々と進んでいるので、実際のプロジェクトの進め方として参考になれば幸いです！</p>
+
+          
+        </div>
+        <footer>
+          <section class="social-area">
+          <!-- シェアボタン START -->
+  <ul class="social-button">
+    
+    <!-- Twitter -->
+    <li>
+      <a class="social-btn twitter-btn" target="_blank" href="https://twitter.com/intent/tweet?url=https://future-architect.github.io/articles/20240508a/&related=twitterapi%2Ctwitter&text=%E4%BA%88%E6%B8%AC%E3%83%A2%E3%83%87%E3%83%AB%E3%82%92%E6%89%B1%E3%81%86%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%81%AE%E9%80%B2%E3%82%81%E6%96%B9%20%7C%20%E3%83%95%E3%83%A5%E3%83%BC%E3%83%81%E3%83%A3%E3%83%BC%E6%8A%80%E8%A1%93%E3%83%96%E3%83%AD%E3%82%B0" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">ツイート</span>
+      </a>
+    </li>
+    <!-- Facebook -->
+    <li>
+      <a class="social-btn fb-btn" target="_blank" href="http://www.facebook.com/share.php?u=https://future-architect.github.io/articles/20240508a/&t=%E4%BA%88%E6%B8%AC%E3%83%A2%E3%83%87%E3%83%AB%E3%82%92%E6%89%B1%E3%81%86%E3%83%97%E3%83%AD%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E3%81%AE%E9%80%B2%E3%82%81%E6%96%B9" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">シェア</span>
+      </a>
+    </li>
+    <!-- hatebu -->
+    <li>
+      <a class="social-btn hatebu-btn" target="_blank" href="https://b.hatena.ne.jp/entry/s/future-architect.github.io/articles/20240508a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">はてな</span>
+      </a>
+    </li>
+    <!-- pocket -->
+    <li>
+      <a class="social-btn pocket-btn" target="_blank" href="https://getpocket.com/save?url=https://future-architect.github.io/articles/20240508a/" rel="nofollow noopener">
+        <i></i><span class="social-btn-label">Pocket</span>
+      </a>
+    </li>
+    
+  </ul>
+<!-- シェアボタン END -->
+
+          </section>
+          <aside>
+            <section class="related-post margin-bottom-40 nav">
+              <h2 id="related"><a href="#related" class="headerlink" title="関連記事"></a>関連記事</h2>
+              
+  <div class="widget">
+    <ul class="nav related-post-link"><li class="related-posts-item"><span>2021.02.25</span><span class="snscount">&#9825;16</span><a href=/articles/20210225/ title="こんにちは。TIG DXユニット所属の村上です。最近データ分析絡みでDynamoDBを触る機会が多く、DynamoDBが体の一部みたいになってきました。本記事の結論はこれです。">DynamoDBから効率的に大量のデータを取得する方法</a></li><li class="related-posts-item"><span>2023.01.05</span><span class="snscount">&#9825;14</span><a href=/articles/20230105a/ title="この記事はフューチャー Advent Calendar 2022の14日目の記事です。PythonのWeb APIをLambdaにデプロイする方法について解説します。">Python Web APIをAWS Lambdaにデプロイ</a></li><li class="related-posts-item"><span>2021.04.23</span><span class="snscount">&#9825;4</span><a href=/articles/20210423b/ title="私は大学時代から深層強化学習の研究をしていますが、分野的にほとんど実世界のデータを扱うことがありませんでした。そんな私ですが、実務で実世界データの分析を行う機会があり、その違いに多くの学びがありました。今回は実世界データのデータ分析を行った結果見えてきた、実世界データの特徴と欠損値や不正データの処理について解説しようと思います。簡易的ですがソースコードも示していますので、参考になれば幸いです。">実世界データの特徴と処理方法</a></li><li class="related-posts-item"><span>2021.02.18</span><span class="snscount">&#9825;11</span><a href=/articles/20210218/ title="本記事では[AWS SDK for Go]を使ってAWSのAPIをコールする場合のリトライアルゴリズムを差し替える方法を紹介します。">AWS SDK for Goのリトライアルゴリズムを差し替える方法</a></li><li class="related-posts-item"><span>2024.05.07</span><span class="snscount">&#9825;1</span><a href=/articles/20240507a/ title="本番環境のAmazon RDS DBインスタンスを別アカウントの検証環境にバックアップリストアする作業を自動化する機会があったので、その手法について紹介します">RDS DBインスタンスのアカウント間複製をGitHub Actionsで自動化<span class="newitem">NEW</span></a></li><li class="related-posts-item"><span>2024.02.26</span><span class="snscount">&#9825;2</span><a href=/articles/20240226a/ title="2023年末にAWS Lambda界隈で話題だった「AWS LambdaのGo 1.xランタイムのサポートが2023年12月31日で終了する」への対応を、あまりネットに無い特殊なやり方を採用して行ったので、考え方や実施メモを残します。">AWS Lambdaのランタイムを provided.al2023 に更新する際、2バイナリをzipして対応してみた</a></li></ul>
+  </div>
+            </section>
+            <section class="reference-post margin-bottom-40 nav">
+              
+            </section>
+            <section class="career-counseling article-entry margin-bottom-40 nav">
+              <h2 id="career"><a href="#career-counseling" class="headerlink" title="キャリア相談"></a>We're hiring</h2>
+              <p>フューチャーで一緒に働く仲間を大募集しています！</p>
+              <p>フューチャーで働くうえでのキャリア、会社紹介や事業内容の説明など相談会を実施中です！</p>
+
+              <div class="row article-card">
+                <a target="_blank" rel="noopener" href="https://open.talentio.com/r/1/c/future/pages/91866" title="フューチャーキャリア相談会 | open.talentio.com" class="col-sm-4 col-md-4 img_wrap">
+                  <img src="/career.jpg" class="img-responsive margin-bottom-20" alt="" width="200" height="135" loading="lazy">
+                </a>
+                <div class="col-sm-8 col-md-8 margin-bottom-40">
+                    <a target="_blank" rel="noopener" href="https://open.talentio.com/r/1/c/future/pages/91866"><div style="font-weight:bold;">フューチャーキャリア相談会 | open.talentio.com</div></a>
+                    <div class="lede">ご希望に応じてフューチャーの会社紹介や事業内容の説明も可能です。</div>
+                </div>
+              </div>
+            </section>
+          </aside>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <aside class="col-md-3 blog-sidebar">
+    <!-- START SIDEBAR  -->
+
+
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"><span class="toc-text">はじめに</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%A7%E3%81%BE%E3%81%8B%E3%81%AA%E6%B5%81%E3%82%8C"><span class="toc-text">大まかな流れ</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0%E3%81%AE%E8%80%83%E6%A1%88"><span class="toc-text">1. アルゴリズムの考案</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%A2%E3%83%87%E3%83%AB%E3%81%AE%E7%A8%AE%E9%A1%9E"><span class="toc-text">モデルの種類</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#a-%E7%B7%9A%E5%BD%A2%E4%BA%88%E6%B8%AC%E3%83%A2%E3%83%87%E3%83%AB"><span class="toc-text">a. 線形予測モデル</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#b-%E9%9D%9E%E7%B7%9A%E5%BD%A2%E4%BA%88%E6%B8%AC%E3%83%A2%E3%83%87%E3%83%AB"><span class="toc-text">b. 非線形予測モデル</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#c-%E3%83%AB%E3%83%BC%E3%83%AB%E3%83%99%E3%83%BC%E3%82%B9%E3%83%A2%E3%83%87%E3%83%AB"><span class="toc-text">c. ルールベースモデル</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%83%87%E3%83%BC%E3%82%BF%E3%82%BB%E3%83%83%E3%83%88%E3%81%AE%E6%80%A7%E8%B3%AA"><span class="toc-text">データセットの性質</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#a-%E9%9D%9E%E6%99%82%E7%B3%BB%E5%88%97%E3%83%87%E3%83%BC%E3%82%BF"><span class="toc-text">a. 非時系列データ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#b-%E6%99%82%E7%B3%BB%E5%88%97%E3%83%87%E3%83%BC%E3%82%BF"><span class="toc-text">b. 時系列データ</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%99%82%E7%B3%BB%E5%88%97%E7%9A%84%E3%81%AA%E7%89%B9%E5%BE%B4%E3%82%92%E6%8A%BD%E5%87%BA%E3%81%99%E3%82%8B%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0"><span class="toc-text">時系列的な特徴を抽出するアルゴリズム</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%83%87%E3%83%BC%E3%82%BF%E5%8F%8E%E9%9B%86"><span class="toc-text">データ収集</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%83%87%E3%83%BC%E3%82%BF%E5%88%86%E5%B8%83%E3%81%8C%E5%A4%89%E5%8C%96%E3%81%99%E3%82%8B"><span class="toc-text">データ分布が変化する</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%A8%E3%83%8D%E3%83%AB%E3%82%AE%E3%83%BC%E4%BD%BF%E7%94%A8%E9%87%8F%E3%83%87%E3%83%BC%E3%82%BF%E3%81%AE%E5%88%86%E6%9E%90"><span class="toc-text">エネルギー使用量データの分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%83%A9%E3%82%A4%E3%83%95%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%AB%E3%81%AB%E3%82%88%E3%82%8B%E9%81%95%E3%81%84"><span class="toc-text">ライフスタイルによる違い</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E8%88%AC%E5%AE%B6%E5%BA%AD%E3%81%A8%E4%BA%8B%E6%A5%AD%E6%89%80%E3%81%AE%E9%81%95%E3%81%84"><span class="toc-text">一般家庭と事業所の違い</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%82%A8%E3%83%8D%E3%83%AB%E3%82%AE%E3%83%BC%E4%BD%BF%E7%94%A8%E9%87%8F%E4%BA%88%E6%B8%AC%E3%83%A2%E3%83%87%E3%83%AB"><span class="toc-text">エネルギー使用量予測モデル</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0%E3%81%AE%E8%A9%95%E4%BE%A1%E3%81%A8%E9%96%A2%E4%BF%82%E8%80%85%E3%81%A8%E3%81%AE%E5%90%88%E6%84%8F"><span class="toc-text">2. アルゴリズムの評価と関係者との合意</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E7%89%88%E3%81%AE%E9%96%8B%E7%99%BA%E3%80%81%E3%83%86%E3%82%B9%E3%83%88%E3%80%81%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9"><span class="toc-text">3. プロダクト版の開発、テスト、リリース</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E5%BE%8C%E3%81%AE%E6%80%A7%E8%83%BD%E8%A9%95%E4%BE%A1"><span class="toc-text">4. リリース後の性能評価</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%81%8A%E3%82%8F%E3%82%8A%E3%81%AB"><span class="toc-text">おわりに</span></a></li></ol>
+</section>
+
+<section class="category">
+<h2 class="margin-top-30">カテゴリー</h2>
+<div class="widget">
+  <ul class="nav sidebar-categories margin-bottom-40">
+  
+  <li class=""><a href="/categories/Programming/">Programming (453)</a></li>
+<li class=""><a href="/categories/Infrastructure/">Infrastructure (274)</a></li>
+<li class=""><a href="/categories/Culture/">Culture (100)</a></li>
+<li class=""><a href="/categories/DataScience/">DataScience (64)</a></li>
+<li class=""><a href="/categories/IoT/">IoT (36)</a></li>
+<li class=""><a href="/categories/DB/">DB (25)</a></li>
+<li class=""><a href="/categories/DevOps/">DevOps (25)</a></li>
+<li class=""><a href="/categories/Business/">Business (22)</a></li>
+<li class=""><a href="/categories/%E8%AA%8D%E8%A8%BC%E8%AA%8D%E5%8F%AF/">認証認可 (21)</a></li>
+<li class=""><a href="/categories/Management/">Management (17)</a></li>
+<li class=""><a href="/categories/Security/">Security (15)</a></li>
+<li class=""><a href="/categories/VR/">VR (13)</a></li>
+<li class=""><a href="/categories/Design/">Design (11)</a></li>
+
+  </ul>
+</div>
+
+</section>
+<section class="podcast-link">
+<h2 class="margin-top-30">Tech Cast</h2>
+
+  <div class="class="widget-wrap">
+  <div class="widget">
+    <ul class="nav techcast">
+      
+    </ul>
+  </div>
+  </div>
+  
+</section>
+<section class="advent-calendar">
+<h2 class="margin-top-30">アドベントカレンダー</h2>
+<div class="widget">
+  <ul class="nav-flex">
+    <li><a href="http://qiita.com/advent-calendar/2023/future" title="フューチャー Advent Calendar 2023 #Qiita" target="_blank" rel="noopener">2023年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2022/future" title="フューチャー Advent Calendar 2022 #Qiita" target="_blank" rel="noopener">2022年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2021/future" title="フューチャー Advent Calendar 2021 #Qiita" target="_blank" rel="noopener">2021年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2020/future" title="フューチャー Advent Calendar 2020 #Qiita" target="_blank" rel="noopener">2020年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2019/future" title="フューチャー Advent Calendar 2019 #Qiita" target="_blank" rel="noopener">2019年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2018/future" title="フューチャー Advent Calendar 2018 #Qiita" target="_blank" rel="noopener">2018年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2017/future" title="フューチャー Advent Calendar 2017 #Qiita" target="_blank" rel="noopener">2017年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2016/future" title="フューチャー Advent Calendar 2016 #Qiita" target="_blank" rel="noopener">2016年</a></li>
+    <li><a href="http://qiita.com/advent-calendar/2015/future" title="フューチャー Advent Calendar 2015 #Qiita" target="_blank" rel="noopener">2015年</a></li>
+  </ul>
+</div>
+
+</section>
+<!-- END SIDEBAR -->
+
+  </aside>
+</div>
+
+  </section>
+</div>
+
+      <!-- BEGIN PRE-FOOTER -->
+    <footer>
+      <div class="pre-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>About Us</h2>
+              <p>経営とITをデザインする、フューチャーの技術ブログです。業務で利用している幅広い技術について紹介します。<br /><br /><a target="_blank" rel="noopener" href="http://www.future.co.jp/">http://www.future.co.jp/</a></p>
+              <div class="social-btn twitter-btn twitter-follow-btn">
+                <a href="https://twitter.com/intent/follow?screen_name=future_techblog " target="_blank" rel="nofollow noopener">
+                  <i></i><span class="tw-btn-label">フューチャー技術ブログをフォロー</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-4 pre-footer-col">
+              <h2>Contact</h2>
+              <address class="margin-bottom-40">
+                <a href="https://www.future.co.jp/recruit/recruit/rec-fresh/" title="新卒採用" target="_blank" rel="noopener">新卒採用</a><br>
+                <a href="https://www.future.co.jp/recruit/recruit/rec-career/" title="キャリア採用" target="_blank" rel="noopener">キャリア採用</a><br>
+                <a href="https://www.future.co.jp/contact_us/" title="お問い合わせページ" target="_blank" rel="noopener">お問い合わせ</a><br>
+                <a href="https://www.future.co.jp/architect/socialmediapolicy/" title="ソーシャルメディアポリシー" target="_blank" rel="noopener">メディアポリシー</a><br><br>
+                <a href="mailto:techblog@future.co.jp">techblog@future.co.jp</a>
+              </address>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-6 pre-footer-col">
+              <h2>Contents</h2>
+              <a href="https://future-architect.github.io/coding-standards/" title="Future Enterprise Coding Standards" target="_blank" rel="noopener">コーディング規約</a><br>
+              <a href="https://future-architect.github.io/typescript-guide/" title="仕事ですぐに使えるTypeScript" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>Event</h2>
+              <a href="https://future.connpass.com/" title="経営とITをデザインするフューチャーの勉強会です" target="_blank" rel="noopener">connpass</a><br>
+              <a href="https://www.future.co.jp/futureinsightseminar/" title="フューチャーインサイトセミナー" target="_blank" rel="noopener">Webセミナー</a><br>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-3 col-3 pre-footer-col">
+              <h2>SNS</h2>
+              <a href="https://github.com/future-architect" title="Future's official open source repositories" target="_blank" rel="noopener">GitHub</a><br>
+              <a href="https://qiita.com/organizations/future" title="フューチャーのQiita Organizationです" target="_blank" rel="noopener">Qiita</a><br>
+              <a href="https://note.future.co.jp/" title="フューチャーの公式note" target="_blank" rel="noopener">未来報</a><br>
+              <a href="https://www.youtube.com/channel/UCJUSwYYd0CkGgmEKAW7QVpw" title="フューチャーYoutubeチャネル" target="_blank" rel="noopener">Youtube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 padding-top-10">
+              &copy; 2024 フューチャー技術ブログ<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-X1C28R8H0M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-X1C28R8H0M');
+  gtag('config', 'UA-74047147-1'); // 過渡期対応
+</script>
+
+  </div>
+</body>
+</html>
