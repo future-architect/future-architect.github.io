@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!--
+    ███████╗██╗░░░██╗████████╗██╗░░░██╗██████╗░███████╗
+    ██╔════╝██║░░░██║╚══██╔══╝██║░░░██║██╔══██╗██╔════╝
+    █████╗░░██║░░░██║░░░██║░░░██║░░░██║██████╔╝█████╗░░
+    ██╔══╝░░██║░░░██║░░░██║░░░██║░░░██║██╔══██╗██╔══╝░░
+    ██║░░░░░╚██████╔╝░░░██║░░░╚██████╔╝██║░░██║███████╗
+    ╚═╝░░░░░░╚═════╝░░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝╚══════╝
+    ████████╗███████╗░█████╗░██╗░░██╗
+    ╚══██╔══╝██╔════╝██╔══██╗██║░░██║
+    ░░░██║░░░█████╗░░██║░░╚═╝███████║
+    ░░░██║░░░██╔══╝░░██║░░██╗██╔══██║
+    ░░░██║░░░███████╗╚█████╔╝██║░░██║
+    ░░░╚═╝░░░╚══════╝░╚════╝░╚═╝░░╚═╝
+    ██████╗░██╗░░░░░░█████╗░░██████╗░
+    ██╔══██╗██║░░░░░██╔══██╗██╔════╝░
+    ██████╦╝██║░░░░░██║░░██║██║░░██╗░
+    ██╔══██╗██║░░░░░██║░░██║██║░░╚██╗
+    ██████╦╝███████╗╚█████╔╝╚██████╔╝
+    ╚═════╝░╚══════╝░╚════╝░░╚═════╝░
+    Welcome engineer.
+    https://www.future.co.jp/recruit/
+  -->
+  <%
+    let title = page.title;
+    let description;
+    let keywords = 'フューチャーアーキテクト,技術ブログ,ITコンサル';
+    let author = 'フューチャー技術ブログ';
+
+    if (is_archive()){
+      title = 'Archives';
+    if (is_month()){
+        title += ': ' + page.year + '/' + page.month;
+      } else if (is_year()){
+        title += ': ' + page.year;
+      }
+    } else if (is_category()){
+      title = page.category + ' の記事一覧';
+      description = page.category + ' カテゴリの記事一覧 | '　+ config.description
+      keywords = keywords + ',' + page.category;
+    } else if (is_tag()){
+      title = page.tag + ' の記事一覧';
+      description = page.tag + ' タグの記事一覧 | '　+ config.description
+      keywords = keywords + ',' + page.tag;
+    } else if (path.indexOf('authors/' + page.author) >= 0) {
+      title = page.author;
+      description = page.author + ' が執筆した記事一覧 | '　+ config.description
+      keywords = keywords + ',' + page.author;
+      author = page.author;
+    }
+
+    if (title) {
+      title = title + ' | ' + config.title
+    } else {
+      title = config.title
+    }
+
+    if (page.tags?.length > 0) {
+      keywords = join_pagetag()
+    }
+
+    if (page.author) {
+      author = page.author;
+    }
+  %>
+  <title><%= title %></title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <%
+  var options = {title:title, description:description, twitter_id:theme.twitter, fb_admins:theme.fb_admins, fb_app_id:theme.fb_app_id};
+  if (page.path == 'index.html'){
+    options['image'] = '/ogp_techblog.jpg';
+  } else if (page.eyecatch) {
+    options['image'] = page.eyecatch;
+  } else {
+    const content  = page.content;
+    let images = [];
+    if (content) {
+      images = images.slice();
+      if (content.includes('<img')) {
+        let img;
+        const imgPattern = /<img [^>]*src=['"]([^'"]+)([^>]*>)/gi;
+        while ((img = imgPattern.exec(content)) !== null) {
+          images.push(img[1]);
+        }
+      }
+    }
+
+    // カテゴリ、タグ、著者ページでは取得できないので、サムネイルから取得
+    if (images.length == 0 && page.posts) {
+      page.posts.map(post => post.thumbnail).forEach(path => {
+        if (path) {
+          images.push(path);
+        }
+      })
+    }
+    options['image'] = images.filter(path => !(path.endsWith(".svg"))).slice(0, 10);
+    if (options['image'].length === 0) {
+      options['image'] = '/ogp_techblog.jpg';
+    }
+  }
+  %>
+  <%- open_graph(options) %>
+  <% if (theme.rss){ %>
+  <link rel="alternate" href="<%- theme.rss %>" title="<%= config.title %>" type="application/atom+xml">
+  <% } %>
+  <link rel="icon" href="/logo.svg" sizes="any" type="image/svg+xml">
+  <link rel="mask-icon" href="/logo.svg" sizes="any" color="#0bd">
+  <link rel="icon alternate" href="<%- theme.favicon %>">
+  <link rel="apple-touch-icon" sizes='180x180' href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes='57x57' href="/apple-touch-icon-57x57.png">
+  <link rel="canonical" href="<%= url.replace("index.html", "") %>">
+  <meta content="<%= keywords %>" name="keywords">
+  <meta content="<%= author %>" name="author">
+  <link rel="preload" as="image" href="/banner.jpg" />
+  <link rel='manifest' href='/manifest.webmanifest'/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <link rel="stylesheet" href="/metronic/assets/style.css">
+  <link rel="stylesheet" href="/css/theme-styles.css">
+</head>
