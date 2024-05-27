@@ -342,7 +342,7 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 
 これは`postcondition`が事後チェックであることを反映している例で、データソースやリソースが取得された後で値が評価されていることを如実に表しています。
 
-こうなると `postcondition`で全部チェックしてしまっても良い気もしますが、事後チェックであるか事後チェックであるかを明示するため、`precondition`で制御できる箇所は`precondition`で制御するようにしましょう。
+こうなると `postcondition`で全部チェックしてしまっても良い気もしますが、事後チェックであるかを明示するため、`precondition`で制御できる箇所は`precondition`で制御するようにしましょう。
 
 ## さいごに
 
