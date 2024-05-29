@@ -35,8 +35,8 @@ https://graph.facebook.com?id=https%3A%2F%2Ffuture-architect.github.io%2Farticle
 
 ```sh
 $ cd ../
-$ git clone --depth 1 https://github.com/future-architect/tech-blog.git
-$ cd tech-blog
+$ git clone --depth 1 https://github.com/future-architect/future-architect.github.io
+$ cd future-architect.github.io
 $ npm install
 
 $ node_modules\.bin\hexo server
@@ -45,22 +45,11 @@ $ node_modules\.bin\hexo server
 
 ## Deploy
 
-```sh
-cd ../
-git clone --depth 1 https://github.com/future-architect/future-architect.github.io
+`main` ブランチにマージトリガーでGitHub Actionsによりデプロイされる。
 
-# Windows Only
-cd tech-blog
-mklink /J public ..\future-architect.github.io
+### SNSカウントの更新
 
-node_modules\.bin\hexo generate
-cd public
-git add .
-git commit -m "<message>"
-git push origin HEAD
-```
-
-## SNSカウントの更新
+GitHub Actions経由で実行されるため、通常開発者によるSNSカウントの更新は不要。
 
 ```sh
 # インストール
