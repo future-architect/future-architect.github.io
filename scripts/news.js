@@ -14,15 +14,15 @@ process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 (async () => {
 
-  let proxyAgent;
-  if (process.env.http_proxy) {
-    proxyAgent = new HttpsProxyAgent.HttpsProxyAgent(process.env.http_proxy);
-  }
+    let proxyAgent;
+    if (process.env.http_proxy) {
+      proxyAgent = new HttpsProxyAgent.HttpsProxyAgent(process.env.http_proxy);
+    }
 
-  const qiitaRssResponse = await fetch(
-    "https://qiita.com/organizations/future/activities.atom",
-    { agent: proxyAgent }
-  );
+    const qiitaRssResponse = await fetch(
+      "https://qiita.com/organizations/future/activities.atom",
+      { agent: proxyAgent, timeout: 30000 }
+    );
   const qiitaRssResponseText = await qiitaRssResponse.text();
 
   const rssParser = new RssParser();
@@ -37,7 +37,7 @@ process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
   const connpassRssResponse = await fetch(
     "https://future.connpass.com/ja.atom",
-    { agent: proxyAgent }
+    { agent: proxyAgent, timeout: 30000 }
   );
   const connpassRssResponseText = await connpassRssResponse.text();
 
