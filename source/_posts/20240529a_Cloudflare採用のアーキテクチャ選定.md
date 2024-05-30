@@ -11,7 +11,7 @@ category:
   - Infrastructure
 thumbnail: /images/20240529a/thumbnail.png
 author: shotap
-lede: "![image.png]"
+lede: "どんなアーキテクチャでCloudflareを採用したのか？結論ですが、ハイブリッドクラウド構成でのCDN/WAFとして"
 ---
 
 <img src="/images/20240529a/image.png" alt="" width="1200" height="404" loading="lazy">
