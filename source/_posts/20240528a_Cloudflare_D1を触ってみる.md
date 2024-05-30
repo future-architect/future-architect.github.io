@@ -12,6 +12,9 @@ thumbnail: /images/20240528a/thumbnail.png
 author: 真野隼記
 lede: "Cloudflare D1を触ってみました。"
 ---
+
+<img src="/images/20240528a/image.png" alt="" width="1200" height="404" loading="lazy">
+
 [Cloudflare連載](/articles/20240527a/)の2日目です。
 
 ## はじめに
