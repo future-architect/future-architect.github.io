@@ -18,7 +18,7 @@ lede: "Cloudflare D1を触ってみました。"
 
 TIG真野です。発表当初に（そのポテンシャルや将来性が）ヤバいと噂されたCloudflare D1を触ってみた記事です。
 
-## Clodflare D1とは
+## Cloudflare D1とは
 
 [D1](https://developers.cloudflare.com/d1/)はSQLiteをベースに構築された、CloudflareのドキュメントによるとサーバレスSQLデータベースです。エッジロケーションでRDBが動く、SQLLiteはファイルベースなのでレプリケーションに適正ありありでは？と評判になったことは記憶に新しいです。
 

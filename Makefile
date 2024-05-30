@@ -4,13 +4,15 @@ SHELL := /bin/bash
 s:
 	node_modules/.bin/hexo s
 
-g:
+update:
 	snssharecount > temp.json
 	mv temp.json sns_count_cache.json
 	echo "refresh sns_count_cache.json"
 	ga > ga_cache.json
 	pv > ga4_pv.json
 	echo "refresh ga_cache.json"
+
+g: update
 	node_modules/.bin/hexo g --force
 	git add .
 	git commit -m "$(ARG)"
