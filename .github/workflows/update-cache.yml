@@ -1,0 +1,58 @@
+name: Update SNS conuts cache
+
+on:
+  # schedule:
+  # # 9:00 JST
+  # - cron: '0 0 * * *'
+  # # 15:00 JST
+  # - cron: '0 6 * * *'
+  # # 21:00 JST
+  # - cron: '0 12 * * *'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Tokyo
+      FB_TOKEN: ${{ secrets.FB_TOKEN }}
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/google_application_credentials.json
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Go tools
+        run: |
+          mkdir ~/bin
+          export GOBIN=~/bin
+          go install github.com/ma91n/snssharecount/cmd/snssharecount@latest
+          go install github.com/ma91n/snssharecount/cmd/ga@latest
+
+      - name: Update SNS counts
+        run: |
+          echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}' > google_application_credentials.json
+          ~/bin/snssharecount > temp.json
+          mv temp.json sns_count_cache.json
+          ~/bin/ga > ga_cache.json
+
+      - name: Commit and push
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sns_count_cache.json ga_cache.json
+          git commit -m "Update SNS counts cache"
+          git push origin HEAD
