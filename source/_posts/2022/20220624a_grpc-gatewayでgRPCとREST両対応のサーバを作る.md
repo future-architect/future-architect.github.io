@@ -6,6 +6,7 @@ tag:
   - gRPC
   - grpc-gateway
   - IDL
+  - ProtocolBuffers
 category:
   - Programming
 thumbnail: /images/20220624a/thumbnail.png
