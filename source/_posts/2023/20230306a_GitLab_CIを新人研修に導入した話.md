@@ -6,6 +6,7 @@ tag:
   - 新人研修
   - CI/CD
   - GitLab
+  - GitLab CI
 category:
   - DevOps
 thumbnail: /images/20230306a/thumbnail.png
