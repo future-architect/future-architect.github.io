@@ -6,6 +6,8 @@ tag:
   - GitHub
   - 自動化
   - CircleCI
+  - ChangeLog
+  - リリースノート
 category:
   - Infrastructure
 thumbnail: /images/20210708a/thumbnail.png

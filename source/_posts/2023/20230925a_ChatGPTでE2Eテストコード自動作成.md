@@ -4,8 +4,8 @@ date: 2023/09/25 00:00:00
 postid: a
 tag:
   - ChatGPT
-  - プロンプト
-  - E2E
+  - プロンプトエンジニアリング
+  - E2Eテスト
   - 技育CAMPアカデミア
   - Playwright
   - Cypress

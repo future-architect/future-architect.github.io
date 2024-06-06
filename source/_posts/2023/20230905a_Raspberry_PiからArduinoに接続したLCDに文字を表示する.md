@@ -5,7 +5,7 @@ postid: a
 tag:
   - RaspberryPi
   - Arduino
-  - 初心者
+  - 初心者向け
   - 電子工作
 category:
   - IoT

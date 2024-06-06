@@ -6,7 +6,7 @@ tag:
   - UnrealEngine
   - UnrealEngine5
   - ゲーム制作
-  - 初心者
+  - 初心者向け
 category:
   - Infrastructure
 thumbnail: /images/20231127a/thumbnail.jpg

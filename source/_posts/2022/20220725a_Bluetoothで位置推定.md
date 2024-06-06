@@ -5,7 +5,7 @@ postid: a
 tag:
   - 電子工作
   - Bluetooth
-  - 位置推定
+  - 位置特定
 category:
   - Infrastructure
 thumbnail: /images/20220725a/thumbnail.png

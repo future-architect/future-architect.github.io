@@ -4,6 +4,7 @@ date: 2021/10/04 00:00:00
 postid: a
 tag:
   - 登壇レポート
+  - 勉強会
   - 合同勉強会
   - LT
   - AWS
@@ -23,14 +24,14 @@ TIGの棚井龍之介です。
 
 以下、登壇者とタイトルになります。
 
-| # 	| 名前                                                                                                  	| 所属   	| タイトル                                             	|
-|---	|-------------------------------------------------------------------------------------------------------	|--------	|------------------------------------------------------	|
-| 1 	| [伊藤さん](https://future-architect.github.io/authors/%E4%BC%8A%E8%97%A4%E5%A4%AA%E6%96%89/)          	| FUTURE 	| GCPのサービスを活用したGitOps                        	|
-| 2 	| 小宮さん                                                                                              	| Nyle   	| パブリッククラウドでDR（災害復旧）に取り組んでみる話 	|
-| 3 	| [棚井さん](https://future-architect.github.io/authors/%E6%A3%9A%E4%BA%95%E9%BE%8D%E4%B9%8B%E4%BB%8B/) 	| FUTURE 	| 無料でIaCを試す AWS×Terraform×LocalStack             	|
-| 4 	| 塚本さん                                                                                              	| Nyle   	| CloudFormationを使用したシームレスな開発の話         	|
-| 5 	| [真野さん](https://future-architect.github.io/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98/)          	| FUTURE 	| 冪等じゃないジョブがなぜ僕を困らせたのか             	|
-| 6 	| 工藤さん                                                                                              	| Nyle   	| レガシーメディアシステムのJamstackリプレイス計画素案 	|
+| # | 名前                                                                                                 | 所属  | タイトル                                             |
+|---|-------------------------------------------------------------------------------------------------------|--------|-----------------------------------------------------|
+| 1 | [伊藤さん](https://future-architect.github.io/authors/%E4%BC%8A%E8%97%A4%E5%A4%AA%E6%96%89/)          | FUTURE | GCPのサービスを活用したGitOps                        |
+| 2 | 小宮さん                                                                                              | Nyle   | パブリッククラウドでDR（災害復旧）に取り組んでみる話 |
+| 3 | [棚井さん](https://future-architect.github.io/authors/%E6%A3%9A%E4%BA%95%E9%BE%8D%E4%B9%8B%E4%BB%8B/) | FUTURE | 無料でIaCを試す AWS×Terraform×LocalStack             |
+| 4 | 塚本さん                                                                                              | Nyle   | CloudFormationを使用したシームレスな開発の話        |
+| 5 | [真野さん](https://future-architect.github.io/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98/)          | FUTURE | 冪等じゃないジョブがなぜ僕を困らせたのか             |
+| 6 | 工藤さん                                                                                              | Nyle   | レガシーメディアシステムのJamstackリプレイス計画素案 |
 
 # 登壇スライドの紹介
 登壇者のスライドです。
