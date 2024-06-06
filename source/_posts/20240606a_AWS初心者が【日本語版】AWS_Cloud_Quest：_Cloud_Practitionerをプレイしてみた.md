@@ -11,7 +11,7 @@ tag:
 category:
   - Infrastructure
 thumbnail: /images/20240606a/thumbnail.png
-author: 井隆太
+author: 平井隆太
 lede: "AWS Cloud Questの魅力や使い方、そして実際にプレイしてみた感想をAWS初学者の目線でお伝えします。"
 ---
 # はじめに
