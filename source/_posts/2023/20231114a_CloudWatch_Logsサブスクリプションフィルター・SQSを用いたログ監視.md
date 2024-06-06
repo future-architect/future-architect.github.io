@@ -3,7 +3,8 @@ title: "CloudWatch Logsサブスクリプションフィルター・SQSを用い
 date: 2023/11/14 00:00:00
 postid: a
 tag:
-  - ログ監視
+  - ログ
+  - 監視
   - AWS
   - CloudWatch
   - SQS

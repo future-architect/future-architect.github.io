@@ -5,7 +5,7 @@ postid: b
 tag:
   - GAS
   - スプレッドシート
-  - 初心者
+  - 初心者向け
   - Vue.js
 category:
   - Programming

@@ -6,7 +6,7 @@ tag:
   - Swift
   - SwiftUI
   - SwiftData
-  - モバイル
+  - モバイルアプリ
 category:
   - Programming
 thumbnail: /images/20240522a/thumbnail.png
