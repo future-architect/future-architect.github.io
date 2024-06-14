@@ -9,6 +9,7 @@ tag:
   - Rivive
   - GitHubActions
   - GitHub
+    外部寄稿
 category:
   - DevOps
 thumbnail: /images/20231129a/thumbnail.png
