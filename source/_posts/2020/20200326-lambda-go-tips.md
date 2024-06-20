@@ -7,6 +7,7 @@ tag:
   - AWS
   - サーバーレス
   - Lambda
+  - Tips
 category:
   - Programming
 author: 真野隼記
