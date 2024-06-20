@@ -9,6 +9,7 @@ tag:
   - SparkSQL
   - Athena
   - Python
+  - Tips
 category:
   - Infrastructure
 thumbnail: /images/20211011a/thumbnail.png
