@@ -7,6 +7,7 @@ tag:
   - Goland
   - JetBrains
   - ショートカット
+  - Tips
 category:
   - Programming
 thumbnail: /images/20210902b/thumbnail.gif
