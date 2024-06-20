@@ -5,6 +5,7 @@ postid: ""
 tag:
   - VSCode
   - チーム開発
+  - Tips
 category:
   - Programming
 thumbnail: /images/20200828/thumbnail.png
