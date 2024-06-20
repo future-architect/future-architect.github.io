@@ -7,6 +7,7 @@ tag:
   - GCP
   - MLOps
   - ナレッジ
+  - Tips
 category:
   - DataScience
 thumbnail: /images/20230213a/thumbnail.png
