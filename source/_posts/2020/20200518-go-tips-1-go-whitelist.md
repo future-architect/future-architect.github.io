@@ -6,6 +6,7 @@ tag:
   - Go
   - GoTips連載
   - プロキシ
+  - Tips
 category:
   - Programming
 thumbnail: /images/20200518/thumbnail.png
