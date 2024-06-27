@@ -68,6 +68,7 @@ snssharecount > temp.json
 mv temp.json sns_count_cache.json
 
 ga > ga_cache.json
+pv > ga4_pv.json
 ```
 
 ## 画像圧縮
