@@ -6,6 +6,7 @@ tag:
   - IaC
   - Pulumi
   - Infrastructure as Code
+  - IaC
 category:
   - Infrastructure
 thumbnail: /images/20230426a/thumbnail.png
