@@ -55,6 +55,7 @@ GitHub Actions経由で実行されるため、通常開発者によるSNSカウ
 # インストール
 go install github.com/ma91n/snssharecount/cmd/snssharecount@latest
 go install github.com/ma91n/snssharecount/cmd/ga@latest
+go install github.com/ma91n/snssharecount/cmd/pv@latest
 ```
 
 実行
@@ -68,6 +69,7 @@ snssharecount > temp.json
 mv temp.json sns_count_cache.json
 
 ga > ga_cache.json
+pv > ga4_pv.json
 ```
 
 ## 画像圧縮
