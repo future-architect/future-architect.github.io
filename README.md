@@ -108,3 +108,10 @@ Lint
 ```sh
 > textlint source/_posts
 ```
+
+Lint with lint-staged(staged files only)
+
+```sh
+git add source/_posts
+npx lint-staged
+```
