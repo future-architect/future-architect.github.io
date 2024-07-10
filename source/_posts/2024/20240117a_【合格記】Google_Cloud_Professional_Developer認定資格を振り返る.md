@@ -4,7 +4,7 @@ date: 2024/01/17 00:00:00
 postid: a
 tag:
   - GCP
-  - Google Cloud
+  - GoogleCloud
   - 合格記
 category:
   - Infrastructure
