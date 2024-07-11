@@ -8,6 +8,7 @@ tag:
   - mail
   - go-smtp-mock
   - Go
+  - モック
 category:
   - Programming
 thumbnail: /images/20240710a/thumbnail.png
