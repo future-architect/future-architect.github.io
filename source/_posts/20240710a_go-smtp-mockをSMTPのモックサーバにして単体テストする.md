@@ -5,7 +5,7 @@ postid: a
 tag:
   - テスト
   - SMTP
-  - mail
+  - メール
   - go-smtp-mock
   - Go
   - モック
