@@ -5,9 +5,10 @@ postid: a
 tag:
   - テスト
   - SMTP
-  - mail
+  - メール
   - go-smtp-mock
   - Go
+  - モック
 category:
   - Programming
 thumbnail: /images/20240710a/thumbnail.png

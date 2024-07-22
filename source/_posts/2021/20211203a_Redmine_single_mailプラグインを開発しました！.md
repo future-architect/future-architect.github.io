@@ -6,6 +6,7 @@ tag:
   - コアテク
   - OSS
   - Redmine
+  - メール
 category:
   - Infrastructure
 thumbnail: /images/20211203a/thumbnail.png

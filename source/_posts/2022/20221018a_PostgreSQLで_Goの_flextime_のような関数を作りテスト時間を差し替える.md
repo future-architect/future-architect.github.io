@@ -7,6 +7,7 @@ tag:
   - flextime
   - テスト
   - トリガー
+  - モック
 category:
   - Infrastructure
 thumbnail: /images/20221018a/thumbnail.jpg

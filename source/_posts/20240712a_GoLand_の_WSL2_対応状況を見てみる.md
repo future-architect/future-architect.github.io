@@ -3,6 +3,7 @@ title: "GoLand の WSL2 対応状況を見てみる"
 date: 2024/07/12 00:00:00
 postid: a
 tag:
+  - Go
   - goland
   - WSL
   - IDE
@@ -118,7 +119,7 @@ Go SDKのIDE経由のダウンロードも、ストレス無く快適に設定�
 
 ### デバッグ実行
 
-デバッグ実行ですが、ステップ実行はできるもののブレイクポイントが動かない？といった課題に総合したことがあります。[Debugger does not work on a project opened via //wsl$/...](https://youtrack.jetbrains.com/issue/GO-12517/Debugger-does-not-work-on-a-project-opened-via-wsl-...)課題がYouTrackにも上がっていました。
+デバッグ実行ですが、ステップ実行はできるもののブレイクポイントが動かない？といった課題に遭遇したことがあります。[Debugger does not work on a project opened via //wsl$/...](https://youtrack.jetbrains.com/issue/GO-12517/Debugger-does-not-work-on-a-project-opened-via-wsl-...)課題がYouTrackにも上がっていました。
 
 `GoLand 2024.1.3` では問題ゼロで動作します。
 
