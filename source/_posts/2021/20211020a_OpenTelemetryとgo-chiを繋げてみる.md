@@ -4,6 +4,7 @@ date: 2021/10/20 00:00:00
 postid: a
 tag:
   - OpenTelemetry
+  - Telemetry
   - go-chi
   - Go
   - CNCF
