@@ -47,11 +47,13 @@ ElasticsearchからOpenSearchへの移行を行った際に、利用するGoの�
 ## 追加/更新系メソッド
 
 ### Index
+
 Indexメソッドは、OpenSearchにおいてデータをIndex[^1]に登録し、既に既存のデータがある場合は上書きする処理です。RDSにおけるUpsertのようなものです。
 
 [^1]: IndexとはRDSにおけるテーブルのようなものです。Elasticsearch/OpenSearchの用語について詳しくは[こちら](https://www.elastic.co/jp/blog/what-is-an-elasticsearch-index)をご覧ください。
 
 #### olivere/elasticの実装
+
 ``` golang
 package main
 
@@ -168,6 +170,7 @@ func main() {
 ```
 
 #### 実装方法の違い
+
 パラメーターは同じですが、大きな違いとして4点あります。
 
 1. ドキュメントの渡し方
@@ -468,4 +471,3 @@ ElasticsearchからOpenSearchへ切り替えるときなどにお役に立てれ
 
 どちらのクライアントも一長一短あり、やりたいことによっては一工夫する必要があることが分かりました。個人的には、あまりこねくり回すことなくビジネスロジックに集中できるライブラリが出来たらいいなと感じました。
 
-[^1]: IndexとはRDSにおけるテーブルのようなものです。詳しくは[こちら](https://www.elastic.co/jp/blog/what-is-an-elasticsearch-index)をご覧ください。

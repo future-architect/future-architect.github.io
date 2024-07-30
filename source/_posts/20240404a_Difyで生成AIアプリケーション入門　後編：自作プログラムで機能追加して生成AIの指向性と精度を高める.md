@@ -27,7 +27,7 @@ lede: "前編のチュートリアル1で作ったSQL生成チャットbotをベ
 SQLの実行環境が必要になりますが、ちょうど Dify が使用している DB（Postgresql） サービスがあるので、これにホストOSからアクセスできるようにします。別でDBを用意できる場合はそちらでもOKです。
 
 `docker-compose.yml` で以下の行をアンコメントしてください。
- 
+
 ```yml docker-compoese.yml
     # uncomment to expose db(postgresql) port to host
     # ports:
@@ -36,7 +36,7 @@ SQLの実行環境が必要になりますが、ちょうど Dify が使用し�
 
 これでホストOSから下記で接続できます。
 
-* ホスト・ポート `localhost:5432` 
+* ホスト・ポート `localhost:5432`
 * DB名 `dify`
 * ユーザ名 `postgres`
 * パスワード `difyai123456`
@@ -179,7 +179,6 @@ OpenAPI (Swagger) 準拠のスキーマが必要になります。上の例で�
 <img src="/images/20240404a/image_4.png" alt="" width="588" height="228" loading="lazy">
 
 「手順」はチュートリアル2の内容に1行追加し、ツールを使うように指示します。変数 `{{DDL}}` `{{DataModelDescriptions}}` は前回同様「段落」に変更するのをお忘れなく。
-
 
 ````
 You can behave as an expert of database expert. Provide a clear answer to the main purpose of the order. Omit preamble, phase, and repeating the order.

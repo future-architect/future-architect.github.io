@@ -17,12 +17,12 @@ lede: "公式チュートリアルDevelop in SwiftのModels and persistence、Da
 <img src="/images/20240522a/image.png" alt="" width="1103" height="542" loading="lazy">
 
 # はじめに
+
 HealthCare Innovation Group(HIG)[^1]の橋本です。
 
 新しく登場した公式チュートリアル[Develop in Swift](https://developer.apple.com/tutorials/develop-in-swift/)のModels and persistence、Data editing and navigation、Relationships and queriesという3つのセクションでSwiftDataを学べるとのことで実際にやってみました。
 
 今回は、1つ目の **Models and persistence編** です。Models and persistenceセクションで学んだこと、Wrap-upのExtend your appの追加課題をやってみたので、これらについてまとめています。
-
 
 # 本記事でわかること
 
@@ -33,11 +33,13 @@ HealthCare Innovation Group(HIG)[^1]の橋本です。
 - Wrap-upのExtend your appの追加課題の解答例を知ることができる
 
 # 環境
+
 - OS: macOS Sonoma 14.4.1
 - Xcode: 15.3 (15E204a)
 - Swift: 5.10
 
 # 目次
+
 - SwiftDataとは
 - Save data
   - Section 1~3(UI等のSwiftDataに直接関係のない事前準備)
@@ -48,11 +50,13 @@ HealthCare Innovation Group(HIG)[^1]の橋本です。
 - おわりに
 
 # SwiftDataとは
+
 <img src="/images/20240522a/image_2.png" alt="" width="1200" height="419" loading="lazy">
 
 [`SwiftData`](https://developer.apple.com/documentation/swiftdata)とは、データモデリングとデータの永続化のフレームワークです。
 これまで主に使われていた`CoreData`の後継として期待されています。
 SwiftDataの主な特徴としては、
+
 - `SwiftUI`との連携
   - `SwiftUI`と深く統合されており、ユーザーインターフェースのためのデータバインディングが非常にスムーズ
 - 宣言的データモデリング:
@@ -62,8 +66,6 @@ SwiftDataの主な特徴としては、
 - パフォーマンス最適化:
   - Appleのエコシステムに合わせて最適化されており、効率的なクエリ実行が可能
 
-
-
 <div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
   <span class="fa fa-fw fa-check-circle"></span>
 
@@ -72,15 +74,15 @@ SwiftDataはiOS17.0+, iPadOS17.0+で使用可能であること。
 
 </div>
 
-
 # Save data
+
 Models and persistenceセクションのSave dataを進めていきます。
 
 ## Section 1~3(UI等のSwiftDataに直接関係のない事前準備)
+
 以下は、Section1~3まで対応後のコードです。この時点では`SwiftData`を使用していないため、誕生日を登録しても、アプリキルすると登録したデータは削除されてしまいます。
 
 <details><summary>BirthdayApp.swift</summary>
-
 
 ```swift
 import SwiftUI
@@ -94,10 +96,10 @@ struct BirthdaysApp: App {
     }
 }
 ```
+
 </details>
 
 <details><summary>Friend.swift</summary>
-
 
 ```swift
 import Foundation
@@ -107,10 +109,10 @@ struct Friend {
     let birthday: Date
 }
 ```
+
 </details>
 
 <details><summary>ContentView.swift</summary>
-
 
 ```swift
 import SwiftUI
@@ -157,9 +159,8 @@ struct ContentView: View {
     }
 }
 ```
+
 </details>
-
-
 
 ## Section４: Convert your structure to a SwiftData model
 
@@ -191,6 +192,7 @@ import Foundation
 ```
 
 ## Section5: Connect SwiftData and SwiftUI
+
 `SwiftData`と`SwiftUI`の`View`を連携させます。
 `SwiftUI`におけるエントリーポイントである`~App.swift`に次のコードを追加することで、`SwiftData`によって永続化させたデータの保存場所と`View`を連携させることができます。
 
@@ -306,7 +308,6 @@ class Frined {
 - 追加された人の誕生日を降順で並ぶように、`@Query`を`@Query(sort: \Friend.birthday)`に修正します。`@Query` だけの場合は、いつも同じ並び順にはならないことに注意してください。
 - `SwiftData`は各モデルインスタンスに独自のIDを提供します。`List`では、`@Model` が提供する識別子を使うため、明示的な`ID`を削除します。つまり、`List()`の引数である`KeyPath`を削除します。
 
-
 ```diff
 import SwiftUI
 import SwiftData
@@ -361,7 +362,9 @@ struct ContentView: View {
 https://developer.apple.com/tutorials/develop-in-swift/models-and-persistence-conclusion
 
 ### Extend your app（ソートする基準の変更、降順or昇順）
+
 #### Sort the birthday list by name instead of birthday.
+
 これはとても簡単に修正することができます。
 `@Query(sort: \Friend.birthday)`を`@Query(sort: \Friend.name)`に変えるだけです。
 
@@ -402,6 +405,7 @@ class Frined {
     }
 }
 ```
+
 </details>
 
 <details><summary>ContentView.swift</summary>
@@ -462,6 +466,7 @@ struct ContentView: View {
     }
 }
 ```
+
 </details>
 
 #### 完成したサンプルアプリ
@@ -479,10 +484,10 @@ struct ContentView: View {
 
 # 参考
 
-* SwiftData | Apple Developer Document https://developer.apple.com/documentation/swiftdata
-* Meet SwiftData https://developer.apple.com/videos/play/wwdc2023/10187/
-* Develop in Swift https://developer.apple.com/tutorials/develop-in-swift
-* Meet SwiftData - WWDC2023 https://developer.apple.com/videos/play/wwdc2023/10187/
-* SwiftData入門 https://zenn.dev/yumemi_inc/articles/2a929c839b2000
+- SwiftData | Apple Developer Document https://developer.apple.com/documentation/swiftdata
+- Meet SwiftData https://developer.apple.com/videos/play/wwdc2023/10187/
+- Develop in Swift https://developer.apple.com/tutorials/develop-in-swift
+- Meet SwiftData - WWDC2023 https://developer.apple.com/videos/play/wwdc2023/10187/
+- SwiftData入門 https://zenn.dev/yumemi_inc/articles/2a929c839b2000
 
 [^1]: 医療・ヘルスケア分野での案件や新規ビジネス創出を担う、2020年に誕生した事業部です。設立エピソードは次の記事をご覧ください。[”新規事業の立ち上げ　フューチャーの知られざる医療・ヘルスケアへの挑戦”](https://note.future.co.jp/n/n8b57d4bf4604)

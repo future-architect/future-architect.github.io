@@ -14,6 +14,7 @@ lede: "CloudflareをCDNやDNSに利用しているサービスにおいて、CDN
 [Cloudflare連載](/articles/20240527a/)5日目の記事です。
 
 # はじめに
+
 TIG DXチームの小林弘樹です。
 
 近年、CloudflareをCDNやDNSで活用しているシステムが増えている印象があります。[宮崎さんの記事](/articles/20240529a/)でもCloudflareを採用した事例が紹介されています。
@@ -152,6 +153,7 @@ resource "cloudflare_ruleset" "single_redirects" {
 ### なぜリダイレクトルールか
 
 Cloudflareでこのようなリダイレクトを行いたいときには、他に以下の手段があります。
+
 - [Cloudflare Rules(Page Rules)](https://developers.cloudflare.com/rules/page-rules/)
 
 - [Cloudflare Workers](https://developers.cloudflare.com/workers/)

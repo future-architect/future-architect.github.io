@@ -15,6 +15,7 @@ lede: みなさん、お使いのiPhoneではダークモードorライトモー
 [春の入門連載](/articles/20240408a/)の14本目です。
 
 # はじめに
+
 HealthCare Innovation Group(HIG)[^1]所属の橋本です。
 
 みなさん、お使いのiPhoneではダークモードorライトモードどちらに設定していますか。
@@ -42,6 +43,7 @@ HealthCare Innovation Group(HIG)[^1]所属の橋本です。
 <img src="/images/20240430a/Simulator_Screen_Recording_-_iPhone_15_Pro_-_2024-04-12_at_23.16.27.gif" alt="Simulator_Screen_Recording_-_iPhone_15_Pro_-_2024-04-12_at_23.16.27.gif" width="240" height="520" loading="lazy">
 
 # 実装方法
+
 まず、切り替えたい３つの表示モードを列挙型で定義しておきます。
 
 ```swift
@@ -60,6 +62,7 @@ enum DisplayMode: String {
 ```swift
 .preferredColorScheme(displayMode == .system ? nil : (displayMode == .dark ? .dark : .light))
 ```
+
 これをエントリーポイントである`〜App.swift`ファイルに次のように記載します。
 
 ```swift
@@ -84,7 +87,6 @@ struct displayModeApp: App {
 
 `Picker`の`selection:`パラメータには`$displayMode`がバインドさせています。これは、選択された値が直接`displayMode`プロパティに保存されることを意味します。
 それぞれの`tag()`メソッドに`DisplayMode`の対応する値が設定されています。これにより、ユーザーがピッカーで選択した表示モードが、`DisplayMode`型の`displayMode`に適切に保存することが可能になります。
-
 
 ```swift
 struct ContentView: View {
@@ -117,12 +119,11 @@ Done！
 
 触れていませんでしたが、@AppStoregeで端末内部に`DisplayMode`を記憶させているので、アプリキル後に立ち上げた際には、以前の設定値が保存されるようにもなっています。
 
-
 # おわりに
+
 ダークモード・ライトモード・端末の設定のモードにアプリ内から切り替える方法を扱いました。
 
 このようにダークモード、ライトモードを変えること自体は簡単ですが、それぞれの色を各画面に対応させるほうが大変ですね。色の管理にはAsset Catalogを使うことでダークモード、ライトモードの色を設定しておく方法がありますが、このあたりについても、うまいやり方があればご紹介したいと思います。
-
 
 # 参考
 
@@ -131,4 +132,3 @@ Done！
 - https://developer.apple.com/documentation/swiftui/colorscheme
 
 [^1]: 医療・ヘルスケア分野での案件や新規ビジネス創出を担う、2020年に誕生した事業部です。設立エピソードは[未来報](https://note.future.co.jp/n/n8b57d4bf4604)の記事をご覧ください。
-

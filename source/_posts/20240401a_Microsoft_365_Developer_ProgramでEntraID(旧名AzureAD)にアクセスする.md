@@ -29,5 +29,3 @@ lede: "過去にいくつかEntraIDが、久々にMicrosoft 365 Developer Progra
 左のツールバーのAdminアイコンをクリックして・・・上のツールバーにentraidを入れて検索して出てくるIdentityがEntraIDです。
 
 <img src="/images/20240401a/image_4.png" alt="image.png" width="859" height="517" loading="lazy">
-
-

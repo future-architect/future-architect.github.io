@@ -53,7 +53,6 @@ RUN --mount=type=cache,target=/root/.cache \
 
 Kinesis Data StreamsなどもDynamoDBと同じようにプリインストールできないかという要望も[#8300](https://github.com/localstack/localstack/issues/8300)で上げられましたが、やはりイメージサイズとのバランス問題で棄却されています。何かしらプリインストールしないと困るユースケースが無いと追加はされないような雰囲気があります。
 
-
 ## Installation of kinesis-mock failed
 
 LocalStackでKinesis Data Streamsのストリームを作成しようとした場合に、`Installation of kinesis-mock failed` というエラーが出るケースについて話します。ログ内容としては次のようなものです。
@@ -188,5 +187,3 @@ localstack-1  | 2024-02-17T06:13:49.936  INFO --- [   asgi_gw_0] localstack.requ
 LocalStack v2からイメージの構成が変わって、起動時に動的にパッケージをインストールするケースがあります。その場合にネットワーク環境によっては外部リソースの取得に失敗するため、CA証明書の設定が必要。OpenSSLで自動化すると楽になるかもしれない、という記事でした。
 
 みんなハマっていないのかな？と思っていましたが、NGだった期間は `v2.0.0` が公開されたときから、`v2.3.0` が公開された `2023.3.31` ～ `2023.9.29` と半年足らずだったので、レアな経験だったのかもしれません。
-
-

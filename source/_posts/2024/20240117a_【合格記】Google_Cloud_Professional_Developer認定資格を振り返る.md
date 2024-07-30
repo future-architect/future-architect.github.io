@@ -14,7 +14,6 @@ lede: "Developer力を試すべくProfessional Developer認定資格を受験し
 ---
 <img src="/images/20240117a/Professional_Level_Google_Meets_Background.png" alt="" width="1200" height="682" loading="lazy">
 
-
 ## はじめに
 
 TIG岸下です。
@@ -28,7 +27,7 @@ Futureに中途で入社して今月で2年になります。2年前に初めて
 Google Cloud 認定資格関連の過去記事：
 
 [【合格体験記】Google Cloudの入門試験：Cloud Digital Leader](https://future-architect.github.io/articles/20231226a/)
-[【合格記】Google Cloud Professional Cloud Security Engineer認定資格を振り返る ](https://future-architect.github.io/articles/20230921a/)
+[【合格記】Google Cloud Professional Cloud Security Engineer認定資格を振り返る](https://future-architect.github.io/articles/20230921a/)
 [【合格記】Google Cloud Professional Data Engineer認定資格を振り返る](https://future-architect.github.io/articles/20211013a/)
 [【合格記】Google Cloud Professional Machine Learning Engineer認定資格を振り返る](https://future-architect.github.io/articles/20220930a/)
 [Google Cloud Professional Cloud Architectの再認定に合格しました](https://future-architect.github.io/articles/20220411a/)
@@ -36,6 +35,7 @@ Google Cloud 認定資格関連の過去記事：
 [GCP Associate Cloud Engineer 合格記](https://future-architect.github.io/articles/20210625a/)
 
 皆さんの協力のおかげで残りの合格記は
+
 - Cloud Database Engineer
 - Cloud DevOps Engineer
 - Google Workspace Administrator
@@ -49,62 +49,62 @@ Google Cloud 認定資格関連の過去記事：
 ### スケーラビリティ、可用性、信頼性に優れたクラウドネイティブ アプリケーションの設計
 
 - コンテナの基礎知識
-    - アプリケーションのコンテナ化におけるベストプラクティス
+  - アプリケーションのコンテナ化におけるベストプラクティス
 - アーキ設計とサービスの使い分け
-    - Cloud Run、Google Kubernetes Engine、App Engine、Managed Instance Groupなどアプリケーションのデプロイ環境
-    - Cloud SQL、Spanner、Bigtable、Firebaseなどのデータベース環境
-    - 内部通信のみを利用したいケース（限定公開のGoogleアクセスを利用するなど）
+  - Cloud Run、Google Kubernetes Engine、App Engine、Managed Instance Groupなどアプリケーションのデプロイ環境
+  - Cloud SQL、Spanner、Bigtable、Firebaseなどのデータベース環境
+  - 内部通信のみを利用したいケース（限定公開のGoogleアクセスを利用するなど）
 - GKE（Kubernetes）の基礎知識
-    - Ingress、Service、Deployment、Podなどの役割、何を定義するのか
-    - Workload Identityを利用したサービスアカウントとの紐づけ
-    - Namespaceの使い分けにおけるベストプラクティス
-    - Pod同士の通信方法
-    - 水平スケーリングと垂直スケーリング
-    - Istio（Google CloudマネージドであればAnthos Service Mesh）
+  - Ingress、Service、Deployment、Podなどの役割、何を定義するのか
+  - Workload Identityを利用したサービスアカウントとの紐づけ
+  - Namespaceの使い分けにおけるベストプラクティス
+  - Pod同士の通信方法
+  - 水平スケーリングと垂直スケーリング
+  - Istio（Google CloudマネージドであればAnthos Service Mesh）
 - PubSubの基礎知識
-    - トピックやサブスクリプションの置き方
-    - トピックからPushされるのか、Pullするのか
+  - トピックやサブスクリプションの置き方
+  - トピックからPushされるのか、Pullするのか
 
 ### アプリケーションのデプロイ
 
 - デプロイ方法の理解
-    - カナリアリリース、Blue/Green、ローリングアップデートなど
+  - カナリアリリース、Blue/Green、ローリングアップデートなど
 - トラフィックの分割
-    - サービスそのものの機能としての分割（Cloud Runなど）、Kubernetesの機能としての分割
+  - サービスそのものの機能としての分割（Cloud Runなど）、Kubernetesの機能としての分割
 - デプロイタイミングの制御
-    - Cloud Buildを利用した自動化
+  - Cloud Buildを利用した自動化
 
 ### デプロイされたアプリケーションの管理
 
 - Cloud Loggingへのログ出力
-    - JSON形式による吐き出しの推奨
-    - エラー標準出力を利用した連携
+  - JSON形式による吐き出しの推奨
+  - エラー標準出力を利用した連携
 - Cloud Loggingの他サービスとの連携
-    - ログルーターを利用したPubSub、BigQuery、Cloud Storageとの連携
-    - Google Cloud外のサービスと連携するにはPubSubにルーティングしておくなど
+  - ログルーターを利用したPubSub、BigQuery、Cloud Storageとの連携
+  - Google Cloud外のサービスと連携するにはPubSubにルーティングしておくなど
 - Cloud Monitoringを利用したアラートの設定
-    - ログベースなのか、メトリクスベースなのか
+  - ログベースなのか、メトリクスベースなのか
 - Cloud ProfilerやTraceを利用したエラーやサービス遅延の解明
 - 権限回り
-    - 最小権限の法則に従う
-    - エラー内容から足りない権限のトラブルシューティング
+  - 最小権限の法則に従う
+  - エラー内容から足りない権限のトラブルシューティング
 
 ### アプリケーションのビルドとテスト
 
 - Cloud Buildを利用したイメージビルド
-    - Cloud Source Repositoryとの連携による自動化
+  - Cloud Source Repositoryとの連携による自動化
 - Artifact Registryを利用したイメージの脆弱性チェック
-    - Binary Authorization
+  - Binary Authorization
 - 単体テストのベストプラクティス
-    - PubSubやCloud Runエミュレータを利用したローカルでのテスト
+  - PubSubやCloud Runエミュレータを利用したローカルでのテスト
 
 ### Google Cloud サービスの統合
 
 - オンプレとGoogle Cloudサービスの統合
-    - Kubernetesクラスターの共存
+  - Kubernetesクラスターの共存
 - リフトアンドシフト
-    - 業務影響を最小に抑えた移行戦略
-    - データベースとして利用されているアプリケーションを考慮した移行
+  - 業務影響を最小に抑えた移行戦略
+  - データベースとして利用されているアプリケーションを考慮した移行
 
 ### 全体的な所感
 
@@ -128,4 +128,3 @@ Google Cloudのサービスは多岐にわたるため数が多く、存在を�
 Developer力を試したい方は一度受けてみてはいかがでしょうか！
 
 アイキャッチ画像は[Google Cloud Certification](https://sites.google.com/robertsonmarketing.com/digitalassetdownloadportal/digital-toolkit)から付与されたものになります。
-

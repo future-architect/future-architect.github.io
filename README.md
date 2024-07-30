@@ -9,6 +9,7 @@
 * _profile.yml に追加
 
 ## setup
+
 ### SNSカウントを表示させるために、Facebook開発者用のトークンが必要
 
 1. Facebook開発者キーが必要

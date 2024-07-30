@@ -81,8 +81,6 @@ resource "aws_subnet" "private-2" {
 
 参考：[cidrsubnet](https://developer.hashicorp.com/terraform/language/functions/cidrsubnet)
 
-
-
 ## ループ処理(count)
 
 `count`を利用すると、このように書くことができます。
@@ -131,7 +129,7 @@ resource "aws_subnet" "private" {
 
 これを忘れると、以下のようなCIDRブロックのコンフリクトエラーが起きます。
 
-> Error: creating EC2 Subnet: InvalidSubnet.Conflict: The CIDR '10.10.2.0/24' conflicts with another subnet 
+> Error: creating EC2 Subnet: InvalidSubnet.Conflict: The CIDR '10.10.2.0/24' conflicts with another subnet
 
 countの使いづらいところは主にここだと思っています。数を増減させたいときに`count.index`の値の変動がどこまで影響するか、大規模や複雑なリソースでは把握が難しく、保守性が低下します。
 
@@ -507,7 +505,6 @@ resource "aws_security_group" "ec2_b" {
 
 このため、`dynamic block`は可読性や保守性を考えて慎重に利用するのが良いと思われます。
 
-
 ## 条件分岐(三項演算子)
 
 Terraformでは条件分岐を行いたい場合は基本1通りで、この三項演算子を利用します。
@@ -556,6 +553,7 @@ Terraformに一般的なプログラミング言語でいうif文はありませ
 使い方は[for（使い方① 特定条件でフィルタリングしてリソースを構築する）](#%E4%BD%BF%E3%81%84%E6%96%B9%E2%91%A0-%E7%89%B9%E5%AE%9A%E6%9D%A1%E4%BB%B6%E3%81%A7%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF%E3%83%AA%E3%83%B3%E3%82%B0%E3%81%97%E3%81%A6%E3%83%AA%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B)をご参照ください。
 
 # 最後に
+
 Terraformにおけるループ処理と条件分岐をまとめました。
 
 自分も例外ではなく、初心者はまずTerraformの構文に慣れるところが難しいかと思います。

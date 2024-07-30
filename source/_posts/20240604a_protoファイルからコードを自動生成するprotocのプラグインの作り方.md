@@ -69,7 +69,7 @@ protoc --myplugin_out=param1=foo1,param2=foo2:gen proto/example1.proto
 
 - 標準入力からバイト列を読み取り、それを[CodeGeneratorRequest](https://github.com/protocolbuffers/protobuf/blob/v27.0/src/google/protobuf/compiler/plugin.proto#L43)として解釈できること
 - 解釈したCodeGeneratorを元に、自身の処理結果を[CodeGeratorResponse](https://github.com/protocolbuffers/protobuf/blob/v27.0/src/google/protobuf/compiler/plugin.proto#L83)に詰め、シリアライズしたバイト列を標準出力に書き込むこと
-- PATH上に`protoc-gen-${NAME}`というファイル名で配置されていること 
+- PATH上に`protoc-gen-${NAME}`というファイル名で配置されていること
 
 以上から、protocのプラグインは言語に依存せず実装ができ、GoのプラグインはGoで、C++のプラグインはC++でといった実装が可能な仕組みになっています。
 
@@ -86,7 +86,6 @@ protoc --myplugin_out=param1=foo1,param2=foo2:gen proto/example1.proto
 上記の方針に則っても良いのですが、実際にコード生成をしようとすると、依存パッケージをimportしたり、protoファイルのsnake_caseからGoファイルで利用するCamelCaseへの変換が必要だったりと、全てを自分でやるのはいささか面倒です。
 
 Goの場合、プラグイン実装に便利な,`google.golang.org/protobuf/compiler/protogen`というライブラリ（[公式ドキュメント](https://pkg.go.dev/google.golang.org/protobuf/compiler/protogen)）が整備されています。このライブラリは、標準のプラグインである`protoc-gen-go`や`protoc-gen-go-grpc`の[実装](https://github.com/golang/protobuf/blob/master/protoc-gen-go/main.go)、`protoc-gen-grpc`の[実装](https://github.com/grpc-ecosystem/grpc-gateway/blob/main/protoc-gen-grpc-gateway/main.go)や`protoc-gen-connect-go`の[実装](https://github.com/connectrpc/connect-go/blob/main/cmd/protoc-gen-connect-go/main.go)でも利用されている実績あるものです。今回はこちらを使って典型的なプラグインの構造を説明します。
-
 
 ### プラグイン実装のアウトライン
 
@@ -164,9 +163,8 @@ protocのプラグインを全体像と、Goの実践的な実装で利用され
 
 - [Protocol Buffers公式](https://protobuf.dev)
 - protocが利用するMessageの定義情報と、そのコンパイル結果を含むgolangライブラリ
-    - [plugin.proto](https://github.com/protocolbuffers/protobuf/blob/v27.0/src/google/protobuf/compiler/plugin.proto)
-    - [google.golang.org/protobuf/types/pluginpb](https://pkg.go.dev/google.golang.org/protobuf/types/pluginpb)（plugin.protoのコンパイル結果を含むgolangライブラリの公式ドキュメント）
+  - [plugin.proto](https://github.com/protocolbuffers/protobuf/blob/v27.0/src/google/protobuf/compiler/plugin.proto)
+  - [google.golang.org/protobuf/types/pluginpb](https://pkg.go.dev/google.golang.org/protobuf/types/pluginpb)（plugin.protoのコンパイル結果を含むgolangライブラリの公式ドキュメント）
 - プラグイン実装に利用可能なより実践的なgolangライブラリ
-    - [google.golang.org/protobuf/compiler/protogen](https://pkg.go.dev/google.golang.org/protobuf/compiler/protogen)
+  - [google.golang.org/protobuf/compiler/protogen](https://pkg.go.dev/google.golang.org/protobuf/compiler/protogen)
 - [protocプラグインの書き方](https://qiita.com/yugui/items/87d00d77dee159e74886)
-

@@ -88,11 +88,11 @@ MVVMパターンは、画面表示している項目（View）で使いたいデ
 Googleが公表している[GoogleTasksのREST Resourceの形式](https://developers.google.com/tasks/reference/rest/v1/tasks?hl=ja)と、スプレッドシートに表示しているタスクリストの各列の項目を連携（擬似的に双方向バインディング）させました。
 
 - スプレッドシートの値を取得し、GoogleTasksにセットする（View→Model）
-    - タスクリストの変更を検知
-        - 変更のあった行の値を取得
-    - スプレッドシートの値をTaskにセットして更新
+  - タスクリストの変更を検知
+    - 変更のあった行の値を取得
+  - スプレッドシートの値をTaskにセットして更新
 - GoogleTasksの情報をスプレッドシートに反映させる（Model→View）
-    - GoogleTaskの情報をスプレッドシートに自動的に反映させる（今回はトリガーを使用して定時実行）
+  - GoogleTaskの情報をスプレッドシートに自動的に反映させる（今回はトリガーを使用して定時実行）
 
 構成図にするとこんなイメージです。
 
@@ -119,6 +119,7 @@ GoogleTasksを利用。みなさんご存知のGoogleカレンダーとの連動
 3. トリガーメニューから、以下のトリガーを設定
     1. onEditを編集時に実行
     2. getGoogleTasksを定時実行
+
 ```js
 // シート取得
 const spreadSheet = SpreadsheetApp.getActiveSpreadsheet()
@@ -276,7 +277,6 @@ function createTaskTable(taskList) {
 GoogleTasksからの変更は定時実行で最短1分ごとに取得できます。
 
 <img src="/images/20240426b/GoogleTasksから変更.gif" alt="GoogleTasksから変更.gif" width="1200" height="662" loading="lazy">
-
 
 # まとめ
 

@@ -100,6 +100,7 @@ services:
 環境変数`COMPOSE_PROJECT_NAME`でプロジェクト名を指定することにより`${プロジェクト名}_${サービス名}`にイメージ名を変更可能です。
 
 - 例: `sample_${サービス名}`でイメージを作成したい場合
+
 ```bash .env
 COMPOSE_PROJECT_NAME=sample
 ```
@@ -214,6 +215,7 @@ services:
   cpsyml:
     image: hello-world:latest
 ```
+
 </details>
 
 ## おわりに

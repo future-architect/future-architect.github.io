@@ -34,16 +34,16 @@ Goのアプリ開発においても、 `C:\\` 配下のファイルに対して�
 [Releases : The GoLand Blog](https://blog.jetbrains.com/go/category/releases/)を見る限り、GoLandは年に3回ほど新バージョンを出すスケジュールを組んでいるようです。WSLへのサポートは2021年頃に行われており、もしかするとこの記事の検証内容は2年以上前から試すことができたかも知れません。もちろんドキュメントにも[WSLサポート](https://www.jetbrains.com/help/go/how-to-use-wsl-development-environment-in-product.html#enable-debugging)について詳しく書かれています。
 
 - [2021-3](https://www.jetbrains.com/go/whatsnew/2021-3/#page__content-wsl-support)
-    - `\\wsl$` 配下にプロジェクトを作れるようになった
+  - `\\wsl$` 配下にプロジェクトを作れるようになった
 - [2020-2](https://www.jetbrains.com/go/whatsnew/2020-2/#:~:text=Version%20Control-,WSL%202%20support%20for%20Git%20on%20Windows,-GoLand%202020.2%20will)
-    - `\\wsl$` 配下でもGit連携ができるようになった
+  - `\\wsl$` 配下でもGit連携ができるようになった
 
 時間差でWSLチャレンジした理由ですが、どのバージョンかは記憶にないのですが、過去トライした時に以下の点が上手く行かなかったからです。
 
 - 認証付きプロキシ設定の読み込みが成功しなかった（≒この時点でノックアウト）
-    - [ローカルプロキシで認証プロキシの煩わしさを解消！](https://future-architect.github.io/articles/20240227a/)にあるmitmproxyで暫定回避はできた
+  - [ローカルプロキシで認証プロキシの煩わしさを解消！](https://future-architect.github.io/articles/20240227a/)にあるmitmproxyで暫定回避はできた
 - Excelなどシステムで拡張子に紐づいたアプリを開けなかった（いちいち、エクスプローラ経由で開いていた）
-    - このあたりの使い勝手が面倒になり撤退した
+  - このあたりの使い勝手が面倒になり撤退した
 
 その当時から半年~1年程度は経過したタイミングで、[2024.1](https://www.jetbrains.com/go/whatsnew/) にて再トライしたところ、かなり良い感じだったので、WSL側にプロジェクトを作る方向に舵を切りました。
 
@@ -66,7 +66,6 @@ Goのアプリ開発においても、 `C:\\` 配下のファイルに対して�
 | 7  | Excelを開く                      | ✅️    | 関連アプリケーションで開くでOK。デフォルト起動方法の変更は未調査だが、Windows側に作成したプロジェクトでも同様なので、WSL関係なし   |
 | 8  | GitHubで開く                     | ✅️    | サードパーティ、標準パッケージのファイルに対しては開けなくなっていたが、Windows側に作成したプロジェクトでも同じなので、WSL関係ない |
 | 8  | PlantUMLプレビュー               | ✅️    | apt installなどのセットアップ無しで利用可能                                                                                      |
-
 
 ### GOPATH設定
 
@@ -161,7 +160,6 @@ GoLandのMarkdownプレビューでPlantUMLを有効にするためには、言�
 
 <img src="/images/20240712a/img_4.png" alt="" width="1200" height="536" loading="lazy">
 
-
 ## つかってみての感想
 
 WSL上なので各種Linuxコマンドを不自由なく使え、かつビルドやテストなどの実行速度も向上しました。体感では倍近く早くなった気がします。とても快適になりました。
@@ -173,4 +171,3 @@ WSL上なので各種Linuxコマンドを不自由なく使え、かつビルド
 過去にWSL2を試した際は、課題が多く厳しいな～という印象でしたが、いつの間にか一切の不満を抱かせない完成度にGoLandが育っていてとても驚きました。
 
 少なくても `2024.1` のバージョンでは WSL2であっても何一つ不自由なく使えた、という結論でした。
-

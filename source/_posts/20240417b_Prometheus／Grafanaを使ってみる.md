@@ -123,6 +123,7 @@ http_request_duration_seconds_sum{handler="/health",method="GET"} 0.001581706004
 # TYPE http_request_duration_seconds_created gauge
 http_request_duration_seconds_created{handler="/health",method="GET"} 1.7132806219318378e+09
 ```
+
 それぞれメトリクスがさし示している情報が何なのかを示してくれていて、わかりやすさを感じました。
 
 次にPrometheus自体の設定です。Prometheusの設定には`prometheus.yml`を用いて読み込ませる必要があります。
@@ -195,7 +196,6 @@ Metricの欄では、Prometheusが取得可能なすべてのメトリクスが�
 
 <img src="/images/20240417b/スクリーンショット_2024-04-17_12.06.32.png" alt="" width="1200" height="588" loading="lazy">
 
-
 ### どんなことに使えそうか
 
 Grafanaはデータソースの一覧からわかるように多様なソースをサポートしています。今回試したPrometheus以外にもPostgreSQLなどのRDB、各クラウドの監視ツールとの連携、Google Analyticsなどの可視化も行えます。それぞれで可視化の部分はサポートされているとは思いますが、可視化ツールの一元管理、という意味ではGrafanaに多様なデータソースを束ねるというのは良いのかもしれません。
@@ -210,4 +210,3 @@ Grafanaはデータソースの一覧からわかるように多様なソース�
 ## 参考書籍
 
 - [Prometheus実践ガイド: クラウドネイティブな監視システムの構築](https://booth.pm/ja/items/3907516)
-

@@ -31,7 +31,7 @@ https://github.com/future-architect/uroborosql
 
 [Amazon Aurora](https://aws.amazon.com/jp/rds/aurora/)や[Cloud Spanner](https://cloud.google.com/spanner/?hl=ja)といったプロダクトに注目が集まるのも、時代の変化とともにDBも並列分散型でスケールアウトはしたいけれども、トランザクションもSQLも使いたいというCAP定理を覆す特徴を持っていることが要因だと思います。
 
-2016/12/24に[クリスマス・イブにCockroachDBに負荷をかけてみる](https://qiita.com/hoshi-k/items/cf0ce018db62de9291dc)という記事を投稿したのですが、このCockroachDBもそんな理想を追い求めるプロダクトで、RDBでNoSQLのメリットを教授したいニーズはもはやエンジニアが切望する夢なんですね✨️ 
+2016/12/24に[クリスマス・イブにCockroachDBに負荷をかけてみる](https://qiita.com/hoshi-k/items/cf0ce018db62de9291dc)という記事を投稿したのですが、このCockroachDBもそんな理想を追い求めるプロダクトで、RDBでNoSQLのメリットを教授したいニーズはもはやエンジニアが切望する夢なんですね✨️
 
 <div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
   <span class="fa fa-fw fa-check-circle"></span>
@@ -113,9 +113,7 @@ SQL文の条件分岐を集計してカバレッジレポートを行うこと�
 | 依存（必須）         | slf4j-api                     |
 | 依存（任意）         | ognl,spring-expression,jline,jansi,logback-classic |
 
-
 ※2024/06/25時点最新バージョンとなるv0.26.8時点
-
 
 # uroboroSQLのコードサンプル
 
@@ -130,7 +128,9 @@ https://future-architect.github.io/uroborosql-doc/
 ```java
 SqlConfig config = UroboroSQL.builder("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", "sa").build();
 ```
+
 ## トランザクション
+
 | トランザクションタイプ | トランザクション有り                                                                                                                                 | トランザクションなし                       |
 | :--------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------- |
 | required               | トランザクション内で処理を実行                                                                                                                       | 新たなトランザクションを開始して処理を実行 |
@@ -245,6 +245,7 @@ try (SqlAgent agent = config.agent()) {
       .first();
 }
 ```
+
 ### SELECT(1件取得、モデル型、取得できない場合例外)
 
 ```java
@@ -267,6 +268,7 @@ try (SqlAgent agent = config.agent()) {
       .orElse(null);
 }
 ```
+
 ### SELECT(1件取得、モデル型、Optional)
 
 ```java
@@ -289,7 +291,6 @@ try (SqlAgent agent = config.agent()) {
       .one(Department.class);
 }
 ```
-
 
 ---
 
@@ -315,6 +316,7 @@ try (SqlAgent agent = config.agent()) {
   });
 }
 ```
+
 ### INSERT/UPDATE/DELETE(バッチ実行)
 
 ```java
@@ -363,7 +365,6 @@ public class Department {
 
 - `@Id/@GeneratedValue`が付与されたフィールドはDBの自動採番を利用することをマークします。
 - `@Version`が付与されたフィールドは楽観ロック用のバージョン情報としてuroboroSQLが認識し、UPDATE時にはSET句で+1され、WHERE句の検索条件に追加されてSQLを発行し、更新件数が0の場合に`OptimisticLockException`を発生させます。
-
 
 ### SELECT(主キー検索)
 
@@ -465,6 +466,7 @@ try (SqlAgent agent = config.agent()) {
 }
 
 ```
+
 ### MERGE
 
 PKによるレコードの検索を行い、レコードがない場合はINSERT、ある場合はUPDATEします。
@@ -507,13 +509,12 @@ OSSにしても社内プロダクトにしても、継続的にアップデー�
 # 参考：uroboroSQLドキュメント、ツール、サンプル
 
 - uroboroSQL日本語ドキュメント
-    - https://future-architect.github.io/uroborosql-doc/
+  - https://future-architect.github.io/uroborosql-doc/
 - uroboroSQLの紹介 (OSC2017 Nagoya) #oscnagoya
-    - https://www.slideshare.net/KenichiHoshi1/uroborosql-osc2017-nagoya-oscnagoya
+  - https://www.slideshare.net/KenichiHoshi1/uroborosql-osc2017-nagoya-oscnagoya
 - uroboroSQL ソースジェネレータ
-    - https://github.com/shout-star/uroborosql-generator
+  - https://github.com/shout-star/uroborosql-generator
 - uroboroSQL サンプルCLIアプリケーション
-    - https://github.com/future-architect/uroborosql-sample
+  - https://github.com/future-architect/uroborosql-sample
 - uroboroSQL サンプルWebアプリケーション(with Spring Boot)
-    - https://github.com/shout-star/uroborosql-springboot-demo
-
+  - https://github.com/shout-star/uroborosql-springboot-demo

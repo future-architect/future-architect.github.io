@@ -32,7 +32,7 @@ cfn-guardのcfnとはAWSのCloudFormation(AWSのIaCソリューションのこ�
 READMEの記載にも、次の通り説明があります。
 
 > Guard offers a policy-as-code domain-specific language (DSL) to write rules and validate JSON- and YAML-formatted data such as CloudFormation Templates, K8s configurations, and Terraform JSON plans/configurations against those rules.
-> 
+>
 > Guardは、CloudFormationテンプレート、K8sコンフィグレーション、TerraformのJSONプラン/コンフィグレーションなどのJSONやYAMLフォーマットのデータに対して、ルールを記述し検証するためのPolicy as Codeなドメイン固有言語(DSL)を提供します。
 
 AWS Certified Securityの勉強をしていて本ツールの名前を知り、READMEを見て、自分は興味を持ちました。
@@ -46,6 +46,7 @@ Terraformのポリシーチェックとしては、過去にFuture技術ブロ�
 それはcfn-guardに読み込ませるルール表となるCFn Guard DSLとAWSマネージドサービスの力を借りてインフラをデプロイする前から後まで一貫したポリシーチェックができるのではないか。と考えたためです。
 
 一度CFn Guard DSL(ポリシールール)を書くことで二度おいしいメリットがあると考えました。
+
 * Terraformのコーディング中に、cfn-guardによりユニットテストを動かす感覚でポリシーチェックを随時できるようになります
 * Terraformを使ってAWSインフラを構築後、意図しない形でリソースが変更されてもAWS ConfigによりトリガーされたCFn Guardルールのスキャンによってインフラのドリフトを検知できるようになります
 
@@ -264,7 +265,6 @@ rule BucketEncryption when %buckets !empty {
 }
 ```
 
-
 別物やんけ。
 
 その通りです。なぜなら、CloudFormationとTerraform planではファイルの構造が全然異なりますので。
@@ -295,4 +295,3 @@ Amazon Web Services' Well-Architected Framework Reliability Pillar等、イン�
 
 [^1]: 現在は `gcloud beta terraform vet` として提供中
 [^2]: 現在は `trivyの1機能` として提供中
-

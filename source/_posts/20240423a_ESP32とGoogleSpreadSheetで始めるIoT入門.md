@@ -323,4 +323,3 @@ IoTで取得したデータをクラウド上にストアすることを考え�
 - [温度センサー DS18B20をESP32で動かすメモ](https://qiita.com/takudooon/items/f6386a45860004aa37e7)
 - [DS18B20 Programmable Resolution 1-Wire Digital Thermometer](https://www.ne.jp/asahi/shared/o-family/ElecRoom/AVRMCOM/DS18B20/DS18B20manual.html)
 - [外部からJSONをPOSTするだけでGoogleSpreadSheetにデータを書き込む](https://rooter.jp/programming/edit-spreadsheet-with-gas/)
-
