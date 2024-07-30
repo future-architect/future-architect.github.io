@@ -5,7 +5,7 @@ postid: a
 tag:
   - GoogleCloud
   - 認定資格
-  - 資格試験
+  - 資格試験aaa
 category:
   - Infrastructure
 thumbnail: /images/20240730a/thumbnail.png
