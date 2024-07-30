@@ -24,9 +24,9 @@ lede: "DifyとAnthropic Claudeを使って簡単に生成AIアプリケーショ
 
 ### 対象読者
 
-- 生成AIに興味があるがまだチャット以上の利用法を見出せず手を出せていない方
-- お試しに手軽に生成AIアプリケーションを構築してみたい方
-- 特にOpenAIに月額費用に躊躇っている方
+* 生成AIに興味があるがまだチャット以上の利用法を見出せず手を出せていない方
+* お試しに手軽に生成AIアプリケーションを構築してみたい方
+* 特にOpenAIに月額費用に躊躇っている方
 
 ### 前提知識・環境
 
@@ -268,11 +268,12 @@ comment on table product is '商品';
 comment on column product.id is 'ID';
 comment on column product.product_name is '商品名';
 ````
+
 </details>
 
 <details><summary>Data Model Descriptions</summary>
 
-````markdown 
+````markdown
 # データモデル概要
 
 ## 売価テーブル ( `selling_price` )
@@ -323,6 +324,7 @@ comment on column product.product_name is '商品名';
 * 販売した商品の売上金額は、登録時の入力値に従って次のように計算されて登録される: `売価 * 移動数 - 値引額`
 * 売価は売価テーブルより `適用開始日 <= 業務日付 <= 適用終了日` の条件で取得する。
 ````
+
 </details>
 
 プロンプト：「売上金額と売上数を場所別・商品別・月別に集計するSQL」

@@ -17,6 +17,7 @@ lede: "業務の中で初めてJenkinsに触れたので、以下の内容につ
 [春の入門連載2024](/articles/20240408a/)の10日目です。
 
 # はじめに
+
 こんにちは。今回初めてブログを書きます、流通サービスグループの中邨です。
 
 最近、業務で初めてJenkinsに触れたので、以下についてまとめます。**「そもそもJenkinsとは？」「CI/CDって何？」** という人に読んでいただけたら嬉しいです。
@@ -24,7 +25,6 @@ lede: "業務の中で初めてJenkinsに触れたので、以下の内容につ
 - Jenkinsで何ができるのか／何が嬉しいのか
 - Jenkinsを初めて触ってみた感想
 - WSL2上のDockerでJenkinsを動かして簡単なジョブを作ってみる
-
 
 # Jenkinsとは何か？
 
@@ -47,6 +47,7 @@ CI/CDは continuous integration and continuous delivery/continuous deployment �
 私の主観になりますが、CI/CD初心者が初めてJenkinsを使ってみた感想です。
 
 ### 心理的ハードルが高い
+
 CI/CDツールをほぼ触ったことがない状態で、既に沢山のジョブが動いているプロジェクト環境のJenkinsで試しにジョブを作ろうとしたとき、個人的には少しハードルが高く感じました。
 
 例えば、自PC上の壊してもいい環境でJenkinsを動かしたことがあれば、ハードルが下がってより身近に感じられるのではないでしょうか。
@@ -166,4 +167,3 @@ CI/CDはシステム開発を縁の下で支える存在ですが、ITの入り�
 - https://www.jenkins.io/doc/
 - https://ja.wikipedia.org/wiki/Jenkins
 - https://ja.wikipedia.org/wiki/継続的デリバリー
-

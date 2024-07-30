@@ -64,6 +64,7 @@ $ terraform state rm aws_s3_bucket.s3
 # 統合先のStateにて
 $ terraform state import aws_s3_bucket.s3 バケット名
 ```
+
 Terraformのバージョンが1.5以上の場合はimport ブロックを使用するのもよいでしょう。
 
 https://developer.hashicorp.com/terraform/language/import
@@ -134,7 +135,7 @@ https://github.com/fujiwara/tfstate-merge
 https://sfujiwara.hatenablog.com/entry/tfstate-merge
 
 ```sh  作業例
-$ tfstate-merge b.tfstate a.tfstate > b'.tfstate
+tfstate-merge b.tfstate a.tfstate > b'.tfstate
 ```
 
 3\. マージしたtfstateファイルを統合先にpush

@@ -31,18 +31,19 @@ Pub/Sub型のメッセージングアーキテクチャを採用するにあた�
 PostgreSQLのPub/Sub機能に関連するクエリは次の3つです。
 
 * [NOTIFY](https://www.postgresql.org/docs/current/sql-listen.html)（Publishを実行）
-    * 構文：`NOTIFY channel [ , payload ]`
-    * 同じ機能の関数として`pg_notify`も用意されている
+  * 構文：`NOTIFY channel [ , payload ]`
+  * 同じ機能の関数として`pg_notify`も用意されている
 * [LISTEN](https://www.postgresql.org/docs/current/sql-listen.html)（Subscribeを開始）
-    * 構文：`LISTEN channel`
+  * 構文：`LISTEN channel`
 * [UNLISTEN](https://www.postgresql.org/docs/current/sql-unlisten.html)（Subscribeを終了）
-    * 構文：`UNLISTEN { channel | * }`
+  * 構文：`UNLISTEN { channel | * }`
 
 基本的な使い方と挙動を見ていきます。
 
 ```sql チャネル"foo"のSubscribeを開始
 LISTEN foo;
 ```
+
 ```sql チャネル"foo"に"hello"というデータをPublish
 NOTIFY foo, 'hello';
 -- または
@@ -51,11 +52,13 @@ SELECT pg_notify('foo', 'hello');
 -- "foo"をSubscribe済みのセッションには次の通知が届く
 -- Asynchronous notification "foo" with payload "hello" received from server process with PID 14728.
 ```
+
 ```sql payload無しの通知も可能
 NOTIFY foo;
 
 -- Asynchronous notification "foo" received from server process with PID 14728.
 ```
+
 ```sql チャネル"foo"のSuscribeを終了する
 UNLISTEN foo;
 ```
@@ -84,8 +87,6 @@ UNLISTEN foo;
 * データベースが同じであれば、スキーマが異なっていても通知できます。!
 
 <img src="/images/20240628a/68747470733a2f2.png" alt="68747470733a2f2.png" width="1200" height="579" loading="lazy">
-
-
 
 ## ペイロードのデータ型・サイズ
 
@@ -123,7 +124,6 @@ COMMIT;
 * トランザクションが終了するとキューデータがクリーンアップされます。ペイロードを目一杯使った場合およそ100万件で上限に掛かるため、適当な件数単位でCOMMITしましょう。
 * Notificationキューの使用率は`pg_notification_queue_usage`関数で確認できます(0から1までの小数で表現)。
 
-
 # JavaによるPub/Subクライアント実装
 
 これまで記載したPub/Sub通信をJavaで実装するときのパターンを3種類紹介します。
@@ -140,6 +140,7 @@ Mavenを使う場合は以下の依存関係を追加します。
     <version>42.7.3</version>
 </dependency>
 ```
+
 ```java
 // 事前にLISTEN用コネクションを作成しておく
 private final org.postgresql.jdbc.PgConnection listenerConn = DriverManager.getConnection(URL, USERNAME, PASSWORD).unwrap(PgConnection.class);
@@ -192,6 +193,7 @@ private void notify(final String channel, final String payload) {
     }
 }
 ```
+
 * `PgConnection#getNotifications(int timeoutMillis)`を使うと、通知が来るまで指定の時間ここでブロックするため、ループで囲えばロングポーリング的なロジックになります。
 * なお`NOTIFY`クエリでペイロードのパラメータバインドを試みると`org.postgresql.util.PSQLException`が出てしまうので代わりに`pg_notify`を実行しています。[^1]
 
@@ -206,6 +208,7 @@ private void notify(final String channel, final String payload) {
     <version>0.8.9</version>
 </dependency>
 ```
+
 ```java
 // 事前にLISTEN用コネクションを作成しておく
 private final com.impossibl.postgres.api.jdbc.PGConnection listenerConn = DriverManager.getConnection(URL, USERNAME, PASSWORD).unwrap(PGConnection.class);
@@ -233,6 +236,7 @@ private void startListen(final String channel) {
 
 // notify()は、PostgreSQL JDBCドライバと同様
 ```
+
 ご覧の通り、こちらは通知受信時の動作をイベントリスナーの形で実装できます。
 チャネルを指定してリスナーを登録することも可能です。
 
@@ -248,6 +252,7 @@ Reactive Streamsに完全準拠し、I/Oは完全にノンブロッキングで�
     <version>1.0.5.RELEASE</version>
 </dependency>
 ```
+
 ```java
 // 事前に送受信用のコネクションを設定しておく
 private Mono<PostgresqlConnection> receiver;
@@ -297,6 +302,7 @@ private void notify(final String channel, final String payload) {
     }).subscribe();
 }
 ```
+
 R2DBCを使う際は、依存する[Project Reactor](https://projectreactor.io/)のAPIを全面的に使うことになります。
 
 今回は簡単な説明にとどめますが、クエリを実行、結果をハンドリングし、指定のタイミングで動く付帯的なアクションを設定する、という一連のフローを構築して、最後にこのフローが動き出すように`subscribe()`を呼び出しています。`doOnNext()`で通知が届いたときのアクションを、`doOnSubscribe()`でsubscribeしたとき（クエリを実行するタイミング）のアクションを設定しており、ここでは単純にログ出力しています。
@@ -314,4 +320,3 @@ PostgreSQLのNOTIFY/LISTENは[リリース9.0](https://www.postgresql.jp/documen
 [^1]: 公式ドキュメントにはNOTIFYのペイロードにはリテラル文字列を設定しなければならず、一方でpg_notifyには不定のチャネル、ペイロードに対応すると謳われているので、NOTIFYはパラメータバインドには対応していない模様です。
 
 [^2]: NOTIFY/LISTENのリリースノートの初出は[1995年7月のリリース0.03のバグフィックス](https://www.postgresql.org/docs/release/0.03/#:~:text=*%20the%20LISTEN/NOTIFY%20asynchronous%20notification%20mechanism%20now%20work)なので、本当に最初期から搭載された機能だとわかります。
-

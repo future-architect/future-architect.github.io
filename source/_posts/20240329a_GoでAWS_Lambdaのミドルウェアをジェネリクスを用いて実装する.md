@@ -381,4 +381,3 @@ func main() {
 ## まとめ
 
 AWS Lambdaの関数ハンドラのミドルウェアを、http.HandlerFuncのようにして作ってみました。Lambda関数ハンドラのシグネチャは、http.HandlerFuncより窓口が広いので、ジェネリクスを用いるとスッキリするよという話でした。
-

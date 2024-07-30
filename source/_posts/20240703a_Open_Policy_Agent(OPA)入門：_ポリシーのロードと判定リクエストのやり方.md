@@ -13,6 +13,7 @@ author: 関靖秀
 lede: "Open Policy Agentを実際にどうやって判定をリクエストするのかやポリシーの管理方法についてはまとまった情報が少なかったため、こちらにまとめようと思いました。"
 ---
 # はじめに
+
 こんにちは、関です。
 
 業務で[Open Policy Agent(OPA)](https://www.openpolicyagent.org)に触れる機会があり、公式ドキュメントや関連記事を呼んだのですが、ユースケースやPolicyの記述方法についての説明に比べて、実際にどうやって判定をリクエストするのかやポリシーの管理方法について情報が少なかったため、こちらにまとめます。
@@ -84,7 +85,6 @@ Terraformと統合する際には、[Terraform planの実行結果をJSONに変�
 
 他にも、Goライブラリを使って自作ツールを作り、CI上で利用する方法も取れます。以前当社のブログに載せられた[Policy as Code を実現する Open Policy Agent に憧れて。ポリシーコードでAPI仕様をLintする](https://future-architect.github.io/articles/20200930/)はこの方法を使っています。
 
-
 # 動作例
 
 [how-to-use-opa](https://github.com/sayshu-7s/how-to-use-opa)に動作例として使えるコードを配置しています。必要に応じて動かしてもらえたらと思います。
@@ -133,7 +133,6 @@ Dataとして、ユーザごとにアクセス可能なresourceIDが存在する
 }
 ```
 
-
 ## ポリシーとDataの作成、バンドルの準備
 
 まずはポリシーとDataを作成します。ポリシーは[Rego](https://www.openpolicyagent.org/docs/latest/policy-language/)という言語を用います。
@@ -172,6 +171,7 @@ allow if {
     input.resourceId in data.example.user_resource[input.user]
 }
 ```
+
 判定リクエストが送られた時、OPAはinputの中にクエリ毎のデータを格納します。input.resourceIdが、先ほどのuser_resourceで管理しているユーザ毎に認可するresourceIdのリストに含まれているかを判定しています。
 
 Bundleを作るには、`opa build`コマンドを使います。以下のコマンドで、bundle.tar.gzとしてBundleが生成されます。
@@ -328,7 +328,9 @@ curlコマンドで、HTTP APIを使った判定リクエストをしてみま�
   }
 }
 ```
+
 判定リクエストは以下のように投げます。見て分かる通り、レスポンスとして受け取りたい項目は、HTTP APIのパスとして表現されています。今回の場合、`example` packageの`allow`という項目を受け取りたいので、`/v1/data/example/allow`にアクセスしています。
+
 ```sh
 curl -vX POST -H 'Content-Type: application/json' -d @input-api.json  http://localhost:8181/v1/data/example/allow 
 ```
@@ -350,11 +352,11 @@ curl -vX POST -H 'Content-Type: application/json' -d @input-api.json  http://loc
 Goのライブラリは2種類あって、高レベルAPIを提供する`sdk`パッケージと低レベルAPIを提供する`rego`パッケージがあります。多くの場合は`sdk`パッケージが有用とされていますが、Bundleやポリシーの読み出し方が限定的だったりと、そこまで使いやすい印象はありませんでした。多くの場合、CLIやHTTP APIで事足りると思うので、詳細は省きます。以下、参考URLです。
 
 - sdk パッケージ(高レベルAPI)
-    - [Integrating with the Go SDK](https://www.openpolicyagent.org/docs/latest/integration/#integrating-with-the-go-sdk)
-    - [公式ドキュメント](https://pkg.go.dev/github.com/open-policy-agent/opa/sdk)
+  - [Integrating with the Go SDK](https://www.openpolicyagent.org/docs/latest/integration/#integrating-with-the-go-sdk)
+  - [公式ドキュメント](https://pkg.go.dev/github.com/open-policy-agent/opa/sdk)
 - rego パッケージ(低レベルAPI)
-    - [Integrating with the Go API](https://www.openpolicyagent.org/docs/latest/integration/#integrating-with-the-go-api)
-    - [公式ドキュメント](https://pkg.go.dev/github.com/open-policy-agent/opa@v0.65.0/rego)
+  - [Integrating with the Go API](https://www.openpolicyagent.org/docs/latest/integration/#integrating-with-the-go-api)
+  - [公式ドキュメント](https://pkg.go.dev/github.com/open-policy-agent/opa@v0.65.0/rego)
 
 # PolicyとDataのロード方法
 
@@ -403,8 +405,10 @@ services:
     volumes:
       - ./bundle.tar.gz:/usr/share/nginx/html/bundles/bundle.tar.gz
 ```
+
 opaコンテナは以下のconfig.yamlを読み込んでいます。
 config.yaml
+
 ```yaml
 services:
   nginx:
@@ -420,6 +424,7 @@ bundles:
 `.services`は、OPAのコントロールプレーンのエンドポイントを表している項目です。Bundleサーバ以外にも、Status APIなどがこの項目を使います。各サービスにアクセスする際に必要な認証に関する設定なども環境変数を利用しながら実施できます。`.bundles`が文字通りBundleの管理先を表していて、`service`でダウンロード先のserviceを指定します。今の場合、nginxを選択しています。また`resource`でダウンロードするBundleを指定しています。
 
 コンテナを起動すると、以下のようなログが出力されるので、BundleをNginxからダウンロードしていることがわかります。
+
 ```txt
 opa_1            | {
 opa_1            |   "level": "info",

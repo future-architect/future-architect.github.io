@@ -109,6 +109,7 @@ aws rds modify-db-snapshot-attribute \
 ```
 
 参照（公式ドキュメント）
+
 - [DB スナップショットの共有](https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_ShareSnapshot.html)
 
 ## 3. 共有されたスナップショットから検証環境上でDBを復元
@@ -120,6 +121,7 @@ aws rds modify-db-snapshot-attribute \
 > スナップショットを共有した AWS アカウント のデフォルト KMSキーを使用して暗号化されたスナップショットを共有することはできません。
 > ...
 >デフォルトの KMS キーの問題を回避するには、次のタスクを実行します。
+>
 > 1. カスタマーマネージドキーを作成し、そのキーへのアクセス権を付与する
 > 2. ソースアカウントからスナップショットをコピーして共有する
 > 3. ターゲットアカウントに共有したスナップショットをコピーします
@@ -172,6 +174,7 @@ aws rds wait db-snapshot-available \
 ```
 
 参照（公式ドキュメント）
+
 - [DB スナップショットの削除](https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_DeleteSnapshot.html)
 - [DB スナップショットのコピー](https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_CopySnapshot.html)
 
@@ -207,6 +210,7 @@ aws rds wait db-instance-available \
 ```
 
 参照（公式ドキュメント）
+
 - [DB インスタンスを削除する](https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_DeleteInstance.html)
 - [DB スナップショットからの復元](https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_RestoreFromSnapshot.html)
 
@@ -222,6 +226,7 @@ aws rds wait db-instance-available \
 ## 必要なIAMロールの設定
 
 [バックアップリストアの実装](#バックアップリストアの実装)で作成したファイル達が正常に実行されるためには、以下ポリシーがIAMロールに付与されており、アクセスが許可されている必要があります。
+
 - AWS CLIコマンド実行のために必要なポリシー
 - 検証環境上での本番環境のAWS KMSキーの使用に必要なポリシー
 
@@ -232,18 +237,18 @@ aws rds wait db-instance-available \
 [バックアップリストアの実装](#バックアップリストアの実装)を踏まえると、本番/検証環境で以下AWS CLIコマンド群を実行できるようにする必要があると分かります。
 
 - スナップショットの削除と複製（本番環境と検証環境の両方）
-    - `delete-db-snapshot`
-    - `wait db-snapshot-deleted`
-    - `describe-db-snapshots`
-    - `copy-db-snapshot`
-    - `wait db-snapshot-available`
+  - `delete-db-snapshot`
+  - `wait db-snapshot-deleted`
+  - `describe-db-snapshots`
+  - `copy-db-snapshot`
+  - `wait db-snapshot-available`
 - スナップショットの共有（本番環境のみ）
-    - `modify-db-snapshot-attribute`
+  - `modify-db-snapshot-attribute`
 - DBインスタンスの削除復元（検証環境のみ）
-    - `delete-db-instance`
-    - `wait db-instance-deleted`
-    - `restore-db-instance-from-db-snapshot`
-    - `wait db-instance-available`
+  - `delete-db-instance`
+  - `wait db-instance-deleted`
+  - `restore-db-instance-from-db-snapshot`
+  - `wait db-instance-available`
 
 以下では、それぞれのコマンド群の実行に必要なポリシーの実装例を挙げています。
 要件によっては、さらに細かくカスタマイズする必要もあると思うので参考程度に留めて役立ててもらえればと思います。
@@ -377,6 +382,7 @@ aws rds wait db-instance-available \
 ```
 
 参照（公式ドキュメント）
+
 - [他のアカウントのユーザーに KMS キーの使用を許可する#他のアカウントで使用できる KMS キーを作成する](https://docs.aws.amazon.com/ja_jp/kms/latest/developerguide/key-policy-modifying-external-accounts.html#cross-account-console)
 
 #### 検証環境での設定
@@ -423,6 +429,7 @@ aws rds wait db-instance-available \
 ```
 
 参照（公式ドキュメント）
+
 - [他のアカウントのユーザーに KMS キーの使用を許可する](https://docs.aws.amazon.com/ja_jp/kms/latest/developerguide/key-policy-modifying-external-accounts.html)
 
 ## GitHub Actions ワークフローを作成する
@@ -430,14 +437,14 @@ aws rds wait db-instance-available \
 必要なIAMロールを設定できたので、あとはGitHub Actionsのワークフローを作成すればバックアップリストア作業を自動化できます。
 
 アカウントごとに適切なIAMロールを`aws-actions/configure-aws-credentials`で指定した後に、次の二つのシェルスクリプトを、対応するアカウントごとに順次実行します。
+
 - `backup_prod.sh`：本番環境で実行
-    - [1. 本番環境のDBのスナップショットを作成](#1-本番環境のdbのスナップショットを作成)
-    - [2. スナップショットを検証環境のアカウントに共有](#2-スナップショットを検証環境のアカウントに共有)
+  - [1. 本番環境のDBのスナップショットを作成](#1-本番環境のdbのスナップショットを作成)
+  - [2. スナップショットを検証環境のアカウントに共有](#2-スナップショットを検証環境のアカウントに共有)
 - `restore_stg.sh`：検証環境で実行（ただし、`backup_prod.sh`の実行完了後）
-    - [3. 共有されたスナップショットから検証環境上でDBを復元](#3-共有されたスナップショットから検証環境上でdbを復元)
+  - [3. 共有されたスナップショットから検証環境上でDBを復元](#3-共有されたスナップショットから検証環境上でdbを復元)
 
 実装例は以下の通りです。
-
 
 ```yaml 実装例.yaml
 name: restore-rds-stg-from-prod
@@ -498,4 +505,3 @@ jobs:
 [^1]: 他にもAWS CodeBuildを用いたりする方法等があります。一方でAWS Lambdaは時間的制約がシビアであるため、DBのバックアップリストアには不向きです。
 [^2]: RDSに関するAWS CLIコマンドの一覧は以下を参照してください。
 https://docs.aws.amazon.com/cli/latest/reference/rds
-

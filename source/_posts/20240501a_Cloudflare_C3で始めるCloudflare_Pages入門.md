@@ -321,4 +321,3 @@ Use '--' to separate paths from revisions, like this:
 
 Cloudflare Pagesは素晴らしいサービスであるものの、自分の身のまわりで知名度が低く、あまり使っている人を見たことが無いのが気に掛かっており、この記事を執筆しました。
 今回紹介出来なかったCloudflare WorkersとPagesの連携などについても、今後取り上げることができればと思います！
-

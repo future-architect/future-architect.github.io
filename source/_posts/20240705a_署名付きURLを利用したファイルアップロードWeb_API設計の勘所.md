@@ -192,7 +192,6 @@ presign, err := client.PresignPutObject(ctx, &s3.PutObjectInput{
 
 拡張子の偽装などに備えファイルをバイナリレベルでチェックしたり、個人情報の観点からEXIFを除去したり、本登録前にさまざまな前処理を行うケースが考えられます。
 
-
 #### ゴミファイルが残らないようにする
 
 テンポラリバケットを設けず、直接本バケットにファイルアップロードを行う場合、次のようなケースにおいて不要なファイルが本バケットに残り続けます。
@@ -202,7 +201,6 @@ presign, err := client.PresignPutObject(ctx, &s3.PutObjectInput{
 
 テンポラリバケットを設けることで、必要なファイルのみを本バケットに保持し、本バケットをクリーンに保つことができます。
 テンポラリバケットは、ライフサイクルポリシーを設定することで、一定期間が経過したファイルを自動的に削除するようにしておくと良いでしょう。
-
 
 ### 署名付きURLを独自ドメインで運用する
 
@@ -222,4 +220,3 @@ CloudFrontの署名付きURLを利用したアップロードはあまり事例�
 [^1]: API Gateway のペイロードサイズ上限は[10MB](https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html)、Lambdaのペイロードサイズ上限は[6MB（同期）](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html#function-configuration-deployment-and-execution)となります。
 [^2]: これまでAPI Gatewayの統合タイムアウト29秒がネックになるケースが多くありましたが、[先日のアップデート](https://aws.amazon.com/jp/about-aws/whats-new/2024/06/amazon-api-gateway-integration-timeout-limit-29-seconds/)で緩和が可能になりました。
 [^3]: [S3経由でXSS!?不可思議なContent-Typeの値を利用する攻撃手法の新観点](https://blog.flatt.tech/entry/content_type) という記事では、不正な `Content-Type` の指定による攻撃手法が紹介されています。
-

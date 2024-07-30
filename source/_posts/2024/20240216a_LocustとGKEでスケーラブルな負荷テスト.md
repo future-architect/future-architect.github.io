@@ -26,26 +26,28 @@ lede: "負荷テストツールであるLocustとGKEを組み合わせて負荷�
 GitHub: https://github.com/locustio/locust
 
 公式ページにも載っておりますが、特徴としては以下の3つになります。
+
 - コードに基づいたユーザー挙動の定義
-    - ダサいUIや膨れ上がったXMLは必要無し
-    - コードのみのわかりやすい記述が可能
+  - ダサいUIや膨れ上がったXMLは必要無し
+  - コードのみのわかりやすい記述が可能
 - 分散型でスケーラブル
-    - 複数のマシンに分散された負荷テストの実行をサポート
-    - 数百万の同時ユーザーによるシミュレーションが可能
+  - 複数のマシンに分散された負荷テストの実行をサポート
+  - 数百万の同時ユーザーによるシミュレーションが可能
 - 歴戦の覇者（battle-tested）で実績がある
-    - GoogleやMicrosoft、AWSといった多くのユーザー（会社）がLocustを支持
-    - Battlefield[^1]の戦績確認用Webアプリ開発時に負荷テストとして利用されたため、本当の意味でbattle-tested🤣
+  - GoogleやMicrosoft、AWSといった多くのユーザー（会社）がLocustを支持
+  - Battlefield[^1]の戦績確認用Webアプリ開発時に負荷テストとして利用されたため、本当の意味でbattle-tested🤣
 
 ## 構築
 
 では早速、検証を行うための環境を構築していきます。必要なものは以下です。
+
 - Google Cloud環境
-    - GKE
-    - AppEngine
-    - Artifact Registry
+  - GKE
+  - AppEngine
+  - Artifact Registry
 - ローカル環境
-    - gcloud
-    - kubectl
+  - gcloud
+  - kubectl
 
 インフラ側は全てTerraformを利用して構築しようと思います。
 ※ProjectやVPCの構築、gcloud、kubectlのインストールは割愛します。
@@ -129,8 +131,8 @@ Cloud Buildを利用することでイメージのビルドとプッシュがgcl
 イメージがちゃんとビルドできているかどうかをコンソールから確認してみましょう。
 <img src="/images/20240216a/image_2.png" alt="image.png" width="1200" height="465" loading="lazy">
 
-
 イメージのビルドができたのでデプロイしていきます。
+
 ```bash terminal
 # Get cluster's credential
 gcloud container clusters get-credentials ${GKE_CLUSTER} --region ${REGION} --project ${PROJECT}
@@ -179,27 +181,29 @@ http://127.0.0.1:8080/
 "Number of users"は負荷テストに利用するユーザーの同時接続数、"Spawn rate"は1秒当たりに何人のユーザーがリクエストを開始するかの数、Hostは接続先になります。
 "Start swarming"を押すことでテストが開始されます。
 以下の条件でテストを開始したときの画面が次のようになります。
+
 - Number of users: 10
 - Spawn rate: 1
 <img src="/images/20240216a/image_4.png" alt="image.png" width="1200" height="237" loading="lazy">
 
 右上のSTATUSの部分では現在接続中のユーザー数（5 Users）が表示されており、10Usersまで増えていきます。RPSはRequest Per Secondで、秒間のリクエスト数を表しております。
 また、各種タブを切り替えることでテストに関する情報を見ることができます。
+
 - Statistics
-    - Requestに対するレスポンスの統計情報
-    - テストを行っている各Pathに対して個別にみることが可能
+  - Requestに対するレスポンスの統計情報
+  - テストを行っている各Pathに対して個別にみることが可能
 - Charts
-    - RPSやレスポンスタイムの時系列情報をグラフで確認することが可能
+  - RPSやレスポンスタイムの時系列情報をグラフで確認することが可能
 - Failures
-    - リクエストが失敗した場合に、どのPathに対してどのMethod失敗したのか、エラーコードは何なのかを確認することが可能
+  - リクエストが失敗した場合に、どのPathに対してどのMethod失敗したのか、エラーコードは何なのかを確認することが可能
 - Exceptions
-    - 例外発生時のTracebackを確認することが可能
+  - 例外発生時のTracebackを確認することが可能
 - Current Ratio
-    - Locustのイメージビルド時にPythonファイルで設定した各種Pathに対するリクエスト数の割合を確認することが可能
+  - Locustのイメージビルド時にPythonファイルで設定した各種Pathに対するリクエスト数の割合を確認することが可能
 - Download Data
-    - テスト結果をCSVやレポートとして出力可能
+  - テスト結果をCSVやレポートとして出力可能
 - Workers
-    - 現在Locustを動作させているPodの数を確認可能
+  - 現在Locustを動作させているPodの数を確認可能
 
 シンプルなUIの作りになっているため、直観的でわかりやすいです。
 また、"Download Data"にてレポートを出力することができるのですが、テスト結果に対して自動でサマリした状態で出力してくれるので非常に便利です。

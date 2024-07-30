@@ -78,7 +78,7 @@ Create Custom Tokenの「Get started」を押下します。
 
 - Token name: 任意の名前を入力
 - Permissions: Terraform経由で操作するサービスを選び、それぞれEditの権限を指定する
-    - どのサービスで何の権限が必要かは[ドキュメント](https://developers.cloudflare.com/fundamentals/api/reference/permissions/)にまとまっているので参照のこと
+  - どのサービスで何の権限が必要かは[ドキュメント](https://developers.cloudflare.com/fundamentals/api/reference/permissions/)にまとまっているので参照のこと
 - Account Resources: 自分が権限を持っているアカウント（メールアドレス）を選択可能。ここではAll accountsとしたが、複数のアカウントがある場合はここで絞っておくことが好ましい
 - Zone Resources: アカウントの中のドメインを選択できる。ここではAll zonesとしたが、操作できるドメインを絞りたいときはここで指定する
 - Client IP Address Filtering: 仮に操作されるIPアドレスが決まっている場合はここで指定する。何も入力しなければ、すべてのIPアドレスからアクセスを許容する
@@ -519,7 +519,6 @@ Do you want to perform these actions?
 
 `Apply complete! Resources: 2 imported, 0 added, 0 changed, 0 destroyed.` が出たらOKです。
 
-
 このあと `terraform plan` を実行してみて、差分が出ていなければ問題なしです。
 
 先ほどインポートに利用したimport.tfは削除しても構いません。
@@ -541,4 +540,3 @@ Terraform has compared your real infrastructure against your configuration and f
 これでCloudflareを操作する際の不安が軽減できるようになり、自分の個人開発モチベも（わずかながら）高まった気がします。また、Terraformのエコシステムや本体の機能の充実さも改めて実感しました。
 
 ぜひ皆さんもCloudflareをTerraform管理してみましょう！
-

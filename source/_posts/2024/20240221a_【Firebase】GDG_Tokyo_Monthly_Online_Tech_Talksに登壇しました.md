@@ -17,6 +17,7 @@ lede: "2024/2/1、GDG Tokyo主催の「【Firebase】GDG Tokyo Monthly Online Te
 <img src="/images/20240221a/image.png" alt="image.png" width="660" height="270" loading="lazy">
 
 # はじめに
+
 こんにちは。最近スギ花粉耐性がないことを実感しつつある山本です。
 
 2024/2/1、GDG Tokyo主催の「[【Firebase】GDG Tokyo Monthly Online Tech Talks](https://gdg-tokyo.connpass.com/event/306983/)」に「Flutter×Firebaseサービス達で高速でモバイルアプリを開発した話」というタイトルで登壇してきたので、その事後レポートです。
@@ -40,6 +41,7 @@ lede: "2024/2/1、GDG Tokyo主催の「【Firebase】GDG Tokyo Monthly Online Te
 今回のイベントのテーマは「Firebase」に関わることで、15分枠 or 5分枠の登壇枠で開催されていました。
 
 ## 登壇
+
 最近お仕事でFirebaseに携わっていたこともあり、社内の人におすすめされたので登壇を申し込んでみました。(会社アカウントとしては初の登壇です...！)
 
 登壇内容としては、新規事業プロジェクト周りでFlutterとFirebaseを活用していたのでそのユースケースの紹介をしてみました。
@@ -75,6 +77,7 @@ Firebaseでログ・アラート周りに使用できるサービスとしては
 [Firebaseで取得したログをBigQueryに連携してユーザー操作をトラッキングする](https://future-architect.github.io/articles/20210316/)
 
 ## Firebase Remote Configについて
+
 <img src="/images/20240221a/image_5.png" alt="image.png" width="964" height="538" loading="lazy">
 
 その他に活用していてユニークだったサービスとしては、Remote Configがあります。
@@ -86,6 +89,7 @@ https://firebase.google.com/docs/remote-config?hl=ja
 まだ導入できていませんが、A/B testingなども行うことができるようなので将来的には触ってみたいですね。
 
 ## まとめ
+
 今回はGDG Tokyoにて、最近触ったFirebaseサービスとFlutterの活用事例について登壇してきました！
 会社アカウントで登壇することは初めてだったのですが、登壇になれた方やチームメンバーに手厚くフォロー頂き楽しく発表してくることができました。
 
@@ -93,4 +97,5 @@ https://firebase.google.com/docs/remote-config?hl=ja
 ※スギ花粉とも頑張って生きていこうと思います。
 
 ## 参考文献
+
 - https://firebase.google.com/docs/remote-config?hl=ja

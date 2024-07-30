@@ -38,63 +38,63 @@ Google Cloud 認定資格関連の過去記事：
 ### スケーラブルで可用性の高いクラウド データベース ソリューションを設計する
 
 - [Google CloudのDBサービス](https://cloud.google.com/products/databases?hl=ja)とその特性を理解する
-    - Relational DB
-        - Cloud SQL
-        - Spanner
-        - AlloyDB
-    - NoSQL
-        - Firestore
-        - Bigtable
-    - インメモリ
-        - Memorystore
-    - その他
-        - MongoDB Atlas
-        - Google Cloud Partner Services
+  - Relational DB
+    - Cloud SQL
+    - Spanner
+    - AlloyDB
+  - NoSQL
+    - Firestore
+    - Bigtable
+  - インメモリ
+    - Memorystore
+  - その他
+    - MongoDB Atlas
+    - Google Cloud Partner Services
 - シチュエーション別でDBサービスを選ぶ
-    - オープンソースのDBサービスを利用したい場合は？
-    - 99.99%の可用性を求められる場合は？
-    - グローバル展開が予測されている場合は？
-    - スケーリングは要る？要らない？
+  - オープンソースのDBサービスを利用したい場合は？
+  - 99.99%の可用性を求められる場合は？
+  - グローバル展開が予測されている場合は？
+  - スケーリングは要る？要らない？
 - DBを構成するデータの種別でサービスを選ぶ
-    - トランザクションデータ
-    - ストリーミングデータ
-    - リアルタイム
+  - トランザクションデータ
+  - ストリーミングデータ
+  - リアルタイム
 
 ### データ ソリューションを移行する
 
 - [Database Migration Service](https://cloud.google.com/database-migration/docs/overview)マジ便利
-    - 他クラウドのDBやオンプレからGoogle Cloudへの移行が容易に可能
-    - ダウンタイムを最小限に抑えた移行を実現
-    - サポートされているサービスは理解しておく
-        - [Supported source and destination databases](https://cloud.google.com/database-migration/docs/supported-databases#mysql)
+  - 他クラウドのDBやオンプレからGoogle Cloudへの移行が容易に可能
+  - ダウンタイムを最小限に抑えた移行を実現
+  - サポートされているサービスは理解しておく
+    - [Supported source and destination databases](https://cloud.google.com/database-migration/docs/supported-databases#mysql)
 - Oracleは[Bare Metal Solution](https://cloud.google.com/bare-metal?hl=ja)を使う
-    - 但し、最近のトレンドとしては[Oracle on Google Cloud](https://cloud.google.com/solutions/oracle?hl=ja)
+  - 但し、最近のトレンドとしては[Oracle on Google Cloud](https://cloud.google.com/solutions/oracle?hl=ja)
 
 ### 複数のデータベース ソリューションにまたがるソリューションを管理する
 
 - トラブルシューティング
-    - [Query Insights](https://cloud.google.com/sql/docs/postgres/using-query-insights?hl=ja)を利用したクエリのパフォーマンス分析
-    - Diskの拡張
-    - DBにホットスポットが発生したときの対策
+  - [Query Insights](https://cloud.google.com/sql/docs/postgres/using-query-insights?hl=ja)を利用したクエリのパフォーマンス分析
+  - Diskの拡張
+  - DBにホットスポットが発生したときの対策
 - データベースのセキュリティ
-    - [Cloud SQL Auth Proxy](https://cloud.google.com/sql/docs/mysql/sql-proxy?hl=ja)を使う
-    - IAMは最小権限の法則に従う
-    - Private IPを利用し、VPC内で接続を完結させる
-    - [VPC Service Controls](https://cloud.google.com/vpc-service-controls/docs/overview?hl=ja)を利用して接続経路を絞る
+  - [Cloud SQL Auth Proxy](https://cloud.google.com/sql/docs/mysql/sql-proxy?hl=ja)を使う
+  - IAMは最小権限の法則に従う
+  - Private IPを利用し、VPC内で接続を完結させる
+  - [VPC Service Controls](https://cloud.google.com/vpc-service-controls/docs/overview?hl=ja)を利用して接続経路を絞る
 
 ### Google Cloud にスケーラブルで可用性の高いデータベースをデプロイする
 
 - ディザスタリカバリ戦略に沿った構成を組む
-    - 復旧時間目標（RTO）
-    - 普及時点目標（RPO）
+  - 復旧時間目標（RTO）
+  - 普及時点目標（RPO）
 - DBとの接続方法
-    - [IAMで制御したい場合は？](https://cloud.google.com/sql/docs/postgres/iam-authentication?hl=ja)
-    - [Cloud RunなどサーバレスとCloud SQLを接続する場合は？](https://cloud.google.com/sql/docs/sqlserver/connect-instance-cloud-functions?hl=ja)
+  - [IAMで制御したい場合は？](https://cloud.google.com/sql/docs/postgres/iam-authentication?hl=ja)
+  - [Cloud RunなどサーバレスとCloud SQLを接続する場合は？](https://cloud.google.com/sql/docs/sqlserver/connect-instance-cloud-functions?hl=ja)
 - IaCツールを利用した開発環境の整備
-    - Terraformなどを利用して一律のフォーマットでデプロイすることで構成のミスを防ぐ
+  - Terraformなどを利用して一律のフォーマットでデプロイすることで構成のミスを防ぐ
 - 高可用性を実現する構成
-    - [プライマリインスタンスとリードレプリカのzone構成]()
-    - [フェイルオーバー時にリードレプリカをプライマリへ昇格させる](https://cloud.google.com/sql/docs/mysql/replication/cross-region-replicas?hl=ja)
+  - [プライマリインスタンスとリードレプリカのzone構成]()
+  - [フェイルオーバー時にリードレプリカをプライマリへ昇格させる](https://cloud.google.com/sql/docs/mysql/replication/cross-region-replicas?hl=ja)
 
 ### 全体的な所感
 
@@ -115,7 +115,7 @@ Google Cloud 認定資格関連の過去記事：
 
 - Google Cloud公式提供の[模擬試験](https://docs.google.com/forms/d/e/1FAIpQLSe55cAg8a3NzgV_QCJ2_F75NAyE44Z-XuVB6oPJXaWnI5UBIQ/viewform?hl=ja)を受験する
 - Udemyなどのオンライン学習サービスで模擬試験を購入し勉強する
-    - https://www.udemy.com/course/2024google-cloud-professional-cloud-database-engineer
+  - https://www.udemy.com/course/2024google-cloud-professional-cloud-database-engineer
 
 正解の選択肢を暗記するというよりは、間違った問題に対してドキュメントを読むことが大切です。なぜその選択肢が正解なのかを理解することで他の問題にも応用できるようになっていきます。
 

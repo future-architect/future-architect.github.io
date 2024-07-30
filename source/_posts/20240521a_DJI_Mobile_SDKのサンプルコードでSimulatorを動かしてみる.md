@@ -32,19 +32,18 @@ lede: "ドローンを利用して自動操縦（Autopilot）のロジックを�
 ## バージョン
 
 - 開発PC
-    - Android Studio Hedgedog
-    - Android SDK API Level 31
-    - Gradle 7.5
-    - Gradle JDK Correcto-11
+  - Android Studio Hedgedog
+  - Android SDK API Level 31
+  - Gradle 7.5
+  - Gradle JDK Correcto-11
 - シミュレータ用PC
-    - DJI Assistant 2 for Phantom
+  - DJI Assistant 2 for Phantom
 - Bridge App用携帯
-    - DJI Bridge App
+  - DJI Bridge App
 
 ## システム構成
 
 <img src="/images/20240521a/image_2.png" alt="image.png" width="1200" height="426" loading="lazy">
-
 
 ## 手順
 
@@ -60,7 +59,6 @@ https://github.com/dji-sdk/Mobile-SDK-Android/tree/master
 ※Package Nameはサンプルコード内のパッケージ名（各パッケージが存在するパス：Sample Code/app/src/main/java）。その他の項目は適当に記載
 
 <img src="/images/20240521a/image_3.png" alt="image.png" width="1192" height="1130" loading="lazy">
-
 
 ### ３．（開発PC）サンプリコード内にAPIキーを入力
 
@@ -86,6 +84,7 @@ AndroidManifest.xml（パス：Sample Code/app/src/main/main)
 - 起動後に「Register App」を押すと、DJI SDK利用が可能になる
 
 ### ６．（BridgeApp用携帯）携帯にBridgeAppをインストール
+
 - iOSはApp Storeからダウンロードする
 - Andriodは[dji-sdk/Android-Bridge-App](https://github.com/dji-sdk/Android-Bridge-App/releases/tag/4.14-trial1)からapk経由でインストール
 

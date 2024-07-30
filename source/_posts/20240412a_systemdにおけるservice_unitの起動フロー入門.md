@@ -17,6 +17,7 @@ lede: "Linuxのsystemdにおけるservice unitの起動と停止のフローに�
 [春の入門連載2024](/articles/20240408a/) の4本目です。
 
 # はじめに
+
 こんにちは、最近寒暖差が激しくて体調崩しがちなTIGの森です。
 
 入門向け記事としてLinuxの `systemd` における `service unit` の起動と停止のフローについて説明します。
@@ -56,7 +57,6 @@ lede: "Linuxのsystemdにおけるservice unitの起動と停止のフローに�
 |`ExecStopPost`|サービス終了後の後処理を実施する。`inactive`になる前の実施する |
 |`ExecReload`|サービスのリロードを実施する|
 
-
 ## サンプル
 
 例として、`ExecStartPre`で実際にどのような前処理が実施できるか試してみましょう。
@@ -66,17 +66,22 @@ EC2のインスタンスのメタデータから自身のリージョンを取�
 ### 手順
 
 1. 環境変数の設定ファイル`/etc/environment`に下記の行を追加して、デフォルトのリージョンを指定
+
     ```bash /etc/environment
     Region=default
     ```
+
 1. `ExecStartPre`で叩かれる事によって自分のリージョンを取得するシェル`/etc/setEnvConf.sh`を作成
+
     ```bash /etc/setEnvConf.sh
     #!/bin/bash
     
     REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed -e 's/.$//')
     sudo sed -i "/^Region=/c\Region=$REGION" /etc/environment
     ```
+
 1. `/etc/systemd/system`配下に`test.service`を作成
+
     ```ini test.service
      [Unit]
     Description=Test Service
@@ -90,7 +95,9 @@ EC2のインスタンスのメタデータから自身のリージョンを取�
     [Install]
     WantedBy=multi-user.target
     ```
-3. サービスファイルを読み込んで起動　
+
+3. サービスファイルを読み込んで起動
+
     ```sh
     sudo systemctl daemon-reload
     sudo systemctl start test

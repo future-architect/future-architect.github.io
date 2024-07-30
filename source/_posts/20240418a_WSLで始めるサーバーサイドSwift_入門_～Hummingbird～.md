@@ -61,6 +61,7 @@ https://docs.hummingbird.codes/2.0/documentation/hummingbird/
 本記事は、以下の環境で実施を確認しています。
 
 - Windows Subsystem for Linux （以下、WSL）に関するバージョン情報
+
     ```sh cmd.exe
     >wsl -v
     WSL バージョン: 2.1.5.0
@@ -71,6 +72,7 @@ https://docs.hummingbird.codes/2.0/documentation/hummingbird/
     DXCore バージョン: 10.0.25131.1002-220531-1700.rs-onecore-base2-hyp
     Windows バージョン: 10.0.19045.4170
     ```
+
 - Ubuntu のバージョン: 22.04.4 LTS
 - Swift のバージョン: 5.10
 
@@ -212,6 +214,7 @@ struct Todos: AsyncParsableCommand {
 ```
 
 一連の修正が完了すると、アプリケーションが正常に動くことを確認できます。
+
 ```bash
 > swift run
 Building for debugging...
@@ -270,7 +273,6 @@ Linux 上でも Homebrew インストールできるみたいなので、Homebre
 https://docs.brew.sh/Homebrew-on-Linux
 
 </div>
-
 
 ```bash
 > sudo apt update
@@ -394,4 +396,3 @@ https://qiita.com/shin4488/items/175151e59a043c724b38
 https://www.swift.org/sswg/
 [^10]:AppleのDeveloper向けのドキュメント
 https://developer.apple.com/documentation/Swift
-

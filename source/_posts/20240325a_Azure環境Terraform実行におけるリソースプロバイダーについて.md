@@ -13,10 +13,10 @@ lede: "昨今のOpenAI需要によって、Azure環境の利用を本格的に�
 ---
 <img src="/images/20240325a/top.png" alt="" width="800" height="515">
 
-
 [Terraform連載2024を](/articles/20240311a/) の8本目です。
 
 # はじめに
+
 こんにちは、SAIG(Strategic AI Group)の真鍋です。
 
 昨今のOpenAI需要によって、Azure環境の利用を本格的に始める方も多いかと思います。

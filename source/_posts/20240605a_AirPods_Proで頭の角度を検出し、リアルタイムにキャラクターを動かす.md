@@ -43,6 +43,7 @@ AirPods(第３世代)、AirPods Pro(全世代)、AirPods Max
 (参考URL: [AirPodsユーザガイド 空間オーディオとヘッドトラッキングを操作する](https://support.apple.com/ja-jp/guide/airpods/dev00eb7e0a3/web))
 
 # 今回作ったもの
+
 AirPodsProで取得した頭の角度でリアルタイムにキャラクター動かせるミニアプリ。
 
 <img src="/images/20240605a/headTracking_2_(1).gif" alt="" width="154" height="334" loading="lazy">
@@ -165,6 +166,7 @@ class HeadTrackingManager: ObservableObject {
 ```
 
 ### 全体概要
+
 このクラスは`ObservableObject`プロトコルに準拠させ、SwiftUIビューと連携して動作させるようにしています。
 
 ### 各プロパティの説明
@@ -179,14 +181,12 @@ class HeadTrackingManager: ObservableObject {
     頭のヨー（水平面内の回転角度）を表す。
     これらのプロパティは、　`@Published`が付与されているので、変更があったときにはビューを自動的に更新する。
 
-
 次に、各メソッドを説明します。
-
 
 ### startTracking()
 
 モーションデータの取得を開始するメソッド。
-    
+
 ```swift
 func startTracking() {
         // 接続している端末でCoreMotionが使えるか否かを確認する
@@ -210,9 +210,10 @@ func startTracking() {
     }
 ```
 
-モーションデータを提供できるかどうかを`isDeviceMotionAvailable`で確認します。その後、モーションデータの更新を開始し、データが取得されるたびに`Task`クロージャ内で、`updateMotionData(_:) `メソッドを呼び出します。
+モーションデータを提供できるかどうかを`isDeviceMotionAvailable`で確認します。その後、モーションデータの更新を開始し、データが取得されるたびに`Task`クロージャ内で、`updateMotionData(_:)`メソッドを呼び出します。
 
 ### stopTracking()
+
 モーションデータの取得を停止するメソッド。`stopDeviceMotionUpdates()` メソッドを呼び、モーションデータの取得を停止します。
 
 ```swift
@@ -220,7 +221,7 @@ func stopTracking() {
     motionManager.stopDeviceMotionUpdates()
 }
 ```
- 
+
 ### updateMotionData(_ motion: CMDeviceMotion) async
 
 モーションデータの取得、更新を行うメソッド。
@@ -234,11 +235,10 @@ private func updateMotionData(_ motion: CMDeviceMotion) async {
         }
     }
 ```
-    
+
 UI更新を安全に行うために、`MainActor.run`内でUIの更新を行うことでUIスレッドの競合が発生しないようにしています。
 
 取得した姿勢データ`attitude`を使用して、`pitch`、`roll`、`yaw`の更新を行います。
-
 
 ## Viewに反映させる
 
@@ -297,6 +297,7 @@ struct HeadTrackingApp: App {
     }
 }
 ```
+
 </details>
 
 <details><summary>HeadTrackingManager.swift</summary>
@@ -346,6 +347,7 @@ class HeadTrackingManager: ObservableObject {
     }
 }
 ```
+
 </details>
 
 <details><summary>ContentView.swift</summary>
@@ -399,6 +401,7 @@ struct ContentView: View {
     }
 }
 ```
+
 </details>
 
 # さいごに
@@ -413,9 +416,9 @@ struct ContentView: View {
 https://www.apple.com/jp/airpods-pro/
 - 空間オーディオとヘッドトラッキングを操作する
 https://support.apple.com/ja-jp/guide/airpods/dev00eb7e0a3/web
-- AirPods Proの加速度センサーの値を取得する【iOS14】 
+- AirPods Proの加速度センサーの値を取得する【iOS14】
 https://qiita.com/tukutuku_tukuyo/items/ea949ee2dbb499d6e7ca
-- Core Motion | Apple Developer Documentation 
+- Core Motion | Apple Developer Documentation
 https://developer.apple.com/documentation/coremotion
 - CMHeadphoneMotionManager | Apple Developer Documentation
 https://developer.apple.com/documentation/coremotion/cmheadphonemotionmanager
@@ -423,7 +426,7 @@ https://developer.apple.com/documentation/coremotion/cmheadphonemotionmanager
 https://developer.apple.com/documentation/coremotion/cmmotionmanager/1616094-isdevicemotionavailable
 - stopDeviceMotionUpdates() | Apple Developer Documentation
 https://developer.apple.com/documentation/coremotion/cmmotionmanager/1616115-stopdevicemotionupdates
-- startDeviceMotionUpdates(to:withHandler) | Apple Developer Documentation 
+- startDeviceMotionUpdates(to:withHandler) | Apple Developer Documentation
 https://developer.apple.com/documentation/coremotion/cmmotionmanager/1616048-startdevicemotionupdates
 - かわいいフリー素材集『いらすとや』
 https://www.irasutoya.com/

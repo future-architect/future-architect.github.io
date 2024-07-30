@@ -33,14 +33,14 @@ IaCを利用してインフラを構成することで、構築忘れや設定�
 以下のような前提で考えてみます。
 
 - Google Cloudを利用
-    - 他クラウドベンダーでも応用可能だと思います
+  - 他クラウドベンダーでも応用可能だと思います
 - 各環境（Development/Staging/Production）毎でプロジェクトは同じになる
-    - dev-app/stg-app/prd-appの様に3つのプロジェクトが存在します
+  - dev-app/stg-app/prd-appの様に3つのプロジェクトが存在します
 - ほぼ同じシステムを他リージョンへロールアウトしていく
-    - インスタンスのマシンスペックなど、リソース周りはカスタム可能にしたいと思います
+  - インスタンスのマシンスペックなど、リソース周りはカスタム可能にしたいと思います
 - Terraformを実行するためのBastionサーバーが存在する
-    - 各環境のBastionサーバーからTerraformをApplyすることになります
-    - 各BastionサーバーでBackendバケットへのアクセスは既に認証済みとなっています
+  - 各環境のBastionサーバーからTerraformをApplyすることになります
+  - 各BastionサーバーでBackendバケットへのアクセスは既に認証済みとなっています
 
 ## 構成案①：ディレクトリ分けのみで管理する
 
@@ -129,8 +129,8 @@ $ terraform workspace list
 また、plan/apply時にtfvarsを利用することによって各環境ワンリソースで管理することが可能となります。
 
 ```sh
-$ terraform plan -var-file config/sydney.tfvars
-$ terraform plan -var-file config/sydney.tfvars
+terraform plan -var-file config/sydney.tfvars
+terraform plan -var-file config/sydney.tfvars
 ```
 
 ```sh terraform storage_bucket.tf

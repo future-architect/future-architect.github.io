@@ -49,7 +49,8 @@ CDN、WAF、DNSはAWS/Azure単体でカバーすることもできるので、�
 1. AWSとAzureをそれぞれ独立させて管理する
 2. AWSかAzureをゲートウェイとし、もう片方のクラウドにルーティングさせる
 3. Cloudflareをゲートウェイとし、それぞれのクラウドにルーティングさせる  
-  - 別サービスとしては当社にて採用実績のあるCloudflareとAkamaiを比較しましたが、Akamaiはコスト面で圧倒的に劣る（その分機能は豊富ですが）ので今回の比較からは除外します。  
+
+- 別サービスとしては当社にて採用実績のあるCloudflareとAkamaiを比較しましたが、Akamaiはコスト面で圧倒的に劣る（その分機能は豊富ですが）ので今回の比較からは除外します。  
 
 比較の前提として、CDN/WAFには以下の要素を求めます。
 
@@ -71,7 +72,6 @@ CDN、WAF、DNSはAWS/Azure単体でカバーすることもできるので、�
 ### ①AWSとAzureをそれぞれ独立させて管理する  
 
 <img src="/images/20240529a/709b68d9-ec9a-4772-3e99-028227cfc9d1.png" alt="" width="922" height="538" loading="lazy">
-
 
 AWSではCloudFront/AWS WAF、AzureではAzureFrontDoorを採用し、それぞれ独立したシステムとするパターンです。  
 まずはこのパターンを考えたくなると思います。  

@@ -155,4 +155,3 @@ RDB の世界では ANSI SQL 標準に準拠することで、DBプロダクト�
 [^4]: 例えば [AWS S3](https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/userguide/notification-how-to-event-types-and-destinations.html#supported-notification-event-types) と [Google Cloud Storage](https://cloud.google.com/functions/docs/calling/storage) は両方ともイベントトリガーの機構を持ちますが、イベントタイプには差異があります。
 
 [^5]: [Don't get locked up into avoiding lock-in](https://martinfowler.com/articles/oss-lockin.html) ではロックインは合計8つの次元で分類されています。
-
