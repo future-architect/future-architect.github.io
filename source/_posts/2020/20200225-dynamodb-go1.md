@@ -14,6 +14,7 @@ lede: "Go言語でWebサーバを実装していた際にDynamoDBを扱うライ
 ---
 
 # はじめに
+
 こんにちは、村田です。Go言語でWebサーバを実装していた際にDynamoDBを扱うライブラリとしてGregさんの https://github.com/guregu/dynamo を使っていました。（2年ほど稼働していますが、特に問題も出ていません）
 
 当時Go初心者だった私は「go dynamo」とすぐさまGoogle先生に問い合わせ、「guregu/dynamoがオススメ」とのエントリーを多数発見しました。オブジェクトの取り回しが隠蔽化されていてとにかく実装が簡単だと記事にも書いてありましたし、私自身も実際そう感じました。
@@ -28,8 +29,8 @@ lede: "Go言語でWebサーバを実装していた際にDynamoDBを扱うライ
 DynamoDB LocalをDocker上で動かすのが楽なので今回はそちらを使います。
 
 ```bash DynamoDB-Localのインストール
-$ docker pull amazon/dynamodb-local
-$ docker run -d --name dynamodb -p 8000:8000 amazon/dynamodb-local
+docker pull amazon/dynamodb-local
+docker run -d --name dynamodb -p 8000:8000 amazon/dynamodb-local
 ```
 
 DynamoDB Localへのアクセスはaws cliを利用するのでそちらも準備します。アクセス時はEndpointのURLを引数で指定してあげる必要があります。
@@ -63,11 +64,11 @@ OKそうですね。あとはテーブルを作成したら準備OKです。
 今回は以下のようなスキーマでテーブルを作成します。
 
 * テーブル名
-    * `MyFirstTable`
+  * `MyFirstTable`
 * HashKey
-    * `MyHashKey` - `S`
+  * `MyHashKey` - `S`
 * RangeKey
-    * `MyRangeKey` - `N`
+  * `MyRangeKey` - `N`
 
 ```bash DynamoDBテーブル作成
 $ aws dynamodb create-table --endpoint-url http://localhost:8000 --table-name MyFirstTable --attribute-definitions AttributeName=MyHashKey,AttributeType=S AttributeName=MyRangeKey,AttributeType=N --key-schema AttributeName=MyHashKey,KeyType=HASH AttributeName=MyRangeKey,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
@@ -114,9 +115,11 @@ $ aws dynamodb create-table --endpoint-url http://localhost:8000 --table-name My
 ちなみにですが、DynamoDB Localの場合は設定したCapacity Unitは考慮されないので適当な値を設定しても問題ありません。
 
 ## ソースコード書いていきます
+
 ※ソースは全て https://github.com/mura123yasu/go-guregu-dynamo にアップしているので適宜参考にしてください。
 
 ### クライアントを準備
+
 環境変数から諸々の値を取得するようにしつつ、クライアントを生成します。
 テーブル名は先程作成した `MyFirstTable` を設定します。
 
@@ -149,9 +152,11 @@ func main() {
 ```
 
 ### 単純なCRUD
+
 ここからはCRUD処理の実装を進めます。
 
 #### Create
+
 Createで利用するメソッドは `Put` です。
 
 Put対象のitemを準備して渡すだけで簡単ですが1点注意事項があります。itemはPut先テーブルのKeyをすべて含むものでなければなりません。今回であれば `MyHashKey` と `MyRangeKey` です。
@@ -175,6 +180,7 @@ func main() {
 ```
 
 #### Read
+
 Readで利用するメソッドは `Get` です。他にも `Scan` も使えるので用途に合わせて色々試してみて下さい。
 
 私達が実装したWebサーバでは、DynamoDBに対するアクセスはキーアクセスのみに限定していたため、Getの利用で事足りました。
@@ -194,6 +200,7 @@ func main() {
 ```
 
 #### Update
+
 利用するメソッドは `Update` です。
 
 少し余談にはなるのですが、Webサーバ実装時はUpdateは使いませんでした。常にPut処理を行っており、全体シーケンスを検討する中で冪等性を保つためにそのような設計にしていました。
@@ -213,6 +220,7 @@ func main() {
 ```
 
 #### Delete
+
 利用するメソッドは `Delete` です。
 
 Keyさえ指定していれば問題ないのは他メソッドと変わりません。
@@ -231,6 +239,7 @@ func main() {
 ```
 
 ### Conditional Check
+
 これはもうゴリゴリに使い倒しました。以下の例はとてもシンプルなものですが、実際には `If("MyText = ?", "some word")` の部分に様々な条件を記載します。書き方は色々あるので必要に応じて確認してみてください。
 
 ```go ConditionalCheck処理
@@ -255,18 +264,18 @@ func main() {
 さて、紹介してきた一連の動作を最後に実行してみましょう。DynamoDB Localを使用する場合は環境変数にて `DYNAMO_ENDPOINT` だけ指定してRunするだけ。簡単ですね。
 
 ```sh 実行
-$ git checkout https://github.com/mura123yasu/go-guregu-dynamo.git
-$ export DYNAMO_ENDPOINT=http://localhost:8000
-$ go run main.go
+git checkout https://github.com/mura123yasu/go-guregu-dynamo.git
+export DYNAMO_ENDPOINT=http://localhost:8000
+go run main.go
 ```
 
 ※ちなみにコミットしているソースはConditional CheckのUpdateだけが失敗しますが、想定通りなので問題ありません。
 
 # 最後に
+
 連載初日の記事はいかがだったでしょうか？レベル的には初学者の方に向けた内容だったかなと思います。「まずはGo言語でDynamoDBをつついてみたい」という方が本記事を通じて簡単にチャレンジできたら幸いです。
 
 [DynamoDB×Go連載企画](/tags/DynamoDB%C3%97Go/) の1本目でした。次は武田さんの[AWS SDKによるDynamoDBの基本操作](/articles/20200227/)です。
-
 
 DynamoDB×Go以外にも多くの連載企画があります。特にGo Cloud連載が今回のテーマに近いです。
 

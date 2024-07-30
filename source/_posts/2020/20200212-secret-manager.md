@@ -27,14 +27,16 @@ lede: "突然ですが、普段生活するうえでカギ🔑をなくした、
 
 ということで、そんな管理人の皆さんに朗報です。 **遂にGCPにシークレット管理機能がやってきました！** CLIツールのBerglasとGUIで管理するSecret Managerを簡単にご紹介したいと思います。
 
-
 ## Berglasを使ってみる
+
 サクっと利用するならCloud Shellだよね！ということで、以下Cloud Shellで作業をしています。
 
 ### Berglasとは？
+
 [Githubページ](https://github.com/GoogleCloudPlatform/berglas)でこのツールについて確認します。
 
 > Berglasは、Google Cloudでシークレットを保存および取得するためのコマンドラインツールおよびライブラリです。シークレットはCloud KMSで暗号化され、Cloud Storageに保存されます。 Secret Managerには相互運用可能なレイヤーもあります。
+>
 > * CLIとして：Berglasは、Google Cloudでのデータの暗号化、復号化、保存のプロセスを自動化します。
 > * ライブラリとして：BerglasはさまざまなGoogle Cloudランタイムへのシークレットの組み込みを自動化します
 >
@@ -45,12 +47,11 @@ lede: "突然ですが、普段生活するうえでカギ🔑をなくした、
 ### Berglasのインストール（正確にはバイナリをダウンロード）
 
 ```shell
-$ wget https://storage.googleapis.com/berglas/master/linux_amd64/berglas
-$ chmod +x berglas
+wget https://storage.googleapis.com/berglas/master/linux_amd64/berglas
+chmod +x berglas
 ```
 
 Dockerコンテナもあるようなので、好みに応じて使い分けください。
-
 
 ### 環境変数の準備と依存してるAPIの有効化
 
@@ -73,7 +74,7 @@ $ gcloud services enable --project ${PROJECT_ID} \
 次コマンドを実行すると、シークレットを保存するための新しいCloud Storageバケットと、データを暗号化するためのCloud KMSキーが自動的に作成されます。
 
 ```shell
-$ berglas bootstrap --project $PROJECT_ID --bucket $BUCKET_ID
+berglas bootstrap --project $PROJECT_ID --bucket $BUCKET_ID
 ```
 
 成功すると下記のような出力が確認できます！最近のCLIツールってこれでもかってくらい優しくできていますよね。
@@ -156,8 +157,8 @@ $ export SA_EMAIL=berglas-service-account@${PROJECT_ID}.iam.gserviceaccount.com
 #### Berglasから先ほど作ったサービスアカウントへシークレットへのアクセス権限を渡す
 
 ```shell
-$ berglas grant ${BUCKET_ID}/api-user --member serviceAccount:${SA_EMAIL}
-$ berglas grant ${BUCKET_ID}/api-pass --member serviceAccount:${SA_EMAIL}
+berglas grant ${BUCKET_ID}/api-user --member serviceAccount:${SA_EMAIL}
+berglas grant ${BUCKET_ID}/api-pass --member serviceAccount:${SA_EMAIL}
 ```
 
 #### Goのプログラム
@@ -207,7 +208,6 @@ func F(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-
 #### デプロイ
 
 ```shell
@@ -230,8 +230,8 @@ $ gcloud functions deploy berglas-example-go \
 割と道のりが長いですが、GCPのサービスから簡単にアクセスできるのは気持ちが良いですね。
 <img src="/images/20200212/photo_20200212_01.png" class="img-small-size" loading="lazy">
 
-
 ## Secret Managerを利用
+
 折り返しです。もうしばしお付き合いください。
 
 ### Secret Manageとは？
@@ -242,6 +242,7 @@ $ gcloud functions deploy berglas-example-go \
 簡潔ですね。CloudKMSはGCPの管理するカギで暗号化、復号などをサポートしたサービスですが、もう一枚レイヤが上なサービスのようです。BerglasのGUI版ぐらいの気持ちでいると良いとお思います。
 
 ### Secret Manager画面
+
 GUI画面へは`セキュリティ -> シークレット マネージャー`でアクセスできます。
 
 作成画面はかなり簡潔で好感度が高いです。この手のサービスはやたらと入力項目が多くて初見殺しなイメージ（勝手）があったので。
@@ -260,14 +261,14 @@ GUI画面へは`セキュリティ -> シークレット マネージャー`で�
 
 何やらBerglasと連携もできるようなので、ちょこっと触ってみます。
 
-- BerglasからSecret Managerのキーにアクセス
+* BerglasからSecret Managerのキーにアクセス
 
 ```shell
 $ berglas access sm://${PROJECT_ID}/the-first-secret
 sugoi-secret
 ```
 
-- migrate
+* migrate
 
 [Google Cloud Blog](https://cloud.google.com/blog/ja/products/identity-security/introducing-google-clouds-secret-manager)に「1回限りの」って書いてあるのが不穏ｗ
 
@@ -287,7 +288,7 @@ Migrating api-pass to projects/my-secret-project/secrets/api-pass... done!
 
 通りました。
 
-- 画面
+* 画面
 
 イケてますね！当然ですが、最終更新日はUPLOADした時間になります。
 
@@ -325,6 +326,7 @@ def print_secret(request):
     secret_string = res.payload.data.decode('utf-8')
     return secret_string
 ```
+
 ライブラリ`google-cloud-secret-manager`が必要なので、`requirements.txt`も作成しましょう。
 
 ```requirements.txt
@@ -343,7 +345,6 @@ $ gcloud functions deploy print_secret \
 <img src="/images/20200212/photo_20200212_06.png" loading="lazy">
 
 ...ニッコリ😄
-
 
 ## まとめ
 

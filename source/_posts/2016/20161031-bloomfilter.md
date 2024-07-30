@@ -14,7 +14,6 @@ lede: "重要なアルゴリズムであるにもかかわらず、まとまっ�
 ---
 <img src="/images/20161102/photo_20161102_00.png" class="img-small-size" alt="">
 
-
 # **1. 初めに**
 
 DBにおける処理はSQLによって記述しますが、データの取得するために具体的にどのような内部処理を行うかという点までは記述しません。
@@ -29,12 +28,9 @@ Bloom Filterは結合処理を効率化するために、結合の前段階で�
 
 <img src="/images/20161102/photo_20161102_01.png" loading="lazy">
 
-
-
 公式なドキュメントとしては以下になります。
 [Oracle Database SQLチューニング・ガイド 12cリリース1(12.1) 結合の最適化 ブルーム・フィルタ](
 http://docs.oracle.com/cd/E49329_01/server.121/b71277/tgsql_join.htm#BABEGJHI)
-
 
 # **2. Bloom Filterとは**
 
@@ -49,10 +45,11 @@ Bloom Filterの概要は他サイトを参照してください。
 
 * ある集合データからBloom Filterを作成した場合、Bloom Filterを利用してその集合の中にデータが含まれているかどうかを判定できる
 * その判定は100%正しくなく、「存在する」判定されたが実際は「存在しない」という誤検知を含む
-  - これを **偽陽性[false positive]** と呼びます
+  * これを **偽陽性[false positive]** と呼びます
 * Bloom Filterは非常に小さいサイズとなることから、「インメモリで保持が可能」「別の処理（プロセス）にフィルタを渡すことが可能」というメリットがある
 
 # **3. サンプルスキーマ**
+
 今回の説明は、Oracleのサンプルスキーマを用いて説明を行います。
 説明に必要なカラム以外は省略しています。
 
@@ -60,7 +57,6 @@ Bloom Filterの概要は他サイトを参照してください。
 http://docs.oracle.com/cd/E57425_01/121/COMSC/toc.htm)
 
 <img src="/images/20161102/photo_20161102_02.png" loading="lazy">
-
 
 DWHにおけるスタースキーマ構成となっています。
 
@@ -70,56 +66,56 @@ DWHにおけるスタースキーマ構成となっています。
 
 実場面ではSALES表にはBitmap Indexを作成する例も多いのですが、今回は無しの状態で議論を進めます。
 
-
 # **4. SQL実行時のBloom Filter**
+
 SQL実行時におけるBloom Filterは「テーブル結合(Join)」で利用されます。
 
 また、「結合操作はハッシュ結合(Hash-Join)であること」という大前提があります。
 その理由はハッシュテーブルを作成するタイミングでBloom Filterを同時に作成するからです。（ハッシュ結合については[ここ](http://www.atmarkit.co.jp/ait/articles/0408/25/news101.html)など参考にどうぞ）
 
 ## **4-1. Bloom Filterを使わない場合のハッシュ結合**
+
 サンプルスキーマにおけるハッシュ結合の具体的なフローは以下のようになります。
 <img src="/images/20161102/photo_20161102_03.png" loading="lazy">
-
 
 1. ディメンジョン表(TIMES)を全スキャンしてハッシュテーブルを作成
 2. ファクト表(SALES)を全スキャン
 3. ハッシュテーブルを確認して結合できるかを判断する（値の比較）
-
 
 ## **4-2. Bloom Filterを用いた場合のハッシュ結合**
 
 これが、Bloom Filterを使うと以下のようになります。
 <img src="/images/20161102/photo_20161102_04.png" loading="lazy">
 
-
 0. ディメンジョン表(TIMES)を全スキャンしてハッシュテーブルとBloom Filterを作成
-  - このBloom FilterをチェックするとTIMESに該当レコードが含まれているかが判断できます
+
+* このBloom FilterをチェックするとTIMESに該当レコードが含まれているかが判断できます
+
 0. ファクト表(SALES)を全スキャン
 0. Bloom FilterをチェックしFilterを通過（TIMESに該当レコードがあると判断した）したレコードについてハッシュテーブルで結合を実施
-  - このフローにより結合操作の対象をフィルタすることができるのが分かります
+
+* このフローにより結合操作の対象をフィルタすることができるのが分かります
 
 Bloom Filterには偽陽性を含むため、Bloom Filterを通過するレコードは実際には必要のないレコードも含まれてしまいます。このレコードについてはハッシュテーブルの確認をした際に結合対象なしと判断されて除外されます。
-
 
 ## **4-3. Bloom Filterを用いた複数テーブルの結合**
 
 さらに、複数のテーブル結合の場合以下のようになります。
 <img src="/images/20161102/photo_20161102_05.png" loading="lazy">
 
-
-
 1. ディメンジョン表(TIMES)を全スキャンしてハッシュテーブルとBloom Filterを作成
 2. ディメンジョン表(PRODUCTS)を全スキャンしてハッシュテーブルとBloom Filterを作成
 3. ファクト表(SALES)を全スキャン
 4. 2つのBloom FilterをチェックしてFilterしたレコードに対してハッシュ結合を2回（PRODUCTS、TIMESの順番に）実施
-  - 結合前に2つのBloom Filterを組み合わせてチェック（双方のフィルタを通過する必要がある）しているので、ハッシュ結合の対象データをいきなり減らすことができます
+
+* 結合前に2つのBloom Filterを組み合わせてチェック（双方のフィルタを通過する必要がある）しているので、ハッシュ結合の対象データをいきなり減らすことができます
 
 <br />
 
 この挙動をサンプルスキーマ（スタースキーマ）で実際に利用するSQLをベースに説明します。
 
 **スタースキーマにおける複数テーブルを結合するSQL**
+
 ```sql
 SELECT
   TIMES.CALENDAR_QUARTER_DESC,
@@ -159,7 +155,6 @@ PRODUCTS.PROD_CATEGORY_DESC;
 
 **この「普通に使うと効果は限定的」という条件があるため「パーティション表」「パラレルクエリ」においてBloom Filterは利用されます（後述）が、非パラレルクエリでは効果が無いため利用されません。**
 
-
 # **5. OracleにおけるBloom Filterの利用**
 
 ここまでを踏まえて、Oracleにおいてどのように利用されているか見ていきます。
@@ -170,12 +165,11 @@ http://docs.oracle.com/cd/E49329_01/server.121/b71277/tgsql_join.htm#BABEGJHI)�
 * 5-1. パーティションテーブル結合
   * 不要なパーティションのアクセスを排除（パーティションプルーニング）するために利用
 * 5-2. パラレルクエリ
-    * パラレルクエリ実行時のスレーブプロセス間で転送されるデータ量を低減させるために利用
+  * パラレルクエリ実行時のスレーブプロセス間で転送されるデータ量を低減させるために利用
 * 5-3. Exadataにおけるストレージサーバ（セルサーバ）からDBサーバに転送されるデータ量を低減させるために利用
 * 5-4. サーバの結果キャッシュにデータが存在するかどうかをチェックするため
 
 (5-4)についてはSQL実行の利用ではないのでここでは除外します。
-
 
 ## **5-1. パーティションテーブル結合におけるBloom Filter**
 
@@ -183,9 +177,8 @@ Bloom Filterの原則「テーブル結合(Join)時に結合対象のデータ�
 
 <img src="/images/20161102/photo_20161102_06.png" loading="lazy">
 
-
 * (1)ディメンジョン表(TIMES)を全スキャンしてCALENDER_YEAR='2001'に合致するデータでハッシュテーブルとBloom Filterを作成。ディクショナリよりSALES表のパーティション定義を取得して、結合対象データが存在するパーティションのリストをBloom Filterとして保持しています。
-  - （SALESのパーティションキーはTIME_IDでTIMES.CALENDER_YEARから導出可能です）
+  * （SALESのパーティションキーはTIME_IDでTIMES.CALENDER_YEARから導出可能です）
 * (2)Bloom Filterを利用してファクト表(SALES)の必要なパーティションのみをスキャンして結合を実施します。
 
 <br />
@@ -193,6 +186,7 @@ Bloom Filterの原則「テーブル結合(Join)時に結合対象のデータ�
 具体的にSQLの実行計画（プラン）を見ていきます。
 
 > **Tips: **
+>
 > * SQLに `gather_plan_statistics` ヒントを入れて実行した場合、SQL実行時の統計が記録されます。
 > * 実行後に `dbms_xplan.display_cursor` を利用することで記録された内容を確認することができます。
 > * A-Rowsを見ると、SQL実行中にアクセスした行数が分かります。
@@ -202,8 +196,8 @@ Bloom Filterの原則「テーブル結合(Join)時に結合対象のデータ�
 
 <br />
 
-
 パーティションテーブルでBloom_Filter利用するSQLを実行します。
+
 ```sql
 SELECT /*+ gather_plan_statistics */
   TIMES.CALENDAR_QUARTER_DESC,
@@ -217,6 +211,7 @@ TIMES.CALENDAR_QUARTER_DESC;
 ```
 
 続いて、実行計画を確認します。
+
 ```sql
 select * from table(dbms_xplan.display_cursor(null,null,'ALLSTATS ALL'));
 PLAN_TABLE_OUTPUT
@@ -233,6 +228,7 @@ PLAN_TABLE_OUTPUT
 ```
 
 最後に、パーティション内のデータ件数を確認します。
+
 ```
 select to_char(a.TIME_ID,'YYYY') time_id_year,count(*)
 from sales a
@@ -256,14 +252,12 @@ LINE#6 BF000を利用してアクセスパーティション範囲を特定し�
 
 このSQLの実行操作についてはBloom Filterの特徴を活用していないためBloom Filter操作の一つとすることにあまりしっくりきません。むしろ「PARTION RANGE JOIN-FILTER」という名称の方が理解しやすいのではと感じます。
 
-
 ## **5-2. パラレルクエリにおけるBloom Filter**
 
 Bloom Filterの原則「 テーブル結合(Join)時に結合対象のデータを減らす効果はあるが、ファクト表のスキャン量は変わらないため普通に使うと効果は限定的」を前提に、パラレルプロセス間のデータ転送量を減らすときに適用しようというコンセプトです。
 
 > * パラレルクエリとは、クエリ実行を複数のプロセスで並列化実行する機能です。
 > * 詳細は[こちら](http://www.oracle.com/technetwork/jp/database/articles/tsushima/index-1741351-ja.html)を参照してください。
-
 
 <br />
 
@@ -277,6 +271,7 @@ Bloom Filterの原則「 テーブル結合(Join)時に結合対象のデータ�
 <br />
 
 パラレルクエリでBloom_Filterを利用するSQLを実行します。
+
 ```sql
 explain plan for
 SELECT /*+parallel(4)*/  --パラレルクエリ実行のためのヒント
@@ -299,6 +294,7 @@ CUSTOMERS.CUST_CITY;
 ```
 
 続いて、実行計画を確認します。
+
 ```sql
 select * from table(dbms_xplan.display(null, null, 'ALL allstats last outline'));
 -----------------------------------------------------------------------------------------------------------
@@ -339,11 +335,9 @@ Predicate Information (identified by operation id):
               ),SYS_OP_BLOOM_FILTER(:BF0001,"SALES"."
 ```
 
-
 図示すると以下のような流れになっているのがわかります。
 
 <img src="/images/20161102/photo_20161102_07.png" loading="lazy">
-
 
 1. TIMES表をスレーブプロセス群(Q01,00)はパラレルスキャンしてハッシュテーブルとBloom Filterを作成。この時、パーティションフィルタ用(BF0000)と、パラレルプロセス用(BF0001)の2つを作成
 2. PRODUCTS表をスレーブプロセス群(Q01,00)はパラレルスキャンしてハッシュテーブルとBloom Filter(BF0002)を作成
@@ -359,7 +353,6 @@ Predicate Information (identified by operation id):
 
 > `filter(SYS_OP_BLOOM_FILTER_LIST(SYS_OP_BLOOM_FILTER(:BF0003,"SALES"."CUST_ID"),SYS_OP_BLOOM_FILTER(:BF0002,"SALES"."PROD_ID"),SYS_OP_BLOOM_FILTER(:BF0001,"SALES"."TIME_ID")))`
 
-
 <br />
 
 ### **Bloom Filterの効果計測**
@@ -369,10 +362,12 @@ Predicate Information (identified by operation id):
 まずはBloom Filterを利用しない場合の実行計画を確認します。
 
 > **Tips: **
+>
 > * Bloom Filterを使用しないヒント句として `no_px_join_filter(テーブル名)` があります。
 > * これを使用することで指定テーブルに対してBloom Filterは作成されなくなります。
 
 **パラレルクエリ：Bloom_Filterなし※データは整形済み**
+
 ```sh
 （使用したヒント:SQL本文は省略）
 parallel(4)
@@ -415,6 +410,7 @@ Execute      1      0.15       0.40       4214       6573         68           0
 変更したのはヒント句のみです。
 
 **パラレルクエリ：Bloom_Filterあり※データは整形済み**
+
 ```sh
 
 （使用したヒント:SQL本文は省略）
@@ -455,6 +451,7 @@ Execute      1      0.12       0.23       3900       4726          0           0
 |* 21 |               TABLE ACCESS FULL | SALES     |:BF0000|:BF0000|  Q1,00 | PCWP |            |    1328|
 -----------------------------------------------------------------------------------------------------------
 ```
+
 Bloom Filterありとなしの実行計画を見てみると、実際にアクセスしたレコード数(A-Rows)は1/3000になっていますが、読み込みデーブロック数(query)はそれほど変わっていないため、実行時間(elapsed)も劇的には変わっていません。
 
 |#| 実際にアクセスしたレコード数(A-Rows) | 読み込みデーブロック数(query) | 実行時間(elapsed) |
@@ -465,7 +462,6 @@ Bloom Filterありとなしの実行計画を見てみると、実際にアク�
 **一見パフォーマンスに効果がありそうだけど、実際はいまいちの効果です。結合対象レコードは減らせるのですが、そもそもファクト表をスキャンするサイズは変わらないからです。
 過度の期待は禁物です。**
 
-
 ## **5-3. ExadataのストレージサーバにおけるBloom Filter**
 
 これは「パラレルクエリにおけるBloom Filter」のコンセプトをExadata のストレージサーバ（セルサーバ）とDBサーバに適用するというコンセプトになります。
@@ -474,8 +470,6 @@ Bloom Filterありとなしの実行計画を見てみると、実際にアク�
 
 <img src="/images/20161102/photo_20161102_08.png" loading="lazy">
 
-
-
 1. ディメンジョン表(TIMES)をスキャンしてハッシュテーブルとBloom Filterを作成
 2. Bloom Filterをストレージサーバに転送する
 3. ストレージサーバ側でファクト表(SALES)をスキャンしBloom Filterを通過したデータのみをDBサーバに転送
@@ -483,6 +477,7 @@ Bloom Filterありとなしの実行計画を見てみると、実際にアク�
 <br />
 
 **ExadataでのBloom_Filter例**
+
 ```sh
 （使用したヒント:SQL本文は省略）
 parallel(4)
@@ -528,7 +523,6 @@ LINE#17がストレージサーバでのBloom Filterの適用を示します。
 
 > `storage(SYS_OP_BLOOM_FILTER_LIST(SYS_OP_BLOOM_FILTER(:BF0003,"SALES"."CUST_ID"),SYS_OP_BLOOM_FILTER(:BF0002,"             SALES"."PROD_ID"),SYS_OP_BLOOM_FILTER(:BF0001,"SALES"."TIME_ID")))`
 
-
 <br />
 
 さらに、Exadataの持つStorage IndexとBloom FilterデータのMin/Max値を利用してさらにデータを絞り込無ことが可能です。これによりBloom FilterによるデータSCAN処理効果が得られます。
@@ -537,11 +531,9 @@ Storage Indexは、ストレージサーバにおいて、あるデータの格�
 
 <img src="/images/20161102/photo_20161102_09.png" loading="lazy">
 
-
 例では、min=3,max=3という値でStorage Indexを利用してファクト表のSCANサイズを削減しています。min=3, max=100という幅広い値である場合はStorage Indexの効果は得られないため、この効果はデータ内容に依存したものとなります。
 
 **データ内容に依存はするけど、ファクト表のSCANサイズを減らすことができる」ここ重要なポイントです。**
-
 
 ## **5-4. In-Memory機能におけるBloom Filter**
 
@@ -549,8 +541,6 @@ Storage Indexは、ストレージサーバにおいて、あるデータの格�
 ここでの図は全て[Oracle Database In-Memory詳細編 検索処理の詳細](http://www.oracle.com/technetwork/jp/ondemand/od12c-coretech-aug2014-2283256-ja.html#anc_08)より引用しています。
 
 <img src="/images/20161102/photo_20161102_10.png" loading="lazy">
-
-
 
 この絵の例で結果取得までの流れは以下の通りです。（パラレルクエリーでのみ動作します)
 
@@ -562,7 +552,6 @@ Storage Indexは、ストレージサーバにおいて、あるデータの格�
 
 <img src="/images/20161102/photo_20161102_11.png" loading="lazy">
 
-
 もう少し具体的なイメージ図は上記のとおりです。
 (3)「フィルタ条件にマッチするファクト表（最大件数表）の列、行を抽出」の効率化がポイントです。ここではIn-Memoryの備える以下の機能が利用されます。
 
@@ -571,7 +560,6 @@ Storage Indexは、ストレージサーバにおいて、あるデータの格�
 * SIMD(Single Instruction Multiple Data)による効果的な値の比較
 
 これらのすべてが利用されることで結合処理が非常に高速で実行可能となります。
-
 
 # **6. OracleにおけるBloom Filterの利用のまとめ**
 
@@ -588,7 +576,6 @@ Bloom Filterが利用される(5-1)(5-2)(5-3)(5-4)のすべてにおいて、Fil
 
 (5-3)はExadataの機能、(5-4)はOracle In-Memoryオプションによる機能ということで、通常のEnterprise Editionにおいては利用できないのは残念です。
 
-
 # **7. 終わりに**
 
 Bloom Filterについて詳しく見ていく中で、Filter自体の効果よりファクト表のSCANサイズを減らすことがパフォーマンス上に効果を与えることが有効であることがわかりました（ある意味当たり前の結論ですが）。この視点で見てみると（Exadataについては特殊なのでおいておくと）Oracle In-Memoryについては本質的には列指向データ保持による効果と言えます。（Oracle In-MemoryはOLTPにも対応しているのでメモリを利用していますが、分析用であればインメモリである必要はないので列指向であることが重要と言えます）
@@ -596,8 +583,6 @@ Bloom Filterについて詳しく見ていく中で、Filter自体の効果よ�
 また、データが大規模になるほどBloom Filterの「Bloom Filterは非常に小さいサイズとなることから、「インメモリで保持が可能」「別の処理（プロセス）にフィルタを渡すことが可能」という効果が重要になってきます。そのため、分散DB（シャーディング機能による複数のサーバにおけるデータを分散保持）においてExadataと同じくサーバ間でBloom Filterを渡すことで処理を効率よく結合処理を分散させることができると言えます。
 
 **Bloom Filterアルゴリズムは「列指向型データベース」「分散DB」に有効であることから今後も利用が広がると予測されます。**
-
-
 
 # **8. さらなる終わりに**
 

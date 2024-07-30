@@ -15,7 +15,6 @@ lede: "今回はGoでアプリ開発するときにお世話になっている�
 
 <img src="/images/20200519/top.png" loading="lazy">
 
-
 # はじめに
 
 [Go Tips連載](/tags/GoTips%E9%80%A3%E8%BC%89/)の第2弾です。
@@ -23,7 +22,6 @@ lede: "今回はGoでアプリ開発するときにお世話になっている�
 こんにちは。TIG DXユニットの真野です。ここ数ヶ月は某IoT案件でGoを用いてバックエンド開発に勤しんでいました。連載第1弾の[ホワイトリストProxy申請するときのGo依存ライブラリURLドメインの調べ方](/articles/20200518/)を書いた宮崎さんとは、Goでメッセージ管理のライブラリとか、2-Way-SQLのライブラリとかを作りたいよねといったネタを交換を良くする仲です。
 
 今回はGoでアプリ開発するときにお世話になっている人が多い、[Goland](https://www.jetbrains.com/go/)のTipsを紹介します。
-
 
 # 背景
 
@@ -50,7 +48,6 @@ export AWS_REGION=ap-northeast-1
 
 これは大変なタスクです。
 
-
 # 結論
 
 Key=Value形式をセミコロン区切りでクリップボードにコピーすると、一括で貼り付け可能です。
@@ -71,7 +68,6 @@ CLI操作では無いのが強いていうと不満ですが、とても楽ち�
 https://plugins.jetbrains.com/plugin/7861-envfile
 
 これを用いれば、ターミナルはdirenv 、Goland上ではEnvFileに任せると一貫性があるかも知れません。
-
 
 # まとめ
 

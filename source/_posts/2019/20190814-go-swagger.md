@@ -60,11 +60,11 @@ Web API を作成して、Swagger でドキュメントを管理しましょう�
 #### なぜ？
 
 1. ドキュメントと実装のズレを解消するコストが高いため
-  * Web API 開発をする中で最も困ることは **ドキュメントと実装がかけ離れること** です。ドキュメントととのずれによる、コミュニケーションを極力減らしたいと考えました
+   * Web API 開発をする中で最も困ることは **ドキュメントと実装がかけ離れること** です。ドキュメントととのずれによる、コミュニケーションを極力減らしたいと考えました
 2. インターフェイスが頻繁に変わることが想定されたため
-  * データ定義の部分が固く決まっていなかったため、データに引きずられて API 仕様の変更も頻繁に起きるだろうと思いました
+   * データ定義の部分が固く決まっていなかったため、データに引きずられて API 仕様の変更も頻繁に起きるだろうと思いました
 3. インターフェイスのやり取りの物理的な距離が遠いため
-  * 同一の会社内だけでなく会社間をまたいだ開発も想定されたため、コミュニケーションコストがより高くなると想定しました
+   * 同一の会社内だけでなく会社間をまたいだ開発も想定されたため、コミュニケーションコストがより高くなると想定しました
 
 ## フレームワーク比較
 
@@ -88,9 +88,7 @@ Swaggerファイルを入力にGoのコードを生成することができる�
 
 #### サンプル
 
-swagger.yml (一部抜粋)
-
-```yml
+```yml swagger.yml (一部抜粋)
 paths:
   /data/{name}:
     post:
@@ -149,14 +147,14 @@ func dataHandler(params operations.DataIDParams) middleware.Responder {
 #### メリット
 
 1. Swagger と実装が乖離することはない
-  * Swagger から自動生成でリクエスト/レスポンスの struct を吐き出します。自動生成部分も CI で必ず生成して build するようにすれば、漏れることはないです。
+   * Swagger から自動生成でリクエスト/レスポンスの struct を吐き出します。自動生成部分も CI で必ず生成して build するようにすれば、漏れることはないです。
 2. go-swagger でリクエスト/レスポンスのオブジェクト型を 生成してくれるためロジックに集中できる
-  *  リクエスト/レスポンスの型だけでなく、リクエストを受ける/レスポンスを返す実装も合わせて生成されます。そのため、実装者は生成されたコードから リクエストパラメータ struct を受け取る → レスポンス struct を生成 までを実装すればよいです
+   * リクエスト/レスポンスの型だけでなく、リクエストを受ける/レスポンスを返す実装も合わせて生成されます。そのため、実装者は生成されたコードから リクエストパラメータ struct を受け取る → レスポンス struct を生成 までを実装すればよいです
 
 #### デメリット
 
 1. Swagger の定義を手で書く必要がある
-  * Swagger の yml 定義を手でメンテする必要がある点は、デメリットになるかと思います。
+   * Swagger の yml 定義を手でメンテする必要がある点は、デメリットになるかと思います。
 
 ### 2. コードからドキュメントを生成
 
@@ -168,10 +166,10 @@ func dataHandler(params operations.DataIDParams) middleware.Responder {
 Go のソースコードを静的解析して、Swagger ドキュメントを生成してくれるツールです。
 以下のフレームワークとの連携をサポートしています。
 
-- [gin](https://github.com/gin-gonic/gin)
-- [echo](https://github.com/labstack/echo)
-- [buffalo](https://github.com/gobuffalo/buffalo)
-- [net/http](https://golang.org/pkg/net/http/)
+* [gin](https://github.com/gin-gonic/gin)
+* [echo](https://github.com/labstack/echo)
+* [buffalo](https://github.com/gobuffalo/buffalo)
+* [net/http](https://golang.org/pkg/net/http/)
 
 #### サンプル
 
@@ -220,9 +218,8 @@ func DataHandler(c *gin.Context) {
 #### デメリット
 
 1. 仕様定義漏れを目見でチェックする必要がある
-  * コメントの解析をベースに、Swagger 生成をしていますが、定義が漏れている場合にエラーになりませんでした。(パラメータの記載漏れ、レスポンスのステータスコード漏れ 等確認しました。) そのため、実装とコメントが乖離していないかは目見で確認しないといけませんでした。コメントの量も多く、目見での確認には漏れが出ることが想像されました。
+   * コメントの解析をベースに、Swagger 生成をしていますが、定義が漏れている場合にエラーになりませんでした。(パラメータの記載漏れ、レスポンスのステータスコード漏れ 等確認しました。) そのため、実装とコメントが乖離していないかは目見で確認しないといけませんでした。コメントの量も多く、目見での確認には漏れが出ることが想像されました。
 2. コメント+実装ベースのため Swagger との連携度が低い
-
 
 ### 補足: コード生成系フレームワーク比較
 
@@ -244,9 +241,8 @@ func DataHandler(c *gin.Context) {
 #### openapi-generator サンプル (gin version)
 
 <details><summary>サンプルコード</summary><div>
-swagger.yml (一部抜粋)
 
-```yml
+```yml swagger.yml (一部抜粋)
 paths:
   "/data/{name}":
     post:
@@ -276,18 +272,14 @@ paths:
           description: Internal Server Error
 ```
 
-handler
-
-```go
+```go handler
 // DataId -
 func DataId(c *gin.Context) {
   c.JSON(http.StatusOK, gin.H{})
 }
 ```
 
-model
-
-```go
+```go model
 type ApiResponse struct {
   Message string `json:"message,omitempty"`
 }

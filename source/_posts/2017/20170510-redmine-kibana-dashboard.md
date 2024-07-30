@@ -22,8 +22,9 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 こんにちは。近藤です。
 
 前回までの記事です
-  * [1記事目](/articles/20160920/) はRedmineのデータをKibanaで表示しました
-  * [2記事目](/articles/20170119/) はRedmineのデータからEVMグラフを作成しKibanaで表示しました
+
+* [1記事目](/articles/20160920/) はRedmineのデータをKibanaで表示しました
+* [2記事目](/articles/20170119/) はRedmineのデータからEVMグラフを作成しKibanaで表示しました
 
 3記事目となる本記事ではRedmineデータを可視化するダッシュボードをKibana上に構築します。Kibanaを使うことによって例えば、担当者別のタスク量、トラッカー別のタスク量、EVMグラフを同時に把握できます。
 
@@ -35,8 +36,8 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 
 なお、下記を前提としています。
 
-- Windows環境で構築する
-- Redmineのデータベース(MySQL)に直接接続する
+* Windows環境で構築する
+* Redmineのデータベース(MySQL)に直接接続する
 
 ## 大まかな流れ
 
@@ -52,8 +53,8 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 
 <img src="/images/20170510/photo_20170510_99.png" loading="lazy">
 
-
 ### モジュールのダウンロード
+
 前回の投稿から時間がたち、ELKのバージョンが上がったのであらためて最新のモジュールをダウンロードします。
 
 * Elastic Search Download URL
@@ -67,9 +68,11 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
   * 私の場合は、「logstash-5.4.0.zip」をダウンロードしました。
 
 ### モジュールの配備
+
 次に、「C:\elastic」というフォルダを作成。そして、先ほどダウンロードしたそれぞれの圧縮ファイルを解凍し、「C:\elastic」へ配置します。
 
 最終的には下記のようなフォルダ構成になります。
+
 ```c
 C:\elastic
  └ elasticsearch-5.4.0
@@ -78,6 +81,7 @@ C:\elastic
 ```
 
 ### JDBCドライバ設定
+
 次に、JDBCドライバを用意します。
 
 [前々回](/articles/20160920/)ダウンロードした「mysql-connector-java-5.1.39-bin.jar」というファイルを、
@@ -153,10 +157,10 @@ C:\elastic
    └ redmine.txt
 ```
 
-
 ## 2.RedmineデータをELKに取り込む
 
 ### ElasticSearchの起動
+
 まず、ElasticSearchを実行します。
 「C:\elasticsearch-5.4.0\bin」フォルダで下記のコマンドを実行。
 
@@ -165,6 +169,7 @@ C:\elastic
 コマンドプロンプトの右下に"started"と表示されたら起動完了です。
 
 ### Logstashを使ったデータ取り込み
+
 次に、Logstashを使って、RedmineのデータをElasticSearchへ取り込みます。
 「C:\elastic\logstash-5.4.0\bin」フォルダで下記コマンドを実行。
 
@@ -175,6 +180,7 @@ C:\elastic
 取り込みが完了しました。
 
 ### Kibanaの起動
+
 次に、Kibanaを起動します。
 「C:\elastic\kibana-5.4.0-windows-x86\bin」フォルダで下記コマンドを実行。
 
@@ -185,6 +191,7 @@ C:\elastic
 Kibanaが起動しました。
 
 ### Kibanaでグラフ表示
+
 では、Kibanaを表示します。ブラウザで `http://localhost:5601`を開く。
 
 <img src="/images/20170510/photo_20170510_03.png" loading="lazy">
@@ -213,8 +220,8 @@ Kibanaが起動しました。
 
 グラフ画面が出ましたね！
 
-
 ### 担当者別のPVグラフ作成
+
 次は、担当者別のPVを表示するグラフを作成。下記の設定箇所にそれぞれの値を設定します。
 
 | 設定箇所 | 値 　|
@@ -237,8 +244,6 @@ Kibanaが起動しました。
 <img src="/images/20170510/photo_20170510_15.png" loading="lazy">
 
 そして、青色の「Save」をクリックすると、グラフが保存されました。
-
-
 
 ## 3.ダッシュボード構築
 
@@ -380,4 +385,3 @@ EVMグラフの大きさを調整すると、
 * [マネージャーがうれしいRedmineデータのEVM表示方法を公開します！！](/articles/20170119/)
 * マネージャーがうれしいRedmineデータのダッシュボード表示方法を公開します！！
 * [マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！（Metabase編）](/articles/20190703/)
-

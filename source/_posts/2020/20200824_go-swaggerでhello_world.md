@@ -17,7 +17,6 @@ lede: "go-swaggerの具体的な実装方法を紹介します。はじめにgo-
 
 The Gopher character is based on the Go mascot designed by [Renée French](http://reneefrench.blogspot.com/).
 
-
 TIG DXチームの伊藤真彦です。
 今回はgo-swaggerの具体的な実装方法を紹介します。
 
@@ -41,6 +40,7 @@ go-swaggerはOpenAPI(Swagger) からGoのコードを生成するライブラリ
 そこで、今回はストーリーベースでの実装手順を説明します。
 
 # go-swaggerのインストール
+
 go-swaggerは開発環境にインストールして使用します。
 下記コマンドでインストールできます。
 
@@ -120,7 +120,6 @@ URLのクエリパラメータに`name`を持たせることができる。
 
 <img src="/images/20200824/open_api_preview.jpg" loading="lazy">
 
-
 この`swagger.yaml`を元に実際にソースコードをビルドしてみましょう。
 
 # ソースコードをビルドする
@@ -196,6 +195,7 @@ func GetGreeting(p factory.GetGreetingParams) middleware.Responder {
   ├─gen
   └─get_greeting_handler.go
 ```
+
 今回は上記のようなディレクトリ構成で配置しました。
 
 `GetGreetingParams`、`NewGetGreetingOK()`などが自動生成された関数、及び構造体です。`GetGreetingParams`はリクエストパラメータであり、`p.Name`でクエリパラメータの内容が取得できます。生成されたコードのお作法に則りハンドラを実装します。今回は受け取ったクエリパラメータをそのままレスポンスとして返してみます。このファイルの変数`payload`を任意の文字列にすると実際にレスポンスが変化します。
@@ -211,10 +211,10 @@ if api.GetGreetingHandler == nil {
         })
 }
 ```
+
 api.GetGreetingHandlerがnilのままでは`not yet been implemented`と出力する設定になっています。
 改めて先ほどのエラーを見てみましょう、細かい表示はともかく同じような内容のメッセージが出力されています。
 <img src="/images/20200824/init_2.jpg" loading="lazy">
-
 
 この部分を書き換えるか、ここより先に評価される行で下記のようにapi.GetGreetingHandlerを定義しましょう。
 
@@ -255,7 +255,6 @@ go run gen/cmd/factory-server/main.go --host 0.0.0.0 --port 3000
 実際には400番、500番のエラーも`swagger.yaml`に定義し、どのような場合にどのエラーを返すかをハンドラに実装していく必要があります。(どの程度不正なリクエストを許容するのかといった柔軟性も、ハンドラで要件に合わせ実装していく形になります。)
 
 今回はhello world編ということでここまでになります、是非皆さんも実際に試してみてください。
-
 
 # go-swaggerの関してはこちらの記事もおすすめです
 

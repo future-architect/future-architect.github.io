@@ -38,8 +38,8 @@ lede: "普段は、Terraform を使っているのですが、ふとCloud Deploy
 [MY_PROJECT]にあらかじめ作成したプロジェクトのID を指定します。
 
 ```bash
-$ gcloud auth login
-$ gcloud config set project [MY_PROJECT]
+gcloud auth login
+gcloud config set project [MY_PROJECT]
 ```
 
 ## Cloud Deployment Manager 事始め
@@ -91,7 +91,7 @@ resources:
 詳細は、[こちら](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments)を参考にしてください。
 
 ```bash
-$ gcloud deployment-manager deployments COMMAND DEPLOYMENT_NAME --config [FILE_PATH] --preview
+gcloud deployment-manager deployments COMMAND DEPLOYMENT_NAME --config [FILE_PATH] --preview
 ```
 
 * COMMAND: create, delete, update などを指定
@@ -115,7 +115,6 @@ test-vm  compute.v1.instance  IN_PREVIEW  []      CREATE_OR_ACQUIRE
 
 <img src="/images/20200219/photo_20200219_01.png" loading="lazy">
 
-
 ブラウザ上からデプロイすることも可能ですが、`gcloud`コマンドから実行したいと思います。
 [update](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/update)を指定し、`DEPLOYMENT_NAME`を指定します（ここではtest）
 
@@ -135,7 +134,6 @@ test-vm  compute.v1.instance  COMPLETED  []
 実際に、GCE コンソールに遷移すると作成されていることが確認できます。
 
 <img src="/images/20200219/photo_20200219_02.png" loading="lazy">
-
 
 その他のコマンドを紹介したいと思います。
 [list](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/list)コマンドでデプロイの一覧を表示することができます。
@@ -169,7 +167,7 @@ test-vm  compute.v1.instance  COMPLETED
 ```
 
 もし、デプロイを削除したい場合は、[delete](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/delete)コマンドを使用します。
-`Do you want to continue (y/N)? `は、`y`と入力します。
+`Do you want to continue (y/N)?`は、`y`と入力します。
 
 ```bash
 $ gcloud deployment-manager deployments delete test
@@ -440,7 +438,7 @@ ERROR: (gcloud.deployment-manager.deployments.create) ResponseError: code=409, m
 それでは、どのように解消するかというと以下のように<font color="LightCoral">"update"</font>を使用します。
 
 ```bash
-$ gcloud deployment-manager deployments update test-templates --config vms.yaml
+gcloud deployment-manager deployments update test-templates --config vms.yaml
 ```
 
 この中途半端に作成されるのは解消されて欲しいですね。。
@@ -454,12 +452,10 @@ GCP リソースをPython で操れることで、自由度の高いテンプレ
 
 そのため、個人的には、GCP だけでなくAWS や、最近ではAlibaba Cloud などのクラウドを利用する機会が多いので、Terraform 一択になってしまうのが本音です。とはいえ、今回のように触れたことのないサービスを使ってみるのも新たな知見として楽しめるので、今後もいろいろ触れていきたいと思います。
 
-
 この記事に類似するオススメする記事です。よければ合わせてチェックください。
 
 * [Terraformのベストなプラクティスってなんだろうか](/articles/20190903/)
 * [Let's Try GCP #1 ～Cloud Run Buttonを使った楽々コンテナデプロイをやってみた～](/articles/20190909/)
-
 
 ## 参考
 
@@ -468,5 +464,3 @@ GCP リソースをPython で操れることで、自由度の高いテンプレ
 [deploymentmanager-samples](https://github.com/GoogleCloudPlatform/deploymentmanager-samples)
 [環境変数](https://cloud.google.com/deployment-manager/docs/configuration/templates/use-environment-variables?hl=ja)
 [サポートしているリソースタイプ](https://cloud.google.com/deployment-manager/docs/configuration/supported-resource-types?hl=en)
-
-

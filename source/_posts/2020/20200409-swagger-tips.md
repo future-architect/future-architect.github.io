@@ -43,11 +43,10 @@ Swaggerや周辺ツールについては [某先輩の記事](/articles/20191008
 
 # 設計規約
 
-
 ## バージョン
 
 * [OpenAPI v2](https://swagger.io/docs/specification/2-0/basic-structure/)
-    * 前述の`go-swagger`が3系に対応されていないため2系を利用
+  * 前述の`go-swagger`が3系に対応されていないため2系を利用
 
 ## paths
 
@@ -147,11 +146,12 @@ description: IDを指定して商品情報を取得する。
 * in:          PATHパラメータ`in: path`またはクエリパラメータ`in: query`のみ利用可能
 * description: 必須
 * name:        物理名を定義する
-    * 命名規約
-        * スネークケース
-        * 原則略語は禁止
-        * `type: array`の場合、`xxx_list`や`xxx_array`はNGとする
-        * `type: boolean`の場合、`is_xxx`や`has_xxx`で定義し`xxx_flag`は非推奨とする
+  * 命名規約
+    * スネークケース
+    * 原則略語は禁止
+    * `type: array`の場合、`xxx_list`や`xxx_array`はNGとする
+    * `type: boolean`の場合、`is_xxx`や`has_xxx`で定義し`xxx_flag`は非推奨とする
+
 ```yaml
 # good
 - in: path
@@ -190,6 +190,7 @@ description: IDを指定して商品情報を取得する。
 * name:     全て`name: body`とする
 * required: リクエストボディが必須でない場合を除いて`required: true`を定義する
 * schema:   リクエストモデルを`type: object`で定義する
+
 ```yaml
 # good
 parameters:
@@ -214,34 +215,35 @@ parameters:
 #### バリデーション
 
 * 必須
-    * required: 必須パラメータのみ`required: true`を定義する
-    * default: 必須でないパラメータでもデフォルト値がある場合は定義する
+  * required: 必須パラメータのみ`required: true`を定義する
+  * default: 必須でないパラメータでもデフォルト値がある場合は定義する
 * 型
-    * type: 必須
-        * 文字列：string
-        * 数値：number
-        * 整数値：integer
-        * ブール値：boolean
-        * 配列：array
-        * オブジェクト：object
-    * `type: array`の場合、配列要素`items`のtypeも必須
-    * `type: null`は原則として利用しない
-    * 複数のタイプを定義しない
+  * type: 必須
+    * 文字列：string
+    * 数値：number
+    * 整数値：integer
+    * ブール値：boolean
+    * 配列：array
+    * オブジェクト：object
+  * `type: array`の場合、配列要素`items`のtypeも必須
+  * `type: null`は原則として利用しない
+  * 複数のタイプを定義しない
 * 桁
-    * 文字列
-        * 最大桁数：`maxLength`
-        * 最小桁数：`minLength`
-    * 数値または整数値
-        * 最大値（境界値を含む）：`maximum`
-        * 最小値（境界値を含む）：`maximum`
-        * 境界値を含まない場合のみ`exclusiveMinimum: true`または`exclusiveMaximum: true`を定義
-    * 配列:
-        * 最大要素数：`maxItems`
-        * 最小要素数：`minItems`
-        * `required: true`の場合は原則として`minItems: 1`を定義する
+  * 文字列
+    * 最大桁数：`maxLength`
+    * 最小桁数：`minLength`
+  * 数値または整数値
+    * 最大値（境界値を含む）：`maximum`
+    * 最小値（境界値を含む）：`maximum`
+    * 境界値を含まない場合のみ`exclusiveMinimum: true`または`exclusiveMaximum: true`を定義
+  * 配列:
+    * 最大要素数：`maxItems`
+    * 最小要素数：`minItems`
+    * `required: true`の場合は原則として`minItems: 1`を定義する
 * 区分値
-    * `enum`必須
-    * `description`に区分値の論理名を記載する
+  * `enum`必須
+  * `description`に区分値の論理名を記載する
+
     ```yaml
       # ex. enum
       name: gender
@@ -256,71 +258,81 @@ parameters:
           01: 男
           02: 女
     ```
+
 * 日付/日時/時刻
-    * 日付
-        * ISO8601拡張形式（YYYY-MM-DD）とする
-        * example: `2020-01-31`
-        * name: 接尾辞`_date`
-        * type: `string`
-        * format: `date`
+  * 日付
+    * ISO8601拡張形式（YYYY-MM-DD）とする
+    * example: `2020-01-31`
+    * name: 接尾辞`_date`
+    * type: `string`
+    * format: `date`
+
         ```yaml
         created_date:
             type: string
             example: '2020-01-31'
             format: date
         ```
-    * 日時
-        * タイムゾーン指定子付きISO8601形式とする
-        * 秒精度（YYYY-MM-DDThh:mm:ss+TZD）の場合
-            * example: `2020-01-31T23:59:59+09:00`
-            * name: 接尾辞`_date_time`
-            * type: `string`
-            * format: `date-time`
+
+  * 日時
+    * タイムゾーン指定子付きISO8601形式とする
+    * 秒精度（YYYY-MM-DDThh:mm:ss+TZD）の場合
+      * example: `2020-01-31T23:59:59+09:00`
+      * name: 接尾辞`_date_time`
+      * type: `string`
+      * format: `date-time`
+
             ```yaml
             created_date_time:
                 type: string
                 example: '2020-01-31T23:59:59+09:00'
                 format: date-time
             ```
-        * ミリ秒精度（YYYY-MM-DDThh:mm:ss.sss+TZD）の場合
-            * example: `2020-01-31T23:59:59.000+09:00`
-            * name: 接尾辞`_date_time`
-            * type: `string`
-            * pattern: 必須
+
+    * ミリ秒精度（YYYY-MM-DDThh:mm:ss.sss+TZD）の場合
+      * example: `2020-01-31T23:59:59.000+09:00`
+      * name: 接尾辞`_date_time`
+      * type: `string`
+      * pattern: 必須
+
             ```yaml
             created_date_time:
                 type: string
                 example: '2020-01-31T23:59:59.000+09:00'
                 pattern: '^((?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9][0-9][0-9])[+|-]([0-9][0-9]:[0-9][0-9])$'`
             ```
-    * 時刻
-        * ISO8601形式（hh:mm）とする
-        * example: `23:59`
-        * name: 接尾辞`_time`
-        * type: string
-        * pattern: 必須
+
+  * 時刻
+    * ISO8601形式（hh:mm）とする
+    * example: `23:59`
+    * name: 接尾辞`_time`
+    * type: string
+    * pattern: 必須
+
         ```yaml
         created_time:
             type: string
             example: 23:59
             pattern: '^(2[0-3]|[01][0-9]):([0-5][0-9])$'
         ```
+
 * その他
-    * 正規表現で表現できる文字列は`pattern`を利用して定義すること
+  * 正規表現で表現できる文字列は`pattern`を利用して定義すること
 
 ## responses
 
 ### GET APIの場合
 
 * description
-    * 必須
-    * HTTPステータスコードのメッセージを記載すること
+  * 必須
+  * HTTPステータスコードのメッセージを記載すること
 * schema
-    * HTTPステータス：200の場合
-        * `type: object`でレスポンスモデルを定義する
-        * required: 必須で返る項目を定義する
-        * 再利用可能なモデルを`definitions`配下に定義する
-            * 複合的なモデルを定義する場合は`allOf`を利用する
+  * HTTPステータス：200の場合
+    * `type: object`でレスポンスモデルを定義する
+    * required: 必須で返る項目を定義する
+    * 再利用可能なモデルを`definitions`配下に定義する
+      * 複合的なモデルを定義する場合は`allOf`を利用する
+
     ```yaml
     # good
     getProductsResponse:
@@ -347,11 +359,13 @@ parameters:
               product_name:
                 type: string
     ```
-    * HTTPステータスコード：400系または500系の場合
-        * 共通で定義されたレスポンスモデルを利用すること
+
+  * HTTPステータスコード：400系または500系の場合
+    * 共通で定義されたレスポンスモデルを利用すること
 * examples
-    * ステータスコード：200の場合のみ`application/json`という命名で必須
-    * 必須項目は必ず値を記載すること
+  * ステータスコード：200の場合のみ`application/json`という命名で必須
+  * 必須項目は必ず値を記載すること
+
 ```yaml
 200:
   description: OK
@@ -375,15 +389,15 @@ parameters:
 ### POST/PUT/DELETE APIの場合
 
 * description
-    * 必須
-    * HTTPステータスコードのメッセージを記載すること
+  * 必須
+  * HTTPステータスコードのメッセージを記載すること
 * schema
-    * 原則不要
-    * 必要な場合は`type: object`でレスポンスモデルを定義する
+  * 原則不要
+  * 必要な場合は`type: object`でレスポンスモデルを定義する
 * examples
-    * schemaを定義した場合のみ記載する
-    * ステータスコード：200の場合のみ`application/json`という命名で必須
-    * 必須項目は必ず値を記載すること
+  * schemaを定義した場合のみ記載する
+  * ステータスコード：200の場合のみ`application/json`という命名で必須
+  * 必須項目は必ず値を記載すること
 
 ## models
 
@@ -391,8 +405,9 @@ parameters:
 
 * URI単位で1モデルを定義する
 * 命名規約
-    * キャメルケース
-    * `postXxxxRequest`または`putXxxxRequest`
+  * キャメルケース
+  * `postXxxxRequest`または`putXxxxRequest`
+
 ```yaml
 # POST /products
 postProductRequest:
@@ -420,8 +435,9 @@ putProductRequest:
 * URI単位で1モデルを定義する
 * リソースモデルをそのまま利用できる場合は不要
 * 命名規約
-    * キャメルケース
-    * `getXxxxResponse`
+  * キャメルケース
+  * `getXxxxResponse`
+
 ```yaml
 # GET /products
 getProductResponse:
@@ -444,7 +460,8 @@ responses:
 
 * リソースや共通で利用するエンティティの単位で単数形で定義する
 * 命名規約
-    * キャメルケース
+  * キャメルケース
+
 ```yaml
 pagination:
   type: object

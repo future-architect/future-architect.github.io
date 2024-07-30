@@ -15,7 +15,6 @@ lede: "Goではそこそこ実績も増えつつある気がするdistroless。�
 
 <img src="/images/20200514/top.png" alt="" width="1260" height="675" loading="lazy">
 
-
 [前回のエントリー](/articles/20200513/)では、Debianベースの堅実な仕事向けのDockerイメージ作成方法について紹介しました。
 
 Goではそこそこ実績も増えつつある気がするdistroless。シェルが入っていないくて、ログインされることもなく安全というGoogle製のDockerイメージです。Python3はまだexperimentalですが、実は小さいと言われるalpine版よりも、イメージサイズが半分ぐらいだったりもします。distrolessでは3.7しかないので、3.7のイメージ同士の比較です。
@@ -111,7 +110,7 @@ gunicorn
 `pip install -r requirements.txt`で依存ライブラリと一緒にインストールした後に、requirements.lockを作ります。前回と同じですね。
 
 ```shell
-$ pip freeze > requirements.lock
+pip freeze > requirements.lock
 ```
 
 Dockerfileは次のようになりました。どうせCコンパイルが必要なC拡張は利用できないため、ベースイメージをslim版にしていますが、それ以外のビルドステージは変化ありません。
@@ -189,14 +188,13 @@ urlpatterns = [
 再びDockerイメージをビルドして実行してみます。
 
 ```sh
-$ docker build -t pytest .
-$ docker run -it --rm -p "8000:8000" pytest
+docker build -t pytest .
+docker run -it --rm -p "8000:8000" pytest
 ```
 
 うまくいきました。manylinux1であれば、distrolessでも動作することが確認できました。機械学習系もそこそこいけるんじゃないでしょうか？
 
 <img src="/images/20200514/1.png" alt="フューチャーのロゴ画像を表示したブラウザ" widht="1684" height="1202" loading="lazy" class="img-middle-size">
-
 
 # まとめ
 

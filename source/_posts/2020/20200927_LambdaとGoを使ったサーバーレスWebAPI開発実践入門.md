@@ -35,7 +35,7 @@ AWS上に構築するインフラはこんな感じです。シンプル。
 
 最初に本チュートリアルで使用しているバージョンを記載します。以下のとおりです。
 
-- 各種ソフトウェアバージョン
+* 各種ソフトウェアバージョン
 
 | #   | ソフトウェア/ライブラリ | バージョン |
 | --- | ----------------------- | ---------- |
@@ -43,22 +43,22 @@ AWS上に構築するインフラはこんな感じです。シンプル。
 | 2   | LocalStack              | 0.11.5     |
 | 3   | Terraform               | 0.13.2     |
 
-- Goの主要ライブラリのバージョン
+* Goの主要ライブラリのバージョン
 
 | #   | ソフトウェア/ライブラリ | バージョン |
 | --- | ----------------------- | ---------- |
 | 1   | go-swagger/go-swagger   | 0.25.0     |
 | 2   | guregu/dynamo           | 1.19.1     |
 
-- LocalStackの起動
+* LocalStackの起動
 
 ローカル開発にはDockerを使ってLocalStackを動かしていきます。LocalStackはバージョン `0.11.0` からすべてのサービスに `4566` ポートを使います。`0.10.x` 以下のバージョンと使用するポートが異なるため、古いバージョンを利用している方は注意してください。
 
 ```
-$ docker run -it -p 4566:4566 -e SERVICES=dynamodb -e DEFAULT_REGION=ap-northeast-1 localstack/localstack:0.11.5
+docker run -it -p 4566:4566 -e SERVICES=dynamodb -e DEFAULT_REGION=ap-northeast-1 localstack/localstack:0.11.5
 ```
 
-- AWS CLIのインストール、設定
+* AWS CLIのインストール、設定
 
 また、Lambda関数のデプロイなどに `aws` コマンドを使いますので、[AWS CLI バージョン 2 のインストール](https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/install-cliv2.html)を参考にAWS CLIをインストールしましょう。使っているOSのインストール手順に従ってインストールしてください。
 
@@ -95,14 +95,14 @@ AWS上に構築するインフラはTerraformで使います。一時的な動�
 
 Terraformに関しては
 
-- [はじめてのTerraform 0.12 ～環境構築～](/articles/20190816/)
-- [はじめてのTerraform 0.12 ～実践編～](/articles/20190816/)
+* [はじめてのTerraform 0.12 ～環境構築～](/articles/20190816/)
+* [はじめてのTerraform 0.12 ～実践編～](/articles/20190816/)
 
 の記事もあわせて見てみてください。その他にも技術ブログに[Terraform](/tags/Terraform/)に関する記事がたくさんあります。
 
 またHashiCorp Learnのドキュメントも参考になります。
 
-- [Serverless Applications with AWS Lambda and API Gateway](https://learn.hashicorp.com/tutorials/terraform/lambda-api-gateway)
+* [Serverless Applications with AWS Lambda and API Gateway](https://learn.hashicorp.com/tutorials/terraform/lambda-api-gateway)
 
 Terraformは[Install Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)を参考に2020年9月にリリースしたv0.13.2をインストールしておきます。v0.12.xでも問題ないです。
 
@@ -137,7 +137,7 @@ Terraform v0.13.2
 
 まずはプロバイダの設定をしておきます。
 
-- provider.tf
+* provider.tf
 
 ```bash
 provider "aws" {
@@ -171,7 +171,7 @@ commands will detect it and remind you to do so if necessary.
 
 続いてAPI GatewayとLambda関数を実装します。まずはLambda関数とAPI Gatewayで必要なIAMを記述します。API GatewayはLambda関数を呼び出す操作、Lambda関数ではCloudWatch Logsにログを書き込む操作、DynamoDBを操作するIAMを定義します。
 
-- iam_policy_document.tf
+* iam_policy_document.tf
 
 ```bash
 data "aws_iam_policy_document" "example_api_policy" {
@@ -207,7 +207,7 @@ data "aws_iam_policy_document" "example_lambda" {
 
 上記のポリシードキュメントをIAMポリシーとして定義します。
 
-- iam_policy.tf
+* iam_policy.tf
 
 ```bash
 resource "aws_iam_policy" "example_lambda" {
@@ -218,7 +218,7 @@ resource "aws_iam_policy" "example_lambda" {
 
 IAMロールを定義します。
 
-- iam_role.tf
+* iam_role.tf
 
 ```bash
 resource "aws_iam_role" "example_lambda" {
@@ -229,7 +229,7 @@ resource "aws_iam_role" "example_lambda" {
 
 信頼ポリシーは以下のようになります。
 
-- assume_role/lambda.json
+* assume_role/lambda.json
 
 ```json
 {
@@ -249,7 +249,7 @@ resource "aws_iam_role" "example_lambda" {
 
 先程記述したIAMロールにIAMポリシーをアタッチします。
 
-- iam_role_policy_attachment.tf
+* iam_role_policy_attachment.tf
 
 ```bash
 resource "aws_iam_role_policy_attachment" "example_api" {
@@ -262,7 +262,7 @@ IAMの設定は以上で完了です。
 
 続いてAPI GatewayのRESTのリソースを作っていきましょう。先程作成したIAMポリシードキュメントを使います。
 
-- api_gateway_rest_api.tf
+* api_gateway_rest_api.tf
 
 ```bash
 resource "aws_api_gateway_rest_api" "example_api" {
@@ -272,7 +272,7 @@ resource "aws_api_gateway_rest_api" "example_api" {
 }
 ```
 
-- api_gateway_resource.tf
+* api_gateway_resource.tf
 
 ```bash
 resource "aws_api_gateway_resource" "example_api" {
@@ -284,7 +284,7 @@ resource "aws_api_gateway_resource" "example_api" {
 
 APIリクエストに対する認可はなしにします。必要な場合は `authorization` パラメータを用いて設定します。
 
-- api_gateway_method.tf
+* api_gateway_method.tf
 
 ```bash
 resource "aws_api_gateway_method" "example_api_get" {
@@ -304,7 +304,7 @@ resource "aws_api_gateway_method" "example_api_post" {
 
 Lambdaプロキシ統合のGETリクエストを実装する場合においても `integration_http_method` パラメータは `POST` と設定する必要があります。
 
-- api_gateway_integration.tf
+* api_gateway_integration.tf
 
 ```bash
 resource "aws_api_gateway_integration" "example_api_get" {
@@ -327,7 +327,7 @@ resource "aws_api_gateway_integration" "example_api_post" {
 }
 ```
 
-- api_gateway_deployment.tf
+* api_gateway_deployment.tf
 
 ```bash
 resource "aws_api_gateway_deployment" "example_api" {
@@ -347,7 +347,7 @@ Lambda関数はアプリケーション側からデプロイできるようにTe
 
 Lambdaの `handler` パラメータは、ビルドして生成した実行可能なファイル名と同じである必要があります。
 
-- lambda_function.tf
+* lambda_function.tf
 
 ```bash
 resource "aws_lambda_function" "example_api" {
@@ -364,7 +364,7 @@ resource "aws_lambda_function" "example_api" {
 
 Lambda関数をAPI Gatewayから呼び出せるように明示的に許可します。
 
-- lambda_permission.tf
+* lambda_permission.tf
 
 ```bash
 resource "aws_lambda_permission" "example_apigateway_lambda" {
@@ -378,7 +378,7 @@ resource "aws_lambda_permission" "example_apigateway_lambda" {
 
 `dummy_function.zip` はビルド可能な適当な `main.go` を `dummy_function` に格納してzip化しておきます。ファイルが存在しないとエラーになります。
 
-- dummy_function/main.go
+* dummy_function/main.go
 
 ```go
 package main
@@ -413,7 +413,7 @@ WebAPI開発です。今回はサンプルアプリケーションなのでGET�
 それでは `go mod init` として開発を始めていきましょう。
 
 ```
-$ go mod init example
+go mod init example
 ```
 
 ## API定義
@@ -513,6 +513,7 @@ definitions:
         type: string
         description: エラーメッセージ
 ```
+
 </div></details>
 
 `go-swagger` は[Installing](https://goswagger.io/install.html)を参考にインストールします。今回は2020/09/23現在の最新バージョンである `0.25.0` をインストールします。以下のように出力されていればOKです。
@@ -534,7 +535,7 @@ commit: f032690aab0634d97e2861a708d8fd9365ba77d2
 
 ついでにTerraformを用いてAWS上にリソースを作成しましょう。キャパシティはオンデマンドモードにしておきます。
 
-- dynamodb_table.tf
+* dynamodb_table.tf
 
 ```bash
 resource "aws_dynamodb_table" "example_users" {
@@ -552,7 +553,7 @@ resource "aws_dynamodb_table" "example_users" {
 
 Lambda関数の環境変数からDynamoDBのテーブル名を取得できるようにLambda関数の環境変数に追加しておきます。環境変数でDynamoDBのテーブル名を設定できるようにしておくと、ローカルでのテストする際にAWS上に構築するテーブル名と別の名前を指定でき、便利です。
 
-- lambda_function.tf
+* lambda_function.tf
 
 ```diff
 resource "aws_lambda_function" "example_api" {
@@ -621,16 +622,16 @@ data "aws_iam_policy_document" "example_lambda_policy" {
 以下のようにディレクトリを作っておきます。
 
 ```bash
-$ mkdir -p %GOPATH%\src\github.com\d-tsuji\example
-$ cd example
-$ mkdir cmd\lambda gen testdata
+mkdir -p %GOPATH%\src\github.com\d-tsuji\example
+cd example
+mkdir cmd\lambda gen testdata
 ```
 
 ## ビルド
 
 ビルドなどのタスクはMakefileに記述しておきます。
 
-- Makefile
+* Makefile
 
 ```bash
 .PHONY: deps
@@ -684,8 +685,8 @@ You can get these now with: go get -u -f gen/...
 `go-swagger` で生成したファイルでビルドに必要なモジュールを `go.mod` に追加します。
 
 ```bash
-$ go get github.com/go-openapi/runtime
-$ go get github.com/jessevdk/go-flags
+go get github.com/go-openapi/runtime
+go get github.com/jessevdk/go-flags
 ```
 
 ## ハンドラ実装
@@ -694,17 +695,17 @@ $ go get github.com/jessevdk/go-flags
 
 まずは `db.go` を実装してDynamoDBに接続します。ローカルでの開発の場合は `4566` ポートで起動しているLocalStackに接続します。DynamoDBのGoのクライアントライブラリは
 
-- [`aws/aws-sdk-go`](https://github.com/aws/aws-sdk-go)
-- [`guregu/dynamo`](https://github.com/guregu/dynamo)
-- [`google/go-cloud`](https://github.com/google/go-cloud)
+* [`aws/aws-sdk-go`](https://github.com/aws/aws-sdk-go)
+* [`guregu/dynamo`](https://github.com/guregu/dynamo)
+* [`google/go-cloud`](https://github.com/google/go-cloud)
 
 などがあります。個人的なおすすめは `guregu/dynamo` です。本チュートリアルでは `guregu/dynamo` を利用することにします。`guregu/dynamo` の使い方については「[DynamoDB×Go連載#1 GoでDynamoDBでおなじみのguregu/dynamoを利用する](/articles/20200225/)」の記事も見てみてください。
 
 ```bash
-$ go get github.com/guregu/dynamo
+go get github.com/guregu/dynamo
 ```
 
-- db.go
+* db.go
 
 ```go
 package example
@@ -749,7 +750,7 @@ DynamoDBから登録されているすべてのユーザを取得する処理を
 
 DynamoDBとマッピングするモデルは以下です。
 
-- dynamo_model.go
+* dynamo_model.go
 
 ```go
 package example
@@ -762,7 +763,7 @@ type User struct {
 
 テーブルから全アイテム取得するためにScanを行います。
 
-- user_handler_db.go
+* user_handler_db.go
 
 ```go
 package example
@@ -790,7 +791,7 @@ func scanUsers(ctx context.Context) ([]User, error) {
 
 続いて上記を使ったハンドラを実装します。
 
-- user_handler.go
+* user_handler.go
 
 ```go
 package example
@@ -827,7 +828,7 @@ func GetUsers(p operations.GetUsersParams) middleware.Responder {
 
 単体テストは実装の詳細をテストしないように、粒度を粗めにしておきます。ハンドラのリクエストに対して想定するJSONのレスポンスが取得できているかどうか確認します。テストファイルは `want_get_users_1.json` `want_get_users_2.json` としておきます。
 
-- user_handler_test.go
+* user_handler_test.go
 
 ```go
 package example
@@ -931,7 +932,7 @@ func TestGetUsers(t *testing.T) {
 }
 ```
 
-- testdata/want_get_users_1.json
+* testdata/want_get_users_1.json
 
 ```json
 [
@@ -946,7 +947,7 @@ func TestGetUsers(t *testing.T) {
 ]
 ```
 
-- testdata/want_get_users_2.json
+* testdata/want_get_users_2.json
 
 ```json
 []
@@ -971,7 +972,6 @@ ok      github.com/d-tsuji/example      0.428s
 POSTのハンドラも同様に実装・テストできますが、本チュートリアルでは省略します。本チュートリアルの内容はGitHubにコミットしてあるので、そちらを参照ください。
 
 `go-swagger` はハンドラの実装とHTTPリクエストのパスのマッピングを自動生成したファイルの中に記述します。今回の場合は `configure_example_app.go` です。
-
 
 ```go
 // This file is safe to edit. Once it exists it will not be overwritten
@@ -1030,11 +1030,11 @@ go-swaggerで実装したWebアプリケーションサーバをLambda関数と�
 
 Lambda関数はAPI Gatewayのリクエストをトリガーに起動します。Lambda関数のAPI Gatewayのリクエスト `events.APIGatewayProxyResponse` をGoのHTTPサーバで扱えるような `*http.Request` に変換する必要があります。
 
-- [awslabs/aws-lambda-go-api-proxy](https://github.com/awslabs/aws-lambda-go-api-proxy)
+* [awslabs/aws-lambda-go-api-proxy](https://github.com/awslabs/aws-lambda-go-api-proxy)
 
 を用いると簡単に変換することができます。もちろん `go-swagger` だけでなく主要なGoのWebアプリケーションフレームに対応しています。
 
-- cmd/lambda/main.go
+* cmd/lambda/main.go
 
 ```go
 package main
@@ -1080,7 +1080,7 @@ func main() {
 
 準備は整いました！Goのファイルをビルドしzip化してAWS Lambda関数にデプロイしましょう。デプロイのコマンドはMakefileにタスクとして記述していました。
 
-- Makefile
+* Makefile
 
 ```makefile
 deploy: zip
@@ -1127,7 +1127,7 @@ aws lambda update-function-code --region ap-northeast-1 --function-name example-
 さてCLIでDynamoDBにデータをPutして、APIのレスポンスを確認してみましょう。
 
 ```bash
-$ aws dynamodb put-item --table-name example-users --item '{"user_id": {"S": "001"}, "user_name": {"S": "Gopher"}}'
+aws dynamodb put-item --table-name example-users --item '{"user_id": {"S": "001"}, "user_name": {"S": "Gopher"}}'
 ```
 
 今回はお手軽にcurlでAPIにリクエストしてレスポンスを確認します。
@@ -1158,4 +1158,3 @@ API Gatewayから想定通りのレスポンスが返ってきました！本チ
 | :---: | --------------------------- | ------------------------------------------------------------------------------------------------- |
 |   1   | GoによるWebAPIの実装        | [d-tsuji/serverless-api-go-tutorial](https://github.com/d-tsuji/serverless-api-go-tutorial)       |
 |   2   | Terraformによるインフラ実装 | [d-tsuji/serverless-api-infra-tutorial](https://github.com/d-tsuji/serverless-api-infra-tutorial) |
-

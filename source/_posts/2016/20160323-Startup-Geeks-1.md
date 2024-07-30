@@ -29,17 +29,17 @@ Startup Geeks #1開催報告
 |20:35-21:00  | 	                    |LT大会 | ピザ食べながら、1人5−10分ぐらいでLT|
 |21:00-22:00 |                      |懇親 | 22:00には完全撤収 |
 
-
 - 当日は、技術の話というよりもサービスのグロースの話や、チームの育て方のテーマが主でとても勉強になりました！（私自身）
 - 当日の資料は[こちら](http://startupgeeks.connpass.com/event/24126/presentation/)からご覧になれます！
 - [togetter](http://togetter.com/li/936597)
 
 ## 会場は以下のような感じ
+
 <img src="/images/20160323/photo_20160323_01.jpeg" loading="lazy">
 <img src="/images/20160323/photo_20160323_02.jpeg" loading="lazy">
 
-
 ## セッション1：AWS 塚田氏
+
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/LauWxdC2QpFCHO" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/akitsukada/mystartuplearningsshortver" title="My Startup Learnings (短縮版)" target="_blank">My Startup Learnings (短縮版)</a> </strong> from <strong><a target="_blank" href="//www.slideshare.net/akitsukada">akitsukada</a></strong> </div>
 
 <img src="/images/20160323/photo_20160323_03.jpeg" loading="lazy">
@@ -48,6 +48,7 @@ Startup Geeks #1開催報告
 - 特に早い段階から **自社の原理原則、文化** を醸成していくことの大事さ、難しさ、そしてそれを維持していくことの大変さが身にしみました。これは、組織の大きさにかかわらず、普段のチームでも同じ状況があると感じ、とても参考になりました。
 
 ## セッション2：appArrayの皆さん
+
 <script async class="speakerdeck-embed" data-id="9792be18b7b14e97baf39ef26a8e3f5f" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
 
 <img src="/images/20160323/photo_20160323_04.jpeg" loading="lazy">
@@ -57,12 +58,14 @@ Startup Geeks #1開催報告
 - 有料総合1位のチームは、どのように開発をしているのか参考になる内容でした！また、立石さんは非エンジニア社長でありながら、自らプログラミングを学び、エンジニアと近い距離を保っていることもいいチームのポイントになっているのかなと感じました。
 
 ## セッション３：Qrio 三上氏
+
 <img src="/images/20160323/photo_20160323_06.jpeg" loading="lazy">
 
 - IoT開発では、普通の開発とは何が違って来るのか語って頂きました。また、Qrioの技術的な話、裏話もあり、三上さんのキャラもあり、盛り上がりました。
 - イケてるデバイス考えても、「で、電池どうしようか」というのがまず問題になるということが印象的でした。
 
 ## セッション４：KUFU 内藤氏
+
 <script async class="speakerdeck-embed" data-id="6ac9ea18f382403eae39b253ac7f8741" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
 
 <img src="/images/20160323/photo_20160323_07.jpeg" loading="lazy">
@@ -71,6 +74,7 @@ Startup Geeks #1開催報告
 - 初期は、受託をやりながらサービス開発していたが、サービスづくりに集中できないので、受託は辞めた話、ユーザーにフォーカスし、ヒアリングし、サービスをグロースしていった話など参考になるお話しがテンコ盛りでした！
 
 ## セッション5：Velc 田向氏
+
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/mSaDnmKbAXyASs" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/tamukai/ss-58039691" title="受託の会社が自社サービスをやる中で取り組んだ開発・運用の工夫" target="_blank">受託の会社が自社サービスをやる中で取り組んだ開発・運用の工夫</a> </strong> from <strong><a target="_blank" href="//www.slideshare.net/tamukai">Yusuke Tamukai</a></strong> </div>
 
 <img src="/images/20160323/photo_20160323_08.jpeg" loading="lazy">
@@ -79,6 +83,7 @@ Startup Geeks #1開催報告
 - 受託をやりつつ、サービス開発をする上で気をつけていること、大事なポイントなどをお話頂き、勉強になりました。KUFUさんのように受託を辞める方法、Velcさんのように受託をやりつつサービスを開発する方法、うーむ、難しいですね。。
 
 ## LT&懇親会
+
 - 本編終了後にPizza&Beerで乾杯しながら、LTも実施しました。
 
 <img src="/images/20160323/photo_20160323_09.jpeg" loading="lazy">

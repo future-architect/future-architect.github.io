@@ -4,6 +4,9 @@ SHELL := /bin/bash
 s:
 	node_modules/.bin/hexo s
 
+fmt:
+	node_modules/.bin/markdownlint-cli2 --fix "**/*.md"
+
 lint:
 	npx lint-staged
 

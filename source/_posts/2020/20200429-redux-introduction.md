@@ -21,7 +21,6 @@ lede: "はじめまして、2019年4月入社_FRX_DigitalLibraryチームの丸�
 研修修了後PJにアサインされて約4ヶ月ほどReact.jsを使って開発を行ってきましたが、Reduxの理解にとても苦しみました。そこで今回はReduxの概要を噛み砕いて説明していきます。同じ悩みを持つ人の理解の助けになればと思います。
 (Redux公式ドキュメントは[こちら](https://redux.js.org/)です。)
 
-
 # 開発で使用している技術要素
 
 * React.js（16.4.1）
@@ -32,9 +31,7 @@ lede: "はじめまして、2019年4月入社_FRX_DigitalLibraryチームの丸�
 Reduxとは、React.jsで使用するstateつまりアプリケーションの状態を管理するフレームワークです
 簡単にReduxの概念の下記に図式化してみました
 
-
 <img src="/images/20200429/1.png" alt="Redux概念図" loading="lazy">
-
 
 **State**：アプリケーションの状態
 **Action**：ユーザーが何押したいかという情報を持つオブジェクト
@@ -42,13 +39,14 @@ Reduxとは、React.jsで使用するstateつまりアプリケーションの�
 **Store**：Stateの情報を保持している場所
 
 # Reduxのデータフロー
+
 では上記で示した概略図をもとにReduxのデータフローをそれぞれ説明していきたいと思います
 
 ## ①ActionCreatorsによってActionを生成する
+
 * ユーザーのインプットによってComponent上からAction作成依頼が飛びActionCreatorでActionが作成されます
 
 <img src="/images/20200429/2.png" alt="Action作成" class="img-small-size" loading="lazy">
-
 
 * 今回はStateの更新を目的としたActionを想定いたします
 * 作成されるActionは下記のようなもので、type項目で他のActionと区別しています
@@ -85,7 +83,6 @@ import { testFunctionA } from "testActionCreator";
 
 <img src="/images/20200429/3.png" alt="Actionのディスパッチ" class="img-small-size" loading="lazy">
 
-
 * Actionを生成するだけではStore内のStateを更新することは出来ません
 * dispatchすることによってActionをStoreに送ることが出来ます
 
@@ -95,6 +92,7 @@ import { testFunctionA } from "testActionCreator";
 ```
 
 ## ③ReducerによってStore内のStateを更新する
+
 * Reducerとは、Actionを元にStateを更新するメソッドのことを言います
 * 引数のstateの更新するのではなく、新しいstateのオブジェクトを返します
 * 各Actionのtypeごとによって処理内容を変更できます

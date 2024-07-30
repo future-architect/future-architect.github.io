@@ -17,7 +17,6 @@ TIGのDXチームに所属している加部です。入社してからは主に
 
 突然ですがAWSを利用しているけどビッグデータの蓄積や解析はBigQueryで実施したい、なんて意見も最近多くなってきているようですね。実際にS3からBigQueryのデータ転送について検索すると、自前でデータ転送を作成してみましたや、データ転送をサービスとして販売しているような会社もあります。そんな中GCPが提供しているBigQeryへのデータ転送サービス[DataTransferService](https://cloud.google.com/bigquery/transfer/)のソース元としてS3が追加され、簡単にS3からBigQueryのデータ転送のジョブを作成できるようになりました。まだ、ベータ版でのリリースのみですが今回は実際にS3からのデータ転送を試してみましょう。
 
-
 # DataTransferServiceとは
 
 <img src="/images/20200214/photo_20200214_01.png" class="img-very-small-size" loading="lazy">
@@ -42,6 +41,7 @@ TIGのDXチームに所属している加部です。入社してからは主に
 今までは主にGoogle系のサービスとの親和性が高く、AWSのS３は初めてのGoogle以外のソース元のサービスになるのではないでしょうか。
 
 # 今回の構成と手順
+
 <img src="/images/20200214/photo_20200214_02.png"  class="img-middle-size" loading="lazy">
 
 今回はS3のバケットに格納したCSVファイルのデータを、DataTransferServiceの機能を使ってBiqQueryに転送します。
@@ -66,6 +66,7 @@ S3のデータ転送をするためには「AmazonS3ReadOnlyAccess」の権限�
 https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cli-services-iam-create-creds.html
 
 # 手順3 DataTransfer APIの有効化
+
 AWS環境の準備が完了したら次はGCP環境の準備です。まずは[DataTransfer APIの有効化](https://cloud.google.com/bigquery-transfer/docs/enable-transfer-service?hl=ja)にしましょう。
 
 コンソールタブの「APIとサービス」からライブラリを選択し、「BigQuery Data Transfer API」と入力して検索してください。
@@ -74,8 +75,8 @@ AWS環境の準備が完了したら次はGCP環境の準備です。まずは[D
 検索したAPIを選択して、有効にするをクリックするとAPIが有効化されます。
 <img src="/images/20200214/photo_20200214_04.png" loading="lazy">
 
-
 # 手順4 BigQueryのデータセット、テーブル作成
+
 今回のサンプルデータとして気象庁のデータから2019年の東京の気温のデータを使います。
 **下記URLから取得**
 http://www.data.jma.go.jp/gmd/risk/obsdl/index.php
@@ -97,6 +98,7 @@ bq mk --table test-project-268106:from_s3.temp_tokyo \
 ```
 
 # 手順5 転送ジョブの作成
+
 いよいよS3からの転送ジョブの作成です。こちらもコマンドラインでの作成していきます。
 
 ```bash
@@ -135,12 +137,12 @@ bq mk \
 ジョブが作成されるとその後すぐに実行され、コンソールから実行ログを確認することができます。
 <img src="/images/20200214/2.png" style="border:solid 1px #000000" loading="lazy">
 
-
 今回は小さなデータでしたが3分ほどかかってジョブは終了しました。
 実際にSQLでデータを見てみると下記の様に取得することができます。
 <img src="/images/20200214/photo_20200214_05.png" class="img-small-size" loading="lazy">
 
 ## 注意点
+
 注意点としてはコマンドラインからの作成の場合、スケジュールの選択オプションがありませんでした。どうやらデフォルト値である24時間ごと(日時)が自動で選択されているようです。作成後にコンソールからジョブのスケジュールを編集することは可能です。下記のように毎日、毎週、毎月、カスタム、オンデマンドと選ぶことができます。
 <img src="/images/20200214/3.png" class="img-middle-size" loading="lazy">
 

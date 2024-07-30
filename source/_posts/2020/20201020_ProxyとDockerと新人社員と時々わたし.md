@@ -107,7 +107,6 @@ Dockerはイメージをインターネット上からPullしてきますので�
 
 <img src="/images/20201020/Docker_pull.png" loading="lazy">
 
-
 ## 社内で通信するケース：自端末内で通信するケース
 
 DockerイメージをpullしてDockerをstartできたら、外部インターネットや他のマシンとの通信を必要しない限り、原則自端末内で完結します。そのため、Docker内でProxyを設定する必要はないですし、ローカル環境とDocker環境で通信するときなどはむしろ `no_proxy` 設定をして上げる必要があります。
@@ -115,7 +114,6 @@ DockerイメージをpullしてDockerをstartできたら、外部インター�
 たまに新人さんで見かけるのが「とにもかくにもProxy設定だ！」ということでPJで使っている `docker-compose.yml` 内に独自にProxy設定した挙げ句localstackのリソース間で通信できません、などという悲しい事故がありますが、これも自端末内での通信なので、Proxy設定は必要ありません。
 
 <img src="/images/20201020/local_no_proxy.png" loading="lazy">
-
 
 ## Docker上から社外と通信するケース：Docker上でDocker pullやpip install
 
@@ -387,5 +385,3 @@ docker-compose build \
 # 最後に
 
 慣れないと苦労するProxyではありますが、会社の情報を守るために大切なものであることに変わりはありません。用法用量を守ってうまく設定しながら素敵な開発ライフを送っていただければと思います。
-
-

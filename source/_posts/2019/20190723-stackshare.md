@@ -20,7 +20,6 @@ https://stackshare.io/future-corporation/futureiot
 
 <img src="/images/20190723/photo_20190723_01.png" style="border:solid 1px #000000" loading="lazy">
 
-
 Futureとしてstackshareを活用するのは初めての試みとなりますが、本記事では公開に至った経緯や技術スタックの採用戦略について簡単にお伝えできればと思います。
 
 ## stackshareとは
@@ -85,7 +84,6 @@ DXユニットは社内組織の中でも特に最先端の技術にチャレン
 疎結合なアーキテクチャを尊重します。
 これはシステム全体として特定のサービス、プロダクトに密に依存することを避け、特定の領域においてプロダクトやサービスを切り替え可能にすることを意味しています。
 
-
 ## おわりに
 
 stackshareについてはひとまず公開してみたというレベルですが、これから技術スタックの拡充や各プロダクトの選定理由の記載も進めていきたいと考えています。
@@ -96,4 +94,3 @@ https://jobs.qiita.com/employers/future/development_teams/109
 
  [^1]: Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。
  [^2]: TIGの中でも特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。
-

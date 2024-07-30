@@ -16,6 +16,7 @@ lede: "私の使用するテキストエディタはVim一択でしたが、最�
 <img src="/images/20201117/image.png" loading="lazy">
 
 # はじめに
+
 こんにちは。TIG/DXユニットの富山です。
 
 私の使用するテキストエディタはVim一択でしたが、最近はVSCodeに浮気気味です。（言わずもがな [Vimプラグイン](https://marketplace.visualstudio.com/items?itemName=vscodevim.vim)は入れています）
@@ -95,7 +96,7 @@ All tools successfully installed. You are ready to Go :).
 インストールを行うために、下記コマンドを実行します。
 
 ```bash
-$ go get -u github.com/derekparker/delve/cmd/dlv
+go get -u github.com/derekparker/delve/cmd/dlv
 ```
 
 インストールが完了したら、ターミナル上で `dlv` コマンドが実行できることを確認してください。
@@ -190,7 +191,6 @@ RUNコンソールの`VARIABLES`部分にて、ブレークポイントで設定
 <img src="/images/20201117/image_6.png" loading="lazy">
 また、VSCode画面中央上部に表示されているパネルでContinueをはじめ、Restartなどの操作ができます。
 
-
 # 関連情報
 
 VSCodeのGo周りでは多賀さんの記事もオススメです。
@@ -201,9 +201,8 @@ VSCodeのGo周りでは多賀さんの記事もオススメです。
 
 * [チームで推奨するVSCode拡張機能を共有するtips | フューチャー技術ブログ](/articles/20200828/)
 
-
 # おわりに
+
 これでデバッグ用にPrint文を埋め込んだままcommitしてしまう自分にオサラバです👋
 
 デバッグ機能をフル活用して快適な開発ライフを。
-

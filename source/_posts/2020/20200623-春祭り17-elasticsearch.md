@@ -15,7 +15,6 @@ lede: "全文検索エンジンとして高い人気を誇る「Elasticsearch」
 
 <img src="/images/20200623/top.png" loading="lazy">
 
-
 # はじめに
 
 こんにちは。TIGメディアユニットの町田です。2020年4月にフューチャーに転職してきました。
@@ -30,6 +29,7 @@ Elasticsearchとは何か、どういうメリットがあるのかというこ�
 ※本記事の環境はWindows 10 Pro 64ビットとなります。
 
 ## Elasticsearchとは何か
+
 Elasticsearchは「全文検索システム」を提供するソフトウェアです。
 
 全文検索とは検索手法の一つで、文字列をキーにして複数の文書データをまたがって検索し、目的のデータを探し出す機能のことを指します。ECサイトやコンテンツマネジメントシステムなどで利用されているいわゆる検索エンジンと呼ばれるものは、裏の仕組みとして全文検索システムが動いているものが多いようです。元々はShay Banon氏（現Elastic社CEO）が妻の料理レシピの情報を検索するためのアプリケーションとして開発されたのがElasticsearchの起源だそうです。
@@ -37,6 +37,7 @@ Elasticsearchは「全文検索システム」を提供するソフトウェア�
 それが今では世界中で利用される検索エンジンとなっている訳ですから、ソフトウェア開発の可能性は無限大ですね！
 
 ## どうやって入手するか
+
 ElasticsearchはElastic社からオープンソースで公開されており、誰でもインストールして無料で利用することが可能です。
 
 また、Amazon Web Service(AWS)上においても「Amazon Elasticsearch Service」としてマネージドサービス(※)として提供されています。
@@ -45,6 +46,7 @@ ElasticsearchはElastic社からオープンソースで公開されており、
 本記事ではオープンソースのソフトウェアをローカルPCにインストールしていきます。
 
 ## Elasticsearchのどういうところが便利か
+
 Elasticsearchのメリットとして、以下が挙げられます。
 
 - 索引型検索を採用しているため、大量データに対して高速検索が可能
@@ -58,6 +60,7 @@ Elasticsearchのメリットとして、以下が挙げられます。
 前置きが長くなりましたが、実際にインストールをして試していきましょう！
 
 # Elasticsearchのインストール
+
 [公式ページ](https://www.elastic.co/jp/downloads/elasticsearch)からzipファイルをダウンロードします。（執筆時のバージョンは7.7.1です）
 <img src="/images/20200623/photo_20200623_02.jpeg" loading="lazy">
 
@@ -99,6 +102,7 @@ Elasticsearchのメリットとして、以下が挙げられます。
 もし変更したい場合は `config/elasticsearch.yml` の `#http.port: 9200` のコメントアウトを外して別のポートを指定することも可能です。（再度起動すると反映されます。）
 
 ## 日本語解析への対応
+
 標準ではElasticsearchは日本語の形態素解析（後述します）に対応しておりませんが、オープンソースの**kuromoji**というソフトウェアを対応させることで、日本語の解析が可能となります。
 `bin/elasticsearch-pulgin.bat` から追加インストールすることができます。コマンドプロンプトで以下のコマンドを実行しましょう。
 
@@ -112,12 +116,14 @@ Elasticsearchのメリットとして、以下が挙げられます。
 [=================================================] 100%??
 -> Installed analysis-kuromoji
 ```
+
 インストール後はElasticsearchを再起動します。
 
 また、ご利用の環境によってはコマンドプロンプトの文字コードによって日本語表示が文字化けることがあります。
 `chcp 65001`と実行すると文字コードがUTF-8になります。
 
 ## Elasticsearchの用語について
+
 ここでElasticsearchで知っておくべき用語と概念を示しておきます。
 Elasticsearchは様々なデータを格納するにあたり、MySQLなどのRDBMSで言うところのデータベースやテーブルに相当する概念が存在します。
 RDBに慣れている方も多いかと思いますので、比較する形で示したいと思います。
@@ -133,6 +139,7 @@ RDBに慣れている方も多いかと思いますので、比較する形で�
 これらを踏まえ、実際にElasticsearchを動かしていってみましょう！
 
 # インデックスとドキュメントの登録
+
 ここからは実際にElasticsearchにドキュメントを登録したり検索したりしてみます。
 
 Elasticsearchは、REST APIによるHTTPリクエストでシンプルに操作できるというメリットがありますので、
@@ -154,9 +161,9 @@ curlコマンドを使ってバシバシ叩いてみましょう。
 
 > - メソッド： POST
 > - URL： http://localhost:9200/my_index/my_type/?pretty
->     - localhost:9200/**{インデックス名を指定}**/**{ドキュメントタイプ名を指定}**/
+>   - localhost:9200/**{インデックス名を指定}**/**{ドキュメントタイプ名を指定}**/
 >       ⇒インデックスとドキュメントタイプが存在しない場合は、自動的に作成される
->     - ?prettyを付与するとJSONが整形された形で返却される
+>   - ?prettyを付与するとJSONが整形された形で返却される
 > - ヘッダ： "Content-Type":"application/json"
 > - ボディ： my_document_1.json
 
@@ -210,9 +217,8 @@ curlコマンドを使ってバシバシ叩いてみましょう。
 
 しっかり登録されていますね！
 
-
-
 # ドキュメントの検索
+
 続いて、Elasticsearchのコア機能となる検索機能を試してみましょう。
 
 検索する条件もJSONに記載します。messageが**「春祭り」**という条件で検索をかけてみましょう。
@@ -407,8 +413,8 @@ Elasticsearchではこの索引型検索方式を採用することで、大量�
 RDBMSでは「～と一致する」や「～を含む」などといったカッチリした条件指定となりますが、Elasticsearchでは文章を解析したりゆれを考慮して結果を返してくれるのです。
 全文検索エンジン便利！！
 
-
 # さいごに
+
 本記事ではドキュメントの登録や検索などのほんの（本当に！）一部しか紹介していませんが、より高度な条件の検索をかけたり、登録ドキュメントの分析を行う様々な種類があります。
 また、周辺ツールとしてデータをグラフィカルに表示する**「Kibana」**や、ログを自動的にElasticsearchに送り込む**「Logstash」**などがあります。
 
@@ -419,5 +425,5 @@ RDBMSでは「～と一致する」や「～を含む」などといったカッ
 - [マネージャーがうれしいRedmineデータのEVM表示方法を公開します！！](/articles/20170119/)
 
 # 参考文献
-- [Elasticsearch実践ガイド](https://www.amazon.co.jp/Elasticsearch%E5%AE%9F%E8%B7%B5%E3%82%AC%E3%82%A4%E3%83%89-impress-top-gear-%E6%83%A3%E9%81%93/dp/4295003913/ref=asc_df_4295003913/?tag=jpgo-22&linkCode=df0&hvadid=295706574430&hvpos=&hvnetw=g&hvrand=18123178779117293225&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=1009309&hvtargid=pla-525424503079&psc=1&th=1&psc=1)
 
+- [Elasticsearch実践ガイド](https://www.amazon.co.jp/Elasticsearch%E5%AE%9F%E8%B7%B5%E3%82%AC%E3%82%A4%E3%83%89-impress-top-gear-%E6%83%A3%E9%81%93/dp/4295003913/ref=asc_df_4295003913/?tag=jpgo-22&linkCode=df0&hvadid=295706574430&hvpos=&hvnetw=g&hvrand=18123178779117293225&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=1009309&hvtargid=pla-525424503079&psc=1&th=1&psc=1)

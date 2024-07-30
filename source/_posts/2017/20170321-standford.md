@@ -40,7 +40,6 @@ lede: "Elastic{ON}への参加のためにサンフランシスコにやって�
 サンフランシスコ駅の途中にGCPのカンファレンス会場があり、こちらも準備中で忙しそうでした。
 あーーー、こっちにも参加したい！ 色々話を聞きたい！(ﾉ_-｡)
 
-
 <img src="/images/20170321/photo_20170321_02.jpeg" loading="lazy">
 
 ## スタンフォード大学到着
@@ -51,7 +50,6 @@ lede: "Elastic{ON}への参加のためにサンフランシスコにやって�
 サンフランシスコと天候が違いすぎることにビックリ！
 ちなみに、先日大粒のヒョウが降ったらしく、昨今は異常気象らしいです...
 やはり、技術も天気も変遷が早いですね（関係ない）
-
 
 <img src="/images/20170321/photo_20170321_03.jpeg" loading="lazy">
 
@@ -72,7 +70,6 @@ lede: "Elastic{ON}への参加のためにサンフランシスコにやって�
 <img src="/images/20170321/photo_20170321_06.jpeg" loading="lazy">
 
 <img src="/images/20170321/photo_20170321_07.jpg" loading="lazy">
-
 
 # Jen-Hsun Huang Engineering Center
 
@@ -101,7 +98,6 @@ PCだけでなく工作できる環境があるのは素敵ですね。
 
 <img src="/images/20170321/photo_20170321_11.jpeg" loading="lazy">
 
-
 ## Hewlett-Packard
 
 Jen-Hsun Huang Engineering Centerから離れ、次の目的地に洋平さんに案内してもらいます。
@@ -117,7 +113,6 @@ Jen-Hsun Huang Engineering Centerから離れ、次の目的地に洋平さん�
 
 * The William Gates Computer Science Building
 <img src="/images/20170321/photo_20170321_14.jpeg" loading="lazy">
-
 
 # Lunch
 
@@ -173,7 +168,6 @@ d.schoolでは人間を中心にしたデザインから、いままでの経験
 
 <img src="/images/20170321/photo_20170321_21.jpeg" loading="lazy">
 
-
 # 散歩
 
 スタンフォード大学の学生は、イメージ通り芝生でくつろいだりしているみたいですね。
@@ -181,9 +175,7 @@ d.schoolでは人間を中心にしたデザインから、いままでの経験
 スタンフォード大学の学生は、「アヒルの水かき」とのこと。
 （写真は、スタンフォード学生ではないですが）
 
-
 <img src="/images/20170321/photo_20170321_22.jpeg" loading="lazy">
-
 
 # おわりに
 

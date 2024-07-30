@@ -91,4 +91,3 @@ ARMなMacが出るとWWDCで発表されてから首を長くしてまってい�
 | BenchmarkMatchString-8         | 5371   | 7498        | 9923           | 10558          |
 | BenchmarkMatchStringCompiled-8 | 529.2  | 551.9       | 670.8          | 538.3          |
 | BenchmarkMatchStringGolibs-8   | 523.5  | 559.2       | 659.5          | 538.2          |
-

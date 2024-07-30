@@ -48,8 +48,8 @@ OKをもらったら、イベントのスポンサーページにフューチャ
 このプログラムはconnpassのイベント情報からユーザー情報を取得して、PDFファイルを作成するところまで行います。Go ConferenceのconnpassのURLは https://gocon.connpass.com/event/148602/ です。この数値をコマンドライン引数に設定します。
 
 ```console
-$ go get github.com/shibukawa/tofuonfire
-$ ./tofuonfire 148602
+go get github.com/shibukawa/tofuonfire
+./tofuonfire 148602
 ```
 
 これでoutputフォルダにPDFがばらばらっと生成されます。これを印刷したらOKです。簡単ですね。
@@ -61,7 +61,6 @@ $ ./tofuonfire 148602
 ## PDFの印刷と名札の制作
 
 <img src="/images/20191202/photo_20191202_04.jpeg" loading="lazy">
-
 
 あとはプリンターでA4でカラーで印刷して、カッターとカッティングボードを用意して手作業で入れていきます。中の厚紙（園児の名前、血液型とかを書く欄があるやつ）を引き出して、上に重ねて一緒に差し込むと比較的かんたんにきれいに入れることができました。
 
@@ -165,4 +164,3 @@ GoでのPDF作成は思いの外かんたんでした。印刷後のサイズも
 大小の勉強会は今後もさらに増加傾向になると思いますし、コンプライアンスは維持しつつ、各社がイベントの協賛として個性を出していく、みたいな方向性でアイディアを競っていきたいですね。
 
 明日はTakaakiOtomoさんによるPub/Subと業務利用についての予定「Pub/Subと業務利用についての予定」です。
-

@@ -15,6 +15,7 @@ lede: "こんにちは、TIGの山田、町田、多賀です。先日2020/11/25
 ---
 
 ## はじめに
+
 こんにちは、TIGの山田、町田、多賀です。先日2020/11/25にオンラインにてFuture Tech Nightという社外勉強会を開催しました。今回は第5弾としてAWS＆DataPlatform を活用した、MaaSビジネスの最新事例を紹介しました。
 
 * [Future Tech Night #1 ~メディア業界変革編～](https://future.connpass.com/event/177093/)
@@ -24,7 +25,6 @@ lede: "こんにちは、TIGの山田、町田、多賀です。先日2020/11/25
 * [Future Tech Night #5 〜AWS＆DataPlatform MaaSビジネス編〜](https://future.connpass.com/event/195568/) ← 今回はここ
 
 <img src="/images/20201228/74fb7c65c1ef518a159eb99b5105ef10.png" loading="lazy">
-
 
 ## 概要
 
@@ -40,7 +40,6 @@ lede: "こんにちは、TIGの山田、町田、多賀です。先日2020/11/25
 町田からは、DataPlatformに蓄積されたデータを外部に提供する仕組みを構築するにあたっての検討内容を紹介しました。また、データ提供基盤であるGatewayアプリの全体像をお話しました。
 
 <img src="/images/20201228/2020-12-25_153425.jpg" loading="lazy">
-
 
 ## 登壇者からコメント
 

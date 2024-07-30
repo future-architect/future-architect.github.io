@@ -18,6 +18,7 @@ lede: "OSSのBIツールであるMetabaseを利用して、Redmineのデータ�
 <img src="/images/20190703/photo_20190703_01.jpeg" loading="lazy">
 
 ## はじめに
+
 こんにちは。近藤です。
 みなさん、Redmineを使っていますか？
 私は使っています。Redmineはタスクをチケット管理する上で便利ですよね。
@@ -42,16 +43,20 @@ lede: "OSSのBIツールであるMetabaseを利用して、Redmineのデータ�
 では実際にやってみましょう。
 
 なお、下記を前提としています。
+
 - **Windows**環境で構築
 - **Redmineのデータベース(MySQL)に直接接続**する
 
 ## 大まかな流れ
+
 下記の手順でグラフを表示します。
+
 1. Javaのインストール
 2. Metabaseのインストール
 3. グラフ表示
 
 ## 1.Javaのインストール
+
 まず、MetabaseではJavaを利用するため、事前にインストールします。
 
 お使いの環境にあったインストーラをご利用ください。
@@ -62,6 +67,7 @@ https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.
 の「jdk-8u211-windows-x64.exe」
 
 ## 2. Metabaseのインストール
+
 次に、Metabaseをダウンロードします。
 
 ◆MetabaseダウンロードURL
@@ -221,6 +227,7 @@ group by
 便利ですね。
 
 ## 最後に
+
 今回は、チケットの発生件数とクローズ件数の推移をグラフで表示しました。
 それ以外のグラフを簡単に追加することも可能です。
 詳しくは下記のMetabaseユーザーガイドをご参照ください。
@@ -238,11 +245,9 @@ https://metabase.com/docs/latest/users-guide/start.html
 
 今後ともよろしくお願い致します。
 
-
 シリーズとして連載しています。こちらもぜひどうぞ。
 
-* [マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！](/articles/20160920/)
-* [マネージャーがうれしいRedmineデータのEVM表示方法を公開します！！](/articles/20170119/)
-* [マネージャーがうれしいRedmineデータのダッシュボード表示方法を公開します！！](/articles/20170510/)
-* マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！（Metabase編）
-
+- [マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！](/articles/20160920/)
+- [マネージャーがうれしいRedmineデータのEVM表示方法を公開します！！](/articles/20170119/)
+- [マネージャーがうれしいRedmineデータのダッシュボード表示方法を公開します！！](/articles/20170510/)
+- マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！（Metabase編）

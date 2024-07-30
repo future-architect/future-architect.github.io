@@ -10,6 +10,7 @@ author: 村瀬善則
 lede: "Google Cloud の Vision API は REST API や RPC API を使用して強力な事前トレーニング済みの機械学習モデルを提供します。画像にラベルを割り当てることで、事前定義済みの数百万のカテゴリに画像を高速で分類できます。オブジェクトや顔を検出し、印刷テキストや手書き入力を読み取り、有用なメタデータを画像カタログに作成します。Google Cloudの公式ページによりますと事前トレーニング済みの機械学習モデルを利用してラベルの割り当てやOCRとしてすぐに利用できるようですね。"
 ---
 # はじめに
+
 こんにちは。TIG DXチームの村瀬です。
 
 今回は[GCP連載企画](/articles/20200202/)の9日目です。私個人としてはGCPはほとんど利用したことがないので、せっかくだから面白そうなことを試してみようと思い、画像AIのサービスであるVision APIについて試してみることにしました。
@@ -48,7 +49,9 @@ https://cloud.google.com/vision/docs/features-list?hl=ja
 https://cloud.google.com/vision/pricing?hl=ja
 
 # 準備
+
 ## プロジェクト作成
+
 <img src="/images/20200218/photo_20200218_01.png" class="img-middle-size" loading="lazy">
 
 プロジェクト名を入力し作成ボタンをクリック
@@ -188,7 +191,6 @@ curl -H 'Content-Type:application/json' -d '{"requests":[{"image":{"source":{"im
 }
 ```
 
-
 descriptionだけ抜き出して整理すると
 
 |description  |日本語  |
@@ -212,7 +214,6 @@ descriptionだけ抜き出して整理すると
 続いてText detection。渋川の[スペックのレーダーチャート](https://www.future.co.jp/recruit/common/img/member/chart_14_pc.png)を解析してみましょう。
 
 <img src="/images/20200218/photo_20200218_06.png" class="img-middle-size" loading="lazy">
-
 
 ```sh Request
 curl -H 'Content-Type:application/json' -d '{"requests":[{"image":{"source":{"imageUri":"https://www.future.co.jp/recruit/common/img/member/chart_14_pc.png"}},"features":[{"type":"TEXT_DETECTION"}]}]}' https://vision.googleapis.com/v1/images:annotate?key=xxxxxxxxxxx
@@ -245,17 +246,14 @@ curl -H 'Content-Type:application/json' -d '{"requests":[{"image":{"source":{"im
 |インラインスケート　   |
 |メタ学習法オタク度|
 
-
 一部の文字はレーダーチャートの線と重なって別の文字として認識されてしまったり、読み込めなかったりしていますが(目的にもよりますが)十分な精度かと思います。
 
 画像AIってすごいですね。
-
 
 # さいごに
 
 機械学習と聞くと利用できるようにするのにトレーニングが必要で、ある種の車輪の再発明に近い作業が必要になり、コストと時間が掛かるものと思っていたのですが、事前トレーニング済みの機械学習モデルが安価にお手軽に利用できてとても便利ですね。様々な検出のタイプがあり、(当たり前ではありますが)適切なタイプを選ぶ必要があるのでそこさえ間違えなければ多種多様なニーズに応えられる素晴らしいAPIかと思います。Vision APIのすばらしさを実感できる検証となりました。
 
 今回は検証目的でプロジェクトを作成したのでプロジェクトを削除して完了です。
-
 
 [GCP連載企画](/articles/20200202/)の9日目でした。次は前原さんの[Cloud Build を知ってみよう](/articles/20210315/)です。

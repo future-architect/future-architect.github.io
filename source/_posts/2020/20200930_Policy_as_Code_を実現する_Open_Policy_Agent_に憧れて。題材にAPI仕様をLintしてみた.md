@@ -23,10 +23,7 @@ lede: "Open Policy Agent（OPA）は汎用的なポリシーエンジンで、[R
 
 [CNCF連載](/articles/20200928/)2回目はOpen Policy Agent がテーマです。前回は伊藤さんによる、[k3sを知る、動かす、感じる](/articles/20200929/)でした。
 
-
 * https://www.openpolicyagent.org/
-
-
 
 # Open Policy Agentとは
 
@@ -34,9 +31,7 @@ Open Policy Agent（OPA）は汎用的なポリシーエンジンで、[Rego](ht
 
 <img src="/images/20200930/opa.png" loading="lazy">
 
-
 OPAは汎用的というだけあって、Kubernetes上でしか動かせないと言った制約は無いです。Go言語で書かれていることもあって、普通の外部パッケージと同様に関数呼び出しができます。また、公式ドキュメントにも適用ドメインを選ばないと書かかれており、いくつかの活用例も挙げられています。
-
 
 * どのユーザーがどのリソースにアクセスできるか
 * どのサブネットの出力トラフィックが許可されているか
@@ -58,8 +53,6 @@ Sentinelは非常に気になっていて、最近[バイナリがダウンロ�
 Sentinelと同様にOpen Policy AgentはPolicy as Codeを掲げています。個人的にはチーム開発において大小様々なポリシーが明示的にも暗黙的にも存在するため、これをポリシーコード化することで、良い成果を生み出せるのではと期待しています。
 
 今回は後で記載している通り、コーディング規約も一種のポリシーとみなして、Open API Spec（Swagger）をLinter的にチェックするツールを題材に、OPAを用いて開発してみたいと思います。
-
-
 
 # Rego概要
 
@@ -84,12 +77,9 @@ PlaygroudのExamplesをクリックすると、他にも色々な例が載って
 
 <img src="/images/20200930/image_2.png" loading="lazy">
 
-
-
 # Regoの文法さわり
 
 Prologをやってれば当たり前かもしれませんが、JavaやGoやJSくらいしか書いたことが無い私から見て、特徴的だなと思った[Regoの文法](https://www.openpolicyagent.org/docs/latest/policy-language/)のつかみを紹介します。かなり異次元だなと思いました。
-
 
 まずは 変数 pi に 3.14159を代入したコードです。`:=` ですでに変数宣言済みかどうかチェックしてくれます。 `{"pi":3.14159}` というJSONが実行結果です。まぁそういうものかと納得できます。
 
@@ -103,7 +93,6 @@ pi := 3.14159
 #    "pi": 3.14159
 # }
 ```
-
 
 次は式が入りました。 x > y が最初にきて、 x,yの代入がその後になっていて実行時エラーになりそうですが、問題なく判定できます。公式ドキュメントに `The order of expressions in a rule does not affect the document’s content.` と書かれている通り、書いた順番は影響ないようです。なるほど。
 
@@ -147,7 +136,6 @@ r5 { r2["local"] }  # 存在しないキーを指定
 #     "r4": true
 # }
 ```
-
 
 次は予約語のdefaultを利用して、allowの初期値をfalseにします。
 
@@ -195,8 +183,6 @@ allow {
 ```
 
 予約後は他にも `some`、`with`、`else` があります。使いこなせばSQLの自己結合みたいな表現もできるようですが、慣れないうちは道のりがとてつもなく長く感じます。パズルみたいで楽しいと思えた人は才能だなと思います。
-
-
 
 # GoからOPAを呼ぶ
 
@@ -256,7 +242,6 @@ func main() {
 
 この構成を利用すれば、他の領域にも展開できそうです。
 
-
 # Open API Spec（Swagger）にポリシーを適用してみる
 
 Open API Specを用いてチームで開発する際、API定義の設定方法で揺れることは無いでしょうか？　以下のようなブログ記事が出るくらい、フューチャーでは設計の揺れを無くす努力をしています。
@@ -268,15 +253,14 @@ Open API Specを用いてチームで開発する際、API定義の設定方法�
 とりあえずルールは上から2つにしぼり、tagsとoperationIdについてのルールを書きます。
 
 * paths/tags
-    * 1URIで１つのタグのみ定義する
+  * 1URIで１つのタグのみ定義する
 * paths/operationId
-    * {HTTPメソッド}{機能物理名}を記載する
-    * キャメルケース
+  * {HTTPメソッド}{機能物理名}を記載する
+  * キャメルケース
 
 ## Rego設計
 
 tagsの数=1を実現するためには[ビルトイン関数](https://www.openpolicyagent.org/docs/latest/policy-reference/#built-in-functions)である `count` を利用します。
-
 
 ```prolog tagsの数チェック
 package test
@@ -328,7 +312,6 @@ deny_opeId_startwith_http_method[msg] {
 ```
 
 これらを1つのファイルとしてまとめて、`policy.rego` に保存しておきます。
-
 
 ## 入力とする Open API Spec
 
@@ -478,7 +461,6 @@ https://github.com/laqiiz/openpolicyagent-example
 }
 ```
 
-
 ## その他
 
 利用したのと同じRegoと入力を、PlaygroundでもPublishしておきました。お手軽に触ってみたい人はどうぞ。
@@ -492,4 +474,3 @@ https://play.openpolicyagent.org/p/1ZhZasqT22
 * OPAはGoから組み込みライブラリとして呼び出せるので、これを活用したLinterを開発可能
 
 長い記事を最後まで読んでいただき、ありがとうございました！
-

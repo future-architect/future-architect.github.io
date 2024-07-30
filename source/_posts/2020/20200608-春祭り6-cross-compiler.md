@@ -15,7 +15,6 @@ lede: "TIG/DXチームの栗田です。もともと宇宙物理を専攻して�
 
 [春の入門祭り](/articles/20200529/)🌸の第6弾です
 
-
 # はじめに
 
 こんにちは、TIG/DXチームの栗田です。もともと宇宙物理を専攻しており、前職では製鉄メーカーでプラントエンジニアをしていました。
@@ -24,7 +23,6 @@ lede: "TIG/DXチームの栗田です。もともと宇宙物理を専攻して�
 IT業界で働き始めると、ソースコードを書いてそれを実行してシステムを動かす、ということを行うことになりますが、その裏で頑張ってくれているのがコンパイラです。普段プログラムを書いていても、「コンパイラ使ったことあるけどその中身までは。。。」「普段Pythonとかで特に意識したことない。」な方もいると思います。
 
 そこで今回は[春の入門祭り](/articles/20200529/)ということで、自分でコンパイラを作ります。ただしコンパイラはコンパイラでも、イチから全部作るのはなかなか大変なので、公開されているコンパイラのソースコードを使って、「クロスコンパイラ」を作ってみようと思います。
-
 
 # クロスコンパイラについて
 
@@ -39,7 +37,6 @@ IT業界で働き始めると、ソースコードを書いてそれを実行し
 より厳密には言語や開発環境に応じてオブジェクトファイルに変換するプログラムをコンパイラ、各種オブジェクトコードを紐付けて処理するリンクを行うプログラムをリンカ、この一連の流れを通してビルドと呼ぶこともありますが、gccを始めとして世の中でコンパイラと呼ばれるプログラムはこの一連の流れを一手に行えます（もっと細かく言うとプリプロセッサやアセンブルなどの処理もありますが、細かくしすぎること今回の趣旨から外れますので割愛します。）。ここからは平たくプラグラムを実行ファイル（バイナリ）にするプログラムを、コンパイラと呼んでいくことにします。
 
 <img src="/images/20200608/photo_20200608_01.png" loading="lazy">
-
 
 余談ではありますが、同じ環境で実行できるコンパイラは複数存在します。
 
@@ -70,7 +67,6 @@ gccもclangもコンパイラであることに変わりはないですが、Xco
 
 <img src="/images/20200608/photo_20200608_02.png" loading="lazy">
 
-
 大学在学時の研究やあるいは趣味でプログラミングしている場合、開発（コンパイル）環境と実行環境が同じケースが多いかと思いますが、異なる環境で動作させなければならないケースがあります。
 
 このような「開発（コンパイル）環境と異なる実行環境で動くようにプログラムをコンパイルするプログラム」をクロスコンパイラと呼びます。この場合の環境とはアーキテクチャレベルでの話であり、最たる例はマイコンなどの組み込み開発です。ラズパイのようなOSが搭載されているようなものではなく、もっと低レイヤーのものになります。有名どころだとArduinoなどがそれに当たりますが、他にはSTM32bitマイコン、もっと前だとH8マイコンなどがあります。
@@ -96,13 +92,13 @@ gccもclangもコンパイラであることに変わりはないですが、Xco
 なお、バージョンとしては基本現時点での最新版でいいと思いますが、gccとbinutilsは直近当てられたパッチ部分がうまく対応してくれなかったので、少し古いものにしました。
 
 * ダウンロードして用意するもの（コンパイルするもの）
-    * [gcc-9.1.0](http://gcc.gnu.org/)
-    * [binutils-2.32](https://www.gnu.org/software/binutils/)
-    * [newlib-3.3.0](https://sourceware.org/newlib/)
+  * [gcc-9.1.0](http://gcc.gnu.org/)
+  * [binutils-2.32](https://www.gnu.org/software/binutils/)
+  * [newlib-3.3.0](https://sourceware.org/newlib/)
 * MacPortsでインストールするもの
-    * MPC
-    * GMP
-    * MPFR
+  * MPC
+  * GMP
+  * MPFR
 
 binutilsはアセンブラや逆アセンブラあるいはリンカなどを目的として利用します。
 
@@ -175,14 +171,14 @@ work
 一気にいきます。
 
 ```bash
-$ export CFLAGS="-I/opt/local/include -O2"
-$ export CXXFLAGS="-I/opt/local/include -O2"
-$ export LDFLAGS="-L/opt/local/lib"
-$ tar zxvf binutils-2.32.tar.xz
-$ cd binutils-2.32
-$ ./configure --prefix=/Users/kurita/work/arm-none-eabi-gcc --disable-werror --target=arm-none-eabi --enable-interwork --enable-multilib
-$ make -j4
-$ make install
+export CFLAGS="-I/opt/local/include -O2"
+export CXXFLAGS="-I/opt/local/include -O2"
+export LDFLAGS="-L/opt/local/lib"
+tar zxvf binutils-2.32.tar.xz
+cd binutils-2.32
+./configure --prefix=/Users/kurita/work/arm-none-eabi-gcc --disable-werror --target=arm-none-eabi --enable-interwork --enable-multilib
+make -j4
+make install
 ```
 
 特にエラーなどでなければ成功です。
@@ -192,22 +188,22 @@ $ make install
 こちらも一気にいきます。なお、newlibはgccのコンパイル時に使用するもので、それ自体でコンパイルすることはしません。
 
 ```bash
-$ cd ~/work/src
-$ tar zxvf newlib-3.3.0.tar.gz
-$ tar zxvf gcc-9.1.0.tar.gz
-$ cd gcc-9.1.0
-$ ln -s ../newlib-3.3.0/newlib .
-$ mkdir build
-$ cd build
-$ ../configure --prefix=/Users/kurita/work/arm-none-eabi-gcc  --target=arm-none-eabi --enable-interwork --enable-multilib --with-newlib --enable-langages="c,c++"
-$ make -j4
-$ make install
+cd ~/work/src
+tar zxvf newlib-3.3.0.tar.gz
+tar zxvf gcc-9.1.0.tar.gz
+cd gcc-9.1.0
+ln -s ../newlib-3.3.0/newlib .
+mkdir build
+cd build
+../configure --prefix=/Users/kurita/work/arm-none-eabi-gcc  --target=arm-none-eabi --enable-interwork --enable-multilib --with-newlib --enable-langages="c,c++"
+make -j4
+make install
 ```
 
 最後に、パスを通して終わりです。
 
 ```bash
-$ export PATH=$PATH:/Users/kurita/work/arm-none-eabi-gcc/bin
+export PATH=$PATH:/Users/kurita/work/arm-none-eabi-gcc/bin
 ```
 
 簡単ではありますが、試しに `--version` で情報表示してみましょう。

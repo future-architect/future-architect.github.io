@@ -30,7 +30,6 @@ lede: "前回の記事に続いて、シリコンバレーのIT企業につい�
   5. Apple
   6. Elastic
 
-
 # 1. シリコンバレー発祥の地
 
 シリコンバレー巡礼のスタート地点は、やはりここからですね。
@@ -124,7 +123,6 @@ Apple本社の**Infinite Loop**！！
 ここでは、一般的にApple Storeで売られているグッズだけでなく、Appleロゴが入ったTシャツや文具など色々と販売されています。
 
 <img src="/images/20170322/photo_20170322_15.jpeg" loading="lazy">
-
 
 # 6. Elastic
 

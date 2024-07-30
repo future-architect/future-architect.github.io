@@ -23,6 +23,7 @@ lede: "前回記事「[CloudEndure Migration - 導入編]」の続きです。�
 初期設定や用語等は、前回記事をご確認ください。
 
 # 今回の環境構成図
+
 CloudEndure Migrationを実施する環境は以下の通りです。
 <img src="/images/20201120/CloudEndure-Diagram.png" loading="lazy">
 
@@ -42,6 +43,7 @@ AWSへ移行後、Wordpressにアクセスするまでを実践します。
 <img src="/images/20201120/GCE-WordPress画面.png" loading="lazy">
 
 # 作業の流れ
+
 以下の流れで作業を実施します。
 
 1. 要件の確認
@@ -58,9 +60,11 @@ AWSへ移行後、Wordpressにアクセスするまでを実践します。
 6. ターゲットマシンからエージェントのアンインストール
 
 # 要件確認
+
 CloudEndureを利用する要件を満たしているか確認します。
 
 ## 共通の要件確認
+
 全OS共通で、以下の要件を満たしている必要があります。
 
 |項目|要件|備考|
@@ -78,9 +82,11 @@ Virtualization type:   full
 完全仮想化のため、OKです。
 
 ### EBSのマルチアタッチ
+
 今回は、GCEのため対象外。
 
 ## LinuxOS固有の要件確認
+
 LinuxOSは、以下の要件を満たしている必要があります。
 
 |項目|要件|備考|
@@ -91,6 +97,7 @@ LinuxOSは、以下の要件を満たしている必要があります。
 |ファイルシステム|root もしくは、bootがXFS5タイプのファイルシステムの場合、サポート対象外|xfsがNGなのか不明のため、今回検証してみようと思います。|
 
 ### カーネルバージョン確認
+
 ```bash 実行結果
 [root@cloudendure-source ~]# uname -r
 3.10.0-1127.19.1.el7.x86_64
@@ -108,12 +115,14 @@ Python 2.7.5
 2.4以上のため、OKです。
 
 ### ブートローダーの確認
+
 ```bash 実行結果
 [root@cloudendure-source ~]# ll /boot/grub2/grub.cfg
 -rw-r--r--. 1 root root 5323 Oct 13 05:43 /boot/grub2/grub.cfg
 ```
 
 ブートローダーはgrubのため、OKです。
+
 ### rootとbootのファイルシステム
 
 ```bash 実行結果
@@ -128,6 +137,7 @@ tmpfs          tmpfs       506876       0    506876   0% /sys/fs/cgroup
 tmpfs          tmpfs       101376       0    101376   0% /run/user/997
 tmpfs          tmpfs       101376       0    101376   0% /run/user/1000
 ```
+
 `/dev/sda2      xfs       20754432 3063128  17691304  15% /`
 Typeにxfsとありますが、NGとなるか検証したいと思います。
 
@@ -160,18 +170,21 @@ RHEL8.0/CentOS8.0の場合、`sudo yum install elfutils-libelf-devel`の実行�
 rootのファイルシステムがxfsなのが気になりますが、移行できるか検証してみたいと思います。
 
 # CloudEndureエージェントインストール
+
 実際にCloudEndure Migrationを利用した移行を開始します。
 
 ## エージェントのインストール手順
+
 マシンの登録がない初期は、CloudEndureコンソールの「Machines」に記載があります。
 また、画面上部にある「MACHINE ACTIONS...」の「Add Machines」からも確認が可能です。
 ※インストール用のTokenは、アカウント固有の情報のため伏せています。
 <img src="/images/20201120/AgentInstall方法.jpg" loading="lazy">
 
 ### エージェントのインストーラーを取得
+
 以下のコマンドを実行して、CloudEndureエージェントのインストーラーを取得します。
 ※wgetは事前にインストールしておいてください。
-`wget -O ./installer_linux.py https://console.cloudendure.com/installer_linux.py `
+`wget -O ./installer_linux.py https://console.cloudendure.com/installer_linux.py`
 
 ```bash 実行結果例
 [root@cloudendure-source ~]# wget -O ./installer_linux.py https://console.cloudendure.com/installer_linux.py
@@ -184,6 +197,7 @@ Saving to: ‘./installer_linux.py’
 100%[=========================================================================>] 7,659       --.-K/s   in 0s
 2020-11-05 14:20:05 (1.17 GB/s) - ‘./installer_linux.py’ saved [7659/7659]
 ```
+
 実行時のログにもありますが、「console.cloudendure.com」を名前解決して、
 IPアドレス「52.72.172.158」に接続しています。
 これは、CloudEndure Service ManagerのIPアドレスです。
@@ -192,6 +206,7 @@ IPアドレス「52.72.172.158」に接続しています。
 ネットワーク要件を満たしているか確認してください。
 
 ### エージェントのインストーラーを実行
+
 以下のコマンドを実行して、インストーラーを実行します。
 ※${インストール用Token}は、書き換えてください。
 `sudo python ./installer_linux.py -t ${インストール用のToken} --no-prompt`
@@ -217,9 +232,9 @@ Installation finished successfully.
 同時にレプリケーションが実行されるとネットワーク環境によっては、占有してしまう要因になります。
 
 インストール完了直後にレプリケーションを開始させたくない場合は、
-インストーラー実行時に`--no-replication `のオプションをつけることで防ぐことができます。
+インストーラー実行時に`--no-replication`のオプションをつけることで防ぐことができます。
 
-`--no-replication `を使ってインストールが完了すると、CloudEnduereコンソールの「Machines」にマシンの登録のみ行われます。
+`--no-replication`を使ってインストールが完了すると、CloudEnduereコンソールの「Machines」にマシンの登録のみ行われます。
 レプリケーションを開始するには、「Machines」> 「MACHINE ACTIONS」メニューから、「Start/resume Data Replication」をクリックすることで実施可能です。
 <img src="/images/20201120/DataReplicationStart.png" loading="lazy">
 
@@ -266,6 +281,7 @@ Installation finished successfully.
 ストレージのI/O速度等が影響するようです。
 
 # ターゲットマシンの設定
+
 データのレプリケーションが完了したら、ターゲットマシンの設定を行います。
 登録されたマシンのページにある「BLUE PRINT」から設定を行います。
 <img src="/images/20201120/Machine-BLUE_PRINT.png" loading="lazy">
@@ -311,15 +327,17 @@ EC2インスタンスを起動する際の設定項目と類似しているた�
 |Disks|SSD|SSDの場合、gp2です、|
 
 # ターゲットマシン起動
+
 ターゲットマシンの起動は、テストモードとカットオーバーの2種類あります。
 
 ## テストモード
+
 テストモードでは、AWS環境で適切に起動できるかの検証が可能です。
 少なくとも、本番切り替えの1週間前には、実施することが推奨されています。
 テストモードで起動後、SSHやRDPでログインし、正しく起動できているか検証します。
 
-
 ### ターゲットマシン起動
+
 実際にテストモードでターゲットマシンを起動してみます。
 
 「LAUNCH TARGET MACHINE」から、「Test Mode」をクリックする。
@@ -345,7 +363,6 @@ CloudEndureの裏の動きについては、AWSコンソールを観察してみ
 ターゲットマシンは、起動直後に停止されます。
 よく見ると、1GBのストレージがアタッチされています。
 <img src="/images/20201120/TargetMachine(TestMode)停止1GB.png" loading="lazy">
-
 
 停止されると、1GBのストレージがデタッチされ、インスタンスの情報からは見れなくなります。
 <img src="/images/20201120/TargetMachine(TestMode)停止デタッチ.png" loading="lazy">
@@ -386,10 +403,12 @@ lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
         TX packets 0  bytes 0 (0.0 B)
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 ```
+
 SSHログインできました。
 rootのファイルシステムが「xfs」でも、問題ないようです。
 
 ### 起動後の設定修正
+
 SSHでログインできたので、WordPress接続に向けた設定修正を行います。
 
 ログインした状態を見た感じ、ホスト名が変更されてますが、
@@ -440,10 +459,12 @@ Apacheを再起動して、WordPressにアクセス/ログインしてみます�
 本番切り替え前に、設定変更が必要な箇所の整理等に利用できます。
 
 ## カットオーバー
+
 テストが完了したら、カットオーバーを実施します。
 カットオーバーすると、テストモードで起動したインスタンスは終了されます。
 
 ### ターゲットマシン起動
+
 テストモードのインスタンスを起動したまま、
 カットオーバーを実施してみます。
 
@@ -466,6 +487,7 @@ AWSのコンソールを確認すると、テストモードで起動したEC2�
 <img src="/images/20201120/Launch_Target(CutOver)成功.png" loading="lazy">
 
 ### 起動後の設定修正
+
 テストモードと同じく、SSHでログインして、
 WordPressの設定を変更したあと、アクセスしてみます。
 (作業内容はテストモードと同一であるため、省略します。)
@@ -473,13 +495,14 @@ WordPressの設定を変更したあと、アクセスしてみます。
 アクセスできました。
 
 # ターゲットマシンからエージェントのアンインストール
+
 カットオーバー完了後は、CloudEndureエージェントは不要となります。
 ターゲットマシンからアンインストールを行います。
 
 ## エージェントの停止
+
 以下のコマンドをrootで実行して、エージェントを停止します。
 `/var/lib/cloudendure/stopAgent.sh`
-
 
 ```bash 実行結果
 $ /var/lib/cloudendure/stopAgent.sh
@@ -507,9 +530,9 @@ Killed tail
 ```
 
 ## インストール時の設定削除
+
 以下のコマンドをrootで実行することで、起動設定などを削除できます。
 `/var/lib/cloudendure/install_agent --remove`
-
 
 ```bash 実行結果
 $ /var/lib/cloudendure/install_agent --remove
@@ -540,9 +563,11 @@ running: 'visudo -c -f /etc/tmpVciTv8'
 /etc/sudoers.d/google_sudoers: parsed OK
 retcode: 0
 ```
+
 あとは、インストーラーやCloudEndureのログファイルなど、適宜削除してください。
 
 # まとめ
+
 2回に分けて、CloudEndureについて、記述しました。
 移行元のサーバーを起動したまま、サーバーをまるごと移行できるのが
 CloudEndure Migrationの強みです。
@@ -553,4 +578,3 @@ CloudEndure自体の利用は無料のため、試してみてはいかがでし
 
 * [CloudEndureDocumentation](https://docs.cloudendure.com/CloudEndure%20Documentation.htm)
 * [[クラウド移行] CloudEndureを使ったEC2への移行を計画する前に考慮しておきたいポイント](https://dev.classmethod.jp/articles/planning-migration-cloudendure/)
-

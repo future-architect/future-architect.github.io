@@ -84,7 +84,6 @@ HTTP/2のフレームは後藤ゆきさん著の[細かく紹介している本]
 
 * [turky in the blogger: 『Real World HTTP』が約三年ぶりに改訂されました](https://turky-in-the.blogspot.com/2020/04/real-world-http.html): 編集をしてくださった瀧澤さんのブログエントリーです。
 
-
 ---
 
 関連ページ:
@@ -92,4 +91,3 @@ HTTP/2のフレームは後藤ゆきさん著の[細かく紹介している本]
 * [Real World HTTPミニ版リリース記念勉強会の実施報告](/articles/20190410/)
 * [インフラ入門vol.2(ネットワーク)](/articles/20170704/)
 * [インフラ入門vol.3(ネットワーク冗長化構成)](/articles/20191107/)
-

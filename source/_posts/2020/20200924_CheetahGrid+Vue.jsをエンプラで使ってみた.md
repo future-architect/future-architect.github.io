@@ -37,6 +37,7 @@ lede: "こんにちは！今回は[CheetahGrid][cheetahgrid-hp]＋[Vue.js][vue-h
 # CheetahGrid+Vue.jsの採用に至るまでの経緯
 
 ## プロジェクト概要
+
 [CheetahGrid][cheetahgrid-hp]＋[Vue.js][vue-hp]を採用した今回のプロジェクトをさらっとご紹介します。
 
 * アパレルのお客様向けソリューションのフレームワーク刷新プロジェクト
@@ -73,9 +74,11 @@ lede: "こんにちは！今回は[CheetahGrid][cheetahgrid-hp]＋[Vue.js][vue-h
 これらの課題を解決すべく候補として挙がったのが、[CheetahGrid][cheetahgrid-hp]でした。
 
 # 実装例
+
 今回のプロジェクトにおける[CheetahGrid][cheetahgrid-hp]を用いた実装をいくつか紹介します。
 
 ## 開発環境
+
 * Node.js(v14.4.0)
 * npm(6.14.5)
 * Nuxt.js(v2.13.3)
@@ -90,6 +93,7 @@ npm install -S cheetah-grid
 ※開発環境については、[入門編の開発環境][beginner-dev-env]に倣っています。
 
 ## 実装した画面と全体ソース
+
 今回実装した画面は以下です。
 <img src="/images/20200924/2020-09-23_20h26_14.png" loading="lazy">
 この画面全体のソースコードは以下です。
@@ -285,6 +289,7 @@ export default {
 ```
 
 ## 範囲ペースト機能
+
 まずは範囲ペースト機能です。クリップボードにコピーしたTSVデータを貼り付けてGrid上に反映することができます。
 
 ```html
@@ -298,7 +303,6 @@ export default {
 範囲ペーストを有効化するには`c-grid`に`:allow-range-paste="true"`を指定するだけです！
 
 以下のようなExcel上のデータをコピーし、
-
 
 <img src="/images/20200924/2020-09-22_00h23_27.png" class="img-small-size" loading="lazy">
 
@@ -334,6 +338,7 @@ export default {
         一括反映
       </button>
 ```
+
 ```js scriptタグ内
         /**
          * カラム1一括反映ボタンクリックイベント
@@ -362,6 +367,7 @@ export default {
         }
     },
 ```
+
 `records: []`で定義しているため、`records`の各要素はリアクティブな変更の対象となりません。
 そこで、JavaScriptで変更した値を`c-grid`で表示させるために`c-grid`の[invalidate API][cheetahgrid-invalidate]を利用して、変更後の`records`で再描画させています。
 ※`vm.$refs.grid.invalidate()`をコメントアウトすると、一括反映ボタンを押下しても見た目には何も起こりませんが、`records`の値は変更された状態になります。
@@ -369,6 +375,7 @@ export default {
 `records`の値を設定する際に`$set`でリアクティブにしたりすることも可能ではあります。ただし、エンプラで利用する際にはサーバ側の検索APIを叩いてその結果が`records`に入ることになり、検索結果の件数によってはパフォーマンス悪化の要因になりえますし、返却する項目名も変わる可能性があります。そのため、今回の実装のように再描画を一度やってしまう方が全体的なパフォーマンスとしては良いものになるのではないかと思います。なんと言っても、[CheetahGrid][cheetahgrid-hp]は描画がめちゃくちゃ早いので再描画でもストレスはありません😎
 
 ### 行追加
+
 エンプラでの利用シーンとしては、明細行を追加したい場合などで、アパレルでは材料メーカーへの支払明細の追加などが例として挙げられます。
 
 ```vuejs templateタグ内
@@ -382,6 +389,7 @@ export default {
         行追加
       </button>
 ```
+
 ```javascript scriptタグ内
         /**
          * 行追加ボタン押下イベント
@@ -405,10 +413,12 @@ export default {
           )
         },
 ```
+
 <img src="/images/20200924/capture-add-row_(1).gif" loading="lazy">
 実装としては、IDの最大値＋１を計算し、`records`へ追加しています。これだけで`c-grid`に新たな行を追加することが可能です。
 
 ### 入力データのバリデーション
+
 エンプラ以外でも必須の機能と言っても過言ではない画面入力値のバリデーション実装です。
 
 ```vuejs templateタグの実装（c-grid内の各カラム）
@@ -419,6 +429,7 @@ export default {
           カラム1（数値1-4桁）
         </c-grid-input-column>
 ```
+
 ```javascript scriptタグの実装（c-grid内の各カラム）
         /**
          * 数値カラムのバリデーションメソッド
@@ -429,6 +440,7 @@ export default {
           return !rec.column1.match('^[0-9]{1,4}$') ? 'エラー：1から4桁の数値を入力してください。' : ''
         },
 ```
+
 <img src="/images/20200924/2020-09-23_21h08_40.png" class="img-small-size" loading="lazy">
 
 `:message="validateNumCol"`にてバリデーション用の関数を呼び出し、エラーの場合にエラーメッセージを返却するように実装します。カラム1のいずれかに4桁以内の数字**以外**を入力した場合にエクスクラメーションマークが表示されることが確認できるでしょう。
@@ -448,6 +460,7 @@ export default {
           カラム1（数値1-4桁）
         </c-grid-input-column>
 ```
+
 ```javascript scriptタグの実装（c-grid内の各カラム）
         /**
          * 行変更イベント処理
@@ -474,6 +487,7 @@ export default {
               :allow-range-paste="true"
               @changed-value="onChangedValueRec($event)">
 ```
+
 他にもバインド可能なイベントは用意されていますが、各`c-grid-*`コンポーネントによって利用できるイベントも異なるので[コンポーネント一覧ページ][cheetahgrid-components]より利用可能なイベントを確認して実装してみてください。
 
 # まとめ
@@ -493,11 +507,10 @@ export default {
 見ていただいたとおり[CheetahGrid][cheetahgrid-hp]は描画は非常に早いのですが、イベント処理やバリデーションロジックの実装は開発者の腕次第です。よって、場合にによっては描画以外の部分で時間がかかり、全体として遅くなってしまいます。例えば、毎回全データのチェックが走るような書き方をしてしまうと、カラムクリックや入力のたびに画面がもっさりしてしまうので、ボタン押下時だけにチェックを寄せるなどのロジックの最適化は必要になります。
 
 # 最後に
+
 弊社内でも[CheetahGrid][cheetahgrid-hp]＋[Vue.js][vue-hp]の組み合わせで本格的に業務システムを作成した初のプロジェクトだったこともあり手探りでの開発ではありましたが、これまでのエンプラのフロントエンド開発で苦労した点がほとんど問題にならず、使ってみてホントに良いなと思いました。
 
-
 ある先輩は、「お客様は我々と業務要件を詰めることはできるが、パフォーマンスはお客様にはどうしようもない。だけど、使ってみて実は一番気になるのは動作が遅かった場合だし遅いと使ってくれない。だからこそプロとしてパフォーマンスに妥協してはいけない。」のようなことを言っていて感銘を受けたものです。それもあって私自身もいくつかのプロジェクトで遅い画面というものに出会うことは少なくなく毎回考えを振り絞ってきたわけですが、[CheetahGrid][cheetahgrid-hp]を利用すればそれらのいくつかの解になり得るものだと思いました。
-
 
 チューニングによってパフォーマンスが改善していくのも気持ちがいいものでその機会が減ってしまうのはちょっぴり悲しさもありますが😅、最初から速いに越したことはないですよね！
 
@@ -514,6 +527,4 @@ export default {
 [beginner-dev-env]:/articles/20200901/
 [future-hp]:https://www.future.co.jp/
 [tig-hp]:https://www.future.co.jp/recruit/new/about/tech/engineers_corps/
-[motivation-performance]:https://qiita.com/ota-meshi/items/a2b68e132fa7c5a32c3d
 [cheetahgrid-invalidate]:https://future-architect.github.io/cheetah-grid/documents/api/vue/components/CGrid.html#methods
-

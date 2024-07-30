@@ -25,11 +25,9 @@ lede: "エンプラ&オンプレでもAnsible導入成功したのでユーザ�
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/1HlAM9KhjgeejI" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/taroshun/3ansible" title="新卒3年目のぼくが、でぶおぷす???なインフラおじさん方にAnsibleを導入してみた" target="_blank">新卒3年目のぼくが、でぶおぷす???なインフラおじさん方にAnsibleを導入してみた</a> </strong> from <strong><a href="https://www.slideshare.net/taroshun" target="_blank">Shuntaro Saiba</a></strong> </div>
 
-
 * 2017/12/21(木) Ansible Night in Tokyo
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/BuEj51P21HL3yF" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/taroshun/3ojisanansible" title="新卒3年目のぼくが、でぶおぷす???なエンプラ金融PJにAnsibleを導入してみた" target="_blank">新卒3年目のぼくが、でぶおぷす???なエンプラ金融PJにAnsibleを導入してみた</a> </strong> from <strong><a href="https://www.slideshare.net/taroshun" target="_blank">Shuntaro Saiba</a></strong> </div>
-
 
 どちらの内容も多くの皆様に共感いただくことができた気がします。。!!特にエンプラPJでのサーバ管理のツラミについて
 
@@ -47,7 +45,6 @@ Ansible？な方に対して、軽く説明させていただきます。Ansible
 
 <img src="/images/20180209/photo_20180209_04.png" loading="lazy">
 
-
 ## Ansibleとは
 
 * Ansibleとはオープンソースのサーバ構成管理ツールです。
@@ -55,17 +52,15 @@ Ansible？な方に対して、軽く説明させていただきます。Ansible
 
 <img src="/images/20180209/photo_20180209_05.png" loading="lazy">
 
-
 * よくAnsibleと比較されるのが以下の2つです。
-    - Ansibleは**エージェントレス**ということもあり、比較的に簡単に導入することができます
-    - あとは定義ファイルの形式がyamlかjsonかの違いというのも大きなポイントです
+  * Ansibleは**エージェントレス**ということもあり、比較的に簡単に導入することができます
+  * あとは定義ファイルの形式がyamlかjsonかの違いというのも大きなポイントです
 
 <img src="/images/20180209/photo_20180209_06.png" loading="lazy">
 
-
 * Ansibleの使い方は非常にシンプルです。基本の構成要素は以下になります
-    - **Invetroy**ファイル: (管理対象のサーバを定義するファイル)
-    - **Playbook**ファイル: (サーバのあるべき状態を定義するファイル)
+  * **Invetroy**ファイル: (管理対象のサーバを定義するファイル)
+  * **Playbook**ファイル: (サーバのあるべき状態を定義するファイル)
 
 <img src="/images/20180209/photo_20180209_07.png" loading="lazy">
 
@@ -73,7 +68,6 @@ Ansibleでサーバのあるべき状態をコードとして定義して、Play
 なんとも便利そうです。これなら数百台あるサーバであっても**構築の自動化**と**高品質な構成管理**ができそうですね。 以下のようにInfrastructure as Codeを導入すれば今までの課題が解決することは明らかだと思います。
 
 <img src="/images/20180209/photo_20180209_08.png" loading="lazy">
-
 
 # エンプラ&オンプレへの導入へのチャレンジ!!
 
@@ -91,13 +85,11 @@ Infrastructure as Codeでインフラ構築の自動化！高品質な構成管�
 
 先述しましたが、Ansibleはエージェントレス型であったため障壁はかなり下がりました。 ただ、それだけでは導入はうまくいきませんでした。
 
-
 ## エンプラ&オンプレ領域って特に難しい、、??
 
 個人的に、**エンプラ&オンプレの領域って、Infrastructure as Codeの導入が一番困難だと思っています。**
 
 <img src="/images/20180209/photo_20180209_09.png" loading="lazy">
-
 
 まず、**オンプレ** これが相性が悪い。その大きな要因は**Mutable(可変)**であるためです。
 クラウドであればサーバを都度破棄して、新規に構築する **"Immutable"**であるので、Infrastructure as Code本来の使い方に準じて利用できると思うのですが、オンプレだと作り直しができない"Mutable"であり、手入れをしながら長く付き合っていくことになります。その点を考慮してInfrastructure as Codeを利用しなければいけません。
@@ -106,7 +98,6 @@ Infrastructure as Codeでインフラ構築の自動化！高品質な構成管�
 (※ 逆に言えばクラウドでもMutableな使い方をしていると相性悪いと思います)
 
 <img src="/images/20180209/photo_20180209_10.png" loading="lazy">
-
 
 そして、**エンプラ** これも相性が悪い。**"制約"**とか**"いままでの文化"**が導入の大きな障壁になります。簡単に言うなら大きくて動きずらい。
 
@@ -118,7 +109,6 @@ Infrastructure as Codeでインフラ構築の自動化！高品質な構成管�
 出典: [Where is the “EA” in DevOps?](https://www.cloudtp.com/doppler/where-is-the-ea-in-devops/)
 
 <img src="/images/20180209/photo_20180209_11.png" loading="lazy">
-
 
 # どのようにして導入したか
 
@@ -136,14 +126,13 @@ Infrastructure as Codeでインフラ構築の自動化！高品質な構成管�
 
 <img src="/images/20180209/photo_20180209_12.png" loading="lazy">
 
-
 ## 作り上げたフレームワーク
 
 * こんな感じのフレームワーク(と言っては大げさかもしれませんが)を作りました。
 * Ansibleの使い方だけではなく、PJに導入するために以下も考えました。
-    - ビジョン
-    - 手順書
-    - ワークフロー
+  * ビジョン
+  * 手順書
+  * ワークフロー
 
 <img src="/images/20180209/photo_20180209_13.png" loading="lazy">
 
@@ -151,7 +140,6 @@ Infrastructure as Codeでインフラ構築の自動化！高品質な構成管�
 * JenkinsとGitlabを駆使して、継続的にAnsible実行&フィードバックができるような仕組みを心掛けました。
 
 <img src="/images/20180209/photo_20180209_14.png" loading="lazy">
-
 
 後述する"特に工夫したこと"で詳細記載します。
 
@@ -163,16 +151,15 @@ Infrastructure as Codeでインフラ構築の自動化！高品質な構成管�
 * **2. メンバーみんなにキャッチアップを求められない。みんなが利用できる仕組みを作る**
 * **3. あきらめない**
 
-
 ### **1. 考え方を押し付けるのはダメ。今までの考え方に歩み寄る**
 
 #### Ansibleで全部やろうとしない
 
 * インフラ構築すべてをAnsibleで実装。は理想ですが、ベンダが構築する部分があったりと、すべてをソースコード化するのは受け入れ側も導入側にもパワーが足りなかったので以下の用途で使用を留めました。しかし、これだけでも効果はかなり大きかったです。
-    - ファイル配布
-    - ディレクトリ作成
-    - ユーザグループ作成
-    - パッケージインストール
+  * ファイル配布
+  * ディレクトリ作成
+  * ユーザグループ作成
+  * パッケージインストール
 
 #### Ansibleのベストプラクティスが私たちにベストとは限らない
 
@@ -184,8 +171,6 @@ Infrastructure as Codeでインフラ構築の自動化！高品質な構成管�
 ※ このせいで、taskファイルや静的ファイルが二重管理になってしまいますが、それは後述のtaskファイル自動生成で補うことができました。
 
 <img src="/images/20180209/photo_20180209_15.png" loading="lazy">
-
-
 
 ### **2. メンバーみんなにキャッチアップを求められない。みんなが利用できる仕組みを作る**
 
@@ -204,7 +189,6 @@ Infrastructure as Codeでインフラ構築の自動化！高品質な構成管�
 
 <img src="/images/20180209/photo_20180209_16.png" loading="lazy">
 
-
 ### **3. あきらめない**
 
 #### 絶対にサーバを手で葬らせない
@@ -220,7 +204,6 @@ Infrastructure as Codeでインフラ構築の自動化！高品質な構成管�
 他のインフラ構築メンバからそんな声がたくさん聞こえてきます。たとえ作業をし終わった後でもAnsibleのソースコード化をしないと、その構築範囲は**構成管理ができなくなります。**それでは意味がありません。なので、Ansibleを使える人だけで人が行った手作業をソースコード化を継続するのが非常に大変でした。。しかし、あきらめてはダメです。(途中からExcelソース自動化を導入したのでだいぶ楽にはなりましたが、軌道にのるまでは辛かった)
 ※Ansibleは冪統性があるので、いったん手で作業したところをソースコード化しても問題ない
 
-
 #### 分かってもらえるまで説明する
 
 インフラチームにはすんなり受け入れられたのですが、チーム全体にInfrastructure as Codeという全く新しい考え方をわかってもらうのもなかなか時間がかかりました。
@@ -234,8 +217,6 @@ Ansibleは簡単に使いやすいとは言え、いままでのサーバ管理�
 * 併せてDevOps勉強会も実施しました
 
 <img src="/images/20180209/photo_20180209_18.png" loading="lazy">
-
-
 
 # 導入の成果
 
@@ -264,7 +245,6 @@ Ansibleは簡単に使いやすいとは言え、いままでのサーバ管理�
 
 <img src="/images/20180209/photo_20180209_22.png" loading="lazy">
 
-
 導入までの歩みをまとめてみました。開発(Dev)は一人でガンガン作りこんでいってしまえばよいだけなのでそんなに大変ではありませんでしたが、運用(Ops)でも使えるように、いろいろな関係者を巻き込んでいくのはなかなか骨が折れました。ただ、保守・運用チームが積極的に協力してくれたので、なんとか運用でも使えるようになるまでこぎつけることができました。感謝です。
 
 # 最後に
@@ -273,12 +253,10 @@ Ansibleのようなツールはどんどん新しいものが出てきて、日�
 私たちのPJは"ユニコーン"ではないので**工夫と時間**がかなり必要ですが、それでもその恩恵を受けることはできます。
 実際に導入までこぎつけて、**"先進的なツール"と"今までのPJのやり方や文化"、これをどう結びつけるかが重要だと感じました。**
 
-
 また、ここまでの仕組みを整えられたのもPJメンバの協力があったからだと感じています。
 この仕組み作りの重要性を理解し「どんどんやっちゃっていいよー」とGOをくれたリーダに感謝です。
 また、一緒にワークフローを検討し運用での利用の仕組みを整えてくれた保守・運用チームにも感謝です。
 勉強会の交流会や、Twitterでは「Ansible広めたいけど、チームの誰も賛同してくれない」と言っている人はたくさんいました。(うちっていい会社ですね！)
-
 
 と言っても、まだまだこの仕組みは使い始められて間もないのでこれからさらに改良を重ねていきたいと考えています。
 

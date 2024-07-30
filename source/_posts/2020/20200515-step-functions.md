@@ -20,7 +20,6 @@ AWS StepFunctionsとLambdaを活用してバッチ処理を行う記事です。
 
 2020年はServerlessアーキテクチャが当たり前のように採用される時代になってきていると実感します。フロントエンドからアクセスされるBackendのAPIはAWS環境だと、AppsyncやAPI Gateway+Lambaの利用、IoTなどイベントドリブンなメッセージに対してはAWS IoT、その後続はKinesisを使い、さらにその後続でLambdaやKinesis AnalyticsでETL処理を行い、データストアとしてDynamoDBやS3に格納するといった一連の流れ全てフルマネージドなサービスに寄せて構築することも当たり前ですし、そういった事例も珍しく無くなってきました。
 
-
 # サーバレスのバッチ処理
 
 そんな中で、バッチ処理（定時起動やユーザの非同期イベントで処理を行うジョブ）に関してはLambdaではなくECSなどを採用することが多いと思います。理由としてはやはり [LambdaのTimeout時間が最大で15分](https://aws.amazon.com/jp/blogs/news/aws-lambda-timeout-15min/)  [^1] であるためです。また、ECSも非同期タスク起動ではなく常駐にしてHTTPリクエストなどでイベントを待ち受けるタイプに関しては、[ALBであれば4000秒（約66分）](https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout)  [^1]なため、1h超えの処理時間になりうる機能は採用できないでしょう。ALBではなくNLBを採用するとこの制約からは逃げられるので、SecurityGroupなどの考えがややALBと異なりますがこちらを採用するチームもいらっしゃると思います。もしくは次の [ecs-run-task](https://docs.aws.amazon.com/cli/latest/reference/ecs/run-task.html) で非同期にECSコンテナを呼び出している、という方式をとることも多いのでは無いでしょうか？ 定期実行であれば、ECS Scheduled Tasksを利用することもできるので便利ですよね。
@@ -39,15 +38,14 @@ ecs-run-taskで非同期（または定期的）にECSを呼び出す方法を�
 ...と言ったことがあります。とは言えいくつかトレードオフもあります。思いつく限りだと...
 
 * ECSタスクの終了を **待ち受けて** 次処理を行うといったことがやりにくい
-    * 起動したECSタスクが終了したということを、通常はPolling的に監視する必要がある
-        * もしくは、ECSコンテナアプリの終了時に、SQSなどに実行終了したことを通知する必要がある
+  * 起動したECSタスクが終了したということを、通常はPolling的に監視する必要がある
+    * もしくは、ECSコンテナアプリの終了時に、SQSなどに実行終了したことを通知する必要がある
 * コンテナサイズに依存して起動時間のオーバーヘッドがある
 * ECS TaskDefinitionの管理が大変
 
 などがあると思います。[kayac/ecspresso](https://github.com/kayac/ecspresso) のようなECSデプロイツールや、ECS以外のサービスを採用しても学習コスト・インフラ保守コストはどうしてもかかるのでやや無理やり上げた感がありますがご容赦ください。
 
 個人的にはジュニアなエンジニアがチームに多いのと、AWSに慣れていない新規参画者が多いという、「**他アプリがLambdaで完結している場合に、ECSという別のアプリランタイムを入れたくない**」 という技術スタックをなるべく増やしたくないという思いがあり、できる限りアプリ開発はLambdaでやりたいと思ってます。（Dockerfileもなるべく書かせなく無ければ、 ECRやECSなどインフラ管理対象も増やしたくないし、CI/CDのバリエーションも下げて楽したいというのがあります）
-
 
 # Lambdaでバッチ処理をガンバル
 
@@ -62,7 +60,6 @@ ecs-run-taskで非同期（または定期的）にECSを呼び出す方法を�
 
 入力データを上手く分割実行できないものに関しては1でシーケンシャルに行う必要がありますが、そうでない場合は2のアプローチのほうが、後々並列実行したい場合にも転用できるので便利だと思いますので、2の方針で進めます。
 
-
 # コードについて
 
 次からGoのコードをまじえながら進めていきます。記載するサンプルコードはimport文などを省略しています。全文は以下のリポジトリを参照ください。
@@ -75,7 +72,6 @@ DynamoDBはKVSという印象が強いですが、非常に多くの機能を持
 
 1. **Scan**: HashKeyを指定せずフルスキャンする
 2. **Query**: HashKeyを指定してSortKeyに対して条件で絞る
-
 
 1のフルスキャンですがアプリケーション側でPartitionKeyのようなものを持たせること無く、DynamoDBの機能として下図のように [並列スキャン](https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Scan.html#Scan.ParallelScan)が可能です。
 
@@ -115,7 +111,6 @@ func ScanSegment(ctx context.Context, total, seg int64, startKey map[string]*dyn
 ```
 
 この `ScanSegment` 関数を呼び出すと、指定されたSegment番号のレコードのみ読み取る事ができます。呼び出し方は後述します。次の**ページング**の考えと合わせて考慮する必要があります。
-
 
 ## DynamoDBをバッチ処理で扱うときの注意
 
@@ -175,7 +170,6 @@ func main() {
 }
 ```
 
-
 ### 出力先をDynamoDBにする場合のスロットリング対策
 
 今回、出力先についてはテーマではないですが、DynamoDBに対して行う場合はクセがあるため追記しておきます。
@@ -229,7 +223,6 @@ func BatchPut(ctx context.Context, puts []Output) error {
 ```
 
 ちょっと大変ですが、上記によってバッチ未処理の取りこぼし無くDynamoDBにデータを登録できます。逆にUnprocessedItemsを考慮せずに実行した場合、 err が発生せず正常終了するけどデータが実は未登録だった、ということがありえるのでご注意ください。
-
 
 # 入力がS3の場合
 
@@ -297,11 +290,9 @@ if err := resp.EventStream.Err(); err != nil {
 
 これにより、S3 Selectレベルで分割されたレコードに対して何かしらの処理を行うことができます。今回はJSON Outputを用いましたが、入力がCSVの場合はCSVそのままで処理したほうが性能は良いかもしれません。
 
-
 ## S3 Selectを使う上での注意
 
 バッチ処理に限らずですが、2020/04月時点ではAthenaのようにS3 Selectは外部スキーマを参照できないようなので、Structへのマッピングで数値項目が来た場合は、SQL側でCASTするのが手間でした。真面目にプロダクションで運用することを考えると、AWS Athenaを利用するほうが Schema on READ になるもの型の恩恵を受けられ良いかもしれません。
-
 
 # Step Functions
 
@@ -313,7 +304,6 @@ if err := resp.EventStream.Err(); err != nil {
 
 ※HelloWorldのStep Functionsの開発イメージ
 
-
 ## Step Functions × Lambda
 
 Lambdaの実行時間制約をStep Functionsで突破しようという試みです。実際には以下のようなイメージです。前提として、処理件数が事前にある程度分かっている場合においては、単純にN個にタスクを分割してStep FunctionsからLambdaを呼び出せば良いです。この分散したLambdaそれぞれでDynamoDBのあるSegmentだけを担当させるイメージです。
@@ -323,7 +313,6 @@ DynamoDBやLambdaの場合はスケールアウトさせやすいサービスの
 <img src="/images/20200515/photo_20200515_04.png" loading="lazy">
 
 ただ、Parallelステートだと分散するタスク自体をJSONで定義する必要があり、同時実行数を増やすたびにStepFunctionsの定義を更新する必要があり手間です。次の動的並列の機能を今回は利用したいと思います。
-
 
 ## 動的並列する場合
 
@@ -340,7 +329,6 @@ Step Functionsは [Amazon Web Services ブログ - 新機能 – Step Functions 
 3つのLambdaを利用しますが、概念的にそれぞれの入力・出力を示します。
 
 <img src="/images/20200515/photo_20200515_06.png" loading="lazy">
-
 
 ## 実装について
 
@@ -549,7 +537,6 @@ func HandleRequest(e InEvent) (*OutEvent, error) {
 
 それぞれ、それぞれのLambdaをデプロイして、StepFunctionsのJSONのARN部分を書き換えると実行可能です。ただし、TaskLambdaだけはDynamoDBにアクセスするためIAM RoleにDynamoDBのScan権限を付与してください。いくつかのコマンドは https://github.com/laqiiz/servlerless-batch-example にも記載しているので参考ください。
 
-
 # 性能検証
 
 作成したStepFunctionsがどれくらい処理性能がスケールするか検証しました。分散数を1, 2, 4, 8, 16 で計測しています。
@@ -572,7 +559,6 @@ func HandleRequest(e InEvent) (*OutEvent, error) {
 | 8      | 5047         | 16.2               |
 | 16     | 3402         | 10.9               |
 
-
 ちなみに、16並列では各実行数が6203~6577の間でScanできていたのでかなり件数は平準化できていました。
 
 # まとめ
@@ -584,6 +570,4 @@ func HandleRequest(e InEvent) (*OutEvent, error) {
 * S3が入力だとしてもS3 Selectで入力を分割する設計で対応できる
 * StepFunctionsの動的並列実行を利用することでLambdaの実行時間制約に引っかからないように、事前で入力を分割しそれぞれのLambdaに渡す仕組みが作れる
 
-
  [サーバレス連載](/articles/20200322/)の6本目でした。次は加部さんの[AWSサービストリガによるLambda起動](/articles/20200722/)です。
-

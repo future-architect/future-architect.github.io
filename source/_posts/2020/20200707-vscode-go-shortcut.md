@@ -30,7 +30,6 @@ Go extension 設定の `go.useLanguageServer` を `true` にしています。
 その他の設定は以下の公式設定を利用しています。
 https://github.com/golang/tools/blob/master/gopls/doc/vscode.md
 
-
 ## コマンドの出し方
 
 そもそもコマンドはどうやって出すかですが、
@@ -41,7 +40,6 @@ VSCode を開いて以下ショートカットキーで出てきます。
 
 あとは利用したいコマンドを検索して Enter を押せば実行できます。
 (各コマンドに対してショートカットキーを割り振ることも可能です。)
-
 
 ## 利用するコマンド
 
@@ -99,11 +97,9 @@ func TestAdd(t *testing.T) {
 
 ```
 
-
 ### 3. Go: Generate Interface Stubs
 
 <img src="/images/20200707/photo_20200707_03.png" loading="lazy">
-
 
 特定の interface を実装するためのメソッドを自動生成してくれます。
 
@@ -132,7 +128,6 @@ func (x XXXReader) Read(p []byte) (n int, err error) {
 
 大量のメソッドを実装する必要があるケースでとても便利に使えます。
 
-
 ### 4. Go: Fill Struct
 
 <img src="/images/20200707/photo_20200707_04.png" loading="lazy">
@@ -152,7 +147,6 @@ type Hoge struct {
 
 以下のように生成されます。
 
-
 ```go
 h := Hoge{
 	A: "",
@@ -168,7 +162,6 @@ field 定義がたくさんあり、どれが必要かわからなくなった�
 ### 5. Go: Add Tags To Struct Fields
 
 <img src="/images/20200707/photo_20200707_05.png" loading="lazy">
-
 
 カーソル下の struct にタグを付与します。
 struct 内にカーソル当てておく必要があります。
@@ -187,14 +180,12 @@ type Hoge struct {
 
 <img src="/images/20200707/photo_20200707_06.png" loading="lazy">
 
-
 カーソル下のテスト関数のみのテストを実行してくれます。
 テストコードを修正して、すぐに試したいといったときに便利です。
 
 ### 7. Go: Install/Update Tools
 
 <img src="/images/20200707/photo_20200707_07.png" loading="lazy">
-
 
 Go extension で利用している コマンドを install/update します。
 extension をいれたタイミングで install は自動でされるため、 update したいときに使います。
@@ -203,4 +194,3 @@ extension をいれたタイミングで install は自動でされるため、 
 
 個人的にはとりあえず `1. Go: Restart Language Server` だけでも覚えればだいぶ開発体験上がると思います。
 ぜひ利用して、開発効率を向上させてください。
-

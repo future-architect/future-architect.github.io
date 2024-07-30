@@ -28,7 +28,6 @@ lede: "サーバレス連載の第2弾はLambdaアプリをGoで開発する中�
 
 * [AWS News Blog: New for AWS Lambda – Functions with Up to 10 GB of Memory and 6 vCPUs](https://aws.amazon.com/jp/blogs/aws/new-for-aws-lambda-functions-with-up-to-10-gb-of-memory-and-6-vcpus/)
 
-
 **以下は2020.03時点の調査結果です。**
 
 Goで開発する場合、少しでも性能を稼ぐためgoroutineを使う場面も多いと思います。特にバックエンドのデータストアがDynamoDBである場合は負荷を気にする必要がほぼ無いため、わたしはデータの書き込み部分を良く並列化することが多いです。
@@ -81,7 +80,6 @@ func main() {
 
 ちなみに、隣に座っている同僚が、つい最近メモリサイズごとの処理性能を計測していましたので大体どのくらいメモリを与えるとよいかの指標は近いうちに公開したいと思います。
 
-
 ## Lambdaの初期処理のポイント
 
 [ドキュメント](https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/golang-handler.html#golang-handler-state) に記載している通り、Lambda関数外に変数を宣言できますし、init関数を用いる事もできます。Lambda関数は同時に1つしか動かないのでスレッドセーフを気にせずフィールドにおけるそうです。
@@ -101,7 +99,6 @@ func main() {
 ```
 
 こうすると、Lambdaの実行時間を削減につながる≒課金額を減らせる可能性があるため、初期処理に寄せられるものはドンドン寄せたほうが良い使い方になります。
-
 
 ## Lambdaの関数タイプ
 
@@ -146,7 +143,6 @@ func main() {
 ということで、Lambdaの起動トリガーとなるEvent種別とマッチしないような関数シグネチャを使っても問題ないということがわかりました。Responseが後続連携のSNSなどにうまく渡せると面白いかなと思いましたが、それは未検証です（パット見、Responseをどう取得できるか分からなかったため）
 
 個人的な考えですが、LambdaのHandler関数をテストする時に、戻り値があると色々と検証が捗るため、Kinesis Triggerであっても戻り値 `TOut`は指定するようにしています。
-
 
 ## errorとLogging
 
@@ -241,7 +237,6 @@ func main() {
 panicということで予期せぬエラーの場合にはStackTraceを出してくれるのは助かりますね。
 
 アプリケーションとしてpanicでエラーハンドリングすると、少々Lambda関数のUnitTestが難しくなりそうなので、なかなか導入する気にはなれないですが、どうしてもStackTraceを出したい場合などは検討してみても良いかもしれません。
-
 
 # まとめ
 

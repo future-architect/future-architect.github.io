@@ -32,16 +32,13 @@ lede: "GCPをテーマにした連載企画を始めるということで、初�
 9. 初めてのGCP 画像AI(VISION API)をさわってみた
 10. Cloud Deployment Manager
 
-
 # Stackdriver Loggingについて
 
 <img src="/images/20200205/photo_20200205_01.png" class="img-small-size" loading="lazy">
 
-
 [Stackdriver Logging](https://cloud.google.com/logging)は、GCPやAWS(!)からのログの収集、検索、分析、モニタリング、通知といった機能を持つGCPのマネージドサービスの1つです。ユーザからするとログの収集・蓄積し、それらを検索するためのログ基盤を自前で構築するのはかなり大変ですが、全てStackdriver Loggingサービス側が面倒見てくれるため、よりアプリケーションなど自分たちの関心事に集中できるようになります。
 
 なお、2020/02/04時点ではログデータがプロジェクトごとに[最初の50 GiBが無料で、 その後は$0.50/GiB](https://cloud.google.com/stackdriver/pricing) の費用がかかります。
-
 
 # Stackdriver Loggingにログを流す方法
 
@@ -54,8 +51,6 @@ Logging Client Librariesを利用しなくても、CloudRunやFunction上にア�
 また、[Stackdriver Logging Agent](https://cloud.google.com/logging/docs/agent/) というfluentdベースのツールを導入することで、ローカルファイル出力されたログも収集させることができます。
 
 今回はアプリケーションからLogging Client Librariesを **利用しない** ケースで調査しています。
-
-
 
 # ログレベルについて
 
@@ -119,7 +114,6 @@ func FmtJSON(logLevel, message string) string {
 わたしたちは、だいたいDEBUG, INFO, WARNING, ERRORの4種類をアプリケーションコードで利用することが多いです。
 開発環境ではDEBUG、プロダクション以上ではINFOレベルでログ出力させ、ERROR以上でSlackやメールに通知するようにしています。
 
-
 ## うまく行かないケース
 
 ログ出力内容をJSONではななくただのテキスト形式、例えば `fmt.Println("[INFO] call any method")`  にしてもStackdriverはseverityを認識してくれません。
@@ -136,7 +130,6 @@ func StartFunc(w http.ResponseWriter, r *http.Request) {
 
 <img src="/images/20200205/photo_20200205_04.png" style="border:solid 1px #000000" loading="lazy">
 
-
 上記のキャプチャ画像を見るとseverity は空っぽなので、見た目も特に色が付いていません。
 ログエントリをドリルダウンして、`severity` のレベルを確認しても空っぽです。
 
@@ -152,12 +145,7 @@ func StartFunc(w http.ResponseWriter, r *http.Request) {
 
 <img src="/images/20200205/photo_20200205_05.png" style="border:solid 1px #000000" loading="lazy">
 
-
-
 こういったログ出力ポリシーになっている場合は、文字列ではERRORというラベルが見えますが、ビューア上は何も変化しないため見落としに注意ください。
-
-
-
 
 # ログ取得時間について
 
@@ -189,8 +177,6 @@ func FmtJSON(logLevel, message string) string {
 
 timeフィールドは任意項目ですが、ローカル実行での確認時にも便利なため特に理由がなければ付けたほうが良いと思います。
 
-
-
 # Stackdriver Traceとは
 
 <img src="/images/20200205/trace.png" class="img-small-size" loading="lazy">
@@ -205,7 +191,6 @@ https://future-architect.github.io/articles/20190604/
 
 <img src="/images/20200205/photo_20200205_07.png" style="border:solid 1px #000000" loading="lazy">
 
-
 ## Stackdriver TraceとStackdriver Loggingの連携
 
 連携の前準備として、アプリケーションのロールに **Cloud Trace エージェント** のロールが必須になります。
@@ -213,7 +198,6 @@ https://future-architect.github.io/articles/20190604/
 コードはまず、OpenCensus経由でStackdriver Traceに連携します。
 
 `trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})` はテスト用に毎回トレースを行うような指定です。通常は毎回実施するとコストが高いため、動作確認時以外は設定しないほうが良いと思います。
-
 
 ```go 初期化処理
 var client *http.Client
@@ -276,7 +260,6 @@ Stackdriver Trace側のログのリンクを見ると、Stackdriver Loggingで�
 
 今回のサンプルコードには記載していないですが、ログ側に検索条件や処理件数を出力しておくと、その処理時間が妥当なのか、想定外なのか判断ができるため、性能調査などを行う場合には非常に有用だと思います。
 
-
 ## GCP以外でアプリケーションを動かす場合
 
 GCP以外のリソース上でアプリケーションを動かす場合は、`trace` と、`spanId` のフィールドを利用するとStackdriver TraceとLoggingを紐付けることができるようです。その場合はログ出力部分を以下のように書き換えれば良いと思います。 **こちらはまだ未検証なので参考程度にお願いします。**
@@ -300,7 +283,6 @@ func FmtJSON(logLevel, message string, span *trace.Span) string {
 # その他
 
 Stackdriverの [LogEntry](https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry) のドキュメントを読むと、他にも `labels` や `traceSampled` などのオプションが存在します。  `traceSampled` はデフォルト false ですが、 trueにするとサンプリングされて Stackdriver Trace側に連携されるようです。このあたりの使い分けは別途調査したいと思います。
-
 
 # まとめ
 

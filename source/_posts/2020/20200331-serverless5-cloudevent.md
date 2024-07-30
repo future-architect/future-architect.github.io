@@ -52,8 +52,8 @@ GitHubを見る限りではGoのSDKが一番開発進んでいるのかなと思
 
 <img src="/images/20200331/d1.png" loading="lazy">
 
-
 ### SDKバージョンについての補足
+
 現在v2は `work in progress` とのことで、今回は雰囲気を掴むためにLatest Releaseの `v1.1.2` のソースコードをいじってみます。
 
 ※v1のREADMEには `2020.03.27` を目処にv2リリースを目指すとの記載がありますが、いまも絶賛開発中と思われます。
@@ -69,10 +69,10 @@ https://github.com/cloudevents/sdk-go/blob/master/README_v1.md
 * https://github.com/mura123yasu/cloudevents-cloudpubsub-receiver
 
 ## まずは、シンプルにローカルで繋げる
+
 まずはローカル端末内で完結する形で実装します。
 
 <img src="/images/20200331/d2.png" loading="lazy">
-
 
 [公式のリポジトリ](https://github.com/cloudevents/sdk-go/tree/v1.1.2/cmd/samples)にしっかりサンプル実装があるので、それを参考にしつつ進めることができました。
 
@@ -102,6 +102,7 @@ func main() {
 	log.Fatal(c.StartReceiver(context.Background(), Receive))
 }
 ```
+
 実処理は `Receive` にて行われていますが、今回は受け取ったイベントを標準出力するのみです。
 
 次にSender側の実装です。
@@ -141,6 +142,7 @@ func main() {
 	}
 }
 ```
+
 `event.SetData` がいわゆるpayloadにあたるデータを詰め込んでいる箇所です。
 
 Receiverを起動してSenderからメッセージを投げてみると...
@@ -161,14 +163,15 @@ Data,
   {"hello":"world"}
 ====
 ```
+
 ちゃんと届きました！簡単ですね。
 
 ## 次に、Cloud Pub/Sub経由の形に変えてみる
+
 実際にはイベントデータの受け渡しはキューを経由するなどして非同期なやりとりになるかと思います。
 というわけで、私が普段GCPを利用しているということもありGCPのCloud Pub/Subを経由する形で実装したいと思います。
 
 <img src="/images/20200331/d3.png" loading="lazy">
-
 
 まずはReceiverの実装です。
 
@@ -338,6 +341,7 @@ export GOOGLE_CLOUD_PROJECT=<YOUR GCP PROJECT>
 export PUBSUB_TOPIC=<YOUR PUBSUB TOPIC> # default is "demo_cloudevents"
 export PUBSUB_SUBSCRIPTION=<YOUR PUBSUB SUBSCRIPTION> # default is "demo_cloudevents_subscriber"
 ```
+
 アプリケーションの認証情報については詳しくは[こちら](https://cloud.google.com/docs/authentication/production?hl=ja)を参照してください。
 
 準備が整ったので動かします！
@@ -365,6 +369,7 @@ Transport Context: Transport Context,
 Data: &{Sequence:0 Message:HELLO}
 ----------------------------
 ```
+
 期待通りにメッセージを受け取ることができました。
 GCPコンソールからもメッセージがしっかりPub/Subに届いていたことが確認できます。
 
@@ -378,7 +383,6 @@ GCPコンソールからもメッセージがしっかりPub/Subに届いてい�
 というわけでラストは先程Cloud Pub/Subに到達したメッセージをCloud Functionsで受け取りたいと思います。
 
 <img src="/images/20200331/d4.png" loading="lazy">
-
 
 先程までのReceiverをCluod Functions仕様に書き換えてあげます。また、さっきまでは受け取ったメッセージの中に含まれるpayloadをプログラム上で扱える形にまでparseしきってなかったのでそこも一緒にやりたいと思います。
 
@@ -423,6 +427,7 @@ func Receiver(ctx context.Context, msg *pubsub.Message) error {
 	return nil
 }
 ```
+
 Cloud Pub/Subの `Message` 型で受け取った電文を、CloudEventsの `Message` 型に変換し、データの中身を `Model` 型へ変換しています。これにより `Sequence` および `Message` という個々の値を扱える状態にできました。
 
 ### CloudEventsのメッセージの取り扱いについての考察
@@ -443,6 +448,7 @@ type Message struct {
 	Attributes map[string]string
 }
 ```
+
 https://github.com/cloudevents/sdk-go/blob/v1.1.2/pkg/cloudevents/transport/pubsub/message.go
 
 つまり、CloudEventsの定義する `Event` データがCloud Pub/Subを通過する際には `pubsub.Message.Data` と `pubsub.Message.Attributes` に情報が集約されます。
@@ -511,6 +517,7 @@ func (m Message) CloudEventsVersion() string {
 	return ""
 }
 ```
+
 https://github.com/cloudevents/sdk-go/blob/v1.1.2/pkg/cloudevents/transport/pubsub/message.go
 
 これは `cepubsub.Message` の `Attributes` の中から `specversion` を取り出しており、ちょうど以下の `ce-specversion:1.0` にあたる情報を取り出していることになります。
@@ -530,6 +537,7 @@ https://github.com/cloudevents/sdk-go/blob/v1.1.2/pkg/cloudevents/transport/pubs
 v1.1.2のSDKでは `specversion` のみの実装ですが、同様の形で `Attributes` からいわゆるメタデータを取り出して処理を行うかあるいは後続にイベントを伝播させるために再度なにかしらのオブジェクトに詰めるかといったことを行うことになるかなと思います。
 
 ### ということで動かしてみる
+
 ちょこっと考察を挟みましたが、肝心のプログラム実行がまだでした。
 まずはReceiver関数をCloud Functionsにデプロイします。
 
@@ -552,6 +560,5 @@ Cloud Functionsのログにてメッセージが届いていることが確認�
 # さいごに
 
 今回は主にCloud Pub/Subにフォーカスする形でCloudEventsの実装について紹介させて頂きました。SDKは絶賛開発中なステータスですが、世に蔓延る様々なイベント形式に悩まされる実装者が幸せになれる未来が待っていると思うと非常に楽しみですし、CloudEventsの動向からますます目が離せませんね。
-
 
 [サーバレス連載](/articles/20200322/)の5本目でした。次は[AWSのStep FunctionsとLambdaでServelessなBatch処理を実現する](/articles/20200515/)です。
