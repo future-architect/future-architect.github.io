@@ -197,5 +197,6 @@ class _LVBuilderPageState extends State<LVBuilderPage> {
 Performanceについても[Flutter stable release](https://docs.flutter.dev/development/tools/sdk/release-notes)で毎回向上していて更新が多く注目度の高い開発ポイントだと分かります。DevToolsをFlutterアプリのPerformance課題解決と品質向上に役立てたいところです。
 
 ## 参考リンク
+
 - Flutter DevTools公式サイトのMemory view解説ページ
   - https://docs.flutter.dev/development/tools/devtools/memory

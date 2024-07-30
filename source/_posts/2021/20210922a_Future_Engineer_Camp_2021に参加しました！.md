@@ -92,6 +92,7 @@ AWS LambdaではGo言語を使用して以下の処理を実装しました。
 <img src="/images/20210922a/スクリーンショット_2021-09-17_11.32.42.png" alt="スクリーンショット_2021-09-17_11.32.42.png" width="789" height="492" loading="lazy">
 
 投稿記事:
+
 - [GoLand Tips 7選](/articles/20210902b/)
 - [【Google Chat API】Incoming Webhook を Go で触ってみる](/articles/20210913a/)
 

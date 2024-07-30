@@ -72,6 +72,7 @@ plugin "google" {
 ```
 
 ※参考
+
 - [Configuring TFLint](https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/config.md)
 - [tflint-ruleset-google installation](https://github.com/terraform-linters/tflint-ruleset-google#installation)
 
