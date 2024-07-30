@@ -272,4 +272,3 @@ https://github.com/jackc/pgx#features
 
 lib/pq から pgx への移行にかかる問題については、golang-migrate の[こちらのIssue](https://github.com/golang-migrate/migrate/issues/512)における議論がとても参考になります。
 移行作業自体はとても簡単ですので、まずは試してみてはいかがでしょうか。
-

@@ -34,7 +34,6 @@ OpenJDK回りのトピックといえば、[AdoptOpenJDKがEclipseに移管](htt
 
 OpenJDKでパッチも上流のプロジェクトで管理されているのでいまのところ大きな違いはなさそうです。独自にサポート期間を延ばしたりという違いがあったりします。
 
-
 # DockerのJDKディストリビューション
 
 今、きちんとメンテナンスされていそうな公式イメージ系は次の5つかと思います
@@ -148,8 +147,6 @@ GraalVMの場合はネイティブイメージになるのでその後はラン�
 | 17 (Azure用) | mcr.microsoft.com/java/jdk:17-zulu-debian10 |  mcr.microsoft.com/java/jre-headless:17-zulu-debian10 |
 | 17 distroless | oopenjdk:17-jdk-slim-bullseye  | gcr.io/distroless/java17-debian11 |
 
-
 # 参考
 
 * [仕事でPythonコンテナをデプロイする人向けのDockerfile (1): オールマイティ編](/articles/20200513/)
-

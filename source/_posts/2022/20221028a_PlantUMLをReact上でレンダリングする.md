@@ -174,7 +174,7 @@ services:
 以下のように起動します。
 
 ```bash
-$ docker compose up
+docker compose up
 ```
 
 次にファイルを変更します。この手の共通のパラメータをインジェクションするにはコンテキストを使うのが一番行儀が良いでしょう。まず`Context`を宣言しつつ、アプリ側に組み込むProviderをエクスポートします。
@@ -223,18 +223,15 @@ $ docker compose up
 次のように環境変数を設定して実行すればローカルに建てたPlantUMLサーバーを利用します。Windowsだったらsetとかで環境変数してからnpm run devすれば大丈夫です。
 
 ```bash
-$ NEXT_PUBLIC_PLANTUML_SERVER=http://localhost:18080 npm run dev
+NEXT_PUBLIC_PLANTUML_SERVER=http://localhost:18080 npm run dev
 ```
 
 開発者ツールで見てみると、きちんとローカルホストのサーバーにアクセスしていることがわかります。
 
 <img src="/images/20221028a/スクリーンショット_2022-10-28_13.05.31.png" alt="スクリーンショット_2022-10-28_13.05.31.png" width="1200" height="286" loading="lazy">
 
-
 # まとめ
 
 今回も最小の依存（deflateのpakoのみ）でPlantUML表示のコンポーネントが作れました。また、標準でお手頃なplantuml.comへのアクセス以外に、plantuml-serverのパスは切り替えられるようにもしてみました。
 
 先ほどのMermaid.jsはGitHubでレンダリングされたり、確かにお手軽なのですが、例えばエンティティに日本語を入れるとか、ノードの色を変えるとか、テーマとか、表現力では圧倒的にPlantUMLですね。
-
-

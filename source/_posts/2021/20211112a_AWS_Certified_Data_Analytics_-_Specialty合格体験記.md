@@ -27,6 +27,7 @@ TIGの伊藤真彦です。
 平たく言うと、[AmazonEMR](https://aws.amazon.com/jp/emr/)や[AWS Glue](https://aws.amazon.com/jp/glue/?whats-new-cards.sort-by=item.additionalFields.postDateTime&whats-new-cards.sort-order=desc)といったサービスの使い方や、ネイティブのApache Spark、Hiveについての知識が問われます。
 
 ## 学習方法
+
 今回も[aws.koiwaclub.com](https://aws.koiwaclub.com/)で合格できました。
 
 しかしこの試験に関しては情報の更新が激しい分野であることもあり、一切見覚えのない問題が多めに出題されました。具体的には2019年8月に一般公開された[AWS Lake Formation](https://aws.amazon.com/jp/lake-formation/?whats-new-cards.sort-by=item.additionalFields.postDateTime&whats-new-cards.sort-order=desc)の情報が結構な頻度で出題されましたが、教材では取り上げられていませんでした。比較的新しい情報が既に問題に組み込まれているようです。
@@ -46,15 +47,18 @@ Amazon EMRはソリューションアーキテクトでも出題されるサー�
 * AWS Batch
 
 #### データ収集
+
 * Amazon Kinesis
 * Amazon Managed Streaming for Apache Kafka
 各ユースケースにおいてData StreamsとData Firehoseどちらが適切かを理解する事が特に重要です
 
 #### データ活用
+
 * Amazon QuickSight
 * Amazon Elasticsearch Service
 
 #### データ保管
+
 * Amazon Redshift
 * Amazon DynamoDB
 * Amazon S3
@@ -78,4 +82,3 @@ Amazon EMRはソリューションアーキテクトでも出題されるサー�
 
 問題文そのものは読んでいて苦痛になるようなレベルの難易度のものは控えめで油断していたのですが、いざ本番を迎えると勘で解くような問題ばかりで焦りました。
 無事に合格できてよかったです。
-

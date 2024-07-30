@@ -17,7 +17,6 @@ lede: "2021年7月21日にFuture Tech Night #14～認証認可（IDaaS）勉強�
 
 <img src="/images/20210812b/key-2114046_1280.jpg" alt="" title="Arek SochaによるPixabayからの画像" width="640" height="408" loading="lazy">
 
-
 # はじめに
 
 Technology Innovation Group所属の山田です。2021年7月21日に [Future Tech Night #14～認証認可（IDaaS）勉強会～](https://future.connpass.com/event/218520/)で発表させてもらいました。
@@ -37,16 +36,17 @@ Technology Innovation Group所属の山田です。2021年7月21日に [Future T
 # 概要
 
 ### ハンズオン
+
 全てのプロダクトをまっさらな状態からハンズオンし、要した時間と、利用できるまでの工程をまとめてみました。
 アプリケーションはVueで統一しています。
 
 ソースコードはコピペで動くを事を目指し、参考URLも掲載しています。
 
-*  Auth0
+* Auth0
 Auth0の初期設定、vueを利用したハンズオン
-*  keycloak
+* keycloak
 keycloakの初期設定、vueを利用したハンズオン
-*  Cognito
+* Cognito
 Cognitoの初期設定、Amplify＋Vueを利用したハンズオン、hosted UI＋Vueを利用したハンズオン
 
 ### 比較

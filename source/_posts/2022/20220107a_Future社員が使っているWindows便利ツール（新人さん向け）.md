@@ -21,6 +21,7 @@ lede: "こんにちは。2020年4月入社の青柳です。タイトルにあ�
 ※前提としてwindowsの方向けなので、Macの方はごめんなさい🙇🏼
 
 # everything
+
 <img src="/images/20220107a/everything2.gif" alt="everything" width="1160" height="428" loading="lazy">
 
 https://forest.watch.impress.co.jp/library/software/everything/
@@ -34,6 +35,7 @@ https://forest.watch.impress.co.jp/library/software/everything/
 もはや必須ツールですね。
 
 # cribor
+
 <img src="/images/20220107a/cribor1.gif" alt="cribor1" width="1200" height="372" loading="lazy">
 
 https://forest.watch.impress.co.jp/library/software/clibor/
@@ -55,6 +57,7 @@ https://tablacus.github.io/explorer.html
 似たようなツールで「QTTabBar」もあるが、個人的にはこちらがおすすめ。アドイン機能も充実しているので、好きなようにカスタマイズもできます。
 
 # orchis launcher
+
 <img src="/images/20220107a/orchislauncher.gif" alt="orchislauncher.gif" width="768" height="348" loading="lazy">
 
 https://forest.watch.impress.co.jp/library/software/orchis/
@@ -90,6 +93,7 @@ https://www.screentogif.com/
 工夫次第で使い道はいくらでもありそうなので、一度使ってみて欲しいです。
 
 # 最後に
+
 テレワークだと先輩社員の仕事を直接見れず、どんなツールを使っているのか知る機会が少ないですよね。
 
 そこで、便利ツールの一覧とかあったら嬉しいかなという気持ちで書きました。

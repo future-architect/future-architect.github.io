@@ -24,7 +24,6 @@ RISC-VはCPU命令セットアーキテクチャ（Instruction Set Architecture:
 
 * 参考: [RISC-V - Wikipedia](https://ja.wikipedia.org/wiki/RISC-V)
 
-
 ## 開発した RISC-V パーソナルコンピュータについて
 
 <img src="/images/20211202a/future_rvpc_promo_1.jpg" alt="future_rvpc_promo_1.jpg" width="1200" height="802" loading="lazy">
@@ -54,7 +53,6 @@ RISC-VはCPU命令セットアーキテクチャ（Instruction Set Architecture:
 
 今回の共同開発で、RISC-Vアーキテクチャをゲームからハイエンドな組み込みシステムまで多様なユースケースへの導入の道筋を作るキッカケにできたと考えています。
 
-
 ## AB Open社さんとの出会い
 
 [AB Open](https://abopen.com/)さんは英国ハリファックスを拠点とする、オープンハードウェアおよび技術コミュニティのコンサルティングを得意とする企業です。
@@ -62,7 +60,6 @@ RISC-VはCPU命令セットアーキテクチャ（Instruction Set Architecture:
 出会いのキッカケですが、完全なRISC-V PCを世界で最初に組み立てた企業の1つとして有名だったAB Open社に、以前からRISC-Vに高い関心をもっていた当社副社長CSOの石橋さんが声をかけたことから始まり、意気投合してプロジェクトが始まりました。それぞれのモノづくりへの強い思いとこだわりを示しながら開発が進められたそうです。
 
 AB Open社のマネージングディレクターであるAndrew Backさんは「RISC-Vアーキテクチャへの関心は日々高まっているため、このプロジェクトはRISC-Vのポテンシャルを示すのに役に立つと思います。最新テクノロジーを採用するフューチャーと一緒にできたことを光栄に思います」と話しており、良い協力関係が築けたかなと感じています。
-
 
 ## なぜ開発にしようと考えたか
 
@@ -80,4 +77,3 @@ https://events.linuxfoundation.org/riscv-summit/
 ## 参考
 
 https://abopen.com/news/future-corporation-partners-with-ab-open-for-unique-risc-v-pc-project/
-

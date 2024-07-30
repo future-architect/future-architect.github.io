@@ -28,7 +28,6 @@ Open APIは[go-swaggerを用いたWebアプリケーション開発Tips19選](/a
 
 なお、定義はYAMLやJSONで行います。
 
-
 ## v2 と v3 の違いについて
 
 我々がよく見るOpen API Specificationのメジャーバージョンは2つあり、v2とv3 があります。2022年時点ですとOpen API Specificationに関連した利用したいツールの対応次第かと思いますが、version 3.0は2017.7.26リリースで5年ほど経過するのでv3を採用するチームが多いのではないでしょうか（3.1との差は次章以降で触れます）。
@@ -45,7 +44,6 @@ v2ですが以前はSwaggerと呼ばれていました。これがOpen API Speci
 
 ちなみにv1はどこ行った？って思ったんですが、[Swaggerのリビジョン履歴](https://swagger.io/specification/v2/)を見ると、Swagger自体が 1.0から2.0 まで上がっているため、Open API Specificationも2.0からスタートしたと思われます。
 
-
 | Version | Date       | Notes                                      |
 |---------|------------|--------------------------------------------|
 | 2.0     | 2014-09-08 | Release of Swagger 2.0                     |
@@ -56,7 +54,6 @@ v2ですが以前はSwaggerと呼ばれていました。これがOpen API Speci
 Swaggerから Open API Specificationへの切り替えですが、 2015年にSwagger　APIプロジェクトを推進していたSmartBear社が、Linux Foundationに寄贈し、Open API Initiative立ち上げとなったそうです。[^1]
 
 [^1]: https://japan.zdnet.com/article/35073148/ より
-
 
 ## v3.0、v3.1
 
@@ -90,7 +87,6 @@ Swaggerから Open API Specificationへの切り替えですが、 2015年にSwa
 
 他にも、`example` が非推奨になり代わりに `examples` を利用しようよとか、 `type: [string, integer]` みたいに複数の型を指定できるようになったとか、`nullable: true` が `type: [string, "null"]` と書くといった拡張・変更があります。
 
-
 ## 次期バージョンと気になったチケット
 
 リポジトリを見ると[v3.1.1](https://github.com/OAI/OpenAPI-Specification/tree/v3.1.1-dev)と[v3.2.0](https://github.com/OAI/OpenAPI-Specification/tree/v3.2.0-dev) が推進のように見えます。[v3.2.0はマイルストーン](https://github.com/OAI/OpenAPI-Specification/milestone/12)が切られていて、3つのIssueが紐づいていました。また [Post 3.0のラベル](https://github.com/OAI/OpenAPI-Specification/labels/Post%203.0%20Proposal) もあります。
@@ -101,7 +97,7 @@ Swaggerから Open API Specificationへの切り替えですが、 2015年にSwa
 
 * パスが`/` 始まりである必要があるかですが、 [#2316](https://github.com/OAI/OpenAPI-Specification/issues/2316) を見ると、OPTIONSメソッドの場合は、`*` の指定も許容するようです。[RFC7231 4.7.3](https://datatracker.ietf.org/doc/html/rfc7231#section-4.3.7)
 * https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/OPTIONS#identifying_allowed_request_methods にもSyntaxでかかれれていました。
-    * サーバー全体に対して指定するときに用いるようです
+  * サーバー全体に対して指定するときに用いるようです
 
 ```
 Syntax
@@ -156,7 +152,6 @@ components:
 
 こんなことできるんだ、凄い、良いよねって思いましたが、非推奨（Deprecate）の方向になっています。JSONスキーマとの互換性が理由のようです。互換性がないことでLinterなどの検証に難もあるようです。
 
-
 ### ③[Support for path parameters which can contain slashes #892](https://github.com/OAI/OpenAPI-Specification/issues/892)
 
 パスパラメータにスラッシュ `/` を許容してほしいという要望です。背景としては
@@ -179,8 +174,6 @@ components:
 
 現状では、`/resources?path=foo/bar/baz` などとするか、個別定義していくかになるので少し大変なので要求が強いのはわかります。なるべく静的に定義したいという気持ちもわかります。仕様策定、、大変ですね。
 
-
 ## まとめ
 
 Open API Specificationの概略と、3.1とそれ以降の議論について簡単に紹介しました。JSONスキーマとの互換性、エコシステムのツールチェーンなどバランスを取って仕様策定する苦悩も伺いしれました。今あるHTTP APIを記述するという用途であれば、すでにさほど困らないかと思いますが、今後の動向もIssueなどを引き続き見ていきたいと思います。
-

@@ -43,7 +43,6 @@ mxGraphについて[次の記事](/articles/20210304/)で紹介する予定で�
 
 vis.jsという可視化ライブラリに含まれるグラフ可視化ライブラリです。その中でもVis Networkはグラフの可視化に特化したライブラリで、[Vis Network Examples](https://visjs.github.io/vis-network/examples/)にあるように様々なグラフを描画することができます。Vis Networkはcanvasに描画するため描画が高速で、パフォーマンスが要求される場面に有用です。 [^1]
 
-
 # Vis Networkの使い方
 
 Vis Networkでは表示するグラフの元となるノード、エッジ、オプションを定義する必要があります。
@@ -70,8 +69,6 @@ const nodes = new vis.DataSet([
 ```
 
 ノードに設定可能な属性一覧は[vis\.js \- Nodes documentation\.](https://visjs.github.io/vis-network/docs/network/nodes.html)をご参照ください。
-
-
 
 ## エッジ定義
 
@@ -111,7 +108,6 @@ const options = {
 
 オプションに設定可能な属性一覧は[vis\.js \- Network documentation\.](https://almende.github.io/vis/docs/network/)をご参照ください。
 
-
 ## 可視化
 
 上記のノード定義、エッジ定義、オプション定義を元に可視化することができます。実際に可視化した例です。
@@ -120,7 +116,6 @@ const options = {
 ソースコードは [Edit fiddle \- JSFiddle \- Code Playground](https://jsfiddle.net/0bxLo6wt/) にて確認できます。
 
 これだけでは寂しいので、少しグラフを加工していきましょう。
-
 
 ## ノードの形状
 
@@ -185,15 +180,11 @@ const nodes = new vis.DataSet([
 イベント一覧は [vis\.js \- Network documentation\.](https://almende.github.io/vis/docs/network/#Events) に記載されています。
 イベント発生時に渡されるパラメータの中身を確認したり、実際にイベント発生させて試したい場合は [Vis Network \| Events \| Interaction events](https://visjs.github.io/vis-network/examples/network/events/interactionEvents.html) がおすすめです。
 
-
-
 ## dot言語からのインポート
 
 Vis NetworkではGephiからエクスポートしたデータやdot言語をインポートすることができます。今回は私が先日Graphvizを用いて可視化したグラフ [^3]をVis Networkで表示してみます。
 
-
 <img src="/images/20210303/名称未設定2.png" loading="lazy">
-
 
 ソースコードは [Edit fiddle \- JSFiddle \- Code Playground](https://jsfiddle.net/kon2cL8r/10/) にて確認できます。
 
@@ -209,10 +200,7 @@ Graphvizほど洗練されたレイアウトにはなりませんが、非常に
 
 当初Vis Networkを使用していましたが、大きめの階層グラフを表示するとエッジの交差が非常に多くなってしまうことがわかりました。例えば下図はこれまでサンプルとして表示していたグラフにオレンジのエッジを一本追加しただけなのですが、エッジの交差が必要以上に多くなってしまっています。
 
-
 <img src="/images/20210303/2021-01-21_10h44_39.png" loading="lazy">
-
-
 
 ソースコードは [Edit fiddle \- JSFiddle \- Code Playground](https://jsfiddle.net/2801wrud/2/) にて確認できます。
 
@@ -233,7 +221,6 @@ vis.jsを使い、ライトに階層グラフを表示・加工出来ること�
 コアテクノロジーユニットでは、現在チームメンバーを募集しています。興味がある方はお気軽に技術ブログTwitterや会社採用HPへ、連絡をお待ちしております。
 
 https://www.future.co.jp/recruit/
-
 
  [^1]: フューチャー発のOSSであるCheetah Gridも高速に描画するためにcanvasを使用しています。興味がある方は[Vue\.jsで最速に始めるCheetah Grid \| フューチャー技術ブログ](/articles/20200901/)や[CheetahGrid\+Vue\.jsをエンプラで使ってみた \| フューチャー技術ブログ](/articles/20200924/)を御覧ください
  [^2]: [fix\(xss\)\!: don't set popup content via innerHTML by Thomaash · Pull Request \#1275 · visjs/vis\-network · GitHub](https://github.com/visjs/vis-network/pull/1275)

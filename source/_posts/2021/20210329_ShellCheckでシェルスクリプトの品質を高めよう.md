@@ -26,7 +26,6 @@ lede: "シェルスクリプト連載の第一弾です。シェルスクリプ�
 
 [<img src="https://github.com/koalaman/shellcheck" alt="koalaman/shellcheck - GitHub](https://gh-card.dev/repos/koalaman/shellcheck.svg)" loading="lazy">
 
-
 ## `ShellCheck` を使うと何がうれしいの？
 
 `ShellCheck` はシェルスクリプトのための静的解析ツールです。`ShellCheck` は以下を目標として作成されています。
@@ -170,6 +169,5 @@ fi
 ## `ShellCheck` を使ってみよう
 
 `ShellCheck` は強力なシェルスクリプトの静的解析ツールです。2021/03/29現在、400以上ものパターンが登録されています。どのようなパターンがあるかは [Wiki](https://github.com/koalaman/shellcheck/wiki) を見てみてください。よくあるミスを指摘し、どのように対応すればいいか出力されるコードから調べることができます。まだ `ShellCheck` を使ったことがない、という方はこれを機に一度導入してみてはいかがでしょうか。
-
 
 明日は真野さんの[CSVと親しくなるAWK](/articles/20210329/)です。

@@ -33,6 +33,7 @@ k8s完全ガイドでは[minikube](https://github.com/kubernetes/minikube)だっ
 ということで、私がひっかかったポイント（おもにServiceまわり）を踏まえて、k8s学習を進めるためのいくつかTipsを紹介します。
 
 # minikubeとは
+
 ローカルk8sクラスタをを簡単に構築できる定番のツールです。DockerやVirtualBoxで仮想マシンが立ち上がりその上にk8sが構築されます。
 
 下の様にオプションなしで起動した場合、筆者環境ではDockerコンテナとして起動します。デフォルトでは1 nodeで構築されます。
@@ -88,7 +89,7 @@ $ docker exec -it minikube ip -4 a
 curlをしてみれば、疎通できることがわかります。
 
 ```sh
-$  curl 192.168.49.2:31307
+curl 192.168.49.2:31307
 ```
 
 **LoadBalancer**を使う場合は`minikube tunnel` で EXTERNAL-IPを払い出し、ホストサーバからEXTERNAL-IPへルートを確保します。
@@ -107,6 +108,7 @@ $ kubectl get service test-deployment
 NAME              TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)        AGE
 test-deployment   LoadBalancer   10.108.139.68   10.108.139.68   80:31284/TCP   2m35s
 ```
+
 `curl 10.108.139.68:80` で疎通が確認できます。
 
 # Ingress
@@ -146,9 +148,8 @@ spec:
               number: 80
 ```
 
-
 ```sh
-$ kubectl apply -f ing.yaml
+kubectl apply -f ing.yaml
 ```
 
 下のようにIngressが作成されたことがわかります。 `ADDRESS` に対してリクエストを送ればアプリケーションにアクセスできます。
@@ -160,7 +161,6 @@ test-ingress    <none>   *       192.168.49.2   80      13m
 ```
 
 [ingress-dns](https://minikube.sigs.k8s.io/docs/handbook/addons/ingress-dns/) addonを使えば、Ingressで設定したホスト名をホストサーバから解決することが可能らしいです。ちょっと試せていないですが、参考までに。
-
 
 # Horizontal Pod Autoscaler
 
@@ -245,6 +245,3 @@ hello-7db79cdc77-gkpwm   1/1     Running   0          4m23s   10.244.1.5   minik
 
 minikubeでk8sを学習していく際のTipsをご紹介しました。minikube以外にも[microk8s](https://microk8s.io/), [kind](https://kind.sigs.k8s.io/)などローカルk8sクラスタ構築ツールの選択肢はありますし、VMとkubeadmで構築するのも勉強になると思います。
 入門者のお役に立てれば幸いです！
-
-
-

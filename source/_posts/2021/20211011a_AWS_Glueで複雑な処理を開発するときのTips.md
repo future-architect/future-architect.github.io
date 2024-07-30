@@ -20,6 +20,7 @@ lede: "PySparkを使用したGlueジョブ開発のお話をします。ETLツ�
 <img src="/images/20211011a/glue_python_spark.png" alt="" width="790" height="260" loading="lazy">
 
 ## はじめに
+
 こんにちは。TIGの藤田です。
 
 [Python連載](/articles/20210927b/) の8日目として、PySparkを使用したGlueジョブ開発のお話をします。
@@ -36,8 +37,8 @@ ETLツールとして使用されるAWS Glueですが、業務バッチで行う
 4. [Tip3: 単体テスト(pytest)](#Tip3-単体テスト-pytest)
 5. [Tip4: データカタログどうする問題](#Tip4-データカタログどうする問題)
 
-
 ## Glueジョブの開発と実行概要
+
 ローカル開発の前に、AWS Glueでのジョブ実行方法を簡単にお話します。複雑な処理をSparkジョブで実行するには、以下4ステップでOKです。
 
 １）ジョブスクリプトを作成、S3に配置
@@ -54,11 +55,12 @@ ETLツールとして使用されるAWS Glueですが、業務バッチで行う
 
 ４）について、[Athena](https://docs.aws.amazon.com/ja_jp/athena/latest/ug/what-is.html)は、標準的なSQLを使用してS3のデータを直接分析できるサービスです。Athenaのクエリ実行には、AWS Glueデータカタログ（DatabaseやTable）の登録が必要ですが、これはAthenaのクエリエディタにDDLを実行すると簡単に行えます。（Glueのデータカタログ定義はTerraform等でも行えるので運用上は他の方法でもよいと思います。）
 
-
 ## Tip1: ローカル環境構築
+
 [AWS公式にGlueコンテナが配布](https://aws.amazon.com/jp/blogs/big-data/developing-aws-glue-etl-jobs-locally-using-a-container/)されて、docker-composeによる環境構築が容易になりました。ローカル環境構築の詳細は、[AWS Glueの開発環境の構築(2021)](/articles/20210521a/)を参照ください。
 
 ## Tip2: PySpark, SparkSQL開発
+
 Glueでは、3つのジョブタイプ、Python shell, Spark streaming, Spark script （Python, Scala）が選択できますが、今回はSpark script（PySpark, SparkSQL）を採用しました。[PySpark](https://spark.apache.org/docs/latest/api/python/index.html)は、[Apache Spark](http://spark.apache.org/)をPythonで呼出すライブラリです。[SparkSQL](https://spark.apache.org/sql/)は、Apache Sparkのモジュールの1つで、SQLとDataFrameによる構造化データの処理を可能にします。
 
 複雑な業務処理の実装にも以下のメリットがありました。
@@ -158,19 +160,20 @@ if __name__ == '__main__':
 
 ```
 
-
 ## Tip3: 単体テスト(pytest)
+
 ローカル環境での、PySparkスクリプトの単体テストは[pytest](https://github.com/pytest-dev/pytest/)で可能です。方法は[AWS Glueの単体テスト環境の構築手順](/articles/20191206/)を参照ください。実行結果のアサーションをファイル単位で行う場合は、DataFrameを比較できるツール（[chispa](https://github.com/MrPowers/chispa)など）を利用すると便利です。
 
 ## Tip4: データカタログどうする問題
+
 データカタログは、データのファイルシステムをDatabaseとTableのように定義して管理する[Hive](https://hive.apache.org/index.html)メタストア同様の機能を担っています。
 
 データカタログは、上記Glueコンテナのディフォルト設定では呼出すことができず、CSVファイルを読込む際にデータ型定義ができない課題がありました。
 
 CSVファイルをDataFrameに読込む際に、schema定義をかいてやることはできますが、ローカル環境でしか使わないコードを、対象データのカラムすべてに対して書くのは嬉しくありません。AWS環境のGlueデータカタログの定義と二重管理にもなります。そこで、2パタンの解決策をご紹介します。
 
-* Tip4-1. AWS環境に接続してGlueデータカタログを使用する
-* Tip4-2. CSVではなく、Parquetファイルを使う
+- Tip4-1. AWS環境に接続してGlueデータカタログを使用する
+- Tip4-2. CSVではなく、Parquetファイルを使う
 
 ### Tip4-1. AWS環境に接続してGlueデータカタログを使用する
 
@@ -258,11 +261,10 @@ AWS環境の使えない状態でも、ファイルをParquetフォーマット�
 
 Parquetファイルは直接開いて中が確認できないですが、上記のようにAthenaで確認できますし、ローカル環境でも、Jupyter Notebook上でDataFrameに読込んでschema表示・データ表示できます。
 
-
 ## まとめ
+
 AWS Glueで複雑な処理を開発するときのTipsをご紹介しました。複雑なロジック開発とテストにAWS Glue環境を用いるのは費用面で不利なので、ぜひローカル環境を活用したいところです。特にファイルIOについては、ローカル環境とAWS環境で同じコードで処理できるようにするのがポイントだと思います。Glueジョブ開発の一助になれば幸いです。
 
 ## 参考リンク
-* [AWS Glue Data CatalogでCSVを扱う - フューチャー技術ブログ](/articles/20211006a/)
-    * AWS環境で、Glueデータカタログを使ってCSVファイルを扱う方法が紹介されています。
-
+- [AWS Glue Data CatalogでCSVを扱う - フューチャー技術ブログ](/articles/20211006a/)
+  - AWS環境で、Glueデータカタログを使ってCSVファイルを扱う方法が紹介されています。

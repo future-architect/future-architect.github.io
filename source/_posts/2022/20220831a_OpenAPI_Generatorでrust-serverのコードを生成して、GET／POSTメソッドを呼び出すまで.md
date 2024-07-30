@@ -18,11 +18,13 @@ TIG DXユニットの中川旭です。
 夏の自由研究ということで、趣味で作ったものを一部改変して記事化しました。
 
 ## はじめに
+
 コードのサンプルを以下のリポジトリに配置しました。
 記事には重要な部分を記載しているので、コード全体を見たい場合にはリポジトリを参照してください。
 https://github.com/modockey/openapi-rust
 
 以下が使用できることを前提としています。
+
 - rustup
 - npm
 - GNU make
@@ -36,6 +38,7 @@ https://github.com/modockey/openapi-rust
 同一PATH(/ip)にGET/POSTメソッドをそれぞれ用意しました。
 
 内容は変化してしまう自宅のグローバルIPの管理のための機能です。
+
 - GET: DBに登録された最新のグローバルIPアドレスを取得する
 - POST: グローバルIPアドレスをDBに登録する。最新のものと同じ場合は確認時刻として記録し、異なる場合は新規登録する。
 
@@ -90,11 +93,13 @@ https://github.com/OpenAPITools/openapi-generator#openapi-generator
 
 いくつか方法がありますが、今回はNPMを使用してインストールしました。
 npmを使用することができれば、以下のようにインストールするだけで使用可能です。
+
 ```bash
 npm install @openapitools/openapi-generator-cli -g
 ```
 
 さて、Makefileに以下のように記載しておきましょう。
+
 ```Makefile
 generate:
 	openapi-generator-cli generate \
@@ -140,10 +145,12 @@ $ tree
 ```
 
 ## DBの準備
+
 本体部分の前に、アクセス対象のDBの説明をしておきます。
 今回はPostgreSQLをDockerで使用します。
 
 以下のように設定ファイルを作成しました。
+
 ```bash
 .
 ├── Makefile
@@ -204,6 +211,7 @@ values
 ```
 
 これにより以下コマンドでDBの起動とテストデータの準備を行うことができるようになりました。
+
 ```bash
 make setup
 ```
@@ -211,31 +219,37 @@ make setup
 ## 生成されたコードの確認 & cargo run で動かせるようコードを移動
 
 生成されたコードをどう使えばいいのか、`README.md`を確認してみると以下の記載があります。
+
 ```markdown README.md
 ### Running the example server
 To run the server, follow these simple steps:
 
 cargo run --example server
 ```
+
 [公式ドキュメント](https://doc.rust-lang.org/cargo/reference/cargo-targets.html#examples)に記載があるように、このコマンドでは`./examples/server/main.rs`が実行されます。
 
 ということで、`./example/`配下のコードを`./src`配下にコピーします。
 `server.rs`は名前が`server`ディレクトリと衝突するので名前を変更しておきましょう。今回は`api.rs`とします。
 
 これに合わせ、`main.rs`のmod宣言と使用部分を以下のように変更します。
+
 ```rust ./src/main.rs
 mod api;
 ```
+
 ```rust ./src/main.rs
 api::create(addr, matches.is_present("https")).await;
 ```
 
 この状態で`cargo run`をすると以下のようなエラーになります。`cargo add`で追加しましょう。
+
 ```
 error[E0433]: failed to resolve: use of undeclared crate or module `tokio`
 ```
 
 自分の場合はエラーログから必要だった以下のcrateを追加しました。
+
 ```bash
 cargo add tokio clap env_logger tokio_openssl
 ```
@@ -243,10 +257,13 @@ cargo add tokio clap env_logger tokio_openssl
 改めて`cargo run`で実行すると、`localhost:8080`にサーバーが立ちます。
 
 サーバーを立てて以下のようにcurlでGETをしてみると
+
 ```bash
 curl localhost:8080/ip
 ```
+
 処理が実装されていないため以下のレスポンスが返ってきます。
+
 ```
 An internal error occurred
 ```
@@ -257,6 +274,7 @@ An internal error occurred
 
 今回は`./src`に`db.rs`,`usecase.rs`を新規作成します。さらに、先ほど`./examples/server/server.rs`をコピーして作成した`api.rs`にも追記します。
 それぞれに記載する内容は以下とします。
+
 - `db.rs`(新規): DBとのIO、`src/db/`には`db.rs`から呼び出すORM用のファイルを配置する
 - `usecase.rs`(新規): DBとのIOを呼び出すロジック
 - `api.rs`(追記): リクエストのハンドリング
@@ -280,6 +298,7 @@ An internal error occurred
 ```
 
 #### db.rsの実装
+
 今回はRustのORMとしてメジャーなDieselを使用するため、`cargo add`をします。
 DieselでPostgresSQLと日時を扱いたいので`--features "postgres chrono"`を引数としています。
 
@@ -288,18 +307,21 @@ cargo add diesel --no-default-features --features "postgres chrono"
 ```
 
 また、設定のためにdiesel_cliをinstallします。
+
 ```bash
 cargo install diesel_cli
 ```
 
 diesel_cliを使用して`db.go`から参照するスキーマを作成します。
 .envファイルに環境変数をセットして、print-schemaを実行しましょう。
+
 ```bash
 DATABASE_URL=postgres://postgres:postgres@localhost/postgres > .env
 diesel print-schema > ./src/db/model/schema.rs
 ```
 
 指定したファイルにschemaが出力されます。
+
 ```rust src/db/model/schema.rs
 table! {
     ipv4_history (id) {
@@ -314,6 +336,7 @@ table! {
 ```
 
 SELECTやINSERTをマップする構造体を定義します。
+
 ```rust src/db/model.rs
 use chrono::{DateTime, Utc};
 
@@ -344,6 +367,7 @@ pub struct NewIpV4Record {
 ```
 
 DBを扱う際に使用する便利なメソッドをいくつか用意します。
+
 ```rust src/db.rs
 use chrono::Utc;
 
@@ -407,7 +431,9 @@ pub fn update_last_checked_at(conn: &PgConnection, target_id: &i32) -> Ipv4Recor
 ```
 
 #### usecase.rsの実装
+
 GET、POSTメソッドで呼び出すロジックを記載しています。ここから`db.rs`にある関数を呼び出します。
+
 ```rust ./src/usecase.rs
 use crate::db;
 use db::*;
@@ -452,8 +478,10 @@ pub fn post_ip4_address(ipv4_address: &str) -> Result<(), String> {
 ```
 
 #### api.rsの実装
+
 リクエストをハンドリングする部分です。
 ※ファイル上部には生成されたコードがあるため、自分で記述したファイル下部のみ記載しています。
+
 ```rust src/db.rs
 use openapi_client::server::MakeService;
 use openapi_client::IpGetResponse::GetGlobalIPv;
@@ -519,14 +547,16 @@ use regex::Regex;
 }
 ```
 
-
 #### ビルド
+
 上記実装をして`cargo build`をすると不足しているcrateがあるはずです。以下のように追加します。
+
 ```bash
 cargo add dotenv regex
 ```
 
 ## curlで動作テスト
+
 さて、DBを立ち上げた状態でAPIサーバーを起動しましょう。
 
 ```bash
@@ -569,6 +599,7 @@ date: Sun, 28 Aug 2022 18:19:40 GMT
 ```
 
 ## おわりに
+
 Rustのコンパイラは本当に優秀で、的確にたくさん叱ってくれます。
 言語仕様も洗練されており、曖昧なところや危険なところはそれを明示する必要があるような仕組みになっています。
 こういった点を楽しめる人にとってRustはきっと最高の言語です。案外ハマるかもしれないので、みなさんぜひ書いてみてください！

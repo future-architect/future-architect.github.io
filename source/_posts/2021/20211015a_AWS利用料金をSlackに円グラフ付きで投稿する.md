@@ -14,6 +14,7 @@ author: 中山楓太
 lede: "AWSの利用料金をSlackに通知する仕組みを作成したので共有したいと思います。私が参加しているプロジェクトでは、毎月AWSにいくらかかっているのか、加えてそれぞれのサービスは全体のコストの内どのぐらいの割合を占めているのか知りたいという話があり、今回AWSから利用額を取得しSlackに通知する仕組みを作る流れとなりました。"
 ---
 # はじめに
+
 こんにちは、フューチャーにアルバイトとして参加中の中山です。
 
 今日はアルバイトで参加しているプロジェクト内でAWSの利用料金をSlackに通知する仕組みを作成したので共有したいと思います。
@@ -25,6 +26,7 @@ lede: "AWSの利用料金をSlackに通知する仕組みを作成したので�
 参考：[今回のソースコード](https://github.com/furiko/aws-cost-notify-to-slack)
 
 # システム概要
+
 それでは実際にどのような仕組みで動いているか説明します。
 
 図のように、
@@ -59,9 +61,11 @@ Tax: 50.00(5)%
 ```
 
 ### 利用料金円グラフ
+
 <img src="/images/20211015a/output.png" alt="output.png" width="512" height="512" loading="lazy">
 
 ## GetCostAndUsage API
+
 [AWS Cost Explorer](https://aws.amazon.com/jp/aws-cost-management/aws-cost-explorer/)が提供するAPIで、指定した期間のアカウントに紐づくAWSの利用料金を取得することができます。パラメータの指定方法など詳細は、[ドキュメント](https://docs.aws.amazon.com/ja_jp/aws-cost-management/latest/APIReference/API_GetCostAndUsage.html)を参照ください。
 
 ここでは、1ヶ月分のAWS各サービスの利用料金を取得する場合のGo言語の場合のサンプルを載せておきます。
@@ -94,6 +98,7 @@ result, err := svc.GetCostAndUsage(&costexplorer.GetCostAndUsageInput{
 GoSDKの[ドキュメント](https://docs.aws.amazon.com/sdk-for-go/api/service/costexplorer/)も必要な場合は参照ください。
 
 ## 円グラフ作成
+
 GetCostAndUsageAPIで取得できたAWS各サービスごとの利用料金を用いて円グラフを作成します。今回はGo言語で実装したいという条件があったので、[go-chart](https://github.com/wcharczuk/go-chart)を用いて作成しました。基本的には[サンプル](https://github.com/wcharczuk/go-chart/blob/master/examples/pie_chart/main.go)のコード参考にし、全体に占める割合が少ないサービスはOthersとしてまとめました。また、今回はLambda上で画像を生成し、Slackに送信している関係上、一度pngファイルに書き出すなどせず、バッファに画像データを書き込んで送信する形をとりました。
 
 ```go
@@ -136,10 +141,12 @@ err := pie.Render(chart.PNG, buffer)
 私自身、初めはグラフ作成に必要なデータを送れば円グラフを作成して返してくれるAPIだと思っていたのですが、上述の通り、Cloudwatchの監視メトリクスをグラフ化するためのAPIであり、汎用的にグラフ作成に用いるAPIではありませんでした。
 
 ## Slack連携
+
 次に、上記で取得した各サービスの利用料金と円グラフをSlackに連携する方法について紹介します。
 開発当初Webhookを用いてテキストのみをSlack連携していたところに円グラフを後から追加したため、今回のサービスではWebhookとfiles.uploadの両方を用いていますが、Bot Tokenに適切なScopeの設定をすることで自作のSlackApp1つで、テキストの投稿・円グラフのアップロードの両方を実現可能かと思います。
 
 ### Webhook
+
 Slackに対して通知する代表的な手段として[Incoming Webhook](https://slack.com/intl/ja-jp/help/articles/115005265063-Slack-%E3%81%A7%E3%81%AE-Incoming-Webhook-%E3%81%AE%E5%88%A9%E7%94%A8)があります。今回のシステムではこちらを利用して、各サービスごとの使用量を箇条書きで通知しています。
 
 ```go
@@ -166,6 +173,7 @@ _, err = http.DefaultClient.Do(req)
 ```
 
 ### files.upload
+
 Webhookではファイル自体のアップロードはできないため、files.uploadを用いてLambda内で生成した円グラフの画像をSlackにアップロードしています。
 
 ```go
@@ -180,6 +188,7 @@ _, err := api.UploadFile(
 ```
 
 # まとめ
+
 AWSのAPIを用いて月々の使用量を取得し、Slackに通知する仕組みの紹介をしてきました。
 
 円グラフを作成して各サービスの割合を出し、各サービスのコスト比重を見返すことは今後のAWS利用の効率化などの考察の一助となると思いますので、興味がある方はぜひこの機会にSlackでAWS利用料金をチェックする仕組みを組んでみてください。
@@ -201,5 +210,3 @@ AWSのAPIを用いて月々の使用量を取得し、Slackに通知する仕組
 Lambdaで実行する場合は各自事前にLambdaの準備とコードのデプロイをお願いします。
 
 Lambdaではなくローカル環境で実行する場合は、main関数内の`lambda.Start(Handle)`を`Handle(context.Background())`に書き換えて実行してください。また、`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`は各自設定をお願いします。
-
-

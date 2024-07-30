@@ -23,6 +23,7 @@ lede: "2021年9月24日にscikit-learn 1.0がリリースされました。私�
 4. StratifiedGroupKFoldの追加
 
 ## 1. キーワード引数の強制
+
 scikit-learnの機械学習のモデルのクラス、メソッドは、多くの入力パラメータを持ちます。
 
 以前のscikit-learnでは以下のようにクラスをインスタンスすることができました。以下[リリースハイライト](https://scikit-learn.org/stable/auto_examples/release_highlights/plot_release_highlights_1_0_0.html)からの引用です。
@@ -119,13 +120,14 @@ pandasのget_dummiesメソッドを使っても同様のone-hot encodingは可�
 ```python
 pd.get_dummies(X)
 ```
+
 以下get_dummiesの出力です。
 <img src="/images/20211008a/pandas.png" alt="get_dummies出力結果の表" width="1200" height="162" loading="lazy">
-
 
 ほぼ同じデータフレームが得られました。今回のように数値変換も同時にscikit-learnで行いたい場合などには、scikit-learnの変換器を通してget_feature_names_out()を使うのがいいのかなと思います。
 
 ## 3. 新しいplot用のクラス追加
+
 これまで混合行列やROC曲線を描画したいときは、sklearn.metricsモジュールのplot_confusion_matrixやplot_roc_curveが使えましたが、scikit-lean 1.0からは非推奨になり、1.2では削除の予定とのことです。代わりにConfusionMatrixDisplay、PrecisionRecallDisplayといったクラスが追加されました。元のplot_*関数はestimatorが引数に必要だったのですが、from_predictionsメソッドを使うことにより、ラベルと予測した値を渡せば描画ができるようになりました。
 
 以下[APIドキュメント](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.ConfusionMatrixDisplay.html)からサンプルコードの引用です。
@@ -150,8 +152,8 @@ plt.show()
 描画される混合行列は以下になります。
 <img src="/images/20211008a/confusion_matrix.png" alt="描画される混合行列のマトリクス図" width="306" height="266" loading="lazy">
 
-
 ## 4. StratifiedGroupKFoldの追加
+
 機械学習のモデルの評価において、交差検証における検証データの作り方は非常に重要です。例として、以下のKaggle State Farm Distracted Driver Detectionに参加したスライドが参考になります。
 
 https://speakerdeck.com/iwiwi/kaggle-state-farm-distracted-driver-detection?slide=22
@@ -163,6 +165,7 @@ https://speakerdeck.com/iwiwi/kaggle-state-farm-distracted-driver-detection?slid
 GroupKFoldは、各セブセット間に同じグループが含まれないように分割します。先程の例のように、同じドライバーを含めてしまうと不当に高くモデルの性能を評価してしまう、といったことを防ぎます。この２つの特徴をどちらも同時に使いたいときがあるのですが、これまでscikit-learnにはこの機能はなく、自分で実装する必要がありました。scikit-learn 1.0からは簡単に使えるようになりました。
 
 ## まとめ
+
 本記事ではscikit-learn 1.0に追加された以下の機能を簡単に紹介しました。
 
 1. キーワード引数の強制

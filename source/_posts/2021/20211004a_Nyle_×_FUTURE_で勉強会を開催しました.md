@@ -34,40 +34,46 @@ TIGの棚井龍之介です。
 | 6 | 工藤さん                                                                                              | Nyle   | レガシーメディアシステムのJamstackリプレイス計画素案 |
 
 # 登壇スライドの紹介
+
 登壇者のスライドです。
 
 ## #1
+
 FUTURE 伊藤さん
 GCPのサービスを活用したGitOps
 
 <script async class="speakerdeck-embed" data-id="4027a686f8b84dd78e486990c3b831d0" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
 
 ## #2
+
 Nyle 小宮さん
 パブリッククラウドでDR（災害復旧）に取り組んでみる話
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/5dUZeE1kpG8mWC" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/ssuser0038b4/dr-250177143" title="クラウドでDr（災害対策）に 取り組んでみる話" target="_blank">クラウドでDr（災害対策）に 取り組んでみる話</a> </strong> from <strong><a href="https://www.slideshare.net/ssuser0038b4" target="_blank">yoshiyuki komiya</a></strong> </div>
 
 ## #3
+
 FUTURE 棚井さん
 無料でIaCを試す AWS×Terraform×LocalStack
 
 <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vSedBlRfsZ4fVuKUt6Rs5iUTeIq_BQ7PsYU9cvDVozcWJeXzxo2yTh2NaOekoZAjg/embed?start=false&loop=false&delayms=3000" frameborder="0" width="100%" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
 
-
 ## #4
+
 Nyle 塚本さん
 CloudFormationを使用したシームレスな開発の話
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/2aBJ41LnFO6Jpj" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/ssuser9b182a/cloudformation-250177886" title="CloudFormationを使用したシームレスな開発の話" target="_blank">CloudFormationを使用したシームレスな開発の話</a> </strong> from <strong><a href="https://www.slideshare.net/ssuser9b182a" target="_blank">祐一郎 塚本</a></strong> </div>
 
 ## #5
+
 FUTURE 真野さん
 冪等じゃないジョブがなぜ僕を困らせたのか
 
 <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vSdSiwGRRkeC106NiMlng2GFyXuAI_ZmqrkN_aQDAn8AXORsLJi9Ft8Z0MpMKIZy1CDRJKcCw8Sp3Wy/embed?start=false&loop=false&delayms=3000" frameborder="0" width="100%" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
 
 ## #6
+
 Nyle 工藤さん
 レガシーメディアシステムのJamstackリプレイス計画素案
 

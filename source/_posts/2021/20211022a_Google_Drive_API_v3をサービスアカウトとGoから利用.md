@@ -35,7 +35,6 @@ Google Drive APIを使うための[認証方式](https://cloud.google.com/docs/a
 
 今回はGCP以外の環境で動かしたいので、4のサービスアカウントを利用します。
 
-
 ## サービスアカウントの払い出し
 
 サービスアカウントはGCPのProjectに紐づきます。もし利用できるProjectが存在しなければ[リソース管理ページ](https://console.cloud.google.com/cloud-resource-manager)から作成します。詳しくは[プロジェクトの作成と管理 - Google Cloud](https://cloud.google.com/resource-manager/docs/creating-managing-projects)を確認下さい。
@@ -54,7 +53,6 @@ Google Drive APIを使うための[認証方式](https://cloud.google.com/docs/a
 
 ダウンロードしたJSONファイルは大事に保存します。AWS上で使う場合は、AWS Systems Manager Parameter StoreにSecureString属性をつけて保存し利用すると良いでしょう。
 
-
 ## サービスアカウントのDriveへのアクセス権限を追加
 
 先程作成したサービスアカウントの `google-drive-example@xxxx-xxxx-123456.iam.gserviceaccount.com` に、アクセスしたいGoogle Drive先の権限を付与します。
@@ -63,16 +61,14 @@ Google Drive APIを使うための[認証方式](https://cloud.google.com/docs/a
 
 <img src="/images/20211022a/権限付与.png" alt="権限付与.png" width="1200" height="388" loading="lazy">
 
-
 これでgoogle-drive-exampleのIDから、Google Drive APIを用いて指定のフォルダにアクセスできるようになりました。
-
 
 ## 実装（List）
 
 GoからGoogle Drive API v3を利用します。
 
 ```sh パッケージ取得
-$ go get -u google.golang.org/api/drive/v3
+go get -u google.golang.org/api/drive/v3
 ```
 
 まず指定されたフォルダ配下にあるファイルの一覧表示します。
@@ -112,7 +108,7 @@ func main() {
 実行する前に先程取得したJSONキーファイルを環境変数で指定する必要があります。
 
 ```sh
-$ export GOOGLE_APPLICATION_CREDENTIALS=./project-name-123456789abc.json
+export GOOGLE_APPLICATION_CREDENTIALS=./project-name-123456789abc.json
 ```
 
 環境変数に `GOOGLE_APPLICATION_CREDENTIALS` が設定されていれば、SDK側が自動で認証してくれます。詳しくは[サービス アカウントとして認証する - Google Cloud](https://cloud.google.com/docs/authentication/production) を参照下さい。
@@ -183,7 +179,6 @@ func download(ctx context.Context, srv *drive.Service, name, id string) error {
 
 こちらを実行すると、権限付与したフォルダ配下のファイルを全て取得できると思います。
 
-
 ## 共有ドライブ（Shared drive）へのアクセス
 
 **2022.10.16追記**
@@ -202,13 +197,11 @@ func download(ctx context.Context, srv *drive.Service, name, id string) error {
 
 業務利用だと出力先を共有ドライブにすることはよくある運用だと思っており、そしてこのオプションはけっこう抜けがちで、本番疎通時にハマることも多いようなのでご注意ください。
 
-
 ## 指定したフォルダ配下のみのファイルをダウンロードしたい
 
 [Google Drive APIの Files: list](https://developers.google.com/drive/api/v3/reference/files/list)を確認すると`q`オプションで検索対象の絞り込みが可能です。いくつか[検索例](https://developers.google.com/drive/api/v3/search-files)がドキュメントに記載されています。
 
 `'1234567' in parents` といった例が記載されていますが、1234567には指定したいフォルダのIDを設定します。IDはブラウザで開いた時にURLで設定されている値です。複数を指定したい場合は `or` 条件で追加も可能です。
-
 
 ```go
 	r, err := srv.Files.List().PageSize(1000).
@@ -223,7 +216,6 @@ func download(ctx context.Context, srv *drive.Service, name, id string) error {
 どういった検索条件を指定できるかは、文法としてまとまっているので迷ったら確認すると早いです。
 
 * https://developers.google.com/drive/api/v3/ref-search-terms
-
 
 ## フォルダ指定かつ再帰的にファイルを探索したい
 
@@ -243,7 +235,6 @@ targetFolder
 この場合は自前で再帰的にList APIをコールする処理を実装する必要があります。少し面倒ですね。少し面倒ですが、最初の実装にあるとおり、OR条件で親フォルダを決め打ちで指定するのが簡単で良いかもしれません。
 
 （parents は複数要素が設定されると思うので、ネストした親フォルダも設定できた場合は、`q` に `'FILE-ID' in parents` の指定で実現できそうです。設定方法がよく分からず今回は上記の結論となりました）
-
 
 ## ページング
 
@@ -293,4 +284,3 @@ func main() {
 ## まとめ
 
 サービスアカウントを用いて、Google Drive API v3をGo SDKを用いて操作する例をいくつかまとめました。Google Drive上のファイルにアクセスできると、システムやアプリに機能として組み込まなくても、ちょっとした業務を効率化することができると思います。うまく役立てていけると良いなと考えています。
-

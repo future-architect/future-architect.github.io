@@ -171,4 +171,3 @@ OpenTelemetryは単に便利なライブラリというだけでなく新しい�
 * [OpenTelemetry公式サイト](https://opentelemetry.io/)
 * [OpenTelemetry仕様リポジトリ](https://github.com/open-telemetry/opentelemetry-specification)
 * [OpenTelemetryドキュメント日本語化プロジェクト](https://github.com/open-telemetry/docs-ja)
-

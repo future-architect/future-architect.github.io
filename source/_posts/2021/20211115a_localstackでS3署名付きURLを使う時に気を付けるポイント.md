@@ -184,7 +184,9 @@ services:
 これらは[LocalStackのREADME](https://github.com/localstack/localstack/blob/master/README.md)をよく見ると書いてあります。
 
 > NOTE: Please use test as Access key id and secret Access Key to make S3 presign url work. We have added presign url signature verification algorithm to validate the presign url and its expiration. You can configure credentials into the system environment using export command in the linux/Mac system. You also can add credentials in ~/.aws/credentials file directly.
+>
 > ## Security Configurations
+>
 > Please be aware that the following configurations may have severe security implications!
 > ENABLE_CONFIG_UPDATES: Whether to enable dynamic configuration updates at runtime, see here (default: 0).
 > DISABLE_CORS_CHECKS: Whether to disable all CSRF mitigations (default: 0).

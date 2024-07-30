@@ -37,20 +37,24 @@ SinglePageApplicationやモバイルアプリなど、ClientになるFront-end�
 # Authorizer設定
 
 ## タイプ
+
 今回はCognitoではなく、KeycloakやAuth0など外部の認証基盤を想定しています。
 AuthorizerをLambda関数で実装することにより、認証認可制御をもっと自由にカスタムすることができます。
 
 ## Lambdaイベントペイロード
+
 Lambda関数の引数となるEventの入力値には2パターン存在します。
 
 - **Tokenタイプ**は簡単にTokenとmethodArnのみが取得可能で、Tokenを検証しその(JWTならば)PayloadとmethodArnのパスを対照するなどで認可を制御することが可能になります。
 - **Requestタイプ**はAPIGatewayのプロキシ統合のリクエストと同じものを引数として受けられます。TokenとmethodArnはもちろん、他のHeaderやQueryString、Bodyなどすべてのリクエストの中身が取得できるため、もう少し自由な認可要件が必要なときに使うこともできます。
 
 ## トークンの検証
+
 Tokenの中身を検証する前に正規表現により簡単にチェックすることができます。一般的にTokenとしてJWTを使う場合は`^Bearer [-_0-9a-zA-Z.]+$`のように設定します。
 この正規表現にマッチしない場合、AuthorizerはLambdaまでリクエストを送らず401を返します。
 
 ## 認可のキャッシュ
+
 AuthorizerはAPIリクエストが送られるとき毎回必ずTokenを検証するので、その負荷を減らすためにキャッシングも可能です。
 しかし、この機能には大きな問題があり、キャシングの単位がTokenそのものではなく、Tokenのソースであるヘッダー名(`Authorization`など)になっています。あるユーザが一度認可したあとならば、他のユーザがそのキャッシュを使い回すことができてしまうため、基本無効にするしかないと思います。
 
@@ -64,6 +68,7 @@ Lambda実装の流れは大きく分けて
 の2つの段階になるかと思います。
 
 ## 入出力
+
 Goで実装する場合メインハンドラー関数は以下のような形になります。
 
 ```go
@@ -75,10 +80,12 @@ func Handle(e events.APIGatewayCustomAuthorizerRequestTypeRequest) (*events.APIG
     // Requestタイプイベントペイロード
 }
 ```
+
 [aws-lambda-go](https://github.com/aws/aws-lambda-go)には、すでにCustomAuthorizerのための入出力構造体が用意されているため大変便利です。
 出力の戻り値としてはAWS IAMのようなAWSPolicyDocumentを使い返します(詳細後述)。
 
 ### 出力パターン
+
 Lambda関数の出力(戻り値)により、以下のようにAPIに送られてきたリクエストを制御することができます。
 
 |出力パターン|動作|HTTP Status|Response Body|
@@ -91,13 +98,16 @@ Lambda関数の出力(戻り値)により、以下のようにAPIに送られて
 *特記事項として、エラーを返すにしてもエラーメッセージを`Unauthorized` (大文字`U`に注意)にすることにより401を返すことができます。*
 
 ## Authentication
+
 認可制御のために前提として、まずは認証が必要になります。一般的にはJWTを検証することになり、JWTのライブラリを使えば簡単ですが、検証のための**公開鍵取得方法**には2パターンがあるかと思われます。
 
 ### 静的に公開鍵を保持する
+
 公開鍵をLambdaの環境変数やDynamoDB、S3などを使い静的に保持する方法です。
 実装は簡単で構造もシンプルですが、鍵のローテションをどうするか考える必要が将来的に出てきます。
 
 ### 公開鍵を動的に取得する
+
 認証基盤が公開している公開鍵エンドポイントから鍵を取得する方法です。
 公開鍵エンドポイントは一般的に認証基盤側が[JSON Web Key(JWK)](https://openid-foundation-japan.github.io/rfc7517.ja.html)により定義し、以下のような形で公開しています。
 
@@ -107,6 +117,7 @@ Lambda関数の出力(戻り値)により、以下のようにAPIに送られて
 この方法は鍵のローテションを気にせずに済みますが、APIリクエストのたびに認証基盤への外部リクエストが発生するので、遅延・負荷を軽減するための効率的なキャッシング戦略を立てる必要があります。
 
 ## Authorization
+
 APIリクエストのToken検証が完了し認証ができたら、次はそのユーザーがリクエストしたエンドポイントにアクセス可能かをチェックする認可処理が必要になります。
 
 認可、アクセスコントロールはJWTのClaimsの値に入っているユーザの属性やロールとAPIエンドポイントのパスなどを対照することにより制御することが可能です。
@@ -117,6 +128,7 @@ APIリクエストのToken検証が完了し認証ができたら、次はその
 - [Auth0 Authorization](https://auth0.com/docs/authorization)
 
 ### 認可の出力
+
 認可ロジックによりユーザのアクセス可否が決まったら、Authorizerは以下のようなJSONで認可処理が完了したことをAPIGatewayに返します。
 
 ```json
@@ -142,6 +154,7 @@ APIリクエストのToken検証が完了し認証ができたら、次はその
 ```
 
 #### Policy Document
+
 IAMのものと同じ形式で、アクセスを許可するか拒否するかを明示的に表現します。
 
 AuthorizerはAPIGateway上で動くものなので`"Action": "execute-api:Invoke"`は固定になります。
@@ -154,6 +167,7 @@ APIリクエストしたユーザが誰なのかを表現します。リクエ�
 一般的にはJWTの[`sub` (Subject) Claim](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.2)をそのまま使うことになります。
 
 #### Authorizer Context
+
 Principal IDと同じように後続のLambda関数などに渡すことができる任意の値です(Principal IDもContextの一部)。APIのレスポンスを出し分けするために必要な任意の情報をKey-Value形式でセットすることが可能です。一見Mapオブジェクトにも見えますが、ValueとしてはNumber・String・BooleanのみでObjectやArrayなどの入れ子構造は使えません。
 
 # 最後に

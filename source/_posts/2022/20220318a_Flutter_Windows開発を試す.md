@@ -215,4 +215,3 @@ import 'package:system_tray/system_tray.dart';
 <img src="/images/20220318a/image_6.png" alt="アイコン" width="229" height="104" loading="lazy">
 
 うまく用途にあうニーズが見つけられればFlutterでやろう！というのは説得できそうな感じがします。使えるチャンスをうかがっていきたいですね。
-

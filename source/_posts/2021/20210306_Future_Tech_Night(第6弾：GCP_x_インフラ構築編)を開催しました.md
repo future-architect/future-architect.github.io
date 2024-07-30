@@ -14,6 +14,7 @@ lede: "こんにちは、TIGの西田、村田です。先日2021.01.29にオン
 ---
 
 # はじめに
+
 こんにちは、TIGの西田、村田です。先日2021.01.29にオンラインにてFuture Tech Nightという社外勉強会を開催しました。第6弾はGCP×インフラというテーマで事例を紹介しました。
 
 1. [メディア業界変革編](https://future.connpass.com/event/177093/)
@@ -28,7 +29,6 @@ lede: "こんにちは、TIGの西田、村田です。先日2021.01.29にオン
 <img src="/images/20210306/hero-cloud-infrastructure.png" loading="lazy">
 
 > https://cloud.google.com/training/cloud-infrastructure より
-
 
 勉強会は以下の2部構成で開催しました。
 
@@ -45,11 +45,9 @@ lede: "こんにちは、TIGの西田、村田です。先日2021.01.29にオン
 
 <img src="/images/20210306/2021-03-10_103811.png" style="border:solid 1px #000000" loading="lazy">
 
-
 上記に対して設計例をベースにお話し、まとめとしてGCPできちんと構築が可能であるということを説明しました。
 
 <img src="/images/20210306/2021-03-10_103053.png" style="border:solid 1px #000000" loading="lazy">
-
 
 前半のエンプラ領域の課題設定がどこまで聞いてくださった方に伝わったのか心配ではありましたが、アンケート的には満足頂けた方が多く、とても嬉しかったです。聴いてくださった方、本当にありがとうございました:blush:
 
@@ -63,16 +61,14 @@ lede: "こんにちは、TIGの西田、村田です。先日2021.01.29にオン
 
 <img src="/images/20210306/image.png" style="border:solid 1px #000000" loading="lazy">
 
-
 GKEのPrivateクラスタ作成時にはVPC Peeringが自動的に作成されるんですが、そのPeeringはGCPコンソール上でユーザが編集・削除できてしまうので気をつけなければならない、というお話でした。
 
-
 <img src="/images/20210306/image_2.png" style="border:solid 1px #000000" loading="lazy">
-
 
 事の経緯は[Qiita：あなたの大切なGKEクラスタを崩壊させてしまう前に](https://qiita.com/famipapamart/items/1a207f90d7dd9ec85d5d)にもまとめてあります。詳細興味湧いた方はぜひ覗いてみてください。
 
 # まとめ
+
 ご参加いただいた方々、ありがとうございました！
 
 フューチャーでは引き続きFuture Tech Nightを中心に[様々なイベントを開催](https://future.connpass.com/)しております。今後も皆様のご参加をお待ちしております。

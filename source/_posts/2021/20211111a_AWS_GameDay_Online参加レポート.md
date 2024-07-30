@@ -21,7 +21,6 @@ TIGの伊藤真彦です。先日社内の同じチームの[加藤さん](/auth
 
 <img src="/images/20211111a/image.png" alt="image.png" width="1200" height="885" loading="lazy">
 
-
 日本語の情報としては[AWS公式ブログ](https://aws.amazon.com/jp/blogs/psa/aws-gameday-online-apn-cup-vol2-2021/)がわかりやすいでしょうか。
 
 > GameDayは座学や手順書ベースのハンズオンワークショップではなく、お題に沿って手順書無しで自分で考えながらシステムを構築し、障害(カオス)に対処することで、知識の定着率を高めるコンテスト要素も含んだ実戦形式のトレーニングです。

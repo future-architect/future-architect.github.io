@@ -16,6 +16,7 @@ lede: "Future Tech Night #17「embeddingの活用」と「MLOps」のAI勉強会
 <img src="/images/20220613a/top.png" alt="" width="600" height="263">
 
 # はじめに
+
 こんにちは。Strategic AI Group所属の金子剛士です。
 
 2021年11月26日に[Future Tech Night #17「embeddingの活用」と「MLOps」のAI勉強会](https://future.connpass.com/event/231310/)を開催し、「embeddingを用いた分析・検索・推薦の技術」というタイトルで発表しました。

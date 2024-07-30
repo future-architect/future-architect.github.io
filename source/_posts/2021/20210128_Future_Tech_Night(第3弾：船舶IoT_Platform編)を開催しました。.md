@@ -20,11 +20,11 @@ lede: "2020/8/17にオンラインにてFuture Tech Nightという社外勉強�
 
 今回は第3弾としてAWS＆DataPlatform を活用した、船舶IoTプロジェクトの事例を紹介しました。
 
-1. [ ~メディア業界変革編～](https://future.connpass.com/event/177093/)
-2. [ ～MaaS ビジネス編～](https://future.connpass.com/event/179387/)
-3. [ ～船舶IoT Platform編～](https://future.connpass.com/event/185051/)← 今回はここ
-4. [ 〜Go x AWS スマート工場編〜](https://future.connpass.com/event/188742/)
-5. [ 〜AWS＆DataPlatform MaaSビジネス編〜](https://future.connpass.com/event/195568/)
+1. [~メディア業界変革編～](https://future.connpass.com/event/177093/)
+2. [～MaaS ビジネス編～](https://future.connpass.com/event/179387/)
+3. [～船舶IoT Platform編～](https://future.connpass.com/event/185051/)← 今回はここ
+4. [〜Go x AWS スマート工場編〜](https://future.connpass.com/event/188742/)
+5. [〜AWS＆DataPlatform MaaSビジネス編〜](https://future.connpass.com/event/195568/)
 6. [GCP x インフラ構築編](https://future.connpass.com/event/201478/)
 
 <img src="/images/20210128/ブログ＿図1.png" loading="lazy">
@@ -32,6 +32,7 @@ lede: "2020/8/17にオンラインにてFuture Tech Nightという社外勉強�
 # 概要
 
 勉強会は以下のような構成で行いました。
+
 1. FutureとTechnology Innovation Groupの紹介
 2. 顧客・業界の紹介
 3. 業界の課題とプロジェクトの提案
@@ -52,8 +53,8 @@ FutureとTechnology Innovation Groupの紹介では、グループ全体の紹�
 
 <img src="/images/20210128/図3.png" loading="lazy">
 
-
 # 登壇者からのコメント
+
 **仲澤：**
 普段、少人数でひっそりとプロジェクトをやっているので、今回の社外発信は、とても有意義でした。
 海事産業はITへの投資は他業界と比較して、まだ進んでおらず、また効果が大きいと感じています。自分たちの手で海上の事故を減らし、業務の効率化ができることに、とてもやりがいを感じています。一緒にやってくれる仲間も募集しています！

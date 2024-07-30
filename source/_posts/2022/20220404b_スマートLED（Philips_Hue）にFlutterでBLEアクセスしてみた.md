@@ -21,7 +21,6 @@ TIG DXユニット真野です。[電子工作/IoT連載](/articles/20220404a/)�
 
 接続ですが、Bluetooth（BLE: Bluetooth Low Energy）で接続可能。Hueブリッジと呼ばれるIoTゲートウェイ（Webサーバ的なもの）を経由してWeb API連携も可能という、いたせりつくせりです。Hueから各デバイスはZigBeeが用いられているということでいかした感じがします。Hueブリッジを経由する例は、Pythonを始め多くの自動化を試みる日本語記事も多く見かけます。今回は先週までブログ連載を開催していた[Flutter](/articles/20220315a/)を用いて、Hueブリッジを用いずBLEで直接LEDの操作をします。
 
-
 ## FlutterでBLE
 
 FlutterでBLEのライブラリはいくつか存在しますが、[PhilipsHue/flutter_reactive_ble](https://github.com/PhilipsHue/flutter_reactive_ble) を利用します。理由は以下の記事をパット見てメンテナンスがされていそうだからということです。
@@ -29,7 +28,6 @@ FlutterでBLEのライブラリはいくつか存在しますが、[PhilipsHue/f
 * https://medium.com/flutter-community/bluetooth-low-energy-in-flutter-an-overview-937d0a68bc41
 
 flutter_reactive_bleはPhilips社が開発元なので、Hue LEDとの接続性もバッチリかと思いましたが、特段それに特化しているわけではなくBLE全般をあつかうライブラリのようです。
-
 
 ## Hue LEDのBLE仕様
 
@@ -110,7 +108,6 @@ Hue LEDのBluetoothの仕様ですが公式は存在しないようです。そ�
 
 https://github.com/ma91n/flutter-hue-led-sample
 
-
 ## 動かしてみた
 
 さきほどのFlutterで作成したアプリから、LEDを操作してみます。
@@ -127,13 +124,6 @@ Lチカです。照明のON/OFFでカメラのフォーカスが変わってし�
 
 <video src="/images/20220404b/色変更.mp4" controls width="50%"></video>
 
-
-
 ## まとめ
 
 BLEで操作する概念のとっかりが難しかったですが、Lチカが無事できて良かったです。BLEがたまにdisconnectになるなど、実用性はまだまだであるため、精度を上げるためには実験を繰り返しながらのトライが必要そうです。
-
-
-
-
-

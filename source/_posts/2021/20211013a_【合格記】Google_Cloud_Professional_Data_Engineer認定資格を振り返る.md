@@ -15,13 +15,14 @@ lede: "TIGの玉木です。先日Professional Data Engineer認定資格を取�
 
 <img src="/images/20211013a/follow-learning-path_2x.png" alt="" width="476" height="274" title="学習イメージ" loading="lazy">
 
-
 こんにちは、TIGの玉木です。先日[Professional Data Engineer認定資格](https://cloud.google.com/certification/data-engineer?hl=ja)を取得しました。この記事ではその振り返りをします。
 
 ## 筆者について、受験のモチベーション
+
 新卒から3年半ほど機械学習モデリングを行っており、ここ半年はAWSでサーバーサイドの実装を主に担当しています。業務でGCPを扱ったことはありませんが、社内で「みんなで資格とっていきましょう！」のような機運があり、以前から機械学習とも関係があるデータエンジニアリングに興味があったため、今回Professional Data Engineer認定資格を受けることにしました。
 
 ## 出題範囲
+
 以下公式サイトの[認定試験ガイド](https://cloud.google.com/certification/guides/data-engineer?hl=ja)からのサマリです。
 
 1. データ処理システムの設計
@@ -54,6 +55,7 @@ lede: "TIGの玉木です。先日Professional Data Engineer認定資格を取�
 次に取り組んだのは[スケーラブルデータサイエンス データエンジニアのための実践Google Cloud Platform](https://www.shoeisha.co.jp/book/detail/9784798158839)です。原著は先程紹介したcourseraのコース1の先生が書かれた本で、Google Cloudではじめる実践データエンジニアリング入門に比べてケーススタディに沿ったハンズオン部分が多めといった印象です。courseraの授業やGoogle Cloudではじめる実践データエンジニアリング入門と重複する内容もありますが、少し違ったケーススタディで再度手を動かしたい方におすすめです。
 
 ## 受けた感想
+
 自宅のネット環境が不安定なので、渋谷のテストセンターで試験を受けてきました。快適に受けられたので自宅のネット環境に不安がある方にはおすすめです。
 
 テスト終了後、合格という文字が画面に出て、テストの2日後に正式にデジタル認定書のリンクが書かれたメールが届きました。
@@ -61,5 +63,5 @@ lede: "TIGの玉木です。先日Professional Data Engineer認定資格を取�
 まだ業務でGCPを使ったデータ基盤構築をしてはいないのですが、実際にそのような業務にあたることがあればスムーズに入れるんじゃないかなぐらいの知識を得たかな、と思っています。自分のように機械学習のバックグラウンドがある方は、結構取り組みやすい分野だとも思います。難易度もそこまで高すぎるわけでもないので、これからデータ基盤周りのことを学びたい方には、勉強のきっかけとしておすすめの資格試験だと思います。
 
 ## まとめ
-Professional Data Engineer認定資格を取得するにあたって取り組んだことを紹介しました。これからProfessional Data Engineer認定資格を受けてみようかなと考えている方に参考になれば幸いです。
 
+Professional Data Engineer認定資格を取得するにあたって取り組んだことを紹介しました。これからProfessional Data Engineer認定資格を受けてみようかなと考えている方に参考になれば幸いです。

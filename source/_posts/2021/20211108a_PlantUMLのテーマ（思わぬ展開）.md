@@ -17,7 +17,6 @@ lede: "PlantUMLで使えるテーマについてのご紹介です。以前、�
 
 [秋のブログ週間](/articles/20211027a/)連載の7本目です。
 
-
 ## はじめに
 
 PlantUMLで使えるテーマについてのご紹介です。
@@ -37,10 +36,10 @@ PlantUMLで使えるテーマについてのご紹介です。
 * この記事で紹介するオリジナルテーマはシーケンス図のために作られたものです
 
 ## オリジナルテーマ
+
 <img src="/images/20211108a/image_2.png" alt="image.png" width="563" height="460" loading="lazy">
 
 出典：[Future Tech Blog](https://future-architect.github.io/articles/20200203/)
-
 
 以前投稿した[「チームで機能設計するためのPlantUML標準化」の記事](/articles/20200203/)では、ユーザが自分で設定できるカラーパレットを２セット紹介しました。嬉しいことに、記事公開後、社内外問わず、沢山の方にこれらのカラーセットを活用してもらうようになりした。
 
@@ -150,11 +149,12 @@ Foo -> Foo7: To queue
 
 ということで、さっそく…
 
-
 ## 新テーマ「mars」
+
 「toy」と「vibrant」が公式テーマになったことを記念して、３つ目のオリジナルテーマ「mars」をフューチャーレポジトリにて公開しました。しかも、こちらもPlantUMLの次のリリースで公式テーマになる予定です！
 
 ### marsのサンプル
+
 <img src="/images/20211108a/example_mars.png" alt="example_mars.png" width="641" height="424" loading="lazy">
 
 ```sql mars_example.pu

@@ -15,6 +15,7 @@ author: 真鍋優
 lede: "「Future Tech Night #21 Google Cloud: データエンジニア＋MLOps」に登壇させていただきましたので、その内容について触れていきたいと思います。"
 ---
 # はじめに
+
 こんにちは、SAIG所属の真鍋です。
 
 この度は「Future Tech Night #21 Google Cloud: データエンジニア＋MLOps」に登壇させていただきましたので、その内容について触れていきたいと思います。
@@ -27,6 +28,7 @@ lede: "「Future Tech Night #21 Google Cloud: データエンジニア＋MLOps�
 * [Future Tech Night #21 Google Cloud: データエンジニア＋MLOps](https://www.youtube.com/watch?v=o0oZnX1Ai-k)
 
 ## MLOpsとは
+
 機械学習プロジェクトが広く一般に普及してきた昨今、多くのカンファレンスや企業活動の中でMLOpsが注目を集めています。
 MLOpsとは、下記のライフサイクルを潤滑に回すための概念であり、Machine Learning + DevOps + Operateを合わせたものです。
 
@@ -36,10 +38,10 @@ MLOpsとは、下記のライフサイクルを潤滑に回すための概念で
 如何にデータサイエンティストのためのコーディング環境や、ハイスペックな学習環境を用意するかといった環境面の問題や、実装されたアルゴリズムをどのようにサービスとして素早くデプロイするのか等が課題となってきます。
 
 ## Vertex AIとは
+
 Vertex AIとはGoogle Cloud Platformにおける必要なMLツールがすべて揃った一元的なAIプラットフォームであり、GAされたのが2021年5月と比較的新しいサービスです。
 
 <img src="/images/20220513a/image_2.png" alt="Vertex AI" width="800" height="450" loading="lazy">
-
 
 * Vertex AI WorkBench
 フルマネージド型のコンピューティング環境で、JupyterLabの環境を数クリックで構築することができます。
@@ -79,9 +81,9 @@ Pipelineは複数のコンポーネントから構成されており、デフォ
   → 私の個人的な印象ですが、mlflowの実験管理機能の方が柔軟性に富んでおり、必要な情報をトラッキングが容易です。今後、Vertex AIとmlflowの連携についても探っていきたいと考えています。
 
 ## おわりに
+
 フルマネージドなサービスを用いることで、オンプレでは難しい柔軟かつ迅速な環境構築が可能であると考えています。
 
 特に必要なマシンスペックに大きな差が生じる機械学習プロジェクトでは、フルマネージドサービスの需要が高まっていくことでしょう。
 
 Vertex AIは現在も発展を続けているサービスであり、引き続きウォッチしていきたいと思います。
-

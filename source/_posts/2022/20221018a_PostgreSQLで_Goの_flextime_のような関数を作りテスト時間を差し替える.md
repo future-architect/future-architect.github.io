@@ -77,11 +77,9 @@ func TestUpdateAlreadyRead(t *testing.T) {
 	}
 ```
 
-
 当然、PostgreSQLのもとから用意されている組み込み関数には、flextimeのような時刻固定の仕組みはないです。
 
 この例だと更新系なので1項目ですが、登録だとcreated_at分も合わせて2項目になります。また、SQLで抽出したGo側でゴリゴリ業務ロジックで組み立てて、またDBに書き戻すようなコードを書いていると、ここで書いた `now` を一々引き回す必要があり面倒です（引き回さないと、微妙に呼び出しタイミングで created_at, updated_at の値が変わって扱いにくくなります）。
-
 
 ## PostgreSQL関数 を作成して代用してみる
 
@@ -142,7 +140,6 @@ INSERT 0 1
 
 そうすると時間が固定化されます。
 
-
 ```sql
 postgres=# SELECT flex_timestamp();
      flex_timestamp
@@ -169,7 +166,6 @@ postgres=# SELECT flex_timestamp();
  2022-10-08 22:58:17.919548+09
 (1 row)
 ```
-
 
 これを用いれば、`current_timestamp` 関数とほぼ同等の使い方でSQLを書け、呼び出し元のコードもプレスホルダー文ちょっとすっきりすると思います。
 
@@ -226,7 +222,6 @@ func TestUpdateAlreadyRead(t *testing.T) {
 ```
 
 ちょっとした違いですが、開発・レビューなどの観点で見落としになり得るポイントを1つでも減らせるのが大きいかなと思っています。
-
 
 ## Appendix
 
@@ -299,7 +294,6 @@ postgresql://user@localhost:5432/postgres?connect_timeout=10&application_name=my
 
 ただ、こういった多段の設定はデータ削除が難しい（気軽に`flex_time` テーブルを `TRUNCATE` しにくくなる）ため、やるならapplication_nameは `NOT NULL` にした運用にしたほうが良いかもしれません。要件に応じて調整ですが、できる限り最初の実装のシンプルモデルの利用に留めるという、用法用量が良い塩梅かと感じます。
 
-
 ## 最後に
 
 PostgreSQLに、何も指定がなければ `current_timestamp`を、何か設定されていればその値を返す`flex_timestamp`関数 を定義して、使ってはどうかという記事でした。
@@ -309,6 +303,5 @@ PostgreSQLに、何も指定がなければ `current_timestamp`を、何か設�
 この記事で公開したサンプルコードは以下にアップしておきました。
 
 * https://github.com/ma91n/postgres-flextime
-
 
 アイキャッチは<a href="https://pixabay.com/ja/users/fearscare-2010330/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=4043090">Patrick</a>による<a href="https://pixabay.com/ja//?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=4043090">Pixabay</a>からの画像を利用させていただきました。

@@ -19,6 +19,7 @@ lede: "IoTに関するデータモデル標準化に用いられるProject Hayst
 Haystack の公式ドキュメントを読んだけどいまいち分からなかったという方がいれば参考にしていただけると幸いです。
 
 ## Project Haystack 概要
+
 Project Haystack は、ファシリティ・機器などの IoT に関するデータモデルを標準化する取り組みです。
 ビルシステムとそれに関連するデバイスのモデルを様々なツールで解釈できるようにするため、メタデータ定義の方法論と共通語彙を提供することをミッションとしています。
 
@@ -28,6 +29,7 @@ Applications include automation, control, energy, HVAC, lighting, and other envi
 (Project Haystack 公式ページから抜粋)
 
 ## 技術概要
+
 Haystackの技術概要をざっくり箇条書でまとめてみました。
 エンティティとタグを使ってデータやデータ間の関係性を表現することがキモなようです。
 
@@ -40,6 +42,7 @@ Haystackの技術概要をざっくり箇条書でまとめてみました。
 ※2 タグ…エンティティに付与する情報。名前と値によって構成されており、タグによって値の型が異なる（例: 文字列型、参照型、真偽値型など）。
 
 ## エンティティごとの主なタグ
+
 エンティティごとのお主なタグを表にまとめました。
 全てのエンティティは一意な id と dis(表示名) のタグを持っており、エンティティごとに固有のタグも存在するようです。
 また、カスタムタグとして Haystack が標準で用意していないタグを作成することも可能なようです。
@@ -47,6 +50,7 @@ Haystackの技術概要をざっくり箇条書でまとめてみました。
 <img src="/images/20220308a/タグ.png" alt="タグ" width="1200" height="565" loading="lazy">
 
 ## エンティティ間の関係性の表現
+
 データモデルの例を図に示します。
 Haystack ではエンティティ内に作成したタグによって、自身のエンティティの特性と他のエンティティとの関係性を示します。
 例）Sample Electricity Meter は、equip, elec, meter タグにより 自身が equip の派生である elec-meterであることを示し、 site タグの中に Sample Site の id を記載することで、 Sample Site の中に設置されていることを示す。
@@ -54,6 +58,7 @@ Haystack ではエンティティ内に作成したタグによって、自身�
 <img src="/images/20220308a/要素間の関連.png" alt="要素間の関連" width="1200" height="506" loading="lazy">
 
 ## Point へのデータの格納
+
 エンティティのうち、Pointだけは実際の観測データを格納するなど、仕組みが複雑に感じたため Point へのデータの格納方法について箇条書きでまとめました。
 
 - point には派生として現在状態を表す cur-point と過去状態を表す his-point が存在する。
@@ -75,4 +80,3 @@ https://project-haystack.org/
 https://marketing.project-haystack.org/images/documents/Project-Haystack-Guide-Specification-Japanese.pdf
 - Simplifying Data Collection and Analysis through Haystack
 https://assets.new.siemens.com/siemens/assets/api/uuid:60cc0b1f-c9df-4a44-8116-a834c994c7ff/us-si-pss-bp-sra-projecthaystack-whitepaper-sie-brand-redesign-0.pdf
-

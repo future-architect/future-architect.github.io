@@ -49,10 +49,12 @@ Reference: [future-architect/vuls](https://github.com/future-architect/vuls)
 まず、私はGORM v2をサポートして、どれくらい改善するかを検証することにしました([gost#60](https://github.com/knqyf263/gost/pull/60))。
 
 ## 期待のGORM v2、そのパフォーマンス
+
 GORMをv1からv2にしたところ、発行されるクエリは大きく変わっていませんでした。
 それでは、簡易なパフォーマンス測定をやってみることにします。
 
 ### 検証(Package: expat)
+
 Debian busterのPackage: expatに関するunfixed/fixedなCVE情報を検索することを100回繰り返して、レスポンスにかかる時間の90%ileを取ってみました。
 
 - unfixed cves
@@ -70,6 +72,7 @@ Debian busterのPackage: expatに関するunfixed/fixedなCVE情報を検索す�
 | GORM v2 |     46    | 0.015868 |
 
 ### 検証(Package: linux)
+
 もしかして発行されるクエリ数が少なすぎるかなと思って、Package: linuxに関するunfixed/fixedなCVE情報でも検証してみました。
 
 すると、この場合はGORM v2にすることによるはっきりとしたパフォーマンスの向上が確認できました。
@@ -92,6 +95,7 @@ Debian busterのPackage: expatに関するunfixed/fixedなCVE情報を検索す�
 まだまだ高速化が必要です😢
 
 ## さらなる高速化に向けて
+
 発行されるクエリのうち、ボトルネックになっていたのはJOIN句が入ったこのクエリです。
 
 ```sql
@@ -130,6 +134,7 @@ SELECT
 ```
 
 ### 検証(クエリチューニング)
+
 先程と同様に、Debian busterにあるPackage: expat、linuxに関するunfixed/fixedなCVE情報を検索することを100回繰り返して、レスポンスにかかる時間の90%ileでクエリチューニングの効果を評価したいと思います。
 
 - expat unfixes cves
@@ -182,6 +187,7 @@ SELECT
 |           3.37          |   11.5  |   9.17  |          2.49          |
 
 # Gost、Ubuntuサポートをする
+
 gostはUbuntuをサポートしていなかったので(TODOにはあった)、ついでと思ってUbuntuのサポートをしました([gost#62](https://github.com/knqyf263/gost/pull/62))。
 
 これをもとにして、VulsでUbuntuをスキャンするときにgostからのCVE情報が追加される予定です([Vuls#1243](https://github.com/future-architect/Vuls/pull/1243))。
@@ -203,6 +209,7 @@ gostはUbuntuをサポートしていなかったので(TODOにはあった)、�
 約48倍も速くなった要因は、スキャン先にインストールされているパッケージ数がDebianの場合よりも多く、GORM v2にアップデートすることによるパフォーマンスの向上が顕著に現れたと考えています。
 
 ## GORM v1とGORM v2におけるPreloadの挙動
+
 さて、GORM v1で実装していて、テストをしていると、Debianの場合はRDBとRedisでレスポンスを比較して、差分は出ないのですが、UbuntuではあるパッケージにGETリクエストを投げたときのレスポンスがRDBとRedisで異なることに気が付きました。
 
 とりあえず、Preloadの順番を変更すると、レスポンスが正しく返ってきました。

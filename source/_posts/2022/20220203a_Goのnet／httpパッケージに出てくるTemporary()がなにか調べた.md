@@ -80,7 +80,6 @@ func shouldRetryError(origErr error) bool {
 
 どういったルールでtrue/falseになって、どのように使われるべきなんでしょうか。
 
-
 ## Temporary() の使い方
 
 go.devの[Error handling and Go](https://go.dev/blog/error-handling-and-go) にドンピシャな説明が書いてありました（本来はエラーハンドリングの説明ですが）。
@@ -124,7 +123,6 @@ func (e *ParseError) Temporary() bool { return false }  // IPアドレスのパ�
 
 最初に説明したhttpErrorはクライアント側で指定した時間に対してタイムアウトしたときに利用されていたため、再試行で成功する可能性があるためtrueが返されるのだと思います。OpErrorはシステムコール側の処理でのエラーハンドリング結果に移譲していますが、ECONNRESET(connection reset by peer)やアボートされたときはリトライの余地がありと判定しtrueを返しています。
 
-
 ## もはや非推奨である
 
 ここまでTemporary()について説明してきましたが、netパッケージのErrorでは（おそらく）Go 1.18からのように書かれます。Deprecated（非推奨）になります。
@@ -146,7 +144,6 @@ type Error interface {
 
 ちなみに、[os: remove ErrTemporary in Go 1.13 #32463](https://github.com/golang/go/issues/32463) にあるように、 `os.ErrTemporary` は削除されたようです。
 
-
 ## Temporary()の判定方法
 
 Temporary()の判定にはType Switchしたり、次のようなerrors.As()を使って判定することが多かったかと思います。
@@ -161,11 +158,8 @@ if errors.As(err, &terr) && terr.Temporary() {
 
 この辺は標準パッケージ側でヘルパー関数を作ったら？という提案が[proposal: errors: add new function Temporary(error) bool](https://github.com/golang/go/issues/37250)出ています。期待ですねと言いたいところですが、Temporary() の立ち位置自体が先程説明したようにちょっと微妙であるため、その結果次第ですがおそらく追加されることは無さそうです。
 
-
-
 ## まとめ
 
 * Temporary()は一時的なエラーであるかどうかを示し、リトライで成功する可能性がある場合にtrueを返す
 * 例えば、タイムアウトやTCP通信でコネクションリセットなどを返されたときにtrueになる
 * とは言え、Temporary()の使い分けのハッキリとした定義が難しく、位置づけがTimeout()と被ることもあり非推奨の方向で進んでいる
-

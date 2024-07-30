@@ -47,8 +47,6 @@ Blazorには「Blazor WebAssembly」と「Blazor Sever」の２種類ありま�
 * まずは既存のERPパッケージのデータベースを参照し、売上情報などの情報を見れるようにしたい。
 * モバイルやPCなどクロスプラットフォームとしたい。
 
-
-
 ## Blazor WebAssembly採用の背景とメリット・デメリット
 
 Blazor WebAssemblyを採用した背景としては、面白そうな技術要素で、かつ開発に時間をかけずにクイックに動くものを見せて欲しいという依頼がリーダーからあり、私が通常業務でC#を扱っている点や弊社内には.NET系のエンジニアが多数在籍している点からBlazor WebAssemblyを選択しました。
@@ -101,7 +99,6 @@ D:\xxx\future_one_demo\future_one_demo.sln で ' dotnet restore ' を実行し�
 
 <img src="/images/20220412a/プロジェクト構成.png" alt="プロジェクト構成.png" width="302" height="760" loading="lazy">
 
-
 `Client`フォルダはフロントエンドのプロジェクトです。拡張子が`.razor`のファイルがありますが、これはRazorコンポーネントと呼ばれており、コンポーネントを組み合わせてWebページを作成するイメージとなります。[^1]
 
 `Server`フォルダはバックエンドのプロジェクトです。Blazor WebAssembly専用とかではなく、純粋なASP.NET Core WebAPIアプリケーションです。
@@ -119,20 +116,16 @@ Vue.jsなどで起こりがちな`Client`と`Server`でデータクラスを個�
 
 <img src="/images/20220412a/アプリ.png" alt="アプリ.png" width="1200" height="749" loading="lazy">
 
-
 アプリを起動した直後、ブラウザのDevToolsで見たネットワークの状態です。
 `System.xxx.dll`という.NETランタイムのアセンブリ群がダウンロードされていることが分かります。全体のサイズで約4MBでした。（参考：.NET SDK v6.0.201）
 
 モバイルなど非力な端末の場合、ネックになるかもしれません。
 
-
 <img src="/images/20220412a/DevTools.png" alt="DevTools.png" width="954" height="710" loading="lazy">
-
 
 ただし、２回目以降に起動した際はダウンロードは発生しません。ランタイム関係のアセンブリはキャッシュストレージへ保存され、キャッシュしたものが使われているようです。この辺りは工夫がされているのですね。
 
 <img src="/images/20220412a/DevTools_2.png" alt="DevTools.png" width="872" height="724" loading="lazy">
-
 
 DevToolsのソースを見てます。
 `_framework`コンテンツ内に複数の`.js`ファイルがあります。
@@ -141,12 +134,10 @@ DevToolsのソースを見てます。
 
 <img src="/images/20220412a/DevTools_3.png" alt="DevTools.png" width="956" height="850" loading="lazy">
 
-
 ## 開発ポイント
 
 ここからはBlazor WebAssmblyの開発で理解しておいた方が良いポイントを挙げてゆきます。
 なお、RazorコンポーネントはRazor構文という独自の文法でコードを記述しますが、文法の詳細については割愛します。
-
 
 ### ライフサイクルイベント
 
@@ -285,6 +276,4 @@ Blazor WebAssemblyでの「Fluxアーキテクチャ」のライブラリも存�
 高級言語から機械語への翻訳はコンパイラに全てお任せ、開発者は馴染みのある高級言語でWebアプリ開発に注力でき、Blazor WebAssemblyはC#を用いてWebアプリケーションを開発できる点が一番のメリットなのかなぁと感じました。
 Blazor WebAssmblyを今後使用される方の一助になれば幸いです。
 
-
 [^1]: BlazorではなくRazorです。紛らわしいですがそういうものらしいです。
-

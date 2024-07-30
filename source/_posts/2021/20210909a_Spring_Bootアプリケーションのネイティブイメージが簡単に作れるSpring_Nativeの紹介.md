@@ -18,7 +18,6 @@ lede: "こんにちは、2021年新卒入社の本田です。Spring Bootアプ�
 
 Spring Bootアプリケーションのネイティブイメージが簡単に作れる[Spring Native](https://docs.spring.io/spring-native/docs/current/reference/htmlsingle/)について調べてみたので、それを紹介します。
 
-
 ## Spring Nativeとは?
 
 Spring NativeとはSpring Bootアプリケーションをほとんど変更することなく、ネイティブイメージを生成することを目指したプロジェクトです。ネイティブイメージの実行はJVM(Java仮想マシン)による実行と比べて、起動時間が早い、ピークパフォーマンスに達するのが早い、メモリの使用量が小さい等の利点を持っています。
@@ -26,6 +25,7 @@ Spring NativeとはSpring Bootアプリケーションをほとんど変更す�
 Spring Nativeでは、Spring Bootアプリケーションのネイティブイメージを生成するためにGraalVMを用いています。
 
 ## ネイティブイメージとは?
+
 ネイティブイメージとはJavaをAOTコンパイルしたスタンドアロンな実行可能ファイルのことです(多分GraalVM用語？)。といっても意味が分からないかもしれないので、背景を説明します。
 
 まず、CPUは機械語と呼ばれるCPUが理解できる命令しか実行できません。したがって、プログラムを実行するためには最終的に機械語に変換しなければなりません。この機械語に変換するタイミングには事前に変換、実行時に変換の2種類があります。事前にコンパイルし、機械語を生成する手法はAOT(ahead of time)コンパイル方式と呼ばれます。C、C++、 RustなどでコンパイルするといえばAOTコンパイルをするということを意味します。AOTコンパイルでは、あるCPUに向けて事前にコンパイルするため、その成果物はターゲットプラットフォームでしか動きません。
@@ -37,12 +37,12 @@ Spring Nativeでは、Spring Bootアプリケーションのネイティブイ�
 また、コードを実行するためにはJVMを起動し、クラスをロードする必要があるため、コードを実行するまでに時間がかかります。そのため、AWS Lambdaのようなイベントをトリガーとして、一回だけコードを実行するなどといった状況や、頻繁に再起動を行うマイクロサービスのようなアプリケーションと相性が悪いです。
 このようなJVMの起動時間の長さを解消するのがネイティブイメージです。ネイティブイメージではクラスローディングなどの初期化処理が必要ないため、高速に起動できます。
 
-
 ### AOTコンパイル方式(上)とインタプリタ+JITコンパイル方式(下)の比較
 
 <img src="/images/20210909a/コンパイルとインタプリタ.png" alt="コンパイルとインタプリタ.png" width="1200" height="354" loading="lazy">
 
 ## GraalVMとは?
+
 [GraalVM](https://www.graalvm.org/)はOracle社が開発する多言語を実行することができる仮想マシンです。
 
 現在主流となっているJVMはHotSpot VMという仮想マシンなのですが、GraalVMはHotSpot VMを拡張したものとなっています。HotSpot VMではC1、C2というJITコンパイラが使われています。C2はC++で記述されているのですが、長年の変更でコードがあまりに複雑になり、機能拡張が困難になっています。GraalVMはC2コンパイラをJava製のGraalVM JITコンパイラに置き換えていて、これにより機能の拡張が容易になりました。さらに、GraalVMはTruffleというGraalVM JITコンパイラの利用を前提とした言語実装用のライブラリを持っています。したがってTruffleを使ってあるプログラミング言語を実装すれば、その言語はGraalVMで走らせることができます。
@@ -70,6 +70,7 @@ Spring Nativeは動的機能を使うためのヒント文をアノテーショ�
 ## Spring Nativeで簡単なアプリケーションのネイティブイメージを作ってみる。
 
 ### ひな型作成
+
 Spring InitializrでSpring WebとSpring Nativeを依存関係に追加してプロジェクトのひな型を生成します。
 
 <img src="/images/20210909a/spring_initializr.png" alt="spring_initializr.png" width="1200" height="675" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;">
@@ -101,7 +102,6 @@ Spring Initializrを使ってSpring Nativeを依存関係に追加してプロ�
 
 <img src="/images/20210909a/image.png" alt="image.png" width="1200" height="552" loading="lazy">
 
-
 ### コンテナを走らせる。
 
 <img src="/images/20210909a/image_2.png" alt="image.png" width="1200" height="765" loading="lazy">
@@ -131,10 +131,9 @@ GraalVMにはCommunity EditionとEnterprise Editonがあり、性能はEnterpris
 
 [Gatling](https://gatling.io/)というツールを使ってパフォーマンスを計測してみましたが、元々のレスポンス時間が短すぎて差は分かりませんでした。実用的なアプリケーションを使って比較してみると、面白いかもしれません。
 
-
 ## 終わりに
-ネイティブイメージは起動時間の短さが魅力的ですが、実務的にはビルド時間の長さがネックになるのかなと思いました。今回は非常にシンプルなアプリにもかかわらず7分かかっているので、プロダクションレベルのアプリのビルドにどれくらい時間がかるのかは要検証だと思います。
 
+ネイティブイメージは起動時間の短さが魅力的ですが、実務的にはビルド時間の長さがネックになるのかなと思いました。今回は非常にシンプルなアプリにもかかわらず7分かかっているので、プロダクションレベルのアプリのビルドにどれくらい時間がかるのかは要検証だと思います。
 
 ### 参考文献
 
@@ -142,4 +141,3 @@ GraalVMにはCommunity EditionとEnterprise Editonがあり、性能はEnterpris
 1. GraalVM https://www.graalvm.org/
 1. Toshiaki Maki, JSUG勉強会 2021年その1: Spring Nativeの紹介 #jsug, https://t.co/iRR5vaK7CX?amp=1
 1. きしだなおき、吉田真也、山田貴裕、蓮沼賢志、阪田浩一、前多賢太郎, みんなのJava, 技術評論社, 2020
-

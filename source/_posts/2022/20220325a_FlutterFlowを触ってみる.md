@@ -16,7 +16,6 @@ lede: "Flutter連載6回目としてFlutterFlowについて調べてみました
 ---
 <img src="/images/20220325a/image.png" alt="image.png" width="1200" height="675" loading="lazy">
 
-
 # はじめに
 
 TIGの宮崎将太です。
@@ -54,7 +53,6 @@ GUIだけでグリグリアプリが作れちゃうという例のアレです�
 | **Githubとの統合**                 | ProプランのみソースコードをGithubリポジトリベースで管理できるとのこと。<br>FlutterFlowにもバージョンの概念はありますが、アプリ全体で断面を切るくらいしかできませんでした。                                                                              |               |                   |       ○      |
 | **Firebase ContentMangeer**        | ProプランのみFirestoreデータをFlutterFlowGUI上で編集できるようになるとのこと。                                                                                                                                                                          |               |                   |       ○      |
 | **料金**                           | per month                                                                                                                                                                                                                                               |       0$      |        30$        |      70$     |
-
 
 # 使い方
 
@@ -98,7 +96,6 @@ TextやColumn、RowなどおなじみのWigdetがデフォルトで登録され�
 
 <img src="/images/20220325a/image_4.png" alt="GUIを用いたAction設定" width="1200" height="515" loading="lazy">
 
-
 ## コンポーネント作成
 
 GUIとコードベースでコンポーネントを作成できます。
@@ -115,8 +112,6 @@ ActionやCustomFunctionから適宜参照、設定ができます。
 
 <img src="/images/20220325a/image_5.png" alt="アプリケーショングローバルな値をLocalStateとして設定" width="1200" height="734" loading="lazy">
 
-
-
 ## APICall
 
 ここが残念なところ....
@@ -124,7 +119,6 @@ FreePlan/Standardでは任意のAPICall設定ができません。Backendを簡�
 ※CustomFunctionとしてAPICallをコーディングしておけばなんとでもなる気がするけど、そこまでやるとFlutterFlowを使用する理由が消失する。
 
 <img src="/images/20220325a/image_6.png" alt="API呼び出し" width="1200" height="745" loading="lazy">
-
 
 ## 生成ソースコード
 
@@ -430,6 +424,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
 # 使い所
 
 軽く触ってみた感触と料金体系を見た感じ、以下の感触でした。
+
 * ProPlanであればPoCプロジェクトは十分に回せそう。ただし、状態管理などより作りを意識する必要があるプロダクト版開発はProPlanでも限定的な使い方になる。（デザイン部分だけをFlutterFlowで作るなど。）
 * Firebase前提でプロトタイプのみを作成するのであればStandardPlanが適当。ソースダウンロードができるので、どこかのリポジトリに保存しておけばプロジェクト終了後も月額費を払い続けるということは必要なし。
 * FreePlanはデザインコードの参考程度の使い道。画面単位でソースコード表示はできるので、部分的にコピペすることで若干開発は早くなるか。
@@ -437,6 +432,3 @@ class _HomePageWidgetState extends State<HomePageWidget> {
 有料プランでも14日間は使用ができそうなので、次はProPlanを試してみようと思います。
 正直FreeとStandardでは実プロジェクトへの導入はなかなか難しそう..
 Proでも料金は70$/月程度なので、プロジェクトで数アカウントだけ取るのはギリギリありかどうか..？といったところです。
-
-
-

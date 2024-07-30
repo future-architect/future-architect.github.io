@@ -200,4 +200,3 @@ go install github.com/d-tsuji/awslambdahandler/cmd/awslambdahandler@latest
 ## まとめ
 
 静的解析を実施することでバグにつながるコードを早い段階で検知できます。[`gostaticanalysis/skeleton`](https://github.com/gostaticanalysis/skeleton) や [`golang.org/x/tools/go/analysis`](https://pkg.go.dev/golang.org/x/tools/go/analysis) を用いることで便利に静的解析ツールを自作できます。`awslambdahandler` を用いることでAWS Lambdaの関数シグネチャを静的解析でき、より安全にAWS Lambdaを実装できるようになりました。
-

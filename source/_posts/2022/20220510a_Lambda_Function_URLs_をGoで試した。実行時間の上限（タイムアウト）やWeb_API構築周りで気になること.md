@@ -19,8 +19,7 @@ lede: "2022/04/06にGAになったと発表された、Lambda Function URLsは�
 TIG DXユニット真野です。2022/04/06にGAになったと発表された、Lambda Function URLsは、AWS Lambdaに直接HTTPSエンドポイントを追加できるというもので、API Gateway（やALB）無しでWeb APIやサイトを構築できると話題になりました。
 
 * [Announcing AWS Lambda Function URLs: Built-in HTTPS Endpoints for Single-Function Microservices](https://aws.amazon.com/jp/blogs/aws/announcing-aws-lambda-function-urls-built-in-https-endpoints-for-single-function-microservices/)
-    * [（4/14公開の日本語訳）AWS Lambda Function URLs の提供開始: 単一機能のマイクロサービス向けの組み込み HTTPS エンドポイント](https://aws.amazon.com/jp/blogs/news/announcing-aws-lambda-function-urls-built-in-https-endpoints-for-single-function-microservices/)
-
+  * [（4/14公開の日本語訳）AWS Lambda Function URLs の提供開始: 単一機能のマイクロサービス向けの組み込み HTTPS エンドポイント](https://aws.amazon.com/jp/blogs/news/announcing-aws-lambda-function-urls-built-in-https-endpoints-for-single-function-microservices/)
 
 私も業務でAPI Gateway + Lambdaの組み合わせで稼働している事例があります。非常に安定稼働していますが、この組み合わせだとタイムアウトがAPI GatewayのLambda統合となるため上限が29秒[^1]です。Lambda Function URLs だとAPI Gatewayを経由しない分、Lambda側の15分[^2]になることが嬉しいなと思いました。Web APIでそんなに長時間動かすことって無いだろうと思いますよね。私もそう思っていましたが、Excelファイルアップロードによるバッチ登録や、Excel帳票ダウンロード機能の登場を予見できず目論見は崩れました。
 
@@ -28,7 +27,6 @@ TIG DXユニット真野です。2022/04/06にGAになったと発表された�
 [^2]: 2022.4.30時点でLambda関数タイムアウトは最大15分で上限緩和不可。https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/gettingstarted-limits.html
 
 さて、ドキュメントにはLambda Function URLsで個別のタイムアウト制約があるという記載がないため、制約は通常のLambdaと同様に15分が上限であることは自明な気がしますが、せっかくなので検証します。また、GoでJSONを返すWeb APIを構築するときにどういった使い方になるかコードベースで試します。
-
 
 ## タイムアウトについて
 
@@ -111,8 +109,6 @@ deploy:
 
 これで、Lambda Function URLsは実行時間の面でかなり有用だと感じます。
 
-
-
 ## WAFの制御
 
 API Gatewayのようなリッチな制御は行えなくても、セキュリティ要件でWAF設置が必須な場合があります。Lambda Function URLsは2022.5.5時点ではAWS WAFの設定は不可のようです。AWS WAFの設定画面をみても、現状はAPI Gateway, ALB, AppSyncの3つに限られています。
@@ -120,7 +116,6 @@ API Gatewayのようなリッチな制御は行えなくても、セキュリテ
 <img src="/images/20220510a/WAF設定画面.png" alt="WAF設定画面" width="840" height="256" loading="lazy">
 
 そのためブラウザアクセスを許容したいけど、検証用のエンドポイントは送信元IPを絞りたいとかも現状はできないです。スロットリング、カスタムドメイン名などとともに、これらの要件が必要な場合はAPI Gatewayを利用しましょうということです。（InboundのSecurity Groupが設定できれば最高なんですが..）
-
 
 ## httpハンドラー対応
 
@@ -164,15 +159,12 @@ aws labs http adapter response!!
 
 そのため、現在API Gateway + Lambda構成で開発しているアプリも、アプリコードとしてはそのまま Lambda Function URLsに移植できますし、同様に `awslabs/aws-lambda-go-api-proxy` を使っている場合もです。 `awslabs/aws-lambda-go-api-proxy` を使っていれば、ECSでもAPI Gateway Lambdaでも Lambda Function URLs でもコアなアプリコードは同じにできるので、非常に安心ですね。（ECSはproxyなしで生のHTTPサーバを実行するイメージです）
 
-
 **2022.10.6 追記**
 
 [AWS lambda's function URL without API Gateway in Go - Stack Over Flow](https://stackoverflow.com/questions/72795881/aws-lambdas-function-url-without-api-gateway-in-go) にあるように、aws-sdk-for-go における apigateway-requestとlambda-function-urlsの構造体が異なるようで、上記の例だとリクエストパラメータはうまく渡るものの、URLのマッピングがすべて `/` になってしまうというフィードバックが社内のチームから報告を受けました。そのままadaptorをつかうのではなく、 `events.LambdaFunctionURLRequest` に載せ替える一手間がひつようかもしれません。
-
 
 ## まとめ
 
 * Lambda Function URLsのタイムアウトは最長15分になり、API Gatewayを経由するときより伸びた
 * AWS WAFはつけられないので、ブラウザ経由のアクセス制御は個別に実施する必要がある
 * リクエストはAPI Gatewayペイロードフォーマットと同じなので、エコシステムをそのまま流用できる
-

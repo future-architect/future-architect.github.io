@@ -25,7 +25,6 @@ lede: "本記事ではRust製SQLフォーマッタであるuroborosql-fmtのVSCo
 
 本記事ではそのフォーマッタをVSCodeの拡張機能化した方法について説明します。
 
-
 # 説明すること
 
 * napi-rsを使用してTypeScript(JavaScript)からRustのコードを呼び出せるようにする方法
@@ -39,12 +38,12 @@ lede: "本記事ではRust製SQLフォーマッタであるuroborosql-fmtのVSCo
 # 説明しないこと
 
 * 本記事ではフォーマッタの仕様、実装方法について説明しません。詳細を知りたい方は以下の記事をご覧ください。
-    * [Engineer Camp2022 RustでSQLフォーマッタ作成（前編） | フューチャー技術ブログ](/articles/20220916b/)
-    * [Engineer Camp2022 RustでSQLフォーマッタ作成（後編） | フューチャー技術ブログ](/articles/20220916c/)
-    * [tree-sitter文法入門 | フューチャー技術ブログ](/articles/20221215a/)
+  * [Engineer Camp2022 RustでSQLフォーマッタ作成（前編） | フューチャー技術ブログ](/articles/20220916b/)
+  * [Engineer Camp2022 RustでSQLフォーマッタ作成（後編） | フューチャー技術ブログ](/articles/20220916c/)
+  * [tree-sitter文法入門 | フューチャー技術ブログ](/articles/20221215a/)
 * LSPを用いた拡張機能作成方法の詳細についても本記事では説明しません。詳細を知りたい方は以下の記事をご覧ください。
-    * [Language Server Protocolを用いたVSCode拡張機能開発 (前編) | フューチャー技術ブログ](/articles/20221124a/)
-    * [Language Server Protocolを用いたVSCode拡張機能開発 (後編) | フューチャー技術ブログ](/articles/20221125a/)
+  * [Language Server Protocolを用いたVSCode拡張機能開発 (前編) | フューチャー技術ブログ](/articles/20221124a/)
+  * [Language Server Protocolを用いたVSCode拡張機能開発 (後編) | フューチャー技術ブログ](/articles/20221125a/)
 * napi-rsで作成したNode.jsアドオンの公開方法
 * 作成したVSCode拡張機能の公開方法
 
@@ -89,8 +88,8 @@ SQLフォーマッタはRust、自作Language ServerはTypeScriptで書かれて
 そこで、napi-rsというツールを使用して、TypeScriptからRustで書かれたSQLフォーマッタを呼び出せるようにしました。
 
 # TypeScriptからRustの呼び出し
-まずTypeScriptからRustを呼び出す方法として以下の3つの方法が考えられます。
 
+まずTypeScriptからRustを呼び出す方法として以下の3つの方法が考えられます。
 
 | 方法 | 使用するツール | メリット | デメリット |
 |--|--|--|--|
@@ -106,15 +105,17 @@ wasmとNode.jsアドオンの性能差は現時点では調査しましたがわ
 
 しかし、SQLフォーマッタは内部的にCで書かれたコードを呼び出していることが要因でwasm化がうまくいかなかったため、今回はnapi-rsを用いてNode.jsアドオン化する方法を選択しました。
 
-
 ## Node-API
+
 napi-rsについて紹介する前にNode-APIについて説明します。
 Node-APIとはNode 8.0.0で導入されたツールで、C/C++コードをNode.jsのアドオン化するツールです。
 Node-APIを使用することで、C/C++コードをJavaScriptで記述されたものと同様の方法で利用できるようになります。
 
 ## napi-rsとは
+
 [napi-rs](https://napi.rs/)とはNode-APIをRustで使用できるようにしたものです。
 例えば以下のようなRustコードをnapi-rsでビルドします。
+
 ```rust  example.rs
 #![deny(clippy::all)]
 
@@ -126,7 +127,9 @@ pub fn sum(a: i32, b: i32) -> i32 {
   a + b + b
 }
 ```
+
 すると、Node.jsアドオンが生成され、JavaScriptからRustの関数を呼び出せるようになります。
+
 ```javascript  example.js
 const { sum } = require("./index.js");
 console.log(sum(3, 4));
@@ -140,8 +143,8 @@ console.log(sum(3, 4));
 <a href="https://codezine.jp/article/detail/14109">N-APIが「Node-API」へ名称変更、既存のコンパイル済みアドオンへの影響はナシ|CodeZine（コードジン）</a>
 </div>
 
-
 ## napi-rsの使い方
+
 napi-rsの使い方を説明します。
 
 <div class="note warn" style="background:#fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
@@ -151,24 +154,33 @@ napi-rsの使い方を説明します。
 </div>
 
 ### 1. CLIツールのインストール
+
 yarnでnapi-rsのCLIツールをインストールします。
 まずyarnをインストールします。以降もyarnが必要になるため、必ずインストールしてください。
+
 ```shell
 npm install -g yarn
 ```
+
 napi-rsのCLIツールをインストールします。
+
 ```shell
 yarn global add @napi-rs/cli
 ```
+
 インストールに成功すると`napi`コマンドが使えるようになります。
 
 ### 2. 新規プロジェクト作成
+
 インストールしたCLIツールを使用して新規プロジェクトを作成します。
 新規プロジェクトを作成したいディレクトリで以下のコマンドを実行します。
+
 ```shell
 napi new
 ```
+
 すると、以下の質問が表示されるので、順に回答してください。
+
 ```shell
 # 任意のパッケージ名
 ? Package name: (The name filed in your package.json)
@@ -198,7 +210,9 @@ x86_64-pc-windows-gnuの環境はサポートされていないため、msvc版�
 これでNode.js add-onを作るテンプレートが完成しました。
 
 ### 3. ビルドと実行
+
 テンプレートの`src/lib.rs`に既にサンプルのRustコードが含まれています。関数sumは2つの引数の合計を返す関数です。
+
 ```rust  src/lib.rs
 #![deny(clippy::all)]
 
@@ -213,32 +227,39 @@ pub fn sum(a: i32, b: i32) -> i32 {
 
 これをNode.jsアドオンへビルドして実行してみます。
 まず先ほど作成したプロジェクトのルートディレクトリでビルドコマンドを実行します。
+
 ```shell
 yarn build
 ```
+
 ビルドに成功すると、プロジェクトのディレクトリ直下に`index.d.ts`、`index.js`、`<プロジェクト名>.<環境>.node`が作成されます。
 
 `index.js`には環境に合ったnodeファイルを読み込んでくれる処理が書いています。そのため、`index.js`をimportすることで自動的に環境に合ったnodeファイルが読み込まれ、そこに含まれる関数を利用することができるようになります。
 
 以下のファイルをプロジェクトのディレクトリ直下に作成します。
+
 ```javascript test.js
 const { sum } = require("./index.js");
 console.log(sum(3, 4));
 ```
+
 実行して"7"という出力が返ってきたら成功です。
+
 ```shell
 node test.js
 # 7
 ```
 
 ## SQLフォーマッタをJavaScriptから実行
+
 プロジェクトのテンプレートを変更してSQLフォーマッタをJavaScriptから実行できるようにしてみます。
 
 ### 1. 新規プロジェクト作成
+
 先述した方法で新規プロジェクトを作成しました。プロジェクト名はuroborosql-fmt-napiとしています。
 
-
 ### 2. `src/lib.rs`を変更し、ビルド
+
 `src/lib.rs`を以下のように変更します。
 SQLフォーマッタのクレート名は`uroborosql_fmt`で、`format_sql()`関数にSQL文を渡すとフォーマットされたSQLが返ってきます。
 
@@ -255,14 +276,19 @@ pub fn runfmt(input: String) ->  String {
     format_sql(&input)
 }
 ```
+
 プロジェクトのルートディレクトリでビルドします。
+
 ```shell
 yarn build
 ```
+
 私の環境はwin32-x64-msvcであるため、`index.d.ts`、`index.ts`、`uroborosql-fmt-napi.win32-x64-msvc.node`が生成されました。
 
 ### 3. run.jsの作成、実行
+
 プロジェクトのディレクトリ直下にrun.jsを作成します。変数targetにはフォーマットしたいSQL文を格納しています。
+
 ```javascript run.js
 const { runfmt } = require("./index.js");
 
@@ -289,10 +315,13 @@ AND SBJ.grade   >
 `;
 console.log(runfmt(target));
 ```
+
 作成した`run.js`を実行します。
+
 ```shell
 node run.js
 ```
+
 出力結果は以下のようになりました。きちんとフォーマットされているため成功です。
 
 ```sql
@@ -315,13 +344,13 @@ AND	JPN_STD.ID		=	SBJ.ID
 AND	SBJ.GRADE		>	/*grade*/50	-- 成績が50点以上
 ```
 
-
 ## クロスプラットフォームビルド
+
 現在はビルドした環境(win32-x64-msvc)でしか作成したNode.jsアドオンが動作しません。
 そこでGitHub Actionsを使ってクロスプラットフォームビルドを行います。
 
-
 ### 0. CI.ymlの作成
+
 もしnapi-rsプロジェクト作成時にGitHub Actionsを有効にしていなかった場合はこちらの作業を行ってください。
 
 1. 適当なディレクトリで`napi new`
@@ -331,16 +360,20 @@ AND	SBJ.GRADE		>	/*grade*/50	-- 成績が50点以上
 1. GitHub Actionsを有効にしてプロジェクトを作成
 1. 完成したプロジェクト内の`.github`ディレクトリをコピーして現在作業中のプロジェクトにペースト
 
-
 ### 1. yarn.lockの作成
+
 プロジェクトのルートディレクトリで以下のコマンドを実行します。
+
 ```shell
 yarn install
 ```
+
 yarn.lockが作成、または更新されれば成功です。
 
 ### 2. CI.ymlの編集、GitHub Actionsの実行
+
 デフォルトではGitHubにpushするとGitHub Actionsが自動的に動いて以下の処理を行ってくれます。
+
 1. 各環境に対応したNode.jsアドオンをビルド
 1. npmパッケージのpublish
 
@@ -353,33 +386,41 @@ GitHub Actionsでビルドを行うと、13個の環境のうち11個の環境�
 試行錯誤して`.github/workflows/CI.yml`を編集すると、最終的に13個中7個の環境でビルドが成功するようになりました。私が実施した変更を参考程度に示します。
 
 #### `CI.yml`の変更1: 長いパスに対応
+
 hostがwindows-latestである環境のbuildに以下の処理を追加しました。
+
 ```
 git config --system core.longpaths true
 ```
 
 #### `CI.yml`の変更2: yarn testの削除
+
 targetがi686-pc-windows-msvcの場合のみビルド時に`yarn test`が走っています。本来は消すべきではないかもしれませんが、今回はテストコードを書いていないのでとりあえず削除しました。
 
 #### `CI.yml`の変更3: aarch64-apple-darwinにおける一部処理の削除
+
 targetがaarch64-apple-darwinの場合のビルド処理の上5行を削除しました。最終的にビルド処理は以下のようになりました。
+
 ```
 yarn build --target aarch64-apple-darwin
 strip -x *.node
 ```
 
 ### 3. 成果物のダウンロード
+
 GitHub Actionsでビルドした各環境のNode.jsアドオンをダウンロードします。
 GitHubのリポジトリ > Actions > 最新のワークフローに移動し、ページ最下部のArtifactsのファイルをすべてダウンロードします。
 <img src="/images/20221228a/image.png" alt="image.png" width="1200" height="392" loading="lazy">
 各ファイルを解凍すると、各環境に合ったNode.jsアドオンが取得できます。
 
 ## nodeファイルをまとめて圧縮
+
 1. 適当なディレクトリを作成
 1. 対応したい環境のnodeファイルを全て置く
 1. napi-rsプロジェクトの`index.d.ts`と`index.js`をコピーしてそのディレクトリにペースト
 1. package.jsonを作成 (nameはパッケージ名)
    フォーマッタの名前がuroborosql-fmtであるため、パッケージ名はuroborosql-fmt-napiとしました。
+
     ```json: package.json
     {
       "name": "uroborosql-fmt-napi",
@@ -392,20 +433,21 @@ GitHubのリポジトリ > Actions > 最新のワークフローに移動し、�
       }
     }
     ```
+
 1. 以下のコマンドを実行して圧縮
+
     ```shell
     npm pack
     ```
+
 1. `プロジェクト名-バージョン.tgz`ファイルが生成されれば成功
 
 今回の例では`uroborosql-fmt-napi-0.0.0.tgz`というファイルが生成されました。
 
-
-
 # 拡張機能の作成
+
 ※再掲
 <img src="/images/20221228a/df88766a-9fef-6408-5603-1c17bed7619c_2.png" alt="" width="1200" height="1190" loading="lazy">
-
 
 TypeScriptからSQLフォーマッタを呼び出すことができるようになったので、次に拡張機能部分を作成します。
 本記事では[microsoft/vscode-extension-samples/lsp-sample](https://github.com/microsoft/vscode-extension-samples/tree/main/lsp-sample)をベースにして拡張機能を作成します。
@@ -416,9 +458,11 @@ LSPを用いた拡張機能作成方法の詳細を知りたい方は以下を�
 * [Language Server Protocolを用いたVSCode拡張機能開発 (後編) | フューチャー技術ブログ](/articles/20221125a/)
 
 ## 拡張機能の設定
+
 `package.json`を変更して拡張機能の設定を変更します。
 
 まず、VSCodeが起動されると拡張機能が有効になるようにします。
+
 ```json package.json
   "activationEvents": [
     "*"
@@ -426,6 +470,7 @@ LSPを用いた拡張機能作成方法の詳細を知りたい方は以下を�
 ```
 
 コマンドパレットから「format sql」コマンドを実行できるように設定します。
+
 ```json package.json
   "contributes": {
     "commands": [
@@ -438,6 +483,7 @@ LSPを用いた拡張機能作成方法の詳細を知りたい方は以下を�
 ```
 
 ## クライアント
+
 `client/src/extension.ts`にクライアント側の処理を記述します。
 
 `clientOptions`内の`documentSelector`を以下のように変更し、全ての形式のファイル、保存されていないUntitledなファイルを拡張機能の対象とします。
@@ -466,8 +512,8 @@ LSPを用いた拡張機能作成方法の詳細を知りたい方は以下を�
   );
 ```
 
-
 ## サーバ
+
 まず先程`npm pack`で取得した`uroborosql-fmt-napi-0.0.0.tgz`をserverディレクトリ内に置きます。
 そして、`server/package.json`のdependenciesを以下のように変更します。
 
@@ -478,6 +524,7 @@ LSPを用いた拡張機能作成方法の詳細を知りたい方は以下を�
     "vscode-languageserver-textdocument": "^1.0.4"
   }
 ```
+
 これでRust製SQLフォーマッタをimportできるようになりました。
 
 `server/src/server.ts`にサーバの処理を記述します。
@@ -562,6 +609,7 @@ connection.onExecuteCommand((params) => {
 ちゃんとフォーマットされることが確認できました🎉
 
 # 拡張機能のパッケージ化
+
 vsceというツールを使用してパッケージ化を行います。vsceとはVSCode拡張機能のパッケージ化、公開、管理を行うことができるCLIツールです。
 
 <div class="note warn" style="background:#fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
@@ -569,11 +617,12 @@ vsceというツールを使用してパッケージ化を行います。vsceと
   <p>本記事では拡張機能の公開については説明しません。</p>
 </div>
 
-
 ## vsceのインストール
+
 私の環境(Windows10)ではインストールに手順が必要だったので順に説明します。
 
 ### 1. Python3のインストール
+
 Python3が必要なためインストールします。既にPython3が入っている方は次のステップに進んでください。
 
 まず[こちら](https://www.python.org/downloads/)からインストーラをダウンロードします。
@@ -584,9 +633,11 @@ Python3が必要なためインストールします。既にPython3が入って
 「Install Now」をクリックしてインストールし、「Setup was Succesful」と表示されればインストール完了です。
 
 ### 2. node-gypのインストールと設定
+
 [node-gyp](https://github.com/nodejs/node-gyp)とは、Node.js のネイティブアドオンモジュールをコンパイルするためのツールです。既に入っていて設定済みの方は次のステップに進んでください。
 
 #### node-gypのインストール
+
 まずnode-gypをインストールします。
 
 ```shell
@@ -594,12 +645,14 @@ npm install -g node-gyp
 ```
 
 ### 3. VisualStudioのビルドツールのインストール
+
 次に[こちら](https://visualstudio.microsoft.com/ja/thank-you-downloading-visual-studio/?sku=BuildTools)からVisualStudioのビルドツールのインストーラをダウンロードします。
 インストーラを起動して「C++によるデスクトップ開発」を選択して、**右側の「インストールの詳細」の中の「Windows 10 SDK」にチェックを入れて**右下のインストールをクリックします。(Windows11の方は「Windows 11 SDK」にチェックを入れてください。)
 
 <img src="/images/20221228a/image_3.png" alt="image.png" width="1200" height="635" loading="lazy">
 
 ### 4. npmの設定
+
 以下を実行します。(2022の部分はダウンロードしたバージョンに合わせて適宜変更して下さい)
 
 ```shell
@@ -607,15 +660,17 @@ npm config set msvs_version 2022
 ```
 
 ### 5. vsceのインストール
+
 以下を実行します。
 
 ```shell
 npm install -g vsce
 ```
+
 vsceコマンドが実行できるようになれば成功です。
 
-
 ## パッケージ化
+
 先程作成した拡張機能のディレクトリで以下のコマンドを実行します。
 
 ```
@@ -634,14 +689,13 @@ code --install-extension .\uroborosql-fmt-1.0.0.vsix
 
 <img src="/images/20221228a/image_4.png" alt="" width="1200" height="629" loading="lazy">
 
-
 # まとめ
+
 本記事ではRust製SQLフォーマッタをVSCode拡張機能化した方法を紹介しました。
 
-
 # 参考文献
+
 * [What is Node-API? · The Node-API Resource](https://nodejs.github.io/node-addon-examples/about/what/)
 * [Rust + Node-APIでクロスプラットフォーム向けnpmパッケージを公開する - 別にしんどくないブログ](https://shisama.hatenablog.com/entry/2021/12/03/054437)
 * [VSCodeの拡張を作ってパッケージ化する - Qiita](https://qiita.com/irico/items/fa60a7e077f4414f0eb6)
 * [Publishing Extensions | Visual Studio Code Extension API](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)
-

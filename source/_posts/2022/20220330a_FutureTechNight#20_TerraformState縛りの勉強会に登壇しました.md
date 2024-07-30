@@ -45,7 +45,9 @@ TIGの棚井龍之介です。
 「state操作を図で表現する」というのが推しポイントだったのですが、勉強会後のツイートで Terraformの「moved block」という方法を教えて頂きました。実際に使ってみたことろ、terraform mvと同様の操作を、私が勉強会で説明した方法よりも安全に実行できると感じたため、この方法について以下で説明します。
 
 # moved blockを試す
+
 ## 事前準備
+
 まずは、こちらの記事「[LocalStackに向けてTerraformを実行する](https://future-architect.github.io/articles/20201113/)」に沿って環境構築を進めて、ローカル環境でTerraformが操作できるようにします。
 
 moved blockは [v1.1.0](https://github.com/hashicorp/terraform/releases/tag/v1.1.0) により追加された機能のため、Terraformは最新バージョンを入れます。
@@ -183,6 +185,7 @@ null_resource.resource_C
 以上で準備は完了です。
 
 ## moved blockでリソースを改名する
+
 さっそく、moved block を利用して、terraform mv と同様に「リソース名の変更」を実施してみましょう。
 
 まずは、同一ディレクトリに `moved.tf` を追加します。
@@ -301,4 +304,3 @@ Terraform has compared your real infrastructure against your configuration and f
 Terraformのリファクタリングには「①stateファイルの操作」と「②Terraformコード自体の操作」の2つが必要であり、①に集中することで②を忘れてしまうことがありますが、moved block を利用すればそれを防げそうです。
 
 私の中では、Terraform stateファイルの操作には「terraform stateコマンドしかない」と思っていましたが、今回の勉強会に参加することで、結果的に新しい方法を知ることができました。改めて、継続的な技術インプット & 定期的なアウトプットが重要だなと実感した勉強会でした。
-

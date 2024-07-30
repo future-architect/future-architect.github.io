@@ -12,7 +12,7 @@ category:
 thumbnail: /images/20210824a/thumbnail.png
 author: 宮永崇史
 lede: "夏の自由研究ブログ連載2021の第2本目の投稿として、Sesame3にFelicaによる施錠解錠を実装しました。Sesame3はCANDY HOUSE JAPANが開発、販売しているスマートロックです。Sesame3本体に加えてwifiモジュールを購入すると、外出先から鍵の施錠/解錠を行うことができます。"
------
+---
 
 <img src="/images/20210824a/サムネ.png" alt="" width="" height="" loading="lazy">
 
@@ -63,9 +63,9 @@ Sesame3は[CANDY HOUSE JAPAN](https://jp.candyhouse.co/)が開発、販売して
 
 - Go1.16.6 linux/amd64
 - Python 3.8.10
-    - [nfcpy/nfcpy: A Python module to read/write NFC tags or communicate with another NFC device\.](https://github.com/nfcpy/nfcpy)
-    - [theskumar/python\-dotenv: Get and set values in your \.env file in local and production servers\.](https://github.com/theskumar/python-dotenv)
-    - [Legrandin/pycryptodome: A self\-contained cryptographic library for Python](https://github.com/Legrandin/pycryptodome)
+  - [nfcpy/nfcpy: A Python module to read/write NFC tags or communicate with another NFC device\.](https://github.com/nfcpy/nfcpy)
+  - [theskumar/python\-dotenv: Get and set values in your \.env file in local and production servers\.](https://github.com/theskumar/python-dotenv)
+  - [Legrandin/pycryptodome: A self\-contained cryptographic library for Python](https://github.com/Legrandin/pycryptodome)
 
 Sesame3を動かすWebAPIは[こちら](https://dash.candyhouse.co/login)からAPI_TOKENを発行してください。
 API_TOKENの発行の方法は[こちら](https://zenn.dev/key3/articles/6c1c2841d7a8a2)のブログが参考になりました。
@@ -78,8 +78,8 @@ API_TOKENの発行の方法は[こちら](https://zenn.dev/key3/articles/6c1c284
 
 の3つです。
 
-
 ## 4. 構成
+
 PythonでカードリーダーによるIDmの読み取りと`SECRET_KEY`の暗号化を行い、GoでHTTPリクエストを行うという構成にしました。
 この構成にした理由は..
 
@@ -90,6 +90,7 @@ PythonでカードリーダーによるIDmの読み取りと`SECRET_KEY`の暗�
 の3点です。本来であれば素直にPython1本、Go1本に絞ったほうが良いと思います....
 
 ### 4.1 システム概要図
+
 以下システムの概要図です。
 
 Raspberry Piにカードリーダー、スピーカーを接続しています。PythonでカードーリーダーからFelicaのIDmを取得し、暗号化したSECRET_KEYとAPI_TOKENをGo側に渡します。また、IDmの検知をユーザーに通知音で知らせています。GOではCANDY HOUSEが公開しているWeb APIに向けてHTTPリクエストを行います。リクエストに応じて、SESAME3を開閉することができるという構成になっています。
@@ -112,6 +113,7 @@ Raspberry Piにカードリーダー、スピーカーを接続しています�
 ```
 
 ## 5. 実装
+
  APIの使用方法は[公式](https://doc.candyhouse.co/ja/SesameAPI)にて、PythonおよびJavaScriptで公開されています。
 
 今回は公式に記載された方法を手掛かりにコーディングしました。
@@ -273,7 +275,7 @@ func executeLock(sign, api, uuid string) string {
 Pythonのコーディングを始める前に`export.go`をビルドします。`/exoprt`にて以下コマンドを実行します。
 
 ```bash
-$ go build -buildmode=c-shared -o export.so
+go build -buildmode=c-shared -o export.so
 ```
 
 ビルド後、export配下に新たに`export.so`、`export.h`が出力されていることが確認できます。
@@ -364,7 +366,6 @@ class MySesame3:
 
 次に一度`main.py`からは離れて、カードリーダーのクラスを定義します。こちらは別ファイル`nfcreader.py`にコーディングします。`nfcreader.py`をコーディングするにあたって[こちら](https://qiita.com/LinaNfinE/items/945a795e53427e768e47)の方の記事を参考にしました。
 
-
 ```python nfcreader.py
 import nfc
 import binascii
@@ -390,7 +391,6 @@ class CardReader():
         print(str(self.idm))
         clf.close()
 ```
-
 
 `main.py`の本体を記述します。
 
@@ -430,6 +430,7 @@ if __name__ == '__main__':
 最後にラズパイから音を出すためにスピーカーを取り付けます。高価なスピーカーはもったいないのでこちらはアンプを取り付けて自作します。スピーカーの取り付けは[こちら](https://karaage.hatenadiary.jp/entry/RPi-Speaker)の記事を参考にしました。
 
 ## 7. 取り付け
+
 スピーカーを取り付けたらとりあえず、新聞受けに投げ入れます。玄関まで電源コードを延長するのが大変でしたが、[こちら](https://www.amazon.co.jp/gp/product/B019O0JS7C)の延長コードでどうにか電源供給できました。
 
 <img src="/images/20210824a/DSC_0482.JPG" alt="玄関に設置の様子" width="1200" height="676" loading="lazy">

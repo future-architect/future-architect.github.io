@@ -14,6 +14,7 @@ author: 一ノ瀬秀都
 lede: "オンプレからクラウドへのデータ移行に関して、AzureのData Boxというサービスを利用する機会があったので、詳細なワークフローや失敗談について共有します。昨今のDX推進の流れにのり、システムのクラウドシフト/リフトに取り組む方も多いかと思います。「クラウドへの移行を考えているがデータ量が膨大で移行ができない」といった悩みがあったり..."
 ---
 # はじめに
+
 はじめまして、テクノロジーイノベーショングループ所属、2021年4月に新卒で入社した一ノ瀬です。
 
 [秋のブログ週間](/articles/20221031a/)の6本目となる本記事では、オンプレからクラウドへのデータ移行に関して、AzureのData Boxというサービスを利用する機会があったので、詳細なワークフローや失敗談について共有します。
@@ -23,6 +24,7 @@ lede: "オンプレからクラウドへのデータ移行に関して、Azure�
 「クラウドへの移行を考えているがデータ量が膨大で移行ができない」といった悩みがあったり、「クラウドへのデータ移行でData Boxサービスを利用したい！けど、よくわからない...」という方々に本記事を参考にしていただけると幸いです。
 
 # Data Boxを利用する背景
+
 今回の要件は、オンプレのデータ分析基盤で収集していた100TB以上のデータをAzureに移行することでした。
 
 当初はAzure専用線を使ったオンラインのデータ移行を検討していました。
@@ -34,7 +36,9 @@ lede: "オンプレからクラウドへのデータ移行に関して、Azure�
 続いては、動作環境に触れていきます。
 
 # 動作環境のはなし
+
 ### 物理構成はどんな感じ？
+
 データコピー時の登場人物は以下の計3端末です。
 
 1. Data Box
@@ -60,6 +64,7 @@ Data Box初期設定用PCとデータコピー用サーバは今回の案件の�
 ※借用PCのため詳細不明
 
 ### Data Boxの結線の詳細は？
+
 Data Boxの結線についても紹介します。
 今回の構成では、以下の組み合わせで結線しています。
 
@@ -81,7 +86,6 @@ Data Boxの結線についても紹介します。
 >・RJ-45 CAT 6 ネットワーク ケーブル 1 本 (MGMT ネットワーク インターフェイスで使用)
 >・RJ-45 CAT 6A OR ネットワーク ケーブル 1 本、RJ-45 CAT 6 ネットワーク ケーブル 1 本 (それぞれ 10 Gbps または 1 Gbps として構成されている DATA 3 ネットワーク インターフェイスで使用)
 
-
 また、マイクロソフトサポートから以下コメントを頂いています。
 >Docsにて「必要」と記載のある部材に関しては原則調達をお願いしております。
 >仮に上記が欠けている場合、有事の際にサービス提供者側としての責任を負うことが出来ないという判断になる懸念がございます。
@@ -90,7 +94,6 @@ Data Boxの結線についても紹介します。
 
 最低限の構成（例：Data#1とMGMTのみ）でも動作はするかと思いますが、今回は万全を期すために、MGMT + Data#1~3ポート全てで結線をしています。
 
-
 また結線に使用したケーブルやアダプターについても説明します。
 
 SFP+アダプターにはCiscoの「SFP-10G-SR」という機種を使用しました。
@@ -98,13 +101,10 @@ SFP+アダプターについては、問い合わせを起票してMiceosoftサ�
 以下サポートからの回答です。
 >[Mellanox ConnectX-3 Firmware Release Notes](https://network.nvidia.com/pdf/firmware/ConnectX3-FW-2_42_5000-release_notes.pdf)の「1.2.1 Validated and Supported 1GbE/10GbE Cables (p.8~11)」に記載されているケーブルと同等のケーブルであれば問題なく動作すると考えられます。
 
-
 RJ45は一般的なLANケーブルで問題ないですが、SFP+のアダプターは小さくても高額ですので、「アダプター準備したけど使えないじゃん」という事態を避けるためにも慎重に準備することをおすすめします。
 
-
-
-
 # Data Boxの主なワークフロー
+
 では、実際の利用の流れを説明していこうと思います。
 
 Data Boxを使ったデータ移行の大まかな流れは以下です。
@@ -119,7 +119,6 @@ Data Boxを使ったデータ移行の大まかな流れは以下です。
 1. 返送
 1. Azureへインポート
 
-
 ※今回の案件では筐体の写真を撮影することができませんでした。手順の中で写真なしで筐体の説明をしていますが、ご了承ください。
 
 # 発注
@@ -127,6 +126,7 @@ Data Boxを使ったデータ移行の大まかな流れは以下です。
 <img src="/images/20221108a/ワークフロー_(1).JPG" alt="ワークフロー_(1).JPG" width="1200" height="179" loading="lazy">
 
 ### 注文の作成
+
 まずはAzure Portalにログインし、ダッシュボードからData Boxを発注していきます。
 
 Azure Portalのホーム画面で[Azure Data Box]を選択し、画面左上の[作成]を押下します。
@@ -152,6 +152,7 @@ Azure Portalのホーム画面で[Azure Data Box]を選択し、画面左上の[
 <img src="/images/20221108a/DataBox発注5.jpg" alt="DataBox発注5.jpg" width="1200" height="531" loading="lazy">
 
 Data Boxサービスは一部のストレージアカウントのタイプをサポートしていないため、発注に先立って確認しておくと良いでしょう。
+
 * [Docs:インポートでサポートされているストレージアカウント](https://learn.microsoft.com/ja-jp/azure/databox/data-box-system-requirements#supported-storage-accounts-for-imports)
 * [Docs:エクスポートでサポートされているストレージアカウント](https://learn.microsoft.com/ja-jp/azure/databox/data-box-system-requirements#supported-storage-accounts-for-exports)
 
@@ -226,12 +227,13 @@ Car number plate (自動車登録番号):
 
 大人一人でギリギリ設置可能な大きさ・重さですが、複数名で行うとより安全でしょう
 
-
 ### Data Boxの起動
+
 まず、ディスプレイとは反対側に位置する扉を開け、電源ケーブルを取り出します。
 電源ケーブルをデバイスと電源に接続し、ディスプレイの下にある電源ボタンを押し、Data Boxを起動します。
 
 ### WebUIへアクセス
+
 次にData BoxのWebUIに Data Box初期設定用PCからアクセスしていきます。
 
 まず Data Box初期設定用PCにIPアドレスを割り当てていきます。Data Box初期設定用PCのイーサネットアダプタのIPアドレスを192.168.100.5/24に設定し、Data BoxのMGMTポートと Data Box初期設定用PCをLANケーブルを結線します。
@@ -276,6 +278,7 @@ Car number plate (自動車登録番号):
 ダッシュボードに戻り、設定したIPが各ポートで反映されていれば設定完了です。
 
 ### データコピーの接続許可設定
+
 次にデータコピーに必要な接続情報を取得・設定します。
 
 ダッシュボードから[Connect and copy]ページを選択した後、対象のストレージアカウントで転送に使用するプロトコルを選択します。今回はCIFSを利用するため、[SMB]を押下します。
@@ -299,6 +302,7 @@ REST APIの場合は、BLOBエンドポイントのURL、また認証情報で�
 <img src="/images/20221108a/【1号機】接続とコピー_RESTAPI.jpg" alt="【1号機】接続とコピー_RESTAPI.jpg" width="1200" height="582" loading="lazy">
 
 # 結線とマウント
+
 <img src="/images/20221108a/ワークフロー_(4).JPG" alt="ワークフロー_(4).JPG" width="1200" height="179" loading="lazy">
 
 ### Data BoxとNWスイッチの結線
@@ -320,6 +324,7 @@ Data Box初期設定用PCのブラウザーからhttps:/{Data＃1〜3ポート�
 この手順ではData Boxのファイルシステムマウントとファイルコピーの動作確認を行います。
 
 ### Data Boxのマウント
+
 まずデータコピー用サーバにログインし、`/etc/fstab` にData BoxをNFSマウントするための定義を記入していきます。
 
 ```sh
@@ -347,15 +352,13 @@ $ df -h
 
 ### マウントポイント配下にディレクトリ作成
 
-次にマウントポイント配下にディレクトリを作成していきます。Data Boxのファイルシステムにデフォルトで備わっているディレクトリは`\<storageaccountname_BlockBlob> ` の1つのみでData Boxを発注したストレージアカウント名がそのままディレクトリ名になっています。
-
+次にマウントポイント配下にディレクトリを作成していきます。Data Boxのファイルシステムにデフォルトで備わっているディレクトリは`\<storageaccountname_BlockBlob>` の1つのみでData Boxを発注したストレージアカウント名がそのままディレクトリ名になっています。
 
 >常にコピーしようとするファイル用のフォルダーを共有下に作成してから、ファイルをそのフォルダーにコピーします。
 >\~~~中略~~~
 >ストレージ アカウント内の root フォルダーに直接ファイルをコピーすることはできません。
 
 [Docs:Data Boxに接続する](https://learn.microsoft.com/ja-jp/azure/databox/data-box-deploy-copy-data-via-nfs#connect-to-data-box)で推奨されているように、デフォルトのディレクトリの1階層下に新たなディレクトリ（以下、コンテナー用ディレクトリ）を作成し、そこにデータをコピーする必要があります
-
 
 >ブロック BLOB およびページ BLOB の共有の下に作成したフォルダーは、データが BLOB としてアップロードされるコンテナーになります。
 
@@ -385,23 +388,26 @@ $ find /mnt/databox* -ls
 以上でディレクトリ作成が完了したので、次はディレクトリの動作確認をしていきます。
 
 ### ディレクトリの動作確認
+
 本手順では、作成したディレクトリ配下でディレクトリとファイルの作成（ディレクトリへの書き込み）ができるかを確認します。
 
 ```sh
-$ touch /mnt/databox1/<containername>/databox1/test.txt
-$ ls -l /mnt/databox1/<containername>/databox1
-$ rm /mnt/databox1/<containername>/databox1/test.txt
-$ ls -l /mnt/databox1/<containername>/databox1
+touch /mnt/databox1/<containername>/databox1/test.txt
+ls -l /mnt/databox1/<containername>/databox1
+rm /mnt/databox1/<containername>/databox1/test.txt
+ls -l /mnt/databox1/<containername>/databox1
 
-$ touch /mnt/databox2/<containername>/databox2/test.txt
-$ ls -l /mnt/databox2/<containername>/databox2
-$ rm /mnt/databox2/<containername>/databox2/test.txt
-$ ls -l /mnt/databox2/<containername>/databox2
+touch /mnt/databox2/<containername>/databox2/test.txt
+ls -l /mnt/databox2/<containername>/databox2
+rm /mnt/databox2/<containername>/databox2/test.txt
+ls -l /mnt/databox2/<containername>/databox2
 ```
+
 以上のコマンドが正常に実行されれば、データコピー作業の準備は以上です。
 ついに、データコピー作業へと移ります。
 
 # データコピー
+
 <img src="/images/20221108a/ワークフロー_(5).JPG" alt="ワークフロー_(5).JPG" width="1200" height="178" loading="lazy">
 
 ### コピーコマンド実行
@@ -409,11 +415,12 @@ $ ls -l /mnt/databox2/<containername>/databox2
 今回の案件では```cp -prf```コマンドでデータコピーを実施しました。
 
 ```sh
-$ cp -prf /<転送元ファイルパス> /mnt/databox1/<containername>/databox1/<転送先パス>
-$ cp -prf /<転送元ファイルパス> /mnt/databox2/<containername>/databox2/<転送先パス>
+cp -prf /<転送元ファイルパス> /mnt/databox1/<containername>/databox1/<転送先パス>
+cp -prf /<転送元ファイルパス> /mnt/databox2/<containername>/databox2/<転送先パス>
 ```
 
 ### コピーのパフォーマンス
+
 ファイルサイズやファイル数に左右されますが、今回の転送速度は100\~170MB/秒でした。
 
 有効容量の80TBいっぱいにコピーしたい場合、24時間休まずシリアル実行すると、8日前後で完了する計算です。
@@ -426,6 +433,7 @@ $ cp -prf /<転送元ファイルパス> /mnt/databox2/<containername>/databox2/
 パラレルでコピーすることによって、さらに転送速度の向上を狙えるようです。
 
 # 発送
+
 <img src="/images/20221108a/ワークフロー_(6).JPG" alt="ワークフロー_(6).JPG" width="1200" height="179" loading="lazy">
 
 ### デバイスの発送準備処理（チェックサム計算）
@@ -453,8 +461,8 @@ $ cp -prf /<転送元ファイルパス> /mnt/databox2/<containername>/databox2/
 発送準備処理のリードタイムは、扱うデータ構造やファイル数、ファイルあたりのサイズなど環境要因に左右されるため参考程度ではありますが、今回の実績ベースでは概ね十数分～数時間程度と考えて良さそうです。
 ドキュメントにあるリードタイムの目安を鵜呑みにする必要はそれほどなく、より余裕を持ったコピー計画を立ても問題ないと感じています。
 
-
 ### Data Boxシャットダウンと抜線
+
 クローズ処理が完了したら、いよいよ発送に向けて準備をします。
 WebUIにアクセスしデバイスをシャットダウンしていきます。[Shut down or restart]ページから[Shut down]を押下します。
 
@@ -475,6 +483,7 @@ WebUIにアクセスしデバイスをシャットダウンしていきます。
 以上が間違いなく梱包されていることを確認し、段ボールの封をします。
 
 ### 引き渡し
+
 発送（Azureデータセンターへの引き渡し）の目処がたった時点で、受け取り時と同様にadbops@microsoft.com宛に引き渡し日時の調整メールを送付します。
 引き渡しでは以下フォーマットでメールを送付します。
 
@@ -492,6 +501,7 @@ Car number plate (自動車登録番号):
 <img src="/images/20221108a/引き渡し準備完了メール.JPG" alt="引き渡し準備完了メール.JPG" width="512" height="561" loading="lazy">
 
 あとは引き渡し当日に以下3点を準備してData BoxをAzureデータセンターに引き渡します。
+
 1. 認証コード
 1. 引き渡し準備完了メールのコピー
 1. 引き渡し担当者の写真つき身分証明書
@@ -501,6 +511,7 @@ Car number plate (自動車登録番号):
 <img src="/images/20221108a/ワークフロー_(7).JPG" alt="ワークフロー_(7).JPG" width="1200" height="180" loading="lazy">
 
 ### インポートを待つ
+
 引き渡し後は特にすることはなく、Azureへのインポートを待ちます。
 
 今回のインポート（デバイス引き渡し完了→BLOBへのインポートまで）のリードタイムは、2台ともに約24時間で、予想よりも短納期で対応していただけた印象です。金曜日にData BoxがAzureデータセンターに到着し、土曜日にインポートが完了したのですが、営業日は考慮せずに対応してもらえるようでした。
@@ -508,6 +519,7 @@ Car number plate (自動車登録番号):
 Data Boxのワークフローについては以上になります。最後に、全体を通してつまずいたポイントを紹介します。
 
 ## つまずいたポイント
+
 ### Azureにインポートしたらファイル権限はなくなるのに、一生懸命権限を保持しようとした
 
 Azureにデータをインポートしてしまえばファイルの権限はなくなってしまうのですが、転送時に権限の保持をしようとしたために、余計な苦労をしました。

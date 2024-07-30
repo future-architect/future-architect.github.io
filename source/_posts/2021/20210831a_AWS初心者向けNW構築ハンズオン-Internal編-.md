@@ -16,6 +16,7 @@ author: 加藤周平
 lede: "AWS初心者にとって、最初に躓きやすい部分がNWの構築かと思います。インスタンス立ててみたけど、これってどうやると他のノードと通信できるんだっけ？なんとなく通信できたけど、なんでだ？といった辺り、なんとなく有耶無耶なままにしていませんか。今回は2020年12月にローンチされたReachability Analyzerを利用して、AWS初心者向けのNW構築ハンズオン-Internal編-をやってみたいと思います。"
 ---
 # はじめに
+
 AWS初心者にとって、最初に躓きやすい部分がNWの構築かと思います。
 
 インスタンス立ててみたけど、これってどうやると他のノードと通信できるんだっけ？なんとなく通信できたけど、なんでだ？といった辺り、なんとなく有耶無耶なままにしていませんか。
@@ -31,12 +32,13 @@ AWS初心者にとって、最初に躓きやすい部分がNWの構築かと思
     1. 各VPCにサブネットを作成
     1. 各VPC内にEC2を作成
 - AWS Reachability Analyzerを利用しての疎通確認
-    - #1 VPC Peeringが不足している
-    - #2 Route Tableのルーティングが不足している
-    - #3 Security Groupのインバウンドの許可設定が不足している
-    - #4 振り返り
+  - #1 VPC Peeringが不足している
+  - #2 Route Tableのルーティングが不足している
+  - #3 Security Groupのインバウンドの許可設定が不足している
+  - #4 振り返り
 
 # 前準備
+
 ## 1. VPCを作成
 
 VPCを2つ作成
@@ -48,7 +50,6 @@ VPCを2つ作成
 
 各VPC（InternalA, B）に、それぞれサブネットを作成する
 <img src="/images/20210831a/subnet.png" alt="subnet.png" width="1200" height="83" loading="lazy">
-
 
 ## 3. 各VPCにEC2を作成
 
@@ -63,6 +64,7 @@ VPCを2つ作成
 <img src="/images/20210831a/sg_b.png" alt="sg_b.png" width="623" height="366" loading="lazy">
 
 # Reachability Analyzerを利用しての疎通確認
+
 前準備は完了したので、ここからはReachability Analyzerを利用しながら疎通確認をしていきましょう。
 
 VPCのメニューバーから選択利用できます。
@@ -139,9 +141,9 @@ Internal AからVPC Peeringに対するルーティング設定が不足して�
 黒字で記載している箇所は今回意識しなかった箇所です。
 
 - EC2のENI：
-    - EC2が通信を行うためのインターフェースです。ENIがないとEC２は通信を行うことができません。EC2を作成したタイミングで合わせて払い出されています。
+  - EC2が通信を行うためのインターフェースです。ENIがないとEC２は通信を行うことができません。EC2を作成したタイミングで合わせて払い出されています。
 - VPCのACL：
-    - VPCの単位でNWの制御を行うためのサービスです。セキュリティグループ同様にセキュリティを高める目的で利用します。
+  - VPCの単位でNWの制御を行うためのサービスです。セキュリティグループ同様にセキュリティを高める目的で利用します。
 
 参考：[AWSのネットワークインターフェース「ENI」とは](https://business.ntt-east.co.jp/content/cloudsolution/column-14.html)
 参考：[Amazon VPCのネットワークACLについて](https://dev.classmethod.jp/articles/amazon-vpc-acl/)

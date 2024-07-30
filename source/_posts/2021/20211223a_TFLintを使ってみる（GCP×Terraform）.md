@@ -23,6 +23,7 @@ lede: "terraform validateやterraform planでは検知できないエラーを�
 本記事では、インストールから利用方法までを記載しています。
 
 # TFLintとは？
+
 いわゆるTerraformのためのLinter。JavaScriptでいうと、ESLintのようなものです。構文やパラメータがルールに違反していないかをチェックしてくれるツールです。
 
 # 環境やバージョン
@@ -33,7 +34,7 @@ lede: "terraform validateやterraform planでは検知できないエラーを�
 - [tflint v0.34.0](https://github.com/terraform-linters/tflint)
 - [tflint-ruleset-google v0.15.0](https://github.com/terraform-linters/tflint-ruleset-google)
 - [terraform v1.1.0](https://www.terraform.io/)
-    - ※Terraformがなくてもtflintは動作するので、Terraformは必須ではない
+  - ※Terraformがなくてもtflintは動作するので、Terraformは必須ではない
 - Google Cloud
 
 # tflintをインストール
@@ -51,8 +52,7 @@ TFLint version 0.34.0
 
 ※他OSでのインストール手順は以下を参照ください。
 
-* [tflint installation](https://github.com/terraform-linters/tflint#installation)
-
+- [tflint installation](https://github.com/terraform-linters/tflint#installation)
 
 # .tflint.hclの作成
 
@@ -61,7 +61,7 @@ TFLint version 0.34.0
 今回は、GCPの RuleSet Pluginをインストールする例を記載します。
 
 - `.tflint.hcl`はホームディレクトリか、カレントディレクトリに配置する必要がある
-    - 今回は、ホームディレクトリに配置とする
+  - 今回は、ホームディレクトリに配置とする
 
 ```js .tflint.hcl
 plugin "google" {
@@ -72,16 +72,15 @@ plugin "google" {
 ```
 
 ※参考
-* [Configuring TFLint](https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/config.md)
-* [tflint-ruleset-google installation](https://github.com/terraform-linters/tflint-ruleset-google#installation)
-
+- [Configuring TFLint](https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/config.md)
+- [tflint-ruleset-google installation](https://github.com/terraform-linters/tflint-ruleset-google#installation)
 
 # tflint --initの実施
 
 `.tflint.hcl` を記載したあとに、Pluginをインストールするために、以下のコマンドを実行します。初回のみ実施で問題ないです。
 
 ```bash PowerShell
-$ tflint --init
+tflint --init
 ```
 
 # tflintの動作確認をしてみる
@@ -117,7 +116,6 @@ Error: "n2-standard-200" is an invalid as machine type (google_compute_instance_
 Terraformにはmoduleと呼ばれるカスタムリソースを作る機能があります。詳しくは[Terraformerとしてコードを書いて思うこと](/articles/20211029a/)を参照ください。
 
 これをTFLintでチェックするためには、[Module Inspection](https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/module-inspection.md)に記載がある通り、`.tflint.hcl`に`module = true`を追記するだけです。
-
 
 ```sh .tflint.hcl
 # add
@@ -226,8 +224,7 @@ $ tflint
 
 ※参考
 
-* [Version固定でTFLintをインストールする](https://dev.classmethod.jp/articles/install-tflint-with-fixed-version/)
-
+- [Version固定でTFLintをインストールする](https://dev.classmethod.jp/articles/install-tflint-with-fixed-version/)
 
 ## 3. Deep Checkingを利用する場合の注意事項
 
@@ -259,7 +256,7 @@ provider "google" {
 
 - [TFLint Rules](https://github.com/terraform-linters/tflint/blob/master/docs/rules/README.md)
 - [TFLint Rules Google](https://github.com/terraform-linters/tflint-ruleset-google/blob/master/docs/rules/README.md)
-    - ※Deep Checkingの`google_disabled_api`は除いています
+  - ※Deep Checkingの`google_disabled_api`は除いています
 
 ```js .tflint.hcl
 config {
@@ -379,7 +376,6 @@ rule "google_project_iam_policy_invalid_member" {
 ```
 
 実運用上は利用しないルールを、個別にdisableにし、検知結果に対して運用が回るように調整していくことが重要かなと思います。
-
 
 # まとめ
 

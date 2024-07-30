@@ -42,15 +42,15 @@ Webサービスのうち、SPAは前回のエントリーで説明しました�
 Go版のMSALは以下のようにしてインポートします。
 
 ```bash
-$ go get github.com/AzureAD/microsoft-authentication-library-for-go
+go get github.com/AzureAD/microsoft-authentication-library-for-go
 ```
 
 なお、追加でいくつかimportしないとエラーが出ます。不思議な構成。
 
 ```bash
-$ go get github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops/accesstokens@v0.7.0
-$ go get github.com/AzureAD/microsoft-authentication-library-for-go/apps/errors@v0.7.0
-$ go get github.com/AzureAD/microsoft-authentication-library-for-go/apps/public@v0.7.0
+go get github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops/accesstokens@v0.7.0
+go get github.com/AzureAD/microsoft-authentication-library-for-go/apps/errors@v0.7.0
+go get github.com/AzureAD/microsoft-authentication-library-for-go/apps/public@v0.7.0
 ```
 
 モバイルアプリとかのパブリッククライアントは`.../apps/public`パッケージにあります。前回のエントリーでも紹介したパブリッククライアント用のパッケージです。これを使ったバイナリはリバースエンジニアリングされても、不正ログインされる材料は提供しません。
@@ -161,4 +161,3 @@ confidential.WithAccessor(cache)
 前回と今回のエントリーは、そのような場合にも対応できるように、AzureAD側の設定の依頼が投げやすいように、開発のストレスを下げたい、という思いで管理画面側の設定もなるべく具体的に書いています。
 
 MSAL系のライブラリにはたくさんの実装がありますが、ウェブフロントエンドもGoも、APIはほぼ一緒でした。Javaとかみてみてもすぐにキャッチアップできそうです。簡単で安全な接続ができるため、接続先がAzureADであれば積極的にMSALシリーズを活用してみると良いと思いました。
-

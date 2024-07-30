@@ -23,8 +23,6 @@ lede: "2022年1月28日にFuture Tech Night #19 AWS CodePipelineと新聞向けC
 
 2022年1月28日に[Future Tech Night #19 AWS CodePipelineと新聞向けCMS構築事例](https://future.connpass.com/event/236138/)を開催しました。こちらの勉強会で「**CodePipelineを用いたECS on EC2でのBlue/Greenデプロイメント**」というテーマで発表させていただきました。
 
-
-
 # 発表の概要
 
 <iframe class="speakerdeck-iframe" frameborder="0" src="https://speakerdeck.com/player/d674a2342857499185e80b1ceb1f46da" title="CodePipelineを用いたECS on EC2でのBlue/Greenデプロイメント" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" style="border: 0px; background: padding-box padding-box rgba(0, 0, 0, 0.1); margin: 0px; padding: 0px; border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 40px; width: 560px; height: 314px;" data-ratio="1.78343949044586"></iframe>
@@ -40,9 +38,8 @@ lede: "2022年1月28日にFuture Tech Night #19 AWS CodePipelineと新聞向けC
 - CapacityProviderの設定を入れている場合、CodeDeployで使用する「appspec.yml」に「CapacityProviderStrategy」の設定を記載しないと、Blue/Greenデプロイが完了した際に構築時に設定したはずの「CapacityProviderStrategy」の設定が消えてしまい、タスクがAZに分散されず偏る事象が発生しました。
 - Blue/Greenデプロイが、サービスのAutoScalingをサポートしていないため、CodeDeployのイベントフックを利用してデプロイ前後にサービスのAutoScalingの停止と再開を実行するLambdaを実行する必要があります。
 
-
-
 # 感想
+
 所属プロジェクト内での勉強会に登壇して発表することはありましたが、社外イベントでの勉強会に登壇することは初めてだったので、とても良い経験になりました。勉強会登壇に向けて再びECS、Codeシリーズのインプットをしたり、資料にアプトプットする段階で理解が深まったりしたので勉強会登壇して本当に良かったです。
 
 後日先輩社員から少し話すのが早かったかなとフィードバックを頂いたので、次発表する機会があれば落ち着いてゆっくりプレゼンできるようにしておきます！（笑）
@@ -50,4 +47,3 @@ lede: "2022年1月28日にFuture Tech Night #19 AWS CodePipelineと新聞向けC
 改めて当発表をご視聴いただいた方、そしてここまで当記事を読んでくださった方ありがとうございました。
 
 次のイベントに関する情報は、フューチャーの[connpass](https://future.connpass.com/)で確認できます。ぜひご参加ください！
-

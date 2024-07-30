@@ -27,7 +27,6 @@ https://auth0.com/blog/partners-with-hashicorp-terraform/
 
 Auth0の概要については[Auth0導入編](/articles/20200122/)をご参照ください。他にも技術ブログには[Auth0関連の記事](/tags/Auth0/)が沢山あります。
 
-
 ## Terraformとは
 
 <img src="/images/20210326/image_2.png" loading="lazy">
@@ -49,7 +48,6 @@ Auth0が出しているツールで、テナント構成をyamlに落とし込�
 Auth0 Deploy CLIについては、TIG市川さんの[Auth0の設定をバージョン管理し、Auth0 Deploy CLIを利用してデプロイ環境を整える](/articles/20200702/)をご参照ください。
 
 Auth0 Deploy CLIには、`dry-run`がサポートされておらず [^8]、**実際に実行してみるまでテナント構成がどうなるのか分からない**、さらに**意図していない変更を検出出来ない**といった課題があります。
-
 
 ## Auth0 Deploy CLI vs Terraform
 
@@ -95,13 +93,12 @@ Terraformで管理出来る様になると以下の点で便利になります�
 - terraform importを利用して既存のAuth0リソースをTerraformに移行できるか
 - 複数環境で設定を統一化出来るか
 
-
 ## 前提
 
-* terraformのバージョンはv0.14.6を利用します。
-* プロパイダは[alexkappa/auth0](https://github.com/alexkappa/terraform-provider-auth0)を利用します。
-    * バージョンはv0.17.1です。
-* 事前にAuth0のテナントのダッシュボードから、Management APIが利用可能なM2Mのアプリケーションを作成しておき、ClientIDとClientSecretを取得しておく必要があります。
+- terraformのバージョンはv0.14.6を利用します。
+- プロパイダは[alexkappa/auth0](https://github.com/alexkappa/terraform-provider-auth0)を利用します。
+  - バージョンはv0.17.1です。
+- 事前にAuth0のテナントのダッシュボードから、Management APIが利用可能なM2Mのアプリケーションを作成しておき、ClientIDとClientSecretを取得しておく必要があります。
 
 ### 準備手順
 
@@ -128,7 +125,6 @@ provider "auth0" {
 その後、`terraform init`をします。
 
 以上で準備完了です。
-
 
 ## terraform importを利用して既存のAuth0リソースをTerraformに移行できるか
 
@@ -160,7 +156,7 @@ Terraformで管理出来るリソースの一覧(リソースタイプ)は↓で
 Terraformで定義されているimportコマンドの書式はこのようになっています。
 
 ```
-$ terraform import [options] ADDRESS ID
+terraform import [options] ADDRESS ID
 ```
 
 <details><summary>ADDRESSとは▼</summary><div>
@@ -207,7 +203,6 @@ IDが振られているリソースタイプである、`auth0_role`のプロパ
 IDの欄に`"id"`と書かれていた場合は**APIを叩いた時のJSONレスポンスのキーが"id"の値**を指します。
 **自由**と書かれていた場合は先述の理由により、自由に設定出来ます。
 
-
 | Resource Type           | ID                                                                                                                                                                                                  | URL                                                                                                                                                                     | 備考                                                               |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
 | auth0\_client           | "client\_id"                                                                                                                                                                                       | [https://auth0.com/docs/api/management/v2#!/Clients/get\_clients](https://auth0.com/docs/api/management/v2#!/Clients/get_clients)                                       |                                                                  |
@@ -224,7 +219,6 @@ IDの欄に`"id"`と書かれていた場合は**APIを叩いた時のJSONレス
 | auth0\_rule\_config     | "key"                                                                                                                                                                                               | [https://auth0.com/docs/api/management/v2#!/Rules\_Configs/get\_rules\_configs](https://auth0.com/docs/api/management/v2#!/Rules_Configs/get_rules_configs)             |                                                                  |
 | auth0\_tenant           | 自由                                                                                                                                                                                                  |                                                                                                                                                                         |                                                                  |
 | auth0\_user             | "user\_id"                                                                                                                                                                                          | [https://auth0.com/docs/api/management/v2#!/Users/get\_users](https://auth0.com/docs/api/management/v2#!/Users/get_users)                                               |
-
 
 ## 複数環境で設定を統一化出来るか
 
@@ -265,8 +259,8 @@ provider "auth0" {
 Terraformのworkspaceを追加しましょう。main.tfで以下のコマンドを実行します。
 
 ```sh
-$ terraform workspace new dev
-$ terraform workspace new test
+terraform workspace new dev
+terraform workspace new test
 ```
 
 以下の様に表示されます(現在いるworkspaceに*が付きます。)
@@ -340,7 +334,6 @@ resource "auth0_rule" "set_env" {
 
 として、test環境では
 
-
 ```js set-env.js
  function setEnv(user, context, callback) {
     const idTokenClaims = context.idToken || {};
@@ -377,9 +370,7 @@ resource "auth0_rule" "set_env" {
 
 2年間本当にお世話になりました。ありがとうございました！
 
-
 <img src="/images/20210326/kobayashi.jpg" loading="lazy">
-
 
  [^1]: TIG: Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。DXユニット: TIGの中にありデジタルトランスフォーメーションに関わる仕事を推進していくチームです。
  [^2]: 執筆中に[terraformer](https://github.com/GoogleCloudPlatform/terraformer)と呼ばれる既存のインフラリソースをリソース定義(.tf)や状態(.tfstate)に落とし込むCLIツールは見つけたのですが、執筆当時はまだ対応リストに記載されていません。
@@ -391,4 +382,3 @@ resource "auth0_rule" "set_env" {
  [^7]: [Resources - Import - Terraform by HashiCorp](https://www.terraform.io/docs/extend/resources/import.html#importer-state-function)
  [^8]: [Support Test Mode · Issue #70 · auth0/auth0-deploy-cli](https://github.com/auth0/auth0-deploy-cli/issues/70)issue自体は記載されています。
  [^9]: 一応Auth0 Deploy CLIでは、意図していないリソースの破壊を防ぐために`AUTH0_ALLOW_DELETE`フラグが設定可能です。https://github.com/auth0/auth0-deploy-cli/blob/master/examples/yaml/README.md#config
-

@@ -57,7 +57,7 @@ generateResolvConf = false
 その後は一度WSL2を再起動します（そうしないとresolve.confが再生してしまった）。
 
 ```
-$ wsl --shutdown
+wsl --shutdown
 ```
 
 次は/etc/resolv.confを編集します
@@ -127,9 +127,9 @@ short-name-mode="enforcing"
 それではまたpodmanを再起動してから、今度はNginxを起動してみます。`http://localhost:8888/`で起動したら完了です。
 
 ```
-$ podman machine stop
-$ podman machine start
-$ podman run --rm -it -p 8888:80 nginx
+podman machine stop
+podman machine start
+podman run --rm -it -p 8888:80 nginx
 ```
 
 <img src="/images/20221227a/image_3.png" alt="image.png" width="1200" height="548" loading="lazy">
@@ -139,4 +139,3 @@ $ podman run --rm -it -p 8888:80 nginx
 Docker Desktopはいろいろな開発者にうれしい機能がたくさん追加されて、積極的に開発されていて、便利ですし、今回やったようなWSL2に入ってプロキシサーバーにつながるような設定をしなくてもアクセスできたりして便利なのですが、ちょびっと検証する目的でPodman Desktopを代わりに実行する方法を紹介しました。プロキシの裏でも動作するようになりました。
 
 まあ、世の中のドキュメントはDockerを使うように書かれていたりするので、トラブルシュートとかを考えると頻繁使う人はDocker Desktopをきちんと入れた方が良いですね。
-

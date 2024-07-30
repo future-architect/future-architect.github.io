@@ -49,5 +49,3 @@ https://github.com/future-architect/linkedpackage
 Goも[debugパッケージ](https://pkg.go.dev/debug/buildinfo@go1.19.4#Read)使えば実行ファイルから、利用しているモジュール一覧が取れるので行けそうですね。そのうち作ろうかな。
 
 ただ、実行ファイルに入っているからといって、それがまた実行されるわけではない、というのはあります。JavaScriptだとtree shakingという最適化がありますが完璧にフィルタリングできるわけではありません。Goはそこまで積極的なCode Eliminationはしてない印象がありますし、グローバル変数を含めinit()から参照されるオブジェクトなんかは使ってなくてもリンクされてしまいます。Goは1.20から[プロファイラ機能とリンクしたオプティマイザ](https://go.googlesource.com/proposal/+/master/design/55022-pgo.md)が入ります。この情報が外部のツールから使えるかどうかはわからないですが、実際に実行されている行だけ取り出せれば、また精度の高いフィルタリングができるんじゃないかな、と思っています。
-
-

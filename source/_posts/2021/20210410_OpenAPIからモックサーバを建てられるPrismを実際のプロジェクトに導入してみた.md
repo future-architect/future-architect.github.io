@@ -50,13 +50,13 @@ https://github.com/stoplightio/prism
 まずはPrismのパッケージをnpm経由で、プロジェクトの `devDependencies` に追加します。
 
 ```bash
-$ npm install -D prism
+npm install -D prism
 ```
 
 あとは、`npx` で起動してみて、モックサーバが起動できていたら完了です。以下の例は、カレントディレクトリ内にある `swagger.yaml` ファイルを指定して、8080番ポートで起動する例です。
 
 ```bash
-$ npx prism mock ./swagger.yaml -p 8080
+npx prism mock ./swagger.yaml -p 8080
 ```
 
 これを実行すると、**OpenAPIファイルに記載されている全てのエンドポイントのURLが一覧で表示**されます。（ここでは、 [Swagger Petstore](https://petstore.swagger.io/) を実行した結果を掲載しています）
@@ -265,7 +265,6 @@ module.exports = {
 
 <img src="/images/20210410/image_2.png" alt="MOCサーバを交えた構成" loading="lazy">
 
-
 これで、実際に先ほどの手順でモックサーバを起動してみて、 `http://localhost:3000/api/v1/` にアクセスしレスポンスが返ってきたらOKです。
 
 ### npm scriptでコマンド一つで起動できるようにする
@@ -377,4 +376,3 @@ docker-compose -p (任意の名前) up -d
 Prismを使うことで、OpenAPIファイルさえ記述していれば簡単にモックサーバとして機能し、開発に効果的に組み込むことができます。ローカルにバックエンドサーバを立ち上げる手間が省けて、**開発体験を格段に向上**させることができました。
 
 ぜひ皆さんも快適な開発環境構築のために、導入を検討してみてはいかがでしょうか。
-

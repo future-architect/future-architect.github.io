@@ -16,6 +16,7 @@ lede: "私のチームでは、「システムの設計情報」や「実装に�
 <img src="/images/20210422b/chain-312403_640.png" class="img-small-size" alt="" title="Clker-Free-Vector-ImagesによるPixabayからの画像">
 
 # はじめに
+
 フューチャー棚井龍之介です。
 
 私のチームでは、「システムの設計情報」や「実装に関わる業務知識」などを、`README.md` に整理して GitHub 管理しています。
@@ -33,6 +34,7 @@ lede: "私のチームでは、「システムの設計情報」や「実装に�
 https://github.com/r-ryu/markdown-link-checker
 
 # 使うツール
+
 Markdown チェックのために、[markdown-link-check](https://github.com/tcort/markdown-link-check) を利用します。
 Markdown テキストからリンクを抽出し、各リンクが生きている（200 OK）か死んでいるかをチェックします。
 
@@ -54,8 +56,8 @@ Options:
   -h, --help             display help for command
 ```
 
-
 # CircleCIへの記述
+
 CircleCI の jobs 内で、markdown-link-check を呼び出します。
 
 [ツール本家の README](https://github.com/tcort/markdown-link-check#check-links-from-a-local-markdown-folder-recursive) に記載された `$ find . -name \*.md -exec markdown-link-check {} \;` による実行方法は、CircleCI で実行した際に欲しい挙動が得られません。リンク切れが1つでも存在したら Task failed で落として欲しいのですが、`-exec` による方法では「最初にチェックされたファイルに、リンク切れがある場合のみ」Task failed で落ちます。2つ目以降のファイルにリンク切れが存在しても、CircleCI は検知してくれません。
@@ -77,7 +79,6 @@ $ find . -type f -name "*.txt" -exec echo "ファイル名: {}" \;
 $ find . -type f -name "*.txt" | xargs echo "ファイル名: "
 ファイル名:  ./test01.txt ./test02.txt ./test03.txt ./test04.txt ./test05.txt
 ```
-
 
 CircleCI で markdown-link-check を xargs により実行させるコートはこちらです。
 ツール自体が node 製なので、プライマリイメージには `cimg/node:15.11.0` を利用しています。
@@ -106,8 +107,8 @@ workflows:
 
 あとは CircleCI を回せば、リポジトリ内のリンク切れを全て検知してくれます。
 
-
 ## 大量のリンク切れを検知したときは
+
 長期間メンテナンスされていないリポジトリの場合、markdown-link-check が大量のリンク切れを検知します。
 `.circleci/config.yml` に定義ファイルが追加された時点で、CircleCI が落ち続けてしまうので、まずはローカル実行でリンク切れ状況をチェックしましょう。
 
@@ -132,8 +133,8 @@ Error: task failed
 Success!
 ```
 
-
 ## 特定のリンクは対象外にしたいとき
+
 正規表現で `ignorePatterns` を設定すれば、特定のリンクをチェック対象外に指定できます。
 
 例えば、別サイトへのリンクをチェック対象外にしたい場合、`config.json` に以下設定を追加します。
@@ -159,8 +160,8 @@ Success!
 その他、config.json の設定次第で様々な動作調整が可能です。
 詳細は [Config file format](https://github.com/tcort/markdown-link-check#config-file-format) をご参照ください。
 
-
 # おわりに
+
 ドキュメントの増加やメンバーの入れ替えなどにより、徐々に資料の陳腐化が進んでしまうのはあるあるだと思います。資料パスのリンク切れは自動検知可能なので、こういった作業は自動化・仕組み化して、エンジニアは開発に集中しましょう。
 
 今回は「CircleCI で Markdown チェックを自動化する」方法でした。
@@ -171,4 +172,3 @@ Success!
 
 - [markdown-link-check](https://github.com/tcort/markdown-link-check#config-file-format)
 - [今さらながらfindパイセンについてまとめてみた](/articles/20210331/)
-

@@ -39,7 +39,6 @@ public class MyService {
 
 <img src="/images/20220729a/名称未設定ファイル.drawio.png" alt="名称未設定ファイル.drawio.png" width="460" height="191" loading="lazy">
 
-
 # まずはロジックの登録機構
 
 やはりDIするにはアノテーションですよね。 ``@UserRank``アノテーションを作ります。1つだけ引数を持つ単一値アノテーションとします。で、アノテーションの合成を使って、`@Component`もつけています。これは、このアノテーションをつけたら、即座にDI対象（別途`@Service`やら`@Component`やら`@Bean`をつける必要はない）とするためのものです。
@@ -104,7 +103,6 @@ public class VIPService implements UserService {
     }
 }
 ```
-
 
 ```java src/main/java/com/example/services/GenericUserService.java
 package com.example.services;
@@ -196,7 +194,6 @@ public class UserServiceFactory {
 インスタンス作成はSpringBootの提供するDIコンテナの機構を使います。そうすれば、サービスクラスが何かしらの外部依存を持っていてもそれのDIも一緒に行えます。
 
 DIのファクトリーは`BeanFactory`を使うのですが、これ自身はDIでインジェクションしてもらえばOKです。クラスの定義は前のコードで取得できていますので、あとは名前をもとにクラスをもってきて、``beanFactory.getBean()``を呼んでインスタンス化するだけです。
-
 
 ```java src/main/java/com/example/UserServiceFactory .java
 import org.springframework.beans.factory.BeanFactory;
@@ -302,4 +299,3 @@ public class BeanFactoryDynamicAutowireService {
 アノテーション単独での実装方法は調べるとすぐ出てきたのですが、その情報をもとにクラス一覧を取得してくるコード、またそのアノテーションの引数をもとにマップを作って、動的に選択してインスタンスを作るところなど、つなぎ合わせのサンプルは出てこなかったので、いろいろ調べながら書いてみました。
 
 このようなロジックを実装したライブラリとかあるかもしれませんが、Javaのメタプログラミング的なところをいろいろ知れて楽しかったです。
-

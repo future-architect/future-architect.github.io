@@ -25,9 +25,11 @@ Pyright のリポジトリには言語サーバ（[`packages/pyright`](https://g
 https://github.com/microsoft/pyright
 
 ## 1. インストール
+
 https://github.com/microsoft/pyright/blob/main/docs/build-debug.md
 
 ます、上の記事にしたがって Pyright をローカルでビルドします。
+
 1. Node.js のインストール
 2. `git clone https://github.com/microsoft/pyright.git && cd pyright`
 3. `npm install`
@@ -49,8 +51,8 @@ Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイ
 
 <img src="/images/20220302a/スクリーンショット_(10).png" alt="ブレークポイントが機能している" width="1200" height="499" loading="lazy">
 
-
 ## 3. デバッガのアタッチ
+
 2 までの手順では、クライアントのみがデバッガで実行されます。しかし、メッセージを受信した後の処理はサーバ側で行われるため、調査のためにはこちらもデバッガで実行したくなります。[`extension.ts:66`](https://github.com/microsoft/pyright/blob/06e9f626f4388bc9b894daf4239a9e4a8e3ffb11/packages/vscode-pyright/src/extension.ts#L66) では、サーバがポート 6600 で建てられているので、ここにデバッガをアタッチします。
 <img src="/images/20220302a/スクリーンショット_(12).png" alt="スクリーンショット_(12).png" width="1074" height="367" loading="lazy">
 
@@ -64,7 +66,9 @@ Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイ
 <img src="/images/20220302a/スクリーンショット_(14).png" alt=".vscode/launch.json" width="909" height="224" loading="lazy">
 
 # 調査内容
+
 ## 1. Initialize Request
+
 [初期化関連の仕様](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialize)を見ると、メソッド `initialize` は送信する必要がありそうです。そこでまず次の二つを順に送信してみます。
 
 > 1. `initialize` メソッド：サーバの初期化を要求
@@ -81,6 +85,7 @@ Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイ
 > 3. 適当な解析メソッド
 
 ## 2. DidChangeWorkspaceFolders Notification
+
 調べると、`workspace.isInitialized` はメソッド [`updateSettingsForWorkspace`](https://github.com/microsoft/pyright/blob/844f7cb98987955dc617cd97b1372325e76a4530/packages/pyright-internal/src/languageServerBase.ts#L1265) が実行されて `true` となります。
 
 <img src="/images/20220302a/スクリーンショット_(16).png" alt="DidChangeWorkspaceFolders Notification" width="967" height="384" loading="lazy">
@@ -98,6 +103,7 @@ Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイ
 ただし、`onDidChangeWorkspaceFolders` は特定の条件で有効化されることに注意します。
 
 ## 3. Initialized Notification
+
 [`onDidChangeWorkspaceFolders`の前後](https://github.com/microsoft/pyright/blob/844f7cb98987955dc617cd97b1372325e76a4530/packages/pyright-internal/src/languageServerBase.ts#L579
 ) を確認すると、有効化には以下の二つの条件を満たす必要があります。
 
@@ -107,7 +113,7 @@ Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイ
 1 は明らかに送信するだけです。[`initialized` メソッド](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialized) は サーバからの InitializeResult に対応するものなので、タイミングは InitializeResult を受け取った後、`workspace/didChangeWorkspaceFolders` メソッドを送信する前になります。2 はわかりにくいですが、[`initialize`メソッド](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialize) のオプションに `capabilities` があるのでここで登録します。つまり、初期化方法は全体で次のようになることがわかりました。
 
 > 1. `initialize` メソッド：サーバの初期化を要求
->   a. `capabilities.workspace.workspaceFolders = true`：ワークスペースフォルダ機能を有効化
+>    a. `capabilities.workspace.workspaceFolders = true`：ワークスペースフォルダ機能を有効化
 > 2. `initialized` メソッド：クライアント側の初期化が完了したことを通知
 > 3. `workspace/didChangeWorkspaceFolders` メソッド：ワークスペースフォルダの変更を通知
 > 4. 適当な解析メソッド

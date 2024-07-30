@@ -16,7 +16,6 @@ lede: "この記事ではこのフューチャー技術ブログを機能拡張�
 
 <img src="/images/20210623a/JSアイコン.png" alt="JSアイコン" width="1200" height="630">
 
-
 TIG DXユニット真野です。[フロントエンド連載](/articles/20210614a/)の7記事目です。
 
 ここ数年はGo言語ばかり利用していたのですが、フューチャー技術ブログで利用している静的サイトジェネレータが[Hexo](https://hexo.io/)である関係上、テンプレートの編集や[カスタムスクリプト](https://github.com/future-architect/tech-blog/tree/master/scripts)作成のためにJavaScriptもよく利用するようになりました。
@@ -26,7 +25,6 @@ TIG DXユニット真野です。[フロントエンド連載](/articles/2021061
 コレクションと言いながらほとんど Array です。元がJava出身者の自分からすると、配列はコレクションじゃなくて、List, Map, Listのイメージがありますが、JavaScriptだとArrayはリッチなインターフェースが一杯あるのでコレクションだと思ってます。
 
 また、フロントエンド連載と言いながらNode.js（v16.3.0）を使ってCLIで動かしていますが、モダンブラウザでも動く内容かと思いますのでご了承を。
-
 
 ## Array.prototype.map()で記事のタグを抽出
 
@@ -74,7 +72,6 @@ console.log(tags);
 
 `map` 以外に出てきますが、tagsは配列であるため、[Array.flat()](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Array/flat)でサブ配列をフラット化しています。 [Array.sort()](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)は表示のわかりやすさのためソートしています。
 
-
 ## Array.prototype.flatMap()でより簡潔な実装
 
 お気づきの方も多いかと思いますが、`map(a => a.tags).flat()` の部分は `flatMap` を使うとより簡潔に実装できます。
@@ -107,7 +104,6 @@ author: 真野隼記
 
 話をコードに戻します。実装は簡潔になりましたが、どちらも結果を見ると、同じタグが重複して出力されていて少し残念です。`distinct（unique）`化したいですが、標準では用意されていないので、少し工夫する必要があります。
 
-
 ## 重複排除
 
 Arrayの重複排除ですが、`Set` を用いるのが一般的なようです。先程の `articles` の重複排除したタグ一覧だと、以下の構文で取得できます。
@@ -121,7 +117,6 @@ console.log(uniqTags);
 やや、見通しが悪いですが、 いったん Setに変換してから スプレッド構文（`...`）でArrayに戻す操作を行っています。`Array.from` とほぼ同等の処理です。Arrayに戻しているのは、今までの静的サイトジェネレータの実装上、Arrayに戻したほうが後続の取り回しが良かったため、この記事でも準拠している意図です。
 
 今回はタグを例にしましたが、他にも記事のカテゴリ・著者など複数の要素で一意なリストが欲しくなるのでよく利用します。Hexoだとヘルパーの `unique()` が用意されているのであまりSetを用いた実装を利用することはないですが。
-
 
 ## Array.prototype.filter() で指定したタグを持つ記事を抽出
 
@@ -144,7 +139,6 @@ console.log(awsArticles);
 ```
 
 実際、Hexoのテンプレート上は、tagsはObjectの配列になっていてもう少しややこしいのですが、慣れればなんとかという感じです。
-
 
 ## タグの利用数カウント
 
@@ -169,8 +163,6 @@ console.log(tagCounts);
 ```
 
 こういった処理は、実用上は静的サイトジェネレータのフレームワーク側で用意されたヘルパー関数を利用することが多いかもしれません。HexoだとHTMLまで生成してくれる[list_tags](https://hexo.io/docs/helpers.html#list-tags)があります。一方でちょっと表示項目をフィルターしたい要件を実現しようとすると、すぐにカスタムスクリプトを書くことになりますので、この手の処理に慣れておくと幸せかなと思います。
-
-
 
 ## Array.prototype.reduce() であるタグに紐づく総SNS数を取得
 
@@ -260,7 +252,6 @@ console.log(popularArticles);
 //]
 ```
 
-
 ## 記事中の最大SNS数を取得
 
 現状の最大のSNS数（やPV数）などを取得したい場合があります。前述した `reduce` を用いても良いですが、スプレッド構文 (`...`) を用いるともう少し簡潔に書けます。
@@ -271,8 +262,6 @@ console.log(max);
 // 15733
 ```
 
-
-
 # まとめ
 
 2021.06.23時点のフューチャー技術ブログでよく実装する代表的なコレクション操作のパターンを紹介しました。
@@ -281,8 +270,4 @@ console.log(max);
 
 何か機能実装のアイデアがあれば可能な限りお答えしますので、ツイッターアカウントなどでメッセージを頂ければです。
 
-
-
-
 [^1]: 最近はこの辺のページを新設しました。https://future-architect.github.io/articles/ とか https://future-architect.github.io/authors/ とか https://future-architect.github.io/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98/ とか
-

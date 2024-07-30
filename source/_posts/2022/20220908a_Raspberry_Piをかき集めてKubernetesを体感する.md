@@ -24,7 +24,6 @@ TIG 岸下です。業務でGKE（Google Kubernetes Engine）を利用するこ�
 
 参考：[RaspberryPi 4 にUbuntu20.04 をインストールして、Kubernetes を構築してコンテナを動かす](https://qiita.com/yasthon/items/c29d0b9ce34d66eab3ec)
 
-
 # 今回Kubernetes構築するにあたって用意したもの
 
 - Raspberry Pi3 Model B（メモリ1GB）
@@ -173,7 +172,6 @@ hostname # 変更の確認作業
 ```
 
 ### /etc/hostsの設定（ラズパイ3台共通）
-
 
 ホスト名とIPアドレスを対応させるために、`etc/hosts`に以下の内容を追記します。
 
@@ -346,7 +344,7 @@ sudo apt-mark hold kubelet kubeadm kubectl
 - Kubeadmは`kube init`や`kubeadm join`といったコマンドを提供するために作られたツールである。
 - 最低限実行可能なKubernetesクラスタを立ち上げるために必要なアクションを実行する。
 - Kubeadmの設計上、クラスタの立ち上げのみにフォーカスを当てており、マシンへのプロビジョニングまでは考えていない。
-    - 同様に、Kubernetesダッシュボードのような種々の便利なアドオンをインストールしたり、モニタリング、クラウド固有のアドオンもスコープ外である。
+  - 同様に、Kubernetesダッシュボードのような種々の便利なアドオンをインストールしたり、モニタリング、クラウド固有のアドオンもスコープ外である。
 - 理想的には全てのデプロイのベースとしてkubeadmを使うことで、適合するクラスタの作成が容易になる。
 
 クラスタの立ち上げまではkubeadmが面倒見てくれて、残りのツールとか設定は各々よしなにやりましょうという感じでしょうか。
@@ -364,19 +362,19 @@ kubeletを理解する前に、クラスターの全体像をまず理解する�
 グレーの箇所はクラスターになり、先程紹介したKubeadmによって提供されます。
 
 - Control Plane（マスターノード）に対してNode（ワーカーノード）がぶら下がる。
-    - 今回で言えば、マスターノードであるラズパイ`master01`にワーカーノードである`worker01`、`worker02`がぶら下がる。
+  - 今回で言えば、マスターノードであるラズパイ`master01`にワーカーノードである`worker01`、`worker02`がぶら下がる。
 - マスターノードはワーカーノードとPodを管理する。
 - ワーカーノードはアプリケーションのコンポーネントであるPodをホストする
 - Podは1つ以上のコンテナのグループを持ち、Kubernetesにデプロイできる最小単位になる
-    - 種々のアプリケーションはPodの中のコンテナ上で動作
+  - 種々のアプリケーションはPodの中のコンテナ上で動作
 
 で、kubeletですが図を見ると各ワーカーノードの中にkubeletが存在し、ワーカーノードの中で使われることがわかります。どこで使われるかがわかったところでkubeletの機能についてまとめていきます。
 
 - kubeletは、各ノード上で実行される主要な”ノードエージェント”
-    - ”エージェント”なので各ノードの中での仲介者で、Podの起動・管理を行う
+  - ”エージェント”なので各ノードの中での仲介者で、Podの起動・管理を行う
 - kubeletは、PodSpecの観点から動作する
-    - PodSpecはPodに関する様々な情報（例えばコンテナの名前やimage）を載せたYAML or JSONファイル
-    - PodSpec通りにコンテナが実行・動作されているかを確認することでPodを管理する
+  - PodSpecはPodに関する様々な情報（例えばコンテナの名前やimage）を載せたYAML or JSONファイル
+  - PodSpec通りにコンテナが実行・動作されているかを確認することでPodを管理する
 
 kubeletは各Pod内の管理・仲介者と考えておくとよさそうです。
 
@@ -452,12 +450,12 @@ sudo kubeadm init --apiserver-advertise-address=192.168.1.101 --pod-network-cidr
 ```
 
 - `apiserver-advertise-address`
-    - このオプションを利用して明示的にAPIサーバーのadvertise addressを設定します。
-    - 明示的に指定しない場合はデフォルトゲートウェイに関連付けられたネットワークインターフェースを使用して設定されます。
+  - このオプションを利用して明示的にAPIサーバーのadvertise addressを設定します。
+  - 明示的に指定しない場合はデフォルトゲートウェイに関連付けられたネットワークインターフェースを使用して設定されます。
 - `pod-network-cidr`
-    - Flannelを使用する場合、こちらを指定する必要があります。
-    - Flannelはノード間をつなぐネットワークに仮想的なトンネルを構成することで、クラスター内のPod同士の通信を実現しています。
-    - `/16`と広めに設定します（[GitHub - flannel-io/flannel](https://github.com/flannel-io/flannel/blob/master/Documentation/kubernetes.md)）。
+  - Flannelを使用する場合、こちらを指定する必要があります。
+  - Flannelはノード間をつなぐネットワークに仮想的なトンネルを構成することで、クラスター内のPod同士の通信を実現しています。
+  - `/16`と広めに設定します（[GitHub - flannel-io/flannel](https://github.com/flannel-io/flannel/blob/master/Documentation/kubernetes.md)）。
 
 初期化後、`kubeadm join 192.168.1.101:6443 --token ...`という出力が出たら、どこかのテキストエディタにコピーしておきます。
 このコマンドはワーカーノードを追加する際に利用します。
@@ -505,7 +503,6 @@ source ~/.bashrc
 先程もちょろっと説明しましたが、Flannelはノードを跨いでコンテナ同士が通信できるようにするPodネットワークアドオンになります。
 コンテナにはIPアドレスが付与されるのですが、Internal IPなのでそのままだとノードを跨いでコンテナ間で通信することができません。これを解決するために、Flannelによってノード間をつなぐネットワークに仮想的なトンネル（オーバーレイネットワーク）を構成することで、Kubernetesクラスター内のPod同士の通信（Podネットワーク）を実現しています。
 
-
 参考：[Kubernetes完全ガイド 3.3.3 Flannel](https://book.impress.co.jp/books/1119101148)
 
 ```sh
@@ -524,7 +521,7 @@ kube-flannel-ds-qcspv   1/1     Running   0          23m
 ## ロードバランサーのインストール（マスターノードのラズパイのみ）
 
 [こちら](https://qiita.com/yasthon/items/c29d0b9ce34d66eab3ec)を参考にして作っているので、同様にMetalLBをインストールします。
-[MetalLB, bare metal load-balancer for Kubernetes ](https://metallb.universe.tf/installation/)を参考にインストールします。
+[MetalLB, bare metal load-balancer for Kubernetes](https://metallb.universe.tf/installation/)を参考にインストールします。
 
 ```sh terminal
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.5/config/manifests/metallb-native.yaml
@@ -690,6 +687,7 @@ spec:
 ```
 
 参考：
+
 - [MetalLB v0.13以降はConfigmapでの設定ができない](https://thr3a.hatenablog.com/entry/20220718/1658127951)
 - [Heads up: breaking changes in 0.13.x #1473](https://github.com/metallb/metallb/issues/1473)
 
@@ -845,4 +843,3 @@ HOSTNAME : work01
 
 ラズパイを使ってKubernetesのクラスタを作成し、ロードバランシング・可用性を体感することができました。クラウド上でゴニョゴニョ行われていることに対して、物理的な構成から作ってみることで解像度が上がった気がします。また、Kubernetes周りで使われている技術（cgroup, kubeadm, kubelet, flannel, ...）について調べながら進めることで、Kubernetesに対して理解が進みました。
 今回、コンテナの構成に関しては自分で作らなかったので、次はWebアプリでも作ってデプロイしてみたいと思います。
-

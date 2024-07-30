@@ -12,6 +12,7 @@ author: 関靖秀
 lede: "テーマは、2021年2月24日に公開されたGKE Autopilotです。この記事は、Kubernetesに触ったことがない方でもわかるように、最も簡単な構成で試してみました。Kubernetesを触ったことがない方にもみていただけるとありがたく思います。"
 ---
 # はじめに
+
 こんにちは、TIGの関と申します。[GCP連載2021](/articles/20210307)第8弾です。
 
 今回技術ブログに初参加させていただきます。テーマは、2021年2月24日に公開されたGKE Autopilotです。
@@ -19,9 +20,11 @@ lede: "テーマは、2021年2月24日に公開されたGKE Autopilotです。�
 Kubernetesを触ったことがない方にもみていただけるとありがたく思います。
 
 # KubernetesとGKEのおさらい
+
 まずは、GKEとKubernetesについて簡単に導入をしたいと思います。
 
 ## Kubernetesとは？
+
 Kubernetesはコンテナオーケストレーションのためのツールで、数百〜数千といった膨大な数のコンテナを管理、協調させることができます。
 
 一つ以上のマシンを組み合わせたクラスタを構成し、それを単位とした分散システムとして動作します。論理的には"コントロールプレーン"と"ワーカーノード"という2つの構成要素からなります。
@@ -34,6 +37,7 @@ Kubernetesへのデプロイは、一つ以上のコンテナをひとまとめ�
 基本的に、Kubernetesにのせるサービスの開発者は、Podの構成は自分たちで考えることになります。
 
 ## GKEとは？
+
 GKE(Google Kubernetes Engine)とは、GoogleがGCPのプロダクトの一つとして提供しているKubernetesのマネージドサービスです。
 
 これまでのGKEは上記で説明したコントロールプレーンについて、Googleが管理してくれていました。
@@ -46,6 +50,7 @@ GKE(Google Kubernetes Engine)とは、GoogleがGCPのプロダクトの一つと
 さて、ここからが本題です。
 
 ## GKE Autopilotとは？
+
 GKE AutopilotはGKEの新しい運用モードです。
 
 これまでのGKEとの大きな違いは、Googleがワーカーノードの基本的な管理を担ってくれるということです。
@@ -65,8 +70,8 @@ Autopilotを使うことで、Googleがワーカーノードの管理、最適�
 デプロイされたPodに割り当てるリソースは、Podの仕様と負荷をに基づきAutopilotが自動でプロビジョニング、スケーリングしてくれます。また、料金計算、SLAはPod単位で行われます。
 
 その他の詳細情報については、公式ドキュメントが詳しいのでそちらを参照してください。
-* [Autopilotの概要](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview?hl=ja)
-* [GKE Autopilot のご紹介: マネージド Kubernetes における革命](https://cloud.google.com/blog/ja/products/containers-kubernetes/introducing-gke-autopilot)
+- [Autopilotの概要](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview?hl=ja)
+- [GKE Autopilot のご紹介: マネージド Kubernetes における革命](https://cloud.google.com/blog/ja/products/containers-kubernetes/introducing-gke-autopilot)
 
 # GKE Autopilotを触ってみる
 
@@ -74,6 +79,7 @@ Autopilotを使うことで、Googleがワーカーノードの管理、最適�
 Kuberntesを触ったことがない方でも、なんとなく雰囲気は掴めるはずです。
 
 ## クラスタの作成
+
 クラスタを作りましょう。Autopilotの設定はクラスタを作る際に行えます。
 新機能ですし、ここではGUIでどのように設定できるのかをみていきましょう。
 
@@ -91,12 +97,13 @@ Kuberntesを触ったことがない方でも、なんとなく雰囲気は掴�
 5min以上待つ必要があります。
 <img src="/images/20210318/image_4.png" loading="lazy">
 
-
 ## gcloudコマンドを導入する
+
 [公式ドキュメント](https://cloud.google.com/sdk/docs/quickstart-macos?hl=ja)に沿って導入しましょう。
 この記事ではクラスタの情報を取得することだけに使うため、出番少なめです。
 
 ## kubectlコマンドを導入する
+
 macでHomebrewを使っているならコマンド一発です。
 
 ```
@@ -106,6 +113,7 @@ brew install kubectl
 Kubernetes公式のインストール方法は[こちら](https://kubernetes.io/ja/docs/tasks/tools/install-kubectl/)
 
 ## kubectlにクラスタの情報を読み込ませる
+
 Kubernetesの操作はkubectlコマンドで行います。
 そのためには、kubectlコマンドにどのクラスタを対象にするのか教えてあげる必要があります。
 
@@ -139,6 +147,7 @@ nodeの情報をみるには`kubectl get node`コマンドを使います。`-o 
 ```
 kubectl get node -o wide
 ```
+
 実行結果
 Autopilotでは利用者側で管理することはないですが、nodeの情報を取得するのは通常通りできるようです。
 
@@ -149,6 +158,7 @@ gk3-autopilot-cluster-1-default-pool-da3faeda-70qd   Ready    <none>   44m   v1.
 ```
 
 ## Depoloymentを作成してみる
+
 さて、ようやくですが、Pod(コンテナ)をデプロイしてみましょう。
 
 今回はnginxを用いたPodをデプロイしてみます。
@@ -227,6 +237,7 @@ gk3-autopilot-cluster-1-default-pool-da3faeda-ndl1   Ready    <none>   3m49s   v
 ```
 kubectl get pod
 ```
+
 実行結果
 
 ```
@@ -281,6 +292,7 @@ NAME         TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
 kubernetes   ClusterIP      10.8.128.1     <none>        443/TCP        109m
 sample-lb    LoadBalancer   10.8.130.152   34.70.67.75   80:31465/TCP   88s
 ```
+
 EXTERNAL-IPと書かれているのが、LoadBalancerのIPです。
 
 LoadBalancer Serviceを作成すると、コントロールプレーンでそれを認識し、GCPのロードバランサを自動で作成してくれます。これはAutopilot限定の機能ではなく、これまでも可能だった機能です。
@@ -298,6 +310,7 @@ LoadBalancer Serviceを作成すると、コントロールプレーンでそれ
 できました！！！
 
 ## リソースの削除
+
 ここからはお片付けです。
 
 次のようにして、`kubectl delete`コマンドで削除できます。特に、LoadBalancer Serviceの削除をサボると自動生成されたLoadBalancerが削除されないままになるので注意が必要です。
@@ -308,17 +321,18 @@ kubectl delete -f service.yaml
 ```
 
 ## クラスタを破棄します
+
 クラスタの再構成がなされるので、完了まで待ちましょう。
 次のように、削除を選択し、しばらく待てばクラスタが削除できます。
 <img src="/images/20210318/image_11.png" loading="lazy">
 
 ## おまけ
+
 これ以外にも、作成するPodの数を増やしてみたり、公式チュートリアルをやったり、いろいろ触ってみました。
 リソースが足りなくなると、新しくNodeを確保して、ちょっと待つとPodがスケジューリングされる様子をみることができ、まさしく"Autopilot"という名にふさわしい挙動でした。
 
-
-
 # 感想
+
 公式の説明通り、ノードの設定を特にせずとも使え、一度作ったあとの使い方には大きな差がなく普通に使いやすいと感じました。
 
 シンプルに、ワーカーノードのことを一切考えなくて良くなるのは魅力です。

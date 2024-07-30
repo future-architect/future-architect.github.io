@@ -23,7 +23,6 @@ TIG真野です。
 
 DynamoDBをGoで操作することにかけては、[DynamoDB×Go連載](/tags/DynamoDB%C3%97Go/) に参加するくらい関心があるのですが、AWS SDK for Goの公式ライブラリに含まれる、ヘルパーパッケージについて存在を今までスルーしていました。使ってみると業務的には利用一択だと思ったので今後使っていくぞという覚書としてまとめます。
 
-
 ## DynamoDBの式をダイレクトに実装した例
 
 私は公式のAWS SDK for Goの[dynamodbパッケージ](https://docs.aws.amazon.com/sdk-for-go/api/service/dynamodb/)を用いる時に、ドキュメントのExampleに書いてあるように、ちまちま `ExpressionAttributeNames`や`ExpressionAttributeValues`や`FilterExpression`や`ProjectionExpression`を指定していました。
@@ -65,11 +64,9 @@ func ScanMusic() {
 
 ## ヘルパーパッケージの福音
 
-
 業務でも様々な技術ブログでも DynamoDB SDK for Goを実装するときは上記のような設定をするコードをよく見ますが、実は公式に便利なヘルパーが用意されています。 `expression` パッケージです。式の組み立て全般をサポートしてくれるビルダーを提供してくれます。
 
 * https://docs.aws.amazon.com/sdk-for-go/api/service/dynamodb/expression/
-
 
 `expression`パッケージ を用いると、`ExpressionAttributeNames` や `ExpressionAttributeValues` や `FilterExpression` などのDynamoDBの式を型安全に構築することができます。例をあげます。
 
@@ -103,7 +100,6 @@ func ScanMusic() {
 
 AWS SDK for Goを生で用いてDynamoDBアクセスを行うのであれば、基本的には積極的に使っていくパッケージでしょう。
 
-
 ## 論理式
 
 先程の例ではEqualでしたが、ドキュメントを見る通り、AND, OR, NotEqualや、LessThan, GreaterThan などなど、一通りの演算子が揃っています。選び放題・使い放題のガッツがあるパッケージです。
@@ -136,7 +132,6 @@ https://docs.aws.amazon.com/sdk-for-go/api/service/dynamodb/expression/
 ```
 
 式で表現すると `Artist == Red || Artist == Green || (Artist == Blue && Year == 2021)` といった感じでしょうか。式が複雑になる場合はこういった擬似コードでコメントの補足を入れると良いかなと思います。
-
 
 ## ProjectionExpressionを指定するのが面倒問題
 
@@ -176,7 +171,6 @@ https://docs.aws.amazon.com/sdk-for-go/api/service/dynamodb/expression/
 
 このあたりを作り込みすぎると、独自DSLを作るような感じになるかと思いますが、愚直に書きすぎると表現の密度が下がりすぎて保守がツライ場合もあるので、バランスを見て取り入れて行くと良いかなと思います。
 
-
 ## クエリの場合
 
 先程まではScanの例でしたが、Queryの場合はさらに `expression` が役立ちます。ハッシュキーにDeviceID、ソートキーにTimestampという典型的な時系列データを保持するDeviceLogというテーブルに対しての実装例です。
@@ -215,7 +209,6 @@ func QueryTable(ctx context.Context, deviceID string, start, end time.Time) {
 ```
 
 あるデバイスに対して、開始～終了日時を指定し、さらに適当なフィルター条件も追加しました。クエリの場合は、`KeyConditionExpression`と `FilterExpression` の両方が設定できるため、`expression` パッケージを利用しない時は`ExpressionAttributeNames` と `ExpressionAttributeValues` の管理が煩雑になりがちでした。
-
 
 ## Update Expression
 
@@ -309,7 +302,6 @@ func Update(ctx context.Context) {
 
 少し残念なのは、 `Key` の部分は `expr` から生成できないということでしょうか。ここだけはハッシュキー（とソートキー）をダイレクトに指定する必要があるので、レベル感がズレて勿体ない気がします。（KeyConditionのように指定したかったですね）
 
-
 ## まとめ
 
 AWS SDK for Goの `dynamodb` パッケージを用いると時に必須とも言える、 `expression` パッケージの使い方について触れました。
@@ -317,4 +309,3 @@ AWS SDK for Goの `dynamodb` パッケージを用いると時に必須とも言
 `expression` パッケージを用いると、従来DynamoDBのAPI仕様を理解したフィールドや、文字列で式を設定する必要があった部分を、型安全に構築することができます。
 
 いくつか残念なところはあるにしろ、メリットは計り知れないのでうまく活用していきたいですね。
-

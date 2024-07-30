@@ -231,7 +231,6 @@ curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d
 
 curlコマンド実行時に想定通りにアプリケーションが動けばコンテナイメージそのものは問題なく出来上がっていることになります。
 
-
 # まとめ
 
 * AWS LambdaではカスタムDockerコンテナを起動することができる

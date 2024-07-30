@@ -24,8 +24,8 @@ Azure が提供されている Event Hubs の Consumer 処理実装の EventProc
 実装言語は Java を想定しています。
 
 - azure-sdk-for-java
-	- com.azure:azure-messaging-eventhubs:5.3.1
-	- com.azure:azure-messaging-eventhubs-checkpointstore-blob:1.3.1
+ 	- com.azure:azure-messaging-eventhubs:5.3.1
+ 	- com.azure:azure-messaging-eventhubs-checkpointstore-blob:1.3.1
 
 ## Event Hubs とは
 
@@ -98,7 +98,6 @@ ownership の担当者ID、 checkpoint の offset値 は Blob のメタデータ
 Azure SDK 内で、メタデータ値を参照/更新することで、複数台のConsumer 間で連携して処理を行うことができるようになっています。Azure SDK 側で提供されている処理は Blob Storage を利用していますが、 `Checkpointstore` interface として切り出されているため、他の Storage (S3, GCS, インメモリ) でも実装することは可能です。
 [azure-sdk-for-java/CheckpointStore.java at master · Azure/azure-sdk-for-java](https://github.com/Azure/azure-sdk-for-java/blob/master/sdk/eventhubs/azure-messaging-eventhubs/src/main/java/com/azure/messaging/eventhubs/CheckpointStore.java)
 
-
 #### 対応SDK
 
 - .NET Core
@@ -150,7 +149,6 @@ eventProcessorClient.stop();
 - [azure-messaging-eventhubs](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/eventhubs/azure-messaging-eventhubs/src/samples/java/com/azure/messaging/eventhubs)
 - [azure-messaging-eventhubs-checkpointstore-blob](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/eventhubs/azure-messaging-eventhubs-checkpointstore-blob/src/samples/java/com/azure/messaging/eventhubs/checkpointstore/blob)
 
-
 ## その他
 
 その他、調査した結果を記載します。
@@ -184,7 +182,6 @@ Endpoint=sb://<namespace>/;SharedAccessKeyName=<KeyName>;SharedAccessKey=<KeyVal
 
 参考: [接続文字列を取得する - Azure Event Hubs - Azure Event Hubs | Microsoft Docs](https://docs.microsoft.com/ja-jp/azure/event-hubs/event-hubs-get-connection-string)
 
-
 ## 所感
 
 Azure Event Hubs の EventProcessorClient について紹介いたしました。
@@ -194,4 +191,3 @@ Azure 系は、他クラウドサービスと比べ情報があまり調べて�
 
 - [複数のインスタンス間でパーティション負荷のバランスを取る - Azure Event Hubs - Azure Event Hubs | Microsoft Docs](https://docs.microsoft.com/ja-jp/azure/event-hubs/event-processor-balance-partition-load)
 - [Azure Service Bus と Event Hubs における AMQP 1.0 プロトコル ガイド - Azure Service Bus | Microsoft Docs](https://docs.microsoft.com/ja-jp/azure/service-bus-messaging/service-bus-amqp-protocol-guide?toc=https%3A%2F%2Fdocs.microsoft.com%2Fja-jp%2Fazure%2Fevent-hubs%2Ftoc.json&bc=https%3A%2F%2Fdocs.microsoft.com%2Fja-jp%2Fazure%2Fbread%2Ftoc.json)
-

@@ -296,4 +296,3 @@ https://github.com/datake914/flutter_global_indicator_demo
 
 [^1]: Navigator2.0で宣言的なナビゲーションが可能になりましたが、ダイアログ表示は依然として命令的になります
 [^2]: cf. https://github.com/flutter/flutter/issues/33566
-
