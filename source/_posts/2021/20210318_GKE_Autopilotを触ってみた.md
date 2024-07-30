@@ -70,6 +70,7 @@ Autopilotを使うことで、Googleがワーカーノードの管理、最適�
 デプロイされたPodに割り当てるリソースは、Podの仕様と負荷をに基づきAutopilotが自動でプロビジョニング、スケーリングしてくれます。また、料金計算、SLAはPod単位で行われます。
 
 その他の詳細情報については、公式ドキュメントが詳しいのでそちらを参照してください。
+
 - [Autopilotの概要](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview?hl=ja)
 - [GKE Autopilot のご紹介: マネージド Kubernetes における革命](https://cloud.google.com/blog/ja/products/containers-kubernetes/introducing-gke-autopilot)
 

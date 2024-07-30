@@ -327,5 +327,6 @@ Cardの中には一つ以上のSectionが、Sectionの中には一つ以上のWi
 慣れれば、Webhookの設定 → コード書いてメッセージを投げるまでがスピーディにできるため、簡単な機能を載せたボットを使いたい場合などにはお勧めできると思います。
 
 # 参考
+
 - https://developers.google.com/chat
 - https://mikan.github.io/2018/03/15/writing-hangouts-chat-incoming-webhook-with-go/

@@ -32,6 +32,7 @@ Gitlabのマークはきつねではなくたぬきだったんですね...。
 * https://api.slack.com/changelog/2017-09-the-one-about-usernames
 
 上記を参考にしたところ以下のいずれかが必要となるようです。
+
 * メンバーID
   * Slackのシステム側でユーザーを一意に識別するためのID
 * Display name

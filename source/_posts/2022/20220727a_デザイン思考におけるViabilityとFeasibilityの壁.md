@@ -124,6 +124,7 @@ DXアプローチ連載2本目として本記事では、デザインワーク�
 具体的なプロセスや事例についてもざっくばらんに話しているので興味のある方は是非！
 
 Future Tech Cast
+
 # 26 【DXアプローチ】デザインワークって何?
 
 * [前編（Spotify）](https://open.spotify.com/episode/3jSrMzDmviOanNXWdJUTZl?si=FrxB4p5NTZiUsApn80ZnkA)
