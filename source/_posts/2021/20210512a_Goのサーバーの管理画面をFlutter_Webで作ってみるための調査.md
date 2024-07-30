@@ -113,7 +113,6 @@ class DetailScreen extends StatelessWidget {
 
 <img src="/images/20210512a/スクリーンショット_2021-05-11_8.49.21.png" alt="Routerのデモをウェブ表示" width="1200" height="1659"  loading="lazy">
 
-
 なお、URLの一部がエンティティのIDとしてパスパラメータとして使いたい場合は、RouteInformationParserを継承したクラスを作ってアプリに渡す必要があります。上記のmediumのページの中でRouteInformationParserで検索して見てみれば書き方がわかりますが、面倒です。ここはそのうち改善されるのでは、ということを期待しています。
 
 ## ハッシュがURLに入ってしまうのをやめる
@@ -155,7 +154,7 @@ https://future-architect.github.io/articles/20210408/
 まずビルドします。[CanvasKitのほうが描画性能は高いとのこと](https://recruit.gmo.jp/engineer/jisedai/blog/flutter2-canvaskit-performance/)ですが、たぶん、レンダラーはHTMLが良いかと思います。
 
 ```bash
-$ flutter build web --web-renderer=html --source-maps
+flutter build web --web-renderer=html --source-maps
 ```
 
 ビルドオプションには--releaseをつけることができます。つけるとビルドは遅くなります（M1 MacBook Proで20秒ほど。つけないと0.3秒）。
@@ -429,9 +428,7 @@ dependencies:
 import 'package:http/http.dart' as http;
 ```
 
-
 無事動いたようです。
-
 
 <img src="/images/20210512a/スクリーンショット_2021-05-11_22.32.50.png" alt="ケンオールAPIを利用したFlutter画面" width="1200" height="1371"  loading="lazy">
 

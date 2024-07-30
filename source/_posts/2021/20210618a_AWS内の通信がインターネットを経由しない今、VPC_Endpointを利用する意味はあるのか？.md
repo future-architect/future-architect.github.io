@@ -15,6 +15,7 @@ lede: "AWS内の通信においてインターネットを経由しないこと�
 ---
 
 # はじめに
+
 こんにちは。TIG村瀬です。
 
 タイトルの通りですがAWS内の通信においてインターネットを経由しないことが最近になって公式ドキュメントに明記されたことを受け、改めてVPC Endpointの必要性について調べてみました。
@@ -30,10 +31,9 @@ lede: "AWS内の通信においてインターネットを経由しないこと�
 
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">これがプライベートネットワークの通信と明示された意味は大きい<br><br>『Q:2つのインスタンスがパブリック IP アドレスを使用して通信する場合、またはインスタンスが AWS のサービスのパブリックエンドポイントと通信する場合、トラフィックはインターネットを経由しますか?』<a href="https://t.co/uy26KyCZKn">https://t.co/uy26KyCZKn</a></p>&mdash; Takuro SASAKI (@dkfj) <a href="https://twitter.com/dkfj/status/1385182566160891909?ref_src=twsrc%5Etfw">April 22, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-
 # VPC Endpointとは
-こちらもAWSの公式サイトから抜粋
 
+こちらもAWSの公式サイトから抜粋
 
 > PrivateLink を使用してサポートされている AWS のサービスや VPC エンドポイントサービスに VPC をプライベートに接続できます。
 > インターネットゲートウェイ、NAT デバイス、VPN 接続、または AWS Direct Connect 接続は必要ありません。
@@ -42,19 +42,22 @@ lede: "AWS内の通信においてインターネットを経由しないこと�
 >
 > [https://docs.aws.amazon.com/ja_jp/vpc/latest/userguide/what-is-amazon-vpc.html](https://docs.aws.amazon.com/ja_jp/vpc/latest/userguide/what-is-amazon-vpc.html)　より引用
 
-
 多少語弊があるかもしれませんが、一言で言うならばVPC内からVPC外に存在するAWSサービスにインターネットを経由せずに接続できる仕組みです。
 
 # 疑問
+
 以前はセキュリティを考慮しインターネットを経由しないようにするにはVPC Endpointが必須でしたが、今はVPC Endpointを利用しなくともインターネットを経由しない通信が可能です。
 
 はたして今でもVPC Endpointを利用するメリットはあるのでしょうか？ケース別に確認してみます。
 
 # 確認
+
 ## ケース1 NAT Gatewayが存在せずprivate subnetからAWSのサービスに接続する場合
+
 この場合は明らかでNAT Gatewayを用意せずともprivate subnetからAWSのサービスに接続するためにVPC Endpointは必要ですね。 (NAT Gatewayが存在しないケースはあまりないと思いますが)
 
 ## ケース2 NAT Gatewayが存在する場合
+
 この場合のメリットは何なのでしょうか？すぐにわからなかったのでコストの面で確認してみます。
 
 |  サービス  |コスト種別 |  コスト($/h)  |
@@ -81,11 +84,10 @@ VPC Endpoint(ゲートウェイ型)に関しては、なんと無料！
 
 <img src="/images/20210618a/vpcendpoint.png" alt="通信費用の資産" loading="lazy">
 
-
 通信量が少ないとインターフェイス自体の料金が掛かる分、メリットが無いですが通信量が増えれば増えるほどVPC Endpointのありがたみが実感できますね！
 
-
 # まとめ
+
 VPC Endpointを利用せずともAWSサービスとのインターネットを経由しない通信は可能です。
 
 VPC Endpoint(ゲートウェイ型)については導入の手間を考慮しなければコストは掛からないのでデータ量によらず導入した方がお得です。
@@ -93,6 +95,3 @@ VPC Endpoint(ゲートウェイ型)については導入の手間を考慮しな
 少量の通信であればVPC Endpoint(インターフェイス型)を利用してもコスト面においてメリットはありません(むしろ割高)が通信量が多いシステムであればあるほどコストメリットを感じられます。
 
 万能なアーキテクチャは存在しないのでデータ量に応じてVPC Endpointの導入を検討すると良いかと思います。
-
-
-

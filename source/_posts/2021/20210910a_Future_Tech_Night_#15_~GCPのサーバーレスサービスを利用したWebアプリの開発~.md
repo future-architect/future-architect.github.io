@@ -23,6 +23,7 @@ lede: "Future Tech Night #15への登壇レポートと、内容についての�
 <script async class="speakerdeck-embed" data-id="79065ba6f3824c0296baca7eac3ad1aa" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
 
 ## 技術選定
+
 今回Webアプリの開発にあたり、アプリを載せるためのGCPのコンピューティングサービスの比較検討を行いました。GCPのコーンピューティングサービスにはいくつか種類があり、
 
 - Compute Engine
@@ -35,9 +36,9 @@ lede: "Future Tech Night #15への登壇レポートと、内容についての�
 の5種類があります。今回は5つを1つに絞るにあたり、以下の制約と要件に合わせて絞っていきました。
 
 - コンテナですでに開発されている
-    - 別途GKEで稼働しているアプリの一部の切り出しのため、コンテナ化がすでにされている
+  - 別途GKEで稼働しているアプリの一部の切り出しのため、コンテナ化がすでにされている
 - 大量のリクエストを捌く必要がない
-    - インフラとしてスケールする必要はあるが、固定費として多くかけたくない
+  - インフラとしてスケールする必要はあるが、固定費として多くかけたくない
 - インフラの管理を極力減らしたい
 
 上記の条件で絞ったものの、App EngineとCloud Runが残りました。この2つをさらに絞るために、リッスンポートが任意にできるかどうかという制約に設けたところ、Cloud Runに決定しました（App Engineは8080ポートでしか受け付けることはできませんが、Cloud Runは任意のポートでリッスンさせることができます）。
@@ -48,6 +49,7 @@ lede: "Future Tech Night #15への登壇レポートと、内容についての�
 <img src="/images/20210910a/Untitled_Diagram.png" alt="Untitled_Diagram.png" width="1011" height="541" loading="lazy">
 
 ## Serverless NEGの利用
+
 Cloud Runは独自でエンドポイントが生成され、それをCNAMEとしてドメインと紐づけることが可能ですが、Cloud Armorを使ったIPやパスのアクセス制御を行うにはCloud Load Balancingが必要不可欠です。とはいえ、Cloud Runに直接さし込むことはできないのでこんな時は[Serverless NEG（Network Endpoint Group）](https://cloud.google.com/load-balancing/docs/negs/serverless-neg-concepts?hl=ja)を利用しましょう。
 利用する、とはいっても難しい設定することはなく、
 
@@ -57,6 +59,7 @@ Cloud Runは独自でエンドポイントが生成され、それをCNAMEとし
 の2ステップで利用できます。私も作成時は難しいのではないかと構えていましたが、すんなり作成できていい意味でびっくりしました。
 
 ## サーバーレスVPCコネクタ
+
 今回、Cloud RunはVPC接続されたCloud SQLに繋ぎに行く必要があるため、Cloud Run自身も漏れず、VPCに接続しないといけません。このようなVPC内部にあるサービスに対して、サーバーレスサービスが接続したい場合には、[サーバーレスVPCコネクタ](https://cloud.google.com/vpc/docs/serverless-vpc-access?hl=ja)を利用します。
 
 サーバーレスVPCコネクタを作成する時は
@@ -72,6 +75,7 @@ Cloud Runは独自でエンドポイントが生成され、それをCNAMEとし
 <img src="/images/20210910a/projects_(1).png" alt="projects_(1).png" width="1200" height="605" loading="lazy">
 
 ## ハマりどころ
+
 ### サービスアカウントの権限
 
 Cloud Runは作成した時に「Cloud Runサービスエージェント」のロールが付与されたサービスアカウントが作成されます。形は`service-PROJECT_ID@serverless-robot-prod.iam.gserviceaccount.com`となります。このサービスアカウントはIAMのページからも「Google 提供のロール付与を含みます」にチェックを入れないと見えないものなので、とても見落としやすいサービスアカウントです。

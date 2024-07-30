@@ -141,7 +141,6 @@ openapi-generator generate -i ./swagger.yaml -g dart -o ./client
 
 <img src="/images/20210511b/image_2.png" alt="openapi-generatorでの生成先ディレクトリ" width="554" height="1102"  loading="lazy">
 
-
 主たる生成コードの役割は以下の通りです。
 
 * `lib/api/xxx_api.dart`: swaggerの`tag`ごとに生成されます。APIレスポンスのモデルバインド等を実行するAPIクライアントラッパーが定義されます。
@@ -485,7 +484,7 @@ class ApiClient {
   }
 }
 ```
-</div></details>
 
+</div></details>
 
 [Dart/Flutter連載](/articles/20210510a/)の2記事目でした。次回は澁川さんの [Goのサーバーの管理画面をFlutter Webで作ってみるための調査](/articles/20210512a/) です。

@@ -21,7 +21,6 @@ golangだとGORMがデファクトスタンダードの位置を勝ち取りつ�
 
 今回は新たな可能性としてFacebook社謹製の[ent/ent](https://github.com/ent/ent)を検証します。個人的なORM経験としてはRuby on RailsのActiveRecordから始まり、当社謹製の[UroboroSQL](https://future-architect.github.io/uroborosql-doc/)というORMからGORMまで割と多めに触れているので、大体どのORMでも気になる機能を中心に作りながら検証します。
 
-
 # entとは
 
 <img src="/images/20210728a/ent_doc_top.png" alt="entドキュメントトップページ" width="1200" height="583" loading="lazy">
@@ -41,6 +40,7 @@ golangだとGORMがデファクトスタンダードの位置を勝ち取りつ�
 # 作りながら検証してみる
 
 ## 前提
+
 以下環境にて準備を始めます。
 
 * OS: Mac Catalina
@@ -50,6 +50,7 @@ golangだとGORMがデファクトスタンダードの位置を勝ち取りつ�
 PostgreSQLはDocker containerをローカルに立てています。
 
 ## 環境準備
+
 適当にworkspaceを作ります。
 
 ```sh
@@ -152,31 +153,30 @@ schema配下のファイルを実装していくことでスキーマ定義を�
 ※Configという定義もありますが、Annotationに置き換えられる予定のようで、2021年7月時点でdeprecatedになっています。
 
 * Fields
-    * テーブルカラムを定義します。
-    * `ent.Field`型としてカラムを宣言し、その配列を返却することでカラム定義としています。
-    * 型桁, `not null`, `default`, `unique`など、カラム属性は全て此処で定義します。
-    * entではデフォルトでサロゲートキー構造を前提としており、何もしないと`ID`カラムがPKとして定義されます。カスタマイズの方法は[こちら](https://entgo.io/ja/docs/schema-fields#id%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89)です。
-    * ちょっと特殊ですが、各カラムはデフォルトで`not null`です。`nullable`として定義する場合は明示的に定義する必要があります。（`nullbale`に意味を持たせるべきという思想らしい。正しいと思いますがパッと見わかりにくい。。）
-    * DBに反映した結果どんな型桁になるかは何もしないとentデフォルト定義に従います。もちろんカスタマイズは可能で、ちょっと触ってみた感じは感覚値とだいぶズレがあったので明示的に定義することをお勧めします。[こちら](https://entgo.io/ja/docs/schema-fields#%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E5%9E%8B)を参照してください。
+  * テーブルカラムを定義します。
+  * `ent.Field`型としてカラムを宣言し、その配列を返却することでカラム定義としています。
+  * 型桁, `not null`, `default`, `unique`など、カラム属性は全て此処で定義します。
+  * entではデフォルトでサロゲートキー構造を前提としており、何もしないと`ID`カラムがPKとして定義されます。カスタマイズの方法は[こちら](https://entgo.io/ja/docs/schema-fields#id%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89)です。
+  * ちょっと特殊ですが、各カラムはデフォルトで`not null`です。`nullable`として定義する場合は明示的に定義する必要があります。（`nullbale`に意味を持たせるべきという思想らしい。正しいと思いますがパッと見わかりにくい。。）
+  * DBに反映した結果どんな型桁になるかは何もしないとentデフォルト定義に従います。もちろんカスタマイズは可能で、ちょっと触ってみた感じは感覚値とだいぶズレがあったので明示的に定義することをお勧めします。[こちら](https://entgo.io/ja/docs/schema-fields#%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E5%9E%8B)を参照してください。
 * Edges
-    * あまり一般的な用語ではなくわかりにくいですが、つまりはリレーションの定義です。
-    * `ent.Edge`型としてリレーションを宣言し、その配列を返却することでリレーション定義としています。
+  * あまり一般的な用語ではなくわかりにくいですが、つまりはリレーションの定義です。
+  * `ent.Edge`型としてリレーションを宣言し、その配列を返却することでリレーション定義としています。
 
 今回は以下のような構造を作ってみます。
 
 * 会社テーブル
-    * id: bigint auto increment pk
-    * 名称: varchar(30) not null
+  * id: bigint auto increment pk
+  * 名称: varchar(30) not null
 * ユーザテーブル
-    * id: bigint auto increment pk
-    * 性:  varchar(30) not null
-        * 無駄にindexを貼ってみます
-    * 名:  varchar(30) not null
-    * 歳:  int nullable
-    * メルアド: varchar(30) nullable
-    * 会社id: bigint not null
-        * 会社との関連カラムです。データ投入が面倒なので外部参照キー制約は貼らないようにしてみます。
-
+  * id: bigint auto increment pk
+  * 性:  varchar(30) not null
+    * 無駄にindexを貼ってみます
+  * 名:  varchar(30) not null
+  * 歳:  int nullable
+  * メルアド: varchar(30) nullable
+  * 会社id: bigint not null
+    * 会社との関連カラムです。データ投入が面倒なので外部参照キー制約は貼らないようにしてみます。
 
 調整してみた結果のスキーマ定義が以下
 
@@ -601,6 +601,5 @@ GORMを使っても結局DSLに近いモデル定義をすることになるの�
 ただし、リレーションの書き方は他のORMと同様で独特の難しさがあり、この辺はケースごとに検証が必要そうです。
 
 また、生成templateカスタマイズができるみたいだけど、どこまでできるか？生成されるSQLあたりまで調整ができるものなのか、別の機会にそこだけ切り取って検証記事をあげられたらと思います。
-
 
 明日は多賀さんの[GORM v1 と v2 のソースコードリーディングしてみた](/articles/20210729a/)です。

@@ -50,7 +50,7 @@ $ cd python-cloud-debug
 まず、ライブラリを追加します。なお、uvicornですが、最近になって、uvloopとhttptools、websocketといった依存ライブラリは明示的にインストールしないと実行時にエラーになるように変わったみたいです。
 
 ```sh
-$ poetry add fastapi uvicorn uvloop httptools
+poetry add fastapi uvicorn uvloop httptools
 ```
 
 ここで.venvフォルダができ、ライブラリ類はそこにインストールされます。処理系がそこをみてくれるように設定すれば、コード補完とかが効きます。PyCharmであれば設定で検索ウインドウにvenvとタイプするとインタプリタ選択がでるので、追加してプロジェクトフォルダの.venv以下を設定します。
@@ -60,7 +60,6 @@ $ poetry add fastapi uvicorn uvloop httptools
 VSCodeは特になにもしなくてもよさそうです。開くだけで.venvフォルダを認識してオープンしてくれました。
 
 <img src="/images/20210311/スクリーンショット_2021-03-05_21.45.41.png" loading="lazy">
-
 
 ## アプリケーションを作ってみる
 
@@ -88,7 +87,7 @@ def read_item(item_id: int, q: Optional[str] = None):
 次のように実行するとローカルの８０００番ポートで起動します。ブラウザでlocalhost:8000にアクセスしたらJSONが表示ができることを確認します。
 
 ```sh
-$ poetry run uvicorn python_cloud_debug.main:app --reload
+poetry run uvicorn python_cloud_debug.main:app --reload
 ```
 
 ## コンテナを作ってpushする
@@ -132,7 +131,6 @@ $ docker push gcr.io/[プロジェクトID]/[プロジェクト名]:latest
 ```
 
 これを使ってCloud Runに登録して実行してみても良いでしょう。アプリケーション名を入れて、このpushしたイメージ名を選択して外部公開してあげれば簡単に起動できます。それ以外にはリポジトリと連携してCloud Buildする方法も選べます。デバッガーではソースコードを別にpushしないといけないのでそっちの方がいいかも？
-
 
 <img src="/images/20210311/スクリーンショット_2021-03-06_9.38.35.png" loading="lazy">
 
@@ -206,4 +204,3 @@ CPU時間のグラフはこんな感じです。きっとプログラムがヘ�
 StackdriverあらためCloud OperationsのDebuggerとProfilerを試してみました。Goサポートがまだだったり、Cloud Run対応がまだだったりとかはありますが、OpenCensus/OpenTelemetryなみに頑張らなくてもちょっとmainのところにコードを足すだけで本番環境の中身を覗いたりプロファイルが取れるのは面白いですね。そのうち、ローカルのデバッグよりもリモートの方が簡単、みたいになってくれそうな気がしました。
 
 明日は村瀬さんの[Text To Speech](/articles/20210312/)です。
-

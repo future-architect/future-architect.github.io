@@ -21,6 +21,7 @@ mathjax: true
 <img src="/images/20210930a/サムネイル2.png" alt="" title="Louis Reed on Unsplash" width="1200" height="675" loading="lazy">
 
 # はじめに
+
 こんにちは。TIG/DXユニット所属の宮永です。
 
 **本記事は[「GoでMQTT\!\!　～温湿度マイスターbotの作成～\(前編\) 」](https://future-architect.github.io/articles/20210929a/)の後半パートです。**
@@ -77,6 +78,7 @@ AWS IoTで受信したデータをDynamoDBに登録する方法は公式に詳�
 <img src="/images/20210930a/image.png" alt="image.png" width="797" height="508" loading="lazy">
 
 ### ルールの作成
+
 作成したテーブルにデータを送信するため、AWS IoT ルールの作成を行います。
 
 AWS IoTコンソール上Act>Ruleからルールの新規作成が行えます。SQLバージョンの使用は2016-03-23を使用しました。From句には **「2. AWS IoTを使用してRaspberryPiからのPublish動作確認」** の実装にてに定義したトピック名を記載してください。
@@ -100,6 +102,7 @@ FROM 'topic/to/publish'
 <img src="/images/20210930a/image_3.png" alt="ロール作成" width="982" height="616" loading="lazy">
 
 ### 疎通確認
+
 最後にDynamoDBにデータが正しく登録されているか確認します。
 DynamoDBコンソールにアクセスして、下図の様にデータが登録されていることを確認してください。
 
@@ -109,6 +112,7 @@ DynamoDBコンソールにアクセスして、下図の様にデータが登録
 次の章では、Boto3を使用してDynamoDBからデータを取得したうえで、扱いやすいようにデータを整形します。
 
 ## 5. Boto3を使用してDynamoDBからデータをQuery、データ整形
+
 PythonモジュールBoto3を使用してDynamoDBからデータをQuery、最新値15点ほどを抜き出してプロットします。
 
 Boto3を使用したQueryは非常に簡単に行えますが、Queryで取得したデータはDecimal型を含む特殊な構造をしているため、JSONに整形する必要があります。
@@ -197,6 +201,7 @@ if __name__ == "__main__":
 それでは、次章で取得したデータをプロットしましょう。
 
 ## 6. 取得データをmatplotlibで可視化
+
 先ほど取得したデータを使用してプロットします。
 
 今回はQueryによって得たデータのうち最新データ15点をプロットするようにしました。ただし、取得したデータをプロットするだけでは面白くないので不快指数を可視化できるようにしました。
@@ -215,6 +220,7 @@ $$
 屋外に関する指標ですが、室内環境の調整には十分そうです。
 
 また、屋内における適正温度は夏場において25 ~ 28℃、適正湿度は40 ~ 70%とのことから、該当領域に色付けをして一目で室内環境を把握できるようにしました。
+
 * *[温度と湿度の関係を知って快適に暮らそう！すぐに実践できる温度・湿度の調節方法もご紹介｜EGR](https://www.egmkt.co.jp/column/consumer/20210506_EG_067.html)*
 
 不快指数などのメッセージは**「7. 作成したプロット図をSlack APIで画像投稿」**にてSlackで通知する仕組みとなっています。
@@ -322,10 +328,10 @@ def worker():
     fig = generate_figure(Timestamp, Temperature, Humidity)
 
 ```
+
 ### 出力結果
 
 <img src="/images/20210930a/室内温湿度.jpg" alt="室内温湿度" width="800" height="600" loading="lazy">
-
 
 ## 7. 作成したプロット図をSlack APIで画像投稿
 
@@ -351,6 +357,7 @@ client = WebClient(
     response2 = client.files_upload(channels="#home", file=fig, title="室内温湿度")
 
 ```
+
 たったこれだけでSlackに自由に投稿できるとは！便利ですね。
 
 >*注意点が一つあります。テキストメッセージの送信の際はchannel="#home"となっていますが、画像を投稿する際はchannels = "#home"です。*
@@ -536,7 +543,6 @@ GoとAWS IoTを使用してMQTT通信を行いました。
 AWS IoTを使用したのは初めてだったのですが、公式のドキュメントやチュートリアルが非常に丁寧であったため、簡単に実装できました。
 
 AWS以外のクラウドサービスのMQTTサポートなどの使い勝手も気になってきたため、近々まとめられればと思います。
-
 
 **（2021.10.1）続編が公開されました**
 

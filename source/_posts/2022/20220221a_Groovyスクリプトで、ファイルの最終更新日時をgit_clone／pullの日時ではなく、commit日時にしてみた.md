@@ -22,6 +22,7 @@ lede: "こんにちは、TIG コアテクノロジーユニットの田中です
 * Perl 5.32.1
 
 # 背景
+
 git clone/pullした時に、ローカルにチェックアウトされたファイルの最終更新日時がどうなっているかご存知でしょうか。
 
 答えは`git clone/pullした時刻`です。(pullした場合はcommitがあったファイルのみ最終更新日時が変わります)
@@ -37,6 +38,7 @@ git cloneをやり直した場合、全てのファイルの最終更新日時�
 実はこれを実現するためのPerlスクリプトがgit公式から配布されています。今回はJVMで動かしたかったので、同様の処理を行う`Groovyスクリプト`を作成しました。
 
 # Perlスクリプト
+
 まずはPerlスクリプトを用いた方法から紹介していきます。
 
 git公式で配布されているPerlスクリプトは[こちら](https://git.wiki.kernel.org/index.php/ExampleScripts#Setting_the_timestamps_of_the_files_to_the_commit_timestamp_of_the_commit_which_last_touched_them)にあります。
@@ -57,7 +59,7 @@ Perlスクリプトの全量は以下です。
 ローカルのgit定義フォルダルートでスクリプトを実行すると、各ファイルの最終更新時間がコミット時間に変更されます。
 
 ```bash 実行
-$ perl git-set-file-times.pl
+perl git-set-file-times.pl
 ```
 
 ```perl git-set-file-times.pl
@@ -130,8 +132,8 @@ close FH;
 
 <img src="/images/20220221a/image_2.png" alt="git log出力" width="1124" height="785" loading="lazy">
 
-
 # Groovyスクリプト
+
 さて本題のGroovyスクリプトです。
 
 処理の流れは基本的にPerlスクリプトの時と同じです。
@@ -139,7 +141,7 @@ close FH;
 スクリプトの全量は以下です。ローカルのgit定義フォルダルートでスクリプトを実行すると、各ファイルの最終更新時間がコミット時間に変更されます。
 
 ```bash 実行
-$ groovy git-set-file-times.groovy
+groovy git-set-file-times.groovy
 ```
 
 ```groovy git-set-file-times.groovy
@@ -195,6 +197,7 @@ pattern_update_time = /^committer .*? (\d+) ([\-\+]\d+)$/
         update_time = it[1]
     }
 ```
+
 * `文字列 =~ /正規表現/`で、正規表現にマッチした文字列を探索出来る
 * `it`で正規表現文字列に一致した文字列を取得
 * `it[1]`のように指定することでグループ化した文字列を取得
@@ -219,6 +222,7 @@ Groovyのキャッチアップは以下のサイトを参考にしました。
 * [[Groovy]正規表現メモ - Qiita](https://qiita.com/saba1024/items/61aeaf36061df35f8bee)
 
 # 処理時間の比較
+
 それぞれのスクリプトを、23,898ファイルを持つgitプロジェクトで実行して処理時間を測定しました。対象プロジェクトの開発期間は6年程で、コミットログもそれなりに育っているという状況です。(4334コミット)
 
 git clone/pullの時間は含んでおらず、純粋なスクリプト実行時間のみを測定しています。Perlスクリプトのほうが速いという結果にはなりましたが、`Groovyスクリプトでも2.4万ファイルに対して約5秒`と十分な性能である事が確認できました。
@@ -235,6 +239,7 @@ Perl | 2.2 秒
 ```bash Perl
 powershell -C (Measure-Command {perl git-set-file-times.pl}).TotalSeconds
 ```
+
 ```bash Groovy
 powershell -C (Measure-Command {groovy git-set-file-times.groovy}).TotalSeconds
 ```
@@ -280,6 +285,7 @@ for (log in logs) {
 <img src="/images/20220221a/image_3.png" alt="git log出力例" width="1200" height="205" loading="lazy">
 
 # まとめ
+
 GroovyスクリプトはJavaと同じ感覚で書けるので、普段Javaを使っている方はほとんどキャッチアップコストをかけずに習得出来ると思います。
 
 シェルやPerlスクリプトが少し使い難いなと思っている方にはオススメです。

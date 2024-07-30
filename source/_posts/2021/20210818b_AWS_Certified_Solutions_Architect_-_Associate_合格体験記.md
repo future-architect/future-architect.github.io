@@ -99,7 +99,6 @@ Black Belt Online Seminarとは、AWSの技術担当者が各サービスにつ�
 
 動画だと理解が深まりやすい分、視聴するのに時間がかかるので、私は全てのサービスを視聴せず、上記教材でも理解が浅い領域のみ見ていました。
 
-
 # 勉強の反省点
 
 当初はUdemyの講座を受けてハンズオンを行い問題演習をする流れで学習を進めていました。しかし、今振り返ってみると理解ができていないまま画面の通りに操作しているだけになってしまったかなと思います。ですので、一旦全体的な知識を身に付け、ある程度の問題演習をした後にハンズオンを実施する流れだと、理解がさらに深まったのではないかと思いました。
@@ -124,15 +123,15 @@ AWS認定試験に合格すると、いくつかの特典を受けることが�
 <img src="/images/20210818b/image.png" alt="合格後の特典" width="425" height="136" loading="lazy">
 
 * 50% Discount on your next Exam
-    * 次回受ける認定試験の受験料が半額となる。
+  * 次回受ける認定試験の受験料が半額となる。
 * AWS Free Practice Exam Voucher
-    * 模擬試験（¥2,000 ~ ¥4,000）の無料クーポン
+  * 模擬試験（¥2,000 ~ ¥4,000）の無料クーポン
 * Apply to join our Subject Matter Expert (SME) Program
-    * SMEへの参加資格を得られる。
+  * SMEへの参加資格を得られる。
 * AWS Certified Associate: Store Access
-    * AWS公式グッズのストアへのアクセスができる。
+  * AWS公式グッズのストアへのアクセスができる。
 * AWS Certified Global LinkedIn Community
-    * AWS認定資格に合格した者のみが参加できるLinkedInのコミュニティへ参加できる。
+  * AWS認定資格に合格した者のみが参加できるLinkedInのコミュニティへ参加できる。
 
 また、試験に合格した証として認定バッチも受け取ることができます。
 
@@ -149,4 +148,3 @@ AWS認定試験に合格すると、いくつかの特典を受けることが�
 今回、資格としての合格は得ることはできましたが、まだスタートラインに立ったばかりなので、これからも継続的に復習をして、レベルアップしていきたいと思います。また、AWS SAAだけでなく、AWS DVAやSOAなどの試験に向けて、継続して学習を進めていきたいと思います。
 
 Future Tech Blogでは、今回扱ったAWS SAAの上位資格であるAWS Certified Solutions Architect - Professionalに合格した[伊藤真彦さんの記事](https://future-architect.github.io/articles/20210607a/)やAWSだけでなく、[GCPやTerraform認定試験の合格記](https://future-architect.github.io/tags/合格記/)もありますので、認定試験を受験する前にぜひご覧ください。
-

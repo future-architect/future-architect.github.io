@@ -22,6 +22,7 @@ lede: "こんにちは、Engineer Campにてインターン中の山本です。
 今回はGoogle Chat APIに関しての記事です。
 
 ## 背景
+
 業務でGoogle Chat上で通知システムを作成する必要があったのですが、実装するにあたりいくつかのハードルがありました。
 
 - 公式の実装例にGoがないため、すぐに使えない
@@ -54,8 +55,8 @@ Google Hangoutsとの関連は以下のようになっています。（[Wikiped
 
 今回はその中から、非同期メッセージの送信機能を持つIncoming Webhookを使用し、Goでメッセージを送信するアプリケーションの実装を行います。
 
-
 # 1. Google ChatでWebhookの設定をする
+
 それでは始めていきます。
 
 コードを書く前に、Google ChatにてWebhookの設定をする必要があります。
@@ -77,8 +78,8 @@ Webhookの名前とアバターURLを入力し、保存を押します。
 
 <img src="/images/20210913a/screenshot_setup4.png" alt="設定完了画面" width="1200" height="469" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
 
-
 # 2. Goでメッセージを送る
+
 Webhookの設定は完了したので、次にGoアプリケーションの実装について説明します。
 以下はWebhookで簡単なメッセージを送信するGoのプログラムです。
 
@@ -121,8 +122,8 @@ func main() {
 
 <img src="/images/20210913a/screenshot_simple_message.png" alt="screenshot_simple_message" width="1066" height="224" loading="lazy">
 
-
 # （付録１）投稿を一つのスレッドにまとめる
+
 投稿に対して返信をしない場合など、スレッドをいちいち作成する必要がないケースについては、同一スレッドにメッセージを投稿した方が見た目がスッキリする場合もあります。
 
 Webhook URLにスレッドに関するクエリパラメータを追加することで投稿するスレッドを一つに指定することができます。（[参照](https://developers.google.com/chat/how-tos/bots-develop#thread_key)）
@@ -134,9 +135,8 @@ const webhook = "<任意のWebhookURL>&threadKey=<適当な文字列>"
 以下のように、同じスレッドにメッセージが投稿されるようになります。
 <img src="/images/20210913a/screenshot_thread.png" alt="screenshot_thread" width="1056" height="222" loading="lazy">
 
-
-
 # （付録２）Card型メッセージ
+
 シンプルなメッセージでは表現しきれない場合の手段としてカード型のメッセージが用意されています。
 以下は[公式ドキュメント](https://developers.google.com/chat/reference/message-formats/cards)で紹介されていた表現をほとんど網羅したカード型のメッセージを送信するプログラムです。
 
@@ -327,6 +327,5 @@ Cardの中には一つ以上のSectionが、Sectionの中には一つ以上のWi
 慣れれば、Webhookの設定 → コード書いてメッセージを投げるまでがスピーディにできるため、簡単な機能を載せたボットを使いたい場合などにはお勧めできると思います。
 
 # 参考
-* https://developers.google.com/chat
-* https://mikan.github.io/2018/03/15/writing-hangouts-chat-incoming-webhook-with-go/
-
+- https://developers.google.com/chat
+- https://mikan.github.io/2018/03/15/writing-hangouts-chat-incoming-webhook-with-go/

@@ -96,4 +96,3 @@ RDS for MySQL DBインスタンスのスナップショットをAurora MySQL DB 
 
 Data Analytics - Specialtyよりは安全な難易度でしたが、個人的な都合で勉強時間1週間で試験に臨んだ結果、少々受かるか不安な状態でした。
 こちらも一発合格できて良かったです。
-

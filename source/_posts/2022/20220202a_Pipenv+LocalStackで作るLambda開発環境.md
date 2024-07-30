@@ -16,7 +16,6 @@ lede: "PipenvとLocalStackを使用したLambda開発環境の構築を紹介し
 ---
 <img src="/images/20220202a/eyecatch.png" alt="" width="969" height="484" loading="lazy">
 
-
 # はじめに
 
 こんにちは、TIG/DXユニット所属の宮永です。
@@ -26,7 +25,6 @@ PipenvとLocalStackを使用したLambda開発環境の構築を紹介します�
 
 https://github.com/orangekame3/pipenv-lambda
 
-
 <div class="note info" style="background: #e5f8e2; padding: 16px;">
   <span class="fa fa-fw fa-check-circle"></span><p>【本記事で伝えたいこと】</p>
   <p>本記事で最も伝えたいことはデプロイパッケージと開発パッケージの分離です。
@@ -34,14 +32,13 @@ Pipenvを使用することでzipの容量を節約しながらLambdaをデプ�
 やや長い記事となっていますので、「LocalStackへのデプロイ」の章だけでも見ていただけると幸いです。</p>
 </div>
 
-
-
 # Pipenvとは
+
 Pipenvはパッケージ管理ツールです。似たようなツールにPoetry等があります。
 Poetryを使用したPython開発環境の構築は[澁川さんの記事](https://future-architect.github.io/articles/20210611a/)がとても参考になりますのでぜひご覧ください。
 
-
 # 開発環境
+
 開発に取り組む前に筆者の開発環境を記載します。記事中Linuxコマンドを使用している箇所があります。Windowsで開発される方はWSLを使用することをおすすめいたします。
 
 * OS Ubuntu 20.04
@@ -63,7 +60,6 @@ pip install pipenv
 プロジェクトのルートディレクトリで以下コマンドを実行してPythonプロジェクトを作成します。
 ランタイムはLambdaでサポートしている最新環境のPython 3.9を使用します。
 参考：[Lambda ランタイム](https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/lambda-runtimes.html)
-
 
 ```bash
 pipenv --python 3.9
@@ -88,7 +84,6 @@ Creating a Pipfile for this project...
 
 プロジェクトの作成ができました 🎉
 この状態でtreeコマンドを実行すると`Pipfile`が作成されていることを確認できます。
-
 
 ```bash
 ~/git/src/pipenv-lambda main*
@@ -125,6 +120,7 @@ Pipenvでパッケージをインストールする際は`pipenv install`コマ�
 この点については後ほど「LocalStackへのデプロイ」で説明します。
 
 ## 開発パッケージのインストール
+
 続いてテスト環境を構築します。以下のコマンドでpytestをインストールします。
 
 ```bash
@@ -148,6 +144,7 @@ Installing dependencies from Pipfile.lock (7c060a)...
 To activate this project's virtualenv, run pipenv shell.
 Alternatively, run a command inside the virtualenv with pipenv run.
 ```
+
 同様にして静的型チェックツールであるmypyもインストールします。
 
 ```bash
@@ -170,9 +167,11 @@ pipenv install pandas xlwt xlsxwriter
 次の章でLocalStackの準備をします。
 
 # LocalStackの準備
+
 LocalStackを使用して、Lambdaのデプロイと動作検証を行います。
 
 ## docker-compose.ymlの作成
+
 以下のような`docker-compose.yml`を用意してください。
 
 ```yml docker-compose.yml
@@ -205,6 +204,7 @@ docker compose up --build
 次にAWS CLIの設定を行います。
 
 ## AWS CLIの設定
+
 AWS CLIでは認証情報などをプロファイルとして保存することができます。
 AWS CLIをインストールされた方はご自身が使用しているOSのhomeディレクトリに`.aws`の隠しファルダがあります。(エクスプローラーなどで確認する場合は隠しフォルダを表示するように設定してください。)`.aws`フォルダ配下には.`config`と
 `.credentials`2つのファイルがありますのでそれぞれ以下のように設定してください。
@@ -225,12 +225,10 @@ aws_access_key_id = test
 aws_secret_access_key = test
 ```
 
-
-
-
 # デモアプリの実装
 
 ## 最終的なディレクトリ構成
+
 以降、複数のファイルを作成します。最終的なディレクトリ構成を記載しますので、適宜参考にしてください。
 
 ```bash
@@ -260,6 +258,7 @@ aws_secret_access_key = test
 ```
 
 ## 全体構成
+
 今回作成するのはS3バケットからJSONファイルを取得し、ETL処理後にExcelファイルとして再度S3バケットに格納するアプリです。
 S3バケットに格納したExcelファイルはAWS CLIコマンドでファイルをダウンロードして想定通りの挙動をしているか検証します。
 以下、構成図です。
@@ -267,6 +266,7 @@ S3バケットに格納したExcelファイルはAWS CLIコマンドでファイ
 <img src="/images/20220202a/構成.png" alt="構成" width="1200" height="810" loading="lazy">
 
 ## アプリ機能詳細
+
 JSON→ExcelのETL処理について以下記載します。
 S3バケットには予め以下の構造をもつJSONファイルを配置しておきます。
 実装するLambdaには大きく2つの機能をもたせます。
@@ -282,7 +282,6 @@ S3バケットには予め以下の構造をもつJSONファイルを配置し�
 </div>
 
 <br />
-
 
 ```json
 [
@@ -318,8 +317,8 @@ S3バケットには予め以下の構造をもつJSONファイルを配置し�
 |001|般若 竜門|2|75|2021-07-19|75|
 |002|十河 アンナ|2|57|2021-09-06|57|
 
-
 ## ハンドラの実装
+
 それではアプリ本体を実装します。
 Lambdaは`lambda.py`と`model.py`の２つで構成します。
 機能のほとんどは`model.py`に記述し、`lambda.py`ではハンドラを呼び出すのみにします。
@@ -424,6 +423,7 @@ class Handler(object):
 [scripts]
 mypy = "mypy model.py lambda.py"
 ```
+
 `Pipfile`へ追記したら以下コマンドを実行します。
 
 ```bash
@@ -565,7 +565,6 @@ tests/test_model.py::test_process[input_dict0-expected_dict0] PASSED            
 
 無事テストを通過しました🎉
 
-
 # LocalStackへのデプロイ
 
 Lambdaのzip化やLocalStackへのデプロイは`Makefile`で管理します。
@@ -574,9 +573,8 @@ Lambdaのzip化やLocalStackへのデプロイは`Makefile`で管理します。
 
 参考：[破壊的変更 - AWS CLI バージョン 1 からバージョン 2 への移行](https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cliv2-migration.html#cliv2-migration-binaryparam)
 
-
-
 ## Makefile全貌
+
 以下作成した`Makefile`です。
 
 ```Makefile Makefile
@@ -652,6 +650,7 @@ json:
 ```
 
 ## デプロイパッケージのzip化
+
 ポイントはzipコマンド部です。
 
 ```Makefile
@@ -667,7 +666,6 @@ zip:clean
     find ./bin/lambda.zip
     cd $(DEPLOY_PACKAGES_DIR) && rm -r *
 ```
-
 
 前提として、Lambda上でPythonの外部パッケージを使用する際は外部パッケージを含んだzipファイルを作成する必要があります。直接CLI等からアップロードする場合は50MBの上限が存在します。
 
@@ -756,6 +754,7 @@ LocalStackへのLambdaデプロイに成功しました🎉
 # 動作検証
 
 ## テストデータの作成
+
 まずはETL処理元のテストデータを作成します。
 ルートディレクトリに`utils/utils.py`を作成し、以下のコードを実装します。
 
@@ -833,8 +832,8 @@ python utils.py 100
 ```
 
 ## Lambdaの実行
-それではデプロイしたLambdaを呼び出します。AWS CLIのinvoke実行時に`--payload '{ "input_obj": "test.json" }'`を付与することでLambdaに`test.json`の場所を渡します。
 
+それではデプロイしたLambdaを呼び出します。AWS CLIのinvoke実行時に`--payload '{ "input_obj": "test.json" }'`を付与することでLambdaに`test.json`の場所を渡します。
 
 ```
 make invoke
@@ -874,10 +873,3 @@ https://github.com/orangekame3/pipenv-lambda
 調べて見るとLambdaの開発環境としては[Serverless Application Model](https://aws.amazon.com/jp/serverless/sam/)や[Serverless Famework](https://github.com/serverless/serverless)などのテンプレートがあるようです。こうしたフレームワークも今後触ってみて自分なりのベストな開発環境を模索していきたいです。
 
 最後までお付き合いいただきありがとうございました。
-
-
-
-
-
-
-

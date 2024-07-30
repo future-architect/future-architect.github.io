@@ -28,27 +28,28 @@ lede: "昨年に続きGCP連載企画の参加です。私個人としてはGCP�
 本記事ではAPIを利用して音声ファイルを作成するところまでを紹介しますが、APIを利用せずどんなものか確認するのであれば[このページ](https://cloud.google.com/text-to-speech/?hl=ja#section-2)の **Text-to-Speech を試してみましょう**  のところで確認できます。あなたがロボットでなければ。
 
 # 料金
+
 無料枠があり、最初の400万文字/月は無料。それを越した場合でも100万文字あたり$4.00でお安いですね。
 詳細は[公式ページ](https://cloud.google.com/text-to-speech/pricing?hl=ja)を参照ください。
 
-
 # 準備
+
 [クイックスタート: コマンドラインの使用のページ](https://cloud.google.com/text-to-speech/docs/quickstart-protocol?hl=ja)を参考に準備をします。
 
 ## 1.新しいプロジェクトの作成
 
 <img src="/images/20210312/00create_prj.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-
 適当にプロジェクト名を入力して作成します。
 
 ## 2.Cloud Text-to-Speech APIの有効化
+
 [クイックスタート ページ内](https://cloud.google.com/text-to-speech/docs/quickstart-protocol?hl=ja)のAPIを有効にするボタン]をクリックして有効にします。
 
 <img src="/images/20210312/01pre.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-
 ## 3.認証の設定
+
 必要なロールはありませんということなのでロールを選択せず作成します。
 
 <img src="/images/20210312/02pre.png" class="img-large-size" style="border:solid 1px #000000" loading="lazy">
@@ -62,8 +63,8 @@ lede: "昨年に続きGCP連載企画の参加です。私個人としてはGCP�
 JSONファイルがダウンロードされるので適切な場所に保存します。のちにこのJSONファイルのパスを環境変数に設定することになります。
 
 ## 4.Cloud SDK をインストールして初期化します。
-[このページ](https://cloud.google.com/sdk/docs/install?hl=ja)に則りインストールします。
 
+[このページ](https://cloud.google.com/sdk/docs/install?hl=ja)に則りインストールします。
 
 <img src="/images/20210312/05sdk.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
@@ -90,6 +91,7 @@ JSONファイルがダウンロードされるので適切な場所に保存し�
 無事に完了しました。
 
 ## 5.環境変数の設定
+
 他のブログをみるとLinux,macOSの記事が多かったので今回はあえてWindowsのPowerShellでやってみます。
 
 ```powershell
@@ -99,6 +101,7 @@ $env:GOOGLE_APPLICATION_CREDENTIALS="C:\xxx\Text-to-Speech-123456789012.json"
 # テキストから音声へ変換
 
 ## ファイルの用意
+
 音声に変換したい文字列や必要となる情報を記載したJSONファイルを用意します。ここではクイックスタートに習ってrequest.jsonとします。日本語の音声を確認したかったので以下の様にしました。
 
 ```json request.json
@@ -119,8 +122,8 @@ $env:GOOGLE_APPLICATION_CREDENTIALS="C:\xxx\Text-to-Speech-123456789012.json"
 
 設定可能な言語、音声は[こちら](https://cloud.google.com/text-to-speech/docs/voices?hl=ja)を参照
 
-
 ## APIの実行
+
 クイックスタートに載ってるコマンドを実行します。
 
 ```powershell
@@ -134,6 +137,7 @@ Invoke-WebRequest `
   -InFile request.json `
   -Uri "https://texttospeech.googleapis.com/v1/text:synthesize" | Select-Object -Expand Content
 ```
+
 実行すると以下のエラーが発生しました。
 
 <img src="/images/20210312/16err.png" loading="lazy">
@@ -147,12 +151,11 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 再度実行すると無事mp3が返却...されません。
 代わりにmp3を生成する基となるbase64を含むJSONが返却されます。
 
-
-
 mp3が返却されないのはAPIの応答は全てJSONに統一されているからでしょうか？
 なお、返却されたJSONの中のbase64の文字列をのちに利用するので応答をファイル出力しておくと便利です。
 
 ## base64からmp3への変換
+
 JSONからaudioContentの値を抜き出してファイル(base64.txt)に保存します。
 
 ```base64.txt
@@ -170,7 +173,6 @@ certutil -decode base64.txt future.mp3
 テキストから生成した音声はこちらになります。
 
 <br><br>
-
 
 <audio controls>
   <source src="/images/20210312/future.mp3">

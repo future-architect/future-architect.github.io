@@ -400,7 +400,6 @@ c.f. [Go の Open API 3.0 のジェネレータ oapi-codegen を試してみた]
 
 <img src="/images/20210730a/sqlboiler.png" alt="ddlとopenapi.ymlを駆動としたコード生成とアプリ開発のフロー図" width="800" height="320" loading="lazy">
 
-
 ### 開発例
 
 今回は例として次のようなOpenAPI定義を用意しました。
@@ -505,4 +504,3 @@ SQLBoilerの使い方と、これを使ったREST APIサーバの開発フロー
 なお、今回利用したコード、プロジェクトは[こちらのリポジトリ](https://github.com/uhey22e/sqlboiler-restapi-example)にまとめてあります。
 
 次は伊藤真彦さんの[SQLビルダーgoquの使い方](/articles/20210802a/)です。
-

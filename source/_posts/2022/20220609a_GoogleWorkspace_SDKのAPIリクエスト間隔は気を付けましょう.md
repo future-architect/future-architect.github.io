@@ -43,8 +43,6 @@ Google WorkspaceはGoogleが提供する組織向けオンラインアプリケ�
 これには<a href="https://cloud.google.com/?hl=ja">Google Cloud Platform（GCP）</a>上で、グループに対してIAMロールを付与することができるという恩恵があり、グループに所属しているメンバー全員に対してGCPリソースの権限管理ができます。（例えば、グループAにはGoogle Cloud Storageの管理者権限、グループBにはGoogle Cloud Storageの閲覧権限のみなど）</p>
 </div>
 
-
-
 ## 何が起きたのか
 
 ### 開発環境
@@ -177,8 +175,6 @@ func main() {
 
 > Indicates that the user rate limit has been exceeded. The default value set in the Google Developers Console is 3,000 queries per 100 seconds per IP address.
 
-
-
 ### 解決策①：リクエスト間隔に余裕を持たせる
 
 高速でリクエストを投げつけるとDoSアタックと勘違いされてブロックされる場合もあるのでちゃんと間隔をおいてリクエストを投げましょう。
@@ -229,8 +225,6 @@ func GetGroupMember() ([]GroupMember, error) {
   <p><a href="/articles/20200121/">スロットリングとの付き合い方</a></p>
 </div>
 
-
-
 先ほどのリクエスト時間に余裕を持たせたうえで以下の変更を施します。
 
 ```golang main.go（createGroupMemberList内のAPI利用時に指数バックオフを導入）
@@ -278,12 +272,9 @@ func createGroupMemberList(srv *admin.Service, email string) ([]GroupMember, err
   <p><a href="/articles/20200523/">Go Tips連載6: Error wrappingされた各クラウドSDKの独自型エラーを扱う</a></p>
 </div>
 
-
-
 ## まとめ
 
 サードパーティのAPIを使う処理を書く場合は、
 
 - リクエスト間隔は気をつけましょう（APIの仕様書をちゃんと読みましょう）。
 - 指数バックオフを導入しておきましょう。
-

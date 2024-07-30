@@ -17,6 +17,7 @@ lede: "認証情報を Lambda の環境変数に渡す要件が発生したた�
 <img src="/images/20210413a/Screen_Shot_2021-03-24_at_2.18.57.png" alt="">
 
 # はじめに
+
 フューチャーの棚井龍之介です。
 
 認証情報を Lambda の環境変数に渡す要件が発生し、
@@ -30,6 +31,7 @@ lede: "認証情報を Lambda の環境変数に渡す要件が発生したた�
 認証情報のコード管理について、Terraform 作業とローカル作業を組み合わせて対応できたため、備忘録も兼ねて手順をブログ化しました。
 
 ## KMS とは
+
 公式: [AWS Key Management Service (KMS)](https://aws.amazon.com/jp/kms/)
 
 AWS の提供する、データの暗号化・復号化サービスです。共通鍵暗号の仕組みを使い、データベースの接続キーや認証情報の暗号化・復号化機能を提供します。他サービスと組み合わせることにより、KMS でアクセスキーで暗号化して、EC2 から RDS への接続時にのみ復号化する、といった柔軟な対応も可能です。
@@ -37,6 +39,7 @@ AWS の提供する、データの暗号化・復号化サービスです。共�
 KMS の仕組み自体は、Classmethod さんの書かれた「[10分でわかる！Key Management Serviceの仕組み](https://dev.classmethod.jp/articles/10minutes-kms/)」が詳しいのです。
 
 ## Terraform とは
+
 公式: [Terraform](https://www.terraform.io/)
 
 HashiCorp 社により開発されている、OSS のクラウド管理ツールです。AWS や GCP などのクラウドサービスに対して、リソースの作成・削除や、各種パラメータの調整機能をコードベースで提供します。オペレーターになどよる GUI 操作や AWS CLI コマンド操作を排除し、インフラリソース管理を Terraform に一本集中することで、煩雑なリソース管理作業を簡略化することができます。
@@ -44,10 +47,12 @@ HashiCorp 社により開発されている、OSS のクラウド管理ツール
 Future の技術ブログでは、[Terraform 関連の投稿](/tags/Terraform/)がありますので、こちらも合わせてご覧ください。
 
 Terraform やってみたいという方は、以下の記事がオススメです。
+
 - [はじめてのTerraform 0.12 ～環境構築～](/articles/20190816/)
 - [春の入門祭り🌸 #18 Terraform 101](/articles/20200624/)
 
 # 本記事の流れ
+
 KMS の暗号化・復号化操作を、以下の流れで説明します。
 
 - Terraform で KMS マスターキーの生成
@@ -57,6 +62,7 @@ KMS の暗号化・復号化操作を、以下の流れで説明します。
 また、本記事では一部 Terraform による操作を前提としていますが、基本的な Terraform 操作の説明は省略しています。
 
 # Terraform で KMS マスターキーの生成
+
 Terraform で KMS リソースを作成します。
 
 KMS マスターキーの定義だけでなく、エイリアスも同時に定義します。
@@ -82,12 +88,14 @@ resource "aws_kms_alias" "demo" {
 ```
 
 Terraform 定義パラメータ
+
 - [aws_kms_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key)
 - [aws_kms_alias](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias)
 
 リソース定義を追加後、`$ terraform plan/apply` により KMS マスターキーと Alias を作成します。
 
 # AWS CLI で暗号化・復号化
+
 作成した Alias を用いて、テキスト情報の暗号化・復号化作業を実施してみます。
 
 暗号化作業で `AliasArn` の値を使うため、環境変数 **$KEYID** に登録します。
@@ -103,6 +111,7 @@ arn:aws:kms:ap-northeast-1:{aws-account}:alias/demo-alias
 ```
 
 ## 暗号化
+
 ローカルに `PlaintextFile` の名前でファイルを生成して、認証情報の平文を保存します。
 
 ```bash
@@ -128,8 +137,8 @@ $ aws kms encrypt \
 
 以上で「平文を暗号化して、暗号文を取得するまで」が完了です。
 
-
 ## 復号化
+
 暗号文 `CiphertextBlob` の値を復号化してみましょう。
 
 先ほどの操作で生成した暗号文 `CiphertextBlob` を、`CiphertextFile` に保存します。
@@ -155,8 +164,8 @@ Hello, World!
 
 以上で「暗号文の復号化」が完了しました。
 
-
 # Lambda で KMS 操作
+
 KMS で生成した暗号文を、Lambda の中で復号化します。
 
 先ほどの暗号化作業で作成した `CiphertextBlob` の値を、Lambda 内で復号化します。
@@ -200,6 +209,7 @@ resource "aws_lambda_function" "kms_lambda" {
 <img src="/images/20210413a/lambda.png" alt="環境変数の編集画面" loading="lazy">
 
 ## Lambda で復号化
+
 以下のコードを Lambda にデプロイして、復号化結果を取得してみます。
 `encryptedKey` には、`CiphertextBlob` の値を直接代入しています。
 
@@ -269,7 +279,6 @@ $ cat outfile.txt
 ```
 
 暗号化されていた `CiphertextBlob` の値が、正しく復号化されたことを確認できました。
-
 
 # まとめ
 

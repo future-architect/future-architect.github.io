@@ -21,11 +21,13 @@ Flutterアプリの開発では、Widgetのビルド単位を考えてコード�
 [AndroidStudioのPerformance機能](https://docs.flutter.dev/development/tools/android-studio#show-performance-data)を使ってWidgetのリビルドを確認している例は見かけるのですが、VSCodeでの確認方法を見かけなかったため調べてみました。予想以上に高機能で、今回使わなかった機能も含めて活用どころがありそうです。
 
 # 内容
+
 １. [VSCode Dart DevTools](#vscode-dart-devtools)
 ２. [Widget Buildをタイムラインで確認する](#widget-buildをタイムラインで確認する)
 ３. [実装のWidget Buildへの影響を確認](#実装のwidget-buildへの影響を確認)
 
 # VSCode Dart DevTools
+
 Flutter公式の[DevTools](https://docs.flutter.dev/development/tools/devtools/overview)は、VSCodeの[Dart Extension](https://marketplace.visualstudio.com/items?itemName=Dart-Code.dart-code), [Flutter Extension](https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter)のインストールと共にインストールされます。レイアウト構造を可視化/編集できる[Flutter Inspector](https://docs.flutter.dev/development/tools/devtools/inspector) がよく使われると思いますが、他にもCPUやメモリ、Networkの可視化など多機能です。今回は、[Performance view](https://docs.flutter.dev/development/tools/devtools/performance)機能を使ってWidget Buildをタイムラインで確認してみます。
 
 # Widget Buildをタイムラインで確認する
@@ -43,7 +45,6 @@ Flutter公式の[DevTools](https://docs.flutter.dev/development/tools/devtools/o
 【補足】 公式ページに紹介される[パフォーマンス診断](https://docs.flutter.dev/perf/rendering/ui-performance#diagnosing-performance-problems)では、UIスレッドとGPUスレッドのプロファイルから実装に落とし込んで対処することを説明しており、実機を使用した[profile mode](https://docs.flutter.dev/testing/build-modes#profile)にて行うことを前提としています。今回はiOSシミュレータにて、DevToolsの使い方と、ソースコードがプロファイルに与える影響の確認方法を見てみたいと思います。
 
 <img src="/images/20220317a/image.png" alt="image.png" width="963" height="749" loading="lazy">
-
 
 # 実装のWidget Buildへの影響を確認
 
@@ -127,11 +128,8 @@ GPUイベントも確認してみます。こちらは、赤いグラフが見�
 
 <img src="/images/20220317a/test1_raster.png" alt="test1_raster.png" width="1200" height="339" loading="lazy">
 
-
-
 ２） コードの改善
 Frame毎のビルド範囲をアニメーション部分に限定するには[AnimatedBuilder](https://api.flutter.dev/flutter/widgets/AnimatedBuilder-class.html)等を用いる方法があります。ただし今回のケースは、以下のように[Image](https://api.flutter.dev/flutter/widgets/Image-class.html) widgetを使用することで、Frame毎のビルドをなくすことができます。
-
 
 ```dart
 import 'package:flutter/material.dart';
@@ -197,19 +195,17 @@ UIイベントの内訳を見てみると、Frame毎の「Build」処理自体�
 GPUイベントについては、画面Overlayグラフからもわかるように、改修前より少し実行時間が増えていますが、Jankは見られず課題はなさそうです。
 <img src="/images/20220317a/test4_raster.png" alt="test4_raster.png" width="1200" height="320" loading="lazy">
 
-
-
 # まとめ
 
 - VSCodeのDevToolsを使って、Dart VM上のDartコード実行によるビルド（UIスレッド）と、GPU上のレンダリング(Rasterスレッド)のFrame毎の実行時間をタイムラインで可視化できます。
 - Jank　Frameを１つの指標として、UIスレッド(Dartコード)の内訳を確認することで、実装コードの改善に利用できます。
 - 効果的なパフォーマンス改善には、他の観点も必要となります。
-    - I/O処理（IOスレッド）は、パフォーマンス上コストが高くUIスレッドやGPUスレッドをブロックするため、その考慮が必要。
-    - CPUやメモリメトリクスの考慮（DevToolsのうち、今回取り上げていない機能）
-    - 実機（ユーザーが使用し得る一番遅いデバイス）での確認
+  - I/O処理（IOスレッド）は、パフォーマンス上コストが高くUIスレッドやGPUスレッドをブロックするため、その考慮が必要。
+  - CPUやメモリメトリクスの考慮（DevToolsのうち、今回取り上げていない機能）
+  - 実機（ユーザーが使用し得る一番遅いデバイス）での確認
 - パフォーマンス改善については、[公式ページ](https://docs.flutter.dev/perf)も参考に、今回紹介できなかった機能も活用していきたいところです。
 
 # 参考リンク
-- [Improving rendering performance](https://docs.flutter.dev/perf/rendering)
-    - Flutter公式サイトにおける、レンダリングパフォーマンスのページ。
 
+- [Improving rendering performance](https://docs.flutter.dev/perf/rendering)
+  - Flutter公式サイトにおける、レンダリングパフォーマンスのページ。

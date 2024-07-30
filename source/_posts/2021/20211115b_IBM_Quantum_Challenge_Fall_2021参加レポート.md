@@ -17,6 +17,7 @@ mathjax: true
 <img src="/images/20211115b/ibm-quantum-challenge-fall-2021-advanced.png" alt="ibm-quantum-challenge-fall-2021-advanced.png" width="600" height="600">
 
 # はじめに
+
 こんにちは。TIG/DXユニット所属の宮永です。
 
 本記事は2021年10月27日~11月5日に開催された[IBM Quantum Challenge Fall 2021](https://ibm.co/challenge-fall-21%E3%80%80)の参加レポートです。
@@ -24,6 +25,7 @@ mathjax: true
 イベントで出題された問題は[GitHubリポジトリ](https://github.com/qiskit-community/ibm-quantum-challenge-fall-2021)に格納されているため、参考にしてください。
 
 # 執筆の動機
+
 本記事の執筆の動機は多くの人にこの素晴らしいイベントを知ってもらい、参加していただきたいと思ったためです。
 
 私自身は当イベントへの参加は前回と今回、2回の参加経験しかないですが、[IBM Quantum Challenge Fall 2021](https://ibm.co/challenge-fall-21%E3%80%80)は前回大会に比べ、より広い層の方が取り組みやすい内容となっており、量子計算入門者でも十分に楽しめる内容となっていました。
@@ -91,6 +93,7 @@ Microsoft社が提供している[Quantum Katas](https://github.com/microsoft/Qu
 より専門的な内容、もっと深い量子コンピューティングの基礎研究などが気になる方は、[量子技術教育プログラム公式サイト](https://www.sqei.c.u-tokyo.ac.jp/qed/)で提供されている基礎ノートをご覧になるとよいかもしれません。
 
 # 参加してみて
+
 10日間は長いようで短かったです。
 
 イベント期間中は[Slack](qiskit.slack.com)でのコミュニケーションが頻繁に行われており、質問やお互いを褒めあう文化が溢れていて気持ちの良いものでした。

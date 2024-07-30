@@ -42,12 +42,11 @@ https://github.com/future-architect/vuls/releases
 
 <img src="/images/20210708a/スクリーンショット_2021-06-27_13.55.17.png" alt="Vuls ChangeLog" width="1200" height="695">
 
-
 ## 今回作成するChangelog
+
 今回は、以下のようなChangeLogを作成していきます。
 
 <img src="/images/20210708a/Screen_Shot_2021-06-27_at_12.42.40.png" alt="ChangeLog出力例" width="1200" height="549">
-
 
 今回作成するChangeLogに含ませる情報は以下の2つとします。
 
@@ -66,6 +65,7 @@ ChangeLogを生成するツールやOSSは沢山ありますが、生成され�
 - [github-release/github-release](https://github.com/github-release/github-release)
 
 ## 実装方法
+
 CircleCIからChangeLogを生成するため、 `.circleci/config.yml` に実装していきます。
 
 ### 手順
@@ -140,6 +140,7 @@ workflows:
 ```
 
 ### 生成しているコマンドについて簡単に解説
+
 「ChangeLogを生成し、GitHub上で公開する」部分は上記ソースコード上の以下にあたります。
 
 ```bash
@@ -156,9 +157,11 @@ github-release release \
 **あとは、試しにPullRequestをマージして、タグを切ってpushしてChangeLogが生成されることを確認できたら成功です！🎉**
 
 ## おまけ
+
 Tipsを載せておきます。
 
 #### ローカルからChangeLogを更新したい
+
 ローカルにGoが入っている方は以下コマンドでインストール、入っていない方はバイナリをインストールしてください。
 
 ```bash
@@ -184,7 +187,6 @@ $ github-release release \
   --description "$(ghch --format=markdown --latest)"
 ```
 
-
 #### 最新バージョンの「ChangeLog」は生成できたけど、過去分のバージョンにもChangeLogを作成したい
 
 `ghch` にはタグを明示的に指定することで、過去分のタグのChangeLogも生成できるので、ローカルから下記コマンドを参考に実行してください。
@@ -202,6 +204,7 @@ $ github-release release \
 ```
 
 ## おわりに
+
 OSSを利用することで、簡単にChangeLogを自動化することができます。
 
 ChangeLogとともに、高品質なプロダクト作成に寄与できたら嬉しいです！

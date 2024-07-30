@@ -26,6 +26,7 @@ TIG DXユニットでアルバイトをしている齋藤です。
 ※ Apple Siliconを搭載したMacでは、[Developing with Flutter on Apple Silicon](https://github.com/flutter/flutter/wiki/Developing-with-Flutter-on-Apple-Silicon) を参考にする必要があるようです。
 
 ## Flutterのインストール、flutter doctor
+
 基本的にはFlutter公式の[Install](https://flutter.dev/docs/get-started/install)に沿ってインストールを進めていきます。
 
 予め、`flutter pub get`で必要になるProxyに関する設定を行います。.zshrc等に設定を追記します。
@@ -83,6 +84,7 @@ export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
 最後に再度`flutter doctor`を実行し、XCode以外は正常であることを確認します。iOSアプリを開発しない場合、XCodeは不要です。
 
 ## プロジェクト作成
+
 Flutterのプロジェクトを作成します。このとき、Android Studioの`New Project`から作成しようとすると、Android StudioでProxyの設定をしていても上手くいきません。そのため、terminalでプロジェクトを作成したいディレクトリに移動し、`flutter create <project_name>`を実行してプロジェクトを作成します。
 
 続いてターミナルでプロジェクトのディレクトリまで移動し、`flutter pub get`を実行します（Android Studioからは上手く動作しない）。これで必要なパッケージが導入されます。
@@ -130,9 +132,9 @@ A problem occurred configuring root project 'android'.
 
 * まず https://dl.google.com/dl/android/ に移動します。404が表示されますが問題ありません。
 * 続いて、以下の手順で証明書を入手します。ブラウザにGoogle Chromeを使用する場合で説明します。
-    * URL横の鍵マークをクリックし、「証明書」をクリックします。
-    * 一番上の証明書をクリックし、表示された証明書アイコンをデスクトップにドラッグ&ドロップします。
-        * `~/Desktop/Digital\ Arts\ Inc.\ CA.cer`が作成される。
+  * URL横の鍵マークをクリックし、「証明書」をクリックします。
+  * 一番上の証明書をクリックし、表示された証明書アイコンをデスクトップにドラッグ&ドロップします。
+    * `~/Desktop/Digital\ Arts\ Inc.\ CA.cer`が作成される。
 * keytoolを用いて、証明書を追加します。
   * 例：`keytool -import -alias certificationdisitalartsinc -keystore ~/Library/Application\ Support/Google/AndroidStudio4.2/ssl/caerts -file ~/Desktop/Digital\ Arts\ Inc.\ CA.cer`
 
@@ -140,9 +142,6 @@ A problem occurred configuring root project 'android'.
 
 <img alt="flutter_demo_launch" src="/images/20210715a/flutter_demo_launch.png" width="500" height="894" loading="lazy">
 
-
 ## まとめ
 
 Proxyがある環境下でMac上にFlutterの環境構築について紹介いたしました。Proxy環境下での環境構築は厄介なことになりがちですが、適切な設定を行い、素敵な開発ライフを送っていただければと思います。
-
-

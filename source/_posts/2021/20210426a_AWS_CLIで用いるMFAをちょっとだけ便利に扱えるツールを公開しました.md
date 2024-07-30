@@ -25,7 +25,7 @@ AWSのIAMユーザのセキュリティ上、IAMユーザにMFA(他要素認証)
 `get-session-token` コマンドを発行することで一時的な認証情報を発行する、ということです。
 
 ```bash
-$ aws sts get-session-token --serial-number arn-of-the-mfa-device --token-code code-from-token --profile my-login-profile
+aws sts get-session-token --serial-number arn-of-the-mfa-device --token-code code-from-token --profile my-login-profile
 ```
 
 コマンドが成功すると、以下のようなJSONがレスポンスとして返ってきます。
@@ -53,15 +53,15 @@ $ aws sts get-session-token --serial-number arn-of-the-mfa-device --token-code c
 
 ### 何ができるのか
 
-* AWSの `config` ファイルや `credential` ファイルにMFA用の名前付きプロファイルを生成
-* MFAに使用する値を、コマンド実行時に自動で更新
+- AWSの `config` ファイルや `credential` ファイルにMFA用の名前付きプロファイルを生成
+- MFAに使用する値を、コマンド実行時に自動で更新
 
 ### 使い方
 
 `sts get-session-token` と同じ要領で `awsmfa` コマンドを実行するだけです。
 
 ```bash
-$ awsmfa --serial-number arn:aws:iam::123456789012:mfa/my-login-role --profile my-login-profile code-from-token
+awsmfa --serial-number arn:aws:iam::123456789012:mfa/my-login-role --profile my-login-profile code-from-token
 ```
 
 MFAの認証情報を扱うプロファイル名はデフォルトで `mfa` としています。(別のプロファイル名で保存したい場合はオプションに `--mfa-profile-name` を指定します。)上記の `awsfma ...` コマンドを実行すると以下のように `mfa` のプロファイル名が追加されます。2回目以降は `~/.aws/credentials` の `mfa` プロファイル名の値を更新するようになっています。
@@ -94,7 +94,7 @@ aws_session_token     = AQoEXAMPLEH4aoAH0gNCAPyJxz4BlCFFxWNE1OPTgk5TthT+FvwqnKwR
 Linuxの場合はシェルスクリプト一発でローカル環境にインストールできます。このコマンドラインツールはGoで書かれており、マルチプラットフォーム向けにシングルバイナリを簡単に提供できます。インストールが簡単に行えるのはとても良いですね。
 
 ```
-$ curl -sfL https://raw.githubusercontent.com/future-architect/awsmfa/master/install.sh | sudo sh -s -- -b /usr/local/bin
+curl -sfL https://raw.githubusercontent.com/future-architect/awsmfa/master/install.sh | sudo sh -s -- -b /usr/local/bin
 ```
 
 Windowsの場合は [Releases](https://github.com/future-architect/awsmfa/releases) から最新のバイナリを取得して、パスが通っているディレクトリにバイナリを配備してください。
@@ -108,4 +108,3 @@ AWS CLIで用いるMFAの運用をちょっとだけ楽にするツールを作�
 さっそくプルリクエストもいただきました。社外の方からも使っていただき嬉しく思います。
 
 https://github.com/future-architect/awsmfa/pull/9
-

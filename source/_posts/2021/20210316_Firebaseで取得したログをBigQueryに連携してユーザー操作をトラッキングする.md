@@ -17,6 +17,7 @@ lede: "[CP連載2021も折り返しの6本目です！陽光麗らかなある�
 ---
 
 # はじめに
+
 [GCP連載2021](/articles/20210307/)も折り返しの6本目です！
 
 陽光麗らかなある春の日、ITコンサルタントのあなたの元に、ユーザーからの問い合わせが入りました。
@@ -44,6 +45,7 @@ lede: "[CP連載2021も折り返しの6本目です！陽光麗らかなある�
 今回はその中の`Google Analytics for Firebase`を用いてAndroidアプリの操作ログを取得していきます。
 
 # Google Analytics for Firebaseとは
+
 <img src="/images/20210316/image.png" loading="lazy">
 
 実態はGoogleのサービス`Google Analytics` (GA)をFirebaseで利用できるようにしたものです。
@@ -51,8 +53,8 @@ lede: "[CP連載2021も折り返しの6本目です！陽光麗らかなある�
 
 > Google アナリティクスは、ウェブ、iOS アプリ、Android アプリがどのように使用されているかを把握するのに役立ちます。
 この SDK は主に次の 2 種類の情報を記録します。
-- イベント: ユーザーの操作、システム イベント、エラーなど、アプリで起こっていること。
-- ユーザー プロパティ: 言語や地域など、ユーザー層を示す属性。自由に定義できます。
+* イベント: ユーザーの操作、システム イベント、エラーなど、アプリで起こっていること。
+* ユーザー プロパティ: 言語や地域など、ユーザー層を示す属性。自由に定義できます。
 
 任意の情報をカスタム設定して取得できますが、**一部の値は特にコードの記述なく[自動的に収集されます。](https://support.google.com/firebase/answer/9234069)**
 位置情報やアプリを使用しているデバイス情報などサクッと取れるのは非常に便利です。
@@ -73,9 +75,10 @@ BigQueryの他にも、Crashlytics, FCM, Firebase Remote ConfigなどとGAを連
 * [GCP連載#4 Cloud Life Sciencesを見てみた](/articles/20200210/)
 * [GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる](/articles/20200214/)
 
-
 # 試してみる
+
 以下の手順を踏んで実際に手を動かしながら、Androidアプリにおけるユーザー操作のトラッキングを実現していきます。
+
 1. Firebaseでログを取得する
 2. BigQueryへログを連携する
 3. BigQueryでクエリを実行する
@@ -83,12 +86,12 @@ BigQueryの他にも、Crashlytics, FCM, Firebase Remote ConfigなどとGAを連
 ※そもそもの、アプリへのFirebaseの追加は[公式ドキュメント](https://firebase.google.com/docs/android/setup?hl=en)を参照いただければと思います。
 
 ## 1. Firebaseでログを取得する
+
 Androidアプリのソースに必要なコードを追記していきます。
 まず、Activityごとの下準備は以下の2点です。
 
 * `FirebaseAnalytics`のオブジェクトを宣言
 * `onCreate`メソッド内で初期化
-
 
 ```java test_activity.java
 //...(省略)...
@@ -131,6 +134,7 @@ Firebaseで扱うログはオブジェクト形式をしており、上記ログ
   }
 }
 ```
+
 ※実際にはデフォルトのパラメータも含まれるため、paramの数はもっと多いです。またevent_nameと並列で、timestampなど諸々の値もデフォルトで送信されます。
 
 paramやevent_nameは任意に指定することもできますし、Firebaseが用意している定数クラスを用いることもできます。
@@ -149,10 +153,8 @@ paramやevent_nameは任意に指定することもできますし、Firebaseが
 <img src="/images/20210316/image_2.png" loading="lazy">
 <img src="/images/20210316/image_3.png" loading="lazy">
 
-
-
-
 ## 2. BigQueryへログを連携する
+
 [こちらのドキュメント](https://support.google.com/firebase/answer/6318765?hl=en)を参照しつつ、設定します。
 全てFirebase Consoleからの操作で可能です。
 
@@ -161,25 +163,21 @@ Firebase Consoleの設定画面から、`Integrations`タブを選択します�
 ※参考画像ではすでに連携済みのため「Manage」となっていますが、初回設定の場合は「Link」と表示されます。
 <img src="/images/20210316/image_4.png" loading="lazy">
 
-
-
 Linkが開始されると、「どのサービスのデータをBigQueryに連携するか」を選択できるようになります。
 今回は`Google Analytics`にチェックを入れます。
 他にも、CrashlyticsやCloud Messagingなどのデータも連携できるようです。
 <img src="/images/20210316/image_5.png" loading="lazy">
-
 
 ここまでの設定で、BigQueryへFirebaseのデータが連携されます。
 GCP Consoleから確認してみると、プロジェクトフォルダの配下に、`analytics_XXXX`というフォルダ名でFirebaseからのデータが連携されています。(XXXXはGAのProperty ID です)
 当日のデータは`events_intraday_YYYYMMDD`というテーブル名称で格納されています。翌日になると `events_YYYYMMDD`の名称に変化します。
 <img src="/images/20210316/image_6.png" loading="lazy">
 
-
 「プレビュー」タブを参照すると、1つの`event_name`に紐付く`params`のkey/valueペアの形でデータが格納されていることが確認できます。
 ただしこのままではFirebaseデフォルトのログと入り混じって見にくい、かつ複数のユーザーのログが混じっている、のでクエリを作成して可読性を上げます。
 
-
 ## 3. BigQueryでクエリを実行する
+
 可読性を向上させてトラッキングを実現するため、クエリを作成します。
 
 純粋なRDBではないBigQueryでは、ネストされたparamsをそのままWHERE句に指定することができません。
@@ -254,9 +252,8 @@ ORDER BY
 端末の戻るボタンが押されて遷移した場合も検知してくれます。
 <img src="/images/20210316/image_7.png" loading="lazy">
 
-
-
 # おわりに
+
 FirebaseとBigQueryの合わせ技で、モバイルアプリのユーザー操作のトラッキングを実現しました。
 これで障害やユーザー問い合わせにも安心して対応できます。
 もちろん、トラッキング対象を別のパラメータ(例えば特定の商品データなど)に変えて応用もできるかと思います。
@@ -265,4 +262,3 @@ FirebaseとBigQueryの合わせ技で、モバイルアプリのユーザー操�
 複数のサービスを組み合わせれば痒いところにも手が届く、それがGCPの魅力のひとつかもしれません。
 
 明日はTechBlogの編集もされている伊藤さんの[Google Cloud BuildpacksとCloud Runで簡単コンテナアプリ開発](/articles/20210317/)です。
-

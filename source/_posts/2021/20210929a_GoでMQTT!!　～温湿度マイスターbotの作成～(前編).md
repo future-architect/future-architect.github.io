@@ -19,6 +19,7 @@ lede: "今回はAWSサービスのうちの一つAWS IoTを使用してRaspberry
 <img src="/images/20210929a/サムネイル1.png" alt="Louis Reed on unsplash.com Unsplash" title="" width="1200" height="676" loading="lazy">
 
 # はじめに
+
 こんにちは。TIG/DXユニット所属の宮永です。
 
 今回はAWSサービスのうちの一つAWS IoTを使用してRaspberryPiとのMQTTによる通信を行います。
@@ -39,8 +40,8 @@ AWS IoTを使用したMQTTのチュートリアルはAWS公式からも詳細な
 
 にて公開しています。
 
-
 # MQTTとは
+
 MQTTはメッセージングプロトコルです。
 以下 [mqtt.org](https://mqtt.org/)より引用です。
 
@@ -56,14 +57,15 @@ Publisherはセンシングの情報（温度や湿度、速度など）をBroke
 <img src="/images/20210929a/image_2.png" alt="image.png" width="1200" height="688" loading="lazy">
 
 # AWS IoTとは
+>
 >*AWS IoT は、IoT デバイスを他のデバイスおよび AWS クラウドサービスに接続するクラウドサービスを提供します。AWS IoT は、IoT デバイスを AWS IoT ベースのソリューションに統合するのに役立つデバイスソフトウェアを提供します。デバイスが AWS IoT に接続できる場合、AWS IoT は AWS が提供するクラウドサービスにそれらのデバイスを接続できます。
 [AWS IoT とは \- AWS IoT Core](https://docs.aws.amazon.com/ja_jp/iot/latest/developerguide/what-is-aws-iot.html)*
-
 
 AWSIoTは各種AWSサービスとIoTデバイスとを手軽に連携できるサービスを展開しています。
 今回はAWS IoT標準サービスで提供されているMQTTブローカーを利用してMQTT通信にトライします。
 
 # システム構成
+
 今回作成するものは室内の温湿度を定期的にセンシングし、Slackに温湿度のプロット図を定期的に送信する仕組みです。
 
 DHT22という温湿度センサをRaspberryPi3B+に取り付けて2時間ごとに温湿度を取得します。取得した温湿度をMQTTによってAWS IoTにPublishします。AWS IoTはDynamoDBと連携させることで、Subscribeしたデータを蓄積します。
@@ -73,14 +75,12 @@ DHT22という温湿度センサをRaspberryPi3B+に取り付けて2時間ごと
 
 <img src="/images/20210929a/image_3.png" alt="image.png" width="1200" height="849" loading="lazy">
 
-
-
 # 開発環境
 
 ## ハードウェア
 
 * Raspberrypi3B+
-* DHT22[ (DSD TECH DHT22 温湿度センサーモジュール AM2302チップ付き)](https://aax-fe.amazon-adsystem.com/x/c/Qr8CAcIgUZEla94kNzcQWMkAAAF8AoohIgcAAAIAAZlrWxE/http://www.amazon.co.jp/gp/slredirect/picassoRedirect.html?ie=UTF8&adId=A3TSWYUGZXCE00&qualifier=1632130179&id=8652485946611051&widgetName=sd_onsite_desktop&url=%2Fdp%2FB06ZXXJL2B%2Fref%3Dsyn_sd_onsite_desktop_95%3Fpsc%3D1)
+* DHT22[(DSD TECH DHT22 温湿度センサーモジュール AM2302チップ付き)](https://aax-fe.amazon-adsystem.com/x/c/Qr8CAcIgUZEla94kNzcQWMkAAAF8AoohIgcAAAIAAZlrWxE/http://www.amazon.co.jp/gp/slredirect/picassoRedirect.html?ie=UTF8&adId=A3TSWYUGZXCE00&qualifier=1632130179&id=8652485946611051&widgetName=sd_onsite_desktop&url=%2Fdp%2FB06ZXXJL2B%2Fref%3Dsyn_sd_onsite_desktop_95%3Fpsc%3D1)
 * ジャンパワイヤー
 
 ## ソフトウェア
@@ -88,14 +88,14 @@ DHT22という温湿度センサをRaspberryPi3B+に取り付けて2時間ごと
 開発はwindows10環境、WSL2上で行いました。標準モジュール以外で使用したものを以下に列挙します。
 
 * go1.16.6 linux/amd64
-    * [MichaelS11/go\-dht: Golang DHT22 / AM2302 / DHT11 interface using periph\.io driver](https://github.com/MichaelS11/go-dht)
-    * [eclipse/paho\.mqtt\.golang](https://github.com/eclipse/paho.mqtt.golang)
+  * [MichaelS11/go\-dht: Golang DHT22 / AM2302 / DHT11 interface using periph\.io driver](https://github.com/MichaelS11/go-dht)
+  * [eclipse/paho\.mqtt\.golang](https://github.com/eclipse/paho.mqtt.golang)
 * Python 3.8.10
-    * [boto/boto3: AWS SDK for Python](https://github.com/boto/boto3)
-    * [Alonreznik/dynamodb\-json: DynamoDB json util to load and dump strings of Dynamodb json format to python object and vise\-versa](https://github.com/Alonreznik/dynamodb-json)
-    * [slackapi/python\-slack\-sdk: Slack Developer Kit for Python](https://github.com/slackapi/python-slack-sdk)
-    * [stub42/pytz: pytz Python historical timezone library and database](https://github.com/stub42/pytz)
-    * [dbader/schedule: Python job scheduling for humans\.](https://github.com/dbader/schedule)
+  * [boto/boto3: AWS SDK for Python](https://github.com/boto/boto3)
+  * [Alonreznik/dynamodb\-json: DynamoDB json util to load and dump strings of Dynamodb json format to python object and vise\-versa](https://github.com/Alonreznik/dynamodb-json)
+  * [slackapi/python\-slack\-sdk: Slack Developer Kit for Python](https://github.com/slackapi/python-slack-sdk)
+  * [stub42/pytz: pytz Python historical timezone library and database](https://github.com/stub42/pytz)
+  * [dbader/schedule: Python job scheduling for humans\.](https://github.com/dbader/schedule)
 * AWS IoT
 * DynamoDB
 * Slack
@@ -105,6 +105,7 @@ DHT22という温湿度センサをRaspberryPi3B+に取り付けて2時間ごと
 *[VSCodeのSSH接続機能で、RaspberryPi内のコードを編集してデバッグ \- Qiita](https://qiita.com/c60evaporator/items/26ab9cfb9cd36facc8fd)*
 
 # 実装
+
 実装は以下の手順で進めます。
 
 1. DHT22から温湿度情報を取得する
@@ -116,6 +117,7 @@ DHT22という温湿度センサをRaspberryPi3B+に取り付けて2時間ごと
 7. 作成したプロット図をSlack APIで画像投稿
 
 ## 1. DHT22から温湿度情報を取得する。
+
 使用した温湿度センサはこちらです。
 [DSD TECH DHT22 温湿度センサーモジュール AM2302チップ付き](https://aax-fe.amazon-adsystem.com/x/c/Qr8CAcIgUZEla94kNzcQWMkAAAF8AoohIgcAAAIAAZlrWxE/http://www.amazon.co.jp/gp/slredirect/picassoRedirect.html?ie=UTF8&adId=A3TSWYUGZXCE00&qualifier=1632130179&id=8652485946611051&widgetName=sd_onsite_desktop&url=%2Fdp%2FB06ZXXJL2B%2Fref%3Dsyn_sd_onsite_desktop_95%3Fpsc%3D1)
 
@@ -182,6 +184,7 @@ func (d MyDHT22) Read() MyDHT22 {
 	return d
 }
 ```
+
 `dht.NewDHT("GPIO2", dht.Celsius, "")`にてDATの接続先を指定してください。また、`Celsius`(摂氏)と`Fahrenheit(`華氏)が選択できるため、`Celsius`を入力します。
 それでは、DHT22よりセンシング情報を正しく取得できているか確かめます。
 `sample`フォルダを作成し、以下の様に`model.go`を`dht22`配下に格納します。
@@ -194,6 +197,7 @@ func (d MyDHT22) Read() MyDHT22 {
 ├── go.sum
 └── main.go
 ```
+
 `main.go`は以下の様に記述します。
 
 ```go main.go
@@ -215,6 +219,7 @@ func main() {
 	}
 }
 ```
+
 `go mod init`、`go mod tidy`を実行した後、上記のようなディレクトリ構成となるはずです。
 それでは`go run main.go`で`main.go`を実行します。以下の様にターミナル上に表示されれば成功です。
 1列目が温度、2列目が湿度、3列目が取得時刻です。
@@ -231,6 +236,7 @@ func main() {
 ここで作成した`model.go`は後の工程でも使用するので削除しないようにしてください。
 
 ## 2. AWS IoTを使用してPublishの動作確認
+
 AWS IoTとRaspberryPiの連携は、「ポリシーの作成」から始まります。
 「ポリシーの作成」から「モノの作成」までの工程はこちらのページに記載されている通りに行ってください。
 [AWS IoT Core の設定 :: AWS IoT Core 初級 ハンズオン](https://aws-iot-core-for-beginners.workshop.aws/phase3/step1.html)
@@ -244,7 +250,6 @@ AWS IoTとRaspberryPiの連携は、「ポリシーの作成」から始まり�
 ├── AmazonRootCA1.pem
 └── AmazonRootCA3.pem
 ```
-
 
 それでは、RaspberryPiからMQTTを使用してメッセージを送信します。
 
@@ -338,10 +343,11 @@ func newTLSConfig() (*tls.Config, error) {
 メッセージの送受信が確認できたところで、次に先ほどの実装で取得した温湿度をpayloadとして配信します。
 
 ## 3. DHT22の温湿度情報をPublish
+
 **「2. AWS IoTを使用してPublishの動作確認」**にて取得した各種証明書と`main.go`を同階層に格納してください。
 同様に**「1. DHT22から温湿度情報を取得する」**にて実装した`model.go`を`dht22`サブディレクトリとして格納してください。
-### ディレクトリ構成
 
+### ディレクトリ構成
 
 ```bash
 .
@@ -395,7 +401,6 @@ func main() {
 ...(省略)
 
 ```
-
 
 下図上部が`main.go`の実行、下部がSubscriptionの様子を示しています。
 

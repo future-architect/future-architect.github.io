@@ -76,13 +76,13 @@ flutter:
 ## 使用ライブラリ
 
 - [tflite_flutter](https://pub.dev/packages/tflite_flutter)^0.9.0
-    - TFLiteの演算処理を担ってくれます。
+  - TFLiteの演算処理を担ってくれます。
 - [tflite_flutter_helper](https://pub.dev/packages/tflite_flutter_helper)^0.3.1
-    - TFLiteモデルに入力するための画像前処理など便利ツール詰め合わせです。
+  - TFLiteモデルに入力するための画像前処理など便利ツール詰め合わせです。
 - [image_picker](https://pub.dev/packages/image_picker)^0.8.4+10
-    - カメラやフォトライブラリから画像を取得するために使います。
+  - カメラやフォトライブラリから画像を取得するために使います。
 - [google_fonts](https://pub.dev/packages/google_fonts/install)^2.3.1
-    - UIにそれっぽいフォントが欲しかったので使いました。
+  - UIにそれっぽいフォントが欲しかったので使いました。
 
 ## tflite_flutterの注意点
 

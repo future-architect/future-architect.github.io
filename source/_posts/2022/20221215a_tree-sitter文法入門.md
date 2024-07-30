@@ -28,6 +28,7 @@ lede: "フューチャーでアルバイトをしている齋藤ですインタ�
 また、現在作成中のフォーマッタのVSCode拡張機能化にも取り組んでいます。ぜひそちらも併せてご覧ください！
 
 VSCode拡張機能化に関する記事:
+
 1. [Language Server Protocolを用いたVSCode拡張機能開発 \(前編\) \| フューチャー技術ブログ](/articles/20221124a/)
 2. [Language Server Protocolを用いたVSCode拡張機能開発 \(後編\) \| フューチャー技術ブログ](/articles/20221125a/)
 
@@ -47,6 +48,7 @@ VSCode拡張機能化に関する記事:
 
 構築されるCSTにはコメントトークンも含まれてるため、シンタックスハイライトに用いられているようです。
 参考:
+
 * [Vimのすゝめ改 \- Tree\-sitter について \| 株式会社創夢 — SOUM/misc](https://www.soum.co.jp/misc/vim-advanced/6/)
 * [EmacsでTree\-sitterを利用してシンタックスハイライトできるようにする](https://zenn.dev/hyakt/articles/6ff892c2edbabb)
 
@@ -75,7 +77,7 @@ tree-sitterでパーサを生成するために、tree-sitter-cliをインスト
 [tree-sitter-sql](https://github.com/m-novikov/tree-sitter-sql)をcloneします。tree-sitter用のSQL構文はいくつかありますが、今回は最もスター数が多いものを選択しました。
 
 ```console
-$ git clone https://github.com/m-novikov/tree-sitter-sql.git
+git clone https://github.com/m-novikov/tree-sitter-sql.git
 ```
 
 `git clone`を行うと、以下のようなエラーが発生する場合があります。
@@ -87,14 +89,14 @@ error: unable to create file [filepath]: Filename too long
 これはファイル名が長すぎることが問題であるようなので、以下の設定を行うことで解決します。
 
 ```console gitの設定
-$ git config --global core.longpaths true
+git config --global core.longpaths true
 ```
 
 `git clone` したtree-sitter-sqlのルートディレクトリで、`tree-sitter test` コマンドでテストが動作したら環境構築終了です。
 
 ```console
-$ cd ./tree-sitter-sql
-$ tree-sitter test
+cd ./tree-sitter-sql
+tree-sitter test
 ```
 
 ### 構文解析例
@@ -211,6 +213,7 @@ fn visit(cursor: &mut TreeCursor, depth: usize, src: &str) {
     }
 }
 ```
+
 ### 実行例
 
 作成したプログラムを用いて、実際にCSTを表示してみましょう。
@@ -254,7 +257,6 @@ where_clause: $ => seq(kw("WHERE"), $._expression)
 `seq`はtree-sitterの文法のDSLの一つで、複数の規則を連結することができます。上の例では、`kw("WHERE")`のあとに`$._expression`が現れることを示しています。
 
 `kw`関数はtree-sitter-sqlの`grammar.js`で定義されている関数で、キーワード(`k`ey`w`ord)が大文字か小文字であるかを考慮しなくするなどの処理を行います。パース時には、`where`や`WHERE`というキーワードとマッチします([kw関数の定義](https://github.com/m-novikov/tree-sitter-sql/blob/218b672499729ef71e4d66a949e4a1614488aeaa/grammar.js#L29))。
-
 
 ### アンダースコアから始まる規則
 
@@ -303,7 +305,6 @@ where_clause: $ => seq(kw("WHERE"), $._expression)
   (number "3))
 ```
 
-
 ### 優先度、結合性
 
 ここで詳細は述べませんが、tree-sitterは明示しない場合、曖昧な文法を扱うことができません([参考](https://tree-sitter.github.io/tree-sitter/creating-parsers#the-grammar-dsl:~:text=conflicts%20%2D%20an%20array,dynamic%20precedence.))。
@@ -332,6 +333,7 @@ const PREC = {
 ```
 
 これを用いて、論理式に優先度・結合性を加えて記述した規則は次のようになります。
+
 ```js
     boolean_expression: $ =>
       choice(
@@ -347,8 +349,6 @@ const PREC = {
 
 ファイルのどこに現れてもよい規則をextrasで記述することができます。
 これを使って、コメントや空白、改行を簡単に記述することができます([コメント、空白の定義](https://github.com/m-novikov/tree-sitter-sql/blob/218b672499729ef71e4d66a949e4a1614488aeaa/grammar.js#L75))が、CST上では直感的でない場所位置に現れる場合もあります([インターンの記事後編](https://future-architect.github.io/articles/20220916c/#:~:text=%E3%82%B3%E3%83%A1%E3%83%B3%E3%83%88%E3%81%AE%E6%83%85%E5%A0%B1%E3%81%AFCST%E4%B8%8A%E3%81%AB%E4%BF%9D%E6%8C%81%E3%81%95%E3%82%8C%E3%81%BE%E3%81%99%E3%81%8C%E3%80%81%E7%9B%B4%E6%84%9F%E7%9A%84%E3%81%A7%E3%81%AA%E3%81%84%E4%BD%8D%E7%BD%AE%E3%81%AB%E7%8F%BE%E3%82%8C%E3%81%A6%E3%81%97%E3%81%BE%E3%81%86%E5%A0%B4%E5%90%88%E3%81%8C%E3%81%82%E3%82%8A%E3%81%BE%E3%81%99%E3%80%82)参照)。
-
-
 
 # BETWEEN述語への対応
 
@@ -475,7 +475,7 @@ AND ID      BETWEEN 0   AND 100
 以下のコマンドでパーサを生成します。
 
 ```console
-$ tree-sitter generate
+tree-sitter generate
 ```
 
 先ほど作成した `print-cst`を用いて、パース結果を出力します。
@@ -584,5 +584,3 @@ syntax highlighting:
 # まとめ
 
 本記事では、tree-sitter-sqlでBETWEEN述語を扱えるように構文拡張を行いました。tree-sitter用のSQL構文はまだまだ未完成なので、皆さんも一緒によりよいパーサを作ってみませんか？
-
-

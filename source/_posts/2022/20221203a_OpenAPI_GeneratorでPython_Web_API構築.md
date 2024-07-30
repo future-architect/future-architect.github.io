@@ -34,8 +34,10 @@ lede: "PythonでWebAPIを構築しました。その際にOpenAPI Generatorが�
 API定義ファイルの書き方の例と、そこからコードを自動生成する方法をご紹介します。
 
 ## API定義ファイル
+
 今回のファイル名は`openapi.yaml`とします。
 以下のようにリクエストパラメータやレスポンスを定義します。
+
 ```yaml
 openapi: "3.0.0"
 info:
@@ -135,7 +137,6 @@ components:
 
 `operationId`で指定した部分が自動生成コードに関数名として反映されます。
 
-
 ## コードの自動生成
 
 生成方法はいくつかありますが、今回はdockerを使って自動生成します。
@@ -149,23 +150,24 @@ $ docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -
 クライアント側
 $ docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/openapi.yaml -g go -o /local
 ```
+
 上記コマンドオプションの`-g`がgeneratorの指定になります。
 generatorに指定できる引数は以下のコマンドで確認することができます。
 
 ```bash
-$ docker run --rm openapitools/openapi-generator-cli list
+docker run --rm openapitools/openapi-generator-cli list
 ```
 
 また、生成されるパッケージ名はデフォルトで`openapi_server`となりますが、以下のようにパッケージ名を明示的に指定することもできます。
 
 ```bash
-$ docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/openapi.yaml -g python-flask -o /local --package-name test_package
+docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/openapi.yaml -g python-flask -o /local --package-name test_package
 ```
 
 pythonのimportパスにも関わってくるため、プロジェクトに沿った名前にすると良いと思います。
 
-
 ## 自動生成されたファイル
+
 自動生成されたサーバ側のディレクトリ及びその内部のファイルを見ていきたいと思います。
 上記の`openapi.yaml`からは以下の内容が出力されました。
 
@@ -232,7 +234,6 @@ APIの本体は`openapi_server`になります。この中の`controllers`にAPI
 
 これはAPIへのルーティング設定で、そのAPIがコールされた際にどのファイルが呼び出されるかが定義されています。
 
-
 ```yaml
 paths:
   /v1/sc/{security_cd}/stockPrice:
@@ -288,7 +289,6 @@ paths:
 
 上記の場合、`/v1/sc/{security_cd}/stockPrice`がコールされた時、`openapi_server/controllers/stock_price_controller.py`の`stock_price関数`が呼び出されることになります。
 
-
 ### .openapi-generator-ignore
 
 このファイルには自動生成時に上書きを禁止するディレクトリやファイルを指定します。
@@ -303,11 +303,12 @@ openapi_server/test/*
 ```
 
 ### Dockerfile
+
 このDockerfileを使うことで、ローカルに簡単にwebサーバを立てることができます。
 
 ```bash
-$ docker build -t openapi_server .
-$ docker run -p 8080:8080 openapi_server
+docker build -t openapi_server .
+docker run -p 8080:8080 openapi_server
 ```
 
 疎通確認をするとAPIのルーティングがしっかりと行われており、返り値が返却されることが分かると思います。
@@ -318,6 +319,7 @@ $ curl http://localhost:8080/v1/sc/4722/stockPrice
 ```
 
 # おわりに
+
 Python自体が動的型付け言語なだけあってプログラミング時に型を常に気にする必要があり、結構精神を擦り減らすと思います。
 
 OpenAPI Generatorは型ヒントも付与してくれるため、なるべくコードを自動生成することで型に関する開発コスト削減にもつながると思います。

@@ -21,17 +21,19 @@ TIGの川端です。
 
 <img src="/images/20210216/thumbnail.png" class="img-middle-size" alt="" title="Diego VelázquezによるPixabayからの画像" loading="lazy">
 
-
 # Service Workerとは
+
 Service Workerは、ブラウザがWebページとは別にバックグラウンドで実行するJavaScriptになります。
 
 # 利用ブラウザ/バージョン情報など
+
 - Chrome v88.0.4324.146
 - Vue.js v2.6.11
 
 # 起きた不具合その１
 
 ## 事象
+
 Service Worker上で、`setInterval`の処理を用意したところ、数分で止まるという報告が上がりました。
 `setInterval`は、バックグランド上で定期的にある処理をするために用意したものです。
 
@@ -42,14 +44,15 @@ const timer = setInterval(() => {
 ```
 
 ## 原因
+
 調べてみるとService Workerの活動には制限があるようでした。
 
 またブラウザのDevToolを起動している場合は、Service Workerは常時活動中となり、`setInterval`の処理が止まることはありません。開発中はブラウザのDevToolを常時起動中であったため、本件不具合に気づかないという事態になりました...
 
 [参考：Service Worker Lifetime](https://w3c.github.io/ServiceWorker/#service-worker-lifetime)
 
-
 ## 対応
+
 `setInterval`の処理をService WorkerからVue.js側（Webアプリ側）に移動しました。
 
 簡単な例ですが、下記のように実行したい画面のComponentに組み込みました。
@@ -71,11 +74,13 @@ export default {
 ```
 
 ## 補足
+
 本記事は、`setInterval`に焦点を当てましたが、Service Worker側に用意したWebSocket受信処理も止まってしまったため、WebSocket受信処理もVue.js側に移動する対応も実施しました。
 
 # 起きた不具合その２
 
 ## 事象
+
 ［Ctrl］＋［Shift］＋［R］キーでリロードすると、下記のエラーが出てVue.jsからService Workerへのメッセージ送信が失敗するという事象が起きました。
 
 ```
@@ -83,6 +88,7 @@ Uncaught TypeError: Cannot read property 'postMessage' of null
 ```
 
 ## 原因
+
 ［Ctrl］＋［Shift］＋［R］キーでリロードすると、Service Workerが解除され、下記の`controller`が`null`になったことが原因でした。
 
 ```
@@ -96,6 +102,7 @@ navigator.serviceWorker.controller.postMessage({ msg })
 の記載があり、［Ctrl］＋［Shift］＋［R］キーでリロードしたときに`controller`が`null`になるのは仕様でした。
 
 ## 対応
+
 再度Service WorkerがWebアプリをコントロールする状態になるように下記を実施しました。
 まずVue.js側に、Service Workerが`active`になったら、Service Worker側に`claim`するようにメッセージを送ります。
 
@@ -125,6 +132,7 @@ self.onmessage = (message) => {
   }
 }
 ```
+
 ここまで対応すると、Service WorkerがWebアプリをコントロールしている状態になります。
 またService Workerがコントロールする状態になるまで、`navigator.serviceWorker.controller.postMessage`の処理は失敗します。
 その失敗した処理のリカバリ方法として、下記のように画面をリロードして再実行するように対応しました。
@@ -147,6 +155,7 @@ if ('serviceWorker' in navigator) {
 ```
 
 # 所感
+
 Service Worker開発で起きた不具合を２例紹介しました。
 
 なかなか解決策が見つからず辛いと感じることもありましたが、こうして考えた解決策を公開することができて、大変嬉しく思っています。

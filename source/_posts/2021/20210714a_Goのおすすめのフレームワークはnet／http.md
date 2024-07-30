@@ -56,7 +56,6 @@ func (r Receiver) ServeHTTP(http.ResponseWriter, *http.Request) {
 
 <img src="/images/20210714a/nested-servemux-ページ3.png" alt="ネストしたルーター" loading="lazy">
 
-
 最近のウェブのフレームワークは、ミドルウェアという機構を用意していたりします。リクエストを事前に解釈し、エラー処理をまとめて行ったり、認証チェックをしたり・・・図には書きにくいのですが、これも、``http.Handler``として振る舞い、受け取ったリクエストの処理結果を次の``http.Handler``に渡すラッパーという実装になります。標準ライブラリの[http.TimeoutHandler](https://golang.org/pkg/net/http/#TimeoutHandler)もこれですね。
 
 <img src="/images/20210714a/middleware.png" alt="ミドルウェア" loading="lazy">
@@ -83,7 +82,6 @@ Ginも同様に、[``http.Server``の上に構築されています](https://git
 
 fasthttpはnet/httpではなし得ないパフォーマンスを発揮するためにつくられたサーバーです。``http.Request``はハンドラーに渡ってくるときには、ヘッダーは完全にパースされて``map[string][]string``に格納されます。一方、fasthttpは不要なパースは避けるために、内部は文字列ですらなく、バイト列で情報を持っています。ヘッダー周りも[このありさま](https://github.com/valyala/fasthttp/blob/v1.28.0/header.go#L56-L86)です。
 
-
 なお、最近[Tech Empower](https://www.techempower.com/benchmarks/#section=data-r20&hw=ph&test=fortune&l=zijocf-sf)でブイブイ言わせている次のライブラリはみんなこのfasthttpの上に構築されているようです。
 
 * [atreugo](https://github.com/savsgio/atreugo)
@@ -99,5 +97,3 @@ Goでウェブのフレームワークを学ぶ場合、多少の機能差はあ
 ``net/http``を単独でそのまま使おうとすると、標準の``http.ServeMux``ではちょっとRouterとして機能が少ないな、とかあります。HTML生成を``html/template``でやろうとしても、他の言語で慣れた記法とちょっと違って面食らって手が動きにくいということもあります。その場合にはchiとか、Go版[mustache](https://github.com/hoisie/mustache)など、いくつかを好きなサードパーティのライブラリに置き換える方法もあります。
 
 echoやGinでもGorillaでもなんでも使っても問題ありません。どれも``net/http``の兄弟です。こいつらの方が、ミドルウェアなどはたくさんリリースしているので、他の言語ユーザーには親しみやすいかもしれません。これをフレームワークと呼ぶかどうか、便利なライブラリ集と見るかはあなた次第です。
-
-

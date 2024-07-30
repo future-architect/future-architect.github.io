@@ -21,8 +21,8 @@ TIG DXユニットの中川旭です。新卒で2020年10月に入社しまし�
 
 * https://github.com/modockey/Init-VueTestingLibrary
 
-
 ## Vue Testing Libraryのいいところ
+
 Vue Testing LibraryはVue.js公式のライブラリであるvue-test-utilをベースとする、DOM Testing LibraryのVue.js用拡張です。
 
 Vue Testing Libraryを用いると、Vue.js公式ライブラリであるvue-test-utilと比較して内部構造を意識せずにテストを作成できます。
@@ -33,10 +33,11 @@ Vue Testing Libraryを用いると、Vue.js公式ライブラリであるvue-tes
 
 ### 使用するものの紹介
 
-- [Vue CLI](https://cli.vuejs.org/)
-- [Jest](https://jestjs.io/ja/docs/getting-started)
+* [Vue CLI](https://cli.vuejs.org/)
+* [Jest](https://jestjs.io/ja/docs/getting-started)
 
 ### 前提
+
 Windows上で Node.js v14.17.0 (npm v6.14.13) を使用しています。
 
 この環境の準備に関しては、Microsoftのページにとても丁寧な説明があります。
@@ -52,6 +53,7 @@ npm install -g @vue/cli
 ```
 
 ### Vueプロジェクトの作成
+
 適当な場所で"sample"という名前のVueプロジェクトを作成します。
 
 ```bash
@@ -98,7 +100,6 @@ Vue CLI v4.5.13
  2.x
 ❯  3.x
 ```
-
 
 その後、いくつか設定ありますが、好みで設定しましょう。("?"のあとが今回選択したものです)
 
@@ -151,6 +152,7 @@ npm install --save-dev jest ts-jest @types/jest
 ```
 
 #### jest.config.js配置
+
 [Jest](https://typescript-jp.gitbook.io/deep-dive/intro-1/jest)のページにあるテンプレートをコピーしてプロジェクトルートに配置します。
 
 ```js jest.config.js
@@ -177,6 +179,7 @@ module.exports = {
 ```
 
 #### テスト用ファイル配置
+
 ```ts src/service/calc.ts
 export function plus(a: number, b: number): number {
   return a + b;
@@ -209,6 +212,7 @@ package.jsonの"scripts"に`"test": "jest"`を追加しました。これで`npm
 ```
 
 #### 単体テスト実行
+
 テストを実行してみましょう。
 
 ```bash
@@ -218,8 +222,8 @@ npm run test
 以下のようにテスト結果が表示されます。テスト成功です！
 <img src="/images/20210614b/image_2.png" alt="テスト成功ログ" width="722" height="316" loading="lazy">
 
-
 ## Vue Testing Libraryを動かす
+
 [公式ページ](https://testing-library.com/docs/vue-testing-library/examples)にある例を使用します。
 今回は上のページの例をここまでの設定で生成されたスタイルに合わせて少し改変して使用します。
 
@@ -236,7 +240,6 @@ cd ~/sample
 npm install --save-dev vue-jest@next
 npm install --save-dev @testing-library/vue@next
 ```
-
 
 #### テスト用コンポーネント&テストコード配置
 
@@ -299,6 +302,7 @@ test("increments value on click", async () => {
 ```
 
 #### jestのバージョンに気を付けよう
+
 ここまでの設定を追えて`npm run test`を実行すると、以下のようにエラーが発生します。
 
 ```log
@@ -323,6 +327,7 @@ npm install --save-dev jest@26 ts-jest@26
 ```
 
 #### babalの設定をする
+
 これでもまだ`npm run test`を実行すると、以下のようにエラーが発生します。
 
 ```log
@@ -386,6 +391,7 @@ module.exports = {
 ```
 
 ### テスト実行
+
 `npm run test`を実行します。
 
 <img src="/images/20210614b/image_3.png" alt="Vue Testing Libraryのテスト実行結果で成功した様子" width="699" height="285" loading="lazy">
@@ -396,9 +402,9 @@ module.exports = {
 
 改めて書くと当然のことばかりですが、この記事の要点は以下の3点です。
 
-- パッケージを使うときは、Vue 3に対応しているか確認する
-- ts.config.js, jest.config.js にコンパイラ設定をちゃんと書く
-- 通常の手順に沿ってもエラーが出る場合、パッケージのバージョンを確認して調べる
+* パッケージを使うときは、Vue 3に対応しているか確認する
+* ts.config.js, jest.config.js にコンパイラ設定をちゃんと書く
+* 通常の手順に沿ってもエラーが出る場合、パッケージのバージョンを確認して調べる
 
 ## さいごに
 
@@ -409,4 +415,3 @@ module.exports = {
 記事を書くことで自分が理解している領域と理解していない領域の境界が明確になることと、記事を書くために調べることで理解している領域が少しだけ広がることを感じました。
 
 新卒研修後すぐの2021年1月から技術ブログ運営をしている真野さん([記事](/authors/%E7%9C%9F%E9%87%8E%E9%9A%BC%E8%A8%98/))のいるプロジェクトにアサインされ、さらにフューチャー技術ブログのエースである澁川さん([記事](/authors/%E6%BE%81%E5%B7%9D%E5%96%9C%E8%A6%8F))にOJTを見て頂くという恵まれた環境に置かれたことへの感謝を今後の自身の成長と記事の執筆につなげていきたいと思います。
-

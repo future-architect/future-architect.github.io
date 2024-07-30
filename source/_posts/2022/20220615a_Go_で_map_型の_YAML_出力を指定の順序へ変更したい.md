@@ -18,7 +18,6 @@ lede: "!表題の通り、Go で map 型の YAML 出力の際、key を指定し
 
 <a href="https://www.flaticon.com/free-icons/yml" title="yml icons">Yml icons created by Darius Dan - Flaticon</a>
 
-
 TIG 所属の多賀です。
 表題の通り、Go で map 型の YAML 出力の際、key を指定した順序にする方法を調査・実装してみました。
 
@@ -33,14 +32,15 @@ Go の map のソート順は不定であることは、よく言われること
 (言語仕様にも明記されています。)
 
 > #### Map types
+>
 > A map is **an unordered group** of elements of one type, called the element type, indexed by a set of unique keys of another type, called the key type. The value of an uninitialized map is nil.
 >
 > [The Go Programming Language Specification - Map types](https://go.dev/ref/spec#Map_types)
 
-
 そのため、map をソートして出力したい場合は、 map に含まれる key のリストをソートし、ソートされた key ごとに map の value を出力することで実現します。
 
 例: [The Go Playground - map sort sample](https://go.dev/play/p/5LC2H8ziPpI)
+
 ```go
 import (
 	"fmt"
@@ -83,6 +83,7 @@ func main() {
 map を YAML 形式へ出力するコードを以下の通りに実装してみました。
 
 例: [The Go Playground - map to yaml sample](https://go.dev/play/p/19g1PtgoyRq)
+
 ```go
 import (
 	"fmt"
@@ -139,6 +140,7 @@ map 型の他に、key/value 形式でソート順が固定されているデー
 変換処理を独自カスタマイズするには、[go-yaml/yaml.v3](https://github.com/go-yaml/yaml) の場合は `Marshaler` interface を実装することで可能です。
 
 [yaml/yaml.go at v3 · go-yaml/yaml · GitHub](https://github.com/go-yaml/yaml/blob/v3/yaml.go#L50)
+
 ```go
 // The Marshaler interface may be implemented by types to customize their
 // behavior when being marshaled into a YAML document. The returned value
@@ -153,7 +155,6 @@ type Marshaler interface {
 
 (`goccy/go-yaml` の場合も同様の interface ([InterfaceMarshaler](https://github.com/goccy/go-yaml/blob/883a73b67b4e35d8f5bad112c918363aad961e3c/yaml.go#L29)) でカスタマイズ可能な模様です。)
 
-
 整理すると、以下の 2点を実装する必要があります。
 
 **① map の値から実行時に struct を新たに生成し、struct のフィールドを指定したソート順で定義する。**
@@ -163,6 +164,7 @@ type Marshaler interface {
 (※ reflection が多用されたナイーブな実装なので、本運用等のコードに使うのは少しリスキーだと思います。今回は CLI ツールでの利用であったため、問題ないとしています。)
 
 [The Go Playground - sort map to yaml sample](https://go.dev/play/p/-ZlYbk2_La-)
+
 ```go
 import (
 	"fmt"
@@ -268,8 +270,6 @@ YAML 形式に閉じずに、他の形式でも似た実装で同じような結
 
 最後まで読んでいただきありがとうございました。
 
-
 ## 参考
 
-- [Goのreflectで任意の構造体のフィールド変数を1つ増やしちゃう - Qiita](https://qiita.com/uechoco@github/items/b51df877659226d2893e)
-
+* [Goのreflectで任意の構造体のフィールド変数を1つ増やしちゃう - Qiita](https://qiita.com/uechoco@github/items/b51df877659226d2893e)

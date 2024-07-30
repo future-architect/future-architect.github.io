@@ -83,13 +83,13 @@ func main() {
 次のコマンドでwasmが生成されることを確認しておきます。
 
 ```bash
-$ GOOS=js GOARCH=wasm go build -o md2sql.wasm
+GOOS=js GOARCH=wasm go build -o md2sql.wasm
 ```
 
 実行時にローダーも必要なのでwasm_exec.jsを取得しておきます。
 
 ```bash
-$ cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" .
+cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" .
 ```
 
 # Webの画面を作る
@@ -196,4 +196,3 @@ WASMのロジックは生成のコールバックが呼ばれた時に呼び出�
 
 * [GoのコードをWebAssenblyにコンパイルしてブラウザ上でGoを実行する](https://www.asobou.co.jp/blog/web/go-webassembly)
 * [Go and WebAssembly (I): interacting with your browser JS API](https://macias.info/entry/202003151900_go_wasm_js.md)
-

@@ -21,29 +21,32 @@ Gitを使っての開発で、指定のツールや好みのGitクライアン�
 GitのBranch作成やCheckout, Commit, Pushまで使えた方向けに、次の段階としてRebase, Cherry Pickなどの実行方法を説明します。
 
 ## 紹介するツール
+
 - [Sourcetree](https://www.sourcetreeapp.com)
 - [Visual Studio Code](https://code.visualstudio.com) with [Git Graphプラグイン](https://marketplace.visualstudio.com/items?itemName=mhutchie.git-graph)
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/)
 
-
 ## Git操作イメージ
+
 説明にあたりGitツリーが以下の状態であることを前提としています。
 `feature` ブランチは個人の開発ブランチです。`master` ブランチは状況により `develop` ブランチなどに適宜読みかえください。
 
 ### 初期状態
+
 <img src="/images/20210420b/commit_base.png" alt="初期状態のブランチ" loading="lazy">
 
 ### masterブランチへRebase
+
 `git rebase master` に相当
 <img src="/images/20210420b/commit_rebase_master.png" alt="Rebase動作イメージ" loading="lazy">
 
-
 ### コミットをまとめる(Squash)
+
 `git rebase -i` に相当
 <img src="/images/20210420b/commit_rebase_squash.png" alt="Squash動作イメージ" loading="lazy">
 
-
 ### 別ブランチのコミットを持ってくる(Cherry-pick)
+
 `git cherry-pick` に相当
 <img src="/images/20210420b/2021-03-26-16-34-37.png" alt="Cherry-pick動作イメージ" loading="lazy">
 
@@ -57,7 +60,6 @@ GitのBranch作成やCheckout, Commit, Pushまで使えた方向けに、次の�
 4. featureブランチがmasterブランチから生えていることを確認
 <img src="/images/20210420b/sourcetree_rebase_master.gif" alt="Sourcetree Rebase操作動画" loading="lazy">
 
-
 ### コミットをまとめる(Squash)
 
 1. リベースしたいブランチ(featureブランチ)をチェックアウト
@@ -70,7 +72,6 @@ GitのBranch作成やCheckout, Commit, Pushまで使えた方向けに、次の�
 8. Sourcetree画面に反映されない場合には「F5」を押し更新
 <img src="/images/20210420b/sourcetree_rebase_squash.gif" alt="Sourcetree Squash操作動画" loading="lazy">
 
-
 ### 別ブランチのコミットを持ってくる(Cherry-pick)
 
 1. チェリーピックしたい先(featureブランチ)をチェックアウト
@@ -79,7 +80,6 @@ GitのBranch作成やCheckout, Commit, Pushまで使えた方向けに、次の�
 4. チェリーピックダイアログが立ち上がる。「OK」を選択
 5. featureブランチに持ってきたコミットが追加されてることを確認
 <img src="/images/20210420b/sourcetree_cherrypick.gif" alt="Sourcetree Cherry-pick操作動画" loading="lazy">
-
 
 ## Visual Studio Code with Git Graphプラグイン
 
@@ -99,6 +99,7 @@ GitのBranch作成やCheckout, Commit, Pushまで使えた方向けに、次の�
 <img src="/images/20210420b/gitgraph_rebase_master.gif" alt="VS Code動作動画" loading="lazy">
 
 ### コミットをまとめる(Squash)
+
 [Issue](https://github.com/mhutchie/vscode-git-graph/issues/410)が上がっているが、GUI単独では現時点でできない。
 リベース選択時に「Launch Interactive Rebase in new Terminal」を選択することにより一部CUIを併用することで実現可能。
 
@@ -117,7 +118,6 @@ GitのBranch作成やCheckout, Commit, Pushまで使えた方向けに、次の�
 
 「View」メニューから「Tool Windows」⇒「Git」と選択しGitの画面を表示する
 <img src="/images/20210420b/intellij_open.gif" alt="IntelliJ IDEAのGitプラグインのインストール" loading="lazy">
-
 
 ### masterブランチへRebase
 
@@ -148,4 +148,3 @@ GitのBranch作成やCheckout, Commit, Pushまで使えた方向けに、次の�
 紹介したツールや実行方法は一例です。
 
 自分にあったツールやコマンドを使い、良いGitライフを！
-

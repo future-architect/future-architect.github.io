@@ -25,9 +25,11 @@ TIG コアテクノロジーユニットの山田です。ソースやドキュ�
     * いわゆるVisitorパターンです
 
 ## Roslynとは
+
 Roslynとは.NET Compiler Platformのコードネームで、コード解析ツール構築のためのAPIを持つコンパイラです[^2] [^3]。Roslynが提供しているAPIを用いることで簡単に静的解析を行うことが出来ます。Microsoft公式で開発されているため、安心感がありますね。
 
 ## 循環的複雑度について
+
 循環的複雑度とはコードの品質を表す指標の一つで、循環的複雑度が高いほど複雑な構造であるといえます。[^4] [^5]
 
 循環的複雑度は制御フローグラフのノード数nとエッジ数eから `e - n + 2` という形で計算できます。
@@ -102,9 +104,9 @@ End Class
 ## 環境構築
 
 下記ツールをインストールします
-- .NET 6.0 SDK
-- Visual Studio Code
-    - C# 拡張機能
+* .NET 6.0 SDK
+* Visual Studio Code
+  * C# 拡張機能
 
 ### プロジェクト作成
 
@@ -143,6 +145,7 @@ dotnet add package Microsoft.CodeAnalysis.Workspaces.MSBuild --version 4.2.0
 `RoslynBlog.csproj` ファイルをエディタで開くことで、依存パッケージが追加されていることが確認できます。言語とビルドツールが統合されており便利ですね。
 
 ### 計算対象のプロジェクトの読み込み
+
 `MSBuildWorkspace`を用いてプロジェクトを読み込み、各ドキュメントの各メソッドごとの循環的複雑度を計算して返します。
 
 ```csharp
@@ -181,6 +184,7 @@ static async Task Main()
 ```
 
 ### クエリメソッドによる循環的複雑度の計算
+
 [こちら](https://docs.microsoft.com/ja-jp/dotnet/csharp/roslyn-sdk/get-started/syntax-analysis#query-methods)で紹介されているクエリメソッドを用いて循環的複雑度を計算します。
 循環的複雑度の加算対象となるノードは以下のように判定できます。
 
@@ -319,6 +323,7 @@ static Dictionary<string, int> CalcCyclomaticComplexityBySyntaxWalker(SyntaxTree
 ```
 
 ## まとめ
+
 今回はRoslynのSyntax APIを使い、VB.NETのプロジェクトを解析し循環的複雑度の計算をしてみました。
 Roslynを使うことで（Solutionや）Projectを簡単に読み込み、解析することができることがわかりました。
 C#の循環的複雑度もノードの型が違うだけで、ほぼ同じ形で作ることができます。
@@ -336,4 +341,3 @@ C#の循環的複雑度もノードの型が違うだけで、ほぼ同じ形で
 [^5]: [コード メトリック - サイクロマティック複雑度 - Visual Studio (Windows) | Microsoft Docs](https://docs.microsoft.com/ja-jp/visualstudio/code-quality/code-metrics-cyclomatic-complexity?view=vs-2022#the-magic-number)
 
 [^6]: .NETの静的解析ツールであるNDependの場合はcontinue, gotoなどもカウントするようですが、今回は計算対象外としています。[Understanding Cyclomatic Complexity -- NDepend](https://blog.ndepend.com/understanding-cyclomatic-complexity/#:~:text=Along%20with%20the%20if%20keyword%2C%20you%20can%20acquire%20additional%20complexity%20by%20use%20of%20looping%20constructs%20(while%2C%20for%2C%20foreach)%2C%20switch%20blocks%20(case/default)%2C%20jumps%20(continue%2C%20goto)%2C%20exceptions%20(catch)%2C%20and%20compound%20conditional%20enablers%20(%26%26%2C%20%7C%7C%2C%20ternary%20operator).)
-

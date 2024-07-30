@@ -14,7 +14,6 @@ lede: "FlutterでWidgetを開発するとき、Stateless WidgetやStateful Widge
 
 <img src="/images/20220316a/logo_lockup_flutter_horizontal.png" alt="" width="700" height="196">
 
-
 ## はじめに
 
 [Dart/Flutter連載](https://future-architect.github.io/articles/20220315a/) の2本目です
@@ -50,21 +49,17 @@ Widget sampleWidget() {
 }
 ```
 
-
 恐らく多くの方がFunctional Widgetはあまり良くないと思っていると思いますが、その理由を明確に説明できるでしょうか。
 
 本記事では、2つの違いや使い分けについて整理したいと思います。
-
 
 ## TL;DR
 
 Flutterが公式に公開している動画でも本件について触れられており、パフォーマンス最適化や予期せぬバグの回避、テスタビリティ（本記事では割愛しています）という観点で Class Widgetの利用が推奨されています。
 
-
 <iframe width="560" height="315" src="https://www.youtube.com/embed/IOyq-eTRhvo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## 2つの違い
-
 
 冒頭のサンプルで記述したClass WidgetとFunctional Widgetをそれぞれ利用した場合、アプリケーションの見た目はどちらも変わりません。
 ２つの一番の違いは生成されるWidgetツリーの構造です。それぞれのWidgetツリーは次のようになります。
@@ -333,7 +328,6 @@ class ParentWidgetState extends State<ParentWidget> {
 Widget Keyの詳細は割愛しますが、気になる方は下記の記事などを参考にすると良いでしょう。
 https://qiita.com/kurun_pan/items/f91228cf5c793ec3f3cc
 
-
 ```dart
   Widget square() {
     return Container(
@@ -500,6 +494,7 @@ class SwitchWidget extends StatelessWidget {
 ```
 
 **Functional Widget**
+
 ```dart
 class ParentWidget extends StatelessWidget {
   const ParentWidget({Key? key, required this.someType}) : super(key: key);
@@ -535,7 +530,6 @@ class ParentWidget extends StatelessWidget {
 
 このようにSwitchや三項演算子などにより、既にClass Widgetとして定義されているWidgetを返却するためのロジックのみを切り出したいような場合（言い換えればFunuctional Widget自体が構造化されたWidgetを定義せず、Privateな関数として広く再利用されないような場合）は　Functional Widgetの利用を許容しても良い気がしています。
 
-
 ## おわりに
 
 原則Class Widgetの利用が推奨されるべきであり、開発時のルールとしてFunctional Widgetは禁止にして問題ないと思います。
@@ -544,4 +538,3 @@ class ParentWidget extends StatelessWidget {
 ## 参考記事
 
 * https://stackoverflow.com/questions/53234825/what-is-the-difference-between-functions-and-classes-to-create-reusable-widgets
-

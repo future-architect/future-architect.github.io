@@ -75,4 +75,3 @@ AWS Lambdaは馴染みのある方も多いと思ったので、GCP Cloud Functi
 次回のイベント情報は[connpass](https://future.connpass.com/)で確認できます。
 
 ぜひ遊びに来てください。
-

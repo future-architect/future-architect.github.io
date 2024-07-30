@@ -20,6 +20,7 @@ OSS として Airflow へ貢献するにあたり、ローカルでの実行や�
 Airflow では、 `Airflow Breeze` と呼ばれる環境が整備され、公式より提供されています。当記事では、 `Airflow Breeze` について概要を記載し、 Airflow への OSS 貢献の入り口となれば良いと考えています。
 
 ## Airflow Breeze とは
+
 Airflow Breeze とは、ローカルで Airflow を簡単に実行できるように整備された環境を指します。実態はコンテナベースで構築され、Docker Compose が利用されています。
 
 <img src="/images/20210528a/AirflowBreeze_logo.png" alt="Airflow Breezeロゴ" loading="lazy">
@@ -32,7 +33,6 @@ Airflow Breeze の環境を整備することで、Airflow が依存する外部
 詳細はドキュメントととしてまとまっています。当記事ではピックアップした情報を記載します。
 [airflow/BREEZE.rst at master · apache/airflow](https://github.com/apache/airflow/blob/master/BREEZE.rst)
 
-
 ### 環境
 
 以下環境で整備します。
@@ -41,7 +41,6 @@ Airflow Breeze の環境を整備することで、Airflow が依存する外部
 * Docker version 20.10.6, build 370c289
 * docker-compose version 1.29.1, build c34c88b2
 * Airflow master branch (commit hash: 180df03482b07c18a57d20235ccdd1c3a12d9173)
-
 
 ### Breeze Install
 
@@ -106,8 +105,6 @@ Airflow の実行と tmux を終了したい場合は、 `airflow_stop` コマ�
 
 <img src="/images/20210528a/スクリーンショット_2021-05-20_10.35.21.png" alt="Airflow管理画面" loading="lazy">
 
-
-
 ### Breeze 環境
 
 環境変数 `AIRFLOW_HOME` は、 `/root/airflow` になっています。
@@ -121,7 +118,6 @@ Airflow の実行と tmux を終了したい場合は、 `airflow_stop` コマ�
 
 <img src="/images/20210528a/スクリーンショット_2021-05-20_11.13.08.png" alt="Airflow UI" loading="lazy">
 
-
 **※ 補足**
 UI 反映のラグを短くしたい場合は、 コンテナ内 `/root/airflow/airflow.cfg` の以下設定値を修正の上、airflow webserver/scheduler を再起動することで反映できます。
 (※ ディレクトリの読み込み頻度を上げるほど、サーバー負荷は上がります。)
@@ -132,8 +128,6 @@ UI 反映のラグを短くしたい場合は、 コンテナ内 `/root/airflow/
 # How often (in seconds) to scan the DAGs directory for new files. Default to 5 minutes.
 dag_dir_list_interval = 300
 ```
-
-
 
 ### breeze コマンド
 
@@ -174,15 +168,15 @@ CI の環境としても利用されていることもあり、テストを実�
 
 Airflow ではテストの種類としては以下3種類が定義されています。 ([airflow/TESTING.rst at master · apache/airflow](https://github.com/apache/airflow/blob/master/TESTING.rst#airflow-test-infrastructure) より)
 
-- Unit Tests
-	- 単体テスト。追加の Integration は不要であり、Airflow 実行環境内で完結する。
-	- ローカル仮想環境 or Breeze 環境下で実施
-- Integration Tests
-	- 結合テスト。外部 Integration を用意しテストを行う。Integration は実際のサービスを起動して実施する。(コンテナ利用)
-	- Breeze 環境下で実施
-- System Tests
-	- システムテスト。外部システムと連携して行うテスト
-	- システム実行環境下(クラウド環境等) で実際に動かすテストを指す
+* Unit Tests
+ 	* 単体テスト。追加の Integration は不要であり、Airflow 実行環境内で完結する。
+ 	* ローカル仮想環境 or Breeze 環境下で実施
+* Integration Tests
+ 	* 結合テスト。外部 Integration を用意しテストを行う。Integration は実際のサービスを起動して実施する。(コンテナ利用)
+ 	* Breeze 環境下で実施
+* System Tests
+ 	* システムテスト。外部システムと連携して行うテスト
+ 	* システム実行環境下(クラウド環境等) で実際に動かすテストを指す
 
 ここでは、 Unit Tests と Integration Tests について詳細を記載します。
 
@@ -307,6 +301,5 @@ Airflow はクセが強いですが 最近(2020/12) バージョン 2.0 にア�
 
 ## 参考
 
-- [airflow/BREEZE.rst at master · apache/airflow](https://github.com/apache/airflow/blob/master/BREEZE.rst#running-kubernetes-tests)
-- [airflow/TESTING.rst at master · apache/airflow](https://github.com/apache/airflow/blob/master/TESTING.rst#running-tests-with-kubernetes)
-
+* [airflow/BREEZE.rst at master · apache/airflow](https://github.com/apache/airflow/blob/master/BREEZE.rst#running-kubernetes-tests)
+* [airflow/TESTING.rst at master · apache/airflow](https://github.com/apache/airflow/blob/master/TESTING.rst#running-tests-with-kubernetes)

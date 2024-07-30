@@ -38,11 +38,11 @@ Goの `context` パッケージは `Context` インターフェース(コンテ�
 
 コンテキストは `context.Context` でルートとなるコンテキストを作成できます。キャンセル処理は `context.WithCancel` タイムアウトは `context.WithTimeout` デッドラインは `context.WithDeadline` の関数を用いて、子コンテキストを生成できます。また値の伝播は `context.WithValue` で値を伝播できる子コンテキストを生成できます。
 
-- 値の伝播
+* 値の伝播
 
 上記の図 `3.WithCancel()` で生成した子コンテキストから値を参照するときは親方向に値を参照するため、キー `x` で参照した場合は値として `aaa` が取得できます。`4.WithValue()` で生成した子コンテキストからキー `x` で値を参照したときは、新しい値である `gopher` の値が取得できます。
 
-- 処理のキャンセル
+* 処理のキャンセル
 
 処理のキャンセルは子のコンテキストのみに影響し、親のコンテキストには影響がありません。`3.WithCancel()` で生成した子コンテキストがキャンセルを実行した場合は、`4.WithValue()` のコンテキストはキャンセルされますが、`2.WithValue()` で生成した親のコンテキストの処理はキャンセルされません。
 
@@ -220,4 +220,3 @@ func (c *cancelCtx) cancel(removeFromParent bool, err error) {
 * キャンセルの伝播は `map` を用いてキャンセルのグラフを実装し、キャンセルされたときは `map` を用いてキャンセルを伝播
 
 としている実装例を紹介しました。`context` パッケージの実装の他にも [AirflowのTips 11選](https://future-architect.github.io/articles/20200131/) の記事で紹介されているような[Airflow](https://airflow.apache.org/)もDAG(グラフの一種)を扱います。グラフは応用範囲が広いデータ構造ですので、皆さんの身近な問題を解決する際にも役に立つでしょう。
-

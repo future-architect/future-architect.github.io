@@ -49,7 +49,6 @@ aws apigateway --profile <my_profile> test-invoke-method --rest-api-id <12341234
 
 --rest-api-id と --resource-idの取得方法は[Stackoverflowの回答](https://stackoverflow.com/questions/52446929/what-is-the-rest-api-id-and-resource-id-and-where-do-i-find-them)がシンプルでした。こちらを参考に取得すると良いかなと思います。
 
-
 ## API GatewayにLambdaオーソライザーが設定されている場合
 
 API GatewayでLambdaオーソライザーが設定されている構成の場合があります。オーソライザー側についてはこのブログにも[AWS APIGateway Custom Authorizer入門](https://future-architect.github.io/articles/20210610a/)という記事がありますのでぜひ参照ください。
@@ -65,7 +64,6 @@ https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/apigateway-us
 * https://docs.aws.amazon.com/cli/latest/reference/apigateway/test-invoke-authorizer.html
 
 私が利用したことがないため、今回は説明を割愛します。
-
 
 ## AWS SDK for Goからテスト要求を呼び出してみる。
 

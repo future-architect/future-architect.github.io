@@ -29,6 +29,7 @@ Mypy や Pyright は Python の静的解析ツールとして有名ですが、�
 * https://qiita.com/simonritchie/items/7492d1c1a3c13b2f27aa#%E4%BA%8B%E5%89%8D%E3%81%AEpyright%E3%81%AE%E8%BF%BD%E5%8A%A0
 
 # 実験概要
+
 Mypy、Pyright はともに `reveal_type(expr)` という機能があります。これを解析対象のコードに挿入すると、実行時点での `expr` の型情報を表示することができます。Mypy、Pyright の両者で同一コードに解析を行いその結果を比較します。以下、コード中ではコメントで `reveal_type` の結果を記録し、`reveal_type` 自体の記述は省略します。
 
 ## 実験 1: 再代入
@@ -45,8 +46,8 @@ a = 'str'  # Type of "a" is "Literal['str']"
 
 `a` に型の違う値を再代入しています。
 
-- Mypy は 1 行目の代入によって `a` の型を `builtins.int` に確定させるため、2 行目の代入は型の違いで失敗します。これは Python 本来の挙動とは異なりますが、暗黙の変換がないため型チェックの観点からは安全です。
-- Pyright はリテラルを別の型に変換せず、リテラルのままで表現しています。また、代入によって型が変わっても、特別問題視はしないようです。
+* Mypy は 1 行目の代入によって `a` の型を `builtins.int` に確定させるため、2 行目の代入は型の違いで失敗します。これは Python 本来の挙動とは異なりますが、暗黙の変換がないため型チェックの観点からは安全です。
+* Pyright はリテラルを別の型に変換せず、リテラルのままで表現しています。また、代入によって型が変わっても、特別問題視はしないようです。
 
 ## 実験 2: オーバーライド
 
@@ -87,6 +88,7 @@ def func(a: int):  # Revealed type is "def (a: builtins.int) -> Any"
 def func(a: int):  # Type of "func" is "(a: int) -> int"
     return a       # Type of "a" is "int"
 ```
+
 引数の型から推論をすれば `func` は明らかに `(int) -> int` となりますが、Mypy は推論を行わないようになっており、戻り値の型が `Any` になります。
 
 ## 実験 4: 戻り値の型チェック
@@ -125,8 +127,8 @@ def func(flg: bool, i: int, j: str):  # Type of "func" is "(flg: bool, i: int, j
 
 if 文の分岐によって `a` の型が変わる例です。
 
-- Mypy は 5 行目でエラーが出ました。実験 1 と同様に 3 行目で `a` の型が `builtins.int` に確定しているためです。
-- Pyright はエラーが出ません。分岐ごとに `a` の型を独立に判断し、戻り値の段階ではこれらの和を取っています。このような技術は Pyright のドキュメント内で [Type Narrowing](https://github.com/microsoft/pyright/blob/main/docs/type-concepts.md#type-narrowing) として紹介されています。
+* Mypy は 5 行目でエラーが出ました。実験 1 と同様に 3 行目で `a` の型が `builtins.int` に確定しているためです。
+* Pyright はエラーが出ません。分岐ごとに `a` の型を独立に判断し、戻り値の段階ではこれらの和を取っています。このような技術は Pyright のドキュメント内で [Type Narrowing](https://github.com/microsoft/pyright/blob/main/docs/type-concepts.md#type-narrowing) として紹介されています。
 
 ## 実験 6: タイプナローイング（到達不能な分岐がある場合）
 
@@ -156,8 +158,7 @@ def func(flg: bool, i: int, j: str):  # Type of "func" is "(flg: bool, i: int, j
 
 実験 5 の if 文に到達しない分岐 (`else`) を追加します。
 
-- Pyright では 6 行目で `flg` の型を `Never` としています。`bool` は `True` と `False` の 2 値しかないため、上 2 つの分岐で消費し、`else` 内に到達する `flg` は存在しないことを表しています。こちらも Pyright のドキュメント内で [Type Checking Concepts](https://github.com/microsoft/pyright/blob/main/docs/internals.md#type-checking-concepts) として紹介されています。
-
+* Pyright では 6 行目で `flg` の型を `Never` としています。`bool` は `True` と `False` の 2 値しかないため、上 2 つの分岐で消費し、`else` 内に到達する `flg` は存在しないことを表しています。こちらも Pyright のドキュメント内で [Type Checking Concepts](https://github.com/microsoft/pyright/blob/main/docs/internals.md#type-checking-concepts) として紹介されています。
 
 # 結論
 

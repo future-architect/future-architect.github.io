@@ -17,7 +17,7 @@ Flutterで環境を一度作ってしまえば、Android StudiからAndroidエ�
 出発点はこちらです。
 
 ```
-$ flutter create dgsample
+flutter create dgsample
 ```
 
 # まずはアプリの設定を修正
@@ -75,7 +75,7 @@ dev_dependencies:
 ```
 
 ```bash
-$ flutter pub run flutter_launcher_icons:main
+flutter pub run flutter_launcher_icons:main
 ```
 
 次にスプラッシュ生成で使うツールをdev_dependenciesに入れてコマンド実行。
@@ -88,7 +88,7 @@ dev_dependencies:
 ```
 
 ```bash
-$ flutte pub run flutter_native_splash:create
+flutte pub run flutter_native_splash:create
 ```
 
 Android Studio上で実行すると、Androidエミュレータ上にインストールされるアイコンが変わりますし、起動画面も変わりました。
@@ -191,4 +191,3 @@ if __name__ == "__main__":
 ```
 
 あとはこれらのビルド結果をDeployGateにあげれば大丈夫なはず！
-

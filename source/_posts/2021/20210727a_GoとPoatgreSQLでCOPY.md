@@ -42,7 +42,6 @@ PostgreSQLには高速にファイルの読み込みを行うCOPY FROMがある�
 
 by [Renée French](http://reneefrench.blogspot.com/)
 
-
 GoのPostgreSQLドライバには2種類あります。
 
 * [github.com/lib/pq](https://pkg.go.dev/github.com/lib/pq)
@@ -61,9 +60,9 @@ ORマッパーの中にはConnを完全にラップして、裏のConnを見せ�
 [鳥貴族のページのアレルギーの情報](https://www.torikizoku.co.jp/anshin/shouhin)のPDFをダウンロードしました。PythonとPoetryはインストール済みの前提で書きます。
 
 ```bash
-$ poetry new conv-toriki
-$ cd conv-toriki
-$ poetry add tabula-py
+poetry new conv-toriki
+cd conv-toriki
+poetry add tabula-py
 ```
 
 スクリプトはこんな感じ
@@ -77,14 +76,14 @@ tabula.convert_into("toriki_allergie_21su.pdf", "output.csv", output_format="csv
 実行します。CSVファイルができるのでヘッダー行とかは手で除去します（自動化できるのかもしれませんが）。
 
 ```bash
-$ poetry run python convert.py
+poetry run python convert.py
 ```
 
 ついでにPostgreSQLもDockerで入れて、起動しておきます。
 
 ```bash
-$ docker pull postgres:13.3
-$ docker run -d --rm --name db -e POSTGRES_USER=pg -e POSTGRES_PASSWORD=pw -e POSTGRES_DB=toriki -p 5432:5432 postgres:13.3
+docker pull postgres:13.3
+docker run -d --rm --name db -e POSTGRES_USER=pg -e POSTGRES_PASSWORD=pw -e POSTGRES_DB=toriki -p 5432:5432 postgres:13.3
 ```
 
 このコンテナのpsqlコマンドを起動してテーブルを作っておきます。
@@ -190,7 +189,6 @@ func main() {
 # pgxでの利用例
 
 pgxは`pgx.CopyFromSource`インタフェースをアプリ側で用意する必要があります。スライスなどからこのインタフェースを生成する便利関数もありますが、あらかじめ[全部メモリに載っける](https://pkg.go.dev/github.com/jackc/pgx/v4#CopyFromRows)か、[行数がわかっているか](https://pkg.go.dev/github.com/jackc/pgx/v4#CopyFromSlice)でないと使えないので、超大規模なデータ投入には向かない気がしました。なので、今回はcsv.Readerをラップしたインタフェースを自作してみました。内部的にもバイナリプロトコルで逐次で流していそうなので、全部がメモリに載せないで処理できそうな気がします(要追加検証)。
-
 
 ```go
 package main
@@ -302,6 +300,5 @@ func main() {
 ```
 
 それはそうと、鳥貴族、アレルギー表が日本語だけじゃなくて英語版も用意されててすごいですね。あと、めちゃくちゃ良いのが小麦アレルギーの項目ごとの注釈。小麦がアレルギーだとしても発酵した醤油はOKな人はいるのですが、単に小麦だけ書かれると良いのか悪いのか迷うことがあります。で、厳しくNGにするとほとんどなにも外食できなくなってしまう。何度かアレルギーの持ちの人と一緒に外食するために店探しをしたりしましたが、これはかなり助かる情報です。他の外食業界の会社さんも真似して欲しい！
-
 
 次は、宮崎さんの[100%型安全なgolangORM「ent」を使ってみた](/articles/20210728a/)です。

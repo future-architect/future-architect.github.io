@@ -16,9 +16,8 @@ lede: "AWS Step Functionsの動的並列処理をローカルで実行する方�
 ---
 <img src="/images/20220204a/eyecatch_stepfunctions.png" alt="" width="1003" height="498" loading="lazy">
 
-
-
 # はじめに
+
 こんにちは、TIG/DXユニット所属の宮永です。
 
 今回はAWS Step Functionsの動的並列処理をローカルで実行する方法をハンズオン形式でまとめました。ソースコードはこちらに格納していますのでご参考にして下さい。
@@ -51,6 +50,7 @@ Lambdaの実行制限時間である15分を超えるであろう処理をStep F
 全体のシステム概要を記載した後に機能詳細を紹介します。
 
 ## システム構成図
+
 今回構築するシステム構成図を以下に記載します。
 
 画像左側はビジュアルワークフロー図と呼ばれるもので今回扱うStep Functionsの定義書から生成されます。画像右側はビジュアルワークフロー図に対応するシステムアーキテクチャ図です。
@@ -62,7 +62,6 @@ S3バケットからJSONを取得し、後続のLambdaでETL処理をします�
 こちらの拡張機能を利用すれば[ステートメント言語](https://docs.aws.amazon.com/ja_jp/step-functions/latest/dg/concepts-amazon-states-language.html)を下図のビジュアルワークフロー図のように可視化することができます。
 
 <img src="/images/20220204a/image.png" alt="ビジュアルワークフロー" width="1200" height="881" loading="lazy">
-
 
 ## 実装するアプリの機能詳細
 
@@ -97,6 +96,7 @@ S3バケットには予め以下の構造をもつJSONファイルを配置し�
 ```
 
 ## ScatterLambda
+
 ScatterLambdaでは上記のJSONファイルを取り込み、DataFrameに変換します。その後、DataFrameをSegmentLamdaが15分以内に処理できる単位に分割します。
 
 分割したファイルはpickleファイルでS3バケットに格納します。
@@ -106,7 +106,7 @@ ScatterLambdaでは上記のJSONファイルを取り込み、DataFrameに変換
 SegmentLambdaではScatterLambdaで分割されたpickleファイルを取り込みETL処理を行います。
 今回行うETL処理を以下記載します。
 
-* 「ボーナスポイント」カラムの追加
+- 「ボーナスポイント」カラムの追加
 
 「ボーナスポイント」は以下の条件で決定します。
 
@@ -114,7 +114,6 @@ SegmentLambdaではScatterLambdaで分割されたpickleファイルを取り込
   <span class="fa fa-fw fa-check-circle"></span><p>【条件】</p>
   <p>会員ランクが「4，5」の会員には「ポイント」×1.25倍のボーナスポイントを、会員ランク「1，2，3」の会員には「ポイント」と同等のボーナスポイントを付与することします。</p>
 </div>
-
 
 上記の条件に従ってSegmentLambdaの処理前後のテーブルをまとめると以下のようになります。
 
@@ -134,21 +133,21 @@ SegmentLambdaではScatterLambdaで分割されたpickleファイルを取り込
 |001|般若 竜門|2|75|2021-07-19|75|
 |002|十河 アンナ|2|57|2021-09-06|57|
 
-
 ## GatherLambda
+
 GatherLambdaではSegmentLambdaでETL処理をされた各pickleファイルを取り込み、ひとつのExcelファイルを作成します。
 作成したExcelファイルはS3バケットにアップロードして処理を終了します。
 
-
 # 開発環境
+
 開発に取り組む前に筆者の開発環境を記載します。記事中Linuxコマンドを使用している箇所があります。Windowsで開発される方はWSLを使用することをおすすめいたします。
 
-* OS Ubuntu 20.04
-* Python(pyenv) 3.9
-* Pipenv
-* Docker
-* docker compose v2
-* AWS CLI v2
+- OS Ubuntu 20.04
+- Python(pyenv) 3.9
+- Pipenv
+- Docker
+- docker compose v2
+- AWS CLI v2
 
 # LocalStackの準備
 
@@ -209,13 +208,13 @@ Step Functionsを実行するときにはログも確認しながらデバッグ
 以下のコマンドを実行してコンテナが2つ起動していることを確認してください。
 
 ```bash
-$ docker compose up --build
+docker compose up --build
 ```
 
 次にAWS CLIの設定を行います。
 
-
 # AWS CLIの設定
+
 AWS CLIでは認証情報などをプロファイルとして保存することができます。
 AWS CLIをインストールされた方はご自身が使用しているOSのhomeディレクトリに`.aws`の隠しファルダがあります。(エクスプローラーなどで確認する場合は隠しフォルダを表示するように設定してください。)`.aws`フォルダ配下には.`config`と
 `.credentials`2つのファイルがありますのでそれぞれ以下のように設定してください。
@@ -236,10 +235,10 @@ aws_access_key_id = test
 aws_secret_access_key = test
 ```
 
-
 次にLambdaの実装を行います。
 
 # Lambdaの実装
+
 このあと、複数のファイルを作成するため、最終的なディレクトリ構造を先に記載します。
 適宜参考にしてください。
 
@@ -309,14 +308,14 @@ aws_secret_access_key = test
 
 </div></details>
 
-
 ## 前提
+
 ローカルマシンにPython3の環境が構築されていることを前提としています。
 今回Lambdaの実装にはPythonを使用します。Pipenvを使用して各Lambda関数毎にプロジェクトを作成します。
 Pipenvは以下のコマンドでインストールができます。
 
 ```bash
-$ pip install pipenv
+pip install pipenv
 ```
 
 冒頭で記載しましたが、以前[Pipenv+LocalStackで作るLambda開発環境](/articles/20220202a/)という記事を書かせていただきました。
@@ -338,32 +337,33 @@ Python環境は3.9を使用します。
 demo-scatter配下で以下のコマンドを実行してください。
 
 ```bash
-$ pipenv --python 3.9
+pipenv --python 3.9
 ```
+
 次に使用する外部モジュールをインストールします。
 demo-scatterで使用するモジュールはpandasだけです。以下のコマンドを実行してください。
 
 ```bash
-$ pipenv install pandas
+pipenv install pandas
 ```
 
 続いて開発環境で使用するパッケージをインストールします。以下のコマンドでpytestとmypyをインストールします。
 
 ```bash
-$ pipenv install pytest mypy --dev
+pipenv install pytest mypy --dev
 ```
 
 これでプロジェクト環境が整いました。他2つのプロジェクトも同様に環境を構築します。
 それぞれ必要なモジュールを記載します。
 
 - demo-segment
-    - pandas
-    - pytest mypy (--dev)
+  - pandas
+  - pytest mypy (--dev)
 - demo-gather
-    - pandas
-    - xlwt
-    - xlsxwriter
-    - pytest mypy (--dev)
+  - pandas
+  - xlwt
+  - xlsxwriter
+  - pytest mypy (--dev)
 
 それではScatterLambdaからロジックの実装をします。
 
@@ -371,8 +371,8 @@ $ pipenv install pytest mypy --dev
 
 demo-scatter配下に以下2つのファイルを作成します。
 
-* scatter.py
-* lambda.py
+- scatter.py
+- lambda.py
 
 機能のほとんどはscatter.pyに記述し、lambda.pyではハンドラを呼び出すのみにします。
 以下、lambda.pyです。
@@ -402,7 +402,6 @@ def lambda_handler(event, context) -> dict:
     )
     return handler.main()
 ```
-
 
 ScatterLambdaでは、ファイルの分割を行います。
 
@@ -477,13 +476,13 @@ test-bucketに格納されたsample.jsonを取得して、pandasでDataFrameに�
 関数の戻り値はS3のオブジェクトキーの一覧です。`segment_definitions`をキーとした辞書にリストして格納しています。
 
 ## SegmentLambda
+
 SegmentLambdaでETL処理を行います。ETL処理時の条件を再度記載します。
 
 <div class="note info" style="background: #e5f8e2; padding: 16px;">
   <span class="fa fa-fw fa-check-circle"></span><p>【条件】</p>
   <p>会員ランクが「4，5」の会員には「ポイント」×1.25倍のボーナスポイントを、会員ランク「1，2，3」の会員には「ポイント」と同等のボーナスポイントを付与することします。</p>
 </div>
-
 
 上記の条件を実装した`segment.py`を以下記載します。
 
@@ -658,8 +657,8 @@ def lambda_handler(event, context) -> str:
     return handler.main()
 ```
 
-
 # LocalStackへのデプロイ
+
 それでは作成したそれぞれのLambda関数をLocalStackにデプロイします。
 デプロイの方法は先程紹介した[こちらの記事](https://future-architect.github.io/articles/20220202a/)にまとめた方法を採用します。各Lambda関数のディレクトリ内に以下のようなMakefileを作成します。
 以下はdemo-scatter内のMakefileの例です。
@@ -785,13 +784,13 @@ make zip
 zip化が完了していれば各ファルダのbinフォルダにlambda.zipが生成されているはずです。
 
 # Step Functionsの準備
+
 ## Amazonステートメント言語
 
 Step Functionsでは各種リソースのオーケストレーション（状態管理）JSON形式のファイルで行います。
 今回採用したスキャッターギャザーメッセージングパターン（分散して集約するようなパターン）は冒頭に紹介した[記事](/articles/20200515/)をほぼそのまま転用させていただきました。
 ScatterLambdaの`event`に引数を渡すため一部追加しています。
 以下、今回使用するステートマシンの定義書であるprallel.jsonです。
-
 
 ```JSON parallel.json
 {
@@ -838,6 +837,7 @@ ScatterLambdaの`event`に引数を渡すため一部追加しています。
 そのため、ScatterLambdaでの返り値はSegmentLambdaに渡したい配列のキーを`segment_definitions`とし、Gatherでは`segment_results`をキーに持つ要素を参照します。返り値はJSONにdumpする必要はなく、辞書型で値を渡します。
 
 ## テストデータの準備
+
 各Lambda関数のデプロイが完了し、ステートマシンの定義も完成しました。あとはStep Functionsの生成と実行をするだけです。
 ステートマシンをLocalStackに作成する前に今回使用するテストデータを生成します。
 テストデータはtest-bucket/test.jsonに格納します。
@@ -944,12 +944,9 @@ demo-gatherによってアップロードされたエクセルファイルをロ
 make download
 ```
 
-
 downloadに成功していればプロジェクトプロジェクトルート直下にresultフォルダが生成されtest.xlsxが生成されていると思います。
 
-
 <img src="/images/20220204a/image_2.png" alt="image.png" width="1200" height="676" loading="lazy">
-
 
 想定通りの出力が得られましたね🎉
 今回はデモなので処理もステップ数も大したことはありません。
@@ -961,15 +958,9 @@ downloadに成功していればプロジェクトプロジェクトルート直
 
 https://github.com/orangekame3/stepfunctions-demo
 
-
-
 # さいごに
+
 いかがでしたでしょうか、Step Functionsでは性質上、複数のリソースを連動させて処理を行います。デバッグの都度リソースをデプロイをするのはかなりの労力を伴うのでローカル環境で動作確認を行えるのはとても良いですね。
 
 今回はLambdaの並列実行でしたが、様々な用途に応用が期待できそうです。
 長くなりましたが、最後まで読んでいただきありがとうございました。
-
-
-
-
-

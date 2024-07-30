@@ -55,7 +55,6 @@ https://drawio-app.com/text-plugin/
 
 <img src="/images/20210525b/anim.gif" alt="draw.ioでオブジェクトにアニメーションを追加する動画" width="720" height="480" loading="lazy">
 
-
 ## flow
 
 こちらもアニメーションですが、線が動きます。面白いです。
@@ -63,7 +62,6 @@ https://drawio-app.com/text-plugin/
 https://drawio-app.com/connector-styles-and-animations-in-draw-io/
 
 <img src="/images/20210525b/flow.gif" alt="draw.ioで矢印の線が流れるアニメーション" width="720" height="480" loading="lazy">
-
 
 ## tags
 

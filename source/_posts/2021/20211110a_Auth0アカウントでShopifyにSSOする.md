@@ -63,6 +63,7 @@ Shopifyストアにログインし、 `設定`に移動して `チェックア�
 このシークレットキーはマルチパスリクエストが正当であることを確認するための暗号を作成するために使用されます。シークレットキーを再発行したい場合、マルチパスを無効にしてから再度有効にすることで、新たなシークレットキーが生成され、以前のものは無効化されます。（上記画像のシークレットキーは既に無効化済みです。）
 
 ## Auth0アプリケーションを作成し、URIを設定する
+
 Auth0ダッシュボード内で`Applications`に移動し、`Create Application`をクリックして適当な名前を付け（「Shopify Store」など）、`Regular Web Applications`を選択し、`CREATE`します。
 <img src="/images/20211110a/技術ブログ②.png" alt="技術ブログ②.png" width="782" height="689" loading="lazy">
 
@@ -76,7 +77,6 @@ Application URIsを以下のように設定します。
 - **Allowed Logout URLs**：https://{shopify-domain}/account/logout
 <img src="/images/20211110a/技術ブログ④.png" alt="技術ブログ④.png" width="976" height="755" loading="lazy">
 
-
 `Advanced Settings`セクションを展開し、Application Metadataに次の2つのKeyとValueのペアを追加します。
 
 - **Key**：shopify_domain ; **Value**：{shopify-domain}
@@ -84,6 +84,7 @@ Application URIsを以下のように設定します。
 <img src="/images/20211110a/技術ブログ③.png" alt="技術ブログ③.png" width="969" height="648" loading="lazy">
 
 ## Auth0ルールを追加して、マルチパストークンを作成する
+
 Auth0ダッシュボードの`Auth Pipeline`の`Rules`に移動して、`Create`を選択、templateは`Empty rule`を選択します。
 わかりやすい名前（「ShopifyMultipass」など）を付け、次のコードを貼り付けます。
 
@@ -138,10 +139,10 @@ function (user, context, callback) {
 <img src="/images/20211110a/技術ブログ⑤.png" alt="技術ブログ⑤.png" width="1059" height="856" loading="lazy">
 
 ## ShopifyテーマにAuth0リンクを設定する
+
 Shopifyテーマを編集してログイン/ログアウトするためのリンクを追加していきます。
 Shopifyストアの現在のテーマの`コードを編集`をクリックします。
 <img src="/images/20211110a/技術ブログ⑥.png" alt="技術ブログ⑥.png" width="975" height="361" loading="lazy">
-
 
 まずは、ログインページを編集してログインリンクを追加します。`Templates`フォルダ内の`customers/login.liquid`ファイルを開き、リンクを追加するのに適した場所を見つけます。今回は、`アカウント作成`リンクの下に以下のリンクを配置します。
 
@@ -185,7 +186,6 @@ Shopifyストアの現在のテーマの`コードを編集`をクリックし�
 
 <img src="/images/20211110a/技術ブログ⑨.png" alt="技術ブログ⑨.png" width="937" height="331" loading="lazy">
 
-
 続いて、URLを作成していきます。
 まずは、以下のようにログインURLを作成します。
 
@@ -215,6 +215,7 @@ Shopifyストアの現在のテーマの`コードを編集`をクリックし�
 以上で実装完了です！
 
 # 実際の画面遷移
+
 ログインページにて、`Log in with Auth0`をクリックする。
 <img src="/images/20211110a/技術ブログ⑫.png" alt="技術ブログ⑫.png" width="1200" height="707" loading="lazy">
 
@@ -232,11 +233,10 @@ Shopifyストアの現在のテーマの`コードを編集`をクリックし�
 
 # 参考リンク
 
-* [Authenticate Shopify Customers with Auth0 – Rovani in C#](https://rovani.net/Shopify-Auth0-Multipass/)
-* [Authenticate Shopify Customers with Auth0 - Shopify - Pavilion](https://thepavilion.io/t/authenticate-shopify-customers-with-auth0/4040)
-* [Multipass | shopify.dev](https://shopify.dev/api/multipass)
-* [multipassify/multipassify.js at master · beaucoo/multipassify](https://github.com/beaucoo/multipassify/blob/master/multipassify.js)
-* [Auth0 Rule to Generate a Multipass token and redirect the user back to the Shopify store](https://gist.github.com/drovani/8199b1e0ffa1976c00af6781fcb98fbf)
-* [Shopify PlusでSSO（シングルサインオン） - Qiita](https://qiita.com/djjimba/items/4946c73742728003e5f5)
-* [Single Sign-On (SSO) For Shopify Using Auth0 as Identity Provider](https://plugins.miniorange.com/single-sign-on-sso-for-shopify-using-auth0-as-identity-provider)
-
+- [Authenticate Shopify Customers with Auth0 – Rovani in C#](https://rovani.net/Shopify-Auth0-Multipass/)
+- [Authenticate Shopify Customers with Auth0 - Shopify - Pavilion](https://thepavilion.io/t/authenticate-shopify-customers-with-auth0/4040)
+- [Multipass | shopify.dev](https://shopify.dev/api/multipass)
+- [multipassify/multipassify.js at master · beaucoo/multipassify](https://github.com/beaucoo/multipassify/blob/master/multipassify.js)
+- [Auth0 Rule to Generate a Multipass token and redirect the user back to the Shopify store](https://gist.github.com/drovani/8199b1e0ffa1976c00af6781fcb98fbf)
+- [Shopify PlusでSSO（シングルサインオン） - Qiita](https://qiita.com/djjimba/items/4946c73742728003e5f5)
+- [Single Sign-On (SSO) For Shopify Using Auth0 as Identity Provider](https://plugins.miniorange.com/single-sign-on-sso-for-shopify-using-auth0-as-identity-provider)

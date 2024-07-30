@@ -17,6 +17,7 @@ lede: "ASUSが販売しているシングルボードコンピュータTinekr Bo
 [電子工作/IoT連載](/articles/20220404a/) の4本目です
 
 ## はじめに
+
 こんにちは、TIG所属の宮永です。
 
 ASUSが販売しているシングルボードコンピュータTinekr Board2SにAWS Greengrassの環境を構築したので記事にまとめました。
@@ -29,9 +30,8 @@ ASUSが販売しているシングルボードコンピュータTinekr Board2S�
 
 本記事がTinker Board2S購入検討をしている方の役にたてば幸いです。
 
-
-
 ## Tinker Board2Sとは
+
 ASUSが販売するArmベースのシングルボードコンピュータです。
 商品についての公式ページは[こちら](https://tinker-board.asus.com/jp/product/tinker-board-2s.html)です。
 まずは外観から観察します。
@@ -43,13 +43,11 @@ ASUSが販売するArmベースのシングルボードコンピュータです�
 
 <img src="/images/20220407a/tinker.JPG" alt="外観" width="1200" height="676" loading="lazy">
 
-
 手前にピンヘッダーが40個確認できます。着色してあるため非常に便利です。
 RaspberryPiだと上から一つずつ数えていかなければ行けないのでこの仕様はとてもありがたいですね。
 
 外部インタフェースを見ていきます。
 <img src="/images/20220407a/usb.JPG" alt="外部インターフェース" width="1200" height="676" loading="lazy">
-
 
 3.2USB Gen1 Type-Aが3つ、3.2USB Gen1 Type-Cが１つ付属しています。有線LANも接続できるようになっています。
 
@@ -136,10 +134,12 @@ SSH接続します。
 ```bash
 ssh linaro@<IPaddress>
 ```
+
 で接続ができます。Passwordを要求されるのでlinaroと入力すると接続ができます。
 AWS Greengrassの環境構築はssh接続できれば問題ありませんので、Tinker Boardの初期セットアップは以上で完了とします。
 
 ## AWS Greengrassのインストール
+
 AWS Greengrassは2022年4月現在v1とv2の２つあります。
 今回はCPU　ARM64 【AArch64】環境でdockerを使用したかったためv1の環境構築を行います。
 v2では　ARM64 【AArch64】のdocker環境はサポートされていないようです。
@@ -150,14 +150,13 @@ v2では　ARM64 【AArch64】のdocker環境はサポートされていない�
 https://docs.aws.amazon.com/ja_jp/greengrass/v1/developerguide/what-is-gg.html
 
 ### Greengrassのグループ作成
+
 まずはAWS Greengrassのグループを作成します。
 デフォルトの設定でグループを作成します。
 AWS IoTコンソール画面左のタブから「クラシック＞グループ」を選択します.
 画面遷移後「グループを作成」を選択すると下図のようになるので「デフォルト作成を使用」を選択します。
 
 <img src="/images/20220407a/image_3.png" alt="Greengrassのグループ作成" width="241" height="107" loading="lazy">
-
-
 
 <img src="/images/20220407a/image_4.png" alt="Greengrassのグループ作成のグループ名" width="879" height="620" loading="lazy">
 適当にグループ名をつけて「次へ」を選択します。
@@ -180,10 +179,10 @@ AWS IoTコンソール画面左のタブから「クラシック＞グループ�
 ダウンロードした圧縮ファイルはデスクトップPCからTinker Boardに転送します。
 以下のコマンドTinker Boardのhomeに転送することができます。
 
-
 ```bash
 scp -r aws-greengrass-docker-1.11.0.tar.gz linaro@<IPaddress>:~/
 ```
+
 先程ダウンロードした証明書も転送してしまいましょう。
 
 ```bash
@@ -193,6 +192,7 @@ scp -r xxxxxx-setup.tar.gz linaro@<IPaddress>:~/
 それではsshでTinker Boardに接続してコンテナを起動します。
 
 sshで接続します。
+
 ```bash
 ssh linaro@<IPaddress>
 ```
@@ -206,6 +206,7 @@ linaro@linaro-alip:~/greengrass$ tree
 ├── xxxxxxx-setup.tar.gz
 └── aws-greengrass-docker-1.11.0.tar.gz
 ```
+
 まずはaws-greengrass-docker-1.11.0.tar.gzを同一ディレクトリに解凍します。
 
 ```bash
@@ -236,7 +237,6 @@ README.md                           greengrass-license-v1.pdf
 certs
 ```
 
-
 ### コンテナの起動
 
 開発ガイドにはLinuxをコアデバイスとするときに以下のコマンドを入力するように記載されていますので、それに従います。
@@ -245,7 +245,9 @@ certs
 echo 1 > /proc/sys/fs/protected_hardlinks
 echo 1 > /proc/sys/fs/protected_symlinks
 ```
+
 また、`/etc/sysctl.conf`に以下の記載をした後に`sudo sysctl -p`を端末に入力します。
+
 ```bash
 net.ipv4.ip_forward = 1
 ```
@@ -263,6 +265,7 @@ sudo docker-compose -f docker-compose.alpine-aarch64.yml build
 ```bash
 sudo wget -O root.ca.pem https://www.amazontrust.com/repository/AmazonRootCA1.pem
 ```
+
 certs配下にroot.ca.pemがダウンロードされていることを確認してください。
 
 ```bash
@@ -284,8 +287,8 @@ sudo docker-compose -f docker-compose.alpine-aarch64.yml up
 
 <img src="/images/20220407a/image_9.png" alt="起動画面" width="1167" height="167" loading="lazy">
 
-
 ### Lambda関数の準備
+
 次にマネジメントコンソールからLambda関数をコンテナに向けてデプロイします。
 
 Lambda関数を作成するのに必要なGreengrassのPython SDKは[ここから](https://github.com/aws/aws-greengrass-core-sdk-python/)ダウンロードすることができます。
@@ -382,14 +385,13 @@ AWS IoTではMQTTをPub/Subすることができます。
 
 <img src="/images/20220407a/image_20.png" alt="ステータス" width="904" height="480" loading="lazy">
 
-
 ## 動作確認
+
 AWS IoTのマネジメントコンソールの「テスト＞MQTTテストクライアント」からトピックをサブスクライブします。
 
 <img src="/images/20220407a/image_21.png" alt="動作確認" width="244" height="103" loading="lazy">
 
 トピックのフィルターはhello/worldとして、各種設定を以下のようにします。
-
 
 <img src="/images/20220407a/image_22.png" alt="トピックの設定" width="899" height="548" loading="lazy">
 
@@ -399,16 +401,7 @@ AWS IoTのマネジメントコンソールの「テスト＞MQTTテストクラ
 
 <img src="/images/20220407a/image_23.png" alt="MQTT受信" width="1200" height="556" loading="lazy">
 
-
 コアデバイスのLambda関数はクラウド上から関数を更新、グループの設定から再デプロイを行うことでいつでも更新することができます。とても便利ですね。
-
 
 今回はTinker BoardにGreengrassの環境を構築して終わりましたが、次回はエッジデバイスでの加工処理なども行いたいと思います。
 最後までお付き合いいただきありがとうございました。
-
-
-
-
-
-
-

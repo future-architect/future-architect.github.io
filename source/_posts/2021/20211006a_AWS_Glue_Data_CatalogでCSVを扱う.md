@@ -24,12 +24,12 @@ lede: "PySparkで予定しておりましたが、PySpark関連として、Glue�
 Glueといっても大きく下記の３種類、処理系をいれると4種類に分かれると思っていますが、それぞれ全く別のプロダクトという理解をしています。
 
 - AWS Glue
-    - Spark（実装はPython or scala）
-    - python shell (Pythonのみ)
-        - python shellを利用る場合、[1/16DPU](https://aws.amazon.com/jp/about-aws/whats-new/2019/01/introducing-python-shell-jobs-in-aws-glue/)で動かせるため、時間制約のないサーバレス処理としても優秀に思えます。
-        - 料金は[こちら](https://aws.amazon.com/jp/glue/pricing/)をご覧ください
+  - Spark（実装はPython or scala）
+  - python shell (Pythonのみ)
+    - python shellを利用る場合、[1/16DPU](https://aws.amazon.com/jp/about-aws/whats-new/2019/01/introducing-python-shell-jobs-in-aws-glue/)で動かせるため、時間制約のないサーバレス処理としても優秀に思えます。
+    - 料金は[こちら](https://aws.amazon.com/jp/glue/pricing/)をご覧ください
 - AWS Glue Data Catalog
-    - Hive MetaStore
+  - Hive MetaStore
 - AWS Glue DataBrew
 
 # CSVを利用する上での困りごと
@@ -58,6 +58,7 @@ OpenCSVSerDeを利用したCatalogでは、データ型をStringに固定する�
 "2","かきくけこ","0","100000000.00000000","2021-10-01","2021-10-02 19:01:13.271231"
 "3","さしすせそ","1","100000000.00000000","2021-10-01","2021-10-03 20:30:13.271231"
 ```
+
 ##### crawlerで読み込んだ直後の状態
 
 crawlerで読み込んだデータをAthenaより表示すると以下の状態となります。
@@ -67,7 +68,6 @@ crawlerで読み込んだデータをAthenaより表示すると以下の状態�
 同じく、Athenaのメニューより見たテーブル定義になります。
 定義的には一見正しく見えますが、前述の通り正しく動かない状態になります。
 <img src="/images/20211006a/スクリーンショット_2021-10-05_8.44.23.png" alt="Athenaのメニューより見たテーブル定義" width="519" height="261" loading="lazy">
-
 
 ### 対応方法１：OpenCSVSerDeを利用する
 
@@ -122,8 +122,8 @@ TBLPROPERTIES (
 ただし、全てはString型として認識されているため、データは文字列として扱う必要があります。
 <img src="/images/20211006a/スクリーンショット_2021-10-05_9.05.19.png" alt="欠損がなくなったAthena実行結果" width="1200" height="196" loading="lazy">
 
-
 ---
+
 ### 対応方法２：crawlerのカスタム分類子（Grok）を利用する
 
 正規表現を元にした、パーサーを自分で用意する形になります。
@@ -139,21 +139,19 @@ TBLPROPERTIES (
   - data-type:
   Catalogの[データ型](https://docs.aws.amazon.com/ja_jp/glue/latest/dg/aws-glue-api-common.html)を指定します。
 
-
 今回のCSVでは、以下の形となります。
 [こちら](https://goodbyegangster.hatenablog.com/entry/2018/10/12/001644)がよく纏められており、見ながらやったのですが、どうしても読み込んでくれませんでした。。。
 
 なお、構文チェックはWebで可能です。
 
 - 構文チェック
-  * [Grok Constructor](http://grokconstructor.appspot.com/do/match)
+  - [Grok Constructor](http://grokconstructor.appspot.com/do/match)
 - Grokパターン
-  * `"%{INT:ID:int}", "%{DOUBLE_BYTE:NAME:STRING}", "%{BASE16FLOAT:NUM:STRING}, "%{DATE:DATE:DATE}", "%{DATESTAMP:DATE TIME: TIMESTAMP}"`
+  - `"%{INT:ID:int}", "%{DOUBLE_BYTE:NAME:STRING}", "%{BASE16FLOAT:NUM:STRING}, "%{DATE:DATE:DATE}", "%{DATESTAMP:DATE TIME: TIMESTAMP}"`
 - カスタムパターン
-  * `DOUBLE_BYTE [^\x01-\x7E]*`
+  - `DOUBLE_BYTE [^\x01-\x7E]*`
 - 画面の入力例
-  * <img src="/images/20211006a/スクリーンショット_2021-10-05_14.54.17.png" alt="Grok入力例" width="755" height="1120" loading="lazy">
-
+  - <img src="/images/20211006a/スクリーンショット_2021-10-05_14.54.17.png" alt="Grok入力例" width="755" height="1120" loading="lazy">
 
 ### 対応方法３：CSVをparquestに変換して利用する
 
@@ -181,7 +179,9 @@ s3.meta.client.upload_file('/tmp/sample.parquet', '${バケット}', 'work/sampl
 <img src="/images/20211006a/スクリーンショット_2021-10-05_18.54.29.png" alt="ワークフロー例" width="1200" height="364" loading="lazy">
 
 全ての成功を確認後、Athenaからデータを見てると、余計な一手間がいらずデータを参照でき、データ型もCatalogの範囲内でハンドリングされています。
+
 ### 実行結果
+
 <img src="/images/20211006a/スクリーンショット_2021-10-05_18.59.15.png" alt="実行結果" width="1200" height="395" loading="lazy">
 
 ### データプレビュー
@@ -189,6 +189,7 @@ s3.meta.client.upload_file('/tmp/sample.parquet', '${バケット}', 'work/sampl
 <img src="/images/20211006a/スクリーンショット_2021-10-05_18.58.52.png" alt="データプレビュー" width="1200" height="209" loading="lazy">
 
 ### テーブル定義
+
 <img src="/images/20211006a/スクリーンショット_2021-10-05_18.58.58.png" alt="テーブル定義" width="384" height="212" loading="lazy">
 
 # まとめ

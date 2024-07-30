@@ -22,16 +22,18 @@ lede: "こんにちは、Futureでアルバイトをしている川渕です。[
 
 後編では前編で解説した[lsp-sample](https://github.com/microsoft/vscode-extension-samples/tree/main/lsp-sample)に機能を追加する方法について説明します。
 
-
 # 説明すること
+
 * コードアクションで実行できる機能の追加方法
 * フォーマット時に実行する機能の追加方法
 * コマンドで実行できる機能の追加方法
 
 # 説明しないこと
+
 * 上記以外の機能の追加方法
 
 # コードアクションで実行できる機能を追加
+
 lsp-sampleでは全て大文字、かつ2文字以上の単語に対して警告を表示していました。その単語を小文字に自動修正するクイックフィックスを作成します。
 
 ## 実装 (server.ts)
@@ -49,6 +51,7 @@ import {
 ```
 
 `connection.onInitialize`の`result`を以下のように変更します。
+
 ```diff  server.ts
   const result: InitializeResult = {
     capabilities: {
@@ -63,8 +66,8 @@ import {
   };
 ```
 
-
 コードアクション時に呼び出されるメソッドである`onCodeAction()`を追加します。
+
 ```ts server.ts
 connection.onCodeAction((params) => {
   const only: string | undefined =
@@ -122,6 +125,7 @@ connection.onCodeAction((params) => {
 ```
 
 ## 動作確認
+
 診断に「利用できるクイックフィックス」が追加されます。
 
 <img src="/images/20221125a/codeAction.drawio.png" alt="codeAction.drawio.png" width="1200" height="230" loading="lazy">
@@ -130,12 +134,12 @@ connection.onCodeAction((params) => {
 
 <img src="/images/20221125a/toLower.gif" alt="toLower.gif" width="1200" height="675" loading="lazy">
 
-
-
 # フォーマット時に実行する機能を追加
+
 フォーマットを実行すると`Formatting has been executed. (linecount: ${行数})`という文字列がファイルの先頭に挿入される機能を作成します。
 
 ## 実装 (server.ts)
+
 server.tsに以下のimportを追加します。
 
 ```diff server.ts
@@ -164,6 +168,7 @@ import {
 ```
 
 ドキュメントのフォーマット時に呼び出されるメソッドである`onDocumentFormatting()`を追加します。
+
 ```ts server.ts
 connection.onDocumentFormatting((params) => {
   // uriからドキュメントを取得
@@ -181,15 +186,16 @@ connection.onDocumentFormatting((params) => {
 ```
 
 ## 動作確認
+
 フォーマットを実行するとFormatting has been executed. (linecount: ${行数})という文字列がファイルの先頭に挿入されるようになります。
 <img src="/images/20221125a/format.gif" alt="format.gif" width="1200" height="675" loading="lazy">
 
-
-
 # コマンドで実行できる機能を追加
+
 コマンドを実行すると選択範囲が反転する機能を作成します。選択範囲がない場合はテキスト全体を反転するように設計します。
 
 ## 大まかな処理の流れ
+
 今回実装する処理には、編集中のドキュメントの情報、エディタ上での選択範囲の情報が必要ですが、コマンド実行情報にはそのような情報がなく、サーバ側で取得することもできません。
 そのため、クライアント側でコマンドを受け、必要な追加情報をサーバに送ることで実装します。
 (「コマンドを実行した」という情報のみが必要な場合は追加情報を送る必要はありません。)
@@ -205,8 +211,8 @@ GitHubに上がっているコードを参考にしたところ、2通りの実�
 
 両方のリポジトリにおいて該当箇所を[dbaeumerさん](https://github.com/dbaeumer)(VSCodeのLSPの中の人)という方が書いているので、どちらの実装方法も正しいと思います。(適切な使い分けについては調査しましたがわかりませんでした。もしわかる方がいたら教えてください。)
 
-
 ## package.jsonの変更
+
 lsp-sample.reveseコマンドをコマンドパレットで実行できるようにします。この変更は2つの実装で共通です。
 
 まず、package.jsonのactivationEventsフィールドに以下を追加し、lsp-sample.reverseコマンドが実行された場合も拡張機能が有効になるように変更します。
@@ -231,11 +237,10 @@ VSCode上ではtitleに入力した文字列がコマンド名として表示さ
 +   ],
 ```
 
-
-
-
 ## 実装1: クライアントでコマンドを送り直す実装
+
 ### 処理の流れ
+
 実装1では以下のようにクライアントからサーバへコマンドを送り直すことで実装します。
 
 1. ユーザがコマンドパレットでlsp-sample.reverseコマンドを実行する
@@ -245,8 +250,8 @@ VSCode上ではtitleに入力した文字列がコマンド名として表示さ
     * アクティブなエディタ上での選択範囲
 1. lsp-sample.executeCommandを検知したサーバは、受け取った情報を基に選択範囲を反転する処理を実行する
 
-
 ### 実装 (extension.ts)
+
 lsp-sample.reverseコマンドを受け取った際にlsp-sample.executeReverseコマンドと選択範囲などの情報をサーバに送信する処理を実装します。
 
 まず以下のimportを追加します。
@@ -269,6 +274,7 @@ import {
 ```
 
 拡張機能の起動時に実行される関数`activate()`の`client.start()`の直前に以下を追加します。
+
 ```ts  extension.ts
   // reverse実行時にserverにexecuteReverseコマンドを送信する
   context.subscriptions.push(
@@ -284,9 +290,11 @@ import {
     })
   );
 ```
+
 この実装によって、クライアント側でlsp-sample.reverseが実行された際にサーバにlsp-sample.executeReverseコマンドと、uri、選択範囲を送信する処理が実現できました。
 
 ### 実装 (server.ts)
+
 lsp-sample.executeReverseコマンドを受け取った際に引数情報を基に選択範囲を反転する処理を実装します。
 
 まず以下のimportを追加します。
@@ -383,6 +391,7 @@ connection.onExecuteCommand((params) => {
 1. lsp-sample.reverseコマンドを検知したサーバは受け取った情報を基に選択範囲を反転する処理を実行する
 
 ### 実装 (extension.ts)
+
 まず以下のimportを追加します。
 
 ```diff  extension.ts
@@ -392,6 +401,7 @@ import {
 + window,
 } from "vscode";
 ```
+
 拡張機能の起動時に実行される関数`activate()`の`clientOptions`を以下のように変更します。
 
 ```diff  extension.ts
@@ -415,6 +425,7 @@ import {
 ```
 
 ### 実装 (server.ts)
+
 lsp-sample.executeReverseコマンドを受け取った際に引数情報を基に選択範囲を反転する処理を実装します。
 
 まず以下のimportを追加します。
@@ -519,20 +530,20 @@ connection.onExecuteCommand((params) => {
 ```
 
 ## 動作確認
+
 任意の範囲を選択肢、コマンドパレットでreverse textを実行すると、選択範囲が反転されます。また、範囲を選択していない場合はドキュメント全体が反転されます。
 <img src="/images/20221125a/reverse.gif" alt="" width="1200" height="675" loading="lazy">
 
 # まとめ
+
 LSPを用いた拡張機能のサンプルコードに機能を追加する方法を解説しました。
 
 LSPを用いたVSCodeの拡張機能の開発に関する日本語記事はまだまだ少ないので、この記事が少しでも開発の助けになれば幸いです。
 
-
 # 参考文献
+
 * [Language Server Protocol開発チュートリアル - Qiita](https://qiita.com/Ikuyadeu/items/98458f9ab760d09660ff)
 * [Language Server Extension Guide | Visual Studio Code Extension API](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide)
 * [language server protocolについて (前編) - Qiita](https://qiita.com/atsushieno/items/ce31df9bd88e98eec5c4)
 * [Pyright を LSP サーバとした自作 LSP クライアント（実装編） | フューチャー技術ブログ](https://future-architect.github.io/articles/20220303a/)
 * [Pyright を LSP サーバとした自作 LSP クライアント（調査編） | フューチャー技術ブログ](https://future-architect.github.io/articles/20220302a/)
-
-

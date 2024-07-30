@@ -20,7 +20,6 @@ TIGの伊藤真彦です。
 
 <img src="/images/20210616a/image.png" alt="Vue.jsアイコン" width="400" height="400" loading="lazy">
 
-
 # はじめに
 
 プログラムを実装する上で、コードの書き方は絶対的な正解のないトピックとして存在します。
@@ -87,7 +86,6 @@ npm run serve
 その際、Vue.jsのバージョンの他、Linter/Formatterの有無等の詳細な設定を選択する事が可能です。
 
 今回は、TypeScriptを利用した状態で、Linter/Formatterを利用しない設定と、利用した状態の差分を比較する事で、Linterを有効にするにあたって必要な、また推奨される設定、準備を確認します。
-
 
 <img src="/images/20210616a/image_3.png" alt="Linter設定" width="642" height="529" loading="lazy">
 

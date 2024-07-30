@@ -29,7 +29,7 @@ Pythonのasyncio周りで[@aodag](https://twitter.com/aodag)と[@moriyoshit](htt
 https://python-poetry.org/docs/
 
 ```bash
-$ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 ```
 
 ```powershell
@@ -43,7 +43,7 @@ $ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-po
 プロジェクトフォルダはコマンドで一緒に作られるので、フォルダをおきたい親フォルダでコマンドを実行
 
 ```bash
-$ poetry new sample-server
+poetry new sample-server
 ```
 
 これでsample-serverフォルダが作られて、その中に設定ファイル一式がつくられる。
@@ -51,21 +51,21 @@ $ poetry new sample-server
 ここで必要なライブラリのインストールとかしてもいいがその前にやっておくと良いことがある。venv環境をプロジェクトの中に作ると、VSCodeとかで仮想環境を上手く扱ってくれるのでこの設定をやっておくと良い。プロジェクトファイル内にpoetry.tomlというファイルが作られる。これをコミットしておけば、プロジェクト全員が同じフォルダ構成になるため、プロジェクトの平準化がしやすい。
 
 ```bash
-$ cd sample-server
-$ poetry config virtualenvs.path ".venv" --local
-$ poetry config virtualenvs.in-project true --local
+cd sample-server
+poetry config virtualenvs.path ".venv" --local
+poetry config virtualenvs.in-project true --local
 ```
 
 ここで仮想環境を有効にして、必要なライブラリをインストール。
 
 ```bash
-$ poetry install
+poetry install
 ```
 
 デフォルトでpytestが入っており、これでテストができる。
 
 ```bash
-$ poetry run pytest
+poetry run pytest
 ```
 
 # ツールのインストール
@@ -85,13 +85,13 @@ Poetryの標準テンプレートでpytest入りますが、linter (flake8, mypy
 フォーマッターはblack、linterはflake8とmypyを入れます。またVSCodeのターミナルを起動すると自動で.venv環境に入ってくれるようになります。
 
 ```bash
-$ poetry add --dev mypy black flake8
+poetry add --dev mypy black flake8
 ```
 
 ツールの実行はまとめて行いたい、みたいなことがありますが、poetryにはツールランチャーの機能はないので、taskipyを入れます。
 
 ```bash
-$ poetry add taskipy
+poetry add taskipy
 ```
 
 https://tech.515hikaru.net/post/2020-02-25-poetry-scripts/
@@ -151,7 +151,7 @@ __pycache__
 必要なライブラリをインストールします。今回はasyncio対応ということで[FastAPI](https://fastapi.tiangolo.com/)を選びました。[Starlette](https://www.starlette.io/)でもいいと思います。
 
 ```bash
-$ poetry add fastapi uvicorn gunicorn
+poetry add fastapi uvicorn gunicorn
 ```
 
 Poetryが作ったコード用のフォルダの中にmain.pyファイルを作り、FastAPIのサンプルコードを貼り付けます。
@@ -256,11 +256,11 @@ CMD ["/opt/app/.venv/bin/gunicorn", "-w", "1", "-k", "uvicorn.workers.UvicornWor
 各DB接続ライブラリのasyncioサポートと必要なパッケージの組み合わせは次の通りです。
 
 * [SQLAlchemy](https://docs.sqlalchemy.org/en/14/orm/extensions/asyncio.html)
-    * PostgreSQL: [asyncpg](https://pypi.org/project/asyncpg/)
+  * PostgreSQL: [asyncpg](https://pypi.org/project/asyncpg/)
 * [databases](https://pypi.org/project/databases/)
-    * PostgreSQL: [asyncpg](https://pypi.org/project/asyncpg/)
-    * MySQL: [aiomysql](https://pypi.org/project/aiomysql/)
-    * SQLite: https://pypi.org/project/aiosqlite/
+  * PostgreSQL: [asyncpg](https://pypi.org/project/asyncpg/)
+  * MySQL: [aiomysql](https://pypi.org/project/aiomysql/)
+  * SQLite: https://pypi.org/project/aiosqlite/
 
 上記のライブラリ群を使う限り、ビルドイメージはslimで大丈夫ですし、追加のパッケージインストールも不要です。asyncpgはCythonで作られていますが、manylinux1なバイナリが提供されているのでDebian系のイメージを使う限りはCコンパイラは不要（slimなイメージのままで大丈夫）です。また、同期接続な[PyMySQL](https://pypi.org/project/PyMySQL/)もpure pythonなのでそのままで大丈夫です。型チェックの書き方さえPython3.7でよければDistroless化も簡単です。
 
@@ -283,8 +283,8 @@ RUN apt-get update \
 実行はいつもの通りです。
 
 ```bash
-$ docker build -t sample-server .
-$ docker run --rm -it -p 8000:8000 sample-server
+docker build -t sample-server .
+docker run --rm -it -p 8000:8000 sample-server
 ```
 
 # Pythonネタで過去に書いた記事です
@@ -294,4 +294,3 @@ $ docker run --rm -it -p 8000:8000 sample-server
 * [仕事でPythonコンテナをデプロイする人向けのDockerfile (2): distroless編](/articles/20200514/)
 * [「2020年代のコンテナ時代のPythonアーキテクチャ&デプロイ」というテーマでPyCon.jp 2020で発表してきました](/articles/20200910/)
 * [Python 3.7とVisual Studio Codeで型チェックが捗る内作Pythonアプリケーション開発環境の構築](https://qiita.com/shibukawa/items/1650724daf117fad6ccd)
-

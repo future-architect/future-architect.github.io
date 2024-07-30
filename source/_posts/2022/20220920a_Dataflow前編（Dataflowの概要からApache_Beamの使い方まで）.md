@@ -25,14 +25,15 @@ lede: "フューチャーのインターンEngineer Campに参加した平野と
 フューチャーのインターンについては[こちら](/tags/インターン/)をご覧ください！
 
 今回の記事は前編・後編に分かれており
+
 * 前編:
-    * Dataflowの概要
-    * Apache Beamの概要・内部的な仕組み
-    * Apache Beamのコードの書き方
+  * Dataflowの概要
+  * Apache Beamの概要・内部的な仕組み
+  * Apache Beamのコードの書き方
 * 後編：
-    * Dataflowを使う上での事前準備と基本的な使い方
-    * GPUを使う上での事前準備と基本的な使い方
-    * Pub/Sub・BigQueryとの連携例
+  * Dataflowを使う上での事前準備と基本的な使い方
+  * GPUを使う上での事前準備と基本的な使い方
+  * Pub/Sub・BigQueryとの連携例
 
 という構成になっています。[後編](/articles/20220920b/)も公開しています。
 
@@ -309,6 +310,5 @@ if __name__ == "__main__":
 * [Apache Beam (Dataflow) 実践入門【Python】](https://qiita.com/esakik/items/3c5c18d4a645db7a8634)
 * [How Beam executes a pipeline (公式ドキュメント)](https://beam.apache.org/documentation/runtime/model/)
 * [Python を使用して Dataflow パイプラインを作成する](https://cloud.google.com/dataflow/docs/quickstarts/create-pipeline-python)
-
 
 アイキャッチは<a href="https://pixabay.com/ja/users/paulbr75-2938186/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=2471293">Paul Brennan</a>による<a href="https://pixabay.com/ja//?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=2471293">Pixabay</a>からの画像です。

@@ -20,6 +20,7 @@ lede: "Cloud Spannerのローカル開発環境をdocker-composeでサクッと�
 本記事では、Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる手順を紹介します。Cloud Spannerを用いた開発を行う方、また興味あるから少し触ってみたいという方にもおすすめです。
 
 # Cloud Spannerとは
+
 簡単にCloud Spanner (以下「Spanner」と記載)について紹介させていただきます。
 
 Spannerは、Google Cloudが提供する"強力な一貫性と水平方向の拡張性を兼ね備えた唯一のリレーショナルデータベースサービス" です。
@@ -35,6 +36,7 @@ Spannerは、Google Cloudが提供する"強力な一貫性と水平方向の拡
 夢のようなデータベースサービスですね。でも、となるとやっぱりお高そう..料金は以下ような感じです。
 
 #### １ノードあたりの料金（すべてのレプリケーションを含む）
+
 | 構成             | リージョン             | $/時間 | $/月 (100%稼働) |
 |------------------|------------------------|--------|-----------------|
 | リージョン       | asia-northeast1 (東京) | 1.17   | 842.4           |
@@ -42,8 +44,8 @@ Spannerは、Google Cloudが提供する"強力な一貫性と水平方向の拡
 
 最小構成のリージョン+1ノード構成でも、なかなかのコストが掛かりますね。
 
-
 # 開発環境どうするか
+
 コストが高いので、開発環境用に気軽にインスタンスを立ち上げるのは難しそうです。
 ということで、本記事ではGCPが公式で提供してくれている [Spanner エミュレータ](https://cloud.google.com/spanner/docs/emulator?hl=ja) を使って開発環境を立ち上げます！(エミューレータあってよかったありがとう!)
 
@@ -51,17 +53,21 @@ gcloud CLIとdockerイメージでの提供がありますが、今回はdocker-
 サンプルコードはこちら: [**tarosaiba/docker-compose-spanner**](https://github.com/tarosaiba/docker-compose-spanner)
 
 以下2点工夫したポイントです。
+
 * 通常、Spannerエミュレータ起動後にインスタンスの作成手順(`gcloud spanner instances create`)が必要になりますが、docker-compose立ち上げ時に自動でインスタンス作成されるようにしています
 * DBの初期化処理(テーブル作成&データ投入)のために、事前に用意したDDL/DMLをdocker-compose立ち上げ時に自動で実行されるようにしています
 
 ということで早速手順を紹介します。
 
 # 要件
+
 * docker >= 19.03.0+
 * docker-compose >= 1.27.0+
 
 # 手順
+
 ## クイックスタート
+
 * リポジトリをクローン [https://github.com/tarosaiba/compose-spanner](https://github.com/tarosaiba/compose-spanner)
 * ディレクトリに移動  `cd compoose-spanner`
 * docker-compose起動 `docker-compose up -d`
@@ -69,6 +75,7 @@ gcloud CLIとdockerイメージでの提供がありますが、今回はdocker-
 手順は以上です!
 
 ## spanner-cliによるSpanner接続方法
+
 さっそくcliで接続してみましょう。
 ※ インスタンス、データベースが作成されるまで十数秒待つ必要があります
 
@@ -108,7 +115,6 @@ spanner> select * from Singers;
 
 開発するアプリケーションで `SPANNER_EMULATOR_HOST=localhost:9010` 設定すればOKです。各クライアントライブラリごとのサンプルは[こちらの公式ドキュメント](https://cloud.google.com/spanner/docs/emulator)を参照してください。
 
-
 ## エミュレータの制限事項と相違点
 
 ここで注意点ですが、[公式ドキュメント](https://cloud.google.com/spanner/docs/emulator?hl=ja#limitations_and_differences)にある通りエミュレータは以下のような制限事項および、相違点があります。以下を理解して利用しましょう。
@@ -120,10 +126,10 @@ spanner> select * from Singers;
 > * 監査ログとモニタリング ツール。
 
 #### 相違点
+>
 > * エミュレータのパフォーマンスとスケーラビリティは、本番環境サービスと同等ではありません。
 > * 読み取り/書き込みトランザクションとスキーマ変更は、完了するまでデータベース全体を排他的にのみアクセスできるようにロックします。
 > * パーティション化 DML とパーティション クエリはサポートされていますが、エミュレータはステートメントが分割可能かどうかは確認しません。つまり、パーティション化 DML またはパーティション クエリ ステートメントがエミュレータで実行される場合でも、本番環境ではパーティション化できないステートメント エラーにより失敗する可能性があります。
-
 
 # 解説
 
@@ -220,15 +226,13 @@ services:
 以下、補足になります
 
 * wrenchコンテナは`restart: on-failure`と設定しています
-    - wrenchはSpannerインスタンス作成後に実行したいのですが、docker-composeの起動制御が複雑になるので、失敗→再起動→再実行 するようになっています
+  * wrenchはSpannerインスタンス作成後に実行したいのですが、docker-composeの起動制御が複雑になるので、失敗→再起動→再実行 するようになっています
 * spanner-cliコンテナは、`tail -f /dev/null` でコンテナ起動状態を保つようにしています
-    - `docker-exec`でコマンドを実行するためです
-    - ※spanner-cliは、go getでもローカルPCにインストール可能 (筆者はローカルにインストールするのが面倒だった)
-
+  * `docker-exec`でコマンドを実行するためです
+  * ※spanner-cliは、go getでもローカルPCにインストール可能 (筆者はローカルにインストールするのが面倒だった)
 
 # おわりに
 
 SpannerはNewSQLと称されるだけあり MySQLやPostgresと比較すると情報も乏しいですが、日本でも採用事例は増えてきていて今後増々期待できるデータベースサービスかと思います！
 
 今回は、Spannerのローカル開発環境を立ち上げる方法を紹介させていただきました。宣言的に定義することで、立ち上げの手順もシンプルにできていると思います。興味のある方はぜひ立ち上げて触ってみてください。
-

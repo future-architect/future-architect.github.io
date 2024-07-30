@@ -45,7 +45,6 @@ FigmaをFlutterに変換できると謳っているプラグインは複数存�
 
 [Figma to Code (HTML, Tailwind, Flutter, SwiftUI](https://www.figma.com/community/plugin/842128343887142055/Figma-to-Code-(HTML%2C-Tailwind%2C-Flutter%2C-SwiftUI))は、Bernardo Ferrariという人が主に開発をしているプラグインで、ソースが[githubに公開](https://github.com/bernaferrari/FigmaToCode)されています。Figma→Flutter以外にもSwiftUI、tailwindcss、HTML5にも対応しているようですが、今回はFlutterの出力のみを試してみます。
 
-
 **② Flutter Export**
 <img src="/images/20211021a/thumbnail-1.png" alt="Flutter Exportアイコン" width="1200" height="600" loading="lazy">
 インストール数：11.3k
@@ -53,7 +52,6 @@ FigmaをFlutterに変換できると謳っているプラグインは複数存�
 
 [Flutter Export](https://www.figma.com/community/plugin/778755750523021654/Flutter-Export)は、とてもFlutterに変換できそうな名前が付いていますが、Figmaで作ったものをPNG画像で出力するだけのプラグインのようです。インストールして少し試してみましたが、上手く動かすことができませんでした。最終更新日も約2年前と古く、メンテもされていなそうなので、今回の**比較対象外**とします。
 （インストール数が少し多い理由が謎です。）
-
 
 **③ FigmaToFlutter**
 <img src="/images/20211021a/thumbnail-2.png" alt="thumbnail-2.png" width="1200" height="600" loading="lazy">
@@ -71,12 +69,10 @@ FigmaをFlutterに変換できると謳っているプラグインは複数存�
 
 Gridaという組織が開発しているようですが、[Gridaのページ](https://www.grida.co/)を見てもGridaがどういう組織なのか（企業なのかどうかも）分からずでした。Gridaのページにはプラグインの[ドキュメント](https://www.grida.co/docs/getting-started)もありますが、空ページが多かったり、まだ発展途上な感が否めないですが、今回の**比較対象**とします。
 
-
 ### Figmaのプラグイン以外を使う方法
 
 Figmaのプラグインを使う方法以外にも、Figmaからコードを生成する方法はあるようです。
 以下2つを紹介します。
-
 
 **⑤ Flutlab.io**
 <img src="/images/20211021a/スクリーンショット_2021-10-08_14.29.55.png" alt="Flutlab.ioイメージ" width="1031" height="460" loading="lazy">
@@ -88,7 +84,6 @@ Figmaのプラグインを使う方法以外にも、Figmaからコードを生�
 
 [Bravo Studio](https://www.bravostudio.app/)は、デザインツールで作成したデザインをノーコードでアプリに変換するサービスです。最終的にネイティブコードを出力できたり、APIを叩く等の機能性を持たせることができたりするようで面白そうです。
 ただし、このツール自体の使い方のキャッチアップが割と必要そうな印象を受けた（コードを上手く出力するためにFigma側のLayerの命名を調整する必要がある等）のと、実際のPJで利用できるだけの自由度があるかが未知数だったので、今回は**比較対象外**とします。
-
 
 ### 今回の検証対象
 
@@ -103,6 +98,7 @@ Figmaのプラグインを使う方法以外にも、Figmaからコードを生�
 ## 比較方法
 
 ### 比較で使うFigmaとエクスポートの粒度
+
 今回は、Figma上で作った以下のログイン画面をFlutterのコードに変換できるかを試していきます。
 <img src="/images/20211021a/スクリーンショット_2021-10-08_14.44.54.png" alt="スクリーンショット_2021-10-08_14.44.54.png" width="543" height="434" loading="lazy">
 「[Adobe XDからFlutterに変換する](https://future-architect.github.io/articles/20210915a/)」の記事では、一つの画面を丸ごとエクスポートするのは、AdobeとGoogleが協力して開発しているプラグインであっても中々上手くいかないことが多く、要素ごとにエクスポートをして貼り付けていくことを推奨していました。
@@ -129,7 +125,6 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 ```
 
-
 ## 比較結果
 
 ### 比較①　ログインフォーム全体の出力
@@ -148,7 +143,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
 最後の**Assistant by Grida**は、テキストしか出力されず、惜しい結果となりました。生成されたコードを見ても、テキスト以外の要素を出そうとした形跡は無かったです。こちらについても、出力対象をもっとシンプルにして、何が変わるかを見てみたいと思います。
 
-
 ### 比較②　ログインボタンのみの出力
 
 |出力対象(Figma)|Figma to Code|FigmaToFlutter|Assistant by Grida|
@@ -163,8 +157,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
 最後の**Assistant by Grida**は、一見何も表示されていないように見えますが、白い「ログイン」という字だけ表示されていて、背景と同化してしまっています。こちらについても生成コードがStackウィジェットを使っているので、Figma上の要素の重なりが無くなると出力品質が変わってくるかもしれません。
 
-
-
 ### 比較③　ログインボタンの箱のみの出力
 
 |出力対象(Figma)|Figma to Code|FigmaToFlutter|Assistant by Grida|
@@ -178,7 +170,6 @@ class _MyHomePageState extends State<MyHomePage> {
 次の**FigmaToFlutter**は、初めてエラーが出ず、出力結果としても問題ないものになりました。やはり、少しでも要素の重なりがあると上手く動いてくれない傾向があるようです。あまり実用的ではないですね。
 
 最後の**Assistant by Grida**では、やっとテキスト以外の要素を出力することができましたが、角丸の表現ができておらず、サイズも正しくありません。
-
 
 ### 比較④　画像の扱い
 
@@ -222,7 +213,6 @@ Figma→Flutterを実現するためのプラグインの比較を行ってき�
 という結果になりました。
 実際の開発に導入するのであれば、**Figma to Code**以外は選択肢から外れるかな、という印象です。
 
-
 # まとめ
 
 今回紹介したプラグインとサービスのまとめ。
@@ -235,4 +225,3 @@ Figma→Flutterを実現するためのプラグインの比較を行ってき�
 | 4 | Assistant by Grida | プラグイン   | △        | ずっと惜しい                                                                               |
 | 5 | Flutlab.io         | 外部サービス | ー       | オンライン上の変換であったためPJによっては利用できない可能性を考慮し、今回は検証をスキップ |
 | 6 | Bravo Studio       | 外部サービス | ー       | Figma側の命名規則があるなどお作法があり今回は検証スキップ                                  |
-

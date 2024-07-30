@@ -26,14 +26,15 @@ lede: "Dataflowを使うための事前準備からパイプライン実行ま�
 フューチャーのインターンについては[こちら](/tags/インターン/)をご覧ください！
 
 今回の記事は前編・後編に分かれており
+
 * 前編:
-    * Dataflowの概要
-    * Apache Beamの概要・内部的な仕組み
-    * Apache Beamのコードの書き方
+  * Dataflowの概要
+  * Apache Beamの概要・内部的な仕組み
+  * Apache Beamのコードの書き方
 * 後編：
-    * Dataflowを使う上での事前準備と基本的な使い方
-    * GPUを使う上での事前準備と基本的な使い方
-    * Pub/Sub・BigQueryとの連携例
+  * Dataflowを使う上での事前準備と基本的な使い方
+  * GPUを使う上での事前準備と基本的な使い方
+  * Pub/Sub・BigQueryとの連携例
 
 という構成になっています。前編は[こちら](/articles/20220920a/)。
 
@@ -48,6 +49,7 @@ Dataflowを使うための事前準備からパイプライン実行までの一
 5. Dataflow上でパイプラインを実行
 
 なお、以降の
+
 * [Dataflowの使用例（GPUなしver.）](#dataflowの使用例gpuなしver)
 * [DataflowでGPUを使う際の事前準備と基本的な使い方](#dataflowでgpuを使う際の事前準備と基本的な使い方)
 * [Dataflowの使用例（GPUありver.）](#dataflowの使用例gpuありver)
@@ -249,6 +251,7 @@ PredictionResult(example=array([5.2, 4.1, 1.5, 0.1]), inference=0)
 
 DataflowでGPUを使用したい場合（例えば機械学習モデルの推論など）には、Dockerと組み合わせることでGPUを使用できます。
 基本的な流れは[Datflowの事前準備と基本的な使い方](#datflowの事前準備と基本的な使い方)と同じです。違いはDockerイメージの準備とパイプラインに追加で渡すオプションが増えることくらいです。ここでは
+
 1. Dockerイメージの準備
 2. GPU使用時のオプション
 
@@ -288,6 +291,7 @@ gcloud builds submit --config build.yaml
     ```bash
     pip3 install apache-beam[gcp]
     ```
+
 * Dockerfileを以下のように変更
 
     ```Dockerfile:Dockerfile

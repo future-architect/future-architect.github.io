@@ -20,7 +20,6 @@ lede: "Go Conference Online 2021 Autumnに登壇しました。Go Conference Aut
 
 <img src="/images/20211122a/image.png" alt="image.png" width="1200" height="619">
 
-
 スライドは以下です。
 
 <iframe class="speakerdeck-iframe" frameborder="0" src="https://speakerdeck.com/player/02845f0d6f7d43fc8a2b12b6da677c94" title="Starting static analysis with Go" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" style="border: 0px; background: padding-box padding-box rgba(0, 0, 0, 0.1); margin: 0px; padding: 0px; border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 40px; width: 560px; height: 314px;" data-ratio="1.78343949044586"></iframe>

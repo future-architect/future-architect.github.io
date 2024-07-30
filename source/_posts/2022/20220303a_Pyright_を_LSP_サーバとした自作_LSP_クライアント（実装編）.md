@@ -16,6 +16,7 @@ lede: "Pyright を LSP  サーバとした自作クライアントを実装し�
 <img src="/images/20220303a/PyrightLarge.png" alt="" width="565" height="234">
 
 # はじめに
+
 こんにちは、Future でアルバイトをしている空閑と申します。本記事ではタイトルの通り、Pyright を LSP (Language Server Protocol) サーバとした自作クライアントを実装しますが、その前に経緯について説明します。本節では実装については触れません。
 
 アルバイトの前は、Future のインターン Engineer Camp で Python のソースコード解析に取り組んでいました。そのときの様子は、[Engineer Camp2021: Python の AST モジュールを使ってクラス構造を可視化する](/articles/20211019a/) で触れています。当時は Python の AST モジュールを活用する方針で、それ以外は自前で解析を行っていました。アルバイトでも引き続き解析に取り組んでいますが、次第に型推論などの技術が必要になってきており、全てを自前で実装することは困難な状況です。そこで現在は、既存のツールを拡張する方針を取っています。
@@ -27,23 +28,26 @@ lede: "Pyright を LSP  サーバとした自作クライアントを実装し�
 # 自作 LSP クライアントの作成
 
 ## 仕様
+
 - 解析対象：Python
 - LSP サーバ：Pyright
 - LSP クライアント：CLI（Node.js, TypeScript）
 - 目標
-    - サーバ・クライアント間のメッセージ送受信
-    - メッセージによる簡単な解析結果の取得
+  - サーバ・クライアント間のメッセージ送受信
+  - メッセージによる簡単な解析結果の取得
 
 ## 最低限実装が必要なメッセージ
+
 1. [Initialize Request](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialize)：サーバの初期化を要求
 2. [Initialized Notification](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialized)：クライアント側の初期化が完了したことを通知
 3. [DidChangeWorkspaceFolders Notification](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_didChangeWorkspaceFolders)：ワークスペースフォルダの変更を通知
 
 詳しくは [Pyright を LSP サーバとした自作 LSP クライアント（調査編）](/articles/20220302a/)を参照してください。
 
-
 # 実装
+
 ## サーバ起動・メッセージ受信
+
 LSP サーバのパスを指定し、子プロセスで起動します。Pyright のリポジトリをクローンした場合、サーバのパスは `pyright/packages/pyright/langserver.index.js` です。Pyright は実行時引数で通信方法を指定できます。`--node-ipc`、`--stdio`、`--socket={number}` から選ぶことができますが、今回は `--node-ipc` を採用します。
 
 接続を確立するために [`vscode-jsonrpc`](https://www.npmjs.com/package/vscode-jsonrpc) の `createMessageConnection` を使います。`vscode-jsonrpc` はメッセージプロトコルのライブラリで、今後もたびたび出てきます。`setup(connection)` ではメッセージハンドラを定義します。最初なのでとりあえず、`notification` と `error` メッセージが来た時に内容を出力することにします。
@@ -86,6 +90,7 @@ main();
 ```
 
 ## Initialize Request
+
 今はまだ起動してメッセージを受信するだけのプログラムなので、今度はメッセージを送信してみます。仕様では最初に Initialize Request を送ることになっているので、これを実装します。サーバにリクエストを送る場合には `connection.sendRequest(type, params)` を使います。`type` はメソッドの種類、`params` はメソッド固有のパラメタになります。これらの型定義は [`vscode-languageserver-protocol`](https://www.npmjs.com/package/vscode-languageserver-protocol) にあるので、適当に参照します。
 
 `InitializeParams` にはいくつかのプロパティがありますが、最低限実装すべきは次の 4 つです。
@@ -141,6 +146,7 @@ Initialize Request が正しく送れていると、Initialize Result が返っ�
 ```
 
 ## Initialized Notification
+
 次は Initialize Result を受けて、クライアント側の初期化が終わったことを通知するために Initialized Notification を送信します。サーバに通知を送る場合には `connection.sendNotification(type, params)` を使います。`InitializedParams` は空のオブジェクトなので実装はしないで `{}` を直接入力することにします。
 
 ```typescript client.ts
@@ -195,8 +201,8 @@ main();
 }
 ```
 
-
 ## DidChangeWorkspaceFolders Notification
+
 ワークスペースフォルダを変更するメソッドを実装します。これを実行することで、解析対象のフォルダを変更することができます。`InitializeParams` 同様に `DidChangeWorkspaceFoldersParams` を実装します。プロパティは多いですが、単にワークスペースとして認識するフォルダの追加と削除を行っているだけです。また、DidChangeWorkspaceFolders Notification はデフォルトではサーバ側から認識されないため、`InitializeParams.capabilities` にワークスペース機能があることを記載します。詳細は、[Pyright を LSP サーバとした自作 LSP クライアント（調査編）](/articles/20220302a/)で解説しています。
 
 ```ts client.ts
@@ -255,6 +261,7 @@ Found {number} source files
 ```
 
 ## 解析メッセージ
+
 以上で、解析に必要な初期化メッセージをすべて実装したことになり、ここから先は自由にメッセージを送信できます。今回は最近のエディタでよく見かける、[Hover Request](https://microsoft.github.io/language-server-protocol/specification#textDocument_hover) を送信してみます。[FastAPI](https://fastapi.tiangolo.com/ja/) を使用した以下のファイルを対象にします。
 
 ```py main.py
@@ -393,17 +400,19 @@ export async function main() {
 }
 main();
 ```
+
 </div>
 </details>
 
 # 感想
+
 今回は、自作の LSP クライアントを実装しました。機能としては不十分ですが、遊ぶ分には楽しめると思います。本来の目的は既存のメッセージを組み合わせての解析なのですが、実際のところかなり面倒です…。LSP が解析目的のプロトコルではないので当然ですが。現在は Pyright 内部をいじることも検討しているので、LSP サーバ側の実装についても今後機会があれば紹介したいと思います。
 
 # 参考
 
-* https://microsoft.github.io/language-server-protocol/
-* https://docs.microsoft.com/en-us/visualstudio/extensibility/language-server-protocol?view=vs-2022
-* https://qiita.com/atsushieno/items/ce31df9bd88e98eec5c4
-* https://qiita.com/Ladicle/items/e666e3fb9fae9d807969
-* https://zenn.dev/takl/books/0fe11c6e177223
-* https://github.com/tennashi/lsp_spec_ja
+- https://microsoft.github.io/language-server-protocol/
+- https://docs.microsoft.com/en-us/visualstudio/extensibility/language-server-protocol?view=vs-2022
+- https://qiita.com/atsushieno/items/ce31df9bd88e98eec5c4
+- https://qiita.com/Ladicle/items/e666e3fb9fae9d807969
+- https://zenn.dev/takl/books/0fe11c6e177223
+- https://github.com/tennashi/lsp_spec_ja

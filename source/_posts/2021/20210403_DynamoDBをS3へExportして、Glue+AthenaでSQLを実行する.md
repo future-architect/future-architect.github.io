@@ -30,6 +30,7 @@ DynamoDBでのデータ検索は原則「スキャンとクエリ」のみです
 何度もデータ集計をして、「aws dynamodb xx yy zz ~~」の職人芸を繰り出すことや、一度きりの集計でしか使えないスクリプトを量産しているうちに、もっと楽で正確で作業コストの低い方法はないか？と思う機会が増えてきました。
 
 ## AWS News Blog からの福音
+
 [New – Export Amazon DynamoDB Table Data to Your Data Lake in Amazon S3, No Code Writing Required](https://aws.amazon.com/jp/blogs/aws/new-export-amazon-dynamodb-table-data-to-data-lake-amazon-s3/)
 
 なんと、DynamoDBのテーブルデータを、追加コードなしでパッとS3に出力できるようになりました！
@@ -38,6 +39,7 @@ PipelineやGlueを利用したS3出力ならば以前から可能でしたが、
 「S3にExportできる →　GlueのデータカタログとAthenaのクエリ機能により、サーバレス環境でSQLを実行できる」の連想ゲームなので、動作検証も兼ねて早速試してみました。
 
 # 本記事の流れ
+
 DynamoDBのデータにSQLを実行するため、本記事では以下の流れで説明します。
 
 1. [DynamoDBを準備](#1dynamodbを準備)
@@ -46,12 +48,13 @@ DynamoDBのデータにSQLを実行するため、本記事では以下の流れ
 4. [GlueのCrawlerを実行](#4glueのcrawlerを実行)
 5. [AthenaでSQLを実行](#5athenaでsqlを実行)
 
-
 ## 1.DynamoDBを準備
+
 Export S3の機能は新しいコンソール画面上でのみ可能なので、古いUIを利用している場合は「新しいコンソールを試す」を選択してください。
 <img src="/images/20210403/1.png" alt="AWS管理コンソール" loading="lazy">
 
 今回の動作検証用に、以下の設定でDynamoDBテーブルを作成します。
+
 - テーブル名: test-s3export-and-query
 - パーティションキー: id(String)
 <img src="/images/20210403/3.png" alt="DynamoDBテーブル作成" loading="lazy">
@@ -81,15 +84,14 @@ Export S3の機能は新しいコンソール画面上でのみ可能なので�
 
 <img src="/images/20210403/4.png" alt="15件のプレビュー" loading="lazy">
 
-
 ## 2.Export先のS3を準備
 
 データ出力先のS3を作成します。
 今回は test-dynamodb-export-20210315 のバケット名で作成しました。
 <img src="/images/20210403/5.png" alt="データ出力先の設定" loading="lazy">
 
-
 ## 3.Exportを実行
+
 テーブルのExportでは、DynamoDBの読み込みキャパシティーユニットが消費されません。よってDBのパフォーマンスには影響を与えずにデータを出力できます。ただし、Export実行のタイミングとトランザクションのタイミングが重なった場合、出力項目が最新のテーブルとはズレが生じる可能性があります。本機能は「DynamoDBの特定の断面をS3にExportすることが目的」なため、リアルタイムなデータ分析には適していない点にご注意ください。
 
 DynamoDBのコンソール画面上から、Export S3を実行します。
@@ -158,7 +160,6 @@ Athenaでのクエリ実行には、事前のテーブル定義が必要です�
 1,2分程度でクローラ実行が完了します。
 以上により、DynamoDBのデータをS3に格納して「クエリが実行できる状態」になりました。
 
-
 ## 5.AthenaでSQLを実行
 
 Athenコンソール画面での「データベース」で「test_dynamodb_export(今回追加したデータベース)」を選択し、テーブルに「users_data」が表示されることを確認します。
@@ -192,6 +193,7 @@ WHERE Item.age.N <= '30'
         AND Item.mobile.S = 'ios'
 ORDER BY  Item.age.N, Item.id.S
 ```
+
 <img src="/images/20210403/18.png" loading="lazy">
 
 テーブルのJOINも、もちろんできます。
@@ -200,18 +202,19 @@ ORDER BY  Item.age.N, Item.id.S
 SELECT count(1) AS "15×15=225"
 FROM test_dynamodb_export.users_data, test_dynamodb_export.users_data
 ```
+
 <img src="/images/20210403/19.png" loading="lazy">
 
 今回の記事では1テーブルしか作成していませんが、各テーブルごとに **Export S3 + Glue Crawler** を実施すれば、DynamoDBテーブル同士のJOINが可能となります。
 
 # まとめ
+
 DynamoDBのS3 Export機能が搭載されたことにより、データ集計コストが下がりました。既存のGlueとAthenaを利用することで、「SQL分析に手間がかかる」というDynamoDBの弱点が一部解消されたと考えています。今回の構成ではリアルタイムなデータ分析は不可能ですが、過去データを特定の断面で集計するには十分です。
 
 みなさんもDynamoDB集計に疲弊されていたら、是非とも `DynamoDB Export S3` を使ってみてください！
 
 ## 参照サイト
+
 - [New – Export Amazon DynamoDB Table Data to Your Data Lake in Amazon S3, No Code Writing Required](https://aws.amazon.com/jp/blogs/aws/new-export-amazon-dynamodb-table-data-to-data-lake-amazon-s3/)
 - [Exporting DynamoDB table data to Amazon S3](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DataExport.html)
 - [【新機能】Amazon DynamoDB Table を S3 に Export して Amazon Athena でクエリを実行する](https://dev.classmethod.jp/articles/dynamodb-table-export-service/)
-
-

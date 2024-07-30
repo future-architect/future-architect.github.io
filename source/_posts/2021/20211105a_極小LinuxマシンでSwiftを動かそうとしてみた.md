@@ -17,7 +17,6 @@ lede: "今回ターゲットとした極小Linuxマシンは、M5Stack UnitV2に
 
 [秋のブログ週間](/articles/20211027a/)連載の7本目です。
 
-
 ## 初めに
 
 今回ターゲットとした極小Linuxマシンは、[M5Stack UnitV2](https://www.switch-science.com/catalog/7160/)になります。

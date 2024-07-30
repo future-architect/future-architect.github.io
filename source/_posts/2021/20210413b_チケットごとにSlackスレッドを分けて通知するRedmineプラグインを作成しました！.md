@@ -15,6 +15,7 @@ lede: "Futureでは約一年前にコミュニケーションツールとして�
 ---
 
 ## 目次
+
 * [はじめに](#はじめに)
 * [プラグイン概要](#プラグインの概要)
 * [実装のポイント](#実装のポイント)
@@ -22,8 +23,8 @@ lede: "Futureでは約一年前にコミュニケーションツールとして�
 * [動作確認](#動作確認)
 * [おわりに](#おわりに)
 
-
 ## はじめに
+
 ​
 こんにちは、TIGコアテクノロジーユニットの高橋・小松です。
 
@@ -90,11 +91,13 @@ Google Hangoutsは任意の値をスレッドIDとすることができるため
     return res_body['ts']
 
 ```
+
 ​
 
 ## インストールと設定
 
 ### 1. インストール
+
 ​
 [README](https://github.com/future-architect/redmine_slack_integration/blob/master/README.md)を参照してください。
 
@@ -133,8 +136,11 @@ Google Hangoutsは任意の値をスレッドIDとすることができるため
     <img src="/images/20210413b/20210302_090112_KthIlVZmu6RK.png" alt="2021-03-02_20h56_42.png" loading="lazy">
 
 ​
+
 ### 3. Redmine設定​
+
 ​
+
 #### 3-1. Redmineプロジェクト設定
 
 1. Redmineプロジェクト管理者権限があるアカウントでログインしてください。
@@ -169,9 +175,10 @@ Google Hangoutsは任意の値をスレッドIDとすることができるため
 ​
 <img src="/images/20210413b/20210304_111712_yt9XAeY0BE7p.png" alt="2021-03-04_11h14_25.png" loading="lazy">
 
-
 ## 動作確認
+
 ​
+
 ### チケット新規起票
 
 <img src="/images/20210413b/20210311_064251_fBozRNNlpJMZ.png" alt="2021-03-04_11h32_12.png" loading="lazy">
@@ -185,7 +192,6 @@ Google Hangoutsは任意の値をスレッドIDとすることができるため
 ​一例ですが、Redmineの更新を受けてSlackスレッドで議論することで対応をスムーズに進めることができます。
 
 <img src="/images/20210413b/20210316_034609_GO1fXyegzuce.png" alt="2021-03-16_15h18_43.png" loading="lazy">
-
 
 ## おわりに
 
@@ -207,6 +213,3 @@ TIGコアテクノロジーユニットでは、現在チームメンバーを�
 https://www.future.co.jp/recruit/
 
 ​
-
-
-

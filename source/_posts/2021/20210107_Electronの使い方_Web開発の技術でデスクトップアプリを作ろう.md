@@ -127,7 +127,6 @@ Vue CLIの案内に従い、バージョンや構成をいくつか選択しま�
 
 <img src="/images/20210107/image_5.png"  style="border:solid 1px #000000" loading="lazy">
 
-
 サーバーが立ち上がり、ブラウザで`localhost:8080`にアクセスするとHello Worldが表示されます。
 
 ここまではVue.jsの説明ですね。このVue.jsアプリケーションをElectron化してみます。
@@ -262,10 +261,8 @@ dist_electronフォルダ配下は画像のような状態です。
 
 <img src="/images/20210107/image_12.png"  style="border:solid 1px #000000" loading="lazy">
 
-
 vue-cli-electron-sample Setup 0.1.0をダブルクリックするとアプリケーションのインストールが開始されます。ちなみに、アプリケーションのバージョン情報は`package.json`記載のバージョンに依存します。
 <img src="/images/20210107/image_13.png" class="img-small-size" loading="lazy">
-
 
 インストールが完了したアプリケーションは一般的なアプリケーション同様に起動することができます。
 <img src="/images/20210107/image_14.png" loading="lazy">
@@ -295,7 +292,6 @@ module.exports = {
 
 <img src="/images/20210107/image_15.png" class="img-small-size" loading="lazy">
 
-
 デフォルトの状態ではアイコンが無いため少々寂しいですが、デスクトップアイコンもvue.config.jsで指定することが可能です。
 
 ```js vue.config.js
@@ -321,7 +317,6 @@ module.exports = {
 なお最小画像サイズ(256 x 256, macの場合512 x 512px)を下回るサイズの画像を指定した場合エラーが発生してビルドできません、ご注意ください。
 
 <img src="/images/20210107/image_16.png" class="img-small-size" loading="lazy">
-
 
 アイコンを設定することでそれらしくなってきました。
 
@@ -361,6 +356,7 @@ create-react-app react-electron-sample
 cd react-electron-sample
 npm start
 ```
+
 <img src="/images/20210107/image_18.png" loading="lazy">
 
 無事にHello Worldが起動しました。
@@ -544,7 +540,6 @@ package.jsonに何も設定が無いとdistディレクトリに生成されま�
 
 <img src="/images/20210107/image_21.png" class="img-small-size" loading="lazy">
 
-
 作業の抜け漏れ、typoの確認や、理想のディレクトリ構成を検討して迷うコストを鑑みると体感でVue.jsの3倍くらいの時間がかかる感触でした。
 
 既存のReact製アプリをElectron化したい、Vueより慣れてるフレームワークがある、など事情はあると思いますので、どちらが良いかはチーム構成と趣味次第ですが、エッジケースの挙動や脆弱性の穴埋め等をライブラリ側である程度保証してくれるVue CLIプラグインの利点は大きいかなと感じています。
@@ -600,4 +595,3 @@ ElectronはWebの技術で開発可能な、デスクトップアプリケーシ
 余談ですが、昨年の[Qiita クソアプリ Advent Calendar 2020](https://qiita.com/advent-calendar/2020/kuso-app)でもElectronを使った開発事例がありましたね。
 
 お仕事で役立つことはもちろんですが、ちょっとした便利ツールでも、クソアプリ Advent Calendar向けの小ネタでも、いつものWeb開発からちょっと趣向を変えて、デスクトップアプリケーションという選択肢を視野に入れていただければ幸いです。
-

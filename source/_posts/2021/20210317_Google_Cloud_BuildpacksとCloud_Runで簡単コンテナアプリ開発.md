@@ -38,14 +38,15 @@ lede: "みなさん、コンテナを利用してアプリケーション開発�
 
 CN Buildpacksについて実際に検証を行っている記事もありますので、こちらもご覧ください。
 
-* [Buildpacksのビルダーをスクラッチから作ってみる | フューチャー技術ブログ](/articles/20201002/)
+- [Buildpacksのビルダーをスクラッチから作ってみる | フューチャー技術ブログ](/articles/20201002/)
 
 ## 環境について
+
 - Dockerがインストールされていること
 - CN Buildpacksがインストールされていること
-    - インストール方法は[こちら](https://buildpacks.io/docs/tools/pack/)を参照
+  - インストール方法は[こちら](https://buildpacks.io/docs/tools/pack/)を参照
 - Google Cloud SDKをインストールして、設定済みであること
-    - 本記事執筆時点では `331.0.0`を利用しています
+  - 本記事執筆時点では `331.0.0`を利用しています
 
 ## Google Cloud Buildpacksについて
 
@@ -64,24 +65,28 @@ Buildpacksにはアプリケーションの言語を検知する機能を有し�
 が利用できます。Cloud Run自体はRubyアプリなども乗せることはできますが、ここはGC Buildpacksの今後の発展に期待ですね。
 
 ## Cloud Native Buildpacksを使ってみる
+
 ここからは[Google Cloud公式のチュートリアル](https://github.com/GoogleCloudPlatform/buildpack-samples)を使いながら実際にCloud Runを利用するところまで実行してみます。今回はnodeのアプリケーションを利用します。
 
 ```shell
-$ git clone https://github.com/GoogleCloudPlatform/buildpack-samples.git
-$ cd buildpack-samples/sample-node
+git clone https://github.com/GoogleCloudPlatform/buildpack-samples.git
+cd buildpack-samples/sample-node
 ```
+
 Cloneまでできたらまずはローカルで動かしましょう。
 
 ```shell
-$ npm install
-$ npm start
+npm install
+npm start
 ```
+
 http://localhost:3000 にアクセスして`hello, world`が表示されることを確認しましょう。まずはコンテナになる前に動くことがわかったので次はBuildpacksを使ってコンテナ化して動かしましょう。
 
 ```shell
-$ pack build --builder=gcr.io/buildpacks/builder node
-$ docker run -it -ePORT=8080 -p8080:8080 node
+pack build --builder=gcr.io/buildpacks/builder node
+docker run -it -ePORT=8080 -p8080:8080 node
 ```
+
 こちらでも同じように`hello, world`が表示されたかと思います。コンテナ化しても同じ動きを確認したので、次は実際にCloud Runを使って確認してみましょう。
 Cloud Runにデプロイする時はContainer Registryからデプロイを行いますが、ローカル環境からのデプロイ方法として2種類あります。
 
@@ -93,16 +98,17 @@ Cloud Runにデプロイする時はContainer Registryからデプロイを行�
 １の方がローカルを汚さずに済んだり、ローカルPCの能力に依存せずにビルドできるので、今回は前者で進めます。
 
 ```shell
-$ gcloud alpha builds submit --pack image=gcr.io/[project-id]/node
+gcloud alpha builds submit --pack image=gcr.io/[project-id]/node
 ```
 
 この１行で自動的にビルドから保存まで実行してくれます。この時、引数に`--pack`をつけることでBuildpacksを使うことを指定しています。ここまでくればあとはデプロイコマンドを１行実行するだけです。
 
 ### Cloud Runへのデプロイを行う
+
 ここでCloud Runにデプロイを行います。とはいえ、コマンド1行で実行完了するので、あっという間です。
 
 ```shell
-$ gcloud run deploy --image=gcr.io/[project-id]/node --platform managed
+gcloud run deploy --image=gcr.io/[project-id]/node --platform managed
 ```
 
 このコマンドを実行すると、
@@ -116,7 +122,6 @@ $ gcloud run deploy --image=gcr.io/[project-id]/node --platform managed
 これで、ローカル、コンテナアプリ、Cloud Runの３つの状態で同じアプリを利用できました。
 
 <img src="/images/20210317/image.png" loading="lazy">
-
 
 ## まとめ
 

@@ -23,8 +23,8 @@ lede: "こんにちは。TIG村瀬です。2021/4/21を開催しました。私�
 
 <script async class="speakerdeck-embed" data-id="104031a6a5794ecaa26d0e160e660617" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
 
-
 # 発表内容
+
 設計と異なり運用はサービスが終了するまでずっと続きます。
 
 アーキテクトの中には設計フェーズまでしか関わらず、運用担当者の苦労を知らない人もいるのでは？と思い、運用にフォーカスした設計の話をしました。
@@ -42,7 +42,6 @@ lede: "こんにちは。TIG村瀬です。2021/4/21を開催しました。私�
 ## 内容をチラ見せ
 
 <img src="/images/20210527a/p1.png" alt="AWSインフラの問題" width="956" height="536" loading="lazy">
-
 
 <img src="/images/20210527a/p2.png" alt="監視対象の図。LB,EC2,DB" width="959" height="539" loading="lazy">
 

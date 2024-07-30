@@ -50,4 +50,3 @@ Goでは `net` パッケージを使うと簡単にTCPクライアントを実�
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">TCP面白かったです！！！<a href="https://twitter.com/hashtag/gocon?src=hash&amp;ref_src=twsrc%5Etfw">#gocon</a> <a href="https://twitter.com/hashtag/goconA?src=hash&amp;ref_src=twsrc%5Etfw">#goconA</a></p>&mdash; luccafort (@luccafort) <a href="https://twitter.com/luccafort/status/1385841179648872452?ref_src=twsrc%5Etfw">April 24, 2021</a></blockquote>
 
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-

@@ -44,12 +44,12 @@ Uri:
 
 注意ですが、この記事に記載しているcurlコマンドをコマンドプロンプト上で動かす場合は、`\`のエスケープと、改行を消す必要があります（記事上では読みやすさのために改行を入れています）。
 
-
 ## 結論から話すと
 
 以下のコマンドで動きます。
 
 1. token取得（postリクエスト）
+
   ```PowerShell
   $client_id =  "xxx"
   $client_secret =  "xxx"
@@ -64,13 +64,17 @@ Uri:
   Invoke-RestMethod -Method Post -Uri "https://xxx/oauth/token" -ContentType 'application/json' -Body ($body|ConvertTo-Json) -OutFile output.txt
   cat output.txt
   ```
+
 2. output.txtからtokenをコピーして2のコマンドを打つ
 3. 全ユーザー数取得コマンド(getリクエスト)
+
   ```PowerShell
   $token = "copyAndPasteHere"
   Invoke-RestMethod -Method Get -Uri "https://xxx/api/v2/users?per_page=0&include_totals=true" -Headers @{Authorization="Bearer $token"}
   ```
+
 4. output.txt が不要になれば削除します
+
   ```PowerShell
   rm .\output.txt
   ```
@@ -83,7 +87,6 @@ Auth0にいる総ユーザー数を取得を `Invoke-RestMethod` で記載する
 
 1. APIを利用するtokenを取得する（POSTリクエスト）
 2. 総ユーザー数取得APIを打つ（GETリクエスト）
-
 
 ### 1. APIを利用するtokenを取得する（POSTリクエスト）
 
@@ -132,13 +135,13 @@ Invoke-RestMethod
 **CURLで指定したオプションは以下のようにマッピング出来そう**ですね。
 
 * --requestは-Method
-    * `-Method Post`
+  * `-Method Post`
 * --urlは-Uri
-    * `-Uri https://$domain/oauth/token`
+  * `-Uri https://$domain/oauth/token`
 * --headerはHeadersとContentTypeが両方ありますね、ContentTypeだけ指定するので-ContentTypeのみ使います。（Headersにcontent-typeと入れたらエラーになってました）
-    * `-ContentType application/json`
+  * `-ContentType application/json`
 * --dataは-body
-    * 後述しますがいい感じに書かないとNGでした
+  * 後述しますがいい感じに書かないとNGでした
 
 これで、**bodyに当たる部分以外は良い感じにマッピング出来ました。**
 
@@ -202,7 +205,6 @@ Invoke-RestMethod -Method Post -Uri "https://$domain/oauth/token" -ContentType '
 しかし、少し斜め上な結果になります。
 
 <img src="/images/20221130a/1.png" alt="1.png" width="1200" height="181" loading="lazy">
-
 
 #### 出力結果最後まで出ない問題
 
@@ -274,16 +276,16 @@ curl --request GET \
 クエリパラメータはGETなのでシンプルですね。token渡したGETリクエストするだけです。[公式ドキュメントのリンクはこちら](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/invoke-restmethod?view=powershell-7.3)です。
 
 * GETリクエストをしている
-    * `--request GET`が`--Method Get`になる
+  * `--request GET`が`--Method Get`になる
 * URLにPOSTと違いクエリパラメータがある
-    * `--url`が`-Uri`になる
-    * `-Uri https://$domain/api/v2/users?per_page=0&include_totals=true`
-    * URLにパラメータを入れることをクエリパラメータと言う
+  * `--url`が`-Uri`になる
+  * `-Uri https://$domain/api/v2/users?per_page=0&include_totals=true`
+  * URLにパラメータを入れることをクエリパラメータと言う
 * token認証情報を渡している
-    * `--header`が`-Headers`になる
-    * `-Headers @{Authorization="Bearer $token"}`
-    * cURLと違い`Invoke-RestMethod`特有のオブジェクト形式で書かないといけないので@{xxx}の形式となる
-    * Authenticationオプションなどでも指定可能だったかもしれない（未検証）
+  * `--header`が`-Headers`になる
+  * `-Headers @{Authorization="Bearer $token"}`
+  * cURLと違い`Invoke-RestMethod`特有のオブジェクト形式で書かないといけないので@{xxx}の形式となる
+  * Authenticationオプションなどでも指定可能だったかもしれない（未検証）
 
 以上からInvokeコマンドに書き換えます。
 

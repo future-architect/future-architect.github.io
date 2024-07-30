@@ -51,6 +51,7 @@ cy.intercept('HTTPメソッド', 'URL')
 `cy.wait`を利用することで、ボタンを押してもAPIが実行されなかった場合、`cy.intercept`で指定したURL以外にリクエストが送信された場合はテストが失敗します。
 
 # APIのリクエスト、レスポンスの内容を検証する
+
 ```js main.ts
   it('API実行ボタンが動作すること', () => {
     cy.intercept('POST', 'http://localhost:3000/api').as('post_req')

@@ -31,14 +31,14 @@ CI/CD 環境作るときに何を使うか迷う時があると思うんです�
 例えば、以下のようなものがあります。
 
 * 自前で用意する系
-    * GitLab（クラウド版もある）
-    * Jenkins
+  * GitLab（クラウド版もある）
+  * Jenkins
 * クラウド系
-    * Cloud Build
-    * CircleCI
-    * Travis CI
-    * Code Build
-    * GitHub
+  * Cloud Build
+  * CircleCI
+  * Travis CI
+  * Code Build
+  * GitHub
 
 要件や取り巻く環境によって選択は変わってくるかと思います。
 
@@ -58,8 +58,6 @@ Cloud Build は、GCP が提供するビルドを行うサービスです。
 ソースやデプロイは、例として記載しています。
 
 <img src="/images/20210315/image.png" loading="lazy">
-
-
 
 ## ソース
 
@@ -184,7 +182,6 @@ Cloud Build のトリガは、GitHub トリガによる自動実行で行われ�
 Cloud Build は、GitHub からソースを取得し、ビルドを実行し、コンテナイメージをContainer Registry にPush します。GKE をデプロイする際は、Cloud Build からkubectl でデプロイします。
 
 <img src="/images/20210315/image_2.png" loading="lazy">
-
 
 ### GitOps パターン
 
