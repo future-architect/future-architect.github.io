@@ -30,19 +30,16 @@ IT歴約1年、社会人2年目新人女子のわたしがハッカソンに挑�
 プログラミング未経験でIT系企業に飛び込んだわたしにとってハッカソンは一大事。
 まずは必要な物を考えました！
 
-
 ・・・そう、食料です！
 大学で農学部だったわたしは、生産的な活動には食事が何より重要だと理解しています！
 ハッカソンを戦い抜くには大量の食料が必要なはず。
 そう考えて即行動した結果、深夜にキャリーバックいっぱいの食料を買い漁る姿を同期に目撃されて怪しまれたとか|д･)
-
 
 会場は東京会場ではなく、JAXA筑波宇宙センターで開催される筑波会場です！
 ロケットが印象的な、のどかなこの地が今回の舞台となります。
 
 <img src="/images/20160511/photo_20160511_02.jpg" loading="lazy">
 <img src="/images/20160511/photo_20160511_03.jpg" loading="lazy">
-
 
 # 会場に着いて
 
@@ -54,8 +51,6 @@ IT歴約1年、社会人2年目新人女子のわたしがハッカソンに挑�
 NASAのステッカーが格好いい！SPACE APPSは黒を選択しました（●＾o＾●）
 <img src="/images/20160511/photo_20160511_05.jpg" loading="lazy">
 
-
-
 # ハッカソンスタート
 
 そんなこんなで、ついにハッカソンがスタートしました！
@@ -63,18 +58,14 @@ NASAのステッカーが格好いい！SPACE APPSは黒を選択しました（
 
 <img src="/images/20160511/photo_20160511_06.png" loading="lazy">
 
-
 ロケットのつもりです(・ω<)
-
 
 写真撮影も終わってみんなで取り掛かりましたハッカソン。
 
 まずはアイデアソンからです。
 
-
 <img src="/images/20160511/photo_20160511_07.jpg" loading="lazy">
 <img src="/images/20160511/photo_20160511_08.png" loading="lazy">
-
 
 せっかくだからFrom JAPAN感を出したいよねーとなり、
 考えたものが、
@@ -95,12 +86,9 @@ TOYOTA？？
 いやいやいや
 <br><br>
 
-
-
 ### **座禅でしょ＼＼\\ ٩( 'ω' )و //／／**
 
 <br><br>
-
 
 ということで作ったものがこちら！
 <br>
@@ -113,14 +101,11 @@ VRと聞くと日常に『無いもの』を生み出すイメージがありま
 
 <img src="/images/20160511/photo_20160511_09.png"  class="img-middle-size" loading="lazy">
 
-
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/eMJQn48KTD1NMX" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/OsakiXXDoukoukai/peoples-choice20160424spaceappschallenge-tsukuba" title="【People&#x27;s Choice賞】20160424_SpaceAppsChallenge Tsukuba発表資料（おおさき天文同好会）" target="_blank">【People&#x27;s Choice賞】20160424_SpaceAppsChallenge Tsukuba発表資料（おおさき天文同好会）</a> </strong> from <strong><a href="//www.slideshare.net/OsakiXXDoukoukai" target="_blank">おおさき未来同好会</a></strong> </div>
-
 
 このアプリ、いろんな空間で座禅が出来るんです。
 横には可愛い女の子がいて、一緒に座禅してくれるんですよ。
 可愛いですよね、Unityちゃん(*ﾉ∀`*)♪
-
 
 # Unityちゃんを座らせる
 
@@ -130,15 +115,11 @@ VRと聞くと日常に『無いもの』を生み出すイメージがありま
 このUnityちゃん、最初こんな感じなんですよ。
 <img src="/images/20160511/photo_20160511_10.png" loading="lazy">
 
-
-
 この状態から…
 
 (っ*´∀｀* )っじゃーん！！！
 
 <img src="/images/20160511/photo_20160511_11.png" loading="lazy">
-
-
 
 座禅をさせました！
 私が！！！（※Unity初心者）
@@ -146,12 +127,9 @@ VRと聞くと日常に『無いもの』を生み出すイメージがありま
 ※がんばっている様子です
 <img src="/images/20160511/photo_20160511_12.jpg" loading="lazy">
 
-
 [blender](https://blender.jp/)という3Dのモデリングアプリケーションも併用して利用しましたが、中々操作に癖があり苦労しました。
 
 初めて上手くいった時は、本当に涙が出ました(´⌒｀。)！笑
-
-
 
 # 結果発表
 
@@ -169,6 +147,7 @@ VRと聞くと日常に『無いもの』を生み出すイメージがありま
 
 > 一般人の投票によって受賞が決まる賞です。
 > SpaceAppsChallngeの場合は以下の手続きで進むようです。
+>
 > 1. 世界161の会場からそれぞれ1チームを選出（=People's Choice賞）
 > 2. NASAによって25のセミファイナリストを選出
 > 3. 一般投票によりトップ5のファイナリストを選出
@@ -180,8 +159,6 @@ VRと聞くと日常に『無いもの』を生み出すイメージがありま
 
 To be Continued.
 
-
-
 # 世界大会
 
 People's Choice を受賞した私たちが、まず行わなければならないことがあります。
@@ -192,12 +169,10 @@ NASAの方々から選んでもらうためのPV作成です！
 <iframe width="560" height="315" src="https://www.youtube.com/embed/eQBTyT3ZyjA" frameborder="0" allowfullscreen></iframe>
 <br>
 
-
 この後、NASA（SpaceAppsChallengeの運営チーム）による厳正な審査により25チームに選出されます。
 <br>
 
 結果やいかに・・・！
-
 
 # 選考結果
 

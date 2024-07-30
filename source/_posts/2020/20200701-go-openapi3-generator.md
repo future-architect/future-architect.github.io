@@ -18,7 +18,6 @@ lede: "go-swagger は Swagger 2.0 にのみ対応しており、OpenAPI 3.0 系�
 
 The Gopher character is based on the Go mascot designed by [Renée French](http://reneefrench.blogspot.com/).
 
-
 ## 概要
 
 TIG DXチーム所属の多賀です。最近はフロントのコードを書いたりすることも増えましたが、引き続き Go も触っています。
@@ -40,7 +39,6 @@ https://github.com/deepmap/oapi-codegen
 - echo, chi の形式でServerソースが出力できる
 - Go の interface で Open API の仕様が定義され interfaceを満たすように実装していく
 
-
 ## 調査
 
 実際に OpenAPI 定義からコードを出力してみます。
@@ -59,9 +57,7 @@ DELETE /pets/{id}
 
 上記を `openapi.yml` としてダウンロードしました。
 
-
 とりあえず、コード生成を実行してみます。
-
 
 ```sh
 # コマンドインストール
@@ -116,14 +112,13 @@ type NewPet struct {
 
 - API仕様が interface として出力
 - 2種類の interface が定義
-    - ClientInterface
-        - API実行の結果 http.Response が返却される
-    - ClientWithResponsesInterface
-        - API実行の結果の Response Body を parse して struct へ詰めてくれる
-            - Body を []byte 形式で保持するためメモリ効率はいまいち
+  - ClientInterface
+    - API実行の結果 http.Response が返却される
+  - ClientWithResponsesInterface
+    - API実行の結果の Response Body を parse して struct へ詰めてくれる
+      - Body を []byte 形式で保持するためメモリ効率はいまいち
 - 上記 interface を実装した struct も合わせて生成済
-    - 生成された Client を利用するだけで良い
-
+  - 生成された Client を利用するだけで良い
 
 `コマンド`
 
@@ -297,7 +292,6 @@ func main() {
 oapi-codegen -generate "chi-server" openapi.yml > openapi_chi_server.gen.go
 ```
 
-
 #### OpenAPI spec
 
 - base64形式で `openapi.yaml` を保持
@@ -321,7 +315,6 @@ var swaggerSpec = []string{
 	}
 ```
 
-
 ## レビュー
 
 良さそうな点と気になる点をまとめました。
@@ -329,55 +322,54 @@ var swaggerSpec = []string{
 ### 良さそうなところ
 
 - 生成コードが薄めで良い
-    - go-swagger は生成コードが重厚かつintefaceで分離されて実装が追いづらい点が気になっていた
-    - echo/chi の APIが直接触れる
+  - go-swagger は生成コードが重厚かつintefaceで分離されて実装が追いづらい点が気になっていた
+  - echo/chi の APIが直接触れる
 - echoやchi などの選択も結構好み
 - tag指定して出力すると依存のある定義のみが出力される
-    - `oapi-codegen -include-tags pet -generate "server" openapi.yml`
+  - `oapi-codegen -include-tags pet -generate "server" openapi.yml`
 - クエリパラメータが struct へ Bindされる
 - パラメータのバリデーションに対応
-    - デフォルトだとリクエストボディはバリデーションされない (読まれないため)
-    - Echo だと middleware をいれれば Body のバリデーションエラーも見れる
-        - `middleware.OapiRequestValidator(swagger)`
-        - OpenAPI の spec が必要
-
+  - デフォルトだとリクエストボディはバリデーションされない (読まれないため)
+  - Echo だと middleware をいれれば Body のバリデーションエラーも見れる
+    - `middleware.OapiRequestValidator(swagger)`
+    - OpenAPI の spec が必要
 
 ### 気になるところ
 
 - 拡張タグは動かなそう
-    - `x-XXX` 系は動作しない
+  - `x-XXX` 系は動作しない
 - 生成 struct の型定義に違和感
-    - required が 基本型 で optional が pointer 型
-    - Go のコードでよく見る定義と逆なので注意が必要
+  - required が 基本型 で optional が pointer 型
+  - Go のコードでよく見る定義と逆なので注意が必要
 - **レスポンス定義は Bind されない**
-    - 実装者がレスポンスの struct を間違えないようにする必要がある
-    - (個人的には一番いまいちかなと感じた点です。生成コード上仕方なさそうでしたが..)
+  - 実装者がレスポンスの struct を間違えないようにする必要がある
+  - (個人的には一番いまいちかなと感じた点です。生成コード上仕方なさそうでしたが..)
 - 1 interface で Open API の定義が出力される
-    - include-tags を利用してタグ別に出力はうまく動作しない
-        - Server interface の実装が1つでないといけないため (echo/chiに登録できない)
-    - 特定の tag のみ実装するケースでの利用可能
+  - include-tags を利用してタグ別に出力はうまく動作しない
+    - Server interface の実装が1つでないといけないため (echo/chiに登録できない)
+  - 特定の tag のみ実装するケースでの利用可能
 - 同一 package に押し込める必要あり
-    - server, client コードは types に依存している
+  - server, client コードは types に依存している
 - echo と chi だと若干 echo 側のほうがリクエストの Bind が良い
-    - echo だと生成 Handler の引数にリクエストパラメータの struct が定義される
-    - chi だと context から取得する必要あり
-        - 生成コードで ctx から取り出すヘルパー関数あり
+  - echo だと生成 Handler の引数にリクエストパラメータの struct が定義される
+  - chi だと context から取得する必要あり
+    - 生成コードで ctx から取り出すヘルパー関数あり
 
 ### 利用するとしたら..?
 
 - echoでの出力を選択
-    - リクエストパラメータのバインドがしっかりされるため
-    - middleware 利用だがリクエストボディのバリデーションチェックもできて良い
+  - リクエストパラメータのバインドがしっかりされるため
+  - middleware 利用だがリクエストボディのバリデーションチェックもできて良い
 - 出力は同一パッケージでファイルを分けて管理
-    - サーバー
-        - server, types, spec
-    - クライアント
-        - client, types
+  - サーバー
+    - server, types, spec
+  - クライアント
+    - client, types
 - 生成コード用の パッケージ (ディレクトリ) を切る
-    - 各生成コードに依存があるため
+  - 各生成コードに依存があるため
 - 各API のレスポンス定義の命名を統一する
-    - レスポンス Body の Bindがされないため
-    - `${operationId}Res` or `${operationId}Response`
+  - レスポンス Body の Bindがされないため
+  - `${operationId}Res` or `${operationId}Response`
 
 ## 所感
 

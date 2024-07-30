@@ -132,7 +132,7 @@ Elasticsearchクローンといっても、全部はできないので、イン�
 cmd/watertower-server以下に実装があります。次のように起動します。WATERTOWER_INDEXES環境変数でカンマ切りで指定するとインデックスを増やせますが、デフォルトはindexとなります。WATERTOWER_DOCUMENT_URL環境変数で、保存先を設定します。デフォルトのmem://でオンメモリ動作します。dyanamo://とか、firestore://とか、mongo://とかも使えるはずです（localStackのDynamoしかテストしてないですが）。
 
 ```sh
-$ ./watertower-server --port=8888
+./watertower-server --port=8888
 ```
 
 あとはcurlでいつものElasticsearchのように使えます。
@@ -176,6 +176,5 @@ $ curl -X GET "http://127.0.0.1:8888/index/_search"
 今週末は都心近くの人はみんなお出かけはしないでしょうし、何か暇つぶしを探している方は、ぜひ検索エンジンを作ってみると良いと思います。
 
 検索エンジン自作入門以外にも手を動かす系書籍の[［ゲーム＆モダン JavaScript文法で2倍楽しい］グラフィックスプログラミング入門](https://amzn.to/2UIpdBm)も杉本さんから献本を頂いてしまっているので、今度は一年以内には・・・
-
 
 [サーバレス連載](/articles/20200322/)の3本目でした。次は佐藤さんの[Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する](/articles/20200330/)です。

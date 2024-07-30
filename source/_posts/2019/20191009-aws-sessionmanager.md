@@ -25,32 +25,33 @@ lede: "世の中コンテナ化の流れでEC2インスタンスを直接利用�
 
 * [Session Manager と踏み台サーバの共存構成](/articles/20200423/)
 
-
 # Session Managerとは
 
 > Session Manager はフルマネージド型 AWS Systems Manager 機能で、インタラクティブなワンクリックブラウザベースのシェル、または AWS CLI を介して Amazon EC2 インスタンスを管理できます。Session Manager は、インバウンドポートを開いたり、踏み台ホストを維持したり、SSH キーを管理したりすることなく、安全で監査可能なインスタンスの管理を提供します。Session Manager は、Amazon EC2 インスタンスへの簡単なワンクリックのクロスプラットフォームアクセスをエンドユーザーに提供しつつ、インスタンスへの制御されたアクセス、厳格なセキュリティプラクティス、インスタンスアクセスの詳細を含む、完全に監査可能なログを必要とする企業ポリシーに準拠することを容易にします。
 
 https://docs.aws.amazon.com/ja_jp/systems-manager/latest/userguide/session-manager.html　より
 
-
 # 利用方法
 
 ### 手順1　サービスメニューからSystems Managerをクリック
+
 <img src="/images/20191009/1-a.png" style="border:solid 1px #000000"  loading="lazy">
 
 ### 手順2　セッションマネージャーをクリック
+
 <img src="/images/20191009/2-a.png" style="border:solid 1px #000000"  loading="lazy">
 
 ### 手順3　セッションの開始をクリック
+
 <img src="/images/20191009/3.png" style="border:solid 1px #000000"  loading="lazy">
 
 ### 手順4　似たような画面で同名のボタンですがインスタンスを選択してセッションの開始をクリック
+
 <img src="/images/20191009/5.png" style="border:solid 1px #000000"  loading="lazy">
 
 するとSession Managerのコンソールが表示されます。
 あとはSSHと同じ要領でコマンドが実行できます。
 <img src="/images/20191009/6.png" style="border:solid 1px #000000"  loading="lazy">
-
 
 # メリット
 
@@ -59,7 +60,6 @@ Session Managerを利用することで以下のメリットがあります。
 ・SSHが必要ないのでSSHクライアントがなくても気軽に利用できる。
 ・セキュリティグループのインバウンドのメンテナンスが不要
 ・SSHの鍵やパスフレーズの管理、ローテーションが不要
-
 
 # 困りごと
 
@@ -100,13 +100,11 @@ d.同時に複数の接続をしているから？
 
 <img src="/images/20191009/7.png" class="img-small-size" style="border:solid 1px #000000"  loading="lazy">
 
-
 切断されず、影響ありませんでした。
 
 ## c.マネジメントコンソールを使用しているから？CLIを使用すると切断されない？
 
 <img src="/images/20191009/8.png" class="img-small-size" style="border:solid 1px #000000"  loading="lazy">
-
 
 そんなこともありませんでした。
 
@@ -148,12 +146,12 @@ while sleep 10; do date; done
 使い勝手はとても良いとは言えませんが、Session Managerにおける作業で時間が空くようであれば無害なコマンドを定期実行することでセッションを保持することができます。(そもそも論として一旦セッションを終了させればよいのかもしれませんが。。。)
 
 # さいごに
+
 Session Managerは不意に切断されてしまうことがありますが、セキュアで非常に便利な機能であることには違いありません。
 長時間利用する場合や、作業の途中で切断されては困る場合には不向きですが、特性を理解した上で利用するのが良いのではないでしょうか？
 より良い方法をご存じの方がおりましたら教えていただけると幸いです。
 
 なお、この記事を作成する上で以下のページを参考にさせていただきました。
 https://qiita.com/serima/items/7260cef8a05d13ec6a47
-
 
 こちらの[Session Manager と踏み台サーバの共存構成](/articles/20200423/) 記事もおすすめです。

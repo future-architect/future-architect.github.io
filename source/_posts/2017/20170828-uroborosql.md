@@ -12,6 +12,7 @@ category:
 thumbnail: /images/20170828/thumbnail_20170828.jpg
 author: 星賢一
 lede: "弊社発のOSSプロダクト「uroboroSQL」をSpring Boot上で動かすサンプルアプリケーションを作ってみました。"
+
 -------------------------------------------------------------------------------------------------------
 
 # uroboroSQLについて
@@ -49,7 +50,6 @@ uroboroSQLは、特定のWebアプリケーションフレームワークには�
 - uroboroSQL PetClinic
   - https://github.com/shout-star/uroborosql-springboot-demo
 
-
 # uroboroSQL PetClinic
 
 <img src="/images/20170828/photo_20170828_01.jpg" class="img-middle-size" loading="lazy">
@@ -65,7 +65,6 @@ uroboroSQLは、特定のWebアプリケーションフレームワークには�
 
 ログイン不要で利用できたり、DBの排他制御がなかったりと、あくまでサンプルという位置づけですね。
 
-
 # uroboroSQLとSpring Boot連携
 
 Spring Bootだと、通常はSpring Data JPAを利用することが多いかと思いますが、今回は uroboroSQLと連携させるので、application.ymlで定義した`DataSource`を、uroboroSQLのSqlConfigに渡してやる必要があります。
@@ -74,9 +73,7 @@ Spring Bootだと、通常はSpring Data JPAを利用することが多いかと
 
 なお、RDBはH2 Database、コネクションプールは、Tomcat JDBC Connection Poolを利用しています。
 
-**application.yml（抜粋）**
-
-```yml
+```yml application.yml（抜粋）
 spring:
   datasource:
     url: jdbc:h2:file:./target/db/petclinic;AUTOCOMMIT=FALSE
@@ -86,9 +83,7 @@ spring:
     name: jdbc/petclinic
 ```
 
-**BaseController.java（抜粋）**
-
-```java
+```java BaseController.java（抜粋）
 public abstract class BaseController {
     private final DataSource dataSource;
 
@@ -125,9 +120,7 @@ public abstract class BaseController {
 
 飼い主の検索画面(Find Owner)で、飼い主(Owner)の名字(LastName)で検索ボタンを押下したときに呼び出される実装は下記のようになります。
 
-**OwnerController.java（抜粋）**
-
-```java
+```java OwnerController.java（抜粋）
 @RestController
 @CrossOrigin
 @RequestMapping("/api/owners")
@@ -189,9 +182,7 @@ uroboroSQLはSQLを実装する方式のライブラリなので、ご覧の通�
 
 次に飼い主の登録画面の実装を見てみます。
 
-**OwnerController.java（抜粋）**
-
-```java
+```java OwnerController.java（抜粋）
 @RestController
 @CrossOrigin
 @RequestMapping("/api/owners")
@@ -203,7 +194,6 @@ public class OwnerController extends BaseController {
     }
 
     /* 以下略 */
-
 }
 ```
 
@@ -236,9 +226,7 @@ public abstract class BaseController {
 }
 ```
 
-**Owner.java（抜粋）**
-
-```java
+```java Owner.java（抜粋）
 @Table(name = "OWNERS")
 public class Owner extends BaseModel {
 
@@ -267,6 +255,7 @@ public class Owner extends BaseModel {
 ```
 
 実際に呼ばれるControllerのメソッドは親に委譲しているだけにシンプルですね。
+
 Spring Bootによって、フロントエンドから渡されたJSONがOwnerというエンティティクラスに自動的にマッピングされて、かつ、BeanValidationが実行され、問題なければDB登録処理が呼び出されます。
 
 uroboroSQLもv0.2より、JPAライクなORマッピング機能を追加したことにより、INSERT/UPDATEといった処理はSQL不要でシンプルに実装することができました。
@@ -286,7 +275,6 @@ uroboroSQLは現在v0.3に向けて、鋭意開発を進めており、まだま
 
 uroboroSQL PetClinicも認証機能など、エンタープライズ用途の参考になるような機能をまだまだ追加していきたいと思っていますので、こちらもよろしくお願いします。
 
-
 ## 番外編：SQLログ表示機能
 
 <img src="/images/20170828/photo_20170828_05.png" class="img-middle-size" loading="lazy">
@@ -300,7 +288,6 @@ uroboroSQL PetClinicも認証機能など、エンタープライズ用途の参
 - オープンソースカンファレンス2017 Tokyo/Fall - オープンソースの文化祭！
   - https://www.ospn.jp/osc2017-fall/
 
-
 # 関連サイト
 
 - uroboroSQL PetClinic
@@ -311,8 +298,8 @@ uroboroSQL PetClinicも認証機能など、エンタープライズ用途の参
   - https://future-architect.github.io/uroborosql-doc/
 
 ## 参考
+
 - Spring Boot
   - https://projects.spring.io/spring-boot/
 - Spring PetClinic
   - https://github.com/spring-projects/spring-petclinic)
-

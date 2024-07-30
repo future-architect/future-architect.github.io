@@ -31,6 +31,7 @@ TIGの伊藤真彦です
 発表で紹介したコードを詳しく確認できるようにまとめます。
 
 ### goqueryについて
+
 <img src="/images/20201010/image_2.png" loading="lazy">
 
 goqueryはjqueryを意識した命名から想像できる通り、Find等のメソッドチェーンを繋いで直感的にスクレイピングを行う事ができます。
@@ -59,6 +60,7 @@ func scrapeYahoo(url string) string {
 ```
 
 ### agoutiについて
+
 <img src="/images/20201010/image_3.png" loading="lazy">
 
 agoutiはスクレイピングを行うための補助として用いましたが、--headlessオプションを使わなければ普段お使いのウェブブラウザが自動で動く様を実際に目で確認できます。
@@ -104,6 +106,7 @@ func scrapeReverb(url string) string {
 ```
 
 ### Dockerファイルについて
+
 一人で作ったのと趣味なので動けばよしの精神があり、スライドでも書いた通り更に攻める余地があると認識しています。
 マルチステージビルドの活用などのノウハウ共有が好意的な感想を頂けたので一安心です。
 

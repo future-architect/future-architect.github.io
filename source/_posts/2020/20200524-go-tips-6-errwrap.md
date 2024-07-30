@@ -15,7 +15,6 @@ lede: "フューチャー社内には「Go相談室」というチャットル�
 
 <img src="/images/20200523/top.png" loading="lazy">
 
-
 [Go Tips連載](/tags/GoTips%E9%80%A3%E8%BC%89/)の第6弾です。
 
 # はじめに
@@ -27,7 +26,6 @@ TIG DXユニットの真野です。先週の[この記事](/articles/20200519/)
 # 背景
 
 Go1.13から`fmt.Errorf` 関数に `%w`という[新しい構文が追加サポート](https://blog.golang.org/go1.13-errors)されたことは、ご存知の方が多いと思います。
-
 
 利用方法は、`%w` (pkg/errorsの時と異なりコロンは不要だし末尾じゃなくてもOK) と一緒に `fmt.Errorf` を用いることで、コンテキストに合わせた情報をメッセージに追加できます。
 
@@ -49,7 +47,6 @@ func AnyFunc() error {
 ```
 
 * [Go Playground] https://play.golang.org/p/C__gN90iyt7
-
 
 また、error種別ごとに処理を分けたい場合で、Sentinel errorを判定する場合は、 errorsパッケージに追加された `errors.Is` でWrapの判定できます。逆に言うとWrapされている場合、今まで通りの `if err == ErrNotFound {` といった構文では判定できなくなるので、既存コードへの導入時は呼び出し元と合わせてリライトが必要です。
 
@@ -78,7 +75,6 @@ func AnyFunc() error {
 * [Go Playground] https://play.golang.org/p/R4KzOPVd_SA
 
 この場合はシンプルで良いのですが、AWS SDK for GoなどのerrorをWrapした時に呼び出し側で判定をしたい時、どうすればよいのかが直接的な内容が見当たらなかったのでここにまとめておきたいと思います。
-
 
 # Handling Errors in the AWS SDK for Go
 
@@ -148,7 +144,6 @@ if err := AnyFunc(); err != nil {
 
 例として愚直にif分岐をすべて網羅するように書きましたが、早期returnを活用すると、よりネストが浅く見通しが良いコードにできると思います。
 
-
 ## GCP SDKの場合
 
 しばしば[以下のエラーを返すことが多い](https://godoc.org/cloud.google.com/go/bigquery#hdr-Errors)とのことです。
@@ -205,7 +200,6 @@ if err := AnyFunc(); err != nil {
 
 どのAPIがどういったerrorを返しうるかは、各[GoDoc](https://godoc.org/cloud.google.com/go)に書いてありますので、個別のハンドリングが必要な場合は確認することになると思います。
 
-
 # Stacktraceの出力について
 
 https://play.golang.org/p/NAYR7XySCdW にサンプルコードを載せましたが、 `%w`構文を用いた`fmt`パッケージではStacktraceが出力されません。もし、Stacktraceが必要な場合は `fmt.Errorf`ではなく `xerrors.Errorf` を用いてWrapします。
@@ -214,7 +208,6 @@ https://play.golang.org/p/NAYR7XySCdW にサンプルコードを載せました
 
 * xerrorsについては、そな太さんの [Goの新しいerrors パッケージ xerrors
 ](https://qiita.com/sonatard/items/9c9faf79ac03c20f4ae1) の記事がとても参考になりました
-
 
 ```go xerrorsを使った例
 import (
@@ -253,12 +246,9 @@ stacktrace: anyFunc any error - internal failed:
         /tmp/sandbox921242282/prog.go:22
 ```
 
-
 ちなみに、xerrorsでWrapされたエラーでも、errors.Is, errors.Asで判定できました。（混在すると少し気持ち悪いですが）
 
 * [Go Playground] https://play.golang.org/p/nfu_JXo6N_e
-
-
 
 # まとめ
 

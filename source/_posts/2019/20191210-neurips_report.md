@@ -41,7 +41,6 @@ NeurIPS(Conference on Neural Information Processing Systems)は、機械学習�
 
 <img src="/images/20191210/inside.jpg" loading="lazy">
 
-
 ## チュートリアル講演
 
 NeurIPS１日目は、主にチュートリアル講演が行われました。
@@ -64,7 +63,6 @@ NeurIPS１日目は、主にチュートリアル講演が行われました。
 
 <img src="/images/20191210/tutorial.jpg" loading="lazy">
 
-
 ## インターン生のポスター発表
 
 [Women in Machine Learning (WiML) Affinity Workshop](https://wimlworkshop.org/2019/program/)というセッションでは、フューチャーのインターン生であるBelonaさんがポスター発表をしていました。
@@ -79,12 +77,10 @@ Belonaさんは、AIMSでヘルスケア分野における機械学習を専門�
 今回、Belonaさんは下記のタイトルで発表しています。
 時系列データに対して、複数のモデルをアンサンブルすることで、非線形で分散の大きいデータに対する予測精度を向上する取り組みを紹介してくれました。
 
-
 「AdaBoost-Models Ensemble Learning to forecast Time series with high variance and nonlinear Trend,
 Belona Mary SONNA MOMO (AIMS)」
 
 <img src="/images/20191210/WiML.jpg" class="img-middle-size" loading="lazy">
-
 
 ## 最後に
 

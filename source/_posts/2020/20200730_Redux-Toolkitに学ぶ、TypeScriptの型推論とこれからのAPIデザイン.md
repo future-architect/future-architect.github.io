@@ -15,7 +15,6 @@ lede: "TypeScriptは、JavaScriptのさまざまなフリーダムな書き方�
 
 <img src="/images/20200730/top.png" loading="lazy">
 
-
 TypeScriptは、JavaScriptのさまざまなフリーダムな書き方を受け入れ、漸進的な型付けを行えるようにするという~~狂った~~高難易度な目的のために作成されているのですが、そろそろ、TypeScriptファーストで、利用者にとって使いやすいAPIみたいな方向性で使われることも増えるのでは、という思いを強く持ちました。「既存のJSプロジェクトをTypeScript化して〜」みたいな紹介のされ方はもはや過去のものになったのではないかと。
 
 すでに[State of JavaScript 2019](https://2019.stateofjs.com/javascript-flavors/typescript/)では2/3のユーザーがすでにTypeScriptを利用したことがある（使っている）と答え、残りの1/3も学びたい、と答えている状況です。この勢いだと、2年後には80%を超えそうです。僕自身も、TypeScriptファーストな世界がくることを想像して[説明に使える教科書](https://github.com/future-architect/typescript-guide/)を書き始めたわけですが、思ったよりもその世界が来るのは早そうです。
@@ -263,7 +262,6 @@ function promiseTest() {
 }
 ```
 
-
 ## 例外
 
 ここがTypeScriptの型推論の秘孔かな、と思います。まず、Javaのthrows宣言がない（何が飛んでくるか事前にわからない）、``Promise``で``reject``に渡される例外の型定義がないからです。受け取り側に型として伝わる物が何もありません。
@@ -425,4 +423,3 @@ defineComponent({
 ```
 
 JavaScript===TypeScriptが吐き出す物、フロントエンド開発者はTypeScriptしか書かないという時代にあわせたAPIデザインについて、一緒に考えていきましょう。
-

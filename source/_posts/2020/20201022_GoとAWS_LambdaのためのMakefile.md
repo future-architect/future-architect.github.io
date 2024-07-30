@@ -21,7 +21,6 @@ lede: "筒井です。GoとAWS LambdaのためのMakefileを整理しました�
 GoとAWS LambdaのためのMakefileを整理しました。
 Lambda Functionの増加と同時に増えていくターゲットにはオサラバです。
 
-
 ## 前提・ディレクトリ構造
 
 次のようなディレクトリ構造を前提としています。
@@ -60,7 +59,6 @@ package:
   include:
     - dist/**
 ```
-
 
 ## Makefile
 
@@ -154,4 +152,3 @@ DEPFILES += $(addprefix $(LAMBDA_HANDLER_DIR)/, $(LAMBDA_HANDLERS:%=%/*$(SUFFIX)
 また `make -j` で並列実行も出来て便利です。Lambda Functionを追加した際には、`LAMBDA_HANDLERS` を追記するだけでOKです。
 
 `make func1`、`make func2`…と繰り返すのと比べると、「Makefileは直したけどCIの設定ファイルを直してなかった！」なんてことも無く安心ですね。
-

@@ -14,7 +14,6 @@ lede: "筆者は普段ファイルを扱って何か簡単な処理をする場�
 
 <img src="/images/20200518/Go-Logo_LightBlue.png" class="img-small-size" loading="lazy">
 
-
 [Go Tips連載](/tags/GoTips連載/)の第3弾目です。
 
 ## はじめに

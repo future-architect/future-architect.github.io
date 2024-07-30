@@ -58,7 +58,6 @@ Pythonユーザーは基本的にAlpineを選んではいけません。いろ�
 
 <img src="/images/20200513/1.png" alt="フォルダ＆ファイル構成" width="794" height="1178" loading="lazy" class="img-middle-size">
 
-
 依存パッケージは今回はこれだけです。ただこのファイルは開発環境を設定するときに書くぐらいですね。あまり重要ではないです。
 
 ```text requirements.txt
@@ -128,14 +127,13 @@ CMD ["uwsgi", "--ini", "/opt/app/uwsgi.ini"]
 ```
 
 ```sh
-$ docker build -t pytest .
-$ docker run -it --rm -p "8000:8000" pytest
+docker build -t pytest .
+docker run -it --rm -p "8000:8000" pytest
 ```
 
 ブラウザでアクセスするとうまくいきました。
 
 <img src="/images/20200513/2.png" alt="HelloWorldと表示されたブラウザ画面" width="1580" height="974" loading="lazy">
-
 
 ## Pythonでどうやってマルチステージビルドを実現するのか
 

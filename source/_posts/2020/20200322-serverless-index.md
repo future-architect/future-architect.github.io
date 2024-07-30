@@ -47,8 +47,6 @@ AWSやGCPのページでも簡潔に説明している記事がありますの�
 | 7  | 加部達郎 | [AWSサービストリガによるLambda起動](/articles/20200722/)                                 |
 | 8  | 真野隼記 | [GoからAWS KinesisのAggregationFormatを利用する](/articles/20200727/)                    |
 
-
 ## 最後に
 
 AWS LambdaやCloud Functionsは当たり前のように溶け込んで来ています。サーバレスの世界観自体は正しい進化の方向だと思いますので、個人的にはドンドン取り入れていこうと思います。
-

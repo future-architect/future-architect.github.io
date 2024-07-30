@@ -26,7 +26,6 @@ lede: こんにちは、TIG DXユニットの真野です。この技術ブロ�
 
 上記でフンフンそうだよね、って理解された方は本記事の対象レベルを超えているので、生暖かく続きを御覧ください。これだけだとちょっとどういうことがわからいよ！って人向けに説明していきます。
 
-
 # CORSとは
 
 CORSとは **オリジン間リソース共有**（Cross-Origin Resource Sharing）の略で、HTTP ヘッダーを使用して、あるオリジンで動作しているウェブアプリケーションに、異なるオリジンにある選択されたリソースへのアクセス権を与えるようブラウザーに指示するための仕組みです。
@@ -39,7 +38,6 @@ CORSとは **オリジン間リソース共有**（Cross-Origin Resource Sharing
 
 <img src="/images/20200717/thumbnail.png" loading="lazy">
 
-
 # CORSのプリフライトリクエストについて
 
 もし、WebAPIのリクエストに `x-api-key` のようなフィールドを用いて認証を行っている場合は、CORSの仕様では実際のHTTPリクエストを行う前に、 **プリフライトリクエスト** という、 **OPTIONS** メソッドでサーバに要求が行われます。
@@ -50,10 +48,7 @@ CORSとは **オリジン間リソース共有**（Cross-Origin Resource Sharing
 
 上図ですが、OPTIONSメソッドには、`Origin`、`Access-Control-Request-Method`、`Access-Control-Request-Headers` のリクエストヘッダが含まれ（1番上の矢印）、それに対してサーバ側が`Access-Control-Allow-Origin`にリクエストされたオリジンの値、`Access-Control-Allow-Methods`に先ほどのメソッドを含めた値、`Access-Control-Allow-Headers`に先ほど要求が合ったヘッダの名称を含めてレスポンスする必要があります（2番目の矢印）。上記の条件を満たせば、ブラウザは通常のメインのリクエストをサーバに要求します。（3,4番目の矢印）
 
-
 CORSに対しては、上記のmozillaの記事や、tomoyukilabsさんのQiitaにある[CORSまとめ](https://qiita.com/tomoyukilabs/items/81698edd5812ff6acb34)も網羅的でオススメです。CORSは必ずプリフライトリクエストが飛ぶのではなく、条件によっては「単純リクエスト」と呼ばれる簡易的な認証を行う場合もあるなど細かい仕様は学びがあります。そもそもなんでCORSという決まり事があるかというと、[同一オリジンポリシー](https://developer.mozilla.org/ja/docs/Web/Security/Same-origin_policy)があって、なぜ同一オリジンポリシーが存在するかというと、ユーザーの情報を他サイトに漏れてしまわないようにといったセキュリティ上の理由が上げられます。
-
-
 
 # GoでのCORS設定例
 
@@ -81,13 +76,9 @@ func setupGlobalMiddleware(h http.Handler) http.Handler {
 
 ...
 
-
 ...
 
-
 ...**🔥🔥そう思っていましたが、上手く動かないという報告😱が上がりました🔥🔥🔥**
-
-
 
 # 🔥状況
 
@@ -110,7 +101,6 @@ Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 ```
 
-
 # 切り分け
 
 Chromeブラウザだけかもしれませんが、プリフライトリクエストはデベロッパーツール上からは省略されていて分かりにくいです。これは `chrome://flags/#out-of-blink-cors` で`Out of blink CORS` を Disableにすれば表示することができます。
@@ -118,7 +108,6 @@ Chromeブラウザだけかもしれませんが、プリフライトリクエ�
 <img src="/images/20200717/image.png" loading="lazy">
 
 また、脳内でブラウザの気持ちになることができるのであれば、先ほどのcurlで適切なリクエストヘッダを付与することでサーバサイドが想定通りか確認することができます。
-
 
 # 原因
 
@@ -132,13 +121,11 @@ APIキーは `x-api-key:aZ12kXCqGrZ9QTnqDtid1P6j2J7luB3v`のようなイメー�
 
 プリフライトリクエストをWAFがブロックすのは想定外で、考慮が漏れていました。分かったときは「なるほど！」とちょっと大きな声を上げました。WAFの設定はどちらかと言えばインフラ側のメンバーが設定したのでお互いの考慮が漏れやすいポイントでもあった気がします。
 
-
 # 解決策
 
 ①WAF側のルールを変えるか、②ブラウザ側でプリフライトリクエスト時にAPI Keyを渡すように設定変更するかを考えました。しかし②ですが、XMLHttpRequestでプリフライトするときに任意のリクエストヘッダが追加できるか調べたところ、以下の回答にある通り仕様として不可でした。そのため、①のWAF側のルールを変更することになります。
 
 https://stackoverflow.com/questions/58547499/is-it-possible-to-add-a-request-header-to-a-cors-preflight-request
-
 
 ## WAFのルール変更
 
@@ -160,8 +147,6 @@ WAFの変更後のルール：
 
 <img src="/images/20200717/68747470733a2f2.png" loading="lazy">
 
-
-
 # まとめ
 
 最後までお付き合いいただき、ありがとうございます。ちょっとしたネタでしたが、少しでもReal World HTTPなドタバタが伝わったら幸いです。
@@ -169,4 +154,3 @@ WAFの変更後のルール：
 * もしCORS周りで問題が起こったら、ブラウザの設定でプリフライトリクエストも表示すると調査が捗る
 * リクエストヘッダを利用したAPI Key認証を行う場合、全てのHTTPメソッドを対象にするのではなく、OPTIONSは通しておく
 * WAFで上記の認証を行う場合は、そういった除外設定ができるか確認しておく
-

@@ -46,10 +46,10 @@ mypyを有効にします。デフォルトの動作だと、型付けをして�
 必要な追加パッケージのインストールが実行されますが、3.9特有の機能はまだPyPIにリリースされている安定版の0.790では対応していません。masterブランチにはいくつかの機能が実装済みなので、0.800リリースまでは最新の開発版をインストールしましょう。
 
 ```bash
-$ git clone https://github.com/python/mypy.git
-$ cd mypy
-$ git submodule --update init
-$ python setup.py install
+git clone https://github.com/python/mypy.git
+cd mypy
+git submodule --update init
+python setup.py install
 ```
 
 ## PyCharm
@@ -187,8 +187,8 @@ https://www.python.org/dev/peps/pep-0585/#implementation
 新と旧で使うべきジェネリック型定義がどこにあるかは上記のPEPにまとまっています。大雑把にいえば、以前は``typing``パッケージがそのすべてを担っていましたが、Python 3.9以降は次のように各パッケージに分散されています。
 
 * 実際にオブジェクトとして使う型そのものであれば、その型定義をそのまま利用
-    * リスト、タプル、辞書などの``__builtins__``の要素であれば、``list``、``tuple``、``dict``など
-    * ``collections``パッケージの各クラスであれば、``collections.deque``など
+  * リスト、タプル、辞書などの``__builtins__``の要素であれば、``list``、``tuple``、``dict``など
+  * ``collections``パッケージの各クラスであれば、``collections.deque``など
 * iterable、callableなどのPythonのプロトコル関係は``collections.abc``以下
 * コンテキスト関係は``contextlib``、正規表現は``re``
 
@@ -214,7 +214,6 @@ def wait_callback(cb: Callable[[str], None]) -> None:
 ``collections.abc``には多数の型があります。今までのコーディングで、これらを細かく区別して利用することは基本的になかったと思いますが、型付けを行うにあたっては、なるべく制約（メソッド）の少ないコレクションを選択する方がポータビリティが上がります。次の図は``collections.abc``および組み込み型のシーケンスの継承関係（実装上の継承ではなく、メソッドの包含で定義した）の図です。左に行くほど、少ないメソッドを持っており、右側に行くほど、メソッドが多くなります。関数の中で使用しているメソッドを見て、なるべくこの図の左側にある型を選んで使うと良いでしょう。
 
 <img src="/images/20201223/collections.png" alt="collections.abcおよび組み込み型のシーケンスの継承関係" loading="lazy">
-
 
 例えば、関数の中で引数のシーケンスに対して、``for``でループを回すだけの使い方をするならば``collections.abc.Iterable``を、さらに``in``で存在確認をする必要があれば、``Collection``を使うと、さまざまなシーケンスのインスタンスを受けて利用できるようになります。ランダムアクセスが必要であれば``Sequence``を使います。値の変更が必要であれば``Mutable``がついた型を利用します。
 
@@ -359,4 +358,3 @@ def json_safe(i: Any) -> Any:
 ここでは紹介していない、細かい機能もいくつかあります。より詳細な情報は[typingパッケージ](https://docs.python.org/ja/3/library/typing.html)や、関連PEPを見ると書かれています。
 
 また、[mypyのサイト](https://mypy.readthedocs.io/en/stable/)にあるcheatsheetも参考になると思います。
-

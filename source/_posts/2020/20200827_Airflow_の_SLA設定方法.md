@@ -51,7 +51,6 @@ t1 = PythonOperator(
 )
 ```
 
-
 SLA 違反をした Task が発生した場合、以下2パターンで通知をすることができます
 
 - Email
@@ -174,4 +173,3 @@ https://airflow.apache.org/docs/stable/_api/airflow/models/taskinstance/index.ht
 ## 所感
 
 ドキュメントに記載してほしいところでしたが、見つけられなかったため別途整理しました。
-

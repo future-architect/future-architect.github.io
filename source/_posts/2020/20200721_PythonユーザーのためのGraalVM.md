@@ -97,7 +97,7 @@ venvを使った環境の分離も可能です。
 パッケージのインストールは動作確認済み？のものだけginstallモジュールを使ってインストールします。pipもvenvの中には作られるのですが、sslモジュールがインポートできないので・・・みたいな警告が出て、うまく使えませんでした。適当に思いつくパッケージをいろいろインストールしようとしたのですが、docutilsとかSphinxはダメで、pytestだけはインストールできたが、うまく動かず、みたいな感じです。既存のプロジェクトを持ってきてそのまま動かす、というのはまだ難しいです。
 
 ```sh
-$ graalpython -m ginstall install numpy
+graalpython -m ginstall install numpy
 ```
 
 昨年の記事ですが、mocobetaさんがJanomeのインストールにトライした記事がありますが、このときと状況は変わっていません。
@@ -170,14 +170,14 @@ GraalVMといえばネイティブな実行バイナリ（ネイティブイメ�
 
 基本的な使い方として紹介されているのはJavaで次のような手順で作ります。
 
-- javacでコンパイル
-- (jarファイル作成)
-- .classもしくは.jarファイルをnative-imageコマンドでネイティブ化
+* javacでコンパイル
+* (jarファイル作成)
+* .classもしくは.jarファイルをnative-imageコマンドでネイティブ化
 
 Java系以外の言語を使った事例や使い方の紹介というのが[公式ドキュメント](https://www.graalvm.org/docs/reference-manual/native-image/)を見てもほとんどないのですが、サンプルコードとして[一つだけ](https://github.com/graalvm/graalvm-demos/tree/master/native-list-dir)ありました。
 
-- ListDir.java: Javaからネイティブイメージ作成
-- ExtListDir.java: 他の言語(JavaScript)を使ったサンプル
+* ListDir.java: Javaからネイティブイメージ作成
+* ExtListDir.java: 他の言語(JavaScript)を使ったサンプル
 
 他の言語を使ったサンプルも.javaファイルです。これは公式ドキュメントでも次のように説明されています。
 
@@ -185,8 +185,8 @@ Java系以外の言語を使った事例や使い方の紹介というのが[公
 
 これを動的言語目線で再構成すると次のようになります。
 
-- Pythonなどの動的言語は「実行はできる」が、それはJVMベースの言語（Java, Scala, Clojure, Kotlin）をホストにして、そこから呼び出す形
-- 動的言語のコードは事前コンパイルされない
+* Pythonなどの動的言語は「実行はできる」が、それはJVMベースの言語（Java, Scala, Clojure, Kotlin）をホストにして、そこから呼び出す形
+* 動的言語のコードは事前コンパイルされない
 
 これはつまり、動的言語の処理系はネイティブ化されるが、それによって実行されるコードはコード中の文字列のまま、ということですね。[Jythonのjpythoncコマンド](https://www.ibm.com/developerworks/jp/java/library/j-jython/index.html)のように、Pythonを.classにする機能でも入れば、Pythonを直接ネイティブ化という道も開けるんでしょうが、現状ではそれに対応していません。
 
@@ -247,12 +247,11 @@ public class ExtListDir {
 
 GraalPythonを試しました。
 
-- まだ実験リリース
-- いろんな言語を組み合わせて実行するpolyglotの処理系の一つとして実装されている
-- GraalVM 20系はPython 3.8ベース
-- 機械学習に対応する部分を目指して開発されているが、Jythonモードがあったり、2.7で止まっているJythonの後継としても期待できる
-- まだ使えない公式ライブラリも多く、既存のライブラリも気軽に使えない
-- GraalVMのネイティブ化は時間もかかりバイナリもでかくなり、GraalVMの動的言語勢はメリットはない
+* まだ実験リリース
+* いろんな言語を組み合わせて実行するpolyglotの処理系の一つとして実装されている
+* GraalVM 20系はPython 3.8ベース
+* 機械学習に対応する部分を目指して開発されているが、Jythonモードがあったり、2.7で止まっているJythonの後継としても期待できる
+* まだ使えない公式ライブラリも多く、既存のライブラリも気軽に使えない
+* GraalVMのネイティブ化は時間もかかりバイナリもでかくなり、GraalVMの動的言語勢はメリットはない
 
 GraalVMはPythonが使える、GraalVMはネイティブイメージが使える、の二つの文章を読むと、Pythonがネイティブになりそうな印象も持ってしまいがちですが、そうではない、ということがわかりました。とはいえ、Python2.7時代のJython並に開発が進めば、用途はいろいろ広がると思います。楽しみですね。
-

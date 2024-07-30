@@ -29,7 +29,6 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 
 <img src="/images/20170119/photo_20170119_40.png" loading="lazy">
 
-
 では早速、Kibana+Timelionを使ってみましょう。
 
 なお、下記を前提としています。
@@ -66,7 +65,6 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 
 いずれも標準値が"1.00"。それを下回る場合は、課題があると考えられます。
 
-
 ## RedmineのデータをEVM表示するとどうなる？
 
 例えば、下記のような4件のチケットがRedmineに登録されているプロジェクトがあったとします。
@@ -78,7 +76,6 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 この場合、**PV**の累計は"**32h**"、**EV**の累計は"**28h**"。PVに対して**EV**が"**4h**"足りていないことが分かります。
 
 また、**SPI**は"**0.875**"。**進捗**が"**0.125**"つまり、**12.5%**遅延していることが分かります。
-
 
 ## 作業時間を付記した場合のEVMの例
 
@@ -97,7 +94,6 @@ EVMを使うことで多角的にプロジェクトを把握する事ができ�
 
 今回は、このEVMをグラフで表示します。
 
-
 ## 大まかな流れ
 
 下記の手順でグラフを表示します。
@@ -114,21 +110,23 @@ EVMを使うことで多角的にプロジェクトを把握する事ができ�
 今回もELK+Timelionを利用して、Redmineデータの可視化環境を構築します。
 
 (a)ELKをダウンロード
-  * [Elastic Search Download URL](https://www.elastic.co/jp/downloads/elasticsearch](https://www.elastic.co/jp/downloads/elasticsearch)
-  * →前回の構築時から最新版が出ているため（2017/1/19時点）私の場合は、「elasticsearch-5.1.2.zip」をダウンロードしました。
+
+- [Elastic Search Download URL](https://www.elastic.co/jp/downloads/elasticsearch](https://www.elastic.co/jp/downloads/elasticsearch)
+- →前回の構築時から最新版が出ているため（2017/1/19時点）私の場合は、「elasticsearch-5.1.2.zip」をダウンロードしました。
 
 (b) Kibanaをダウンロード
-  * [Kibana Download URL](https://www.elastic.co/downloads/kibana](https://www.elastic.co/downloads/kibana)
-    * →私の場合は、「kibana-5.1.2-windows-x86.zip」をダウンロードしました。
+
+- [Kibana Download URL](https://www.elastic.co/downloads/kibana](https://www.elastic.co/downloads/kibana)
+  - →私の場合は、「kibana-5.1.2-windows-x86.zip」をダウンロードしました。
 
 (c) Logstashをダウンロード
-  * [Logstash Download URL](https://www.elastic.co/downloads/logstash](https://www.elastic.co/downloads/logstash)
-    * →私の場合は、「logstash-5.1.2.zip」をダウンロードしました。
+
+- [Logstash Download URL](https://www.elastic.co/downloads/logstash](https://www.elastic.co/downloads/logstash)
+  - →私の場合は、「logstash-5.1.2.zip」をダウンロードしました。
 
 (d) 「c:\elastic」というフォルダを作成
 
 (e) 先ほどダウンロードしたそれぞれの圧縮ファイルを解凍し、「c:\elastic」へ配置します。
-
 
 最終的には下記のようなフォルダ構成になります。
 
@@ -282,6 +280,7 @@ Kibanaが起動しました。
 PVの累計が期日別に表示されました。
 
 記載の意味は下記の通りです。
+
 - .es(metric)：表示する項目を指定する。今回はPVの合計を指定。
 - .es(timefield)：X軸の項目名を指定する。今回は期日(due_date)を指定。
 - .cusum()：累積表示するという意味。
@@ -296,6 +295,7 @@ PVの累計が期日別に表示されました。
 すると、EVの累計が更新日別に表示されます。
 
 記載の意味は下記の通りです。
+
 - .es(metric)：表示する項目を指定する。今回はEVの合計を指定。
 - .es(timefield)：X軸の項目名を指定する。今回は更新日(updated_on)を指定。
 - .cusum()：累積表示するという意味。
@@ -334,6 +334,7 @@ PVの累計が期日別に表示されました。
 CPIが表示されました。
 
 記載の意味は下記の通りです。
+
 - .divide()：割り算するという意味。今回は、EV÷ACを指定。
 - .yaxis()：Y軸の表示範囲を指定する。今回は、0.75～1.25を指定。
 
@@ -354,11 +355,9 @@ RedmineをKibana＋Timelionと組み合わせることで、グラフ表示が�
 
 今後ともよろしくお願い致します。
 
-
 シリーズとして連載しています。こちらもぜひどうぞ。
 
-* [マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！](/articles/20160920/)
-* マネージャーがうれしいRedmineデータのEVM表示方法を公開します！！
-* [マネージャーがうれしいRedmineデータのダッシュボード表示方法を公開します！！](/articles/20170510/)
-* [マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！（Metabase編）](/articles/20190703/)
-
+- [マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！](/articles/20160920/)
+- マネージャーがうれしいRedmineデータのEVM表示方法を公開します！！
+- [マネージャーがうれしいRedmineデータのダッシュボード表示方法を公開します！！](/articles/20170510/)
+- [マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！（Metabase編）](/articles/20190703/)

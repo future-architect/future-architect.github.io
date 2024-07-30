@@ -27,7 +27,6 @@ AWS マネージド Airflow (MWAA) が 2020/11/24 にリリースされました
 <img src="/images/20201206/wordmark_1.png" loading="lazy">
 [Airflow logos](https://cwiki.apache.org/confluence/display/AIRFLOW/Airflow+logos) からの画像
 
-
 ## MWAA (Managed Workflow for Apache Airflow) とは?
 
 [Airflow](https://airflow.apache.org/) のマネージドサービスで、インスタンスやDB管理不要で、Airflowを利用することができます。Airflow 完全互換を謳っており、フォークしたソースではなく、Airflow 本体が利用されています。Auto Scaling に対応しており、 worker 数を設定した最大数まで自動でスケールアップしてくれます。また、ログインのための、ユーザー権限制御に IAM を利用しており、詳細な権限制御が可能です。
@@ -36,16 +35,16 @@ AWS マネージド Airflow (MWAA) が 2020/11/24 にリリースされました
 
 ## MWAA FAQ
 
-- [Airflow のバージョンは?](#airflow-のバージョンは)
-- [Executorはどのタイプ?](#executorはどのタイプ)
-- [DAGの定義と配置方法は?](#dagの定義と配置方法は)
-- [Python のライブラリの取得方法は？](#python-のライブラリの取得方法は)
-- [階層化した dag の読み込みは可能か?](#階層化した-dag-の読み込みは可能か)
-- [Airflow UI へのアクセス方法は?](#airflow-ui-へのアクセス方法は)
-- [metadata DBの移行は可能?](#metadata-dbの移行は可能)
-- [ネットワーク構成は?](#ネットワーク構成は)
-- [Airflow CLIの実行方法は?](#airflow-cliの実行方法は)
-- [ワンタイムログイントークンの発行方法は?](#ワンタイムログイントークンの発行方法は)
+* [Airflow のバージョンは?](#airflow-のバージョンは)
+* [Executorはどのタイプ?](#executorはどのタイプ)
+* [DAGの定義と配置方法は?](#dagの定義と配置方法は)
+* [Python のライブラリの取得方法は？](#python-のライブラリの取得方法は)
+* [階層化した dag の読み込みは可能か?](#階層化した-dag-の読み込みは可能か)
+* [Airflow UI へのアクセス方法は?](#airflow-ui-へのアクセス方法は)
+* [metadata DBの移行は可能?](#metadata-dbの移行は可能)
+* [ネットワーク構成は?](#ネットワーク構成は)
+* [Airflow CLIの実行方法は?](#airflow-cliの実行方法は)
+* [ワンタイムログイントークンの発行方法は?](#ワンタイムログイントークンの発行方法は)
 
 ### Airflow のバージョンは?
 
@@ -66,7 +65,6 @@ Celery Executor の構成は以下の図の通りです。
 
 各プロセスは Fargate を利用しており、コンテナ起動です。scheduler と worker は VPC 内での実行が保証されています。metadata DB と webserver は サービスアカウントレベルで共有して利用する模様です。
 
-
 ### DAGの定義と配置方法は?
 
 DAGファイルは S3 に配置することで、自動で読み込みを実施してくれます。
@@ -76,14 +74,11 @@ DAGファイルは S3 に配置することで、自動で読み込みを実施�
 ※ S3 バケット名は、 `airflow-` プレフィックスで始まる必要があります。
 <img src="/images/20201206/スクリーンショット_2020-12-03_21.32.58のコピー.png" loading="lazy">
 
-
 ### Python のライブラリの取得方法は？
 
 `requirements.txt` を S3 に配置することで、ライブラリを読み込んでくれます。
 配置先は MWAA に設定します。
 <img src="/images/20201206/スクリーンショット_2020-12-03_21.32.58のコピー2.png" loading="lazy">
-
-
 
 ### 階層化した dag の読み込みは可能か?
 
@@ -125,12 +120,9 @@ AWS コンソール上に UI へのリンクが表示されます。
 ちなみに IAM での認証が必須のため、直接URLにアクセスするとログインを求められます。
 <img src="/images/20201206/image.png" loading="lazy">
 
-
-
 ### metadata DBの移行は可能?
 
 現在(2020/12/03) サポートされていません。過去の実行履歴は metadata DB に保持されているため、現状MWAA へ移行する際は、履歴なしでの移行になります。
-
 
 ### ネットワーク構成は?
 
@@ -140,15 +132,14 @@ VPC の設定が必須です。
 
 [詳細はこちら](https://docs.aws.amazon.com/mwaa/latest/userguide/vpc-create.html)
 
-- public subnet: 2リージョン
-- private subnet: 2リージョン
-- inbound/outbound all security group
-- Elastic IP: 2つ
-- Internet Gateway
-- Nat Gateway
+* public subnet: 2リージョン
+* private subnet: 2リージョン
+* inbound/outbound all security group
+* Elastic IP: 2つ
+* Internet Gateway
+* Nat Gateway
 
 ※ 適当に subnet 指定した場合、起動しませんでした..
-
 
 ### Airflow CLIの実行方法は?
 
@@ -215,10 +206,9 @@ EC2 上への構築では、EC2複数台、RDS、Redis と管理するコンポ�
 
 現状、機能的には十分足りており、実利用は問題なさそうです。ただ、metadata DBの移行はできないので機能としてサポートされると嬉しいですね。
 
-
 ## 参考
 
-- [Introducing Amazon Managed Workflows for Apache Airflow (MWAA)](https://aws.amazon.com/jp/blogs/aws/introducing-amazon-managed-workflows-for-apache-airflow-mwaa/)
-- [MWAA公式ドキュメント](https://docs.aws.amazon.com/mwaa/latest/userguide/what-is-mwaa.html)
-- [AWSのマネージドAirflow、Amazon Managed Workflow for Apache Airflow（MWAA）が登場！](https://dev.classmethod.jp/articles/amazon-managed-workflows-for-apache-airflow-mwaa-ga/)
-- [Amazon Managed Workflows for Apache Airflow（MWAA）によるデータパイプラインの構築 #reinvent #emb007](https://dev.classmethod.jp/articles/reinvent2020-emb007-data-pipelines-with-amazon-managed-workflows-for-apache-airflow/)
+* [Introducing Amazon Managed Workflows for Apache Airflow (MWAA)](https://aws.amazon.com/jp/blogs/aws/introducing-amazon-managed-workflows-for-apache-airflow-mwaa/)
+* [MWAA公式ドキュメント](https://docs.aws.amazon.com/mwaa/latest/userguide/what-is-mwaa.html)
+* [AWSのマネージドAirflow、Amazon Managed Workflow for Apache Airflow（MWAA）が登場！](https://dev.classmethod.jp/articles/amazon-managed-workflows-for-apache-airflow-mwaa-ga/)
+* [Amazon Managed Workflows for Apache Airflow（MWAA）によるデータパイプラインの構築 #reinvent #emb007](https://dev.classmethod.jp/articles/reinvent2020-emb007-data-pipelines-with-amazon-managed-workflows-for-apache-airflow/)

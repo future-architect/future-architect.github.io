@@ -17,8 +17,8 @@ lede: "現在業務では直接開発をする機会はないのですが、業�
 
 [春の入門祭り](/articles/20200529/)の第19弾です
 
-
 # はじめに
+
 フューチャーに入社して約半年が経ちました。CSIGの谷田です。
 
 現在業務では直接開発をする機会はないのですが、業務の合間を縫って日々プログラミングを勉強中です。そんな中、お世話になっている先輩から手始めに、Google Chromeの拡張機能の作成方法を教えて頂いたので、拡張機能の作成方法入門を書いていこうと思います。
@@ -51,16 +51,16 @@ desktop
 ```
 
 表示させるカレンダーは至って普通のもの。こちらのサイトを参考に作成しました。
+
 * [JavaScriptでカレンダーを自作したら勉強になった](https://qiita.com/kan_dai/items/b1850750b883f83b9bee)
 
 縦の軸と横の軸を考えて、毎月曜日や日にちが変わる状況で、土日祝日も反映させるにはどうすればいいか..？など頭を使いますが、for文とif文の練習になりますよ！
 
 JavaScriptの基本から勉強するには、MDNのこちらのサイトがおすすめです。
+
 * https://developer.mozilla.org/ja/docs/Learn/JavaScript/Building_blocks/conditionals
 
-
 以上！！
-
 
 ## manifest.json
 
@@ -81,45 +81,51 @@ JavaScriptの基本から勉強するには、MDNのこちらのサイトがお�
 }
 ```
 
-
 以下、今回記載した項目と簡単な説明です。
 
 ### name（必須）
+
 拡張機能の名前を書きます。
 ブラウザに追加した際に、拡張機能の管理画面にも名前として表示されます。
 
 ### discription（推奨）
+
 必要に応じて拡張機能の説明を記載します。
 なくても動作しますが、あったほうが分かりやすいです。
 
 ### version（必須）
+
 拡張機能自体のバージョンを記載します。
 最初なので1.0を記載しておきます。
 
 ### manifest_version（必須）
+
 拡張機能で使用される manifest.json のバージョンを指定します。
 現在のバージョンは2なので2を記載します。
 
 ### browser_action
+
 ツールバーに拡張機能を追加します。
 
 #### - default_icon（推奨）
+
 拡張機能を有効化した際に、ブラウザのツールバーに表示するアイコンを指定できます。16は、16px×16pxの大きさという意味です。
 
 #### - default_popup
-アイコンをクリックすると、指定したファイルがポップアップとして表示されます。
 
+アイコンをクリックすると、指定したファイルがポップアップとして表示されます。
 
 ### その他
 
 今回は、記載するのは上記だけです。
 
 その他の項目の意味や詳細は、manifest.jsonの公式リファレンスも参考にしてみてください。
+
 * https://developer.chrome.com/extensions/manifest
 
 MDNにも詳しく載っています。
-* https://developer.mozilla.org/ja/docs/Mozilla/Add-ons/WebExtensions/manifest.json
 
+* https://developer.mozilla.org/ja/docs/Mozilla/Add-ons/WebExtensions/manifest.json
 
 ## Chrome拡張機能に追加
 
@@ -146,8 +152,6 @@ MDNにも詳しく載っています。
 ```
 
 <img src="/images/20200625/kuma.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
-
-
 
 ## jQueryを用いた拡張
 
@@ -183,15 +187,18 @@ https://jquery.com/
 配列で記載し、特定のウェブページのコンテキストで実行される拡張機能の一部を指定します。
 
 #### - matches
+
 動作対象のURLを記載します。
 今回はhttps://www.google.com/
 を開いたときに画面にカレンダーを表示する仕様です。
 カレンダーを表示したいサイトのURLを記載します。
 
 #### - css
+
 動作させるcssファイルを記載します。
 
 #### - js
+
 動作させるjsファイルを記載します。ここにjquery.jsも記載します。
 
 `www.google.com` には、searchformというidのdivがあります。
@@ -214,7 +221,6 @@ Myextension
   └ jquery.js     # wwww.google.comにdivを追加するために使用
 ```
 
-
 拡張機能を読み込み直し、”matches”で指定したhttps://www.google.com/ を開くと、カレンダーを表示することができました。
 <img src="/images/20200625/photo_20200625_03.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
@@ -223,4 +229,3 @@ Myextension
 この基本を元に、他の動きも組み合わせて現在使用しているアプリのAPIと連携したりすると、便利な拡張機能が作成できるかもしれませんね！
 
 何か便利な機能を思いついたときに、ぜひ"無いものは作って"みてください！
-

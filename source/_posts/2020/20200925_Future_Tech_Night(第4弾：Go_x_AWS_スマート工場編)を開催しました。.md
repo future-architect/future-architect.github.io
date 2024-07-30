@@ -50,7 +50,6 @@ Gopherのアイキャッチのおかげか、Future Tech Night史上過去最高
 
 <img src="/images/20200925/78e26c1c-e68c-0cc3-ea3d-24ec4e113889.png" loading="lazy">
 
-
 伊藤からはGoを用いて、AWSクラウドから工場のPLCと通信するためのプロトコル実装を解説しました。MCプロトコルで通信するためのGoのライブラリは [future-architect/go-mcprotocol](https://github.com/future-architect/go-mcprotocol) としてGitHubに公開しています。
 
 <img src="/images/20200925/4010f0c0-415f-ae07-b1d7-d825a1e1fe59.png" loading="lazy">
@@ -100,4 +99,3 @@ FutureではFuture Tech Nightの他にも様々なイベントを開催してお
 connpassのフューチャーグループイベントの[メンバー登録](https://future.connpass.com/)やtwitter(@future_recruit_)のフォローもお忘れなく📝
 
 <img src="/images/20200925/217f3b78-542d-dce3-e9c0-cfb79c91bd49.png" loading="lazy">
-

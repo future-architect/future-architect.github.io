@@ -35,8 +35,8 @@ TerraformはLocalstackに対してもapplyできます。便利な方法なの�
 
 以降の内容では、localstackの立ち上げ → terraform plan/apply実行 までを説明します。
 
-
 # Localstackに向けて、Terraformを打つ
+
 以下の流れで説明します。
 
 0. 今回のディレクトリ構造
@@ -47,7 +47,6 @@ TerraformはLocalstackに対してもapplyできます。便利な方法なの�
 また、作業では `docker-compose` と `terraform` と `awscli` を利用しますが、これらのコマンドは各自で用意済みの前提とします。
 
 ローカル完結の作業であるため、各コマンドの実行環境が揃っていれば、**AWSアカウントの準備はもちろん不要**です。
-
 
 参考までに、私が本ブログの執筆時に利用したバージョンはこちらです。
 
@@ -95,8 +94,8 @@ func main() {
 build, zipコマンド
 
 ```bash
-$ GOOS=linux GOARCH=amd64 go build -o hello
-$ zip lambda.zip hello
+GOOS=linux GOARCH=amd64 go build -o hello
+zip lambda.zip hello
 ```
 
 以上で、作業前の準備は完了です。
@@ -148,6 +147,7 @@ localstack_main   docker-entrypoint.sh   Up      127.0.0.1:4566->4566/tcp, 4567/
 ```
 
 ## 3. Terraformファイルを編集
+
 Terraform定義に、Localstackへplan,applyを打ち込むための設定を記入します。
 
 ```sh terraform main.tf
@@ -190,7 +190,6 @@ providerは `aws` ですが、以下4つの引数をtrueに設定することで
 - access_key
 - secret_key
 
-
 ### endpointsについて
 
 providerがawsの場合、各awsサービスのendpointsをカスタマイズ可能です。endpointsの向き先を調整することにより、ローカル完結のterraform環境が実現可能という訳です。
@@ -201,7 +200,6 @@ localstackは [2020-09-15リリース](https://github.com/localstack/localstack#
 なので、endpointsのURLは全て `http://localhost:4566` になります。
 
 各自でカスタマイズする場合は、terraform で apply 予定のリソース全てをendpoints定義に追加してください。利用可能なサービス一覧は、[こちら](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/custom-service-endpoints#available-endpoint-customizations) に掲載されています。
-
 
 ### 本記事でLocalstackに構築するもの
 
@@ -310,6 +308,7 @@ resource "aws_s3_bucket" "local_archive" {
 ## 3. Localstackにterraform plan/apply
 
 ### まずは terraform init から
+
 新しいディレクトリでterraformを使う場合は、まずは `$ terraform init` して、backend と provider を設定します
 
 ```bash
@@ -330,6 +329,7 @@ Terraform has been successfully initialized!
 terraform init が完了しました。
 
 ## Localstackに向けて、terraform plan を実行
+
 Terraformの実行準備が完了したので、`$ terraform plan` を実行します。
 
 ```bash
@@ -463,9 +463,8 @@ $ aws --endpoint-url http://localhost:4566 lambda list-functions
 
 ここまで読んでいただいた皆様も、色々なリソースをterraformコマンドでLocalstackに構築してみてください！
 
-
 ## 参照サイト
+
 - [Terraform Registory Custom Service Endpoint Configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/custom-service-endpoints#available-endpoint-customizations)
 - [Testing Infrastructure as Code on Localhost](https://www.hashicorp.com/resources/testing-infrastructure-as-code-on-localhost)
 - [LocalStack + Terraform + CircleCI for Lambda without AWS](https://spin.atomicobject.com/2020/02/03/localstack-terraform-circleci/)
-

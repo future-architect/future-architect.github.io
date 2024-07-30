@@ -25,7 +25,6 @@ https://github.com/future-architect/gcp-instance-scheduler
 
 このツールを用いてGCPを利用しない時間帯を上手く指定することで、クラウドの運用費用を節約できます。
 
-
 # ツールの概要
 
 `state-scheduler:true` というラベルがついた、GCE, SQL, GKEなどのインスタンスを停止します。
@@ -44,11 +43,9 @@ GKEの場合は、ノードプールを構成するインスタンスグルー�
 
  [^1]: 参考: https://cloud.google.com/scheduler/docs/start-and-stop-compute-engine-instances-on-a-schedule
 
-
 # デプロイ方法
 
 ツールのデプロイ手順を1~3の順に説明します。
-
 
 ## 1. ラベルの設定
 
@@ -72,7 +69,6 @@ gcloud container clusters update <cluster-name> \
   --zone <cluster-master-node-zone> \
   --update-labels state-scheduler=true
 ```
-
 
 ## 2. Cloud Functionのデプロイ
 
@@ -111,7 +107,6 @@ gcloud beta scheduler jobs create pubsub shutdown-workday \
 
 テキストでは長いですが、コマンド数として少ないので簡単に適用できると思います。
 
-
 # こぼれ話（ツール設計について）
 
 このGCP停止ツールの特徴として、Goの[GCP SDK](https://godoc.org/cloud.google.com/go)経由でインスタンスの制御を行っています。
@@ -126,7 +121,6 @@ gcloud beta scheduler jobs create pubsub shutdown-workday \
 
 結果として、個人的なプライベートの小さなGCP環境にでも簡単に適用できるので、これはこれで良かったなと思っています。
 
-
 # 今後
 
 まだまだ、稼働し始めたところで作りが甘いところがあり、継続的に改善していきます。
@@ -139,7 +133,3 @@ gcloud beta scheduler jobs create pubsub shutdown-workday \
 今後も有益だと思われるツールはドンドン公開していこうと考えています。
 
 この記事が少しでも皆さんの役にたてば幸いです。
-
-
-
-

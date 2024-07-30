@@ -15,8 +15,8 @@ lede: "本記事の内容はHashiTalks: Japanに登壇したのでその時に�
 
 <img src="/images/20200710/top.png" loading="lazy">
 
-
 ## はじめに
+
 こんにちは。TIG/DXユニットの[伊藤](https://twitter.com/kaedemalu)です。最近Terraformネタが多くなってきました。さて、本記事の内容はHashiTalks: Japanに登壇したのでその時に話したことを書いていきます。大きめなイベントには初の登壇だったのでなかなかドキドキしましたが、なんとかやりきりました。
 
 ## HashiTalks: Japanとは
@@ -32,8 +32,8 @@ lede: "本記事の内容はHashiTalks: Japanに登壇したのでその時に�
 
 <script async class="speakerdeck-embed" data-id="01797d2feb8b41359be8138a65170819" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
 
-
 ### 監視設定の大変さ
+
 Terraformは各クラウドプロバイダーのリソースをコードで管理できるInfrastructure as Code(IaC)を実現するツールとして使われています。AWSのCloudFormation、GCPのDeployment Managerではなくクラウドに依存しないツールとしてマルチクラウド戦略を行うところではTerraformを採用されているのではないでしょうか？
 基本的にクラウド(今回ではGCP)のリソースは全てTerraformで管理されていることが望ましく、それは監視ツールであるCloud Monitoringも例外ではありません。特に私が大変だと感じているのは特定のメトリクスを抽出するためのフィルターです。
 
@@ -51,9 +51,11 @@ resource "google_monitoring_alert_policy" "someone_alert_policy" {
   }
 }
 ```
+
 このように複数の条件を重ねて書くことはとても大変であるので、私はコード化にTerraformerを使っています。
 
 ### Terraformerの使いどころ
+
 TerraformerはGCPに限らず、AWSなどのメジャークラウドに存在するリソースをコマンド一つでコードに落とせる便利なツールです。とても便利ではある反面、Terraformでのリソース名はわかりにくいものになっています。
 
 ```sh
@@ -70,6 +72,7 @@ resource "google_monitoring_alert_policy" "tfer--projects--project-name--alertPo
 基本的には`terraform state mv`コマンドを実行してリソース名を変更するかと思いますが、一通り作り切ってからこのコマンドを実行するのもそれなりに時間がかかります。私は、監視のTerraformのコードは特に再利用性が高いと思っており、それであれば雛形として最低限作成して、展開することで時間の節約になったり、コードの変更を最低限で抑えられると考えています。
 
 ### セキュリティに気をつけたい
+
 Cloud Monitoringにはアラート設定をしたときに、その通知先をメールやSlackにすることができます。しかし、SlackのTokenやメールアドレス自体をコード上にハードコードすることは避けなければいけません。Tokenなどを守る方法としては
 
 - tfvarsで逃す

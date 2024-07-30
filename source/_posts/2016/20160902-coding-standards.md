@@ -42,16 +42,13 @@ lede: "システム屋さんがうれしいJava8対応のコーディング規�
 
 <img src="/images/20160902/photo_20160902_01.png" alt="フューチャーコーディング規約のイメージキャラクター" loading="lazy">
 
-
 世の中になければ自分たちで作るというのは弊社の行動理念でもあるので、社内で伝統的に受け継がれ、細かな改善をしてきたコーディング規約をベースに技術チーム有志にてJava8対応版を作りました。
 (ちなみにモチーフがなぜハチなのかは、わかりますよね？)
 
 そして、「Future Enterprise Coding Standards」と名付けて、せっかくなので、Githubに公開しました！！
 
-
 * Future Enterprise Coding Standards for Java
-    * https://future-architect.github.io/coding-standards/
-
+  * https://future-architect.github.io/coding-standards/
 
 Java8対応以外にも、性能の考慮も含めたコーディング規約になってます。
 その一部をここで紹介します。
@@ -61,6 +58,7 @@ Java8対応以外にも、性能の考慮も含めたコーディング規約に
 例えばStream APIですが、皆さんだったら、下記3パターンのうち、どれを標準にしますか？
 
 #### パターン1
+
 ```java
 List<Character> alphabetLower = list
     .stream()
@@ -70,6 +68,7 @@ List<Character> alphabetLower = list
  ```
 
 #### パターン２
+
 ```java
 List<Character> alphabetLower = list.stream()
                                     .filter(Character::isAlphabetic)
@@ -78,6 +77,7 @@ List<Character> alphabetLower = list.stream()
  ```
 
 #### パターン3
+
 ```java
 List<Character> alphabetLower = list.stream()
     .filter(Character::isAlphabetic)
@@ -88,7 +88,6 @@ List<Character> alphabetLower = list.stream()
 パターン1だと1行目が気持ち悪いと感じる人がいそうですね。
 パターン2は一見美しく見えるのですが、Eclipse等でフォーマッタの設定が難しかったりします。
 そんなわけで、私達が設定したコーディング規約では可読性とフォーマッタとの相性も踏まえて、パターン3にしてます。
-
 
 ### 性能の考慮
 
@@ -130,7 +129,6 @@ Java8を使っているし、せっかくだからStream APIで実装しよう�
 | 1億件 | 949 | 1,026 |
 | 2億件 | 1,822 | 2,081
 
-
 このように従来通りの拡張for文のほうが速かったりするので、性能も踏まえて実装をどうすべきかを判断する必要があります。こういった性能への考慮事項もコーディング規約に組み込んであります。
 
 ## コーディング規約の今後について
@@ -144,17 +142,13 @@ Java8を使っているし、せっかくだからStream APIで実装しよう�
 
 https://github.com/future-architect/coding-standards
 
-
 ## 参考：イメージキャラクターについて
 
 <img src="/images/20160902/photo_20160902_01.png" alt="フューチャーコーディング規約のイメージキャラクター" style="width:200px;" loading="lazy">
 
 ### 特徴
 
-- 目と触覚の配色はDukeをリスペクト
-- 針ではなく葉っぱが生えてる（「Javaハチ」 -> 「Java鉢」 -> 鉢植えには葉っぱが生えてる）
+* 目と触覚の配色はDukeをリスペクト
+* 針ではなく葉っぱが生えてる（「Javaハチ」 -> 「Java鉢」 -> 鉢植えには葉っぱが生えてる）
 
 イメージキャラクターは、[前回記事](/articles/20160721/)のアイコンセット作者の木村さん作成です。
-
-
-

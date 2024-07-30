@@ -57,7 +57,7 @@ Cloud Runでウェブサービスを作るのは通常のコンテナで動く�
 
 * Goでnet/http + [chi router](https://github.com/go-chi/chi)
 * Vue.js + TypeScript
-    * ビルドした静的ファイルもコンテナの中に入れる
+  * ビルドした静的ファイルもコンテナの中に入れる
 * UI部品は[Material Design WebComponents](https://mwc-demos.glitch.me/demos/)
 
 chiは高速だけども、イベントハンドラ周りは標準のnet/httpと同じものが使えるので、多くのGoユーザーにとって敷居が低いライブラリです。Vueは説明不要ですよね。管理画面といってもそれなりに綺麗な部品を使って画面を作りたいものです。Material Design WebComponentsは[2019年はWebComponents元年(2回目)！WebComponentsをReact/Angular/Vueと一緒に使う](https://qiita.com/shibukawa/items/5a36147ec103d35c1b5e)で紹介したツールキットの1つです。Ionicはすでに使って見たので、今回はこっちを選択。
@@ -232,7 +232,6 @@ export default class AboutPage extends Vue {
 <img src="/images/20200207/photo_20200207_01.png" loading="lazy">
 
 <img src="/images/20200207/photo_20200207_02.png" loading="lazy">
-
 
 ## Goのサーバーを作る
 
@@ -431,8 +430,8 @@ CMD ["/app"]
 コンテナになったら、この状態でも動作確認できます。
 
 ```sh
-$ DOCKER_BUILDKIT=1 docker build -t "serverless-app" .
-$ docker run -p 8080:8080 --rm "serverless-app"
+DOCKER_BUILDKIT=1 docker build -t "serverless-app" .
+docker run -p 8080:8080 --rm "serverless-app"
 ```
 
 ## Cloud Runで動かす
@@ -441,8 +440,8 @@ $ docker run -p 8080:8080 --rm "serverless-app"
 GCP_PROJECTは自分で作成したプロジェクトを入れてください。IMAGE_NAMEはなんでも大丈夫です。日本から近いのでGCRはasia.gcr.ioにしています。
 
 ```sh
-$ gcloud builds submit --tag asia.gcr.io/${GCP_PROJECT}/${IMAGE_NAME}
-$ gcloud run deploy --image asia.gcr.io/${GCP_PROJECT}/${IMAGE_NAME}
+gcloud builds submit --tag asia.gcr.io/${GCP_PROJECT}/${IMAGE_NAME}
+gcloud run deploy --image asia.gcr.io/${GCP_PROJECT}/${IMAGE_NAME}
 ```
 
 最後のコマンドを起動すると、マネージドで動かすかAnthosで動かすか、どのリージョンで動かすか、名前を何にするかを聞いてきます。それに回答したらURLが表示されるので、それにアクセスすると動作が確認できます。初回は認証なしでアクセスできるかどうか、というのも聞かれました。
@@ -461,6 +460,4 @@ Cloud Functionsと比べると、動作するアプリケーションが普通�
 
 今回は使いませんでしたが、アプリケーションの実装がローカルで単体で動くサーバーを作れば良い、ということで、以前本ブログで紹介した[Go Cloud](/tags/GoCDK/)を使えば、他のクラウドサービスでも動作するようなマルチクラウドな管理画面もかんたんに作れそうです。
 
-
 [GCP連載](/articles/20200202/)の3回目でした。次は伊藤さんの[Cloud Life Sciencesを見てみた](/articles/20200210/)です。
-

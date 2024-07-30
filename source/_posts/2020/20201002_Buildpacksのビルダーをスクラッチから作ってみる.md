@@ -32,7 +32,7 @@ Herokuがオリジナルで作ったビルドツールです。Herokuのオリ�
 使い方は簡単で、作業フォルダで次のコマンドでDockerイメージができてしまうのです。デフォルトで利用するビルダーはあらかじめ設定できるので、そうなるともっと短くコマンドを回せます。
 
 ```bash
-$ pack build [イメージ名] --builder [ビルダーイメージ名]
+pack build [イメージ名] --builder [ビルダーイメージ名]
 ```
 
 BuildpacksはGCPのGoogle App Engine、Cloud Functions、Cloud Runのビルドでも使われているようです。
@@ -52,7 +52,6 @@ Buildpackは、現在のワークフォルダが自分のタスクと関係あ�
 その作業の土台になるのが「Stack」です。「Stack」は実行用のDockerイメージと、ビルド用のDockerイメージのペアです。普通に公開されているものではなく、少し手を加える必要があります。Dockerfileで作ってもいいです。GoogleはBazelを使っているようです。
 
 <img src="/images/20201002/Screen_Shot_2020-10-02_at_9.11.57.png" loading="lazy">
-
 
 ビルダーを作るにはこれらの構成要素を1つずつ作っていくことになります。
 
@@ -157,9 +156,9 @@ uri = "empty/"
 buildpackのパッケージ、.cnbファイルを作成します。ここではファイルに書き出していますが、DockerイメージにしてBuilderから利用させることもできるようです。
 
 ```bash
-$ pushd buildpacks
-$ pack package-buildpack empty.cnb --config ./empty-package.toml --format file
-$ popd
+pushd buildpacks
+pack package-buildpack empty.cnb --config ./empty-package.toml --format file
+popd
 ```
 
 ## イメージの作成
@@ -191,10 +190,10 @@ ENV CNB_GROUP_ID="1000"
 ```
 
 ```bash
-$ pushd images
-$ docker build -t distroless:python -f ./Dockerfile.run .
-$ docker build -t distroless:python-builder -f ./Dockerfile.build .
-$ popd
+pushd images
+docker build -t distroless:python -f ./Dockerfile.run .
+docker build -t distroless:python-builder -f ./Dockerfile.build .
+popd
 ```
 
 ## ビルダーの作成
@@ -320,7 +319,6 @@ echo "---> Python Buildpack"
 ## Pythonビルドコード
 
 ビルドの方はやや複雑です。
-
 
 今回はvenvで環境を作って、それをレイヤーとしました。
 
@@ -517,4 +515,3 @@ https://buildpacks.io/docs/reference/spec/buildpack-api/
 今回はシェルスクリプトを使いましたが、公式のbuildpackはGoで書かれたものもあります。後から、せっかくならPythonあたりで書いてもよかったな、と思いました。いろいろ大掛かりで複雑に見えますが、引数で渡されたフォルダの中に成果物を置いて、設定ファイルを書き出すだけなので、ビルド用イメージで使える言語であれば問題なく利用できるはず。
 
 アドバンスな使い方というと、キャッシュ周り、または公式のbuildpackのように、複数のbuildpackが連携してアーティファクトを作る、みたいな多段構成あたりですね。そのうち書くかもしれません。
-

@@ -24,12 +24,9 @@ ssh先のGCEインスタンスとクライアント間で、キーペア(秘密�
 * 使い慣れたsshクライアント(TeraTerm等)を使ってsshしたい
 * VScodeのsshプラグイン(便利ですよね)を使ってリモートサーバー上のファイルを編集したい
 
-
 そんな方は、きっと `~/.ssh` 配下に生成された秘密鍵( `google_compute_engine`) とホスト情報を `~/.ssh/config` に手動で追加されていることでしょう。
 
-
 ただ、対象のホストが多くなると都度configを更新するのは大変ですよね。実はこのconfigへの追加、 `gcloud compute config-ssh`コマンドを使えば 自動でやってくれますよ! (**本題**)
-
 
 ## やってみる
 
@@ -76,7 +73,7 @@ permitted by applicable law.
 hoge@test-instance:~$
 ```
 
-ローカルの` ~/.ssh`配下にキーペア( `google_compute_engine`, `google_compute_engine.pub`)が生成されていますね。
+ローカルの`~/.ssh`配下にキーペア( `google_compute_engine`, `google_compute_engine.pub`)が生成されていますね。
 
 ```bash
 ❯ ls ~/.ssh
@@ -95,7 +92,6 @@ For example, try running:
 ```
 
  `~/.ssh/config` に `test-instance`が追加されていますね!
-
 
 ```bash
 ❯ cat ~/.ssh/config
@@ -139,6 +135,4 @@ hoge@test-instance:~$
 
 これで快適なsshライフ??が送れますね
 
-
 [GCP連載企画](/articles/20200202/)の8日目でした。次は村瀬さんの[初めてのGCP 画像AI(Vision API)をさわってみた](/articles/20200218/)です。
-

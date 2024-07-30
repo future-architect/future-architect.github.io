@@ -16,11 +16,11 @@ lede: "こんにちは、Android Developerの佐藤です。モバイルアプ�
 ---
 
 # はじめに
+
 こんにちは、Android Developerの佐藤です。
 
 [サーバーレス連載](/articles/20200322/)の4回目を担当します！
 モバイルアプリ品質強化の強い味方となってくれるFirebase Crashlyticsを紹介したいと思います！
-
 
 # そもそもFirebaseとは
 
@@ -48,6 +48,7 @@ Firebase Crashlyticsを導入することで、以下の情報を簡単に知る
 以下では、実際にFirebase Crashlyticsを使って、どのようにクラッシュ情報にアクセスできるようになるのかを見ていきます。
 
 # Firebase Crashlyticsを使ってみる
+
 簡単なサンプルアプリを用いて、
 
 - どのようにしたらクラッシュ情報をFirebaseに送ることができるのか
@@ -60,9 +61,7 @@ Firebase Crashlyticsを導入することで、以下の情報を簡単に知る
 Android Studioで`Empty Activity`テンプレートをベースにした新規プロジェクトを作成します。
 ボタンを画像のように2つ追加します。
 
-
 <img src="/images/20200330/1.png" class="img-small-size" loading="lazy">
-
 
 それぞれのボタンに`OnClickListener`を実装します。実装例は後述しますが、それぞれのボタンをクリックしたときの振る舞いを簡単に説明すると、以下のようになります。
 
@@ -72,6 +71,7 @@ Android Studioで`Empty Activity`テンプレートをベースにした新規�
 意図的に例外が発生する状況を再現しています。
 
 ## Firebaseをセットアップする
+
 Firebase公式ページを見ながらFirebaseのセットアップを行います。
 https://firebase.google.com/docs/android/setup
 (Firebase公式ページには日本語に訳されているページもありますが、英語ページのアップデートに追随していない箇所がいくつかあります。日本語ページを参照する場合は、英語ページも併せてご覧になることをおすすめします。)
@@ -80,9 +80,8 @@ Firebaseコンソール画面も親切にナビゲートしてくれるので安
 
 <img src="/images/20200330/2.png" loading="lazy">
 
-
-
 ## Firebase Crashlyticsをセットアップする
+
 [Firebaseのセットアップ](https://firebase.google.com/docs/android/setup)が完了していれば、`build.gradle`にコードを数カ所追加するだけでCrashlyticsの最小限の設定は完了です。アプリが異常終了したとき、自動的にFirebaseにクラッシュレポートが送信されます。
 
 - Projectの`build.gradle`
@@ -120,9 +119,8 @@ dependencies {
 
 ※ 2020/3/30現在2つのCrashlytics SDKが存在します。"Fabric系譜のCrashlytics SDK"と"Firebase向けに新調されたSDK"です。後者は、2020/3/30現在beta版となっています。今回はGAになっている前者のSDKを使用しています。
 
-
-
 ## アプリをクラッシュさせてみる
+
 `MainActivity`の実装例はこちらです。`FATAL`ボタン、`NON FATAL`ボタンに`OnClickListener`をセットしています。
 
 ```java アプリクラッシュするMainActivity実装例
@@ -171,21 +169,20 @@ public class MainActivity extends AppCompatActivity {
 ## Firebaseコンソールでクラッシュレポートを確認する
 
 ### Overview
+
 サイドナビの`品質`から`Crashlytics`を選択するとCrashlyticsの画面が開きます。
 こちらの画面からクラッシュ状況の概要がわかります。
 `FATAL`ボタンをクリックしたときのレポートは「MainActivity.java - line 23」として通知されています。
 `NON FATAL`ボタンをクリックしたときのレポートは「MainActivity.java - line 30」として通知されています。
 「評価」項目をみると「クラッシュレポート」なのか「非致命的な例外のレポート」なのかがひと目でわかりますね。
 
-
 <img src="/images/20200330/3.png" loading="lazy">
 
-
 ### クラッシュレポート
+
 `Fatal`ボタンをクリックすることによって発生したクラッシュレポート(MainActivity.java - line 23)を見てみましょう。
 
 <img src="/images/20200330/4.png" loading="lazy">
-
 
 以下がひと目でわかりますね。
 
@@ -195,14 +192,13 @@ public class MainActivity extends AppCompatActivity {
 - どのバージョンでクラッシュしたのか
 - どの機種でクラッシュしたのか
 
-
 また「スタックトレース」タブからクラッシュしたときのスタックトレースを見ることができます。
 なぜクラッシュしたのかが詳細にわかります。
 
 <img src="/images/20200330/5.png" loading="lazy">
 
-
 ### ユーザーIDでの検索
+
 「ユーザーIDでの検索」も行うことができます。
 ユーザーから不具合の問い合わせがあった際に、ソースコードのどの箇所で異常があったがゆえにそのユーザーの端末で不具合が発生したのかを素早く知ることができます。
 <img src="/images/20200330/6.png" loading="lazy">
@@ -212,7 +208,6 @@ public class MainActivity extends AppCompatActivity {
 ```java ユーザID検索
 Crashlytics.setUserIdentifier("user0001");
 ```
-
 
 # 最後に
 

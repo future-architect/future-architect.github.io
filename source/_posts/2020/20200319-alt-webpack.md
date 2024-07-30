@@ -43,8 +43,8 @@ JavaScriptでビルドといっても、いろいろなステップがありま�
 [Parcel](https://parceljs.org/)はゼロコンフィグを目指したバンドラーです。TypeScriptも最初からサポートしています。エントリーポイントを指定するだけでビルドしてくれます。tsconfig.jsonがあればそれを拾って解釈してくれますし、なくても動きます。単にtsファイルをエントリーポイントとしてわたしてあげれば、そのままTypeScriptの処理系をインストールしつつビルドしてくれます。最初のビルドも高速ですし、キャッシュもしてくれて2回目以降も速いです。TreeShakingとかの生成されたファイルの最適化機構も入っているとのこと。
 
 ```sh
-$ npm install -D parcel-bundler
-$ npx parcel build src/index.ts
+npm install -D parcel-bundler
+npx parcel build src/index.ts
 ```
 
 エントリーポイントにHTMLファイルを指定できて、フロントエンド開発の開発サーバーも付いている。これは無敵！と思いきや・・・わざと型を間違ったTypeScriptのファイルを入力しても何もエラーも出ません。
@@ -158,7 +158,7 @@ task("dist", async ctx => {
 npmにアップロードするコードをシンプルにする、超快適に開発する、というのを目指して作られているのが[ncc](https://www.npmjs.com/package/@zeit/ncc)です。ある意味browserifyの後継な感じを受けます。簡単。ひたすら簡単。Next.jsで有名なZeitが開発しています。
 
 ```sh
-$ npm install -D @zeit/ncc
+npm install -D @zeit/ncc
 ```
 
 npmのサイズを小さくするという目標を体現しているツールで、それ自身もTypeScript内臓だけど、インストールは一瞬で終わります。他への依存もなく、パッケージがとても小さい。
@@ -193,12 +193,12 @@ Babelの作者とかが関わっているツールです。コンパイラ、Lin
 npmにも上がっていないので、git cloneするところから。
 
 ```bash
-$ git clone --depth 1 https://github.com/facebookexperimental/rome
-$ pushd rome
-$ ./scripts/build-release dist
-$ popd
-$ cd rome-test
-$ npm install -D ../rome/dist
+git clone --depth 1 https://github.com/facebookexperimental/rome
+pushd rome
+./scripts/build-release dist
+popd
+cd rome-test
+npm install -D ../rome/dist
 ```
 
 このヘルプメッセージから溢れ出るexperimental感。残念ながら、開発サーバーとかはないようです。Facebookなので、ウェブフロントエンドだけではなくて、React Nativeとかもターゲットに考えているのかもしれないし、そこのあたりはよくわかりません。

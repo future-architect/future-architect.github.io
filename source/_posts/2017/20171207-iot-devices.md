@@ -24,7 +24,6 @@ lede: "今年、社内のR&Dチームにて開発し利用を開始した汎用I
 こんな感じのサイコロ型のデバイスです。
 <img src="/images/20171207/photo_20171207_02.jpeg" loading="lazy">
 
-
 アップすると FutureIoT のロゴが印字されています。
 <img src="/images/20171207/asset_20171207_01.png" loading="lazy">
 
@@ -38,12 +37,10 @@ lede: "今年、社内のR&Dチームにて開発し利用を開始した汎用I
 
 ロゴデザインは[99design](https://99designs.jp)さん経由にて作成を依頼しました。
 
-
 # 作成の目的
 
 このデバイスは、IoT関連ソリューションのワークショップ、[PoC](https://ja.wikipedia.org/wiki/%E6%A6%82%E5%BF%B5%E5%AE%9F%E8%A8%BC)、プロトタイピング、パイロット導入などの用途をカバーすることを目指して開発したものとなります。
 直近では、お客様向けのIoT関連研修での教材として10数台程利用しました。
-
 
 # 力を入れた点
 
@@ -54,8 +51,8 @@ lede: "今年、社内のR&Dチームにて開発し利用を開始した汎用I
 * フルワイヤレス
 * 追加モジュールによる柔軟な拡張性
 
-
 # スペック
+
 スペックは次の通りです。（随時ブラッシュアップしているので変更される/している可能性があります）
 
 ## ハードウェア
@@ -63,30 +60,35 @@ lede: "今年、社内のR&Dチームにて開発し利用を開始した汎用I
 <img src="/images/20171207/photo_20171207_03.jpeg" loading="lazy">
 
 ### [MPU](https://ja.wikipedia.org/wiki/%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD%E3%83%97%E3%83%AD%E3%82%BB%E3%83%83%E3%82%B5)
+
 MPUとしては、Wi-Fi、BLEも内蔵した比較的安価なESP32を採用しました。
+
 * [ESP32](https://ja.wikipedia.org/wiki/ESP32)
 
 ### 通信
+
 基本的に無線での運用となります。Wi-Fi APやLoRaWAN GW などを経由してクラウドに接続します。
+
 * 有線
-    * シリアル通信(USB)
+  * シリアル通信(USB)
 * 無線
-    * [Wi-Fi](https://ja.wikipedia.org/wiki/Wi-Fi)
-    * [BLE](https://ja.wikipedia.org/wiki/Bluetooth_Low_Energy)
-    * [LTE](https://ja.wikipedia.org/wiki/Long_Term_Evolution)(オプション)
-    * [LoRaWAN](https://ja.wikipedia.org/wiki/LPWA_(%E7%84%A1%E7%B7%9A)#LoRa)(オプション)
+  * [Wi-Fi](https://ja.wikipedia.org/wiki/Wi-Fi)
+  * [BLE](https://ja.wikipedia.org/wiki/Bluetooth_Low_Energy)
+  * [LTE](https://ja.wikipedia.org/wiki/Long_Term_Evolution)(オプション)
+  * [LoRaWAN](https://ja.wikipedia.org/wiki/LPWA_(%E7%84%A1%E7%B7%9A)#LoRa)(オプション)
 
 ### コネクタ
+
 コネクタとしては、PCなどの通信や充電のためのmicroUSBと、センサーなどの外部モジュールや内蔵モジュールのためのGroveコネクタがあります。
 
 * microUSB コネクタ x1
-    * 充電
-    * シリアル通信
+  * 充電
+  * シリアル通信
 * Grove コネクタ x8
-    * デジタル入力
-    * アナログ入力
-    * UART
-    * I2C
+  * デジタル入力
+  * アナログ入力
+  * UART
+  * I2C
 
 ### ストレージ
 
@@ -102,30 +104,32 @@ MPUとしては、Wi-Fi、BLEも内蔵した比較的安価なESP32を採用し�
 * 内蔵：Li-Poバッテリ
 * 外付：microUSBケーブルでACアダプタ、PC、モバイルバッテリと接続
 
-
 ## ソフトウェア
 
 ### OS
+
 現在はその完成度の面から下記のOSを利用しています。
+
 * [Mongoose OS](https://mongoose-os.com/)
 
 ### プログラミング言語
+
 非エンジニアまでターゲット層を広げているため、複数のプログラミング環境をWeb上に用意しています。
 
 * プログラミング初学者向け
-    * [Blockly](https://developers.google.com/blockly/)
+  * [Blockly](https://developers.google.com/blockly/)
 * Web開発者向け
-    * JavaScript
+  * JavaScript
 * 組込開発者向け
-    * C++
-    * C
+  * C++
+  * C
 
 <img width="400" alt="Blocklyの編集画面" src="/images/20171207/asset_20171207_04.jpeg">
 
 <img width="400" alt="JavaScriptの編集画面" src="/images/20171207/asset_20171207_05.png">
 
-
 ## クラウド
+
 弊社のIoTプラットフォームである Future IoT との連携や、AWS、GCP、Azuleなどの主要なクラウドとの連携を行うことができます。
 
 ## 対応プロトコル
@@ -134,7 +138,6 @@ MPUとしては、Wi-Fi、BLEも内蔵した比較的安価なESP32を採用し�
 * [WebSocket](https://ja.wikipedia.org/wiki/WebSocket)
 * HTTP
 
-
 # 今後の展開
 
 今後、次のような点を進めていく予定です。
@@ -142,4 +145,3 @@ MPUとしては、Wi-Fi、BLEも内蔵した比較的安価なESP32を採用し�
 
 * 追加モジュールの拡充
 * プログラミング環境のブラッシュアップ
-

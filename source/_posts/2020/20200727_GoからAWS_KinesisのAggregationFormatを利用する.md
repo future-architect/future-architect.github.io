@@ -23,7 +23,6 @@ TIG DXユニットの真野です。ここ数年は産業向けのIoT（例え�
 
 [サーバレス連載企画](/articles/20200322/) の第8弾目として、Serverlessの代表格であるAWS LambdaでGoを用いてKinesisに対するKPL/KCL相当の処理についてまとめていきます。
 
-
 # 背景
 
 某IoTをテーマとした案件で、Kinesisを用いたストリーミングETLなパイプラインを構築するにあたって、下図のようにKinesisの後段はGoとLambdaを採用しました。Kinesisが多段になっているのは、Rawデータと加工済みデータを別システムで利用したかったためです。
@@ -43,7 +42,6 @@ https://github.com/laqiiz/go-kinesis-aggr-example
 
 簡単に言うとAWS上でPub-Subメッセージングを行えるサービスです。Kinesisの文脈ではデータを送信するPublish側をProducer、データを受信するSubscribe側をConsumerと呼びます。SQSとはメッセージを非同期に連携する部分は同じですが、Consumer側をN個配置できるところなどが異なります。
 
-
 # Kinesis Record Aggregation & Deaggregation
 
 KinesisにはRecord Aggregation（レコードの集約）といった考え方があります。
@@ -57,7 +55,6 @@ record 1   |        [ Aggregation ]
     ...    |
 record A --|
 ```
-
 
 AWSでこの25KB以下のメッセージを集約するフォーマットは、**KPL Aggregated Record Format**と呼ぶそうです。仕様は以下に記載されていました。
 
@@ -101,11 +98,9 @@ message Record {
 
 細かく説明しましたが、KPL Aggregated Record Formatの構造を知らなくても既存のライブラリを活用すれば利用可能ですのでご安心ください。
 
-
 ## Record Aggregation と PutRecordsの区別
 
 ちょっとややこしいのが、 Kinesisには複数RECORDを一度のリクエストで登録する[PutRecords](https://aws.amazon.com/jp/blogs/aws/kinesis-update-putrecords-api/)というAPIがありますが、 Record Aggregationはそれとは異なります（別の概念なので共存できます）。PutRecordsはあくまで複数のRECORDを1度のリクエストに束ねるものであって、Aggregated Formatは複数メッセージを1メッセージに集約する点が違いです。PutRecordsはHTTP Requestの発行を抑えられる分スループットの向上が期待できる点は、Aggregated Formatと同じですが、メッセージ数は変化ないので料金は同じです。当然別物なのでAggregated FormatのメッセージをPutRecordsもできます。
-
 
 # 実施方法
 
@@ -116,16 +111,13 @@ message Record {
 
 DeAggregationに関してはAWSLabのリポジトリを利用できるのでちょっと安心できますね。利用方法は簡単かと言われると？でしたのでここに利用方法を残していきます。
 
-
 # 利用方法
 
 それぞれのライブラリの利用手順を説明していきます。このエントリーで記載しているコードは以下のリポジトリに記載しています。
 
 https://github.com/laqiiz/go-kinesis-aggr-example
 
-
 ## Aggregate（a8m/kinesis-producer）
-
 
 最初にコードのサンプルを載せます。
 
@@ -189,7 +181,6 @@ func main() {
 
 これでGoでLambdaでもKinesisへRecord Aggregationが行えます。
 
-
 ## DeAggregate(awslabs/kinesis-aggregation])
 
 awslabs/kinesis-aggregationを利用します。この時、Lambdaの引数として渡される `events.KinesisEvent` の型と、deaggregatorが求める方が異なるため、自分で型の詰め替え作業が必要です（最初のループ分の部分）。そこが最大の山場で、それさえできてしまえば`deagg.DeaggregateRecords`を呼び出して、レコードの集約解除が行われます。
@@ -243,14 +234,11 @@ func main() {
 レコード集約の解除処理は、ことKinesisトリガーのLambdaに対しては常に実装しておいても良い気がします。
 理由ですが、`deagg.DeaggregateRecords` が集約済み**ではない** レコードに対して実行してもerrorが発生しないためと、最初は集約レコードじゃない入力だったとしても、途中で集約レコードに切り替わったときに急に動かなくなることを防ぐことも出来るからです。（疎通の1件は通ったけど、結合テストで複数レコードを連携しだすと急に落ちた、みたいなことも回避できます）。特にJavaクライアントがKPLを利用している場合は、集約あり/集約無しはあまり意識しないことが多く、事前のすり合わせでは集約しないと行っていたものの、いざ結合テストをする場合に、集約済みメッセージを連携してきたこともありました。
 
-
 # 動作検証
 
 下図のような環境を構築して動かしてみます。デプロイ方法はリポジトリのREADMEを参考ください。
 
 <img src="/images/20200727/abstract.png" loading="lazy">
-
-
 
 最初のKinesisにはawscli経由で3件データを投入します。
 
@@ -297,7 +285,6 @@ aws kinesis --profile my_profile put-record --stream-name aggregate --partition-
 * A deep-dive into lessons learned using Amazon Kinesis Streams at scale
   * https://read.acloud.guru/deep-dive-into-aws-kinesis-at-scale-2e131ffcfa08
 * KPL の主要なコンセプト
-    * https://docs.aws.amazon.com/ja_jp/streams/latest/dev/kinesis-kpl-concepts.html
+  * https://docs.aws.amazon.com/ja_jp/streams/latest/dev/kinesis-kpl-concepts.html
 * KPL Aggregated Record Format
-    * https://github.com/awslabs/amazon-kinesis-producer/blob/master/aggregation-format.md
-
+  * https://github.com/awslabs/amazon-kinesis-producer/blob/master/aggregation-format.md
