@@ -130,4 +130,3 @@ VBAからPowerShellへのオフロードが実現できました。文字列を�
 * https://atmarkit.itmedia.co.jp/ait/articles/0407/08/news101.html
 * https://www.tipsfound.com/vba/18026
 * https://future-architect.github.io/articles/20221130a/
-

@@ -122,6 +122,7 @@ for _, message := range messages {
     }
 }
 ```
+
 あとは、Backlog APIを用いて取得したデータを送信するだけです。
 
 # さいごに

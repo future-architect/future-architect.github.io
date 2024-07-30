@@ -35,7 +35,6 @@ VPC Service Controlsを利用することによって、Google Cloudのリソー
 
 <img src="/images/20230119a/a864e1b2-7cd3-c69c-bf63-fe2b21622b6d.png" alt="" width="1200" height="640" loading="lazy">
 
-
 こちらの画像のように、境界（Service Perimeter）内に存在するBigQueryは認証されたVPC、VM（GCE）からのみアクセス可能となり、認証されていないリソースからは境界内へのアクセス・境界外へのアクセス共に制限されることになります。
 
 現在、VPC Service Controlsがサポートしているリソースの一覧はこちらになります。
@@ -50,7 +49,6 @@ VPC Service Controlsはそれに加えて、境界全体への上り（Ingress�
 コンテキストベースは、例えば「どこ（IPアドレス）」、「だれ（ユーザーアカウント・サービスアカウント、**グループは現在不可**）」、「何で（OS）」などアクセス元の背景からリソースへのアクセス可否を判断します。
 
 どちらが良い・悪いというのは無く、併用することでより強固なセキュリティを築くことが可能となります。
-
 
 ## BigQueryを使って挙動を確認
 
@@ -91,7 +89,6 @@ ID制御を行ってみます。
 
 <img src="/images/20230119a/755d759c-cde1-42d1-c0c4-e62dc1425a89.png" alt="" width="930" height="348" loading="lazy">
 
-
 #### アクセスレベルを作成する
 
 [アクセスレベル](https://cloud.google.com/access-context-manager/docs/overview#access-levels)ではリソースへのアクセスを許可する条件を定義します。
@@ -118,7 +115,6 @@ resource "google_access_context_manager_access_level" "id" {
 }
 
 ```
-
 
 #### サービス境界を作成する
 
@@ -267,7 +263,6 @@ resource "google_access_context_manager_access_level" "id_and_ip" {
 
 <img src="/images/20230119a/9de770bd-ea00-9238-2464-906a4bc2561a.png" alt="" width="795" height="320" loading="lazy">
 
-
 次に指定されたIPアドレスのVMに認証済みのアカウントで`gcloud auth login`してから`bq`コマンドを打ってみます。
 
 ```bash
@@ -323,7 +318,6 @@ bq query --use_legacy_sql=false --project_id <YOUR_PROJECT_ID>  'select worker_i
 そして、それぞれのBigQueryを以下のように別のサービス境界で守ります。
 
 <img src="/images/20230119a/34000be3-c373-0fe1-47b6-fdae7b41ec73.png" alt="" width="1078" height="374" loading="lazy">
-
 
 ではこの時、どのようにIngree/Egressを設定すればよいのでしょうか？
 正解は以下のようになります。

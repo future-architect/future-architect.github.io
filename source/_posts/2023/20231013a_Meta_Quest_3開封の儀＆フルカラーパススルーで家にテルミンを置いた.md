@@ -108,4 +108,3 @@ Oculus Integration のパッケージを導入していましたが、かなり�
 とりあえず直近は、深度センサーも活用してなにか作って遊べないか試したいです。
 
 [^1]:Meta Reveals How Quest 3 Controller Tracking Works As Beat Saber Founder Gives His Take https://www.uploadvr.com/meta-explains-quest-3-controller-tracking/
-

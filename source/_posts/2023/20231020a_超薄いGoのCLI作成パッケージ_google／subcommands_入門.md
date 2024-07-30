@@ -52,7 +52,6 @@ subcommandsですが、利用ガイド的なものは見当たらなく、[READM
 
 最初に、`printCmd`、`writeCmd` を実装していきます。実装すべきは `Name()`、`Synopsis()`、 `Usage()`、`SetFlags()`、`Execute()` です。`Name()`、`Synopsis()`、 `Usage()` はヘルプメッセージに用いるメソッドで、実態は `SetFlags()`、`Execute()` の2種類です。シンプルですね。
 
-
 ```go commands.go
 package main
 
@@ -167,8 +166,7 @@ func main() {
 }
 ```
 
-
-これをビルドして、ヘルプコマンドを表示します。 
+これをビルドして、ヘルプコマンドを表示します。
 
 ```sh
 $ go build -o subclip .
@@ -226,7 +224,6 @@ commands:
 
 利用頻度が高く重要なオプションは、 `help` コマンドで表示してほしいことも多いと思います。`subcommands.ImportantFlag()` が対応してくれそうですが、これはトップレベルのフラグにしか対応していないようです（awscli で言えば、 --profile などの全コマンドに適用するオプションのイメージ）。
 そのため、必要であれば、 `Synopsis()` に利用例を書くなどの工夫が必要そうです。
-
 
 ## グループ化
 
@@ -298,23 +295,21 @@ Subcommands for main:
 
 [Goでsubcommandsを使う - yunomuのブログ](https://yunomu.hatenablog.jp/entry/2020/06/16/170027) にかかれている通り、`subcommands.Commander` を自前で重ねることでN階層にネストしたコマンドを作れるそうです。READMEに実装例が無かったので実現できないと私は最初、勘違いしていました。おそらく勘違いしやすいポイントなので、覚えておくと良いと思います。
 
-
 ## その他の機能
 
 以下のような機能は無さそうでした。
 
 フラグのパースは標準パッケージのflagを用いているため、同様の壁がある。
 
-* `--number`, `-n` のような、ロング・ショートバージョンのオプション
-    * フラグのパースは、標準パッケージのflagを使っているため、必要であれば自前で実装する必要があります
-* 環境変数からオプション指定、上書き
-    * 標準パッケージのflagを用いているため、必要であれば自前で実装する必要があります
+- `--number`, `-n` のような、ロング・ショートバージョンのオプション
+  - フラグのパースは、標準パッケージのflagを使っているため、必要であれば自前で実装する必要があります
+- 環境変数からオプション指定、上書き
+  - 標準パッケージのflagを用いているため、必要であれば自前で実装する必要があります
 
 コマンドのtypoから一番近いコマンドを提案するような機能。
 
-* `subclip wite` じゃなくて、`subclip write` みたいな提案をする機能は無いです
-    * 存在しないコマンドを指定した場合、 `help` が表示されます
-
+- `subclip wite` じゃなくて、`subclip write` みたいな提案をする機能は無いです
+  - 存在しないコマンドを指定した場合、 `help` が表示されます
 
 ## まとめ
 
@@ -328,4 +323,3 @@ subcommandsは非常に薄く、シンプルであるため機能を特化した
 
 - https://osinet.fr/go/en/articles/cli-google-subcommands/#13-passing-non-cli-arguments-to-commands
 - https://osinet.fr/go/en/articles/cli-google-subcommands/
-

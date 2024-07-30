@@ -152,7 +152,6 @@ resource "google_tags_location_tag_binding" "prd" {
 }
 ```
 
-
 ### gcloudコマンドでタグを付与する
 
 以下のコマンドで付与することができます。

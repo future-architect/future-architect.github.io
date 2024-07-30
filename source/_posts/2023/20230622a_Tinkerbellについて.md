@@ -168,7 +168,7 @@ yaml形式で、プロビジョニングで実行したいタスクがコンテ�
 
 ※Hookが起動した様子。当初、このクジラを見てPXE Bootがうまくいったと喜んでいたら、実はストレージパスの設定ミスでフリーズしてたのはいい思い出
 
-このHookは、起動すると `tink-worker` というワークフローエンジンを自動的に立ち上げます。`tink-worker` ワークフローエンジンは Tinkerbell Stackと呼ばれる本体側の `tink-server` からワークフローをダウンロードします。 
+このHookは、起動すると `tink-worker` というワークフローエンジンを自動的に立ち上げます。`tink-worker` ワークフローエンジンは Tinkerbell Stackと呼ばれる本体側の `tink-server` からワークフローをダウンロードします。
 
 `tink-worker` はワークフローに基づいてターゲットサーバー内でコンテナイメージを起動し、必要なタスクを実行していきます。最後にリブートすると、プロビジョニングは完了します。
 
@@ -221,7 +221,7 @@ Appleの開発者が[講演](https://youtu.be/MtocKi97hsc)を行っており、T
 
 ベアメタルサーバーに対して1からキッティングする機会って今どき中々ないと思うので、家庭に眠ってた古いPCがあればぜひ試してみてください。
 
-[^1]: Tinkerbell is an open-source, bare metal provisioning engine, built by the team at Equinix Metal. 参照: https://docs.tinkerbell.org/ 
+[^1]: Tinkerbell is an open-source, bare metal provisioning engine, built by the team at Equinix Metal. 参照: https://docs.tinkerbell.org/
 
 [^2]: 元々はPacketというニューヨークのスタートアップ企業であるベアメタルクラウド・プロバイダーが開発していましたが、Equnixが2020年に買収し、OSSとして公開しました。参照: https://techcrunch.com/2020/01/14/equinix-is-acquiring-bare-metal-cloud-provider-packet/
 
@@ -232,4 +232,3 @@ Appleの開発者が[講演](https://youtu.be/MtocKi97hsc)を行っており、T
 [^4]: LinuxKitはmoby社(Docker)が開発したコンテナランタイム用のLinuxディストリビューションです。開発コンセプトでもある、コンテナランタイム専用のイミュータブル&軽量Linuxディストリビューションっていう意味では旧Container Linux/現CoreOSと非常に良く似ていますね。
 
 [^8]: まとめきれなかった所感をこちらに。<br/>**構築の簡単な点、難しい点**: TinkerbellはPXE Bootを行うため、Bootsと呼ばれるコンポーネントがDHCPサーバーの役割を担っているのですが、MACアドレスでフィルタリングしております。接続できなくなったらその時さ、と思いつつ、家庭用LAN上でそのまま実証していたんですが、一時的に同一ネットワーク内にDHCPサーバーが二台あるような状態でも特に問題ありませんでした。VLANが必要な状況下だとベアメタルサーバーのキッティングは正直混乱するのでケアが不要で良かったです。<br/>一方でTinkerbell Stack自体の構築はわりと難航しました。当初はベアメタルサーバー(Ubuntu)上に構築したk3sの上でTinkerbell Stackを動かすつもりでしたが、 `kubectl get svc -n tink-system` でいつまでも払い出されないIPアドレスに色々諦めて、Tinkerbellの中の人が実践していたk3dを使って構築しました。TinkerbellのデフォルトのCNIとしてkube-vipを利用しているのですが、その特色について理解を深めたらまた素のk3sへのTinkerbell構築に再チャレンジしたいところです。<br/>また、デフォルトのライティングツールはqcow2形式のイメージファイルを使用します。Ubuntuのように最初からqcow2形式でわかりやすく公開されているディストリビューションもありますが、そうではない場合、qemu-imgツールによる変換作業というひと手間が必要そうです。qcow2は恥ずかしながら初めて扱う形式だったので若干戸惑いました。<br/>**templateとcloud-init/Ignitionの棲み分け**: Tinkerbellのテンプレートファイルは自由度が高く、GitHub ActionsのSelfHostedRunnerを動かすこともできたりします。ですが、プロビジョニングツールとしては既にcloud-init(CoreOSだとIgnition)というツールが普及しております。TinkerbellでもHegelと呼ばれるメタデータサーバーというツールを通じて、tink-workerで起動中にファイルを取得、動かす機能が予め備わっています。[参考: Cluster API Provider Tinkerbellの該当処理。](https://github.com/tinkerbell/cluster-api-provider-tinkerbell/blob/e5dcf1b2ba7038bf1d3afe9b4b6e33e5507c6cbf/internal/templates/templates.go#L102)実運用の際は、Tinkerbellでいろいろできるけどcloud-initに寄せるんだろうなって思いました。
-

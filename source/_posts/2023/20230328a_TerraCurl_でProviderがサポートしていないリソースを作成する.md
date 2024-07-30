@@ -64,7 +64,6 @@ resource "null_resource" "my_custom_resource" {
 
 今回紹介するTerraCurlも、上記で説明した脱出ハッチ的な `local-exec`の使い方と似たようなユースケースになります。ネイティブのProviderではサポートされていないけど、サービス側のAPIではサポートされている場合に利用します。Provider側ですでにリソース作成が提供されていればTerraCurlを使う必要はありません。
 
-
 ## TerraCurlでAPI呼び出し
 
 [TerraCurlドキュメントのExcample](https://registry.terraform.io/providers/devops-rob/terracurl/latest/docs/resources/request) を元に、Qiita APIを用いてダミーの記事を作成しています。Qiita記事をTerraform管理する対象したいユースケースは皆無だと思います。TerraCurlを使うという1点のみが理由です。
@@ -190,7 +189,6 @@ qiita_article_response = "6410f22e585d0907005e"
 
 ※URLまでキャプチャに載せていますが、テスト投稿した記事は削除済みです
 
-
 ## Destoryする時どうするの？
 
 Qiita APIの記事投稿に関して、IDは公開後に分かります（APIで指定すれば固定できるかも知れませんが）。そのため、以下のような `output` で取得した値を、`destory_url` に指定できると良いのですが、これは `terraform apply` に決定する値ですので、循環参照となり指定できません。このあたりはどうするか一工夫が必要そうです。
@@ -216,10 +214,8 @@ resource "terracurl_request" "qiita_article" {
 
 もし、上記に一致するような条件で、従来 `local-exec` で実行していたけど、内部的には `curl` コマンドだけだった場合には、 `tf` ファイルで完結するので素晴らしいツールだと思います。スクリプトを別途用意しなくてよいのは開発、保守的にも嬉しいと思います。
 
-
 ## まとめ
 
 TerraCurlを使ってみました。ツールの命名が素晴らしくcurlで済ませられるようなリソースに関してはシンデレラフィットしそうなProviderです。
 
 作成時のレスポンスの値を、Destory時などに使いまわしたい場合などは少し取り回しが難しそうなので、取り扱いに注意して導入したいと思います。
-

@@ -146,6 +146,7 @@ export GOOGLE_PROJECT=xxxxxxxx
 ```
 
 ## Pulumiプロジェクトの作成
+
 Pulumiを利用するためPulumiプロジェクトを作成します。
 
 ```bash
@@ -287,7 +288,7 @@ func main() {
 上記の内容でPulumiを実行してGoogle Cloudのリソースを作成します。
 
 ```bash
-$ pulumi up
+pulumi up
 ```
 
 上記のコマンドを実行すると、Goのプログラムを評価し、実行するリソースの更新を決定します。変更の概要を示すプレビューが表示されます。
@@ -446,6 +447,7 @@ Do you want to perform this update?  [Use arrows to move, type to filter]
 ```
 
 `yes`を入力します。
+
 ```bash
 Do you want to perform this update? yes
 Updating (dev)

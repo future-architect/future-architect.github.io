@@ -44,7 +44,6 @@ Supporting 55 languages, 24 formats, 20 tooling formats and ready to use out of 
 
 基本的なフローは下図のようにコミットがある度にLinterが走り、各種レポートが作成されるというものです。
 
-
 <div align="center">
 ▼MegaLinterの基本的なフロー
 <img src="/images/20231129a/属性.png" alt="属性" width="1200" height="621" loading="lazy">
@@ -355,7 +354,6 @@ Download it from artifacts then copy-paste it in your local repo to apply linter
 表形式にまとめてくれているため、非常にわかりやすいですね。
 
 PRは[こちら](https://github.com/orangekame3/megalinter-sample/pull/1)です。
-
 
 # さいごに
 

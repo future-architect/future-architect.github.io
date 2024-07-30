@@ -15,6 +15,7 @@ lede: "こんにちは！HealthCare Innovation Group[^1]所属の橋本です。
 ---
 
 ## はじめに
+
 こんにちは！HealthCare Innovation Group(HIG)[^1]所属の橋本です。
 
 本記事は、[夏の自由研究ブログ連載2023](/articles/20230830a/)の1本目です。

@@ -22,9 +22,9 @@ lede: "Dev ContainersのPython環境を作っていきます。"
 まずリポジトリのフォルダを作ります。`python-dev`とします。
 
 ```shell
-$ mkdir python-dev
-$ cd python-dev
-$ git init
+mkdir python-dev
+cd python-dev
+git init
 ```
 
 ここをVSCodeで開き、Dev Containersの設定をしていきます。左下のリモートのボタンを押して **Add Dev Container Configuration Files...**　を選択します。
@@ -152,8 +152,8 @@ devcontainer.jsonに以下のように書いておくと、起動のたびにパ
 アプリ開発で必要なライブラリを追加するときは、pyproject.tomlのproject/dependenciesのリストに追加した後に、インストールしてlockファイル相当のrequirements.txtを作ります。このファイルはコンテナ作成やデプロイに使えます。このままだとdevセクションのものも入ってしまうのですが・・・このあたりもPythonツールチェーンが良くなって欲しいところの一つ。
 
 ```bash
-$ pip3 install --user .
-$ pip3 freeze --user > requirements.txt
+pip3 install --user .
+pip3 freeze --user > requirements.txt
 ```
 
 プロジェクトの雛形ができたら開発ツール類を整備します。必要な拡張、あとは設定などはdevcontainer.jsonに書いておくと環境を作った瞬間にチーム内で同じ設定を共有できます。
@@ -215,4 +215,3 @@ ryeを使う場合はdevcontainer.jsonのpostCreateCommandに次のコマンド�
 歴史が長いPythonの場合、環境分離の方法がいくつかあり、どれを選ぶかのトレードオフがあります。本エントリーでは、Dev Containersを唯一の環境分離手段として使い、モジュールは``pip install --user``でインストールする方法と、環境分離が二重がけになってしまい複雑になってしまうが、便利なryeの設定方法を紹介しました。
 
 pyproject.tomlを手作りするあたりはこれからツールの進歩があればだいぶマシになるかと思いますが``setup.py``を手書きしていたのと比べて別に悪化はしてないし許容範囲かな、と思っています。まあ他の言語と比べていまいち、というのはわかりますが。
-

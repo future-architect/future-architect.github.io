@@ -172,7 +172,7 @@ walkthroughを確認すると、どうやらPythonの実行環境があるらし
 robertにユーザを変更します。
 
 ```sh
-$ su robert
+su robert
 ```
 
 パスワードはmysqlの接続情報に記載されていた`M3g4C0rpUs3r!`を入力するとユーザを切り替えすることができました。

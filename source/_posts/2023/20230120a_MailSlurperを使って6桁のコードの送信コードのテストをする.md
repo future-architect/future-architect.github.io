@@ -86,7 +86,7 @@ services:
 あとは起動するだけです。 http://localhost:8080 にアクセスして管理画面にアクセスできることを確認しましょう。
 
 ```bash
-$ docker compose up
+docker compose up
 ```
 
 <img src="/images/20230120a/スクリーンショット_2023-01-16_1.41.30.png" alt="スクリーンショット_2023-01-16_1.41.30.png" width="1200" height="684" loading="lazy">
@@ -307,5 +307,3 @@ func TestMain(m *testing.M) {
 これで実SMTPサーバーを使ったコードを書いて、それをMailSlurperを使ってテストする方法を学びました。REST APIのおかげで、ヘルパーさえ用意してしまえば、テストを書くのは簡単です。
 
 これだけ使いやすいとなると、非同期通信系は全部SMTPに寄せたくなってくる気もします。まあ本番環境の安定稼働を考えると実際にやることはないですが、MailSlurperは送信結果を見るのもできて、開発体験はかなり良いです。
-
-

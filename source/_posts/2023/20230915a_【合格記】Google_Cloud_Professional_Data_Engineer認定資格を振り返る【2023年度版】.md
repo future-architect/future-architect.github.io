@@ -45,72 +45,72 @@ Google Cloud 認定資格関連の過去記事：
 ### データ処理システムの設計
 
 - データの前処理を行ううえでどのようなアーキテクチャ・サービスが推奨されるか？
-    - ローコード・ノーコードで前処理したい
-        - DataprepやData Fusion
-    - Kubernetesを利用したオーケストレーションの活用
-        - Cloud Composer
+  - ローコード・ノーコードで前処理したい
+    - DataprepやData Fusion
+  - Kubernetesを利用したオーケストレーションの活用
+    - Cloud Composer
 - データの受け口にキューイングシステムであるPubSubを構えておくのが鉄板
 - データベースの用途は何なのか？取り扱うデータは？時系列？トランザクション？
-    - 用途によって、DBのサービスを選ぶ
-    - Cloud SQL/Bigtable/Firestore/Spannerどれを選ぶべきか
+  - 用途によって、DBのサービスを選ぶ
+  - Cloud SQL/Bigtable/Firestore/Spannerどれを選ぶべきか
 - サーバーレスでSQL使いたい？データウェアハウスを構築したい？
-    - BigQuery使おう
+  - BigQuery使おう
 - BigQueryとPubSubが優秀
-    - 回答に困ったらとりあえずBigQueryかPubSubが入っている選択肢を選ぶというくらいにBigQueryとPubSubが強すぎる感（主観）
-    - 特にBigQueryは別格感ありますね。実務でも使い倒されてます。
+  - 回答に困ったらとりあえずBigQueryかPubSubが入っている選択肢を選ぶというくらいにBigQueryとPubSubが強すぎる感（主観）
+  - 特にBigQueryは別格感ありますね。実務でも使い倒されてます。
 
 ### 機械学習モデルの運用化
 
 - モデルが過学習している場合はどうするか？
-    - データを増やす
-    - 正規化する
-    - 学習パラメータを減らす
+  - データを増やす
+  - 正規化する
+  - 学習パラメータを減らす
 - 欠損値を含む場合はどうするか？
-    - ノーコードで除去したい場合はDataprep
-    - DataflowでBigQueryを前処理として組み込む手もある
+  - ノーコードで除去したい場合はDataprep
+  - DataflowでBigQueryを前処理として組み込む手もある
 - 機械学習モデルの学習処理を早く終わらせたい場合はどうするか？
-    - GPUが使えるフレームワークであれば、GPU搭載インスタンスの利用
+  - GPUが使えるフレームワークであれば、GPU搭載インスタンスの利用
 - クライアントが解決したい課題はどのモデルを使うべきか
-    - 回帰問題/分類問題を理解しておく
+  - 回帰問題/分類問題を理解しておく
 - 機械学習モデルの運用方法
-    - 学習の自動化
-    - データセットの監視・管理
+  - 学習の自動化
+  - データセットの監視・管理
 
 ### ソリューションの品質の確保
 
 - 適切なアラート設計
-    - 何を指標としたアラートを設計すべきか？
+  - 何を指標としたアラートを設計すべきか？
 - システムの可用性はどうあるべきか
-    - ゾーナル/リージョナル/マルチリージョナル
-    - レプリカの活用
+  - ゾーナル/リージョナル/マルチリージョナル
+  - レプリカの活用
 - Dataflowなどにおける処理遅延に対するトラブルシューティング
-    - 適切なノードのスケールアップ
+  - 適切なノードのスケールアップ
 - 法規制に対応するためのデータの置き方
-    - 1プロジェクトにデータを集約させるデータレイクのような形をとっておく
+  - 1プロジェクトにデータを集約させるデータレイクのような形をとっておく
 - 適切なログの集約・保管
-    - Log sinkやログバケットの活用
-    - 検索性を高めたいのであればBigQueryへシンク
+  - Log sinkやログバケットの活用
+  - 検索性を高めたいのであればBigQueryへシンク
 
 ### データ処理システムの構築と運用化
 
 - 複数のリソースからデータを参照したい場合のDB・ストレージの選択
 - IAMを利用したデータのアクセス制限
-    - プロジェクトレベルのIAM
-    - データセットレベルのIAM
-    - テーブルの列レベルのIAM
+  - プロジェクトレベルのIAM
+  - データセットレベルのIAM
+  - テーブルの列レベルのIAM
 - Cloud DLPを利用した機密情報の保護
-    - 暗号化した情報は復元できるようにしておく必要がある or Not?
+  - 暗号化した情報は復元できるようにしておく必要がある or Not?
 
 ## 受験までの過程
 
 勉強期間は約1か月ほどで、主に以下2つの教材を利用しました。
 
 - Google Cloud Skills Boost for Partners
-    - [Create and Manage Cloud Resources](https://go.cloudplatformonline.com/ODA4LUdKVy0zMTQAAAGLnYP9oegPUvBCNvLo78WmEQiM_CnVxjPXmx9ZG9q4pL9Bk0xJ1_vowa60C6W4Qm_6JFo07i8=)
-    - [Perform Foundational Data, ML and AI Tasks in Google Cloud](https://go.cloudplatformonline.com/ODA4LUdKVy0zMTQAAAGLnYP9oUG5zPOW9QIHqa1spOv9I4AzHhHRS34gabCSyuSdn6Aa3zIPRpEex1uthLSuBtNJiSM=)
-    - [Engineer Data in Google Cloud](https://go.cloudplatformonline.com/ODA4LUdKVy0zMTQAAAGLnYP9oZY0kQV0dpn8ANn8j0ArOZiyxYzkn_yNbnbe_Av40gu0nqSxLYUw7WT_K-QYO8_De6I=)
+  - [Create and Manage Cloud Resources](https://go.cloudplatformonline.com/ODA4LUdKVy0zMTQAAAGLnYP9oegPUvBCNvLo78WmEQiM_CnVxjPXmx9ZG9q4pL9Bk0xJ1_vowa60C6W4Qm_6JFo07i8=)
+  - [Perform Foundational Data, ML and AI Tasks in Google Cloud](https://go.cloudplatformonline.com/ODA4LUdKVy0zMTQAAAGLnYP9oUG5zPOW9QIHqa1spOv9I4AzHhHRS34gabCSyuSdn6Aa3zIPRpEex1uthLSuBtNJiSM=)
+  - [Engineer Data in Google Cloud](https://go.cloudplatformonline.com/ODA4LUdKVy0zMTQAAAGLnYP9oZY0kQV0dpn8ANn8j0ArOZiyxYzkn_yNbnbe_Av40gu0nqSxLYUw7WT_K-QYO8_De6I=)
 - Udemy
-    - [GCP : Google Cloud Professional Data Engineer Practice Tests](https://www.udemy.com/share/109eq23@8q8wUTalxAxhRgFfWbEgH1c3mbjL7aXRRw7dpbqd0PHnoLq-HnSq5UGeaHyEwA0e/)
+  - [GCP : Google Cloud Professional Data Engineer Practice Tests](https://www.udemy.com/share/109eq23@8q8wUTalxAxhRgFfWbEgH1c3mbjL7aXRRw7dpbqd0PHnoLq-HnSq5UGeaHyEwA0e/)
 
 ### Google Cloud Skills Boost for Partners
 

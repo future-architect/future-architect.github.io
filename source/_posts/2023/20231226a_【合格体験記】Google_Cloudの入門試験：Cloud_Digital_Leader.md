@@ -37,7 +37,7 @@ https://cloud.google.com/learn/certification/cloud-digital-leader?hl=ja
 
 ### 推奨される経験
 
-> 技術専門家と連携した経験 
+> 技術専門家と連携した経験
 技術的な前提条件はありません
 
 自身が技術専門家として従事した業務経験を前提としていない為、私のようにインフラやクラウドが未経験の人でも目指せる資格ということがわかります。
@@ -75,6 +75,7 @@ https://future-architect.github.io/articles/20230302a/
 模擬試験がメインの試験対策になるため、本の内容は熟読せずに流し読みでも問題ないです。私は１周流し読みしました。4時間くらいかかりました。（細かい記載は飛ばしました。）
 
 ## 2\. Udemyの模擬試験の反復
+
 Udemyにて、こちらの模擬試験を購入し反復しました。
 
 >GCP：Google Cloud Digital Leader模擬試験問題集（6回分320問）
@@ -116,4 +117,3 @@ https://www.udemy.com/course/google-cloud-digital-leader6320/
 また、AWSやAzureなど、他のクラウドサービスにもGoogle Cloudにあるような機能がある為、クラウド全般の入門としてもいいと思いました。
 
 これからクラウドの知識やインフラの知識を身に着けたい人のスタートに良い試験だと思います。ぜひ受験してみてください！
-

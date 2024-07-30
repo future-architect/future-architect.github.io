@@ -29,7 +29,7 @@ Playwrightをインストールするには、npm yarn pnpmのいずれを使用
 Playwrightによるテストを構築したいディレクトリ下で、以下のコマンドを実行します。
 
 ```sh
-$ npm init playwright@latest
+npm init playwright@latest
 ```
 
 実行すると初期化に伴うオプションの変更をあれこれ聞かれます。 特にこだわりがなければそのままEnterを押していってください。空白で送信した場合はデフォルト値で設定されます。

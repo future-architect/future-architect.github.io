@@ -31,15 +31,19 @@ lede: "新しいSQLフォーマッターであるuroboroSQL-fmtをリリース�
 という課題を抱えており、それを解消するため新たなSQLフォーマッターを開発していました。
 
 #### ANTLR+TypeScriptによるSQLフォーマッターの開発
+
 [Engineer Camp2020](/articles/20200606/)でANTLRとTypeScriptによるSQLフォーマッターを開発しました。インターンシップ中にSQLがフォーマットできるようになり、この方向性で旧版が抱えていた課題は解決できそうに思えましたが、SQLの構文解析が著しく遅いという問題点がありました。弊社太田が[ANTLRのJavaScript runtimeの不具合を発見](https://github.com/antlr/antlr4/issues/2902)し、かなり高速化されたものの実用的な速さにはならなかったこともありANTLRを用いたSQLフォーマッターの開発はストップしました。
 
 インターンシップで行ったことについては以下の記事をご覧ください。
+
 - [Engineer Camp2020でSQLフォーマッタを開発しました](/articles/20200919/)
 
 #### RustによるSQLフォーマッターの開発
+
 旧版の課題を解決しつつ十分な速さでフォーマット可能なSQLフォーマッターを開発するため、[Engineer Camp2022](https://future-architect.github.io/articles/20220606b/)でRustによるSQLフォーマッターの開発を開始しました。インターンシップ終了時点で簡単なSQLのフォーマットが可能になり、その後もアルバイトとしてSQLフォーマッター開発に参画していただき、旧版のフォーマッターでは実現できなかったSELECT句のエイリアス補完等の機能、[vscode拡張化](https://marketplace.visualstudio.com/items?itemName=Future.uroborosql-fmt)、[wasm化](https://future-architect.github.io/uroborosql-fmt/)を実現しリリースに至りました。
 
 インターンシップで行ったことや開発の過程で調査したことは以下の記事をご覧ください。
+
 - [Engineer Camp2022 RustでSQLフォーマッタ作成（前編）](/articles/20220916b/)
 - [Engineer Camp2022 RustでSQLフォーマッタ作成（後編）](/articles/20220916c/)
 - [Language Server Protocolを用いたVSCode拡張機能開発 (前編)](/articles/20221124a/)
@@ -65,7 +69,9 @@ lede: "新しいSQLフォーマッターであるuroboroSQL-fmtをリリース�
 字句解析ベースから構文解析ベースになったことで、下記のような構文を意識した補完やauto fixができるようになっています。
 
 ##### カラムのAS補完
+
 ###### フォーマット前
+
 ```sql
 SELECT
 	COLUMN1	COL1
@@ -74,6 +80,7 @@ FROM
 ```
 
 ###### フォーマット後
+
 ```sql
 SELECT
 	COLUMN1	AS	COL1
@@ -84,6 +91,7 @@ FROM
 ##### カラムエイリアス補完
 
 ###### フォーマット前
+
 ```sql
 SELECT
 	COL1
@@ -92,6 +100,7 @@ FROM
 ```
 
 ###### フォーマット後
+
 ```sql
 SELECT
 	COL1	AS	COL1
@@ -201,11 +210,11 @@ wasm版は[こちらのデモ](https://future-architect.github.io/uroborosql-fmt
 
 <img src="/images/20231120a/wasm版フォーマットデモ.gif" alt="wasm版フォーマットデモ.gif" width="1200" height="618" loading="lazy">
 
-
 #### 方法2：vscode拡張として使用する
 
 1. まず、他の拡張機能と同様に[uroborosql\-fmt \- Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Future.uroborosql-fmt)をvscodeにインストールしてください。
 1. settings.jsonに以下の設定を入れてください
+
     ```json
     {
       "[sql]": {
@@ -213,10 +222,12 @@ wasm版は[こちらのデモ](https://future-architect.github.io/uroborosql-fmt
       }
     }
     ```
+
 1. SQLファイルを開き、コマンドパレットから`Format Document`か、`format sql`を実行してください
   `format sql`では選択範囲のフォーマットをサポートしています
 
 ##### フォーマットの設定方法
+
 フォーマットの各種設定を記載したファイルのパスを指定することができます。
 指定されなかった場合にはデフォルトのパスにある `./.uroborosqlfmtrc.json` を読み込みます。
 設定ファイルが存在しなかった場合、デフォルト値でフォーマットされます。
@@ -257,11 +268,13 @@ wasm版は[こちらのデモ](https://future-architect.github.io/uroborosql-fmt
 ### チーム開発で使用する場合
 
 1. `.vscode/settings.json` を作成し、以下のように`uroborosql-fmt.configurationFilePath`の設定を記載してください
+
     ```json
     {
         "uroborosql-fmt.configurationFilePath": "./.uroborosqlfmtrc.json"
     }
     ```
+
 1. チームで使用したいフォーマットの設定を`.uroborosqlfmtrc.json`に記載し、リポジトリ直下に配置してください
 
 ### 最後に

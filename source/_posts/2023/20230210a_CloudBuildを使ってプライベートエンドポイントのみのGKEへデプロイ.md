@@ -14,18 +14,19 @@ author: 渡邉光
 lede: "こんにちは！筋肉エンジニアの渡邉です。最近はGCP/GKEについて勉強しています。今回はGitHubへのPushをトリガーにCloudBuildを起動し、プライベートエンドポイントのみのGKEへデプロイする基盤を作りましたので、共有したいと思います。GCPリソースはTerraformで作成しています。"
 ---
 # 初めに
+
 こんにちは！筋肉エンジニアの渡邉です。最近はGCP/GKEについて勉強しています。
 
 今回はGitHubへのPushをトリガーにCloudBuildを起動し、プライベートエンドポイントのみのGKE(Google Kubernetes Engine)へデプロイする基盤を作りましたので、共有したいと思います。
 
 GCPリソースはTerraformで作成しています。CloudBuildとGitHubの連携は一部画面による紐づけが必要になるので、手動でCloudBuildを作成した後、terraform importでコード管理するようにしました。
 
-
 # デプロイフロー
 
 <img src="/images/20230210a/Deploy_Architecture.drawio.png" alt="Deploy_Architecture.drawio.png" width="901" height="264" loading="lazy">
 
 デプロイフローは以下の流れになります。
+
 1. ローカルでアプリケーションコードの修正
 2. ローカルで修正をCommit、GitHubへPush
 3. GitHubへPushされたことをトリガーにCloudBuildが起動
@@ -33,6 +34,7 @@ GCPリソースはTerraformで作成しています。CloudBuildとGitHubの連�
 5. CloudBuildからGKEへコンテナイメージをデプロイ
 
 # アプリケーションコード
+
 Goで記述されたアプリケーションを書きました。
 リクエストを投げると、Hello world!とVersionとHostnameをレスポンスします。
 
@@ -80,6 +82,7 @@ func hello(w http.ResponseWriter, r *http.Request) {
 
 GKEにデプロイするアプリケーションはコンテナのため、Dockerfileを作成します。
 Dockerfileは以下の通りです。
+
 ```Dockerfile
 # goバージョン
 FROM golang:1.19.1-alpine
@@ -102,6 +105,7 @@ EXPOSE 8080
 <img src="/images/20230210a/architecture.drawio.png" alt="architecture.drawio.png" width="1151" height="429" loading="lazy">
 
 ## クラスタ構成
+
 - **クラスタバージョン**：1.23.13-gke.900（リリースチャンネルをSTABLEで構築した時のデフォルトバージョン）
 - **リージョンクラスタ**：本番環境で利用することを考慮して可用性を高くしたいため
 - **VPCネイティブクラスタ**：GKE バージョン 1.21.0-gke.1500 以降のすべてのクラスタはVPCネイティブクラスタがデフォルトのネットワークモードのため
@@ -110,6 +114,7 @@ EXPOSE 8080
 ※この構成は制限が厳しいのでセキュリティ要件的に問題なければ、「パブリック エンドポイント アクセスが有効、承認済みネットワークが有効」で構築してもよいです。
 
 ## Manifest
+
 GoのアプリケーションコンテナをGKE上にPodとして建てたいので、deploymentを作成します。containers.imageにはArtifact Registryに保存されているイメージ名を指定します。containerPortにはDockerfileのEXPOSEで指定した8080を指定します。
 
 ```yaml deployment.yaml
@@ -189,6 +194,7 @@ spec:
             port:
               number: 80
 ```
+
 Ingressに適用させるGoogleマネージド証明書を作成します。
 ドメインはterraformで作成済みの静的外部IPアドレスにフリーなワイルドカードDNSのnip.ioを設定しました。
 
@@ -214,7 +220,6 @@ manifestファイルの適用自体は踏み台サーバから実行していま
 
 <img src="/images/20230210a/2-Application-Access①.png" alt="2-Application-Access①.png" width="344" height="119" loading="lazy">
 
-
 # CloudBuildの作成
 
 現状の状態だと
@@ -231,6 +236,7 @@ GitHubへのPushをトリガーに上記の手順の3~5を自動化したいた�
 ## CloudBuildトリガーの作成
 
 ### GitHubとの連携
+
 CloudBuildとGitHub（プライベートリポジトリ）を連携するためには画面での認証手続きが生じるため、一旦Terraformでは作成せず手動で設定を行いました。
 手動で設定が完了した後、terraform importコマンドを利用してコード管理するようにします。
 
@@ -248,6 +254,7 @@ Google Cloudコンソール画面から「Cloud Build」をクリック→「ト
 <img src="/images/20230210a/1-CloudBuild②.png" alt="1-CloudBuild②.png" width="979" height="884" loading="lazy">
 
 リポジトリに接続画面で
+
 - ソースを選択：GitHub (Cloud Build GitHubアプリ)
 を選択し、「続行」をクリックする。
 
@@ -271,6 +278,7 @@ Google Cloud Build by Google Cloud Build would like permission toの画面の「
 <img src="/images/20230210a/1-CloudBuild⑥.png" alt="1-CloudBuild⑥.png" width="572" height="903" loading="lazy">
 
 Install Google Cloud Buildの画面から
+
 - Only Select repositories：Cloud Buildと連携したいリポジトリ
 を入力し、「Install」をクリックします。
 
@@ -281,7 +289,6 @@ Install Google Cloud Buildの画面から
 を入力し、チェックボックスにチェックを入れて「接続」をクリックします。
 
 <img src="/images/20230210a/1-CloudBuild⑧.png" alt="1-CloudBuild⑧.png" width="575" height="901" loading="lazy">
-
 
 ここまでの設定で、Cloud Buildと自身のGitHubリポジトリを連携させることができます。
 
@@ -308,12 +315,12 @@ your Terraform state and will henceforth be managed by Terraform.
 ```
 
 terraform import後
+
 - サービスアカウントの設定
 - ビルド実行時に必要なビルド構成ファイルのパスを設定
 - ビルド構成ファイルに必要な環境変数
 
 を指定してterraform applyをして適用します。
-
 
 # CloudBuildからGKE Control Planeへの接続
 
@@ -322,8 +329,8 @@ terraform import後
 CloudBuildからGKE Control Planeのプライベートエンドポイント接続を内部ネットワークを経由するようにしたいので、CloudBuildをPrivate Poolを利用するように作成します。
 Cloud Build プライベート プールを使用した限定公開 Google Kubernetes Engine クラスタへのアクセスはGoogle Cloudの[アーキテクチャセンター](https://cloud.google.com/architecture/accessing-private-gke-clusters-with-cloud-build-private-pools)にも記載されているので、詳しくはこちらの記事をご覧ください。
 
-
 ## ネットワークアーキテクチャ
+
 CloudBuildからGKEへデプロイするためのネットワークアーキテクチャの完成図になります。
 <img src="/images/20230210a/New_architecture.drawio.png" alt="New_architecture.drawio.png" width="1200" height="355" loading="lazy">
 
@@ -347,17 +354,16 @@ Private Poolとプライベート接続する用のVPCには、**名前付きIP�
 この設定により、のちにPrivate PoolにGKE Control PlaneのCIDR(192.168.64.0/28)が広報されます。
 <img src="/images/20230210a/4-network-architecuture④.png" alt="4-network-architecuture④.png" width="1200" height="847" loading="lazy">
 
-
 ### GKE Control Planeとmy-stg-environment-vpc間
+
 <img src="/images/20230210a/between_gke_control_plane_my_stg_environment.drawio.png" alt="between_gke_control_plane_my_stg_environment.drawio.png" width="1200" height="355" loading="lazy">
 
 GKE Control Planeとmy-stg-environment-vpcを接続しているVPC Peeringのカスタムルートのエクスポートを有効化します。
 これにより、のちにHA VPN Gatewayを通じて広報されてきたPrivate PoolのCIDR(192.168.3.0/24)をGKE Control Plane側に広報することができます。
 <img src="/images/20230210a/4-network-architecuture①.png" alt="4-network-architecuture①.png" width="1200" height="849" loading="lazy">
 
-
-
 ### HA VPNの作成
+
 <img src="/images/20230210a/between_sample_build_vpc_my_stg_environment.drawio.png" alt="between_sample_build_vpc_my_stg_environment.drawio.png" width="1200" height="355" loading="lazy">
 
 CloudBuildのprivate poolのCIDR(192.168.3.0/24)をmy-stg-environment-vpcに、GKE Control PlaneのCIDR(192.168.64.0/28)をsample-build-vpcにそれぞれ広報したいので、my-stg-environment-vpcとsample-build-vpcをHA VPNで接続します。
@@ -400,15 +406,14 @@ my-stg-environmentにCloudBuild Private PoolのCIDR(192.168.3.0/24)を広報し�
 
 <img src="/images/20230210a/4-network-architecuture⑩.png" alt="4-network-architecuture⑩.png" width="1200" height="847" loading="lazy">
 
-
-
 ここまでの設定で、CloudBuildからGKEへデプロイするためのネットワークアーキテクチャの完成になります。
 
-
 # デプロイの実施
+
 上記でCloudBuildから内部ネットワークを経由してGKE Contorl Planeへ通信できるルートができたので、実際にデプロイを実施してみましょう。
 
 ## CloudBuild.yaml
+
 CloudBuildでビルドを実行するためには、ビルド構成ファイルを作成する必要があります。
 ビルド構成ファイルには、各ビルドSTEPごとに実行したい処理を記述します。
 ビルド構成ファイルに記載しているプロパティの内容は以下の通りです。
@@ -474,6 +479,7 @@ options:
   workerPool:
     'projects/$PROJECT_ID/locations/${_REGION}/workerPools/private-build-pool'
 ```
+
 こちらのcloudbuild.yamlをGitHub上のルートディレクトリ内に保存します。
 
 ```sh
@@ -507,6 +513,7 @@ options:
 ```
 
 ## アプリケーションコードの修正
+
 Version: 1.0.0　→　Version: 2.0.0へ修正してmainブランチにPushします。
 
 ```bash
@@ -542,6 +549,7 @@ To https://GitHub.com/xxxxxxxx/xxxxxxxx.git
 ```
 
 ## CloudBuildのビルド画面
+
 GitHubにPushされたことをトリガーにCloudBuildのビルドが実行されます。（過去にビルドに苦戦したビルド履歴が残っていますね。。。（笑））
 
 <img src="/images/20230210a/3-Deploy①.png" alt="3-Deploy①.png" width="1200" height="847" loading="lazy">
@@ -559,6 +567,7 @@ CloudBuildのビルドが正常終了したので、再度ドメインに対し�
 <img src="/images/20230210a/3-Deploy③.png" alt="3-Deploy③.png" width="352" height="93" loading="lazy">
 
 ## Podのライフサイクル
+
 最後のビルドステップでGKEへのデプロイが行われます。
 
 踏み台サーバから`kubectl get pods -w`を実行することでGKE上のPodの状態を確認することができます。
@@ -606,7 +615,6 @@ hello-go-deployment-78b555bdf6-z5rk8   0/1     Terminating         0          7m
 hello-go-deployment-78b555bdf6-z5rk8   0/1     Terminating         0          7m13s
 hello-go-deployment-78b555bdf6-z5rk8   0/1     Terminating         0          7m13s
 ```
-
 
 # 最後に
 

@@ -53,12 +53,12 @@ https://github.com/future-architect/tftarget/releases
 </div>
 
 # 2 tftargetの概要
+
 ## Terraformターゲットを選択的に実行する機能
 
 動作を直接見る方がわかりやすいと思いますので、tftargetを利用して`terraform apply`を実行するデモ画像を添付します。
 
 <img src="/images/20230329a/tftarget-apply.gif" alt="tftarget-apply.gif" width="854" height="431" loading="lazy">
-
 
 `terraform apply`の代わりに`tftarget apply`を実行します。
 実行後、しばらく待つと`terraform plan`によって出力された差分がリソース名とアクション（`create`や`destroy`など）ともに表示されます。ユーザーは、`terraform apply`を適用したいリソースにチェックを入れてEnterを押すことで、選択的に`terraform apply`を実行できます。
@@ -66,6 +66,7 @@ https://github.com/future-architect/tftarget/releases
 `apply`だけではなく、`plan`と`destroy`にも対応しています。
 
 ## どのようなシチュエーションで役立つか
+
 冒頭で述べたように、複数人で開発を行い、各人が個別に定義したリソースに影響を与えずに開発を進める際に役立ちます。`terraform target`を簡単に実行したい場面全般で利用価値があるおもいます。
 
 <div class="note alert" style="background: #feebee; padding:16px; margin:24px 12px; border-radius:8px;">
@@ -74,6 +75,7 @@ https://github.com/future-architect/tftarget/releases
 </div>
 
 # 3 tftargetのインストール方法
+
 ## Go
 
 Go製のCLIツールであるtftargetは、`go install`コマンドを使ってインストールできます。次のコマンドを実行してください。
@@ -97,6 +99,7 @@ brew install future-architect/tap/tftarget
 https://github.com/future-architect/tftarget/releases
 
 # 4 tftargetの使い方
+
 ## 基本的なコマンドの紹介
 
 tftargetには、`plan`、`apply`、`destroy`の3つのコマンドが用意されています。基本的な使い方は、これらのコマンドに共通しています。まず、`plan`コマンドの使い方を紹介します。
@@ -141,6 +144,7 @@ Spaceキーを押すことでチェックを付けることができます。右
 <img src="/images/20230329a/simple-usage-5.png" alt="simple-usage-5.png" width="1074" height="147" loading="lazy">
 
 ### tftarget destroy
+
 `tftarget apply`と利用方法は全く同じですので、ここでは説明を省略します。
 
 ## オプション
@@ -180,6 +184,7 @@ tftarget apply -i 50
 このコマンドは、最初の選択肢表示画面で最大50個のリソースが表示されるように設定します。
 
 ### --parallel, -p
+
 `--parallel`オプションはTerraform CLIで実装されている`-parallelism`に並列数を渡すためのオプションです。デフォルトでは10が設定されています。
 
 ```shell
@@ -187,6 +192,7 @@ tftarget apply -p 30
 ```
 
 ### --summary, -s
+
 `--summary`オプションでは、選択したリソースのサマリ表示を有効または無効にすることができます。デフォルトでは、`plan`や`apply`の結果にサマリが表示されますが、このオプションを使用してサマリ表示をオフにすることができます。
 
 <img src="/images/20230329a/simple-usage-5_2.png" alt="simple-usage-5.png" width="1074" height="147" loading="lazy">
@@ -200,14 +206,17 @@ tftarget apply -s false
 以上で、tftargetの使い方についての説明を終了します。
 
 # 5 バグ報告や機能提案の受付方法
+
 開発してまだ日が浅いのでバグや機能提案がある際はこちらに起票のほどよろしくお願いします。
 
 https://github.com/future-architect/tftarget/issues
 
 # 6 まとめ
+
 ## tftargetが解決する問題点
+
 tftargetを使用することで、簡単に`terraform target`を実行できます。特に、複数のメンバーが開発を行う際、各メンバーが定義したリソースを破壊することなく、安全に運用できるようになります。
 
 ## 今後の展望やアップデート予定
-現在、tftargetはAWS環境でのみ動作検証が行われています。今後は、GCPやAzureでの動作確認や改善を行っていく予定です。
 
+現在、tftargetはAWS環境でのみ動作検証が行われています。今後は、GCPやAzureでの動作確認や改善を行っていく予定です。

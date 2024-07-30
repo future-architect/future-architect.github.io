@@ -78,6 +78,7 @@ https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-i
 [引用元 2023/01 [AWS Black Belt Online Seminar] Amazon OpenSearch Serverless 27スライド目](https://pages.awscloud.com/rs/112-TZM-766/images/AWS-Black-Belt_2023_AmazonOpenSearchServerless_0131_v1.pdf)
 
 ### 公式ページはこちら
+
 - https://aws.amazon.com/jp/opensearch-service/features/serverless/
 
 公式ページでは、以下の情報がまとまっています
@@ -151,6 +152,7 @@ https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-i
    <img src="/images/20230525a/image_7.png" alt="image.png" width="1200" height="275" loading="lazy"><br>
    - 試しに[デベロッパーガイドのチュートリアル](https://docs.aws.amazon.com/ja_jp/opensearch-service/latest/developerguide/serverless-getting-started.html#serverless-gsg-index)の「ステップ3: データをアップロードして検索する」にならってインデックスの作成を行う
    以下を入力し、列の右側に再生ボタンのようなアイコンが出るのでクリック
+
    ```json
    PUT movies-index/_doc/1
    {
@@ -159,6 +161,7 @@ https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-i
      "year": 1994
    }
    ```
+
    作成できた旨のメッセージが出ます。
    <img src="/images/20230525a/image_8.png" alt="image.png" width="1200" height="283" loading="lazy">
    - `GET /movies-index/_doc/1` を入力、実行してデータが登録できることを確認

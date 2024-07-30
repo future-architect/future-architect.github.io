@@ -41,7 +41,6 @@ SQLインスタンスをインターネット上に晒したくないという�
 
 <img src="/images/20231019a/image.png" alt="image.png" width="782" height="550" loading="lazy">
 
-
 2の場合は、Cloud SQLが存在するVPC内へアクセス経路を持つ必要があるため、VPC PeeringやCloud VPN、Cloud Interconnectによって接続元が利用するVPCがお互いに経路を確保し、Cloud SQLのPrivate IPが広報される必要があります。
 ※本記事では[HA-VPN構成](https://cloud.google.com/network-connectivity/docs/vpn/concepts/topologies?hl=ja)を例に取り扱わせて頂きます。
 

@@ -122,4 +122,3 @@ Slack に作業スレッドを貼り、そこに今現在行っていること�
 今回インターンとして受け入れてくださったフューチャーさん、受け入れ先で支えていただいた社員の方々、共に1カ月間を過ごしたインターンの同期の方々、ありがとうございました！
 
 アイキャッチは<a href="https://pixabay.com/ja/users/thedigitalartist-202249/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8037837">Pete Linforth</a>による<a href="https://pixabay.com/ja//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=8037837">Pixabay</a>からの画像です。
-

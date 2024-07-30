@@ -35,13 +35,11 @@ lede: "VSCode Dev Containersを利用してPlaywrightの実行環境をコンテ
   </p>
 </div>
 
-
 Playwrightをデバッグ起動したりUIモードで起動したりする場合、コンテナ上で起動するGUIをホストOS上に表示する必要があるため、X Window Systemを利用します。（Playwrightをコマンドラインのみで利用する場合、本手順は不要です。）
 なお、何も設定をせずにコンテナ上でGUIを起動しようとすると`Missing X server or $DISPLAY`のようなエラーが発生します。
 
 今回はホストOSとしてMacを利用しているため [Xquartz](https://www.xquartz.org/) の導入手順を紹介します。
 Windowsの方は[Xming](http://www.straightrunning.com/XmingNotes/)などを利用してください。
-
 
 Xquartzをインストールし、コンテナからのアクセスを許可するため「ネットワーク・クライアントからの接続を許可」します。
 下記はコマンドラインから実行していますがGUI上から実施していただいても構いません。
