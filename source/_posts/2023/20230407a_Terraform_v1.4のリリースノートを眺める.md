@@ -25,6 +25,7 @@ Terraformのv1.0が出て約2年弱、ついにv1.4までやってきました�
 なお、本連載でもいくつかテーマとしている記事がありますので、その内容については割愛します。
 
 ## null_resourceに変わるビルトインリソースができた
+
 `null_resource`は、実行するホストマシンでシェルコマンドを実行したり、するために取り入れられているリソースですが、これがもう少し汎用性が高まる形で`terraform_data`というビルトインリソースができました。
 
 ビルトインということもあって、本来の機能からは逸れますが、`terraform init`コマンドをそれぞれ利用する前提で実行した時にinitにかかる時間や、実際の`terraform init`の中で行われている内容に違いが現れています。
@@ -95,6 +96,7 @@ resource "terraform_data" "pip_install" {
 ```
 
 ## `terraform workspace select`コマンドにオプションが追加
+
 `terraform workspace select`に新しいオプションとして`-or-create`というオプションが使えるようになりました。実際にhelpを実行しても見えるようになりました。
 
 ```bash
@@ -117,6 +119,7 @@ $ terraform workspace list
   dev
 * stg
 ```
+
 ここに、さらに`prd`というworkspaceを選択して、本番環境を作成するとしましょう。現在であれば、`terraform workspace select`コマンドはないworkspaceを指定するので、エラーになってしまいます。しかし、`-or-create`オプションがあることで、ない場合でもエラーにならずに、新しいworkspaceが作成されるようになります。
 
 ```bash
@@ -128,6 +131,7 @@ Workspace "prd" doesn't exist.
 You can create this workspace with the "new" subcommand
 or include the "-or-create" flag with the "select" subcommand.
 ```
+
 ```bash
 # オプションがある時
 terraform workspace select -or-create prd
@@ -137,6 +141,7 @@ You're now on a new, empty workspace. Workspaces isolate their state,
 so if you run "terraform plan" Terraform will not see any existing state
 for this configuration.
 ```
+
 ```bash
 # workspaceがあるか確認
 terraform workspace list
@@ -155,6 +160,7 @@ terraform workspace list
 既存で存在するTerraformコンテナにおいては `terraform workspace select test || terraform workspace new test`が実行できない問題があること、また、CIでworkspaceを新規作成する時に上記コマンドを実行することに不都合が生じる、というケースの解決を目的としているようです。
 
 ## `terraform show`のメッセージ
+
 `teraform show`コマンドは、そのStateで管理されているリソースを全て展開して表示してくれるコマンドですが、そのStateで管理しているリソースがない場合もあり得ます。この時に、「なぜ何も表示されないのか」をメッセージとして表示してくれるようになりました。
 従来では、Stateがそもそもないときはコメントが返ってくるものの、Stateはある状態で中身がないときは何もでませんでした。
 
@@ -168,8 +174,9 @@ $ terraform show
 
 # 何も出力されない
 ```
+
 後者のStateはあって、リソースがないケースについて、メッセージが出るようになりました。
-　
+
 ```bash
 $ terraform show
 The state file is empty. No resources are represented.
@@ -178,9 +185,10 @@ The state file is empty. No resources are represented.
 上記は、一度`terraform apply`コマンドでリソースを作った後に、`terraform destroy`コマンドでリソースを全て削除した後に実行しました。そのため、表示される文章としても「表示するリソースがない」というものになります。
 
 ## まとめ
+
 今回は、Terraform v1.4のリリース内容の一部をかいつまんで紹介しました。今回はすごく大きな変更、影響があるものは少ないものの、細かい要求に対してフィットしたような印象でした。今回紹介した機能追加も、「あると嬉しい」だったと感じているので、今後もより使いやすくなればと思います。
 
 その他のリリース内容
+
 - [Terraform 1.4 Update:Private Service Connectを利用したbackend/gcsへのアクセス](/articles/20230327b/)
 - [Terraformでの機密情報の取り扱い on Google Cloud](/articles/20230331a/)
-

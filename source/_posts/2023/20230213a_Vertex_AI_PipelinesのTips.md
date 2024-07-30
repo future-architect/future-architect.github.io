@@ -32,6 +32,7 @@ Vertex AI Pipelinesとは、GCP上でMLパイプライン機能を提供する�
 Vertex AI Pipelinesを使う際に参照することになる、Kubeflowの公式ドキュメントです。こちらもKubeflowの概要からコンポーネントの作成・パイプラインの実行、サンプルなどがまとめてあります。
 
 ## 関連用語
+
 [MLOps on GCP 入門 〜Vertex AI Pipelines 実践〜](https://recruit.gmo.jp/engineer/jisedai/blog/vertex-ai-pipelines-intro/)で分かりやすく解説されていたため、参考にさせていただきました。
 
 * パイプライン
@@ -39,16 +40,17 @@ Vertex AI Pipelinesを使う際に参照することになる、Kubeflowの公�
 * コンポーネント
 パイプラインで実行する一つ一つの処理のことを指します。例えば、preprocess -> train -> deployを実行するパイプラインの場合、「preprocess」、「train」、「deploy」がコンポーネントです。コンポーネントを定義する関数には`@component`デコレータを付けます。コンポーネントの実装には以下の3つが存在します。
 **コンポーネントの実装パターン**
-    * ① GCR に push されている**Docker image**を使う  （詳細は[自前のDocker imageを使って実装するには？](#自前のdocker-imageを使って実装するには)）
+  * ① GCR に push されている**Docker image**を使う  （詳細は[自前のDocker imageを使って実装するには？](#自前のdocker-imageを使って実装するには)）
     GCRにpushされているimageのURIを引数として与えることで処理を行う関数が用意されています。
-    * ② パイプラインのソースコードに**関数ベース**で書く （詳細は[事前のDocker imageの準備なしでPythonスクリプトのみで実装には？](#事前のdocker-imageの準備なしでpythonスクリプトのみで実装には)）
+  * ② パイプラインのソースコードに**関数ベース**で書く （詳細は[事前のDocker imageの準備なしでPythonスクリプトのみで実装には？](#事前のdocker-imageの準備なしでpythonスクリプトのみで実装には)）
     dockerのimageを使わずPythonベースで好きな処理を書くことができるため、簡単な処理を試したい場合などに向いています。
-    * ③ **Google Cloudパイプラインコンポーネント**を使う
+  * ③ **Google Cloudパイプラインコンポーネント**を使う
     よく利用される処理についてはGoogle側がすでに用意してくれているため、事前に関数一発で呼び出して実行してくれるものになっています。
 
 <img src="/images/20230213a/pipeline_example.png" alt="pipeline_example.png" width="960" height="540" loading="lazy">
 
 ### 参考
+
 * [MLOps on GCP 入門 〜Vertex AI Pipelines 実践〜](https://recruit.gmo.jp/engineer/jisedai/blog/vertex-ai-pipelines-intro/)
 
 # Tips
@@ -61,16 +63,20 @@ Vertex AI Pipelinesを使う際に参照することになる、Kubeflowの公�
 ② 事前のDocker imageの準備なしでPythonスクリプトのみで実装
 
 ### ① 自前のDocker imageを使って実装するには？
+
 #### 1. コンポーネントの作成
+
 **コンテナ（Dockerfile+src）とコンポーネント定義yamlを用意する**
 
 こちらの方法では、コンポーネントごとにDocker imageを用意して、そのDocker imageにコンポーネントの処理の内容を記述したPythonスクリプトを含ませることでコンポーネントを作成します。この方法は、利用するDocker imageのDockerfileやコンポーネントの各種設定を記述したyamlファイルを用意する必要がありますが、ローカルで動かしていたPythonスクリプトをそのままコンポーネント化することができます。Docker imageでコンポーネントを作成するために必要なファイルは以下の3つになります。
+
 * Pythonスクリプト：コンポーネントの処理の内容を記述する。
 * Dockerfile：Pythonスクリプトの実行に必要なパッケージをインストールする。Pythonスクリプトのコピーも。
 * yamlファイル：コンポーネントの入出力、使用するDocker image、Pythonスクリプト実行の際の引数の設定などを記述する。
 
 それぞれのファイルの記述例を以下に示します。
 Pythonスクリプトの記述例
+
 ```python main.py
 import argparse  # 必要なパッケージのインポート
 import pandas as pd
@@ -90,7 +96,9 @@ if __name__ == '__main__':
 
     run(**vars(args))
 ```
+
 Dockerfileの記述例
+
 ```Dockerfile Dockerfile
 FROM python:3.8-slim
 WORKDIR /root
@@ -103,7 +111,9 @@ COPY . .
 
 ENTRYPOINT ["python", "main.py"]
 ```
+
 yamlファイルの記述例
+
 ```yaml foo.yaml
 name: foo
 description: bar
@@ -123,6 +133,7 @@ implementation:
 ```
 
 #### 2. パイプラインの作成
+
 **Pythonでパイプラインを定義する（コンポーネントの依存関係定義など）**
 
 コンポーネントの作成が終わったら、続いてそれらのコンポーネントをつなげてパイプラインを作成します。
@@ -132,6 +143,7 @@ implementation:
 また、パイプラインをコンパイルするには`compiler.Compiler().compile`関数を使用します。引数にはコンパイルする関数、コンパイル結果を出力するjsonファイルのパスを渡します。
 
 パイプラインの定義、コンパイルを行うPythonスクリプトの例は以下の通りです。
+
 ```python
 from kfp.v2 import compiler, components, dsl
 
@@ -211,6 +223,7 @@ compiler.Compiler().compile(pipeline_func=pipeline,
 ```
 
 ### 参考
+
 * [Vertex Pipelinesによる機械学習パイプラインの実行](https://zenn.dev/dhirooka/articles/71a5fc473baefb)
 * [Building Python function-based components](https://www.kubeflow.org/docs/components/pipelines/v1/sdk/python-function-components/)
 
@@ -350,6 +363,7 @@ def pipeline():
 ```
 
 また、`CustomJob.jobSpec.workerPoolSpecs`から指定することもできます。
+
 ```python
 from kfp.v2 import compiler, components, dsl
 
@@ -443,12 +457,15 @@ def pipeline() -> None:
 
 1. コンパイルしたパイプラインjsonファイルをGoogle Cloud Storageにアップロード
 以下のコマンドでローカルのファイルをバケットにアップロードします。
+
 ```sh
 gsutil cp <ローカルファイルまでのパス> gs://<BUCKET_NAME>/<ファイル名>
 ```
+
 2. HTTPリクエストに応じてパイプラインを実行するPythonスクリプトの作成
 Cloud FunctionsでHTTPリクエストが送信された場合にパイプラインを実行するコードを作成します。
 以下がPythonスクリプトの例です。HTTPリクエストのbodyに、実行するパイプラインのjsonファイルまでのパス、パイプラインに渡すパラメータが含まれているという想定です。
+
 ```python
 import json
 from google.cloud import aiplatform
@@ -492,7 +509,9 @@ def process_request(request):
    job.submit()
    return "Job submitted"
 ```
+
 以下はHTTPリクエストのbodyの内容です。Cloud Schedulerジョブを作成する際に以下の内容を含むjsonファイルを使用します。
+
 ```json
  {
    "pipeline_spec_uri": "<path-to-your-compiled-pipeline>",
@@ -501,9 +520,11 @@ def process_request(request):
    }
  }
 ```
+
 3. Cloud Functionsの関数をデプロイ
 続いて、HTTPトリガーを使用して関数をデプロイします。
 上で作成したPythonスクリプトを含むディレクトリで以下のコマンドを実行します。
+
 ```sh
 gcloud functions deploy python-http-function \
     --gen2 \
@@ -513,8 +534,10 @@ gcloud functions deploy python-http-function \
     --entry-point=process_request \
     --trigger-http
 ```
+
 4. Cloud Schedulerジョブを作成
 最後に以下のコマンドでCloud Schedulerジョブを作成します。以下の例では毎日の朝9時にパイプラインが実行されます。
+
 ```sh
 gcloud scheduler jobs create http run-pipeline \
     --schedule="0 9 * * *"
@@ -525,6 +548,7 @@ gcloud scheduler jobs create http run-pipeline \
 ```
 
 ### 参考
+
 * [Cloud Scheduler でパイプライン実行をスケジュールする](https://cloud.google.com/vertex-ai/docs/pipelines/schedule-cloud-scheduler?hl=ja)
 * [Google Cloud CLI を使用して Cloud Functions（第 2 世代）の関数を作成してデプロイする](https://cloud.google.com/functions/docs/create-deploy-gcloud?hl=ja#functions-prepare-environment-python)
 * [cron ジョブを作成して構成する](https://cloud.google.com/scheduler/docs/creating?hl=ja#gcloud_2)
@@ -588,6 +612,7 @@ if __name__ == "__main__":
 
 コンポーネント間でのデータの受け渡しは、渡すデータが単一データか複数データかで異なります。
 単一データの受け渡しの場合、以下のようになります。
+
 ```python
 from kfp.v2 import dsl
 
@@ -609,9 +634,11 @@ def pipeline(a: int = 1, b: int = 2) -> None:
     add_task = add(a, b)
     print_task = print_result(add_task.output)
 ```
+
 単一データの場合、関数の出力は`<task_name>.output`で渡すことができます。
 
 一方、複数データの受け渡しの場合は、以下のようになります。
+
 ```python
 from typing import NamedTuple
 from kfp.v2 import dsl
@@ -679,6 +706,7 @@ def train(..., model: Output[Model], ...) -> None:
 ```
 
 また、Dockerベースの場合には、コンポーネントの仕様を定義したyamlファイルの`outputs`に記述することでできます。
+
 ```yaml
 name: train
 ...
@@ -741,7 +769,9 @@ if __name__ == "__main__":
         location="<region>",
     )
 ```
+
 パイプライン実行時に以下のように作成したexperimentを指定することでパイプラインをexperimentに登録することができます。
+
 ```python
 import google.cloud.aiplatform as aip
 
@@ -814,6 +844,7 @@ $$(パイプライン実行料金)+(n1-standard-4の1時間当たりの料金) \
 料金の詳細については、以下の参考のリンク先をご参照ください。
 
 ### 参考
+
 [Vertex AI Pipelinesの料金](https://cloud.google.com/vertex-ai/pricing?hl=ja#pipelines)
 
 ## 起動時間の目安は？
@@ -872,6 +903,7 @@ components/<component group>/<component name>/
 実際にこの構成で管理された[公式のサンプルコード](https://github.com/kubeflow/pipelines/tree/master/components/contrib/sample/keras/train_classifier)がありましたので、詳細はそちらをご参照ください。
 
 ### 参考
+
 * [Organizing the component files](https://www.kubeflow.org/docs/components/pipelines/v1/sdk/component-development/#organizing-the-component-files)
 
 ## テストはどうすればよい？
@@ -879,6 +911,7 @@ components/<component group>/<component name>/
 [kubeflowの公式のサンプル](https://github.com/kubeflow/pipelines/tree/6ee767769d8b8daa61379be6511e7375f8de0a55/samples/test)では、`unittest`を用いたテストの例がありました。
 
 ### 参考
+
 * [Vertex Pipelines コードを管理するためのベスト プラクティス](https://cloud.google.com/blog/ja/topics/developers-practitioners/best-practices-managing-vertex-pipelines-code)
 * [Writing tests](https://www.kubeflow.org/docs/components/pipelines/v1/sdk/best-practices/#writing-tests)
 
@@ -895,6 +928,7 @@ Compute Engineのデフォルトのサービスアカウントには、**プロ�
 `gcp-sa-aiplatform-cc.iam.gserviceaccount.com`はカスタムトレーニングコードを実行する際に利用され、`gcp-sa-aiplatform.iam.gserviceaccount.com`はVertex AI全般の機能を動作させるために利用されるようです。これら2つのアカウントが持つロールについては[こちら](https://cloud.google.com/iam/docs/understanding-roles#service-agents-roles)をご参照ください。
 
 ### 参考
+
 * [きめ細かい権限を持つサービス アカウントを構成する](https://cloud.google.com/vertex-ai/docs/pipelines/configure-project#service-account)
 * [Service agents](https://cloud.google.com/iam/docs/service-agents)
 * [IAM によるアクセス制御](https://cloud.google.com/vertex-ai/docs/general/access-control#service-agents)
@@ -917,4 +951,3 @@ Vertex AI Pipelinesでは、パイプラインジョブの同時実行数やタ�
 ## おわりに
 
 Vertex AI Pipelinesを利用するにあたって気になりそうなことをまとめました。皆様の一助となれば幸いです。
-

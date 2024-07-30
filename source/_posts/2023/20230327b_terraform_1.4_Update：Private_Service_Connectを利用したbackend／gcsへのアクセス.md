@@ -30,6 +30,7 @@ Terraform 1.4.0の`ENHANCEMENTS`で以下の機能が追加されました。
 - GCS
 
 # Private Service Connectを利用しない構成
+
 Private Service Connectを利用しない構成はこちらです。
 
 GCEにTerraformをインストールし、Terraform Serverとしています。Terraform Serverでterraform initを実行するとVPCに構築済みのCloud Nat/インターネット経由でGCSへアクセスされます。
@@ -37,7 +38,6 @@ GCEにTerraformをインストールし、Terraform Serverとしています。T
 この構成は皆さんお使いのいつもの構成だと思います。
 
 <img src="/images/20230327b/architecture01.drawio.png" alt="" width="772" height="591" loading="lazy">
-
 
 # Private Service Connectを利用した構成
 
@@ -49,16 +49,16 @@ Private Service Connectを利用した構成はこちらになります。
 
 <img src="/images/20230327b/architecture02.drawio.png" alt="architecture02.drawio.png" width="772" height="591" loading="lazy">
 
-
 ## Private Service Connectとは
 
 Private Service Connectとは一言でいうと、Google Cloud API にプライベートネットワーク経由でアクセスするための機能になります。
 
 詳しくはG-genの杉村さんの技術ブログがすごくわかりやすくまとまっているのでこちらを参照ください。
 
-* https://blog.g-gen.co.jp/entry/google-api-private-service-connect-explained
+- https://blog.g-gen.co.jp/entry/google-api-private-service-connect-explained
 
 ## Private Service Connectの作成
+
 以下公式ドキュメントを参考にPrivate Service Connectを作成します。
 
 https://cloud.google.com/vpc/docs/configure-private-service-connect-apis?hl=ja#console_1
@@ -87,8 +87,6 @@ Service Directoryも作成されています。
 
 <img src="/images/20230327b/image_4.png" alt="" width="1200" height="851" loading="lazy">
 
-
-
 限定公開DNSゾーンも作成されています。
 <img src="/images/20230327b/image_5.png" alt="" width="1200" height="852" loading="lazy">
 
@@ -116,7 +114,6 @@ xxxxxxxxxx@tky-bastion:~/terraform$ curl -v 10.0.3.0/generate_204
 <
 * Connection #0 to host 10.0.3.0 left intact
 ```
-
 
 ## Terraform の設定
 
@@ -372,6 +369,7 @@ tcpdump: listening on ens4, link-type EN10MB (Ethernet), capture size 262144 byt
 05:28:31.596653 IP (tos 0x0, ttl 64, id 27444, offset 0, flags [DF], proto UDP (17), length 78)
     10.0.0.2.58257 > 169.254.169.254.53: [bad udp cksum 0x5e4a -> 0x126e!] 14384+ [1au] AAAA? registry.terraform.io. ar: . OPT UDPsize=512 (50)
 ```
+
 すると、`storage-sampleendpoint.p.googleapis.com`のほかに`registry.terraform.io`を名前解決していることがわかりました。
 >05:28:31.596564 IP (tos 0x0, ttl 64, id 831, offset 0, flags [DF], proto UDP (17), length 78)
     10.0.0.2.43466 > 169.254.169.254.53: [bad udp cksum 0x5e4a -> 0x143a!] 35627+ [1au] A? registry.terraform.io. ar: . OPT UDPsize=512 (50)
@@ -410,7 +408,6 @@ d3rdzqodp6w8cx.cloudfront.net. 60 IN    A       18.65.202.87　★該当IPアド
 ```
 
 このことからTerraform 1.4.0で追加されたPrivate Service Connectを利用したbackend/gcsへのアクセスの機能を利用してもbackendのGCSへの通信のみプライベート接続され、Terraformのgoogle providerなどを利用するためにregistry.terraform.ioへのインターネットアクセスは避けられず完全プライベートではterraformは利用できないことが分かりました（当たり前か...）
-
 
 # 最後に
 

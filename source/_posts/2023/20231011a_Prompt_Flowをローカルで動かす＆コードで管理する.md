@@ -37,9 +37,11 @@ Prompt FlowはPython[ライブラリ](https://github.com/microsoft/promptflow)�
 ## 事前準備
 
 ### 1. Pythonのインストール
+
 Prompt Flowを動かすには、`Python 3.9`あるいは`Python 3.10`以上がインストールされている必要があります。
 
 ### 2. Prompt Flowライブラリのインストール
+
 以下のコマンドで`promptflow`,`promptflow-tools`のライブラリをインストールします
 
 ```sh
@@ -81,7 +83,7 @@ pf flow init --flow my-simple-flow
 <img src="/images/20231011a/image_2.png" alt="my-simple-flow, \pycache_, promptflow, flow.tools.json, .gitignore, data.jsonl, flow.dag.yaml, hello.jinja, hello.py, requirements.txt" width="432" height="330" loading="lazy">
 
 * `__pycache__`: Pythonを実行する際に生成されるキャッシュディレクトリ（削除しても特に問題はない）
-* `.promptflow/flow.tools.json`: flow.dag.yamlから参照されるToolsのメタデータ（修正する必要はない） 
+* `.promptflow/flow.tools.json`: flow.dag.yamlから参照されるToolsのメタデータ（修正する必要はない）
 * `data.jsonl`: フローに入力するデータ
 * `flow.dag.yaml`: 入出力・ノード・バリアント等を含むフローの全てを定義したファイル
 * `.py, .jinja2等のファイル`: フロー内のツールが参照するコードスクリプト
@@ -155,11 +157,9 @@ pf connection create -f <YAMLファイルのパス>
 
 <img src="/images/20231011a/pic4.png" alt="+LLM" width="1200" height="436" loading="lazy">
 
-
 上部に、LLMツールの名前入力が求められるので好きな名前を設定します。（ここでは`llm_node`と設定）
 
 <img src="/images/20231011a/image_3.png" alt="llm_node" width="889" height="97" loading="lazy">
-
 
 名前入力が完了すると、「new file」を選択します。（`<LLMツール名>.jinja2`というファイルが新規生成されます）
 
@@ -221,6 +221,7 @@ nodes:
   connection: connection-azure-openai
   api: chat
 ```
+
 </details>
 
 各ノードの詳細は以下の通りです。
@@ -229,11 +230,9 @@ nodes:
 
 <img src="/images/20231011a/image_6.png" alt="question string 東京はどこの国の都市？" width="1200" height="333" loading="lazy">
 
-
 #### system_prompt
 
 <img src="/images/20231011a/image_7.png" alt="${inputs.question}" width="1200" height="222" loading="lazy">
-
 
 <details><summary>system_prompt.jinja2</summary>
 
@@ -246,6 +245,7 @@ user:
 
 AI:
 ```
+
 </details>
 
 #### llm_node
@@ -257,12 +257,12 @@ AI:
 ```jinja2
 {{input_prompt}}
 ```
+
 </details>
 
 #### echo_llm_output
 
 <img src="/images/20231011a/image_8.png" alt="" width="1200" height="218" loading="lazy">
-
 
 <details><summary>echo_llm_output.py</summary>
 
@@ -273,8 +273,8 @@ from promptflow import tool
 def echo_llm_output(input: str) -> str:
     return "LLM出力: " + input
 ```
-</details>
 
+</details>
 
 ### 4. フローの実行
 
@@ -287,7 +287,6 @@ pf flow test --flow my-simple-flow
 Outputsの欄に出力が表示されます。
 
 <img src="/images/20231011a/image_9.png" alt="" width="914" height="440" loading="lazy">
-
 
 ### 5. フローの一括実行
 
@@ -335,6 +334,7 @@ nodes:
   connection: connection-azure-openai
   api: chat
 ```
+
 </details>
 
 次に、フローのディレクトリ内にあった`data.jsonl`を編集し、以下のような内容を記載します。
@@ -357,7 +357,6 @@ pf run create --flow my-simple-flow --data ./my-simple-flow/data.jsonl --name my
 
 <img src="/images/20231011a/7.png" alt="" width="1200" height="297" loading="lazy">
 
-
 複数実行の結果はログとして記録されており、以下のコマンドでいつでも可視化できます。
 
 ```sh
@@ -371,7 +370,6 @@ pf run show-details --name my_run_001
 今回作成したファイル群は以下の通りです。
 
 <img src="/images/20231011a/image_10.png" alt="" width="472" height="368" loading="lazy">
-
 
 これらはgitで管理することができます。
 

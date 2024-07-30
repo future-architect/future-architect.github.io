@@ -14,7 +14,6 @@ lede: "この記事はフューチャー Advent Calendar 2022の14日目の記�
 ---
 この記事は[フューチャー Advent Calendar 2022](https://qiita.com/advent-calendar/2022/future)の14日目の記事です。
 
-
 # はじめに
 
 こんにちは。TIG DXユニットの村上です。
@@ -26,7 +25,6 @@ PythonでWeb APIを構築する方法は[OpenAPI GeneratorでPython Web API構�
 本記事ではPython Web APIのアプリ実装は完成している前提で、下図の流れでデプロイする手順を解説します。
 
 <img src="/images/20230105a/image.png" alt="PythonアプリをDockerコンテナイメージビルド→ECR→Lambdaにデプロイする" width="778" height="495" loading="lazy">
-
 
 # Lambda起動用のモジュール
 
@@ -54,6 +52,7 @@ def lambda_handler(event, context):
 # デプロイする方法
 
 Lambdaにソースコードをデプロイする方法は2種類あります。
+
 1. ソースコードとその依存ライブラリをZIPにアーカイブしてアップロードする
 2. ECRのコンテナイメージをアップロードする
 
@@ -124,7 +123,7 @@ $ docker build \
 ビルドができたらECRにプッシュします。
 
 ```bash
-$ docker push <AWSアカウントID>.dkr.ecr.ap-northeast-1.amazonaws.com/<ECRリポジトリ名>:latest
+docker push <AWSアカウントID>.dkr.ecr.ap-northeast-1.amazonaws.com/<ECRリポジトリ名>:latest
 ```
 
 プッシュが完了したらECRからLambdaにアップロードします。

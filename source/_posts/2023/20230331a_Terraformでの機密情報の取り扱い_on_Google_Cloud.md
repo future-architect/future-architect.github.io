@@ -252,4 +252,3 @@ Terraform will perform the following actions:
 また、Google CloudのSDKが利用な環境であればSecret Managerを使うなど、**できる限りGitには機密情報をあげないようにして運用する工夫**は大切です。
 
 明日は川口さんの[Terraform x GitOps](/articles/20230403a/)です。お楽しみに！
-

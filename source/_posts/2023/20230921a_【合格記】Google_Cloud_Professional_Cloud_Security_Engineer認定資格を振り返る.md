@@ -41,61 +41,61 @@ Google Cloud 認定資格関連の過去記事：
 ### クラウド ソリューション環境内のアクセスの構成
 
 - IAMによるサービスへのアクセス制御
-    - 組織IAM・フォルダIAM・プロジェクトIAM・リソースIAMのすみわけ
-    - 継承の理解
-        - どの階層のIAMが適用されるのか？
+  - 組織IAM・フォルダIAM・プロジェクトIAM・リソースIAMのすみわけ
+  - 継承の理解
+    - どの階層のIAMが適用されるのか？
 - 組織ポリシーの理解
-    - Service Account作成の制限やCloud Storage Bucketの公開制限など、プロジェクト全体のリソースを制御
+  - Service Account作成の制限やCloud Storage Bucketの公開制限など、プロジェクト全体のリソースを制御
 - プロジェクトやフォルダの分け方のベストプラクティス
-    - 例：部署ごとにフォルダ分けをして、その中にプロジェクトを作成するなど
-        - [エンタープライズ企業のベスト プラクティス](https://cloud.google.com/docs/enterprise/best-practices-for-enterprise-organizations?hl=ja)
+  - 例：部署ごとにフォルダ分けをして、その中にプロジェクトを作成するなど
+    - [エンタープライズ企業のベスト プラクティス](https://cloud.google.com/docs/enterprise/best-practices-for-enterprise-organizations?hl=ja)
 - Cloud Identityによるユーザー管理
-    - グループを利用したユーザーの管理
-    - Google Cloud Directory Syncを利用したADサーバーとGoogle Cloudの統合
+  - グループを利用したユーザーの管理
+  - Google Cloud Directory Syncを利用したADサーバーとGoogle Cloudの統合
 
 ### ネットワーク セキュリティの構成
 
 - 以下のGoogle Cloudネットワークの[暗黙のFirewallルール](https://cloud.google.com/firewall/docs/firewalls?hl=ja#default_firewall_rules)は絶対に覚えておきましょう
-    - **INGRESSは全て拒否**
-    - **EGRESSは全て許可**
+  - **INGRESSは全て拒否**
+  - **EGRESSは全て許可**
 - Firewall全般
-    - [Priority値の高低と優先度の関係](https://cloud.google.com/firewall/docs/firewalls?hl=ja#priority_order_for_firewall_rules)
-    - ネットワークタグ・サービスアカウントを活用したFirewallルール
+  - [Priority値の高低と優先度の関係](https://cloud.google.com/firewall/docs/firewalls?hl=ja#priority_order_for_firewall_rules)
+  - ネットワークタグ・サービスアカウントを活用したFirewallルール
 - VPC Peering/Cloud VPN/Cloud Interconnectの使い分け
-    - Cloud InterconnectはさらにPartner/Dedicatedで用途が分かれる
+  - Cloud InterconnectはさらにPartner/Dedicatedで用途が分かれる
 
 ### データ保護の確保
 
 - [VPC Service Control](https://cloud.google.com/vpc-service-controls/docs/overview?hl=ja)によるデータ保護
-    - プロジェクトに対して各種サービスのAPI実行を制限し、データの持ち出し・持ち込みを防ぐ
-    - 拙著も参考にしてみて下さい：[VPC Service ControlでGoogle Cloud環境をガッチリ守る](https://future-architect.github.io/articles/20230119a/)
+  - プロジェクトに対して各種サービスのAPI実行を制限し、データの持ち出し・持ち込みを防ぐ
+  - 拙著も参考にしてみて下さい：[VPC Service ControlでGoogle Cloud環境をガッチリ守る](https://future-architect.github.io/articles/20230119a/)
 - Cloud DLP(Data Loss Prevention)の活用
-    - 個人情報に対する適切な暗号化
-    - 暗号化は復元する必要があるのか否かによって手法が変わる
-        - 決定的暗号化 or 完全なマスキング
+  - 個人情報に対する適切な暗号化
+  - 暗号化は復元する必要があるのか否かによって手法が変わる
+    - 決定的暗号化 or 完全なマスキング
 
 ### クラウド ソリューション環境内のオペレーションの管理
 
 - Cloud KMSを利用した暗号鍵の保管
-    - [Envelop encryption](https://cloud.google.com/kms/docs/envelope-encryption?hl=ja)は勿論、それに関わる以下の用語は説明できるようにしておきましょう
-        - CMEK
-        - CSEK
-        - DEK
-        - KEK
-    - どうやって暗号鍵を保管しておきたいのか？
- - Secret Managerの活用
-     - API keyなどはSecret Managerに保存しておきましょう
+  - [Envelop encryption](https://cloud.google.com/kms/docs/envelope-encryption?hl=ja)は勿論、それに関わる以下の用語は説明できるようにしておきましょう
+    - CMEK
+    - CSEK
+    - DEK
+    - KEK
+  - どうやって暗号鍵を保管しておきたいのか？
+- Secret Managerの活用
+  - API keyなどはSecret Managerに保存しておきましょう
 
 ### コンプライアンスの確保
 
 - 各種ログで何の情報が得られるのか？
-    - Audit log
-    - Data Access log
+  - Audit log
+  - Data Access log
 - Googleの`_Default`/`_Required`のログバケットとは？
-    - [ログバケットの構成](https://cloud.google.com/logging/docs/buckets?hl=ja)
-    - 保存期間や料金体系も異なる
+  - [ログバケットの構成](https://cloud.google.com/logging/docs/buckets?hl=ja)
+  - 保存期間や料金体系も異なる
 - 監査ログの保管方法
-    - 長期間保管したい場合はLog SinkとCloud Storageを活用してコストカット
+  - 長期間保管したい場合はLog SinkとCloud Storageを活用してコストカット
 
 ## 受験までの過程
 
@@ -107,10 +107,10 @@ Google Cloud 認定資格関連の過去記事：
 - 組織ポリシーいろいろ
 - 組織・フォルダ・プロジェクトの分け方
 - Google Cloudのネットワーク関連
-    - Shared VPC
-    - Cloud VPN
-    - VPC Peering
-    - Dedicated/Partner Interconnect
+  - Shared VPC
+  - Cloud VPN
+  - VPC Peering
+  - Dedicated/Partner Interconnect
 - Secret Mangerによる機密情報管理やCloud KMSによる暗号鍵管理
 - Cloud Identityの利用
 

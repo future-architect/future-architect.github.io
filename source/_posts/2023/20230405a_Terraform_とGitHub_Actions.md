@@ -211,7 +211,6 @@ jobs:
 
 上記のワークフローは、Terraform validate, init, plan までを実行するワークフローです。
 
-
 ```yaml
   push:
     paths:
@@ -334,6 +333,7 @@ jobs:
 
 手動実行する際は、[workflow_dispatch](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows)を利用します。
 Input タイプは、string、choice、boolean、environment　などが存在します。
+
 * 参考: [GitHub Actions: Input types for manual workflows](https://docs.github.com/en/actions/learn-github-actions/contexts#inputs-context)
 
 ワークフローを手動実行する際に`env`を指定したい場合は、`environment`を利用します。

@@ -179,6 +179,7 @@ stree my-bucket/test/dir2 -r us-east-1 -e http://localhost:4537
 出力は同じであるため省略します。
 
 ## カラー出力を無効化
+
 `--no-color(-n)`でカラー出力を無効化できます。
 
 ▼カラーつき

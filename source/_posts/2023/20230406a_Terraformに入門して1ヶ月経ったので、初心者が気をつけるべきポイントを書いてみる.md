@@ -107,7 +107,6 @@ Plan: 0 to add, 1 to change, 0 to destroy.
 
 <img src="/images/20230406a/image.png" alt="" width="1200" height="583" loading="lazy">
 
-
 ここで公式ドキュメントの記述を見てみましょう。[aws_iam_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role)のページ冒頭に、黄色で「NOTE」が書かれているようです。
 
 <img src="/images/20230406a/image_2.png" alt="" width="750" height="259" loading="lazy">
@@ -151,8 +150,7 @@ https://developer.hashicorp.com/terraform/tutorials/state/resource-targeting
 
 また、Terraform連載3リソース目の宮永さんが、[tftarget](https://github.com/future-architect/tftarget/releases)というCLIツールを開発されています。このツールを使うことで、ターゲットの対象とするリソースをチェックを入れるように選択できるため、より簡単に・ミスなく指定できるようになります。こちらの記事もぜひご覧ください！
 
-* [tftarget:Terraformターゲットを選択的に実行するためのGo製CLIツール](https://future-architect.github.io/articles/20230329a/)
-
+- [tftarget:Terraformターゲットを選択的に実行するためのGo製CLIツール](https://future-architect.github.io/articles/20230329a/)
 
 #### `terraform apply -parallelism=(並列実行数)`
 
@@ -279,4 +277,3 @@ terraform-provider-aws のGitHubにアクセスし、Issueの検索から[「pin
 
 いかがだったでしょうか。ほとんどTerraformに限らない話だったかもしれませんが、この記事が少しでも私と同じTerraform初心者のお役に立つことができれば幸いです。
 私もまだまだ勉強中の身であるので、間違ったことを言っているようでしたら、優しくご指摘ください！
-

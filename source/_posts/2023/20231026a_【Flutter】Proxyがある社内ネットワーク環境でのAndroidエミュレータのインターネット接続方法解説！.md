@@ -47,7 +47,7 @@ lede: "プロキシが存在するネットワーク内で、Androidエミュレ
 まずは、Android仮想デバイス（AVD）を作成します。今回は `Pixel_4_XL` を利用するとします。
 
 ```sh
-$ %UserProfile%\AppData\Local\Android\sdk\emulator\emulator -writable-system -avd Pixel_4_XL_API_30
+%UserProfile%\AppData\Local\Android\sdk\emulator\emulator -writable-system -avd Pixel_4_XL_API_30
 ```
 
 `%USERPROFILE%/.android`に `advancedFeatures.ini` を作成し、以下の2行を追加します。
@@ -191,7 +191,6 @@ void main() async {
 ここは任意ですが、エミュレータAndroid上にChromeをインストールしておくと、疎通などで便利なことがあるので合わせて設定しておくことをオススメします。
 
 [こちら](https://www.apkmirror.com/apk/google-inc/chrome/chrome-69-0-3497-86-release/chrome-browser-69-0-3497-86-3-android-apk-download/?redirected=thank_you_invalid_nonce)からapkをダウンロードし、エミュレータ画面にdrag & dropします。
-
 
 ## おわりに
 

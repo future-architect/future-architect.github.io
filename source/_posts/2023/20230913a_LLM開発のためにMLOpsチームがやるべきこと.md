@@ -103,6 +103,7 @@ LLM自体やLLMを活用したシステムを開発していく場合、MLOpsチ
 MLOpsチームがやるべきことは、以下のような課題や検討事項を解決し、LLM開発を円滑に進めることです。
 
 ※課題の一部を羅列
+
 ### 1. モデル開発における課題・検討事項
 
 | 課題 | やるべきこと | サービス・ツール候補 |
@@ -118,12 +119,14 @@ MLOpsチームがやるべきことは、以下のような課題や検討事項
 | LLMはプロンプト次第で振る舞いが大きく変わってしまう | タスクに合わせてプロンプトを改良する。タスクが複数ある場合はそれぞれ独立で改良していく | [\[20\] LangChain](#20-langchain) <br>[\[21\] LlamaIndex](#21-llamaindex) |
 
 ### 2. デプロイメントにおける課題・検討事項
+
 | 課題 | やるべきこと | サービス・ツール候補 |
 |----|--------|------------|
 | プロプライエタリモデル使用時特有のコスト管理が必要 | プロプライエタリモデル使用の際、コストマネジメントのため、入力トークン数を監視する | [\[12\] Datadog](#12-datadog) |
 | プロプライエタリモデルの場合、レイテンシが発生してしまう | プロプライエタリモデル使用の際、サービス品質保証のため、レイテンシを監視する | [\[12\] Datadog](#12-datadog) |
 
 ### 3. インテグレーションにおける課題・検討事項
+
 | 課題 | やるべきこと | サービス・ツール候補 |
 |----|--------|------------|
 | サービス開始前にテストを行う必要がある | チャット形式のUIを用意してLLMを試験的に試してみる | [\[13\] Dify](#13-dify) <br>[\[14\] Fixie](#14-fixie) <br>[\[15\] Playground](#15-playground) |
@@ -132,6 +135,7 @@ MLOpsチームがやるべきことは、以下のような課題や検討事項
 | LLMに会話の流れを理解させる必要がある | チャットの履歴を管理する | [\[20\] LangChain](#20-langchain) <br>[\[21\] LlamaIndex](#21-llamaindex) |
 
 ### 4. モニタリングにおける課題・検討事項
+
 | 課題 | やるべきこと | サービス・ツール候補 |
 |----|--------|------------|
 | サービスの継続的な改善 | 過去のプロンプトを保持し、プロンプト改良に繋げる。苦手なプロンプトを見つけたらマークして保持 | [\[20\] LangChain](#20-langchain) <br>[\[21\] LlamaIndex](#21-llamaindex) |
@@ -182,11 +186,11 @@ AWSやAzure、GCPなどのクラウドサービスでは、「大量なデータ
 AWSやGCPなどのクラウドサービスでは、LLM開発のための学習基盤が用意されています。
 
 * AWS
-    * Amazon SageMaker上でLLMの分散学習が可能です（[参考](https://aws.amazon.com/jp/blogs/news/training-large-language-models-on-amazon-sagemaker-best-practices/)）
+  * Amazon SageMaker上でLLMの分散学習が可能です（[参考](https://aws.amazon.com/jp/blogs/news/training-large-language-models-on-amazon-sagemaker-best-practices/)）
 * GCP
-    * [T5X](https://t5x.readthedocs.io/en/latest/)とVertex AIを用いてLLMを学習させることができます（[参考](https://github.com/GoogleCloudPlatform/t5x-on-vertex-ai)）
+  * [T5X](https://t5x.readthedocs.io/en/latest/)とVertex AIを用いてLLMを学習させることができます（[参考](https://github.com/GoogleCloudPlatform/t5x-on-vertex-ai)）
 * Azure
-    * Azure Machine LearningでLLMの学習が可能です（[参考](https://learn.microsoft.com/ja-jp/azure/machine-learning/overview-what-is-azure-machine-learning)）。[Prompt Flow](https://learn.microsoft.com/ja-jp/azure/machine-learning/prompt-flow/get-started-prompt-flow)（後述）を利用することで、LLM自体の開発を含めたLLMを用いたサービスの開発を行うことができます
+  * Azure Machine LearningでLLMの学習が可能です（[参考](https://learn.microsoft.com/ja-jp/azure/machine-learning/overview-what-is-azure-machine-learning)）。[Prompt Flow](https://learn.microsoft.com/ja-jp/azure/machine-learning/prompt-flow/get-started-prompt-flow)（後述）を利用することで、LLM自体の開発を含めたLLMを用いたサービスの開発を行うことができます
 
 ### \[4\] MLflow
 

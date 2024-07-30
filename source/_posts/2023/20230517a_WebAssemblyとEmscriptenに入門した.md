@@ -54,6 +54,7 @@ UnrealEngineやUnityなどのゲームエンジンや、Qtのようなアプリ�
 EmscriptenでC言語で書かれたソースコードをWasmにコンパイルします。Emscripten SDKの導入は[こちら](https://emscripten.org/docs/getting_started/downloads.html)から行います。
 
 ### 使用したCプログラム
+
 `test.c` を以下の内容で作成します。
 ここで定義している、2つの整数を受け取り和を返す関数 `add()` をブラウザから使用することを目指します。
 
@@ -71,6 +72,7 @@ int add(int a,int b) {
 ```
 
 ### Wasmへのコンパイル
+
 先程用意したCプログラムをWasmにコンパイルします。
 コマンドは以下の通りです。
 
@@ -93,6 +95,7 @@ emcc -o test.html test.c -sEXPORTED_RUNTIME_METHODS=ccall,cwrap
 ```
 
 ## 4. JavaScriptからWasmを呼び出す
+
 JavaScriptからコンパイルされたCの関数を呼び出す2種類の方法について試してみました。
 
 ### ccallを使用した方法

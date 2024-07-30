@@ -40,7 +40,6 @@ JavaでWebサービス開発というと、SpringBoot、という時代が長く
 
 <img src="/images/20230308a/image.png" alt="image.png" width="870" height="684" loading="lazy">
 
-
 # Helidon
 
 MicroProfile準拠のウェブアプリケーションフレームワークは、[Quarkus](https://quarkus.io/)(RedHat), [Helidon](https://helidon.io/)(Oracle), [Open Liberty](https://openliberty.io/)(IBM)などたくさん出ています。ただし、対応するMicroProfileのバージョンは微妙に違うようです。
@@ -174,7 +173,6 @@ func main() {
 
 ```
 
-
 ## ネイティブビルドのエラー対策
 
 [こちらのissue](https://github.com/helidon-io/helidon/issues/6260)を立てたところ、contributorの方に反応していただけました。少し`Dockerfile.native`の修正と`pom.xml`の修正が必要です。
@@ -200,4 +198,3 @@ func main() {
 ということで、コードを書かずにサンプルを動かしただけですが、今時のJavaの開発を体験してみました。ネイティブイメージのビルドはまだエラーがありますが（回避は可能）、`helidon`コマンドでプロジェクト作成から開発サーバーの起動ができ、jarもビルドできました。また、Dockerイメージのビルドも、最初からDockerfileがついてくるので簡単にでき、デプロイも簡単そうです。ウェブ開発に必要なものがコンパクトにまとまっていますね。PythonでFastAPI環境を作るよりも簡単なぐらい。
 
 現在のJavaはSpringBootと、このMicroProfileの2つの潮流に集約されてきているようです。チャンスがあればこのHelidonとかのMicroProfileを実開発に投入してみたいですね。
-

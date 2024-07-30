@@ -162,4 +162,3 @@ Dockerのコンテナは、UNIX的な思想を体現したもので、1アプリ
 なお、本エントリーを書くにあたって、 [@lambda_sakura](https://twitter.com/lambda_sakura) さん、 [@ryushi](https://twitter.com/ryushi) さん、 [@tk0miya](https://twitter.com/tk0miya) さんにアドバイスをいろいろ教えてもらいました。ありがとうございます。
 
 [次回](/articles/20231212a/)はPythonの環境を作っていきます。
-

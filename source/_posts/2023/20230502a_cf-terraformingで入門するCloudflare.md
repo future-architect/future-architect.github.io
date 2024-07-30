@@ -55,8 +55,8 @@ CLIはこれで準備が完了したので、次にディレクトリ周りの�
 cf-terraformingを利用する際には事前にProviderが利用できる状態になっている必要があるので、以下のように任意のディレクトリを作成し、`provider.tf`を作成しておきましょう。
 
 ```bash
-$ mkdir cloudflare-terraform
-$ cd cloudflare-terraform
+mkdir cloudflare-terraform
+cd cloudflare-terraform
 ```
 
 ```tf
@@ -102,7 +102,7 @@ resource "cloudflare_workers_kv_namespace" "terraform_managed_resource_xxxxxxxxx
 上記で[cloudflare_workers_kv_namespace](https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs/resources/workers_kv_namespace)に対応したリソースが作成されたことがわかりました。実際には、ファイルに記述して利用したいので、
 
 ```bash
-$ cf-terraforming generate --resource-type "cloudflare_workers_kv_namespace" >> workers_kv_namespace.tf
+cf-terraforming generate --resource-type "cloudflare_workers_kv_namespace" >> workers_kv_namespace.tf
 ```
 
 のように利用するのが良さそうです。また、新規にWorkers KVを作成した場合(`SAMPLE_TF2`)とした場合には以下のような出力になるため、指定したTerraformのリソースに該当するリソースを全て出力してくれるようです。

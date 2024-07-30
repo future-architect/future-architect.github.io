@@ -14,6 +14,7 @@ author: 渡邉光
 lede: "プロジェクトでJenikisを利用する機会があり、初めてJenkinsfileでTerraformのCI/CD環境を構築する機会があったので記事に残そうと思います。クラウドを使っているとAWSではCodeBuild、Google CloudではCloudBuildのサービスをCI/CD環境として利用するのでyamlでのCI/CDスクリプトには慣れていましたが..."
 ---
 # 初めに
+
 こんにちは！筋肉エンジニアのTIG渡邉です。最近ヘルニアになってしまい筋トレが思うようにできずくすぶっています。
 
 [Terraform連載](/articles/20230327a/) の4リソース目の記事になります！
@@ -21,6 +22,7 @@ lede: "プロジェクトでJenikisを利用する機会があり、初めてJen
 さて、今回はプロジェクトでJenikisを利用する機会があり、初めてJenkinsfileでTerraformのCI/CD環境を構築する機会があったので記事に残そうと思います。クラウドを使っているとAWSではCodeBuild、Google CloudではCloudBuildのサービスをCI/CD環境として利用するのでyamlでのCI/CDスクリプトには慣れていましたが、今回はJenkinsでCI/CDを構築する要件でしたのでJenkinsfileでCI/CDスクリプトには苦戦しました。
 
 以下、今回利用したクラウドやTerraform、Jenkinsのバージョンを記載しておきます。
+
 - クラウド：Google Cloud
 - Terraform : 1.4.0
 - Jenkins : 2.375.3
@@ -34,10 +36,12 @@ lede: "プロジェクトでJenikisを利用する機会があり、初めてJen
 まず、JenkinsサーバやJenkinsサーバに付随するリソース（Cloud Load Balancing/Cloud Armorなど）はローカルPCからTerraformを実行して作成していきます。Jenkinsサーバを構築後、諸々Jenkinsの設定を終えたのちはJenkins Consoleからボタンポチポチでterraform planからterraform applyを実行してほかのGoogle Cloudのリソースたちを構築することができるようになります。
 
 # Jenkinsサーバを構築するTerraformコード
+
 ローカルPCからJenkinsサーバを構築するためのTerraformコードを記載します。
 前提としてGoogle CloudのプロジェクトやVPC、Subnetなどのネットワークリソースはすでに構築されているものとします。
 
 ## ディレクトリ構成
+
 本ディレクトリ構成は以下の通りです。
 
 ```sh
@@ -359,7 +363,6 @@ systemctl enable jenkins
 
 </details>
 
-
 # Jenkins初期設定
 
 Jenkinsサーバが構築出来たら、ローカルPCからCloud Load Balancingに設定されたURLからJenkins Consoleにアクセスします。
@@ -375,7 +378,6 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 次にJenkins Pluginの設定を求められるので、Jenkinsが推奨している「Install suggested plugins」を選択します。
 
 <img src="/images/20230330a/jenkins_setting_2.png" alt="" width="995" height="910" loading="lazy">
-
 
 Jenkinsが推奨しているPluginをインストールされるまで待ちます。
 <img src="/images/20230330a/jenkins_setting_3.png" alt="" width="993" height="915" loading="lazy">
@@ -421,7 +423,6 @@ Jenkins実行ログに色を付けたいので、AnsiColorをインストール�
 
 その後、「Installed plugins」をクリックし、「ジョブが実行中でなければ再起動」をクリックし、Jenkinsサーバを再起動します。
 
-
 <img src="/images/20230330a/global_tool_configuration_4.png" alt="" width="1200" height="892" loading="lazy">
 
 再起動すると、再度ログインが求められるのでログイン情報を入力し、ログインします。
@@ -434,7 +435,6 @@ Jenkins実行ログに色を付けたいので、AnsiColorをインストール�
 
 <img src="/images/20230330a/image.png" alt="" width="1200" height="899" loading="lazy">
 
-
 Terraformプラグインをインストールしている状態だと、Global Tool ConfigurationにTerraformが表示されるので、設定します。
 
 - Name : Terraform-1.4.0　（Jenkinsfileで使用するためこの名前にします）
@@ -443,7 +443,6 @@ Terraformプラグインをインストールしている状態だと、Global T
 を設定し、「Save」をクリックします。
 
 <img src="/images/20230330a/image_2.png" alt="" width="1200" height="899" loading="lazy">
-
 
 # Terraform Plan/Applyジョブの作成
 
@@ -468,6 +467,7 @@ ConfigurationでGeneralから
 <img src="/images/20230330a/jenkins_job_setting_9.png" alt="" width="1200" height="895" loading="lazy">
 
 ## Terraform planジョブの作成
+
 terraformフォルダが作成されたので、terraform planジョブの作成を行っていきます。
 「新規アイテムの作成」をクリックします。
 <img src="/images/20230330a/jenkins_job_setting_10.png" alt="" width="1200" height="894" loading="lazy">
@@ -476,6 +476,7 @@ terraformフォルダが作成されたので、terraform planジョブの作成
 <img src="/images/20230330a/jenkins_job_setting_2.png" alt="" width="1200" height="894" loading="lazy">
 
 ConfigurationでGeneralから
+
 - 表示名：terraform-plan
 - 説明：terraform planを実行するジョブです。
 
@@ -514,6 +515,7 @@ Behavioursは
 <img src="/images/20230330a/jenkins_job_setting_6.png" alt="" width="888" height="845" loading="lazy">
 
 Build Configurationから
+
 - Mode：by Jenkinsfile
 - script Path：Jenkinsfileが存在するパス
 を入力して「保存」をクリックします。
@@ -590,10 +592,10 @@ pipeline {
 ```
 
 ## Terraform Applyジョブの作成
+
 terraform-planジョブが作成できたので、同様の設定でterraform-applyジョブを作成していきます。
 
 <img src="/images/20230330a/jenkins_job_setting_13.png" alt="" width="1200" height="895" loading="lazy">
-
 
 実際のJenkinsfileはこちらです。
 
@@ -716,11 +718,13 @@ pipeline {
 ```
 
 terraform plan実行時に、-detailed-exitcodeオプションをつけることでexit codeで処理の分岐を実現しています。
+
 - exit code 0 : No changesでplanが成功
 - exit code 1 : planがError
 - exit code 2 : 差分ありでplanが成功
 
 # Terraform Plan/Applyジョブの実行
+
 Terraform Plan/Applyジョブが作成できたので、ジョブを実際に実行していきます。
 gcsバケットを作成するtfファイルを準備して、commit、リポジトリにpushします。
 
@@ -735,24 +739,21 @@ resource "google_storage_bucket" "bucket" {
 ```
 
 ## Terraform Planジョブの実行
+
 作成したTerraform Planジョブを実行してみましょう。
 「ビルド実行」をクリックします。
 
 <img src="/images/20230330a/image_3.png" alt="" width="1200" height="901" loading="lazy">
 
-
 ジョブが実行されています。
 <img src="/images/20230330a/image_4.png" alt="" width="1200" height="893" loading="lazy">
-
 
 ジョブが正常終了したので、ログを確認するとplan結果が表示されています。
 事前準備でgcsバケットを作成するtfファイルを準備したので、plan結果に「1 to add」と表示されました。
 <img src="/images/20230330a/plan.png" alt="" width="1200" height="904" loading="lazy">
 
-
-
-
 ## Terraform Applyジョブの実行
+
 次に、作成したTerraform Applyジョブを実行してみましょう。
 
 「ビルド実行」をクリックします。

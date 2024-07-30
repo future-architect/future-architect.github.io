@@ -90,4 +90,3 @@ psql -h ${接続先インスタンス名} -U ${マスターユーザー名} -d p
 ## まとめ
 
 本記事では、Aurora PostgreSQL と RDS Proxy の環境で `pg_hint_plan` 拡張を利用する際に遭遇した問題、その原因、そして解決方法を説明しました。ポイントは、`postgres` データベースにも `pg_hint_plan` の拡張を適用することが必要である、ということです。Aurora PostgreSQL と RDS Proxy の環境下で SQL ヒントを利用するために `pg_hint_plan` の拡張を導入する方の参考になれば幸いです。
-

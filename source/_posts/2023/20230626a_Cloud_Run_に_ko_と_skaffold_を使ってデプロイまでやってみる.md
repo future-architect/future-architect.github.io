@@ -17,6 +17,7 @@ author: 川口翔大
 lede: "CNCF の Knative を基盤として利用している Cloud Run と CNCF の各種ビルドツール ko, skaffold、Cloud Deploy を用いたうえで、アプリケーションのビルドからデプロイまでを行います。"
 ---
 # はじめに
+
 こんにちは！
 TIG コアテクチームの川口です。本記事は、[CNCF連載](/articles/20230619a/) の5回目の記事になります。
 
@@ -39,16 +40,19 @@ TIG コアテクチームの川口です。本記事は、[CNCF連載](/articles
 今回は、この Cloud Run に Go 製アプリケーションをデプロイしていこうと思います。
 
 ### ko
+
 [ko](https://www.cncf.io/projects/ko/) は、Go のコンテナイメージを Dockerfile 無しに簡単にビルドすることができるツールです。また、2022年の12月に CNCF の Sandbox プロジェクトとして承認されています。
 
 「Dockerfile 無しに」という言葉だと、2018年10月に Incubating プロジェクトとして承認された [Buildpacks](https://www.cncf.io/projects/buildpacks/) が想起されますが、 [こちらの記事](https://cloud.google.com/blog/ja/products/containers-kubernetes/ship-your-go-applications-faster-cloud-run-ko) でそちらとの比較が行われています。Buildpacks では、Go 以外にも Java・Node・Python 等といった言語がビルドができるという差異がありますが、今回は Go を扱うということもあり ko を利用したいと思います。
 
 ### Skaffold
+
 [Skaffold](https://skaffold.dev/docs/) は、コンテナベース（特に Kubernetes アプリケーション）の継続的な開発を容易にするコマンドラインツールです。ビルド・デプロイ・テストといった CI 上で扱うような各種機能がいくつか実装されていたり、本記事では扱いませんがローカル開発の際にも、[開発時に便利となるローカルでのアプリケーション実行](https://skaffold.dev/docs/workflows/dev/) も行えます。
 
 **また後述のデプロイ時に利用する Cloud Deploy では、Skaffold を扱うことが必須となっています。**
 
 先述のサービスとの連携といった点では以下のとおりよさそうな感じです。
+
 - Cloud Run とは、 [yaml で宣言的に記述する](https://cloud.google.com/run/docs/reference/yaml/v1) 機能を用いることで連携できます。
   - ref: https://skaffold.dev/docs/deployers/cloudrun/
 - ビルド時には先述の ko とも連携を行えます。
@@ -107,6 +111,7 @@ go version go1.20.5 darwin/arm64
 ```
 
 ## ソースコード
+
 以下のように 8080 ポートをリッスンして、"/" にアクセスされたら、"Hello World v1!" を返すものとします。
 
 今回カナリアデプロイを後程ためすので、2つの version のアプリとして `app/v1`・`app/v2` の二つ分作っておきましょう。
@@ -272,6 +277,7 @@ $ skaffold build \
 ```
 
 ## デリバリーパイプラインの作成
+
 まずは、以下のような `deploy.yaml` を作成します。
 
 ```yaml  deploy.yaml

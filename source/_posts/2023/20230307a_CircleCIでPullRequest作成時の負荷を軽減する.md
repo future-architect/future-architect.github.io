@@ -14,9 +14,8 @@ lede: "CircleCIでGitHubのPR作成時の負荷を軽減するために、PR作�
 ---
 <img src="/images/20230307a/theme.png" alt="" width="1200" height="673" loading="lazy">
 
-
-
 # はじめに
+
 こんにちは。
 フューチャーアーキテクト株式会社、TIG/EXユニット所属の宮永です。
 
@@ -74,7 +73,6 @@ release.ymlを作成したらリリース時にGenerate release noteを押下す
 
 <img src="/images/20230307a/image.png" alt="image.png" width="1200" height="934" loading="lazy">
 
-
 >GitHub標準機能を用いずにtagのPUSHをトリガーにCircleCIで自動化する場合は[当技術ブログの過去記事](https://future-architect.github.io/articles/20210708a/)が参考になると思います。
 
 今回、「CircleCIでPullRequest作成時の負荷を軽減したい」と思った経緯ですが、このリリースノートの自動生成が背景にあります。
@@ -84,6 +82,7 @@ release.ymlを作成したらリリース時にGenerate release noteを押下す
 この「きちんとラベルを付与する」というのは簡単な作業に思えますが案外忘れてしまいがちです。せっかくリリースノートの自動生成まで行ったのですから、ラベルの付与も自動化してしまいたいと思い、CircleCIベースでラベルの付与を自動化しました。
 
 # ラベルの振り分け方
+
 さて、ラベルの振り分け方ですがいくつか方法が考えられます。例えば特定のディレクトリの変更に依存してラベルを付与する方法です。
 
 これを実現するには[actions/labeler](https://github.com/actions/labeler)を利用するのが最も導入コストが低いと思います。
@@ -99,6 +98,7 @@ release.ymlを作成したらリリース時にGenerate release noteを押下す
 加えて、諸事情がありGitHub ActionsではなくCircleCI上に導入したかったので、[actions/labeler](https://github.com/actions/labeler)の導入は見送りました。
 
 # GitHub CLIの利用
+
 どうやら、自前でGitHubAPIを操作する必要が出てきそうでしたので、まずはGitHub CLIでラベルの付与操作などがサポートされていないかを調査したところ、それらしい機能がサポートされていることがわかりました。
 
 [GitHub CLI gh pr edit](https://cli.github.com/manual/gh_pr_edit)
@@ -316,6 +316,7 @@ if [[ $branch == *$name* ]]; then
 fi
 done
 ```
+
 # 動作確認
 
 <div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
@@ -330,7 +331,6 @@ CircleCIのOnly build pull requests
 
 <img src="/images/20230307a/image_2.png" alt="image.png" width="1200" height="569" loading="lazy">
 
-
 <div class="note warn" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
   <span class="fa fa-fw fa-exclamation-circle"></span>
 
@@ -341,6 +341,7 @@ add_label.shでは、author.nameがスペースで区切られていないこと
 </div>
 
 # 少しハマったところ
+
 [circleci/github-cli](https://circleci.com/developer/orbs/orb/circleci/github-cli)の`- gh/setup`は何も指定しないとGitHub CLIのデフォルトバージョンは2.3.0です。
 記事執筆時の2023年2月18日にローカルにインストールされていたGitHub CLIは2.23.0でした。
 
@@ -360,6 +361,7 @@ https://github.com/cli/cli/releases/tag/v2.23.0
 ```
 
 # おわりに
+
 今回、諸事情がありGitHubActionsではなくCircleCIで実装しましたが、GitHubActionsであればGitHub CLIはプリインストールされているので本記事よりも簡単に導入できます。
 
 * [ワークフローで GitHub CLI を使用する](https://docs.github.com/ja/actions/using-workflows/using-github-cli-in-workflows)

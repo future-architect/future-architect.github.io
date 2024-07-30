@@ -14,6 +14,7 @@ author: 藤戸四恩
 lede: "積読消化目的で参加させていただきました。図解即戦力 Google Cloudのしくみと技術がこれ1冊でしっかりわかる教科書を選んだ理由としては、CCoEメンバーに参加しGoogle Cloud に触れる機会があったのですが、いままではCloudというものに触れてこなかったため掴みたいと考えたからです"
 ---
 # はじめに
+
 金融グループ所属、新人の藤戸四恩です。
 インデックス記事に書かせていただきましたが、積読消化目的で参加させていただきました。
 <img src="/images/20230302a/image.png" alt="" width="400" height="564" loading="lazy">
@@ -25,8 +26,10 @@ lede: "積読消化目的で参加させていただきました。図解即戦�
 気になったところについて感想を書いていきたいと思います。
 
 ## 書籍の概要
+
 この書籍は2021年9月3日に発売された本で、Google Cloudに関する基本的な知識を学ぶことができます。
 下記の通り10章から構成されています。
+
 - 1章 Google Cloud の基礎知識
 - 2章 クラウドの仕組みとGoogleの取り組み
 - 3章 Google Cloud を使うには
@@ -79,7 +82,6 @@ VMの移行は3つのステップで行われます。
 移行が完了すると、移行元のVMが削除されることによって実現されます。
 Google Cloud は障害の事前検知を行っているため[^4]、検知した際にライブマイグレーションに影響がない場合は、上記のようなライブマイグレーションで障害対応を行っていることがわかりました。
 
-
 ### BigQuery と RDB の違い
 
 9章 データ分析のサービスのBigQueryとRDBの違い(p.253)で下記の記載があります。
@@ -103,6 +105,7 @@ Google Cloud は障害の事前検知を行っているため[^4]、検知した
 これらによりBigQueryは大規模なデータを効率よく処理されています。
 
 ## おわりに
+
 図解即戦力 Google Cloudのしくみと技術がこれ1冊でしっかりわかる教科書の読書感想文でした。
 
 クラウドサービスを触ったことがなかった自分でも躓くことなく読み進めることができました。
@@ -111,7 +114,6 @@ Google Cloudを使用する上で基礎的な知識を学ぶことができた�
 
 明日の読書感想連載は工藤さんの[SQLアンチパターン](/articles/20230303a/)です。
 
-
 [^1]: https://www.publickey1.jp/blog/22/202221aws2azure3google_cloud3.html
 [^2]: https://www.canalys.com/newsroom/global-cloud-services-Q2-2022
 [^3]: https://cloud.google.com/compute/docs/instances/live-migration-process?hl=ja
@@ -119,4 +121,3 @@ Google Cloudを使用する上で基礎的な知識を学ぶことができた�
 [^5]: https://www.asahi.com/articles/ASQCL441NQC6ULBH006.html
 [^6]: https://future-architect.github.io/articles/20210419b/
 [^7]: https://tech.plaid.co.jp/inside_bigquery
-

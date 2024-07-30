@@ -92,7 +92,6 @@ $ PGPASSWORD=pass psql -h localhost -p 5432 -U postgres -c "select current_setti
 (1 row)
 ```
 
-
 ## 検証用のテーブル作成
 
 検証用にtimestamp with time zone（timestampz）型を含む `event` テーブルを用意します。
@@ -121,14 +120,14 @@ Goのアプリ経由で、データの書き込み/読み込みを行ってみ�
 Go経由で `event` テーブルに2レコード書き込みます。内容は以下です。
 
 | イベントID | イベント時間 |
-|-- | --- | 
+|-- | --- |
 | 0001 | タイムゾーンなし（UTC）で現在日時|
 | 0002 | JSTで現在日時 |
 
 ドライバーは `jackc/pgx/v5` です。フューチャー技術ブログに関連記事がありますので、よければ参照ください。
 
-* [lib/pq から jackc/pgx への移行](/articles/20210916a/)
-* [GoとPoatgreSQLでCOPY](/articles/20210727a/)
+- [lib/pq から jackc/pgx への移行](/articles/20210916a/)
+- [GoとPoatgreSQLでCOPY](/articles/20210727a/)
 
 ```go
 package main
@@ -246,7 +245,7 @@ func main() {
 
 動かすと、 `0001`はUTC、 `0002` はJSTにしたtime.Timeの値をDBに登録したのですが、結果は **どちらもUTC**になっていることがわかります。
 
-```sh 
+```sh
 $ TZ=UTC go run .
 0001 2023-10-21T12:04:20Z
 0002 2023-10-21T12:04:20Z
@@ -276,9 +275,9 @@ $ $ TZ=Asia/Tokyo go run .
 
 つまり、最初に書いた挙動をすることがわかります。
 
-* timestampz カラムをGoのアプリで読み取りする時は、**Go側のタイムゾーン設定に依存**する（環境変数 `TZ` や端末のタイムゾーンなど、time.Timeパッケージの仕様の値が用いられる）
-* DBのセッションで有効になっているタイムゾーンが、Goアプリの time.Time のタイムゾーンで利用されるわけでもない
-* まして、書き込み時に利用したタイムゾーンが使われるわけでもない
+- timestampz カラムをGoのアプリで読み取りする時は、**Go側のタイムゾーン設定に依存**する（環境変数 `TZ` や端末のタイムゾーンなど、time.Timeパッケージの仕様の値が用いられる）
+- DBのセッションで有効になっているタイムゾーンが、Goアプリの time.Time のタイムゾーンで利用されるわけでもない
+- まして、書き込み時に利用したタイムゾーンが使われるわけでもない
 
 ## 接続URLにタイムゾーンを設定すると？
 
@@ -340,7 +339,6 @@ $ TZ=UTC go run .
 セッションのタイムゾーンが `Asia/Singapore` に変わったものの、time.Timeに設定されるタイムゾーンはUTCのまま（time.Timeの仕様で `TZ=UTC` に設定されたタイムゾーンが利用される）であることが分かります。
 
 接続時のパラメータで指定するタイムゾーンをいい感じに `time.Time` に設定してほしかったかもしれませんが、残念ながらそのような挙動ではないです。
-
 
 ## Goの設定として
 
@@ -430,7 +428,6 @@ $ PGTZ=UTC PGPASSWORD=pass psql -h localhost -p 5432 -U postgres -c 'select * fr
 
 ちなみに、DBeaver 23.2.2 では、`set timezone to 'UTC'` などをしても `timestampz` カラムを表示する際に利用するタイムゾーンに変わりはありませんでした（`+0900` のまま）。DBeaverはローカルのタイムゾーンを利用するため、もしローカル端末のタイムゾーンと、DBのタイムゾーンが異なる場合は、`dbeaver.ini` に `-Duser.timezone=xxx` を追加して、タイムゾーンを一致させる必要があるようです。
 
-
 ### `timestampz` だけPostgreSQLのDBサーバからテキストフォーマットで受け取れば、セッションのタイムゾーン付きで受信できるため、それを元に time.Time にタイムゾーンを指定すればよいでは？
 
 同じことを思ったのですが、[Scanning of timestamp without time zone forces UTC #924](https://github.com/jackc/pgx/issues/924#issuecomment-770910226) を読んだところ、いくつか課題があるようです。
@@ -439,7 +436,6 @@ $ PGTZ=UTC PGPASSWORD=pass psql -h localhost -p 5432 -U postgres -c 'select * fr
 - 夏時間のため単純にテキストから時刻に変換すると、壊れる可能性がある
 
 これらの理由のため、対応は難しいようです。PRコントリビュートチャンスかと思いましたが、やはり簡単ではないですね…。
-
 
 ### DB接続時のセッションで有効なタイムゾーンってGoアプリの場合、どこに影響するの？
 
@@ -475,17 +471,16 @@ pgxにも同じような旨のIssueである、[How do you set the timezone conn
 
 ## まとめ
 
-* `timestamp with time zone`(`timestampz`) 型はUTCでデータを保持する
-* セッションで利用されるタイムゾーン（DBデフォルトのタイムゾーンや接続文字列で指定した値など）は、少なくても `pgx` を利用する限りにおいては利用されず、 `time.Location` のタイムゾーンが設定される。別のタイムゾーンにしたい場合は、一般的には環境変数`TZ`を用いるか、`time.Location` の値を書き換えるか、個別に `time.In()` でタイムゾーンを書き換える必要がある
-* 通常は、DB側のタイムゾーンと、Goアプリ側の `time.Time` が利用するタイムゾーンを一致させておくと良い
+- `timestamp with time zone`(`timestampz`) 型はUTCでデータを保持する
+- セッションで利用されるタイムゾーン（DBデフォルトのタイムゾーンや接続文字列で指定した値など）は、少なくても `pgx` を利用する限りにおいては利用されず、 `time.Location` のタイムゾーンが設定される。別のタイムゾーンにしたい場合は、一般的には環境変数`TZ`を用いるか、`time.Location` の値を書き換えるか、個別に `time.In()` でタイムゾーンを書き換える必要がある
+- 通常は、DB側のタイムゾーンと、Goアプリ側の `time.Time` が利用するタイムゾーンを一致させておくと良い
 
 ## 参考
 
-* https://www.postgresql.jp/docs/15/datatype-datetime.html
-* https://scientre.hateblo.jp/entry/20150407/datetime_with_time_zone
-* https://anakage.com/blog/how-to-setup-time-zone-in-windows-system/
-* https://tutuz-tech.hatenablog.com/entry/2021/01/30/192956
-* https://github.com/jackc/pgx/issues/520
-* https://stackoverflow.com/questions/72771272/how-to-setup-pgx-to-get-utc-values-from-db
-* https://www.postgresql.org/docs/current/protocol-overview.html#PROTOCOL-FORMAT-CODES
-
+- https://www.postgresql.jp/docs/15/datatype-datetime.html
+- https://scientre.hateblo.jp/entry/20150407/datetime_with_time_zone
+- https://anakage.com/blog/how-to-setup-time-zone-in-windows-system/
+- https://tutuz-tech.hatenablog.com/entry/2021/01/30/192956
+- https://github.com/jackc/pgx/issues/520
+- https://stackoverflow.com/questions/72771272/how-to-setup-pgx-to-get-utc-values-from-db
+- https://www.postgresql.org/docs/current/protocol-overview.html#PROTOCOL-FORMAT-CODES

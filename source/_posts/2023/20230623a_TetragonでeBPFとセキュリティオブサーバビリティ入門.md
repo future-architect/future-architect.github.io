@@ -35,9 +35,7 @@ eBPFとはLinuxカーネル内部で高速安全にプログラムを実行す�
 
 eBPFそのものの実態は、カーネルのイベントをトリガーとして動作するプログラムとその実行環境です。基本的にC言語で記述してeBPFのバイトコードにコンパイルされ、eBPFのVMで動きます。eBPFバイトコードはカーネルにロードされる前に検証器にチェックされるようになっており、そのおかげでカーネルをクラッシュさせたり脆弱性のもとになるバグを埋め込まず安全に実行できるようです。
 
-
 eBPFを使ったツールを開発する場合、eBPFプログラムそのものと、それをカーネルのイベントソースにアタッチしてeBPFとデータをやり取りするユーザスペースのコードを書く必要があります。
-
 
 実際にeBPFのサンプルプログラムを動かしてみましょう。サンプルプログラムには[BCC](https://github.com/iovisor/bcc) (BPF Compiler Collection）という、Python/LuaでeBPFを扱うことのできるツールを使います。インストール方法は[こちら](https://github.com/iovisor/bcc/blob/master/INSTALL.md)が参考になります。
 
@@ -177,7 +175,6 @@ BCC + Pythonは初心者にとっつきやすいですが、実際にはeBPFの�
 主な機能としては、定義したポリシーに従ってKuberntesクラスター上のコンテナ内で実行されるプロセスのシステムコールやネットワーク関連のイベントをフィルタリングし、ログとして出力するというものです。ポリシーに応じて動的にeBPFプログラムをアタッチし、カーネル空間内で直接フィルタリングしています。
 
 <img src="/images/20230623a/tetragon-2023-06-21-2234.png" alt="tetragon-2023-06-21-2234.png" width="1065" height="637" loading="lazy">
-
 
 ### プロセス実行の監視
 
@@ -416,12 +413,12 @@ kprobeというのは先ほども出てきましたが、カーネルの関数�
 
 - `call`にはトレース対象のカーネル関数を定義します。今回は`fd_install`が対象です。この関数はファイルテーブルに新しいファイルディスクリプタを割り当てる関数、、、早い話がファイルオープン時に必ず呼ばれる関数です。この関数にkprobeを使ってeBPFプログラムをアタッチする、ということです。fd_install` の引数の0番目はint型、1番目はfileという構造体であり、これらの引数をトレースに含めます。
 - `selectors`以下はフィルタリング条件と、フィルターにマッチしたときの挙動を定義しています。
-    - `matchPID`
-        - PID Namespace内でpid=1ではないプロセスに対してトレースする（つまりコンテナで動かす本来のプロセスはpid 1なのでトレース対象外で、 `kubectl exec` などで実行したプロセスがトレース対象となります）
-    - matchArgs
-        - indexの1番目=fileのprefixが `etc` の場合にトレースする。
-    - `matchActions.action: FollowFD`
-        - カーネル関数に渡されたファイルディスクリプタとファイル名をBPF mapに保存する。
+  - `matchPID`
+    - PID Namespace内でpid=1ではないプロセスに対してトレースする（つまりコンテナで動かす本来のプロセスはpid 1なのでトレース対象外で、 `kubectl exec` などで実行したプロセスがトレース対象となります）
+  - matchArgs
+    - indexの1番目=fileのprefixが `etc` の場合にトレースする。
+  - `matchActions.action: FollowFD`
+    - カーネル関数に渡されたファイルディスクリプタとファイル名をBPF mapに保存する。
 
 他の`spec.kprobe`以下の部分も同じように、どの関数にeBPFをアタッチするかを定義しています。
 
@@ -430,6 +427,7 @@ kprobeというのは先ほども出てきましたが、カーネルの関数�
 今までトレーシング機能を紹介してきましたが、フィルタリング条件に合致するイベントを検出した際に、プロセスに直接SIGKILLを送出する、といったことも可能です。
 
 ## 終わりに
+
 eBPFとeBPF製品Tetragonに入門にしてみました。Tetragonの親プロジェクトのCiliumでは、eBPFでネットワークを効率化しています。主要クラウドプロバイダーのKubernetesサービスでは、Ciliumが使用できるようになっており、例えばGoogle CloudのGKEでは[Dataplane V2](https://cloud.google.com/kubernetes-engine/docs/concepts/dataplane-v2?hl=ja)というモードで提供されています。暇があればCilium, eBPF+ネットワークも勉強したいなと思います。
 
 TetragonやBCCの公式ドキュメントのほか、以下のブログを参考にしました。
@@ -437,4 +435,3 @@ TetragonやBCCの公式ドキュメントのほか、以下のブログを参考
 https://blog.yuuk.io/entry/2021/ebpf-tracing
 
 https://gihyo.jp/admin/serial/01/ubuntu-recipe/0688
-

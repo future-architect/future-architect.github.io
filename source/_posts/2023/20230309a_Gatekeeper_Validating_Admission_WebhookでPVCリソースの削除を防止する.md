@@ -15,6 +15,7 @@ author: 岩崎賢太
 lede: "みなさん、ArgoCDは使っていますか？業務でEKSクラスタにArgoCDをデプロイして、Kubernetesリソースを管理しています。ArgoCDはGitOpsに則ったCDツールで、WebUIが優れていてKubernetesリソースの作成や更新がとても簡単で便利ですね。"
 ---
 ## はじめに
+
 フューチャーインスペース株式会社の岩崎です。
 
 みなさん、[ArgoCD](https://argo-cd.readthedocs.io/en/stable/)は使っていますか？
@@ -30,6 +31,7 @@ GrafanaのPVCには、ダッシュボードやアラートなどの設定が入�
 そこで、同環境でデプロイしている[Gatekeeper](https://open-policy-agent.github.io/gatekeeper/website/docs/)から、PVCの削除を防げないかを模索していたところ、「Validating Admission Webhook」でArgoCDによるPVCの削除リクエストを拒否することができたので、設定から検証までを書いていきます。
 
 ## 環境/構成
+
 - OS: Amazon Linux2
 - EKS: 1.23
 - ArgoCD: v2.4.15
@@ -43,24 +45,30 @@ Validating Admission Webhookの前に、KubernetesのAdmission Controlを理解�
 
 Validating Admission Webhookはリクエストがポリシーを満たしているか否かを監視し、ポリシーに反したリクエストが飛んで来た場合は、そのリクエストを拒否するように動作します。
 そして、Validating Admission Webhookのポリシーの作成には、以下の3つが必要になります。
+
 - Gatekeeper
 - Constraint-Template
 - Constraint
 
 ### Gatekeeper
+
 Gatekeeperは汎用的なポリシーエンジン[Open Policy Agent（OPA）](https://www.openpolicyagent.org/docs/latest/)をベースに作成されており、KubernetesのAdmission Controlの仕組みを活用し、Kubernetes APIへのリクエストに対して、Mutation（追加・更新・削除）、Validation(検証)などのポリシーをカスタマイズできます。
 
 ### Constraint-Template
+
 Constraint-TemplateはConstraintに必要なパラメータを用意します。Rego言語で記述したポリシーの定義を埋め込んだ、Constraint CRDを定義するテンプレートです。
 
 ### Constraint
+
 Constraintは条件に合致したリクエストを拒否します。Constraint-Templateで定義した内容に従って、監視対象のリソースの種類とアノテーションやラベルなどといったリクエストの拒否条件を記述します。
 
 ## PVCの削除を防止するポリシーを作成
+
 本題のPVCの削除を防止するポリシーを作成します。
 今回はPVCリソースを削除しないポリシーをnamespace毎に管理する必要があったため、「特定のnamespaceにおけるPVCリソースを削除しないポリシー」を作成していきます。
 
 ### Gatekeeperデプロイ
+
 [公式ドキュメント](https://open-policy-agent.github.io/gatekeeper/website/docs/install)通りに[gatekeeper.yaml](https://github.com/open-policy-agent/gatekeeper/blob/master/deploy/gatekeeper.yaml )をArgoCDでデプロイします。
 なお、デフォルトのGatekeeperのValidating Admission Webhookでは、CREATE, UDPATE（作成、更新）を監視する設定になっているため、次のように、ValidatingWebhookConfigurationリソースの`webhooks.rules.operations`にDELETE（削除）を追加することで、削除リクエストも監視対象に設定する必要があります。
 参考: https://open-policy-agent.github.io/gatekeeper/website/docs/customize-admission/#how-to-enable-validation-of-delete-operations
@@ -84,6 +92,7 @@ metadata:
 ```
 
 ### Constraint-Templateデプロイ
+
 以下の通り、`k8sdeletepvc`CRDとポリシーを作成します。
 
 ```yaml constraint-template.yaml
@@ -318,20 +327,19 @@ GatekeeperのValidating Admission Webhookを用いてPVCリソースの削除リ
 
 最後に、この検証を始めたときはKubernetesのAPIリクエストのことを全く理解しておらず、Rego言語も初めて知りました。何も知らない状態から調べていったので、少々時間がかかりましたが、Kubernetesへの理解が深まり、ポリシーを自分の手で作成できるようになったので、とても良い勉強になりました。
 
-
 ## 参考記事
 
 - OPA/Gatekeeper
-    - https://www.openpolicyagent.org/docs/latest/
-    - https://open-policy-agent.github.io/gatekeeper/website/docs/howto/
-    - https://github.com/open-policy-agent/gatekeeper
+  - https://www.openpolicyagent.org/docs/latest/
+  - https://open-policy-agent.github.io/gatekeeper/website/docs/howto/
+  - https://github.com/open-policy-agent/gatekeeper
 - Admission Webhook
-    - https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/
-    - https://tech.jxpress.net/entry/2019/12/01/kubernetes-admission-webhook-getting-started
+  - https://blog.mosuke.tech/entry/2022/05/15/admission-webhook-1/
+  - https://tech.jxpress.net/entry/2019/12/01/kubernetes-admission-webhook-getting-started
 - Constraint-Template、Constraint
-    - https://qiita.com/yokawasa/items/fe1ce8311db84fd1394b
-    - https://github.com/open-policy-agent/gatekeeper-library/tree/master/library/general
+  - https://qiita.com/yokawasa/items/fe1ce8311db84fd1394b
+  - https://github.com/open-policy-agent/gatekeeper-library/tree/master/library/general
 - Rego
-    - https://zenn.dev/mizutani/articles/5b1cd56b4b3f4f
-    - https://adventar.org/calendars/6601
-    - https://play.openpolicyagent.org/
+  - https://zenn.dev/mizutani/articles/5b1cd56b4b3f4f
+  - https://adventar.org/calendars/6601
+  - https://play.openpolicyagent.org/

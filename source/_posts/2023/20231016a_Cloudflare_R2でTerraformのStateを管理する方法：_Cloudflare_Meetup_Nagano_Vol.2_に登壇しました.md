@@ -28,7 +28,6 @@ lede: "10/14に開催されたCloudflare Meetup Naganoに登壇したので発�
 
 https://github.com/kaedemalu/cf-teraform-handson
 
-
 ### Cloudflare R2でTerraformのStateを管理する方法
 
 今回の登壇では、CloudflareのR2でTerraformのStateを管理できるのか、を調べたので、これを登壇ネタとしました。
@@ -138,7 +137,6 @@ terraform {
 
 これで、無事R2でState管理をできるようになり、リソース作成を行うと、実際にStateファイル(`default.state`)が配置されたり、更新されることがわかりました。そのため、現在のS3互換のAPIサポート状況でも問題なく利用できることがわかりました。
 
-　
 ## ほかの登壇内容
 
 ### Cloudflare 亀田さんのセッション
@@ -186,8 +184,9 @@ https://github.com/koda-masaru/chat-bot
 <img src="/images/20231016a/IMG_3553.jpg" alt="" width="1200" height="1093" loading="lazy">
 
 ## 参考
+
 - 技術ブログのほかのClouflare記事
-    - [CDN 入門とエッジでのアプリケーション実行](https://future-architect.github.io/articles/20230427a/)
-    - [cf-terraformingで入門するCloudflare](https://future-architect.github.io/articles/20230502a/)
+  - [CDN 入門とエッジでのアプリケーション実行](https://future-architect.github.io/articles/20230427a/)
+  - [cf-terraformingで入門するCloudflare](https://future-architect.github.io/articles/20230502a/)
 - イベント当日のハッシュタグ [#CloudflareUG_mmj](https://twitter.com/hashtag/CloudflareUG_mmj)
 - [Togetter](https://togetter.com/li/2241595)
