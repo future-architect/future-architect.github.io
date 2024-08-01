@@ -93,7 +93,7 @@ Google Cloud 認定資格関連の過去記事：
 - IaCツールを利用した開発環境の整備
   - Terraformなどを利用して一律のフォーマットでデプロイすることで構成のミスを防ぐ
 - 高可用性を実現する構成
-  - [プライマリインスタンスとリードレプリカのzone構成]()
+  - プライマリインスタンスとリードレプリカのzone構成
   - [フェイルオーバー時にリードレプリカをプライマリへ昇格させる](https://cloud.google.com/sql/docs/mysql/replication/cross-region-replicas?hl=ja)
 
 ### 全体的な所感

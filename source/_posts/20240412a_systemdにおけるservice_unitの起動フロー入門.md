@@ -71,7 +71,7 @@ EC2のインスタンスのメタデータから自身のリージョンを取�
     Region=default
     ```
 
-1. `ExecStartPre`で叩かれる事によって自分のリージョンを取得するシェル`/etc/setEnvConf.sh`を作成
+2. `ExecStartPre`で叩かれる事によって自分のリージョンを取得するシェル`/etc/setEnvConf.sh`を作成
 
     ```bash /etc/setEnvConf.sh
     #!/bin/bash
@@ -80,7 +80,7 @@ EC2のインスタンスのメタデータから自身のリージョンを取�
     sudo sed -i "/^Region=/c\Region=$REGION" /etc/environment
     ```
 
-1. `/etc/systemd/system`配下に`test.service`を作成
+3. `/etc/systemd/system`配下に`test.service`を作成
 
     ```ini test.service
      [Unit]
@@ -96,7 +96,7 @@ EC2のインスタンスのメタデータから自身のリージョンを取�
     WantedBy=multi-user.target
     ```
 
-3. サービスファイルを読み込んで起動
+4. サービスファイルを読み込んで起動
 
     ```sh
     sudo systemctl daemon-reload
