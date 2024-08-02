@@ -75,7 +75,7 @@ https://nextcloud.com/
 
 かつてownCloudというソフトウェアからフォークされたもので、ownCloudと比べるとチャットやビデオ会議機能が追加されているようです。
 
-NextCloudでは基本的にNextCloudがインストールされたマシンのストレージをデータの保存場所としますが、「External Storage Support」というアプリ(プラグイン)をインストールすることで、各種外部ストレージサービスを保存場所に設定することができます。
+NextCloudでは基本的にNextCloudがインストールされたマシンのストレージをデータの保存場所としますが、「External Storage Support」というアプリ(プラグイン)をインストールすることで、各種外部ストレージサービスを保存場所に設定できます。
 
 対応している外部ストレージサービスは以下のとおりです。
 
@@ -93,7 +93,7 @@ NextCloudでは基本的にNextCloudがインストールされたマシンの�
 
 先述の通り、NextCloudでは外部ストレージとしてAmaon S3が利用できます。さらに、Cloudflare R2はAmazon S3のAPIと互換性があるため、NextCloudのバックエンドとしてCloudflare R2が利用できるという算段です。
 
-この構成を使うのではなく、一般的なクラウドストレージサービス(Google Drive, iCloud等)で良いのでは？という声が聞こえてくるかもしれません。しかし、これには無視できない絶妙なコスト差が発生します。
+この構成を使うのではなく、一般的なクラウドストレージサービス(Google Drive, iCloud等)で良いのでは？ という声が聞こえてくるかもしれません。しかし、これには無視できない絶妙なコスト差が発生します。
 
 以下は一般的なクラウドストレージサービスの料金比較です。
 
@@ -114,7 +114,7 @@ NextCloudでは基本的にNextCloudがインストールされたマシンの�
 
 つまり、**保存したいファイルの総量が551.67GBに達する前まではこの方法のほうがおトク**といえるでしょう。(2024年6月現在)
 
-また、2TBを超える場合など既存のクラウドストレージの提供するプランを超えてしまっているときなども良い選択肢になるでしょう。一方で、同様のサービスにWasabiというオブジェクトストレージサービスがあります。こちらはCloudflare R2よりも安い1TB6.99USDで運用することができるので、比較検討してみるのもよいでしょう。
+また、2TBを超える場合など既存のクラウドストレージの提供するプランを超えてしまっているときなども良い選択肢になるでしょう。一方で、同様のサービスにWasabiというオブジェクトストレージサービスがあります。こちらはCloudflare R2よりも安い1TB6.99USDで運用できるので、比較検討してみるのもよいでしょう。
 
 https://wasabi.com/pricing
 
@@ -128,7 +128,7 @@ https://wasabi.com/pricing
 
 事前にIPアドレスを固定し、SSH接続できるようにしてあります。この方法は本題からそれてしまうので、割愛します。
 
-（もしセットアップにDockerが使えるのであれば、Dockerを使ったほうが何倍も楽にスタートすることができるのでおすすめです。今回のようにDockerを動かすにはスペック不足であったり、何らかの原因によってインストール出来ない場合にのみ、以下の方法で実施しましょう。）
+（もしセットアップにDockerが使えるのであれば、Dockerを使ったほうが何倍も楽にスタートできるのでおすすめです。今回のようにDockerを動かすにはスペック不足であったり、何らかの原因によってインストール出来ない場合にのみ、以下の方法で実施しましょう）。
 
 ### MariaDB・nginx・PHP環境のインストール
 
@@ -264,7 +264,7 @@ sudo systemctl enable nginx
 
 <img src="/images/20240603a/image_2.png" alt="image.png" width="913" height="574" loading="lazy">
 
-続いてPHPをインストールします。デフォルトではPHP8.2がインストールされるようだったので、リポジトリを追加してPHP8.3をインストールします。以下コマンドを実行し、 `php8.3` と `php8.3-fpm` 、それから各種モジュールをインストールします。
+続いてPHPをインストールします。デフォルトではPHP 8.2がインストールされるようだったので、リポジトリを追加してPHP8.3をインストールします。以下コマンドを実行し、 `php8.3` と `php8.3-fpm` 、それから各種モジュールをインストールします。
 
 ```bash
 sudo wget -qO /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
@@ -347,7 +347,7 @@ wget https://download.nextcloud.com/server/installer/setup-nextcloud.php
 
 <img src="/images/20240603a/image_9.png" alt="image.png" width="897" height="662" loading="lazy">
 
-続いてAPIトークンを発行します。R2メニューの右上「Manage R2 API Tokens」に進みます。（ユーザプロフィールから発行できるユーザトークンとはまた別なので注意）
+続いてAPIトークンを発行します。R2メニューの右上「Manage R2 API Tokens」に進みます（ユーザプロフィールから発行できるユーザトークンとはまた別なので注意）
 
 <img src="/images/20240603a/image_10.png" alt="image.png" width="1200" height="380" loading="lazy">
 
@@ -390,7 +390,7 @@ wget https://download.nextcloud.com/server/installer/setup-nextcloud.php
 
 <img src="/images/20240603a/image_16.png" alt="image.png" width="1134" height="504" loading="lazy">
 
-実際にファイルをアップロードしてみましょう。ファイルをドラッグ・アンド・ドロップすると……
+実際にファイルをアップロードしてみましょう。ファイルをドラッグ&ドロップすると……
 
 <img src="/images/20240603a/image_17.png" alt="image.png" width="1057" height="486" loading="lazy">
 
@@ -402,6 +402,6 @@ Cloudflare R2側にも反映されているようです。
 
 ## おわりに
 
-NextCloudのバックエンドとしてCloudflare R2を用いることにより、ある条件下ではおトクに自分専用のクラウドストレージを構築することができました。ぜひ自宅に使っていないラズパイやミニPCが転がっている方、既存クラウドストレージサービスの見直しをしている方は、ぜひ構築してみてください！
+NextCloudのバックエンドとしてCloudflare R2を用いることにより、ある条件下ではおトクに自分専用のクラウドストレージを構築できました。ぜひ自宅に使っていないラズパイやミニPCが転がっている方、既存クラウドストレージサービスの見直しをしている方は、ぜひ構築してみてください！
 
 以上、Cloudflare R2 + NextCloudで作る自分専用クラウドストレージのススメでした。

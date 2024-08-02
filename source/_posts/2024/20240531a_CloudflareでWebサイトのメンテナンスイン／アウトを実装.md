@@ -67,7 +67,7 @@ Cloudflare R2の設定画面からパブリックアクセス設定の「ドメ�
 
 メンテナンスページ（htmlファイル）のデプロイは自動化したいため、APIでのアップロードを行います。
 
-Cloudflare R2のAPIは、制約は多いですが[AWS S3 APIと互換性](https://developers.cloudflare.com/r2/api/s3/api/)があるため、AWS CLIやAWS SDKなどと同様に実行することができます。
+Cloudflare R2のAPIは、制約は多いですが[AWS S3 APIと互換性](https://developers.cloudflare.com/r2/api/s3/api/)があるため、AWS CLIやAWS SDKなどと同様に実行できます。
 
 今回はAWS CLIで実行します。
 
@@ -248,6 +248,6 @@ curl -X GET https://api.cloudflare.com/client/v4/zones/$ZONE_ID/rulesets/$RULESE
 
 # 最後に
 
-Cloudflare R2とリダイレクトルールを利用してメンテナンスイン/アウトを実装することができました。
+Cloudflare R2とリダイレクトルールを利用してメンテナンスイン/アウトを実装できました。
 
 少しでもCloudflareを利用している方の参考になれば幸いです。

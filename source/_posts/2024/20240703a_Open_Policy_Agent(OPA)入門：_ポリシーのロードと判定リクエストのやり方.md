@@ -34,7 +34,7 @@ OPAが担うのは、あくまでポリシーによる意思決定部分で、�
 
 ポリシーをコードとして表現することで、管理、自動化を可能にする考え方です。
 
-ソフトウェア開発のベストプラクティスである、バージョン管理、自動テスト、自動デプロイといった恩恵をポリシーの管理にも適用することができます。OPAはRegoという記述言語を用いてポリシーを記述することができます。
+ソフトウェア開発のベストプラクティスである、バージョン管理、自動テスト、自動デプロイといった恩恵をポリシーの管理にも適用できます。OPAはRegoという記述言語を用いてポリシーを記述できます。
 
 ## Policy decoupling
 
@@ -44,7 +44,7 @@ OPAが担うのは、あくまでポリシーによる意思決定部分で、�
 
 また、OSSなど、ソフトウェアの開発元がポリシーを管理する組織と異なる場合にもうまく機能します。
 
-OPAは、ポリシー管理を必要とするソフトウェアとは別プロセスとしても動作できるので、Policy decouplingを実現することができます。
+OPAは、ポリシー管理を必要とするソフトウェアとは別プロセスとしても動作できるので、Policy decouplingを実現できます。
 
 # OPAによるポリシー判定
 
@@ -56,7 +56,7 @@ OPAは、ポリシー管理を必要とするソフトウェアとは別プロ�
 
 OPAは判定リクエストを受け付ける前に、インメモリにPolicyとDataをロードします。Policyは判定に使われるルール群、Dataはポリシーの判定に使われるリクエスト間で共通するデータです。ロードのやり方は別で説明します。Queryは判定リクエストです。この中には、JSONの値（input）と、レスポンスとして受け取りたい項目の指定が含まれています。レスポンスとして受け取りたい項目を指定することで、どのPolicyで評価するかが決まります。Queryを受け取ったOPAは、inputとDataを、レスポンスを構成するために必要なポリシーで評価し、その結果であるDecisionをJSONとして返却します。
 
-## OPAの配布形態と評価をリクエストする際のインターフェース
+## OPAの配布形態と評価をリクエストする際のインタフェース
 
 OPAは、以下の3種類の形態で配布されています。
 
@@ -64,7 +64,7 @@ OPAは、以下の3種類の形態で配布されています。
 - コンテナイメージ
 - Goライブラリ
 
-また、OPAに評価を依頼するための主要なインターフェースは以下になります。
+また、OPAに評価を依頼するための主要なインタフェースは以下になります。
 
 - CLI
 - HTTP API
@@ -73,7 +73,7 @@ OPAは、以下の3種類の形態で配布されています。
 
 他にもwasmも使えるようですが、あまり詳しくないので割愛します。
 
-何かしらのツールやサービスが必要とする意思決定をOPAに委譲する際には、配布形態とこれらのインターフェースの組み合わせを考える必要があります。
+何かしらのツールやサービスが必要とする意思決定をOPAに委譲する際には、配布形態とこれらのインタフェースの組み合わせを考える必要があります。
 
 例えば、REST APIの認可判定で利用する場合は、サイドカーコンテナとしてOPAコンテナを起動し、HTTP APIを使ってリクエストすれば良いでしょう。
 
@@ -205,7 +205,7 @@ CLIで呼び出して即時に結果を受け取るには、`opa exec`コマン�
 opa exec --decision "/example/allow" -b ./bundle.tar.gz  input_cli.json
 ```
 
-`--decision`オプションでレスポンスとして受け取りたい項目を指定しています。上で作成したpolicy.regoは、`example` packageに属しており、そのうちの`allow`の値を取得したいため、`/example/allow`と指定しています。`-b`オプションでは利用するバンドルを指定し、続いて判定に使う一つ以上のJSONファイルを渡します。
+`--decision`オプションでレスポンスとして受け取りたい項目を指定しています。上で作成したpolicy.regoは、`example` packageに属しており、そのうちの`allow`の値を取得したいため、`/example/allow`と指定しています。`-b`オプションでは利用するバンドルを指定し、続いて判定に使う1つ以上のJSONファイルを渡します。
 
 出力結果
 
@@ -282,7 +282,7 @@ opa eval -d bundle.tar.gz -i input_cli.json "data.example.allow"
 }
 ```
 
-`opa eval`コマンドは、bundleの作成をしなくてもビルド対象ディレクトリを直接指定すれば実行することができます。このため、開発時の動作確認やちょっとしたお試しで便利です。
+`opa eval`コマンドは、bundleの作成をしなくてもビルド対象ディレクトリを直接指定すれば実行できます。このため、開発時の動作確認やちょっとしたお試しで便利です。
 
 ```sh
 opa eval -d ./policies -i input_cli.json "data.example.allow"
@@ -294,7 +294,7 @@ opa eval -d ./policies -i input_cli.json "data.example.allow"
 
 #### `opa run`コマンドによる起動
 
-`opa run --server`コマンドを使うことで、OPAをHTTP APIとして起動することができます。`-b`オプションで利用対象のBundleを指定できます。
+`opa run --server`コマンドを使うことで、OPAをHTTP APIとして起動できます。`-b`オプションで利用対象のBundleを指定できます。
 
 ```sh
 # デフォルトで、0.0.0.0:8181 で公開される。
@@ -372,9 +372,9 @@ Goのライブラリは2種類あって、高レベルAPIを提供する`sdk`パ
 
 ## Bundleサーバからのダウンロード
 
-Bundleを管理する中で最もポピュラーな方法が、Bundleを配布するWebサーバを作成し、そこからダウンロードする方法です。この方法の利点は、アプリ+OPAのデプロイとポリシーのデプロイが分離され、ポリシーのみを更新することができることです。Webサーバの機能としては,[Bundle Service API](https://www.openpolicyagent.org/docs/latest/management-bundles/#bundle-service-api)が指定する方式でBundleファイルを提供できれば問題なく、Nginxはもちろんのこと、Amazon S3, Google Cloud Storage, Azure Blob Storageといったオブジェクトストレージにも対応しています。詳細は[Bundles](https://www.openpolicyagent.org/docs/latest/management-bundles/)を参照してください。
+Bundleを管理する中で最もポピュラーな方法が、Bundleを配布するWebサーバを作成し、そこからダウンロードする方法です。この方法の利点は、アプリ+OPAのデプロイとポリシーのデプロイが分離され、ポリシーのみを更新できることです。Webサーバの機能としては,[Bundle Service API](https://www.openpolicyagent.org/docs/latest/management-bundles/#bundle-service-api)が指定する方式でBundleファイルを提供できれば問題なく、nginxはもちろんのこと、Amazon S3, Google Cloud Storage, Azure Blob Storageといったオブジェクトストレージにも対応しています。詳細は[Bundles](https://www.openpolicyagent.org/docs/latest/management-bundles/)を参照してください。
 
-ここでは、Nginxにバンドルを配置してダウンロードする方法について触れたいと思います。
+ここでは、nginxにバンドルを配置してダウンロードする方法について触れたいと思います。
 
 以下のdocker-compose.yamlで起動したコンテナを題材にしたいと思います。このファイルは[こちら](https://www.openpolicyagent.org/docs/latest/http-api-authorization/#2-bootstrap-the-tutorial-environment-using-docker-compose)を参考に、改修を加えて作成しています。
 
@@ -423,7 +423,7 @@ bundles:
 
 `.services`は、OPAのコントロールプレーンのエンドポイントを表している項目です。Bundleサーバ以外にも、Status APIなどがこの項目を使います。各サービスにアクセスする際に必要な認証に関する設定なども環境変数を利用しながら実施できます。`.bundles`が文字通りBundleの管理先を表していて、`service`でダウンロード先のserviceを指定します。今の場合、nginxを選択しています。また`resource`でダウンロードするBundleを指定しています。
 
-コンテナを起動すると、以下のようなログが出力されるので、BundleをNginxからダウンロードしていることがわかります。
+コンテナを起動すると、以下のようなログが出力されるので、Bundleをnginxからダウンロードしていることがわかります。
 
 ```txt
 opa_1            | {
@@ -439,7 +439,7 @@ opa_1            | }
 
 ## REST APIによるポリシー・Dataの作成
 
-[Policy API](https://www.openpolicyagent.org/docs/latest/rest-api/#policy-api)を使うことで、ポリシーを動的にCRUDすることができます。また、[Data API](https://www.openpolicyagent.org/docs/latest/rest-api/#data-api)を使うことで、DataをCRUDできます。Data APIは、判定リクエストを送る際に利用するAPIと共通です。普通のREST APIで、特に難しくないので詳細は公式ドキュメントを見てもらえたらと思います。
+[Policy API](https://www.openpolicyagent.org/docs/latest/rest-api/#policy-api)を使うことで、ポリシーを動的にCRUDできます。また、[Data API](https://www.openpolicyagent.org/docs/latest/rest-api/#data-api)を使うことで、DataをCRUDできます。Data APIは、判定リクエストを送る際に利用するAPIと共通です。普通のREST APIで、特に難しくないので詳細は公式ドキュメントを見てもらえたらと思います。
 
 # 終わりに
 

@@ -27,7 +27,7 @@ cfn-guardのcfnとはAWSのCloudFormation(AWSのIaCソリューションのこ�
 
 このツールはCloudFormationを使ってAWSのリソースをデプロイするときにその内容をチェックするポリシーチェックツールとしてよく使われています。
 
-しかし、cfn-guardはその名前に反して、CloudFormationに限らず、JSON/YAMLファイルに対する汎用的なポリシーチェックツールとしても使用することができます。
+しかし、cfn-guardはその名前に反して、CloudFormationに限らず、JSON/YAMLファイルに対する汎用的なポリシーチェックツールとしても使用できます。
 
 READMEの記載にも、次の通り説明があります。
 
@@ -83,7 +83,7 @@ resource "aws_s3_bucket_public_access_block" "my_bucket" {
 ```
 
 このファイルがまだ未作成の場合、次のようにコマンドを実行することで
-作成後に想定されるリソース構成をJSONファイルで出力することができます。
+作成後に想定されるリソース構成をJSONファイルで出力できます。
 
 ```shell
 terraform plan -out tfplan.bin

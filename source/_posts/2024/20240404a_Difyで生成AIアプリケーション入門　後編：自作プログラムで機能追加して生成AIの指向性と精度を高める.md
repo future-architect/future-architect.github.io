@@ -158,13 +158,13 @@ OpenAPI (Swagger) 準拠のスキーマが必要になります。上の例で�
 
 ### 作ったアプリケーションをDifyにツールとして登録
 
-（先ほど作ったアプリケーションは起動してリクエストを受け付ける状態にしておいてください。）
+（先ほど作ったアプリケーションは起動してリクエストを受け付ける状態にしておいてください）。
 
 画面上部のメニュー右端の[ツール](http://localhost/tools?category=api)をクリックし、左上の「カスタムツールを作成する」をクリックします。
 
 <img src="/images/20240404a/image.png" alt="" width="573" height="143" loading="lazy">
 
-名前は適当につけて、APIのスキーマは手動でコピペするか、（Dockerの設定でホスト名 `host.docker.internal` を有効にしているなら） [http://host.docker.internal:8080/v3/api-docs](http://host.docker.internal:8080/v3/api-docs) 等を使ってインポートします。ここで念のためテストして通れば準備OKです。保存してください。
+名前は適当につけて、APIのスキーマは手動でコピー&ペーストするか、（Dockerの設定でホスト名 `host.docker.internal` を有効にしているなら） [http://host.docker.internal:8080/v3/api-docs](http://host.docker.internal:8080/v3/api-docs) 等を使ってインポートします。ここで念のためテストして通れば準備OKです。保存してください。
 
 <img src="/images/20240404a/image_2.png" alt="" width="581" height="694" loading="lazy">
 
@@ -210,7 +210,7 @@ Generated SQL must be validated using the tool `sqlReview`, then respond only wi
 
 <img src="/images/20240404a/image_7.png" alt="" width="827" height="259" loading="lazy">
 
-さて、SQLのレビューに失敗した場合はどうなるのか？少し意地悪をして、変数 `DDL` をオプション扱いにして、空欄にして実行してみます。
+さて、SQLのレビューに失敗した場合はどうなるのか？ 少し意地悪をして、変数 `DDL` をオプション扱いにして、空欄にして実行してみます。
 
 <img src="/images/20240404a/image_8.png" alt="" width="608" height="147" loading="lazy">
 

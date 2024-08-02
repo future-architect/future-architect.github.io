@@ -47,11 +47,11 @@ lede: "ドローンを利用して自動操縦（Autopilot）のロジックを�
 
 ## 手順
 
-### １．（開発PC）DJI Mobile SDK V4をクローン
+### １（開発PC）DJI Mobile SDK V4をクローン
 
 https://github.com/dji-sdk/Mobile-SDK-Android/tree/master
 
-### ２．（開発PC）DJI DeveloperでAPIキーを発行
+### ２（開発PC）DJI DeveloperでAPIキーを発行
 
 - [DJI Developer](https://developer.dji.com/user/apps/#all)でログイン
 - 「CREATE APP」でアプリケーションを登録する
@@ -60,13 +60,13 @@ https://github.com/dji-sdk/Mobile-SDK-Android/tree/master
 
 <img src="/images/20240521a/image_3.png" alt="image.png" width="1192" height="1130" loading="lazy">
 
-### ３．（開発PC）サンプリコード内にAPIキーを入力
+### ３（開発PC）サンプリコード内にAPIキーを入力
 
 AndroidManifest.xml（パス：Sample Code/app/src/main/main)
 
 <img src="/images/20240521a/image_4.png" alt="image.png" width="1200" height="405" loading="lazy">
 
-### ４．（開発PC）Sample Codeフォルダーを開いてビルドする
+### ４（開発PC）Sample Codeフォルダーを開いてビルドする
 
 - gradle-wrapper.properties(パス：Sample Code/gradle/wrapper)で一度「Sync」OR「build」
 ※まず最初からSyncするといいと思うが、大抵の場合ビルドエラーが起こる。こんな感じ
@@ -77,18 +77,18 @@ AndroidManifest.xml（パス：Sample Code/app/src/main/main)
 
 <img src="/images/20240521a/image_6.png" alt="image.png" width="1200" height="454" loading="lazy">
 
-### ５．（開発PC）エミュレータを起動
+### ５（開発PC）エミュレータを起動
 
 <img src="/images/20240521a/image_7.png" alt="image.png" width="794" height="1594" loading="lazy">
 
 - 起動後に「Register App」を押すと、DJI SDK利用が可能になる
 
-### ６．（BridgeApp用携帯）携帯にBridgeAppをインストール
+### ６（BridgeApp用携帯）携帯にBridgeAppをインストール
 
 - iOSはApp Storeからダウンロードする
 - Andriodは[dji-sdk/Android-Bridge-App](https://github.com/dji-sdk/Android-Bridge-App/releases/tag/4.14-trial1)からapk経由でインストール
 
-### ７．（BridgeApp用携帯）Bridge AppでRCに接続
+### ７（BridgeApp用携帯）Bridge AppでRCに接続
 
 - 携帯は開発者モードをONにし、USB DebuggingをONにする
 - RCの電源をON、Phantom 4の電源をONにする
@@ -98,7 +98,7 @@ AndroidManifest.xml（パス：Sample Code/app/src/main/main)
 
 - 画面のIPアドレスをメモる(こちらの端末では192.168.1.35)
 
-### ８．（開発PC）IPアドレスをエミュレータ画面に入力
+### ８（開発PC）IPアドレスをエミュレータ画面に入力
 
 - 「WSBridge IP」欄にIPアドレスを入力
 
@@ -110,7 +110,7 @@ AndroidManifest.xml（パス：Sample Code/app/src/main/main)
 
 <img src="/images/20240521a/image_10.png" alt="image.png" width="888" height="1868" loading="lazy">
 
-### ９．（シミュレータ用PC）DJI Assistant 2でPhantom 4に接続
+### ９（シミュレータ用PC）DJI Assistant 2でPhantom 4に接続
 
 - DJI Assistant 2 for Phantomを立ち上げて、USBでPhantom 4に繋ぐ
 - このアプリを使うには、以下の制限と設定が必要です（少し面倒ですね...）
@@ -124,7 +124,7 @@ AndroidManifest.xml（パス：Sample Code/app/src/main/main)
 <img src="/images/20240521a/image_12.png" alt="image.png" width="1200" height="753" loading="lazy">
 
 - 「Simulator」＞「Start Simulating」を押すと、Simulatorが立ち上がる
-※ファイアウォールを無効化にする必要！そうしないとRCからの信号が到達できない
+※ファイアウォールを無効化にする必要！ そうしないとRCからの信号が到達できない
 
 <img src="/images/20240521a/image_13.png" alt="image.png" width="1200" height="750" loading="lazy">
 

@@ -163,7 +163,7 @@ kubectl get pods
 ```
 
 初めて`envsubst`コマンドを知ったのですが、ターミナル上で定義済みの環境変数を代入出来て便利ですね。
-無事にLocustをデプロイすることができたので、ポートフォワードして画面に接続してみます。
+無事にLocustをデプロイできたので、ポートフォワードして画面に接続してみます。
 
 ```bash terminal
 kubectl port-forward svc/locust-master-web -n default 8080:8089
@@ -191,22 +191,22 @@ http://127.0.0.1:8080/
 
 - Statistics
   - Requestに対するレスポンスの統計情報
-  - テストを行っている各Pathに対して個別にみることが可能
+  - テストを行っているパスに対して個別にみることが可能
 - Charts
   - RPSやレスポンスタイムの時系列情報をグラフで確認することが可能
 - Failures
-  - リクエストが失敗した場合に、どのPathに対してどのMethod失敗したのか、エラーコードは何なのかを確認することが可能
+  - リクエストが失敗した場合に、どパスに対してどのMethod失敗したのか、エラーコードは何なのかを確認することが可能
 - Exceptions
   - 例外発生時のTracebackを確認することが可能
 - Current Ratio
-  - Locustのイメージビルド時にPythonファイルで設定した各種Pathに対するリクエスト数の割合を確認することが可能
+  - Locustのイメージビルド時にPythonファイルで設定した各パスに対するリクエスト数の割合を確認することが可能
 - Download Data
   - テスト結果をCSVやレポートとして出力可能
 - Workers
   - 現在Locustを動作させているPodの数を確認可能
 
 シンプルなUIの作りになっているため、直観的でわかりやすいです。
-また、"Download Data"にてレポートを出力することができるのですが、テスト結果に対して自動でサマリした状態で出力してくれるので非常に便利です。
+また、"Download Data"にてレポートを出力できるのですが、テスト結果に対して自動でサマリした状態で出力してくれるので非常に便利です。
 <img src="/images/20240216a/image_5.png" alt="image.png" width="1200" height="735" loading="lazy">
 <img src="/images/20240216a/image_6.png" alt="image.png" width="1200" height="897" loading="lazy">
 <img src="/images/20240216a/image_7.png" alt="image.png" width="1200" height="776" loading="lazy">

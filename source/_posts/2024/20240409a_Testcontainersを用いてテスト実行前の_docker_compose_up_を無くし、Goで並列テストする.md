@@ -32,7 +32,7 @@ Testcontainers を用いて、単体テスト実行前に `docker compose up -d`
 
 - https://testcontainers.com/
 
-テストコード上で任意のコンテナを起動・停止できるドライバのようなライブラリです。Java, Go, Python, Rustなど様々な言語でをサポートしています。次はGoでredisを起動するコードです。Dockerfileで記載されていた内容を、Goの構造体に渡するとコンテナが起動しそうだということが分かると思います。
+テストコード上で任意のコンテナを起動・停止できるドライバのようなライブラリです。Java, Go, Python, Rustなど様々な言語でをサポートしています。次はGoでRedisを起動するコードです。Dockerfileで記載されていた内容を、Goの構造体に渡するとコンテナが起動しそうだということが分かると思います。
 
 ```go
 container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{

@@ -17,7 +17,7 @@ lede: "Google Cloud認定資格全冠を目指すべく、Professional Cloud Dev
 
 ## はじめに
 
-Google Cloud認定資格全冠を目指すべく、Professional Cloud DevOps Engineer 認定資格（PCDE）を受けてきました。無事に合格することができたので、本記事ではざっくりとした所感を書いていきたいと思います。
+Google Cloud認定資格全冠を目指すべく、Professional Cloud DevOps Engineer 認定資格（PCDE）を受けてきました。無事に合格できたので、本記事ではざっくりとした所感を書いていきたいと思います。
 
 また本試験はGoogle Cloudパートナー企業向けのバウチャーを活用して受験しました。大変感謝しております！
 
@@ -109,7 +109,7 @@ Google Cloud 認定資格関連の過去記事：
 
 Google Cloudを利用するエンジニアにとって、Google Workspaceの一員としてGmailやGoogle Calender、Google Driveなどは頻繁に利用されているかもしれませんが、Workspace自身で設定されている内容自体は馴染みの薄いものだと思います。
 
-実際に自分も類似のサービスであるCloud Identityを触ったことがあったため若干の知見はありましたが、70%くらいは初見でした。
+実際に自分も類似のサービスであるCloud Identityを触ったことがあったため若干の知見はありましたが、70％くらいは初見でした。
 
 ただ、ファイルの共有方法やGmailの設定などGoogle Workspaceを利用したことがある方であれば、一度は見たことがある内容も多いので、そこらへんの記憶を頼りに解いていけるのではないでしょうか。
 

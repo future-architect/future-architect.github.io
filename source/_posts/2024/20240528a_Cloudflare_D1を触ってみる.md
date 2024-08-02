@@ -23,7 +23,7 @@ TIG真野です。発表当初に（そのポテンシャルや将来性が）�
 
 ## Cloudflare D1とは
 
-[D1](https://developers.cloudflare.com/d1/)はSQLiteをベースに構築された、CloudflareのドキュメントによるとサーバレスSQLデータベースです。エッジロケーションでRDBが動く、SQLLiteはファイルベースなのでレプリケーションに適正ありありでは？と評判になったことは記憶に新しいです。
+[D1](https://developers.cloudflare.com/d1/)はSQLiteをベースに構築された、CloudflareのドキュメントによるとサーバレスSQLデータベースです。エッジロケーションでRDBが動く、SQLLiteはファイルベースなのでレプリケーションに適正ありありでは？ と評判になったことは記憶に新しいです。
 
 そんなD1は、[2022年](https://blog.cloudflare.com/ja-jp/introducing-d1-ja-jp)に発表され、この記事が公開される少し前の[2024年4月](https://blog.cloudflare.com/making-full-stack-easier-d1-ga-hyperdrive-queues-ja-jp)にGA（Generally Available）となりました。
 

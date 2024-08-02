@@ -40,7 +40,7 @@ Go のコードジャンプやテスト実行のため、以下の拡張機能�
 * [Go Test Explorer](https://marketplace.visualstudio.com/items?itemName=premparihar.gotestexplorer)
 
 また、コードリーディングのお供として「GitHub Copilot」も追加します。
-GitHub アカウントで Copilot を有効化する方法や、VSCode の拡張機能とリンクする方法については、ネット上に多数情報がありますのでそちらをご参照ください。（ex. [GitHub Copilot のドキュメント](https://docs.github.com/ja/copilot)）
+GitHub アカウントで Copilot を有効化する方法や、VSCode の拡張機能とリンクする方法については、ネット上に多数情報がありますのでそちらをご参照ください（ex. [GitHub Copilot のドキュメント](https://docs.github.com/ja/copilot)）
 
 * [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
 * [GitHub Copilot Chat](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat)
@@ -347,7 +347,7 @@ $ du -h terraform/
 820M    terraform/
 ```
 
-何とかならないか？と `build.sh` を読み進めたところ、環境変数 `TF_DEV` に値を設定すれば、ビルド環境だけの実行バイナリを生成してくれるとありました。
+何とかならないか？ と `build.sh` を読み進めたところ、環境変数 `TF_DEV` に値を設定すれば、ビルド環境だけの実行バイナリを生成してくれるとありました。
 
 ```sh build.sh
 # If its dev mode, only build for ourself
@@ -483,7 +483,7 @@ func realMain() int {
 }
 ```
 
-VSCode のコードジャンプが有効となっていれば、Ctrl を押しながら対象関数を左クリックすることにより、関数の定義元にジャンプすることができます。
+VSCode のコードジャンプが有効となっていれば、Ctrl を押しながら対象関数を左クリックすることにより、関数の定義元にジャンプできます。
 
 ## `PanicHandler()`
 
@@ -547,7 +547,7 @@ main.main()
         github.com/hashicorp/terraform/main.go:64 +0x13
 ```
 
-`terraform` コマンドの実行時、何らかの理由により panic が起きてしまった場合には、**TERRAFORM CRASH** のメッセージ表示と issue の起票催促、デバックトレースが表示されることを確認できました。
+`terraform` コマンドの実行時、何らかの理由により panic が起きてしまった場合には、**TERRAFORM CRASH** のメッセージ表示と issue の起票催促、デバッグトレースが表示されることを確認できました。
 
 それでは、意図的に仕込んだ panic の1行を削除して、再ビルドまで完了したら、次の処理を見ていきます。
 
@@ -784,6 +784,6 @@ if streams.Stdin.IsTerminal() {
 
 # おわりに
 
-本ブログでは、「Terraform の実装コードを、動かしながら読む」という目標を掲げ、実行バイナリのビルドやコードの改造を取り入れながら、OSS のコードリーディングを行いました。前半の環境準備に原稿の多くが割かれているため、実際のコードリーディング行数は100行未満ではないかと思います。OSS コードリーディングの面白さは「各自が、自分の好き勝手に読めること」にあると思いますので、私ならどのように読むか？を詳しく解説してきました。
+本ブログでは、「Terraform の実装コードを、動かしながら読む」という目標を掲げ、実行バイナリのビルドやコードの改造を取り入れながら、OSS のコードリーディングを行いました。前半の環境準備に原稿の多くが割かれているため、実際のコードリーディング行数は100行未満ではないかと思います。OSS コードリーディングの面白さは「各自が、自分の好き勝手に読めること」にあると思いますので、私ならどのように読むか？ を詳しく解説してきました。
 
 ここまで長文にお付き合いいただき、ありがとうございました。

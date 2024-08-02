@@ -134,7 +134,7 @@ resource "aws_instance" "example" {
 │ This instance type is not free in AWS
 ```
 
-指定のエラーメッセージとともに無事？planが通らなくなりました。(当然、applyもできません。)
+指定のエラーメッセージとともに無事？ planが通らなくなりました。(当然、applyもできません。)
 
 このように`validation`と違って動的な変数の制御を可能にするのが`precondition`の特徴です。
 
