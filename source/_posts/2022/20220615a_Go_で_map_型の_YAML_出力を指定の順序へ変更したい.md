@@ -73,7 +73,7 @@ func main() {
 ```
 
 同様に、map を [YAML](https://ja.wikipedia.org/wiki/YAML) へ出力する際も key でソートして出力したかったのですが、YAML を扱うライブラリ側でソート順が固定化されており、できませんでした。ライブラリの調査について以下に記載します。
-まず、Go で YAML を扱うためには、一般的に以下ライブラリが利用することができます。
+まず、Go で YAML を扱うためには、一般的に以下ライブラリが利用できます。
 
 * [go-yaml/yaml.v3](https://github.com/go-yaml/yaml)
 * [goccy/go-yaml](https://github.com/goccy/go-yaml)
@@ -157,8 +157,8 @@ type Marshaler interface {
 
 整理すると、以下の 2点を実装する必要があります。
 
-**① map の値から実行時に struct を新たに生成し、struct のフィールドを指定したソート順で定義する。**
-**② YAML 出力時に map → struct 変換を実装するため、出力カスタマイズ可能な interface を満たすように実装する。**
+**（1） map の値から実行時に struct を新たに生成し、struct のフィールドを指定したソート順で定義する。**
+**（2） YAML 出力時に map → struct 変換を実装するため、出力カスタマイズ可能な interface を満たすように実装する。**
 
 こちらの 2点を満たす実装を以下の通り実施してみました。
 (※ reflection が多用されたナイーブな実装なので、本運用等のコードに使うのは少しリスキーだと思います。今回は CLI ツールでの利用であったため、問題ないとしています。)

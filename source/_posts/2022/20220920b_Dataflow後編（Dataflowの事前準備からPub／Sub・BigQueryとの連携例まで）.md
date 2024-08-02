@@ -79,11 +79,11 @@ pip3 install apache-beam[gcp]
 ## Cloud Storageバケットの作成
 
 Dataflowでパイプライン処理を行う場合、一時ファイルや出力ファイルを保存するためにCloud Storageのバケットを作成する必要があります。
-バケットの作成はコンソール画面から作成する方法とpythonから作成する方法があります。
+バケットの作成はコンソール画面から作成する方法とPythonから作成する方法があります。
 コンソール画面からは以下のように作成できます。
 <img src="/images/20220920b/make_bucket_new.gif" alt="make_bucket_new.gif" width="1200" height="665" loading="lazy">
 
-pythonからバケットを作成する際は以下のコードを参考にしてください（`pip3 install google-cloud-storage`が必要です）。
+Pythonからバケットを作成する際は以下のコードを参考にしてください（`pip3 install google-cloud-storage`が必要です）。
 
 ```python
 from google.cloud import storage
@@ -135,7 +135,7 @@ python {ソースコードまでのpath} \
 
 ## ソースコードの準備
 
-今回実行したいソースコード(ファイル名:`runinference_sklearn.py`)です。モデルの重みパラメータまでのpathは`{ソースコードがあるディレクトリ}/models/sklearn_models/SVC_iris.pkl2`です。
+今回実行したいソースコード(ファイル名:`runinference_sklearn.py`)です。モデルの重みパラメータまでのパスは`{ソースコードがあるディレクトリ}/models/sklearn_models/SVC_iris.pkl2`です。
 
 ```python runinference_sklearn.py
 import logging
@@ -449,7 +449,7 @@ class MNIST_Model(nn.Module):
         return x
 ```
 
-これらのソースコードはCloud Shellの同一のディレクトリに置いてください。また、モデルの重みパラメータまでのpathは`{ソースコードがあるディレクトリ}/models/pytorch_models/mnist_epoch_10.pth`です。
+これらのソースコードはCloud Shellの同一のディレクトリに置いてください。また、モデルの重みパラメータまでのパスは`{ソースコードがあるディレクトリ}/models/pytorch_models/mnist_epoch_10.pth`です。
 
 ## Dockerコンテナイメージの作成
 
@@ -574,7 +574,7 @@ tensor([ -3.8291,  -2.5081,  16.6454,   6.6208,  -7.5311, -10.9999, -13.9144,
 ## ソースコードの準備
 
 今回実行したいソースコード(ファイル名:`predict_iris_dataflow_pubsub2bq.py`)です。
-モデルの重みパラメータまでのpathは`{ソースコードがあるディレクトリ}/models/sklearn_models/SVC_iris.pkl2`です。
+モデルの重みパラメータまでのパスは`{ソースコードがあるディレクトリ}/models/sklearn_models/SVC_iris.pkl2`です。
 
 ```python predict_iris_dataflow_pubsub2bq.py
 import json
@@ -783,7 +783,7 @@ SELECT * FROM `{プロジェクトID}.{データセットの名前}.{テーブ�
 
 今回のインターンで扱わせていただいたDataflowは、なかなか個人で扱う機会がない一方で、ビジネスの場面ではとても需要のあるサービスです。そのようなものを扱う機会を頂けたことは今回のインターンに参加してよかったと思えることの１つです。また、私は今まで技術ブログを書いた経験がなかったため、今回のインターンで、学んだことを言語化しまとめることの難しさを知ることができました。
 
-そのほかにも、インターンではSAIG（フューチャーのAIチーム）の進捗報告会に参加させていただき、さまざまなプロジェクトの存在、各プロジェクトの進め方、各プロジェクトの難しさなど実際の仕事の現場を体験することができました。また、インターンのイベントの一環である社員の方にインタビューをさせていただき、そこでは専門分野の勉強の進め方、AIのトレンドのキャッチアップのやり方を教えていただきました。
+そのほかにも、インターンではSAIG（フューチャーのAIチーム）の進捗報告会に参加させていただき、さまざまなプロジェクトの存在、各プロジェクトの進め方、各プロジェクトの難しさなど実際の仕事の現場を体験できました。また、インターンのイベントの一環である社員の方にインタビューをさせていただき、そこでは専門分野の勉強の進め方、AIのトレンドのキャッチアップのやり方を教えていただきました。
 
 今回のインターンでは本当に多くのことを学ばせていただきました。受け入れ先プロジェクトの方々やフューチャーHRの皆さん、本当にありがとうございました！
 

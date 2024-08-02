@@ -110,7 +110,7 @@ FROM
     STUDENT
 ```
 
-`tree-sitter parse`コマンドで、ソースファイルをパースすることができます。
+`tree-sitter parse`コマンドで、ソースファイルをパースできます。
 
 ```Clojure
 $ tree-sitter parse ./exapmles/simple.sql
@@ -238,7 +238,7 @@ source_file [(0, 0)-(1, 12)]
       identifier "STUDENT" [(1, 5)-(1, 12)]
 ```
 
-ノードに対応する文字列とキーワードを出力することができました。
+ノードに対応する文字列とキーワードを出力できました。
 
 # 構文例
 
@@ -254,13 +254,13 @@ tree-sitter では文法を `grammar.js` に記述します。clone した tree-
 where_clause: $ => seq(kw("WHERE"), $._expression)
 ```
 
-`seq`はtree-sitterの文法のDSLの一つで、複数の規則を連結することができます。上の例では、`kw("WHERE")`のあとに`$._expression`が現れることを示しています。
+`seq`はtree-sitterの文法のDSLの1つで、複数の規則を連結できます。上の例では、`kw("WHERE")`のあとに`$._expression`が現れることを示しています。
 
 `kw`関数はtree-sitter-sqlの`grammar.js`で定義されている関数で、キーワード(`k`ey`w`ord)が大文字か小文字であるかを考慮しなくするなどの処理を行います。パース時には、`where`や`WHERE`というキーワードとマッチします([kw関数の定義](https://github.com/m-novikov/tree-sitter-sql/blob/218b672499729ef71e4d66a949e4a1614488aeaa/grammar.js#L29))。
 
 ### アンダースコアから始まる規則
 
-規則名の先頭の文字をアンダースコアから始めることで、生成されるCSTにノードとして出現させないように設定することができます([ドキュメント](https://tree-sitter.github.io/tree-sitter/creating-parsers#hiding-rules))。例えば、算術演算や識別子、リテラルなどの式は`_expression`という名前で以下のように定義されています。
+規則名の先頭の文字をアンダースコアから始めることで、生成されるCSTにノードとして出現させないように設定できます([ドキュメント](https://tree-sitter.github.io/tree-sitter/creating-parsers#hiding-rules))。例えば、算術演算や識別子、リテラルなどの式は`_expression`という名前で以下のように定義されています。
 
 ```js 式に対応する規則
  _expression: $ =>
@@ -276,7 +276,7 @@ where_clause: $ => seq(kw("WHERE"), $._expression)
       ),
 ```
 
-`choice`はtree-sitterのDSLで、引数のうちいずれか1つとマッチすることを意味しています。つまり、この規則は、文字列や`TRUE`、`FALSE`など各式に対応した規則を呼び出し、いずれか一つとマッチすることになります。つまり、ソースファイル中に式が現れるたびに`_expression`が呼び出されています。これがCST上に現れると、例えば`1+2-3`という式のパース結果が以下のようになってしまいます。
+`choice`はtree-sitterのDSLで、引数のうちいずれか1つとマッチすることを意味しています。つまり、この規則は、文字列や`TRUE`、`FALSE`など各式に対応した規則を呼び出し、いずれか1つとマッチすることになります。つまり、ソースファイル中に式が現れるたびに`_expression`が呼び出されています。これがCST上に現れると、例えば`1+2-3`という式のパース結果が以下のようになってしまいます。
 
 ```Clojure
 (_expression
@@ -293,7 +293,7 @@ where_clause: $ => seq(kw("WHERE"), $._expression)
       (number "3"))))
 ```
 
-アンダースコアから始めることで、CST上に現れないように設定でき、以下のようにシンプルな木にすることができます。
+アンダースコアから始めることで、CST上に現れないように設定でき、以下のようにシンプルな木にできます。
 
 ```Clojure
 (binary_expression
@@ -317,7 +317,7 @@ NOT X AND Y OR Z
 
 この式はどのように解釈されるでしょうか？`NOT (X AND (Y OR Z))`や`(NOT X) AND (Y OR Z)`、`((NOT X) AND Y) OR Z`など、複数通りに解釈できてしまうと思います。このように、複数通りの解釈ができてしまうような文法を曖昧な文法といい、そのままではパースできません。
 
-これは、優先度・結合性を文法に記述することで対処できます。tree-sitter-sqlでは優先度をJavascriptの定数として以下のように定義しています。
+これは、優先度・結合性を文法に記述することで対処できます。tree-sitter-sqlでは優先度をJavaScriptの定数として以下のように定義しています。
 
 ```js
 const PREC = {
@@ -347,8 +347,8 @@ const PREC = {
 
 ### extras
 
-ファイルのどこに現れてもよい規則をextrasで記述することができます。
-これを使って、コメントや空白、改行を簡単に記述することができます([コメント、空白の定義](https://github.com/m-novikov/tree-sitter-sql/blob/218b672499729ef71e4d66a949e4a1614488aeaa/grammar.js#L75))が、CST上では直感的でない場所位置に現れる場合もあります([インターンの記事後編](https://future-architect.github.io/articles/20220916c/#:~:text=%E3%82%B3%E3%83%A1%E3%83%B3%E3%83%88%E3%81%AE%E6%83%85%E5%A0%B1%E3%81%AFCST%E4%B8%8A%E3%81%AB%E4%BF%9D%E6%8C%81%E3%81%95%E3%82%8C%E3%81%BE%E3%81%99%E3%81%8C%E3%80%81%E7%9B%B4%E6%84%9F%E7%9A%84%E3%81%A7%E3%81%AA%E3%81%84%E4%BD%8D%E7%BD%AE%E3%81%AB%E7%8F%BE%E3%82%8C%E3%81%A6%E3%81%97%E3%81%BE%E3%81%86%E5%A0%B4%E5%90%88%E3%81%8C%E3%81%82%E3%82%8A%E3%81%BE%E3%81%99%E3%80%82)参照)。
+ファイルのどこに現れてもよい規則をextrasで記述できます。
+これを使って、コメントや空白、改行を簡単に記述できます([コメント、空白の定義](https://github.com/m-novikov/tree-sitter-sql/blob/218b672499729ef71e4d66a949e4a1614488aeaa/grammar.js#L75))が、CST上では直感的でない場所位置に現れる場合もあります([インターンの記事後編](https://future-architect.github.io/articles/20220916c/#:~:text=%E3%82%B3%E3%83%A1%E3%83%B3%E3%83%88%E3%81%AE%E6%83%85%E5%A0%B1%E3%81%AFCST%E4%B8%8A%E3%81%AB%E4%BF%9D%E6%8C%81%E3%81%95%E3%82%8C%E3%81%BE%E3%81%99%E3%81%8C%E3%80%81%E7%9B%B4%E6%84%9F%E7%9A%84%E3%81%A7%E3%81%AA%E3%81%84%E4%BD%8D%E7%BD%AE%E3%81%AB%E7%8F%BE%E3%82%8C%E3%81%A6%E3%81%97%E3%81%BE%E3%81%86%E5%A0%B4%E5%90%88%E3%81%8C%E3%81%82%E3%82%8A%E3%81%BE%E3%81%99%E3%80%82)参照)。
 
 # BETWEEN述語への対応
 
@@ -421,7 +421,7 @@ BETWEEN述語は次のような構文になっています。[PostgreSQLのド�
       ),
 ```
 
-これでBETWEEN述語の規則を追加することができました。拡張した文法をもとにパーサを生成してみましょう。以下のコマンドを実行します。
+これでBETWEEN述語の規則を追加できました。拡張した文法をもとにパーサを生成してみましょう。以下のコマンドを実行します。
 
 ```sh
 $ tree-sitter generate
@@ -443,7 +443,7 @@ Possible resolutions:
   3:  Add a conflict for these rules: `in_expression`, `between_and_expression`, `boolean_expression`
 ```
 
-エラーが発生してしまい、パーサが生成できませんでした。これは、上述した規則では優先度を記述していないため、文法が曖昧になってしまっていることが原因です。例えば、`X BETWEEN Y AND Z AND W`の`AND`がBETWEEN述語のものなのか、論理式のものなのかをパーサが自動で判別することができません。つまり、`X BETWEEN (Y AND Z) AND W`や`(X BETWEEN Y AND Z) AND W`など、複数の解釈ができてしまいます。
+エラーが発生してしまい、パーサが生成できませんでした。これは、上述した規則では優先度を記述していないため、文法が曖昧になってしまっていることが原因です。例えば、`X BETWEEN Y AND Z AND W`の`AND`がBETWEEN述語のものなのか、論理式のものなのかをパーサが自動で判別できません。つまり、`X BETWEEN (Y AND Z) AND W`や`(X BETWEEN Y AND Z) AND W`など、複数の解釈ができてしまいます。
 
 そこで、優先度と結合性を追加します。
 
@@ -556,7 +556,7 @@ AND ID      BETWEEN 0   AND 100
 * 次に、入力として与えるソースコードを記述し、下に`---`を記述します
 * 最後に期待する結果をS式で記述します
 
-`tree-sitter test`でテストを行います。`-f`フラグを加えることで、特定のテストのみを実行することができます。
+`tree-sitter test`でテストを行います。`-f`フラグを加えることで、特定のテストのみを実行できます。
 
 ```sh
 $ tree-sitter test -f 'BETWEEN predicates'

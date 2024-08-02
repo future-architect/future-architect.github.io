@@ -225,7 +225,7 @@ func TestUpdateAlreadyRead(t *testing.T) {
 
 ## Appendix
 
-あまりないかもしれませんが、もしテストを並列に実行しかつ、固定化したい時間を変えたい場合は、コネクション単位で `application_name` を変え、その単位で設定するように関数を改修しても良いかもしれません。（flex_timeだけ分ける意味があるかはさておき）
+あまりないかもしれませんが、もしテストを並列に実行しかつ、固定化したい時間を変えたい場合は、コネクション単位で `application_name` を変え、その単位で設定するように関数を改修しても良いかもしれません（flex_timeだけ分ける意味があるかはさておき）
 
 `application_name` というカラムを追加したバージョンです。
 
@@ -286,7 +286,7 @@ postgres=# SELECT flex_timestamp();
 (1 row)
 ```
 
-`application_name` ですが、次のようにコネクション接続時に指定できます。（[参考](https://www.postgresql.jp/docs/9.2/libpq-connect.html)）
+`application_name` ですが、次のようにコネクション接続時に指定できます（[参考](https://www.postgresql.jp/docs/9.2/libpq-connect.html)）
 
 ```
 postgresql://user@localhost:5432/postgres?connect_timeout=10&application_name=myapp

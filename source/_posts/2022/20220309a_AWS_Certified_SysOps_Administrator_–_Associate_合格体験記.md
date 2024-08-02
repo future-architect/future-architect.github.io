@@ -17,7 +17,7 @@ lede: "2019年新卒入社筋肉エンジニアの渡邉光です。AWS Certifie
 
 お久しぶりです。2019年新卒入社筋肉エンジニアの渡邉光です。
 
-前回の[AWS Certified Developer - Associate 合格体験記](https://future-architect.github.io/articles/20210906a/)から結構時間がたってしまいましたが、時間的に余裕が出てきたのでAWS Certified SysOps Administrator – Associate (AWS SOA-C02) を受験してきました。無事合格できたので、Associate試験は3冠を達成することができました！
+前回の[AWS Certified Developer - Associate 合格体験記](https://future-architect.github.io/articles/20210906a/)から結構時間がたってしまいましたが、時間的に余裕が出てきたのでAWS Certified SysOps Administrator – Associate (AWS SOA-C02) を受験してきました。無事合格できたので、Associate試験は3冠を達成できました！
 
 * AWS Certified Cloud Practitioner (AWS CLF)
 * AWS Certified Solutions Architect – Associate (AWS SAA)
@@ -26,7 +26,7 @@ lede: "2019年新卒入社筋肉エンジニアの渡邉光です。AWS Certifie
 
 # AWS Certified SysOps Administrator – Associate (AWS SOA-C02)とは
 
-AWS認定資格の一つで、AWSでのワークロードのデプロイ、管理、運用に関して問われる試験になっています。去年の7月27日にAWS SOAの試験形式が刷新されました。従来の択一選択問題、複数選択問題に加えて、**試験ラボ（マネジメントコンソール操作）** が追加されました。
+AWS認定資格の1つで、AWSでのワークロードのデプロイ、管理、運用に関して問われる試験になっています。去年の7月27日にAWS SOAの試験形式が刷新されました。従来の択一選択問題、複数選択問題に加えて、**試験ラボ（マネジメントコンソール操作）** が追加されました。
 
 試験ラボは、サンドボックス用のAWSアカウントを操作し表示されたシナリオ通りにマネジメントコンソールから設定を行っていく試験です。
 
@@ -50,7 +50,7 @@ AWS認定資格の一つで、AWSでのワークロードのデプロイ、管�
 
 ### 学習サイト aws.koiwaclub.com
 
-安定のkoiwaclubさんのサイトを使用して、選択問題の対策は行いました。koiwaclubさんの合格体験記にも記載があるように、#50~#95を中心に二周問題を解きました。試験当日もkoiwaclubさんで解いた問題と同じような意図の問題が多く出題されたためすらっと回答することができたと思います。
+安定のkoiwaclubさんのサイトを使用して、選択問題の対策は行いました。koiwaclubさんの合格体験記にも記載があるように、#50~#95を中心に二周問題を解きました。試験当日もkoiwaclubさんで解いた問題と同じような意図の問題が多く出題されたためすらっと回答できたと思います。
 
 ## 試験ラボ対策
 
@@ -64,14 +64,14 @@ AWS認定資格の一つで、AWSでのワークロードのデプロイ、管�
 
 # 受験結果と感想
 
-合格ライン720点に対して777点と予想より低い点数となってしまいましたが、無事合格することができました。
+合格ライン720点に対して777点と予想より低い点数となってしまいましたが、無事合格できました。
 
 普段はterraformを使用してAWS環境構築を行っており、試験ラボのマネジメントコンソールから設定する形式に対応できるか不安だったので、試験範囲のサービスはマネジメントコンソールから設定できるようにAWS hands-on for Beginnersを利用したり、自分でアーキテクチャを考えてマネジメントコンソールから作成してみる等の対策を行いました。実際の試験ラボの結果も「コンピテンシーを満たしている」結果だったので、対策のおかげでハンズオンは余裕でした！
 
 # 最後に
 
-無事にAssociate三冠取得することができたので、今後はprofessional試験に挑戦していこうと思います。
+無事にAssociate三冠取得できたので、今後はprofessional試験に挑戦していこうと思います。
 
-伊藤真彦さんが[AWS認定資格全冠された](/articles/20211112b/)のでAPN ALL AWS Certifications Engineersに表彰されます！おめでとうございます！
+伊藤真彦さんが[AWS認定資格全冠された](/articles/20211112b/)のでAPN ALL AWS Certifications Engineersに表彰されます！ おめでとうございます！
 
 私も伊藤さん目指して頑張ります！！

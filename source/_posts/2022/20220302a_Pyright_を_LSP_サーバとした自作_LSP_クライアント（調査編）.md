@@ -20,7 +20,7 @@ Language Server Protocol の理解として、Pyright を LSP サーバとした
 
 # 調査方法
 
-Pyright のリポジトリには言語サーバ（[`packages/pyright`](https://github.com/microsoft/pyright/tree/main/packages/pyright)）だけでなく、VSCode 拡張用のクライアント（[`packages/vscode-pyright`](https://github.com/microsoft/pyright/tree/main/packages/vscode-pyright)）が存在します。今回はこの二つをデバッガで実行して調査します。
+Pyright のリポジトリには言語サーバ（[`packages/pyright`](https://github.com/microsoft/pyright/tree/main/packages/pyright)）だけでなく、VSCode 拡張用のクライアント（[`packages/vscode-pyright`](https://github.com/microsoft/pyright/tree/main/packages/vscode-pyright)）が存在します。今回はこの2つをデバッガで実行して調査します。
 
 https://github.com/microsoft/pyright
 
@@ -42,7 +42,7 @@ Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイ
 
 <img src="/images/20220302a/s.png" alt="VS Codeデバッグ実行" width="1200" height="656" loading="lazy">
 
-実行すると、VSCode がもう一つ別のウィンドウで立ち上がります。上部に [拡張機能開発ホスト] と書かれていることを確認します。このウィンドウは現在実行している拡張機能が反映された VSCode になっています。
+実行すると、VSCode がもう1つ別のウィンドウで立ち上がります。上部に [拡張機能開発ホスト] と書かれていることを確認します。このウィンドウは現在実行している拡張機能が反映された VSCode になっています。
 <img src="/images/20220302a/ss.png" alt="VSCode がもう一つ別のウィンドウ" width="1200" height="84" loading="lazy">
 
 ブレークポイントが動作することを確認します。[`packages/vscode-pyright/src/extension.ts:206`](https://github.com/microsoft/pyright/blob/06e9f626f4388bc9b894daf4239a9e4a8e3ffb11/packages/vscode-pyright/src/extension.ts#L206) にはクライアントからサーバへ再起動を要求するメッセージ送信が実装されているので、ここにブレークポイントを置いてみます。[拡張機能開発ホスト] のウィンドウでコマンドパレットを開き、"Pyright: Restart Server" を実行すると、プログラムが一時停止しておりブレークポイントが機能していることを確認できます。
@@ -69,7 +69,7 @@ Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイ
 
 ## 1. Initialize Request
 
-[初期化関連の仕様](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialize)を見ると、メソッド `initialize` は送信する必要がありそうです。そこでまず次の二つを順に送信してみます。
+[初期化関連の仕様](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialize)を見ると、メソッド `initialize` は送信する必要がありそうです。そこでまず次の2つを順に送信してみます。
 
 > 1. `initialize` メソッド：サーバの初期化を要求
 > 2. 適当な解析メソッド
@@ -105,7 +105,7 @@ Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイ
 ## 3. Initialized Notification
 
 [`onDidChangeWorkspaceFolders`の前後](https://github.com/microsoft/pyright/blob/844f7cb98987955dc617cd97b1372325e76a4530/packages/pyright-internal/src/languageServerBase.ts#L579
-) を確認すると、有効化には以下の二つの条件を満たす必要があります。
+) を確認すると、有効化には以下の2つの条件を満たす必要があります。
 
 1. `initialized` メソッドの送信
 2. `this.client.hasWorkspaceFoldersCapability = true`

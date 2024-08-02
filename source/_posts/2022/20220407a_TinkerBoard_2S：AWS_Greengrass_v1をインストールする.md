@@ -44,7 +44,7 @@ ASUSが販売するArmベースのシングルボードコンピュータです�
 <img src="/images/20220407a/tinker.JPG" alt="外観" width="1200" height="676" loading="lazy">
 
 手前にピンヘッダーが40個確認できます。着色してあるため非常に便利です。
-RaspberryPiだと上から一つずつ数えていかなければ行けないのでこの仕様はとてもありがたいですね。
+RaspberryPiだと上から1つずつ数えていかなければ行けないのでこの仕様はとてもありがたいですね。
 
 外部インタフェースを見ていきます。
 <img src="/images/20220407a/usb.JPG" alt="外部インターフェース" width="1200" height="676" loading="lazy">
@@ -58,7 +58,7 @@ HDMIの横にMIDI DSI(Mobile Industry Processor Interface Display Serial Interfa
 
 <img src="/images/20220407a/DSC_0560.JPG" alt="HDMI" width="1200" height="676" loading="lazy">
 
-最後に前面(背面？)です。
+最後に前面(背面？ )です。
 手前に見えている端子はMIPI CSI(Mobile Industry Processor Interfa Camera Serial Interface)です。こちらの端子はカメラモジュールを取り付ける際に使用します。
 
 その右側には小さいですがLEDが3つついています。
@@ -73,7 +73,7 @@ Tinker Boardは専用のOSが[公式ページ](https://tinker-board.asus.com/jp/
 以下Ubuntu22.04がインストールされた母艦PCをデスクトップPCと呼称しています。
 
 デバイスをUSB経由でPCに接続しデスクトップPCでの正常に認識されているかを確認します。
-`lsusb`で接続デバイスを確認することができます。
+`lsusb`で接続デバイスを確認できます。
 
 **Tinker Board接続前**
 
@@ -171,13 +171,13 @@ AWS IoTコンソール画面左のタブから「クラシック＞グループ�
 <img src="/images/20220407a/image_7.png" alt="証明書の発行" width="910" height="859" loading="lazy">
 
 次に先程発行した証明書を使用してGreengrassコンテナを起動します。
-必要なDockerfileなどは[こちら](https://docs.aws.amazon.com/ja_jp/greengrass/v1/developerguide/what-is-gg.html?icmpid=docs_gg_mktg#gg-docker-download)からダウンロードすることができます。
+必要なDockerfileなどは[こちら](https://docs.aws.amazon.com/ja_jp/greengrass/v1/developerguide/what-is-gg.html?icmpid=docs_gg_mktg#gg-docker-download)からダウンロードできます。
 
 私はバージョン1.10を使用しました。
 <img src="/images/20220407a/image_8.png" alt="バージョン1.10" width="1197" height="181" loading="lazy">
 
 ダウンロードした圧縮ファイルはデスクトップPCからTinker Boardに転送します。
-以下のコマンドTinker Boardのhomeに転送することができます。
+以下のコマンドTinker Boardのhomeに転送できます。
 
 ```bash
 scp -r aws-greengrass-docker-1.11.0.tar.gz linaro@<IPaddress>:~/
@@ -291,7 +291,7 @@ sudo docker-compose -f docker-compose.alpine-aarch64.yml up
 
 次にマネジメントコンソールからLambda関数をコンテナに向けてデプロイします。
 
-Lambda関数を作成するのに必要なGreengrassのPython SDKは[ここから](https://github.com/aws/aws-greengrass-core-sdk-python/)ダウンロードすることができます。
+Lambda関数を作成するのに必要なGreengrassのPython SDKは[ここから](https://github.com/aws/aws-greengrass-core-sdk-python/)ダウンロードできます。
 
 [開発者ガイド](https://docs.aws.amazon.com/ja_jp/greengrass/v1/developerguide/create-lambda.html)に記載の通り
 Helloフォルダにgreengrasssdkをコピーしてzipファイルに圧縮します。
@@ -361,7 +361,7 @@ Greengrassのグループから「Lambdaの追加」を選択します。
 <img src="/images/20220407a/image_16.png" alt="Greengrassの最初のサブスクリプションの追加" width="920" height="605" loading="lazy">
 
 「サブスクリプションの作成」画面ではメッセージの送信元(ソース)と受信先（ターゲット）を選択します。
-AWS IoTではMQTTをPub/Subすることができます。
+AWS IoTではMQTTをPub/Subできます。
 以前RaspberryPiとAWS IoT CoreでPub/Subした記事をいかにまとめていますのでよろしければご覧になってください。
 
 [GoでMQTT!!　～温湿度マイスターbotの作成～(前編)](https://future-architect.github.io/articles/20210929a/)
@@ -401,7 +401,7 @@ AWS IoTのマネジメントコンソールの「テスト＞MQTTテストクラ
 
 <img src="/images/20220407a/image_23.png" alt="MQTT受信" width="1200" height="556" loading="lazy">
 
-コアデバイスのLambda関数はクラウド上から関数を更新、グループの設定から再デプロイを行うことでいつでも更新することができます。とても便利ですね。
+コアデバイスのLambda関数はクラウド上から関数を更新、グループの設定から再デプロイを行うことでいつでも更新できます。とても便利ですね。
 
 今回はTinker BoardにGreengrassの環境を構築して終わりましたが、次回はエッジデバイスでの加工処理なども行いたいと思います。
 最後までお付き合いいただきありがとうございました。

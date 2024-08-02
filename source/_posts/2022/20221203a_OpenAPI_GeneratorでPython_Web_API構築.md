@@ -21,11 +21,11 @@ lede: "PythonでWebAPIを構築しました。その際にOpenAPI Generatorが�
 
 こんにちは。TIG DXユニットの村上です！
 
-さて、私の所属しているプロジェクトではバックエンドシステムに主にGo言語を用いており、Go言語によるWebAPIを構築しています。
+さて、私の所属しているプロジェクトではバックエンドシステムに主にGo言語を用いており、Go言語によるWeb APIを構築しています。
 
 例えば[LambdaとGoを使ったサーバーレスWebAPI開発実践入門](/articles/20200927/)など、Future Tech Blogには多くのノウハウが投稿されていますので是非ご覧になっていただければと思います。
 
-今回はGo言語ではなくPythonでWebAPIを構築しました。その際にOpenAPI Generatorが便利だったのでご共有します。
+今回はGo言語ではなくPythonでWeb APIを構築しました。その際にOpenAPI Generatorが便利だったのでご共有します。
 
 # OpenAPI Generator
 
@@ -152,7 +152,7 @@ $ docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -
 ```
 
 上記コマンドオプションの`-g`がgeneratorの指定になります。
-generatorに指定できる引数は以下のコマンドで確認することができます。
+generatorに指定できる引数は以下のコマンドで確認できます。
 
 ```bash
 docker run --rm openapitools/openapi-generator-cli list
@@ -164,7 +164,7 @@ docker run --rm openapitools/openapi-generator-cli list
 docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/openapi.yaml -g python-flask -o /local --package-name test_package
 ```
 
-pythonのimportパスにも関わってくるため、プロジェクトに沿った名前にすると良いと思います。
+Pythonのimportパスにも関わってくるため、プロジェクトに沿った名前にすると良いと思います。
 
 ## 自動生成されたファイル
 

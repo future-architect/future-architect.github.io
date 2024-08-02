@@ -23,13 +23,13 @@ DynamoDBは日付型を直接サポートしておらず、文字列型で保存
 
 * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes.String
 
-データサイズや諸々の理由で[UnixTime](https://docs.aws.amazon.com/sdk-for-go/api/service/dynamodb/dynamodbattribute/#UnixTime) 勢力もあるかもしれませんが、アプリケーションから直接参照されず、トレースその他を運用時の利用を目的にしたシステム項目は、可読性が大事なのでRFC3339ナノ秒で保管していました。RFC3339ナノ秒は `2022-06-01T03:31:14.6300415Z` と言った形式です。
+データサイズや諸々の理由で[UnixTime](https://docs.aws.amazon.com/sdk-for-go/api/service/dynamodb/dynamodbattribute/#UnixTime) 勢力もあるかもしれませんが、アプリケーションから直接参照されず、トレースその他を運用時の利用を目的にしたシステム項目は、可読性が大事なのでRFC 3339ナノ秒で保管していました。RFC 3339ナノ秒は `2022-06-01T03:31:14.6300415Z` と言った形式です。
 
 ここまでは良かったのですがタイムゾーンはUTCに統一する方針を取っていたので、JSTではないです。変換するときは常に+9時間することになり激しく反省をしています。少なくてもクライアントのタイムゾーンがJSTであれば、JSTで保存したほうが良かったと考えています。JSTですと次のような形式を想定しています。
 
 * `2022-06-01T12:31:14.6300415+09:00`
 
-ちなみに、AWS SDK for Goを用いると、time.Time型はデフォルトではRFC3339で保存されます。
+ちなみに、AWS SDK for Goを用いると、time.Time型はデフォルトではRFC 3339で保存されます。
 
 > `time.Time` is marshaled as RFC3339 format.
 > https://docs.aws.amazon.com/sdk-for-go/api/service/dynamodb/dynamodbattribute/#:~:text=%60time.Time%60%20is%20marshaled%20as%20RFC3339%20format.

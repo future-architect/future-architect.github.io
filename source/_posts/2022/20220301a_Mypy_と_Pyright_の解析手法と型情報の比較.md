@@ -19,7 +19,7 @@ lede: "Mypy や Pyright は Python の静的解析ツールとして有名です
 
 # はじめに
 
-Mypy や Pyright は Python の静的解析ツールとして有名ですが、これら二つに解析情報でどのような違いがあるのかわからなかったので、実験することにしました。Pyright は Mypy に比べて後発のプロジェクトですが、性能面で優れているなどとして徐々に注目を集めています。
+Mypy や Pyright は Python の静的解析ツールとして有名ですが、これら2つに解析情報でどのような違いがあるのかわからなかったので、実験することにしました。Pyright は Mypy に比べて後発のプロジェクトですが、性能面で優れているなどとして徐々に注目を集めています。
 
 * https://github.com/python/mypy
 * https://github.com/microsoft/pyright
@@ -30,7 +30,7 @@ Mypy や Pyright は Python の静的解析ツールとして有名ですが、�
 
 # 実験概要
 
-Mypy、Pyright はともに `reveal_type(expr)` という機能があります。これを解析対象のコードに挿入すると、実行時点での `expr` の型情報を表示することができます。Mypy、Pyright の両者で同一コードに解析を行いその結果を比較します。以下、コード中ではコメントで `reveal_type` の結果を記録し、`reveal_type` 自体の記述は省略します。
+Mypy、Pyright はともに `reveal_type(expr)` という機能があります。これを解析対象のコードに挿入すると、実行時点での `expr` の型情報を表示できます。Mypy、Pyright の両者で同一コードに解析を行いその結果を比較します。以下、コード中ではコメントで `reveal_type` の結果を記録し、`reveal_type` 自体の記述は省略します。
 
 ## 実験 1: 再代入
 

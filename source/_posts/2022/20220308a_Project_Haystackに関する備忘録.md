@@ -63,7 +63,7 @@ Haystack ではエンティティ内に作成したタグによって、自身�
 
 - point には派生として現在状態を表す cur-point と過去状態を表す his-point が存在する。
 - cur-point は、スカラー値が入るcurValタグを持つ。
-- his-point は、timestamp と curVal のセットをローカルストレージに記録することで履歴を管理することができる。
+- his-point は、timestamp と curVal のセットをローカルストレージに記録することで履歴を管理できる。
 - equip と point は1対多の関係であり、1つの point が1つの値（温度、速度など）を表す。
 - point は他のエンティティと結合し、用途に応じた働きをするための新たなエンティティを形成する。
 例）point に air, temp タグをつけることで、 point と air-temp が結合し、温度計が計測した温度を表すためのエンティティとなる。

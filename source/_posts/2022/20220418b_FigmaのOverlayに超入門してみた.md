@@ -19,7 +19,7 @@ lede: "春の入門連載の1日目です。この記事ではFigmaを使って�
 
 * [世界でデザインコラボレーションツールをリードする「Figma」が日本へ本格進出｜Figma Japan株式会社のプレスリリース](https://prtimes.jp/main/html/rd/p/000000001.000097201.html)
 
-様々なデザインシステム[^1]もFigma上で公開されており、UIの生きた教材となっているようです。（私はまだ眺めていてすごいなーくらいですが）
+様々なデザインシステム[^1]もFigma上で公開されており、UIの生きた教材となっているようです（私はまだ眺めていてすごいなーくらいですが）
 
 [^1]: https://www.concentinc.jp/design_research/2021/04/designsystem/
 
@@ -32,7 +32,7 @@ lede: "春の入門連載の1日目です。この記事ではFigmaを使って�
 * [公式サイト](https://www.figma.com/)で、まずはログインします
 * New design fileを選択して開きます
 
-最初の使い方については[サクッと始めるウェブデザイン【Figma】](https://zenn.dev/umi_mori/books/d1ea181264ebb3) がチュートリアルとして楽でした。また、Figmaの使い方はYoutube動画に多く説明されており、むしろそちらの方が情報が多い印象です。
+最初の使い方については[サクッと始めるウェブデザイン【Figma】](https://zenn.dev/umi_mori/books/d1ea181264ebb3) がチュートリアルとして楽でした。また、Figmaの使い方はYouTube動画に多く説明されており、むしろそちらの方が情報が多い印象です。
 
 よりよいデザインで作る場合は、既存のFigma Resources（Figmaで利用できる素材）をうまく活用し、むしろ乗っかっていく方がてっとり早いと思いますが、今回は使い方を学ぶということでなるべく手動で作る領域を多めにとる方針とします。
 
@@ -56,7 +56,7 @@ New design fileで開くと、バナーからフレームを選択します。
 
 <img src="/images/20220418b/オブジェクト挿入.png" alt="オブジェクト挿入.png" width="573" height="180" loading="lazy">
 
-Cornar radiusで少し端っこを丸くすると入力フォームぽくなります。
+Cornar RADIUSで少し端っこを丸くすると入力フォームぽくなります。
 
 <img src="/images/20220418b/角丸.png" alt="角丸.png" width="356" height="271" loading="lazy">
 
@@ -64,7 +64,7 @@ Cornar radiusで少し端っこを丸くすると入力フォームぽくなり�
 
 <img src="/images/20220418b/テキスト入力.png" alt="テキスト入力.png" width="592" height="76" loading="lazy">
 
-ログインボタンはCornar radiusを強めにするして色を塗りつぶすとそれっぽく見えます。同様にトップページも作っておき、2ページ並べて全体を見ると次のような状態を作ります。
+ログインボタンはCornar RADIUSを強めにするして色を塗りつぶすとそれっぽく見えます。同様にトップページも作っておき、2ページ並べて全体を見ると次のような状態を作ります。
 
 <img src="/images/20220418b/全体モック.png" alt="全体モック.png" width="1200" height="599" loading="lazy">
 

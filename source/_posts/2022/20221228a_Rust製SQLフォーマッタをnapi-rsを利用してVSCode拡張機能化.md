@@ -234,7 +234,7 @@ yarn build
 
 ビルドに成功すると、プロジェクトのディレクトリ直下に`index.d.ts`、`index.js`、`<プロジェクト名>.<環境>.node`が作成されます。
 
-`index.js`には環境に合ったnodeファイルを読み込んでくれる処理が書いています。そのため、`index.js`をimportすることで自動的に環境に合ったnodeファイルが読み込まれ、そこに含まれる関数を利用することができるようになります。
+`index.js`には環境に合ったnodeファイルを読み込んでくれる処理が書いています。そのため、`index.js`をimportすることで自動的に環境に合ったnodeファイルが読み込まれ、そこに含まれる関数を利用できるようになります。
 
 以下のファイルをプロジェクトのディレクトリ直下に作成します。
 
@@ -387,7 +387,7 @@ GitHub Actionsでビルドを行うと、13個の環境のうち11個の環境�
 
 #### `CI.yml`の変更1: 長いパスに対応
 
-hostがwindows-latestである環境のbuildに以下の処理を追加しました。
+hostがWindows-latestである環境のbuildに以下の処理を追加しました。
 
 ```
 git config --system core.longpaths true
@@ -395,7 +395,7 @@ git config --system core.longpaths true
 
 #### `CI.yml`の変更2: yarn testの削除
 
-targetがi686-pc-windows-msvcの場合のみビルド時に`yarn test`が走っています。本来は消すべきではないかもしれませんが、今回はテストコードを書いていないのでとりあえず削除しました。
+targetがi686-pc-Windows-msvcの場合のみビルド時に`yarn test`が走っています。本来は消すべきではないかもしれませんが、今回はテストコードを書いていないのでとりあえず削除しました。
 
 #### `CI.yml`の変更3: aarch64-apple-darwinにおける一部処理の削除
 
