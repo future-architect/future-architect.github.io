@@ -53,7 +53,7 @@ https://ax.dev/
 
 https://www.featurestore.org/
 
-Technology Radarの解説には「Feature Storeとは、与えられたドメインやビジネス問題に関連する特徴量の識別、発見、監視を容易にするためのアーキテクチャの概念です。」と書いてありますが、個々の具体的なツールではなく抽象的な概念のようで、何のことやら……。[featurestore.orgの解説](https://www.featurestore.org/what-is-a-feature-store)を読むと、生データからの特徴量抽出・モデルの訓練・モデルのデプロイと本番での推論と、モデルのライフサイクルによってチームが分かれるときも、データエンジニア・データサイエンティスト・機械学習エンジニアの全員が参照できるようなプラットフォームを作るのがFeature Storeのようです。
+Technology Radarの解説には「Feature Storeとは、与えられたドメインやビジネス問題に関連する特徴量の識別、発見、監視を容易にするためのアーキテクチャの概念です」と書いてありますが、個々の具体的なツールではなく抽象的な概念のようで、何のことやら……。[featurestore.orgの解説](https://www.featurestore.org/what-is-a-feature-store)を読むと、生データからの特徴量抽出・モデルの訓練・モデルのデプロイと本番での推論と、モデルのライフサイクルによってチームが分かれるときも、データエンジニア・データサイエンティスト・機械学習エンジニアの全員が参照できるようなプラットフォームを作るのがFeature Storeのようです。
 
 Feature Storeの具体例としてはAmazon SageMaker Feature Store, Vertex AI Feature Storeなどがあります。Vertex AIについては[技術ブログ内の他の記事](https://future-architect.github.io/tags/VertexAI/)もご覧ください。
 
@@ -81,7 +81,7 @@ https://www.evidentlyai.com/
 
 https://pytorch.org/
 
-なぜ今更このタイミングでPyTorch……？と思って[履歴を見てみる](https://www.thoughtworks.com/radar/languages-and-frameworks/pytorch)と、2020年にはTrialとして紹介されていましたが、3年後の今回Adoptに昇格しています。
+なぜ今更このタイミングでPyTorch……？ と思って[履歴を見てみる](https://www.thoughtworks.com/radar/languages-and-frameworks/pytorch)と、2020年にはTrialとして紹介されていましたが、3年後の今回Adoptに昇格しています。
 
 他のフレームワークと比べたとき、以下を主な利点として挙げています。
 
@@ -99,7 +99,7 @@ https://riverml.xyz/dev/
 
 https://github.com/unionai-oss/pandera
 
-データのバリデーションツールです。1つ前のvolume 27では同様のツールとしてGreat Expectationsが紹介されました。（Great Expectationsについては、フューチャー技術ブログの[MLシステムにおけるモデル・データの監視【概要編】](/20230412a/#Great-Expectations)でも触れています。また、もうすぐGreat Expectationsについての記事が出るので併せてご参照ください。）
+データのバリデーションツールです。1つ前のvolume 27では同様のツールとしてGreat Expectationsが紹介されました（Great Expectationsについては、フューチャー技術ブログの[MLシステムにおけるモデル・データの監視【概要編】](/20230412a/#Great-Expectations)でも触れています。また、もうすぐGreat Expectationsについての記事が出るので併せてご参照ください）。
 
 panderaも入力データに対してバリデーションを行うPythonライブラリです。Radarの説明や[両者の比較記事](https://endjin.com/blog/2023/03/a-look-into-pandera-and-great-expectations-for-data-validation)などを読むと、機能が多く本番環境まで考慮に入れるならばGreat Expectations、比較的シンプルですぐに使いやすいのがpandera、という違いがあるようです。
 

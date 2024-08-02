@@ -14,13 +14,13 @@ lede: "Terraform 1.4.0のENHANCEMENTSで以下の機能が追加されました�
 ---
 # 初めに
 
-こんにちは！筋肉エンジニアのTIG渡邉です。[Terraform連載2023](/articles/20230327a/) の1リソース目の記事です。
+こんにちは！ 筋肉エンジニアのTIG渡邉です。[Terraform連載2023](/articles/20230327a/) の1リソース目の記事です。
 
 Terraform 1.4.0の`ENHANCEMENTS`で以下の機能が追加されました。
 
 >backend/gcs: Add storage_custom_endpoint argument, to allow communication with the backend via a Private Service Connect endpoint.
 
-内容はtfstateが保存されているGCSへのアクセスがインターネット経由ではなく、Private Service Connectエンドポイントを利用したプライベートネットワーク経由でbackendに指定したGCSへアクセスすることができる機能です。今回はこの機能を検証します。
+内容はtfstateが保存されているGCSへのアクセスがインターネット経由ではなく、Private Service Connectエンドポイントを利用したプライベートネットワーク経由でbackendに指定したGCSへアクセスできる機能です。今回はこの機能を検証します。
 
 以下のリソースは構築済みとします。
 
@@ -130,7 +130,7 @@ https://developer.hashicorp.com/terraform/language/settings/backends/gcs
 
 backend.tfにterraform 1.4で追加された`storage_custom_endpoint`を追加してみます。
 
-こちらの設定を追加することで、tfstateが保存されているbackendのGCSへのアクセスをPrivate Service Connectのエンドポイント経由にすることができます。
+こちらの設定を追加することで、tfstateが保存されているbackendのGCSへのアクセスをPrivate Service Connectのエンドポイント経由にできます。
 `https://storage-xyz.p.googleapis.com/storage/v1/b`をベースに値の置き換えをします。
 
 - xyz→sampleendpoint（Private Service Connectのエンドポイント名）
@@ -349,7 +349,7 @@ tcpdump: listening on ens4, link-type EN10MB (Ethernet), capture size 262144 byt
 > 05:14:59.618319 IP (tos 0x0, ttl 64, id 11848, offset 0, flags [DF], proto TCP (6), length 60)
     10.0.0.2.53478 > 10.0.3.0.443: Flags [S], cksum 0x1730 (incorrect -> 0xad7d), seq 1890652633, win 65320, options [mss 1420,sackOK,TS val 3353962346 ecr 0,nop,wscale 7], length 0
 
-もう一つterraform init時にGCE(10.0.0.2)から18.65.202.87へアクセスしているパケットをキャプチャすることができました。
+もう1つterraform init時にGCE(10.0.0.2)から18.65.202.87へアクセスしているパケットをキャプチャできました。
 
 > 05:15:00.436271 IP (tos 0x0, ttl 64, id 49780, offset 0, flags [DF], proto TCP (6), length 52)
     10.0.0.2.34760 > 18.65.202.87.443: Flags [.], cksum 0xe6c0 (incorrect -> 0x1325), seq 601, ack 7649, win 501, options [nop,nop,TS val 118988510 ecr 3287755066], length 0
@@ -373,8 +373,8 @@ tcpdump: listening on ens4, link-type EN10MB (Ethernet), capture size 262144 byt
 すると、`storage-sampleendpoint.p.googleapis.com`のほかに`registry.terraform.io`を名前解決していることがわかりました。
 >05:28:31.596564 IP (tos 0x0, ttl 64, id 831, offset 0, flags [DF], proto UDP (17), length 78)
     10.0.0.2.43466 > 169.254.169.254.53: [bad udp cksum 0x5e4a -> 0x143a!] 35627+ [1au] A? registry.terraform.io. ar: . OPT UDPsize=512 (50)
-05:28:31.596653 IP (tos 0x0, ttl 64, id 27444, offset 0, flags [DF], proto UDP (17), length 78)
-    10.0.0.2.58257 > 169.254.169.254.53: [bad udp cksum 0x5e4a -> 0x126e!] 14384+ [1au] AAAA? registry.terraform.io. ar: . OPT UDPsize=512 (50
+05:28:31.596653 IP (tos 0×0, ttl 64, id 27444, offset 0, flags [DF], proto UDP (17), length 78)
+    10.0.0.2.58257 > 169.254.169.254.53: [bad udp cksum 0×5e4a -> 0×126e!] 14384+ [1au] AAAA? registry.terraform.io. ar: . OPT UDPsize=512 (50
 
 今度はdigコマンドを利用して`registry.terraform.io`を名前解決してみます。
 すると先ほどの`tcpdump -n -vv dst port 443`コマンドを実行して出力されたIPアドレス`18.65.202.87`が存在することがわかりました。

@@ -37,7 +37,7 @@ lede: "初心者がTerraformを扱う際に気をつけるべきポイントに�
 1. 何よりまずは公式ドキュメントを読もう
 2. `terraform` コマンドを使いこなそう
 3. 効率よく書こう
-4. これはバグ？と思ったらIssueを見に行こう
+4. これはバグ？ と思ったらIssueを見に行こう
 
 ### 1. 何よりまずは公式ドキュメントを読もう
 
@@ -118,7 +118,7 @@ Plan: 0 to add, 1 to change, 0 to destroy.
 
 DeepLに日本語訳してもらいます。
 
-「このリソースの `managed_policy_arns` 引数または `inline_policy` 設定ブロックを使用すると、このリソースはロールのそれぞれのポリシータイプ（例えば、両方の引数を使用した場合は両方のポリシータイプ）の排他的管理を引き受けます。これらの引数は、`aws_iam_policy_attachment` 、`aws_iam_role_policy_attachment` 、`aws_iam_role_policy` といったロールのポリシーを管理する他の方法と互換性がありません。複数の手段でロールのポリシーを管理しようとすると、リソースの循環やエラーが発生します。」
+「このリソースの `managed_policy_arns` 引数または `inline_policy` 設定ブロックを使用すると、このリソースはロールのそれぞれのポリシータイプ（例えば、両方の引数を使用した場合は両方のポリシータイプ）の排他的管理を引き受けます。これらの引数は、`aws_iam_policy_attachment` 、`aws_iam_role_policy_attachment` 、`aws_iam_role_policy` といったロールのポリシーを管理する他の方法と互換性がありません。複数の手段でロールのポリシーを管理しようとすると、リソースの循環やエラーが発生します」
 
 確かに今回の例では、 `aws_iam_role` リソースの引数として `managed_policy_arns` を設定し `AWSLambdaVPCAccessExecutionRole` ポリシーをアタッチすると同時に、 `aws_iam_role_policy_attachment` リソースも記述し、カスタマー管理ポリシーをアタッチしようとしています。まさに、「**複数の手段でロールのポリシーを管理しようとすると、リソースの循環やエラーが発生します。**」という部分に該当します。
 
@@ -130,7 +130,7 @@ DeepLに日本語訳してもらいます。
 
 ### 2. `terraform` コマンドを使いこなそう
 
-`terraform` コマンドでよく使うのは、 `plan` 、 `apply` 、 `destroy` の3つだと思います。それぞれのコマンドには多数のオプションがあることをご存知でしょうか？ここでは、私が1ヶ月間の間に非常にお世話になったコマンド・オプションを3つピックアップして紹介します。
+`terraform` コマンドでよく使うのは、 `plan` 、 `apply` 、 `destroy` の3つだと思います。それぞれのコマンドには多数のオプションがあることをご存知でしょうか？ ここでは、私が1ヶ月間の間に非常にお世話になったコマンド・オプションを3つピックアップして紹介します。
 
 #### `terraform apply -target=(リソース名)`
 
@@ -138,7 +138,7 @@ https://developer.hashicorp.com/terraform/tutorials/state/resource-targeting
 
 `plan` 、 `apply` 、 `destroy` ともに、 `-target` オプションをつけると、指定したリソースのみを対象として各操作を実施できます。例えば、 `terraform apply -target=aws_s3_bucket.hoge` コマンドを実施することで、 `hoge` という名前のS3バケットのみをapplyできます。
 
-複数のリソースを指定したい場合は、一つずつ `-target` 引数を追加するか、 `{}` の中にコンマ区切りで指定します。例えば、 `fuga` と `piyo` という名前のS3バケットのみをdestroyしたい場合は、このように記載します。
+複数のリソースを指定したい場合は、1つずつ `-target` 引数を追加するか、 `{}` の中にコンマ区切りで指定します。例えば、 `fuga` と `piyo` という名前のS3バケットのみをdestroyしたい場合は、このように記載します。
 
 - `terraform destroy -target=aws_s3_bucket.fuga -target=aws_s3_bucket.piyo`
 - `terraform destroy -target={aws_s3_bucket.fuga,aws_s3_bucket.piyo}`
@@ -174,7 +174,7 @@ https://developer.hashicorp.com/terraform/cli/commands/fmt#usage
 
 Terraformの記法として、 `for_each` や `count` を利用して、複数のリソースを1回の記述で作成できます。
 
-私がプロジェクトで初めて提出したPRは、「利用するサービス分のVPCエンドポイントを構築する」TerraformのPRでした。私は愚直にも一つ一つ丁寧に `aws_vpc_endpoint` リソースをサービス分作成しており、レビュアーである[ゆるふわエンジニア前原さん](https://future-architect.github.io/authors/%E5%89%8D%E5%8E%9F%E5%BF%9C%E5%85%89/)から「 `for_each` を使おうね！」と諭されてしまいました。
+私がプロジェクトで初めて提出したPRは、「利用するサービス分のVPCエンドポイントを構築する」TerraformのPRでした。私は愚直にも1つ1つ丁寧に `aws_vpc_endpoint` リソースをサービス分作成しており、レビュアーである[ゆるふわエンジニア前原さん](https://future-architect.github.io/authors/%E5%89%8D%E5%8E%9F%E5%BF%9C%E5%85%89/)から「 `for_each` を使おうね！」と諭されてしまいました。
 
 具体例を見てみましょう。今回は、S3とSecrets ManagerのVPC Endpointに接続するための、Interface型のVPC Endpointを構築します。
 
@@ -237,7 +237,7 @@ resource "aws_vpc_endpoint" "vpc_endpoints" {
 
 ポイント: **エンジニアなら楽すべし！ `for_each` を使いこなそう！**
 
-### 4. これはバグ？と思ったらIssueを見に行こう
+### 4. これはバグ？ と思ったらIssueを見に行こう
 
 Terraform本体や、各サービスのプロバイダーはOSSとして公開されています。日々世界中の有志の開発者たちによって、各種クラウド環境のアップデートへの追従や、コードの改善が繰り返されています。
 
@@ -251,7 +251,7 @@ Error: deleting Pinpoint Application (xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx): %!s(<ni
 
 普段は `%!s(<nil>)` の部分にエラーメッセージが表示されるはずですが、このメッセージでは `nil` と書かれています。Terraform自体はGolangで書かれているので、 `nil` はメッセージとなる文字列が正常に渡されなかったと推測できます。つまりこれはバグであると判断しました。
 
-terraform-provider-aws のGitHubにアクセスし、Issueの検索から[「pinpoint nil」で検索します](https://github.com/hashicorp/terraform-provider-aws/issues?q=pinpoint+nil)。すると……ヒットしました！すでにCloseされていましたが、[「[Bug]: Unable to delete Application PinPoint, destroy command error」](https://github.com/hashicorp/terraform-provider-aws/issues/29341) というタイトルのIssueを発見しました。
+terraform-provider-aws のGitHubにアクセスし、Issueの検索から[「pinpoint nil」で検索します](https://github.com/hashicorp/terraform-provider-aws/issues?q=pinpoint+nil)。すると……ヒットしました！ すでにCloseされていましたが、[「[Bug]: Unable to delete Application PinPoint, destroy command error」](https://github.com/hashicorp/terraform-provider-aws/issues/29341) というタイトルのIssueを発見しました。
 
 <img src="/images/20230406a/image_3.png" alt="image.png" width="1200" height="664" loading="lazy">
 
@@ -271,7 +271,7 @@ terraform-provider-aws のGitHubにアクセスし、Issueの検索から[「pin
 
 また、もし起票されていないバグを発見したら、自分でIssueを起票しましょう！
 
-ポイント: **バグを踏んだらまずIssueを見よ！世界中の開発者たちに感謝しつつ、最新情報をキャッチせよ！**
+ポイント: **バグを踏んだらまずIssueを見よ！ 世界中の開発者たちに感謝しつつ、最新情報をキャッチせよ！**
 
 ## おわりに
 

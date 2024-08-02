@@ -87,7 +87,7 @@ Output Metricsについては、本記事を読んだ上で、こちらの記事
 * `hour.csv`: 時間ごとのシェアバイク利用者数が記録されている（全17379行）
 
 `day.csv`ではデータ数が少ないので、`hour.csv`を使うことにします。\
-データの内容は以下のようになっています。（最初の5行のみ表示）
+データの内容は以下のようになっています（最初の5行のみ表示）
 
 <img src="/images/20230413a/image.png" alt="" width="1200" height="107" loading="lazy">
 
@@ -141,7 +141,7 @@ AutoMLでは学習に使う特徴量（説明変数）を選択するといっ�
 
 Vertex AIではこの予算の単位には「トレーニング時間」というものが使われています。
 
-1トレーニング時間当たり2000~3000円掛かります。（[参考](https://cloud.google.com/vertex-ai/pricing?_ga=2.100859905.-1083087641.1678234233&_gac=1.161532622.1678234235.CjwKCAiA3pugBhAwEiwAWFzwdV87TWSYMsS7XAUXked_GSRNHRLhPL2skos9L6jwACckfFioeizOvBoCVf0QAvD_BwE&hl=ja#automl_models)）
+1トレーニング時間当たり2000~3000円掛かります（[参考](https://cloud.google.com/vertex-ai/pricing?_ga=2.100859905.-1083087641.1678234233&_gac=1.161532622.1678234235.CjwKCAiA3pugBhAwEiwAWFzwdV87TWSYMsS7XAUXked_GSRNHRLhPL2skos9L6jwACckfFioeizOvBoCVf0QAvD_BwE&hl=ja#automl_models)）
 
 <img src="/images/20230413a/image_7.png" alt="" width="1200" height="449" loading="lazy">
 
@@ -150,7 +150,7 @@ Vertex AIではこの予算の単位には「トレーニング時間」とい�
 ## 4.4. エンドポイントの作成
 
 モデルは完成しましたが、そのモデルを使って予測を行う窓口（エンドポイント）を作成する必要があります。\
-左メニューの「エンドポイント」よりエンドポイントを作成することができます。
+左メニューの「エンドポイント」よりエンドポイントを作成できます。
 
 <img src="/images/20230413a/image_8.png" alt="" width="1200" height="651" loading="lazy">
 
@@ -188,9 +188,9 @@ Vertex AI自体にバージョンの概念はありませんが、`2023/3/29`時
 
 ## 5.1. 監視できること
 
-Vertex AIではInput Metricsとして**トレーニング / サービング スキュー**と**予測ドリフト**を検出することができます。
+Vertex AIではInput Metricsとして**トレーニング / サービング スキュー**と**予測ドリフト**を検出できます。
 
-Vertex AIでは二者を以下のように定義しています。（[公式サイト](https://cloud.google.com/vertex-ai/docs/model-monitoring/overview?hl=ja)）
+Vertex AIでは二者を以下のように定義しています（[公式サイト](https://cloud.google.com/vertex-ai/docs/model-monitoring/overview?hl=ja)）
 
 * トレーニング / サービング スキュー（スキュー）
   * 訓練データと推論データ間で特徴の分布が異なること
@@ -281,7 +281,7 @@ Cloud Strage上のCSVファイル、BigQueryテーブル、Vertex AIデータセ
 
 このため、トレーニング統計の分布は表示されていません。
 
-右側にモニタリングが実施された時間が表示されており、クリックすることで各時間の分布を表示することができます。
+右側にモニタリングが実施された時間が表示されており、クリックすることで各時間の分布を表示できます。
 
 <img src="/images/20230413a/image_19.png" alt="" width="1200" height="918" loading="lazy">
 
@@ -290,7 +290,7 @@ Cloud Strage上のCSVファイル、BigQueryテーブル、Vertex AIデータセ
 監視設定はVertex AIのコンソール画面から設定できるので、**実装コスト**はほぼ必要ないと言ってもいいでしょう。\
 また、モニタリングも自動で定期的に行ってくれるため、**運用コスト**も必要ありません。
 
-ただし、Vertex AI Model Monitoringを使用するには以下の**金銭的コスト**が発生します。（[引用元](https://cloud.google.com/vertex-ai/pricing?hl=ja#modelmonitoring)）\
+ただし、Vertex AI Model Monitoringを使用するには以下の**金銭的コスト**が発生します（[引用元](https://cloud.google.com/vertex-ai/pricing?hl=ja#modelmonitoring)）\
 大規模なデータを扱う時には金銭的コストに注意が必要です。
 
 > * Vertex AI Model Monitoring を使用すると、以下に対して課金されます。
@@ -300,7 +300,7 @@ Cloud Strage上のCSVファイル、BigQueryテーブル、Vertex AIデータセ
 # 6. Evidently AIでの監視
 
 [Evidently AI](https://docs.evidentlyai.com/)はオープンソースのPythonライブラリで、ML監視に関わるあらゆる機能を提供してくれます。\
-監視の結果はHTMLファイルやJSONファイルで確認することができます。
+監視の結果はHTMLファイルやJSONファイルで確認できます。
 
 Input Metricsだけでなく、Output Metricsの監視まで支援してくれる機能もありますが、\
 今回はInput Metricsに限定して紹介します。
@@ -324,11 +324,11 @@ Evidently AIには大きく以下の2種類の機能があります。\
 両者とも監視項目としては似ていますが、その結果の扱い方に違いがあります。
 
 * Report
-  * データの品質調査の結果を可視化することができる
-  * データの傾向を分析したいときに活用
+  * データの品質調査の結果を可視化できる
+  * データの傾向を分析したいときにデータ活用ができる
   * 例）ドリフト検出にて特徴量分布を可視化して傾向を分析する
 * Test
-  * データ品質の異常をテストすることができる
+  * データ品質の異常をテストできる
   * 予め基準を定めておき、それを満たすか否か自動で判別したいときに活用
   * 例）ドリフト検出にて自動で異常を検知してアラートを発する
 
@@ -383,7 +383,7 @@ report.show(mode='inline') # Notebookのセル出力で結果を表示する
 
 すると、以下のように各特徴量の分布が可視化されたものが出力されます。
 
-一度に複数の特徴量分布の差を比較できる、分かりやすいレポートです。分布間の距離計算アルゴリズムは、データの数や種類に応じて適切なものを自動で選択しているようです。（[公式の解説](https://docs.evidentlyai.com/reference/data-drift-algorithm)）
+一度に複数の特徴量分布の差を比較できる、分かりやすいレポートです。分布間の距離計算アルゴリズムは、データの数や種類に応じて適切なものを自動で選択しているようです（[公式の解説](https://docs.evidentlyai.com/reference/data-drift-algorithm)）
 
 <img src="/images/20230413a/image_20.png" alt="" width="1200" height="934" loading="lazy">
 
@@ -466,6 +466,6 @@ AI監視ツールである、Vertex AI Model Monitoring及びEvidently AIを具�
 
 一方、Evidently AIは、クラウドやオンプレミスの環境で自己運用型のOSSとして提供されます。
 
-Vertex AI Model Monitoringは、ドリフト/スキューを監視することができますが、Evidently AIは、ドリフト/スキューだけでなく、入力データの品質等、より広範な指標を監視することができます。
+Vertex AI Model Monitoringは、ドリフト/スキューを監視できますが、Evidently AIは、ドリフト/スキューだけでなく、入力データの品質等、より広範な指標を監視できます。
 
 Vertex AI Model Monitoringよりも幅広い項目を監視したいと思う場合、Evidently AIを検討することをおすすめします。

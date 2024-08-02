@@ -14,7 +14,7 @@ lede: "GKE を利用したWebアプリケーションのGoogleアカウント認
 ---
 # 初めに
 
-明けましておめでとうございます！Future筋肉エンジニアの渡邉です。年も明けたことなので切り替えて減量に入りました。三月末までを目安に体を絞ろうと思っています。
+明けましておめでとうございます！ Future筋肉エンジニアの渡邉です。年も明けたことなので切り替えて減量に入りました。三月末までを目安に体を絞ろうと思っています。
 
 私は現在Google Cloudを利用しているプロジェクトに所属しており、Google Cloudのスキルアップにいそしんでいます。今回はGKE (Google Kubernetes Engine)でCloud IAP (Identity-Aware Proxy)を利用したWebアプリケーションのGoogleアカウント認証について記事を書こうと思います。
 
@@ -23,7 +23,7 @@ lede: "GKE を利用したWebアプリケーションのGoogleアカウント認
 以下、[公式ドキュメント](https://cloud.google.com/iap/docs/concepts-overview?hl=ja)引用
 > IAP を使用すると、HTTPS によってアクセスされるアプリケーションの一元的な承認レイヤを確立できるため、ネットワーク レベルのファイアウォールに頼らずに、アプリケーション レベルのアクセス制御モデルを使用できます。
 
-簡単に言うとGoogleアカウントとCloud IAMの仕組みを用いてWebアプリケーションの認証をすることができます。
+簡単に言うとGoogleアカウントとCloud IAMの仕組みを用いてWebアプリケーションの認証をできます。
 
 ## 認証・承認フロー
 
@@ -32,7 +32,7 @@ lede: "GKE を利用したWebアプリケーションのGoogleアカウント認
 [公式ドキュメント](https://cloud.google.com/iap/docs/concepts-overview?hl=ja)はこちら
 
 - Google Cloudリソースへのリクエスト(Cloud Load Balancing)します。
-- IAPが有効になっている場合は、IAP認証サーバへ情報を送信します。（プロジェクト番号、リクエストURL、リクエストヘッダー、Cookie内のIAP認証情報など）
+- IAPが有効になっている場合は、IAP認証サーバへ情報を送信します（プロジェクト番号、リクエストURL、リクエストヘッダー、Cookie内のIAP認証情報など）
 - IAP認証サーバがブラウザの認証情報をチェックします。
 - 認証情報が存在しない場合は、OAuth2.0のGoogleアカウントログインフローにリダイレクトし、認証確認を実施する。認証トークンは今後のアクセスのためブラウザのCookieに保存されます。
 - 認証情報が有効な場合、認証サーバは認証情報からユーザのID（メールアドレスとユーザID）を取得します。
@@ -96,7 +96,7 @@ kubectl get node
 
 ### Deployment
 
-NginxのPodを用意するため、Deploymentのmanifestを作成しました。
+nginxのPodを用意するため、Deploymentのmanifestを作成しました。
 
 ```yaml deployment.yaml
 apiVersion: apps/v1
@@ -156,7 +156,7 @@ spec:
 
 ### Ingress
 
-インターネット上にNginxを公開するためにIngressを構築するmanifestを作成しました。
+インターネット上にnginxを公開するためにIngressを構築するmanifestを作成しました。
 
 ```yaml ingress.yaml
 apiVersion: networking.k8s.io/v1
@@ -188,7 +188,7 @@ spec:
 # Cloud IAPなしでのアクセス確認
 
 まず、Cloud IAPなしでのアクセス確認を行います。
-Load Balancerに設定したドメインに対してアクセスを行うと、特に認証画面を経由することもなくアクセスすることができます。
+Load Balancerに設定したドメインに対してアクセスを行うと、特に認証画面を経由することもなくアクセスできます。
 <img src="/images/20230113a/1-IAPなしでのアクセス確認.png" alt="1-IAPなしでのアクセス確認.png" width="956" height="525" loading="lazy">
 
 # Cloud IAPの設定を追加
@@ -291,7 +291,7 @@ client_id:      73 bytes
 
 ## BackendConfigの作成
 
-Kubernetes Secretで作成したSecretをBackendConfigに設定することでCloud IAPを適用することができます。
+Kubernetes Secretで作成したSecretをBackendConfigに設定することでCloud IAPを適用できます。
 以下のmanifestファイルを用意します。
 
 ```yaml backendconfig.yaml
@@ -366,7 +366,7 @@ Load Balancerに設定したドメインに対してアクセスを行うと、C
 
 <img src="/images/20230113a/6-IAPアクセスあり①.png" alt="6-IAPアクセスあり①.png" width="529" height="565" loading="lazy">
 
-本GoogleアカウントはCloud IAPのアクセスできる権限(**IAP で保護されたウェブアプリ ユーザー**)を持っているため、画面にアクセスすることができました。
+本GoogleアカウントはCloud IAPのアクセスできる権限(**IAP で保護されたウェブアプリ ユーザー**)を持っているため、画面にアクセスできました。
 <img src="/images/20230113a/6-IAPアクセスあり②.png" alt="6-IAPアクセスあり②.png" width="908" height="299" loading="lazy">
 
 # 最後に

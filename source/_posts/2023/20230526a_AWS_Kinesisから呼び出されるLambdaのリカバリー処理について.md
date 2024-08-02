@@ -198,7 +198,7 @@ sqs_message_dict = json.loads(sqs_message)
 
 ここで、着目したいのが `requestPayload` 配下です。この要素には、本来ビジネスロジックで処理する予定だったデータが渡されます。
 
-したがって、このデータを元にリカバリーしたいと思った場合、`requestPayload.KinesisRecord` を取り出してAWS Lambdaに渡せば、再実行することができます。
+したがって、このデータを元にリカバリーしたいと思った場合、`requestPayload.KinesisRecord` を取り出してAWS Lambdaに渡せば、再実行できます。
 
 しかし、「ストリーム呼び出し」では同じ手段ではうまくいきません。Bodyの内容を同様に見てみましょう。
 
@@ -234,7 +234,7 @@ sqs_message_dict = json.loads(sqs_message)
 
 `requestPayload` と `KinesisBatchInfo` の違いは何でしょうか？
 
-`requestPayload` には、AWS Lambdaを実行時に渡されるデータがそのまま入っています。したがって、`requestPayload` の下のデータをAWS Lambdaに再送すればそのまま再実行することができます。
+`requestPayload` には、AWS Lambdaを実行時に渡されるデータがそのまま入っています。したがって、`requestPayload` の下のデータをAWS Lambdaに再送すればそのまま再実行できます。
 
 しかし、 `KinesisBatchInfo` には Kinesisから渡されたデータは入っていません。代わりに、Kinesis内のデータ=レコードを示すいわゆる "ポインタ" にあたる情報が入っており、この情報を元に、Kinesisからレコードを見つけて再送する必要があります。
 
@@ -254,10 +254,10 @@ sqs_message_dict = json.loads(sqs_message)
 <div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
   <span class="fa fa-fw fa-check-circle"></span>
 
-運用側では当然両者のデータの違いを意識したくなかったのでリカバリー処理のためにツールを実装しました。二種類の異なるコードを書きつつ、両者とも元はKinesisのデータなんだけどなっていう、もったいない？気持ちがありつつも、違いについて勉強になりました。
+運用側では当然両者のデータの違いを意識したくなかったのでリカバリー処理のためにツールを実装しました。二種類の異なるコードを書きつつ、両者とも元はKinesisのデータなんだけどなっていう、もったいない？ 気持ちがありつつも、違いについて勉強になりました。
 
 Kinesisのクロスアカウントサポート来てほしいです...
 
 </div>
 
-[^3]: 私信なのでコメントで補足します: そもそも、Lambdaを非同期で呼び出して処理に失敗した場合、データの送信先として「DLQ」と「Destinations」を選ぶことができます。どちらを使ってよいかAWSを最近使いだしたユーザーには判断が難しいところだと思います。両者を比較しても「DLQでできることは全部Destinationsでできるよ」という推しの弱い結論しか出てこないのではないでしょうか。そもそも両者が似たような機能なのは必然なのかもしれません。時系列でみてみると、DLQが2016年、Destinationsが2019年と、Destinationsが後発組です。そのためか、DLQの既存ユーザーのためにDLQとDestinationsが両方利用できるように残してるのでは？(だから、似た機能なのか)と読み取れる記述が[テックブログ](https://aws.amazon.com/jp/blogs/compute/introducing-aws-lambda-destinations/)にあります。「Destinations and DLQs can be used together and at the same time although Destinations should be considered a more preferred solution. 」(DestinationsとDLQは同時に使用することができますが、Destinationsの方がより好ましいソリューションです) これを見る限りでは「AWS公式の資料でもういっそ、DLQの後継機能がDestinationsだから、Destinationsを使いましょう」ってはっきり言いきっちゃってほしい、とぼやきたいところです。あえて機能面に踏み込むなら、Destinations経由で渡されるメッセージにはAWS LambdaのARNが入っているのでコールバックが楽だし、失敗時だけでなく成功時でもハンドリングやメトリクスを取得したい機会が来るから機能拡張の容易な「Destinations」を選択しようというのが今できる説明かなと存じます。
+[^3]: 私信なのでコメントで補足します: そもそも、Lambdaを非同期で呼び出して処理に失敗した場合、データの送信先として「DLQ」と「Destinations」を選ぶことができます。どちらを使ってよいかAWSを最近使いだしたユーザーには判断が難しいところだと思います。両者を比較しても「DLQでできることは全部Destinationsでできるよ」という推しの弱い結論しか出てこないのではないでしょうか。そもそも両者が似たような機能なのは必然なのかもしれません。時系列でみてみると、DLQが2016年、Destinationsが2019年と、Destinationsが後発組です。そのためか、DLQの既存ユーザーのためにDLQとDestinationsが両方利用できるように残してるのでは？ (だから、似た機能なのか)と読み取れる記述が[テックブログ](https://aws.amazon.com/jp/blogs/compute/introducing-aws-lambda-destinations/)にあります。「Destinations and DLQs can be used together and at the same time although Destinations should be considered a more preferred solution. 」(DestinationsとDLQは同時に使用できますが、Destinationsの方がより好ましいソリューションです) これを見る限りでは「AWS公式の資料でもういっそ、DLQの後継機能がDestinationsだから、Destinationsを使いましょう」ってはっきり言いきっちゃってほしい、とぼやきたいところです。あえて機能面に踏み込むなら、Destinations経由で渡されるメッセージにはAWS LambdaのARNが入っているのでコールバックが楽だし、失敗時だけでなく成功時でもハンドリングやメトリクスを取得したい機会が来るから機能拡張の容易な「Destinations」を選択しようというのが今できる説明かなと存じます。

@@ -21,14 +21,14 @@ JavaでWebサービス開発というと、SpringBoot、という時代が長く
 
 歴史的な経緯をまとめるとこんな感じですかね。
 
-* Javaのウェブアプリケーション開発の基盤としてJavaEE（昔の名前はJ2EE）があった
-* 2016年により活発な開発を求めて、Eclipse FoundationがJavaEEをフォークしてMicroProfileを作った
+* Javaのウェブアプリケーション開発の基盤としてJava EE（昔の名前はJ2EE）があった
+* 2016年により活発な開発を求めて、Eclipse FoundationがJava EEをフォークしてMicroProfileを作った
 * 2017年にOracleはJava EEをEclipse Foundationに移管を発表し、JakartaEEとなることを発表
 * 2019年にJakartaEE 8がリリース
 * 2020年にMicroProfileの最初のJakartaEE準拠版の4.0がリリース
 * 2022年にJakartaEE 10 Core Profileを内包したMicroProfile 6.0がリリース
 
-フォークしたけど、どちらもEclipse Foundationに入り、2020年からは仲良く歩調を合わせている、という感じですかね。JavaEEやJakartaEEは過去との互換性を重視している感じで、MicroProfileの方はイケイケな感じということを当初狙っていたみたいですが、2022年12月に出た6.0では、含まれるプロファイルにJakartaEE 10 Core Profileという文字が見えます。
+フォークしたけど、どちらもEclipse Foundationに入り、2020年からは仲良く歩調を合わせている、という感じですかね。Java EEやJakartaEEは過去との互換性を重視している感じで、MicroProfileの方はイケイケな感じということを当初狙っていたみたいですが、2022年12月に出た6.0では、含まれるプロファイルにJakartaEE 10 Core Profileという文字が見えます。
 
 <img src="/images/20230308a/スクリーンショット_2023-02-21_18.44.43.png" alt="スクリーンショット_2023-02-21_18.44.43.png" width="1200" height="447" loading="lazy">
 
@@ -36,13 +36,13 @@ JavaでWebサービス開発というと、SpringBoot、という時代が長く
 
 <img src="/images/20230308a/スクリーンショット_2023-02-21_18.48.43.png" alt="スクリーンショット_2023-02-21_18.48.43.png" width="1200" height="428" loading="lazy">
 
-ソフトウェアの歴史で何度か見たことがあるような流れではあります。[Jakarta EE 10の仕様の構成要素の図](https://jakarta.ee/release/10/)にMicroProfile 6.0の項目も合わせてみたのが以下の図です。クラウドネイティブなフレームワークとなるために、どのような部分を切りすてて、何が必要とされているのかが一目瞭然ですね。これは他の言語のユーザーがフレームワークを考えるうえでも興味深い図なんじゃないでしょうか？ちょっと補足すると、Interceptorsというのは他の言語のフレームワークではDIコンテナと呼んでいるやつですね。
+ソフトウェアの歴史で何度か見たことがあるような流れではあります。[Jakarta EE 10の仕様の構成要素の図](https://jakarta.ee/release/10/)にMicroProfile 6.0の項目も合わせてみたのが以下の図です。クラウドネイティブなフレームワークとなるために、どのような部分を切りすてて、何が必要とされているのかが一目瞭然ですね。これは他の言語のユーザーがフレームワークを考えるうえでも興味深い図なんじゃないでしょうか？ ちょっと補足すると、Interceptorsというのは他の言語のフレームワークではDIコンテナと呼んでいるやつですね。
 
 <img src="/images/20230308a/image.png" alt="image.png" width="870" height="684" loading="lazy">
 
 # Helidon
 
-MicroProfile準拠のウェブアプリケーションフレームワークは、[Quarkus](https://quarkus.io/)(RedHat), [Helidon](https://helidon.io/)(Oracle), [Open Liberty](https://openliberty.io/)(IBM)などたくさん出ています。ただし、対応するMicroProfileのバージョンは微妙に違うようです。
+MicroProfile準拠のウェブアプリケーションフレームワークは、[Quarkus](https://quarkus.io/)(Red Hat), [Helidon](https://helidon.io/)(Oracle), [Open Liberty](https://openliberty.io/)(IBM)などたくさん出ています。ただし、対応するMicroProfileのバージョンは微妙に違うようです。
 
 MicroProfileに準拠していれば、Webサービスのパスや、リクエストやレスポンスの定義、DIコンテナなどのアノテーションはどれも同じように使えるようです。フレームワークが変わってもアプリケーションの実装をほとんど変えなくて済む、と。前述のJJUGナイトセミナーのレポートを見ると、ストレージ周りに組み込まれている機能とかがフレームワークによって個性があるみたいですね。
 
@@ -135,7 +135,7 @@ $ docker build -f Dockerfile.native .
 
 デフォルトのjar版は417MBが、jlink版が126MB、GraalVM版が186MBでした。GraalVMがちょっと大きいですが、jlinkのベースの`debian:stretch-slim`が50MBで、GraalVM版の`ghcr.io/oracle/oraclelinux:9-slim`が107MBで、ベースイメージの差であって上の部分のサイズはだいたい同じぐらいですね。
 
-GraalVM版は圧倒的な起動の速さですし、消費メモリも少ないです。気になるビルド時間は手元のM2 Airでダウンロード周りが20秒、ネイティブ実行イメージ生成が110秒ぐらいですね。まあCI環境だけでやるならいいんじゃないでしょうか？とはいえ、JVM版、jlink版もそこまで起動は遅くはないです。
+GraalVM版は圧倒的な起動の速さですし、消費メモリも少ないです。気になるビルド時間は手元のM2 Airでダウンロード周りが20秒、ネイティブ実行イメージ生成が110秒ぐらいですね。まあCI環境だけでやるならいいんじゃないでしょうか？ とはいえ、JVM版、jlink版もそこまで起動は遅くはないです。
 
 思ったよりもいいな、と思ったのがjlink版。300MBぐらい小さいイメージになったし、ビルドも実行もそんなに遅くないです。とりあえず手元でコンテナをさっと作ってローカル結合テストをするときはjlink版で、本番環境に撒く前提だったり、ステージングでテストする場合にGraalVMと使い分けるのが良さそうですね。
 

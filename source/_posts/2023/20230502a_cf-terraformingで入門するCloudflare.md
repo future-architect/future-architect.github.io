@@ -23,15 +23,15 @@ Cloudflare Workersについては、小澤さんの[CDN 入門とエッジでの
 
 ## CloudflareとTerraform
 
-Terraformは言わずもがな、Infrastructure as Code(IaC)を実現するためのツールとして知られています。そして、CloudflareについてもTerraformのProviderをCloudflareで開発しており、他のパブリッククラウドやサービスと同じようにTerraformで管理することができます。
+Terraformは言わずもがな、Infrastructure as Code(IaC)を実現するためのツールとして知られています。そして、CloudflareについてもTerraformのProviderをCloudflareで開発しており、他のパブリッククラウドやサービスと同じようにTerraformで管理できます。
 
 https://github.com/cloudflare/terraform-provider-cloudflare
 
-さて、このようにTerraform管理できることで、Cloudflareのリソースがどれだけあるか、どのように設定されているか見通しを良くすることができますが、一方で元々手動で作ってしまったリソースをTerraformの管理下とする場合、そもそも全量把握できているか、と不透明な状況になります。そこで、今回取り上げるcf-terraformingです。
+さて、このようにTerraform管理できることで、Cloudflareのリソースがどれだけあるか、どのように設定されているか見通しを良くできますが、一方で元々手動で作ってしまったリソースをTerraformの管理下とする場合、そもそも全量把握できているか、と不透明な状況になります。そこで、今回取り上げるcf-terraformingです。
 
 ## cf-terraformingによるIaC化
 
-cf-terraformingは、Cloudflareにて開発されているOSSで、その名前の通り、Cloudflare上のリソースをHCL化し、出力されたソースを利用してTerraformのState管理下にすることができるツールです。利用準備も含めて、実際に見ていきましょう。
+cf-terraformingは、Cloudflareにて開発されているOSSで、その名前の通り、Cloudflare上のリソースをHCL化し、出力されたソースを利用してTerraformのState管理下にできるツールです。利用準備も含めて、実際に見ていきましょう。
 
 https://github.com/cloudflare/cf-terraforming
 

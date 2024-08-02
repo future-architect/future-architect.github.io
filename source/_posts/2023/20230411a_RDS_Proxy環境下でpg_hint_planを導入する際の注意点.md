@@ -28,7 +28,7 @@ PostgreSQL を使用する際、最適な実行計画が選択されず、クエ
 
 導入方法は[pg_hint_plan 日本語マニュアルのインストール](https://pghintplan.osdn.jp/pg_hint_plan-ja.html#install)に記載がある手順が基本ですが、Aurora PostgreSQL 環境ではいくつか手順が異なります。以下の手順で `pg_hint_plan` を利用できるようにしました。
 
-1.マスターユーザーで `sampledb` データベースにログインし、`pg_hint_plan` の拡張を有効にする
+1.マスタユーザーで `sampledb` データベースにログインし、`pg_hint_plan` の拡張を有効にする
 
 ```sql
 psql -h ${接続先インスタンス名} -U ${マスターユーザー名} -d sampledb -c "CREATE EXTENSION pg_hint_plan;"

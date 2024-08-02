@@ -30,7 +30,7 @@ Flutterアプリの開発では、ウィジェットのビルド単位を考え�
 
 Flutter公式の[DevTools](https://docs.flutter.dev/development/tools/devtools/overview)は、VSCodeの[Dart Extension](https://marketplace.visualstudio.com/items?itemName=Dart-Code.dart-code), [Flutter Extension](https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter)のインストールと共にインストールされます。レイアウト構造を可視化/編集できる[Flutter Inspector](https://docs.flutter.dev/development/tools/devtools/inspector) がよく使われると思いますが、他にもCPUやメモリ、Networkの可視化など多機能です。今回は、[Performance view](https://docs.flutter.dev/development/tools/devtools/performance)機能を使って`Widget Build`をタイムラインで確認してみます。
 
-# `Widget Build`をタイムラインで確認する
+# `Widget Build` をタイムラインで確認する
 
 1. devTools起動: [公式手順](https://docs.flutter.dev/development/tools/devtools/vscode)に従って、アプリの起動後にDevToolsを起動します。
 2. DevToolsのPerformanceタブを開きます。

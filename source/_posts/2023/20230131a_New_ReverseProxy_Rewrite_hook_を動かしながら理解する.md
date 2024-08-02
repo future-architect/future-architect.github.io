@@ -73,7 +73,7 @@ Release Note では[こちら](https://tip.golang.org/doc/go1.20#reverseproxy_re
 
 という感じでしょうか。
 
-私自身が Go でリバースプロキシを立てた経験に疎く、1.19 から 1.20 への変更箇所がどのようなものなのか？をイメージできなかったので、テストコード側の利用例を見たところ、httptest.NewServer の引数に http.Handler として渡す中身が NewSingleHostReverseProxy（Director 型）から func(r \*httputil.ProxyRequest) {...} （Rewrite 型）に変わっていました。
+私自身が Go でリバースプロキシを立てた経験に疎く、1.19 から 1.20 への変更箇所がどのようなものなのか？ をイメージできなかったので、テストコード側の利用例を見たところ、httptest.NewServer の引数に http.Handler として渡す中身が NewSingleHostReverseProxy（Director 型）から func(r \*httputil.ProxyRequest) {...} （Rewrite 型）に変わっていました。
 
 それぞれのコードについて、Go1.20は[release-branch.go1.20](https://github.com/golang/go/blob/release-branch.go1.20/src/net/http/httputil/example_test.go#L96-L128)を、Go1.19は[release-branch.go1.19](https://github.com/golang/go/blob/release-branch.go1.19/src/net/http/httputil/example_test.go#L96-L123)を参照しています。また、Go1.20とGo1.19のコード差分について、Go1.20 は「+」 1.19は「-」の diff で表現します。
 
@@ -293,7 +293,7 @@ X-Forwarded-Host: 127.0.0.1:44977
 X-Forwarded-Proto: http
 ```
 
-RFC2616 では「hop-by-hop ヘッダーの削除」が定義されているので、次はこの動作確認として以下のコードを動かしてみます。
+RFC 2616 では「hop-by-hop ヘッダーの削除」が定義されているので、次はこの動作確認として以下のコードを動かしてみます。
 処理内部で新たにリクエストを作成して、ヘッダーに「Connection: Keep-Alive」を追加しています。
 
 ```golang

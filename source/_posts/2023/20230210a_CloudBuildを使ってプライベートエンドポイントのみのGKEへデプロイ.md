@@ -15,7 +15,7 @@ lede: "こんにちは！筋肉エンジニアの渡邉です。最近はGCP/GKE
 ---
 # 初めに
 
-こんにちは！筋肉エンジニアの渡邉です。最近はGCP/GKEについて勉強しています。
+こんにちは！ 筋肉エンジニアの渡邉です。最近はGCP/GKEについて勉強しています。
 
 今回はGitHubへのPushをトリガーにCloudBuildを起動し、プライベートエンドポイントのみのGKE(Google Kubernetes Engine)へデプロイする基盤を作りましたので、共有したいと思います。
 
@@ -139,7 +139,7 @@ spec:
         - containerPort: 8080
 ```
 
-deploymentを作成するだけでは、podに対して外部からアクセスすることができないのでServiceとIngressを作成します。
+deploymentを作成するだけでは、podに対して外部からアクセスできないのでServiceとIngressを作成します。
 Ingressを使用するためには、ServiceのtypeをNodePortにしなければならないのでNodePortで構築します。ports.portに80を指定し、ports.targetPortにdeploymentのports.containerPortで指定した8080を指定します。
 
 80番ポートでServiceにアクセスされ、8080番ポートのdeploymentの各Podにルーティングされる仕組みです。
@@ -296,7 +296,7 @@ Install Google Cloud Buildの画面から
 
 ### terraform importの実行
 
-作成したトリガーの「実行」の隣をクリックし、リソースパスをコピーをクリックします。（terraform importで利用します。）
+作成したトリガーの「実行」の隣をクリックし、リソースパスをコピーをクリックします（terraform importで利用します）。。
 <img src="/images/20230210a/1-CloudBuild⑩.png" alt="1-CloudBuild⑩.png" width="1011" height="883" loading="lazy">
 
 terraform実行環境にて、terraform importを実行し、手動で作成したCloud Buildトリガーをコード管理できるように設定します。
@@ -325,7 +325,7 @@ terraform import後
 # CloudBuildからGKE Control Planeへの接続
 
 今回、Control Planeへのアクセスにプライベートエンドポイントのみの「パブリックエンドポイントアクセスが無効」でGKEを構成しているため、CloudBuildからGKE Control Planeへの接続も内部ネットワーク経由でプライベートエンドポイントに対して行わなければいけません。
-（GKEをパブリック エンドポイント アクセスが有効、承認済みネットワークが有効で構成している場合は、CloudBuildからGKE Control Planeへのアクセスもパブリックエンドポイントに対して行う必要がありますが、CloudBuildの外部IPはユーザで指定できずビルド環境ごとに変わってしまい、承認済みネットワークが定義できないので、少しトリッキーなやり方をしないとアクセスができないです。）
+（GKEをパブリック エンドポイント アクセスが有効、承認済みネットワークが有効で構成している場合は、CloudBuildからGKE Control Planeへのアクセスもパブリックエンドポイントに対して行う必要がありますが、CloudBuildの外部IPはユーザで指定できずビルド環境ごとに変わってしまい、承認済みネットワークが定義できないので、少しトリッキーなやり方をしないとアクセスができないです）。。
 CloudBuildからGKE Control Planeのプライベートエンドポイント接続を内部ネットワークを経由するようにしたいので、CloudBuildをPrivate Poolを利用するように作成します。
 Cloud Build プライベート プールを使用した限定公開 Google Kubernetes Engine クラスタへのアクセスはGoogle Cloudの[アーキテクチャセンター](https://cloud.google.com/architecture/accessing-private-gke-clusters-with-cloud-build-private-pools)にも記載されているので、詳しくはこちらの記事をご覧ください。
 
@@ -342,7 +342,7 @@ CloudBuildからGKEへデプロイするためのネットワークアーキテ�
 
 Private Poolは、サービスプロデューサーネットワークと呼ばれる Google 所有の Virtual Private Cloud ネットワークでホストされます。サービスプロデューサーネットワークだけでは、GKE Control Planeへアクセスするルートがないので、Private Poolとプライベート接続する用のVPC(sample-build-vpc)を別途作成します。
 
-Private Poolとプライベート接続する用のVPCには、**名前付きIP範囲**を指定することができるので、**192.168.3.0/24**を設定します。private poolが、このIPアドレス範囲からGKEのControl Planeにトラフィックを送信できるので、こちらのIP範囲をGKEの承認済みネットワークに定義します。
+Private Poolとプライベート接続する用のVPCには、**名前付きIP範囲**を指定できるので、**192.168.3.0/24**を設定します。private poolが、このIPアドレス範囲からGKEのControl Planeにトラフィックを送信できるので、こちらのIP範囲をGKEの承認済みネットワークに定義します。
 
 名前付きIP範囲には以下のIP範囲は避けるように[公式ドキュメント](https://cloud.google.com/build/docs/private-pools/set-up-private-pool-to-use-in-vpc-network?hl=ja#understanding_the_network_configuration_options)に記載されているので、注意しましょう。
 
@@ -359,7 +359,7 @@ Private Poolとプライベート接続する用のVPCには、**名前付きIP�
 <img src="/images/20230210a/between_gke_control_plane_my_stg_environment.drawio.png" alt="between_gke_control_plane_my_stg_environment.drawio.png" width="1200" height="355" loading="lazy">
 
 GKE Control Planeとmy-stg-environment-vpcを接続しているVPC Peeringのカスタムルートのエクスポートを有効化します。
-これにより、のちにHA VPN Gatewayを通じて広報されてきたPrivate PoolのCIDR(192.168.3.0/24)をGKE Control Plane側に広報することができます。
+これにより、のちにHA VPN Gatewayを通じて広報されてきたPrivate PoolのCIDR(192.168.3.0/24)をGKE Control Plane側に広報できます。
 <img src="/images/20230210a/4-network-architecuture①.png" alt="4-network-architecuture①.png" width="1200" height="849" loading="lazy">
 
 ### HA VPNの作成
@@ -368,7 +368,7 @@ GKE Control Planeとmy-stg-environment-vpcを接続しているVPC Peeringのカ
 
 CloudBuildのprivate poolのCIDR(192.168.3.0/24)をmy-stg-environment-vpcに、GKE Control PlaneのCIDR(192.168.64.0/28)をsample-build-vpcにそれぞれ広報したいので、my-stg-environment-vpcとsample-build-vpcをHA VPNで接続します。
 
-VPC PeeringでそれぞれのVPCを接続することもできますが、VPC Peeringは推移的ピアリングをサポートしていないため、CloudBuildのprivate poolのCIDR(192.168.3.0/24)とGKE Control PlaneのCIDR(192.168.64.0/28)をそれぞれのVPCへ広報することができません。
+VPC PeeringでそれぞれのVPCを接続することもできますが、VPC Peeringは推移的ピアリングをサポートしていないため、CloudBuildのprivate poolのCIDR(192.168.3.0/24)とGKE Control PlaneのCIDR(192.168.64.0/28)をそれぞれのVPCへ広報できません。
 
 まず、HA VPN Gatewayを作成します。
 my-stg-environment-vpcに「ha-vpn-my-stg-environment-tky-gw」、sample-build-vpcに「ha-vpn-sample-build-vpc-tky-gw」を作成します。
@@ -550,11 +550,11 @@ To https://GitHub.com/xxxxxxxx/xxxxxxxx.git
 
 ## CloudBuildのビルド画面
 
-GitHubにPushされたことをトリガーにCloudBuildのビルドが実行されます。（過去にビルドに苦戦したビルド履歴が残っていますね。。。（笑））
+GitHubにPushされたことをトリガーにCloudBuildのビルドが実行されます（過去にビルドに苦戦したビルド履歴が残っていますね（笑））
 
 <img src="/images/20230210a/3-Deploy①.png" alt="3-Deploy①.png" width="1200" height="847" loading="lazy">
 
-最新のビルド履歴（9ee5d0a6）をクリックすると、詳細が確認できます。cloudbuild.yamlに記述したビルドステップごとにビルドが進行していきます。各ビルドステップごとのログも「ビルドログ」から確認することができます。
+最新のビルド履歴（9ee5d0a6）をクリックすると、詳細が確認できます。cloudbuild.yamlに記述したビルドステップごとにビルドが進行していきます。各ビルドステップごとのログも「ビルドログ」から確認できます。
 
 正常終了するとすべてのステップでグリーンになります。
 
@@ -570,7 +570,7 @@ CloudBuildのビルドが正常終了したので、再度ドメインに対し�
 
 最後のビルドステップでGKEへのデプロイが行われます。
 
-踏み台サーバから`kubectl get pods -w`を実行することでGKE上のPodの状態を確認することができます。
+踏み台サーバから`kubectl get pods -w`を実行することでGKE上のPodの状態を確認できます。
 
 ビルドしたイメージをPullしてデプロイされることで、もともと存在していたPodが次々と終了し、新しいPodが作成されていることがわかります。
 

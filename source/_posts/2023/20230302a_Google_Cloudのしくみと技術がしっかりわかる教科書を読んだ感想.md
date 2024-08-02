@@ -45,10 +45,10 @@ lede: "積読消化目的で参加させていただきました。図解即戦�
 
 書籍内の内容ではないですが、読み進めるにあたり、Google Cloud がどれくらいのシェアがあるのか気になり、調べてみました。
 
-Publickey社の記事内では[^1]、Canalys社が調査した、2022年度第2四半期時点のクラウドのシェア率について記載されており、AWS が31%で1位、 Azure が24%で2位、Google Cloud が8%が記載されています。[^2]
+Publickey社の記事内では[^1]、Canalys社が調査した、2022年度第2四半期時点のクラウドのシェア率について記載されており、AWS が31％で1位、 Azure が24％で2位、Google Cloud が8％が記載されています。[^2]
 
 また、Googleでの検索比率を Google Trends でそれぞれのクラウドサービス名を検索しました。
-比較したクラウドサービスは、Amazon Web Services (以下AWS)、Microsoft Azure (以下Azure)、Google Cloudの三つです。
+比較したクラウドサービスは、Amazon Web Services (以下AWS)、Microsoft Azure (以下Azure)、Google Cloudの3つです。
 
 ※Google Cloud は2022年6月に Google Cloud Platform から Goolge Cloud に[名称変更](https://cloud.google.com/blog/ja/topics/developers-practitioners/introducing-new-homepage-google-cloud)されたため、Google Cloud Platform をトピックにいれています。
 
@@ -58,7 +58,7 @@ Publickey社の記事内では[^1]、Canalys社が調査した、2022年度第2�
 
 ## ライブマイグレーションについて
 
-4章 サーバーサービス「Compute Engine」の障害発生時の対応①~ライブマイグレーション(p.92)でCompute Engine の障害発生時の対応方法についての説明があり、対応方法の一つとして`ライブマイグレーション`が紹介されています。
+4章 サーバーサービス「Compute Engine」の障害発生時の対応（1）~ライブマイグレーション(p.92)でCompute Engine の障害発生時の対応方法についての説明があり、対応方法の1つとして`ライブマイグレーション`が紹介されています。
 
 > Compute Engineは、ハードウェアを購入することなくオンデマンドで仮想マシンを利用できるコンピューティングサービスです。
 > Compute Engineでは仮想マシンが、仮想マシンを実行するためのソフトウェアであるハイパーバイザ上で複数実行されます。

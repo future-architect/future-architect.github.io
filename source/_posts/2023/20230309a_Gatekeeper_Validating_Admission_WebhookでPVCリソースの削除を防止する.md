@@ -21,14 +21,14 @@ lede: "みなさん、ArgoCDは使っていますか？業務でEKSクラスタ�
 みなさん、[ArgoCD](https://argo-cd.readthedocs.io/en/stable/)は使っていますか？
 業務で[EKS](https://aws.amazon.com/jp/eks/)（Elastic Kubernetes Service）クラスタにArgoCDをデプロイして、Kubernetesリソースを管理しています。
 
-ArgoCDはGitOpsに則ったCDツールで、WebUIが優れていてKubernetesリソースの作成や更新がとても簡単で便利ですね。
+ArgoCDはGitOpsに則ったCDツールで、Web UIが優れていてKubernetesリソースの作成や更新がとても簡単で便利ですね。
 
 しかし、ArgoCDから[kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)アプリケーションの削除時に、[StatefulSet](https://kubernetes.io/ja/docs/concepts/workloads/controllers/statefulset/)で作成されたGrafanaのPVC(Persistent Volume Claim 永続化ボリューム要求)も想定外に削除されてしまうことに気づきました。
 ※ StatefulSetはステートフルなアプリケーションを管理するオブジェクトで、本来はStatefulSetで関連付けられたPVCは削除されません。
 
 GrafanaのPVCには、ダッシュボードやアラートなどの設定が入っているため、PVCが削除される度にGrafanaを設定しなおす必要がありました。
 
-そこで、同環境でデプロイしている[Gatekeeper](https://open-policy-agent.github.io/gatekeeper/website/docs/)から、PVCの削除を防げないかを模索していたところ、「Validating Admission Webhook」でArgoCDによるPVCの削除リクエストを拒否することができたので、設定から検証までを書いていきます。
+そこで、同環境でデプロイしている[Gatekeeper](https://open-policy-agent.github.io/gatekeeper/website/docs/)から、PVCの削除を防げないかを模索していたところ、「Validating Admission Webhook」でArgoCDによるPVCの削除リクエストを拒否できたので、設定から検証までを書いていきます。
 
 ## 環境/構成
 
@@ -293,7 +293,7 @@ kube-prometheus-stackにSyncをかけてPVCをデプロイします。
         }
 ```
 
-ラベルは複数個管理することができるため、Parametersフィールドの定義もラベルを複数個管理できるようにarray型で定義しています。
+ラベルは複数個管理できるため、Parametersフィールドの定義もラベルを複数個管理できるようにarray型で定義しています。
 
 また、削除用のラベルが複数個でも対応するように、配列の減算を用います。上記では、Constraintで定義したラベルをすべて含んでいたら、`delete_labels`の要素が0になり、含んでいなければ、要素が1以上になります。今回は、Constraintで定義したラベルをすべて含む場合に削除リクエストを承認するので、`count(delete_labels) > 0`で比較を行っています。
 
@@ -321,7 +321,7 @@ spec:
 
 ## まとめ
 
-GatekeeperのValidating Admission Webhookを用いてPVCリソースの削除リクエストを拒否することができました。バックアップを取得していれば、リソースの復元は可能ですが、リソースを予期せぬ削除から守ることも重要だと思います。
+GatekeeperのValidating Admission Webhookを用いてPVCリソースの削除リクエストを拒否できました。バックアップを取得していれば、リソースの復元は可能ですが、リソースを予期せぬ削除から守ることも重要だと思います。
 
 また、ポリシーを記述するRegoですが、Kubernetesリソースのデータ取得とルールの記述方法を押さえれば、自由にポリシーを作れるのではと感じました。
 

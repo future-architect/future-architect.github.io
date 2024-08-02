@@ -35,7 +35,7 @@ WebAssembly/Emscriptenに入門した際の流れや気付きについて紹介�
 
 WebAssemblyは
 
-- CやRustなどで書いたコードから生成することができる
+- CやRustなどで書いたコードから生成できる
 - ウェブ上でJavaScriptと一緒に動く
 - 高速に動作する
 
@@ -87,7 +87,7 @@ emcc -o test.js test.c -sEXPORTED_RUNTIME_METHODS=ccall,cwrap
 
 `-sEXPORTED_RUNTIME_METHODS=ccall,cwrap` というオプションによって、`test.js`にこれらのメソッドが追加されます。`ccall`,`cwrap` はどちらもエクスポートされたCの関数を呼び出すメソッドです。詳細は後ほど説明します。
 
-また以下のようにコマンドを実行した場合、`test.js` を実行しブラウザに表示する `test.html` も出力することができます。
+また以下のようにコマンドを実行した場合、`test.js` を実行しブラウザに表示する `test.html` も出力できます。
 出力される `test.html` は今回の記事で説明しないものを多く含むので、htmlについては自分で作成したものを使用していきます。
 
 ```sh
@@ -137,7 +137,7 @@ JavaScriptからコンパイルされたCの関数を呼び出す2種類の方�
 
 addボタンを押すたびに `Module.ccall()` によってCプログラムで定義した `add()` が呼び出され和を計算しています。
 
-引数には呼び出すCの関数の"関数名"、"戻り値の型"、"引数の型"、"引数"を渡すことで実行することができます。
+引数には呼び出すCの関数の"関数名"、"戻り値の型"、"引数の型"、"引数"を渡すことで実行できます。
 
 ### cwrapを使用した方法
 
@@ -190,6 +190,6 @@ Uncaught RuntimeError: Aborted(Assertion failed: native function `add` called be
 
 ブラウザ上でC言語を動作させる技術として以前から気になっていたWebAssemblyとEmscriptenについて、簡単に触ってみた内容を記事にさせていただきました。Emscriptenによって出力される内容がかなり充実しており、ほとんど実装することなくブラウザ上での動作を実現できました。
 
-今回はEmscriptenを中心に理解を深めることができましたが、今後はWebAssembly自体について詳しく見ていきたいと思います。
+Emscriptenを中心に理解を深めることができましたが、今後はWebAssembly自体について詳しく見ていきたいと思います。
 
 次の記事は佐々木さんの[ネットワーク入門としてCCNA試験を受験してみた](/articles/20230518a/)です！
