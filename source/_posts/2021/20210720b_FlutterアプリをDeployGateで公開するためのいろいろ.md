@@ -65,7 +65,7 @@ flutter_native_splash:
   color: "fff8f0"
 ```
 
-それぞれ、flutter-native-splashを使うのですが、同時に入れると依存ライブラリのバージョンがコンフリクトするので一つずつ行います。まずはアイコン生成で使うツールをdev_dependenciesに入れてコマンド実行。
+それぞれ、flutter-native-splashを使うのですが、同時に入れると依存ライブラリのバージョンがコンフリクトするので1つずつ行います。まずはアイコン生成で使うツールをdev_dependenciesに入れてコマンド実行。
 
 ```yaml pubspec.yaml
 dev_dependencies:
@@ -101,7 +101,7 @@ Android Studio上で実行すると、Androidエミュレータ上にインス�
 
 DeployGate用のSDKを入れると、ログやら何やらが見れるようになるとのことですので入れてみます。
 
-ドキュメントは[こちら](https://docs.deploygate.com/docs/android-sdk)ですが、Flutter用になっていないので少し追加の解説を行います。依存を追加するbuild.gradleはandroid/app以下にあります。
+ドキュメントは[こちら](https://docs.deploygate.com/docs/android-sdk)ですが、Flutterようになっていないので少し追加の解説を行います。依存を追加するbuild.gradleはandroid/app以下にあります。
 
 ```gradle android/app/build.gradle
 dependencies {

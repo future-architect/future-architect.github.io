@@ -21,7 +21,7 @@ lede: "Dart/Flutter連載の2記事目です。はじめまして、TIGの宮崎
 
 突然ですがみなさん、Swagger使いたいですよね。当社でもGo言語などでSwaggerを用いてREST APIサーバ/クライアントコードを生成する機会が増えています。
 
-たまたま Flutter+Rails でアプリケーション構築をする機会があったので、今回Flutterのみに着目してSwagger(OpenAPISpec)を使用する方法をコード付きで解説していきます。(Railsは需要があったら書こうと思いますので、SNSでリアクションもらえるとです！)
+たまたま Flutter+Rails でアプリケーション構築をする機会があったので、今回Flutterのみに着目してSwagger(OpenAPISpec)を使用する方法をコード付きで解説していきます。(Railsは需要があったら書こうと思いますので、SNSでリアクションもらえるとです！ )
 
 # Swaggerとは？
 
@@ -131,7 +131,7 @@ openapi-generator generate -i ./swagger.yaml -g dart -o ./client
 各オプションは以下の通りです。
 
 * `i`: swagger.yamlへのパス
-* `g`: 生成コードの形式(≒言語)を指定します。様々な形式での生成ができるので以下参考にしてください。（dartも別形式である`dart-dio`を指定可能。）
+* `g`: 生成コードの形式(≒言語)を指定します。様々な形式での生成ができるので以下参考にしてください（dartも別形式である`dart-dio`を指定可能）。
   https://openapi-generator.tech/docs/generators/
 * `o`: 生成コードの出力先パス
 
@@ -205,12 +205,12 @@ dependencies:
   `ApiClient`をインスタンス化しています。アクセスの設定や共通ヘッダを実装したい場合は此処に実装することになります。
 `ApiClient`の定義は`client/lib/api_client.dart`に生成されます。
 1. APIクライアントラッパーを生成
-  swaggerの`tag`ごとに生成されるクラスです。APIレスポンスのモデルへバインド等を実行します。swaggerの`path`一つにつき後述の3と4の2メソッドが生成されます。クラス定義は`client/lib/api/xxx_api.dart`に生成されます。
+  swaggerの`tag`ごとに生成されるクラスです。APIレスポンスのモデルへバインド等を実行します。swaggerの`path`1つにつき後述の3と4の2メソッドが生成されます。クラス定義は`client/lib/api/xxx_api.dart`に生成されます。
 1. リクエスト発行（レスポンスボディのみが欲しい場合）
-  単純にレスポンスボディのみが欲しい場合は`${パス名+HTTPメッソド名}`のメソッドをcallします。（この場合は`healthGet`）。HTTPステータスが400以上の場合やレスポンスボディがnullの場合は例外(`ApiException`)をthrowしてくれます。
+  単純にレスポンスボディのみが欲しい場合は`${パス名+HTTPメッソド名}`のメソッドをcallします（この場合は`healthGet`）。HTTPステータスが400以上の場合やレスポンスボディがnullの場合は例外(`ApiException`)をthrowしてくれます。
 1. リクエスト発行（ヘッダも含めて欲しい場合）
-  ③のメソッドではHTTPヘッダ情報が取得できなかったり、HTTPステータスが400以上の場合には例外をthrowしてしまうので、この挙動が嫌な場合は`${パス名+HTTPメッソド名}WithHttpInfo`をcallします。（例の場合は`healthGetWithHttpInfo`）
-  ただし、返り値は`http/http.dart`パッケージの`Response`インスタンスとなるので、レスポンスボディのモデルバインドは自前で実装する必要がある点に注意してください。生成コード的には③の中で④をcallするような構造になっています。
+  （3）のメソッドではHTTPヘッダ情報が取得できなかったり、HTTPステータスが400以上の場合には例外をthrowしてしまうので、この挙動が嫌な場合は`${パス名+HTTPメッソド名}WithHttpInfo`をcallします（例の場合は`healthGetWithHttpInfo`）。
+  ただし、返り値は`http/http.dart`パッケージの`Response`インスタンスとなるので、レスポンスボディのモデルバインドは自前で実装する必要がある点に注意してください。生成コード的には（3）の中で（4）をcallするような構造になっています。
 
 # さいごに
 

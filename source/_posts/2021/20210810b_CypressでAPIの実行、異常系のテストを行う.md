@@ -64,7 +64,7 @@ cy.intercept('HTTPメソッド', 'URL')
   })
 ```
 
-`cy.wait`の戻り値からHTTPリクエスト、レスポンスを上記のように詳細にテストすることができます。
+`cy.wait`の戻り値からHTTPリクエスト、レスポンスを上記のように詳細にテストできます。
 
 ```js main.ts
   import assert_req_body from '../../fixtures/request/post_api1.json'
@@ -104,7 +104,7 @@ JSONとしてのシンタックスハイライトや構文エラーの検知が�
   })
 ```
 
-`cy.intercept`は第三引数を利用することでレスポンスをスタブすることができます。全てのAPI実行をスタブすればバックエンドサーバーが存在しない状態でもテストできます。
+`cy.intercept`は第三引数を利用することでレスポンスをスタブできます。全てのAPI実行をスタブすればバックエンドサーバーが存在しない状態でもテストできます。
 
 ```js main.ts
 cy.intercept('HTTPメソッド', 'URL', {期待するレスポンス})

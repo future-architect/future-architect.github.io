@@ -33,7 +33,7 @@ lede: "リリースした際に、機能強化や不具合修正の内容など�
 
 ChangeLogとは、機能拡張や不具合修正の内容などをユーザーや他開発メンバーに示すために作成されるウェブページや資料のことです。
 
-リモートリポジトリにGitHubを利用されている場合、リポジトリの `Releases` ページにChangeLogを作成することができます。
+リモートリポジトリにGitHubを利用されている場合、リポジトリの `Releases` ページにChangeLogを作成できます。
 `CHANGELOG.md`というファイルに追記していく事例もよく目にします。
 
 [future-architect/vuls](https://github.com/future-architect/vuls)もChangelog（リリースノート)を付けています。
@@ -154,7 +154,7 @@ github-release release \
 
 `ghch` で、最新のタグと最新-1のタグの差分のChangeLogのテキストをマークダウンで生成し、`github-release` で、GitHubに反映させています。
 
-**あとは、試しにPullRequestをマージして、タグを切ってpushしてChangeLogが生成されることを確認できたら成功です！🎉**
+**あとは、試しにPullRequestをマージして、タグを切ってpushしてChangeLogが生成されることを確認できたら成功です！ 🎉**
 
 ## おまけ
 
@@ -205,6 +205,6 @@ $ github-release release \
 
 ## おわりに
 
-OSSを利用することで、簡単にChangeLogを自動化することができます。
+OSSを利用することで、簡単にChangeLogを自動化できます。
 
 ChangeLogとともに、高品質なプロダクト作成に寄与できたら嬉しいです！

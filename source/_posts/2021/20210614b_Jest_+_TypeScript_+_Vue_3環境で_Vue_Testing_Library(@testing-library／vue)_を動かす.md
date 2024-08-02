@@ -61,7 +61,7 @@ cd ~
 vue create sample
 ```
 
-以下のような画面から基本設定をすることができます。今回はせっかくなので"Manually select features"を選択してみます。
+以下のような画面から基本設定をできます。今回はせっかくなので"Manually select features"を選択してみます。
 
 ```log
 Vue CLI v4.5.13

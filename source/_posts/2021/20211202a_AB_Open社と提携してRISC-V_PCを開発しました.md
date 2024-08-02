@@ -20,7 +20,7 @@ ITコンサルティング企業のフューチャーがなぜRISC-Vベースの
 
 ## RISC-Vとは
 
-RISC-VはCPU命令セットアーキテクチャ（Instruction Set Architecture: ISA）の一種で、日本語では「リスクファイブ」と呼ぶこと多いです。Intelのx86/x64系やArm系と異なるのは、使用料がかからないOSSライセンスで提供されていることでしょう。近年RISC-V準拠CPUコアや開発環境などが活発に開発され広がりを見せており、今後普及が進むと予想されているアーキテクチャの一つです。
+RISC-VはCPU命令セットアーキテクチャ（Instruction Set Architecture: ISA）の一種で、日本語では「リスクファイブ」と呼ぶこと多いです。Intelのx86/x64系やArm系と異なるのは、使用料がかからないOSSライセンスで提供されていることでしょう。近年RISC-V準拠CPUコアや開発環境などが活発に開発され広がりを見せており、今後普及が進むと予想されているアーキテクチャの1つです。
 
 * 参考: [RISC-V - Wikipedia](https://ja.wikipedia.org/wiki/RISC-V)
 

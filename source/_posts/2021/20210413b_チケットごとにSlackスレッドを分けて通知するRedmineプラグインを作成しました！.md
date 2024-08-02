@@ -25,11 +25,11 @@ lede: "Futureでは約一年前にコミュニケーションツールとして�
 
 ## はじめに
 
-​
+
 こんにちは、TIGコアテクノロジーユニットの高橋・小松です。
 
 皆さん、Slack使っていますか？
-​
+
 Futureでは約一年前にコミュニケーションツールとして採用され社内外のコミュニケーションにSlackを使うことも増えました。そしてプロジェクト管理で利用しているRedmineは相変わらず現役です。個人的にはRedmine4.2のリリースを心待ちにしています。
 
 さて、そうなるとRedmineからSlackへ通知したくなりますね。
@@ -41,7 +41,7 @@ Futureでは約一年前にコミュニケーションツールとして採用�
 Github上に[redmine-slack](https://github.com/sciyoshi/redmine-slack)プラグインがすでに公開されていますが、題名にもある通り今回開発したRedmine Slack IntegrationプラグインはRedmineチケットごとにSlackスレッドを分けて通知してくれます。
 
 これによりスレッド内で過去の更新を確認でき、議論しやすくなります。またプロジェクトやユーザごとに通知を無効化できる機能もつけています。
-​
+
 Redmineでチケット起票や更新のイベントが発生した際に、自動的にSlackチャンネルにメッセージが送信されます。
 
 ### 主な機能
@@ -55,7 +55,7 @@ Redmineでチケット起票や更新のイベントが発生した際に、自�
 ## 実装のポイント
 
 Google HangoutsとSlackではスレッドIDの管理方法が少々異なります。
-Google Hangoutsは任意の値をスレッドIDとすることができるためRedmineチケットURLのハッシュ値をスレッドIDとしました。
+Google Hangoutsは任意の値をスレッドIDとできるためRedmineチケットURLのハッシュ値をスレッドIDとしました。
 
 ```ruby
     # Google Hangouts通知のスレッドIDの設定部分抜粋
@@ -66,7 +66,7 @@ Google Hangoutsは任意の値をスレッドIDとすることができるため
     client.post_async url, {:body => data.to_json, :header => {'Content-Type' => 'application/json'}}
 ```
 
-一方SlackはスレッドIDをRedmine側から指定することができずSlack側で生成されたスレッドIDを取得する必要があります。
+一方SlackはスレッドIDをRedmine側から指定できずSlack側で生成されたスレッドIDを取得する必要があります。
 
 そのためSlackApp(インストール方法は後述)からスレッドIDの戻り値を取得しRedmineチケットのカスタムフィールドでスレッドIDを管理することにしました。
 
@@ -92,13 +92,13 @@ Google Hangoutsは任意の値をスレッドIDとすることができるため
 
 ```
 
-​
+
 
 ## インストールと設定
 
 ### 1. インストール
 
-​
+
 [README](https://github.com/future-architect/redmine_slack_integration/blob/master/README.md)を参照してください。
 
 (フューチャー社内連絡)利用の際はコンシェルジュで依頼ください
@@ -132,14 +132,14 @@ Google Hangoutsは任意の値をスレッドIDとすることができるため
     立ち上がったポップアップの「許可する」をクリックして、Bot User OAuth Tokenを作成します。
     <img src="/images/20210413b/20210311_062417_BXwWoDuY3G67.png" alt="2021-03-02_20h53_11.png" loading="lazy">
 8. Bot User OAuth Tokenをコピー
-    * 「OAuth Tokens for Your Team」-> 「Bot User OAuth Token」のトークン内容をメモしてください。（「Copy」をクリック）
+    * 「OAuth Tokens for Your Team」-> 「Bot User OAuth Token」のトークン内容をメモしてください（「Copy」をクリック）
     <img src="/images/20210413b/20210302_090112_KthIlVZmu6RK.png" alt="2021-03-02_20h56_42.png" loading="lazy">
 
-​
 
-### 3. Redmine設定​
 
-​
+### 3. Redmine設定
+
+
 
 #### 3-1. Redmineプロジェクト設定
 
@@ -172,12 +172,12 @@ Google Hangoutsは任意の値をスレッドIDとすることができるため
 例えば、ビルドユーザで大量のREST-APIを利用するシーンなどを想定しています。
 
 設定はビルドユーザでログインしてビルドユーザの個人設定画面で行ってください。
-​
+
 <img src="/images/20210413b/20210304_111712_yt9XAeY0BE7p.png" alt="2021-03-04_11h14_25.png" loading="lazy">
 
 ## 動作確認
 
-​
+
 
 ### チケット新規起票
 
@@ -189,7 +189,7 @@ Google Hangoutsは任意の値をスレッドIDとすることができるため
 
 ### Slackスレッドで議論
 
-​一例ですが、Redmineの更新を受けてSlackスレッドで議論することで対応をスムーズに進めることができます。
+一例ですが、Redmineの更新を受けてSlackスレッドで議論することで対応をスムーズに進めることができます。
 
 <img src="/images/20210413b/20210316_034609_GO1fXyegzuce.png" alt="2021-03-16_15h18_43.png" loading="lazy">
 
@@ -212,4 +212,4 @@ TIGコアテクノロジーユニットでは、現在チームメンバーを�
 
 https://www.future.co.jp/recruit/
 
-​
+

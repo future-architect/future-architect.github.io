@@ -68,7 +68,7 @@ func ScanMusic() {
 
 * https://docs.aws.amazon.com/sdk-for-go/api/service/dynamodb/expression/
 
-`expression`パッケージ を用いると、`ExpressionAttributeNames` や `ExpressionAttributeValues` や `FilterExpression` などのDynamoDBの式を型安全に構築することができます。例をあげます。
+`expression`パッケージ を用いると、`ExpressionAttributeNames` や `ExpressionAttributeValues` や `FilterExpression` などのDynamoDBの式を型安全に構築できます。例をあげます。
 
 ```go
 func ScanMusic() {
@@ -96,7 +96,7 @@ func ScanMusic() {
 
 `expression` パッケージを利用して、フィルター条件やプロジェクション式を構築しています。ややコードとしては長くなりましたが、`dynamodb.ScanInput` のフィールドがの設定が一律シンプル下したことがわかります。この勢いで `TableName` も `expr` から指定したい気もしますが、それはパッケージの担当外なようです。
 
-サンプルコードだけ見ると、心理的なハードルが高く思えるかもしれませんが、そもそも元の実装にあるような、`ExpressionAttributeNames` や `ExpressionAttributeValues` や `FilterExpression` の記載方法を覚え、正しく使用することの方が大変です。 `expression` パッケージを用いると、何かしら指定が論理的に正しくない場合は、式のビルド時にエラーで検知することができるため、開発時のトラブルシュートにも役立つと思います。
+サンプルコードだけ見ると、心理的なハードルが高く思えるかもしれませんが、そもそも元の実装にあるような、`ExpressionAttributeNames` や `ExpressionAttributeValues` や `FilterExpression` の記載方法を覚え、正しく使用することの方が大変です。 `expression` パッケージを用いると、何かしら指定が論理的に正しくない場合は、式のビルド時にエラーで検知できるため、開発時のトラブルシュートにも役立つと思います。
 
 AWS SDK for Goを生で用いてDynamoDBアクセスを行うのであれば、基本的には積極的に使っていくパッケージでしょう。
 
@@ -173,7 +173,7 @@ https://docs.aws.amazon.com/sdk-for-go/api/service/dynamodb/expression/
 
 ## クエリの場合
 
-先程まではScanの例でしたが、Queryの場合はさらに `expression` が役立ちます。ハッシュキーにDeviceID、ソートキーにTimestampという典型的な時系列データを保持するDeviceLogというテーブルに対しての実装例です。
+先程まではScanの例でしたが、Queryの場合はさらに `expression` が役立ちます。ハッシュキーに `DeviceID`、ソートキーに `Timestamp` という典型的な時系列データを保持するDeviceLogというテーブルに対しての実装例です。
 
 ```go クエリの実装例
 var db = dynamodb.New(session.Must(session.NewSession()))
@@ -300,12 +300,12 @@ func Update(ctx context.Context) {
 
 式の構築部分が型セーフに実装できていることが分かると思います。
 
-少し残念なのは、 `Key` の部分は `expr` から生成できないということでしょうか。ここだけはハッシュキー（とソートキー）をダイレクトに指定する必要があるので、レベル感がズレて勿体ない気がします。（KeyConditionのように指定したかったですね）
+少し残念なのは、 `Key` の部分は `expr` から生成できないということでしょうか。ここだけはハッシュキー（とソートキー）をダイレクトに指定する必要があるので、レベル感がズレて勿体ない気がします（KeyConditionのように指定したかったですね）
 
 ## まとめ
 
 AWS SDK for Goの `dynamodb` パッケージを用いると時に必須とも言える、 `expression` パッケージの使い方について触れました。
 
-`expression` パッケージを用いると、従来DynamoDBのAPI仕様を理解したフィールドや、文字列で式を設定する必要があった部分を、型安全に構築することができます。
+`expression` パッケージを用いると、従来DynamoDBのAPI仕様を理解したフィールドや、文字列で式を設定する必要があった部分を、型安全に構築できます。
 
 いくつか残念なところはあるにしろ、メリットは計り知れないのでうまく活用していきたいですね。

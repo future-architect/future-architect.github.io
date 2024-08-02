@@ -20,7 +20,7 @@ lede: "Javaアドベントカレンダーにエントリーした記事になり
 
 Javaのイメージを作る上で、どのDockerイメージをベースに選べばいいのか、というのを軽く調べ始めたら、選択肢がたくさんでてきたので、ちょっと突っ込んで調べてみました。
 
-以前、[仕事でPythonコンテナをデプロイする人向けのDockerfile (1): オールマイティ編](/articles/20200513/)で書いたOS名とかは今回は紹介しませんので、busterとかalpineとかwindowsservercoreってなによ？というお話はそちらの記事を参照してください。一点アップデートがあるのは、Debian 11がリリースされて、イメージとしてbullseyeというのが追加された点ですね。あとはfocal=Ubuntu 20.04LTSというのを覚えてもらえれば。
+以前、[仕事でPythonコンテナをデプロイする人向けのDockerfile (1): オールマイティ編](/articles/20200513/)で書いたOS名とかは今回は紹介しませんので、busterとかalpineとかWindowsservercoreってなによ？ というお話はそちらの記事を参照してください。一点アップデートがあるのは、Debian 11がリリースされて、イメージとしてbullseyeというのが追加された点ですね。あとはfocal=Ubuntu 20.04LTSというのを覚えてもらえれば。
 
 # JDK周りのニュース
 
@@ -60,7 +60,7 @@ GraalVMはGitHubのコンテナレジストリにありました。
 
 ## Eclipse Temurin
 
-Adoptiumがプロジェクト名で、Temurinがソフトウェア名ですかね？ RedHat, IBM, Microsoftが母体となって作ったAdoptOpenJDKがEclipseに移管されたものがこれです。もともとはEclipse OpenJ9という別バージョンのJVMがあったりと細かくバリエーションがあったのは、少し整理されて減っているように思います。
+Adoptiumがプロジェクト名で、Temurinがソフトウェア名ですかね？ Red Hat, IBM, Microsoftが母体となって作ったAdoptOpenJDKがEclipseに移管されたものがこれです。もともとはEclipse OpenJ9という別バージョンのJVMがあったりと細かくバリエーションがあったのは、少し整理されて減っているように思います。
 
 Javaのバージョンとしては8, 11, 16, 17を提供しており、8と11のみJREも提供されています。
 
@@ -106,11 +106,11 @@ Javaのバージョンは8, 9, 11で、なぜか9が入っています。それ�
 
 ## OracleJDK
 
-ページを見るとタグ情報がなく、名前と連絡先を入れるContact Formに入力しないと詳しく知れない謎イメージです。説明を見ると、JDK 11の有料時代のものっぽいのですが、17になった後の更新は行われていない？詳しく見ていないです。
+ページを見るとタグ情報がなく、名前と連絡先を入れるContact Formに入力しないと詳しく知れない謎イメージです。説明を見ると、JDK 11の有料時代のものっぽいのですが、17になった後の更新は行われていない？ 詳しく見ていないです。
 
 ## Microsoft OpenJDK
 
-Azul Zulu for Azureという、早口言葉？というのが正式名称のMicrosoftのOpenJDKビルドです。イメージ自体はA独自のコンテナレジストリに登録されています。"Microsoft Azure, Azure Functions (anywhere), Azure Stack, or Microsoft SQL Server"で使う前提とのことです。
+Azul Zulu for Azureという、早口言葉？ というのが正式名称のMicrosoftのOpenJDKビルドです。イメージ自体はA独自のコンテナレジストリに登録されています。"Microsoft Azure, Azure Functions (anywhere), Azure Stack, or Microsoft SQL Server"で使う前提とのことです。
 
 Javaバージョンが広く、7から17までサポートしており、それぞれでJDK, JRE, Headless JRE, Maven, Tomcat付きなど幅広いです。17のJREは他では見当たらないので貴重ですね。
 

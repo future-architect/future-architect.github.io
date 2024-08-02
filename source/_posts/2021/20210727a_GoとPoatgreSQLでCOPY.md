@@ -32,7 +32,7 @@ PostgreSQLには高速にファイルの読み込みを行うCOPY FROMがある�
 * `COPY`と`\COPY`がある。
 * `COPY`はDBサーバーのローカルファイルとのやりとり（`COPY FROM`でテーブルへのローカルファイルからの読み込み、`COPY TO`でテーブルからのローカルファイルへの書き込み）ができる
 * pg_dumpは内部で`COPY FROM/TO`を使っているらしい。`COPY FROM STDIN`とか`COPY TO STDOUT`を使ってローカルにファイルを転送している？
-* `\COPY`はクライアント・サーバー間でも利用可能。INSERTを並べたSQLよりも11倍高速。INSERTをまとめて1つのトランザクションで処理するのと比べても3倍以上高速（[この記事](https://www.citusdata.com/blog/2017/11/08/faster-bulk-loading-in-postgresql-with-copy/)参照)
+* `\COPY`はクライアント／サーバー間でも利用可能。INSERTを並べたSQLよりも11倍高速。INSERTをまとめて1つのトランザクションで処理するのと比べても3倍以上高速（[この記事](https://www.citusdata.com/blog/2017/11/08/faster-bulk-loading-in-postgresql-with-copy/)参照)
 
 2種類あるけど特に使い分けとか考える必要はなさそうです。
 
@@ -53,7 +53,7 @@ lib/pqとpgxは[pgxの方がパフォーマンスが良い](https://devandchill.
 
 実現方法はちょっと違っていて、pgxは`database/sql`の`Conn`を拡張した独自`Conn`型を持っており（`database/sql`のインタフェースの上位互換になっている）、その`Conn`に[CopyFrom()メソッド](https://pkg.go.dev/github.com/jackc/pgx/v4#Conn.CopyFrom)が生えています。lib/pqはPrepare/Execの[標準インタフェースを活用する実装](https://pkg.go.dev/github.com/lib/pq#hdr-Bulk_imports)になっていました。
 
-ORマッパーの中にはConnを完全にラップして、裏のConnを見せないようなライブラリもあったりする（gormとか？）のでその場合はlib/pqを使うとか、状況によって使い分けできそうですね。まあ、そもそもバッチでデータ一括で入れるなら本番コードとアーキテクチャを合わせたりORマッパー使わなくてもいいと思うのでpgxをダイレクトに使う・・・とかでも良さそう。
+O/Rマッパーの中にはConnを完全にラップして、裏のConnを見せないようなライブラリもあったりする（gormとか？）のでその場合はlib/pqを使うとか、状況によって使い分けできそうですね。まあ、そもそもバッチでデータ一括で入れるなら本番コードとアーキテクチャを合わせたりO/Rマッパー使わなくてもいいと思うのでpgxをダイレクトに使う・・・とかでも良さそう。
 
 # 試してみる（準備)
 

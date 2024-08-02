@@ -26,7 +26,7 @@ lede: "2021年9月24日にscikit-learn 1.0がリリースされました。私�
 
 scikit-learnの機械学習のモデルのクラス、メソッドは、多くの入力パラメータを持ちます。
 
-以前のscikit-learnでは以下のようにクラスをインスタンスすることができました。以下[リリースハイライト](https://scikit-learn.org/stable/auto_examples/release_highlights/plot_release_highlights_1_0_0.html)からの引用です。
+以前のscikit-learnでは以下のようにクラスをインスタンスできました。以下[リリースハイライト](https://scikit-learn.org/stable/auto_examples/release_highlights/plot_release_highlights_1_0_0.html)からの引用です。
 
 ```python
 est = HistGradientBoostingRegressor("squared_error", 0.1, 100, 31, None,

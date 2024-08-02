@@ -16,13 +16,13 @@ TIGの伊藤真彦です
 
 先日[入門記事](/articles/20211221a/)を書いたFlutterですが、実践的なアプリケーションの作り込みも試してみました。
 
-# FlutterでGoogleマップを表示したい
+# FlutterでGoogle Mapsを表示したい
 
-FlutterではGoogleマップを表示するためのウィジェットが存在するため、どのくらい簡単に実現できるか検証してみました。
+FlutterではGoogle Mapsを表示するためのウィジェットが存在するため、どのくらい簡単に実現できるか検証してみました。
 
 # 実装の準備
 
-[Google Maps Platform](https://developers.google.com/maps/documentation?hl=ja)を活用することで、任意のアプリケーションからGoogleマップの機能を利用することができます。
+[Google Maps Platform](https://developers.google.com/maps/documentation?hl=ja)を活用することで、任意のアプリケーションからGoogle Mapsの機能を利用できます。
 アプリケーションの実装の前に、GCPアカウントを用意し、`Maps JavaScript API`など必要な機能を有効化し、APIを実行するためのキーを払い出す必要があります。
 
 # google_maps_flutter
@@ -46,7 +46,7 @@ Flutter on the Webでは[google_maps_flutter_web](https://pub.dev/packages/googl
 flutter pub add google_maps_flutter_web
 ```
 
-導入するとGoogleMapウィジェットが使えるようになります。
+導入するとGoogle Mapsウィジェットが使えるようになります。
 
 ```dart main.dart
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -64,7 +64,7 @@ Widget build(BuildContext context) {
 }
 ```
 
-Flutter on the Webでは`index.html`のヘッダー部分にGoogle MapsのJavascriptを追加するとウィジェットが正常に動作します。
+Flutter on the Webでは`index.html`のヘッダー部分にGoogle MapsのJavaScriptを追加するとウィジェットが正常に動作します。
 
 ```html index.html
 <head>
@@ -143,17 +143,17 @@ class MapSampleState extends State<MapSample> {
 
 <img src="/images/20211224a/image.png" alt="Google Mapサンプルアプリ" width="628" height="719" loading="lazy">
 
-実際のアプリケーションではGoogleMapウィジェットを全画面に表示するだけのものを作ることにはならないと思います。
+実際のアプリケーションではGoogle Mapsウィジェットを全画面に表示するだけのものを作ることにはならないと思います。
 サンプルの様々な部分を参考に何らかの機能を追加したり、他のウィジェットと組み合わせたりと拡張していきましょう。
 
-例えば他の情報を表示する余白を作るためにContainerウィジェットでGoogleMapウィジェットをラッピングするようなことができます。
+例えば他の情報を表示する余白を作るためにContainerウィジェットでGoogle Mapsウィジェットをラッピングするようなことができます。
 <img src="/images/20211224a/image_2.png" alt="ウィジェットを用いてラッピングしたマップ" width="1200" height="1278" loading="lazy">
 
 README記載のサンプルで表示される地図の場所はGoogle本社オフィスのようです、近くにゴルフ場やコンピュータ歴史博物館があるんですね、楽しそうです。
 
 # 地図のプロパティを変更する
 
-GoogleMapウィジェットのプロパティを設定する事で地図の描画スタイルや機能の有無など様々な変更ができます。
+Google Mapsウィジェットのプロパティを設定する事で地図の描画スタイルや機能の有無など様々な変更ができます。
 [ドキュメント](https://pub.dev/documentation/google_maps_flutter/latest/google_maps_flutter/GoogleMap-class.html)を参考に変更してみましょう。
 
 例えば`mapType`プロパティをnormalに変更することで、地図の描画が航空写真から地図らしい描画に切り替わります。
@@ -169,9 +169,9 @@ GoogleMap(
 
 # 地図にマーカーを表示する
 
-独自のアプリケーションを作り込むからには、任意の地点を地図に表示したい要望が出てくるでしょう。GoogleMapウィジェットの[markersプロパティ](https://pub.dev/documentation/google_maps_flutter/latest/google_maps_flutter/GoogleMap/markers.html)に`Set<Marker>`の適切なデータを追加することでマーカーが表示されます。
+独自のアプリケーションを作り込むからには、任意の地点を地図に表示したい要望が出てくるでしょう。Google Mapsウィジェットの[markersプロパティ](https://pub.dev/documentation/google_maps_flutter/latest/google_maps_flutter/GoogleMap/markers.html)に`Set<Marker>`の適切なデータを追加することでマーカーが表示されます。
 
-[Markerクラス](https://pub.dev/documentation/google_maps_flutter_platform_interface/latest/google_maps_flutter_platform_interface/Marker-class.html)は位置情報、アイコンなどのプロパティの他、オンクリックイベントのコールバック関数などを設定することができます。マーカーの位置情報である[LatLngクラス](https://pub.dev/documentation/google_maps_flutter_platform_interface/latest/google_maps_flutter_platform_interface/LatLng-class.html)は緯度経度の情報です。
+[Markerクラス](https://pub.dev/documentation/google_maps_flutter_platform_interface/latest/google_maps_flutter_platform_interface/Marker-class.html)は位置情報、アイコンなどのプロパティの他、オンクリックイベントのコールバック関数などを設定できます。マーカーの位置情報である[LatLngクラス](https://pub.dev/documentation/google_maps_flutter_platform_interface/latest/google_maps_flutter_platform_interface/LatLng-class.html)は緯度経度の情報です。
 
 infoWindowでマーカーの名称や情報を追加できます。
 
@@ -194,7 +194,7 @@ GoogleMap(
 
 # 地図に線を引く
 
-GoogleMapウィジェットは[polylinesプロパティ](https://pub.dev/documentation/google_maps_flutter/latest/google_maps_flutter/GoogleMap/polylines.html)で２点間のルート情報を表示することもできます。
+Google Mapsウィジェットは[polylinesプロパティ](https://pub.dev/documentation/google_maps_flutter/latest/google_maps_flutter/GoogleMap/polylines.html)で２点間のルート情報を表示することもできます。
 
 ```dart main.dart
 Set<Marker> _markers = {
@@ -235,9 +235,9 @@ GoogleMap(
 
 ## Directions APIを活用する
 
-これまで紹介したGoogle MapのAPIは地図の描画に専念して用意されたAPIです。経路探索や距離の計算は別のAPIとして公開されています。
+これまで紹介したGoogle MapsのAPIは地図の描画に専念して用意されたAPIです。経路探索や距離の計算は別のAPIとして公開されています。
 
-[Directions API](https://developers.google.com/maps/documentation/directions/overview?hl=ja)を利用することで、任意の２点間の現実的で最適な経路を取得することができます。  `Directions API`も`Javascript API`のようにGCPの管理画面で機能を有効化する必要があります。
+[Directions API](https://developers.google.com/maps/documentation/directions/overview?hl=ja)を利用することで、任意の２点間の現実的で最適な経路を取得できます。  `Directions API`も`Javascript API`のようにGCPの管理画面で機能を有効化する必要があります。
 
 `Directions API`を実行するDartパッケージとして[flutter_polyline_points](https://pub.dev/packages/flutter_polyline_points)が存在しますが、執筆時点ではレスポンスのパース処理に不具合があったため、愚直に`Directions API`を実行し、レスポンスのパースは[google_polyline_algorithm](https://pub.dev/packages/google_polyline_algorithm)で行いました。
 
@@ -287,7 +287,7 @@ Future<List<LatLng>> getPolylineResult(
 
 曲がり角の情報だけでなく、線を道に沿って表示するにはどこを繋ぐとよいのか、という詳細な緯度経度情報の配列が取得できます。[エンコードされた緯度軽度の圧縮アルゴリズム](https://developers.google.com/maps/documentation/utilities/polylinealgorithm)はドキュメントとして公開されているため、仕様に則ってデコードするだけですが、中々難しいことをしています。
 
-`Drection API`の実行結果を地図に反映させると画像のようになります。完璧なルートが出力されました、当たり前のように使ってるGoogleマップって改めて考えると凄いなと感じますね。
+`Drection API`の実行結果を地図に反映させると画像のようになります。完璧なルートが出力されました、当たり前のように使ってるGoogle Mapsって改めて考えると凄いなと感じますね。
 
 <img src="/images/20211224a/image_6.png" alt="image.png" width="1200" height="1337" loading="lazy">
 
@@ -310,7 +310,7 @@ Flutter on the Webは、対象プラットフォームがモバイルアプリ�
 
 # アプリケーションとして整備する
 
-最低限やれることはわかってきました。ウィジェットとしてリファクタリングする、データの取得と画面描画をリファクタリングする、オンクリックイベントの実装などアプリケーションとして作り込んでいきます。サンプルアプリケーションを見るとGoogleMapウィジェットはExpandウィジェットなどと組み合わせて利用されています。今回はColumnウィジェットの一要素としてGoogleMapウィジェットを読み込んでみるスタイルにしてみます。Columnウィジェットに積み込む他のウィジェットは適当にflutterロゴを出してみます。
+最低限やれることはわかってきました。ウィジェットとしてリファクタリングする、データの取得と画面描画をリファクタリングする、オンクリックイベントの実装などアプリケーションとして作り込んでいきます。サンプルアプリケーションを見るとGoogle MapsウィジェットはExpandウィジェットなどと組み合わせて利用されています。今回はColumnウィジェットの一要素としてGoogle Mapsウィジェットを読み込んでみるスタイルにしてみます。Columnウィジェットに積み込む他のウィジェットは適当にflutterロゴを出してみます。
 
 <img src="/images/20211224a/image_7.png" alt="image.png" width="1200" height="730" loading="lazy">
 
@@ -324,7 +324,7 @@ Flutter on the Webは、対象プラットフォームがモバイルアプリ�
 
 上記の作り込みをまとめると下記のようになります。
 
-今回は大掛かりなファイル分割は行わず、`main.dart`と`service.dart`の2ファイルに分けて、GoogleMap用のトークンを書き換えたら動くような形にしました。
+今回は大掛かりなファイル分割は行わず、`main.dart`と`service.dart`の2ファイルに分けて、Google Maps用のトークンを書き換えたら動くような形にしました。
 
 ```dart main.dart
 import 'dart:async';
@@ -597,7 +597,7 @@ class MapRoute {
 
 # まとめ
 
-* Flutterにはチーム公式のGoogleMapライブラリが存在する
+* Flutterにはチーム公式のGoogle Mapsライブラリが存在する
 * ルートの計算を行うにはDirections APIを活用する
 * Flutter on the WebはCORS対策の必要性がある
 * ウィジェットの組み合わせなどは公式サンプルが参考になる

@@ -81,7 +81,7 @@ export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
 
 何回か同意を求められるので`y`を入力し、同意します。
 
-最後に再度`flutter doctor`を実行し、XCode以外は正常であることを確認します。iOSアプリを開発しない場合、XCodeは不要です。
+最後に再度`flutter doctor`を実行し、Xcode以外は正常であることを確認します。iOSアプリを開発しない場合、XCodeは不要です。
 
 ## プロジェクト作成
 
@@ -89,7 +89,7 @@ Flutterのプロジェクトを作成します。このとき、Android Studio�
 
 続いてターミナルでプロジェクトのディレクトリまで移動し、`flutter pub get`を実行します（Android Studioからは上手く動作しない）。これで必要なパッケージが導入されます。
 
-次にAndroidアプリを実行する仮想デバイスを起動します。画面上部の`<no device selected>`からプルダウンして`Open Android Emulator: Pixel 3A API 30 x86`などを選択します。最初からAndroid Emulatorが一つはインストールされていると思います。選択すると仮想デバイスが起動されます。
+次にAndroidアプリを実行する仮想デバイスを起動します。画面上部の`<no device selected>`からプルダウンして`Open Android Emulator: Pixel 3A API 30 x86`などを選択します。最初からAndroid Emulatorが1つはインストールされていると思います。選択すると仮想デバイスが起動されます。
 
 続いて、仮想デバイス選択の右の欄でエントリーポイントが`main.dart`になっていることを確認します。最後にさらに右にある再生ボタンの形をした「Run」をクリックします。
 

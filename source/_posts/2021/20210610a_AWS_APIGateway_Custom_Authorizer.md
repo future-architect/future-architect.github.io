@@ -20,7 +20,7 @@ lede: "今回は流行りの認証プロトコルであるOpenID ConnectとOAuth
 
 <img alt="カスタムオーソライザの動作フロー" src="/images/20210610a/custom-auth-workflow.png" loading="lazy">
 
-[Authorizer](https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html)とはAWS APIGatewayにある機能の一つで、外からAPIサーバに送られてくるリクエストを検証することにより、アクセスを制御する機能です。OAuth2.0のプロトコルにおいては、AuthorizerはJWTなどTokenを検証することで、APIサーバ、つまり `ResourceServer` を保護する役割を持っています。
+[Authorizer](https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html)とはAWS APIGatewayにある機能の1つで、外からAPIサーバに送られてくるリクエストを検証することにより、アクセスを制御する機能です。OAuth2.0のプロトコルにおいては、AuthorizerはJWTなどTokenを検証することで、APIサーバ、つまり `ResourceServer` を保護する役割を持っています。
 
 OSSのAPIGatewayであるKongを触ったことがある方ならば、[JWT Plugin](https://docs.konghq.com/hub/kong-inc/jwt/)とほぼ同じ立ち位置のものと思って構いません。
 
@@ -30,7 +30,7 @@ SinglePageApplicationやモバイルアプリなど、ClientになるFront-end�
 
 `RelyingParty` の場合、KeycloakやAuth0など認証基盤が提供するライブラリや、OIDCに準拠したライブラリを使えば割と簡単にセキュアにすることが可能です。
 
-一方、`ResourceServer` にはAuthorizerを実装する必要があります。Authorizerはサーバの内部のMiddleware層などに実装することも可能ですが、複数のAPIサーバが存在してて、一つのAPIGatewayでEndpointを集中管理する場合にAuthorizerをLambdaとして一本実装することにより、開発やデプロイなどにメリットをもたらすことができます。
+一方、`ResourceServer` にはAuthorizerを実装する必要があります。Authorizerはサーバの内部のMiddleware層などに実装することも可能ですが、複数のAPIサーバが存在してて、1つのAPIGatewayでEndpointを集中管理する場合にAuthorizerをLambdaとして一本実装することにより、開発やデプロイなどにメリットをもたらすことができます。
 
 この度はそのAuthorizerを実装するにあたって、いくつか考慮すべきポイントについて触れて行こうと思います。
 
@@ -39,18 +39,18 @@ SinglePageApplicationやモバイルアプリなど、ClientになるFront-end�
 ## タイプ
 
 今回はCognitoではなく、KeycloakやAuth0など外部の認証基盤を想定しています。
-AuthorizerをLambda関数で実装することにより、認証認可制御をもっと自由にカスタムすることができます。
+AuthorizerをLambda関数で実装することにより、認証認可制御をもっと自由にカスタムできます。
 
 ## Lambdaイベントペイロード
 
 Lambda関数の引数となるEventの入力値には2パターン存在します。
 
 - **Tokenタイプ**は簡単にTokenとmethodArnのみが取得可能で、Tokenを検証しその(JWTならば)PayloadとmethodArnのパスを対照するなどで認可を制御することが可能になります。
-- **Requestタイプ**はAPIGatewayのプロキシ統合のリクエストと同じものを引数として受けられます。TokenとmethodArnはもちろん、他のHeaderやQueryString、Bodyなどすべてのリクエストの中身が取得できるため、もう少し自由な認可要件が必要なときに使うこともできます。
+- **Requestタイプ**はAPIGatewayのプロキシ統合のリクエストと同じものを引数として受けられます。TokenとmethodArnはもちろん、他のHeaderやクエリ文字列、Bodyなどすべてのリクエストの中身が取得できるため、もう少し自由な認可要件が必要なときに使うこともできます。
 
 ## トークンの検証
 
-Tokenの中身を検証する前に正規表現により簡単にチェックすることができます。一般的にTokenとしてJWTを使う場合は`^Bearer [-_0-9a-zA-Z.]+$`のように設定します。
+Tokenの中身を検証する前に正規表現により簡単にチェックできます。一般的にTokenとしてJWTを使う場合は`^Bearer [-_0-9a-zA-Z.]+$`のように設定します。
 この正規表現にマッチしない場合、AuthorizerはLambdaまでリクエストを送らず401を返します。
 
 ## 認可のキャッシュ
@@ -86,7 +86,7 @@ func Handle(e events.APIGatewayCustomAuthorizerRequestTypeRequest) (*events.APIG
 
 ### 出力パターン
 
-Lambda関数の出力(戻り値)により、以下のようにAPIに送られてきたリクエストを制御することができます。
+Lambda関数の出力(戻り値)により、以下のようにAPIに送られてきたリクエストを制御できます。
 
 |出力パターン|動作|HTTP Status|Response Body|
 |-|-|-|-|
@@ -168,7 +168,7 @@ APIリクエストしたユーザが誰なのかを表現します。リクエ�
 
 #### Authorizer Context
 
-Principal IDと同じように後続のLambda関数などに渡すことができる任意の値です(Principal IDもContextの一部)。APIのレスポンスを出し分けするために必要な任意の情報をKey-Value形式でセットすることが可能です。一見Mapオブジェクトにも見えますが、ValueとしてはNumber・String・BooleanのみでObjectやArrayなどの入れ子構造は使えません。
+Principal IDと同じように後続のLambda関数などに渡すことができる任意の値です(Principal IDもContextの一部)。APIのレスポンスを出し分けするために必要な任意の情報をkey-value形式でセットすることが可能です。一見Mapオブジェクトにも見えますが、ValueとしてはNumber・String・BooleanのみでObjectやArrayなどの入れ子構造は使えません。
 
 # 最後に
 

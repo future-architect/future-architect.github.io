@@ -67,7 +67,7 @@ Sesame3は[CANDY HOUSE JAPAN](https://jp.candyhouse.co/)が開発、販売して
   - [theskumar/python\-dotenv: Get and set values in your \.env file in local and production servers\.](https://github.com/theskumar/python-dotenv)
   - [Legrandin/pycryptodome: A self\-contained cryptographic library for Python](https://github.com/Legrandin/pycryptodome)
 
-Sesame3を動かすWebAPIは[こちら](https://dash.candyhouse.co/login)からAPI_TOKENを発行してください。
+Sesame3を動かすWeb APIは[こちら](https://dash.candyhouse.co/login)からAPI_TOKENを発行してください。
 API_TOKENの発行の方法は[こちら](https://zenn.dev/key3/articles/6c1c2841d7a8a2)のブログが参考になりました。
 
 施錠/解錠に必要な情報は
@@ -81,19 +81,19 @@ API_TOKENの発行の方法は[こちら](https://zenn.dev/key3/articles/6c1c284
 ## 4. 構成
 
 PythonでカードリーダーによるIDmの読み取りと`SECRET_KEY`の暗号化を行い、GoでHTTPリクエストを行うという構成にしました。
-この構成にした理由は..
+この構成にした理由は以下の3点です。
 
 1. Pythonに便利なモジュールがあった
 2. Goに少しでも慣れたかった
 3. cgoというものを見つけてしまった
 
-の3点です。本来であれば素直にPython1本、Go1本に絞ったほうが良いと思います....
+本来であれば素直にPython1本、Go1本に絞ったほうが良いと思います...。
 
 ### 4.1 システム概要図
 
 以下システムの概要図です。
 
-Raspberry Piにカードリーダー、スピーカーを接続しています。PythonでカードーリーダーからFelicaのIDmを取得し、暗号化したSECRET_KEYとAPI_TOKENをGo側に渡します。また、IDmの検知をユーザーに通知音で知らせています。GOではCANDY HOUSEが公開しているWeb APIに向けてHTTPリクエストを行います。リクエストに応じて、SESAME3を開閉することができるという構成になっています。
+Raspberry Piにカードリーダー、スピーカーを接続しています。PythonでカードーリーダーからFelicaのIDmを取得し、暗号化したSECRET_KEYとAPI_TOKENをGo側に渡します。また、IDmの検知をユーザーに通知音で知らせています。GOではCANDY HOUSEが公開しているWeb APIに向けてHTTPリクエストを行います。リクエストに応じて、SESAME3を開閉できるという構成になっています。
 
 <img src="/images/20210824a/image.png" alt="システム構成図" width="1200" height="933" loading="lazy">
 
@@ -156,11 +156,11 @@ type ResponseBody struct {
 }
 ```
 
-それでは、鍵の開閉を行う関数`executeSesame3`を実装します。関数内で指定された引数`signPtr`、`apiPtr`、`uuidPtr`はPythonから渡されることを想定しています。`C.`を指定することで`cgo`内の関数を使用することができます。
+それでは、鍵の開閉を行う関数`executeSesame3`を実装します。関数内で指定された引数`signPtr`、`apiPtr`、`uuidPtr`はPythonから渡されることを想定しています。`C.`を指定することで`cgo`内の関数を使用できます。
 
-ここで一つ注意が必要です。`cgo`を利用する際はメソッドの上のコメントを関数名にそろえる必要があります。
+ここで1つ注意が必要です。`cgo`を利用する際はメソッドの上のコメントを関数名にそろえる必要があります。
 
-開閉の流れとしては「施錠中/解錠中の確認`fetchStatus`」→「解錠中`isUnlocked`であれば`executeLock`を実行」、「施錠中であれば`executeUnlock`を実行する」という構成です。
+開閉の流れとしては「施錠中/解錠中の確認`fetchStatus`」→「解錠中`isUnlocked`であれば`executeLock`を実行」「施錠中であれば`executeUnlock`を実行する」という構成です。
 
 ```go export.go
 //export executeSesame3
@@ -453,6 +453,6 @@ if __name__ == '__main__':
 
 Sesame3のWeb APIを利用して、Felicaによる施錠解錠の機能を実装しました。
 
-今回認証に使用したIDmはスマホアプリでも簡単に取得することができます。そのため、IDm単体に認証を任せてしまうのはセキュリティの観点から適切ではありません。実用に耐えうるにはさらなる工夫が求められます。とはいえ、GoとPythonを使って楽しみながらコーディングできたため、夏休みの自由研究の目的は達成できたと思います。
+今回認証に使用したIDmはスマホアプリでも簡単に取得できます。そのため、IDm単体に認証を任せてしまうのはセキュリティの観点から適切ではありません。実用に耐えうるにはさらなる工夫が求められます。とはいえ、GoとPythonを使って楽しみながらコーディングできたため、夏休みの自由研究の目的は達成できたと思います。
 
 次は大野さんによる[最高の持ち歩きキーボード考](https://future-architect.github.io/articles/2021082)です。

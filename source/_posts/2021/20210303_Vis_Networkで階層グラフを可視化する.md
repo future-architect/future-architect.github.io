@@ -41,7 +41,7 @@ mxGraphについて[次の記事](/articles/20210304/)で紹介する予定で�
 
 ## Vis Networkとは
 
-vis.jsという可視化ライブラリに含まれるグラフ可視化ライブラリです。その中でもVis Networkはグラフの可視化に特化したライブラリで、[Vis Network Examples](https://visjs.github.io/vis-network/examples/)にあるように様々なグラフを描画することができます。Vis Networkはcanvasに描画するため描画が高速で、パフォーマンスが要求される場面に有用です。 [^1]
+vis.jsという可視化ライブラリに含まれるグラフ可視化ライブラリです。その中でもVis Networkはグラフの可視化に特化したライブラリで、[Vis Network Examples](https://visjs.github.io/vis-network/examples/)にあるように様々なグラフを描画できます。Vis Networkはcanvasに描画するため描画が高速で、パフォーマンスが要求される場面に有用です。 [^1]
 
 # Vis Networkの使い方
 
@@ -49,7 +49,7 @@ Vis Networkでは表示するグラフの元となるノード、エッジ、オ
 
 ## ノード定義
 
-下記のようにノードを定義することができます。
+下記のようにノードを定義できます。
 
 ```javascript
 const nodes = new vis.DataSet([
@@ -110,7 +110,7 @@ const options = {
 
 ## 可視化
 
-上記のノード定義、エッジ定義、オプション定義を元に可視化することができます。実際に可視化した例です。
+上記のノード定義、エッジ定義、オプション定義を元に可視化できます。実際に可視化した例です。
 
 <img src="/images/20210303/2021-01-19_14h29_14.png" loading="lazy">
 ソースコードは [Edit fiddle \- JSFiddle \- Code Playground](https://jsfiddle.net/0bxLo6wt/) にて確認できます。
@@ -182,19 +182,19 @@ const nodes = new vis.DataSet([
 
 ## dot言語からのインポート
 
-Vis NetworkではGephiからエクスポートしたデータやdot言語をインポートすることができます。今回は私が先日Graphvizを用いて可視化したグラフ [^3]をVis Networkで表示してみます。
+Vis NetworkではGephiからエクスポートしたデータやdot言語をインポートできます。今回は私が先日Graphvizを用いて可視化したグラフ [^3]をVis Networkで表示してみます。
 
 <img src="/images/20210303/名称未設定2.png" loading="lazy">
 
 ソースコードは [Edit fiddle \- JSFiddle \- Code Playground](https://jsfiddle.net/kon2cL8r/10/) にて確認できます。
 
-Graphvizほど洗練されたレイアウトにはなりませんが、非常に簡単にdot言語をインポートすることができました。
+Graphvizほど洗練されたレイアウトにはなりませんが、非常に簡単にdot言語をインポートできました。
 
 ※ 上記画像ではVis Networkのノードやエッジのラベルが読み取れない状態になっていますが、Canvas上で拡大することでラベルを読み取ることが出来ます
 
 # 注意
 
-開発中にバージョンアップしたときに何も表示されなくなる不具合 [^4]に遭遇したことがありました。このようなわかりやすい不具合ならまだいいですが、細かいところで挙動が変わってしまっている可能性もあるのでバージョンアップの際には十分な検証が必要かなと思います。（どのソフトウェアにも言えることではありますが…）
+開発中にバージョンアップしたときに何も表示されなくなる不具合 [^4]に遭遇したことがありました。このようなわかりやすい不具合ならまだいいですが、細かいところで挙動が変わってしまっている可能性もあるのでバージョンアップの際には十分な検証が必要かなと思います（どのソフトウェアにも言えることではありますが…）
 
 # 課題
 

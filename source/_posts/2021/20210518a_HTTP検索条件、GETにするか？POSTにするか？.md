@@ -17,7 +17,7 @@ lede: "RESTfullとかRESTishな方針でWebAPIの横断検索を設計する際�
 
 TIG DXユニット [^1]真野です。
 
- [^1]: Technology Innovation Group（TIG）は、「最先端、且つ先進的なテクノロジーのプロフェッショナル集団」、「プロジェクト品質と生産性の向上」、「自社サービス事業の立ち上げ」を主なミッションとする、技術部隊です。DXユニットとはデジタルトランスフォーメーションを推進するチームで、IoTやらMaaSなどのテクノロジーカットでビジネス転換を支援しています。
+ [^1]: Technology Innovation Group（TIG）は、「最先端、且つ先進的なテクノロジーのプロフェッショナル集団」「プロジェクト品質と生産性の向上」「自社サービス事業の立ち上げ」を主なミッションとする、技術部隊です。DXユニットとはデジタルトランスフォーメーションを推進するチームで、IoTやらMaaSなどのテクノロジーカットでビジネス転換を支援しています。
 
 RESTfullとかRESTishな方針でWebA PIの横断検索を設計する際にチーム内で方針について議論したやり取りの備忘記事です。
 
@@ -59,7 +59,7 @@ RESTfullとかRESTishな方針でWebA PIの横断検索を設計する際にチ�
 
 * 検索（参照）の処理なのにPOSTメソッドを利用するのは分かりにくいのではないか？
 * 例えば、ElasticsearchはGETメソッドにリクエストボディを指定している（POSTにフォールバックもしています）
-  * Issueの[ここ](https://github.com/elastic/elasticsearch/issues/16024)でそれってどうなの？っていう議論がある
+  * Issueの[ここ](https://github.com/elastic/elasticsearch/issues/16024)でそれってどうなの？ っていう議論がある
   * GETにリクエストボディを置くこと自体は、実プロダクトでも事例がある
 * GETにリクエストボディって、RFCに違反していない？
   * [RFC7231 Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content](https://tools.ietf.org/html/rfc7231)だと、明示的に違反とは書かれていなさそう。GET（とDELETE）でリクエストボディを含めると、実装によってはリクエストが拒否されるかもよという記述
@@ -104,20 +104,20 @@ RESTfullとかRESTishな方針でWebA PIの横断検索を設計する際にチ�
 
 1. GET/POSTの両方用意したら良いのでは？
     * LSUDsとかOSSツールならそれの方が良い気がします
-    * SSKDsだと、誤ってGET版を触って動かないんだけどなんで？とか問い合わせを受けそうなので、利用者側の設計の余地を狭めるためにどっちか片方だけ（POSTだけ）の提供にしたいと思っています
+    * SSKDsだと、誤ってGET版を触って動かないんだけどなんで？ とか問い合わせを受けそうなので、利用者側の設計の余地を狭めるためにどっちか片方だけ（POSTだけ）の提供にしたいと思っています
 
 ## HTTP SEARCH メソッドの提案がある
 
 2021/05/01時点ではDraftフェーズですが、何度かHTTP SEARCH メソッドの仕様検討があるようです。
 
-簡単に言うと、GETのように参照（検索）の意味を持つSEARCHメソッドで、条件はPOSTのようにリクエストボディに記載することができます
+簡単に言うと、GETのように参照（検索）の意味を持つSEARCHメソッドで、条件はPOSTのようにリクエストボディに記載できます
 
 * https://tools.ietf.org/html/draft-snell-search-method-02
   * Expiresが2021/03/06なので、もう無効になっているので注意です。過去には00, 01版もあり定期的に検討されていそう
 * あまり詳しくないですが、次はこちらのトラッカーで議論がされていそう
   * https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/?include_text=1
 
-SEARCH自体はWebDAV（サーバー上のファイルを読み取りや編集をWebブラウザ上で行えるようにする仕組み）の[RFC5323](https://tools.ietf.org/html/rfc5323) で存在するので、互換性について検討中とのこと。SEARCHじゃなくてQUERYやFETCHなどにする話もあるらしいです。
+SEARCH自体はWebDAV（サーバー上のファイルを読み取りや編集をブラウザ上で行えるようにする仕組み）の[RFC5323](https://tools.ietf.org/html/rfc5323) で存在するので、互換性について検討中とのこと。SEARCHじゃなくてQUERYやFETCHなどにする話もあるらしいです。
 
 * https://httptoolkit.tech/blog/http-search-method/
 
@@ -133,7 +133,7 @@ Queryメソッドについて記載がありましたので追記しました。
 
 * ネストを含む構造化した検索条件の指定は、POSTメソッドで設計しておくのが無難
 * Webのセマンティクス的にはGETかもしれないが、エコシステム側が対応していないケースがあり、変なハマりを生む可能性があるので業務では避けたほうが無難
-  * GETのフォールバック先でPOSTを用意する、ElasticSearchのようなパターンもありかもしれないが、特にSSKDsなWebAPIの場合はPOSTのみ準備することが良さそう
+  * GETのフォールバック先でPOSTを用意する、ElasticSearchのようなパターンもありかもしれないが、特にSSKDsなWeb APIの場合はPOSTのみ準備することが良さそう
     * 保守対象のエンドポイントを少しでも減らすのと、下手にGETを用意してツールでハマる利用者もいるかもしれないので
 * HTTP SEARCHメソッドの標準化に期待
 

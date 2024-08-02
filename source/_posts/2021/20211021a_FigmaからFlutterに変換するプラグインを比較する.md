@@ -33,10 +33,10 @@ FigmaからFlutter用のdartコードを生成する方法は主に以下の2パ
 
 ### Figmaのプラグインを使う方法
 
-FigmaをFlutterに変換できると謳っているプラグインは複数存在していて、個人がメインで開発しているものから、企業が公開しているものまで様々です。ここでは、2021年10月時点のインストール数の上位4つを紹介します。
-（[Figma Communityのページで検索する](https://www.figma.com/community/search?model_type=public_plugins&q=flutter)と、インストール数がもっと少ないものもいくつか出てきます。）
+FigmaをFlutterに変換できると謳っているプラグインは複数存在していて、個人がメインで開発しているものから、企業が公開しているものまで様々です。ここでは、2021年10月時点のインストール数の上位4つを紹介します。
+（[Figma Communityのページで検索する](https://www.figma.com/community/search?model_type=public_plugins&q=flutter)と、インストール数がもっと少ないものもいくつか出てきます）。
 
-**① Figma to Code（HTML, Tailwind, Flutter, SwiftUI）**
+**（1） Figma to Code（HTML, Tailwind, Flutter, SwiftUI）**
 
 <img src="/images/20211021a/Figma_to_Code.png" alt="Figmaからコード生成イメージ" width="1200" height="600" loading="lazy">
 
@@ -45,41 +45,41 @@ FigmaをFlutterに変換できると謳っているプラグインは複数存�
 
 [Figma to Code (HTML, Tailwind, Flutter, SwiftUI](https://www.figma.com/community/plugin/842128343887142055/Figma-to-Code-(HTML%2C-Tailwind%2C-Flutter%2C-SwiftUI))は、Bernardo Ferrariという人が主に開発をしているプラグインで、ソースが[githubに公開](https://github.com/bernaferrari/FigmaToCode)されています。Figma→Flutter以外にもSwiftUI、tailwindcss、HTML5にも対応しているようですが、今回はFlutterの出力のみを試してみます。
 
-**② Flutter Export**
+**（2） Flutter Export**
 <img src="/images/20211021a/thumbnail-1.png" alt="Flutter Exportアイコン" width="1200" height="600" loading="lazy">
 インストール数：11.3k
 最終更新日：2019年11月22日
 
 [Flutter Export](https://www.figma.com/community/plugin/778755750523021654/Flutter-Export)は、とてもFlutterに変換できそうな名前が付いていますが、Figmaで作ったものをPNG画像で出力するだけのプラグインのようです。インストールして少し試してみましたが、上手く動かすことができませんでした。最終更新日も約2年前と古く、メンテもされていなそうなので、今回の**比較対象外**とします。
-（インストール数が少し多い理由が謎です。）
+（インストール数が少し多い理由が謎です）。
 
-**③ FigmaToFlutter**
+**（3） FigmaToFlutter**
 <img src="/images/20211021a/thumbnail-2.png" alt="thumbnail-2.png" width="1200" height="600" loading="lazy">
 インストール数：10.8k
 最終更新日：2021年1月2日
 
 [FigmaToFlutter](https://www.figma.com/community/plugin/844008530039534144/FigmaToFlutter)は、1つ目のFigma to Codeと同様に個人が開発しているプラグインで、使い方も非常に似ています。今回の**比較対象**とします。
 
-**④ Assistant by Grida**
+**（4） Assistant by Grida**
 <img src="/images/20211021a/thumbnail-3.png" alt="Assistant by Gridaイメージ" width="1200" height="600" loading="lazy">
 インストール数：4.7k
 最終更新日：2021年8月25日
 
 [Assistant by Grida](https://www.figma.com/community/plugin/896445082033423994/Assistant-by-Grida)は、以前はBridgedという名前だったプラグインです。
 
-Gridaという組織が開発しているようですが、[Gridaのページ](https://www.grida.co/)を見てもGridaがどういう組織なのか（企業なのかどうかも）分からずでした。Gridaのページにはプラグインの[ドキュメント](https://www.grida.co/docs/getting-started)もありますが、空ページが多かったり、まだ発展途上な感が否めないですが、今回の**比較対象**とします。
+Gridaという組織が開発しているようですが、[Gridaのページ](https://www.grida.co/)を見てもGridaがどのような組織なのか（企業なのかどうかも）分からずでした。Gridaのページにはプラグインの[ドキュメント](https://www.grida.co/docs/getting-started)もありますが、空ページが多かったり、まだ発展途上な感が否めないですが、今回の**比較対象**とします。
 
 ### Figmaのプラグイン以外を使う方法
 
 Figmaのプラグインを使う方法以外にも、Figmaからコードを生成する方法はあるようです。
 以下2つを紹介します。
 
-**⑤ Flutlab.io**
+**（5） Flutlab.io**
 <img src="/images/20211021a/スクリーンショット_2021-10-08_14.29.55.png" alt="Flutlab.ioイメージ" width="1031" height="460" loading="lazy">
 
 [FlutLab.io](https://flutlab.io/)は、Flutter用のオンラインIDE（総合開発環境）で、その中の機能としてFigma to Flutter Converterというものがあるようです。オンラインIDEは、セキュリティ等のポリシー上、実際のPJで利用できるかが不透明なため、今回は**比較対象外**とします。
 
-**⑥ Bravo Studio**
+**（6） Bravo Studio**
 <img src="/images/20211021a/スクリーンショット_2021-10-08_14.30.51.png" alt="Bravo Studioイメージ図" width="927" height="432" loading="lazy">
 
 [Bravo Studio](https://www.bravostudio.app/)は、デザインツールで作成したデザインをノーコードでアプリに変換するサービスです。最終的にネイティブコードを出力できたり、APIを叩く等の機能性を持たせることができたりするようで面白そうです。
@@ -101,12 +101,12 @@ Figmaのプラグインを使う方法以外にも、Figmaからコードを生�
 
 今回は、Figma上で作った以下のログイン画面をFlutterのコードに変換できるかを試していきます。
 <img src="/images/20211021a/スクリーンショット_2021-10-08_14.44.54.png" alt="スクリーンショット_2021-10-08_14.44.54.png" width="543" height="434" loading="lazy">
-「[Adobe XDからFlutterに変換する](https://future-architect.github.io/articles/20210915a/)」の記事では、一つの画面を丸ごとエクスポートするのは、AdobeとGoogleが協力して開発しているプラグインであっても中々上手くいかないことが多く、要素ごとにエクスポートをして貼り付けていくことを推奨していました。
+「[Adobe XDからFlutterに変換する](https://future-architect.github.io/articles/20210915a/)」の記事では、1つの画面を丸ごとエクスポートするのは、AdobeとGoogleが協力して開発しているプラグインであっても中々上手くいかないことが多く、要素ごとにエクスポートをして貼り付けていくことを推奨していました。
 
-よって、今回のFigma→Flutterの検証では様々な粒度でのエクスポートを試していきます。具体的には下記の**①〜③**を試していきます。下図の**画面全体**は、OS側で描画するホームバー等もFigma上で表現してしまっていて、それらの要素を省くと**①ログインフォーム全体**との差分があまり無くなるので今回の検証では省略します。
+よって、今回のFigma→Flutterの検証では様々な粒度でのエクスポートを試していきます。具体的には下記の**（1）〜（3）**を試していきます。下図の**画面全体**は、OS側で描画するホームバー等もFigma上で表現してしまっていて、それらの要素を省くと**（1）ログインフォーム全体**との差分があまり無くなるので今回の検証では省略します。
 <img src="/images/20211021a/スクリーンショット_2021-10-11_15.24.18.png" alt="スクリーンショット_2021-10-11_15.24.18.png" width="911" height="525" loading="lazy">
 
-また**①〜③**のUIパーツ生成の検証に加え、画像の扱いについても比較検証を行いたいと思います。
+また**（1）〜（3）**のUIパーツ生成の検証に加え、画像の扱いについても比較検証を行いたいと思います。
 
 ### 比較で使うdartコード
 
@@ -127,14 +127,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
 ## 比較結果
 
-### 比較①　ログインフォーム全体の出力
+### 比較（1）　ログインフォーム全体の出力
 
 |出力対象(Figma)|Figma to Code|FigmaToFlutter|Assistant by Grida|
 |---|---|---|---|
 |<img src="/images/20211021a/スクリーンショット_2021-10-11_13.47.58.png" alt="ログインフォーム" width="340" height="231" loading="lazy">| <img src="/images/20211021a/login_figma2code.png" alt="figma to code結果" width="357" height="698" loading="lazy"> |  <img src="/images/20211021a/login_figma2flutter.png" alt="figma to flutter" width="357" height="698" loading="lazy"> | <img src="/images/20211021a/login_assistantByGrida.png" alt="assistanbe by grid結果" width="357" height="698" loading="lazy"> |
 
 ログインフォーム全体を出力対象として、各プラグインで出力した結果を上に示しています。
-出力結果がプラグインによって全く異なるため、一つづつ見てきましょう。
+出力結果がプラグインによって全く異なるため、1つづつ見てきましょう。
 
 まず、**Figma to Code**は、最も生成されたコードの質が高かったです。ContainerでそれぞれのUI要素の枠組みを作り、ColumnとRowで並べて、Sized Boxで要素間の隙間を作っていて、比較的可読性も高いコードになっていました。工事現場のような黄色と黒の線が出ているのは一番外側のContainerのheightが足りなく、中の要素がはみ出しているためです。これは、足りないheightの値を調整するだけで解消しました。
 入力欄やボタンを判別することはできないようなので、生成されたコードはただの箱が並んでいるだけですが、生成結果をベースとしながら手直しをしていく前提で考えれば、割と実用的かなという印象です。
@@ -143,21 +143,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
 最後の**Assistant by Grida**は、テキストしか出力されず、惜しい結果となりました。生成されたコードを見ても、テキスト以外の要素を出そうとした形跡は無かったです。こちらについても、出力対象をもっとシンプルにして、何が変わるかを見てみたいと思います。
 
-### 比較②　ログインボタンのみの出力
+### 比較（2）　ログインボタンのみの出力
 
 |出力対象(Figma)|Figma to Code|FigmaToFlutter|Assistant by Grida|
 |---|---|---|---|
 |<img src="/images/20211021a/スクリーンショット_2021-10-11_14.00.39.png" alt="ログインボタン" width="338" height="154" loading="lazy">| <img src="/images/20211021a/button_figma2code.png" alt="figma to code結果" width="357" height="698" loading="lazy">| <img src="/images/20211021a/button_figma2flutter.png" alt="figma to flutter結果" width="357" height="698" loading="lazy"> | <img src="/images/20211021a/button_assistantByGrida.png" alt="Assistant by Grida結果" width="357" height="698" loading="lazy">    |
 
-ログインのボタン（青いボタンとログインのテキスト）を出力対象として、各プラグインで出力した結果を上に示しています。出力結果を一つづつ見てきましょう。
+ログインのボタン（青いボタンとログインのテキスト）を出力対象として、各プラグインで出力した結果を上に示しています。出力結果を1つづつ見てきましょう。
 
 まず、**Figma to Code**は、問題ない出力結果で、1つ目の検証で起こっていた「要素のはみ出し」現象も無くなりました。
 
-次の**FigmaToFlutter**は、再びエラーが出てしまいました。FigmaToFlutterが生成するコードでは、Figma to Codeと異なり、Stackウィジェットが使われています。Stackウィジェットは要素を重ねるときに使うウィジェットなので、Figma上の要素の重なり方が出力結果に何かしら影響している可能性があります。（今回のケースの出力対象は「ログイン」というテキスト部分と青い角丸の四角部分を重ねて作っています。）よって、出力対象を更にシンプルにして、要素の重なりが全く無い場合どうなるかを見てみようと思います。
+次の**FigmaToFlutter**は、再びエラーが出てしまいました。FigmaToFlutterが生成するコードでは、Figma to Codeと異なり、Stackウィジェットが使われています。Stackウィジェットは要素を重ねるときに使うウィジェットなので、Figma上の要素の重なり方が出力結果に何かしら影響している可能性があります（今回のケースの出力対象は「ログイン」というテキスト部分と青い角丸の四角部分を重ねて作っています）。よって、出力対象を更にシンプルにして、要素の重なりが全く無い場合どうなるかを見てみようと思います。
 
 最後の**Assistant by Grida**は、一見何も表示されていないように見えますが、白い「ログイン」という字だけ表示されていて、背景と同化してしまっています。こちらについても生成コードがStackウィジェットを使っているので、Figma上の要素の重なりが無くなると出力品質が変わってくるかもしれません。
 
-### 比較③　ログインボタンの箱のみの出力
+### 比較（3）　ログインボタンの箱のみの出力
 
 |出力対象(Figma)|Figma to Code|FigmaToFlutter|Assistant by Grida|
 |---|---|---|---|
@@ -169,9 +169,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
 次の**FigmaToFlutter**は、初めてエラーが出ず、出力結果としても問題ないものになりました。やはり、少しでも要素の重なりがあると上手く動いてくれない傾向があるようです。あまり実用的ではないですね。
 
-最後の**Assistant by Grida**では、やっとテキスト以外の要素を出力することができましたが、角丸の表現ができておらず、サイズも正しくありません。
+最後の**Assistant by Grida**では、やっとテキスト以外の要素を出力できましたが、角丸の表現ができておらず、サイズも正しくありません。
 
-### 比較④　画像の扱い
+### 比較（4）　画像の扱い
 
 |出力対象(Figma)|Figma to Code|FigmaToFlutter|Assistant by Grida|
 |---|---|---|---|

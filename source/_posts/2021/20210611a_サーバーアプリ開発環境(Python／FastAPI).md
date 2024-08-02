@@ -192,7 +192,7 @@ INFO:     Waiting for application startup.
 INFO:     Application startup complete.```
 ```
 
-これでどんどんコードを書いてブラウザで動かして・・・というのはできるのですが、デバッグもしたいですよね？VSCodeの設定ファイルを作っておいておきます。
+これでどんどんコードを書いてブラウザで動かして・・・というのはできるのですが、デバッグもしたいですよね？ VSCodeの設定ファイルを作っておいておきます。
 
 ```json .vscode/launch.json
 {
@@ -262,7 +262,7 @@ CMD ["/opt/app/.venv/bin/gunicorn", "-w", "1", "-k", "uvicorn.workers.UvicornWor
   * MySQL: [aiomysql](https://pypi.org/project/aiomysql/)
   * SQLite: https://pypi.org/project/aiosqlite/
 
-上記のライブラリ群を使う限り、ビルドイメージはslimで大丈夫ですし、追加のパッケージインストールも不要です。asyncpgはCythonで作られていますが、manylinux1なバイナリが提供されているのでDebian系のイメージを使う限りはCコンパイラは不要（slimなイメージのままで大丈夫）です。また、同期接続な[PyMySQL](https://pypi.org/project/PyMySQL/)もpure pythonなのでそのままで大丈夫です。型チェックの書き方さえPython3.7でよければDistroless化も簡単です。
+上記のライブラリ群を使う限り、ビルドイメージはslimで大丈夫ですし、追加のパッケージインストールも不要です。asyncpgはCythonで作られていますが、manylinux1なバイナリが提供されているのでDebian系のイメージを使う限りはCコンパイラは不要（slimなイメージのままで大丈夫）です。また、同期接続な[PyMySQL](https://pypi.org/project/PyMySQL/)もpure Pythonなのでそのままで大丈夫です。型チェックの書き方さえPython3.7でよければDistroless化も簡単です。
 
 PostgreSQLで、同期接続の[psycopg2](https://pypi.org/project/psycopg2/)を使う場合にlibpq5（とlibxml2)が必要となりますし、Cコンパイラも必要になるので、ビルドイメージをslimじゃないものにして、次のコードを実行イメージのFROMのところに入れておきます。ビルドイメージのslimじゃないbusterイメージには最初からlibpq5-devとかも入っているので追加インストールは実行イメージ側だけで大丈夫です。
 

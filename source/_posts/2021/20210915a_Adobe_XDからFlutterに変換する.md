@@ -18,7 +18,7 @@ lede: "モバイル開発をする場合、デザインはAdobe XDかFigmaか何
 
 * [みやしもブログ: Adobe XDを使おう！無料・有料プランの違いを詳しく解説](https://miya-system-works.com/blog/detail/adobe-xd-plan/)
 
-スターターパックをインストールしたら、Creative Cloudアプリ（タスクバーに常駐していると思います）のマーケットプレースから、XD to Flutterというプラグインを入れます。[AdobeとGoogleが協力して開発している](https://blog.adobe.com/jp/publish/2020/09/25/cc-web-xd-flutter-plugin-now-available.html)プラグインで、これがあるのとないのでは開発効率が大きく変わります。なお、この常駐アプリ、結構CPUを持っていくっぽいので、プラグインを入れた後は終了させたほうが良いかも？プラグインのインストール以外はXDのバージョンアップでは使いましたが、使うのはそれぐらいかと。
+スターターパックをインストールしたら、Creative Cloudアプリ（タスクバーに常駐していると思います）のマーケットプレースから、XD to Flutterというプラグインを入れます。[AdobeとGoogleが協力して開発している](https://blog.adobe.com/jp/publish/2020/09/25/cc-web-xd-flutter-plugin-now-available.html)プラグインで、これがあるのとないのでは開発効率が大きく変わります。なお、この常駐アプリ、結構CPUを持っていくっぽいので、プラグインを入れた後は終了させたほうが良いかも？ プラグインのインストール以外はXDのバージョンアップでは使いましたが、使うのはそれぐらいかと。
 
 <img src="/images/20210915a/スクリーンショット_2021-09-08_17.06.46.png" alt="XD to Flutterプラグイン" width="1136" height="752" loading="lazy">
 
@@ -77,7 +77,7 @@ Flutterはプラグインを入れればSVGが使えます。adobe_xdパッケ�
 
 <img src="/images/20210915a/スクリーンショット_2021-09-08_17.39.48.png" alt="SVGエクスポート" width="632" height="342" loading="lazy">
 
-その後はOSSの[Inkscape](https://inkscape.org/ja/)で、DPIを180とか大きめにしてPNGに書き出しています。ちょっと不安定だったり、ウェルカムウインドウが開いているとウインドウ操作ができなかったり、DPIを変更してフォーカスを変換してからエクスポート先、の方を押さないとサイズが反映されなかったり、ちょっと癖はありますが、根気よくがんばりましょう。
+その後はOSSの[Inkscape](https://inkscape.org/ja/)で、DPIを180とか大きめにしてPNGに書き出しています。ちょっと不安定だったり、ウェルカムウィンドウが開いているとウィンドウ操作ができなかったり、DPIを変更してフォーカスを変換してからエクスポート先、の方を押さないとサイズが反映されなかったり、ちょっと癖はありますが、根気よくがんばりましょう。
 
 <img src="/images/20210915a/スクリーンショット_2021-09-08_17.49.11.png" alt="PNGに書き出し" width="498" height="909" loading="lazy">
 
