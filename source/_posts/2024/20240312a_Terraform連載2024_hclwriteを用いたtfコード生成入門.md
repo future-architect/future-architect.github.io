@@ -70,7 +70,7 @@ resource "aws_cloudwatch_metric_alarm" "myproduct_read_dynamodb_throttledrequest
 
 <img src="/images/20240312a/dynamodb_hclwrite.drawio.png" alt="" width="1200" height="631" loading="lazy">
 
-ちなみに、通常、DynamoDBはそこまで数が増えない（ほいほい増えるようであればおそらくDynamoDBを使うべきではない）し、監視項目もそう変更しないだろうから、コード生成もモジュール化しなくても良いんじゃないか？という意見もあるかと思いますが、それはそれとします。
+ちなみに、通常、DynamoDBはそこまで数が増えない（ほいほい増えるようであればおそらくDynamoDBを使うべきではない）し、監視項目もそう変更しないだろうから、コード生成もモジュール化しなくても良いんじゃないか？ という意見もあるかと思いますが、それはそれとします。
 
 ## 整合性チェック
 
@@ -199,7 +199,7 @@ $ go run . ../example/dynamodb_table.tf
 [myproduct_read myproduct_content]
 ```
 
-属性を取得するためには、`b.Body().GetAttribute()` などで取得できますので、目的に応じて条件を追加することができます。
+属性を取得するためには、`b.Body().GetAttribute()` などで取得できますので、目的に応じて条件を追加できます。
 
 ## 空リソース生成
 
@@ -255,7 +255,7 @@ resource "aws_cloudwatch_metric_alarm" "dynamodb_throttledrequests_myproduct_con
 
 `SetAttributeRaw()` を用いて各属性ごとに項目を追加していきます。 `SetAttributeRaw()` は低レベルのAPIで、トークンを直接追加します。今回、`"${aws_dynamodb_table.myproduct_read.name}-throttledrequests"` といったリファレンスを追加したいため利用しています。`SetAttributeValue()` を使う方法だと、 `$` がエスケープされて、 `$$` と出力されてしまうためです。
 
-また、特記したいことは[zclconf/go-cty](https://github.com/zclconf/go-cty) というライブラリの型で値を競ってしないとならないことです。ここでさらに別のライブラリ？と一瞬焦る気持ちがありますが、慣れていきましょう。
+また、特記したいことは[zclconf/go-cty](https://github.com/zclconf/go-cty) というライブラリの型で値を競ってしないとならないことです。ここでさらに別のライブラリ？ と一瞬焦る気持ちがありますが、慣れていきましょう。
 
 属性の型がオブジェクトであり、その中にリファレンスが入ると、再び `AppendNewBlock()` を呼び出す必要があるなど、生成したい定義によっては試行錯誤する必要があるので、注意してください。
 

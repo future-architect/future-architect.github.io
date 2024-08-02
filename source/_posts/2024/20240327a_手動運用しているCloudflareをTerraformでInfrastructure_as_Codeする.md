@@ -210,7 +210,7 @@ backend の設定で、 `skip_credentials_validation` と `skip_requesting_accou
 
 ### ドメインのDNSレコードをimportする
 
-Cloudflareのimportには、Terraform公式で用意されているimportコマンドを利用するほか、Cloudflareが独自に提供している [cf-terraforming](https://github.com/cloudflare/cf-terraforming) というツールを利用することができます。
+Cloudflareのimportには、Terraform公式で用意されているimportコマンドを利用するほか、Cloudflareが独自に提供している [cf-terraforming](https://github.com/cloudflare/cf-terraforming) というツールを利用できます。
 
 cf-terraformingについては、これまた伊藤さんが書かれている記事があるので、こちらも読んでみてください。
 
@@ -293,7 +293,7 @@ resource "cloudflare_record" "cname_root" {
 
 このままでは新規追加した分がそのまま新規として認識されてしまうので、すでに作成されているリソースについてはimportしてtfstateへ反映させる必要があります。
 
-importするためのコマンドはcf-terraformingを利用して出力することができます。ただし今回はリソース名をわかりやすく変更したため、コマンドを修正します。
+importするためのコマンドはcf-terraformingを利用して出力できます。ただし今回はリソース名をわかりやすく変更したため、コマンドを修正します。
 
 まずはcf-terraformingを利用してコマンドを出力してみましょう。
 

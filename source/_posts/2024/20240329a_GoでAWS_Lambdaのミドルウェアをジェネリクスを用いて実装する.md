@@ -361,7 +361,7 @@ func DoTinTOut[TI, TO any](fn LambdaTInTOutFunc[TI, TO]) LambdaTInTOutFunc[TI, T
 
 例えば、本来lambdatintoutmiddleware.DoTinTOut()を呼び出すべきはずが、誤って `lambdatintoutmiddleware.DoOut()` を呼び出してしまったとします。
 
-この場合、コンパイルエラーにすることができます。
+この場合、コンパイルエラーにできます。
 
 ```diff cmd/tintoutlambda/main.go
 func main() {

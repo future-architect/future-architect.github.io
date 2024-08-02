@@ -16,7 +16,7 @@ lede: "Terraformでは似たリソースを複数構築する際に、ループ�
 
 ## はじめに
 
-はじめまして！TIG DXチームの小林と申します。
+はじめまして！ TIG DXチームの小林と申します。
 
 Terraformでは似たリソースを複数構築する際に、ループ処理や条件分岐を利用することで、コードの冗長化を防ぎ、可読性や保守性を上げることができます。
 
@@ -47,7 +47,7 @@ Terraformでは似たリソースを複数構築する際に、ループ処理�
 AWS上に10.10.0.0/16 のVPC1つと、10.10.0.0/24 ～ 10.10.3.0/24 でサブネットを計4つ（public2つ、private2個想定）を各パターンで作成していきます。
 
 まずはベースとして、シンプルにresource blockを羅列したものを記載しています。
-（以降、サブネット部分の処理がメインのため、VPC部分の記述は省略します。）
+（以降、サブネット部分の処理がメインのため、VPC部分の記述は省略します）。
 
 ```sh
 resource "aws_vpc" "test-vpc" {
@@ -159,9 +159,9 @@ tfstateを覗いてみると、`index_key`というキーの値が0や1などの
 
 `for_each`を使うと以下のように書くことができます。
 
-[set](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#set)や[map](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#map)を定義して、その要素の数だけリソースを構築することができます。
+[set](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#set)や[map](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#map)を定義して、その要素の数だけリソースを構築できます。
 
-setやmapの値は`each.key`（setの値やmapのkey）や`each.value`（setの値やmapのvalue）を使って各変数に定義できます。（＝setを使う場合は`each.key`と`each.value`は同じになります。）
+setやmapの値は`each.key`（setの値やmapのkey）や`each.value`（setの値やmapのvalue）を使って各変数に定義できます（＝setを使う場合は`each.key`と`each.value`は同じになります）。
 
 mapが多重構造になっている場合は、以下のように`each.value.xxx`と書くことで変数に定義できます。
 
@@ -203,7 +203,7 @@ resource "aws_subnet" "subnet" {
 
 具体的には、`for`は[list](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#list), [set](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#set), [tuple](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#tuple), [map](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#map), [object](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#object)を入力として、[tuple](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#tuple)もしくは[object](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#object)を出力するものです。そのため使い方は多様ですが、個人的に嬉しい使い方を2つ記載します。
 
-### 使い方① 特定条件でフィルタリングしてリソースを構築する
+### 使い方（1） 特定条件でフィルタリングしてリソースを構築する
 
 構築するリソースが増えてくると、tfファイルの数やコードの行数が多くなって管理が大変でしょう。
 
@@ -254,7 +254,7 @@ resource "aws_subnet" "private" {
 
 参考：[Local Values](https://developer.hashicorp.com/terraform/language/values/locals)
 
-### 使い方② あるリソースの特定の設定値一覧を取得する
+### 使い方（2） あるリソースの特定の設定値一覧を取得する
 
 例えばprivateサブネットからのみアクセス可能としたいリソース（EC2など）を構築し、そのセキュリティグループを構築するような場合を考えます。
 
@@ -327,7 +327,7 @@ resource "aws_security_group" "private_resource" {
 
 `count`や`for_each`がresource blockを複数作成するときに利用したのに対し、`dynamic block`はresource block内のブロックを複製するときに利用できます。
 
-例えば、`for`の使い方②で述べたようなセキュリティグループを構築する場合で、publicとprivate両方のサブネットからアクセス可能なセキュリティグループを作りたいとします。
+例えば、`for`の使い方（2）で述べたようなセキュリティグループを構築する場合で、publicとprivate両方のサブネットからアクセス可能なセキュリティグループを作りたいとします。
 
 この場合は、`ingress`のブロックを複製すると簡単に構築できるため、以下のように`dynamic block`が利用して書くことができます。
 
@@ -395,13 +395,13 @@ resource "aws_security_group" "public_resource" {
 }
 ```
 
-ただし、`dynamic block`は冒頭の説明でも述べた通り「resource block内のブロック」を複製するもので、単純なkey : value の形で定義する変数では利用できなかったりと、使い方が限定的です。（本記事では主にサブネットを複製してきましたが、サブネットの複製にdynamic blockは使えません。）
+ただし、`dynamic block`は冒頭の説明でも述べた通り「resource block内のブロック」を複製するもので、単純なkey : value の形で定義する変数では利用できなかったりと、使い方が限定的です（本記事では主にサブネットを複製してきましたが、サブネットの複製にdynamic blockは使えません）。
 
 もう少しだけ`dynamic block`の使い道を考えます。
 
 実践ではセキュリティグループは1個ということは基本ありえず、様々なリソース用に色々なセキュリティグループを構築することになるでしょう。
 
-また、それぞれのセキュリティグループにはルールはいくつか存在し、CIDRブロックでなくセキュリティグループがソースになったり、ポートやプロトコルが異なっていたりもするでしょう。そうなると、以下のように全ての設定値を`local values`にmapとしてまとめておくのが良いでしょう。（長くなるのでサブネット部分の記述も省略しました。）
+また、それぞれのセキュリティグループにはルールはいくつか存在し、CIDRブロックでなくセキュリティグループがソースになったり、ポートやプロトコルが異なっていたりもするでしょう。そうなると、以下のように全ての設定値を`local values`にmapとしてまとめておくのが良いでしょう（長くなるのでサブネット部分の記述も省略しました）。
 
 ```sh
 locals {

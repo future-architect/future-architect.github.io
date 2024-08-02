@@ -15,7 +15,7 @@ lede: "フューチャーの有志メンバでOpenAPI Specification（OAS） v3.
 ---
 ## はじめに
 
-フューチャーの有志メンバでOpenAPI Specification（OAS） v3.0.3に対応したコーディング規約を作成しました。
+フューチャーの有志メンバーでOpenAPI Specification（OAS） v3.0.3に対応したコーディング規約を作成しました。
 
 <a href="https://future-architect.github.io/coding-standards/documents/forOpenAPISpecification/OpenAPI_Specification_3.0.3.html">
 <img src="/images/20240702a/image.png" alt="" width="1200" height="719" loading="lazy">

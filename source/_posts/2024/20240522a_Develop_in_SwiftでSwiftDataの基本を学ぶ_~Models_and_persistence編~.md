@@ -58,7 +58,7 @@ HealthCare Innovation Group(HIG)[^1]の橋本です。
 SwiftDataの主な特徴としては、
 
 - `SwiftUI`との連携
-  - `SwiftUI`と深く統合されており、ユーザーインターフェースのためのデータバインディングが非常にスムーズ
+  - `SwiftUI`と深く統合されており、ユーザーインタフェースのためのデータバインディングが非常にスムーズ
 - 宣言的データモデリング:
   - 属性、関係性、オブジェクトのバリデーションなどを宣言的に定義できること
 - データ永続化:
@@ -365,7 +365,7 @@ https://developer.apple.com/tutorials/develop-in-swift/models-and-persistence-co
 
 #### Sort the birthday list by name instead of birthday.
 
-これはとても簡単に修正することができます。
+これはとても簡単に修正できます。
 `@Query(sort: \Friend.birthday)`を`@Query(sort: \Friend.name)`に変えるだけです。
 
 ```Swift
@@ -478,7 +478,7 @@ struct ContentView: View {
 
 # おわりに
 
-公式チュートリアル[Develop in Swift](https://developer.apple.com/tutorials/develop-in-swift)を使って`SwiftData`の基本的な使い方を学びました。気になった方は、実際にチュートリアルを一つずつ実際にコードを書きながら、進めることをおすすめします。
+公式チュートリアル[Develop in Swift](https://developer.apple.com/tutorials/develop-in-swift)を使って`SwiftData`の基本的な使い方を学びました。気になった方は、実際にチュートリアルを1つずつ実際にコードを書きながら、進めることをおすすめします。
 
 次回は、公式チュートリアル[Develop in Swift](https://developer.apple.com/tutorials/develop-in-swift/)のData editing and navigation編を公開したいと思います。
 

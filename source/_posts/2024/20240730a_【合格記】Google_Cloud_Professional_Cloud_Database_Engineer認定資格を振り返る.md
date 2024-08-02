@@ -16,7 +16,7 @@ lede: "Google Cloud認定資格全冠を目指すべく、Professional Cloud Dat
 
 ## はじめに
 
-Google Cloud認定資格全冠を目指すべく、Professional Cloud Database Engineer Certification（PCDB）を受けてきました。無事に合格することができたので、ざっくりとした所感を書いていきます。
+Google Cloud認定資格全冠を目指すべく、Professional Cloud Database Engineer Certification（PCDB）を受けてきました。無事に合格できたので、ざっくりとした所感を書いていきます。
 
 また本試験はGoogle Cloudパートナー企業向けのバウチャーを活用して受験しました。大変感謝しております！
 
@@ -52,9 +52,9 @@ Google Cloud 認定資格関連の過去記事：
     - Google Cloud Partner Services
 - シチュエーション別でDBサービスを選ぶ
   - オープンソースのDBサービスを利用したい場合は？
-  - 99.99%の可用性を求められる場合は？
+  - 99.99％の可用性を求められる場合は？
   - グローバル展開が予測されている場合は？
-  - スケーリングは要る？要らない？
+  - スケーリングは要る？ 要らない？
 - DBを構成するデータの種別でサービスを選ぶ
   - トランザクションデータ
   - ストリーミングデータ
@@ -74,7 +74,7 @@ Google Cloud 認定資格関連の過去記事：
 
 - トラブルシューティング
   - [Query Insights](https://cloud.google.com/sql/docs/postgres/using-query-insights?hl=ja)を利用したクエリのパフォーマンス分析
-  - Diskの拡張
+  - ディスクの拡張
   - DBにホットスポットが発生したときの対策
 - データベースのセキュリティ
   - [Cloud SQL Auth Proxy](https://cloud.google.com/sql/docs/mysql/sql-proxy?hl=ja)を使う

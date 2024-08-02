@@ -49,7 +49,7 @@ Protocol Buffersを利用する際の基本的なワークフローは以下で�
 protoc --myplugin_out=out example1.proto example2.proto
 ```
 
-上記のコマンドが実行されると、protocはコンパイル対象が`example1.proto`, `example2.proto`の2つであること、オプションの`myplugin_out`から利用プラグインが`protoc-gen-myplugin`であることと、そのプラグインの出力先ディレクトリが`out`であることを把握します。（※プラグインは、`protoc-gen-${NAME}`という名前でPATH上に配置されている必要があり、protocがプラグインを使う時には`-${NAME}_out`というオプションで出力先ディレクトリを指定する必要があります。）その後、コンパイル対象ファイルとその依存先ファイルを解析し、その結果を[CodeGeneratorRequest](https://github.com/protocolbuffers/protobuf/blob/v27.0/src/google/protobuf/compiler/plugin.proto#L43)に詰めます。次に、利用プラグインを呼び出した上で、その標準入力に解析結果であるCodeGeneratorRequestをシリアライズしたバイト列を書き込みます。プラグインは書き込まれたCodeGeneratorRequestをデシリアライズの上、自身の処理を実行し、実行結果を[CodeGeratorResponse](https://github.com/protocolbuffers/protobuf/blob/v27.0/src/google/protobuf/compiler/plugin.proto#L83)に詰め、シリアライズしたバイト列を標準出力に書き込みます。protocはプラグインの実行結果であるCodeGeratorResponseを受け取ったら、そこに書かれている指示を元にファイルを生成します。
+上記のコマンドが実行されると、protocはコンパイル対象が`example1.proto`, `example2.proto`の2つであること、オプションの`myplugin_out`から利用プラグインが`protoc-gen-myplugin`であることと、そのプラグインの出力先ディレクトリが`out`であることを把握します（※プラグインは、`protoc-gen-${NAME}`という名前でPATH上に配置されている必要があり、protocがプラグインを使う時には`-${NAME}_out`というオプションで出力先ディレクトリを指定する必要があります）。その後、コンパイル対象ファイルとその依存先ファイルを解析し、その結果を[CodeGeneratorRequest](https://github.com/protocolbuffers/protobuf/blob/v27.0/src/google/protobuf/compiler/plugin.proto#L43)に詰めます。次に、利用プラグインを呼び出した上で、その標準入力に解析結果であるCodeGeneratorRequestをシリアライズしたバイト列を書き込みます。プラグインは書き込まれたCodeGeneratorRequestをデシリアライズの上、自身の処理を実行し、実行結果を[CodeGeratorResponse](https://github.com/protocolbuffers/protobuf/blob/v27.0/src/google/protobuf/compiler/plugin.proto#L83)に詰め、シリアライズしたバイト列を標準出力に書き込みます。protocはプラグインの実行結果であるCodeGeratorResponseを受け取ったら、そこに書かれている指示を元にファイルを生成します。
 
 次に、プラグインに対して何らかのパラメータを渡すケースを見てみます。下記はいずれも同じ意味になります。
 

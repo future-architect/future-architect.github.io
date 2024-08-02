@@ -16,7 +16,7 @@ lede: "Google Cloud認定資格全冠を目指すべく、Professional Cloud Dev
 
 ## はじめに
 
-Google Cloud認定資格全冠を目指すべく、Professional Cloud DevOps Engineer 認定資格（PCDE）を受けてきました。無事に合格することができたので、本記事ではざっくりとした所感を書いていきたいと思います。
+Google Cloud認定資格全冠を目指すべく、Professional Cloud DevOps Engineer 認定資格（PCDE）を受けてきました。無事に合格できたので、本記事ではざっくりとした所感を書いていきたいと思います。
 
 また本試験はGoogle Cloudパートナー企業向けのバウチャーを活用して受験しました。大変感謝しております！
 

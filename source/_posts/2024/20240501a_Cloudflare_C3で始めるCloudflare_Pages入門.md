@@ -30,11 +30,11 @@ Cloudflare Pagesとは、一言で言えば **「Cloudflareが提供するWebサ
 
 みなさんは、静的Webサイトを作成した後どこにデプロイしますか？
 
-ホスティングの方法は多種多様、色々な方法が存在します。一昔前までは、レンタルサーバを借りてFTP接続し、各種ファイルを配置する……というものが一般的でした。しかし最近は大手クラウドベンダの提供するPaaS(Platform as a Service)が台頭し、面倒なサーバ管理無しに、コードさえあればすぐにWebサイトを公開できる、というのも一般的になってきました。
+ホスティングの方法は多種多様、色々な方法が存在します。一昔前までは、レンタルサーバを借りてFTP接続し、各種ファイルを配置する……というものが一般的でした。しかし最近は大手クラウドベンダーの提供するPaaS(Platform as a Service)が台頭し、面倒なサーバ管理無しに、コードさえあればすぐにWebサイトを公開できる、というのも一般的になってきました。
 
-特に静的Webサイトをホスティングするサービスには、AWSの[Amplify](https://aws.amazon.com/jp/amplify/hosting/)（中身はS3+CloudFront構成）やGoogleの[Firebase Hosting](https://firebase.google.com/docs/hosting?hl=ja)など大手クラウドベンダが提供するクラウドの1サービス、はたまた[Netlify](https://www.netlify.com/)や[Vercel](https://vercel.com/)などの独立系プラットフォーマーのサービスなどが挙げられます。
+特に静的Webサイトをホスティングするサービスには、AWSの[Amplify](https://aws.amazon.com/jp/amplify/hosting/)（中身はS3+CloudFront構成）やGoogleの[Firebase Hosting](https://firebase.google.com/docs/hosting?hl=ja)など大手クラウドベンダーが提供するクラウドの1サービス、はたまた[Netlify](https://www.netlify.com/)や[Vercel](https://vercel.com/)などの独立系プラットフォーマーのサービスなどが挙げられます。
 
-その中に彗星のごとく現れたのが、大手CDNプロパイダの一つ、Cloudflareが提供する[Cloudflare Pages](https://www.cloudflare.com/ja-jp/developer-platform/pages/)です。
+その中に彗星のごとく現れたのが、大手CDNプロパイダの1つ、Cloudflareが提供する[Cloudflare Pages](https://www.cloudflare.com/ja-jp/developer-platform/pages/)です。
 
 ### Cloudflare Pagesの魅力: コストの安さ
 
@@ -240,7 +240,7 @@ Vue.js - The Progressive JavaScript Framework
 
 ### 更新後の反映
 
-ページの更新をPagesへデプロイするには、本来[Wrangler](https://developers.cloudflare.com/workers/wrangler/)というCloudflareのCLIツールを利用するのが一般的です。一方で、Cloudflare C3を利用して構築したプロジェクトでは、npm scriptsにデプロイ用のコマンドが追加されているため、以下のコマンドだけで反映することができます。
+ページの更新をPagesへデプロイするには、本来[Wrangler](https://developers.cloudflare.com/workers/wrangler/)というCloudflareのCLIツールを利用するのが一般的です。一方で、Cloudflare C3を利用して構築したプロジェクトでは、npm scriptsにデプロイ用のコマンドが追加されているため、以下のコマンドだけで反映できます。
 
 ```
 npm run deploy

@@ -19,7 +19,7 @@ lede: "MLflowはハイパーパラメータを自動調整するツールとし�
 
 [MLflow](https://mlflow.org/)は機械学習の管理を扱うツールとして、[Optuna](https://www.preferred.jp/ja/projects/optuna/)はハイパーパラメータを自動調整するツールとしてともに広く使用されているツールです。MLflowとOptunaを同時に利用した際に、Optunaが複数回試行することによってMLflow上にrunが大量に生成され、MLflow上で試行結果が見づらくなります。
 
-本記事では、大量に生成されるrunに親のrunを付与することで、MLflowのWebUIから見やすくする方法を提示します。
+本記事では、大量に生成されるrunに親のrunを付与することで、MLflowのWeb UIから見やすくする方法を提示します。
 
 ## 課題
 
@@ -36,14 +36,14 @@ MLflowは機械学習の管理について幅広く扱うツールであり、�
 ### 方針
 
 MLflowではrun毎にタグを設定できますが、その中でも[システムタグ](https://mlflow.org/docs/latest/tracking/tracking-api.html#system-tags)と呼ばれるタグがあり、MLflowの中で特殊な意味を持ちます。
-`mlflow.parentRunId`というタグはシステムタグの一つで、このタグに親のrunのIDを設定すると、WebUI上で親子のrunがネストした形で表示されるようになります。
+`mlflow.parentRunId`というタグはシステムタグの1つで、このタグに親のrunのIDを設定すると、Web UI上で親子のrunがネストした形で表示されるようになります。
 
 そのため...
 
 1. MLflowで空のrunを実行する。
 2. 1で実行したrunを目的関数の中で親のrunとして設定する。
 
-...という2つの手順を踏めば、Optunaによって生成される大量のrunを一つの親runに結び付けることができます。
+...という2つの手順を踏めば、Optunaによって生成される大量のrunを1つの親runに結び付けることができます。
 
 ### 実装
 
@@ -136,13 +136,13 @@ if __name__ == "__main__":
 
 上のコードを実行すると、Optunaによって実行された全ての試行がMLflowに送信されます。
 
-WebUI上では画像のように表示され、Optunaの実行単位ごとにrunがネストして表示されるので見やすくなりました。
+Web UI上では画像のように表示され、Optunaの実行単位ごとにrunがネストして表示されるので見やすくなりました。
 
 <img src="/images/20240416a/image_2.png" alt="image.png" width="1200" height="391" loading="lazy">
 
 ## おわりに
 
-以上、`mlflow.parentRunId`というシステムタグにrunIDを設定するとWebUI上でrunがネストして表示されることを利用して、自動生成されるrunをUI上で整理して表示させるという話でした。
+以上、`mlflow.parentRunId`というシステムタグにrunIDを設定するとWeb UI上でrunがネストして表示されることを利用して、自動生成されるrunをUI上で整理して表示させるという話でした。
 
 MLflowのシステムタグはmlflow.parentRunId以外にも存在するので、それらを利用するとUI上で更なる恩恵が得られるかもしれません。
 

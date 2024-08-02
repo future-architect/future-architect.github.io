@@ -19,7 +19,7 @@ lede: "Cloudflare Snippetsは新しいCloudflareのサービスであり2023年6
 
 ## はじめに
 
-Cloudflare Snippetsは新しいCloudflareのサービスであり2023年6月にクローズドアルファ版がリリースされ、2024 Develoer Weekでは無作為に抽出された5%のユーザーが利用可能になっていました。6月頭より全ユーザーが利用可能となったサービスです。
+Cloudflare Snippetsは新しいCloudflareのサービスであり2023年6月にクローズドアルファ版がリリースされ、2024 Develoer Weekでは無作為に抽出された5％のユーザーが利用可能になっていました。6月頭より全ユーザーが利用可能となったサービスです。
 
 https://blog.cloudflare.com/ja-jp/cloudflare-snippets-alpha-ja-jp
 
@@ -41,7 +41,7 @@ Cloudflare Workers はWeb Workershttps://developer.mozilla.org/en-US/docs/Web/AP
 
 <img src="/images/20240614a/2.png" alt="" width="1200" height="766" loading="lazy">
 
-この性質により、一つ処理を一つのSnippetsとして分割しておくことで、一つの通信に複数のSnippetsを起動させる、ということも可能です。
+この性質により、1つ処理を一つのSnippetsとして分割しておくことで、一つの通信に複数のSnippetsを起動させる、ということも可能です。
 
 また、Workersと異なり、最大実行時間は5msで最大メモリは2MB、パッケージの合計サイズは32KBと小さいのも特徴です。
 
@@ -56,7 +56,7 @@ Cloudflare Workers はWeb Workershttps://developer.mozilla.org/en-US/docs/Web/AP
 
 <img src="/images/20240614a/3.png" alt="" width="370" height="165" loading="lazy">
 
-マネージメントコンソールから`Rules`→`Snippets`をクリックします。
+マネジメントコンソールから`Rules`→`Snippets`をクリックします。
 `Create a Snippet`をクリックします。
 
 <img src="/images/20240614a/4.png" alt="" width="1200" height="487" loading="lazy">
