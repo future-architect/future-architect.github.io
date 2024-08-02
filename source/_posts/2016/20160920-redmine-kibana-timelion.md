@@ -34,11 +34,11 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 
 そこで、本日はKibana＋Timelionを使ってRedmineデータをグラフ表示する方法を紹介します。
 
-例えば、Kibana+Timelionを利用すると、チケット発生件数の4週移動平均を簡単に表示することができるのです。
+例えば、Kibana+Timelionを利用すると、チケット発生件数の4週移動平均を簡単に表示できるのです。
 
 <img src="/images/20160920/photo_20160920_02.png" loading="lazy">
 
-これがあれば、平均して毎週どれくらいのタスクが発生しているかが分かりますね。（このテストデータの場合は9月時点で毎週28件のタスクが発生している）
+これがあれば、平均して毎週どれくらいのタスクが発生しているかが分かりますね（このテストデータの場合は9月時点で毎週28件のタスクが発生している）
 
 では早速、Kibana+Timelionを使ってみましょう。
 
@@ -101,20 +101,19 @@ Elastic Search＋Logstash＋Kibanaそれぞれの頭文字をとって、ELKと�
 
 まず、JDBCドライバをダウンロードします。
 
-私のRemineはMysqlを利用しているので、今回はMysqlのJDBCドライバーをインストールしました。
+私のRemineはMySQLを利用しているので、今回はMysqlのJDBCドライバーをインストールしました。
 
-◆Mysql JDBC ドライバ URL
+◆MySQL JDBC ドライバ URL
 
 [https://dev.mysql.com/downloads/connector/j/](https://dev.mysql.com/downloads/connector/j/)
 
 →私の場合は、「Platform Independent (Architecture Independent), ZIP Archive」をダウンロードしました。
 
-ダウンロードしたファイル内の「mysql-connector-java-5.1.39-bin.jar」というファイルを、
-「C:\elastic\logstash-all-plugins-2.4.0\logstash-2.4.0\bin」以下に配置します。
+ダウンロードしたファイル内の `mysql-connector-java-5.1.39-bin.jar` というファイルを、`C:\elastic\logstash-all-plugins-2.4.0\logstash-2.4.0\bin` に配置します。
 
-次に、「redmine.txt」というファイルを作成。中身は下記のようにします。（★を含む箇所は皆様の環境に合わせた値へ変えて下さい。）
+次に、「redmine.txt」というファイルを作成。中身は下記のようにします（★を含む箇所は皆様の環境に合わせた値へ変えて下さい）。
 
-```json
+```sh
 input {
     jdbc {
         jdbc_connection_string => "jdbc:mysql://★IP★:3306/★サービス名★"
@@ -253,24 +252,10 @@ timelion便利ですね！
 
 ## 最後に
 
-今回は、累積グラフと、移動平均グラフを表示しました。
+今回は、累積グラフと、移動平均グラフを表示しました。それ以外のグラフも簡単に追加することが可能です。
 
-それ以外のグラフも簡単に追加することが可能です。
+詳しくは[Timelionのリファレンス](https://github.com/elastic/timelion/blob/master/FUNCTIONS.md)をご参照ください。
 
-詳しくは下記Timelionのリファレンスをご参照ください。
+RedmineをKibana＋Timelionと組み合わせることで、グラフ表示が可能になり、結果的にプロジェクト状況の把握が容易になります。
 
-◆Timelion function reference
-
-[https://github.com/elastic/timelion/blob/master/FUNCTIONS.md](https://github.com/elastic/timelion/blob/master/FUNCTIONS.md)
-
-<br/>
-
-いかがでしたでしょうか？RedmineをKibana＋Timelionと組み合わせることで、グラフ表示が可能になり、結果的にプロジェクト状況の把握が容易になります。
-
-本記事が、皆様のプロジェクトマネジメントに役に立てば幸いです。
-
-なお、今後私がブログを執筆する際は、EVM表示、グラフのドリルダウン、プロジェクトダッシュボードの構築、ダッシュボード画像のメール配信に関する方法を記載していく予定。
-
-これらの記事が、みなさまにとって参考になりそうでしたら「いいね！」をクリックして頂けますと幸いです。執筆の励みになります。＾＾
-
-今後ともよろしくお願い致します。
+みなさまのプロジェクトマネジメントに役に立てば幸いです。
