@@ -45,7 +45,7 @@ lede: "こんにちは。TIGの伊藤太斉です。今回は先日開催され�
 ### Open Policy Agentについて
 
 簡単にOPAについて説明します。
-OPAはPolicy as Code（PaC）を実現するツールです。CNCFでホストされているのでKubernetesにしか利用できない、というわけではなく、JSON、YAMLなど様々なデータを扱ってポリシーで管理することができます。
+OPAはPolicy as Code（PaC）を実現するツールです。CNCFでホストされているのでKubernetesにしか利用できない、というわけではなく、JSON、YAMLなど様々なデータを扱ってポリシーで管理できます。
 記述する際にはRegoという独自言語で実装します。サンプルなどは後述します。
 
 ### Infrastructure as Codeの横展開で起こりうる話

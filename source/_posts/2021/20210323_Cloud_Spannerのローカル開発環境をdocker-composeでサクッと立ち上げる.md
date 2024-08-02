@@ -37,7 +37,7 @@ Spannerは、Google Cloudが提供する"強力な一貫性と水平方向の拡
 
 #### １ノードあたりの料金（すべてのレプリケーションを含む）
 
-| 構成             | リージョン             | $/時間 | $/月 (100%稼働) |
+| 構成             | リージョン             | $/時間 | $/月 (100％稼働) |
 |------------------|------------------------|--------|-----------------|
 | リージョン       | asia-northeast1 (東京) | 1.17   | 842.4           |
 | マルチリージョン | asia1 (東京+大阪)      | 3.9    | 2808            |
@@ -47,7 +47,7 @@ Spannerは、Google Cloudが提供する"強力な一貫性と水平方向の拡
 # 開発環境どうするか
 
 コストが高いので、開発環境用に気軽にインスタンスを立ち上げるのは難しそうです。
-ということで、本記事ではGCPが公式で提供してくれている [Spanner エミュレータ](https://cloud.google.com/spanner/docs/emulator?hl=ja) を使って開発環境を立ち上げます！(エミューレータあってよかったありがとう!)
+ということで、本記事ではGCPが公式で提供してくれている [Spanner エミュレータ](https://cloud.google.com/spanner/docs/emulator?hl=ja) を使って開発環境を立ち上げます！ (エミューレータあってよかったありがとう!)
 
 gcloud CLIとdockerイメージでの提供がありますが、今回はdocker-composeで利用する例を紹介します。
 サンプルコードはこちら: [**tarosaiba/docker-compose-spanner**](https://github.com/tarosaiba/docker-compose-spanner)
@@ -85,7 +85,7 @@ Connected.
 spanner>
 ```
 
-接続できました！では、テーブルを確認してみましょう。
+接続できました！ では、テーブルを確認してみましょう。
 
 ```bash
 spanner> show tables;
@@ -109,7 +109,7 @@ spanner> select * from Singers;
 4 rows in set (800.4us)
 ```
 
-テーブルとデータも確認することができました。
+テーブルとデータも確認できました。
 
 ## アプリケーションからの接続方法
 

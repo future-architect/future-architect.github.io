@@ -434,7 +434,7 @@ import 'package:http/http.dart' as http;
 
 # まとめ
 
-そろそろReact/Vue/Angularに飽きてきたかも？な人の新たなおもちゃとしてFlutter Webの紹介をしました。機能的には以下の3つを紹介しました
+そろそろReact/Vue/Angularに飽きてきたかも？ な人の新たなおもちゃとしてFlutter Webの紹介をしました。機能的には以下の3つを紹介しました
 
 * Router周り
 * ビルドした成果物がどうなっていて他の言語(Go)のサーバーにどう組み込めばいいのか

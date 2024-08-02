@@ -22,7 +22,7 @@ lede: "こんにちは、辻です。先日開催されました [Go Conference 
 
 > The Gopher character is based on the Go mascot designed by Renée French.
 
-[Go Conference'20 in Autumn](https://sendai.gocon.jp/)ではオンラインとオフラインのハイブリッドな構成でしたが、今回はGo Conference史上初となるフルオンラインでの開催となりました。今回のカンファレンスでは事前録画したビデオによる発表もサポートされていました。またオンラインでのリアルタイム登壇にあたって、リハーサルを始め手厚いサポートをいただき、安心して発表することができました。運営の皆様、ありがとうございました！
+[Go Conference'20 in Autumn](https://sendai.gocon.jp/)ではオンラインとオフラインのハイブリッドな構成でしたが、今回はGo Conference史上初となるフルオンラインでの開催となりました。今回のカンファレンスでは事前録画したビデオによる発表もサポートされていました。またオンラインでのリアルタイム登壇にあたって、リハーサルを始め手厚いサポートをいただき、安心して発表できました。運営の皆様、ありがとうございました！
 
 ### 実務で役立つTCPクライアントの作り方
 
@@ -41,7 +41,7 @@ Goでは `net` パッケージを使うと簡単にTCPクライアントを実�
 
 といったポイントを紹介しています。
 
-セッションを見ていただいた皆様、twitterでコメントくださった皆様、ありがとうございました！
+セッションを見ていただいた皆様、Twitterでコメントくださった皆様、ありがとうございました！
 
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Goでソケットを直接触る機会、ありそうでなかなかないのでこういった知識の復習大事 <a href="https://twitter.com/hashtag/gocon?src=hash&amp;ref_src=twsrc%5Etfw">#gocon</a> <a href="https://twitter.com/hashtag/goconA?src=hash&amp;ref_src=twsrc%5Etfw">#goconA</a></p>&mdash; castaneai (@castanea) <a href="https://twitter.com/castanea/status/1385837483384995841?ref_src=twsrc%5Etfw">April 24, 2021</a></blockquote>
 

@@ -41,7 +41,7 @@ mathjax: true
 
 IBM Quantum ChallengeはIBM社が開発を進めている量子計算パッケージ[Qiskit](https://qiskit.org/)を使用し、与えられた課題を解いてくハッカソン形式の大会です。全世界同時開催されており、[IBM Quantum Challenge Fall 2021](https://ibm.co/challenge-fall-21%E3%80%80)では約1300名が10日間、頭を悩ませ、問題に挑戦しました。
 
-[IBM Quantum Challenge Fall 2021](https://ibm.co/challenge-fall-21%E3%80%80)では「金融」、「化学」、「機械学習」、「最適化」に関する全4問の課題が出題されました。全4問の課題はチュートリアル形式になっており、参加者は与えられたヒントや参考文献をもとに問題を解いていきます。中には論文片手に解き進める問題もあり、入門者から上級者まで楽しめるようになっています。
+[IBM Quantum Challenge Fall 2021](https://ibm.co/challenge-fall-21%E3%80%80)では「金融」「化学」「機械学習」「最適化」に関する全4問の課題が出題されました。全4問の課題はチュートリアル形式になっており、参加者は与えられたヒントや参考文献をもとに問題を解いていきます。中には論文片手に解き進める問題もあり、入門者から上級者まで楽しめるようになっています。
 
 大会終了後は参加者の解答状況によってサムネイルのようなバッチが進呈されます。こういったイベントも参加者のモチベーションになり、とても良いですね。
 
@@ -100,7 +100,7 @@ Microsoft社が提供している[Quantum Katas](https://github.com/microsoft/Qu
 
 <img src="/images/20211115b/quantum_challenge_slack.png" alt="quantum_challenge_slack.png" width="1200" height="211" loading="lazy">
 
-私自身の実績としては全4問の課題を解き終え、サムネイルのAdvancedバッジを取得することができました。
+私自身の実績としては全4問の課題を解き終え、サムネイルのAdvancedバッジを取得できました。
 
 <img src="/images/20211115b/image.png" alt="image.png" width="1068" height="312" loading="lazy">
 

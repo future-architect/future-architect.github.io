@@ -33,13 +33,13 @@ https://github.com/future-architect/backlogslackify
 
 未完了のBacklogチケットの存在をSlackに通知するツールです。
 
-Slackと連携するものをslackifyと呼ぶのはRuby On Rails開発者時代にお世話になった[capistrano-slackify](https://github.com/onthebeach/capistrano-slackify)を真似ています。
+Slackと連携するものをslackifyと呼ぶのはRuby on Rails開発者時代にお世話になった[capistrano-slackify](https://github.com/onthebeach/capistrano-slackify)を真似ています。
 
 READMEに記載していますが、未完了のBacklogチケットのURL、リンク、担当者を画像のようにSlackに投稿してくれます。
 
 <img src="/images/20210806b/image_2.png" alt="ツールイメージ" width="946" height="322" loading="lazy">
 
-GoでBacklogチケットを取り扱うロジックは[公式ドキュメント](https://developer.nulab.com/ja/docs/backlog/libraries/#)にも紹介されている事から、[kenzo0107さんのライブラリ](https://github.com/kenzo0107/backlog)を安心して利用することができ、仕事の片手間にササっと作ることができました、ありがとうございます。
+GoでBacklogチケットを取り扱うロジックは[公式ドキュメント](https://developer.nulab.com/ja/docs/backlog/libraries/#)にも紹介されている事から、[kenzo0107さんのライブラリ](https://github.com/kenzo0107/backlog)を安心して利用でき、仕事の片手間にササっと作ることができました、ありがとうございます。
 
 # 設定方法
 

@@ -71,12 +71,12 @@ Cloud Build は、GCP が提供するビルドを行うサービスです。
 
 ## ビルド
 
-ビルドは、ユーザが自由にビルドステップを作成して実行することも可能ですし、Cloud Build やコミュニティが提供するビルドステップを利用することができます。
+ビルドは、ユーザが自由にビルドステップを作成して実行することも可能ですし、Cloud Build やコミュニティが提供するビルドステップを利用できます。
 
 * [Cloud Build が提供するビルドステップ](https://github.com/GoogleCloudPlatform/cloud-builders)
 * [コミュニティが提供するビルドステップ](https://github.com/GoogleCloudPlatform/cloud-builders-community)
 
-ビルドの構成ファイルは、YAML またはJSON で記述することができます。
+ビルドの構成ファイルは、YAML またはJSON で記述できます。
 
 ### ビルドステップ
 
@@ -195,6 +195,6 @@ Argo CD は、ポーリングもしくはWebhook により、反映を行いま�
 
 いかがでしたでしょうか？
 
-Cloud Build を用いてどういった構成をとれるのかをイメージすることができたら幸いです。
+Cloud Build を用いてどういった構成をとれるのかをイメージできたら幸いです。
 
 明日は、松井さんによる [Firebaseで取得したログをBigQueryに連携してユーザー操作をトラッキングする](/articles/20210316/) です。

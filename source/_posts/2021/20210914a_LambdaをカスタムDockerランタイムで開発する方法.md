@@ -233,8 +233,8 @@ curlコマンド実行時に想定通りにアプリケーションが動けば�
 
 # まとめ
 
-* AWS LambdaではカスタムDockerコンテナを起動することができる
-* aws-lambda-providedをベースイメージにするのがオススメ
+* AWS LambdaではカスタムDockerコンテナを起動できる
+* aws-lambda-providedをベースイメージにすることがオススメ
 * ECR + Lambdaの組み合わせで構築、運用する
 * ローカル環境でデバッグすることも可能
 

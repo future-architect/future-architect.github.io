@@ -24,7 +24,7 @@ lede: "Go Conference Online 2021 Autumnに登壇しました。Go Conference Aut
 
 <iframe class="speakerdeck-iframe" frameborder="0" src="https://speakerdeck.com/player/02845f0d6f7d43fc8a2b12b6da677c94" title="Starting static analysis with Go" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" style="border: 0px; background: padding-box padding-box rgba(0, 0, 0, 0.1); margin: 0px; padding: 0px; border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 40px; width: 560px; height: 314px;" data-ratio="1.78343949044586"></iframe>
 
-静的解析というと、聞いたことはある。実際 [`golangci-lint`](https://github.com/golangci/golangci-lint) にはめちゃくちゃお世話になっている。ただ、自分でアドホックな静的解析のモジュールを自作するとなると、めちゃくちゃハードル高いんじゃないの？と思う方が多いと思います。しかし、そんなことはありません。本発表では実際に私がはじめて静的解析のモジュールを自作した経験から、静的解析のモジュールを作るのはハードル高くないよ、ということをお伝えしたくて登壇しました。
+静的解析というと、聞いたことはある。実際 [`golangci-lint`](https://github.com/golangci/golangci-lint) にはめちゃくちゃお世話になっている。ただ、自分でアドホックな静的解析のモジュールを自作するとなると、めちゃくちゃハードル高いんじゃないの？ と思う方が多いと思います。しかし、そんなことはありません。本発表では実際に私がはじめて静的解析のモジュールを自作した経験から、静的解析のモジュールを作るのはハードル高くないよ、ということをお伝えしたくて登壇しました。
 
 以下は、静的解析のモジュールを作って、現場で活用できるようになったよ、という記事です。
 https://future-architect.github.io/articles/20210603a/

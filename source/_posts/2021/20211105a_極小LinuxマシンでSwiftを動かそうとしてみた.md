@@ -21,7 +21,7 @@ lede: "今回ターゲットとした極小Linuxマシンは、M5Stack UnitV2に
 
 今回ターゲットとした極小Linuxマシンは、[M5Stack UnitV2](https://www.switch-science.com/catalog/7160/)になります。
 
-こちらのマシンは、ARM Cortex-A7デュアルコア1.2GHz、128MBメモリ、512MB内蔵フラッシュ、microSDスロット、Full HDカメラ、Wi-Fi、冷却ファンを搭載し、OSはLinuxがプリインストールされていますが、非常にコンパクトで1万円弱で購入することができます。
+こちらのマシンは、ARM Cortex-A7デュアルコア1.2GHz、128MBメモリ、512MB内蔵Flash、microSDスロット、Full HDカメラ、Wi-Fi、冷却ファンを搭載し、OSはLinuxがプリインストールされていますが、非常にコンパクトで1万円弱で購入できます。
 
 [Python、Jupyter Notebookはプリインストールされている](https://docs.m5stack.com/en/quick_start/unitv2/jupyter_notebook)ので、あえて、他の手段を試す必然性は全くないのですが、Swiftのインストールを試してみました。
 

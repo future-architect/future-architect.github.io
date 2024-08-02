@@ -119,7 +119,7 @@ func main() {
 このような方法で、受け取ったcontextからライブラリがcontextに含めた情報を取得することが可能です。
 実際の運用としては、ログ出力の際にprefixに`AwsRequestID`を出力するように開発しておき、`Amazon CloudWatch Logs`に送信されたログから、同一リクエストにおける一連のログ出力を抽出する際に役立てたりしています。
 
-lambdaで開発したAPIの認証認可に`Amazon Cognito`を利用している場合は、`LambdaContext`構造体から`CognitoIdentityID`、`CognitoIdentityPoolID`を取得することができるようになっています。
+lambdaで開発したAPIの認証認可に`Amazon Cognito`を利用している場合は、`LambdaContext`構造体から`CognitoIdentityID`、`CognitoIdentityPoolID`を取得できるようになっています。
 新しい`context`に`LambdaContext`構造体の情報を詰める`func NewContext(parent context.Context, lc *LambdaContext)`も用意されています。
 このような公式から提供されているユーティリティを見落とさず使いこなしていきたいですね。
 

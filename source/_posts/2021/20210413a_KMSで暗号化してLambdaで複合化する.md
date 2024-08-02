@@ -42,7 +42,7 @@ KMS の仕組み自体は、Classmethod さんの書かれた「[10分でわか�
 
 公式: [Terraform](https://www.terraform.io/)
 
-HashiCorp 社により開発されている、OSS のクラウド管理ツールです。AWS や GCP などのクラウドサービスに対して、リソースの作成・削除や、各種パラメータの調整機能をコードベースで提供します。オペレーターになどよる GUI 操作や AWS CLI コマンド操作を排除し、インフラリソース管理を Terraform に一本集中することで、煩雑なリソース管理作業を簡略化することができます。
+HashiCorp 社により開発されている、OSS のクラウド管理ツールです。AWS や GCP などのクラウドサービスに対して、リソースの作成・削除や、各種パラメータの調整機能をコードベースで提供します。オペレーターになどよる GUI 操作や AWS CLI コマンド操作を排除し、インフラリソース管理を Terraform に一本集中することで、煩雑なリソース管理作業を簡略化できます。
 
 Future の技術ブログでは、[Terraform 関連の投稿](/tags/Terraform/)がありますので、こちらも合わせてご覧ください。
 
@@ -55,21 +55,21 @@ Terraform やってみたいという方は、以下の記事がオススメで�
 
 KMS の暗号化・復号化操作を、以下の流れで説明します。
 
-- Terraform で KMS マスターキーの生成
+- Terraform で KMS マスタキーの生成
 - AWS CLI で暗号化・復号化
 - Lambda で KMS 操作
 
 また、本記事では一部 Terraform による操作を前提としていますが、基本的な Terraform 操作の説明は省略しています。
 
-# Terraform で KMS マスターキーの生成
+# Terraform で KMS マスタキーの生成
 
 Terraform で KMS リソースを作成します。
 
-KMS マスターキーの定義だけでなく、エイリアスも同時に定義します。
+KMS マスタキーの定義だけでなく、エイリアスも同時に定義します。
 
-マスターキーの値は `1234abcd-12ab-34cd-56ef-1234567890ab` のような値であり非常に判別しづらいため、別名（エイリアス）として `alias/demo-alias` のように任意の識別名を付与します。
+マスタキーの値は `1234abcd-12ab-34cd-56ef-1234567890ab` のような値であり非常に判別しづらいため、別名（エイリアス）として `alias/demo-alias` のように任意の識別名を付与します。
 
-マスターキーの値と Alias の関係は **マスターキー : Alias = 1 : n** なので、1つのマスターキーには複数の Alias が設定可能です。逆に、1つの Alias を複数のマスターキーに紐づけることはできません。
+マスタキーの値と Alias の関係は **マスタキー : Alias = 1 : n** なので、1つのマスタキーには複数の Alias が設定可能です。逆に、1つの Alias を複数のマスタキーに紐づけることはできません。
 
 公式: [エイリアスの使用](https://docs.aws.amazon.com/ja_jp/kms/latest/developerguide/kms-alias.html)
 
@@ -92,7 +92,7 @@ Terraform 定義パラメータ
 - [aws_kms_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key)
 - [aws_kms_alias](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias)
 
-リソース定義を追加後、`$ terraform plan/apply` により KMS マスターキーと Alias を作成します。
+リソース定義を追加後、`$ terraform plan/apply` により KMS マスタキーと Alias を作成します。
 
 # AWS CLI で暗号化・復号化
 
@@ -282,7 +282,7 @@ $ cat outfile.txt
 
 # まとめ
 
-本記事では、KMS のマスターキー生成を Terraform で行い、暗号化は AWS CLI で手動実施するというハイブリッド方式をご紹介しました。
+本記事では、KMS のマスタキー生成を Terraform で行い、暗号化は AWS CLI で手動実施するというハイブリッド方式をご紹介しました。
 
 `CiphertextBlob` の値は KMS で暗号化済みのため、Terraform やアプリケーションコードに直接追記しても問題ありません（Lambdaで利用するならば、ハードコードではなく環境変数に追記すべきですが）。GitHub 管理するコード上には暗号文のまま登録して、呼び出し先で復号化する機能配置ならば、生の認証情報がリポジトリに残らないようにできます。
 

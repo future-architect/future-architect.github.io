@@ -22,7 +22,7 @@ lede: "今回はAWSサービスのうちの一つAWS IoTを使用してRaspberry
 
 こんにちは。TIG/DXユニット所属の宮永です。
 
-今回はAWSサービスのうちの一つAWS IoTを使用してRaspberryPiとのMQTTによる通信を行います。
+今回はAWSサービスのうちの1つAWS IoTを使用してRaspberryPiとのMQTTによる通信を行います。
 
 AWS IoTを使用したMQTTのチュートリアルはAWS公式からも詳細なハンズオン記事が出ています。
 
@@ -71,7 +71,7 @@ AWSIoTは各種AWSサービスとIoTデバイスとを手軽に連携できる�
 DHT22という温湿度センサをRaspberryPi3B+に取り付けて2時間ごとに温湿度を取得します。取得した温湿度をMQTTによってAWS IoTにPublishします。AWS IoTはDynamoDBと連携させることで、Subscribeしたデータを蓄積します。
 
 また、RaspberryPiではPythonスクリプトも同時に起動しておきます。PythonではBoto3を使用してDynamoDBに向けて定期的にQueryを行います。受け取った情報からtimestampを横軸、温度湿度を縦軸にとったプロット図を作成します。作成したプロット図は2時間ごとにSlackに投稿するという仕組みにしています。
-（※冒頭のプロット図は便宜的に１分毎のデータをプロットしています。）
+（※冒頭のプロット図は便宜的に１分毎のデータをプロットしています）。
 
 <img src="/images/20210929a/image_3.png" alt="image.png" width="1200" height="849" loading="lazy">
 
@@ -85,7 +85,7 @@ DHT22という温湿度センサをRaspberryPi3B+に取り付けて2時間ごと
 
 ## ソフトウェア
 
-開発はwindows10環境、WSL2上で行いました。標準モジュール以外で使用したものを以下に列挙します。
+開発はWindows10環境、WSL2上で行いました。標準モジュール以外で使用したものを以下に列挙します。
 
 * go1.16.6 linux/amd64
   * [MichaelS11/go\-dht: Golang DHT22 / AM2302 / DHT11 interface using periph\.io driver](https://github.com/MichaelS11/go-dht)

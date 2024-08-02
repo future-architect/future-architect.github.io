@@ -32,7 +32,7 @@ TIGの伊藤真彦です。
 
 しかしこの試験に関しては情報の更新が激しい分野であることもあり、一切見覚えのない問題が多めに出題されました。具体的には2019年8月に一般公開された[AWS Lake Formation](https://aws.amazon.com/jp/lake-formation/?whats-new-cards.sort-by=item.additionalFields.postDateTime&whats-new-cards.sort-order=desc)の情報が結構な頻度で出題されましたが、教材では取り上げられていませんでした。比較的新しい情報が既に問題に組み込まれているようです。
 
-逆に言うとLake Formationまでキャッチアップできる教材であれば鮮度は高いという事になります。とはいえ教材のおかげで自信をもって解ける問題も10%以上は出題されました。
+逆に言うとLake Formationまでキャッチアップできる教材であれば鮮度は高いという事になります。とはいえ教材のおかげで自信をもって解ける問題も10％以上は出題されました。
 
 Amazon EMRはソリューションアーキテクトでも出題されるサービスであり、試験問題の難易度そのものも決して高くないはずですが、その上で詳細な知識、経験がないと手も足も出ない要素が多めです。どうにか合格できましたが、結果を見るまで受かった手ごたえはありませんでした。
 
@@ -76,7 +76,7 @@ Amazon EMRはソリューションアーキテクトでも出題されるサー�
 * Spark、Hive、Hadoop、HBaseなどApache製品への理解
 * Jupyter Notebook、Kibana、Logstashなどデータ分析で用いる各種プロダクトの理解
 * Parquet、ORCなどのデータ形式
-* GZIP、SNAPPYなどデータ圧縮形式
+* gzip、SNAPPYなどデータ圧縮形式
 
 ## 感想
 

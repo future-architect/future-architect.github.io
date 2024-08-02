@@ -20,7 +20,7 @@ TIGの伊藤真彦です。
 
 [Electron](https://www.electronjs.org/)は、GitHubが開発したオープンソースのソフトウェアフレームワークです。
 
-ChromiumとNode.jsをコアとして採用する事で、Web開発と同じようにHTML,CSS,JavaScriptを用いて開発したものを、デスクトップアプリケーションとしてビルドすることが可能になります。クロスプラットフォームであることも利点の一つであり、同一のソースコードからmacOS、Windows、Linuxへのアプリケーションビルドが可能です。
+ChromiumとNode.jsをコアとして採用する事で、Web開発と同じようにHTML,CSS,JavaScriptを用いて開発したものを、デスクトップアプリケーションとしてビルドすることが可能になります。クロスプラットフォームであることも利点の1つであり、同一のソースコードからmacOS、Windows、Linuxへのアプリケーションビルドが可能です。
 
 つまりWeb開発の技術でデスクトップアプリが作成できるものです。
 
@@ -44,7 +44,7 @@ ReactやVue.js等のフロントエンドライブラリと組み合わせて使
 
 [electron-quick-startのリポジトリ](https://github.com/electron/electron-quick-start)が参考になります。
 
-git cloneから起動までを体験できる一連のコマンドは[公式ページ](https://www.electronjs.org/)にも記載があります。
+Git cloneから起動までを体験できる一連のコマンドは[公式ページ](https://www.electronjs.org/)にも記載があります。
 
 ```
 # Clone the Quick Start repository
@@ -65,7 +65,7 @@ $ npm install && npm start
 
 proxy認証が必要なネットワークの場合、環境変数の設定及びnpmでのproxy設定をしないと`npm install`が失敗します。
 
-`npm config`は`-g`オプションでグローバル設定にすることができますが、Electronのライブラリがグローバル設定を見に行かない場合があるため、うまく動かない場合はグローバルで設定した覚えがある方でも`-g`オプション無しで設定してみてください。
+`npm config`は`-g`オプションでグローバル設定にできますが、Electronのライブラリがグローバル設定を見に行かない場合があるため、うまく動かない場合はグローバルで設定した覚えがある方でも`-g`オプション無しで設定してみてください。
 
 下記6つの設定を済ませればproxy環境下でも問題なく動きます。id、pass、proxyのドメインは適宜組み替えてください。
 
@@ -82,7 +82,7 @@ SET HTTP_PROXY=http://id:pass@proxy.example.com:port
 
 個人的にはElectronアプリを作成する場合は、Vue.jsとの組み合わせがオススメです。
 
-[Vue CLI Plugin Electron Builder](https://nklayman.github.io/vue-cli-plugin-electron-builder/)の存在が大きいです。このプラグインを導入することで、とても簡単に、Vue.jsで作成したWebアプリケーションをElectronアプリとしてビルドすることができます。
+[Vue CLI Plugin Electron Builder](https://nklayman.github.io/vue-cli-plugin-electron-builder/)の存在が大きいです。このプラグインを導入することで、とても簡単に、Vue.jsで作成したWebアプリケーションをElectronアプリとしてビルドできます。
 
 実際に試してみましょう。
 
@@ -98,7 +98,7 @@ npm install -g @vue/cli
 
 インストールが完了したら、Vue CLIを用いてVue.jsのプロジェクトを作成します。
 
-プロジェクト用のフォルダやgitリポジトリを作成することを推奨します。
+プロジェクト用のフォルダやGitリポジトリを作成することを推奨します。
 
 ```sh
 mkdir vue-cli-electron-sample
@@ -264,7 +264,7 @@ dist_electronフォルダ配下は画像のような状態です。
 vue-cli-electron-sample Setup 0.1.0をダブルクリックするとアプリケーションのインストールが開始されます。ちなみに、アプリケーションのバージョン情報は`package.json`記載のバージョンに依存します。
 <img src="/images/20210107/image_13.png" class="img-small-size" loading="lazy">
 
-インストールが完了したアプリケーションは一般的なアプリケーション同様に起動することができます。
+インストールが完了したアプリケーションは一般的なアプリケーション同様に起動できます。
 <img src="/images/20210107/image_14.png" loading="lazy">
 
 vue.config.jsに、下記のように、ビルド設定を`portable`に設定することで、インストール不要な、ダウンロードしたファイルを直接実行、起動できるようなものとしてアプリケーションをビルドする事もできます。
@@ -324,7 +324,7 @@ portable形式でビルドしたものをダブルクリックすると、その
 
 これを回避するためには[アプリケーションの署名](https://www.electronjs.org/docs/tutorial/code-signing)が必要になります。仕事で開発する場合は避けては通れない部分ですね。
 
-細かい設定項目はありますが、最小コストとしてはライブラリの導入だけでデスクトップアプリをビルドすることができました。
+細かい設定項目はありますが、最小コストとしてはライブラリの導入だけでデスクトップアプリをビルドできました。
 
 ## ReactでElectronアプリをビルドする
 
@@ -577,7 +577,7 @@ Webアプリケーションとして一通りの機能を持ったアプリケ�
 
 ## Electronアプリの開発フロー
 
-上記の通り、Vue.jsとして動かしているときは問題なかったがビルドすると動かなくなった、というケースは少ないです。（0ではありません）
+上記の通り、Vue.jsとして動かしているときは問題なかったがビルドすると動かなくなった、というケースは少ないです（0ではありません）
 
 そのため、基本は完全にWeb開発の流れで、Vue.jsのホットリロードを効かせた状態でWebアプリとして開発しています。機能が出来上がった段階でElectronアプリケーションとしてビルドし、ビルドが通り、正常に動作するか確認するような形で開発を行うことが可能です。Electronアプリケーションとして起動しつつ、ホットリロードを行う[electron-reload](https://www.npmjs.com/package/electron-reload)のようなパッケージも存在します。万全を期すために、これを導入して常にElectronアプリケーションとして問題ないか検証しながら作業するようなフローにすることも可能かもしれません。導入コストや通常時の動作が重くなる可能性などを考慮し、私のチームでは現在導入していません。
 
@@ -587,7 +587,7 @@ ElectronはWebの技術で開発可能な、デスクトップアプリケーシ
 
 クロスプラットフォームで、フロントエンドライブラリに依存しない、デスクトップアプリケーションの開発プラットフォームがElectronです。ライブラリの導入以外でWeb開発と開発手法が大きく異なるようなことはありません。
 
-記事にするために整理したhello world状態のアプリケーション2種類をプライベートのgithubで公開しています。参考になれば、もしくはこれをベースに何かアプリケーションを作って頂ければ嬉しいです。
+記事にするために整理したhello world状態のアプリケーション2種類をプライベートのGitHubで公開しています。参考になれば、もしくはこれをベースに何かアプリケーションを作って頂ければ嬉しいです。
 
 * [vue-cli-electron-sample](https://github.com/maito1201/vue-cli-electron-sample)
 * [react-electron-sample](https://github.com/maito1201/react-electron-sample)

@@ -62,7 +62,7 @@ CircleCI の jobs 内で、markdown-link-check を呼び出します。
 
 [ツール本家の README](https://github.com/tcort/markdown-link-check#check-links-from-a-local-markdown-folder-recursive) に記載された `$ find . -name \*.md -exec markdown-link-check {} \;` による実行方法は、CircleCI で実行した際に欲しい挙動が得られません。リンク切れが1つでも存在したら Task failed で落として欲しいのですが、`-exec` による方法では「最初にチェックされたファイルに、リンク切れがある場合のみ」Task failed で落ちます。2つ目以降のファイルにリンク切れが存在しても、CircleCI は検知してくれません。
 
-CircleCI のチェックで、リンク切れファイルが**1つでも**存在する場合は Task failed で落としてもらうために、`xargs` を利用します。xargs を利用することで、対象ファイル全てに一括でリンターチェックが適用できます。（-exec の場合、1ファイルごとに処理されます。）
+CircleCI のチェックで、リンク切れファイルが**1つでも**存在する場合は Task failed で落としてもらうために、`xargs` を利用します。xargs を利用することで、対象ファイル全てに一括でリンターチェックが適用できます（-exec の場合、1ファイルごとに処理されます）。
 
 - 引用: [今さらながらfindパイセンについてまとめてみた（‐execオプション）](/articles/20210331/)
 

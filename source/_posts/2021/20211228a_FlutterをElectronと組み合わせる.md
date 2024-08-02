@@ -18,10 +18,10 @@ TIGの伊藤真彦です。
 
 # FlutterをElectronと組み合わせる
 
-* [入門記事](/articles/20211221a/): Flutterであればデスクトップアプリケーションを構築することができることを説明しました
+* [入門記事](/articles/20211221a/): Flutterであればデスクトップアプリケーションを構築できることを説明しました
 * [Electronの入門記事](/articles/20210107/): これも私が書きましたが、Electronもクロスプラットフォームのデスクトップアプリケーションを開発できるライブラリです
 
-ElectronはHTML、Javascriptをアセットとして利用してデスクトップアプリケーションとして動かすことができます、結論としてはFlutterアプリケーションをWEB向けにビルドして、その成果物をElectronアプリケーションとしてビルドすることができました。
+ElectronはHTML、JavaScriptをアセットとして利用してデスクトップアプリケーションとして動かすことができます、結論としてはFlutterアプリケーションをWeb向けにビルドして、その成果物をElectronアプリケーションとしてビルドできました。
 
 なぜそのような事を行うかというポイントですが2点あります。
 
@@ -37,7 +37,7 @@ Flutter on Desktopはまだまだリリースから間もないため、安心�
 
 <img src="/images/20211228a/image.png" alt="ビルドエラー" width="1200" height="937" loading="lazy">
 
-同じソースコードをWEB向けにビルドし、Electronに組み込むと問題なく動作します。
+同じソースコードをWeb向けにビルドし、Electronに組み込むと問題なく動作します。
 
 <img src="/images/20211228a/image_2.png" alt="ElectronでMap表示" width="1200" height="949" loading="lazy">
 
@@ -47,7 +47,7 @@ Flutter on Desktopのエコシステムが充実するまでの繋ぎとして�
 
 ビジネス要件的にどうしても必要な、Electronに向け最適化されたJavaScript、TypeScript製モジュールがありました。これらの資産をDart向けに作り直す必要をなくす、という意味でFlutter on Electronという組み合わせが実現できないかな、という検証を行ったという背景もあります。
 
-あまり頼りすぎるとFlutter on Desktopに本格移行する難易度が跳ね上がりますが、この組み合わせであれば既存の資産や豊富なnpmモジュールを活用することができます。
+あまり頼りすぎるとFlutter on Desktopに本格移行する難易度が跳ね上がりますが、この組み合わせであれば既存の資産や豊富なnpmモジュールを活用できます。
 
 # Flutter on Desktopのおさらい
 
@@ -81,7 +81,7 @@ flutter create .
 
 さて本題です。
 
-やる事自体はFlutterアプリケーションは素直にFlutter on the WEBとして開発し、ビルド成果物を組み込むElectronライブラリを用意する形です。作成したmyappフォルダと同じ階層にElectron部分を用意するフォルダを作成します、名前は`nodejs`フォルダにしておきます。
+やる事自体はFlutterアプリケーションは素直にFlutter on the Webとして開発し、ビルド成果物を組み込むElectronライブラリを用意する形です。作成したmyappフォルダと同じ階層にElectron部分を用意するフォルダを作成します、名前は`nodejs`フォルダにしておきます。
 
 ```sh
 project
@@ -139,7 +139,7 @@ cp -r ./build/web/ ../nodejs/src/
 sed -i -e 's/base href=\"\/\"/base href=\"\"/' ../nodejs/src/index.html
 ```
 
-Flutter on the Webには`index.html`に記載された`base`タグを参照してJavascriptのモジュールが動く仕組みになっています。
+Flutter on the Webには`index.html`に記載された`base`タグを参照してJavaScriptのモジュールが動く仕組みになっています。
 
 ```html index.html
   <!--
@@ -174,9 +174,9 @@ base-href should start and end with /
 
 仕方がないので一旦オプション無しでビルドして、sedコマンドで編集しています。
 
-`index.html`のテンプレートを変更してしまっても良いですが、Flutter側の変更は控えることでElectronとFlutterの関係性をなるべく疎結合なものに保ちたい意図があります。ともかくこれだけの変更でFlutter on the WEB向けにビルドしたファイルがElectronのアセットファイルとして利用できます。
+`index.html`のテンプレートを変更してしまっても良いですが、Flutter側の変更は控えることでElectronとFlutterの関係性をなるべく疎結合なものに保ちたい意図があります。ともかくこれだけの変更でFlutter on the Web向けにビルドしたファイルがElectronのアセットファイルとして利用できます。
 
-あとは`package.json`に追加したコマンドで指定している場所(nodejs/src)に`background.js`を配置しておきます。中身はよくあるElectron向けの起動スクリプトです。個人的にはVue.js向けのElectronプラグインが生成してくれるファイルが一番気が利いていると感じているのですが、MacOSでのエッジケース向けの挙動などはそこから拝借しています。
+あとは`package.json`に追加したコマンドで指定している場所(nodejs/src)に`background.js`を配置しておきます。中身はよくあるElectron向けの起動スクリプトです。個人的にはVue.js向けのElectronプラグインが生成してくれるファイルが一番気が利いていると感じているのですが、Mac OSでのエッジケース向けの挙動などはそこから拝借しています。
 
 ```js background.js
 const electron = require('electron');
@@ -262,6 +262,6 @@ Flutter on Desktopとして起動したものと比較すると、微妙にフ�
 # まとめ
 
 * Flutter on Desktop未対応のパッケージはまだ存在する
-* Flutter on the WEBとElectronの組み合わせは簡単に実現できる
+* Flutter on the WebとElectronの組み合わせは簡単に実現できる
 
 なかなかトリッキーな試みでブログ記事にするか迷いましたが、面白いという意見をいただけたのと意外と需要があるかも...?ということで記事にしてみました。

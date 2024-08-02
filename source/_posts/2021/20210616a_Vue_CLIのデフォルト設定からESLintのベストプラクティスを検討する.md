@@ -42,7 +42,7 @@ Linterとは、ソースコードを静的解析し、問題点を指摘、ま�
 
 開発を行う上で、敢えてLinterを利用しない選択をする事は少ないのではないでしょうか。
 
-Vue.js、Reactなど、node.jsを用いたアプリケーションの開発では、[ESLint](https://eslint.org/)が利用できます。
+Vue.js、Reactなど、Node.jsを用いたアプリケーションの開発では、[ESLint](https://eslint.org/)が利用できます。
 
 # Linterの設定
 
@@ -103,7 +103,7 @@ Linter/Formatter無しの状態とpackage.jsonを比較してみます。
 
 `scripts`の設定にに`lint`コマンドが追加されています。
 
-これにより`npm run lint`コマンドでLinterの指摘事項を確認する事ができます。
+これにより`npm run lint`コマンドでLinterの指摘事項を確認できます。
 `npm run lint --fix`コマンドで、ある程度自動フォーマットすることも可能です。
 
 またeslintの各種プラグインがインストールされています。
@@ -141,7 +141,7 @@ ESLintに加え、[Prettier](https://prettier.io/)も有効にした状態を確
 
 [Prettier](https://prettier.io/)とは、HTMLやVue.js等各種ファイル、フレームワークの記法に対応したフォーマットルールが適用可能なプラグインです。
 
-ESLintは、Prettierと比較するとJavascriptの言語としてのコーディングのみにフォーカスしたLinterであると言えます。  Prettierも有効にすることで、HTMLテンプレート部分のコードなどもフォーマット可能になります。
+ESLintは、Prettierと比較するとJavaScriptの言語としてのコーディングのみにフォーカスしたLinterであると言えます。  Prettierも有効にすることで、HTMLテンプレート部分のコードなどもフォーマット可能になります。
 
 このオプションを有効にすると、package.jsonにPrettierも追加されている事が確認できます。
 

@@ -71,7 +71,7 @@ Consumber group 別の offset 管理を行う実装として、 `EventProcessorC
 
 ちなみに、旧版の`EventProcessorHost` (`azure-eventhubs` )でも同様のことができますが、他 API との実装の一貫性のために新版への移行が推奨されています。([参考](https://github.com/Azure/azure-sdk-for-java/blob/master/sdk/servicebus/azure-messaging-servicebus/migration-guide.md#migration-benefits))
 
-実際の動きとしては、各 Consumer ごとに partition を自動で割り当ててメッセージ取得処理をします。Consumer は 1 つ以上の partition を保持することができます。また、Consumer の増減にも対応し自動で再割り振りをしてくれます。注意点として、Consumer と partition が 1対n 対応する都合上、 Consumer と partition が同一数までしかスケールアウトせず、同一数以上に Consumer を増やしても、増やした Consumer はメッセージ受信処理をしません。
+実際の動きとしては、各 Consumer ごとに partition を自動で割り当ててメッセージ取得処理をします。Consumer は 1 つ以上の partition を保持できます。また、Consumer の増減にも対応し自動で再割り振りをしてくれます。注意点として、Consumer と partition が 1対n 対応する都合上、 Consumer と partition が同一数までしかスケールアウトせず、同一数以上に Consumer を増やしても、増やした Consumer はメッセージ受信処理をしません。
 
 ### どういった実装になっているのか？
 
@@ -161,7 +161,7 @@ Event Hubs の実装は、 **Kafka ではない** とドキュメントに記載
 
 https://docs.microsoft.com/ja-jp/azure/event-hubs/apache-kafka-frequently-asked-questions
 
-ただ、Kafka API との互換性があるため、Pub/Sub の実装は Kafka のソースコードを利用することができます。
+ただ、Kafka API との互換性があるため、Pub/Sub の実装は Kafka のソースコードを利用できます。
 
 ## 接続プロトコル
 

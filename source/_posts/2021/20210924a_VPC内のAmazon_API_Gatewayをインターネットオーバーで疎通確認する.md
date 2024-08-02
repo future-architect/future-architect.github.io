@@ -15,7 +15,7 @@ lede: " Gateway+Lambda という構成でWebAPI開発を行う際、ちょっと
 ---
 # はじめに
 
-TIG DXユニットの真野です。AWSのAPI Gateway+Lambda という構成でWebAPI開発を行う際、ちょっと便利に使える疎通方法をまとめます。
+TIG DXユニットの真野です。AWSのAPI Gateway+Lambda という構成でWeb API開発を行う際、ちょっと便利に使える疎通方法をまとめます。
 
 ## 背景
 
@@ -117,7 +117,7 @@ map[Content-Type:application/json Vary:Accept-Encoding X-Amzn-Trace-Id:Root=1-67
 {"message":"OK"}
 ```
 
-awscli側のapigateway test-invoke-methodに慣れておけば、インターフェースで悩むことはほぼ無いと思います。
+awscli側のapigateway test-invoke-methodに慣れておけば、インタフェースで悩むことはほぼ無いと思います。
 取得結果のステータスコードや応答ボディなどは *int64や*string でポインタなので一瞬戸惑うくらいでしょうか。
 
 ## まとめ

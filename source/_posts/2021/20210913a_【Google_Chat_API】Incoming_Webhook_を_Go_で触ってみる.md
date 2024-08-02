@@ -31,7 +31,7 @@ lede: "こんにちは、Engineer Campにてインターン中の山本です。
 以上を踏まえて、この記事では以下の事柄について説明していきます。
 
 - Webhookを使用しGoでメッセージを送信する方法
-- 投稿を一つのスレッドにまとめる方法
+- 投稿を1つのスレッドにまとめる方法
 - カード型メッセージの送信方法
 
 <img src="/images/20210913a/スクリーンショット_2021-09-07_17.18.14.png" alt="カード型メッセージ投稿例" width="476" height="598" loading="lazy">
@@ -42,7 +42,7 @@ lede: "こんにちは、Engineer Campにてインターン中の山本です。
 
 Google Chat API とは、Google Chat で Bot を通じて機能の実装、拡張を支援する API です。
 
-Google Hangoutsとの関連は以下のようになっています。（[Wikipediaより引用](https://ja.wikipedia.org/wiki/Google_%E3%83%8F%E3%83%B3%E3%82%B0%E3%82%A2%E3%82%A6%E3%83%88)）
+Google Hangoutsとの関連は以下のようになっています（[Wikipediaより引用](https://ja.wikipedia.org/wiki/Google_%E3%83%8F%E3%83%B3%E3%82%B0%E3%82%A2%E3%82%A6%E3%83%88)）
 >2020年4月、ビデオ会議機能を「Google Meet」、チャット機能を「Google Chat」としてそれぞれ分離。残されたテキストメッセージ機能については、2020年後半を目処にGoogle Chatに統合し、ハングアウトは廃止される予定である。
 
 ユースケースとしては、
@@ -126,7 +126,7 @@ func main() {
 
 投稿に対して返信をしない場合など、スレッドをいちいち作成する必要がないケースについては、同一スレッドにメッセージを投稿した方が見た目がスッキリする場合もあります。
 
-Webhook URLにスレッドに関するクエリパラメータを追加することで投稿するスレッドを一つに指定することができます。（[参照](https://developers.google.com/chat/how-tos/bots-develop#thread_key)）
+Webhook URLにスレッドに関するクエリパラメータを追加することで投稿するスレッドを1つに指定できます（[参照](https://developers.google.com/chat/how-tos/bots-develop#thread_key)）
 
 ```go
 const webhook = "<任意のWebhookURL>&threadKey=<適当な文字列>"
@@ -312,9 +312,9 @@ func main() {
 
 長々とコードが書かれていますが、シンプルなメッセージで紹介したプログラムと行っていることは変わらず、json.MarshalしたときにGoogle Chatが求めている形になるようにGoの構造体に値を詰めて渡しています。
 
-それぞれの要素の関係をわかりやすく図にすると以下のようになります。（厳密には異なります）
+それぞれの要素の関係をわかりやすく図にすると以下のようになります（厳密には異なります）
 
-Cardの中には一つ以上のSectionが、Sectionの中には一つ以上のWidgetが必要になります。Widgetの中にはTextParagraphやKeyValue、Buttonの配列などの中から一つの要素が入ります。
+Cardの中には1つ以上のSectionが、Sectionの中には1つ以上のウィジェットが必要になります。ウィジェットの中にはTextParagraphやKeyValue、Buttonの配列などの中から1つの要素が入ります。
 <img src="/images/20210913a/screenshot_card_message.png" alt="screenshot_card_message" width="1200" height="654" loading="lazy">
 
 出力結果がこちらです。

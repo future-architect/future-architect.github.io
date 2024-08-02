@@ -37,7 +37,7 @@ lede: "この記事は温度と湿度、不快指数を定期投稿するbotの�
 
 MQTTを使用して、室内温度を定点観測するだけならば以上の記事で十分ですが、ここまで作成してふと思いました。
 
-**「室内温度を知りたいのに2時間も待てない。。。」**
+**「室内温度を知りたいのに2時間も待てない」**
 
 上記の記事では、定期的にworkerを実行する構成としたため、能動的に温度や湿度を知ることができないのです。
 
@@ -73,7 +73,7 @@ AWS IoTからMQTTでコマンドを送信し、Subscriberではコマンド受�
 
 # 開発環境
 
-開発はwindows10環境、WSL2上で行いました。標準モジュール以外で使用したものを以下に列挙します。(※前回記事との差分です)
+開発はWindows10環境、WSL2上で行いました。標準モジュール以外で使用したものを以下に列挙します。(※前回記事との差分です)
 
 ## ハードウェア
 
@@ -105,7 +105,7 @@ AWS IoTからMQTTでコマンドを送信し、Subscriberではコマンド受�
 
 PythonでAWS IoTをSubscribeします。使用するPythonモジュールは[eclipse/paho\.mqtt\.python: paho\.mqtt\.python](https://github.com/eclipse/paho.mqtt.python)です。
 
-モジュールの使い方はREADMEに記載されています。Getting Startedをコピペしたものが以下のスクリプトです。
+モジュールの使い方はREADMEに記載されています。Getting Startedをコピー&ペーストしたものが以下のスクリプトです。
 
 ```python main.py
 import paho.mqtt.client
@@ -159,7 +159,7 @@ if __name__ == '__main__':
 
 大事なことなのでもう一度言います。
 
-**「AWS Lambdaのリージョンは「オレゴン」としてください。」**
+**「AWS Lambdaのリージョンは「オレゴン」としてください」**
 
 まずはLambdaに設定するIAMロールを作成します。
 
@@ -232,7 +232,7 @@ def lambda_handler(event, context):
 ## 3. Alexa Home Skillでスキルを作成する
 
 Alexa Home Skillを作成する前にAmazon　Developerアカウントを作成します。Amazon DeveloperアカウントやAlexa Developerコンソールを使用した経験がある方も本章の内容確認は必ず行ってください。**特に、amazon.comでの購入経験がある方は要注意です。**ここで手順を誤ってしまうと無限に時間を溶かします。
-（私は溶かしました。）
+（私は溶かしました）。
 
 泥沼の中から私を救ってくれた記事はこちらです。
 
@@ -304,7 +304,7 @@ Alexaのリダイレクト先のURLには3つのURLが記載されていると�
 
 次に[Amazon開発者ポータル](https://developer.amazon.com/ja/)にて先ほどの3つのURLを設定します。
 
-「許可された返信URL」に先ほどメモしたURLを一つずつ登録します。
+「許可された返信URL」に先ほどメモしたURLを1つずつ登録します。
 <img src="/images/20211001a/skill3.png" alt="skill3.png" width="1200" height="402" loading="lazy">
 
 次が最後の設定項目です。Alexa Developerコンソールのスマートホーム画面にてスキルIDをコピーしてください。こちらをAWS Lambdaのトリガーに設定することで連携の完了です。
@@ -401,7 +401,7 @@ def send_command() :
 
 ここまで変更ができたら関数をデプロイしましょう。
 
-サンプルコードのpythonディレクトリをzip化してAWS Lambdaにアップロードしてください。この時handler関数の設定は`lambda.lambda_handler`としてください。
+サンプルコードのPythonディレクトリをzip化してAWS Lambdaにアップロードしてください。この時handler関数の設定は`lambda.lambda_handler`としてください。
 
 ## 6. Alexaアプリと連携する
 

@@ -38,7 +38,7 @@ TIG DXチームの多賀です。[Good First Issue](https://goodfirstissue.dev/)
 1. [Good First Issue](https://goodfirstissue.dev/) で [go-swagger](https://github.com/go-swagger/go-swagger) を発見
     * GitHub の Issue からのラベル絞り込みを試していましたが、対象も多くイマイチ決めきれていないところで、[Good First Issue](https://goodfirstissue.dev/)  を見つけました。`good first issue` を言語別に検索できるということで、 得意な `Go` 言語で絞り込んでみました。その結果、たまたま PJ 等でよく利用していた [go-swaggeer](https://github.com/go-swagger/go-swagger) が上位に出てきました。ライブラリの利用時にコードもある程度読んで、なんとなく理解していたので、これならわかるかもと思い Issue をいくつか見てみました。
 2. 解決したいIssue を発見
-    * いくつか Issue を参照した中で、ひとつの Issue ([Can't configure content type in generated client · Issue #1924 · go-swagger/go-swagger](https://github.com/go-swagger/go-swagger/issues/1924) )が目に止まりました。 Issue の詳細を読んでいく中で、「そういえば以前使った際に、生成された Client コードが使いづらかったな」ということを思い出し、 **この機能欲しいな** と思っていました。また、Issue をよく見ると `good first issue` がついているだけあって、作者から直しの方針がコードベースで記載されていて、後はこのコードを入れ込むだけでした。これなら、自分でもできると思い対応してみることにしました。
+    * いくつか Issue を参照した中で、ひとつの Issue ([Can't configure content type in generated client · Issue #1924 · go-swagger/go-swagger](https://github.com/go-swagger/go-swagger/issues/1924) )が目に留まりました。 Issue の詳細を読んでいく中で、「そういえば以前使った際に、生成された Client コードが使いづらかったな」ということを思い出し、 **この機能欲しいな** と思っていました。また、Issue をよく見ると `good first issue` がついているだけあって、作者から直しの方針がコードベースで記載されていて、後はこのコードを入れ込むだけでした。これなら、自分でもできると思い対応してみることにしました。
 
 ### Issue を見つけて PR を送るまで
 
@@ -48,7 +48,7 @@ TIG DXチームの多賀です。[Good First Issue](https://goodfirstissue.dev/)
 * swagger コマンドに含まれるテンプレートファイルの更新
  	* go-swagger では [kevinburke/go-bindata](https://github.com/kevinburke/go-bindata) を利用して、build 時にテンプレートファイルを含めるようになっていました (余談: Go 1.16 から変わるかもですね。)
 
-修正して動作確認がとれたので、 master ブランチに commit しました。このままだと PR が送れないと気づいたので自分の GitHub アカウントに Fork して、remote を追加して git push しました。
+修正して動作確認がとれたので、 master ブランチに commit しました。このままだと PR が送れないと気づいたので自分の GitHub アカウントに Fork して、remote を追加して Git push しました。
 PR を送ろうかと考えていたとき、 go-swagger のコントリビュート方針があるのではと気づいたので、リポジトリを探してみると、`.github` ディレクトリ以下に、 [CONTRIBUTING.md](https://github.com/gmidorii/go-swagger/blob/master/.github/CONTRIBUTING.md) がありました。[CONTRIBUTING.md](https://github.com/gmidorii/go-swagger/blob/master/.github/CONTRIBUTING.md) にリンクされる形で、 [Guidelines to maintainers](https://github.com/gmidorii/go-swagger/blob/master/docs/guidelines/README.md) を見つけました。
 
 ガイドを読んでいると、[Guidelines to maintainers](https://github.com/gmidorii/go-swagger/blob/master/docs/guidelines/README.md) に、PR の Rule があり、 `Draft PR` を上げてレビュー前に CI チェックしても良いとあったので、テスト修正対象の特定をしたく、ひとまず `Draft PR` を作ってみました。すると、テスト以外の CI が失敗していました。 失敗した CI とガイドを再度見返すと 「[sign off](https://git-scm.com/docs/git-commit#Documentation/git-commit.txt--s)」を commit へ入れてくれと記載があることに気づきました。CI のエラーメッセージを参考にしつつ commit を amend して直してみたところ、おそらく rebase で HEAD から戻すコミット数をミスしており、commit の状態が壊れてしまいました (ここは未だに細かくわかっていないです)。
@@ -57,7 +57,7 @@ commit の状態を復元するのに時間を使うか、修正箇所が少な�
 
 <img src="/images/20210205/Pasted_image_20210203191633.png" loading="lazy">
 
-あとで、説明を追加すればよいかと思い、1日程度置いていると、レビュワーの方から `Approve` されてました。レビュワーの方から「どうして Draft なのか ?」と聞かれていたので、「CIを見たかったから」と返しつつ `Approve` 出ているので良いだろうと思い、そのまま `Open` にしました。
+あとで、説明を追加すればよいかと思い、1日程度置いていると、レビュアの方から `Approve` されてました。レビュアの方から「どうして Draft なのか ?」と聞かれていたので、「CIを見たかったから」と返しつつ `Approve` 出ているので良いだろうと思い、そのまま `Open` にしました。
 また 1日後にみると、マージされていて、無事コントリビュートに成功しました。
 
 ## 振り返り
@@ -71,7 +71,7 @@ commit の状態を復元するのに時間を使うか、修正箇所が少な�
 * 「利用したことがあるライブラリ/ツール」であること
 * Issue を見たときに「この機能欲しい/直したい」と思えること
 
-最初にコントリビュートするにあたって、「初めての壁」はどうしてもあります。壁突破の一つのやり方として、うまくモチベーション作る方法があるかなと思います。
+最初にコントリビュートするにあたって、「初めての壁」はどうしてもあります。壁突破の1つのやり方として、うまくモチベーション作る方法があるかなと思います。
 この2点をクリアすることで、いい感じのモチベーションが生まれたなと思いました。
 
 実際の手順に落とし込むと、以下の形が良さそうです。
@@ -90,7 +90,7 @@ commit の状態を復元するのに時間を使うか、修正箇所が少な�
 2. master ブランチに直修正しない
     Fork 先へ push するので問題ないかと思い master にしてましたが、Fork 元の master の状態がなくなり修正が効かなくなるので、ブランチは何かしら切ったほうが良さそうでした。その際、ブランチの切り方にルールがないかガイドを確認するべきですね。
 3. Draft PR でも参照されるので説明を書く
-    レビュワーにもよりそうですが、Draft でも見られることがあるので、多少なりとも説明は書いておいたほうがより通りやすくなりそうです。
+    レビュアにもよりそうですが、Draft でも見られることがあるので、多少なりとも説明は書いておいたほうがより通りやすくなりそうです。
     今回は Issue 側に細かく書いてあったので、なくてもなんとかなったのかなと思いました。
 
 ## 所感

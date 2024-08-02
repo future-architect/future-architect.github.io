@@ -39,7 +39,7 @@ https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio
 
 DDLからDraｗ.ioのERDを作れます。
 
-凄く便利！と思うのですが、リレーション貼れなかったりあと1歩な感じです。
+凄く便利！ と思うのですが、リレーション貼れなかったりあと1歩な感じです。
 
 https://drawio-app.com/sql-plugin/
 

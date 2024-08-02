@@ -25,8 +25,8 @@ Glueといっても大きく下記の３種類、処理系をいれると4種類
 
 - AWS Glue
   - Spark（実装はPython or scala）
-  - python shell (Pythonのみ)
-    - python shellを利用る場合、[1/16DPU](https://aws.amazon.com/jp/about-aws/whats-new/2019/01/introducing-python-shell-jobs-in-aws-glue/)で動かせるため、時間制約のないサーバレス処理としても優秀に思えます。
+  - Python shell (Pythonのみ)
+    - Python shellを利用る場合、[1/16DPU](https://aws.amazon.com/jp/about-aws/whats-new/2019/01/introducing-python-shell-jobs-in-aws-glue/)で動かせるため、時間制約のないサーバレス処理としても優秀に思えます。
     - 料金は[こちら](https://aws.amazon.com/jp/glue/pricing/)をご覧ください
 - AWS Glue Data Catalog
   - Hive MetaStore

@@ -16,7 +16,7 @@ lede: "RedmineとGitLabリポジトリを連携するRedmine GitLab Adapter Plug
 
 ## はじめに
 
-​
+
 こんにちは、TIGコアテクノロジーユニットの高橋・小松です。
 
 RedmineとGitLabリポジトリを連携する[Redmine GitLab Adapter Plugin](https://github.com/future-architect/redmine_gitlab_adapter)を開発しましたので紹介させていただきます。
@@ -31,17 +31,17 @@ RedmineとGitLabリポジトリを連携する[Redmine GitLab Adapter Plugin](ht
 
 Gitリポジトリ登録機能ですが、Redmineサーバ上で直接Gitリポジトリを読み取ることができないといけません。大きく以下の2つの方式が採られることが多いようです。
 
-①bareリポジトリをRedmineサーバ上にコピーし、定期的にリポジトリの更新を反映させる
+（1）bareリポジトリをRedmineサーバ上にコピーし、定期的にリポジトリの更新を反映させる
 
 <img src="/images/20210908a/1.png" alt="1.png" width="507" height="320" loading="lazy">
 
-②リポジトリサーバをNFSマウントしRedmineサーバ上から直接参照できるようにする
+（2）リポジトリサーバをNFSマウントしRedmineサーバ上から直接参照できるようにする
 
 <img src="/images/20210908a/2.png" alt="2.png" width="514" height="326" loading="lazy">
 
 当社では主にNFS方式で直接参照させるような構成を取っていました。
 
-NFSマウントがあるというだけでサーバの起動順番を意識しないといけないですし障害ポイントにもなりやすいです。また[最近のGitLabのバージョンアップでストレージパスがハッシュ値に変更](https://gitlab-docs.creationline.com/ce/administration/repository_storage_types.html#hashed-storage)され、GitLabサーバ管理者でないと登録困難な状況になってしまいました。​
+NFSマウントがあるというだけでサーバの起動順番を意識しないといけないですし障害ポイントにもなりやすいです。また[最近のGitLabのバージョンアップでストレージパスがハッシュ値に変更](https://gitlab-docs.creationline.com/ce/administration/repository_storage_types.html#hashed-storage)され、GitLabサーバ管理者でないと登録困難な状況になってしまいました。
 
 <img src="/images/20210908a/ハッシュ値.png" alt="ハッシュ値.png" width="753" height="138" loading="lazy">
 
@@ -60,7 +60,7 @@ httpプロキシを経由する場合やコンテキストルートを独自に�
 
 ## 実装のポイント
 
-従来方式ではgit logコマンドで指定した開始リビジョン番号と終了リビジョン番号の間のコメントだけを一括取得できます。一方GitLab APIではリビジョン番号の指定ではなく、指定日時の期間で取得することができます。また一回のAPI実行で最大100個のコミット情報しか取得できません。
+従来方式ではGit logコマンドで指定した開始リビジョン番号と終了リビジョン番号の間のコメントだけを一括取得できます。一方GitLab APIではリビジョン番号の指定ではなく、指定日時の期間で取得できます。また1回のAPI実行で最大100個のコミット情報しか取得できません。
 
 よって最初の取り込みでは、一番古いコミット情報から一定数をchangesetsへ取り込み、取り込んだ分のコミット最終時刻をrepositoriesテーブルのextra_infoに記録しておきます。その後fetch_changesetsコマンドが実行される度に記録されたコミット時刻を参照し、その時刻からのコミット情報を500件ごとにchangesetsテーブルに取り込む動作になっています。
 
@@ -111,7 +111,7 @@ httpプロキシを経由する場合やコンテキストルートを独自に�
 1. Redmineプロジェクト管理者でログインしてください。
 2. 対象プロジェクトの「設定」->「リポジトリ」-> 「新しいリポジトリ」の画面を開いてください。
 3. 「バージョン管理システム」プルダウンメニューから「GitLab」を選択してください。
-4. 「URL」にgit clone対象のGitLabリポジトリURLを入力してください。
+4. 「URL」にGit clone対象のGitLabリポジトリURLを入力してください。
 5. 「API Token」に先ほど取得したGitLab APIアクセストークンを入力してください。
 6. GitLabのURLにコンテキストパスが含まれている場合は、「Root URL」にコンテキストパスまでを含めたURLを入力してください。
 7. 「作成」をクリックして、保存してください。
@@ -139,7 +139,7 @@ GitLabのURLにコンテキストパスが含まれている場合は
 ### 8. 補足
 
 本プラグインでRedmineへ新規にGitLabリポジトリを登録するとデータのロードが完了するまでは画面表示に時間がかかることがあります。リポジトリ画面へのアクセス、もしくはfetch_changesetsの実行により500件ごとにRedmineDBへロードされます。従来でも必要ですが同様にcron等でfetch_changesetsを定期実行するようにしてください。
-​
+
 
 ## 動作確認
 
@@ -149,7 +149,7 @@ Redmineのリポジトリタブを選択して以下のような画面が表示�
 
 ## おわりに
 
-このプラグインによって長年の課題であったNFSマウントを一つ減らすことができました。
+このプラグインによって長年の課題であったNFSマウントを1つ減らすことができました。
 
 [Github](https://github.com/future-architect/redmine_gitlab_adapter)からダウンロード可能ですのでぜひお試しください。Pull Requestもお待ちしております。
 

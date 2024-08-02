@@ -66,7 +66,7 @@ Tax: 50.00(5)%
 
 ## GetCostAndUsage API
 
-[AWS Cost Explorer](https://aws.amazon.com/jp/aws-cost-management/aws-cost-explorer/)が提供するAPIで、指定した期間のアカウントに紐づくAWSの利用料金を取得することができます。パラメータの指定方法など詳細は、[ドキュメント](https://docs.aws.amazon.com/ja_jp/aws-cost-management/latest/APIReference/API_GetCostAndUsage.html)を参照ください。
+[AWS Cost Explorer](https://aws.amazon.com/jp/aws-cost-management/aws-cost-explorer/)が提供するAPIで、指定した期間のアカウントに紐づくAWSの利用料金を取得できます。パラメータの指定方法など詳細は、[ドキュメント](https://docs.aws.amazon.com/ja_jp/aws-cost-management/latest/APIReference/API_GetCostAndUsage.html)を参照ください。
 
 ここでは、1ヶ月分のAWS各サービスの利用料金を取得する場合のGo言語の場合のサンプルを載せておきます。
 注意点として、このAPIは`us-east-1`でのみ提供されるのでLambdaを`ap-northeast-1`などにデプロイしている場合でもAPIを呼び出す際には必ず`us-east-1`を指定する必要があります。
