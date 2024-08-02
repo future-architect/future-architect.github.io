@@ -55,7 +55,7 @@ DynamoDBは2018年に[トランザクションがサポート](https://aws.amazo
 ## DynamoDBにおける対応策
 
 まず前提としてお伝えしておきたいのが、DynamoDBのトランザクション機能はこの書き込みスキューを回避するために利用できるものではありません。
-（後述するように副次的に利用するケースはあります。）
+（後述するように副次的に利用するケースはあります）。
 
 一般的に書き込みスキューはトランザクション分離レベルがSERIALIZABLE（直列化可能）なら回避可能であり、DynamoDBのトランザクションについて調べると、[トランザクション分離レベルはSERIALIZABLE](https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/transaction-apis.html#transaction-isolation)となっています。
 しかしながら、間違ってもドキュメントだけを読んで、これで大丈夫だと思わないようにしてください。
@@ -67,7 +67,7 @@ DynamoDBが提供するトランザクションに依存しない方法で対応
 ### 対応案1: 集計・集約処理の直列化
 
 対応案のひとつとして、集計・集約処理（今回の例の場合、申し込み人数が3人を超過しているかどうかのチェック）を直列化する方法が挙げられます。
-例えばDynamoDB Streamsを利用することで、パーティション単位に、データの変更の発生順に処理を直列化して、非同期実行することができます。
+例えばDynamoDB Streamsを利用することで、パーティション単位に、データの変更の発生順に処理を直列化して、非同期実行できます。
 
 <img src="/images/20220906a/DynamoDB_Write_Skew_Example_2.drawio.png" alt="DynamoDB_Write_Skew_Example_2.drawio.png" width="1101" height="341" loading="lazy">
 
@@ -83,8 +83,8 @@ DynamoDBが提供するトランザクションに依存しない方法で対応
 
 ### 対応案2: Conditional Update による擬似的な直列化
 
-DynamoDBは[Conditional Update（条件付きの書き込み）](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html)を利用することで、楽観的排他制御を実現し、書き込み処理を擬似的に直列化することができます。
-ただし今回のように特定の条件を満たす行が**存在しないこと**が条件となっていて、書き込みによってその条件を満たす行が**追加**されるケースにおいては、そもそも楽観ロック対象となるレコードが存在しないため、単純に Conditional Update を適用することができません。
+DynamoDBは[Conditional Update（条件付きの書き込み）](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html)を利用することで、楽観的排他制御を実現し、書き込み処理を擬似的に直列化できます。
+ただし今回のように特定の条件を満たす行が**存在しないこと**が条件となっていて、書き込みによってその条件を満たす行が**追加**されるケースにおいては、そもそも楽観ロック対象となるレコードが存在しないため、単純に Conditional Update を適用できません。
 
 以下、具体的な方法について説明します。
 
@@ -95,13 +95,13 @@ DynamoDBは[Conditional Update（条件付きの書き込み）](https://docs.aw
 
 <img src="/images/20220906a/DynamoDB_Write_Skew_Example_3.drawio.png" alt="DynamoDB_Write_Skew_Example_3.drawio.png" width="1081" height="211" loading="lazy">
 
-これによりConditional Updateを利用して書き込みスキューを回避することができます。
+これによりConditional Updateを利用して書き込みスキューを回避できます。
 具体的な処理の流れは下記のとおりとなります。
 
 <img src="/images/20220906a/DynamoDB_Write_Skew_Example_4.drawio.png" alt="DynamoDB_Write_Skew_Example_4.drawio.png" width="1101" height="341" loading="lazy">
 
 1. ユーザからの申し込み要求が行われた場合に、テーブルから対象イベント（EVENT01）のレコードを取得します。
-このときDynamoDBの[Consistent Read](https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html)を利用して、 一貫性のあるデータの読み取りを行う必要があります。これを行わないと最新の書き込みデータを読み込むことが保証できず、楽観的排他制御を正しく実現することができません。
+このときDynamoDBの[Consistent Read](https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html)を利用して、 一貫性のあるデータの読み取りを行う必要があります。これを行わないと最新の書き込みデータを読み込むことが保証できず、楽観的排他制御を正しく実現できません。
 2. レコードが存在しない、または申込者数（Count）が3件未満の場合は処理を継続し、3件以上の場合はエラーを返却します。
 3. 処理を継続する場合は、各カラムの値を設定して Conditional Update を行います。
 ここでの条件は **「キー（Event ID: EVENT01）が存在しない」** または **「キー（Event ID: EVENT01）が存在し、Versionカラムの値が `1` である」** ことになります。
@@ -110,7 +110,7 @@ DynamoDBは[Conditional Update（条件付きの書き込み）](https://docs.aw
 ユーザBが書き込みを行うタイミングでは、更新対象のレコードのバージョンは `2` となっているため、条件に合致せず更新処理が失敗する形になります。
 
 このようにテーブルの構造を変更することが可能な場合は、書き込みスキューに対する有効な対応策となります。
-一方で、要件上、元のテーブルの構造を変更することができないケースも往々にしてあるでしょう。例えば今回のケースでいうと、ユーザをキーとしたGSIを設定することで、ユーザ単位で申し込みをしているイベントの一覧を取得したいケースなどが考えられます。
+一方で、要件上、元のテーブルの構造を変更できないケースも往々にしてあるでしょう。例えば今回のケースでいうと、ユーザをキーとしたGSIを設定することで、ユーザ単位で申し込みをしているイベントの一覧を取得したいケースなどが考えられます。
 
 そのような場合は次に紹介するような対応が考えられます。
 

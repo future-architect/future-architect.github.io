@@ -46,7 +46,7 @@ TIG DXユニットの真野です。[夏休み自由研究連載](/articles/2022
 
 ## FUSEとは
 
-FUSEとはFilesystem in Userspaceの略で、ユーザーランドで手軽に動作するファイルシステムを作成するための仕組みです。FUSEではカーネルがファイルなどの操作のシステムコールを、ユーザーランド側で動作しているプロセスに転送する仕組みで、決められたインターフェースを実装すると、手軽にファイルシステムを実装できます。同僚の澁川さん著作な[Goならわかるシステムプログラミング 第2版](https://www.lambdanote.com/products/go-2) の10章にも触れられています。
+FUSEとはFilesystem in Userspaceの略で、ユーザーランドで手軽に動作するファイルシステムを作成するための仕組みです。FUSEではカーネルがファイルなどの操作のシステムコールを、ユーザーランド側で動作しているプロセスに転送する仕組みで、決められたインタフェースを実装すると、手軽にファイルシステムを実装できます。同僚の澁川さん著作な[Goならわかるシステムプログラミング 第2版](https://www.lambdanote.com/products/go-2) の10章にも触れられています。
 
 下図は[Wikipedia](https://ja.wikipedia.org/wiki/Filesystem_in_Userspace)より引用した動作イメージです。左上の `ls -l` をされると、カーネルにシステム要求が飛び、それをFUSEの仕組みを経由してユーザーランドのアプリケーションが応答するような流れです。
 
@@ -86,9 +86,9 @@ awscliでファイルを予め登録したファイル(hello.txt)を確認→マ
 デモは以下のことをしています。
 
 1. 左のウィンドウで `localstackmount` を起動
-1. 真ん中のウインドウで、 awscliの `s3 api list-buckets` でバケットの一覧、`s3 ls --recursive` と `s3 cp` コマンドでファイルをダウンロードし表示
-1. 右のウインドウで、LocalStackをマウントしたディレクトリにアクセスし、先程ダウンロードしたファイルを編集・保存
-1. 真ん中のウインドウに戻って、マウント経由で編集したファイルをaws cli経由で再度ダウンロードし、編集結果が反映されていることを確認
+1. 真ん中のウィンドウで、 awscliの `s3 api list-buckets` でバケットの一覧、`s3 ls --recursive` と `s3 cp` コマンドでファイルをダウンロードし表示
+1. 右のウィンドウで、LocalStackをマウントしたディレクトリにアクセスし、先程ダウンロードしたファイルを編集・保存
+1. 真ん中のウィンドウに戻って、マウント経由で編集したファイルをaws cli経由で再度ダウンロードし、編集結果が反映されていることを確認
 
 <img src="/images/20220829a/demo1.gif" alt="" width="1200" height="502" loading="lazy">
 
@@ -157,7 +157,7 @@ type FileSystem interface {
 }
 ```
 
-多すぎて大変！って思われた方も大丈夫です。
+多すぎて大変！ って思われた方も大丈夫です。
 
 すべてを実装しなくても、`pathfs.NewDefaultFileSystem()` と言う一律 `fuse.ENOSYS(Function not implemented)` を返すデフォルト実装があるためこれを組み込んで、必要なものだけ順次、動作を確認しながら実装できます。
 
@@ -175,7 +175,7 @@ func (f *FileSystem) GetAttr(name string, ctx *fuse.Context) (*fuse.Attr, fuse.S
 }
 ```
 
-あと、`Open` など `nodefs.File` を返すのですが、こういったインターフェースです。実際にファイルへの追記・編集で使われます（例えばファイルを編集して保存するとWrite、Flush、Releaseが呼ばれます）。
+あと、`Open` など `nodefs.File` を返すのですが、こういったインタフェースです。実際にファイルへの追記・編集で使われます（例えばファイルを編集して保存するとWrite、Flush、Releaseが呼ばれます）。
 
 ```go
 type File interface {
@@ -206,7 +206,7 @@ type File interface {
 }
 ```
 
-今回開発した ma91n/localstack では、ChmodやChown、Symlinkなどは非対応にしました。かつ、`Extended attributes` と書かれている `GetXAttr`、`ListXAttr`、`RemoveXAttr`、`SetXAttr` も未実装です（実装していれば適時呼ばれますが、なければノーマルな `GetAttr` などにフォールバックされる仕組みなようです。）
+今回開発した ma91n/localstack では、ChmodやChown、Symlinkなどは非対応にしました。かつ、`Extended attributes` と書かれている `GetXAttr`、`ListXAttr`、`RemoveXAttr`、`SetXAttr` も未実装です（実装していれば適時呼ばれますが、なければノーマルな `GetAttr` などにフォールバックされる仕組みなようです）。
 
 どれがどれに紐づくか、最初はピンとこなかったのでざっくりと紹介します。
 
@@ -274,15 +274,15 @@ type File interface {
 * `cd`、`ls` などのコマンドが、どのようなファイルシステム操作をしているか再認識したり、挙動について覚え直すキッカケなった
   * mvするときに、既存のファイルが存在したら上書きする or しない
 * ファイルシステムとしての実装の考え方が少しわかった
-  * どの操作で、どういうAPIが呼び出されるかの脳内マッピング（これくらいのAPI数で逆に成り立つのか、まぁ成り立つよねという心の天秤）
+  * どの操作で、どのようなAPIが呼び出されるかの脳内マッピング（これくらいのAPI数で逆に成り立つのか、まぁ成り立つよねという心の天秤）
   * どこにキャッシュを用いると効果的かの勘所
   * 高速化の工夫と、マウントを経由しない別経路での更新（例えばAWS CLIで直接更新など）とのバランス（キャッシュの有効期限のパラメータ調整）
-* 例えばVS Codeがどういう情報をファイルシステムに問い合わせているか、FUSE側のAPI呼び出しのログを見てイメージが湧いた
-  * VS Codeでmy-bucket/aaa/bbb/hello.txtにあるマウントしたファイルを開くと、以下のファイルを探していた
-    * my-bucket/aaa/bbb/git.exe
-    * my-bucket/aaa/.git
-    * my-bucket/aaa/HEAD
-    * my-bucket/.git
+* 例えばVS Codeがどのような情報をファイルシステムに問い合わせているか、FUSE側のAPI呼び出しのログを見てイメージが湧いた
+  * VS Codeで `my-bucket/aaa/bbb/hello.txt` にあるマウントしたファイルを開くと、以下のファイルを探していた
+    * `my-bucket/aaa/bbb/git.exe`
+    * `my-bucket/aaa/.git`
+    * `my-bucket/aaa/HEAD`
+    * `my-bucket/.git`
 * FUSE、思ったよりWSL2でシャキシャキ動く
   * Windowsならではのハマりがもっと壮絶にあると思ったんですが、環境周りのハマりはほぼ無しで余裕でした
     * 逆にMacは新しいバージョンの手持ちが無く動作検証ができず

@@ -70,7 +70,7 @@ func main() {
 }
 ```
 
-デプロイは次のようなMakefileを作って行います（どういうやり方でも良いと思います）
+デプロイは次のようなMakefileを作って行います（どのようなやり方でも良いと思います）
 
 ```Makefile
 deploy:
@@ -115,7 +115,7 @@ API Gatewayのようなリッチな制御は行えなくても、セキュリテ
 
 <img src="/images/20220510a/WAF設定画面.png" alt="WAF設定画面" width="840" height="256" loading="lazy">
 
-そのためブラウザアクセスを許容したいけど、検証用のエンドポイントは送信元IPを絞りたいとかも現状はできないです。スロットリング、カスタムドメイン名などとともに、これらの要件が必要な場合はAPI Gatewayを利用しましょうということです。（InboundのSecurity Groupが設定できれば最高なんですが..）
+そのためブラウザアクセスを許容したいけど、検証用のエンドポイントは送信元IPを絞りたいとかも現状はできないです。スロットリング、カスタムドメイン名などとともに、これらの要件が必要な場合はAPI Gatewayを利用しましょうということです（InboundのSecurity Groupが設定できれば最高なんですが..）
 
 ## httpハンドラー対応
 
@@ -157,7 +157,7 @@ aws labs http adapter response!!
 > The request and response event formats follow the same schema as the Amazon API Gateway payload format version 2.0.
 > https://docs.aws.amazon.com/lambda/latest/dg/urls-invocation.html#urls-payloads
 
-そのため、現在API Gateway + Lambda構成で開発しているアプリも、アプリコードとしてはそのまま Lambda Function URLsに移植できますし、同様に `awslabs/aws-lambda-go-api-proxy` を使っている場合もです。 `awslabs/aws-lambda-go-api-proxy` を使っていれば、ECSでもAPI Gateway Lambdaでも Lambda Function URLs でもコアなアプリコードは同じにできるので、非常に安心ですね。（ECSはproxyなしで生のHTTPサーバを実行するイメージです）
+そのため、現在API Gateway + Lambda構成で開発しているアプリも、アプリコードとしてはそのまま Lambda Function URLsに移植できますし、同様に `awslabs/aws-lambda-go-api-proxy` を使っている場合もです。 `awslabs/aws-lambda-go-api-proxy` を使っていれば、ECSでもAPI Gateway Lambdaでも Lambda Function URLs でもコアなアプリコードは同じにできるので、非常に安心ですね（ECSはproxyなしで生のHTTPサーバを実行するイメージです）
 
 **2022.10.6 追記**
 

@@ -12,13 +12,13 @@ thumbnail: /images/20221227a/thumbnail.png
 author: 澁川喜規
 lede: "ちょっとローカルでPostgreSQLの最新バージョンを試したいけどDocker Desktopの稟議が間に合わない！みたいなときのためのメモです。Docker Desktopの有償化と契約すべきライセンスについては以前書きました。その後..."
 ---
-ちょっとローカルでPostgreSQLの最新バージョンを試したいけどDocker Desktopの稟議が間に合わない！みたいなときのためのメモです。
+ちょっとローカルでPostgreSQLの最新バージョンを試したいけどDocker Desktopの稟議が間に合わない！ みたいなときのためのメモです。
 
 Docker Desktopの有償化と契約すべきライセンスについては以前書きました。その後、値段がちょっと上がったのと、100人以上のTeamプランは許可されずにBuisinessプランが必須になり、BusinessプランではSSOが利用できるようになったのが変更点です。
 
 * [Docker Desktop有償化！どのライセンス契約する？](/articles/20220124a/)
 
-[Docker Desktop](https://www.docker.com/products/docker-desktop/)の代替のものがいくつかでています。[Rancher Desktop](https://rancherdesktop.io/)と、[Podman Desktop](https://podman-desktop.io/)があります。Rancher Desktopは会社のプロキシの裏で動かすのが難しく、ちょっと苦戦した上に、WSLのコンテナが再作成されるタイミングでプロキシ設定がリセットされるということを聞いて、Podman Desktopを使ってみました。PodmanはRedHatが開発しているコンテナのエコシステムで、コンテナエンジン（以下サーバーとします）、CLIツールで構成されます。それにデスクトップのUIとPodman自身のインストーラを組み合わせたものがPodman Desktopです。
+[Docker Desktop](https://www.docker.com/products/docker-desktop/)の代替のものがいくつかでています。[Rancher Desktop](https://rancherdesktop.io/)と、[Podman Desktop](https://podman-desktop.io/)があります。Rancher Desktopは会社のプロキシの裏で動かすのが難しく、ちょっと苦戦した上に、WSLのコンテナが再作成されるタイミングでプロキシ設定がリセットされるということを聞いて、Podman Desktopを使ってみました。PodmanはRed Hatが開発しているコンテナのエコシステムで、コンテナエンジン（以下サーバーとします）、CLIツールで構成されます。それにデスクトップのUIとPodman自身のインストーラを組み合わせたものがPodman Desktopです。
 
 <img src="/images/20221227a/image.png" alt="" width="1200" height="978" loading="lazy">
 
@@ -124,7 +124,7 @@ env=["CONTAINERS_SHORT_NAME_ALIASING=on"]
 short-name-mode="enforcing"
 ```
 
-それではまたpodmanを再起動してから、今度はNginxを起動してみます。`http://localhost:8888/`で起動したら完了です。
+それではまたpodmanを再起動してから、今度はnginxを起動してみます。`http://localhost:8888/`で起動したら完了です。
 
 ```
 podman machine stop

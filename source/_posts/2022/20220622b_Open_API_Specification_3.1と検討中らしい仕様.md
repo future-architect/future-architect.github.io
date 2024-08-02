@@ -20,7 +20,7 @@ Open APIは[go-swaggerを用いたWebアプリケーション開発Tips19選](/a
 
 ## Open API Specificationとは
 
-[Open API Specification](https://github.com/OAI/OpenAPI-Specification)（公式でもOASと略されます）は、HTTP APIのIDL（インターフェース記述言語）です。HTTP APIということで、いわゆるRESTishなAPIも含みます。エンドポイント（URLのパス）、パラメーター（リクエスト、レスポンスのヘッダ・ボディ）、認証フローなどを標準的に定義でき、そこからコードやAPIドキュメントを生成できて便利です。
+[Open API Specification](https://github.com/OAI/OpenAPI-Specification)（公式でもOASと略されます）は、HTTP APIのIDL（インタフェース記述言語）です。HTTP APIということで、いわゆるRESTishなAPIも含みます。エンドポイント（URLのパス）、パラメーター（リクエスト、レスポンスのヘッダ・ボディ）、認証フローなどを標準的に定義でき、そこからコードやAPIドキュメントを生成できて便利です。
 
 今のコミュニティの方向性としてはJSONスキーマの最新Draftバージョンと互換性を保つように設計されています。
 
@@ -42,7 +42,7 @@ Version2と3はメジャーバージョンが変わったということで、�
 
 v2ですが以前はSwaggerと呼ばれていました。これがOpen API Specificationのフォーマットとして採用されたため、Swagger ≒ Open API Specification v2 との認識が広がっていると思われます。
 
-ちなみにv1はどこ行った？って思ったんですが、[Swaggerのリビジョン履歴](https://swagger.io/specification/v2/)を見ると、Swagger自体が 1.0から2.0 まで上がっているため、Open API Specificationも2.0からスタートしたと思われます。
+ちなみにv1はどこ行った？ って思ったんですが、[Swaggerのリビジョン履歴](https://swagger.io/specification/v2/)を見ると、Swagger自体が 1.0から2.0 まで上がっているため、Open API Specificationも2.0からスタートしたと思われます。
 
 | Version | Date       | Notes                                      |
 |---------|------------|--------------------------------------------|
@@ -93,7 +93,7 @@ Swaggerから Open API Specificationへの切り替えですが、 2015年にSwa
 
 関連Issueを読んでいて面白かった部分を紹介します
 
-### ①[Investigate possibility of removing the constraint that paths must start with "/" #2327](https://github.com/OAI/OpenAPI-Specification/issues/2327)
+### （1）[Investigate possibility of removing the constraint that paths must start with "/" #2327](https://github.com/OAI/OpenAPI-Specification/issues/2327)
 
 * パスが`/` 始まりである必要があるかですが、 [#2316](https://github.com/OAI/OpenAPI-Specification/issues/2316) を見ると、OPTIONSメソッドの場合は、`*` の指定も許容するようです。[RFC7231 4.7.3](https://datatracker.ietf.org/doc/html/rfc7231#section-4.3.7)
 * https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/OPTIONS#identifying_allowed_request_methods にもSyntaxでかかれれていました。
@@ -107,9 +107,9 @@ OPTIONS * HTTP/1.1
 
 OPTIONS、CORSのプリフライトリクエストの時に利用されるイメージしかなかったので、ターゲットに `*` できるの知らなかったです。
 
-### ②[Deprecate discriminator? #2143](https://github.com/OAI/OpenAPI-Specification/issues/2143)
+### （2）[Deprecate discriminator? #2143](https://github.com/OAI/OpenAPI-Specification/issues/2143)
 
-discriminatorの廃止議論です。まずdiscriminatorがなにかという話ですが、3.0で追加された Open API Specification独自の機能で、スキーマを切り替えることができます。次が[OpenAPI 3.0ガイドに記載されたInheritance and Polymorphism](https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/) に記載された例です。レスポンスは `oneOf`によって`Object1`, `Object2`, `sysObject`の3種類が取りうるとしています。このとき、どのスキーマを選択するか `discriminator.propertyName` に記載された `objectType` によって決定することができるます。
+discriminatorの廃止議論です。まずdiscriminatorがなにかという話ですが、3.0で追加された Open API Specification独自の機能で、スキーマを切り替えることができます。次が[OpenAPI 3.0ガイドに記載されたInheritance and Polymorphism](https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/) に記載された例です。レスポンスは `oneOf`によって`Object1`, `Object2`, `sysObject`の3種類が取りうるとしています。このとき、どのスキーマを選択するか `discriminator.propertyName` に記載された `objectType` によって決定できるます。
 
 ```yml
 components:
@@ -152,7 +152,7 @@ components:
 
 こんなことできるんだ、凄い、良いよねって思いましたが、非推奨（Deprecate）の方向になっています。JSONスキーマとの互換性が理由のようです。互換性がないことでLinterなどの検証に難もあるようです。
 
-### ③[Support for path parameters which can contain slashes #892](https://github.com/OAI/OpenAPI-Specification/issues/892)
+### （3）[Support for path parameters which can contain slashes #892](https://github.com/OAI/OpenAPI-Specification/issues/892)
 
 パスパラメータにスラッシュ `/` を許容してほしいという要望です。背景としては
 
@@ -162,7 +162,7 @@ components:
 
 のように、複数のサブリソースが紐づいている場合に、`/resources/{resourceRef+}` で一括してエンドポイントを定義したいと要望があるようです。Django、Flask、gin、echo、express.jsなど複数のプロダクトが `*` をサポートしているので追随してはどうかという意見もあります。
 
-反対意見としては、他のどのIssueでも共通ですがエコシステムのツールチェーンが対応できるかが1つ要因としてあるそうです。例えば以下が区別できないため何かしらの優先度ベースのわかりやすいアルゴリズムが存在しない限りは難しいという立場です。（これに対しても多くの意見が寄せられています）
+反対意見としては、他のどのIssueでも共通ですがエコシステムのツールチェーンが対応できるかが1つ要因としてあるそうです。例えば以下が区別できないため何かしらの優先度ベースのわかりやすいアルゴリズムが存在しない限りは難しいという立場です（これに対しても多くの意見が寄せられています）
 
 * `/{resourceRef+}`
 * `/resources/{resourceRef+}`

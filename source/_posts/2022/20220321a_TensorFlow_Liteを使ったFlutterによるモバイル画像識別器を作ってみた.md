@@ -20,7 +20,7 @@ lede: "初めまして、2022年中途入社でTIG所属の岸下です。Flutte
 
 # TensorFlow Liteとは
 
-近年ではご存じの方も多くなってきたかと思いますが、[TensorFlow](https://www.tensorflow.org/?hl=ja)はGoogle社が開発を行っているディープラーニングを行うためのフレームワークの1種です。
+近年ではご存じの方も多くなってきたかと思いますが、[TensorFlow](https://www.tensorflow.org/?hl=ja)はGoogle社が開発を行っているディープラーニングを行うためのフレームワークの一種です。
 TensorFlowを使えば、
 
 - 画像識別
@@ -40,7 +40,7 @@ TFLiteはCPU上で演算を行うことに特化しており、スマホなど�
 
 AIモデルの中身では入力された特徴量に対して重み付け演算して、その結果を伝搬するためのネットワークが構築されております。この演算の際に本来であれば32bitの浮動小数点精度（float32）が用いられるのですが、それを8bitまで精度を落とすことで高速化を狙います。
 
-これをint8量子化と呼び、TFLiteには他にもfloat16量子化や重み量子化などのオプションが存在します。簡単に言えば予測精度を若干犠牲にして、推論速度を高めようというのがモデルの量子化になります。（もちろん、量子化によって精度がガタ落ちするパターンもあります。）
+これをint8量子化と呼び、TFLiteには他にもfloat16量子化や重み量子化などのオプションが存在します。簡単に言えば予測精度を若干犠牲にして、推論速度を高めようというのがモデルの量子化になります（もちろん、量子化によって精度がガタ落ちするパターンもあります）。
 
 詳しくは、[TensorFlow Lite 8ビット量子化の仕様](https://www.tensorflow.org/lite/performance/quantization_spec?hl=ja)を読まれるとわかりやすいと思います。
 
@@ -89,7 +89,7 @@ flutter:
 tflite_flutterを使用する前にTFliteの動的ライブラリをワークフォルダにインストールする必要があります。
 [Initial setup : Add dynamic libraries to your app](https://pub.dev/packages/tflite_flutter#important-initial-setup--add-dynamic-libraries-to-your-app)
 
-使用PCがLinuxであれば`install.sh`、windowsであれば`install.bat`を↑のpub.devページからダウンロードして、Flutterのプロジェクトフォルダに置いてください。置いた後、コマンドラインから`sh install.sh`や`insatall.bat`を入力してファイルの実行を行ってください。あとはよしなにやってくれます。
+使用PCがLinuxであれば`install.sh`、Windowsであれば`install.bat`を↑のpub.devページからダウンロードして、Flutterのプロジェクトフォルダに置いてください。置いた後、コマンドラインから`sh install.sh`や`insatall.bat`を入力してファイルの実行を行ってください。あとはよしなにやってくれます。
 
 ## 画像識別クラス（classifier.dart）
 
@@ -173,7 +173,7 @@ tflite_flutterを使用する前にTFliteの動的ライブラリをワークフ
 
 `loadModel`では.tflite形式の重みファイルをロードします。ロードを待つために非同期の`await`が指定されていますね。
 また、ロードしたモデルから`_inputShape`などの入力・出力サイズとデータの型（intやfloatなど）の情報を取得します。
-今回は入力画像サイズが160x160で、int8量子化されたモデルを使うので型はuint8になります。
+今回は入力画像サイズが160×160で、int8量子化されたモデルを使うので型はuint8になります。
 また、出力を格納する`_outputBuffer`もここで出力サイズと型を指定します。
 
 ### 画像の前処理と推論
@@ -335,7 +335,7 @@ AIモデルの中では、画像の色合いや配色パターンの特徴から
 
 <img src="/images/20220321a/fa8d1a39-a1b8-044e-4faa-04523e5bf10f.gif" alt="" width="532" height="1118" loading="lazy">
 
-お！うまくホットドッグを識別できていますね！
+お！ うまくホットドッグを識別できていますね！
 
 推論処理自体は大体80～90msで結構スムーズに動いてそうです！
 原作通りいけば、これで僕にもベンチャーキャピタルから話が…

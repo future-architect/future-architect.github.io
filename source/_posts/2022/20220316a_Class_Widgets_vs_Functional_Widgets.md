@@ -18,13 +18,13 @@ lede: "FlutterでWidgetを開発するとき、Stateless WidgetやStateful Widge
 
 [Dart/Flutter連載](https://future-architect.github.io/articles/20220315a/) の2本目です
 
-FlutterでWidgetを開発するとき、Stateless WidgetやStateful Widgetを継承したクラスを作成することが一般的だと思います。一方でクラスを定義せずとも、Widgetを返却するFunctionを定義することで同様のことが実現できるのでは？と考えたことはないでしょうか。
+Flutterでウィジェットを開発するとき、 `Stateless Widget` や `Stateful Widget` を継承したクラスを作成することが一般的だと思います。一方でクラスを定義せずとも、ウィジェットを返却するFunctionを定義することで同様のことが実現できるのでは？ と考えたことはないでしょうか。
 
-本記事では前者をClass Widget, 後者をFunctional Widgetと称して以下説明をしていきます。
+本記事では前者を`Class Widge`, 後者を`Functional Widget`と称して以下説明をしていきます。
 
 簡単なサンプルを示してみましょう。
 
-### Class Widget
+### `Class Widge`
 
 ```dart
 class SampleWidget extends StatelessWidget {
@@ -39,7 +39,7 @@ class SampleWidget extends StatelessWidget {
 }
 ```
 
-### Functional Widget
+### `Functional Widget`
 
 ```dart
 Widget sampleWidget() {
@@ -49,31 +49,31 @@ Widget sampleWidget() {
 }
 ```
 
-恐らく多くの方がFunctional Widgetはあまり良くないと思っていると思いますが、その理由を明確に説明できるでしょうか。
+恐らく多くの方が`Functional Widget`はあまり良くないと思っていると思いますが、その理由を明確に説明できるでしょうか。
 
 本記事では、2つの違いや使い分けについて整理したいと思います。
 
 ## TL;DR
 
-Flutterが公式に公開している動画でも本件について触れられており、パフォーマンス最適化や予期せぬバグの回避、テスタビリティ（本記事では割愛しています）という観点で Class Widgetの利用が推奨されています。
+Flutterが公式に公開している動画でも本件について触れられており、パフォーマンス最適化や予期せぬバグの回避、テスタビリティ（本記事では割愛しています）という観点で `Class Widge`の利用が推奨されています。
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/IOyq-eTRhvo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## 2つの違い
 
-冒頭のサンプルで記述したClass WidgetとFunctional Widgetをそれぞれ利用した場合、アプリケーションの見た目はどちらも変わりません。
-２つの一番の違いは生成されるWidgetツリーの構造です。それぞれのWidgetツリーは次のようになります。
+冒頭のサンプルで記述した`Class Widge`と`Functional Widget`をそれぞれ利用した場合、アプリケーションの見た目はどちらも変わりません。
+２つの一番の違いは生成されるウィジェットツリーの構造です。それぞれのウィジェットツリーは次のようになります。
 
-### Class Widget
+### `Class Widge`
 
-```
+```sh
 ParentWidget
 　　└─ SampleWidget
 　　　　　　　　　　└─ Container
 　　　　　　　　　　　　　　　　　　└─ Text
 ```
 
-### Functional Widget
+### `Functional Widget`
 
 ```
 ParentWidget
@@ -81,9 +81,9 @@ ParentWidget
 　　　　　　　　　　└─ Text
 ```
 
-Widgetツリーの構造は、FlutterがWidgetをリビルドする際の挙動に影響します。
+ウィジェットツリーの構造は、Flutterがウィジェットをリビルドする際の挙動に影響します。
 
-Functional WidgetはClass Widgetに比べて、パフォーマンスが最適化されない可能性があり、また予期せぬバグが発生する可能性が高まります。
+`Functional Widget`は`Class Widge`に比べて、パフォーマンスが最適化されない可能性があり、また予期せぬバグが発生する可能性が高まります。
 
 以下、具体的に説明していきましょう。
 
@@ -92,7 +92,7 @@ Functional WidgetはClass Widgetに比べて、パフォーマンスが最適化
 ### リビルドの最適化
 
 これは紹介した動画でも述べられている例になります。
-下記のようにクリック時に状態を変更するようなボタンをFunctional Widgetとして切り出した場合を考えてみます。この場合、ボタンをクリックした場合には大元のWidget全体のリビルドが実行されてしまいます。
+下記のようにクリック時に状態を変更するようなボタンを`Functional Widget`として切り出した場合を考えてみます。この場合、ボタンをクリックした場合には大元のウィジェット全体のリビルドが実行されてしまいます。
 
 ```dart
 class BigUIElementState extends State<BigUIElement> {
@@ -122,7 +122,7 @@ class BigUIElementState extends State<BigUIElement> {
 }
 ```
 
-このボタンが変更する状態のスコープが限定的な場合（例えばいいねボタンの様にクリックによってボタン自身の色を変更するようなケース）は、Functional WidgetではなくStateful Widgetとして切り出した方がリビルドの範囲を限定できるため、パフォーマンスの面で優れています。
+このボタンが変更する状態のスコープが限定的な場合（例えばいいねボタンの様にクリックによってボタン自身の色を変更するようなケース）は、`Functional Widget`ではなく `Stateful Widget` として切り出した方がリビルドの範囲を限定できるため、パフォーマンスの面で優れています。
 
 ```dart
 class BigUIElementState extends State<BigUIElement> {
@@ -162,12 +162,12 @@ class SampleButtonState extends State<SampleButton> {
 }
 ```
 
-ただこの例は、状態のスコープを最小化すべきというのが主要なポイントであって、Class WidgetとFunctional Widgetの本質的な違いの例としては少しズレているように筆者は感じてしまったので、もう一つリビルドの最適化に着目した例を示しましょう。
+ただこの例は、状態のスコープを最小化すべきというのが主要なポイントであって、`Class Widge`と`Functional Widget`の本質的な違いの例としては少しズレているように筆者は感じてしまったので、もう1つリビルドの最適化に着目した例を示しましょう。
 
 ### リビルドの最適化 その２
 
-先ほどの例は切り出すWidgetが状態を保持する前提でしたが、下記のように状態を持たないWidgetの場合はどうでしょうか。
-Functional Widgetの場合は`ParentElement`の状態が変わるたびに`sampleWidget()`が呼び出され、内部で返却しているWidgetが都度再生成されることになります。
+先ほどの例は切り出すウィジェットが状態を保持する前提でしたが、下記のように状態を持たないウィジェットの場合はどうでしょうか。
+`Functional Widget`の場合は`ParentElement`の状態が変わるたびに`sampleWidget()`が呼び出され、内部で返却しているウィジェットが都度再生成されることになります。
 
 ```dart
 class ParentElementState extends State<ParentElement> {
@@ -192,8 +192,8 @@ class ParentElementState extends State<ParentElement> {
 }
 ```
 
-この場合も、Functional Widgetではなく Stateless Widgetとして切り出すことで、リビルドを最適化することができます。（const constructorが利用できることが前提となります。）
-下記のようにStateless Widgetとして切り出した場合は`ParentElement`がリビルドされた場合でも`SampleWidget`のリビルドは実行されません。
+この場合も、`Functional Widget`ではなく Stateless ウィジェットとして切り出すことで、リビルドを最適化できます（const constructorが利用できることが前提となります）。。
+下記のように `Stateless Widget` として切り出した場合は`ParentElement`がリビルドされた場合でも`SampleWidget`のリビルドは実行されません。
 
 ```dart
 
@@ -226,7 +226,7 @@ class SampleWidget extends StatelessWidget {
 
 ### 誤ったBuild Contextの参照
 
-例えば `Builder` Widgetを使用するようなコードにおいて、Build Contextの1つに任意の別の名前（ここでは innerContext）を指定すると、下層のWidgetにて古いBuild Contextを参照することができてしまいます。
+例えば `Builder Widget` を使用するようなコードにおいて、Build Contextの1つに任意の別の名前（ここでは innerContext）を指定すると、下層のウィジェットにて古いBuild Contextを参照できてしまいます。
 
 ```dart
 class ParentWidget extends StatelessWidget {
@@ -247,7 +247,7 @@ class ParentWidget extends StatelessWidget {
 }
 ```
 
-Class Widgetとして切り出すことでこのような予期せぬバグを防ぐことができます。
+`Class Widge`として切り出すことでこのような予期せぬバグを防ぐことができます。
 
 ```dart
 class ParentWidget extends StatelessWidget {
@@ -272,10 +272,10 @@ class SampleWidget extends StatelessWidget {
 }
 ```
 
-### Widget Keyによるリビルド制御
+### ウィジェット Keyによるリビルド制御
 
 少し無理やりな例ですが、下記のようにボタンクリックによって、四角のコンテナが円形にアニメーションする例を考えてみましょう。
-`circle()`メソッドと`square()`メソッドで返却されるWidgetはどちらも `Container` Widgetであるため、RuntimeTypeが同じであり、アニメーションがうまく機能しません。
+`circle()`メソッドと`square()`メソッドで返却されるウィジェットはどちらも `Container Widget`であるため、RuntimeTypeが同じであり、アニメーションがうまく機能しません。
 https://dartpad.dev/?id=ab9ef6401c4687811ea59f44adfa8ee7
 
 ```dart
@@ -324,8 +324,9 @@ class ParentWidgetState extends State<ParentWidget> {
 }
 ```
 
-それぞれの `Container` WidgetにKeyを指定すればうまく機能します。
-Widget Keyの詳細は割愛しますが、気になる方は下記の記事などを参考にすると良いでしょう。
+それぞれの `Container Widget` にKeyを指定すればうまく機能します。
+
+ウィジェット Keyの詳細は割愛しますが、気になる方は下記の記事などを参考にすると良いでしょう。
 https://qiita.com/kurun_pan/items/f91228cf5c793ec3f3cc
 
 ```dart
@@ -352,7 +353,7 @@ https://qiita.com/kurun_pan/items/f91228cf5c793ec3f3cc
 }
 ```
 
-このような予期せぬ不具合もClass Widgetとして切り出しておけば WidgetのKeyを意識せずとも未然に防ぐことが可能です。
+このような予期せぬ不具合も`Class Widge`として切り出しておけば ウィジェットのKeyを意識せずとも未然に防ぐことが可能です。
 https://dartpad.dev/?id=a69d57ea09802753676a46efc8390d15
 
 ```dart
@@ -412,11 +413,11 @@ class Circle extends StatelessWidget {
 
 ## 使い分け
 
-ここまでみてきた通り、基本的には原則Class Widgetを利用する形が良いでしょう。
+ここまでみてきた通り、基本的には原則`Class Widge`を利用する形が良いでしょう。
 
-ただしFunctional Widgetそれ自体が問題を引き起こすものではなく、リファクタを目的としたプライベートなFunctional Widgetであれば、Functional Widgetの方がスマートに記述できるシーンがあると考えています。
+ただし`Functional Widget`それ自体が問題を引き起こすものではなく、リファクタを目的としたプライベートな`Functional Widget`であれば、`Functional Widget`の方がスマートに記述できるシーンがあると考えています。
 
-下記のように、Widget自体が分岐によって切り替わるようなケースにおいて、`build`メソッド内が肥大化しているため、Switchのロジックを切り出したくなったとします。
+下記のように、ウィジェット自体が分岐によって切り替わるようなケースにおいて、`build`メソッド内が肥大化しているため、Switchのロジックを切り出したくなったとします。
 
 ```dart
 class ParentWidget extends StatelessWidget {
@@ -449,9 +450,9 @@ class ParentWidget extends StatelessWidget {
 }
 ```
 
-このような場合は、Class Widgetではなく Functional Widgetの方がより簡潔にかつ分かりやすく記述できるのではないでしょうか。
+このような場合は、`Class Widge`ではなく `Functional Widget`の方がより簡潔にかつ分かりやすく記述できるのではないでしょうか。
 
-**Class Widget**
+**`Class Widge`**
 
 ```dart
 class ParentWidget extends StatelessWidget {
@@ -493,7 +494,7 @@ class SwitchWidget extends StatelessWidget {
 }
 ```
 
-**Functional Widget**
+**`Functional Widget`**
 
 ```dart
 class ParentWidget extends StatelessWidget {
@@ -528,12 +529,12 @@ class ParentWidget extends StatelessWidget {
 }
 ```
 
-このようにSwitchや三項演算子などにより、既にClass Widgetとして定義されているWidgetを返却するためのロジックのみを切り出したいような場合（言い換えればFunuctional Widget自体が構造化されたWidgetを定義せず、Privateな関数として広く再利用されないような場合）は　Functional Widgetの利用を許容しても良い気がしています。
+このようにSwitchや三項演算子などにより、既に`Class Widge`として定義されているウィジェットを返却するためのロジックのみを切り出したいような場合（言い換えればFunuctional ウィジェット自体が構造化されたウィジェットを定義せず、Privateな関数として広く再利用されないような場合）は　`Functional Widget`の利用を許容しても良い気がしています。
 
 ## おわりに
 
-原則Class Widgetの利用が推奨されるべきであり、開発時のルールとしてFunctional Widgetは禁止にして問題ないと思います。
-ただ最後に記述したとおり、Functional Widgetを使いたくなるようなシーンがいくつかあるような気がしており、（筆者もうまく明文化ができていないですが）そのようなケースが他にもあればコメントいただけますと幸いです。
+原則`Class Widge`の利用が推奨されるべきであり、開発時のルールとして`Functional Widget`は禁止にして問題ないと思います。
+ただ最後に記述したとおり、`Functional Widget`を使いたくなるようなシーンがいくつかあるような気がしており、（筆者もうまく明文化ができていないですが）そのようなケースが他にもあればコメントいただけますと幸いです。
 
 ## 参考記事
 

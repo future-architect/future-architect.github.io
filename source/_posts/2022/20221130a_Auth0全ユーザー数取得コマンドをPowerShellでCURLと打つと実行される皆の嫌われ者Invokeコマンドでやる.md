@@ -28,7 +28,7 @@ CLIから通信を行える便利コマンド `curl` は元々UNIX系のコマ�
 
 [こちらの記事](https://ascii.jp/elem/000/004/021/4021036/)によると、2018年のWindows 10 Ver.1803からCurl.exeがWindowsにデフォルトで使えるようになったそうです。そこからは、コマンドプロンプトなら、`curl`、PowerShellの場合`curl.exe`と打てばcurlが使えます。
 
-ここで大事なことですが、2018年までcurlが使えなかった時代の名残なのか、 **PowerShellの場合、`curl` と打つとwindows用の`curl`であった`Invoke-WebRequest`が実行されてしまいます**。（curl.exeだとcurlが動くが、curlにはinvokeコマンドのエイリアスが貼ってある）。普段Windows環境を触らない人にとって、高度な罠ですね。
+ここで大事なことですが、2018年までcurlが使えなかった時代の名残なのか、 **PowerShellの場合、`curl` と打つとWindows用の`curl`であった`Invoke-WebRequest`が実行されてしまいます**（curl.exeだとcurlが動くが、curlにはinvokeコマンドのエイリアスが貼ってある）。普段Windows環境を触らない人にとって、高度な罠ですね。
 
 ```sh:powershellでcurlと入力した場合の挙動例
 PS C:\Users\xxxx> curl
@@ -138,7 +138,7 @@ Invoke-RestMethod
   * `-Method Post`
 * --urlは-Uri
   * `-Uri https://$domain/oauth/token`
-* --headerはHeadersとContentTypeが両方ありますね、ContentTypeだけ指定するので-ContentTypeのみ使います。（Headersにcontent-typeと入れたらエラーになってました）
+* --headerはHeadersとContentTypeが両方ありますね、ContentTypeだけ指定するので-ContentTypeのみ使います（Headersにcontent-typeと入れたらエラーになってました）
   * `-ContentType application/json`
 * --dataは-body
   * 後述しますがいい感じに書かないとNGでした
@@ -149,7 +149,7 @@ Invoke-RestMethod
 
 <img src="/images/20221130a/image.png" alt="" width="700" height="1083" loading="lazy">
 
-ぱっと見は理解することが難しいですよね。オブジェクトで渡せば良いのかな？とわかります。
+ぱっと見は理解することが難しいですよね。オブジェクトで渡せば良いのかな？ とわかります。
 
 [公式にPOSTの例が](https://learn.microsoft.com/ja-jp/powershell/module/microsoft.powershell.utility/invoke-restmethod?view=powershell-7.3#2-post)あるので参考にできます。
 

@@ -21,7 +21,7 @@ lede: "Pyright を LSP  サーバとした自作クライアントを実装し�
 
 アルバイトの前は、Future のインターン Engineer Camp で Python のソースコード解析に取り組んでいました。そのときの様子は、[Engineer Camp2021: Python の AST モジュールを使ってクラス構造を可視化する](/articles/20211019a/) で触れています。当時は Python の AST モジュールを活用する方針で、それ以外は自前で解析を行っていました。アルバイトでも引き続き解析に取り組んでいますが、次第に型推論などの技術が必要になってきており、全てを自前で実装することは困難な状況です。そこで現在は、既存のツールを拡張する方針を取っています。
 
-ツールの候補としては、Mypy および Pyright が挙がりましたが、検討の結果（[Mypy と Pyright の解析比較](/articles/20220301a/)）Pyright を拡張することにしています。Pyright は Pylance 上での実行を前提としているため、入力補完などで使う、型チェックにとどまらない情報を取得できることが理由の一つです。また、Pyright には LSP での実装が存在するため、これを利用することで、Pyright 本体の実装に手を加える必要がなく、システムを疎結合に保てます。
+ツールの候補としては、Mypy および Pyright が挙がりましたが、検討の結果（[Mypy と Pyright の解析比較](/articles/20220301a/)）Pyright を拡張することにしています。Pyright は Pylance 上での実行を前提としているため、入力補完などで使う、型チェックにとどまらない情報を取得できることが理由の1つです。また、Pyright には LSP での実装が存在するため、これを利用することで、Pyright 本体の実装に手を加える必要がなく、システムを疎結合に保てます。
 
 問題は、LSP クライアントをエディタ（主に VSCode）以外で実装するサンプルがほとんどないことです。解析ツールはコマンドラインで動作するようにしたいため、エディタ依存の機能は使えません。[LSP の仕様](https://microsoft.github.io/language-server-protocol/specifications/specification-current/)は公開されているものの、詳細な手順については記載がありません。特に Pyright における初期化の手順は、実際の実装を追う必要があり苦戦しました。次節以降では、初期化の手順を含めた自作 LSP クライアントの実装方法を紹介します。
 
@@ -91,7 +91,7 @@ main();
 
 ## Initialize Request
 
-今はまだ起動してメッセージを受信するだけのプログラムなので、今度はメッセージを送信してみます。仕様では最初に Initialize Request を送ることになっているので、これを実装します。サーバにリクエストを送る場合には `connection.sendRequest(type, params)` を使います。`type` はメソッドの種類、`params` はメソッド固有のパラメタになります。これらの型定義は [`vscode-languageserver-protocol`](https://www.npmjs.com/package/vscode-languageserver-protocol) にあるので、適当に参照します。
+今はまだ起動してメッセージを受信するだけのプログラムなので、今度はメッセージを送信してみます。仕様では最初に Initialize Request を送ることになっているので、これを実装します。サーバにリクエストを送る場合には `connection.sendRequest(type, params)` を使います。`type` はメソッドの種類、`params` はメソッド固有のパラメータになります。これらの型定義は [`vscode-languageserver-protocol`](https://www.npmjs.com/package/vscode-languageserver-protocol) にあるので、適当に参照します。
 
 `InitializeParams` にはいくつかのプロパティがありますが、最低限実装すべきは次の 4 つです。
 
@@ -203,7 +203,7 @@ main();
 
 ## DidChangeWorkspaceFolders Notification
 
-ワークスペースフォルダを変更するメソッドを実装します。これを実行することで、解析対象のフォルダを変更することができます。`InitializeParams` 同様に `DidChangeWorkspaceFoldersParams` を実装します。プロパティは多いですが、単にワークスペースとして認識するフォルダの追加と削除を行っているだけです。また、DidChangeWorkspaceFolders Notification はデフォルトではサーバ側から認識されないため、`InitializeParams.capabilities` にワークスペース機能があることを記載します。詳細は、[Pyright を LSP サーバとした自作 LSP クライアント（調査編）](/articles/20220302a/)で解説しています。
+ワークスペースフォルダを変更するメソッドを実装します。これを実行することで、解析対象のフォルダを変更できます。`InitializeParams` 同様に `DidChangeWorkspaceFoldersParams` を実装します。プロパティは多いですが、単にワークスペースとして認識するフォルダの追加と削除を行っているだけです。また、DidChangeWorkspaceFolders Notification はデフォルトではサーバ側から認識されないため、`InitializeParams.capabilities` にワークスペース機能があることを記載します。詳細は、[Pyright を LSP サーバとした自作 LSP クライアント（調査編）](/articles/20220302a/)で解説しています。
 
 ```ts client.ts
 import ...

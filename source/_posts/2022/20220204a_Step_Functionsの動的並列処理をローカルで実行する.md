@@ -59,7 +59,7 @@ S3バケットからJSONを取得し、後続のLambdaでETL処理をします�
 
 >余談ですが、Visual Studio Codeには[AWS Tool Kit](https://aws.amazon.com/jp/visualstudiocode/)という拡張機能が存在します。
 
-こちらの拡張機能を利用すれば[ステートメント言語](https://docs.aws.amazon.com/ja_jp/step-functions/latest/dg/concepts-amazon-states-language.html)を下図のビジュアルワークフロー図のように可視化することができます。
+こちらの拡張機能を利用すれば[ステートメント言語](https://docs.aws.amazon.com/ja_jp/step-functions/latest/dg/concepts-amazon-states-language.html)を下図のビジュアルワークフロー図のように可視化できます。
 
 <img src="/images/20220204a/image.png" alt="ビジュアルワークフロー" width="1200" height="881" loading="lazy">
 
@@ -201,7 +201,7 @@ AWS_ACCESS_KEY_ID=test
 AWS_SECRET_ACCESS_KEY=test
 ```
 
-また、`DEBUG`オプションに`1`と選択することでLocalStackのログを細かく確認することができます。
+また、`DEBUG`オプションに`1`と選択することでLocalStackのログを細かく確認できます。
 Step Functionsを実行するときにはログも確認しながらデバッグするとよいと思います。
 
 これでLocalStackの準備が整いました。
@@ -215,7 +215,7 @@ docker compose up --build
 
 # AWS CLIの設定
 
-AWS CLIでは認証情報などをプロファイルとして保存することができます。
+AWS CLIでは認証情報などをプロファイルとして保存できます。
 AWS CLIをインストールされた方はご自身が使用しているOSのhomeディレクトリに`.aws`の隠しファルダがあります。(エクスプローラーなどで確認する場合は隠しフォルダを表示するように設定してください。)`.aws`フォルダ配下には.`config`と
 `.credentials`2つのファイルがありますのでそれぞれ以下のように設定してください。
 
@@ -575,7 +575,7 @@ def lambda_handler(event, context) -> str:
 
 ## GatherLambda
 
-最後にSegmentLambdaでETL処理をしたDataFrameを取り込み、一つのExcelファイルにまとめるGatherLambdaを実装します。
+最後にSegmentLambdaでETL処理をしたDataFrameを取り込み、1つのExcelファイルにまとめるGatherLambdaを実装します。
 こちらもScatterLambda、SegmentLamdaと同様にハンドラを記載したgather.pyとハンドラを呼ぶlambda.pyを作成します。
 
 gather.pyは以下のようになります。
@@ -938,7 +938,7 @@ make stepfunctions
 
 <img src="/images/20220204a/stepfunctions.gif" alt="stepfunctions" width="1200" height="629" loading="lazy">
 
-demo-gatherによってアップロードされたエクセルファイルをローカルにダウンロードしましょう。
+demo-gatherによってアップロードされたExcelファイルをローカルにダウンロードしましょう。
 
 ```bash
 make download
@@ -950,7 +950,7 @@ downloadに成功していればプロジェクトプロジェクトルート直
 
 想定通りの出力が得られましたね🎉
 今回はデモなので処理もステップ数も大したことはありません。
-より大規模な処理が必要となるときStep Functionsでうまく分散することでLambdaで超えられない壁を突破することができるようになります。
+より大規模な処理が必要となるときStep Functionsでうまく分散することでLambdaで超えられない壁を突できるよううになります。
 
 それでは、今回はここまでとしたいと思います。
 

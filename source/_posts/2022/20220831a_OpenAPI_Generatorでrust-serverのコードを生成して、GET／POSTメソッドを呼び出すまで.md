@@ -92,7 +92,7 @@ OpenAPI Generatorのリポジトリに使用方法が書いてあるので、好
 https://github.com/OpenAPITools/openapi-generator#openapi-generator
 
 いくつか方法がありますが、今回はNPMを使用してインストールしました。
-npmを使用することができれば、以下のようにインストールするだけで使用可能です。
+npmを使用できれば、以下のようにインストールするだけで使用可能です。
 
 ```bash
 npm install @openapitools/openapi-generator-cli -g
@@ -275,8 +275,8 @@ An internal error occurred
 今回は`./src`に`db.rs`,`usecase.rs`を新規作成します。さらに、先ほど`./examples/server/server.rs`をコピーして作成した`api.rs`にも追記します。
 それぞれに記載する内容は以下とします。
 
-- `db.rs`(新規): DBとのIO、`src/db/`には`db.rs`から呼び出すORM用のファイルを配置する
-- `usecase.rs`(新規): DBとのIOを呼び出すロジック
+- `db.rs`(新規): DBとのI/O、`src/db/`には`db.rs`から呼び出すO/Rマッパ用のファイルを配置する
+- `usecase.rs`(新規): DBとのI/Oを呼び出すロジック
 - `api.rs`(追記): リクエストのハンドリング
 
 ```
@@ -299,7 +299,7 @@ An internal error occurred
 
 #### db.rsの実装
 
-今回はRustのORMとしてメジャーなDieselを使用するため、`cargo add`をします。
+今回はRustのO/RマッパとしてメジャーなDieselを使用するため、`cargo add`をします。
 DieselでPostgresSQLと日時を扱いたいので`--features "postgres chrono"`を引数としています。
 
 ```bash

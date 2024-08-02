@@ -18,11 +18,11 @@ lede: "net/httpパッケージのコードを呼んでいると、Temporary() �
 
 TIG真野です。net/httpパッケージには非常にお世話になっています。Goの net/httpの内部にはサーバー/クライアントの両方が含まれていますが、今回はクライアントサイドの話です。
 
-[TCPレベルの接続エラーの調査](https://future-architect.github.io/articles/20211026a/)のために標準パッケージやサードパーティのライブラリのコードを読み込んでいくと、Temporary() 関数だけをもった temporary インターフェースが登場します。HTTP周りでtemporaryと聞くと、 307 Temporary Redirect のステータスコードのことかと思いますが、ちょっと違いそうです。どういったものでどういった場合に出てくるのか、調べました。
+[TCPレベルの接続エラーの調査](https://future-architect.github.io/articles/20211026a/)のために標準パッケージやサードパーティのライブラリのコードを読み込んでいくと、Temporary() 関数だけをもった temporary インタフェースが登場します。HTTP周りでtemporaryと聞くと、 307 Temporary Redirect のステータスコードのことかと思いますが、ちょっと違いそうです。どういったものでどういった場合に出てくるのか、調べました。
 
 ## Temporary()とは
 
-Temporary()はnet/http パッケージなどのコードを見ていると出てくる関数です。プライベートなインターフェースがあちこちのパッケージや呼び出し元のライブラリでつくられています。
+Temporary()はnet/http パッケージなどのコードを見ていると出てくる関数です。プライベートなインタフェースがあちこちのパッケージや呼び出し元のライブラリでつくられています。
 
 ```go
 type temporary interface {
@@ -30,7 +30,7 @@ type temporary interface {
 }
 ```
 
-例えば次のhttpErrorはtemporaryインターフェースを満たし、常にtrueを返すように実装されています。
+例えば次のhttpErrorはtemporaryインタフェースを満たし、常にtrueを返すように実装されています。
 
 ```go transport.go
 type httpError struct {
@@ -43,7 +43,7 @@ func (e *httpError) Timeout() bool   { return e.timeout }
 func (e *httpError) Temporary() bool { return true }  //  常に true を返しているが..？
 ```
 
-netパッケージのOpErrorもtemporaryインターフェースを満たし、Temporary()関数にはロジックが結構が入っています。
+netパッケージのOpErrorもtemporaryインタフェースを満たし、Temporary()関数にはロジックが結構が入っています。
 
 ```go net.go
 func (e *OpError) Temporary() bool {
@@ -62,7 +62,7 @@ func (e *OpError) Temporary() bool {
 }
 ```
 
-AWS SDK for GoにもorigiErrがtemporaryインターフェース(Temporary() boolの関数)を満たしていて、かつTemporary()の結果がtrueの場合はリトライする、みたいな実装がよくあります。
+AWS SDK for GoにもorigiErrがtemporaryインタフェース(Temporary() boolの関数)を満たしていて、かつTemporary()の結果がtrueの場合はリトライする、みたいな実装がよくあります。
 
 ```go retryer.go
 // AWS SDK for Goのretyer.goの例
@@ -140,7 +140,7 @@ type Error interface {
 }
 ```
 
-[net: deprecate Temporary error status #45729](https://github.com/golang/go/issues/32463)に理由が書かれています。 Timeout()はわかりやすいけど、Temporary()は何が一時的で何が永続的なのかの区別が明確じゃなく、本来別の表現で区別されるものもTemporary()として扱われてしまっているのでは無いかということ。Timeout()で区別がつけるものはそちらを使いましょうということかと思います。（これだとECONNRESET, ECONNABORTEDが表現できない気がしますが...）
+[net: deprecate Temporary error status #45729](https://github.com/golang/go/issues/32463)に理由が書かれています。 Timeout()はわかりやすいけど、Temporary()は何が一時的で何が永続的なのかの区別が明確じゃなく、本来別の表現で区別されるものもTemporary()として扱われてしまっているのでは無いかということ。Timeout()で区別がつけるものはそちらを使いましょうということかと思います（これだとECONNRESET, ECONNABORTEDが表現できない気がしますが...）
 
 ちなみに、[os: remove ErrTemporary in Go 1.13 #32463](https://github.com/golang/go/issues/32463) にあるように、 `os.ErrTemporary` は削除されたようです。
 
@@ -156,7 +156,7 @@ if errors.As(err, &terr) && terr.Temporary() {
 }
 ```
 
-この辺は標準パッケージ側でヘルパー関数を作ったら？という提案が[proposal: errors: add new function Temporary(error) bool](https://github.com/golang/go/issues/37250)出ています。期待ですねと言いたいところですが、Temporary() の立ち位置自体が先程説明したようにちょっと微妙であるため、その結果次第ですがおそらく追加されることは無さそうです。
+この辺は標準パッケージ側でヘルパー関数を作ったら？ という提案が[proposal: errors: add new function Temporary(error) bool](https://github.com/golang/go/issues/37250)出ています。期待ですねと言いたいところですが、Temporary() の立ち位置自体が先程説明したようにちょっと微妙であるため、その結果次第ですがおそらく追加されることは無さそうです。
 
 ## まとめ
 

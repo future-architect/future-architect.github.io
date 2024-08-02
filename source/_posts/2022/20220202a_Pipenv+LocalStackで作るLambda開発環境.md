@@ -156,7 +156,7 @@ pipenv install mypy --dev
 Pythonの標準パッケージ以外にも使用したいパッケージはあると思います。
 Lambdaを実行する上で必要となる外部パッケージは`--dev`オプションは付けずにインストールします。
 今回はpandasをインストールします。
-またpandasでエクセルファイルを扱うため、xlwtとxlsxwriterもインストールします。
+またpandasでExcelファイルを扱うため、xlwtとxlsxwriterもインストールします。
 
 ```bash
 pipenv install pandas xlwt xlsxwriter
@@ -205,7 +205,7 @@ docker compose up --build
 
 ## AWS CLIの設定
 
-AWS CLIでは認証情報などをプロファイルとして保存することができます。
+AWS CLIでは認証情報などをプロファイルとして保存できます。
 AWS CLIをインストールされた方はご自身が使用しているOSのhomeディレクトリに`.aws`の隠しファルダがあります。(エクスプローラーなどで確認する場合は隠しフォルダを表示するように設定してください。)`.aws`フォルダ配下には.`config`と
 `.credentials`2つのファイルがありますのでそれぞれ以下のように設定してください。
 
@@ -416,7 +416,7 @@ class Handler(object):
 ```
 
 実装では型アノテーションを付けています。
-正しく型アノテーションを付与できているか、mypyを使ってチェックすることができます。
+正しく型アノテーションを付与できているか、mypyを使ってチェックできます。
 `Pipfile`に以下を追記します。
 
 ```ini Pipfile
@@ -454,9 +454,9 @@ Success: no issues found in 2 source files
 
 `__init__.py`ファイルがないとテストに失敗するので忘れずに作成してください。
 
-pytestを使用すれば簡単にテーブルドリブンテストを実装することができます。
+pytestを使用すれば簡単にテーブルドリブンテストを実装できます。
 
-`fixture`を使用することで`handler`の初期値を入力することができ、各メソッドテストで使い回しが可能です。今回pandasを使用したテストを行うため、`assert`部にはpandasのDataFrame比較メソッドである`testing.assert_frame_equal`を使用しました。
+`fixture`を使用することで`handler`の初期値を入力でき、各メソッドテストで使い回しが可能です。今回pandasを使用したテストを行うため、`assert`部にはpandasのDataFrame比較メソッドである`testing.assert_frame_equal`を使用しました。
 
 以下はボーナスポイント付与のメソッドである`process`をテストした`test_process`の例です。
 
@@ -539,7 +539,7 @@ def test_process(handler, input_dict, expected_dict):
 
 ```
 
-テストも`Pipfile`でコマンド化することができます。以下を`Pipfile`に追記してください。
+テストも`Pipfile`でコマンド化できます。以下を`Pipfile`に追記してください。
 
 ```ini
 [scripts]
@@ -677,11 +677,11 @@ zip:clean
 pipenv lock -r -> requirements.txt
 ```
 
-requirements.txtには--devオプションでインストールしたパッケージは含まれません。開発パッケージとデプロイパッケージを分離することができました。
+requirements.txtには--devオプションでインストールしたパッケージは含まれません。開発パッケージとデプロイパッケージを分離できました。
 
-次にrequirements.txtを元にdeploy-packagesというフォルダを作成します。事前に`mkdir`コマンドで`deploy-packages`を作成しておきます。pipコマンドは`--target`オプションを付与することでインストール先を指定することができます。
+次にrequirements.txtを元にdeploy-packagesというフォルダを作成します。事前に`mkdir`コマンドで`deploy-packages`を作成しておきます。pipコマンドは`--target`オプションを付与することでインストール先を指定できます。
 
-コマンド冒頭で`pipenv run`を付与することで、プロジェクトの仮想環境上で実行することができます。
+コマンド冒頭で`pipenv run`を付与することで、プロジェクトの仮想環境上で実行できます。
 
 ```bash
 pipenv run pip install -r requirements.txt --target $(DEPLOY_PACKAGES_DIR)
@@ -823,7 +823,7 @@ if __name__ == "__main__":
 
 テストデータを作成するにあたってmimesisとfireの2つの外部パッケージを使用しました。
 
-mimesisはダミーデータを作成するパッケージ、fireはPythonスクリプトにコマンドライン引数を渡すパッケージです。fireは社内チャットで話題になっていたので今回使用してみました。非常に便利でした。皆さんぜひ、使ってみてください。utils直下で以下コマンドを実行することで先程作成した`test-bucket`に`test.json`を任意のデータ量で格納することができます。
+mimesisはダミーデータを作成するパッケージ、fireはPythonスクリプトにコマンドライン引数を渡すパッケージです。fireは社内チャットで話題になっていたので今回使用してみました。非常に便利でした。皆さんぜひ、使ってみてください。utils直下で以下コマンドを実行することで先程作成した`test-bucket`に`test.json`を任意のデータ量で格納できます。
 
 今回は100行のダミーデータを作成しました。
 

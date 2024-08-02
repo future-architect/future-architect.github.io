@@ -18,7 +18,7 @@ eyecatch: /images/20220720a/4sq_overview.png
 
 こんにちは、Strategic AI Group所属の金子です。普段は推薦に関連する実装やデータ分析を行っています。
 
-先日Kaggleで開催された[「Foursquare - Location Matching」コンペ](https://www.kaggle.com/competitions/foursquare-location-matching/overview)(以下4sqコンペ)に社外の知人共にチームで参加し、1083チーム中7位をとりました。（初の金メダルでKaggle Competitions Masterになりました！)
+先日Kaggleで開催された[「Foursquare - Location Matching」コンペ](https://www.kaggle.com/competitions/foursquare-location-matching/overview)(以下4sqコンペ)に社外の知人共にチームで参加し、1083チーム中7位をとりました（初の金メダルでKaggle Competitions Masterになりました！ )
 
 本記事では参加記として以下の内容を紹介します。
 
@@ -42,7 +42,7 @@ Foursquareは位置を共有するSNS等を提供する企業です。現在は�
 * 名称(name)
 * 住所(country, state, city, address)
 * 緯度経度(latitude, longitude)
-* カテゴリ(categories, 一つのレコードに0~複数個紐づく)
+* カテゴリ(categories, 1つのレコードに0~複数個紐づく)
 * URLや電話番号、郵便番号
 
 下記の表は私がつくったデータの見本です。「フューチャー株式会社」・「Future Corporation」・「フューチャー」はすべて同じPOIですが、欠損や表記ゆれを含んだ状態でデータセットの中に散在しています。訓練データは約110万件、テストデータは約60万件あり、テストデータではPOIが隠された状態で渡されていました。提出は各行のIDに対して同じPOIであるIDを連結したmatchesの出力を求められました。
@@ -57,7 +57,7 @@ Foursquareは位置を共有するSNS等を提供する企業です。現在は�
 # 解法のサマリ
 
 前回紹介した[H&Mコンペ](https://future-architect.github.io/articles/20220602b/)でもそうでしたが、600,000 x 600,000 の組み合わせについてすべて正確に評価することは難しいです。
-そこで、今回は以下の三つのパートで予測を行いました。
+そこで、今回は以下の3つのパートで予測を行いました。
 
 * 全候補から大まかに候補を絞り込むretrieval part
 * 二点間のペアに対して正確な予測を行うpredict part
@@ -67,7 +67,7 @@ Foursquareは位置を共有するSNS等を提供する企業です。現在は�
 
 # 解法の詳細
 
-上記の三つのパートに各データの前処理について加え、前処理から順に説明していきます。
+上記の3つのパートに各データの前処理について加え、前処理から順に説明していきます。
 
 ## 前処理パート
 
@@ -111,7 +111,7 @@ city, state, countryはカテゴリ変数として扱うことにしました。
 
 ### categoriesの前処理
 
-categoriesは一つの列にカンマ区切りで複数のカテゴリが入っていました。そこでカンマ区切りで分割し、RaggedTensorとして扱いました。また、categoriesに何も入っていない場合は"nan"のカテゴリで補完しました。後述のカテゴリ予測モデルを作った後は"nan"の行に予測を行い、カテゴリを一つ追加しました。
+categoriesは1つの列にカンマ区切りで複数のカテゴリが入っていました。そこでカンマ区切りで分割し、RaggedTensorとして扱いました。また、categoriesに何も入っていない場合は"nan"のカテゴリで補完しました。後述のカテゴリ予測モデルを作った後は"nan"の行に予測を行い、カテゴリを1つ追加しました。
 
 ### URL/Phoneの正規化
 
@@ -126,7 +126,7 @@ URLについては[urllib](https://docs.python.org/ja/3/library/urllib.parse.htm
 
 #### embeddingの学習
 
-学習にはname, address, categoriesと、カテゴリ変数にしたcountry, city, state, geo_nameを用い以下の三つのタスクを行いました。
+学習にはname, address, categoriesと、カテゴリ変数にしたcountry, city, state, geo_nameを用い以下の3つのタスクを行いました。
 
 1. 同じname内の単語の共起情報からembeddingを学習するSkip-Gramベースのタスク
 2. categories以外からcategoriesを予測するmetric learningタスク
@@ -153,15 +153,15 @@ embeddingの評価としてデータごとに近傍を取得し、precision@16 (
 |address embedding|0.8690|0.8811|
 |mix embedding|0.8997|0.9120|
 
-nameに関しては、Universal Sentence Encoderよりも高いprecisionで、非常に質の高いembeddingを作成することができました。
+nameに関しては、Universal Sentence Encoderよりも高いprecisionで、非常に質の高いembeddingを作成できました。
 
 ### K-means++ & Word Tour
 
-embeddingをLightGBMのようなGBDTが解釈しやすい形にするため、球面K-means++と[Word Tour](https://arxiv.org/abs/2205.01954)を組み合わせた手法で一次元に落とし込みました。Word Tourはembedding間の距離を元に巡回セールスマン問題(TSP)を解き、その順番でembeddingを並び替えるという手法で、これにより一次元上で距離の近い位置に似たembeddingが並ぶようになります。
+embeddingをLightGBMのようなGBDTが解釈しやすい形にするため、球面K-means++と[Word Tour](https://arxiv.org/abs/2205.01954)を組み合わせた手法で1次元に落とし込みました。Word Tourはembedding間の距離を元に巡回セールスマン問題(TSP)を解き、その順番でembeddingを並び替えるという手法で、これにより1次元上で距離の近い位置に似たembeddingが並ぶようになります。
 
-これは決定木系の分割手法と相性がよく、[Food101のデータセットでの検証を行った際](https://www.kaggle.com/code/nadare/word-tour-experiment/notebook)はPCAでの圧縮よりもはるかに高パフォーマンスに次元を圧縮することができました。また、Food101のラベルについてWord Tourを実施すると、ラベルは以下のように並ぶため、決定木との相性の良さがわかると思います。
+これは決定木系の分割手法と相性がよく、[Food101のデータセットでの検証を行った際](https://www.kaggle.com/code/nadare/word-tour-experiment/notebook)はPCAでの圧縮よりもはるかに高パフォーマンスに次元を圧縮できました。また、Food101のラベルについてWord Tourを実施すると、ラベルは以下のように並ぶため、決定木との相性の良さがわかると思います。
 
-```
+```text
 eggs_benedict
 omelette
 lasagna
@@ -187,8 +187,8 @@ retrieval パートではGPU上で全組み合わせの計算ができる高速�
 
 ### 候補生成
 
-作成したembeddingやhaversine距離を元に一つのサンプルにつき32の候補を作成しLightGBMでの学習・予測に用いました。
-候補生成は以下の五つの方法を用いました。これらはTensorFlowを用いてGPU上で計算を行ったので、全組み合わせについて愚直に計算することができました。
+作成したembeddingやhaversine距離を元に1つのサンプルにつき32の候補を作成しLightGBMでの学習・予測に用いました。
+候補生成は以下の5つの方法を用いました。これらはTensorFlowを用いてGPU上で計算を行ったので、全組み合わせについて愚直に計算できました。
 
 |番号|処理の種類|取得数|
 |-|-|-|
@@ -237,11 +237,11 @@ predict パートでは、ある地点(query)とその候補(candidate)の1:1の
 #### query, candidateのそれぞれのカテゴリとword tourの一次元の距離
 
 IDごとにそれぞれのカテゴリやクラスタを計算し、queryとcandidateの両方のIDとマージしました。
-また、Word Tourで求めたクラスタラベルについては一次元上での距離を計算しました。
+また、Word Tourで求めたクラスタラベルについては1次元上での距離を計算しました。
 
 #### name, addressについてのゲシュタルトマッチング、レーベンシュタイン距離、ジャロ・ウィンクラー距離
 
-これらは文字列の類似度を計算する古典的な手法で、python内蔵の[difflib](https://docs.python.org/ja/3/library/difflib.html)や、[Levenshtein](https://github.com/ztane/python-Levenshtein)といったライブラリで計算することができます。CPUでの計算なので時間はかかりますが、有効な特徴量であったため、3種類の方法で加工したname, addressとname, addressの数字部分だけを抽出したものをこれらの手法で類似度を計算しました。
+これらは文字列の類似度を計算する古典的な手法で、Python内蔵の[difflib](https://docs.python.org/ja/3/library/difflib.html)や、[Levenshtein](https://github.com/ztane/python-Levenshtein)といったライブラリで計算できます。CPUでの計算なので時間はかかりますが、有効な特徴量であったため、3種類の方法で加工したname, addressとname, addressの数字部分だけを抽出したものをこれらの手法で類似度を計算しました。
 
 #### name, addressについてのROUGE-N, ROUGE-L
 
@@ -306,13 +306,13 @@ Postpeocessパートでは、グラフとして予測されたペアをつなげ
 
 ## メモリ増加のテクニック
 
-Kaggleにコードを提出する際、実行には以下の二つの環境を選べます。
+Kaggleにコードを提出する際、実行には以下の2つの環境を選べます。
 
 * 4CPU 16GBRAM 9時間以内
 * 2CPU 13GBRAM 1GPU 16GBRAM 9時間以内
 
 今回のコンペにとってはメモリが少なく、OOMを起こしやすい実行環境でした。
-そこで私は以下の二つの工夫をしました。
+そこで私は以下の2つの工夫をしました。
 
 * 予測は10000行単位で特徴量生成→予測の流れで行う。
 * BoWの行列はTensorFlowのRaggedTensorやSparseTensorに変換し、embeddingと一緒にGPU RAMに配置する。
@@ -321,7 +321,7 @@ embeddingをGPUに配置することで実質29GBのメモリを使えること�
 
 ## 高速化のテクニック
 
-また、embeddingのコサイン類似度やROUGEの計算はGPUで行い、lgbmの推論もForestInferenceによるGPUでの推論を活用することで高速化できました。これのおかげで提出から結果が出るまでの時間はおよそ5時間で、4時間の余裕がありました。これを有効活用できなかったのは残念ですが、余裕をもって特徴量生成に集中することができました。
+また、embeddingのコサイン類似度やROUGEの計算はGPUで行い、lgbmの推論もForestInferenceによるGPUでの推論を活用することで高速化できました。これのおかげで提出から結果が出るまでの時間はおよそ5時間で、4時間の余裕がありました。これを有効活用できなかったのは残念ですが、余裕をもって特徴量生成に集中できました。
 
 ## 各言語処理のテクニック
 
@@ -340,7 +340,7 @@ embeddingをGPUに配置することで実質29GBのメモリを使えること�
 
 # リーク問題について
 
-今回のコンペは参加者が推論を行うコードを提出すると、参加者が直接見ることのできないtestデータで評価を行われPublicとPrivateのリーダーボードが更新されました。しかし、コンペ終了後運営のミスによってtestデータの67%がtrainデータと一致していた可能性が参加者から指摘されました。(trainデータのnameと緯度経度が完全一致するレコードについてLB上で検証が行われました。)7/19時点で全提出について重複を排除したデータについて再評価が行われ、一部のチームに追加の賞金が支払われることが決まりました。
+今回のコンペは参加者が推論を行うコードを提出すると、参加者が直接見ることのできないtestデータで評価を行われPublicとPrivateのリーダーボードが更新されました。しかし、コンペ終了後運営のミスによってtestデータの67％がtrainデータと一致していた可能性が参加者から指摘されました。(trainデータのnameと緯度経度が完全一致するレコードについてLB上で検証が行われました。)7/19時点で全提出について重複を排除したデータについて再評価が行われ、一部のチームに追加の賞金が支払われることが決まりました。
 
 このリークにより金圏付近までの解法の良しあしの比較が困難になってしまいました。ただ、リークがあったにしろ上位の解法は納得のできるもので、私自身も自身の解法は他にも活用できる自信を持っています。このリークによって上位の解法の価値がなくなったわけではないことについて、理解が広まればいいなと考えています。
 

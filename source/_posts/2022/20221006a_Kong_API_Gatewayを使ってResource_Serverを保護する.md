@@ -28,7 +28,7 @@ https://future-architect.github.io/articles/20210610a/
 
 [Kong](https://github.com/Kong/kong)はOSSから始まったAPIサーバのトラフィックを管理するためのミドルウェアです。
 
-NginxベースにLuaJITエンジンを使ってLuaスクリプトが組み込めるWebプラットフォームの[OpenResty](https://openresty.org)を採用し、Luaで書かれた様々なPlug-inをデフォルトで揃え、それを組み立てることでAPIGatewayの機能を実装しています。また、Luaスクリプトで新しいカスタムPlug-inを作りそれを組み込むことも可能です。
+nginxベースにLuaJITエンジンを使ってLuaスクリプトが組み込めるWebプラットフォームの[OpenResty](https://openresty.org)を採用し、Luaで書かれた様々なPlug-inをデフォルトで揃え、それを組み立てることでAPIGatewayの機能を実装しています。また、Luaスクリプトで新しいカスタムPlug-inを作りそれを組み込むことも可能です。
 
 Enterprise版が登場してからはAPIGateway以外にも様々さサービスがありますが、今回はKong Gatewayにのみ注目して行きたいです。
 
@@ -36,10 +36,10 @@ Enterprise版が登場してからはAPIGateway以外にも様々さサービス
 
 構築の話になる前にかんたんにKongの構造を触れていきます。上の図のようにKongは基本的にConsumer/Route/Service/LoadBalancer(Upstream)の4つのレイヤリングが存在します。Kongで使う様々なPlug-inはこの4つのレイヤーのどこか、もしくはGlobalに組み込むこともできます。
 
-- **Consumer**: Kongを実際利用するAPIClient(もしくはユーザ)を表すEntity
-- **Route**: Requestのルールを定義するEntity
-- **Service**: KongがProxyするBackendServiceを表すEntity
-- **Upstream**: Backendの負荷分散やHealthCheckなどに使う仮想ホストのEntity
+- **Consumer**: Kongを実際利用するAPIClient(もしくはユーザ)を表すエンティティ
+- **Route**: Requestのルールを定義するエンティティ
+- **Service**: KongがProxyするBackendServiceを表すエンティティ
+- **Upstream**: Backendの負荷分散やHealthCheckなどに使う仮想ホストのエンティティ
 
 # Actors
 
@@ -78,7 +78,7 @@ Kongは設定の保存先としてDBを使うのでPostgreSQLもインストー�
 
 Kongはデフォルトで
 
-- Port 8001：あらゆるEntity設定を行うのAdminAPI
+- Port 8001：あらゆるエンティティ設定を行うのAdminAPI
 - Port 8000：実際トラフィックをさばくProxy
 
 に分かれています。
@@ -120,7 +120,7 @@ curl -i http://localhost:8000/mock/requests # 401 Unauthorized
 
 ## Consumer
 
-次はConsumerの設定です。ConsumerはAPI Clientを表すEntityですが、今回の場合は特定認可サーバ(Keycloak)に認証済みのユーザ全員を表すために予め設定するものになります。
+次はConsumerの設定です。ConsumerはAPI Clientを表すエンティティですが、今回の場合は特定認可サーバ(Keycloak)に認証済みのユーザ全員を表すために予め設定するものになります。
 
 ```sh
 curl -X POST http://localhost:8001/consumers -d "username=authorized_user"

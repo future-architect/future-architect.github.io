@@ -1,5 +1,5 @@
 ---
-title: "Groovyスクリプトで、ファイルの最終更新日時をgit clone/pullの日時ではなく、commit日時にしてみた"
+title: "Groovyスクリプトで、ファイルの最終更新日時を`git clone/pull`の日時ではなく、commit日時にしてみた"
 date: 2022/02/21 00:00:00
 postid: a
 tag:
@@ -23,25 +23,25 @@ lede: "こんにちは、TIG コアテクノロジーユニットの田中です
 
 # 背景
 
-git clone/pullした時に、ローカルにチェックアウトされたファイルの最終更新日時がどうなっているかご存知でしょうか。
+`git clone/pull`した時に、ローカルにチェックアウトされたファイルの最終更新日時がどうなっているかご存知でしょうか。
 
-答えは`git clone/pullした時刻`です。(pullした場合はcommitがあったファイルのみ最終更新日時が変わります)
+答えは `git clone/pull` した時刻 です。(pullした場合はコミットがあったファイルのみ最終更新日時が変わります)
 
 この時困るのが、ファイルの最終更新日時を見てファイルの更新有無を判定し、更新があったファイルにのみ処理を実行する、いわゆる`差分解析`のような事を行いたいケースです。
 
-git cloneをやり直した場合、全てのファイルの最終更新日時が変わってしまうので、結局差分解析が全てのファイルに対して走ってしまいます。pullした場合はcommitがあったファイルのみ最終更新日時が変わるので、基本的にはcloneはやり直さずpullし続ければ意図通りの差分解析を行う事は可能です。
+クローンをやり直した場合、全てのファイルの最終更新日時が変わってしまうので、結局差分解析が全てのファイルに対して走ってしまいます。pullした場合はコミットがあったファイルのみ最終更新日時が変わるので、基本的にはcloneはやり直さずpullし続ければ意図通りの差分解析を行う事は可能です。
 
-しかし例えば、Jenkinsでスポットインスタンスを立ち上げた場合や、GitHub Actions/GitLab CIで実行した場合など、毎回git cloneが必要な場合があります。
+しかし例えば、Jenkinsでスポットインスタンスを立ち上げた場合や、GitHub Actions/GitLab CIで実行した場合など、毎回クローンが必要な場合があります。
 
-こういった状況でも差分解析を意図通りに行うため、ファイルの最終更新日時をcloneした日時ではなく、`commitした日時`である必要があります。
+こういった状況でも差分解析を意図通りに行うため、ファイルの最終更新日時をcloneした日時ではなく、`コミットした日時`である必要があります。
 
-実はこれを実現するためのPerlスクリプトがgit公式から配布されています。今回はJVMで動かしたかったので、同様の処理を行う`Groovyスクリプト`を作成しました。
+実はこれを実現するためのPerlスクリプトがGit公式から配布されています。今回はJVMで動かしたかったので、同様の処理を行う`Groovyスクリプト`を作成しました。
 
 # Perlスクリプト
 
 まずはPerlスクリプトを用いた方法から紹介していきます。
 
-git公式で配布されているPerlスクリプトは[こちら](https://git.wiki.kernel.org/index.php/ExampleScripts#Setting_the_timestamps_of_the_files_to_the_commit_timestamp_of_the_commit_which_last_touched_them)にあります。
+Git公式で配布されているPerlスクリプトは[こちら](https://git.wiki.kernel.org/index.php/ExampleScripts#Setting_the_timestamps_of_the_files_to_the_commit_timestamp_of_the_commit_which_last_touched_them)にあります。
 
 このスクリプトの探索および内容理解のため以下記事を参考にしました。
 
@@ -52,11 +52,11 @@ Perlスクリプトの全量は以下です。
 
 処理の方針としては比較的単純です。
 
-1. gitの`コミットログ`から各ファイルのコミット情報を取得
+1. Gitの`コミットログ`から各ファイルのコミット情報を取得
 1. コミットの新しい順に、対応するローカルファイルの最終更新時間をコミット時間で上書き
 1. コミットログで同一ファイルが出てきたら、最新のコミット時間を優先
 
-ローカルのgit定義フォルダルートでスクリプトを実行すると、各ファイルの最終更新時間がコミット時間に変更されます。
+ローカルのGit定義フォルダルートでスクリプトを実行すると、各ファイルの最終更新時間がコミット時間に変更されます。
 
 ```bash 実行
 perl git-set-file-times.pl
@@ -94,7 +94,7 @@ $/ = "\n";
 open FH, "git log -m -r --name-only --no-color --pretty=raw -z @ARGV |" or die $!;
 while (<FH>) {
 	chomp;
-    # 「comitter」キーワード行に記載されているcommit日時を抽出
+    # 「comitter」キーワード行に記載されているコミット日時を抽出
 	if (/^committer .*? (\d+) (?:[\-\+]\d+)$/) {
 		$commit_time = $1;
     # 「commit」キーワード直前にcommit対象ファイル一覧が記載されている
@@ -113,12 +113,12 @@ while (<FH>) {
 close FH;
 ```
 
-イメージしやすさのため、各gitコマンドで取得されるデータ例を記載しておきます。
+イメージしやすさのため、各Gitコマンドで取得されるデータ例を記載しておきます。
 
 * `git ls-files -z`
   * `-z`をつけているため、ファイルはASCII NULで区切られています。
   * `<0x00>`の箇所にASCII NULが入っています。
-  * ターミナルやコマンドプロンプトでgit ls-files -z してもNULは見えないのですが、Groovyで`'git ls-files -z'.execute().text`の実行結果をファイルに出力後、[Windows版Sublime Text](https://www.sublimetext.com/3)で確認しました。
+  * ターミナルやコマンドプロンプトでGit ls-files -z してもNULは見えないのですが、Groovyで`'git ls-files -z'.execute().text`の実行結果をファイルに出力後、[Windows版Sublime Text](https://www.sublimetext.com/3)で確認しました。
 エディタやビューアによってはNUL文字表示をサポートしていないものがあるようです。
 
 <img src="/images/20220221a/image.png" alt="NUL文字表示" width="941" height="162" loading="lazy">
@@ -126,7 +126,7 @@ close FH;
 * `git log -m -r --name-only --no-color --pretty=raw -z`
   * `--name-only`で更新ファイルの情報を表示します。
   * `-z`で1コミットログがASCII NULで区切られます。
-  * git logのオプション詳細は[こちら](https://git-scm.com/docs/git-log)。
+  * Git logのオプション詳細は[こちら](https://git-scm.com/docs/git-log)。
   * `<0x00>`の箇所にASCII NULが入っています。
   * この出力の見方は、`git ls-files`の出力の見方と同様です。
 
@@ -138,7 +138,7 @@ close FH;
 
 処理の流れは基本的にPerlスクリプトの時と同じです。
 
-スクリプトの全量は以下です。ローカルのgit定義フォルダルートでスクリプトを実行すると、各ファイルの最終更新時間がコミット時間に変更されます。
+スクリプトの全量は以下です。ローカルのGit定義フォルダルートでスクリプトを実行すると、各ファイルの最終更新時間がコミット時間に変更されます。
 
 ```bash 実行
 groovy git-set-file-times.groovy
@@ -213,7 +213,7 @@ if(files.remove(update_file)){
 
 * `files.remove(update_file)`で配列filesから`update_file`要素を削除。削除出来た場合はtrueを返す。
 * `f = new File(update_file)`で、`update_file`で指定したローカルファイルを取得
-* `f.setLastModified((update_time as long) * 1000)`で、ファイルの最終更新時間を上書き。コミットログで取得したUnix時間は10桁なので、13桁に合わせるため1000倍している。
+* `f.setLastModified((update_time as long) * 1000)`で、ファイルの最終更新時間を上書き。コミットログで取得したUNIX時間は10桁なので、13桁に合わせるため1000倍している。
 
 Groovyのキャッチアップは以下のサイトを参考にしました。
 
@@ -223,9 +223,9 @@ Groovyのキャッチアップは以下のサイトを参考にしました。
 
 # 処理時間の比較
 
-それぞれのスクリプトを、23,898ファイルを持つgitプロジェクトで実行して処理時間を測定しました。対象プロジェクトの開発期間は6年程で、コミットログもそれなりに育っているという状況です。(4334コミット)
+それぞれのスクリプトを、23,898ファイルを持つGitプロジェクトで実行して処理時間を測定しました。対象プロジェクトの開発期間は6年程で、コミットログもそれなりに育っているという状況です。(4334コミット)
 
-git clone/pullの時間は含んでおらず、純粋なスクリプト実行時間のみを測定しています。Perlスクリプトのほうが速いという結果にはなりましたが、`Groovyスクリプトでも2.4万ファイルに対して約5秒`と十分な性能である事が確認できました。
+`git clone/pull`の時間は含んでおらず、純粋なスクリプト実行時間のみを測定しています。Perlスクリプトのほうが速いという結果にはなりましたが、`Groovyスクリプトでも2.4万ファイルに対して約5秒`と十分な性能である事が確認できました。
 
 スクリプト | 処理時間(3回平均)
 --- | ---
@@ -246,7 +246,7 @@ powershell -C (Measure-Command {groovy git-set-file-times.groovy}).TotalSeconds
 
 # Groovyスクリプト改良版
 
-git logのオプションでフォーマットを指定すると、変更に強く、かつスッキリとしたソースになります。
+Git logのオプションでフォーマットを指定すると、変更に強く、かつスッキリとしたソースになります。
 
 `--pretty="--pretty=format:"update_time:%ct"`と`--name-only`を指定することで、必要最小限の情報、コミット時間と更新ファイルのみを出力させる事が出来ます。`--pretty`の詳細は[こちらのwiki](https://git-scm.com/docs/pretty-formats)を参考にして下さい。
 
@@ -278,7 +278,7 @@ for (log in logs) {
 }
 ```
 
-この場合のgit log出力例は以下のようになります。
+この場合のGit log出力例は以下のようになります。
 
 * `git log -m -r --name-only --no-color --pretty=format:"update_time:%ct" -z`
 

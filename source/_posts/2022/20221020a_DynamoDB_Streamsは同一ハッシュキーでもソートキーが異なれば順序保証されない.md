@@ -60,7 +60,7 @@ DynamoDB Streamsについては1.5年前に似たような小ネタを投稿し�
 
 [Amazon DynamoDB ストリームを使用して、順序付けされたデータをアプリケーション間でレプリケーションする方法 | Amazon Web Services ブログ](https://aws.amazon.com/jp/blogs/news/how-to-perform-ordered-data-replication-between-applications-by-using-amazon-dynamodb-streams/) からの図を参照します。
 
-DynamoDB Streamsは内部的にシャードと呼ばれる単位で分割されています。シャードがどういう単位で分割されるかは利用者側の制御ができず、操作数に応じて柔軟に拡大・縮小する仕組みです。（下図だと3シャードに分かれており、その単位でLambdaが起動します。）
+DynamoDB Streamsは内部的にシャードと呼ばれる単位で分割されています。シャードがどのような単位で分割されるかは利用者側の制御ができず、操作数に応じて柔軟に拡大・縮小する仕組みです（下図だと3シャードに分かれており、その単位でLambdaが起動します）。
 
 <img src="/images/20221020a/DDB-Stream.jpg" alt="DDB-Stream.jpg" width="880" height="459" loading="lazy">
 

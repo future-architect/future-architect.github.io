@@ -31,7 +31,7 @@ TIG DXユニットの岸下です。2022年2月にキャリア入社して、早
 Google WorkspaceはGoogleが提供する組織向けオンラインアプリケーションセットです。
 
 [Google Workspace Admin SDK](https://developers.google.com/admin-sdk)はGoogle Workspaceに存在する情報を取得するための管理者向けSDKになっています。
-また、[Directory API](https://developers.google.com/admin-sdk/directory)はGoogle Workspaceで利用しているドメインのユーザーや繋がっているデバイス、サードパーティアプリケーションを管理したり、取得したりすることができます。
+また、[Directory API](https://developers.google.com/admin-sdk/directory)はGoogle Workspaceで利用しているドメインのユーザーや繋がっているデバイス、サードパーティアプリケーションを管理したり、取得したりできます。
 
 ## 何をしていたのか
 
@@ -175,7 +175,7 @@ func main() {
 
 > Indicates that the user rate limit has been exceeded. The default value set in the Google Developers Console is 3,000 queries per 100 seconds per IP address.
 
-### 解決策①：リクエスト間隔に余裕を持たせる
+### 解決策（1）：リクエスト間隔に余裕を持たせる
 
 高速でリクエストを投げつけるとDoSアタックと勘違いされてブロックされる場合もあるのでちゃんと間隔をおいてリクエストを投げましょう。
 
@@ -207,7 +207,7 @@ func GetGroupMember() ([]GroupMember, error) {
 }
 ```
 
-### あれ？またリクエストがコケたぞ
+### あれ？ またリクエストがコケたぞ
 
 リクエスト間隔を調整したにも関わらず、たまーに500エラーが返ってきます。
 
@@ -215,7 +215,7 @@ func GetGroupMember() ([]GroupMember, error) {
 > "You did everything right, but Google is having some trouble handling your request."
 > （コードは正しく書けているけど、Google側でリクエストを処理しようとした際に何かしらのエラーが起きているみたいよ）
 
-### 解決策②：指数バックオフを導入する
+### 解決策（2）：指数バックオフを導入する
 
 こういったケースはどのAPIでもあり得るので、 **[指数バックオフ](https://cloud.google.com/memorystore/docs/redis/exponential-backoff?hl=ja)** を導入しましょう。
 「指数バックオフ？？数学＋横文字やめて！」となるかもしれませんが、簡単にまとめると「APIへリクエストしたにも関わらず失敗した際に、時間を少しおいてリクエストをもう一度送る」処理になります。

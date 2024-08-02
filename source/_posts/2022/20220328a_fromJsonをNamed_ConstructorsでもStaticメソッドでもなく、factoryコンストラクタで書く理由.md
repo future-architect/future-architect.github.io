@@ -60,7 +60,7 @@ class Album {
 
 ## Static Methodで無い理由
 
-Static Methodで実装した例です。呼び出され方は変わりませんし、ほぼstaticがついたくらいの変更でしょうか。（正確にはAlbumとfromJsonの間はドットからスペースに変わりましたが）
+Static Methodで実装した例です。呼び出され方は変わりませんし、ほぼstaticがついたくらいの変更でしょうか（正確にはAlbumとfromJsonの間はドットからスペースに変わりましたが）
 
 ```dart Static Methodの例
   static Album fromJson(Map<String, dynamic> json) {
@@ -72,7 +72,7 @@ Static Methodで実装した例です。呼び出され方は変わりません�
   }
 ```
 
-[StackOverFlow](https://stackoverflow.com/questions/62014117/dart-named-constructor-vs-static-method-what-to-prefer)でもStatic MethodとNamed Constructorのどっちが良いのか？という似たような議論がありました。詳細はそれらに譲るとして、通常インスタンスを提供する目的であれば、コンストラクタで準備しておくほうがユーザーにとって自然でしょう。DartのLinterルールにも[prefer_constructors_over_static_methods](https://dart-lang.github.io/linter/lints/prefer_constructors_over_static_methods.html) とあり、あえて独自ルールを作ることも無いと思います。
+[StackOverFlow](https://stackoverflow.com/questions/62014117/dart-named-constructor-vs-static-method-what-to-prefer)でもStatic MethodとNamed Constructorのどっちが良いのか？ という似たような議論がありました。詳細はそれらに譲るとして、通常インスタンスを提供する目的であれば、コンストラクタで準備しておくほうがユーザーにとって自然でしょう。DartのLinterルールにも[prefer_constructors_over_static_methods](https://dart-lang.github.io/linter/lints/prefer_constructors_over_static_methods.html) とあり、あえて独自ルールを作ることも無いと思います。
 
 というわけで、fromJsonをStatic Methodで実装することはまぁ無いよね、ということはすぐにわかりました。
 
