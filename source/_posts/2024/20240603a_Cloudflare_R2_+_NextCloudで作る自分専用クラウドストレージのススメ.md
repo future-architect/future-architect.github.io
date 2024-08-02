@@ -264,7 +264,7 @@ sudo systemctl enable nginx
 
 <img src="/images/20240603a/image_2.png" alt="image.png" width="913" height="574" loading="lazy">
 
-続いてPHPをインストールします。デフォルトではPHP 8.2がインストールされるようだったので、リポジトリを追加してPHP8.3をインストールします。以下コマンドを実行し、 `php8.3` と `php8.3-fpm` 、それから各種モジュールをインストールします。
+続いてPHPをインストールします。デフォルトではPHP 8.2がインストールされるようだったので、リポジトリを追加してPHP 8.3をインストールします。以下コマンドを実行し、 `php8.3` と `php8.3-fpm` 、それから各種モジュールをインストールします。
 
 ```bash
 sudo wget -qO /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg

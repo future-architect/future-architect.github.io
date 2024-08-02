@@ -73,14 +73,14 @@ Googleには所々に自転車が置いてあり、社員でなくとも利用�
 <img src="/images/20170322/photo_20170322_06.jpeg" loading="lazy">
 
 ということで、Facebook本社に着きました。
-facebookは、オリジナル番地を取得しており、住所が**「1 Hacker Way」**です。
+Facebookは、オリジナル番地を取得しており、住所が**「1 Hacker Way」**です。
 
 **Hacker Way：速く・大胆に・オープンであれ**
 
 <img src="/images/20170322/photo_20170322_07.jpeg" loading="lazy">
 
 元々ここの敷地はSun Microsystemsで、そこにFacebookが移転しました。
-なので、facebookの看板裏には、Sun Microsystemsの文字が・・・。
+なので、Facebookの看板裏には、Sun Microsystemsの文字が・・・。
 
 <img src="/images/20170322/photo_20170322_08.jpeg" loading="lazy">
 
@@ -140,7 +140,7 @@ Elastic{ON}の対応でほぼ全ての社員が出ていると思うので受付
 # さいごに
 
 はい！ ということで、シリコンバレー巡礼はこれにておしまいです！
-洋平さん！お忙しいところ本当にありがとうございましたm(_ _)m
+洋平さん！ お忙しいところ本当にありがとうございましたm(_ _)m
 貴重な体験をさせていただきました☆彡
 
 <img src="/images/20170322/photo_20170322_18.jpeg" loading="lazy">

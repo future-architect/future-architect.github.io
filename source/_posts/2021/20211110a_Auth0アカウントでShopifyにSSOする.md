@@ -193,18 +193,18 @@ Shopifyストアの現在のテーマの`コードを編集`をクリックし�
 
 <img src="/images/20211110a/技術ブログ⑩.png" alt="技術ブログ⑩.png" width="764" height="95" loading="lazy">
 
-- **auth0-instance**：Auth0ドメイン（例：sample.jp.auth0.com）
-- **clientid**：Auth0アプリケーションからの値。
-- **shopify-domain**：自身のストアのドメイン。
-- **return-to-path**：任意で返したいパスを設定可能（例：ログイン後にアカウントページに遷移させたい場合は、`account`と設定）。
+- `auth0-instance`：Auth0ドメイン（例：sample.jp.auth0.com）
+- `clientid`：Auth0アプリケーションからの値。
+- `shopify-domain`：自身のストアのドメイン。
+- `return-to-path`：任意で返したいパスを設定可能（例：ログイン後にアカウントページに遷移させたい場合は、`account`と設定）。
 
 `https://{auth0-instance}/authorize?response_type=code&client_id={clientid}&return_to=https://{shopify-domain}/{return-to-path}&scope=SCOPE&state=STATE`
 
 同様にログアウトURLも作成します。
 
-- **auth0-instance**：Auth0ドメイン（例：sample.jp.auth0.com）
-- **clientid**：Auth0アプリケーションからの値。
-- **shopify-domain**：自身のストアのドメイン。
+- `auth0-instance`：Auth0ドメイン（例：sample.jp.auth0.com）
+- `clientid`：Auth0アプリケーションからの値。
+- `shopify-domain`：自身のストアのドメイン。
 
 `https://{auth0-instance}.auth0.com/v2/logout?response_type=code&client_id={clientid}&returnTo=https://{shopify-domain}/account/logout`
 

@@ -16,7 +16,6 @@ lede: "RedmineとGitLabリポジトリを連携するRedmine GitLab Adapter Plug
 
 ## はじめに
 
-
 こんにちは、TIGコアテクノロジーユニットの高橋・小松です。
 
 RedmineとGitLabリポジトリを連携する[Redmine GitLab Adapter Plugin](https://github.com/future-architect/redmine_gitlab_adapter)を開発しましたので紹介させていただきます。
@@ -139,7 +138,6 @@ GitLabのURLにコンテキストパスが含まれている場合は
 ### 8. 補足
 
 本プラグインでRedmineへ新規にGitLabリポジトリを登録するとデータのロードが完了するまでは画面表示に時間がかかることがあります。リポジトリ画面へのアクセス、もしくはfetch_changesetsの実行により500件ごとにRedmineDBへロードされます。従来でも必要ですが同様にcron等でfetch_changesetsを定期実行するようにしてください。
-
 
 ## 動作確認
 

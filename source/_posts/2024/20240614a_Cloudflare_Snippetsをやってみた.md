@@ -41,7 +41,7 @@ Cloudflare Workers はWeb Workershttps://developer.mozilla.org/en-US/docs/Web/AP
 
 <img src="/images/20240614a/2.png" alt="" width="1200" height="766" loading="lazy">
 
-この性質により、1つ処理を一つのSnippetsとして分割しておくことで、一つの通信に複数のSnippetsを起動させる、ということも可能です。
+この性質により、1つ処理を1つのSnippetsとして分割しておくことで、1つの通信に複数のSnippetsを起動させる、ということも可能です。
 
 また、Workersと異なり、最大実行時間は5msで最大メモリは2MB、パッケージの合計サイズは32KBと小さいのも特徴です。
 

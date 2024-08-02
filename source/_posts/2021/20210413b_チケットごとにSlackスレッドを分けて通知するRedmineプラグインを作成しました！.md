@@ -25,7 +25,6 @@ lede: "Futureでは約一年前にコミュニケーションツールとして�
 
 ## はじめに
 
-
 こんにちは、TIGコアテクノロジーユニットの高橋・小松です。
 
 皆さん、Slack使っていますか？
@@ -92,12 +91,9 @@ Google Hangoutsは任意の値をスレッドIDとできるためRedmineチケ�
 
 ```
 
-
-
 ## インストールと設定
 
 ### 1. インストール
-
 
 [README](https://github.com/future-architect/redmine_slack_integration/blob/master/README.md)を参照してください。
 
@@ -135,11 +131,7 @@ Google Hangoutsは任意の値をスレッドIDとできるためRedmineチケ�
     * 「OAuth Tokens for Your Team」-> 「Bot User OAuth Token」のトークン内容をメモしてください（「Copy」をクリック）
     <img src="/images/20210413b/20210302_090112_KthIlVZmu6RK.png" alt="2021-03-02_20h56_42.png" loading="lazy">
 
-
-
 ### 3. Redmine設定
-
-
 
 #### 3-1. Redmineプロジェクト設定
 
@@ -177,8 +169,6 @@ Google Hangoutsは任意の値をスレッドIDとできるためRedmineチケ�
 
 ## 動作確認
 
-
-
 ### チケット新規起票
 
 <img src="/images/20210413b/20210311_064251_fBozRNNlpJMZ.png" alt="2021-03-04_11h32_12.png" loading="lazy">
@@ -211,5 +201,3 @@ TIGコアテクノロジーユニットでは、現在チームメンバーを�
 興味がある方はお気軽に技術ブログTwitterや会社採用HPへ、連絡をお待ちしております。
 
 https://www.future.co.jp/recruit/
-
-
