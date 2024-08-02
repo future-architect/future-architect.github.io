@@ -89,10 +89,10 @@ class DialogPatternPage extends StatelessWidget {
 }
 ```
 
-### 2. Stack ウィジェット Pattern
+### 2. `Stack Widget` Pattern
 
-Stack ウィジェットを用いて、状態（ローディング中かどうか）の変化の場合にインジケータを表示するパターンです。
-Stateful ウィジェットとしてピュアに実装すると下記のようなイメージになります。
+`Stack Widget`を用いて、状態（ローディング中かどうか）の変化の場合にインジケータを表示するパターンです。
+`Stateful Widget`としてピュアに実装すると下記のようなイメージになります。
 
 ```dart
 class StackWidgetPatternPage extends StatefulWidget {
@@ -158,7 +158,7 @@ Riverpodの[AsyncValue](https://riverpod.dev/ja/docs/providers/future_provider/)
 
 ### どちらを採用するか
 
-ソースコードを見てわかる通り、1のDialog Patternが「命令的」にインジケータを表示しているのに対し、2のStack ウィジェット Patternは状態の変化に応じて「宣言的」にインジケータを表示しています。
+ソースコードを見てわかる通り、1のDialog Patternが「命令的」にインジケータを表示しているのに対し、2の`Stack Widget` Patternは状態の変化に応じて「宣言的」にインジケータを表示しています。
 Flutter自体が「宣言的UIのフレームワーク」と言われているように、ダイアログの表示も「宣言的」に行う[^1]方が筆者としては自然に感じます。
 
 Dialog Patternの場合は、Navigatorに依存しており、ダイアログの非表示を`Navigator.pop()`で行わなければならない点が意図しない挙動を生む可能性があると考えています。なぜなら`Navigator.pop()`はスタックに積まれた一番上のページをpopしているだけであり、インジケータを閉じることを保証している訳ではないからです。
@@ -214,7 +214,7 @@ class LoadingService extends StateNotifier<bool> {
 
 ## UIの共通化
 
-先ほどの例でみたパターン2のStack ウィジェット Patternでは個々のページにStack ウィジェットを定義しなければなりませんでした。
+先ほどの例でみたパターン2の`Stack Widget` Patternでは個々のページに`Stack Widget`を定義しなければなりませんでした。
 これを共通化するためにMaterialApp ウィジェットの`builder`プロパティを利用することで、MaterialAppの配下かつ、Navigatorよりも上層に共通的にウィジェットを定義できます。
 
 ```dart

@@ -15,7 +15,7 @@ lede: "VS CodeのDevToolsをを使用したWidget Buildの可視化について�
 # はじめに
 
 こんにちは。TIGの藤田です。
-[Dart/Flutter連載](/articles/20220315a/) の2日目として、VSCodeの[DevTools](https://docs.flutter.dev/development/tools/devtools/overview)を使用したウィジェット Buildの可視化についてご紹介します。
+[Dart/Flutter連載](/articles/20220315a/) の2日目として、VSCodeの[DevTools](https://docs.flutter.dev/development/tools/devtools/overview)を使用した`Widget Build`の可視化についてご紹介します。
 
 Flutterアプリの開発では、ウィジェットのビルド単位を考えてコードを記述/改修すると思います。
 [AndroidStudioのPerformance機能](https://docs.flutter.dev/development/tools/android-studio#show-performance-data)を使ってウィジェットのリビルドを確認している例は見かけるのですが、VSCodeでの確認方法を見かけなかったため調べてみました。予想以上に高機能で、今回使わなかった機能も含めて活用どころがありそうです。
@@ -28,9 +28,9 @@ Flutterアプリの開発では、ウィジェットのビルド単位を考え�
 
 # VSCode Dart DevTools
 
-Flutter公式の[DevTools](https://docs.flutter.dev/development/tools/devtools/overview)は、VSCodeの[Dart Extension](https://marketplace.visualstudio.com/items?itemName=Dart-Code.dart-code), [Flutter Extension](https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter)のインストールと共にインストールされます。レイアウト構造を可視化/編集できる[Flutter Inspector](https://docs.flutter.dev/development/tools/devtools/inspector) がよく使われると思いますが、他にもCPUやメモリ、Networkの可視化など多機能です。今回は、[Performance view](https://docs.flutter.dev/development/tools/devtools/performance)機能を使ってウィジェット Buildをタイムラインで確認してみます。
+Flutter公式の[DevTools](https://docs.flutter.dev/development/tools/devtools/overview)は、VSCodeの[Dart Extension](https://marketplace.visualstudio.com/items?itemName=Dart-Code.dart-code), [Flutter Extension](https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter)のインストールと共にインストールされます。レイアウト構造を可視化/編集できる[Flutter Inspector](https://docs.flutter.dev/development/tools/devtools/inspector) がよく使われると思いますが、他にもCPUやメモリ、Networkの可視化など多機能です。今回は、[Performance view](https://docs.flutter.dev/development/tools/devtools/performance)機能を使って`Widget Build`をタイムラインで確認してみます。
 
-# ウィジェット Buildをタイムラインで確認する
+# `Widget Build`をタイムラインで確認する
 
 1. devTools起動: [公式手順](https://docs.flutter.dev/development/tools/devtools/vscode)に従って、アプリの起動後にDevToolsを起動します。
 2. DevToolsのPerformanceタブを開きます。
@@ -46,9 +46,9 @@ Flutter公式の[DevTools](https://docs.flutter.dev/development/tools/devtools/o
 
 <img src="/images/20220317a/image.png" alt="image.png" width="963" height="749" loading="lazy">
 
-# 実装のウィジェット Buildへの影響を確認
+# 実装の`Widget Build`への影響を確認
 
-例として、アニメーションの実装方法によるウィジェット Buildパターンの違いをタイムラインで確認します。今回はiOSシミュレータ（iPhone 13）を使用しています。
+例として、アニメーションの実装方法による`Widget Build`パターンの違いをタイムラインで確認します。今回はiOSシミュレータ（iPhone 13）を使用しています。
 
 １） 全体ビルド（アンチパターン）。
 bodyのアニメーションのためにsetState()することで、レイアウト全体をビルドしてしまっています。

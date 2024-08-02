@@ -278,11 +278,11 @@ type File interface {
   * どこにキャッシュを用いると効果的かの勘所
   * 高速化の工夫と、マウントを経由しない別経路での更新（例えばAWS CLIで直接更新など）とのバランス（キャッシュの有効期限のパラメータ調整）
 * 例えばVS Codeがどのような情報をファイルシステムに問い合わせているか、FUSE側のAPI呼び出しのログを見てイメージが湧いた
-  * VS Codeでmy-bucket/aaa/bbb/hello.txtにあるマウントしたファイルを開くと、以下のファイルを探していた
-    * my-bucket/aaa/bbb/Git.exe
-    * my-bucket/aaa/.Git
-    * my-bucket/aaa/HEAD
-    * my-bucket/.Git
+  * VS Codeで `my-bucket/aaa/bbb/hello.txt` にあるマウントしたファイルを開くと、以下のファイルを探していた
+    * `my-bucket/aaa/bbb/git.exe`
+    * `my-bucket/aaa/.git`
+    * `my-bucket/aaa/HEAD`
+    * `my-bucket/.git`
 * FUSE、思ったよりWSL2でシャキシャキ動く
   * Windowsならではのハマりがもっと壮絶にあると思ったんですが、環境周りのハマりはほぼ無しで余裕でした
     * 逆にMacは新しいバージョンの手持ちが無く動作検証ができず

@@ -122,7 +122,7 @@ class BigUIElementState extends State<BigUIElement> {
 }
 ```
 
-このボタンが変更する状態のスコープが限定的な場合（例えばいいねボタンの様にクリックによってボタン自身の色を変更するようなケース）は、`Functional Widget`ではなくStateful ウィジェットとして切り出した方がリビルドの範囲を限定できるため、パフォーマンスの面で優れています。
+このボタンが変更する状態のスコープが限定的な場合（例えばいいねボタンの様にクリックによってボタン自身の色を変更するようなケース）は、`Functional Widget`ではなく `Stateful Widget` として切り出した方がリビルドの範囲を限定できるため、パフォーマンスの面で優れています。
 
 ```dart
 class BigUIElementState extends State<BigUIElement> {
