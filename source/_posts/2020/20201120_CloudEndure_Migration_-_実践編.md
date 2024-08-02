@@ -481,7 +481,7 @@ CloudEndureコンソールの「JobProgress」を確認すると、CutOverが開
 
 AWSのコンソールを確認すると、テストモードで起動したEC2インスタンスが終了後されていることがわかります。
 <img src="/images/20201120/TestMode_Machine終了.png" loading="lazy">
-（後続の動作は、テストモードと同一であるため、省略します。）
+（後続の動作は、テストモードと同一であるため、省略します）。
 
 カットオーバーが完了しました。
 <img src="/images/20201120/Launch_Target(CutOver)成功.png" loading="lazy">

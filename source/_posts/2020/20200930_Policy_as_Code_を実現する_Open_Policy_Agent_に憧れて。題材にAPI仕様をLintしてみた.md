@@ -48,7 +48,7 @@ Policy as Codeの先駆けは自分が知る限り HashiCorp の [Sentinel](http
 
 * [HashiCorp、インフラ変更全体にまたがるアクセス権を設定する「Sentinel」発表「Policy as Code」を実現するフレームワーク。HashiConf'17 - Publickey](https://www.publickey1.jp/blog/17/hashicorpsentinelpolicy_as_codehashiconf17.html)
 
-Sentinelは非常に気になっていて、最近[バイナリがダウンロード](https://docs.hashicorp.com/sentinel/downloads/)できるぞ！と、伊藤さんに教えてもらいましたが、利用ライセンスがよく分からないため触れずでした。（ご存知の方は教えて下さい）
+Sentinelは非常に気になっていて、最近[バイナリがダウンロード](https://docs.hashicorp.com/sentinel/downloads/)できるぞ！ と、伊藤さんに教えてもらいましたが、利用ライセンスがよく分からないため触れずでした（ご存知の方は教えて下さい）
 
 Sentinelと同様にOpen Policy AgentはPolicy as Codeを掲げています。個人的にはチーム開発において大小様々なポリシーが明示的にも暗黙的にも存在するため、これをポリシーコード化することで、良い成果を生み出せるのではと期待しています。
 
@@ -192,7 +192,7 @@ OPAは`github.com/open-policy-agent/opa/rego`パッケージを利用するこ�
 
 ドキュメントそのままですが、転載します。いわゆるルールは module 変数に代入しています。`rego.New`で `rego.Rego` を作成してから、`PrepareForEval` で `PreparedEvalQuery` を作成すると、`Eval` で評価できます。OPAからするとRegoはモジュールと呼ばれているので、ここの表現は慣れかなと思います。
 
-Regoモジュールの内容は、HTTP Requestが指定のパスか、Adminだったら評価するというものです。リクエストが1つ目の条件を満たしているので、評価結果は `x:true` を取得できています。（最後のコメント部分）
+Regoモジュールの内容は、HTTP Requestが指定のパスか、Adminだったら評価するというものです。リクエストが1つ目の条件を満たしているので、評価結果は `x:true` を取得できています（最後のコメント部分）
 
 全文は[こちら](https://github.com/laqiiz/openpolicyagent-example/blob/master/exmaple/example.go)に載せています。
 

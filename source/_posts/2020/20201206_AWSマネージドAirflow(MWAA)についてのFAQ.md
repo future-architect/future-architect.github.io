@@ -29,7 +29,7 @@ AWS マネージド Airflow (MWAA) が 2020/11/24 にリリースされました
 
 ## MWAA (Managed Workflow for Apache Airflow) とは?
 
-[Airflow](https://airflow.apache.org/) のマネージドサービスで、インスタンスやDB管理不要で、Airflowを利用することができます。Airflow 完全互換を謳っており、フォークしたソースではなく、Airflow 本体が利用されています。Auto Scaling に対応しており、 worker 数を設定した最大数まで自動でスケールアップしてくれます。また、ログインのための、ユーザー権限制御に IAM を利用しており、詳細な権限制御が可能です。
+[Airflow](https://airflow.apache.org/) のマネージドサービスで、インスタンスやDB管理不要で、Airflowを利用できます。Airflow 完全互換を謳っており、フォークしたソースではなく、Airflow 本体が利用されています。Auto Scaling に対応しており、 worker 数を設定した最大数まで自動でスケールアップしてくれます。また、ログインのための、ユーザー権限制御に IAM を利用しており、詳細な権限制御が可能です。
 
 [MWAA 公式ドキュメント](https://docs.aws.amazon.com/mwaa/latest/userguide/what-is-mwaa.html)
 
@@ -139,13 +139,13 @@ VPC の設定が必須です。
 * Internet Gateway
 * Nat Gateway
 
-※ 適当に subnet 指定した場合、起動しませんでした..
+※ 適当に subnet 指定した場合、起動しませんでした.。
 
 ### Airflow CLIの実行方法は?
 
-CLI は http ごしに実行することができます。
+CLI は http ごしに実行できます。
 
-① aws cli でトークンを取得
+（1） aws cli でトークンを取得
 
 ```sh
 aws mwaa create-cli-token --name ${airflow name}
@@ -155,7 +155,7 @@ aws mwaa create-cli-token --name ${airflow name}
 }
 ```
 
-② airflow cli を実行
+（2） airflow cli を実行
 リクエスト Body にコマンドを指定します。標準出力と、標準エラー出力が base64 エンコードされて返ってきます。
 
 ```sh

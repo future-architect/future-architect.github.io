@@ -34,7 +34,7 @@ JavaScriptでビルドといっても、いろいろなステップがありま�
 2. SCSSとかPostCSSを使ってブラウザにない機能を使って書かれたCSSを素のCSSに変換
 3. webpackなどを使って、1つのJavaScriptファイル、もしくは遅延ロードをするJSファイル群を生成
 
-まあ実際にはこんなに綺麗にステップが分かれることはなくて、webpackがimport文を追跡しつつファイルを探し、.tsを見つけてはTypeScriptで処理して（コンパイル）、コード中にSCSSを見つけてはSCSSの処理系に投げて、一つのファイルにまとめる（バンドル）・・みたいな工程を行ったりきたりしながらビルドします。以前は、これにJake、Gulp、Gruntなどのタスクランナーも組み合わせてやってましたが、今はwebpack単体にts-loaderなどを組み合わせる感じで一通りできます。webpackが[シェア80%](https://www.jetbrains.com/lp/devecosystem-2019/javascript/)で一強ですね。
+まあ実際にはこんなに綺麗にステップが分かれることはなくて、webpackがimport文を追跡しつつファイルを探し、.tsを見つけてはTypeScriptで処理して（コンパイル）、コード中にSCSSを見つけてはSCSSの処理系に投げて、1つのファイルにまとめる（バンドル）・・みたいな工程を行ったりきたりしながらビルドします。以前は、これにJake、Gulp、Gruntなどのタスクランナーも組み合わせてやってましたが、今はwebpack単体にts-loaderなどを組み合わせる感じで一通りできます。webpackが[シェア80%](https://www.jetbrains.com/lp/devecosystem-2019/javascript/)で一強ですね。
 
 なお、これにファイルの変更検知を行って、変更時に変更部分だけをビルド（ウォッチ）、読み込んでいるブラウザに変更したことを伝えてリロードを行わせる開発サーバーとよぶサーバーも加えると、世間で「JavaScriptのビルドツール」と呼ぶ機能はだいたい網羅されるんじゃないですかね。
 
@@ -47,7 +47,7 @@ npm install -D parcel-bundler
 npx parcel build src/index.ts
 ```
 
-エントリーポイントにHTMLファイルを指定できて、フロントエンド開発の開発サーバーも付いている。これは無敵！と思いきや・・・わざと型を間違ったTypeScriptのファイルを入力しても何もエラーも出ません。
+エントリーポイントにHTMLファイルを指定できて、フロントエンド開発の開発サーバーも付いている。これは無敵！ と思いきや・・・わざと型を間違ったTypeScriptのファイルを入力しても何もエラーも出ません。
 
 これは現在は意図した動作らしく、Parcelは最速でバンドルするだけを目指しており、設計方針としてエラーは出さないとのこと。もしかしたら、TypeScriptで開発し、Visual Studio CodeとかWebStorm上でエラーが出てくるなら問題ないとも言えるかもしれません。とはいえ、せっかくのチェック機構をまったく無視するのはTypeScriptを使うメリットがだいぶ削られてしまいます。また、別途CIなりを整備するのもちょっと手間ですよね。まあ、TypeScriptとかが流行る前は型チェックなんてなかったわけで、ちょっと昔の感覚を思い出しました。
 
@@ -190,7 +190,7 @@ ts-nodeは実行にtypescriptパッケージが必要で、ts-nodeとtypescript�
 
 Babelの作者とかが関わっているツールです。コンパイラ、Linter、フォーマッター、テスト、バンドラーなどを全部まとめて持っていて、外部依存がないのがウリとのこと。なお、ウェブサイトはありますが、それよりも[GitHubのREADME](https://github.com/facebookexperimental/rome)の方がいろいろプロジェクトの背景等が詳しく書かれていたりします（実行の仕方の説明はREADMEは古くて動かないですが）。
 
-npmにも上がっていないので、git cloneするところから。
+npmにも上がっていないので、Git cloneするところから。
 
 ```bash
 git clone --depth 1 https://github.com/facebookexperimental/rome

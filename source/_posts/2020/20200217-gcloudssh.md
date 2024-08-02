@@ -133,6 +133,6 @@ Last login: Sun Feb 16 11:58:05 2020 from 126.228.201.100
 hoge@test-instance:~$
 ```
 
-これで快適なsshライフ??が送れますね
+これで快適なsshライフ?? が送れますね
 
 [GCP連載企画](/articles/20200202/)の8日目でした。次は村瀬さんの[初めてのGCP 画像AI(Vision API)をさわってみた](/articles/20200218/)です。

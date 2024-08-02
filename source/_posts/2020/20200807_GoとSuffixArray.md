@@ -24,7 +24,7 @@ TIG の辻です。
 
 Go は標準ライブラリが充実しているとよく言われます。標準ライブラリだけで、HTTP サーバを作れたり、暗号化処理や、JSON や CSV といったデータ形式を扱うことができます。`go list std | grep -v vendor | wc -l` としてパッケージ数を見てみると、約 200 ものパッケージが存在することがわかります。本記事では、その多くの Go の標準ライブラリの中でも、個人的に面白いなと思ったライブラリを紹介したいと思います。[suffixarray](https://golang.org/pkg/index/suffixarray/) パッケージです。
 
-`suffixarray` パッケージは Suffix Array を扱うライブラリです。`suffixarray` パッケージの魅力を感じるには、まず Suffix Array とは何か？を知る必要があるでしょう。
+`suffixarray` パッケージは Suffix Array を扱うライブラリです。`suffixarray` パッケージの魅力を感じるには、まず Suffix Array とは何か？ を知る必要があるでしょう。
 
 ## Suffix Arrayとは
 
@@ -61,7 +61,7 @@ Suffix Array は文字列のすべての suffix を辞書順でソートし、�
 |    5     | na     |
 |    3     | nana   |
 
-よって、`banana` の文字列における Suffix Array とは [6, 4, 2, 1, 5, 3] という配列になります。suffix の開始位置があれば元の suffix を構成することができ、開始位置から n 文字目までの部分文字列になります。`banana` における suffix の開始位置が 3 であれば元の suffix は 3 文字目から 6 文字目までの部分文字列であるため、`nana` という suffix であることがわかります。
+よって、`banana` の文字列における Suffix Array とは [6, 4, 2, 1, 5, 3] という配列になります。suffix の開始位置があれば元の suffix を構成でき、開始位置から n 文字目までの部分文字列になります。`banana` における suffix の開始位置が 3 であれば元の suffix は 3 文字目から 6 文字目までの部分文字列であるため、`nana` という suffix であることがわかります。
 
 ### 文字列のパターンマッチング
 
@@ -120,7 +120,7 @@ suffix: anana, match: an
 
 https://play.golang.org/p/JFNugaoB26N
 
-このパターンマッチングは元の文字列 T の長さを $n$ として、マッチングしたい文字列 P の長さを $m$ とすると $O(m \log n)$ 時間でマッチングできます。Go の [sort.Search](https://golang.org/pkg/sort/#Search) 関数はソートされた配列やスライスに対して条件を満たす最小の index を二分探索することができます。上記の実装では、suffix における prefix の先頭 `len(p)` 文字目までの部分文字列とマッチングしたい文字列 `p` を [strings.Compare](https://golang.org/pkg/strings/#Compare) で比較し、結果が 0 以上と 1 となる最小の index  [^3]を探索しています。Suffix Array に対して二分探索を行うことによって、パターンマッチングするときは、元の文字列の長さに対して、対数時間でおさえることができます。
+このパターンマッチングは元の文字列 T の長さを $n$ として、マッチングしたい文字列 P の長さを $m$ とすると $O(m \log n)$ 時間でマッチングできます。Go の [sort.Search](https://golang.org/pkg/sort/#Search) 関数はソートされた配列やスライスに対して条件を満たす最小の index を二分探索できます。上記の実装では、suffix における prefix の先頭 `len(p)` 文字目までの部分文字列とマッチングしたい文字列 `p` を [strings.Compare](https://golang.org/pkg/strings/#Compare) で比較し、結果が 0 以上と 1 となる最小の index  [^3]を探索しています。Suffix Array に対して二分探索を行うことによって、パターンマッチングするときは、元の文字列の長さに対して、対数時間でおさえることができます。
 
 ## Suffix Array の構築
 

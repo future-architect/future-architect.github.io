@@ -33,7 +33,7 @@ IaCがアプリケーション開発やっと同じ土俵に立った今、同�
 
 # Terraform Validator とは
 
-これを実現するのが、今回紹介する **Terraform Validator** です。Terraform Validatorは、 **terraformがapplyされる前に、インフラのリソース設定が定義したポリシーに従っているかをチェックすることができるツール**です。GCPのオープンソースとして公開されています。 [GoogleCloudPlatform/terraform-validator](https://github.com/GoogleCloudPlatform/terraform-validator)
+これを実現するのが、今回紹介する **Terraform Validator** です。Terraform Validatorは、 **terraformがapplyされる前に、インフラのリソース設定が定義したポリシーに従っているかをチェックできるツール**です。GCPのオープンソースとして公開されています。 [GoogleCloudPlatform/terraform-validator](https://github.com/GoogleCloudPlatform/terraform-validator)
 
 以下が概要の図です。
 
@@ -143,9 +143,9 @@ Found Violations:
 Constraint allow_some_storage_location on resource //storage.googleapis.com/validator-trial: //storage.googleapis.com/validator-trial is in a disallowed location.
 ```
 
-Validationによりポリシー違反を検知しました！🚫
+Validationによりポリシー違反を検知しました！ 🚫
 
-main.tf を修正して..
+main.tf を修正して.。
 
 ```diff
 resource "google_storage_bucket" "validator_trial" {
@@ -158,14 +158,14 @@ resource "google_storage_bucket" "validator_trial" {
 }
 ```
 
-再度実行してみると..
+再度実行してみると.。
 
 ```bash
 $ terraform-validator validate --policy-path=${POLICY_PATH} ./terraform.tfplan.json
 No violations found
 ```
 
-今度はValidationが成功しました！✅ 期待通りの動きをしてくれました。
+今度はValidationが成功しました！ ✅ 期待通りの動きをしてくれました。
 
 # ポリシー定義 (Policy as code)
 
@@ -242,7 +242,7 @@ PR上でのフィードバックのイメージ
 
 # 最後に
 
-本記事ではあまり触れませんでしたが、実は、[Forseti](https://forsetisecurity.org/)というツールを用いてOngoingでの監視も可能です。こちらもGCPが公開しているオープンソースのツールです。これを用いれば、一元管理されたポリシーでTerraform経由ではない手作業によるポリシー違反の発生も検知することができます。
+本記事ではあまり触れませんでしたが、実は、[Forseti](https://forsetisecurity.org/)というツールを用いてOngoingでの監視も可能です。こちらもGCPが公開しているオープンソースのツールです。これを用いれば、一元管理されたポリシーでTerraform経由ではない手作業によるポリシー違反の発生も検知できます。
 
 <img src="/images/20200213/photo_20200213_06.png" loading="lazy">
 

@@ -29,12 +29,12 @@ lede: "現在業務では直接開発をする機会はないのですが、業�
 
 Webページの閲覧や情報の検索に使用するブラウザに、自身で選んだ機能を追加することで、日常業務や作業を効率化して、便利にしてくれるものです。
 
-皆さんもお気に入りのものを追加して日々の業務で使用されているのではないでしょうか？拡張機能はChrome以外のブラウザ（IE、Firefox等）でも存在し、アドオンとかextensionという言い方もしますよね。
+皆さんもお気に入りのものを追加して日々の業務で使用されているのではないでしょうか？ 拡張機能はChrome以外のブラウザ（IE、Firefox等）でも存在し、アドオンとかextensionという言い方もしますよね。
 
 この拡張機能、Google Storeから好きなものを追加できますが、自分で作成することもできるのです。
 
 * What are extensions?: https://developer.chrome.com/extensions
-* 拡張機能とは何か？: https://developer.mozilla.org/ja/docs/Mozilla/Add-ons/WebExtensions/What_are_WebExtensions
+* 拡張機能とは何か？ : https://developer.mozilla.org/ja/docs/Mozilla/Add-ons/WebExtensions/What_are_WebExtensions
 
 # 用意する物
 
@@ -54,7 +54,7 @@ desktop
 
 * [JavaScriptでカレンダーを自作したら勉強になった](https://qiita.com/kan_dai/items/b1850750b883f83b9bee)
 
-縦の軸と横の軸を考えて、毎月曜日や日にちが変わる状況で、土日祝日も反映させるにはどうすればいいか..？など頭を使いますが、for文とif文の練習になりますよ！
+縦の軸と横の軸を考えて、毎月曜日や日にちが変わる状況で、土日祝日も反映させるにはどうすればいいか..？ など頭を使いますが、for文とif文の練習になりますよ！
 
 JavaScriptの基本から勉強するには、MDNのこちらのサイトがおすすめです。
 
@@ -157,7 +157,7 @@ MDNにも詳しく載っています。
 
 次に、jQueryを使用して、指定した画面にカレンダーをが表示されるようにしてみました。
 https://jquery.com/
-からjQueryをインストールし、同一フォルダにjquery.jsとして保存して、manifest.jsonを以下の様に記載します。
+からjQueryをインストールし、同一フォルダにjQuery.jsとして保存して、manifest.jsonを以下の様に記載します。
 
 ```json manifest.json
 {
@@ -199,12 +199,12 @@ https://jquery.com/
 
 #### - js
 
-動作させるjsファイルを記載します。ここにjquery.jsも記載します。
+動作させるjsファイルを記載します。ここにjQuery.jsも記載します。
 
 `www.google.com` には、searchformというidのdivがあります。
 calendar.jsに以下を追記し、https://www.google.com/ を開いたときに、`www.google.com`のsearchformというidを持ったdivにcalendarというidを持ったdivが追加され、calendar.jsに記載されているカレンダーが表示されるようにします。
 
-jQueryのappendメソッドは、要素を追加できるメソッドで、HTMLを直接指定することができます。
+jQueryのappendメソッドは、要素を追加できるメソッドで、HTMLを直接指定できます。
 
 ```js calendar.js
 $('#searchform').append(`<div id="calendar"></div>`)
@@ -221,7 +221,7 @@ Myextension
   └ jquery.js     # wwww.google.comにdivを追加するために使用
 ```
 
-拡張機能を読み込み直し、”matches”で指定したhttps://www.google.com/ を開くと、カレンダーを表示することができました。
+拡張機能を読み込み直し、”matches”で指定したhttps://www.google.com/ を開くと、カレンダーを表示できました。
 <img src="/images/20200625/photo_20200625_03.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
 今回は以上です。いかがでしたでしょうか？

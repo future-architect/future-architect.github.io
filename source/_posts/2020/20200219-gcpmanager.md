@@ -83,7 +83,7 @@ resources:
 
 リソースのデプロイは、`gcloud`をコマンドを使用してデプロイします。
 
-まずは、プレビューで作成したいと思います。プレビューを指定すると作成や更新前にどのような変化をもたらすかを確認することができます。要は、dry-run 的な用途で使えるオプションです。
+まずは、プレビューで作成したいと思います。プレビューを指定すると作成や更新前にどのような変化をもたらすかを確認できます。要は、dry-run 的な用途で使えるオプションです。
 
 #### コマンドの構成について
 
@@ -111,7 +111,7 @@ test-vm  compute.v1.instance  IN_PREVIEW  []      CREATE_OR_ACQUIRE
 ```
 
 実行結果のステータスが、`IN_PREVIEW`であることからプレビュー状態であることがわかります。
-プレビュー実行後にブラウザで確認すると以下のように構成などを確認することができます。
+プレビュー実行後にブラウザで確認すると以下のように構成などを確認できます。
 
 <img src="/images/20200219/photo_20200219_01.png" loading="lazy">
 
@@ -136,7 +136,7 @@ test-vm  compute.v1.instance  COMPLETED  []
 <img src="/images/20200219/photo_20200219_02.png" loading="lazy">
 
 その他のコマンドを紹介したいと思います。
-[list](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/list)コマンドでデプロイの一覧を表示することができます。
+[list](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/list)コマンドでデプロイの一覧を表示できます。
 
 ```bash
 $ gcloud deployment-manager deployments list
@@ -144,7 +144,7 @@ NAME  LAST_OPERATION_TYPE  STATUS  DESCRIPTION  MANIFEST  ERRORS
 test  preview              DONE                           []
 ```
 
-[describe](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/describe)コマンドでデプロイの詳細情報を確認することができます。
+[describe](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/describe)コマンドでデプロイの詳細情報を確認できます。
 
 ```bash
 $ gcloud deployment-manager deployments describe test
@@ -241,13 +241,13 @@ test-vm-02  compute.v1.instance  COMPLETED  []
 
 <img src="/images/20200219/photo_20200219_03.png" loading="lazy">
 
-このようにYAML で定義ファイルを書いて作成することができることがわかりました。
+このようにYAML で定義ファイルを書いて作成できることがわかりました。
 しかし、このような書き方では冗長さを感じてしまいますね。
 次は、再利用性を高めるためのテンプレートを紹介します。
 
 ## テンプレートを利用する
 
-テンプレートを利用するとリソースを定義したファイルを独立させて再利用性を高めることができます。テンプレートを作成するには、<font color="DeepSkyBlue">Python</font>や<font color="DeepSkyBlue">Jinja2</font>を使用することができます。Pythonを使用する場合は、Python 3.x で作成する必要があります（公式ドキュメントの日本語サイトだとPython 2.7 と記載がありますが、英語サイトだとPython 3.x と記載があるので注意）
+テンプレートを利用するとリソースを定義したファイルを独立させて再利用性を高めることができます。テンプレートを作成するには、<font color="DeepSkyBlue">Python</font>や<font color="DeepSkyBlue">Jinja2</font>を使用できます。Pythonを使用する場合は、Python 3.x で作成する必要があります（公式ドキュメントの日本語サイトだとPython 2.7 と記載がありますが、英語サイトだとPython 3.x と記載があるので注意）
 
 ### テンプレートの作成
 
@@ -266,7 +266,7 @@ test-vm-02  compute.v1.instance  COMPLETED  []
 ### 環境変数とプロパティについて
 
 テンプレートのプロパティは、任意の変数を表します。
-例えば以下のように変数を指定することができます。
+例えば以下のように変数を指定できます。
 
 ```python
 context.properties['zone'],
@@ -448,7 +448,7 @@ gcloud deployment-manager deployments update test-templates --config vms.yaml
 GCP リソースをPython で操れることで、自由度の高いテンプレートを作成できる点は面白いと思いました。
 また、Terraform は、tfstate というファイルをGCS やS3 に保存する必要があるので、アクセス権限や同時実行などを気にする必要がありますが、CloudFormation 同様に状態管理は、GCP 側でよしなにやってもらえるのもメリットだと感じました。
 
-ただ、Google 自体は[Terraformer](https://github.com/GoogleCloudPlatform/terraformer)などのツールを作成していることから割とTerraform 推しなのでは？と感じるところもあります（個人的見解）
+ただ、Google 自体は[Terraformer](https://github.com/GoogleCloudPlatform/terraformer)などのツールを作成していることから割とTerraform 推しなのでは？ と感じるところもあります（個人的見解）
 
 そのため、個人的には、GCP だけでなくAWS や、最近ではAlibaba Cloud などのクラウドを利用する機会が多いので、Terraform 一択になってしまうのが本音です。とはいえ、今回のように触れたことのないサービスを使ってみるのも新たな知見として楽しめるので、今後もいろいろ触れていきたいと思います。
 

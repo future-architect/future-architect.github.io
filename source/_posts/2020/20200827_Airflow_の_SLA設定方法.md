@@ -34,7 +34,7 @@ def sla_alert(
 
 ## SLA設定
 
-SLA とは Service Level Agreement の略で、サービス提供者が保証する品質を明示する際に利用されます。当 Airflow の SLA は、各 Task が指定の時間内に終わることを保証する形で定義されます。
+SLA とは Service Level Agreement の略で、サービス提供者が保証する品質を明示する際に利用されます。当 Airflow の SLA は、各 Task が指定の時間内に終わることを保証する形で定義されます。
 
 そのため、Airflow は 各 Task に対して SLA 値(時間) を設定できます。
 
@@ -51,7 +51,7 @@ t1 = PythonOperator(
 )
 ```
 
-SLA 違反をした Task が発生した場合、以下2パターンで通知をすることができます
+SLA 違反をした Task が発生した場合、以下2パターンで通知をできます
 
 - Email
 - sla_miss_callback (Function) の任意実装

@@ -15,13 +15,13 @@ lede: "ARMなMacが出るとWWDCで発表されてから首を長くしてまっ
 
 ARMなMacが出るとWWDCで発表されてから首を長くしてまっていて、発表と同時にMacBook Proを買って、[アプリケーションのARMネイティブ対応](https://qiita.com/shibukawa/items/797b7cbb7e530842e6f7)がされているかいろいろインストールして試してみたりしています。まだ発売されて2週間足らずですが（といっても、みんな開発キットをつかって以前から準備したようですが）、動作しているアプリケーションは多いです。発売後にも、Erlang、Node.jsあたりはmasterブランチにパッチが入りました。Goも、[昨日パッチがマージ](https://github.com/golang/go/issues/38485)されました。
 
-業務利用が多い言語のうちの一つということで、手元のPCで軽くベンチマークをとってみました。使った機種は3つです。
+業務利用が多い言語のうちの1つということで、手元のPCで軽くベンチマークをとってみました。使った機種は3つです。
 
 * 2020モデルのM1のMacBook Pro
 * 2020モデルの10th Gen Core i5のMacBook Air
 * Ryzen 9 4900HSのASUSのZephyrus G14
 
-前2つがTDP 10Wクラスの中、RyzenだけTDP 35Wでだいぶ上のクラスではあります。ベンチマークは[github.com/SimonWaldherr/golang-benchmarks](https://github.com/SimonWaldherr/golang-benchmarks)を利用しています。Goはmasterの[0433845](https://github.com/golang/go/commit/0433845ad18a355413033bb3495ba3195f4c69ec)をとってきて、Intel Mac上から、bootstrap.bashでarm64/darwin、amd64/darwin、amd64/windowsの3セット作って使いました。コア数はそれぞれ8(低速4+高速4)、8(物理4、論理8)、16(物理8、論理16)と構成に違いはあるものの、特にマルチスレッド性能を測るテストはなく、-cpuオプションを設定しても結果は違いがなかったので、デフォルト値で実行しています。
+前2つがTDP 10Wクラスの中、RyzenだけTDP 35Wでだいぶ上のクラスではあります。ベンチマークは[github.com/SimonWaldherr/golang-benchmarks](https://github.com/SimonWaldherr/golang-benchmarks)を利用しています。Goはmasterの[0433845](https://github.com/golang/go/commit/0433845ad18a355413033bb3495ba3195f4c69ec)をとってきて、Intel Mac上から、bootstrap.bashでarm64/darwin、amd64/darwin、amd64/Windowsの3セット作って使いました。コア数はそれぞれ8(低速4+高速4)、8(物理4、論理8)、16(物理8、論理16)と構成に違いはあるものの、特にマルチスレッド性能を測るテストはなく、-cpuオプションを設定しても結果は違いがなかったので、デフォルト値で実行しています。
 
 ベンチマークの数値の結果は[こちら](https://docs.google.com/spreadsheets/d/1hzwyeWSNknyV3AhAnOJOifoR1f8UxQP_N9jMJv26Deg/edit?usp=sharing)です。Goのベンチマークはタスクごとの経過時間で出てくるので、MacBook Airの結果を100として相対値をとってグラフにしたのが以下の図です（項目が多くてラベルが半分非表示になっていますが）。グラフは短いほど高速です。
 

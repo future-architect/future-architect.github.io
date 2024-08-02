@@ -27,7 +27,7 @@ lede: "こんにちは、Android Developerの佐藤です。モバイルアプ�
 Firebaseとは、AndroidやiOSなどのモバイルアプリのバックエンド機能を提供してくれるサービスです。
 [提供されているサービス](https://firebase.google.com/products?hl=ja)は、利用状況の解析、クラッシュの検知、認証、通知、ホスティングなど多種多様です。
 これらのサービスを利用する上で、サーバーの管理が不要なのはもちろん、導入する上で追加のコーディングはほぼ必要ありません。
-`Firebase SDK`をアプリのソースコードに組み込むだけで、Firebaseの機能を利用することができます。
+`Firebase SDK`をアプリのソースコードに組み込むだけで、Firebaseの機能を利用できます。
 
 ※ Firebaseはモバイルアプリだけでなく、Webアプリにも対応しています。サービスごとに、対応しているプラットフォームが異なる点に注意が必要です。
 
@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
 `Firebase SDK`は、開発者が意図しない強制終了(クラッシュ)が発生したときに、自動でスタックトレースをFirebaseに送信してくれます。上のコードでいうと`FATAL`ボタンをクリックしたときにアプリが強制終了してしまいますが、裏でSDKがクラッシュレポートをFirebaseに送信してくれます。
 
-クラッシュが起きないようにエラーハンドリングはしているけれど、開発者目線で「この例外の発生は検知したい」というような場合がよくあります。そういった場合は、`Crashlytics.logException()`メソッドを利用します。発生した例外を「非致命的(Non-fatal)」な例外としてFirebaseに通知することができます。
+クラッシュが起きないようにエラーハンドリングはしているけれど、開発者目線で「この例外の発生は検知したい」というような場合がよくあります。そういった場合は、`Crashlytics.logException()`メソッドを利用します。発生した例外を「非致命的(Non-fatal)」な例外としてFirebaseに通知できます。
 
 ## Firebaseコンソールでクラッシュレポートを確認する
 
@@ -211,7 +211,7 @@ Crashlytics.setUserIdentifier("user0001");
 
 # 最後に
 
-Firebase Crashlyticsは本当にさくっと導入することができます。
+Firebase Crashlyticsは本当にさくっと導入できます。
 ユーザーの端末に埋もれてしまいがちなクラッシュ情報に簡単にアクセスできるのが嬉しいポイントですね。
 [クラッシュレポートはカスタマイズ](https://firebase.google.com/docs/crashlytics/customize-crash-reports?platform=android)もできるのですが、`build.gradle`にSDKを追加するだけのシンプルな実装だけでも大変役に立ちます。
 

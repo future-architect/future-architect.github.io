@@ -34,9 +34,9 @@ lede: "プロダクションコードでたくさんRedux周りにもreducerな�
 
 # Redux Toolkit
 
-Reduxは、いくつもの部品を実装する必要がありました。まずはReducer。入力と出力にstate、中に巨大なswitch文と値を書き換えるロジックを持ちます。Reducerに食わせるためにAction Creatorというのが必要でした。さらに非同期な処理をするにはRedux Thunkとかが必要で、さらにcombineReducerで複数のReducerを一つにまとめ・・・みたいな。Redux周りでもフォルダ構造を事前に定義して、拡張性を考えて何個もファイルをフォルダに分散しておいたり・・・みたいな感じですよね？
+Reduxは、いくつもの部品を実装する必要がありました。まずはReducer。入力と出力にstate、中に巨大なswitch文と値を書き換えるロジックを持ちます。Reducerに食わせるためにAction Creatorというのが必要でした。さらに非同期な処理をするにはRedux Thunkとかが必要で、さらにcombineReducerで複数のReducerを1つにまとめ・・・みたいな。Redux周りでもフォルダ構造を事前に定義して、拡張性を考えて何個もファイルをフォルダに分散しておいたり・・・みたいな感じですよね？
 
-また、TypeScriptのシェアが伸びる時期のもので型情報は一応つけられるものの、型情報をつけるための型、みたいな動くものを作るのとはちょっと違う手間暇がかかっていました。特にFluxは処理の流れが循環するというアーキテクチャなので、reducerを定義するにはアクションのキーを定義したいし、引数のactionは他のすべてのアクションの和集合として型定義したい、で非同期アクションを定義するにはstateも扱うからreducer周りの型定義を利用したい、あれ？参照が循環するぞ、またこの定義は別ファイルに書かないと、みたいなTypeScriptで使うための苦労がやたらと多い。
+また、TypeScriptのシェアが伸びる時期のもので型情報は一応つけられるものの、型情報をつけるための型、みたいな動くものを作るのとはちょっと違う手間暇がかかっていました。特にFluxは処理の流れが循環するというアーキテクチャなので、reducerを定義するにはアクションのキーを定義したいし、引数のactionは他のすべてのアクションの和集合として型定義したい、で非同期アクションを定義するにはstateも扱うからreducer周りの型定義を利用したい、あれ？ 参照が循環するぞ、またこの定義は別ファイルに書かないと、みたいなTypeScriptで使うための苦労がやたらと多い。
 
 Redux Toolkitでは`createSlice()`という関数が提供されており、これを使うと、初期値とaction creatorとreducerが一発で作られます。巨大なswitch文を書く必要がなく、小さい処理単位で関数を定義すると、裏でswitch文相当を作ってくれます。Win32 APIとMFCみたいな感じです。
 
@@ -56,7 +56,7 @@ Reduxを使ったアプリケーションの心臓部のReducerとstoreです。
 
 <img src="/images/20200501/1.png" loading="lazy">
 
-これは処理の呼び出しの依存ですが、やっかいなのはaction creatorを実装するときのデータはreducerに流れる（reduxがやってくれる）ので、実装するときの脳みそとしてはこちらの依存も解決する必要がありますが、あくまでもコードの依存だけ取り上げています。
+これは処理の呼び出しの依存ですが、やっかいなのはaction creatorを実装するときのデータはreducerに流れる（Reduxがやってくれる）ので、実装するときの脳みそとしてはこちらの依存も解決する必要がありますが、あくまでもコードの依存だけ取り上げています。
 
 非同期の処理のためにRedux Thunkを使う場合は依存が追加で発生します。
 
@@ -64,7 +64,7 @@ Reduxを使ったアプリケーションの心臓部のReducerとstoreです。
 
 ## TypeScriptを使おうとした場合
 
-TypeScriptだとactionやstateの型定義を行い、コードの中で矛盾がないか確認したいですよね？いくつか型定義を追加する必要がでてきます。入りきらないので折り返しました。blockdiagのfolded初めて使って見ました。
+TypeScriptだとactionやstateの型定義を行い、コードの中で矛盾がないか確認したいですよね？ いくつか型定義を追加する必要がでてきます。入りきらないので折り返しました。blockdiagのfolded初めて使って見ました。
 
 <img src="/images/20200501/3.png" loading="lazy">
 
@@ -76,13 +76,13 @@ Redux thunkで非同期を扱うとこんな感じに。
 
 ここまでくれば、型が揃うので、reducerの中でも型チェックがききますし、action cratorの中の属性名の間違いもわかりますが・・・得られるメリットに対してコストがかかりすぎているなぁ、と思っていました。
 
-関数で純粋だぜっていっても、型システムの都合上、依存関係が循環しそうになると、ファイル分割とかに頭を使う必要が出てきます。TypeScriptのファイルの行数もすごく増えてしまう。Redux以下を1ファイルに全部まとめちゃえば解決するといえばするのですが、そもそも大規模アプリに導入するのが前提のRedux。1000行とか2000行のファイルのメンテなんてしたくないですよね？しかも、１つのアクションを修正するのに、ファイルの上の方やら下の方やら同時に直す必要がある。
+関数で純粋だぜっていっても、型システムの都合上、依存関係が循環しそうになると、ファイル分割とかに頭を使う必要が出てきます。TypeScriptのファイルの行数もすごく増えてしまう。Redux以下を1ファイルに全部まとめちゃえば解決するといえばするのですが、そもそも大規模アプリに導入するのが前提のRedux。1000行とか2000行のファイルのメンテなんてしたくないですよね？ しかも、１つのアクションを修正するのに、ファイルの上の方やら下の方やら同時に直す必要がある。
 
 ## Redux Toolkit + TypeScriptの場合
 
 Redux Toolkitは、この分散したものを集めます。APIがいろいろあるのですが、[createSlice](https://redux-toolkit.js.org/usage/usage-with-typescript#createslice)という便利なやつがあります。
 
-sliceというのは、状態とそれを変更するアクションをまとめたものです。どこかで見たことがあるやつですね？そうです。オブジェクト指向です。状態とメソッドの塊をつくってくれるのです。しかも、State以外、型定義らしい型定義もありません。きちんと推論でぜんぶまるっとやってくれるのです。
+sliceというのは、状態とそれを変更するアクションをまとめたものです。どこかで見たことがあるやつですね？ そうです。オブジェクト指向です。状態とメソッドの塊をつくってくれるのです。しかも、State以外、型定義らしい型定義もありません。きちんと推論でぜんぶまるっとやってくれるのです。
 
 <img src="/images/20200501/5.png" loading="lazy">
 
@@ -147,7 +147,7 @@ export const store = configureStore({
 
 ## Reduxを使う側も型を生かす
 
-Redux Tooolkitの機能ではないのではなく、react-redux側の機能ですが、Reduxを使う側も型が活かせます。このインプットにはRedux Toolkitを使って作ったStoreから、Stateの型を取り出すことで簡単にセットアップが可能です。これでカスタム版の``useSelector``を作ります。
+Redux Tooolkitの機能ではないのではなく、reactRedux側の機能ですが、Reduxを使う側も型が活かせます。このインプットにはRedux Toolkitを使って作ったStoreから、Stateの型を取り出すことで簡単にセットアップが可能です。これでカスタム版の``useSelector``を作ります。
 
 ```ts
 import { useSelector as rawUseSelector, TypedUseSelectorHook } from 'react-redux';
@@ -161,7 +161,7 @@ export type RootState = ReturnType<typeof store.getState>;
 export const useSelector: TypedUseSelectorHook<RootState> = rawUseSelector
 ```
 
-Reactコード側では、react-reduxの``useSelector()``を直接使うのではなく、このストア定義の中で作ったuseSelectorを使うと型チェックがuseSelectorのコールバックの中でも効くようになります。
+Reactコード側では、reactReduxの``useSelector()``を直接使うのではなく、このストア定義の中で作ったuseSelectorを使うと型チェックがuseSelectorのコールバックの中でも効くようになります。
 
 ```ts
 import { useSelector } from './store.ts'
@@ -345,4 +345,4 @@ function reducer(state: State, action: RootAction) {
 }
 ```
 
-どのファイルからどの順番でコードを書けばよかったんですかね？何度かトライしているものの、いつもなんかいまいちに感じていました。
+どのファイルからどの順番でコードを書けばよかったんですかね？ 何度かトライしているものの、いつもなんかいまいちに感じていました。

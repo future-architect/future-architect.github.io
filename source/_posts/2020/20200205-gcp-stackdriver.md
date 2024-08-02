@@ -42,9 +42,9 @@ lede: "GCPをテーマにした連載企画を始めるということで、初�
 
 # Stackdriver Loggingにログを流す方法
 
-Stackdriver Loggingへ直接ログデータを流し込むには、[Logging Client Libraries](https://cloud.google.com/logging/docs/reference/librarie)が存在します。こちらは内部的にStackdriver LoggingのWebAPIのエンドポイントをコールしてログデータを流し込んでくれます。
+Stackdriver Loggingへ直接ログデータを流し込むには、[Logging Client Libraries](https://cloud.google.com/logging/docs/reference/librarie)が存在します。こちらは内部的にStackdriver LoggingのWeb APIのエンドポイントをコールしてログデータを流し込んでくれます。
 
-Logging Client Librariesを利用しなくても、CloudRunやFunction上にアプリケーションをデプロイし、それ上で標準出力/標準エラーでログを出せばStackdriver LoggingにGCPサービス側で連携することができます。CloudRunは標準出力/標準エラーに加えて、 `/var/log` やsyslog(`/dev/log`) に出力しても連携されます [^1]。
+Logging Client Librariesを利用しなくても、CloudRunやFunction上にアプリケーションをデプロイし、それ上で標準出力/標準エラーでログを出せばStackdriver LoggingにGCPサービス側で連携できます。CloudRunは標準出力/標準エラーに加えて、 `/var/log` やsyslog(`/dev/log`) に出力しても連携されます [^1]。
 
  [^1]: CloudRunのその仕様はドキュメント読むまで気が付かなかったです。https://cloud.google.com/run/docs/logging
 
@@ -54,7 +54,7 @@ Logging Client Librariesを利用しなくても、CloudRunやFunction上にア�
 
 # ログレベルについて
 
-ログレベル（Stackdriver Loggingのコンテキストではseverity）によって、ビューアで表示する見た目を変更することができます。
+ログレベル（Stackdriver Loggingのコンテキストではseverity）によって、ビューアで表示する見た目を変更できます。
 
 <img src="/images/20200205/photo_20200205_02.png" style="border:solid 1px #000000" loading="lazy">
 <br>
@@ -149,7 +149,7 @@ func StartFunc(w http.ResponseWriter, r *http.Request) {
 
 # ログ取得時間について
 
-ログレベルの `severity` 同様に `time` というJSONフィールドを設定すると、ログ上のタイムスタンプを上書きすることができます。指定しない場合はおそらく現在時刻が設定されます。
+ログレベルの `severity` 同様に `time` というJSONフィールドを設定すると、ログ上のタイムスタンプを上書きできます。指定しない場合はおそらく現在時刻が設定されます。
 
 時刻フォーマットはprotobufでいう[Timestamp](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Timestamp) で、RFC 3339に則れば良いとのことです。
 
@@ -184,10 +184,10 @@ timeフィールドは任意項目ですが、ローカル実行での確認時�
 Stackdriver Traceはアプリケーションからレイテンシ データを収集して Google Cloud Platform Console に表示する、分散トレースシステムです。
 https://cloud.google.com/trace/
 
-分散トレースって何？という方はこちら↓の記事を参考ください。
+分散トレースって何？ という方はこちら↓の記事を参考ください。
 https://future-architect.github.io/articles/20190604/
 
-分散トレースの機能の一つには、下図のようなウォーターフォールチャートを出すことができます。これを利用して、アプリケーションのボトルネック調査などに活かすことできます。
+分散トレースの機能の1つには、下図のようなウォーターフォールチャートを出すことができます。これを利用して、アプリケーションのボトルネック調査などに活かすことできます。
 
 <img src="/images/20200205/photo_20200205_07.png" style="border:solid 1px #000000" loading="lazy">
 
@@ -250,7 +250,7 @@ func StartFunc(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-Stackdriver Trace側のログのリンクを見ると、Stackdriver Loggingでログを確認することができます。
+Stackdriver Trace側のログのリンクを見ると、Stackdriver Loggingでログを確認できます。
 
 <img src="/images/20200205/photo_20200205_08.png" style="border:solid 1px #000000" loading="lazy">
 

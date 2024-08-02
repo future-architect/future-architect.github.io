@@ -24,7 +24,7 @@ lede: こんにちは、TIG DXユニットの真野です。この技術ブロ�
 
 > **会社のチャットで、CORSのプリフライトリクエスト（OPTIONメソッド）は認証なしでOKにしておかないとCORSのやりとりが失敗する** というのを見て、なるほどぉ、と思ったりもあります。
 
-上記でフンフンそうだよね、って理解された方は本記事の対象レベルを超えているので、生暖かく続きを御覧ください。これだけだとちょっとどういうことがわからいよ！って人向けに説明していきます。
+上記でフンフンそうだよね、って理解された方は本記事の対象レベルを超えているので、生暖かく続きを御覧ください。これだけだとちょっとどういうことがわからいよ！ って人向けに説明していきます。
 
 # CORSとは
 
@@ -32,7 +32,7 @@ CORSとは **オリジン間リソース共有**（Cross-Origin Resource Sharing
 
 * (参考)https://developer.mozilla.org/ja/docs/Web/HTTP/CORS
 
-最近はSPAな画面をブラウザで構築することが当たり前になってきていて、バックエンドの通信はJSON形式のWebAPI経由で通信することが多いと思いますが、最初のページを取得した **オリジン**  (≒ドメイン＋プロトコル＋ポート番号) と、WebAPIのオリジンが異なると、適切な設定なしでは以下のようなエラーメッセージがブラウザに表示されて上手く通信できません。
+最近はSPAな画面をブラウザで構築することが当たり前になってきていて、バックエンドの通信はJSON形式のWeb API経由で通信することが多いと思いますが、最初のページを取得した **オリジン**  (≒ドメイン＋プロトコル＋ポート番号) と、Web APIのオリジンが異なると、適切な設定なしでは以下のようなエラーメッセージがブラウザに表示されて上手く通信できません。
 
 `'Access-Control-Allo-Origin' header is present on the requested resource.` といったメッセージをブラウザのデベロッパーツールのコンソールで一度は見かけた人も多いのではないでしょうか？
 
@@ -40,13 +40,13 @@ CORSとは **オリジン間リソース共有**（Cross-Origin Resource Sharing
 
 # CORSのプリフライトリクエストについて
 
-もし、WebAPIのリクエストに `x-api-key` のようなフィールドを用いて認証を行っている場合は、CORSの仕様では実際のHTTPリクエストを行う前に、 **プリフライトリクエスト** という、 **OPTIONS** メソッドでサーバに要求が行われます。
+もし、Web APIのリクエストに `x-api-key` のようなフィールドを用いて認証を行っている場合は、CORSの仕様では実際のHTTPリクエストを行う前に、 **プリフライトリクエスト** という、 **OPTIONS** メソッドでサーバに要求が行われます。
 
 <img src="/images/20200717/preflight_correct.png" loading="lazy">
 
 [オリジン間リソース共有 (CORS)](https://developer.mozilla.org/ja/docs/Web/HTTP/CORS#Preflighted_requests) から引用
 
-上図ですが、OPTIONSメソッドには、`Origin`、`Access-Control-Request-Method`、`Access-Control-Request-Headers` のリクエストヘッダが含まれ（1番上の矢印）、それに対してサーバ側が`Access-Control-Allow-Origin`にリクエストされたオリジンの値、`Access-Control-Allow-Methods`に先ほどのメソッドを含めた値、`Access-Control-Allow-Headers`に先ほど要求が合ったヘッダの名称を含めてレスポンスする必要があります（2番目の矢印）。上記の条件を満たせば、ブラウザは通常のメインのリクエストをサーバに要求します。（3,4番目の矢印）
+上図ですが、OPTIONSメソッドには、`Origin`、`Access-Control-Request-Method`、`Access-Control-Request-Headers` のリクエストヘッダが含まれ（1番上の矢印）、それに対してサーバ側が`Access-Control-Allow-Origin`にリクエストされたオリジンの値、`Access-Control-Allow-Methods`に先ほどのメソッドを含めた値、`Access-Control-Allow-Headers`に先ほど要求が合ったヘッダの名称を含めてレスポンスする必要があります（2番目の矢印）。上記の条件を満たせば、ブラウザは通常のメインのリクエストをサーバに要求します（3,4番目の矢印）
 
 CORSに対しては、上記のmozillaの記事や、tomoyukilabsさんのQiitaにある[CORSまとめ](https://qiita.com/tomoyukilabs/items/81698edd5812ff6acb34)も網羅的でオススメです。CORSは必ずプリフライトリクエストが飛ぶのではなく、条件によっては「単純リクエスト」と呼ばれる簡易的な認証を行う場合もあるなど細かい仕様は学びがあります。そもそもなんでCORSという決まり事があるかというと、[同一オリジンポリシー](https://developer.mozilla.org/ja/docs/Web/Security/Same-origin_policy)があって、なぜ同一オリジンポリシーが存在するかというと、ユーザーの情報を他サイトに漏れてしまわないようにといったセキュリティ上の理由が上げられます。
 
@@ -103,11 +103,11 @@ Vary: Access-Control-Request-Headers
 
 # 切り分け
 
-Chromeブラウザだけかもしれませんが、プリフライトリクエストはデベロッパーツール上からは省略されていて分かりにくいです。これは `chrome://flags/#out-of-blink-cors` で`Out of blink CORS` を Disableにすれば表示することができます。
+Chromeブラウザだけかもしれませんが、プリフライトリクエストはデベロッパーツール上からは省略されていて分かりにくいです。これは `chrome://flags/#out-of-blink-cors` で`Out of blink CORS` を Disableにすれば表示できます。
 
 <img src="/images/20200717/image.png" loading="lazy">
 
-また、脳内でブラウザの気持ちになることができるのであれば、先ほどのcurlで適切なリクエストヘッダを付与することでサーバサイドが想定通りか確認することができます。
+また、脳内でブラウザの気持ちになることができるのであれば、先ほどのcurlで適切なリクエストヘッダを付与することでサーバサイドが想定通りか確認できます。
 
 # 原因
 
@@ -123,7 +123,7 @@ APIキーは `x-api-key:aZ12kXCqGrZ9QTnqDtid1P6j2J7luB3v`のようなイメー�
 
 # 解決策
 
-①WAF側のルールを変えるか、②ブラウザ側でプリフライトリクエスト時にAPI Keyを渡すように設定変更するかを考えました。しかし②ですが、XMLHttpRequestでプリフライトするときに任意のリクエストヘッダが追加できるか調べたところ、以下の回答にある通り仕様として不可でした。そのため、①のWAF側のルールを変更することになります。
+（1）WAF側のルールを変えるか、（2）ブラウザ側でプリフライトリクエスト時にAPI Keyを渡すように設定変更するかを考えました。しかし②ですが、XMLHttpRequestでプリフライトするときに任意のリクエストヘッダが追加できるか調べたところ、以下の回答にある通り仕様として不可でした。そのため、①のWAF側のルールを変更することになります。
 
 https://stackoverflow.com/questions/58547499/is-it-possible-to-add-a-request-header-to-a-cors-preflight-request
 
@@ -143,7 +143,7 @@ WAFの変更後のルール：
 
 あとは、web ACLに先ほど作成したPreflight-request-checkのルールをAPI Keyのルールに追加し、`Default action`に`Block all requests that don't match any rules` を選択すれば、API Key認証を残しつつ、しかしプリフライトリクエストを受け付けることができます。
 
-この対応で無事WebAPIをブラウザが利用することができました！
+この対応で無事Web APIをブラウザが利用できました！
 
 <img src="/images/20200717/68747470733a2f2.png" loading="lazy">
 

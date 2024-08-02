@@ -18,19 +18,19 @@ lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知�
 
 こんにちは、TIGのDXユニットの西田です。前職ではServiceNowというaPaaS上でのアプリケーション開発をしておりました。現在は、GCPインフラの設計・構築をTerraform, Ansibleを利用して開発しております。GCP, ServiceNow ともに資格を持っています。
 
-さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知でしょうか？Salesforceと非常によく似ておりますが、米国発の SaaS, aPaaS サービスです。米国では割とポピュラーなサービスとして位置づけられていますが、日本ではまだまだです。が、伸び率は今年度は4割近くと、利用ユーザがすごい勢いで伸びています。そんな中、お客様内でSNOWを利用していて、それと関連する領域をFutureが担当するケースも増えてくるかと思いますので、今回は本ブログでSNOWについて少しだけ紹介したいと思います。SNOW とは？の説明は、言葉だけだと概念過ぎてわかりづらいので、現状、**私が直面している課題の解決案ベースで解説**していきたいと思います。
+さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知でしょうか？ Salesforceと非常によく似ておりますが、米国発の SaaS, aPaaS サービスです。米国では割とポピュラーなサービスとして位置づけられていますが、日本ではまだまだです。が、伸び率は今年度は4割近くと、利用ユーザがすごい勢いで伸びています。そんな中、お客様内でSNOWを利用していて、それと関連する領域をFutureが担当するケースも増えてくるかと思いますので、今回は本ブログでSNOWについて少しだけ紹介したいと思います。SNOW とは？の説明は、言葉だけだと概念過ぎてわかりづらいので、現状、**私が直面している課題の解決案ベースで解説**していきたいと思います。
 
 # 課題設定
 
-- 課題①
+- 課題（1）
   - 昨今、会社内でのITシステムの開発体制って、以下の様なケースが多くないですか？
-    - 事業部門がアプリケーション開発ベンダを直接雇っている。情シス部門は関知していない。
+    - 事業部門がアプリケーション開発ベンダーを直接雇っている。情シス部門は関知していない。
     - 情シス部門（インフラ部門）はインフラのみ（主にサーバ）を提供する。
     - セキュリティ部門（or 品質保証部）が別で存在し、それらの監査・チェックを担当している。
-  - インフラの準備は、組織が分かれているため、**組織間の仕事の受け渡しが主に打合せ & エクセル & メール**で発生している。
+  - インフラの準備は、組織が分かれているため、**組織間の仕事の受け渡しが主に打合せ & Excel & メール**で発生している。
   - 現状、これらの組織間調整がとてもレガシーで非効率である事はみんな課題意識はあるが、解決方法がよくわからない。
-- 課題②
-  - **インフラ構築の依頼作業は単純作業が多く、6割方はコピー＆ペーストして名前を変える**程度。
+- 課題（2）
+  - **インフラ構築の依頼作業は単純作業が多く、6割方はコピー&ペーストして名前を変える**程度。
   - 設計が必要なインフラ構築だけにリソースを割きたい。
 
 # ソリューションの概要
@@ -39,7 +39,7 @@ lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知�
 
 - SNOW：人の動き（リクエスト、承認フロー）を自動化する
 - Terraform：インフラの構築を自動化する
-- Go：インターフェース役
+- Go：インタフェース役
 
 <img src="/images/20200416/photo_20200416_01.png" loading="lazy">
 
@@ -47,7 +47,7 @@ lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知�
 
 1. SNOW の Service Catalog を利用し、準備するインフラをメニュー化する（簡単な＆頻繁なリクエストのみ）
 2. Terraform の各種実行と、承認を順番に実施するワークフローを実行するFlowDesignerを作る。
-3. Infra構築を担う Terraform は、GCP Project 単位にディレクトリを切り、inventory 書き換えだけで terraform plan, terraform apply が出来るファイル構成にする。（地味にこれが一番頭を使いました…）
+3. Infra構築を担う Terraform は、GCP Project 単位にディレクトリを切り、inventory 書き換えだけで terraform plan, terraform apply が出来るファイル構成にする（地味にこれが一番頭を使いました…）
 4. FlowDesigner からの API に応対し、Terraform の inventory を作り、コマンドの実行結果を返す API-SV を Go で作る。
 
 4に関しては、**SNOW の API リファレンスのサンプルコードは基本 Python** なので、そっちの方がベターです。本記事では、単にGoを書きたかったので、Goを採用しています。
@@ -67,11 +67,11 @@ lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知�
 
 # 1. インフラ構築のリクエストをメニュー化する @ SNOW
 
-本来ならこの**メニュー化する対象の作業は何か？を決める**のが非常に大変ですよね。今回は GCE のリクエストを例にします。
+本来ならこの**メニュー化する対象の作業は何か？ を決める**のが非常に大変ですよね。今回は GCE のリクエストを例にします。
 
 ## SNOW の環境準備
 
-[developerサイト](https://developer.servicenow.com/) でインスタンスを準備。最新版のOrlando(出たばかり！)を使ってます。
+[developerサイト](https://developer.servicenow.com/) でインスタンスを準備。最新版のOrlando(出たばかり！ )を使ってます。
 払いだされたインスタンスに admin でログインしてください。
 少しだけ宣伝交じりですが、この developer インスタンスはアカウントを作れば誰でも発行できます。6時間触らないと sleep、10日触らないと消えます（でもリストア可）。本来はライセンス費用を払わなければならないあらゆる機能が全て無料で使えるので、とてもおススメです！
 
@@ -241,7 +241,7 @@ cat *.tfvars > ../terraform.tfvars
 処理を整理すると、以下です。
 
 1. SNOW(FlowDesigner)からの Rest API の受け口を作る。
-2. SNOW から受け取るパラメータは、Project名とインスタンス名だけである。（SNOW の CMDB を本格利用すればそうでもないですが、構成管理は Terraform でコード化されているから、SNOW ではやらない。フロントエンドに徹する。）
+2. SNOW から受け取るパラメータは、Project名とインスタンス名だけである（SNOW の CMDB を本格利用すればそうでもないですが、構成管理は Terraform でコード化されているから、SNOW ではやらない。フロントエンドに徹する）。
 3. Terraform の Project ディレクトリの GCE, GCS に対応する tfvars ファイルに受け取ったリソース名を書き込む。
 4. vars/filejoin.sh を実行する。
 5. terraform plan を実行し、結果を返す。
@@ -389,7 +389,7 @@ terraform apply -auto-approve -no-color
 
 ### ユーザの操作
 
-Service Catalog のダッシュボードに、GCP infra の widget を追加すると、以下の様になります。
+Service Catalog のダッシュボードに、GCP infra の ウィジェット を追加すると、以下の様になります。
 <img src="/images/20200416/u1.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 <img src="/images/20200416/u2.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
@@ -397,7 +397,7 @@ Service Catalog のダッシュボードに、GCP infra の widget を追加す�
 <img src="/images/20200416/u3.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 <img src="/images/20200416/u4.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-Shoppingっぽくなっているのは、あんまり気にしないでください。SaaSで細部を気にし始めると工数が跳ね上がります。（※初期構築だけ考えるとそうでもないですが、保守や機能拡張を考えると雪だるま式に増えます。）
+Shoppingっぽくなっているのは、あんまり気にしないでください。SaaSで細部を気にし始めると工数が跳ね上がります（※初期構築だけ考えるとそうでもないですが、保守や機能拡張を考えると雪だるま式に増えます）。
 
 これだけでユーザのリクエストは完了です。本当にパラメータを2つ入れるだけ。
 
@@ -434,7 +434,7 @@ Terraform の実行ログを見てみましょう。この結果からすると�
 <img src="/images/20200416/u14.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 <img src="/images/20200416/u15.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-来ましたね！同時実行とか、変更・削除はどうするのかとか色々ありますが、とりあえずPoCとしては完成！
+来ましたね！ 同時実行とか、変更・削除はどうするのかとか色々ありますが、とりあえずPoCとしては完成！
 
 # 結局 ServiceNow とは何か？
 
