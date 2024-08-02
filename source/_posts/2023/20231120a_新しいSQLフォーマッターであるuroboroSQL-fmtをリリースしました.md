@@ -189,7 +189,7 @@ where
 |予約語をファイルで指定|o|-|
 |vscode拡張|-|o|
 |wasm|-|o|
-|eclipse plugin|o|-|
+|Eclipse plugin|o|-|
 |IntelliJ plugin|o|-|
 |SublimeText3 plugin|o|-|
 |exe版|o|-|
@@ -197,7 +197,7 @@ where
 |選択範囲フォーマット|-|o  vscode拡張版のみ|
 
 - PostgreSQL以外のSQLには対応していないため、PostgreSQL以外のSQLのフォーマットには旧版の使用をお勧めしています。
-- eclipse pluginとexe版は現在は用意できていないのですが、将来的には作成する予定です！
+- Eclipse pluginとexe版は現在は用意できていないのですが、将来的には作成する予定です！
 
 ### 使い方
 
@@ -228,7 +228,7 @@ wasm版は[こちらのデモ](https://future-architect.github.io/uroborosql-fmt
 
 ##### フォーマットの設定方法
 
-フォーマットの各種設定を記載したファイルのパスを指定することができます。
+フォーマットの各種設定を記載したファイルのパスを指定できます。
 指定されなかった場合にはデフォルトのパスにある `./.uroborosqlfmtrc.json` を読み込みます。
 設定ファイルが存在しなかった場合、デフォルト値でフォーマットされます。
 ※ 現状は設定ファイルのパスしかできませんが、個々の設定の変更もvscodeの設定画面から出来るようにする予定です。

@@ -38,7 +38,7 @@ MegaLinterはdockerイメージをベースに各種リンターやフォーマ�
 >MegaLinter is an Open-Source tool for CI/CD workflows that analyzes the consistency of your code, IAC, configuration, and scripts in your repository sources, to ensure all your projects sources are clean and formatted whatever IDE/toolbox is used by their developers, powered by OX Security.
 Supporting 55 languages, 24 formats, 20 tooling formats and ready to use out of the box, as a GitHub action or any CI system highly configurable and free for all uses.
 
-55言語というのは55個のLinterツールが用意されている。ということみたいです。例えばGo言語であれば`golangci-lint`と`revive`がサポートされており、これを2つ分とカウントしています。他の言語に関しても1言語1ツールというわけではなく、かなり広範にサポートしているため、普通に利用する分にはMegaLinter一つ入れておけばリンターやフォーマッタはカバーできそうです。
+55言語というのは55個のLinterツールが用意されている。ということみたいです。例えばGo言語であれば`golangci-lint`と`revive`がサポートされており、これを2つ分とカウントしています。他の言語に関しても1言語1ツールというわけではなく、かなり広範にサポートしているため、普通に利用する分にはMegaLinter1つ入れておけばリンターやフォーマッタはカバーできそうです。
 
 ## 概要
 

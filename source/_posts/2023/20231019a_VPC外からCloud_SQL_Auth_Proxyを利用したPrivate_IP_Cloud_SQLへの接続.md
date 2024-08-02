@@ -20,7 +20,7 @@ lede: "Private IPしか持たないCloud SQLへ接続する方法として、Clo
 
 [Cloud SQL](https://cloud.google.com/sql/docs/introduction?hl=ja)はMy SQL、PostgreSQL、SQL Server用のフルマネージドリレーショナルデータベースのサービスです。
 
-Google Cloudには、AlloyDB、Spanner、Firestore、Bigtableなど様々なデータベースサービスが存在しますが、Cloud SQLもその内の1つになります。たくさんあってどれ選べばいいのかわからない！という状況に陥った場合は、[Your Google Cloud database options, explained](https://cloud.google.com/blog/topics/developers-practitioners/your-google-cloud-database-options-explained?hl=en)からベストプラクティスを探るのが良いと思います。
+Google Cloudには、AlloyDB、Spanner、Firestore、Bigtableなど様々なデータベースサービスが存在しますが、Cloud SQLもその内の1つになります。たくさんあってどれ選べばいいのかわからない！ という状況に陥った場合は、[Your Google Cloud database options, explained](https://cloud.google.com/blog/topics/developers-practitioners/your-google-cloud-database-options-explained?hl=en)からベストプラクティスを探るのが良いと思います。
 
 ### Cloud SQLへの接続方法
 
@@ -46,7 +46,7 @@ SQLインスタンスをインターネット上に晒したくないという�
 
 <img src="/images/20231019a/image_2.png" alt="image.png" width="1200" height="394" loading="lazy">
 
-但し、Cloud SQLのプライベートIPアドレスが既に割り振られている場合、広報先のVPC内でそのIPアドレスが既に使われている場合は多々あります。そのような状況で広報をしてしまうと、IPアドレスが被ってしまい広報することができない、もしくはネットワーク事故につながることになります。さて、この場合どうしましょう🤔
+但し、Cloud SQLのプライベートIPアドレスが既に割り振られている場合、広報先のVPC内でそのIPアドレスが既に使われている場合は多々あります。そのような状況で広報をしてしまうと、IPアドレスが被ってしまい広報できない、もしくはネットワーク事故につながることになります。さて、この場合どうしましょう🤔
 
 ### Cloud SQL Auth Proxy
 

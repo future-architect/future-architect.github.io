@@ -238,7 +238,7 @@ func main() {
 }
 ```
 
-タイムゾーンをUTCにして実行します。timeパッケージのGoDocを見ると、`TZ` 環境変数があればUnixシステムではそれを用いるとあるので、切り替えはこちらで行います。
+タイムゾーンをUTCにして実行します。timeパッケージのGoDocを見ると、`TZ` 環境変数があればUNIXシステムではそれを用いるとあるので、切り替えはこちらで行います。
 
 > On Unix systems, Local consults the TZ environment variable to find the time zone to use.
 > https://pkg.go.dev/time#Location
@@ -413,7 +413,7 @@ postgres=# select * from event;
 
 `psql` およびその利用ライブラリである `libpq` の仕様に私は詳しくないですが、おそらく `libpq` はPostgreのDBサーバとのやり取りを、バイナリフォーマットではなく、テキストフォーマットを利用しています。テキストプロトコルの場合は。DBサーバ側がセッションのタイムゾーンの値を元に`timestampz` 型の表示を変えて、その値をクライアントである `psql` に送信するため、直感的な動作をします。
 
-ちなみに、`libpq` は `PGTZ` という環境変数で、タイムゾーンを変更することができます（[SET timezone TO ...と等価である](https://www.postgresql.jp/docs/15/libpq-envars.html#:~:text=PGTZ%E3%81%AF%E3%83%87%E3%83%95%E3%82%A9%E3%83%AB%E3%83%88%E3%81%AE%E6%99%82%E9%96%93%E5%B8%AF%E3%82%92%E8%A8%AD%E5%AE%9A%E3%81%97%E3%81%BE%E3%81%99%E3%80%82%20(SET%20timezone%20TO%20...%E3%81%A8%E7%AD%89%E4%BE%A1%E3%81%A7%E3%81%99%E3%80%82)) とありますが、DB側のログにはSET timezone To ... が出てこなかったので、接続時に指定していると思われます）。
+ちなみに、`libpq` は `PGTZ` という環境変数で、タイムゾーンを変更できます（[SET timezone TO ...と等価である](https://www.postgresql.jp/docs/15/libpq-envars.html#:~:text=PGTZ%E3%81%AF%E3%83%87%E3%83%95%E3%82%A9%E3%83%AB%E3%83%88%E3%81%AE%E6%99%82%E9%96%93%E5%B8%AF%E3%82%92%E8%A8%AD%E5%AE%9A%E3%81%97%E3%81%BE%E3%81%99%E3%80%82%20(SET%20timezone%20TO%20...%E3%81%A8%E7%AD%89%E4%BE%A1%E3%81%A7%E3%81%99%E3%80%82)) とありますが、DB側のログにはSET timezone To ... が出てこなかったので、接続時に指定していると思われます）。
 
 環境変数`PGTZ`でのタイムゾーンを`UTC`にした、`psql` コマンドを利用する例です。
 
@@ -461,11 +461,11 @@ $ PGPASSWORD=pass psql -h localhost -p 5432 -U postgres \
 
 ### DB接続セッションのタイムゾーン値を利用してクエリ結果を time.Time 型のフィールドにマッピングするときに自動で設定する実装をしたい
 
-pgxにも同じような旨のIssueである、[How do you set the timezone connection variable? #520](https://github.com/jackc/pgx/issues/520) が上がっていますが、少なくてもpgxにはそのような機能は無いようです。あまり探していませんがそういったライブラリが無いような気がします。（みんな、 `TZ` で指定するか、 `time.Local` に設定している？）。pgxは拡張性が高いパッケージなので、下回りを操作すれば実現できるかもしれませんが、私は試していません。こうやれば良いよと言うのがあればぜひ教えてください。
+pgxにも同じような旨のIssueである、[How do you set the timezone connection variable? #520](https://github.com/jackc/pgx/issues/520) が上がっていますが、少なくてもpgxにはそのような機能は無いようです。あまり探していませんがそういったライブラリが無いような気がします（みんな、 `TZ` で指定するか、 `time.Local` に設定している？）。pgxは拡張性が高いパッケージなので、下回りを操作すれば実現できるかもしれませんが、私は試していません。こうやれば良いよと言うのがあればぜひ教えてください。
 
 `select current_setting('TIMEZONE')` で取得したタイムゾーンを、`time.In()` に設定して欲しい気持ちはよくわかります。
 
-### go-sql-driver/mysql みたいな loc=Asia%2FTokyo" オプションは無いの？
+### go-sql-driver/MySQL みたいな loc=Asia%2FTokyo" オプションは無いの？
 
 自信がなくなってきましたが、少なくても `jackc/pgx` については、私が探した範囲では見つけられませんでした。
 
