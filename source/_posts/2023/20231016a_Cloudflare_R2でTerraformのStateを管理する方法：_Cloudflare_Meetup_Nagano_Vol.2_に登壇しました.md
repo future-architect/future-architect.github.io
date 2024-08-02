@@ -61,7 +61,7 @@ terraform {
 
 https://github.com/hashicorp/terraform/issues/33847
 
-そこで目をつけたのが、[S3 API compatibility](https://developers.cloudflare.com/r2/api/s3/api/)に記載されている、R2とS3の互換性です。R2ではS3の一定のAPIを担保しており、`aws`コマンドでR2を操作することができます。そのため同様にTerraformでも、`backend`ブロックでS3を宣言していても実態はR2を見せることができるのではないかと思って今回のネタにしました。
+そこで目をつけたのが、[S3 API compatibility](https://developers.cloudflare.com/r2/api/s3/api/)に記載されている、R2とS3の互換性です。R2ではS3の一定のAPIを担保しており、`aws`コマンドでR2を操作できます。そのため同様にTerraformでも、`backend`ブロックでS3を宣言していても実態はR2を見せることができるのではないかと思って今回のネタにしました。
 
 #### R2でState管理を実際に行う
 
@@ -174,7 +174,7 @@ https://github.com/koda-masaru/chat-bot
 
 ## まとめ
 
-前回に引き続きVol.2も参加し、かつ今回は登壇の機会をいただけたので、調べても出てこなかったことをネタにして形にすることができました。
+前回に引き続きVol.2も参加し、かつ今回は登壇の機会をいただけたので、調べても出てこなかったことをネタにして形にできました。
 また、イベントの開催地が私の地元である長野であるということもあり、地元のコミュニティに関われたことがとても嬉しかったので、今後もなんらかの形で関われればと考えています。
 
 ## 余談）地方勉強会参加のススメ

@@ -183,8 +183,8 @@ void main() async {
 
 ### ※それでもインターネット接続できない場合
 
-1. Androidエミュレータ側のプロキシ設定を外してみる。（direct）
-2. localhost:9000 にmiddleproxyが起動しているか確認する。（例： ホスト側のプロキシをproxy.example.com:8000 から、 localhost:9000 に変えてみて、ホスト側のブラウザが起動するか、もしくはcurlが通るか、確認してみる）
+1. Androidエミュレータ側のプロキシ設定を外してみる（direct）
+2. localhost:9000 にmiddleproxyが起動しているか確認する（例： ホスト側のプロキシをproxy.example.com:8000 から、 localhost:9000 に変えてみて、ホスト側のブラウザが起動するか、もしくはcurlが通るか、確認してみる）
 
 ## （任意）AndroidエミュレータへのChromeインストール
 

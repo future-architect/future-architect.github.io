@@ -23,7 +23,7 @@ Prompt Flowとは、Azure Machine Learning上の機能で、Azure OpenAIで提�
 
 実際にLLMアプリケーションを開発する場合、「プロンプトを入力して終わり」ではなく、ベクトル検索など複数の要素を組み合わせることもあります。このため、Prompt Flowでは処理のフローをDAG(有向非巡回グラフ)で可視化することで、開発効率が大きく向上します。
 
-Prompt FlowはPython[ライブラリ](https://github.com/microsoft/promptflow)（2023/09/27時点ではMITライセンス）として提供されており、Azureのコンソール画面だけでなく、ローカル環境でも実行することができます。
+Prompt FlowはPython[ライブラリ](https://github.com/microsoft/promptflow)（2023/09/27時点ではMITライセンス）として提供されており、Azureのコンソール画面だけでなく、ローカル環境でも実行できます。
 
 ローカルで実行できることには以下の利点があります。
 
@@ -127,7 +127,7 @@ pf flow test --flow my-simple-flow
 
 まずはConnection（接続）の設定を行います。
 
-任意のディレクトリ上で、接続先を定義するYAMLファイルを作成します。（ここでは`connection-azure-openai.yaml`という名前で作成）
+任意のディレクトリ上で、接続先を定義するYAMLファイルを作成します（ここでは`connection-azure-openai.yaml`という名前で作成）
 
 YAMLファイルの中身は[公式Docs](https://microsoft.github.io/promptflow/how-to-guides/manage-connections.html)を参考に以下のように作ります。
 
@@ -157,11 +157,11 @@ pf connection create -f <YAMLファイルのパス>
 
 <img src="/images/20231011a/pic4.png" alt="+LLM" width="1200" height="436" loading="lazy">
 
-上部に、LLMツールの名前入力が求められるので好きな名前を設定します。（ここでは`llm_node`と設定）
+上部に、LLMツールの名前入力が求められるので好きな名前を設定します（ここでは`llm_node`と設定）
 
 <img src="/images/20231011a/image_3.png" alt="llm_node" width="889" height="97" loading="lazy">
 
-名前入力が完了すると、「new file」を選択します。（`<LLMツール名>.jinja2`というファイルが新規生成されます）
+名前入力が完了すると、「new file」を選択します（`<LLMツール名>.jinja2`というファイルが新規生成されます）
 
 <img src="/images/20231011a/image_4.png" alt="new file" width="885" height="131" loading="lazy">
 
@@ -347,7 +347,7 @@ nodes:
 
 1行が1つの入力に相当します。質問文を変えたり行を追加したりしても大丈夫です。
 
-最後に、フローの親ディレクトリから以下のコマンドを実行します。（`my_run_001`の部分は任意）
+最後に、フローの親ディレクトリから以下のコマンドを実行します（`my_run_001`の部分は任意）
 
 ```sh
 pf run create --flow my-simple-flow --data ./my-simple-flow/data.jsonl --name my_run_001
@@ -371,9 +371,9 @@ pf run show-details --name my_run_001
 
 <img src="/images/20231011a/image_10.png" alt="" width="472" height="368" loading="lazy">
 
-これらはgitで管理することができます。
+これらはgitで管理できます。
 
-予め`.gitignore`ファイルが含まれているため、余計なキャッシュ等を含まずプッシュすることができますが、connection情報が入ったYAMLファイルは後で作成したファイルなので、プッシュしてしまう恐れがあります。
+予め`.gitignore`ファイルが含まれているため、余計なキャッシュ等を含まずプッシュできますが、connection情報が入ったYAMLファイルは後で作成したファイルなので、プッシュしてしまう恐れがあります。
 
 該当ファイルを`.gitignore`に追記するなどして、十分注意してください。
 

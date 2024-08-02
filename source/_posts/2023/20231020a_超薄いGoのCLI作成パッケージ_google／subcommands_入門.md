@@ -19,7 +19,7 @@ lede: "Google Go Coding Guideで紹介されていたgoogle/subcommandsについ
 
 TIG真野です。育休明けです。
 
-GoでCLI（コマンドラインインターフェイス）の開発に役立つツールといえばいくつか選択肢があります。大きく分ければフラグのパースを支援するもの（[標準のflagパッケージ](https://pkg.go.dev/flag)、[alecthomas/kong/go-flags](https://github.com/jessevdk/go-flags)、[alecthomas/kong](https://github.com/alecthomas/kong)など）と、開発フレームワークと言っても良い包括的に支援するもの（[urfave/cli](https://github.com/urfave/cli)、[spf13/cobra](https://github.com/spf13/cobra)など）の2つに分けられるかなと思います（※概念的に分けてみただけで捉え方によっては全てパーサだしフレームワークとみなしても良いかもしれません。あくまで個人的なイメージです）。
+GoでCLI（コマンドラインインタフェース）の開発に役立つツールといえばいくつか選択肢があります。大きく分ければフラグのパースを支援するもの（[標準のflagパッケージ](https://pkg.go.dev/flag)、[alecthomas/kong/go-flags](https://github.com/jessevdk/go-flags)、[alecthomas/kong](https://github.com/alecthomas/kong)など）と、開発フレームワークと言っても良い包括的に支援するもの（[urfave/cli](https://github.com/urfave/cli)、[spf13/cobra](https://github.com/spf13/cobra)など）の2つに分けられるかなと思います（※概念的に分けてみただけで捉え方によっては全てパーサだしフレームワークとみなしても良いかもしれません。あくまで個人的なイメージです）。
 
 私は `urfave/cli` を利用することが多いのですが、`spf13/cobra` も人気ですよね。どちらも広く利用されていますが、支配的と言った感じではなく、例えば私がよく用いるterraformコマンドは[mitchellh/cli](https://github.com/mitchellh/cli)という[ライブラリが使われていました](https://github.com/hashicorp/terraform/blob/main/main.go#L29C3-L29C27)し、Go製のテンプレートエンジンで有名なHugoは、Hugoの要件にフィットするように[bep/simplecobra](https://github.com/bep/simplecobra)というライブラリを開発しているようでした。Protocol Bufferのprotocコマンドに至っては[標準パッケージのflag](https://github.com/golang/protobuf/blob/master/protoc-gen-go/main.go#L32)を使っています。気に入ったのを好きに使えば良いんだ感があります。
 
@@ -34,7 +34,7 @@ GoでCLI（コマンドラインインターフェイス）の開発に役立つ
 - `kubectl create`、`kubectl run` といったサブコマンドを含むCLI開発の場合は、シンプルで正しく利用しやすい `subcommands` がお勧め
 - `subcommands` が提供されていない機能を求める場合は`cobra`がお勧め
 
-`subcommands` は開発元がGoogleだけあって推しを感じますね（なお、READMEには "This is not an official Google product（「Google公式プロダクトじゃないよ」）" とあります。）。ちなみに、`kubectl` は`cobra`を使っています。さらに余談ですが、 `docker` コマンドも `cobra` で開発されています。
+`subcommands` は開発元がGoogleだけあって推しを感じますね（なお、READMEには "This is not an official Google product（「Google公式プロダクトじゃないよ」）" とあります）。。ちなみに、`kubectl` は`cobra`を使っています。さらに余談ですが、 `docker` コマンドも `cobra` で開発されています。
 
 Goのコーディング規約として、`Google Coding Guide` には今後少なからず影響を受けていくと思うので、 `subcommands` について理解を深めようと思います。
 
@@ -203,7 +203,7 @@ print [-n number] [-trim]:
 
 こうしてみると、 `flags` は `help` に包含されている内容であるため、コマンドラインとして用意しなくても良い気がしますね（wireなんかはすべて登録しているので、subcommandsを利用する場合はすべて登録する流れかもしれませんが）。
 
-続いて予め用意された`commands` ですが、これはコマンドの一覧を表示します。`help` で詳細を確認するとその通りの内容です（どういうケースで嬉しいのかいまいち掴みきれませんが）。
+続いて予め用意された`commands` ですが、これはコマンドの一覧を表示します。`help` で詳細を確認するとその通りの内容です（どのようなケースで嬉しいのかいまいち掴みきれませんが）。
 
 ```sh
 $ subclip commands

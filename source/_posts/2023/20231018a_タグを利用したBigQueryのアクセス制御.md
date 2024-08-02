@@ -22,9 +22,9 @@ BigQueryは完全マネージドな、ペタバイトスケールかつコスパ
 
 ## Resource Managerのタグとは
 
-Google Cloudのリソースに対して、Key-Valueペアでタグを付与してIAMの条件に含めることができる機能です。
+Google Cloudのリソースに対して、key-valueペアでタグを付与してIAMの条件に含めることができる機能です。
 
-例えばBigQueryのデータセットであれば、Key:`environment`に対してValue:`dev`, `stg`, `prd`を用意したり、Key:`dataset_type`に対してValue:`non-pii`, `pii`（個人情報を含むか否か）を用意したりなど、データの種類に応じてタグを付与して、より詳細な条件でIAMを管理することができます。
+例えばBigQueryのデータセットであれば、Key:`environment`に対してValue:`dev`, `stg`, `prd`を用意したり、Key:`dataset_type`に対してValue:`non-pii`, `pii`（個人情報を含むか否か）を用意したりなど、データの種類に応じてタグを付与して、より詳細な条件でIAMを管理できます。
 
 [タグの作成と管理 - Google Cloud](https://cloud.google.com/resource-manager/docs/tags/tags-creating-and-managing?hl=ja#before_you_begin)
 
@@ -67,7 +67,7 @@ resource "google_tags_tag_value" "prd_tag" {
 適用後、コンソールを見てみましょう。
 <img src="/images/20231018a/71638260-a888-a69d-56d2-bcb92fb94825.png" alt="" width="1200" height="489" loading="lazy">
 
-`environment`に対して、`dev`, `stg`, `prd`というKey-Valueペアが生成されました。
+`environment`に対して、`dev`, `stg`, `prd`というkey-valueペアが生成されました。
 
 ## BigQueryのDatasetにタグを付与する
 
@@ -154,7 +154,7 @@ resource "google_tags_location_tag_binding" "prd" {
 
 ### gcloudコマンドでタグを付与する
 
-以下のコマンドで付与することができます。
+以下のコマンドで付与できます。
 
 ```bash terminal
 gcloud alpha resource-manager tags bindings create \
@@ -174,7 +174,7 @@ BigQueryのページから、データセットをクリックすると以下の
 
 <img src="/images/20231018a/fe171bd5-fe90-8ef9-cb20-1eeb945b2560.png" alt="" width="1200" height="499" loading="lazy">
 
-タグを追加を押すことで、所望のタグを付与することができます。
+タグを追加を押すことで、所望のタグを付与できます。
 
 <img src="/images/20231018a/4358d88e-757f-d924-3c7f-a6a0a59ae98c.png" alt="" width="852" height="1222" loading="lazy">
 

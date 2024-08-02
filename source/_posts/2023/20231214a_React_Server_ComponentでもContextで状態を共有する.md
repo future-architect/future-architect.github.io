@@ -100,7 +100,7 @@ export function Child() {
 }
 ```
 
-どこがダメでしょうか？実行してみると、`createContext()`の呼出はダメよ、とエラーになっています。このファイルに"use client"を足してもダメです。
+どこがダメでしょうか？ 実行してみると、`createContext()`の呼出はダメよ、とエラーになっています。このファイルに"use client"を足してもダメです。
 
 <img src="/images/20231214a/image.png" alt="image.png" width="1159" height="688" loading="lazy">
 

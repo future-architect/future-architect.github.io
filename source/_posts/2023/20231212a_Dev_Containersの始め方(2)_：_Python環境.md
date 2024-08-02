@@ -149,7 +149,7 @@ devcontainer.jsonに以下のように書いておくと、起動のたびにパ
 }
 ```
 
-アプリ開発で必要なライブラリを追加するときは、pyproject.tomlのproject/dependenciesのリストに追加した後に、インストールしてlockファイル相当のrequirements.txtを作ります。このファイルはコンテナ作成やデプロイに使えます。このままだとdevセクションのものも入ってしまうのですが・・・このあたりもPythonツールチェーンが良くなって欲しいところの一つ。
+アプリ開発で必要なライブラリを追加するときは、pyproject.tomlのproject/dependenciesのリストに追加した後に、インストールしてlockファイル相当のrequirements.txtを作ります。このファイルはコンテナ作成やデプロイに使えます。このままだとdevセクションのものも入ってしまうのですが・・・このあたりもPythonツールチェーンが良くなって欲しいところの1つ。
 
 ```bash
 pip3 install --user .
