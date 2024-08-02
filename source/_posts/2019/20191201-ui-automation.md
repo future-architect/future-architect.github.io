@@ -75,8 +75,8 @@ WindowsのGUIアプリの操作自動化と言っても大げさなものでは�
 
 - Windows 10
 - Ruby 2.5.x
-- selenium-WebDriver 3.142.6
-- appium_lib 10.4.1
+- `selenium-webdriver` 3.142.6
+- `appium_lib` 10.4.1
 - WinAppDriver 1.2
 - Inspect.exe
 
@@ -93,8 +93,8 @@ gem install appium_lib -v 10.4.1
 
 Ruby設定ファイルの編集:
 
-EventMachine.rbを開き、以下の1文を追加してください。
-（筆者の環境では以下のパスにありました。）。
+`eventmachine.rb` を開き、以下の1文を追加してください。
+（筆者の環境では以下のパスにありました）。
 `C:¥Ruby25-x64¥lib¥ruby¥gems¥2.5.0gems¥eventmachine-1.2.7-x64-mingw32¥lib¥eventmachine.rb`
 
 ```ruby:eventmachine.rb

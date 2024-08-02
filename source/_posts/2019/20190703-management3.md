@@ -64,7 +64,7 @@ lede: "OSSのBIツールであるMetabaseを利用して、Redmineのデータ�
 
 ◆Java SE DevelopmentダウンロードURL
 https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
-の「jdk-8u211-Windows-x64.exe」
+の `jdk-8u211-windows-x64.exe`
 
 ## 2. Metabaseのインストール
 
