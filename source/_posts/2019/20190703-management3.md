@@ -34,7 +34,7 @@ lede: "OSSのBIツールであるMetabaseを利用して、Redmineのデータ�
 
 そこで、本日はOSSのBIツールである[Metabase](https://metabase.com/)を利用して、Redmineのデータをグラフ表示する方法を紹介します。
 
-例えば、Metabaseを利用すると、チケットの発生件数とクローズ件数の推移を簡単に表示することができます。
+例えば、Metabaseを利用すると、チケットの発生件数とクローズ件数の推移を簡単に表示できます。
 <img src="/images/20190703/photo_20190703_03.png" style="border:solid 1px #000000" loading="lazy">
 
 構築する環境は下記の通り。Kibana+Timelionで構築した環境よりもシンプルですね。
@@ -64,7 +64,7 @@ lede: "OSSのBIツールであるMetabaseを利用して、Redmineのデータ�
 
 ◆Java SE DevelopmentダウンロードURL
 https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
-の「jdk-8u211-windows-x64.exe」
+の `jdk-8u211-windows-x64.exe`
 
 ## 2. Metabaseのインストール
 
@@ -135,7 +135,7 @@ c:\metabase
 <img src="/images/20190703/photo_20190703_16.png" style="border:solid 1px #000000" loading="lazy">
 
 「データベースを選択する」から、先ほど入力したデータベースを選択しましょう。
-（私の場合は、「redmine」）
+（私の場合は、「redmine」）。
 <img src="/images/20190703/photo_20190703_17.png" style="border:solid 1px #000000" loading="lazy">
 
 次に、チケットの発生件数とクローズ件数を取得する下記のSQLを水色のエリアに貼り付けます。
@@ -235,7 +235,7 @@ group by
 ◆Metabaseユーザーガイド
 https://metabase.com/docs/latest/users-guide/start.html
 
-いかがでしたでしょうか？RedmineをMetabaseと組み合わせることで、グラフ表示が可能になり、結果的にプロジェクト状況の把握が容易になります。
+いかがでしたでしょうか？ RedmineをMetabaseと組み合わせることで、グラフ表示が可能になり、結果的にプロジェクト状況の把握が容易になります。
 
 本記事が、皆様のプロジェクトマネジメントに役に立てば幸いです。
 

@@ -46,15 +46,15 @@ NeurIPS(Conference on Neural Information Processing Systems)は、機械学習�
 NeurIPS１日目は、主にチュートリアル講演が行われました。
 以下のようなタイトルのチュートリアルが開催されました。
 
-- Tutorials Session 1
+- Tutorials セッション 1
   - Imitation Learning and its Application to Natural Language Generation
   - Deep Learning with Bayesian Principle
   - Human Behavior Modeling with Machine Learning: Opportunities and Challenges
-- Tutorials Session 2
+- Tutorials セッション 2
   - Interpretable Comparison of Distributions and Models
   - Machine Learning for Computational Biology and Health
   - Efficient Processing of Deep Neural Network: from Algorithms to Hardware Architectures
-- Tutorials Session 3
+- Tutorials セッション 3
   - Reinforcement Learning: Past, Present, and Future Perspectives
   - Representation Learning and Fairness
   - Synthetic Control
