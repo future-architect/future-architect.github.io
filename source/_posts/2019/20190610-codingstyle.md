@@ -108,7 +108,7 @@ func isPositive(*str) {
 
 言語や目的がそれぞれ違うので、関数やモジュールの長さ制限に明確なルールは存在しません。
 
-ただ、参考にできる観点と原則があります。それは、1つの関数は一つの機能しか担当させないこと（[単一責任原則（Single responsibility principle）](https://en.wikipedia.org/wiki/Single_responsibility_principle)）、言い換えると、コメント一言で説明できるぐらいの量が適切ということです。
+ただ、参考にできる観点と原則があります。それは、1つの関数は1つの機能しか担当させないこと（[単一責任原則（Single responsibility principle）](https://en.wikipedia.org/wiki/Single_responsibility_principle)）、言い換えると、コメント一言で説明できるぐらいの量が適切ということです。
 
 ある関数が複数タスクを担当していたとして、ポイント１の「名称には嘘ついていけない」という観点で素直に名称をつけたとすると`checkValidationAndDoTask1AndDoTask2AndSubmit()`的な名前になってしまいます。素直に、タスクごとに関数を分けたほうが分かりやすいでしょう。
 
