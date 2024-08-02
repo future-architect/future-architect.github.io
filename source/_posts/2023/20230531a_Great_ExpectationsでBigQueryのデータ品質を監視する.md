@@ -20,7 +20,7 @@ lede: "Great Expectationsというツールを使って、表形式データの�
 
 Great Expectationsというツールを使って、表形式データの品質をバリデーションする流れをご紹介します。
 
-MLOpsを推進するにあたりMLモデルの監視が必要となってきています。その中でも、MLモデルに入出力されるデータ品質をバリデーションすることは重要な監視事項の一つです。
+MLOpsを推進するにあたりMLモデルの監視が必要となってきています。その中でも、MLモデルに入出力されるデータ品質をバリデーションすることは重要な監視事項の1つです。
 
 ML監視についての概要や意義については、[こちらの記事](/articles/20230413a/)で詳しく述べられているのでぜひご覧ください。
 
@@ -190,11 +190,11 @@ table_name = "<BigQueryのテーブル名>" # 監視対象データのテーブ�
 
 #### 補足
 
-`datasource_new.ipynb`では、GX全体の設定ファイルである`great_expectations.yml`のデータソースを定義する部分を編集しているだけで、Notebookはこれを編集するための分かりやすいインターフェースに過ぎません。
+`datasource_new.ipynb`では、GX全体の設定ファイルである`great_expectations.yml`のデータソースを定義する部分を編集しているだけで、Notebookはこれを編集するための分かりやすいインタフェースに過ぎません。
 
 従って、Notebookを使わずに`great_expectations.yml`のデータソース定義部分を直接編集するだけで設定が可能です。
 
-例えばBigQueryなら、以下のようにデータソースを定義します。（[公式Docs参考](https://docs.greatexpectations.io/docs/guides/connecting_to_your_data/database/bigquery)）
+例えばBigQueryなら、以下のようにデータソースを定義します（[公式Docs参考](https://docs.greatexpectations.io/docs/guides/connecting_to_your_data/database/bigquery)）
 
 ```yaml
 name: my_datasource
@@ -216,7 +216,7 @@ data_connectors:
 
 続いて、Expectation Suiteを作成します。
 
-Expectation Suiteは複数のExpectationの集まりのことを指します。一つ一つ手作業でExpectationを定義・バリデーションしていくのは非効率なため、Expectation Suiteを定義してまとめて行うのです。
+Expectation Suiteは複数のExpectationの集まりのことを指します。1つ1つ手作業でExpectationを定義・バリデーションしていくのは非効率なため、Expectation Suiteを定義してまとめて行うのです。
 
 `great_expectations suite new`コマンドを実行すると、先程と似た流れでCLIとNotebookを使ってセットアップを行います。最初の「How would you like to create your Expectation Suite?」という質問に「3」と回答するとExpectation Suiteを自動で生成してくれます。
 
@@ -286,7 +286,7 @@ Notebookのセルを全て実行すると、自動でExpectation Suiteが作成�
 
 expectationは計13個自動生成されたようです。
 
-その中の一つは`expect_column_values_to_be_between`というもので、「`hr`列は0から23までの値をとるはずである」という内容のexpectationです。
+その中の1つは`expect_column_values_to_be_between`というもので、「`hr`列は0から23までの値をとるはずである」という内容のexpectationです。
 
 またこの時点で、Expectation Suiteの生成と同時に、データのバリデーションまで行われています。
 
@@ -303,9 +303,9 @@ expectationは計13個自動生成されたようです。
 
 最後に、Checkpointを作成する必要があります。
 
-Checkpointとは「監視対象データ（データソース）、Expectation Suite、バリデーションを実施した後の行動」の3点をまとめたものであり、Checkpointを実行することで、Expectation Suiteをまとめてバリデーションすることができます。
+Checkpointとは「監視対象データ（データソース）、Expectation Suite、バリデーションを実施した後の行動」の3点をまとめたものであり、Checkpointを実行することで、Expectation Suiteをまとめてバリデーションできます。
 
-バリデーションを実施した後の行動として、結果をメールやSlackでの通知する等が挙げられますが、Pythonでプログラミングできるものなら何でも可能となっており、自由度が高いです。（[公式Docs参考](https://docs.greatexpectations.io/docs/terms/action)）\
+バリデーションを実施した後の行動として、結果をメールやSlackでの通知する等が挙げられますが、Pythonでプログラミングできるものなら何でも可能となっており、自由度が高いです（[公式Docs参考](https://docs.greatexpectations.io/docs/terms/action)）\
 ※今回はバリデーションを実施した後の行動の設定までは扱いません
 
 `great_expectations checkpoint new <設定したいcheckpoint名>`コマンドを実行すると、`great_expectations/uncommitted/edit_checkpoint_~~.ipynb`にNotebookファイルが自動生成されます。
@@ -350,7 +350,7 @@ Notebookの全てのセルを実行し、末尾のセルのコメントアウト
 
 以下のように、不正な行を1行追加しただけで不合格の項目が増えていることが確認できます。
 
-このようにしてデータの不正・品質劣化を監視することができます。
+このようにしてデータの不正・品質劣化を監視できます。
 
 <img src="/images/20230531a/2023-05-10-10-45-19.png" alt="" width="1200" height="923" loading="lazy">
 
@@ -358,7 +358,7 @@ Notebookの全てのセルを実行し、末尾のセルのコメントアウト
 
 上記（3.1.~3.5.）の手順を実行しておけば、今後はCheckpointを実行するだけでバリデーションできます。
 
-Checkpointの定義はyamlファイルとして保存されており、PythonまたはCLIからAPIを呼び出すだけで何度でも実行することができます。
+Checkpointの定義はyamlファイルとして保存されており、PythonまたはCLIからAPIを呼び出すだけで何度でも実行できます。
 
 ## 4. Tips
 
@@ -370,7 +370,7 @@ GXの利用を検討しているさいはご参考ください。
 
 `great_expectations suite edit <編集したいExpectation Suite名>`コマンドにより編集できます。
 
-CLIコマンドによる対話形式で「2. Interactively, with a sample batch of data」の選択肢を選ぶと、Notebook形式のインターフェースでExpectationを一つ一つ編集できます。
+CLIコマンドによる対話形式で「2. Interactively, with a sample batch of data」の選択肢を選ぶと、Notebook形式のインタフェースでExpectationを一つ一つ編集できます。
 
 ```console
 $ great_expectations suite edit exp_suite_test --no-jupyter
@@ -399,7 +399,7 @@ Type [n] to see the next page or [p] for the previous. When you're ready to sele
 To continue editing this suite, run jupyter notebook <現在のディレクトリ>/great_expectations/uncommitted/edit_exp_suite_test.ipynb
 ```
 
-JSONファイルを直接編集することもできますが、複雑なため、Notebook形式やPythonのAPI経由で編集することをお勧めします。（[公式Docs参考](https://docs.greatexpectations.io/docs/guides/expectations/how_to_create_and_edit_expectations_with_instant_feedback_from_a_sample_batch_of_data)）
+JSONファイルを直接編集することもできますが、複雑なため、Notebook形式やPythonのAPI経由で編集することをお勧めします（[公式Docs参考](https://docs.greatexpectations.io/docs/guides/expectations/how_to_create_and_edit_expectations_with_instant_feedback_from_a_sample_batch_of_data)）
 
 ### GCPにおける構成例は？
 
@@ -419,12 +419,12 @@ JSONファイルを直接編集することもできますが、複雑なため�
 
 多すぎて把握出来ていませんが、[公式コミュニティ](https://greatexpectations.io/expectations/)に既存のExpectationsが300個以上あります。
 
-Expectationを自作することも可能であり、カスタマイズ性は非常に高いです。（[公式Docs参考](https://docs.greatexpectations.io/docs/guides/expectations/creating_custom_expectations/overview)）
+Expectationを自作することも可能であり、カスタマイズ性は非常に高いです（[公式Docs参考](https://docs.greatexpectations.io/docs/guides/expectations/creating_custom_expectations/overview)）
 
 ## 5. おわりに
 
 今回は、Great Expectations（GX）を利用してBigQueryのデータ品質を監視する簡単な流れを紹介をしました。
 
-GXには様々な機能や拡張性を備えており、様々なユースケースにカスタマイズすることができます。
+GXには様々な機能や拡張性を備えており、様々なユースケースにカスタマイズできます。
 
 本記事が読者の皆様のご参考になれば幸いです。

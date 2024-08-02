@@ -40,7 +40,7 @@ CircleCIでGitHubのPullRequest作成時の負荷を軽減したいと思った�
 
 [git-pr-release](https://github.com/x-motemen/git-pr-release)の導入に合わせてGitHubの標準機能である[リリースノート自動生成](https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes)も導入しました。
 
-以下のymlファイルをリポジトリの`.github`配下に格納するだけでリリースノートを自動生成することができます。
+以下のymlファイルをリポジトリの`.github`配下に格納するだけでリリースノートを自動生成できます。
 
 ```yaml release.yml
 # .github/release.yml
@@ -91,7 +91,7 @@ release.ymlを作成したらリリース時にGenerate release noteを押下す
 
 ブランチ名ベースでラベルを振り分ける方法を採用したのは、弊チームのリポジトリが複数サービスが含まれたモノリポ構成であることが大きな理由です。
 
-一部機能は同じ階層のファイルを共有していたりするため、果たして改修部分がservice Aの改修なのか、service Bの改修なのかはコードを見ないと判断できません。ブランチ名ベースでラベルの振り分けを行えば正確にラベルを付与することができます。
+一部機能は同じ階層のファイルを共有していたりするため、果たして改修部分がservice Aの改修なのか、service Bの改修なのかはコードを見ないと判断できません。ブランチ名ベースでラベルの振り分けを行えば正確にラベルを付与できます。
 
 そこで、「[actions/labeler](https://github.com/actions/labeler)にそんな機能搭載されていないかな?」と思い、確認しましたが2020年に[Issue#54](https://github.com/actions/labeler/issues/54)が起票されてから2023年現在もOpenのままで、簡単に導入とはいかないようです。
 
@@ -103,7 +103,7 @@ release.ymlを作成したらリリース時にGenerate release noteを押下す
 
 [GitHub CLI gh pr edit](https://cli.github.com/manual/gh_pr_edit)
 
-GitHub CLIをインストールして、以下コマンドを実行することでPullRequestを操作することができます。
+GitHub CLIをインストールして、以下コマンドを実行することでPullRequestを操作できます。
 
 ```shell
 gh pr edit [<number> | <url> | <branch>] [flags]
@@ -285,7 +285,7 @@ Open a pull request in the browser
 author=$(gh pr view --json author --jq .author.login)
 ```
 
-`--json`オプションはカンマ区切りで複数指定ができますので以下のようにして一回のリクエストにまとめることができます。
+`--json`オプションはカンマ区切りで複数指定ができますので以下のようにして1回のリクエストにまとめることができます。
 
 ```sh
 prinfo=$(gh pr view --json author,headRefName --jq .author.login,.headRefName)
@@ -353,7 +353,7 @@ https://github.com/cli/cli/releases/tag/v2.23.0
 
 どうやらバージョン2.3.0では`gh pr view --json author`のレスポンスに`name`という属性はなかったようで、ローカルのバージョンとの差分に気づかずにPullRequest作成者の情報の取得ができずに悩んでいました。(スクリプトではnameではなく、loginで取得しています)
 バージョン情報を事前に確認しておくことは大事ですね。
-`- gh/setup`には`version`を指定することができるので、最新のバージョンを確認しつつ指定してください。
+`- gh/setup`には`version`を指定できるので、最新のバージョンを確認しつつ指定してください。
 
 ```yaml
 - gh/setup:

@@ -30,7 +30,7 @@ Starting Pointとは、Hack The Boxを行う上での基礎的なことを学ぶ
 
 ## Oopsie
 
-TIER2の問題から`root.txt`と`user.txt`の二つフラグを取得する必要があります。
+TIER2の問題から`root.txt`と`user.txt`の2つフラグを取得する必要があります。
 
 問題はTASK1 ~ TASK10と`root.txt`と`user.txt`の中身を提出する12問から構成されています。
 
@@ -102,7 +102,7 @@ On uploading a file, what directory does that file appear in on the server?
 
 ファイルをアップロードすると、そのファイルはサーバー上のどのディレクトリに表示されますか?と問われています。
 
-TASK3,4でadminユーザはID34322と分かったので、cookieのuserを34322、roleをadminに変更し、uploadsをクリックします。
+TASK3,4でadminユーザはID34322と分かったので、Cookieのuserを34322、roleをadminに変更し、uploadsをクリックします。
 
 <img src="/images/20230425a/image_6.png" alt="" width="1200" height="743" loading="lazy">
 
@@ -142,7 +142,7 @@ $conn = mysqli_connect('localhost','robert','M3g4C0rpUs3r!','garage');
 ?>
 ```
 
-mysqlへの接続情報が記載されています。よって、設問の解答は`db.php`になります。
+MySQLへの接続情報が記載されています。よって、設問の解答は`db.php`になります。
 
 ### TASK7
 
@@ -175,7 +175,7 @@ robertにユーザを変更します。
 su robert
 ```
 
-パスワードはmysqlの接続情報に記載されていた`M3g4C0rpUs3r!`を入力するとユーザを切り替えすることができました。
+パスワードはMySQLの接続情報に記載されていた`M3g4C0rpUs3r!`を入力するとユーザを切り替えできました。
 bugtrackerに属するファイルを探します。
 
 ```shell
@@ -191,7 +191,7 @@ $ find / -group bugtracker 2>/dev/null
 Regardless of which user starts running the bugtracker executable, what's user privileges will use to run?
 ```
 
-どのユーザーがbugtracker実行ファイルを実行し始めたかに関わらず、実行するために使用するユーザー権限は何ですか？と問われています。こちらの回答は`root`になります。
+どのユーザーがbugtracker実行ファイルを実行し始めたかに関わらず、実行するために使用するユーザー権限は何ですか？ と問われています。こちらの回答は`root`になります。
 
 ### TASK9
 
@@ -211,7 +211,7 @@ SUIDとは、Set owner User IDの略で、セットしたUserIDでファイル�
 What is the name of the executable being called in an insecure manner?
 ```
 
-安全でない方法で呼び出されている実行ファイルの名前は何ですか？と問われています。
+安全でない方法で呼び出されている実行ファイルの名前は何ですか？ と問われています。
 
 TASK7でbugtracker　グループに属しているファイルを実行してみます。
 

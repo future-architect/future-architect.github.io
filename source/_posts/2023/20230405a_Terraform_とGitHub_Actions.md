@@ -250,7 +250,7 @@ Push 時に`terraform/*`でファイルの変更があった際にワークフ�
         run: terraform plan -no-color
 ```
 
-Terraform を実行する際には、[setup-terraform](https://github.com/hashicorp/setup-terraform)を利用することで容易に実行することができます。
+Terraform を実行する際には、[setup-terraform](https://github.com/hashicorp/setup-terraform)を利用することで容易に実行できます。
 ここでは、Terraform の実行内容を簡略化して記載しています。
 
 ## ワークフロー手動実行

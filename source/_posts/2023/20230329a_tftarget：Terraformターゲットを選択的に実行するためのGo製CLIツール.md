@@ -193,7 +193,7 @@ tftarget apply -p 30
 
 ### --summary, -s
 
-`--summary`オプションでは、選択したリソースのサマリ表示を有効または無効にすることができます。デフォルトでは、`plan`や`apply`の結果にサマリが表示されますが、このオプションを使用してサマリ表示をオフにすることができます。
+`--summary`オプションでは、選択したリソースのサマリ表示を有効または無効にできます。デフォルトでは、`plan`や`apply`の結果にサマリが表示されますが、このオプションを使用してサマリ表示をオフにできます。
 
 <img src="/images/20230329a/simple-usage-5_2.png" alt="simple-usage-5.png" width="1074" height="147" loading="lazy">
 

@@ -36,15 +36,15 @@ Vertex AI Pipelinesを使う際に参照することになる、Kubeflowの公�
 [MLOps on GCP 入門 〜Vertex AI Pipelines 実践〜](https://recruit.gmo.jp/engineer/jisedai/blog/vertex-ai-pipelines-intro/)で分かりやすく解説されていたため、参考にさせていただきました。
 
 * パイプライン
-機械学習の一連の処理をカプセル化したものです。Pythonで定義します。前処理やモデル学習、エンドポイントへのデプロイなどの一つ一つの処理（コンポーネント）の実行順序を記述します。パイプラインを定義する関数には`@pipeline`デコレータを付けます。パイプラインの内部には「精度がある値を超えたらデプロイする」などの条件分岐を含ませることも可能です。
+機械学習の一連の処理をカプセル化したものです。Pythonで定義します。前処理やモデル学習、エンドポイントへのデプロイなどの1つ1つの処理（コンポーネント）の実行順序を記述します。パイプラインを定義する関数には`@pipeline`デコレータを付けます。パイプラインの内部には「精度がある値を超えたらデプロイする」などの条件分岐を含ませることも可能です。
 * コンポーネント
-パイプラインで実行する一つ一つの処理のことを指します。例えば、preprocess -> train -> deployを実行するパイプラインの場合、「preprocess」、「train」、「deploy」がコンポーネントです。コンポーネントを定義する関数には`@component`デコレータを付けます。コンポーネントの実装には以下の3つが存在します。
+パイプラインで実行する1つ1つの処理のことを指します。例えば、preprocess -> train -> deployを実行するパイプラインの場合、「preprocess」「train」「deploy」がコンポーネントです。コンポーネントを定義する関数には`@component`デコレータを付けます。コンポーネントの実装には以下の3つが存在します。
 **コンポーネントの実装パターン**
-  * ① GCR に push されている**Docker image**を使う  （詳細は[自前のDocker imageを使って実装するには？](#自前のdocker-imageを使って実装するには)）
+  * （1） GCR に push されている**Docker image**を使う  （詳細は[自前のDocker imageを使って実装するには？](#自前のdocker-imageを使って実装するには)）。
     GCRにpushされているimageのURIを引数として与えることで処理を行う関数が用意されています。
-  * ② パイプラインのソースコードに**関数ベース**で書く （詳細は[事前のDocker imageの準備なしでPythonスクリプトのみで実装には？](#事前のdocker-imageの準備なしでpythonスクリプトのみで実装には)）
+  * （2） パイプラインのソースコードに**関数ベース**で書く （詳細は[事前のDocker imageの準備なしでPythonスクリプトのみで実装には？](#事前のdocker-imageの準備なしでpythonスクリプトのみで実装には)）。
     dockerのimageを使わずPythonベースで好きな処理を書くことができるため、簡単な処理を試したい場合などに向いています。
-  * ③ **Google Cloudパイプラインコンポーネント**を使う
+  * （3） **Google Cloudパイプラインコンポーネント**を使う
     よく利用される処理についてはGoogle側がすでに用意してくれているため、事前に関数一発で呼び出して実行してくれるものになっています。
 
 <img src="/images/20230213a/pipeline_example.png" alt="pipeline_example.png" width="960" height="540" loading="lazy">
@@ -59,16 +59,16 @@ Vertex AI Pipelinesを使う際に参照することになる、Kubeflowの公�
 
 おさらいとしてパイプラインの実装方法から始めます。ここではコンポーネントを実装する方法の内、以下２つを紹介します。
 
-① 自前のDocker imageを使って実装
-② 事前のDocker imageの準備なしでPythonスクリプトのみで実装
+（1） 自前のDocker imageを使って実装
+（2） 事前のDocker imageの準備なしでPythonスクリプトのみで実装
 
-### ① 自前のDocker imageを使って実装するには？
+### （1） 自前のDocker imageを使って実装するには？
 
 #### 1. コンポーネントの作成
 
 **コンテナ（Dockerfile+src）とコンポーネント定義yamlを用意する**
 
-こちらの方法では、コンポーネントごとにDocker imageを用意して、そのDocker imageにコンポーネントの処理の内容を記述したPythonスクリプトを含ませることでコンポーネントを作成します。この方法は、利用するDocker imageのDockerfileやコンポーネントの各種設定を記述したyamlファイルを用意する必要がありますが、ローカルで動かしていたPythonスクリプトをそのままコンポーネント化することができます。Docker imageでコンポーネントを作成するために必要なファイルは以下の3つになります。
+こちらの方法では、コンポーネントごとにDocker imageを用意して、そのDocker imageにコンポーネントの処理の内容を記述したPythonスクリプトを含ませることでコンポーネントを作成します。この方法は、利用するDocker imageのDockerfileやコンポーネントの各種設定を記述したyamlファイルを用意する必要がありますが、ローカルで動かしていたPythonスクリプトをそのままコンポーネント化できます。Docker imageでコンポーネントを作成するために必要なファイルは以下の3つになります。
 
 * Pythonスクリプト：コンポーネントの処理の内容を記述する。
 * Dockerfile：Pythonスクリプトの実行に必要なパッケージをインストールする。Pythonスクリプトのコピーも。
@@ -164,9 +164,9 @@ compiler.Compiler().compile(pipeline_func=pipeline,
 
 パイプラインを定義したファイルを実行すると、パイプライン実行時に必要なjsonファイルが`compiler.Compiler().compile()`の`package_path`に指定したパス（上記の例では`pipeline.json`）に生成されます。
 
-### ② 事前のDocker imageの準備なしでPythonスクリプトのみで実装には？
+### （2） 事前のDocker imageの準備なしでPythonスクリプトのみで実装には？
 
-Vertex AI Pipelinesでは、コンポーネントの処理内容をPythonの関数として記述することでPythonスクリプトのみでコンポーネントを作成することができます。その一方で関数の定義の仕方には若干の癖があります。コンポーネントの関数はstandaloneである必要があり、以下の要件を満たす必要があります。
+Vertex AI Pipelinesでは、コンポーネントの処理内容をPythonの関数として記述することでPythonスクリプトのみでコンポーネントを作成できます。その一方で関数の定義の仕方には若干の癖があります。コンポーネントの関数はstandaloneである必要があり、以下の要件を満たす必要があります。
 
 * 関数の外で定義された関数や変数を含まない
 * 関数内で必要なパッケージ・モジュールは関数内でimportする
@@ -191,7 +191,7 @@ def add() -> None:
     print(c)
 ```
 
-コンポーネントを定義する関数には`@component`デコレータを付け、`base_image`引数でコンポーネントを実行するコンテナイメージを指定、`packages_to_install`引数にリストで必要なパッケージを指定します。また、`create_component_from_func`で関数をラップすることでもコンポーネント化することができます（この場合は`@component`デコレータは必要ありません）。`create_component_from_func`の引数にも`base_image`、`packages_to_install`があるので、そちらでコンテナイメージ、必要なパッケージを指定できます。
+コンポーネントを定義する関数には`@component`デコレータを付け、`base_image`引数でコンポーネントを実行するコンテナイメージを指定、`packages_to_install`引数にリストで必要なパッケージを指定します。また、`create_component_from_func`で関数をラップすることでもコンポーネント化できます（この場合は`@component`デコレータは必要ありません）。`create_component_from_func`の引数にも`base_image`、`packages_to_install`があるので、そちらでコンテナイメージ、必要なパッケージを指定できます。
 
 コンポーネントの作成が終わったら、続いてそれらのコンポーネントをつなげてパイプラインを作成します。
 
@@ -229,7 +229,7 @@ compiler.Compiler().compile(pipeline_func=pipeline,
 
 ## コンポーネントの依存関係を制御するには？
 
-①パイプラインの実行順序は基本的にはコンポーネントの入出力の関係から自動的に決定されます。
+（1）パイプラインの実行順序は基本的にはコンポーネントの入出力の関係から自動的に決定されます。
 
 例えば、以下のようなパイプラインの場合、`add_op`→`mul_op`→`print_op`の順に実行されます。
 
@@ -274,7 +274,7 @@ if __name__ == "__main__":
 
 <img src="/images/20230213a/dependancy.png" alt="dependancy.png" width="413" height="408" loading="lazy">
 
-②パイプラインの実行順序を明示的に制御したい場合には、`ContainerOp.after`関数を使うことで可能です。
+（2）パイプラインの実行順序を明示的に制御したい場合には、`ContainerOp.after`関数を使うことで可能です。
 
 ```Python
 @dsl.pipeline(name='dependancy-check')
@@ -344,7 +344,7 @@ job = aip.PipelineJob(
 job.submit()
 ```
 
-`job.submit()`のほかに`job.run()`も利用することができ、両者の違いは、`submit()`はジョブを投げ終わると終了、`run()`はジョブを投げた後、パイプラインの状態を定期的に表示してくれます。
+`job.submit()`のほかに`job.run()`も利用でき、両者の違いは、`submit()`はジョブを投げ終わると終了、`run()`はジョブを投げた後、パイプラインの状態を定期的に表示してくれます。
 
 ### 参考
 
@@ -423,7 +423,7 @@ pl = PipelineJob(
 )
 ```
 
-タスク単位でキャッシュを利用する場合は、`<task_name>.set_caching_options(True)`で利用することができます。
+タスク単位でキャッシュを利用する場合は、`<task_name>.set_caching_options(True)`で利用できます。
 
 ```python
 @dsl.pipeline(
@@ -439,7 +439,7 @@ def pipeline() -> None:
     ...
 ```
 
-キャッシュが利用されたかどうかは、パイプラインのGUIから確認することができます。キャッシュが利用されている場合にはコンポーネントの右に以下のような矢印マークが付きます。また、ノード情報からもキャッシュ済みかを確認できます。
+キャッシュが利用されたかどうかは、パイプラインのGUIから確認できます。キャッシュが利用されている場合にはコンポーネントの右に以下のような矢印マークが付きます。また、ノード情報からもキャッシュ済みかを確認できます。
 
 <img src="/images/20230213a/cached.png" alt="cached.png" width="380" height="127" loading="lazy">
 
@@ -677,7 +677,7 @@ def pipeline(a: list = [1, 2, 3]) -> None:
 
 パイプラインを定義した関数の入力が自動で保存されます。例えばパイプラインを以下のような関数とした場合、`learning_rate`と`max_depth`が「パイプライン実行分析」の「実行パラメータ」や、パイプライン比較の「パラメータ」として表示されます。
 
-また、これらのパラメータはパイプラインのリランの際に、別の値を入力してパイプラインを実行することができます。**リランの際にはこれらのパラメータしか変更できないため、変更の可能性があるパラメータはすべてパイプラインの関数の引数としておくことをおすすめします。**
+また、これらのパラメータはパイプラインのリランの際に、別の値を入力してパイプラインを実行できます。**リランの際にはこれらのパラメータしか変更できないため、変更の可能性があるパラメータはすべてパイプラインの関数の引数としておくことをおすすめします。**
 
 ```python
 @dsl.pipeline(name='train LightGBM')
@@ -751,11 +751,11 @@ Vertex AI Pipelinesのコンソールからログを見たいパイプライン�
 
 ## パイプラインのグループ分け・実行結果を比較するには？
 
-Vertex AI Pipelinesでは、パイプライン実行で生じる様々なデータ（入力パラメータ、データセット、モデル、指標、etc）を保存することができ、後でそれらを確認したり、複数のパイプラインを比較したりすることができます。データの保存については[パラメータ・中間データ・モデルを管理するには？](#パラメータ中間データモデルを管理するには)をご覧ください。
+Vertex AI Pipelinesでは、パイプライン実行で生じる様々なデータ（入力パラメータ、データセット、モデル、指標、etc）を保存でき、後でそれらを確認したり、複数のパイプラインを比較したりできます。データの保存については[パラメータ・中間データ・モデルを管理するには？](#パラメータ中間データモデルを管理するには)をご覧ください。
 
 ### パイプラインのグルーピング
 
-パイプラインをのちの比較のためにグルーピングしておきたい場合には、Vertex AI Experimentsが便利です。Vertex AI Experimentsではexperimentを作成してそこにパイプラインを登録することができます。experimentの作成は以下のようにしてできます。
+パイプラインをのちの比較のためにグルーピングしておきたい場合には、Vertex AI Experimentsが便利です。Vertex AI Experimentsではexperimentを作成してそこにパイプラインを登録できます。experimentの作成は以下のようにしてできます。
 
 ```python
 import google.cloud.aiplatform as aip
@@ -770,7 +770,7 @@ if __name__ == "__main__":
     )
 ```
 
-パイプライン実行時に以下のように作成したexperimentを指定することでパイプラインをexperimentに登録することができます。
+パイプライン実行時に以下のように作成したexperimentを指定することでパイプラインをexperimentに登録できます。
 
 ```python
 import google.cloud.aiplatform as aip
@@ -832,7 +832,7 @@ if __name__ == "__main__":
 
 ## Vertex AI Pipelinesを利用するコストは？
 
-Vertex AI Pipelinesでは、パイプライン実行ごとに0.03ドルかかります。（執筆時点）
+Vertex AI Pipelinesでは、パイプライン実行ごとに0.03ドルかかります（執筆時点）
 
 加えて、コンポーネントによって使用されるCompute Engineリソースやデータの保存に使用されるGoogle Cloudリソースに対しても課金されます。
 

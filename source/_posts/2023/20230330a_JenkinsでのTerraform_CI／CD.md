@@ -15,7 +15,7 @@ lede: "プロジェクトでJenikisを利用する機会があり、初めてJen
 ---
 # 初めに
 
-こんにちは！筋肉エンジニアのTIG渡邉です。最近ヘルニアになってしまい筋トレが思うようにできずくすぶっています。
+こんにちは！ 筋肉エンジニアのTIG渡邉です。最近ヘルニアになってしまい筋トレが思うようにできずくすぶっています。
 
 [Terraform連載](/articles/20230327a/) の4リソース目の記事になります！
 
@@ -33,7 +33,7 @@ lede: "プロジェクトでJenikisを利用する機会があり、初めてJen
 
 <img src="/images/20230330a/architecture.drawio.png" alt="architecture.drawio.png" width="1200" height="492" loading="lazy">
 
-まず、JenkinsサーバやJenkinsサーバに付随するリソース（Cloud Load Balancing/Cloud Armorなど）はローカルPCからTerraformを実行して作成していきます。Jenkinsサーバを構築後、諸々Jenkinsの設定を終えたのちはJenkins Consoleからボタンポチポチでterraform planからterraform applyを実行してほかのGoogle Cloudのリソースたちを構築することができるようになります。
+まず、JenkinsサーバやJenkinsサーバに付随するリソース（Cloud Load Balancing/Cloud Armorなど）はローカルPCからTerraformを実行して作成していきます。Jenkinsサーバを構築後、諸々Jenkinsの設定を終えたのちはJenkins Consoleからボタンポチポチでterraform planからterraform applyを実行してほかのGoogle Cloudのリソースたちを構築できるようになります。
 
 # Jenkinsサーバを構築するTerraformコード
 
@@ -62,7 +62,7 @@ lede: "プロジェクトでJenikisを利用する機会があり、初めてJen
 └── versions.tf
 ```
 
-locals.tfの中身はGoogle Cloudのプロジェクト名や、自宅外部IPが含まれるので省略させていただきます。また、GCEのStartup Scriptを利用してGCEの構築時にJenkinsのインストールやGKEを操作するためのkubectlなどの諸々の設定も行っています（今回はGKEについては記載しませんがkubectlのインストールだけは一緒に行っています。）。
+locals.tfの中身はGoogle Cloudのプロジェクト名や、自宅外部IPが含まれるので省略させていただきます。また、GCEのStartup Scriptを利用してGCEの構築時にJenkinsのインストールやGKEを操作するためのkubectlなどの諸々の設定も行っています（今回はGKEについては記載しませんがkubectlのインストールだけは一緒に行っています）。。
 
 <details><summary>backend.tf</summary>
 
@@ -764,7 +764,7 @@ resource "google_storage_bucket" "bucket" {
 
 <img src="/images/20230330a/image_6.png" alt="" width="1200" height="904" loading="lazy">
 
-planフェーズでジョブが一時停止し、Apply Plan？と表示されます。
+planフェーズでジョブが一時停止し、Apply Plan？ と表示されます。
 
 <img src="/images/20230330a/image_7.png" alt="" width="772" height="236" loading="lazy">
 

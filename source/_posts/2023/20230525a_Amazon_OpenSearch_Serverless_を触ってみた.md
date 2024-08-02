@@ -14,7 +14,7 @@ author: 齊藤英比古
 lede: "Amazon OpenSearch Service  を触る機会があり、興味があったのでプレビューで公開されていたServerless版でいろいろ試していました"
 ---
 [春の入門連載2023](/articles/20230417a)、17日ぶり2回目の寄稿、23日目を担当します齊藤です。よろしくお願いします。
-運良く2個目の記事をアップできることになりました！(やったね)
+運良く2個目の記事をアップできることになりました！ (やったね)
 
 業務でAmazon OpenSearch Service (Serviceのほう) を触る機会があり、興味があったのでプレビューで公開されていたServerless版でいろいろ試しました。
 
@@ -29,7 +29,7 @@ Serverless版は、無料利用枠がないため、入門のために少し触�
 
 参考までに自分の場合は、5,6回コレクションを作成したり消したりAPI叩いたりで、800円くらいの請求でした。無料枠で OpenSearch を試したい場合は、Service版を使ってください。
 
-いくらかかかってもいいけどとりあえず触って感触掴みたい！みたいな方はServerless版をどうぞ。
+いくらかかかってもいいけどとりあえず触って感触掴みたい！ みたいな方はServerless版をどうぞ。
 
 # Amazon OpenSearch Serverless
 
@@ -112,10 +112,10 @@ https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-i
    (時系列を選ぶと、前述の通り直近24時間分のデータしか検索対象とならない)
    <img src="/images/20230525a/Add_new_collection.png" alt="Add_new_collection" width="921" height="637" loading="lazy">
    - 暗号化
-   初学者の方は、「AWS 所有キーを使用する」でAWSにおまかせしましょう。自前で用意したい方は、もう一つの方で。
+   初学者の方は、「AWS 所有キーを使用する」でAWSにおまかせしましょう。自前で用意したい方は、もう1つの方で。
    <img src="/images/20230525a/encryption.png" alt="encryption" width="905" height="410" loading="lazy">
    - ネットワークアクセス
-   今回はアクセスタイプにVPCは使わずにパブリックを利用します。 ~~VPCの説明までするとめんどくさいので~~ OpenSearch に絞って学べるようパブリックです。後ほどアクセスポリシー内でIAMユーザーでのアクセスとするので、誰でも触れる！というわけではないので安心してください。
+   今回はアクセスタイプにVPCは使わずにパブリックを利用します。 ~~VPCの説明までするとめんどくさいので~~ OpenSearch に絞って学べるようパブリックです。後ほどアクセスポリシー内でIAMユーザーでのアクセスとするので、誰でも触れる！ というわけではないので安心してください。
    ※説明でAPIのエンドポイントとダッシュボードのエンドポイントで異なるネットワーク設定をできるような記述があるが、注釈の方で同じ設定にするよう記載がある
    <img src="/images/20230525a/network_access.png" alt="network_access" width="909" height="521" loading="lazy">
    - データのアクセスポリシー
@@ -175,7 +175,7 @@ https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-i
 
 ## まとめ
 
-個人的に、ぱっとOpenSearchが使えるので入門で使うにはちょうどいいのでは？と思っており、まとめられて非常に満足です。
+個人的に、ぱっとOpenSearchが使えるので入門で使うにはちょうどいいのでは？ と思っており、まとめられて非常に満足です。
 
 サービス自体としては、OpenSearchダッシュボードがそのまま使えたり、VPC経由ではService版と同様にコンソールアクセスが可能とのことで、移行はスムーズに行えそう。
 

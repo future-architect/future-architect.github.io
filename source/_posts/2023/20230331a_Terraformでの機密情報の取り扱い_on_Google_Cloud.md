@@ -33,7 +33,7 @@ https://github.com/hashicorp/terraform/releases/tag/v1.4.0
 
 ### sensitive指定されたvariableの取り扱い
 
-plan/apply時にインタラクティブに入力を求めることができるvariableですが、以下のように`sensitive`フラグを指定することができます。
+plan/apply時にインタラクティブに入力を求めることができるvariableですが、以下のように`sensitive`フラグを指定できます。
 
 ```sh
 resource "google_sql_user" "test_user" {
@@ -115,8 +115,8 @@ https://github.com/carlpett/terraform-provider-sops
 
 ### Cloud Key Management Service(Cloud KMS)
 
-[Cloud Key Management Service（Cloud KMS）](https://cloud.google.com/kms/docs/key-management-service?hl=ja)はGoogle Cloudの鍵作成・管理サービスで、鍵を生成したり、既存の鍵をCloud KMSへインポートして管理することができます。
-また暗号化するための鍵をキーリングという形でグルーピングして管理することができます。
+[Cloud Key Management Service（Cloud KMS）](https://cloud.google.com/kms/docs/key-management-service?hl=ja)はGoogle Cloudの鍵作成・管理サービスで、鍵を生成したり、既存の鍵をCloud KMSへインポートして管理できます。
+また暗号化するための鍵をキーリングという形でグルーピングして管理できます。
 
 今回はsopsの暗号化に利用する鍵にKMSの鍵を利用します。
 また、暗号化・復号化には以下のIAMロールが必要となります。
@@ -157,7 +157,7 @@ resource "google_kms_key_ring_iam_policy" "key_ring_iam" {
 }
 ```
 
-（sopsのインストールは公式のgoを利用した方法ではうまくいかず、[こちら](https://docs.technotim.live/posts/install-mozilla-sops/)を参考にバイナリからインストールしました。）
+（sopsのインストールは公式のgoを利用した方法ではうまくいかず、[こちら](https://docs.technotim.live/posts/install-mozilla-sops/)を参考にバイナリからインストールしました）。
 
 ```sh sopsによる暗号化
 sops --input-type json --encrypt --gcp-kms projects/<PROJECT_ID>/locations/global/keyRings/test-key-ring/cryptoKeys/test-key secrets/test-apikey.json > secrets/test-apikey_encrypted.json

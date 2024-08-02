@@ -18,7 +18,7 @@ lede: "Terraform x GitOps ということで、いつかちゃんと調べてお
 ---
 # はじめに
 
-こんにちは！TIG コアテクの川口です。
+こんにちは！ TIG コアテクの川口です。
 
 こちらは、 [Terraform 連載](/articles/20230327a/) の6日目の記事になります！
 今回は **Terraform x GitOps** について調査しました。
@@ -47,7 +47,7 @@ lede: "Terraform x GitOps ということで、いつかちゃんと調べてお
 
 ## 一般的な CI/CD サービス
 
-一般的なとは？というお話ですが…。「後述の2つのものとは違うよ。」といった意味合いで用いています。
+一般的なとは？ というお話ですが…。「後述の2つのものとは違うよ」といった意味合いで用いています。
 具体的なものでいうと以下のようなものを指しています。
 
 - **GitHub Actions**
@@ -66,7 +66,7 @@ lede: "Terraform x GitOps ということで、いつかちゃんと調べてお
 
 **GitHub Actions** とは、GitHub上で自動化されたワークフローを作成・実行できる機能です。GitHub を開発時に利用している場合には、扱いやすさの観点で採用されやすいサービスだと個人的には思っています。
 
-また、[変更されたファイルをもとにイベントを発火する](https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#using-filters-to-target-specific-paths-for-pull-request-or-push-events) 機能はなかなかユニークだなーとなった記憶があります。（最近だと、他サービスも拡張機能等で実現できるようにしていそうですが。）
+また、[変更されたファイルをもとにイベントを発火する](https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#using-filters-to-target-specific-paths-for-pull-request-or-push-events) 機能はなかなかユニークだなーとなった記憶があります（最近だと、他サービスも拡張機能等で実現できるようにしていそうですが）。
 
 GitHub Actions でいうところのいわゆる拡張機能は、**Actions** と呼ばれるもので様々な開発者が提供してくれています。どのようなものがあるかを調べるには、[こちら](https://github.com/marketplace?type=actions) の **Actions MarcketPlace** が参考になると思います。その他詳細に関しては、 [ドキュメント](https://docs.github.com/en/actions) を参照してください。
 
@@ -108,7 +108,7 @@ consistent deployment and operations experience for any applications
 **Terraform Cloud** とは、Terraform をクラウド上で管理するためのツールです。
 plan, apply 等の各種作業をクラウド上でできるようになります。
 
-それだと GitOps は？といったことになりそうですが、様々な [VCS Integration](https://developer.hashicorp.com/terraform/cloud-docs/vcs) を提供しているため、こちらを使えば実現できます。
+それだと GitOps は？ といったことになりそうですが、様々な [VCS Integration](https://developer.hashicorp.com/terraform/cloud-docs/vcs) を提供しているため、こちらを使えば実現できます。
 ただし、ユーザー数や利用する機能によっては [有料になる](https://www.hashicorp.com/products/terraform/pricing) ためそこには注意が必要そうです。
 
 ドキュメントは、 [こちら](https://developer.hashicorp.com/terraform/cloud-docs) になります。
@@ -121,7 +121,7 @@ plan, apply 等の各種作業をクラウド上でできるようになりま�
 個人的には、plan には成功したけれど apply で失敗する…。といったこともまあまあ起こりうるのかなーと思っているので、main に merge されたら apply するというよりかは、PR 上で apply まで担保できるようにするといった運用が取れるのはなかなか良さそうなのカナーと思いました。
 
 さらに [独自のロックの機構](https://www.runatlantis.io/docs/locking.html) も持っているようで、この機能によりチーム単位で修正を行う際でも安全に plan や apply を行えそうです。
-このロックは、もちろんリポジトリ単位ではなくディレクトリ単位や Terraform Workspace 単位でロックがかかるようになっているようです。（そもそもどのようなディレクトリ構成の Terraform を扱えるかは [こちら](https://www.runatlantis.io/docs/requirements.html#repository-structure) に記載があります。）
+このロックは、もちろんリポジトリ単位ではなくディレクトリ単位や Terraform Workspace 単位でロックがかかるようになっているようです（そもそもどのようなディレクトリ構成の Terraform を扱えるかは [こちら](https://www.runatlantis.io/docs/requirements.html#repository-structure) に記載があります）。。
 GitHub Actions 等でもいわゆる ChatOps 的な運用を実現することは可能ではあるのですが、なかなかここまで厳密なロックの機構を実現するのは難しそうなのかなと思います。
 
 その他詳細は、[ドキュメント](https://www.runatlantis.io/docs/) を参照してください。
@@ -133,7 +133,7 @@ GitHub Actions 等でもいわゆる ChatOps 的な運用を実現すること�
 今回は Git ホスティングサービスとしては、 **GitHub** を対象とします。
 また Terraform の管理対象としては **Google Cloud の各種リソース** とします。
 
-改めてですが GitOps の原則に忠実に則るということであれば、**「コンソール等からシステムの状態・構成を変更するような作業は一切禁止とする。」** ことにも注意です。上述の #1, #2 の原則に反するからですね！
+改めてですが GitOps の原則に忠実に則るということであれば、**「コンソール等からシステムの状態・構成を変更するような作業は一切禁止とする」** ことにも注意です。上述の #1, #2 の原則に反するからですね！
 
 # GitHub Actions を使った GitOps
 
@@ -146,14 +146,14 @@ GitHub Actions 等でもいわゆる ChatOps 的な運用を実現すること�
 ## Setup
 
 上述の通りに GitHub Actions では様々な Actions が公開されており、 Terraform を管理するためのものもありました。
-基本的に今回の用途であれば、以下の二つの Actions を使用してワークフローを組むとよさそうです。
+基本的に今回の用途であれば、以下の2つの Actions を使用してワークフローを組むとよさそうです。
 
 - [setup terraform](https://github.com/hashicorp/setup-terraform): Terraform をよしなに扱えるようにする Action。
-- [google auth](https://github.com/google-github-actions/auth): Google Cloud の認証を行う Action。（Wokload Identity による認証とサービスアカウントのキーを使った認証のどちらにも対応している様子。）
+- [google auth](https://github.com/google-github-actions/auth): Google Cloud の認証を行う Action（Wokload Identity による認証とサービスアカウントのキーを使った認証のどちらにも対応している様子）。
 
 GitHub Actions では、[こちら](https://docs.github.com/en/actions/using-workflows/triggering-a-workflow) のように様々なトリガーが設定できます。また、先ほどのパスの概念も用いれば柔軟に運用はできそうですね！
 
-原則 #4 に従うとなるとなかなか難しそうですが、厳密に相違点が出た場合に検知したいということであれば、 [schedule workflow](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule) を使ってチェックする感じですかね。（そこまで厳密にやらなければならないケースがあるかは悩ましいところですが。）
+原則 #4 に従うとなるとなかなか難しそうですが、厳密に相違点が出た場合に検知したいということであれば、 [schedule workflow](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule) を使ってチェックする感じですかね（そこまで厳密にやらなければならないケースがあるかは悩ましいところですが）。
 
 また、排他制御に関しても、[concurrency](https://docs.github.com/en/actions/using-jobs/using-concurrency) という概念がある程度利用できそうです。
 
@@ -161,9 +161,9 @@ GitHub Actions では、[こちら](https://docs.github.com/en/actions/using-wor
 
 ## Install
 
-PipeCD を扱うためには、 **Control Plane** と **Piped** を [インストールする必要があります](https://pipecd.dev/docs-dev/installation)。そもそも Control Plane とは？ Piped とは？といったところは [PipeCD の Concepts](https://pipecd.dev/docs-dev/concepts/) に記載されています。
+PipeCD を扱うためには、 **Control Plane** と **Piped** を [インストールする必要があります](https://pipecd.dev/docs-dev/installation)。そもそも Control Plane とは？ Piped とは？ といったところは [PipeCD の Concepts](https://pipecd.dev/docs-dev/concepts/) に記載されています。
 
-イメージとしては、Control Plane が集中管理用のコンポーネント（Web コンソール等を含む）でおおよそ組織単位で1つできるもの。Piped が GitOps を行いたい各種対象と疎通をするためのステートレスエージェントでおおよそ開発環境単位で1つできるものといったものになるのかなと思います。（諸々運用によっては変わりそうではありそうな気配はありますが、本筋から逸れるのでそこまでは言及しません！）
+イメージとしては、Control Plane が集中管理用のコンポーネント（Web コンソール等を含む）でおおよそ組織単位で1つできるもの。Piped が GitOps を行いたい各種対象と疎通をするためのステートレスエージェントでおおよそ開発環境単位で1つできるものといったものになるのかなと思います（諸々運用によっては変わりそうではありそうな気配はありますが、本筋から逸れるのでそこまでは言及しません！）
 
 以下は上記リンクに記載がありました概念図になります。
 
@@ -179,7 +179,7 @@ Piped のインストールは Piped 自体がステートレスなエージェ�
 
 ### Terraform Application の作成
 
-はじめにやることは Terraform Application の作成です。そもそも Application とは？といったところも、 [Concepts](https://pipecd.dev/docs-dev/concepts/#application) に記載がありました。
+はじめにやることは Terraform Application の作成です。そもそも Application とは？ といったところも、 [Concepts](https://pipecd.dev/docs-dev/concepts/#application) に記載がありました。
 
 https://pipecd.dev/docs-dev/user-guide/managing-application/adding-an-application
 
@@ -202,13 +202,13 @@ Terraform を設定する際の example もいくつか [公開されていま�
 - **Slack 通知の設定:** https://pipecd.dev/docs-dev/user-guide/managing-piped/configuring-notifications
   - いくつかのイベントを Slack 通知してくれる機能です。
 - **GitHub 上での Plan Preview の設定:** https://pipecd.dev/docs-dev/user-guide/plan-preview
-  - PR 上で、Plan の Preview を行ってくれる機能です。（GitHub Actions にも、公式の [Actions](https://github.com/pipe-cd/actions-plan-preview) が公開されているようでした。）
+  - PR 上で、Plan の Preview を行ってくれる機能です（GitHub Actions にも、公式の [Actions](https://github.com/pipe-cd/actions-plan-preview) が公開されているようでした）。
 
 # Terraform Cloud を使った GitOps
 
 ## Install
 
-すべてクラウド上で管理できるようになっているため、特別何かをインストールする必要はありません。（ただし GitHub と連携する際に、GitHub Actions を使用することになるため、先述の Self Hosted Runner を使う場合にはその設定が必要になります。）
+すべてクラウド上で管理できるようになっているため、特別何かをインストールする必要はありません（ただし GitHub と連携する際に、GitHub Actions を使用することになるため、先述の Self Hosted Runner を使う場合にはその設定が必要になります）。
 
 ## Setup
 
@@ -221,7 +221,7 @@ PR 上でのプレビューもあり、運用のイメージもしやすいで�
 
 <img src="/images/20230403a/assets.gif" alt="" width="800" height="599" loading="lazy">
 
-もちろん履歴は、Terraform Cloud 上から（この場合だと GitHub Actions 上からも。）わかりやすく確認できるようになっています。
+もちろん履歴は、Terraform Cloud 上から（この場合だと GitHub Actions 上からも）。わかりやすく確認できるようになっています。
 
 その他 Terraform Cloud のユニークな機能について、下記にあげておきます。
 
@@ -244,7 +244,7 @@ PR 上でのプレビューもあり、運用のイメージもしやすいで�
 
 ### Drift Detection
 
-[**Drift Detection**](https://www.hashicorp.com/campaign/drift-detection-for-terraform-cloud) は、差分検知を行い、差分があれば可視化、必要に応じて通知を飛ばせる機能です。（GitOps の原則 #4 を実現するための機能とも言えますね！）
+[**Drift Detection**](https://www.hashicorp.com/campaign/drift-detection-for-terraform-cloud) は、差分検知を行い、差分があれば可視化、必要に応じて通知を飛ばせる機能です（GitOps の原則 #4 を実現するための機能とも言えますね！）。
 ※ 現在 Cloud Business 以上のプランでのみ使える機能です。
 
 # Atlantis を使った GitOps
@@ -266,17 +266,17 @@ Atlantis も PipeCD と同じように自身で Atlantis の各種コンポー�
 いくつかのサービスの所感としては以下のようになります。
 
 - **GitHub Actions:**
-  - 他のサービスと比べて、取り入れやすい。（すでに取り入れられているケースも多そう。）
+  - 他のサービスと比べて、取り入れやすい（すでに取り入れられているケースも多そう）。
   - 任意のスクリプトが実行できて、かつ様々なトリガーを設定できるのでカスタマイズ性は豊富。
   - ただし、詳細なワークフローは自身で記載する必要があるので GitHub Actions そのものや、利用する Actions、各種 Terraform コマンドについての詳細な理解が必要になる。
 - **PipeCD:**
   - やや取り入れやすさは他と比べると見劣りしそう。ただし、すでに Kubernetes Cluster がある場合や、Kubernetes リソースを管理するサービスを探している場合には十分候補に上がりそう。
   - GitOps を忠実に再現できるところはメリット。
 - **Terraform Cloud:**
-  - 特別にインストール等の手順が必要なわけではないので取り入れやすくはあるが、ユーザー数や利用する機能によって有料になる点が注意。（マシン代等はかかるので、他のものが厳密に無料でできるということでもないですが。）
+  - 特別にインストール等の手順が必要なわけではないので取り入れやすくはあるが、ユーザー数や利用する機能によって有料になる点が注意（マシン代等はかかるので、他のものが厳密に無料でできるということでもないですが）。
   - 基本的な機能の他、Policy Enforcement や、Cost Estimation、Drift Detection 等のユニークな機能を有している。
 - **Atlantis**
   - 様々なデプロイの方法があるとはいったもののデプロイの手間は一定かかってしまいそう。
   - ChatOps による運用ができる点や、独自のロック機能は個人的には魅力。
 
-次は棚井さんの記事になりますー！お楽しみに〜！！
+次は棚井さんの記事になりますー！ お楽しみに〜！！
