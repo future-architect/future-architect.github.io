@@ -90,7 +90,7 @@ CoreMotionフレームワークのひとつのクラスとして、`CMHeadphoneM
 
 # 実際にアプリを作ってみる
 
-### 事前準備
+## 事前準備
 
 CoreMotionフレームワークが使えるように、Info.plistに`NSMotionUsageDescription`キーを追加、説明を記載します。
 
@@ -165,11 +165,11 @@ class HeadTrackingManager: ObservableObject {
 }
 ```
 
-### 全体概要
+## 全体概要
 
 このクラスは`ObservableObject`プロトコルに準拠させ、SwiftUIビューと連携して動作させるようにしています。
 
-### 各プロパティの説明
+## 各プロパティの説明
 
 - `motionManager: CMHeadphoneMotionManager`
     MHeadphoneMotionManager のインスタンスで、ヘッドモーションデータの取得を管理する。
@@ -183,7 +183,7 @@ class HeadTrackingManager: ObservableObject {
 
 次に、各メソッドを説明します。
 
-### startTracking()
+## startTracking()
 
 モーションデータの取得を開始するメソッド。
 
@@ -212,7 +212,7 @@ func startTracking() {
 
 モーションデータを提供できるかどうかを`isDeviceMotionAvailable`で確認します。その後、モーションデータの更新を開始し、データが取得されるたびに`Task`クロージャ内で、`updateMotionData(_:)`メソッドを呼び出します。
 
-### stopTracking()
+## stopTracking()
 
 モーションデータの取得を停止するメソッド。`stopDeviceMotionUpdates()` メソッドを呼び、モーションデータの取得を停止します。
 
@@ -281,7 +281,7 @@ Button {
 
 全体のコードは次に記載しているので、手元で試してみてください。
 
-### コード全体
+## コード全体
 
 <details><summary>HeadTrackingApp.swift</summary>
 

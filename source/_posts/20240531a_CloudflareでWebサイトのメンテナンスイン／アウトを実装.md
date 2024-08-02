@@ -41,7 +41,7 @@ Cloudflareでドメインを取得したり、取得済みのドメインをClou
 
 # Cloudflare R2設定
 
-### バケット構築
+## バケット構築
 
 まずはバケットを作ります。
 2024/05現在では凝った設定はできないため、ただ箱のみとなります。
@@ -53,7 +53,7 @@ resource "cloudflare_r2_bucket" "maintenance" {
 }
 ```
 
-### パブリックアクセス設定
+## パブリックアクセス設定
 
 Cloudflare R2の設定画面からパブリックアクセス設定の「ドメインに接続」をクリックし、Cloudflareで管理しているドメインを利用して任意のドメインを入力します
 
@@ -63,7 +63,7 @@ Cloudflare R2の設定画面からパブリックアクセス設定の「ドメ�
 
 <img src="/images/20240531a/r2_setting_2.jpg" alt="r2_setting_2.jpg" width="1200" height="291" loading="lazy">
 
-### htmlファイルアップロード
+## htmlファイルアップロード
 
 メンテナンスページ（htmlファイル）のデプロイは自動化したいため、APIでのアップロードを行います。
 
@@ -101,7 +101,7 @@ aws s3 cp $HTML_PATH s3://$R2_BUCKET_NAME --endpoint-url https://$R2_ENDPOINT --
 
 # リダイレクトルール設定
 
-### 許可IPリスト作成
+## 許可IPリスト作成
 
 まずメンテンナンス中でもアクセスを許可したい運用保守拠点のIPアドレスリストを作成します。
 
@@ -117,7 +117,7 @@ aws s3 cp $HTML_PATH s3://$R2_BUCKET_NAME --endpoint-url https://$R2_ENDPOINT --
 
 <img src="/images/20240531a/rule_setting_3.jpg" alt="rule_setting_3.jpg" width="1159" height="627" loading="lazy">
 
-### リダイレクトルール作成
+## リダイレクトルール作成
 
 作成したIPリスト以外のIPリストからのアクセスはメンテナンスページにリダイレクトするように設定します。
 
@@ -150,7 +150,7 @@ resource "cloudflare_ruleset" "single_redirects" {
 
 ```
 
-### なぜリダイレクトルールか
+## なぜリダイレクトルールか
 
 Cloudflareでこのようなリダイレクトを行いたいときには、他に以下の手段があります。
 
@@ -166,7 +166,7 @@ Workersはより細かく柔軟に設定が可能ですが、今回のような�
 
 自動化についてはGitHub Actionsなどを想定してはしていますが、特定のサービスに依存はしないためコマンドのみ記載します。
 
-### APIトークン作成
+## APIトークン作成
 
 まずはAPIで色々と実行するためにAPIトークンを作成します。
 
@@ -186,7 +186,7 @@ Workersはより細かく柔軟に設定が可能ですが、今回のような�
 
 <img src="/images/20240531a/auto_setting_3.jpg" alt="auto_setting_3.jpg" width="946" height="439" loading="lazy">
 
-### メンテナンスイン
+## メンテナンスイン
 
 以下のコマンドでメンテナンスインを実現できます。
 
@@ -207,7 +207,7 @@ curl -X POST https://api.cloudflare.com/client/v4/zones/$ZONE_ID/purge_cache \
     -d '{"purge_everything":true}'
 ```
 
-### メンテナンスアウト
+## メンテナンスアウト
 
 以下のコマンドでメンテナンスアウトを実現できます。
 
@@ -228,7 +228,7 @@ curl -X POST https://api.cloudflare.com/client/v4/zones/$ZONE_ID/purge_cache \
     -d '{"purge_everything":true}'
 ```
 
-### 【補足】ルールセットID（&ルールID）の確認方法
+## 【補足】ルールセットID（&ルールID）の確認方法
 
 著者が調べた限りでは、画面上で簡単にルールセットIDを確認する方法がありませんでしたので、Cloudflare APIを利用して確認しています。
 
