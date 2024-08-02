@@ -99,7 +99,7 @@ Packerを代用しようとする場合は、踏み台や、特定のサーバ�
 
 ### `local-exec`を利用する
 
-先ほどはProvisionerで`remote-exec`を利用しましたが、今回は`local-exec`を使います。実行場所が`local`、つまりTerraformの実行端末上で行うコマンドです。Ansibleは実行するときは各インスタンス上ではなく、ローカルや踏み台サーバーから実行するかと思いますので、`local-exec`を今回は使います（構築したサーバー上でlocalhostでAnsibleは実行できますがお掃除も大変ですね…。）。
+先ほどはProvisionerで`remote-exec`を利用しましたが、今回は`local-exec`を使います。実行場所が`local`、つまりTerraformの実行端末上で行うコマンドです。Ansibleは実行するときは各インスタンス上ではなく、ローカルや踏み台サーバーから実行するかと思いますので、`local-exec`を今回は使います（構築したサーバー上でlocalhostでAnsibleは実行できますがお掃除も大変ですね…）。。
 今回はケースとして、以下をディレクトリ構成で考えます。
 
 ```sh

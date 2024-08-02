@@ -123,7 +123,7 @@ APIキーは `x-api-key:aZ12kXCqGrZ9QTnqDtid1P6j2J7luB3v`のようなイメー�
 
 # 解決策
 
-（1）WAF側のルールを変えるか、（2）ブラウザ側でプリフライトリクエスト時にAPI Keyを渡すように設定変更するかを考えました。しかし②ですが、XMLHttpRequestでプリフライトするときに任意のリクエストヘッダが追加できるか調べたところ、以下の回答にある通り仕様として不可でした。そのため、①のWAF側のルールを変更することになります。
+（1）WAF側のルールを変えるか、（2）ブラウザ側でプリフライトリクエスト時にAPI Keyを渡すように設定変更するかを考えました。しかし（2）ですが、XMLHttpRequestでプリフライトするときに任意のリクエストヘッダが追加できるか調べたところ、以下の回答にある通り仕様として不可でした。そのため、（1）のWAF側のルールを変更することになります。
 
 https://stackoverflow.com/questions/58547499/is-it-possible-to-add-a-request-header-to-a-cors-preflight-request
 

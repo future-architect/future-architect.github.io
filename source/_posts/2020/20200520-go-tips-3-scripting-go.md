@@ -384,7 +384,7 @@ b, err := exec.Command("/bin/sh", "-c", "ls", "*.go").Output()
 testFilePath := tempDir + "/" + "test.txt"
 ```
 
-ファイルパス関連で問題の1つとして UNIX 系 OS と Windows でパスのセパレータが異なるという問題があります。Unix 系 OS ではセパレータが `/` であって Windows では `\` という話です。通常、この手のスクリプトを UNIX 系 OS と Windows の両方で動作させることは少ないと思うので、問題になることはあまりないと思いますが、[path/filepath](https://golang.org/pkg/path/filepath/) パッケージを用いるとマルチプラットフォームで扱うことができスマートです。パス/filepath パッケージは対象の OS で定義されているファイルパスと互換性のある方法でファイルパスを操作できるユーティリティを提供しているパッケージです。
+ファイルパス関連で問題の1つとして UNIX 系 OS と Windows でパスのセパレータが異なるという問題があります。UNIX 系 OS ではセパレータが `/` であって Windows では `\` という話です。通常、この手のスクリプトを UNIX 系 OS と Windows の両方で動作させることは少ないと思うので、問題になることはあまりないと思いますが、[path/filepath](https://golang.org/pkg/path/filepath/) パッケージを用いるとマルチプラットフォームで扱うことができスマートです。パス/filepath パッケージは対象の OS で定義されているファイルパスと互換性のある方法でファイルパスを操作できるユーティリティを提供しているパッケージです。
 
 以下はカレントディレクトリ直下に一時的なディレクトリ tempxxxx を作成して、その一時ディレクトリにファイルを生成する実装例です。ファイルパスの結合に [filepath.Join](https://golang.org/pkg/path/filepath/#Join) を用いています。以下の実装では tempDir と test.txt を Join していますが、3 つ以上の文字列を Join することも可能です。
 
