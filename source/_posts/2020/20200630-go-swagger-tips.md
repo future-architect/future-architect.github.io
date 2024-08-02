@@ -57,7 +57,7 @@ The Gopher character is based on the Go mascot designed by [Renée French](http:
 
 # Tips
 
-そんなgo-swaggerを用いてWeb APIサーバを開発し、いくつかのシステムをリリースしてきました。そこで得たTipsを紹介していきます。比較的サーバサイドの話が多いですが、一部クライアントサイドの話しもあります（前述したあるWeb APIサーバから、別のOpenAPIで定義されているWebAPIを呼び出すことも合ったので）
+そんなgo-swaggerを用いてWeb APIサーバを開発し、いくつかのシステムをリリースしてきました。そこで得たTipsを紹介していきます。比較的サーバサイドの話が多いですが、一部クライアントサイドの話しもあります（前述したあるWeb APIサーバから、別のOpenAPIで定義されているWeb APIを呼び出すことも合ったので）
 
 ## 1. インストールバージョンをチームで固定しよう
 
