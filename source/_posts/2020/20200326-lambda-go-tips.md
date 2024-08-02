@@ -32,7 +32,7 @@ lede: "サーバレス連載の第2弾はLambdaアプリをGoで開発する中�
 
 Goで開発する場合、少しでも性能を稼ぐためgoroutineを使う場面も多いと思います。特にバックエンドのデータストアがDynamoDBである場合は負荷を気にする必要がほぼ無いため、わたしはデータの書き込み部分を良く並列化することが多いです。
 
-そういった場面で概算でどれくらい性能上がるのかな？と推測ができるよう、Lambda上で利用できるgoroutineの個数を調べました。メモリを128MB~3008MBを調整することで、裏のCPUやNW幅も増減する話も聞いたので、メモリサイズを変えて調べました。
+そういった場面で概算でどれくらい性能上がるのかな？ と推測ができるよう、Lambda上で利用できるgoroutineの個数を調べました。メモリを128MB~3008MBを調整することで、裏のCPUやNW幅も増減する話も聞いたので、メモリサイズを変えて調べました。
 
 Goで利用コア数を調べるには [NumCPU](https://golang.org/pkg/runtime/#NumCPU) を利用するそうです。これをLambdaのお作法に組み込みます。
 
@@ -175,7 +175,7 @@ func errLog(fn lambdaHandlerFunc) lambdaHandlerFunc  {
 }
 ```
 
-上記のようなerrLogという関数を、ロジックが実装された `handle` をWrapすると事前・事後の処理をうまくWrapすることができます。
+上記のようなerrLogという関数を、ロジックが実装された `handle` をWrapすると事前・事後の処理をうまくWrapできます。
 
 ```go 呼び出す場合
 lambda.Start(errLog(handle))

@@ -42,7 +42,7 @@ Reduxとは、React.jsで使用するstateつまりアプリケーションの�
 
 では上記で示した概略図をもとにReduxのデータフローをそれぞれ説明していきたいと思います
 
-## ①ActionCreatorsによってActionを生成する
+## （1）ActionCreatorsによってActionを生成する
 
 * ユーザーのインプットによってComponent上からAction作成依頼が飛びActionCreatorでActionが作成されます
 
@@ -79,7 +79,7 @@ function testFunctionA(testStateA) {
 import { testFunctionA } from "testActionCreator";
 ```
 
-## ②Actionをdispatchする
+## （2）Actionをdispatchする
 
 <img src="/images/20200429/3.png" alt="Actionのディスパッチ" class="img-small-size" loading="lazy">
 
@@ -91,7 +91,7 @@ import { testFunctionA } from "testActionCreator";
   dispatch(testFunctionA());
 ```
 
-## ③ReducerによってStore内のStateを更新する
+## （3）ReducerによってStore内のStateを更新する
 
 * Reducerとは、Actionを元にStateを更新するメソッドのことを言います
 * 引数のstateの更新するのではなく、新しいstateのオブジェクトを返します
@@ -115,7 +115,7 @@ export const testReducer = ({ testStateA = "", testStateB = "" } = {}, action) =
 };
 ```
 
-## ④ReactとReduxを連携しStore内のStateをComponentで参照する
+## （4）ReactとReduxを連携しStore内のStateをComponentで参照する
 
 * mapStateToPropsを使用するとComponentのpropsにStateの中身を詰め込むことが出来ます
 * それによって、Store内にあるStateををthis.props.testStateAとして使用することが出来ます
@@ -130,7 +130,7 @@ export const testReducer = ({ testStateA = "", testStateB = "" } = {}, action) =
 4. **ReactとReduxの連携しStore内のStateをComponentで参照する**
 
 最後に、ご紹介したコード例全体像はこちらです。
-(※今回はComponent、ActionCreater、Reducerをそれぞれ別ファイルで作成しています。）
+(※今回はComponent、ActionCreater、Reducerをそれぞれ別ファイルで作成しています）。
 
 ```js Test.js
 // Component

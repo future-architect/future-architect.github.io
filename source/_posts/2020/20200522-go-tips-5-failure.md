@@ -88,7 +88,7 @@ func (e *ClientError) Unwrap() error {
 
 各層のerror を wrappingして handler 層に返却します。ここは愚直にやらないといけないところです。(静的解析ツールを作ってチェックする機構を用意するほうがより良いですね。)
 
-関数の戻り値の第2引数自体を `AppError` 型にすることも考えられますが、標準 error インターフェイスを尊重したほうが良いとのノウハウがあるので対応しませんでした。
+関数の戻り値の第2引数自体を `AppError` 型にすることも考えられますが、標準 error インタフェースを尊重したほうが良いとのノウハウがあるので対応しませんでした。
 
 参考: [初めてGolangで大規模Microservicesを作り得た教訓](https://www.slideshare.net/yuichi1004/golangtokyo-6-in-japanese?ref=https://golangtokyo.connpass.com/event/57168/presentation/)
 
@@ -180,7 +180,7 @@ const (
 ### handler 層に返却される error を必ずエラーコードに対応させた独自エラーとする
 
 morikuni/failure でも、エラーコードへの変換 ( `failure.Translate`  ) や エラーコードの Wrap ( `failure.Wrap` ) は可能です。
-(ちなみに、failureで生成したエラーも errors package のインターフェイスを満たしています。)
+(ちなみに、failureで生成したエラーも errors package のインタフェースを満たしています。)
 
 ```go
 package service

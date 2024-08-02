@@ -20,7 +20,7 @@ lede: "筆者は普段ファイルを扱って何か簡単な処理をする場�
 
 TIG の辻です。
 
-筆者は普段ファイルを扱って何か簡単な処理をする場合は、シェルスクリプトで実装することが多かったのですが、実は Go で書くと簡単に、かつ Testable でスクリプトちっく  [^2] に書くことでできて、幸せになるんじゃないか？と最近考えています。
+筆者は普段ファイルを扱って何か簡単な処理をする場合は、シェルスクリプトで実装することが多かったのですが、実は Go で書くと簡単に、かつ Testable でスクリプトちっく  [^2] に書くことでできて、幸せになるんじゃないか？ と最近考えています。
 
  [^2]: スクリプトちっくとは main.go と main_test.go の 2 ファイルで簡潔に実装できる程度の処理、くらいのニュアンスで使っています。
 
@@ -31,8 +31,8 @@ TIG の辻です。
 1. ファイルの読み込みにio.Readerを用いる
 2. ファイルの書き込みにio.Writerを用いる
 3. リストファイルから1行ずつ読み込む
-4. os/execを使う
-5. ファイルパスの操作にpath/filepathを使う
+4. `os/exec` を使う
+5. ファイルパスの操作に `path/filepath`を使う
 
 ## Tips
 
@@ -40,7 +40,7 @@ TIG の辻です。
 
 ファイルを読み込む際に [io.Reader](https://golang.org/pkg/io/#Reader) を受け取って処理するようにすると Testable なスクリプトになって安心です。簡単な処理とはいえやはりテストは書きたいですよね。
 
-例として、ファイルの中に「Copyright」という文字列が含まれるかどうか調べる処理を考えてみます。実装例として以下の hasCopyright のような実装が考えられます。ポイントは io.Reader のインターフェースを関数の引数として受け取ることです。
+例として、ファイルの中に「Copyright」という文字列が含まれるかどうか調べる処理を考えてみます。実装例として以下の hasCopyright のような実装が考えられます。ポイントは io.Reader のインタフェースを関数の引数として受け取ることです。
 
 ```go io.Readerの引数がポイント
 func hasCopyright(r io.Reader) (bool, error) {
@@ -83,7 +83,7 @@ func hasCopyright(f *os.File) (bool, error) {
 }
 ```
 
-インターフェースである io.Reader を受け取る関数にすることで io.Reader を満たす任意の構造体を関数に渡すことができます。つまりファイルディスクリプタを示す os.File だけでなく [byte.Buffer](https://golang.org/pkg/bytes/#Buffer) や [strings.Reader](https://golang.org/pkg/strings/#Reader) といった構造体を渡すことができます。文字列の場合は [strings.NewReader](https://golang.org/pkg/strings/#NewReader) を用いて string から io.Reader を生成でき便利です。以下のようにテストすることが可能になります。
+インタフェースである io.Reader を受け取る関数にすることで io.Reader を満たす任意の構造体を関数に渡すことができます。つまりファイル記述子を示す os.File だけでなく [byte.Buffer](https://golang.org/pkg/bytes/#Buffer) や [strings.Reader](https://golang.org/pkg/strings/#Reader) といった構造体を渡すことができます。文字列の場合は [strings.NewReader](https://golang.org/pkg/strings/#NewReader) を用いて string から io.Reader を生成でき便利です。以下のようにテストすることが可能になります。
 
 ```go main_test.go
 package main
@@ -175,7 +175,7 @@ func writeHello(w io.Writer) {
 }
 ```
 
-実際のファイルに書き込まなくても io.Writer を実装している [bytes.Buffer](https://golang.org/pkg/bytes/#Buffer) に文字列を書き込み、比較してテストすることができます。実際にファイルを作成したい場合は [os.Create](https://golang.org/pkg/os/#Create) などとすれば生成することができます。
+実際のファイルに書き込まなくても io.Writer を実装している [bytes.Buffer](https://golang.org/pkg/bytes/#Buffer) に文字列を書き込み、比較してテストできます。実際にファイルを作成したい場合は [os.Create](https://golang.org/pkg/os/#Create) などとすれば生成できます。
 
 ```go main_test.go
 package main
@@ -314,9 +314,9 @@ func main() {
 }
 ```
 
-### 4.os/execを使う
+### 4. `os/exec` を使う
 
-ファイルを扱うスクリプトに限った話ではないですが Go では [exec.Cmd](https://golang.org/pkg/os/exec/#Cmd) を用いて外部コマンドを実行することができます。とても便利です。[exec.Command](https://golang.org/pkg/os/exec/#Command) 関数を用いて Path と Args に実行したい文字列をセットします。外部コマンドの実行結果が不要であれば [Run()](https://golang.org/pkg/os/exec/#Cmd.Run), 必要であれば [Output()](https://golang.org/pkg/os/exec/#Cmd.Output) を用いることができます。たいていの場合この 2 つのメソッドで充足することが多いです。
+ファイルを扱うスクリプトに限った話ではないですが Go では [exec.Cmd](https://golang.org/pkg/os/exec/#Cmd) を用いて外部コマンドを実行できます。とても便利です。[exec.Command](https://golang.org/pkg/os/exec/#Command) 関数を用いて Path と Args に実行したい文字列をセットします。外部コマンドの実行結果が不要であれば [Run()](https://golang.org/pkg/os/exec/#Cmd.Run), 必要であれば [Output()](https://golang.org/pkg/os/exec/#Cmd.Output) を用いることができます。たいていの場合この 2 つのメソッドで充足することが多いです。
 
 外部コマンドの実行した結果、エラーが発生すれば戻り値の error に値が格納されます。`_` などとしてエラーを無視しないようにしましょう。ちゃんとエラーをチェックすれば直前のコマンドでエラーが発生していたけど、間違って次のコマンドが実行されてしまった。`cd` でエラーが発生していたけど、後続の `rm` が実行されて意図しないファイルやディレクトリが削除されてしまった。。。などということは防げます。Bash で `set -ue` しておくのと似たような雰囲気です。
 
@@ -376,7 +376,7 @@ b, err := exec.Command("/bin/sh", "-c", "ls", "*.go").Output()
 
 その他にも os.exec の [Overview](https://golang.org/pkg/os/exec/#pkg-overview) には、リダイレクトはされない、glob パターンの展開には `filepath.Glob` を用いることができる、などといった os.exec を扱う上での注意点が記載されています。あらためて確認してみてください。
 
-### 5.ファイルパスの操作にpath/filepathを使う
+### 5.ファイルパスの操作に `path/filepath` を使う
 
 ファイルパスの結合に以下のように文字列で `/` を結合させて、あるディレクトリにファイルを生成することがあると思います。
 
@@ -384,7 +384,7 @@ b, err := exec.Command("/bin/sh", "-c", "ls", "*.go").Output()
 testFilePath := tempDir + "/" + "test.txt"
 ```
 
-ファイルパス関連で問題の一つとして Unix 系 OS と Windows でパスのセパレータが異なるという問題があります。Unix 系 OS ではセパレータが `/` であって Windows では `\` という話です。通常、この手のスクリプトを Unix 系 OS と Windows の両方で動作させることは少ないと思うので、問題になることはあまりないと思いますが、[path/filepath](https://golang.org/pkg/path/filepath/) パッケージを用いるとマルチプラットフォームで扱うことができスマートです。path/filepath パッケージは対象の OS で定義されているファイルパスと互換性のある方法でファイルパスを操作することができるユーティリティを提供しているパッケージです。
+ファイルパス関連で問題の1つとして UNIX 系 OS と Windows でパスのセパレータが異なるという問題があります。UNIX 系 OS ではセパレータが `/` であって Windows では `\` という話です。通常、この手のスクリプトを UNIX 系 OS と Windows の両方で動作させることは少ないと思うので、問題になることはあまりないと思いますが、[path/filepath](https://golang.org/pkg/path/filepath/) パッケージを用いるとマルチプラットフォームで扱うことができスマートです。パス/filepath パッケージは対象の OS で定義されているファイルパスと互換性のある方法でファイルパスを操作できるユーティリティを提供しているパッケージです。
 
 以下はカレントディレクトリ直下に一時的なディレクトリ tempxxxx を作成して、その一時ディレクトリにファイルを生成する実装例です。ファイルパスの結合に [filepath.Join](https://golang.org/pkg/path/filepath/#Join) を用いています。以下の実装では tempDir と test.txt を Join していますが、3 つ以上の文字列を Join することも可能です。
 
@@ -420,4 +420,4 @@ func main() {
 
 ## まとめ
 
-ファイル扱うようなスクリプトを Go で実装する上での Tips 5 選を紹介しました。io.Reader や io.Writer といったインターフェースを受け取ることでファイルを扱うスクリプトでも簡単にテストすることができます。エラーも明示的にハンドリングすることができていい感じです。ちょっとしたファイルを扱う処理を Go で書いてみてはいかがでしょうか。
+ファイル扱うようなスクリプトを Go で実装する上での Tips 5 選を紹介しました。io.Reader や io.Writer といったインタフェースを受け取ることでファイルを扱うスクリプトでも簡単にテストできます。エラーも明示的にハンドリングできていい感じです。ちょっとしたファイルを扱う処理を Go で書いてみてはいかがでしょうか。

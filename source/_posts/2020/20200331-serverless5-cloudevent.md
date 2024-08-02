@@ -164,7 +164,7 @@ Data,
 ====
 ```
 
-ちゃんと届きました！簡単ですね。
+ちゃんと届きました！ 簡単ですね。
 
 ## 次に、Cloud Pub/Sub経由の形に変えてみる
 
@@ -379,7 +379,7 @@ GCPコンソールからもメッセージがしっかりPub/Subに届いてい�
 
 ## 最後に、Cloud Pub/Subから先をCloud Functionsに切り替える
 
-さて、Pub/SubキューはCloud Functionsに渡してあげたいと思うのは私だけでしょうか？（求ム、同志）
+さて、Pub/SubキューはCloud Functionsに渡してあげたいと思うのは私だけでしょうか？（求ム、同志）。
 というわけでラストは先程Cloud Pub/Subに到達したメッセージをCloud Functionsで受け取りたいと思います。
 
 <img src="/images/20200331/d4.png" loading="lazy">
@@ -555,7 +555,7 @@ Senderは同じものを利用するだけなので新しい準備は不要で�
 <img src="/images/20200331/photo_20200331_03.png" loading="lazy">
 Cloud Functionsのログにてメッセージが届いていることが確認できました！
 
-無事に『CloudEvents仕様のメッセージをローカル端末からCloud Pub/Sub経由でCloud Functionsに渡し、個々の値を取り出しプログラムで扱える形にすること』という目的を達成することができました。
+無事に『CloudEvents仕様のメッセージをローカル端末からCloud Pub/Sub経由でCloud Functionsに渡し、個々の値を取り出しプログラムで扱える形にすること』という目的を達成できました。
 
 # さいごに
 

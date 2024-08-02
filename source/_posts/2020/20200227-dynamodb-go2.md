@@ -63,7 +63,7 @@ type Item struct {
 }
 ```
 
-`dynamodbav` というタグを利用することで、DynamoDBのキーを指定して構造体とマッピングすることができます。
+`dynamodbav` というタグを利用することで、DynamoDBのキーを指定して構造体とマッピングできます。
 省略した場合は構造体のキー名がそのまま利用されます。
 
 ## 基本的なCRUD
@@ -277,7 +277,7 @@ func (repo *BaseRepository) attributes(domain interface{}, condition func(tag re
 }
 ```
 
-同様にUpdate, Create, Deleteも汎化することで、呼び出し元の実装は極めてシンプルにすることができてました。
+同様にUpdate, Create, Deleteも汎化することで、呼び出し元の実装は極めてシンプルにできてました。
 もちろんより複雑なことをやろうとするとコードも煩雑になり、それこそ `dynamodb/guregu` 相当のものを再開発することになりかねません。
 ある程度の制約を設けるなどしてDynamoDBの利用シーンをシンプルにできるのであるのであれば、筆者はaws-sdkのみの利用を推奨します。
 

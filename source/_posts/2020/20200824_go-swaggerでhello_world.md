@@ -185,7 +185,7 @@ func GetGreeting(p factory.GetGreetingParams) middleware.Responder {
 }
 ```
 
-※importするパスはご自身のgithubリポジトリになります。
+※importするパスはご自身のGitHubリポジトリになります。
 
 ```sh
 .

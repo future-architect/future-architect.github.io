@@ -19,7 +19,7 @@ lede: "私の使用するテキストエディタはVim一択でしたが、最�
 
 こんにちは。TIG/DXユニットの富山です。
 
-私の使用するテキストエディタはVim一択でしたが、最近はVSCodeに浮気気味です。（言わずもがな [Vimプラグイン](https://marketplace.visualstudio.com/items?itemName=vscodevim.vim)は入れています）
+私の使用するテキストエディタはVim一択でしたが、最近はVSCodeに浮気気味です（言わずもがな [Vimプラグイン](https://marketplace.visualstudio.com/items?itemName=vscodevim.vim)は入れています）
 
 今回はVSCodeでGo言語用のデバッグ環境をテーマします！
 
@@ -32,12 +32,12 @@ lede: "私の使用するテキストエディタはVim一択でしたが、最�
 
 ## Step 1：プラグインのインストール
 
-Googleが公開しているVSCode用のGoプラグインである、[Go for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=golang.Go)をインストールします。（2020年6月に開発管理がMicrosoftからGoogleのGo開発チームへ移管されました）。
+Googleが公開しているVSCode用のGoプラグインである、[Go for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=golang.Go)をインストールします（2020年6月に開発管理がMicrosoftからGoogleのGo開発チームへ移管されました）。
 <img src="/images/20201117/image_2.png" loading="lazy">
 
 インストールが終わったら、Goプラグインに必要な各種ツールをインストールしていきます。
 
-1. コマンドパレットを開く（Windows: `Ctrl + Shift` + `p` / Mac: `Command` + `Shift` + `p` ）
+1. コマンドパレットを開く（Windows: `Ctrl + Shift` + `p` / Mac: `Command` + `Shift` + `p`）
 2. `>Go: Install/Update Tools` と入力する。
 3. 表示されるツールから任意のツールにチェックを入れる。
 <img src="/images/20201117/image_3.png" loading="lazy">
@@ -179,7 +179,7 @@ func main() {
 
 さぁ、実行してみましょう。
 
-9行目にブレークポイントを設定してみます。（行番号の左側をクリックで設定）
+9行目にブレークポイントを設定してみます（行番号の左側をクリックで設定）
 
 赤丸が該当行左側に表示されたら、設定完了です。
 <img src="/images/20201117/image_5.png" loading="lazy">

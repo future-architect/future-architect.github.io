@@ -21,7 +21,7 @@ lede: "フューチャー社内には「Go相談室」というチャットル�
 
 TIG DXユニットの真野です。先週の[この記事](/articles/20200519/)ぶりの投稿になります。
 
-フューチャー社内には「Go相談室」というチャットルームがあり、そこでGoに関連する疑問を投げたら、大体1日くらいで強い人が解決してくれるという神対応が行われています。そこでAWSやGCPの独自エラーをError warppingされた時にどうやってハンドリングすればよいの？と聞いた時にやり取りした内容をまとめました。
+フューチャー社内には「Go相談室」というチャットルームがあり、そこでGoに関連する疑問を投げたら、大体1日くらいで強い人が解決してくれるという神対応が行われています。そこでAWSやGCPの独自エラーをError warppingされた時にどうやってハンドリングすればよいの？ と聞いた時にやり取りした内容をまとめました。
 
 # 背景
 
@@ -78,7 +78,7 @@ func AnyFunc() error {
 
 # Handling Errors in the AWS SDK for Go
 
-[ドキュメント](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/handling-errors.html)を読むと例えば、AWSのErorrハンドリングは以下のように、`awserr.Error` というインターフェースで表現されており、一度errを型アサーションしてから内部的なエラーコードに応じてハンドリングすることになっています。
+[ドキュメント](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/handling-errors.html)を読むと例えば、AWSのErorrハンドリングは以下のように、`awserr.Error` というインタフェースで表現されており、一度errを型アサーションしてから内部的なエラーコードに応じてハンドリングすることになっています。
 
 ```go AWS-SDKの通常版エラーハンドリング
 if err != nil {
@@ -156,7 +156,7 @@ if e, ok := err.(*googleapi.Error); ok {
 }
 ```
 
-もしこれらのerrorをWrapする場合は、同様に `errors.As` で判定します。（実際は後述する各サービスごとに宣言されているSentinel errorで判断することが多いと思います）
+もしこれらのerrorをWrapする場合は、同様に `errors.As` で判定します（実際は後述する各サービスごとに宣言されているSentinel errorで判断することが多いと思います）
 
 ```go
 if err := AnyFunc(); err != nil {
@@ -204,7 +204,7 @@ if err := AnyFunc(); err != nil {
 
 https://play.golang.org/p/NAYR7XySCdW にサンプルコードを載せましたが、 `%w`構文を用いた`fmt`パッケージではStacktraceが出力されません。もし、Stacktraceが必要な場合は `fmt.Errorf`ではなく `xerrors.Errorf` を用いてWrapします。
 
-シビアに性能が求められない、例えばBackendのWebAPIをGoで実装する場合は、 [xerrorsパッケージ](https://godoc.org/golang.org/x/xerrors)を利用した方が、2020/01/26 時点では良さそうです。
+シビアに性能が求められない、例えばBackendのWeb APIをGoで実装する場合は、 [xerrorsパッケージ](https://godoc.org/golang.org/x/xerrors)を利用した方が、2020/01/26 時点では良さそうです。
 
 * xerrorsについては、そな太さんの [Goの新しいerrors パッケージ xerrors
 ](https://qiita.com/sonatard/items/9c9faf79ac03c20f4ae1) の記事がとても参考になりました
@@ -246,7 +246,7 @@ stacktrace: anyFunc any error - internal failed:
         /tmp/sandbox921242282/prog.go:22
 ```
 
-ちなみに、xerrorsでWrapされたエラーでも、errors.Is, errors.Asで判定できました。（混在すると少し気持ち悪いですが）
+ちなみに、xerrorsでWrapされたエラーでも、errors.Is, errors.Asで判定できました（混在すると少し気持ち悪いですが）
 
 * [Go Playground] https://play.golang.org/p/nfu_JXo6N_e
 

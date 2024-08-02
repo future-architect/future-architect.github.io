@@ -29,7 +29,7 @@ lede: "突然ですが、普段生活するうえでカギ🔑をなくした、
 
 ## Berglasを使ってみる
 
-サクっと利用するならCloud Shellだよね！ということで、以下Cloud Shellで作業をしています。
+サクっと利用するならCloud Shellだよね！ ということで、以下Cloud Shellで作業をしています。
 
 ### Berglasとは？
 
@@ -77,7 +77,7 @@ $ gcloud services enable --project ${PROJECT_ID} \
 berglas bootstrap --project $PROJECT_ID --bucket $BUCKET_ID
 ```
 
-成功すると下記のような出力が確認できます！最近のCLIツールってこれでもかってくらい優しくできていますよね。
+成功すると下記のような出力が確認できます！ 最近のCLIツールってこれでもかってくらい優しくできていますよね。
 
 ```
 Successfully created berglas environment:
@@ -249,7 +249,7 @@ GUI画面へは`セキュリティ -> シークレット マネージャー`で�
 
 <img src="/images/20200212/photo_20200212_02.png" class="img-small-size" style="border:solid 1px #000000" loading="lazy">
 
-ラベルで整理ができるのも片づけが苦手な私にぴったりです。（今回はつけていないですが。。。）
+ラベルで整理ができるのも片づけが苦手な私にぴったりです（今回はつけていないですが）。。。
 
 有効化、無効化、破棄も非常に容易にできます。新しいバージョンを選択することで、シークレットの中身の更新と過去のシークレットを一括無効にできます。
 
@@ -278,7 +278,7 @@ Migrating api-user to projects/my-secret-project/secrets/api-user... done!
 Migrating api-pass to projects/my-secret-project/secrets/api-pass... done!
 ```
 
-二回目の実行
+2回目の実行
 
 ```shell
 $ berglas migrate ${BUCKET_ID} --project ${PROJECT_ID}
@@ -290,7 +290,7 @@ Migrating api-pass to projects/my-secret-project/secrets/api-pass... done!
 
 * 画面
 
-イケてますね！当然ですが、最終更新日はUPLOADした時間になります。
+イケてますね！ 当然ですが、最終更新日はUPLOADした時間になります。
 
 <img src="/images/20200212/photo_20200212_05.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 

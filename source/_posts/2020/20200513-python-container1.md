@@ -12,28 +12,27 @@ thumbnail: /images/20200513/thumbnail.png
 author: 澁川喜規
 lede: "Pythonで書かれたアプリケーションをDockerイメージにする堅い方法の紹介です。イメージサイズを少しでも削ろう！とかではなくて実用性重視の方向です。今回は第一弾ということで、Debianベースのイメージを使う方法を紹介します。"
 ---
-Pythonで書かれたアプリケーションをDockerイメージにする堅い方法の紹介です。イメージサイズを少しでも削ろう！とかではなくて実用性重視の方向です。今回は第一弾ということで、Debianベースのイメージを使う方法を紹介します。
+Pythonで書かれたアプリケーションをDockerイメージにする堅い方法の紹介です。イメージサイズを少しでも削ろう！ とかではなくて実用性重視の方向です。今回は第一弾ということで、Debianベースのイメージを使う方法を紹介します。
 
-* 続編も公開されました。
-  * https://future-architect.github.io/articles/20200514/
+* [続編](/articles/20200514/)も公開されました。
 
 # Pythonのベースイメージ選び
 
 イメージ作成にはベースイメージ選びからですが、基本的には次の2つかなと思います。Pythonバージョンは機械学習だと3.7がよく使われていると思いますが、5/8にTensorflowが3.8向けのwheelとセットで新バージョンを出したので、そろそろ3.8になっていきますかね。本記事も3.8にしますが、3.7でも動作します。
 
-* python:3.x-buster
-* python:3.x-slim-buster
+* `python:3.x-buster`
+* `python:3.x-slim-buster`
 
 イメージのOSには以下のような種類があります。
 
 | 名前 | どんなもの？ |
 |:-:|:-:|
-| buster  | Debian 10で処理系とかいっぱいインストール済み  |
-| buster-slim  | Debian 10で処理系なしの実行環境用 |
-| stretch  | Debian 9で処理系入り  |
-| stretch-slim  | Debian 9で処理系なしの実行環境用  |
-| alpine  | 元はフロッピーで起動するファイルサイズ重視のディストリビューション |
-| windowsservercore  | Windows。LinuxやmacOS上では動作しない  |
+| `buster`  | Debian 10で処理系とかいっぱいインストール済み  |
+| `buster-slim`  | Debian 10で処理系なしの実行環境用 |
+| `stretch`  | Debian 9で処理系入り  |
+| `stretch-slim`  | Debian 9で処理系なしの実行環境用  |
+| `alpine`  | 元はフロッピーで起動するファイルサイズ重視のディストリビューション |
+| `windowsservercore`  | Windows。LinuxやmacOS上では動作しない  |
 
 BusterとかStretchという名前が見慣れない方もいるかもしれませんが、これはLinuxディストリビューションとしてシェアの大きな[Debianのコードネーム](https://www.debian.org/releases/index.en.html)です。
 
@@ -44,9 +43,9 @@ Pythonユーザーは基本的にAlpineを選んではいけません。いろ�
 * [AlpineはUbuntuよりも50%以上遅い](https://superuser.com/questions/1219609/why-is-the-alpine-docker-image-over-50-slower-than-the-ubuntu-image)
 * [Alpineにするとビルド時間が50倍になる](https://pythonspeed.com/articles/alpine-docker-python/)
 
-最初の項目。なぜ遅いかというと、Alpineのアプリが使うlibc(musl)のメモリ周りアロケートの実装が、性能よりもライブラリのサイズ重視のシンプルでPythonの使い方と合わなくて速度が出ないとのこと。これはアプリケーションの実装次第なのでjemallocを使っているRubyとかの人は関係ないでしょうし、PostgreSQLとかNginxはAlpine版でも速度は変わらないようです。性能が2倍違うということは、クラウドでアプリケーションを動かすときはメモリさえ許せば一つ下のインスタンスでいいわけで、お金にも利いてきますよね。
+最初の項目。なぜ遅いかというと、Alpineのアプリが使うlibc(musl)のメモリ周りアロケートの実装が、性能よりもライブラリのサイズ重視のシンプルでPythonの使い方と合わなくて速度が出ないとのこと。これはアプリケーションの実装次第なのでjemallocを使っているRubyとかの人は関係ないでしょうし、PostgreSQLとかnginxはAlpine版でも速度は変わらないようです。性能が2倍違うということは、クラウドでアプリケーションを動かすときはメモリさえ許せば1つ下のインスタンスでいいわけで、お金にも利いてきますよね。
 
-後者の速度の問題ですが、PyPIはLinux向けにはmanylinux1という形式でバイナリを提供しており、DebianでもRedHatでも高速にインストールできます。しかし、この形式はAlpineには対応していないため、C拡張を使うライブラリを使うと、Dockerイメージのビルド時間が伸びまくってしますわけです。
+後者の速度の問題ですが、PyPIはLinux向けにはmanylinux1という形式でバイナリを提供しており、DebianでもRed Hatでも高速にインストールできます。しかし、この形式はAlpineには対応していないため、C拡張を使うライブラリを使うと、Dockerイメージのビルド時間が伸びまくってしますわけです。
 
 それでも、どうしても、PurePythonで処理速度はどうでも良い/お金がたくさんある、あるいはC拡張を使う場合でも人生を犠牲にしてでも、イメージサイズをどうしても減らしたいみたいな選ばれし者はAlpineを使う感じでしょうかね。
 
@@ -90,7 +89,7 @@ uid = uwsgiusr
 gid = uwsgiusr
 ```
 
-Dockerfileはこうなりました。slimの方にはlibxml2などがないので追加します。PostgreSQLのライブラリのlibpq5はまあおまけです。大抵ウェブアプリケーション作るときはPostgreSQLかMySQLは使うでしょうし。もし、使うライブラリがpure python、もしくはC拡張でもwheelによるバイナリ配布をしているパッケージのみであれば、ビルド用イメージも3.8-slim-busterにできます。slimを使っていても、もしライブラリを追加した瞬間にGCCが必要になっても、イメージを3.8-busterに変えるだけなので、このマルチステージビルドの構成は崩さない方が良いでしょう。お仕事であれば問題回避の速度が大事ですからね。
+Dockerfileはこうなりました。slimの方にはlibxml2などがないので追加します。PostgreSQLのライブラリのlibpq5はまあおまけです。大抵ウェブアプリケーション作るときはPostgreSQLかMySQLは使うでしょうし。もし、使うライブラリがpure Python、もしくはC拡張でもwheelによるバイナリ配布をしているパッケージのみであれば、ビルド用イメージも3.8-slim-busterにできます。slimを使っていても、もしライブラリを追加した瞬間にGCCが必要になっても、イメージを3.8-busterに変えるだけなので、このマルチステージビルドの構成は崩さない方が良いでしょう。お仕事であれば問題回避の速度が大事ですからね。
 
 ```Dockerfile Dockerfile
 # ここはビルド用のコンテナ

@@ -156,7 +156,7 @@ aws apigateway get-resources \
   --rest-api-id ${rest_api_id}
 ```
 
-parent-idには一つ前のコマンドで返ってきたidの値を利用します。
+parent-idには1つ前のコマンドで返ってきたidの値を利用します。
 
 ```sh
 aws apigateway create-resource \
@@ -419,7 +419,7 @@ aws lambda create-event-source-mapping \
   --function-name kinesis-trigger-test
 ```
 
-event source mappingの設定ではエラー時のレコード送信先をSQSに設定できたり、バッチ処理するレコードの数など色々なオプションを指定することができます。
+event source mappingの設定ではエラー時のレコード送信先をSQSに設定できたり、バッチ処理するレコードの数など色々なオプションを指定できます。
 
 それではKinesisにテストレコードをputしてみましょう。
 
@@ -484,4 +484,4 @@ aws logs get-log-events \
 
 このあたりの設定に関しては知っていれば難しいことはないのですが、初見だと少し苦労する部分かなと思います。本記事ではCLIによる設定をしていきましたが、もちろんCloudFormationやTerraformなどのInfrastructure as Codeでも設定すべき内容は基本的に同じになります。
 
-一度マスターしてしまえばどうということ無いことなので、ぜひ一度Localstackを利用して試しに実装してみてください。
+一度習得してしまえばどうということ無いことなので、ぜひ一度Localstackを利用して試しに実装してみてください。

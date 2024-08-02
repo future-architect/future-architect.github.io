@@ -37,9 +37,9 @@ Cloud RunとFargateもライバルのように言われますが、Fargateは複
 
 ストレージに書き込まれたタイミングで何かイベントを駆動したいのであればCloud Functions一択ですが、両方でサポートされているHTTPリクエストを受け取るウェブサービスやスケジュールで駆動するイベントを受ける場合にはどちらも使えます。
 
-Cloud Functionsは基本的に、1つのリクエストごとにインスタンスが作られる（正確には1つのインスタンスは同時に1つのリクエストのみを処理する）とドキュメントには書かれています。Cloud Runは同時80接続までは一つのインスタンスで処理できます。Cloud Functionsで大量アクセスがあって起動が頻繁に行われると、DBへのコネクションが新規に大量に張られてトラブルになる可能性があります。AWSではLambda RDS Proxyが提供されはじめていて(MySQLのみ)、LambdaでもRDBを使えるようにという機能が提供され始めていますが、GCPにはまだありません。ウェブアプリケーションを作るならCloud SQLも使えるCloud Runの方が良さそうです。スケジュール駆動のイベントの場合はそんなに並列で走ることはないと思うので、どちらでも良いと思います。
+Cloud Functionsは基本的に、1つのリクエストごとにインスタンスが作られる（正確には1つのインスタンスは同時に1つのリクエストのみを処理する）とドキュメントには書かれています。Cloud Runは同時80接続までは1つのインスタンスで処理できます。Cloud Functionsで大量アクセスがあって起動が頻繁に行われると、DBへのコネクションが新規に大量に張られてトラブルになる可能性があります。AWSではLambda RDS Proxyが提供されはじめていて(MySQLのみ)、LambdaでもRDBを使えるようにという機能が提供され始めていますが、GCPにはまだありません。ウェブアプリケーションを作るならCloud SQLも使えるCloud Runの方が良さそうです。スケジュール駆動のイベントの場合はそんなに並列で走ることはないと思うので、どちらでも良いと思います。
 
-日本語のCloud Runを紹介しているサイトではまだベータ扱いの操作になっているものも多いのですが（本家のGCPの日本語ドキュメントもまだ更新されていない）[Cloud Runは昨年の11月にGAになり](https://cloud.google.com/run/docs/release-notes)、ベータが取れました。SLAも99.95%になっています。
+日本語のCloud Runを紹介しているサイトではまだベータ扱いの操作になっているものも多いのですが（本家のGCPの日本語ドキュメントもまだ更新されていない）[Cloud Runは昨年の11月にGAになり](https://cloud.google.com/run/docs/release-notes)、ベータが取れました。SLAも99.95％になっています。
 
 ・・・というのは性能指標だけを見た場合の比較ですが、Cloud RunにはVPCに繋げられないという問題があります。今年のうちには使えるようになるらしいです。このエントリーは今後に超期待ということでの先行検証ぐらいに見ておいていただければと思います。Cloud FunctionsをVPCに接続する方法はこのブログの[Let's Try GCP #2 ～Cloud FunctionをVPC connectorと一緒に使ってみる～](/articles/20190927/)で紹介しています。
 
@@ -60,7 +60,7 @@ Cloud Runでウェブサービスを作るのは通常のコンテナで動く�
   * ビルドした静的ファイルもコンテナの中に入れる
 * UI部品は[Material Design WebComponents](https://mwc-demos.glitch.me/demos/)
 
-chiは高速だけども、イベントハンドラ周りは標準のnet/httpと同じものが使えるので、多くのGoユーザーにとって敷居が低いライブラリです。Vueは説明不要ですよね。管理画面といってもそれなりに綺麗な部品を使って画面を作りたいものです。Material Design WebComponentsは[2019年はWebComponents元年(2回目)！WebComponentsをReact/Angular/Vueと一緒に使う](https://qiita.com/shibukawa/items/5a36147ec103d35c1b5e)で紹介したツールキットの1つです。Ionicはすでに使って見たので、今回はこっちを選択。
+chiは高速だけども、イベントハンドラ周りは標準のnet/httpと同じものが使えるので、多くのGoユーザーにとって敷居が低いライブラリです。Vueは説明不要ですよね。管理画面といってもそれなりに綺麗な部品を使って画面を作りたいものです。Material Design Web Componentsは[2019年はWebComponents元年(2回目)！WebComponentsをReact/Angular/Vueと一緒に使う](https://qiita.com/shibukawa/items/5a36147ec103d35c1b5e)で紹介したツールキットの1つです。Ionicはすでに使って見たので、今回はこっちを選択。
 
 ## プロジェクトのフォルダを作る
 
@@ -102,7 +102,7 @@ module.exports = {
 };
 ```
 
-後は通常のTypeScriptでのVueの開発ですが、今回は[2019年はWebComponents元年(2回目)！WebComponentsをReact/Angular/Vueと一緒に使う](https://qiita.com/shibukawa/items/5a36147ec103d35c1b5e)で紹介したUI部品を使います。WebComponentsのタグは``ignoreElements``に登録しておきます。
+後は通常のTypeScriptでのVueの開発ですが、今回は[2019年はWebComponents元年(2回目)！WebComponentsをReact/Angular/Vueと一緒に使う](https://qiita.com/shibukawa/items/5a36147ec103d35c1b5e)で紹介したUI部品を使います。Web Componentsのタグは``ignoreElements``に登録しておきます。
 
 ```ts src/main.ts
 Vue.config.ignoredElements = [
@@ -235,7 +235,7 @@ export default class AboutPage extends Vue {
 
 ## Goのサーバーを作る
 
-Goのサーバーはnet/httpですが、今回はフロントとの通信はJSON-RPCにしました。標準ライブラリのJSON-RPCはいろいろ制約が強いので、github.com/semrush/zenrpcを使いました。それらをchiのrouterに登録してサーバー起動しておしまい。注意点としては、PORT環境変数を見て、ポートを切り替えられるようにすることです。ついでにHOST環境変数も見てますが、これはChromebookの制約故なので他の人はいらないかもです。
+Goのサーバーはnet/httpですが、今回はフロントとの通信はJSON-RPCにしました。標準ライブラリのJSON-RPCはいろいろ制約が強いので、 `gitHub.com/semrush/zenrpc` を使いました。それらをchiのrouterに登録してサーバー起動しておしまい。注意点としては、PORT環境変数を見て、ポートを切り替えられるようにすることです。ついでにHOST環境変数も見てますが、これはChromebookの制約故なので他の人はいらないかもです。
 
 ```go main.go
 package main
@@ -357,7 +357,7 @@ Open Server at 127.0.0.1:8888
 
 ## フロントエンドのアセットをGoサーバーにバンドル
 
-本番環境に向けて、1コンテナの1プロセスで動作するようにしていきます。AWSのFargateであれば、複数コンテナをまとめて1つのタスクとできるので、静的HTMLの配信にはフロントに立てたNginxを使うという方法もできますが、Cloud Runの場合は1つのコンテナにまとめる必要があります。
+本番環境に向けて、1コンテナの1プロセスで動作するようにしていきます。AWSのFargateであれば、複数コンテナをまとめて1つのタスクとできるので、静的HTMLの配信にはフロントに立てたnginxを使うという方法もできますが、Cloud Runの場合は1つのコンテナにまとめる必要があります。
 
 静的ファイルをサーバー側でバンドルして配信する方法はいろいろありますが、自作の[brbundle](https://godoc.org/go.pyspa.org/brbundle)というのにします。Single Page Applicationの場合、[Angularのページで紹介されている](https://angular.io/guide/deployment)ように、静的ファイルを配信するときに見つからなかったらindex.htmlにフォールバックする、ということが必要です。この自作のライブラリはSSP用にnet/httpやらchiのアダプタを持っていて、このフォールバックもできるようにしています。
 
@@ -399,7 +399,7 @@ Cloud RunにデプロイするにはDockerコンテナを作ります。
 
 ## Dockerコンテナを作る
 
-いよいよDockerにしていきます。みなさん、まさかAlpineとか使っていないですよね？今どきのセキュリティを気にするエンジニアの常識はシェルがなくてログインができないdistrolessをベースイメージにするって、マックで隣の女子高生が言っていました。
+いよいよDockerにしていきます。みなさん、まさかAlpineとか使っていないですよね？ 今どきのセキュリティを気にするエンジニアの常識はシェルがなくてログインができないdistrolessをベースイメージにするって、マックで隣の女子高生が言っていました。
 
 distrolessはDebian系なので、ビルド用のオフィシャルイメージとも合わせやすいです。
 

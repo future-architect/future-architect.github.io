@@ -36,7 +36,7 @@ Swaggerや周辺ツールについては [某先輩の記事](/articles/20191008
 というわけで、今回は下記のツールを利用することを前提として規約を作成しています。
 
 * [go-swagger](https://github.com/go-swagger/go-swagger): Goアプリケーションのハンドラ、リクエスト/レスポンスのドメインモデル、バリデーションフレームワーク [^2]
-* [openapi-generator/typescript-axios](https://github.com/OpenAPITools/openapi-generator): フロントエンドのHTTPクライアント、リクエスト/レスポンスのインターフェイス
+* [openapi-generator/typescript-axios](https://github.com/OpenAPITools/openapi-generator): フロントエンドのHTTPクライアント、リクエスト/レスポンスのインタフェース
 * [Prism](https://stoplight.io/open-source/prism): フロントエンド開発時に利用するモックサーバー
 
  [^2]: go-swaggerについては [WAFとして go-swagger を選択してみた](/articles/20190814/) で詳しく紹介されています。
@@ -261,7 +261,7 @@ parameters:
 
 * 日付/日時/時刻
   * 日付
-    * ISO8601拡張形式（YYYY-MM-DD）とする
+    * ISO 8601拡張形式（YYYY-MM-DD）とする
     * example: `2020-01-31`
     * name: 接尾辞`_date`
     * type: `string`
@@ -275,7 +275,7 @@ parameters:
         ```
 
   * 日時
-    * タイムゾーン指定子付きISO8601形式とする
+    * タイムゾーン指定子付きISO 8601形式とする
     * 秒精度（YYYY-MM-DDThh:mm:ss+TZD）の場合
       * example: `2020-01-31T23:59:59+09:00`
       * name: 接尾辞`_date_time`
@@ -303,7 +303,7 @@ parameters:
             ```
 
   * 時刻
-    * ISO8601形式（hh:mm）とする
+    * ISO 8601形式（hh:mm）とする
     * example: `23:59`
     * name: 接尾辞`_time`
     * type: string

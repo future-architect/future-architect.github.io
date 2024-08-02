@@ -20,7 +20,7 @@ lede: "Real World HTTP 第2版が2020/04/20に出版されました。第2版が
 
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">4/17新刊『Real World HTTP　第2版 歴史とコードに学ぶインターネットとウェブ技術』オライリー（978-4-87311-903-8）渋川よしき 著◆「オライリー」棚にて展開中！Webテクノロジーの基礎となるHTTPの仕様を網羅的に学べる学習書が内容を充実させて改訂！ <a href="https://t.co/k86zXGaHe9">pic.twitter.com/k86zXGaHe9</a></p>&mdash; 書泉ブックタワーコンピュータ書 (@shosen_bt_pc) <a href="https://twitter.com/shosen_bt_pc/status/1251037915582312448?ref_src=twsrc%5Etfw">April 17, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-Real World HTTPの初版の執筆時にも、ネットで見かけるHTTP絡みのネタとかをGitLabのissueにガンガン突っ込みつつ執筆も行っていました。しかしそのissueが発散するばかりで収束しないので、「もうここで手を打ちましょう」とスナップショットを取ったのが初版でした。その後もウェブのネタ(issue)はどんどん増えていきます。それを昨年のミニ版で一部反映したものの、消化しきれなかったものや、その後追加されたものを入れて出来上がったのが第2版になります。ページ数は1.5倍になったのにお値段は5%しか上がっていないというお買い得本になっています。
+Real World HTTPの初版の執筆時にも、ネットで見かけるHTTP絡みのネタとかをGitLabのissueにガンガン突っ込みつつ執筆も行っていました。しかしそのissueが発散するばかりで収束しないので、「もうここで手を打ちましょう」とスナップショットを取ったのが初版でした。その後もウェブのネタ(issue)はどんどん増えていきます。それを昨年のミニ版で一部反映したものの、消化しきれなかったものや、その後追加されたものを入れて出来上がったのが第2版になります。ページ数は1.5倍になったのにお値段は5％しか上がっていないというお買い得本になっています。
 
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Real World HTTPの初版と2版の比較です。1.5倍ぐらいになっています。古い内容削ったりしたのだけど。 <a href="https://t.co/4jT4lF6PWt">pic.twitter.com/4jT4lF6PWt</a></p>&mdash; 渋川よしき (@shibu_jp) <a href="https://twitter.com/shibu_jp/status/1251060223827046401?ref_src=twsrc%5Etfw">April 17, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
@@ -32,7 +32,7 @@ MDNに対してChromeなど他のブラウザベンダーもコミットしま�
 
 EdgeがChromiumベースになってしまったのは少しショックでしたが、Windows 7などにもEdgeが配信されることで、標準がIEしかない、という状況は改善されました。本書でもセキュリティ以外のIEのみの話はかなり削りました。Let's Encryptの大流行でAlways TLSが大幅に進行したのも初版と大きく世界が変わったところですね。
 
-とはいえ、個人目線では追いきれないほどの変化が日々発生しています。SxSとかWebTransportなどは今回触れていません。基本的に https://caniuse.com を見てChrome一党のみが対応しているものは除外しています。RFCもQUICみたいな確度の高いものを除いては、提案段階ではなく策定が完了し、現実世界で広く使われているものを中心に絞っています。中にはクッキーのSameSiteみたいに、RFCがないんだけど全ブラウザが何故か実装しているやつもありますが、これも取り上げています。
+とはいえ、個人目線では追いきれないほどの変化が日々発生しています。SxSとかWebTransportなどは今回触れていません。基本的に https://caniuse.com を見てChrome一党のみが対応しているものは除外しています。RFCもQUICみたいな確度の高いものを除いては、提案段階ではなく策定が完了し、現実世界で広く使われているものを中心に絞っています。中にはCookieのSameSiteみたいに、RFCがないんだけど全ブラウザが何故か実装しているやつもありますが、これも取り上げています。
 
 ただ、これらの状況の変化による追記よりは、それまでもあった内容の追加の方が多数に及びます。
 

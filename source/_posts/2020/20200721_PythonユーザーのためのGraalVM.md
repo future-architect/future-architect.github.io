@@ -68,7 +68,7 @@ java		jconsole	jhsdb		jmap		jshell		keytool		npx		rmid
 
 これをみるとわかるようにjavacやjar、javaといったコマンドがいるのがわかります。GraalVMは、ちょっとオルタナティブなJDKの顔をしているのがわかります。この後にも説明は出てきますが、Javaコンパイラとしても利用します。それ以外にはnode, npm, npxというコマンドも見えます。つまり、Node.jsの互換処理系も入っているのです。下手にパスを通すと、既存のJavaのプロジェクトやら、Node.jsのプロジェクトがおかしくなる可能性があります。なので、必要なフォルダでのみ有効にした方が良いです。
 
-GraalVMですが、一つのVMの中で、JavaScriptやRといったさまざまな言語をサポートしています。Rでデータファイルを読み込んでPythonでデータ処理をして・・・など言語跨ぎで各言語の得意な部分を生かしたコーディングができるのを目指しているようです。
+GraalVMですが、1つのVMの中で、JavaScriptやRといったさまざまな言語をサポートしています。Rでデータファイルを読み込んでPythonでデータ処理をして・・・など言語跨ぎで各言語の得意な部分を生かしたコーディングができるのを目指しているようです。
 
 # Graal.Pythonの状況
 
@@ -94,7 +94,7 @@ venvを使った環境の分離も可能です。
 % source .venv/bin/activate
 ```
 
-パッケージのインストールは動作確認済み？のものだけginstallモジュールを使ってインストールします。pipもvenvの中には作られるのですが、sslモジュールがインポートできないので・・・みたいな警告が出て、うまく使えませんでした。適当に思いつくパッケージをいろいろインストールしようとしたのですが、docutilsとかSphinxはダメで、pytestだけはインストールできたが、うまく動かず、みたいな感じです。既存のプロジェクトを持ってきてそのまま動かす、というのはまだ難しいです。
+パッケージのインストールは動作確認済み？ のものだけginstallモジュールを使ってインストールします。pipもvenvの中には作られるのですが、sslモジュールがインポートできないので・・・みたいな警告が出て、うまく使えませんでした。適当に思いつくパッケージをいろいろインストールしようとしたのですが、docutilsとかSphinxはダメで、pytestだけはインストールできたが、うまく動かず、みたいな感じです。既存のプロジェクトを持ってきてそのまま動かす、というのはまだ難しいです。
 
 ```sh
 graalpython -m ginstall install numpy
@@ -131,7 +131,7 @@ Pythonの互換実装で有名なものはいくつかありますが、Javaで�
 % graalpython --jvm --experimental-options --python.EmulateJython
 ```
 
-[ここのサンプルの通り](https://github.com/graalvm/graalpython/blob/master/docs/user/JYTHON.md)ですが、こんな感じで、AWTを使ってウインドウを表示できます。
+[ここのサンプルの通り](https://github.com/graalvm/graalpython/blob/master/docs/user/JYTHON.md)ですが、こんな感じで、AWTを使ってウィンドウを表示できます。
 
 ```sh
  % graalpython --jvm --experimental-options --python.EmulateJython
@@ -248,10 +248,10 @@ public class ExtListDir {
 GraalPythonを試しました。
 
 * まだ実験リリース
-* いろんな言語を組み合わせて実行するpolyglotの処理系の一つとして実装されている
+* いろんな言語を組み合わせて実行するpolyglotの処理系の1つとして実装されている
 * GraalVM 20系はPython 3.8ベース
 * 機械学習に対応する部分を目指して開発されているが、Jythonモードがあったり、2.7で止まっているJythonの後継としても期待できる
 * まだ使えない公式ライブラリも多く、既存のライブラリも気軽に使えない
 * GraalVMのネイティブ化は時間もかかりバイナリもでかくなり、GraalVMの動的言語勢はメリットはない
 
-GraalVMはPythonが使える、GraalVMはネイティブイメージが使える、の二つの文章を読むと、Pythonがネイティブになりそうな印象も持ってしまいがちですが、そうではない、ということがわかりました。とはいえ、Python2.7時代のJython並に開発が進めば、用途はいろいろ広がると思います。楽しみですね。
+GraalVMはPythonが使える、GraalVMはネイティブイメージが使える、の2つの文章を読むと、Pythonがネイティブになりそうな印象も持ってしまいがちですが、そうではない、ということがわかりました。とはいえ、Python2.7時代のJython並に開発が進めば、用途はいろいろ広がると思います。楽しみですね。

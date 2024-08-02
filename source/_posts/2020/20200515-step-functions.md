@@ -45,7 +45,7 @@ ecs-run-taskで非同期（または定期的）にECSを呼び出す方法を�
 
 などがあると思います。[kayac/ecspresso](https://github.com/kayac/ecspresso) のようなECSデプロイツールや、ECS以外のサービスを採用しても学習コスト・インフラ保守コストはどうしてもかかるのでやや無理やり上げた感がありますがご容赦ください。
 
-個人的にはジュニアなエンジニアがチームに多いのと、AWSに慣れていない新規参画者が多いという、「**他アプリがLambdaで完結している場合に、ECSという別のアプリランタイムを入れたくない**」 という技術スタックをなるべく増やしたくないという思いがあり、できる限りアプリ開発はLambdaでやりたいと思ってます。（Dockerfileもなるべく書かせなく無ければ、 ECRやECSなどインフラ管理対象も増やしたくないし、CI/CDのバリエーションも下げて楽したいというのがあります）
+個人的にはジュニアなエンジニアがチームに多いのと、AWSに慣れていない新規参画者が多いという、「**他アプリがLambdaで完結している場合に、ECSという別のアプリランタイムを入れたくない**」 という技術スタックをなるべく増やしたくないという思いがあり、できる限りアプリ開発はLambdaでやりたいと思ってます（Dockerfileもなるべく書かせなく無ければ、 ECRやECSなどインフラ管理対象も増やしたくないし、CI/CDのバリエーションも下げて楽したいというのがあります）
 
 # Lambdaでバッチ処理をガンバル
 
@@ -298,7 +298,7 @@ if err := resp.EventStream.Err(); err != nil {
 
 [AWS Step Functions](https://aws.amazon.com/jp/step-functions/) はAWS の複数のサービスに対してワークフローを組むことができるサービスです。ワークフローはステートマシンとして表現することでLambdaの実行管理を任せることができます。
 
-ワークフローをJSONベースの構造化言語である[Amazon States Language](https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html)で記載するという点がツラミとして挙げられることが大きもしますが、定義したワークフローは即座にプレビューで可視化されますしそれをSVGなどでExportもできるので、JSON力を鍛えながら開発することができます。
+ワークフローをJSONベースの構造化言語である[Amazon States Language](https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html)で記載するという点がツラミとして挙げられることが大きもしますが、定義したワークフローは即座にプレビューで可視化されますしそれをSVGなどでExportもできるので、JSON力を鍛えながら開発できます。
 
 <img src="/images/20200515/photo_20200515_03.png" loading="lazy">
 
@@ -308,7 +308,7 @@ if err := resp.EventStream.Err(); err != nil {
 
 Lambdaの実行時間制約をStep Functionsで突破しようという試みです。実際には以下のようなイメージです。前提として、処理件数が事前にある程度分かっている場合においては、単純にN個にタスクを分割してStep FunctionsからLambdaを呼び出せば良いです。この分散したLambdaそれぞれでDynamoDBのあるSegmentだけを担当させるイメージです。
 
-DynamoDBやLambdaの場合はスケールアウトさせやすいサービスのため、固定であればParallelステートを利用して並列実行することができます。
+DynamoDBやLambdaの場合はスケールアウトさせやすいサービスのため、固定であればParallelステートを利用して並列実行できます。
 
 <img src="/images/20200515/photo_20200515_04.png" loading="lazy">
 
@@ -551,7 +551,7 @@ func HandleRequest(e InEvent) (*OutEvent, error) {
 
 処理時間と[ms]と分散数1との比率を表にしました。大体10万件のDynamoDBをScanするのに1並列だと30秒程度かかります。DynamoDBをScanするだけの処理では完全にリニアにスケールするというわけではないですが、本来はこの読み取ったレコードに対して、なにかしらの追加処理を行う時間が加算されるはずなのでほとんどのユースケースでは問題ないと思います。
 
-| 分散数 | 処理時間[ms] | 分散数1との比率[%] |
+| 分散数 | 処理時間[ms] | 分散数1との比率[％] |
 |--------|--------------|--------------------|
 | 1      | 31077        | 100                |
 | 2      | 15414        | 49.6               |

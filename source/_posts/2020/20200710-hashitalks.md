@@ -56,7 +56,7 @@ resource "google_monitoring_alert_policy" "someone_alert_policy" {
 
 ### Terraformerの使いどころ
 
-TerraformerはGCPに限らず、AWSなどのメジャークラウドに存在するリソースをコマンド一つでコードに落とせる便利なツールです。とても便利ではある反面、Terraformでのリソース名はわかりにくいものになっています。
+TerraformerはGCPに限らず、AWSなどのメジャークラウドに存在するリソースをコマンド1つでコードに落とせる便利なツールです。とても便利ではある反面、Terraformでのリソース名はわかりにくいものになっています。
 
 ```sh
 resource "google_monitoring_alert_policy" "tfer--projects--project-name--alertPolicies--17320504" {
@@ -73,7 +73,7 @@ resource "google_monitoring_alert_policy" "tfer--projects--project-name--alertPo
 
 ### セキュリティに気をつけたい
 
-Cloud Monitoringにはアラート設定をしたときに、その通知先をメールやSlackにすることができます。しかし、SlackのTokenやメールアドレス自体をコード上にハードコードすることは避けなければいけません。Tokenなどを守る方法としては
+Cloud Monitoringにはアラート設定をしたときに、その通知先をメールやSlackにできます。しかし、SlackのTokenやメールアドレス自体をコード上にハードコードすることは避けなければいけません。Tokenなどを守る方法としては
 
 - tfvarsで逃す
 - Vaultを使う
@@ -100,7 +100,7 @@ resource "google_monitoring_alert_policy" "someone_alert_policy" {
 
 ## まとめ
 
-今回発表したことはTerraformとGCPを組み合わせて以来、ずっと直面している問題で、発表するに当たって、自分の中で一つの答えになったかなと思っています。Terraform Associateを取ったり、こういった登壇する挑戦で少しづつではありますが、自分の自信に繋がっているので、今後も発信は媒体に関係なく続けていきたいなと思います。
+今回発表したことはTerraformとGCPを組み合わせて以来、ずっと直面している問題で、発表するに当たって、自分の中で1つの答えになったかなと思っています。Terraform Associateを取ったり、こういった登壇する挑戦で少しづつではありますが、自分の自信に繋がっているので、今後も発信は媒体に関係なく続けていきたいなと思います。
 
 最後にこちらが話しているYouTubeになりますのでよければご覧ください。
 [Cloud MonitoringとTerraformの付き合い方 - YouTube](https://www.youtube.com/watch?v=SiCCwE9a1iY&list=PL81sUbsFNc5aWJJrpaclnwARJAzf1-2bV&index=14&t=0s)

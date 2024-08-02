@@ -149,7 +149,7 @@ AWSが提供しているGoのSDK [`aws-sdk-go`](https://github.com/aws/aws-sdk-g
 - `func (c *Lambda) InvokeRequest(input *InvokeInput) (req *request.Request, output *InvokeOutput)`
 - `func (c *Lambda) InvokeWithContext(ctx aws.Context, input *InvokeInput, opts ...request.Option) (*InvokeOutput, error)`
 
-`InvokeWithContext` は `Context` を引数に受け取るため、`context.WithValue` でセットした値を呼び出し先のLambda関数に伝播できるのでは？と思うかもしれません。しかし、呼び出し元で `Context` に `context.WithValue` でセットしても値は呼び出し先のLambda関数に伝播されません。なぜなら `InvokeWithContext` における `Context` はリクエストのキャンセルするためのもので、値を伝播するためのものではないからです。
+`InvokeWithContext` は `Context` を引数に受け取るため、`context.WithValue` でセットした値を呼び出し先のLambda関数に伝播できるのでは？ と思うかもしれません。しかし、呼び出し元で `Context` に `context.WithValue` でセットしても値は呼び出し先のLambda関数に伝播されません。なぜなら `InvokeWithContext` における `Context` はリクエストのキャンセルするためのもので、値を伝播するためのものではないからです。
 
 ### 解決策
 
@@ -168,7 +168,7 @@ type InvokeInput struct {
 }
 ```
 
-`Payload` フィールドにJSONエンコードしたバイト配列をセットすることで呼び出し先のLambda関数に値を伝播することができます。以下のようにして呼び出し先のLambda関数に値を渡すことができます。
+`Payload` フィールドにJSONエンコードしたバイト配列をセットすることで呼び出し先のLambda関数に値を伝播できます。以下のようにして呼び出し先のLambda関数に値を渡すことができます。
 
 ```go
 	// 呼び出し先のLambdaに渡したい値
@@ -413,7 +413,7 @@ func init() {
 
 ## 4. デフォルトでは同期呼び出し
 
-Lambda関数の呼び出しは2種類あります。1つは呼び出しのレスポンスを待つ同期型、もう一つは呼び出し時は即座に呼び出し元がレスポンスが返し、後で処理が実行される非同期型です。`InvokeWithContext` を使ってLambda関数を呼び出す場合はデフォルトだと同期型として呼び出します。呼び出し先のLambda関数が重い処理でレスポンスを返すまでに時間がかかる場合は非同期型を選択する場合もあるでしょう。呼び出し方法の選択は `InvokeInput` の `InvocationType` フィールドを用いて指定します。同期型の場合は `lambda.InvocationTypeRequestResponse` (`RequestResponse` の文字列)で非同期型の場合は `lambda.InvocationTypeEvent` (`Event`)となります。
+Lambda関数の呼び出しは2種類あります。1つは呼び出しのレスポンスを待つ同期型、もう1つは呼び出し時は即座に呼び出し元がレスポンスが返し、後で処理が実行される非同期型です。`InvokeWithContext` を使ってLambda関数を呼び出す場合はデフォルトだと同期型として呼び出します。呼び出し先のLambda関数が重い処理でレスポンスを返すまでに時間がかかる場合は非同期型を選択する場合もあるでしょう。呼び出し方法の選択は `InvokeInput` の `InvocationType` フィールドを用いて指定します。同期型の場合は `lambda.InvocationTypeRequestResponse` (`RequestResponse` の文字列)で非同期型の場合は `lambda.InvocationTypeEvent` (`Event`)となります。
 
 以下のようにすると非同期としてLambda関数を呼び出します。
 
@@ -429,7 +429,7 @@ Lambda関数の呼び出しは2種類あります。1つは呼び出しのレス
 
 ## 5. 呼び出し先のLambdaの同時実行数以上の同期呼び出しは即座にエラーが返る
 
-Lambda関数は「[同時実行数](https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/configuration-concurrency.html)」という設定を使って、同時に実行できるLambda関数に制約を付与することができます。非同期型の呼び出しの場合は、呼び出し元には成功のステータスが返されます。Lambda関数はキューイング後、遅延して実行されます。しかし、同期型として呼び出す場合、同時実行数以上の数を呼び出した場合は即座に呼び出し元に [`TooManyRequestsException`](https://pkg.go.dev/github.com/aws/aws-sdk-go@v1.35.7/service/lambda#TooManyRequestsException) のエラーが返ってきます。
+Lambda関数は「[同時実行数](https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/configuration-concurrency.html)」という設定を使って、同時に実行できるLambda関数に制約を付与できます。非同期型の呼び出しの場合は、呼び出し元には成功のステータスが返されます。Lambda関数はキューイング後、遅延して実行されます。しかし、同期型として呼び出す場合、同時実行数以上の数を呼び出した場合は即座に呼び出し元に [`TooManyRequestsException`](https://pkg.go.dev/github.com/aws/aws-sdk-go@v1.35.7/service/lambda#TooManyRequestsException) のエラーが返ってきます。
 
 <img src="/images/20201112/image_7.png" loading="lazy">
 
@@ -464,7 +464,7 @@ null
 
 ## 6. 呼び出し先のLambdaに設定されている環境変数は使える
 
-APIでLambda関数を呼び出した場合、呼び出し先の環境変数が使えなくなるのでは？と思う方もいるかもしれませんが、実は環境変数もちゃんとセットされます。
+APIでLambda関数を呼び出した場合、呼び出し先の環境変数が使えなくなるのでは？ と思う方もいるかもしれませんが、実は環境変数もちゃんとセットされます。
 
 呼び出し先のLambda関数のハンドラは以下のようにしておきます。
 
