@@ -73,7 +73,7 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 
 最終的には下記のようなフォルダ構成になります。
 
-```c
+```sh
 C:\elastic
  └ elasticsearch-5.4.0
  └ kibana-5.4.0-windows-x86
@@ -84,8 +84,7 @@ C:\elastic
 
 次に、JDBCドライバを用意します。
 
-[前々回](/articles/20160920/)ダウンロードした「MySQL-connector-java-5.1.39-bin.jar」というファイルを、
-「C:\elastic\logstash-5.4.0\bin」以下に配置します。
+[前々回](/articles/20160920/)ダウンロードした `mysql-connector-java-5.1.39-bin.jar` というファイルを、`C:\elastic\logstash-5.4.0\bin` に配置します。
 
 次に、「redmine.txt」というファイルを作成。中身は下記のようにします（★を含む箇所は皆様の環境に合わせた値へ変えてください）。
 
@@ -147,7 +146,7 @@ output {
 
 結果的に、下記のようなフォルダ構成になります。
 
-```c
+```sh
 C:\elastic
  └ elasticsearch-5.4.0
  └ kibana-5.4.0-windows-x86
@@ -162,7 +161,7 @@ C:\elastic
 ### ElasticSearchの起動
 
 まず、ElasticSearchを実行します。
-「C:\elasticsearch-5.4.0\bin」フォルダで下記のコマンドを実行。
+`C:\elasticsearch-5.4.0\bin` フォルダで下記のコマンドを実行。
 
 `elasticsearch.bat`
 
@@ -171,7 +170,7 @@ C:\elastic
 ### Logstashを使ったデータ取り込み
 
 次に、Logstashを使って、RedmineのデータをElasticSearchへ取り込みます。
-「C:\elastic\logstash-5.4.0\bin」フォルダで下記コマンドを実行。
+`C:\elastic\logstash-5.4.0\bin` フォルダで下記コマンドを実行。
 
 `logstash.bat -f redmine.txt`
 
@@ -182,7 +181,7 @@ C:\elastic
 ### Kibanaの起動
 
 次に、Kibanaを起動します。
-「C:\elastic\kibana-5.4.0-Windows-x86\bin」フォルダで下記コマンドを実行。
+`C:\elastic\kibana-5.4.0-windows-x86\bin` フォルダで下記コマンドを実行。
 
 `kibana.bat`
 
@@ -371,13 +370,9 @@ EVMグラフの大きさを調整すると、
 
 ## 最後に
 
-今回は、Redmineデータを可視化するダッシュボードを構築しました。今回の設定を拡張することで、様々な軸で、様々な値を可視化することが可能。RedmineをKibanaと組み合わせることで、結果的にプロジェクト状況の把握が容易になります。
+Redmineデータを可視化するダッシュボードを構築しました。今回の設定を拡張することで、様々な軸で、様々な値を可視化することが可能。RedmineをKibanaと組み合わせることで、結果的にプロジェクト状況の把握が容易になります。
 
-本記事が、皆様のプロジェクトマネジメントに役に立てば幸いです。
-みなさまにとって参考になりそうでしたら「いいね！」をクリックして頂けますと幸いです。執筆の励みになります。＾＾
-
-なお、次回以降私がブログを執筆する際は、ダッシュボード画像のメール配信に関する方法を記載する予定。
-今後ともよろしくお願い致します。
+みなさまのプロジェクトマネジメントに役に立てば幸いです。
 
 シリーズとして連載しています。こちらもぜひどうぞ。
 

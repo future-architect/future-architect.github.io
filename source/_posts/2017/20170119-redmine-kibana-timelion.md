@@ -117,12 +117,12 @@ EVMを使うことで多角的にプロジェクトを把握できますね。
 (b) Kibanaをダウンロード
 
 - [Kibana Download URL](https://www.elastic.co/downloads/kibana](https://www.elastic.co/downloads/kibana)
-  - →私の場合は、「kibana-5.1.2-Windows-x86.zip」をダウンロードしました。
+  - →私の場合は、 `kibana-5.1.2-windows-x86.zip` をダウンロードしました。
 
 (c) Logstashをダウンロード
 
 - [Logstash Download URL](https://www.elastic.co/downloads/logstash](https://www.elastic.co/downloads/logstash)
-  - →私の場合は、「logstash-5.1.2.zip」をダウンロードしました。
+  - →私の場合は、 `logstash-5.1.2.zip` をダウンロードしました。
 
 (d) 「c:\elastic」というフォルダを作成
 
@@ -130,7 +130,7 @@ EVMを使うことで多角的にプロジェクトを把握できますね。
 
 最終的には下記のようなフォルダ構成になります。
 
-```
+```sh
 C:\elastic
   └elasticsearch-5.1.2
   └kibana-5.1.2-windows-x86
@@ -141,8 +141,7 @@ C:\elastic
 
 次に、JDBCドライバを用意します。
 
-[前回](/articles/20160920/)ダウンロードした「MySQL-connector-java-5.1.39-bin.jar」というファイルを、
-「C:\elastic\logstash-5.1.2\bin」以下に配置します。
+[前回](/articles/20160920/)ダウンロードした `mysql-connector-java-5.1.39-bin.jar` というファイルを、`C:\elastic\logstash-5.1.2\bin` 以下に配置します。
 
 次に、「redmine.txt」というファイルを作成。中身は下記のようにします（★を含む箇所は皆様の環境に合わせた値へ変えて下さい）。
 
@@ -196,7 +195,7 @@ output {
 
 結果的に、下記のようなフォルダ構成になります。
 
-```
+```sh
 C:\elastic
 └elasticsearch-5.1.2
 └kibana-5.1.2-windows-x86
@@ -223,7 +222,7 @@ C:\elastic
 取り込みが完了しました。
 
 次に、Kibanaを起動します。
-「C:\elastic\kibana-5.1.2-Windows-x86\bin」フォルダで下記コマンドを実行。
+`C:\elastic\kibana-5.1.2-windows-x86\bin` フォルダで下記コマンドを実行。
 
 `kibana.bat`
 
@@ -325,7 +324,7 @@ PVの累計が期日別に表示されました。
 
 <img src="/images/20170119/photo_20170119_43.png" loading="lazy">
 
-そして、`.es(*)`という記載を
+そして、`.es(*)`という記載を 
 `.es(metric='sum:ev', timefield='updated_on').cusum().divide(.es(metric='sum:ac', timefield='updated_on').cusum()).label('cpi').yaxis(min=0.75, max=1.25)`
 に変更すると。
 
@@ -342,18 +341,9 @@ CPIが表示されました。
 
 ## 最後に
 
-今回は、EVMグラフを表示しました。
+EVMグラフを表示しました。RedmineをKibana＋Timelionと組み合わせることで、グラフ表示が可能になり、結果的にプロジェクト状況の把握が容易になります。
 
-いかがでしたでしょうか？
-RedmineをKibana＋Timelionと組み合わせることで、グラフ表示が可能になり、結果的にプロジェクト状況の把握が容易になります。
-
-本記事が、皆様のプロジェクトマネジメントに役に立てば幸いです。
-
-なお、次回以降私がブログを執筆する際は、グラフのドリルダウン、プロジェクトダッシュボードの構築、ダッシュボード画像のメール配信に関する方法を記載していく予定。
-
-これらの記事が、みなさまにとって参考になりそうでしたら「いいね！」をクリックして頂けますと幸いです。執筆の励みになります。＾＾
-
-今後ともよろしくお願い致します。
+みなさまのプロジェクトマネジメントに役に立てば幸いです。
 
 シリーズとして連載しています。こちらもぜひどうぞ。
 
