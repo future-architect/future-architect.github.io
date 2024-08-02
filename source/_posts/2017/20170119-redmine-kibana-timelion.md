@@ -324,7 +324,7 @@ PVの累計が期日別に表示されました。
 
 <img src="/images/20170119/photo_20170119_43.png" loading="lazy">
 
-そして、`.es(*)`という記載を 
+そして、`.es(*)`という記載を
 `.es(metric='sum:ev', timefield='updated_on').cusum().divide(.es(metric='sum:ac', timefield='updated_on').cusum()).label('cpi').yaxis(min=0.75, max=1.25)`
 に変更すると。
 
