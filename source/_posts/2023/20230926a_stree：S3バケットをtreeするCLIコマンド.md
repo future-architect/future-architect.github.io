@@ -126,7 +126,7 @@ my-bucket
 
 通常のユースケースを考えると、バケットの中には大量のオブジェクトが存在していることが予想されます。
 
-そのため、バケット指定しかできない状況では使い物になりません。バケット名に続けてprefixを指定することで、ユーザーが確認したいパスの情報のみを確認することができます。
+そのため、バケット指定しかできない状況では使い物になりません。バケット名に続けてprefixを指定することで、ユーザーが確認したいパスの情報のみを確認できます。
 
 ```sh
 stree my-bucket/test/dir2 -p my_profile
@@ -202,9 +202,9 @@ stree my-bucket/test/dir2 -r us-east-1 -e http://localhost:4537
 - [Goでtreeを表現する](https://zenn.dev/ddddddo/articles/8cd85c68763f2e)
 - [Markdown形式の入力からファイル/ディレクトリを生成するCLI/Goパッケージ](https://zenn.dev/ddddddo/articles/460d12e8c07763)
 
-また、gtreeの作者である[@ddddddO](https://twitter.com/ddddddOpppppp)さんにはstreeに[issue](https://github.com/orangekame3/stree/issues/9)を起票いただいており、本記事公開前に致命的なバグを修正することができました。ありがとうございます。
+また、gtreeの作者である[@ddddddO](https://twitter.com/ddddddOpppppp)さんにはstreeに[issue](https://github.com/orangekame3/stree/issues/9)を起票いただいており、本記事公開前に致命的なバグを修正できました。ありがとうございます。
 
-gtreeでstreeの機能の核は難なく実装することができたため、着想から実装完了まで１日もかかりませんでした。
+gtreeでstreeの機能の核は難なく実装できたため、着想から実装完了まで１日もかかりませんでした。
 
 S3をtreeしてみたくなったらぜひstreeを利用してみてください。
 

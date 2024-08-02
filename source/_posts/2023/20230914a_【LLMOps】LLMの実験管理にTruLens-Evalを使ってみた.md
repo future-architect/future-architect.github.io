@@ -105,14 +105,14 @@ TruLens-Evalは、LLMアプリケーションの性能に対する評価をサ�
 
 ### TruLens-Evalでできること
 
-- feedback関数を利用することにより、実験の評価を円滑に実行することができます。feedback関数とは、LLMアプリケーションが生成するテキストを分析し、LLMアプリケーションの性能をスコアリングします。
-- LLMアプリケーションを実行するだけで、feedback関数の実行やLLMの利用状況の**トラッキングを自動で行い**、データベースに保存することができます。
-- ブラウザから実験結果を閲覧することができ、実験結果の分析をサポートします。
-- データベースには後から情報を追加することができるため、人による評価などを管理することができます。
+- feedback関数を利用することにより、実験の評価を円滑に実行できます。feedback関数とは、LLMアプリケーションが生成するテキストを分析し、LLMアプリケーションの性能をスコアリングします。
+- LLMアプリケーションを実行するだけで、feedback関数の実行やLLMの利用状況の**トラッキングを自動で行い**、データベースに保存できます。
+- ブラウザから実験結果を閲覧でき、実験結果の分析をサポートします。
+- データベースには後から情報を追加できるため、人による評価などを管理できます。
 
 ブラウザから閲覧できる情報について説明します。
 
-- LLMをアプリケーションとして扱い、アプリケーション毎に実験管理をすることができます。一覧できる情報は次の通りです。
+- LLMをアプリケーションとして扱い、アプリケーション毎に実験管理をできます。一覧できる情報は次の通りです。
   - 実験回数
   - 実行時間の平均
   - 実行によるコスト(OpenAIモデルのような従量課金の場合)
@@ -140,7 +140,7 @@ TruLens-Evalは、LLMアプリケーションの性能に対する評価をサ�
 
 <img src="/images/20230914a/コメント_2023-09-01_144443.png" alt="" width="1200" height="580" loading="lazy">
 
-また、LangChainを用いた場合は、モデル毎の入出力とハイパーパラメータを確認できます。（未検証）
+また、LangChainを用いた場合は、モデル毎の入出力とハイパーパラメータを確認できます（未検証）
 
 <img src="/images/20230914a/Leaderboard.png" alt="Leaderboard.png" width="1200" height="568" loading="lazy">
 <img src="/images/20230914a/Chain_Explore.png" alt="Chain_Explore.png" width="1200" height="605" loading="lazy">
@@ -188,7 +188,7 @@ response, record = basic_app.call_with_record(prompt_input) # response: 出力�
 
 ### ブラウザから閲覧
 
-シェルで以下のコマンドを実行すると、Webサーバが立ち上がりブラウザから実験結果を閲覧することができます。
+シェルで以下のコマンドを実行すると、Webサーバが立ち上がりブラウザから実験結果を閲覧できます。
 
 ```bash
 trulens-eval
@@ -196,18 +196,18 @@ trulens-eval
 
 ### 人による評価について
 
-Truクラスを利用することで、データベースに任意の情報を追加・削除したり、Webサーバの起動などができます。そのため、後から評価の追加が可能です。これを応用することで、人による評価について検討することができます。以下は考えられる運用例です。
+Truクラスを利用することで、データベースに任意の情報を追加・削除したり、Webサーバの起動などができます。そのため、後から評価の追加が可能です。これを応用することで、人による評価について検討できます。以下は考えられる運用例です。
 
 - 開発者毎に実験結果に対する評価を行い、チームによるレビューとして管理する。
 - 評価指標（根拠性、関連性、毒性など）毎に開発者が評価を行い、統計する。
 
 ## feedback関数
 
-入力プロンプトや出力結果に対して評価を行うfeedback関数を定義することで、実験の評価を自動的に行うことができます。TruLensはOpenAIやHuggingFaceのモデルを用いたfeedback関数を既に用意しているため、基礎的な評価については簡単に導入することができます。
+入力プロンプトや出力結果に対して評価を行うfeedback関数を定義することで、実験の評価を自動的に行うことができます。TruLensはOpenAIやHuggingFaceのモデルを用いたfeedback関数を既に用意しているため、基礎的な評価については簡単に導入できます。
 
 ### feedback関数の実装
 
-まず、Providerクラスを継承する形で、feedback関数の定義を保持するクラスを作成します。Providerクラスのメンバメソッドとしてfeedback関数を定義します。
+まず、Providerクラスを継承する形で、feedback関数の定義を保持するクラスを作成します。Providerクラスのメンバーメソッドとしてfeedback関数を定義します。
 
 ```python
 from trulens_eval import Provider, Feedback
@@ -239,7 +239,7 @@ input_function = Feedback(my_feedbacks.output_length).on_input()
 inout_function = Feedback(my_feedbacks.inout_length).on_input_output()
 ```
 
-前述の「LLMアプリのラッピング化と実行」に加える形で、feedback関数を複数設定することができます。これにより、実行時に自動的にfeedback関数も実行され、結果が記録されます。また、後から実験結果に対してfeedback関数を実行することも可能です（[詳細](https://www.trulens.org/trulens_eval/custom_feedback_functions/)）。
+前述の「LLMアプリのラッピング化と実行」に加える形で、feedback関数を複数設定できます。これにより、実行時に自動的にfeedback関数も実行され、結果が記録されます。また、後から実験結果に対してfeedback関数を実行することも可能です（[詳細](https://www.trulens.org/trulens_eval/custom_feedback_functions/)）。
 
 ```python
 basic_app = TruBasicApp(llm_standalone, app_id="my_function", feedbacks=[input_function, output_function, inout_function])
@@ -248,7 +248,7 @@ response, record = basic_app.call_with_record(prompt_input) # response: 出力�
 
 ### 用意されているfeedback関数
 
-TruLens-EvalはいくつかのOpenAIやHuggingFaceが提供しているモデルやサービスを利用したfeedback関数をいくつか用意しています。（[詳細](https://www.trulens.org/trulens_eval/function_definitions/#model-agreement)）
+TruLens-EvalはいくつかのOpenAIやHuggingFaceが提供しているモデルやサービスを利用したfeedback関数をいくつか用意しています（[詳細](https://www.trulens.org/trulens_eval/function_definitions/#model-agreement)）
 
 ここではfeedback関数の例としていくつか紹介したいと思います。
 
@@ -297,7 +297,7 @@ RELEVANCE:
 
 - Moderation（節度）
 
-ModerationはOpenAIが提供しているAPIである[openai.Moderation](https://platform.openai.com/docs/guides/moderation/overview)をラッピングしたものになります。これを用いることで、差別的、暴力的、性的などの評価軸で、テキストを数値評価することができます。
+ModerationはOpenAIが提供しているAPIである[openai.Moderation](https://platform.openai.com/docs/guides/moderation/overview)をラッピングしたものになります。これを用いることで、差別的、暴力的、性的などの評価軸で、テキストを数値評価できます。
 
 ## ユースケース
 
@@ -305,12 +305,12 @@ ModerationはOpenAIが提供しているAPIである[openai.Moderation](https://
 
 ### 良いプロンプトの検討
 
-各評価指標における良いプロンプトは何か、整理して検討することに役立ちます。評価指標については、ルールベースなものからLLMを用いた評価、人による評価についても対応することができます。また、あらかじめ評価指標を決定する必要はなく、後から遡って実験結果を評価することもできます。
+各評価指標における良いプロンプトは何か、整理して検討することに役立ちます。評価指標については、ルールベースなものからLLMを用いた評価、人による評価についても対応できます。また、あらかじめ評価指標を決定する必要はなく、後から遡って実験結果を評価することもできます。
 
 実験結果を各評価指標によって並べ替えることができます。
 <img src="/images/20230914a/コメント_2023-09-06_163018.png" alt="コメント_2023-09-06_163018.png" width="1200" height="586" loading="lazy">
 
-各評価指標のヒストグラムを作成することができます。アプリケーション名によるフィルタリングができます。
+各評価指標のヒストグラムを作成できます。アプリケーション名によるフィルタリングができます。
 <img src="/images/20230914a/コメント_2023-09-06_163113.png" alt="コメント_2023-09-06_163113.png" width="1200" height="441" loading="lazy">
 
 各アプリケーションの評価スコアの平均値を一覧できます。

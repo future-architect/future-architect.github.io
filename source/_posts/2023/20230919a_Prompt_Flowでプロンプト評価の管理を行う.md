@@ -78,7 +78,7 @@ LLMには、追加学習による精度の改善だけでなく、入力する�
 
 ここでは評価指標を定めるための参考として、いくつか事例を集めたので以下にご紹介します。
 
-### 事例①: Prompt Flowの組み込み評価指標
+### 事例（1）: Prompt Flowの組み込み評価指標
 
 AzureのPrompt Flowにはいくつか組み込みの評価指標が用意されています。
 
@@ -99,7 +99,7 @@ LLMベースの評価は、プロンプト次第であらゆる評価結果を�
 * [Azure Machine Learning Prompt flow 評価メトリクス解説](https://speakerdeck.com/nohanaga/azure-machine-learning-prompt-flow-ping-jia-metorikusujie-shuo)
 * [Azure Machine Learning の Prompt flow の評価メトリクス紹介 ― ChatGPT どう評価する？](https://qiita.com/nohanaga/items/b68bf5a65142c5af7969)
 
-### 事例②: Pythonのみで実装できる独自定義の評価指標
+### 事例（2）: Pythonのみで実装できる独自定義の評価指標
 
 こちらの事例では、Prompt Flowを使ってPythonのみで実装できる評価指標を実装しています。
 
@@ -132,13 +132,13 @@ LLMベースの評価は、プロンプト次第であらゆる評価結果を�
 * (B)`easiness`: 簡単な表現で分かりやすいか（1~10の整数値）
 * (C)`has_source`: ソースの参照を行っているか（2値）
 
-(A)(B)は、先の事例①を参考にLLMベースの評価指標を作成します。
+(A)(B)は、先の事例（1）を参考にLLMベースの評価指標を作成します。
 
-(C)については、先の事例②を参考にPythonのみで実装できるものを作成します。
+(C)については、先の事例（2）を参考にPythonのみで実装できるものを作成します。
 
 ## Prompt Flowでプロンプト評価の管理を行う
 
-### ①評価フローを実装する
+### （1）評価フローを実装する
 
 ここからは実際にPrompt Flowを使ってプロンプト自動評価の仕組みを実装していきます。
 
@@ -369,7 +369,7 @@ def aggregate_variants_results(variant_ids: List[int], line_numbers: List[int], 
 
 この時点で、「質問文」と「LLMの回答」を入力した際、`consistency`, `easiness`, `has_source`の3つの評価指標の値を出してくれる評価フローが出来上がりました。
 
-### ②評価フローを実行する
+### （2）評価フローを実行する
 
 それでは、実際に評価を行っていきます。
 
@@ -413,7 +413,7 @@ question
 
 <img src="/images/20230919a/03.png" alt="" width="1200" height="415" loading="lazy">
 
-すると、以下のように各実行に対する評価指標を比較することができます。
+すると、以下のように各実行に対する評価指標を比較できます。
 
 もちろん、任意の評価指標についてソートすることもできます。
 

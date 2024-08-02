@@ -75,7 +75,7 @@ ChatGPTなどの生成AIが大ヒットしている現在、その応用場面�
 
 ### 使ったライブラリ
 
-以下の2つのライブラリを使って実装しています。どれもシンプルなインターフェースを持って使いやすいと思います。
+以下の2つのライブラリを使って実装しています。どれもシンプルなインタフェースを持って使いやすいと思います。
 
 #### Sentence-Transformers
 
@@ -97,7 +97,7 @@ Sentence-Transformersのフレームワークが[huggingface](https://huggingfac
 
 https://simpleneighbors.readthedocs.io/en/latest/
 
-コーパスの項目に対して最近傍検索を実行するための簡単なインターフェイスです。
+コーパスの項目に対して最近傍検索を実行するための簡単なインタフェースです。
 `Annoy`、`Sklearn`、`BruteForcePurePython`の3つのバックエンドをサポートしていますが、`Annoy`が推奨していますので、それも一緒にインストールします。
 
 ```sh
@@ -106,7 +106,7 @@ pip install simpleneighbors annoy
 
 高速に検索するため、事前にindexのツリーをビルドする必要があります。つまり、検索対象のデータを増加したら、改めてツイリーのビルドが必要という点に要注意です。
 
-また、N-Neighborを探す結果は近似的な結果になることにもご注意ください。とはいえ、訓練のモデルから検索結果の精度はすべて有限であるので、近似と言っても十分な精度が保証できていると思います。（参考: [Approximate Nearest Neighbors](https://en.wikipedia.org/wiki/Nearest_neighbor_search#Approximate_nearest_neighbor)）
+また、N-Neighborを探す結果は近似的な結果になることにもご注意ください。とはいえ、訓練のモデルから検索結果の精度はすべて有限であるので、近似と言っても十分な精度が保証できていると思います（参考: [Approximate Nearest Neighbors](https://en.wikipedia.org/wiki/Nearest_neighbor_search#Approximate_nearest_neighbor)）
 
 ### Semantic Searchの実装
 

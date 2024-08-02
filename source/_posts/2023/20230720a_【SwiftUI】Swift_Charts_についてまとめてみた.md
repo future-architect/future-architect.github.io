@@ -16,7 +16,7 @@ lede: "はじめまして!2022年5月キャリア入社、HealthCare Innovation 
 
 # はじめに
 
-はじめまして！2022年5月キャリア入社、HealthCare Innovation Group(HIG)[^1]の橋本です。技術ブログ初投稿です。
+はじめまして！ 2022年5月キャリア入社、HealthCare Innovation Group(HIG)[^1]の橋本です。技術ブログ初投稿です。
 
 iOS16からApple標準で利用できるようになったSwift Chartsというグラフ等を作成できるフレームワークを取り上げます。
 
@@ -108,7 +108,7 @@ struct ContentView: View {
 
 <img src="/images/20230720a/5fd9a545-cb98-f283-f114-5216698e0097.png" alt="" width="564" height="432" loading="lazy">
 
-BarMark内の`x: .value("Fruit", "Apple")`でx軸のラベル自体を`Fruit`と定義し、表示されている一つのバー要素が`Apple`であることを示しています。`y: .value("Price", 100)`も同様に、y軸のラベル自体を`Price`と定義し、表示されている一つのバー要素が`100`であることを示しています。
+BarMark内の`x: .value("Fruit", "Apple")`でx軸のラベル自体を`Fruit`と定義し、表示されている1つのバー要素が`Apple`であることを示しています。`y: .value("Price", 100)`も同様に、y軸のラベル自体を`Price`と定義し、表示されている1つのバー要素が`100`であることを示しています。
 
 ”りんご” のバーを追加できましたので、オレンジ、バナナを追加します。
 
@@ -133,9 +133,9 @@ BarMark内の`x: .value("Fruit", "Apple")`でx軸のラベル自体を`Fruit`と
 
 <img src="/images/20230720a/4616977c-472b-b182-8dea-58c0b452892c.png" alt="" width="558" height="430" loading="lazy">
 
-これで完成イメージ通りのグラフが完成しました。しかし、この方法ですとBarMarkを要素が一つ追加するごとに増えていくので、数が多くなると大変見づらくなってしまいます。
+これで完成イメージ通りのグラフが完成しました。しかし、この方法ですとBarMarkを要素が1つ追加するごとに増えていくので、数が多くなると大変見づらくなってしまいます。
 
-そこで、グラフの要素を構造体で定義することで`View`内を簡潔に記載することができます。
+そこで、グラフの要素を構造体で定義することで`View`内を簡潔に記載できます。
 
 #### グラフを描く要素を定義するデータ構造を設計する
 
@@ -171,7 +171,7 @@ struct ContentView: View {
         }
 ```
 
-`Charts`を`ForEach`のように利用することができるため、これまでSwiftUIを触ったことがある人にはとても使いやすいと思いました。
+`Charts`を`ForEach`のように利用できるため、これまでSwiftUIを触ったことがある人にはとても使いやすいと思いました。
 
 ## 6つのMarkとその使い方
 
@@ -189,7 +189,7 @@ struct ContentView: View {
 
 BarMarkの使い方は、すでに紹介しましたので、残りの5つのMarkのサンプルコードを次に記載します。
 
-（ここでは基本的にデータ構造などのコードは省き、`Chart{}`内のコードのみを載せています。）
+（ここでは基本的にデータ構造などのコードは省き、`Chart{}`内のコードのみを載せています）。
 
 ### Area Markのサンプルコード
 
@@ -298,7 +298,7 @@ struct RuleMaskView: View {
 
 WWDC2023で発表された`SectorMark`のサンプルコードです。`BarMark`等で使っていた`x:`を`angle`に変えるだけで、簡単にPie chartsに変換できます。
 
-また、`innnerRadius:`、`angularInset`でPie chartsをカスタマイズすることができます。`innnerRadius:`を使用することで、パイチャートの内部を指定の比率だけくり抜き、ドーナッツチャートにすることもできます。
+また、`innnerRadius:`、`angularInset`でPie chartsをカスタマイズできます。`innnerRadius:`を使用することで、パイチャートの内部を指定の比率だけくり抜き、ドーナッツチャートにすることもできます。
 
 ```swift
 var body: some View {
