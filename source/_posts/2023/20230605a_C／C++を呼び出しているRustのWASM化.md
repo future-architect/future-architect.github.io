@@ -59,7 +59,7 @@ wasmはCPUの活用、起動の高速化から、ネイティブアプリ並の�
 * [sqlite](https://sqlite.org/index.html) ([ドキュメント](https://sqlite.org/wasm/doc/trunk/index.md))
 * [Google Earth](https://www.google.co.jp/intl/ja/earth/) ([記事](https://medium.com/google-earth/google-earth-comes-to-more-browsers-thanks-to-webassembly-1877d95810d6))
 
-また、wasm化することでフロントエンドだけでアプリケーションが動くようになるため、RustやGoで書いたアプリケーションも簡単にGitHub Pagesなどの静的なサイトで実行することができます。
+また、wasm化することでフロントエンドだけでアプリケーションが動くようになるため、RustやGoで書いたアプリケーションも簡単にGitHub Pagesなどの静的なサイトで実行できます。
 
 <!--
 > WebAssembly は最近のウェブブラウザーで動作し、新たな機能と大幅なパフォーマンス向上を提供する新しい種類のコードです。基本的に直接記述ではなく、C、C++、Rust 等の低水準の言語にとって効果的なコンパイル対象となるように設計されています。
@@ -135,7 +135,7 @@ Rustのwasm化において一番メジャーで簡単な方法です。wasm-pack
     ```
 
     適当な方法でローカルサーバを立てます。(サーバを立てずにwasmを実行するとCORSエラーが発生します。)
-    今回はpythonを使う方法でやってみます。
+    今回はPythonを使う方法でやってみます。
 
     ```sh
     python3 -m http.server 8080
@@ -275,8 +275,8 @@ C/C++を呼んでいる場合はこちらの方法をオススメします。
     }
     ```
 
-    [`#[no_mangle]`アトリビュート](https://doc.rust-lang.org/reference/abi.html#the-no_mangle-attribute)を付与することで関数名をマングリングしないようにすることができます。マングリングとはコンパイラが関数名などをユニークな名前に変更することです。(例: `int Add(int a, int b)` →  `_Z3Addii`)
-    今回の例では関数greetの名前を勝手に変更してほしくないので`#[no_mangle]`アトリビュートを付与しています。
+    [`#[no_mangle]`アトリビュート](https://doc.rust-lang.org/reference/abi.html#the-no_mangle-attribute)を付与することで関数名をマングリングしないようにできます。マングリングとはコンパイラが関数名などをユニークな名前に変更することです。(例: `int Add(int a, int b)` →  `_Z3Addii`)
+    今回の例では関数greetの名前を勝手に変更してほしくないので`#[no_mangle]`属性を付与しています。
 
 7. `build.sh`の作成
     プロジェクトのルートディレクトリに`build.sh`を作成します。
@@ -345,7 +345,7 @@ C/C++を呼んでいる場合はこちらの方法をオススメします。
     ```
 
 10. 実行
-    適当な方法でローカルサーバを立てます。今回はpythonを使う方法でやってみます。
+    適当な方法でローカルサーバを立てます。今回はPythonを使う方法でやってみます。
 
     ```sh
     python3 -m http.server 8080
@@ -453,7 +453,7 @@ Rustの[最適化レベル](https://doc.rust-lang.org/cargo/reference/profiles.h
 
 C/C++を呼び出しているRustのwasm化について説明しました。
 
-本記事には書きませんでしたが、tree-sitter-sqlのパーササイズが大きすぎてコンパイルできない問題などにも遭遇して非常に苦戦していました。最終的にはなんとかwasm化することができたのでよかったです。同様の問題を抱えている方の助けになれば幸いです。
+本記事には書きませんでしたが、tree-sitter-sqlのパーササイズが大きすぎてコンパイルできない問題などにも遭遇して非常に苦戦していました。最終的にはなんとかwasm化できたのでよかったです。同様の問題を抱えている方の助けになれば幸いです。
 
 ## 参考文献
 

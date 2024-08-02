@@ -85,11 +85,11 @@ jobs:
 
 <img src="/images/20230828a/image.png" alt="image.png" width="654" height="457" loading="lazy">
 
-今回の場合テストしか入っていないレポジトリなので、`npm ci` (Install dependencies) の時間が最小限に収まっています。例えば、フロントエンドのレポジトリにE2Eテストを相乗りさせている場合には依存ライブラリのインストール時間が余計にかかってしまいます。
+今回の場合テストしか入っていないリポジトリなので、`npm ci` (Install dependencies) の時間が最小限に収まっています。例えば、フロントエンドのリポジトリにE2Eテストを相乗りさせている場合には依存ライブラリのインストール時間が余計にかかってしまいます。
 
 ## 試行錯誤 その2 サブディレクトリでのインストール
 
-相乗りさせたレポジトリの場合に依存ライブラリのインストール時間が余計に掛かってしまうので、サブディレクトリにPlaywrightのもろもろを配置する場合は以下のようなymlファイルを用意することになります。
+相乗りさせたリポジトリの場合に依存ライブラリのインストール時間が余計に掛かってしまうので、サブディレクトリにPlaywrightのもろもろを配置する場合は以下のようなymlファイルを用意することになります。
 
 ```yaml # .github\workflows\playwright-2.yml
 name: Playwright Tests 2
@@ -111,15 +111,15 @@ jobs:
       run: (cd playwright && npx playwright test && cd -)
 ```
 
-そして、レポジトリに`playwright`というディレクトリを作成し、その中で`npm init playwright@latest`を実行。その1と同様にspecファイルを配置しました。
+そして、リポジトリに`playwright`というディレクトリを作成し、その中で`npm init playwright@latest`を実行。その1と同様にspecファイルを配置しました。
 
 こちらをGitHub Actionsで実行してみると29秒かかりました。
 
 <img src="/images/20230828a/image_2.png" alt="" width="658" height="462" loading="lazy">
 
-こちらも実行時間はその1とほぼ同程度。Playwightでのテストレポジトリであればその1の構成、そうでない場合は、依存ライブラリのインストール時間を削減するためにもその2の構成が良いのではと考えています。
+こちらも実行時間はその1とほぼ同程度。Playwightでのテストリポジトリであればその1の構成、そうでない場合は、依存ライブラリのインストール時間を削減するためにもその2の構成が良いのではと考えています。
 
-## 試行錯誤 その3 playwright-github-actionを使う
+## 試行錯誤 その3 `playwright-gitHub-action` を使う
 
 こちらの方法は非推奨です。
 
@@ -127,7 +127,7 @@ jobs:
 
 [microsoft/playwright-github-action: Run Playwright tests on GitHub Actions](https://github.com/microsoft/playwright-github-action)
 
-現在もレポジトリは残っていますが、READMEに「❌ You don't need this GitHub Action」と非推奨である旨が大きく書かれています。
+現在もリポジトリは残っていますが、READMEに「❌ You don't need this GitHub Action」と非推奨である旨が大きく書かれています。
 
 非推奨である理由として、どのバージョンのPlaywrightが実行されているかわからないから、と書かれています。おそらくサポート上の問題があったのでしょう。
 
@@ -155,7 +155,7 @@ jobs:
       run: npx playwright test
 ```
 
-Playwrightのインストール部分(`npx playwright install --with-deps chromium`)は本来不要であったと思いますが、レポジトリが半年以上更新されていないため、インストールをせず実行すると `npx playwright test` のタイミングで以下のエラーが出て止まってしまいます。
+Playwrightのインストール部分(`npx playwright install --with-deps chromium`)は本来不要であったと思いますが、リポジトリが半年以上更新されていないため、インストールをせず実行すると `npx playwright test` のタイミングで以下のエラーが出て止まってしまいます。
 
 ```sh
     Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium-1071/chrome-linux/chrome
@@ -235,6 +235,6 @@ Installing dependencies...
 
 PlaywrightをCIで実行する際にどのようなymlファイルを書けばGitHub Actionsでの初期処理にかかる時間を短くできるかを試行錯誤しました。
 
-結果的には、Playwright専用のレポジトリを作る、もしくはサブディレクトリの中で環境を構築。そのあとはnpmでの環境構築を行うのが良さそうだ、という結果になりました。
+結果的には、Playwright専用のリポジトリを作る、もしくはサブディレクトリの中で環境を構築。そのあとはnpmでの環境構築を行うのが良さそうだ、という結果になりました。
 
 何かしらの参考になれば幸いです。

@@ -41,7 +41,7 @@ TIG コアテクチームの川口です。本記事は、[CNCF連載](/articles
 
 ### ko
 
-[ko](https://www.cncf.io/projects/ko/) は、Go のコンテナイメージを Dockerfile 無しに簡単にビルドすることができるツールです。また、2022年の12月に CNCF の Sandbox プロジェクトとして承認されています。
+[ko](https://www.cncf.io/projects/ko/) は、Go のコンテナイメージを Dockerfile 無しに簡単にビルドできるツールです。また、2022年の12月に CNCF の Sandbox プロジェクトとして承認されています。
 
 「Dockerfile 無しに」という言葉だと、2018年10月に Incubating プロジェクトとして承認された [Buildpacks](https://www.cncf.io/projects/buildpacks/) が想起されますが、 [こちらの記事](https://cloud.google.com/blog/ja/products/containers-kubernetes/ship-your-go-applications-faster-cloud-run-ko) でそちらとの比較が行われています。Buildpacks では、Go 以外にも Java・Node・Python 等といった言語がビルドができるという差異がありますが、今回は Go を扱うということもあり ko を利用したいと思います。
 
@@ -67,7 +67,7 @@ TIG コアテクチームの川口です。本記事は、[CNCF連載](/articles
 
 [Artifact Registry](https://cloud.google.com/artifact-registry/docs/overview) は、Google Cloud におけるマネージドのアーティファクト管理サービスです。
 
-Docker コンテナイメージのほか、Java・Node・Python といった各種言語のパッケージも保存・配信することができます。
+Docker コンテナイメージのほか、Java・Node・Python といった各種言語のパッケージも保存・配信できます。
 
 今回は、先述の ko・Skaffold を用い、この Artifact Registry にて Docker コンテナイメージを管理してもらうことにします。
 
@@ -77,11 +77,11 @@ Docker コンテナイメージのほか、Java・Node・Python といった各�
 
 先述の通り Cloud Deploy では Skaffold を扱うことは必須としており、 [ドキュメント](https://cloud.google.com/deploy/docs/using-skaffold) でも、Skaffold を併用する方法について言及しています。現状は、GKE・Cloud Run・Anthos にてデプロイを行えるようで、また最近 preview ではありますが、 [カナリアデプロイ](https://cloud.google.com/deploy/docs/deployment-strategies/canary) も行えるようになっています。
 
-Cloud Deploy を用いたデプロイの流れとしては、ざっくりと以下のようなものになっています。（太字部分は、Cloud Deploy 内で扱っている用語です。）
+Cloud Deploy を用いたデプロイの流れとしては、ざっくりと以下のようなものになっています（太字部分は、Cloud Deploy 内で扱っている用語です）。
 
-1. 事前に **デリバリーパイプライン** （デプロイ先となる **ターゲット** や、デプロイの手順についてまとめたもの。）を yaml を記載して作成する
+1. 事前に **デリバリーパイプライン** （デプロイ先となる **ターゲット** や、デプロイの手順についてまとめたもの）。を yaml を記載して作成する
 2. アプリケーションを Artifact Registry 等に保存する
-3. いくつか（1つでも可。）の保存したアプリケーションを **リリース** という単位にまとめる
+3. いくつか（1つでも可）。の保存したアプリケーションを **リリース** という単位にまとめる
 4. **リリース** を **ターゲット** にロールアウトする
 5. 問題が発生したら、任意の **リリース** にロールバックする
 6. 問題が発生しなかったら、次の **ターゲット** に **プロモーション** をする
@@ -114,7 +114,7 @@ go version go1.20.5 darwin/arm64
 
 以下のように 8080 ポートをリッスンして、"/" にアクセスされたら、"Hello World v1!" を返すものとします。
 
-今回カナリアデプロイを後程ためすので、2つの version のアプリとして `app/v1`・`app/v2` の二つ分作っておきましょう。
+今回カナリアデプロイを後程ためすので、2つの version のアプリとして `app/v1`・`app/v2` の2つ分作っておきましょう。
 
 ```go  main.go
 package main
@@ -164,7 +164,7 @@ $ gcloud artifacts repositories create hello-world \
 ## Skaffold を用いたコンテナイメージのプッシュ
 
 まずは以下のようにして、`skaffold_v1.yaml`・`skaffold_v2.yaml` を作成します。
-（本記事では触れませんが、[Profiles 機能](https://skaffold.dev/docs/environment/profiles/) を使うとより dry に書くこともできます。）
+（本記事では触れませんが、[Profiles 機能](https://skaffold.dev/docs/environment/profiles/) を使うとより dry に書くこともできます）。
 
 ```yaml  skaffold_v1 (or v2).yaml
 apiVersion: skaffold/v3alpha1
@@ -189,7 +189,7 @@ build:
 
 `build.tagPolicy` では、イメージビルド時のタギングポリシーの設定を行なっており、`build.artifacts` では、イメージをどのようにして作成するかの設定を行なっています。
 
-今回は、ko を扱うのでそちらの設定に則っています。（各種詳細は、コメントのリンクを参照してください。）
+今回は、ko を扱うのでそちらの設定に則っています（各種詳細は、コメントのリンクを参照してください）。
 
 こちらのファイルが用意できたら、以下のコマンドを実行すると Artifact Registry にイメージのプッシュが行えるはずです。
 
@@ -253,8 +253,8 @@ spec:
         - image: app # skaffold が適切な値に変えてくれます
 ```
 
-ここまで作成することができたらまた改めてビルドを行いましょう。
-今度は、成果物をローカルにアウトプットもしておきます。（後ほど Cloud Deploy にてこの成果物を用いてデプロイを行います。）
+ここまで作成できたらまた改めてビルドを行いましょう。
+今度は、成果物をローカルにアウトプットもしておきます（後ほど Cloud Deploy にてこの成果物を用いてデプロイを行います）。
 
 ```bash
 $ skaffold build \
@@ -302,9 +302,9 @@ run:
 
 `kind: DeliveryPipeline` は、名前の通りデリバリーを行ううえでのパイプラインの設定を行うもので、`kind: Target` は、デプロイ先の設定を行うものになります。
 
-上記の設定は、最小限のものになるので必要に応じて [こちら](https://cloud.google.com/deploy/docs/config-files) を参考にしてパイプラインの設定を追加するとよさそうです。（カナリアデプロイをできるようにする設定はこの後行います。）
+上記の設定は、最小限のものになるので必要に応じて [こちら](https://cloud.google.com/deploy/docs/config-files) を参考にしてパイプラインの設定を追加するとよさそうです（カナリアデプロイをできるようにする設定はこの後行います）。
 
-ファイルを作成することができたら、以下のコマンドを実行して Cloud Deploy に反映します。
+ファイルを作成できたら、以下のコマンドを実行して Cloud Deploy に反映します。
 
 ```bash
 $ gcloud deploy apply \
@@ -379,7 +379,7 @@ run:
 
 特にこのカナリアデプロイを行ううえで重要な項目が `serialPipeline.stages.strategy.canary.canaryDeployment.percentages` です。
 
-こちらでどのようにトラフィックを流していくのかを明示しています。今回の設定では、「10% 新しい ver. に流す。」という設定にしています。（複数値設定できるので、より段階的なロールアウトも可能です。）
+こちらでどのようにトラフィックを流していくのかを明示しています。今回の設定では、「10％ 新しい ver. に流す」という設定にしています（複数値設定できるので、より段階的なロールアウトも可能です）。
 
 それでは再度修正したものを Cloud Deploy に反映しましょう。
 

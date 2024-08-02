@@ -16,7 +16,7 @@ lede: "こんにちは！HealthCare Innovation Group[^1]所属の橋本です。
 
 ## はじめに
 
-こんにちは！HealthCare Innovation Group(HIG)[^1]所属の橋本です。
+こんにちは！ HealthCare Innovation Group(HIG)[^1]所属の橋本です。
 
 本記事は、[夏の自由研究ブログ連載2023](/articles/20230830a/)の1本目です。
 
@@ -43,7 +43,7 @@ lede: "こんにちは！HealthCare Innovation Group[^1]所属の橋本です。
 
 ## CreateML、CoreMLとは
 
-CreateMLとは、Appleが提供する機械学習のフレームワークの一つで、機械学習モデルを作成するツールです。また、このCreateMLで作成したモデルを実際にiOSアプリなどで使用ために使われるフレームワークとしてCoreMLがあります。簡単に説明すると、
+CreateMLとは、Appleが提供する機械学習のフレームワークの1つで、機械学習モデルを作成するツールです。また、このCreateMLで作成したモデルを実際にiOSアプリなどで使用ために使われるフレームワークとしてCoreMLがあります。簡単に説明すると、
 
 - CreateMLが機械学習モデル（画像認識、オブジェクト認識、音声認識、文字認識など）を作成するもの
 - CoreMLが作成したモデルを様々な実際にアプリに組み込むもの
@@ -96,7 +96,7 @@ https://developer.apple.com/jp/machine-learning/models/
 　└MiyamaStagBeatle #ミヤマクワガタ
 ```
 
-（飼育経験のあるこの四種類を分類することにしてみました。）
+（飼育経験のあるこの四種類を分類することにしてみました）。
 
 ### 識別モデルを作成
 
@@ -112,7 +112,7 @@ CreateMLを`Xcode` > `Open Developer Tool` > `CreatML`をクリックし、ウ�
 
 左上の`Train`を押下すると、渡したデータをもとに学習が始まります。
 
-数秒で学習が完了し、以下のように学習時の様子が`Trainingタブ`で確認することができます。
+数秒で学習が完了し、以下のように学習時の様子が`Trainingタブ`で確認できます。
 
 <img src="/images/20230831a/image_4.png" alt="" width="868" height="362" loading="lazy">
 
@@ -122,7 +122,7 @@ CreateMLを`Xcode` > `Open Developer Tool` > `CreatML`をクリックし、ウ�
 
 <img src="/images/20230831a/image_5.png" alt="" width="1114" height="398" loading="lazy">
 
-今回の四種類のカブトムシ・クワガタの分類精度は、ノコギリクワガタが50％をわずかに下回っているが、4分類であることを考えると何もパラメータチューニングをしていない割に、オオクワガタ(giantStagBeatle)は65%とまずまずの精度となっていました。
+今回の四種類のカブトムシ・クワガタの分類精度は、ノコギリクワガタが50％をわずかに下回っているが、4分類であることを考えると何もパラメータチューニングをしていない割に、オオクワガタ(giantStagBeatle)は65％とまずまずの精度となっていました。
 
 #### 画像中のMetrics
 
@@ -166,7 +166,7 @@ class ImagePredictor {
         }
 ```
 
-これで学習させたモデルで撮影した画像が『カブトムシ』か『〇〇クワガタ』かを識別することができます。
+これで学習させたモデルで撮影した画像が『カブトムシ』か『〇〇クワガタ』かを識別できます。
 
 **作成したカブトムシ・クワガタを分類するミニアプリ(再掲)**
 

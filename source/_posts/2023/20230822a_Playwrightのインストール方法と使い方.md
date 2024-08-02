@@ -22,7 +22,7 @@ Playwrightは、Microsoftが開発したE2Eテストフレームワークです�
 
 ## Playwrightのインストール
 
-Playwrightをインストールするには、npm yarn pnpmのいずれを使用してインストールすることができます。
+Playwrightをインストールするには、npm yarn pnpmのいずれを使用してインストールできます。
 
 今回は、npmを使用します。
 
@@ -119,7 +119,7 @@ npx playwright codegen https://playwright.dev/
 
 <img src="/images/20230822a/画像2.png" alt="" width="1200" height="750" loading="lazy">
 
-今回はgithubのアイコンをカーソルを当てると`getByLabel('GitHub repository')`と表示されます。
+今回はGitHubのアイコンをカーソルを当てると`getByLabel('GitHub repository')`と表示されます。
 
 ```ts
 await page.getByLabel('GitHub repository')
@@ -220,7 +220,7 @@ To open last HTML report run:
 
 ## テストレポートの出力
 
-Playwrightでは実行結果をHTMLのレポートとして表示することができます。
+Playwrightでは実行結果をHTMLのレポートとして表示できます。
 
 表示するには以下のコマンドを実行します。
 

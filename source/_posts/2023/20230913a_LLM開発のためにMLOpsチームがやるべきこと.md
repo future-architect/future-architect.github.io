@@ -84,7 +84,7 @@ LLM自体やLLMを活用したシステムを開発していく場合、MLOpsチ
 
 このフェーズは、[LLM開発のフロー](/articles/20230912a/)における「モデルの能力を引き出す（推論）フェーズ」に相当します。
 
-「モデルの能力を引き出す（推論）フェーズ」では、モデル開発の段階で開発したモデルをプロンプトエンジニアリングにより対象タスクに特化させたり、外部データと統合することで学習段階ではモデルが得ていなかった知識を活用して回答を生成することができるようになります。こちらも詳細は[LLM開発のフロー]()をご参照ください。
+「モデルの能力を引き出す（推論）フェーズ」では、モデル開発の段階で開発したモデルをプロンプトエンジニアリングにより対象タスクに特化させたり、外部データと統合することで学習段階ではモデルが得ていなかった知識を活用して回答を生成できるようになります。こちらも詳細は[LLM開発のフロー]()をご参照ください。
 
 また、サービスを提供するための周辺機能（フロントエンドのUIや外部データのデータベース等）を実装・テストし、サービスの提供を開始します。
 
@@ -197,7 +197,7 @@ AWSやGCPなどのクラウドサービスでは、LLM開発のための学習�
 [MLflow](https://mlflow.org/docs/latest/index.html)は、従来のMLOpsにおいても広く使われてきたツールですが、MLflowはバージョン2.3からLLMに対応し、
 HuggingfaceのトランスフォーマーやLangChainのロギング機能が追加されました。
 
-また、バージョン2.4からはLLMの評価のための機能も追加され、複数のモデルの入力、出力、中間結果を簡単に比較することができます。
+また、バージョン2.4からはLLMの評価のための機能も追加され、複数のモデルの入力、出力、中間結果を簡単に比較できます。
 
 <details>
 <summary>参考</summary>
@@ -216,7 +216,7 @@ LangChainの処理の可視化、各実行における入出力、中間結果�
 
 ### \[6\] aim
 
-[aim](https://aimstack.readthedocs.io/en/latest/)では、LLMの学習における各種パラメータやメトリクスのロギング、出力の確認、比較をすることができます。
+[aim](https://aimstack.readthedocs.io/en/latest/)では、LLMの学習における各種パラメータやメトリクスのロギング、出力の確認、比較をできます。
 
 LangChainの公式Docsに、[Aimを用いたLangChainのトラッキングの例](https://python.langchain.com/docs/ecosystem/integrations/aim_tracking)が記載されており、具体的な導入方法も分かりく紹介されています。加えて[MLflowと組み合わせて使うことも可能](https://github.com/aimhubio/aimlflow)なため、MLflowを現在使われている場合にも、導入を考えることができます。
 
@@ -253,7 +253,7 @@ LangChainの公式Docsに、[Aimを用いたLangChainのトラッキングの例
 
 ### \[9\] toxic-bert
 
-[toxic-bert](https://huggingface.co/unitary/toxic-bert)はコメントの有害レベルの分類や有害なコメントの分類（どのような有害さを持っているか）が可能なモデルです。LLMの出力の監視に利用することができます。
+[toxic-bert](https://huggingface.co/unitary/toxic-bert)はコメントの有害レベルの分類や有害なコメントの分類（どのような有害さを持っているか）が可能なモデルです。LLMの出力の監視に利用できます。
 
 複数言語で学習済みのモデルが公開されていますが、日本語での学習済みモデルはないようです。しかし、学習用のコードは公開されているため、データセットを用意すれば日本語に対応したモデルも作成することもできるでしょう。
 
@@ -265,7 +265,7 @@ Moderationでは、ポリシーに反しているかのフラグ(True/False)に�
 
 ### \[11\] Prompt Flow
 
-[Prompt Flow](https://learn.microsoft.com/ja-jp/azure/machine-learning/prompt-flow/get-started-prompt-flow)はLLMを用いたアプリケーションの作成・デバッグ・評価・デプロイを行うことができるツールです。作成したフローがグラフで可視化されているため、開発時にはどのようなフローになるのかを簡単に確認することができます。また、作成したフローは簡単に評価することができます。その後、デプロイまでをPrompt Flowで完結させることができます。
+[Prompt Flow](https://learn.microsoft.com/ja-jp/azure/machine-learning/prompt-flow/get-started-prompt-flow)はLLMを用いたアプリケーションの作成・デバッグ・評価・デプロイを行うことができるツールです。作成したフローがグラフで可視化されているため、開発時にはどのようなフローになるのかを簡単に確認できます。また、作成したフローは簡単に評価できます。その後、デプロイまでをPrompt Flowで完結させることができます。
 
 <details>
 <summary>詳細</summary>
@@ -280,7 +280,7 @@ Moderationでは、ポリシーに反しているかのフラグ(True/False)に�
 
 [Datadog](https://docs.datadoghq.com/ja/)は、SaaS形式で利用できるモニタリングサービスです。
 
-Datadogでは、OpenAI API利用時のトークンの総消費量、リクエストごとのトークンの平均総数、レスポンスタイム、APIのエラー率を監視することができます。
+Datadogでは、OpenAI API利用時のトークンの総消費量、リクエストごとのトークンの平均総数、レスポンスタイム、APIのエラー率を監視できます。
 
 <details>
 <summary>詳細</summary>
@@ -293,7 +293,7 @@ Datadogでは、OpenAI API利用時のトークンの総消費量、リクエス
 
 ### \[13\] Dify
 
-[Dify](https://docs.dify.ai/getting-started/intro-to-dify)はLLMを用いたアプリケーションを簡単に作成できるツールです。Difyではテキスト生成型と会話型のアプリケーションを作成することができます。
+[Dify](https://docs.dify.ai/getting-started/intro-to-dify)はLLMを用いたアプリケーションを簡単に作成できるツールです。Difyではテキスト生成型と会話型のアプリケーションを作成できます。
 
 アプリケーションのタイプを決めた後は、プロンプトテンプレートを作成、データセットの読み込み、デバッグ、パラメータ調整等ができます。
 
@@ -314,17 +314,17 @@ Datadogでは、OpenAI API利用時のトークンの総消費量、リクエス
 
 ### \[14\] Fixie
 
-[Fixie](https://www.fixie.ai/)は、LLMを用いたアプリケーションを開発することができるプラットフォームです。
+[Fixie](https://www.fixie.ai/)は、LLMを用いたアプリケーションを開発できるプラットフォームです。
 
-Fixieでは、agent registryに登録されているLLMを使用することができ、使用するLLMにはOpenAIなどのプロプライエタリモデルや独自にファインチューニングしたモデルなどを選ぶことができます。また、外部データとしてGitHub、Google Calendar、databaseなどを利用することができます。
+Fixieでは、agent registryに登録されているLLMを使用でき、使用するLLMにはOpenAIなどのプロプライエタリモデルや独自にファインチューニングしたモデルなどを選ぶことができます。また、外部データとしてGitHub、Google Calendar、databaseなどを利用できます。
 
-開発したLLMを用いたアプリケーションを作成したい場合や、開発したLLMが期待通りの挙動を示すかどうかのテストなどに利用することができるかと思います。
+開発したLLMを用いたアプリケーションを作成したい場合や、開発したLLMが期待通りの挙動を示すかどうかのテストなどに利用できるかと思います。
 
 ### \[15\] Playground
 
 [Playground](https://learn.microsoft.com/ja-jp/azure/ai-services/openai/chatgpt-quickstart?tabs=command-line&pivots=programming-language-studio)は、Azure OpenAI Serviceで利用できる、モデルをインタラクティブに試すことが可能なサービスです。
 
-チャット形式とcompletion形式でモデルを試すことができ、各種設定（システムメッセージ（モデルがどのように振舞うべきかを定義した文）や温度パラメータなど）もその場で変更することができます。
+チャット形式とcompletion形式でモデルを試すことができ、各種設定（システムメッセージ（モデルがどのように振舞うべきかを定義した文）や温度パラメータなど）もその場で変更できます。
 
 <details>
 <summary>参考</summary>
@@ -349,7 +349,7 @@ LangChainやLlamaIndexとの連携をサポートしており（[参考](https:/
 
 大量のデータ量やリクエスト量であってもスケーラブルに分散処理が可能となっています。 バージョン8.0からはNLPを用いたセマンティック検索の機能も追加されました（[参考](https://www.elastic.co/jp/virtual-events/introduction-to-nlp-models-and-vector-search)）。
 
-これにより、LLMを活用したシステムにおける外部データの保存先として利用することができます。
+これにより、LLMを活用したシステムにおける外部データの保存先として利用できます。
 
 ### \[18\] Faiss
 
@@ -357,13 +357,13 @@ LangChainやLlamaIndexとの連携をサポートしており（[参考](https:/
 
 テキストのインデックスの作成、検索が可能となっています。
 
-マルチGPUでの検索もサポートされており、高速に類似した文章を検索することができます。
+マルチGPUでの検索もサポートされており、高速に類似した文章を検索できます。
 
 ### \[19\] Pinecone
 
 [Pinecone](https://www.pinecone.io/)はフルマネージドなベクトルデータベースです。
 
-商用のサービスとはなりますが、インデックスの作成、検索、保存・管理をこのサービス1つで完了させることができます。また、スケーリングにも対応しているため、大量のリクエストにも高速に対応することができます。
+商用のサービスとはなりますが、インデックスの作成、検索、保存・管理をこのサービス1つで完了させることができます。また、スケーリングにも対応しているため、大量のリクエストにも高速に対応できます。
 
 ### \[20\] LangChain
 
@@ -377,10 +377,10 @@ LangChainでは、LLMの呼び出しから、プロンプトの管理、外部�
 
 | 機能 | 説明 |
 |----|----|
-| Models | LangChainがサポートしている多くのモデルを同一インターフェースで扱える |
+| Models | LangChainがサポートしている多くのモデルを同一インタフェースで扱える |
 | Prompts | プロンプトの管理、最適化、シリアル化ができる |
 | Memory | LLMとのやり取りを保存でき、またそれを用いてLLMに過去のやり取りを踏まえた回答を促すことができる |
-| Indexes | LLMに外部データを踏まえた回答をさせるため、外部データのロードやクエリ、更新のためのインターフェースが用意されている |
+| Indexes | LLMに外部データを踏まえた回答をさせるため、外部データのロードやクエリ、更新のためのインタフェースが用意されている |
 | Chains | LLMに対して連続的に指示を出すことができる |
 | Agents | LLMに次にすべきことの決定、実行、結果の観測を繰り返させ、高レベルの指示に応えさせることができる |
 | Callbacks | Chainの過程を記録することができ、アプリケーションのデバッグ・評価をしやすくする |
@@ -411,13 +411,13 @@ LlamaIndexを用いることで、
 
 ### \[23\] Azure Cache for Redis
 
-[Azure Cache for Redis](https://azure.microsoft.com/products/cache)も会話履歴を保存する際に利用することができます。通常はインメモリキャッシュとして使用することが想定されますが、データ永続化の機能を利用することでNoSQLのDBとしても利用することができます
+[Azure Cache for Redis](https://azure.microsoft.com/products/cache)も会話履歴を保存する際に利用できます。通常はインメモリキャッシュとして使用することが想定されますが、データ永続化の機能を利用することでNoSQLのDBとしても利用できます
 
 （[参考](https://qiita.com/nohanaga/items/18baccb843b4148e6a77#3-%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E5%B1%A5%E6%AD%B4%E3%81%AE%E6%A4%9C%E7%B4%A2azure-cache-for-redis)）。
 
 ### \[24\] Semantic Kernel
 
-[Semantic Kernel(SK)](https://github.com/microsoft/semantic-kernel)は、Microsoftが開発しているOSSのサービスで、LLMと従来のプログラミング言語を簡単に組み合わせることが可能で、LLMをアプリに統合することができます。
+[Semantic Kernel(SK)](https://github.com/microsoft/semantic-kernel)は、Microsoftが開発しているOSSのサービスで、LLMと従来のプログラミング言語を簡単に組み合わせることが可能で、LLMをアプリに統合できます。
 
 SKでは、LLMを特定のタスクを実行する関数(Semantic Function)として扱い、従来のプログラミング言語の関数(Native Function)と合わせて、「スキル」という枠組みで扱います。そして、これらのスキルをパイプライン化してまとめることが可能です。
 
@@ -449,30 +449,30 @@ Guardrails AIには以下のような出力検証機能があります。
 
 <img src="/images/20230913a/LLM構成例5.png" alt="LLM構成例5" width="921" height="416" loading="lazy">
 
-* ①UI
+* （1）UI
   * ユーザーからの入力をチャット形式で受け付ける
-  * チャット形式のインターフェースに[Text generation web UI](https://github.com/oobabooga/text-generation-webui)というツールを利用
+  * チャット形式のインタフェースに[Text generation web UI](https://github.com/oobabooga/text-generation-webui)というツールを利用
   * あらゆるLLMに対応しているため、モデルの交換等がスムーズに行える
-* ②前処理
+* （2）前処理
   * プロンプトインジェクションという攻撃を防ぐ役割を持つ
   * プロンプトインジェクションとは、「LLMに対して特殊な質問をすることで、LLMが持つ機密情報や非公開データを不正に引き出す攻撃」を指す
   * ユーザーからの入力を何らかの形でフィルタリングする必要がありますが、確固たる手法は未だ無い
   * 現状、前処理部は概念として図示しているが、今後必要になってくると考えられる
   * この前処理部分は、プロンプト生成部にまとめても良い
-* ③プロンプト生成
+* （3）プロンプト生成
   * ここでは入力された質問からプロンプトを生成する
   * プロンプト生成のためのライブラリとして、[LangChain](https://github.com/hwchase17/langchain)や[LlamaIndex](https://github.com/jerryjliu/llama_index)が代表的
   * ライブラリを使うことで、「長い文章をベクトル化してプロンプトに含める」や「ベクトルDBから検索したい文章を抽出しプロンプトに含める」等の処理が実装できる
-* ④ベクトルDB
+* （4）ベクトルDB
   * ベクトルデータを扱えるデータベース
   * 社内文書など、様々なテキストデータをベクトル化し、得られたベクトルをデータベースに格納する
   * 検索する時は、検索したいキーワードのベクトルと類似のベクトルをデータベースから検索する
   * ベクトルDB・全文検索エンジンとして、[Chroma](https://github.com/chroma-core/chroma)や[Elasticsearch](https://www.elastic.co/jp/elasticsearch/)等が挙げられる
-* ⑤LLM
+* （5）LLM
   * 自力でファインチューニングしたモデルやプロプライエタリモデルを使用する
-* ⑥後処理
+* （6）後処理
   * LLMの出力の品質を保つために、出力に後処理を施す
-  * [Guardrails AI](https://shreyar.github.io/guardrails/)というライブラリを使うと、生成されたテキストに偏りがないか、生成されたコードにバグがないかなどを検証することができる
+  * [Guardrails AI](https://shreyar.github.io/guardrails/)というライブラリを使うと、生成されたテキストに偏りがないか、生成されたコードにバグがないかなどを検証ができる
   * この後処理部分は、プロンプト生成部にまとめても良い
 
 ### クラウドサービスを用いた構成例
