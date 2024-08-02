@@ -38,7 +38,7 @@ lede: "アルバイトの視点から見た「Future ってこんな会社なん
     - Docker
     - AWS
   - OS
-    - MacOS
+    - Mac OS
 
 ## Future 入って分かったこと
 
