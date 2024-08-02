@@ -18,13 +18,13 @@ lede: "弊社発のOSSプロダクト「uroboroSQL」をSpring Boot上で動か�
 
 こんにちは。星です。
 
-今回は本技術ブログにもロゴが掲載されている弊社OSSプロダクトの一つ、「[uroboroSQL](/uroborosql-doc/)」を利用してWebアプリケーションをどうやって開発すればよいのか？という話をさせて頂きたいと思います。
+今回は本技術ブログにもロゴが掲載されている弊社OSSプロダクトの1つ、「[uroboroSQL](/uroborosql-doc/)」を利用してWebアプリケーションをどうやって開発すればよいのか？ という話をさせて頂きたいと思います。
 
 今年3月に実施されたオープンソースカンファレンス2017 Tokyo/Springを皮切りに、5月の名古屋、そして、8月の京都の開催においてもブース出展・セミナーでご紹介してきましたが、来場者の方々に興味をもって頂き、さまざまなフィードバックを頂き、OSSにした実感を得ています。
 
 JavaでRDBにアクセスするアプリケーションを開発する場合、Java標準のJPA(Java Persistence API)や、Hiberate、MyBatis、EclipseLink、DBFlute、Domaなど、多くの選択肢が存在しています。
 
-uroboroSQLもこういったJavaにおけるDB永続化ライブラリの一つであり、ORマッピングの機能も持っていますが、基本的にはJavaからSQLを生成することよりも、SQLに足りないところをJavaで補うアプローチを採用しているのが特徴です。
+uroboroSQLもこういったJavaにおけるDB永続化ライブラリの1つであり、O/Rマッピングの機能も持っていますが、基本的にはJavaからSQLを生成することよりも、SQLに足りないところをJavaで補うアプローチを採用しているのが特徴です。
 
 > uroboroSQLに興味を持たれた方は、公式サイトおよび私がオープンソースカンファレンス2017 Nagoyaにて、講演した資料をご覧ください。
 >
@@ -36,11 +36,11 @@ uroboroSQLもこういったJavaにおけるDB永続化ライブラリの一つ�
 
 # uroboroSQLを利用したSpring BootによるWebアプリケーション
 
-さて、JavaでWebアプリケーションを開発するとき、いわゆるWebアプリケーションフレームワークをどうするかという話がありますが、有償のWebアプリケーションサーバを利用する前提であれば、JavaEEは有力な選択肢でしょうし、そうでなければ、Spring Framework(Spring Boot)、Play Frameworkなどが有力かなと思います。特に最近はPaaSなどでコンテナ上で動かす場合は、TomcatやJettyなどを組み込んで、実行可能jarにしてデプロイするという方式もトレンドでしょうか。
+さて、JavaでWebアプリケーションを開発するとき、いわゆるWebアプリケーションフレームワークをどうするかという話がありますが、有償のWebアプリケーションサーバを利用する前提であれば、Java EEは有力な選択肢でしょうし、そうでなければ、Spring Framework(Spring Boot)、Play Frameworkなどが有力かなと思います。特に最近はPaaSなどでコンテナ上で動かす場合は、TomcatやJettyなどを組み込んで、実行可能jarにしてデプロイするという方式もトレンドでしょうか。
 
 uroboroSQLは、特定のWebアプリケーションフレームワークには依存しませんが、現在コマンドラインのサンプルぐらいしか用意できていないので、実際にWebアプリケーションを開発する場合のイメージがわかないという声も聞こえてくるようになりました。
 
-そこで、現在最も人気のあるJavaのWebアプリケーションフレームワークの一つである「Spring Boot」を採用して、uroboroSQLのリファレンスとなるWebアプリケーションを開発してみました。
+そこで、現在最も人気のあるJavaのWebアプリケーションフレームワークの1つである「Spring Boot」を採用して、uroboroSQLのリファレンスとなるWebアプリケーションを開発してみました。
 
 そして、今回採用するSpring Bootが「Spring PetClinic」というサンプルアプリケーションを公開していることもあり、それを見習って、「uroboroSQL PetClinic」を作ってみました。
 
@@ -257,7 +257,7 @@ public class Owner extends BaseModel {
 
 Spring Bootによって、フロントエンドから渡されたJSONがOwnerというエンティティクラスに自動的にマッピングされて、かつ、BeanValidationが実行され、問題なければDB登録処理が呼び出されます。
 
-uroboroSQLもv0.2より、JPAライクなORマッピング機能を追加したことにより、INSERT/UPDATEといった処理はSQL不要でシンプルに実装することができました。
+uroboroSQLもv0.2より、JPAライクなO/Rマッピング機能を追加したことにより、INSERT/UPDATEといった処理はSQL不要でシンプルに実装できました。
 
 # まとめ
 

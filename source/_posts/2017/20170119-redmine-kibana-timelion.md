@@ -23,7 +23,7 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 
 今回はRedmineデータをEVMグラフとして表示します。
 
-例えば、Kibana+Timelionを使うと、RedmineデータからEVMグラフを表示することができるのです。
+例えば、Kibana+Timelionを使うと、RedmineデータからEVMグラフを表示できるのです。
 
 **◆EVMグラフ例**
 
@@ -58,10 +58,10 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 
 これらの数値を別々に把握できると、下記が別々に管理できそうです。
 
-- ①.画面開発の進捗（EV ÷ PV）
-- ②.メンバーの生産性（EV ÷ AC）
+- （1）.画面開発の進捗（EV ÷ PV）
+- （2）.メンバーの生産性（EV ÷ AC）
 
-①の値を**SPI**(Schedule Performance Index)、②の値を**CPI**(Cost Performance Index)と呼びます。
+（1）の値を**SPI**(Schedule Performance Index)、（2）の値を**CPI**(Cost Performance Index)と呼びます。
 
 いずれも標準値が"1.00"。それを下回る場合は、課題があると考えられます。
 
@@ -69,13 +69,13 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 
 例えば、下記のような4件のチケットがRedmineに登録されているプロジェクトがあったとします。
 
-チケット番号#4の進捗が50%の状況ですね。
+チケット番号#4の進捗が50％の状況ですね。
 
 <img src="/images/20170119/photo_20170119_49.png" loading="lazy">
 
 この場合、**PV**の累計は"**32h**"、**EV**の累計は"**28h**"。PVに対して**EV**が"**4h**"足りていないことが分かります。
 
-また、**SPI**は"**0.875**"。**進捗**が"**0.125**"つまり、**12.5%**遅延していることが分かります。
+また、**SPI**は"**0.875**"。**進捗**が"**0.125**"つまり、**12.5％**遅延していることが分かります。
 
 ## 作業時間を付記した場合のEVMの例
 
@@ -90,7 +90,7 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 つまり、遅延はしているが、メンバーの生産性は標準。
 メンバーの作業時間を確保することで、進捗が向上する事が検討出来そうです。
 
-EVMを使うことで多角的にプロジェクトを把握する事ができますね。
+EVMを使うことで多角的にプロジェクトを把握できますね。
 
 今回は、このEVMをグラフで表示します。
 
@@ -117,7 +117,7 @@ EVMを使うことで多角的にプロジェクトを把握する事ができ�
 (b) Kibanaをダウンロード
 
 - [Kibana Download URL](https://www.elastic.co/downloads/kibana](https://www.elastic.co/downloads/kibana)
-  - →私の場合は、「kibana-5.1.2-windows-x86.zip」をダウンロードしました。
+  - →私の場合は、「kibana-5.1.2-Windows-x86.zip」をダウンロードしました。
 
 (c) Logstashをダウンロード
 
@@ -141,10 +141,10 @@ C:\elastic
 
 次に、JDBCドライバを用意します。
 
-[前回](/articles/20160920/)ダウンロードした「mysql-connector-java-5.1.39-bin.jar」というファイルを、
+[前回](/articles/20160920/)ダウンロードした「MySQL-connector-java-5.1.39-bin.jar」というファイルを、
 「C:\elastic\logstash-5.1.2\bin」以下に配置します。
 
-次に、「redmine.txt」というファイルを作成。中身は下記のようにします。（★を含む箇所は皆様の環境に合わせた値へ変えて下さい。）
+次に、「redmine.txt」というファイルを作成。中身は下記のようにします（★を含む箇所は皆様の環境に合わせた値へ変えて下さい）。
 
 ```json
 input {
@@ -223,7 +223,7 @@ C:\elastic
 取り込みが完了しました。
 
 次に、Kibanaを起動します。
-「C:\elastic\kibana-5.1.2-windows-x86\bin」フォルダで下記コマンドを実行。
+「C:\elastic\kibana-5.1.2-Windows-x86\bin」フォルダで下記コマンドを実行。
 
 `kibana.bat`
 

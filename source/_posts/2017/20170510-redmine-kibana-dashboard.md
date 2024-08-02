@@ -62,7 +62,7 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
   * 私の場合は、「elasticsearch-5.4.0.zip」をダウンロードしました。
 * Kibana Download URL
   * [https://www.elastic.co/downloads/kibana](https://www.elastic.co/downloads/kibana)
-  * 私の場合は、「kibana-5.4.0-windows-x86.zip」をダウンロードしました。
+  * 私の場合は、「kibana-5.4.0-Windows-x86.zip」をダウンロードしました。
 * Logstash Download URL
   * [https://www.elastic.co/downloads/logstash](https://www.elastic.co/downloads/logstash)
   * 私の場合は、「logstash-5.4.0.zip」をダウンロードしました。
@@ -84,10 +84,10 @@ C:\elastic
 
 次に、JDBCドライバを用意します。
 
-[前々回](/articles/20160920/)ダウンロードした「mysql-connector-java-5.1.39-bin.jar」というファイルを、
+[前々回](/articles/20160920/)ダウンロードした「MySQL-connector-java-5.1.39-bin.jar」というファイルを、
 「C:\elastic\logstash-5.4.0\bin」以下に配置します。
 
-次に、「redmine.txt」というファイルを作成。中身は下記のようにします。（★を含む箇所は皆様の環境に合わせた値へ変えてください。）
+次に、「redmine.txt」というファイルを作成。中身は下記のようにします（★を含む箇所は皆様の環境に合わせた値へ変えてください）。
 
 ```sh
 input {
@@ -182,7 +182,7 @@ C:\elastic
 ### Kibanaの起動
 
 次に、Kibanaを起動します。
-「C:\elastic\kibana-5.4.0-windows-x86\bin」フォルダで下記コマンドを実行。
+「C:\elastic\kibana-5.4.0-Windows-x86\bin」フォルダで下記コマンドを実行。
 
 `kibana.bat`
 
@@ -277,7 +277,7 @@ Kibanaが起動しました。
 
 <img src="/images/20170510/photo_20170510_21.png" loading="lazy">
 
-では、もう一つグラフを作成します。
+では、もう1つグラフを作成します。
 
 作成したグラフの上にカーソルを当てると、右上にボタンが出てくるので、
 
