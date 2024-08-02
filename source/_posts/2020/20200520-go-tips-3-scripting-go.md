@@ -31,8 +31,8 @@ TIG の辻です。
 1. ファイルの読み込みにio.Readerを用いる
 2. ファイルの書き込みにio.Writerを用いる
 3. リストファイルから1行ずつ読み込む
-4. os/execを使う
-5. ファイルパスの操作にパス/filepathを使う
+4. `os/exec` を使う
+5. ファイルパスの操作に `path/filepath`を使う
 
 ## Tips
 
@@ -314,7 +314,7 @@ func main() {
 }
 ```
 
-### 4.os/execを使う
+### 4. `os/exec` を使う
 
 ファイルを扱うスクリプトに限った話ではないですが Go では [exec.Cmd](https://golang.org/pkg/os/exec/#Cmd) を用いて外部コマンドを実行できます。とても便利です。[exec.Command](https://golang.org/pkg/os/exec/#Command) 関数を用いて Path と Args に実行したい文字列をセットします。外部コマンドの実行結果が不要であれば [Run()](https://golang.org/pkg/os/exec/#Cmd.Run), 必要であれば [Output()](https://golang.org/pkg/os/exec/#Cmd.Output) を用いることができます。たいていの場合この 2 つのメソッドで充足することが多いです。
 
@@ -376,7 +376,7 @@ b, err := exec.Command("/bin/sh", "-c", "ls", "*.go").Output()
 
 その他にも os.exec の [Overview](https://golang.org/pkg/os/exec/#pkg-overview) には、リダイレクトはされない、glob パターンの展開には `filepath.Glob` を用いることができる、などといった os.exec を扱う上での注意点が記載されています。あらためて確認してみてください。
 
-### 5.ファイルパスの操作にパス/filepathを使う
+### 5.ファイルパスの操作に `path/filepath` を使う
 
 ファイルパスの結合に以下のように文字列で `/` を結合させて、あるディレクトリにファイルを生成することがあると思います。
 

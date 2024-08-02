@@ -190,7 +190,7 @@ ts-nodeは実行にtypescriptパッケージが必要で、ts-nodeとtypescript�
 
 Babelの作者とかが関わっているツールです。コンパイラ、Linter、フォーマッター、テスト、バンドラーなどを全部まとめて持っていて、外部依存がないのがウリとのこと。なお、ウェブサイトはありますが、それよりも[GitHubのREADME](https://github.com/facebookexperimental/rome)の方がいろいろプロジェクトの背景等が詳しく書かれていたりします（実行の仕方の説明はREADMEは古くて動かないですが）。
 
-npmにも上がっていないので、Git cloneするところから。
+npmにも上がっていないので、`git clone` するところから。
 
 ```bash
 git clone --depth 1 https://github.com/facebookexperimental/rome

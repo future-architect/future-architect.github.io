@@ -235,7 +235,7 @@ export default class AboutPage extends Vue {
 
 ## Goのサーバーを作る
 
-Goのサーバーはnet/httpですが、今回はフロントとの通信はJSON-RPCにしました。標準ライブラリのJSON-RPCはいろいろ制約が強いので、GitHub.com/semrush/zenrpcを使いました。それらをchiのrouterに登録してサーバー起動しておしまい。注意点としては、PORT環境変数を見て、ポートを切り替えられるようにすることです。ついでにHOST環境変数も見てますが、これはChromebookの制約故なので他の人はいらないかもです。
+Goのサーバーはnet/httpですが、今回はフロントとの通信はJSON-RPCにしました。標準ライブラリのJSON-RPCはいろいろ制約が強いので、 `gitHub.com/semrush/zenrpc` を使いました。それらをchiのrouterに登録してサーバー起動しておしまい。注意点としては、PORT環境変数を見て、ポートを切り替えられるようにすることです。ついでにHOST環境変数も見てますが、これはChromebookの制約故なので他の人はいらないかもです。
 
 ```go main.go
 package main

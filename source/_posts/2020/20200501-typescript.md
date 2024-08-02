@@ -147,7 +147,7 @@ export const store = configureStore({
 
 ## Reduxを使う側も型を生かす
 
-Redux Tooolkitの機能ではないのではなく、reactRedux側の機能ですが、Reduxを使う側も型が活かせます。このインプットにはRedux Toolkitを使って作ったStoreから、Stateの型を取り出すことで簡単にセットアップが可能です。これでカスタム版の``useSelector``を作ります。
+Redux Tooolkitの機能ではないのではなく、`react-redux` 側の機能ですが、Reduxを使う側も型が活かせます。このインプットにはRedux Toolkitを使って作ったStoreから、Stateの型を取り出すことで簡単にセットアップが可能です。これでカスタム版の``useSelector``を作ります。
 
 ```ts
 import { useSelector as rawUseSelector, TypedUseSelectorHook } from 'react-redux';
@@ -161,7 +161,7 @@ export type RootState = ReturnType<typeof store.getState>;
 export const useSelector: TypedUseSelectorHook<RootState> = rawUseSelector
 ```
 
-Reactコード側では、reactReduxの``useSelector()``を直接使うのではなく、このストア定義の中で作ったuseSelectorを使うと型チェックがuseSelectorのコールバックの中でも効くようになります。
+Reactコード側では、`react-redux`の``useSelector()``を直接使うのではなく、このストア定義の中で作ったuseSelectorを使うと型チェックがuseSelectorのコールバックの中でも効くようになります。
 
 ```ts
 import { useSelector } from './store.ts'

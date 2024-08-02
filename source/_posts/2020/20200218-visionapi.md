@@ -232,7 +232,7 @@ curl -H 'Content-Type:application/json' -d '{"requests":[{"image":{"source":{"im
 }
 ```
 
-解析したWordを整理すると
+解析したテキストを整理すると
 
 |text|
 |---|

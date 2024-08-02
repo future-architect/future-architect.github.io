@@ -14,26 +14,25 @@ lede: "Pythonで書かれたアプリケーションをDockerイメージにす�
 ---
 Pythonで書かれたアプリケーションをDockerイメージにする堅い方法の紹介です。イメージサイズを少しでも削ろう！ とかではなくて実用性重視の方向です。今回は第一弾ということで、Debianベースのイメージを使う方法を紹介します。
 
-* 続編も公開されました。
-  * https://future-architect.github.io/articles/20200514/
+* [続編](/articles/20200514/)も公開されました。
 
 # Pythonのベースイメージ選び
 
 イメージ作成にはベースイメージ選びからですが、基本的には次の2つかなと思います。Pythonバージョンは機械学習だと3.7がよく使われていると思いますが、5/8にTensorflowが3.8向けのwheelとセットで新バージョンを出したので、そろそろ3.8になっていきますかね。本記事も3.8にしますが、3.7でも動作します。
 
-* Python:3.x-buster
-* Python:3.x-slim-buster
+* `python:3.x-buster`
+* `python:3.x-slim-buster`
 
 イメージのOSには以下のような種類があります。
 
 | 名前 | どんなもの？ |
 |:-:|:-:|
-| buster  | Debian 10で処理系とかいっぱいインストール済み  |
-| buster-slim  | Debian 10で処理系なしの実行環境用 |
-| stretch  | Debian 9で処理系入り  |
-| stretch-slim  | Debian 9で処理系なしの実行環境用  |
-| alpine  | 元はフロッピーで起動するファイルサイズ重視のディストリビューション |
-| Windowsservercore  | Windows。LinuxやmacOS上では動作しない  |
+| `buster`  | Debian 10で処理系とかいっぱいインストール済み  |
+| `buster-slim`  | Debian 10で処理系なしの実行環境用 |
+| `stretch`  | Debian 9で処理系入り  |
+| `stretch-slim`  | Debian 9で処理系なしの実行環境用  |
+| `alpine`  | 元はフロッピーで起動するファイルサイズ重視のディストリビューション |
+| `windowsservercore`  | Windows。LinuxやmacOS上では動作しない  |
 
 BusterとかStretchという名前が見慣れない方もいるかもしれませんが、これはLinuxディストリビューションとしてシェアの大きな[Debianのコードネーム](https://www.debian.org/releases/index.en.html)です。
 
