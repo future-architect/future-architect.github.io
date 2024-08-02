@@ -36,7 +36,7 @@ Electronを使って開発されているアプリケーションの中でも有
 
 Electronはnpmパッケージとして提供されています。
 
-```
+```sh
 npm install electron
 ```
 
@@ -44,9 +44,9 @@ ReactやVue.js等のフロントエンドライブラリと組み合わせて使
 
 [electron-quick-startのリポジトリ](https://github.com/electron/electron-quick-start)が参考になります。
 
-Git cloneから起動までを体験できる一連のコマンドは[公式ページ](https://www.electronjs.org/)にも記載があります。
+`git clone` から起動までを体験できる一連のコマンドは[公式ページ](https://www.electronjs.org/)にも記載があります。
 
-```
+```sh
 # Clone the Quick Start repository
 $ git clone https://github.com/electron/electron-quick-start
 
@@ -92,7 +92,7 @@ SET HTTP_PROXY=http://id:pass@proxy.example.com:port
 
 `npm`コマンドが利用できるようになったら、[Vue CLI](https://cli.vuejs.org/)をインストールします。
 
-```
+```sh
 npm install -g @vue/cli
 ```
 
@@ -133,7 +133,7 @@ Vue CLIの案内に従い、バージョンや構成をいくつか選択しま�
 
 `npm run serve`コマンドを叩いた場所と同じディレクトリで、`vue add`コマンドを使ってVue CLIプラグインをインストールします。
 
-```
+```sh
 vue add electron-builder
 ```
 
@@ -341,7 +341,7 @@ npm install create-react-app
 
 インストールに成功したら、新しくアプリケーションを構築します。
 
-```
+```sh
 mkdir react-electron-sample
 cd react-electron-sample
 create-react-app react-electron-sample
@@ -521,7 +521,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 下記コマンドを実行するとElectronアプリケーションが起動します。
 
-```
+```sh
 npm run electron:serve
 ```
 
@@ -531,7 +531,7 @@ npm run electron:serve
 
 アプリケーションのビルドは下記コマンドです。
 
-```
+```sh
 npm run electron:build
 ```
 

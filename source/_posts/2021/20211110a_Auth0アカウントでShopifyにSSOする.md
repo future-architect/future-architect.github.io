@@ -196,7 +196,7 @@ Shopifyストアの現在のテーマの`コードを編集`をクリックし�
 - **auth0-instance**：Auth0ドメイン（例：sample.jp.auth0.com）
 - **clientid**：Auth0アプリケーションからの値。
 - **shopify-domain**：自身のストアのドメイン。
-- **return-to-パス**：任意で返したいパスを設定可能（例：ログイン後にアカウントページに遷移させたい場合は、`account`と設定）。
+- **return-to-path**：任意で返したいパスを設定可能（例：ログイン後にアカウントページに遷移させたい場合は、`account`と設定）。
 
 `https://{auth0-instance}/authorize?response_type=code&client_id={clientid}&return_to=https://{shopify-domain}/{return-to-path}&scope=SCOPE&state=STATE`
 

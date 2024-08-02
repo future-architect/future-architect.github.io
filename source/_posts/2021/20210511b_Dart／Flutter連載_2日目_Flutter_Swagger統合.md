@@ -131,7 +131,7 @@ openapi-generator generate -i ./swagger.yaml -g dart -o ./client
 各オプションは以下の通りです。
 
 * `i`: swagger.yamlへのパス
-* `g`: 生成コードの形式(≒言語)を指定します。様々な形式での生成ができるので以下参考にしてください（dartも別形式である`dart-dio`を指定可能）。。
+* `g`: 生成コードの形式(≒言語)を指定します。様々な形式での生成ができるので以下参考にしてください（dartも別形式である`dart-dio`を指定可能）。
   https://openapi-generator.tech/docs/generators/
 * `o`: 生成コードの出力先パス
 
