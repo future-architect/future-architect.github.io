@@ -75,3 +75,5 @@ lede: "8/1-8/2にパシフィコ横浜で開催されているGoogle Cloud Next 
 特にこういった大規模イベントで貰えるSwagが醍醐味でもあります！
 
 <img src="/images/20240802a/PXL_20240801_151358344.jpg" alt="" width="1200" height="675" loading="lazy">
+
+（2024.8.5追記）[Google Cloud Next Tokyo '24 2日目参加レポート ](/articles/20240805a/) 公開しました！
