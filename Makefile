@@ -8,6 +8,7 @@ fmt:
 	node_modules/.bin/markdownlint-cli2 --fix "**/*.md"
 
 fix:
+	node_modules/.bin/textlint --fix source/_posts/*.md
 	node_modules/.bin/textlint --fix source/_posts/**/*.md
 
 lint:
