@@ -10,7 +10,7 @@ tag:
 category:
   - Infrastructure
 thumbnail: /images/20240529a/thumbnail.png
-author: shotap
+author: 宮崎将太
 lede: "どんなアーキテクチャでCloudflareを採用したのか？結論ですが、ハイブリッドクラウド構成でのCDN/WAFとして"
 ---
 
