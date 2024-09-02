@@ -246,7 +246,7 @@ generator:
 
 ただ認可側の実装はドキュメントの[Misc > Request lifecycle > security-handlers](https://ogen.dev/docs/misc/request_lifecycle/#security-handlers)に記載が少しある程度で少し推測が必要でした。
 
-生成コードを読んでいった方が早いかもしれません。ドキュメントと生成コードを見比べていくと、`api/SecurityHandler` インターフェースを満たす必要があるとわかります。Bearer認証とOAuth2.0認証ごとに呼ばれる関数が異なる作りのようです。さらに同じ認証方式だけど、あるエンドポイントだけで挙動を変えたい場合は、`operationName` （`openapi.yaml` で定義した `operationId` が入っていました）を用いて拡張可能な作りです。親切！
+生成コードを読んでいった方が早いかもしれません。ドキュメントと生成コードを見比べていくと、`api/SecurityHandler` インタフェースを満たす必要があるとわかります。Bearer認証とOAuth2.0認証ごとに呼ばれる関数が異なる作りのようです。さらに同じ認証方式だけど、あるエンドポイントだけで挙動を変えたい場合は、`operationName` （`openapi.yaml` で定義した `operationId` が入っていました）を用いて拡張可能な作りです。親切！
 
 ```go 満たすべきインターフェース security_handler.go
 type SecurityHandler interface { bn
@@ -374,7 +374,7 @@ $ curl -H "Authorization: Bearer <1文字シグネチャを書き換えた不正
 {"error_message":"operation HelloBearer: security \"Bearer\": token signature is invalid: crypto/ecdsa: verification error"}
 ```
 
-詳細は割愛しますが、JWTトークンにユーザーIDなどが含まれており、各Handlerアプリ側で利用したい場合も、`ctx` に詰めて連携可能であり、使いやすインターフェース（フレームワーク）だと感じました。
+詳細は割愛しますが、JWTトークンにユーザーIDなどが含まれており、各Handlerアプリ側で利用したい場合も、`ctx` に詰めて連携可能であり、使いやすインタフェース（フレームワーク）だと感じました。
 
 ogenのサーバサイドコード生成について、まとめると次のような所感です。
 
@@ -411,7 +411,7 @@ generate:
 output: api/gen.go
 ```
 
-各エンドポイントは `oapi-codegen` が生成した `api/gen.go` の `StrictServerInterface`インターフェースを実装する必要があります。全体像は [hello_handler.go](https://github.com/ma91n/summer2024/blob/main/oapicodegensample/hello_handler.go) を参照いただきたいですが、`ref` でオブエジェクト参照すると、`ogen`と比べ生成されたコードにネストが発生するところが、少しもどかしさを感じます。
+各エンドポイントは `oapi-codegen` が生成した `api/gen.go` の `StrictServerInterface`インタフェースを実装する必要があります。全体像は [hello_handler.go](https://github.com/ma91n/summer2024/blob/main/oapicodegensample/hello_handler.go) を参照いただきたいですが、`ref` でオブエジェクト参照すると、`ogen`と比べ生成されたコードにネストが発生するところが、少しもどかしさを感じます。
 
 ```go hello_handler.go（抜粋）
 type HelloServer struct{}
@@ -464,7 +464,7 @@ func main() {
 }
 ```
 
-ミドルウェアの実体としては次のようなインターフェースを実装します。現時点ではセキュリティスキーマごちゃまぜですので、入力値でスイッチして切り替えます。`openapi3filter.AuthenticationInput` は`openapi.yaml` の解析結果や `http.Request` も取れるため、やろうと思えばすべて判定できます。
+ミドルウェアの実体としては次のようなインタフェースを実装します。現時点ではセキュリティスキーマごちゃまぜですので、入力値でスイッチして切り替えます。`openapi3filter.AuthenticationInput` は`openapi.yaml` の解析結果や `http.Request` も取れるため、やろうと思えばすべて判定できます。
 
 ```go jwt_authenticator.go
 func NewAuthenticator() openapi3filter.AuthenticationFunc {
@@ -592,7 +592,7 @@ func (s *PingAPIService) HelloOIDC(ctx context.Context) (ImplResponse, error) {
 
 `openapi-generator` のGoサーバサイド生成ですが、**セキュリティスキーマには未対応** です。[generators/go-server.md](https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/go-server.md#security-feature) にもその旨が書かれています。コード生成上の支援は現時点では受けられません。
 
-そのため、認証処理はミドルウェアで個別実装する必要があります。デフォルトでは github.com/gorilla/mux が利用される（chiに切り替えも可能）ので、muxのミドルウェアを実装します。
+そのため、認証処理はミドルウェアで個別実装する必要があります。デフォルトでは GitHub.com/gorilla/mux が利用される（chiに切り替えも可能）ので、muxのミドルウェアを実装します。
 
 ミドルウェアとして、そのリクエストが認証なし・Bearer・OAuth2.0・OIDCかどうかは自分で判定する必要があります。また、該当のリクエストがどのスコープを要求するかも自分でマッピングを準備する必要があります。
 
@@ -628,13 +628,12 @@ func validateToken(r *http.Request) error {
 
 マッピング情報を `oepnapi.yaml` とダブルメンテすることは実運用上、耐えられないチームが多いと思いますのでそのままでは利用できないという判断を下すことが多いかなと思います。そのため、Yusuke ItoさんのZennブック[【Go言語】OpenAPI Generatorを使いこなすスキーマ駆動開発](https://zenn.dev/ysk1to/books/248fad8cb34abe) にある通り、テンプレートがmustacheで書かれており、これを拡張して利用するといった取り組みが必要となるかと思います。
 
-
 `openapi-generator` のサーバサイドコード生成について、まとめると次のような所感です。
 
 - 記事には書いていなかったが、`.openapi-generator`、`.openapi-generator-ignore`、`openapitools.json`、`README.md` などGoのコード以外にもファイルが生成して初見は少し驚く
 - 各エンドポイントの実装は迷うことが少ないが、ImplResponseのボディは `interface{}` であるため、型がふわっとしてしまって残念に感じた（回避方法の有無は未調査）
 - 認可周りのコード生成上の支援が無く、使いこなすにはテンプレートをカスタマイズする勢いが必要そう
-- Yusuke ItoさんのZennブック[【Go言語】OpenAPI Generatorを使いこなすスキーマ駆動開発]によれば、カスタマイズしたテンプレート実行には、Java環境（mavenなど）が必要で、メンバーのスキルセット次第では障壁がある（FAT JAR提供とかあったらすいません）
+- Yusuke ItoさんのZennブック[【Go言語】OpenAPI Generatorを使いこなすスキーマ駆動開発]によれば、カスタマイズしたテンプレート実行には、Java環境（Mavenなど）が必要で、メンバーのスキルセット次第では障壁がある（FAT JAR提供とかあったらすいません）
 - 調査すると、他の言語（Swiftなど）の結果が出てくるので、検索ワード力が必要かもしれない
 
 ## さいごに
