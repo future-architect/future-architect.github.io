@@ -14,7 +14,7 @@ lede: "LLMが流行って久しいですが、MS、AWS、Googleクラウドベ�
 ---
 ## 1. はじめに
 
-LLMが流行って久しいですが、MS、AWS、Googleクラウドベンダ各社が自社のマネージドを利用したサンプルアプリを公開し始めているので、中の実装を見つつリファレンスとしての考え方を確認するための記事です。
+LLMが流行って久しいですが、MS、AWS、Googleクラウドベンダー各社が自社のマネージドを利用したサンプルアプリを公開し始めているので、中の実装を見つつリファレンスとしての考え方を確認するための記事です。
 
 次のサンプルコードを見ていきます。
 
@@ -31,7 +31,7 @@ LLMが流行って久しいですが、MS、AWS、Googleクラウドベンダ各
 
 ## 3. 構成
 
-トップにMakefileが存在するため `make help` で「何ができて」、「動くのか」予想もできます。
+トップにMakefileが存在するため `make help` で「何ができて」「動くのか」予想もできます。
 
 ```bash make help結果
 help                    💬 This help message :)
@@ -51,6 +51,7 @@ destroy                 🧨 Destroy everything in Azure
 
 - パッケージ構成
 全て掲載すると雑音になるので、要素別にトップレベルのみに絞っています
+
   ```sh
   .
   ├── code
@@ -82,10 +83,10 @@ destroy                 🧨 Destroy everything in Azure
 
   |#|コード(or パス)|役割|
   | ---- | ---- | ---- |
-  |①|code/backend/batch/get_conversation_response.py|画面からChatの質問を受けて、Azure OpenAIを呼び出しているFunction(get_conversation_response)|
-  |②|code/backend/batch/batch_push_results.py|ベクトルデータを作っているFunction(batch_push_results)|
-  |③|code/backend/pages|管理画面|
-  |④|code/backend/batch/utilities|共通処理|
+  |（1）|code/backend/batch/get_conversation_response.py|画面からChatの質問を受けて、Azure OpenAIを呼び出しているFunction(get_conversation_response)|
+  |（2）|code/backend/batch/batch_push_results.py|ベクトルデータを作っているFunction(batch_push_results)|
+  |（3）|code/backend/pages|管理画面|
+  |（4）|code/backend/batch/utilities|共通処理|
 
 ## 4. 詳細
 
@@ -121,7 +122,7 @@ Tool Callingの実装も入っているので、ハンズオンとしては学�
 |layout|recognizer|
 |read|recognizer|
 |web|langchain|
-|docx|python-docx|
+|docx|Python-docx|
 
 #### 4.2.2. 分割(管理画面の`chunking_strategy`の設定)
 
@@ -158,4 +159,4 @@ searchServiceにindexを作ります。あまり特筆すべきところはな�
 
 ## 5. 所感
 
-ハンズオンレベルの私とはしては、初期でここまで動くソースを自由に使えるのは普通に嬉しいです。クラウドベンダもそれだけ自社のサービスを使って欲しいんだなと感じることができました。
+ハンズオンレベルの私とはしては、初期でここまで動くソースを自由に使えるのは普通に嬉しいです。クラウドベンダーもそれだけ自社のサービスを使って欲しいんだなと感じることができました。
