@@ -5,6 +5,7 @@ postid: a
 tag:
   - LSP
   - VSCode
+  - VSCode拡張
   - TypeScript
   - SQL
   - フォーマッター
