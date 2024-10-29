@@ -13,7 +13,7 @@ author: 高橋大翔
 lede: "フューチャーのサマーインターン2023 Summer Enginner Camp の「Goとサーバレスアーキテクチャで体験。100万台超えの大規模スマートセンサーloTプラットフォームに関わってみませんか？」というプロジェクトに参加させていただきました"
 ---
 
-<img src="/images/20230920a/computer-8037837_640.jpg" alt="" width="640" height="479">
+<img src="/images/20230920a/undraw_undraw_applications_vaxx_(1)_p5j1.png" alt="" width="916" height="671">
 
 こんにちは、フューチャーのサマーインターン2023 Summer Enginner Camp に参加させて頂いた高橋大翔です！
 
