@@ -8,7 +8,7 @@ tag:
   - インターン2023
 category:
   - Programming
-thumbnail: /images/20230920a/thumbnail.jpg
+thumbnail: /images/20230920a/thumbnail.png
 author: 高橋大翔
 lede: "フューチャーのサマーインターン2023 Summer Enginner Camp の「Goとサーバレスアーキテクチャで体験。100万台超えの大規模スマートセンサーloTプラットフォームに関わってみませんか？」というプロジェクトに参加させていただきました"
 ---
