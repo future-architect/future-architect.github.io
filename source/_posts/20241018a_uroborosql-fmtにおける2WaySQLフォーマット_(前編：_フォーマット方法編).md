@@ -12,7 +12,7 @@ category:
   - Programming
 thumbnail: /images/20241018a/thumbnail.png
 author: 川渕皓太
-lede: "先日、当社では新しいSQLフォーマッタである[uroborosql-fmt]に基づいてSQLをフォーマットするものです。uroborosql-fmtの基本的な情報は以下の記事を参照してください。- [新しいSQLフォーマッターであるuroboroSQL-fmtをリリースしました | フューチャー技術ブログ]"
+lede: "uroborosql-fmtにおいて2WaySQLのフォーマットに対応した方法を説明していきます。"
 ---
 # はじめに
 こんにちは、2024年4月入社の川渕皓太です。

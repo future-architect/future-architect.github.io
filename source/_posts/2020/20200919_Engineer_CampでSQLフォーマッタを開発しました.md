@@ -9,6 +9,7 @@ tag:
   - ANTLR4
   - 構文解析
   - VSCode
+  - VSCode拡張
   - コアテク
   - フォーマッター
 category:
