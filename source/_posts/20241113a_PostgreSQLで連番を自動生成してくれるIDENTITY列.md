@@ -511,13 +511,20 @@ CREATE TABLE tablename (
 ALTER SEQUENCE tablename_colname_seq OWNED BY tablename.colname;
 ```
 
-IDENTITY列に関しては、手動で作成したシーケンスとIDENTITY列を紐づける構文は、ドキュメントを探した時点では存在しませんでした。
+IDENTITY列に関しては、手動で作成したシーケンスとIDENTITY列を紐づける構文は、ドキュメントを探した時点では存在しませんでした（予め作成したシーケンスを複数の用途で共有して使いたいといったユースケースは実現できなさそうです）。
 
-そのため、独自の名称のシーケンスにしたければ `ALTER SEQUENCE RENAME` で変更する運用になるかと思います。
+名称だけの話であれば可能です。作成時にシーケンスオプションで指定するか、先述の通り、 `ALTER SEQUENCE RENAME` で変更できます。
 
-また、次のようにシーケンスオプションも作成時に指定できます（ALTERで変更も可能）です。おそらく、困ることは無いかなと思います。
+```sql シーケンスオプションで指定
+CREATE TABLE color (
+    color_id BIGINT GENERATED ALWAYS AS IDENTITY (SEQUENCE NAME custom_color_seq) PRIMARY KEY,
+    color_name VARCHAR NOT NULL
+);
+```
 
-```sql
+また、次のように名称以外も、シーケンスオプションで指定できます（ALTERで変更も可能）です。一般的なユースケースでは、困ることは無いかなと思います。
+
+```sql シーケンスの開始値、キャッシュ値などを指定
 CREATE TABLE color (
     color_id INT GENERATED ALWAYS AS IDENTITY (START WITH 10 INCREMENT BY 1 CACHE 100),
     color_name VARCHAR NOT NULL
