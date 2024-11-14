@@ -1,5 +1,5 @@
 ---
-title: "PostgreSQLで連番を自動生成してくれるIDENTITY列"
+title: "PostgreSQLで連番を自動生成するIDENTITY列。SERIALとどちらを使うべきか"
 date: 2024/11/13 00:00:00
 postid: a
 tag:
