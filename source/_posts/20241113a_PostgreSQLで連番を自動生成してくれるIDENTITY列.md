@@ -178,7 +178,7 @@ postgres=# select * from color;
 
 ```sql
 -- DEFAULT を指定
-INSERT INTO color (color_id, color_name) OVERRIDING SYSTEM VALUE VALUES (DEFAULT, 'Black');
+INSERT INTO color (color_id, color_name) VALUES (DEFAULT, 'Black');
 ```
 
 結果です。無事登録できています。
@@ -411,7 +411,7 @@ ERROR:  cannot drop sequence color_color_id_seq because column color_id of table
 HINT:  You can drop column color_id of table color instead.
 ```
 
-もし、このシーケンスを削除したい場合は、colorテーブルのcolor_id列を削除する必要があるとあります。妥当なメッセージです。
+もし、このシーケンスを削除したい場合は、colorテーブルのcolor_id列を削除する必要があるとあります。親切なメッセージですね。
 
 ### 6. シーケンス名の上限63文字を超過したテーブル、カラム名の場合
 
@@ -439,7 +439,7 @@ postgres=# SELECT pg_get_serial_sequence('looooooooooooooooooooooooooooooooong',
  public.loooooooooooooooooooooooooooo_loooooooooooooooooooooooooooo_seq
 ```
 
-テーブル名、カラム名が長いと最長で29文字で前方からオミットされて生成されるようです。
+テーブル名、カラム名が長いと最長で29文字で前方からオミットされて生成されるようです。**エラーにならない！** 点は注意が必要です。
 
 直接シーケンス名を指定して `setval()` するときに困ることが多いかなと思いますので、注意が必要です。
 
