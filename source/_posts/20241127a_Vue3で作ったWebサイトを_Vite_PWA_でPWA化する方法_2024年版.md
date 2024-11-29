@@ -8,13 +8,13 @@ tag:
   - Vite
 category:
   - Programming
-thumbnail: /images/20241129a/thumbnail.png
+thumbnail: /images/20241127a/thumbnail.png
 author: 大岩潤矢
 lede: "Vue3で作ったWebサイトをPWA(Progressive Web Apps)化する方法を紹介します。"
 ---
 ## はじめに
 
-<img src="/images/20241129a/ogp-2.png" alt="ogp-2.png" width="1200" height="730" loading="lazy">
+<img src="/images/20241127a/ogp-2.png" alt="ogp-2.png" width="1200" height="730" loading="lazy">
 
 本記事は [Vue連載2024](/articles/20241125a/) 3日目の記事です。
 
@@ -32,7 +32,7 @@ Progressive Web Apps、直訳すると「革新的なWebアプリ」です。か
 
 Google Trendsによると、PWAは2017年頃から盛り上がりを見せ、2020年頃に一度ピークが落ち着いたものの、最近じわじわと話題が盛り返しているようです。2017年〜2020年頃にPWAに触れたものの、それっきり追っていないという方も多いのではないでしょうか？
 
-<img src="/images/20241129a/Pasted_image_20241125132625.png" alt="Pasted_image_20241125132625.png" width="1200" height="713" loading="lazy">
+<img src="/images/20241127a/Pasted_image_20241125132625.png" alt="Pasted_image_20241125132625.png" width="1200" height="713" loading="lazy">
 
 個人的な主観とはなりますが、一時期PWAが次世代のアプリの姿として持て囃されていたものの、日本の約半数のシェアを占めるiOSがPWAサポートに消極的であったことが採用の障壁となり話題も落ち着いたものと推測します。
 
@@ -42,7 +42,7 @@ AndroidのGoogle ChromeにおいてPWAサポートが始まったのが2015年�
 
 しかし、iOSのバージョンが上がるにつれてそれらの問題も徐々に改善していきます。特に昨今一番のアップデートとして、バックグラウンドでのPush通知に対応したことが挙げられます。2023年3月27日リリースのiOS16.4から、Service WorkerでバックグラウンドのPush通知を受信する `ServiceWorkerRegistration.showNotification()` に対応しました。これにより、iOSでのPWA実現の一番の障壁だったPush通知がそれなりに動くようになり、一層PWAが完成に近づいたと言えるでしょう。
 
-<img src="/images/20241129a/Pasted_image_20241125133903.png" alt="Pasted_image_20241125133903.png" width="1200" height="615" loading="lazy">
+<img src="/images/20241127a/Pasted_image_20241125133903.png" alt="Pasted_image_20241125133903.png" width="1200" height="615" loading="lazy">
 
 https://developer.mozilla.org/ja/docs/Web/API/ServiceWorkerRegistration/showNotification
 
@@ -54,7 +54,7 @@ https://developer.mozilla.org/ja/docs/Web/API/ServiceWorkerRegistration/showNoti
 
 その前に、今回利用する Vite PWA について紹介します。
 
-<img src="/images/20241129a/Pasted_image_20241125170224.png" alt="Pasted_image_20241125170224.png" width="1200" height="401" loading="lazy">
+<img src="/images/20241127a/Pasted_image_20241125170224.png" alt="Pasted_image_20241125170224.png" width="1200" height="401" loading="lazy">
 
 https://vite-pwa-org.netlify.app/
 
@@ -69,7 +69,7 @@ https://vite-pwa-org.netlify.app/
 
 本来であれば自分で用意しないといけない複雑な設定ファイルを、Viteのコンフィグファイルにオプションを記載するだけで自動で出力してくれるというすぐれものです。
 
-<img src="/images/20241129a/Pasted_image_20241125200146.png" alt="Pasted_image_20241125200146.png" width="1200" height="699" loading="lazy">
+<img src="/images/20241127a/Pasted_image_20241125200146.png" alt="Pasted_image_20241125200146.png" width="1200" height="699" loading="lazy">
 
 PWAはウェブマニフェストファイルとServiceWorkerのファイルから成り立ちます。前者はPWAをインストールする際に使われるメタ情報的な役割で、後者はキャッシュ対応やバックグラウンド処理等のJSコードです。Vite PWAはこの2つのファイルを自動生成してくれます。
 
@@ -77,7 +77,7 @@ PWAはウェブマニフェストファイルとServiceWorkerのファイルか�
 
 まずはVue3で作成したアプリをPWA化してみましょう。ここでは、簡易的に天気予報APIを叩いて各地の天気予報を取得する簡単なアプリを用意しました。
 
-<img src="/images/20241129a/Pasted_image_20241125170033.png" alt="Pasted_image_20241125170033.png" width="1200" height="672" loading="lazy">
+<img src="/images/20241127a/Pasted_image_20241125170033.png" alt="Pasted_image_20241125170033.png" width="1200" height="672" loading="lazy">
 
 ソースコードとデモサイトは以下に配置しています。
 
@@ -122,11 +122,11 @@ export default defineConfig({
 
 このように `dev-sw.js` がService Workerとして読み込まれている事がわかります。
 
-<img src="/images/20241129a/Pasted_image_20241125173130.png" alt="Pasted_image_20241125173130.png" width="1200" height="621" loading="lazy">
+<img src="/images/20241127a/Pasted_image_20241125173130.png" alt="Pasted_image_20241125173130.png" width="1200" height="621" loading="lazy">
 
 ターミナルのほうを見てみると、 `sw.js` と `workbox-xxxxxxxx.js` が自動生成されていることがわかります。
 
-<img src="/images/20241129a/Pasted_image_20241125173237.png" alt="Pasted_image_20241125173237.png" width="889" height="180" loading="lazy">
+<img src="/images/20241127a/Pasted_image_20241125173237.png" alt="Pasted_image_20241125173237.png" width="889" height="180" loading="lazy">
 
 ### PWAをインストールできるようにする（Webマニフェスト設定）
 
@@ -152,11 +152,11 @@ export default defineConfig({
 
 記載できたら、 `npx pwa-assets-generator --preset minimal-2023` で実行しましょう。
 
-<img src="/images/20241129a/Pasted_image_20241125203153.png" alt="Pasted_image_20241125203153.png" width="1072" height="746" loading="lazy">
+<img src="/images/20241127a/Pasted_image_20241125203153.png" alt="Pasted_image_20241125203153.png" width="1072" height="746" loading="lazy">
 
 正しく書き出せていそうです。
 
-<img src="/images/20241129a/Pasted_image_20241125203351.png" alt="Pasted_image_20241125203351.png" width="1200" height="710" loading="lazy">
+<img src="/images/20241127a/Pasted_image_20241125203351.png" alt="Pasted_image_20241125203351.png" width="1200" height="710" loading="lazy">
 
 後は `vite.config.ts` に設定を記載するだけです。
 
@@ -205,15 +205,15 @@ https://developer.mozilla.org/en-US/docs/Web/Manifest
 
 保存したら、再度開発サーバを立ち上げてみましょう。アドレスバー横にアイコンが表示され、クリックするとPWAのインストールダイアログが表示されます。
 
-<img src="/images/20241129a/Pasted_image_20241125204440.png" alt="Pasted_image_20241125204440.png" width="544" height="242" loading="lazy">
+<img src="/images/20241127a/Pasted_image_20241125204440.png" alt="Pasted_image_20241125204440.png" width="544" height="242" loading="lazy">
 
 iPhoneでも試してみましょう。cloudflaredを使って外からアクセスできるようにして、ページを開いて「ホーム画面に追加」をタップします。
 
-<img src="/images/20241129a/スライド3.png" alt="スライド3.png" width="1200" height="675" loading="lazy">
+<img src="/images/20241127a/スライド3.png" alt="スライド3.png" width="1200" height="675" loading="lazy">
 
 問題なく表示できていますね。
 
-<img src="/images/20241129a/スライド4.png" alt="スライド4.png" width="1200" height="675" loading="lazy">
+<img src="/images/20241127a/スライド4.png" alt="スライド4.png" width="1200" height="675" loading="lazy">
 
 ### プリキャッシュを導入する
 
@@ -279,11 +279,11 @@ files generated
 
 書き出された `dist/sw.js` を見てみると、 `e.precacheAndRoute()` の引数に、書き出されたファイルが一覧されているようです。 
 
-<img src="/images/20241129a/Pasted_image_20241128142353.png" alt="Pasted_image_20241128142353.png" width="1200" height="1165" loading="lazy">
+<img src="/images/20241127a/Pasted_image_20241128142353.png" alt="Pasted_image_20241128142353.png" width="1200" height="1165" loading="lazy">
 
 では実際に試してみましょう。ビルドした後、先ほどと同様 cloudflared を使ってhttps通信でスマホからアクセスし、ホーム画面に追加。PWAアプリを一度開き、その後オフライン状態にして再度開くと……
 
-<img src="/images/20241129a/スライド5.png" alt="スライド5.png" width="1200" height="675" loading="lazy">
+<img src="/images/20241127a/スライド5.png" alt="スライド5.png" width="1200" height="675" loading="lazy">
 
 オフライン状態でも表示できました！しかし、外部リソース（ここでは天気予報APIやそこから取得した画像ファイル）からの取得は失敗してしまっていますね。
 
@@ -322,7 +322,7 @@ workbox: {
 
 では実際に試してみましょう。build後、PWAをインストールし直してみます。
 
-<img src="/images/20241129a/スライド6.png" alt="スライド6.png" width="1200" height="675" loading="lazy">
+<img src="/images/20241127a/スライド6.png" alt="スライド6.png" width="1200" height="675" loading="lazy">
 
 今回はオフライン状態でもAPIリクエストをキャッシュできました！
 
