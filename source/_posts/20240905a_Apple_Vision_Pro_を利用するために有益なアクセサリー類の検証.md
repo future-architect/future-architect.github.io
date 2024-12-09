@@ -117,3 +117,7 @@ lede: "2024年初めから米国で発売開始されたApple Vision Proです�
 Apple Vision Proを利用する際に必要となったり、より快適になるアクセサリー類を検証した内容をまとめてみました。
 
 現在は、企業向けアプリで利用できるEnterprise APIの検証なども行っているため、次回はそれらについての記事も書きたいと考えています。
+
+**2024年12月9日追記 続編が公開されました*:
+
+- [「続 Apple Vision Pro を利用するために有益なアクセサリー類の検証」](https://qiita.com/rkyymmt@github/items/3f9d4cc91bd6802fd4b8)
