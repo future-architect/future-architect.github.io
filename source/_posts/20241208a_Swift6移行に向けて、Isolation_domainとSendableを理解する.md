@@ -11,6 +11,7 @@ category:
 thumbnail: /images/20241208a/thumbnail.png
 author: 橋本竜我
 lede: "SwiftZoomin#20の内容から、Swift6移行に向けて理解が必要なSwift Concurrencyの重要な概念について簡単にまとめました。"
+skip_career: true
 ---
 <img src="/images/20241208a/image.png" alt="" width="1200" height="416" loading="lazy">
 
@@ -158,11 +159,11 @@ actor A {
 func run() async {
     let box: Box = .init()
     let a: A = .init() // actor A のインスタンスa
-    
+
    await a.setBox(box) // actor A のインスタンスaにboxを渡す　⇐ boxがIsolation bounadaryを超えて、actor AのインスタンスaのIsolation domainに入る。
 // ここで次のエラーメッセージが出る。
 // Sending 'box' risks causing data races
-    
+
     print(box.value)
 }
 ```

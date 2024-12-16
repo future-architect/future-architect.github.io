@@ -10,10 +10,10 @@ category:
 thumbnail: /images/20241205a/thumbnail.png
 author: 澁川喜規
 lede: "イマドキのJavaScriptの書き方2018]というのを以前書いたのだけど、配列周りはかなり変わっているな、というのを思ったので、そこの部分だけアップデートするつもりで書いてみました。"
+skip_career: true
 ---
 
 <img src="/images/20241205a/ts2024.png" alt="" width="900" height="513">
-
 
 [TypeScriptアドベントカレンダー](https://qiita.com/advent-calendar/2024/typescript)の12/5のエントリーです。昨日は@nanasi-1さんの[【TypeScript】ジェネレーターによる遅延評価でフィボナッチ数列を生成する](https://zenn.dev/nanasi_1/articles/22696e18f3a2f9)でした。
 
@@ -63,7 +63,7 @@ const array1 = [1, 2, 3];
 
 // 空の場合は型指定必須
 const array2: string[] = [];   // なるべくこちら推奨
-const array3 = [] as string[]; // 式として書かないといけない場合は右辺に 
+const array3 = [] as string[]; // 式として書かないといけない場合は右辺に
 ```
 
 既存のデータ構造からコピーして作る
@@ -273,7 +273,7 @@ const newA2 = [0, ...a];    // 先頭にも追加できる
 const a = [1, 2, 3, 4, 5];
 
 a.pop();    // 末尾の要素の削除
-a.length--; // これでも可能 
+a.length--; // これでも可能
 a.shift();  // 先頭の要素の削除
 ```
 
