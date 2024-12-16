@@ -14,13 +14,6 @@ lede: "SwiftZoomin#20の内容から、Swift6移行に向けて理解が必要�
 ---
 <img src="/images/20241208a/image.png" alt="" width="1200" height="416" loading="lazy">
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
-本記事は、[Swift Advent Calendar 2024](https://qiita.com/advent-calendar/2024/swift)の8日目です。
-7日目は、[@hinakko](https://qiita.com/hinakko)さんの[Split Viewを考慮したSize Classを使用したiPad対応](https://qiita.com/hinakko/items/ac65d149e3141a8bc7da)です。
-
-</div>
-
 HealthCare Innovation Group(HIG)[^1]の橋本です。
 
 先日参加したSwiftZoomin#20の内容から、Swift6移行に向けて理解が必要なSwift Concurrencyの重要な概念について簡単にまとめました。
