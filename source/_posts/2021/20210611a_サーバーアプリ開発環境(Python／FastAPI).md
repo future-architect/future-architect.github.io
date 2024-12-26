@@ -6,6 +6,7 @@ tag:
   - Docker
   - VSCode
   - Python
+  - FastAPI
 category:
   - Programming
 thumbnail: /images/20210611a/thumbnail.png
