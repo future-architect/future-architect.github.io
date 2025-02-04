@@ -272,7 +272,7 @@ function createTaskTable(taskList) {
 
 スプレッドシートからの変更は編集をトリガーに実行されます。
 
-<img src="/images/20240426b/スプレッドシートから変更.gif" alt="スプレッドシートから変更.gif" width="1200" height="662" loading="lazy">
+<img src="/images/20240426b/スプレッドシートから変更.gif" alt="スプレッドシートから変更.gif" width="1200" height="662" loading="lazy">
 
 GoogleTasksからの変更は定時実行で最短1分ごとに取得できます。
 

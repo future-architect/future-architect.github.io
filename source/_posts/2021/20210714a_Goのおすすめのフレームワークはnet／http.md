@@ -54,7 +54,7 @@ func (r Receiver) ServeHTTP(http.ResponseWriter, *http.Request) {
 
 この``ServeMux``は他の``http.Handler``も子供にできるのでネストできます。一部のパスを別のRouterに渡せます。このインタフェースを提供している静的ファイル配信の[http.FileServer](https://golang.org/pkg/net/http/#FileServer)とか[http.RedirectHandler](https://golang.org/pkg/net/http/#RedirectHandler)とか柔軟に組み合わせられます。
 
-<img src="/images/20210714a/nested-servemux-ページ3.png" alt="ネストしたルーター" loading="lazy">
+<img src="/images/20210714a/nested-servemux-ページ3.png" alt="ネストしたルーター" loading="lazy">
 
 最近のウェブのフレームワークは、ミドルウェアという機構を用意していたりします。リクエストを事前に解釈し、エラー処理をまとめて行ったり、認証チェックをしたり・・・図には書きにくいのですが、これも、``http.Handler``として振る舞い、受け取ったリクエストの処理結果を次の``http.Handler``に渡すラッパーという実装になります。標準ライブラリの[http.TimeoutHandler](https://golang.org/pkg/net/http/#TimeoutHandler)もこれですね。
 
