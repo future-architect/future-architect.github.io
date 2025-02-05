@@ -209,11 +209,11 @@ https://developer.mozilla.org/en-US/docs/Web/Manifest
 
 iPhoneでも試してみましょう。cloudflaredを使って外からアクセスできるようにして、ページを開いて「ホーム画面に追加」をタップします。
 
-<img src="/images/20241127a/スライド3.png" alt="スライド3.png" width="1200" height="675" loading="lazy">
+<img src="/images/20241127a/スライド3.png" alt="スライド3.png" width="1200" height="675" loading="lazy">
 
 問題なく表示できていますね。
 
-<img src="/images/20241127a/スライド4.png" alt="スライド4.png" width="1200" height="675" loading="lazy">
+<img src="/images/20241127a/スライド4.png" alt="スライド4.png" width="1200" height="675" loading="lazy">
 
 ### プリキャッシュを導入する
 
@@ -283,7 +283,7 @@ files generated
 
 では実際に試してみましょう。ビルドした後、先ほどと同様 cloudflared を使ってhttps通信でスマホからアクセスし、ホーム画面に追加。PWAアプリを一度開き、その後オフライン状態にして再度開くと……
 
-<img src="/images/20241127a/スライド5.png" alt="スライド5.png" width="1200" height="675" loading="lazy">
+<img src="/images/20241127a/スライド5.png" alt="スライド5.png" width="1200" height="675" loading="lazy">
 
 オフライン状態でも表示できました！しかし、外部リソース（ここでは天気予報APIやそこから取得した画像ファイル）からの取得は失敗してしまっていますね。
 
@@ -322,7 +322,7 @@ workbox: {
 
 では実際に試してみましょう。build後、PWAをインストールし直してみます。
 
-<img src="/images/20241127a/スライド6.png" alt="スライド6.png" width="1200" height="675" loading="lazy">
+<img src="/images/20241127a/スライド6.png" alt="スライド6.png" width="1200" height="675" loading="lazy">
 
 今回はオフライン状態でもAPIリクエストをキャッシュできました！
 
