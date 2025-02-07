@@ -75,7 +75,7 @@ Startup Geeks #1開催報告
 
 ## セッション5：Velc 田向氏
 
-<iframe src="//www.slideshare.net/slideshow/embed_code/key/mSaDnmKbAXyASs" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/tamukai/ss-58039691" title="受託の会社が自社サービスをやる中で取り組んだ開発・運用の工夫" target="_blank">受託の会社が自社サービスをやる中で取り組んだ開発・運用の工夫</a> </strong> from <strong><a target="_blank" href="//www.slideshare.net/tamukai">Yusuke Tamukai</a></strong> </div>
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/mSaDnmKbAXyASs" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/tamukai/ss-58039691" title="受託の会社が自社サービスをやる中で取り組んだ開発・運用の工夫" target="_blank">受託の会社が自社サービスをやる中で取り組んだ開発・運用の工夫</a> </strong> from <strong><a target="_blank" href="//www.slideshare.net/tamukai">Yusuke Tamukai</a></strong> </div>
 
 <img src="/images/20160323/photo_20160323_08.jpeg" loading="lazy">
 

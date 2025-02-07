@@ -25,7 +25,7 @@ TIGの伊藤真彦です。
 
 資料は[こちら](https://www.slideshare.net/ssuserebd24d1/future-tech-night-12go)です。
 
-<iframe src="//www.slideshare.net/slideshow/embed_code/key/4cJRNedlyqb6RY" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/ssuserebd24d1/future-tech-night-12go" title="Future tech night #12～goで始めるサーバレスファーストという選択肢～" target="_blank">Future tech night #12～goで始めるサーバレスファーストという選択肢～</a> </strong> from <strong><a href="https://www.slideshare.net/ssuserebd24d1" target="_blank">masahiko ito</a></strong> </div>
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/4cJRNedlyqb6RY" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/ssuserebd24d1/future-tech-night-12go" title="Future tech night #12～goで始めるサーバレスファーストという選択肢～" target="_blank">Future tech night #12～goで始めるサーバレスファーストという選択肢～</a> </strong> from <strong><a href="https://www.slideshare.net/ssuserebd24d1" target="_blank">masahiko ito</a></strong> </div>
 
 下記の流れで発表しました。
 
