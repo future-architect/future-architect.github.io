@@ -49,7 +49,7 @@ aws sts get-session-token --serial-number arn-of-the-mfa-device --token-code cod
 
 ## `future-architect/awsmfa`
 
-[<img src="https://github.com/future-architect/awsmfa" alt="future-architect/awsmfa - GitHub](https://gh-card.dev/repos/future-architect/awsmfa.svg)" loading="lazy">
+[![future-architect/awsmfa - GitHub](https://gh-card.dev/repos/future-architect/awsmfa.svg)](https://github.com/future-architect/awsmfa)
 
 ### 何ができるのか
 
