@@ -33,7 +33,7 @@ Terraformは、インフラ構築をコードで管理できる強力なツー�
 
 Terraformは、リソースのライフサイクルをコードで管理できますが、以下のいくつのケースの際に、テーブルを再度自動作成されるため、意図しないデータ損失が発生します。
 - Terraform上のスキーマ変更を適用したとき
-- Cloud Functionなどでデータを洗い替えされ、再度`terraform apply`を実行されたとき（BigqueryAPIのJobConfigによって事前に防ぐことができます。詳しくは３．の項で。）
+- Cloud Functionなどでデータを洗い替えされ、再度`terraform apply`を実行されたとき（BigqueryAPIのJobConfigによって事前に防ぐことができます。詳しくは３．の項で）。
 
 ## 対策
 
