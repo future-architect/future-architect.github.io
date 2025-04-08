@@ -7,6 +7,7 @@ tag:
   - プロビジョニング
   - AWS
   - Ansible
+  - 用語解説
 category:
   - Infrastructure
 thumbnail: /images/20250403a/thumbnail.png
