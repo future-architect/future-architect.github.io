@@ -43,7 +43,7 @@ GitLabの公式AIソリューションとしては、[GitLab Duo](https://about.
 
 PR-Agentは、大規模言語モデル(LLM)を活用してPull Requestに関連する様々なタスクを自動化・強化するために設計されたオープンソース**ツール**です。
 
-Qodo(旧CodiumAI)によって開発が進められており、Apache 2.0ライセンスの下で公開されています。OSSの信頼性を判断する指標の一つであるGitHubでのスター数は`7.6k`（本記事執筆時点）と、一定の評価を得ていると言えるでしょう。
+Qodo(旧CodiumAI)によって開発が進められており、Apache 2.0ライセンスの下で公開されています。OSSの信頼性を判断する指標の1つであるGitHubでのスター数は`7.6k`（本記事執筆時点）と、一定の評価を得ていると言えるでしょう。
 
 なお、PR-Agentをベースにより機能が豊富な[Qodo Merge](https://qodo-merge-docs.qodo.ai/overview/pr_agent_pro/)というマネージドサービスもありますが、本記事での紹介は割愛します。
 
