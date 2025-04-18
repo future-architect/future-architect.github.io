@@ -19,7 +19,7 @@ lede: "フューチャーでは、Gitホスティング環境として、SaaSと
 
 フューチャーでは、Gitホスティング環境として、SaaSとしてのGitHubだけでなく、社内開発基盤運用チームが構築・運用している、オンプレミス版のGitLabも利用可能となっています。
 
-私が所属するSATでは、後者のGitLabを用いて開発を行っています。
+私が所属するSATでは、後者のGitLabを用いて開発しています。
 
 近頃の社内では、「[Gemini、社内利用スタート！](/articles/20250311a/)」といった記事に代表されるように、AI業務利活用の動きが本格化しています。
 
@@ -106,7 +106,7 @@ GitLabへの導入の場合、大きく分けて次の２パターンでの構�
 こちらの手法を選ぶメリットは以下の通りです。
 
 - 1つのWebhook Serverを、複数プロジェクトから呼び出すことが可能
-- プロジェクトごとのCI Pipeline定義への修正を行わずに済む
+- プロジェクトごとのCI Pipeline定義への修正しなくても済む
   - PR-Agentの挙動は、後述する設定ファイルによってリポジトリごとにカスタマイズ可能です
 
 ## GitLab Webhook Serverの構築
@@ -153,7 +153,7 @@ GitLabへの導入の場合、大きく分けて次の２パターンでの構�
 
 これで GitLab Webhook Server側のセットアップは完了です。
 
-次に、GitLab側のプロジェクトでWebhook設定を行います。
+次に、GitLab側のプロジェクトでWebhook設定します。
 
 以下のイベントが発生した際にWebhookをトリガーし、先ほど公開したWebhookサーバーが受け取れるように設定します。
 
@@ -165,7 +165,7 @@ GitLabへの導入の場合、大きく分けて次の２パターンでの構�
 
 OSS版のPR-Agentの各種挙動は、対象リポジトリのデフォルトブランチのルートに`.pr-agent.toml`という設定ファイルをアップロードすることで制御が可能です。
 
-マネージドサービスの`Qodo Merge`では、Gitリポジトリ内のWikiページを利用したり、組織全体で設定を一元管理したりすることも可能なようです。詳しくは公式ドキュメントを参照してください。
+マネージドサービスの`Qodo Merge`では、Gitリポジトリ内のWikiページを利用したり、組織全体で設定を一元管理が可能なようです。詳しくは公式ドキュメントを参照してください。
 [Configuration File - Qodo Merge (and open-source PR-Agent)](https://qodo-merge-docs.qodo.ai/usage-guide/configuration_options/)
 
 実際に利用中の設定例を紹介します。
@@ -197,7 +197,7 @@ extra_instructions = "Please use Japanese."
 extra_instructions = "Please use Japanese."
 ```
 
-以下、抜粋して説明します
+以下、抜粋して説明します。
 
 - `git_provider`は、`gitlab`を使うことを明示しています
 - `model`,`fallback_model`で利用するLLMを指定しています
