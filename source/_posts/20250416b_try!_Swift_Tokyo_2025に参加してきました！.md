@@ -93,7 +93,7 @@ WWDCのセッション動画で利用できると知っても、使えるよう�
 - `UIHostingConfiguration`
   - [UIHostingConfiguration](https://developer.apple.com/documentation/SwiftUI/UIHostingConfiguration) → これにより、SwiftUIを簡単にUIKitに入れ込むことができる
 - `TextField(_:,text:,axis: .vertical)`
-  - `[]()` → `TextField(_:,text:,axis: .vertical)`を使うことで、文字数が長くなったときに、テキストを途中で折り返し、テキストを全量表示できる
+  - [init(_:text:axis:)](https://developer.apple.com/documentation/swiftui/textfield/init(_:text:axis:)) → `TextField(_:,text:,axis: .vertical)`を使うことで、文字数が長くなったときに、テキストを途中で折り返し、テキストを全量表示できる
 - `Color.gradient`
   - [gradient](https://developer.apple.com/documentation/swiftui/color/gradient) → デザイナーからの指定がないようなプロトタイプ作成のようなとりあえずグラデーションをかけたいときに便利
 
