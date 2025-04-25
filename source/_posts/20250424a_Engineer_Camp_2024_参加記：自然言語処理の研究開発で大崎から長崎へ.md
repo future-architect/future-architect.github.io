@@ -8,7 +8,7 @@ tag:
   - NLP
   - 自然言語処理
 category:
-  - Infrastructure
+  - DataScience
 thumbnail: /images/20250424a/thumbnail.jpg
 author: 羽根田賢和
 lede: "フューチャーのサマーインターン2024 Engineer Campに参加した経緯から実際にインターンで取り組んだ内容、学会参加の後日談までを、私のインターン体験記としてまとめていこうと思います。"
