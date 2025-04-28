@@ -116,8 +116,8 @@ Cursorの初期設定ではModel選択が「Auto」になっています。Curso
 > Cursor helps youselect the best premium model, based on performance and speed
 
 ...と説明があります。
-し
-かし、この時に内部的にどのモデルが使われたのかは分かりません。
+
+しかし、この時に内部的にどのモデルが使われたのかは分かりません。
 
 [How to see which model Auto option uses in Cursor 0.47?](https://forum.cursor.com/t/how-to-see-which-model-auto-option-uses-in-cursor-0-47/62414) を参考にしつつ、設定のUser Rulesに「使用しているAIモデルの名前を最初に出力せよ」という旨の指示を追加しました。[^2]
 
