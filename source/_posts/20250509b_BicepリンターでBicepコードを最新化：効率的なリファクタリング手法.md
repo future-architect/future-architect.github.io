@@ -1,5 +1,5 @@
 ---
-title: "BicepリンターでBicepコードを最新化：効率的なリファクタリング手法"
+title: "Azure BicepリンターでBicepコードを最新化：効率的なリファクタリング手法"
 date: 2025/05/09 00:00:01
 postid: b
 tag:
