@@ -7,6 +7,7 @@ tag:
   - 寄稿
   - CDN
   - Web
+  - テクニカルライティング
 category:
   - Infrastructure
 thumbnail: /images/20241227a/thumbnail.jpg

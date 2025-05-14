@@ -9,6 +9,7 @@ tag:
   - AISearch
   - インターン
   - インターン2024
+  - Azure
 category:
   - DataScience
 thumbnail: /images/20250512b/thumbnail.png
