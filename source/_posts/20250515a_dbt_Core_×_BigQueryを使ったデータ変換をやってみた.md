@@ -259,7 +259,7 @@ dbt seed
 ## staging レイヤのモデルを作成する
 
 - dbt_trial/models 直下に staging ディレクトリを作成します。
-- 作成した staging ディレクトリ配下に、以下の 3 つのファイルを新規作成し、それぞれの内容をコピー＆ペーストしてください。
+- 作成した staging ディレクトリ配下に、以下の 3 つのファイルを新規作成し、それぞれの内容をコピー&ペーストしてください。
 - 本記事では、BigQuery に投入したデータソース（sales.csv）の内容を、そのまま staging レイヤのモデルとして利用します。
 
 <details><summary>stg_sales.sql</summary>
