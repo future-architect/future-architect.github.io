@@ -179,7 +179,7 @@ dbt におけるレイヤは、データの変換プロセスを整理し、管�
 
 こちらは、データ変換ではないのですが、データ変換のもとなるデータを BiqQuery に投入する手順となります。
 
-以下の CSV ファイルを、dbt プロジェクト内の dbt_trial/seeds/ ディレクトリ配下にコピー＆ペーストします。
+以下の CSV ファイルを、dbt プロジェクト内の dbt_trial/seeds/ ディレクトリ配下にコピー&ペーストします。
 
 <div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
 今回は sales.csv のみ利用します。
