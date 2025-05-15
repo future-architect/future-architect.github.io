@@ -356,7 +356,7 @@ stg_sales.sql などの SQL ファイルには、データの抽出、変換、�
 ## mart レイヤのモデルを作成する
 
 - 作成した dbt プロジェクトの models ディレクトリ内に、mart という名前のディレクトリを作成します。
-- 作成した mart ディレクトリ配下に、以下の 2 つのファイルを新規作成し、それぞれの内容をコピー＆ペーストしてください。
+- 作成した mart ディレクトリ配下に、以下の 2 つのファイルを新規作成し、それぞれの内容をコピー&ペーストしてください。
 - mart_sales_amount_per_day では、stg_sales モデルを日付で集約し、日付毎の売り上げを取得するロジックを実装しています。
 
 <details><summary>mart_sales_amount_per_day.sql</summary>
