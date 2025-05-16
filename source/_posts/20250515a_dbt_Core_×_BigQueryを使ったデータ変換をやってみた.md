@@ -181,7 +181,7 @@ dbt におけるレイヤは、データの変換プロセスを整理し、管�
 
 こちらは、データ変換ではないのですが、データ変換のもとなるデータを BiqQuery に投入する手順となります。
 
-以下の CSV ファイルを、dbt プロジェクト内の dbt_trial/seeds/ ディレクトリ配下にコピー＆ペーストします。
+以下の CSV ファイルを、dbt プロジェクト内の dbt_trial/seeds/ ディレクトリ配下にコピー&ペーストします。
 
 <div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
 今回は sales.csv のみ利用します。
@@ -261,7 +261,7 @@ dbt seed
 ## staging レイヤのモデルを作成する
 
 - dbt_trial/models 直下に staging ディレクトリを作成します。
-- 作成した staging ディレクトリ配下に、以下の 3 つのファイルを新規作成し、それぞれの内容をコピー＆ペーストしてください。
+- 作成した staging ディレクトリ配下に、以下の 3 つのファイルを新規作成し、それぞれの内容をコピー&ペーストしてください。
 - 本記事では、BigQuery に投入したデータソース（sales.csv）の内容を、そのまま staging レイヤのモデルとして利用します。
 
 <details><summary>stg_sales.sql</summary>
@@ -358,7 +358,7 @@ stg_sales.sql などの SQL ファイルには、データの抽出、変換、�
 ## mart レイヤのモデルを作成する
 
 - 作成した dbt プロジェクトの models ディレクトリ内に、mart という名前のディレクトリを作成します。
-- 作成した mart ディレクトリ配下に、以下の 2 つのファイルを新規作成し、それぞれの内容をコピー＆ペーストしてください。
+- 作成した mart ディレクトリ配下に、以下の 2 つのファイルを新規作成し、それぞれの内容をコピー&ペーストしてください。
 - mart_sales_amount_per_day では、stg_sales モデルを日付で集約し、日付毎の売り上げを取得するロジックを実装しています。
 
 <details><summary>mart_sales_amount_per_day.sql</summary>
