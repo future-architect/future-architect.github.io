@@ -142,7 +142,7 @@ variable "instance_type" {
 }
 ```
 
-`variables.tf` で定義してるって言ったのに、string と説明欄しかない！ってなりますが、環境ごとに値を変えたい場合は実際に値を入れるのは main.tf になります。
+`variables.tf` で定義してるって言ったのに、string と説明欄しかない！ ってなりますが、環境ごとに値を変えたい場合は実際に値を入れるのは main.tf になります。
 
 ```sh project2/dev/main.tf
 module "EC2" {
