@@ -9,6 +9,7 @@ tag:
   - Mac
   - ショートカット
   - 環境構築
+  - Change Key
 category:
   - Infrastructure
 thumbnail: /images/20230216a/thumbnail.png
