@@ -1,5 +1,5 @@
 ---
-title: "RaspberryPiと障害物検知センサーを用いて遊んでみよう（入門編）"
+title: "RaspberryPiと赤外線反射センサーを用いて遊んでみよう（入門編）"
 date: 2025/05/22 00:00:00
 postid: a
 tag:
