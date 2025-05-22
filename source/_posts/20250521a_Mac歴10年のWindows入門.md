@@ -18,7 +18,7 @@ thumbnail: /images/20250521a/thumbnail.png
 author: 長谷川寛人
 lede: "Windowsを徹底的にMacBookに近づけ、快適な作業環境を構築することにしました。そのプロセスを詳しく紹介します。"
 ---
-本記事は、[春の入門祭り2025](/articles/20250413a/)の20本目の記事です。
+[春の入門祭り2025](/articles/20250413a/)の20本目の記事です。
 
 <img src="/images/20250521a/mac_windows.png" alt="" width="1200" height="800" loading="lazy">
 
