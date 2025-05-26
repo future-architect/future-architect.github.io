@@ -57,7 +57,7 @@ Microsoft PurviewとはData Security, Data Governance, Risk & Complianceにお�
   - 監査: アクティビティログの記録、不正の検出
   - コミュニケーションコンプライアンス: Outlook、Teamsなどのコミュニケーション内容の監視
 
-PurviewにおいてデータカタログはData Governanceの一つのソリューションとして位置付けられており、データマップを作り、それを利用してデータカタログを作ることができます。
+PurviewにおいてデータカタログはData Governanceの1つのソリューションとして位置付けられており、データマップを作り、それを利用してデータカタログを作ることができます。
 
 Purviewを調べる際、最初に「[5分でわかるMicrosoft Purview](https://www.youtube.com/watch?v=IlzkHxkzo1M)」というYouTube動画を見て一回もデータカタログに関する話が出てこなくて困惑しました。しかしPurviewの全体像を理解することで腑に落ちました。
 
