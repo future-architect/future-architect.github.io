@@ -15,6 +15,8 @@ lede: "OracleDBにおける主要な採番方法であるSEQUENCEとIDENTITY列�
 
 <img src="/images/20250520a/oracle-database-logo.png" alt="" width="500" height="271">
 
+[春の入門祭り2025](/articles/20250413a/)の19本目の記事です。
+
 # はじめに
 
 こんにちは、Cyber Security Innovation Group（以降CSIG）の姫路康太郎です。2025年2月から新卒としてプロジェクトに配属され、認可整理のチームでアジャイル開発を行っています。

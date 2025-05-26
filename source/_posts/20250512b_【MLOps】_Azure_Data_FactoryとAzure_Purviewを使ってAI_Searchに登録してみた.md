@@ -5,7 +5,7 @@ postid: b
 tag:
   - MLOps
   - AzureDataFactory
-  - AzurePurview
+  - Purview
   - AISearch
   - インターン
   - インターン2024

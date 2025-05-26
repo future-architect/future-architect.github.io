@@ -14,6 +14,7 @@ thumbnail: /images/20250522a/thumbnail.png
 author: 生駒開
 lede: "「自分の手で作ったコードが、現実世界のモノを動かす」という体験をしてみたくなりました。そこで目をつけたのが Raspberry Pi です。"
 ---
+
 <img src="/images/20250522a/image.png" alt="" width="1200" height="675" loading="lazy">
 
 [春の入門祭り2025](/articles/20250413a/)の21本目の記事です。
