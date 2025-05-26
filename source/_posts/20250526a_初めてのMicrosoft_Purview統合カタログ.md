@@ -73,7 +73,7 @@ Purviewを調べる際、最初に「[5分でわかるMicrosoft Purview](https:/
 
 # Azure のデータカタログの歴史
 
-Microsoft Purviewのデータカタログを調べると、Azure Purviewという名前が見受けられます。（上記で記載した料金のリンクもタイトルタグがAzure Purviewになっています。）
+Microsoft Purviewのデータカタログを調べると、Azure Purviewという名前が見受けられます（上記で記載した料金のリンクもタイトルタグがAzure Purviewになっています）。
 
 インターネットを漁ってみると、Azureの提供するデータカタログ製品は下記のような変遷をたどっているようです。
 
