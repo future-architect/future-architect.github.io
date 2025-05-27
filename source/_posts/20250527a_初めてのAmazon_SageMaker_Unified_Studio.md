@@ -68,7 +68,7 @@ SageMaker Unified Studioでは以下の図のようにデータを活用して�
 
    <img src="/images/20250527a/{8B87197D-E9A8-48E1-9190-50A4BB050BBF}.png" alt="{8B87197D-E9A8-48E1-9190-50A4BB050BBF}.png" width="1200" height="611" loading="lazy">
 
-   ここで一つポイントですがこのままでは統合スタジオにはログインできないので、ログイン前に先ほど作成したドメインよりユーザーの追加を行ってください（SSOユーザー、IAMユーザー、SSOグループのいずれかが追加できます）
+   ここで1つポイントですがこのままでは統合スタジオにはログインできないので、ログイン前に先ほど作成したドメインよりユーザーの追加を行ってください（SSOユーザー、IAMユーザー、SSOグループのいずれかが追加できます）
 
    <img src="/images/20250527a/image_4.png" alt="image.png" width="1200" height="472" loading="lazy">
 
