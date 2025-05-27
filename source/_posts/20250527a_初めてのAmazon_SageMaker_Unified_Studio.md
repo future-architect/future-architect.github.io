@@ -26,7 +26,7 @@ lede: "カタログ管理やデータ活用を行うツールとしてAmazon Sag
 
 みなさんAWSでSageMakerと聞くと何を想像するでしょうか？ おそらくAWSのSageMakerと聞くと機械学習を行うためのサービスを思い浮かべる方も多いかと思います（私も同じ認識でした）
 
-実はAWSのデータマネージメント関連のサービスがSagemakerシリーズとして統合されることが[re:Invent2024で発表](https://aws.amazon.com/jp/blogs/news/healthcare-and-life-sciences-top-10-announcements-from-aws-reinvent-2024/)され、その中で中核を担うAmazon SageMaker Unified Studioが[2025年3月13日に一般提供](https://aws.amazon.com/jp/about-aws/whats-new/2025/03/amazon-sagemaker-unified-studio-generally-available/)されました。
+実はAWSのデータマネジメント関連のサービスがSagemakerシリーズとして統合されることが[re:Invent2024で発表](https://aws.amazon.com/jp/blogs/news/healthcare-and-life-sciences-top-10-announcements-from-aws-reinvent-2024/)され、その中で中核を担うAmazon SageMaker Unified Studioが[2025年3月13日に一般提供](https://aws.amazon.com/jp/about-aws/whats-new/2025/03/amazon-sagemaker-unified-studio-generally-available/)されました。
 
 公式のページのSageMakerの配下にはおなじみのRedshiftやGlueやAthenaなども記載されており、これらのデータを扱う既存のサービス群との連携を強化し、より利便性を高めていくのがAmazon SageMaker Unified Studioの役割になっていくと思います。
 
