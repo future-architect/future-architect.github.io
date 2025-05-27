@@ -88,7 +88,7 @@ SnowflakeやDatabricksなど外部のDWHにも対応しているので、デー�
 
 # 利用におけるハマりポイントや今後改善を期待するポイント
 
-Amazon SageMaker Unified Studioにはデータ活用に関する様々な機能が実装されていますが2025年3月13日に一般提供されたばかりですのでハマりポイントや改善を期待したいポイントがあります。（以下の記載内容は2025年5月23日時点の所感です）
+Amazon SageMaker Unified Studioにはデータ活用に関する様々な機能が実装されていますが2025年3月13日に一般提供されたばかりですのでハマりポイントや改善を期待したいポイントがあります（以下の記載内容は2025年5月23日時点の所感です）
 
 - [マニュアル](https://docs.aws.amazon.com/sagemaker-unified-studio/latest/userguide/what-is-sagemaker-unified-studio.html)の記載が乏しい部分がある（応用的な使い方をしようとするとマニュアルの記載内容では情報が足りない場合が多い）
 - Terraformに対応していない（使い込んでいくと結構細かい設定が増えていくのでIaC化できないとつらい）
