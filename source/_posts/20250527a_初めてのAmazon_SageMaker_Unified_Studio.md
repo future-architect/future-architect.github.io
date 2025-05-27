@@ -20,7 +20,7 @@ lede: "カタログ管理やデータ活用を行うツールとしてAmazon Sag
 
 こんにちは、TIG中神です。
 
-カタログ管理やデータ活用を行うツールとしてAmazon SageMaker Unified Studioの調査・検証を行ったので触ってみた所感やポイントなどつらつらとまとめます。
+カタログ管理やデータ活用ツールとしてAmazon SageMaker Unified Studioの調査・検証を行ったので触ってみた所感やポイントなどつらつらとまとめます。
 
 # Amazon SageMaker Unified Studioとは？
 
