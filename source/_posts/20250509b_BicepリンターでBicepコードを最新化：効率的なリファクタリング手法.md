@@ -4,8 +4,8 @@ date: 2025/05/09 00:00:01
 postid: b
 tag:
   - Azure
-  - AzureCLI
-  - AzureBicep
+  - Bicep
+  - FutureOne
 category:
   - Infrastructure
 thumbnail: /images/20250509b/thumbnail.png
