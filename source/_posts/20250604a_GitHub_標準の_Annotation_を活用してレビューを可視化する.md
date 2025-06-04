@@ -11,6 +11,8 @@ thumbnail: /images/20250604a/thumbnail.png
 author: 武田大輝
 lede: "コードレビューを自動で可視化するためのツールといえばreviewdogが有名です。"
 ---
+[CI/CD連載](/articles/20250603a/) 2本目の記事です。
+
 ## はじめに
 
 コードレビューを自動で可視化するためのツールといえば [reviewdog](https://github.com/reviewdog) が有名です。
