@@ -270,5 +270,4 @@ Dokployそのものの制限というよりも下で動いているDocker/Traefi
 DNSサーバーを建てるときに、最初.localでやろうとしてハマって「[macOSのmDNSが別の用途で使う](https://support.apple.com/ja-jp/101903)からダメ」というアドバイスを[@takabow](https://x.com/takabow)と[@takuan_osho](https://x.com/takuan_osho)にもらってなんとか書き切りました。ありがとうございます。
 
 * 参考
-    * [Buildpacksのビルダーをスクラッチから作ってみる](https://future-architect.github.io/articles/20201002/)
-
+  * [Buildpacksのビルダーをスクラッチから作ってみる](https://future-architect.github.io/articles/20201002/)
