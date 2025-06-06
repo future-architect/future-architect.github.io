@@ -7,6 +7,7 @@ tag:
   - Go
   - GCP
   - CloudFunctions
+  - CloudEvents
 category:
   - Programming
 thumbnail: /images/20200331/thumbnail.png
