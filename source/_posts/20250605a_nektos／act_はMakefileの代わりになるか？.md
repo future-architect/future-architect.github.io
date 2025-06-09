@@ -16,7 +16,7 @@ lede: "GitHub Actionsをローカル環境で実行できる nektos/act をMakef
 
 <img src="/images/20250605a/unnamed.jpg" alt="unnamed.jpg" width="1024" height="1024" loading="lazy">
 
-※画像はGemini Pro 2.5で作成しました
+※画像はGemini Pro 2.5で作成しました。
 
 [CI/CD連載](/articles/20250603a/) 3本目です。
 
