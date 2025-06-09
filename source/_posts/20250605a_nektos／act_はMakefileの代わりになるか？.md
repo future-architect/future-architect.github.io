@@ -189,7 +189,7 @@ jobs:
 
 `act -j greet` で実行します。
 
-初回はMicro/Medium/Largeのうち、どのランナーで動かすか？と聞かれますが、`Medium` で良いでしょう。
+初回はMicro/Medium/Largeのうち、どのランナーで動かすか？ と聞かれますが、`Medium` で良いでしょう。
 
 ```sh 実行結果
 $ time act -j greet
