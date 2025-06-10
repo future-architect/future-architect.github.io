@@ -253,7 +253,7 @@ App Store Connect の TestFlight タブに新しいビルドが作成され、�
 
 - [Connecting Xcode Cloud to Slack | Apple Developer Documentation](https://developer.apple.com/documentation/xcode/connecting-xcode-cloud-to-slack)
 
-まず、Slack への通知を行いたい WorkFlow の編集画面を開き、Post-Actions に Notify を追加します。
+まず、Slack への通知したい WorkFlow の編集画面を開き、Post-Actions に Notify を追加します。
 
 <img src="/images/20250609a/image_17.png" alt="image.png" width="965" height="634" loading="lazy">
 
