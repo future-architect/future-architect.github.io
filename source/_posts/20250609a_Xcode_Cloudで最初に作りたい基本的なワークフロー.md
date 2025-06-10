@@ -164,7 +164,7 @@ GitHub の PR 上で次のように、Pull Request Workflow が成功してい�
 
 ### Environment
 
-Xcode Version, macOS Version を最新に設定します。（自身のプロジェクトに合わせて対象バージョンを修正してください。）
+Xcode Version, macOS Version を最新に設定します（自身のプロジェクトに合わせて対象バージョンを修正してください）。
 
 <img src="/images/20250609a/image_4.png" alt="image.png" width="1200" height="792" loading="lazy">
 
