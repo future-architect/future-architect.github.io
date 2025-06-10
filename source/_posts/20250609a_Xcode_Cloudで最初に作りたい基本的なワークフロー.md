@@ -154,7 +154,7 @@ GitHub の PR 上で次のように、Pull Request Workflow が成功してい�
 ## ワークフローの設定
 
 ワークフローを次のように設定します。ここでは、Xcode 上から設定する例を示します。
-重要な点としては、TestFlight リリースを行うために、Actions に Archive を必ず追加します。
+重要な点としては、TestFlight リリースするために、Actions に Archive を必ず追加します。
 
 ### General
 
