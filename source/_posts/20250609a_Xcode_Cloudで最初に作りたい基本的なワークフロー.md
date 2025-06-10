@@ -171,7 +171,7 @@ Xcode Version, macOS Version を最新に設定します。（自身のプロジ
 ### Start Conditions (Tag Changes)
 
 Git タグの Push をトリガーとするため、Tag Changes を選択します。
-ここでは、TagはAny Tag としています。（Tag の命名ルールがある場合は、Custom Tags から指定することができます。）
+ここでは、TagはAny Tag としています（Tag の命名ルールがある場合は、Custom Tags から指定できます）。
 
 <img src="/images/20250609a/image_5.png" alt="image.png" width="1200" height="788" loading="lazy">
 
