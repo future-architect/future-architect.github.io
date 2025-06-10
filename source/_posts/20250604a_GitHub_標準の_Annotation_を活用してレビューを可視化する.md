@@ -5,6 +5,7 @@ postid: a
 tag:
   - GitHub
   - GitHubActions
+  - CI/CD
 category:
   - Infrastructure
 thumbnail: /images/20250604a/thumbnail.png
