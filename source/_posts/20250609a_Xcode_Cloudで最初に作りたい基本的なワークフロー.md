@@ -187,7 +187,7 @@ TestFlight リリースを行う本ワークフローではビルドとテスト
 
 ### Post-Actions
 
-Slack への通知を行うNotify、内部テスター向けTest Flight リリースを行う TestFlight Internal Testing を追加します。
+Slack への通知するNotify、内部テスター向けTest Flight リリースする TestFlight Internal Testing を追加します。
 
 1. Notify - Successes and Failures
   <img src="/images/20250609a/image_9.png" alt="image.png" width="1200" height="789" loading="lazy">
