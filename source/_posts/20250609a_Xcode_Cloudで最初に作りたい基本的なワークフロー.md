@@ -82,7 +82,7 @@ Xcode Cloud の毎月25時間分無料枠は、2025年6月時点の情報にな�
 
 ### Environment
 
-Xcode Version, macOS Version を最新に設定します。（自身のプロジェクトに合わせて対象バージョンを修正してください。）
+Xcode Version, macOS Version を最新に設定します（自身のプロジェクトに合わせて対象バージョンを修正してください）。
 
 <img src="/images/20250609a/スクリーンショット_2025-06-09_12.26.35.png" alt="スクリーンショット_2025-06-09_12.26.35.png" width="1200" height="790" loading="lazy">
 
