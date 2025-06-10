@@ -149,7 +149,7 @@ GitHub の PR 上で次のように、Pull Request Workflow が成功してい�
 
 # TestFlight Release Workflow
 
-シンプルなGitタグのPushをトリガーとする、ビルド、テスト、アーカイブ、TestFlightリリースを行う`TestFlight Release Workflow`を作成します。
+シンプルなGitタグのPushをトリガーとする、ビルド、テスト、アーカイブ、TestFlightリリースする `TestFlight Release Workflow`を作成します。
 
 ## ワークフローの設定
 
