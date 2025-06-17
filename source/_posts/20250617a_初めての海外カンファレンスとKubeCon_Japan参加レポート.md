@@ -48,7 +48,7 @@ CNCFのChrisから、直近のクラウドネイティブのコミュニティ�
 
 タイムテーブル自体、個人的な最近の興味関心も含まれていますが、生成AI系やOpen TelemetryをはじめとしたObservabilityが多いように感じました。
 
-また、今回私がみたセッションを一つ紹介します。
+また、今回私がみたセッションを1つ紹介します。
 
 ### Should Our Project Join the CNCF? - Lenka Bočincová, Red Hat
 
