@@ -21,7 +21,7 @@ lede: "このCNCF連載とタイミングを同じくして開催しているKub
 ## KubeConとは
 
 Cloud Native Computing Foundation(CNCF)が開催しているカンファレンスであり、これまで、ヨーロッパ、北アメリカをはじめとして世界各国で開催されてきました。私がクラウドネイティブ系のコミュニティに関わり始めたのが2019年ごろで、その時から行ってみたいカンファレンスでした。
-そして、今年ついに日本で開催されると聞き、今回参加することができました。
+そして、今年ついに日本で開催されると聞き、今回参加できました。
 （参考：[日本初開催！KubeCon + CloudNativeCon Japan 2025、6月16日-17日に東京で開催](https://www.linuxfoundation.jp/blog/2024/11/announcing-the-first-ever-kubecon-cloudnativecon-japan-2025-on-june-16-17-in-tokyo/)）
 
 ## KeyNote
