@@ -12,7 +12,7 @@ category:
   - Infrastructure
 thumbnail: /images/20250620a/thumbnail.png
 author: 山本竜玄
-lede: "本記事は、[CI/CD連載]の6本目の記事となります。こんにちは。HealthCare Innovation Groupの山本竜玄です。"
+lede: "Gemma3とUnslothを組み合わせて、完全オンプレミス環境でのAIコードレビューができる環境を構築してみました。"
 ---
 
 本記事は、[CI/CD連載](/articles/20250603a/)の6本目の記事となります。
