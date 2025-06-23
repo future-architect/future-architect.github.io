@@ -11,7 +11,7 @@ tag:
 category:
   - Infrastructure
 thumbnail: /images/20250623a/thumbnail.png
-author: ys_nishida
+author: 西田好孝
 lede: "子育てをする中で、意外にも本職の知識でDIYして役に立つことってありませんか？子どもの年齢や家庭でのデバイス・IT環境も千差万別ありますが、抽象化した悩みとしては2つに集約すると思います"
 ---
 # はじめに
