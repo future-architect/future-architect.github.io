@@ -229,7 +229,7 @@ REPOSITORY                                           TAG               IMAGE ID 
 foobar.dkr.ecr.ap-northeast-1.amazonaws.com/foobar    overlayfs    728928885b94    9 hours ago    linux/amd64    7.929GB    4.755GB
 ```
 
-それぞれのsnapshotterに対応させるためイメージフォーマットの変換や、インデックスの作成を行います。
+それぞれのsnapshotterに対応させるためイメージフォーマットの変換や、インデックスの作成します。
 
 ```bash
 # stargz フォーマットに変換
