@@ -47,7 +47,7 @@ Notary（実際に用いるのはCLI実装のNotation）の使い所ですが、
 
 セキュリティ対策は多層的になされることが原則であるため、リスク評価にも続き優先度付けの上で、こういった対策を講ずるべき場合もあるでしょう。
 
-より詳しくは、[ECS × AWS Signer を使ったイメージ署名ワークフローを試してみた](https://speakerdeck.com/ozawa/ecs-x-aws-signer-woshi-tutaimesishu-ming-wakuhurowoshi-sitemita) の記事が参考になりました。
+より詳しくは、[ECS × AWS Signer を使ったイメージ署名ワークフローを試してみた](https://speakerdeck.com/ozawa/ecs-x-aws-signer-woshi-tutaimesishu-ming-wakuhurowoshi-sitemita) の記事が参考になりました。
 
 # Notationのインストール
 
