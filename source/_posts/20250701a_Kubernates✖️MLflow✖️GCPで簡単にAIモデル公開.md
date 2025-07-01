@@ -4,7 +4,7 @@ date: 2025/07/01 00:00:00
 postid: a
 tag:
   - CNCF
-  - FLflow
+  - MLflow
   - MLOps
   - GCP
 category:
