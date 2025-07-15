@@ -11,6 +11,8 @@ thumbnail: /images/20250714a/thumbnail.png
 author: 山本力世
 lede: "Apple Vision ProでLLMを利用する方法について整理していきます"
 ---
+[AI Tips連載](/articles/20250707a/)の3本目の記事となります。
+
 Apple Vision ProでLLMを利用する方法について整理します（ユーザ向けのAI機能であるApple Intelligence自身が提供する各機能については本記事では対象にしません）。
 
 注）LLMは[Large Language Model](https://ja.wikipedia.org/wiki/%E5%A4%A7%E8%A6%8F%E6%A8%A1%E8%A8%80%E8%AA%9E%E3%83%A2%E3%83%87%E3%83%AB)の略称ですが、この記事では、[SML(Small Language Model)](https://ja.wikipedia.org/wiki/%E5%B0%8F%E8%A6%8F%E6%A8%A1%E8%A8%80%E8%AA%9E%E3%83%A2%E3%83%87%E3%83%AB)、[VML(Vision Language Model)](https://www.nvidia.com/ja-jp/glossary/vision-language-models/)、[基盤モデル(Foundation Model)](https://ja.wikipedia.org/wiki/%E5%9F%BA%E7%9B%A4%E3%83%A2%E3%83%87%E3%83%AB)などが指し示す概念についても包括して便宜的に「LLM」という単語を用いて説明しています。
