@@ -4,7 +4,7 @@ date: 2025/06/25 00:00:00
 postid: a
 tag:
   - Dapr
-  - AI Agent
+  - AIエージェント
   - Dapr Agents
   - Claude Code
   - OpenAPI
