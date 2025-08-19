@@ -7,6 +7,7 @@ tag:
   - SLO
   - 参加レポート
   - SLOconf
+  - 心理的安全性
 category:
   - Infrastructure
 thumbnail: /images/20230518b/thumbnail.png
