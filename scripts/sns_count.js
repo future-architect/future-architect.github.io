@@ -14,8 +14,8 @@ hexo.extend.helper.register("get_fb_count", url => {
   return getFacebookCnt(url) || "シェア";
 });
 
-hexo.extend.helper.register("get_tw_count", url => {
-  return getTwitterCnt(url) || "ツイート";
+hexo.extend.helper.register("get_x_count", url => {
+  return getTwitterCnt(url) || "ポスト";
 });
 
 hexo.extend.helper.register("get_feedly_count", url => {
