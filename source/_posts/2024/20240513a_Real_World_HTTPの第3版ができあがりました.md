@@ -11,7 +11,7 @@ tag:
   - HTTP
   - Web
 category:
-  - Culture
+  - Infrastructure
 thumbnail: /images/20240513a/thumbnail.jpg
 author: 澁川喜規
 lede: "ひとえに読者の皆さんが買ってくれたおかげで、Real World HTTPを改訂し、このたび3版を上梓しました。ありがとうございます。"
