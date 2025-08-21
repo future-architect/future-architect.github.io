@@ -9,7 +9,7 @@ tag:
   - フォーマッター
   - Rust
 category:
-  - Culture
+  - Programming
 thumbnail: /images/20220916c/thumbnail.png
 author: 川渕皓太
 lede: "作成したフォーマッタの実装について説明します。前編でも示しましたが、今回作成したフォーマッタの処理の流れを再度示します。"
