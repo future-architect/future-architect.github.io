@@ -9,7 +9,7 @@ tag:
   - フォーマッター
   - Rust
 category:
-  - Culture
+  - Programming
 thumbnail: /images/20220916b/thumbnail.gif
 author: 川渕皓太
 lede: "みなさん、こんにちは！Future Engineer Camp 2022に参加した川渕と齋藤です。今回のインターンではSQLフォーマッタをRustで作成しました。私達が取り組んだ内容を紹介します。SQLフォーマッタとはSQLを統一された体裁にフォーマットしてくれるツールです。体裁を統一することで他人が見ても読みやすいコードになり、生産性が向上します。"
