@@ -83,7 +83,7 @@ root_logger.addHandler(handler)
 - `--enable-job-insights`
 - `--enable-observability-metrics`
 
-Google検索すると、[Monitoring with AWS Glue job run insights](https://docs.aws.amazon.com/glue/latest/dg/monitor-job-insights.html)がヒットして設定できそうに見えますが、よく見ると「Spark and PySpark jobs」配下にあり、PySpark用の設定値であることが分かります。（見落としがち）
+Google検索すると、[Monitoring with AWS Glue job run insights](https://docs.aws.amazon.com/glue/latest/dg/monitor-job-insights.html)がヒットして設定できそうに見えますが、よく見ると「Spark and PySpark jobs」配下にあり、PySpark用の設定値であることが分かります（見落としがち）
 
 もしCPUやメモリの利用状況をモニタリングしたい場合は、下記のようにpsutilなどを使ってモニタリングする必要があります。
 
