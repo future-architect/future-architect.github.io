@@ -153,7 +153,7 @@ Python ShellではgetResolvedOptionsを利用して実行パラメータにア�
 - https://github.com/awslabs/aws-glue-libs/blob/9d8293962e6ffc607e5dc328e246f40b24010fa8/awsglue/utils.py#L119
 - https://github.com/python/cpython/blob/06fc882eac0e59220a7b8b127a1e7babe0055d45/Lib/argparse.py#L1859
 
-もしオプションの実行パラメータを設定する場合は、[PEP 8](https://peps.python.org/pep-0008/)で非推奨な方法になりますが、例外の基底クラスであるBaseExceptionでcatchする必要があります。（↓例）
+もしオプションの実行パラメータを設定する場合は、[PEP 8](https://peps.python.org/pep-0008/)で非推奨な方法になりますが、例外の基底クラスであるBaseExceptionでcatchする必要があります（↓例）
 
 ```py
 import sys
