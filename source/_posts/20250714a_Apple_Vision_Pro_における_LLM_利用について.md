@@ -5,6 +5,7 @@ postid: a
 tag:
   - VisionPro
   - LLM
+  - Apple
 category:
   - VR
 thumbnail: /images/20250714a/thumbnail.png
