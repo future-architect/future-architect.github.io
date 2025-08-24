@@ -7,7 +7,7 @@ tag:
   - 生成AI
   - マネジメント
 category:
-  - Business
+  - Management
 thumbnail: /images/20250415a/thumbnail.png
 author: 棚井龍之介
 lede: "現在、手元の Gemini を開いてみると、Deep Research は Deep Research with 2.5 Pro へとバージョンアップされています。ほんの1ヶ月程度で記事が古くなっており、生成AIの改良・発展速度に改めて驚かされたのと、またその一方で..."
