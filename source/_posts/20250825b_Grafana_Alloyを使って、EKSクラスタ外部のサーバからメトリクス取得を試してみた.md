@@ -87,7 +87,7 @@ Push方式は、Alloy内部にてコンポーネント間でデータを渡す�
 
 ### 4-2. config.alloy
 
-config.alloyの設定です
+config.alloyの設定です。
 
 ```js config.alloy
 // Node Exporter相当の機能をAlloy内部で提供
