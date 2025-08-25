@@ -71,7 +71,7 @@ lede: "Grafana Alloyの豊富な機能の一部を利用してEKSクラスタ外
 
 ### 4-1. コンポーネント同士の連携方法
 
-Grafana Alloyではconfig.alloyという設定ファイルで、機能単位である「コンポーネント」を繋ぎ合わせ、テレメトリデータの取得を行うことができます。
+Grafana Alloyではconfig.alloyという設定ファイルで、機能単位である「コンポーネント」を繋ぎ合わせ、テレメトリデータの取得ができます。
 
 設定ファイルは、Grafana agentの設定言語である[river言語](https://grafana.com/docs/agent/latest/flow/concepts/config-language/)をベースに記述され、宣言的に記述できるという特徴があります。
 
