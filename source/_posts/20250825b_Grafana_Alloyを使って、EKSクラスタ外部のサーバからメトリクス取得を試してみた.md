@@ -259,7 +259,7 @@ GrafanaのVariables設定を行い、監視対象のサーバをドロップダ�
 
 ### 5-3. 複数サーバの監視
 
-`4. 設定方法`に記載している設定を行ったサーバを複数台構築した場合、`instance`を切り替えることで監視対象サーバを切り替えることができます。
+`4. 設定方法`に記載した設定のサーバを複数台構築した場合、`instance`を切り替えることで監視対象サーバを切り替えることができます。
 
 <img src="/images/20250825b/Grafana_dashboards.png" alt="Grafana_dashboards.png" width="1200" height="624" loading="lazy">
 
