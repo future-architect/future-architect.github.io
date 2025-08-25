@@ -237,7 +237,7 @@ Grafana Alloyからデータを受け取るには、送信先であるPrometheus
 
 ### 5-1. Variables(変数)の設定
 
-GrafanaのVariables設定を行い、監視対象のサーバをドロップダウンで選択できるように設定します。
+GrafanaのVariablesを設定し、監視対象のサーバをドロップダウンで選択できるようにします。
 
 1. ダッシュボード右上の`edit`をクリックし、`Settings`を選択します。
 1. Variablesタブに移動してnodeを選択します
