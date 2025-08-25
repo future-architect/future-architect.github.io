@@ -52,7 +52,7 @@ lede: "Grafana Alloyの豊富な機能の一部を利用してEKSクラスタ外
 実際の利用方法と記載内容は後述します。
 
 - [prometheus.export.unix](https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.exporter.unix/)
-    メトリクスの生成を行います。
+    メトリクスを生成します。
     このコンポーネントを利用することで、別途node_exporterをインストールしなくても、CPU、メモリ、ディスクスペース、ディスクI/O、ネットワークなどUNIXシステムのメトリクスを公開できます。
 - [prometheus.scrape](https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.scrape/)
     exporterが公開したメトリクスを定期的に収集(スクレイプ)します。
