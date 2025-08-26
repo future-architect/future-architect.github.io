@@ -9,7 +9,7 @@ tag:
 category:
   - Infrastructure
 thumbnail: /images/20240327a/thumbnail.png
-author: 大岩潤矢 
+author: 大岩潤矢
 lede: "Cloudflareで管理しているドメインのDNS設定や、Cloudflare Pages等のサービスの設定を、Terraform管理に移行した際の手順等を、備忘録がてら記載します。"
 ---
 ## はじめに
@@ -176,9 +176,9 @@ Terraformのバージョン情報やプロパイダの設定、tfstateの配置�
 - Pages: `global/pages/プロジェクト名.tfstate`
 - Workers: `global/workers/プロジェクト名.tfstate`
 
-```sh setup.tf
+```tf setup.tf
 terraform {
-  // terraformのバージョン設定
+  # terraformのバージョン設定
   required_version = "~> 1.7.5"
 
   // cloudflareプロバイダを利用
@@ -189,7 +189,7 @@ terraform {
     }
   }
 
-  // tfstateの保存先の設定。R2 Storageを使用する
+  # tfstateの保存先の設定。R2 Storageを使用する
   backend "s3" {
     endpoints = {
       s3 = "https://<アカウントID>.r2.cloudflarestorage.com"
@@ -223,7 +223,7 @@ https://future-architect.github.io/articles/20230502a/
 まずは現在の設定をTerraformの記述に落とし込んでくれる `generate` コマンドを試します。
 
 ```bash
-cf-terraforming generate --resource-type "cloudflare_record" --zone "ゾーンID" 
+cf-terraforming generate --resource-type "cloudflare_record" --zone "ゾーンID"
 ```
 
 - `--resource-type` オプションで取得したいリソースを指定します。今回はDNS設定を取得してみるので、 `cloudflare_record` を指定します。
@@ -233,13 +233,13 @@ cf-terraforming generate --resource-type "cloudflare_record" --zone "ゾーンID
 実行してみたところ、以下のエラーが出ました。
 
 ```sh
-FATA[0000] --account and --zone are mutually exclusive, support for both is deprecated 
+FATA[0000] --account and --zone are mutually exclusive, support for both is deprecated
 ```
 
 どうやら先程セットした環境変数 `CLOUDFLARE_ACCOUNT_ID` がセットされていると正常に動いてくれなさそうなので、一旦 `unset CLOUDFLARE_ACCOUNT_ID` コマンドで環境変数を外しておきます。
 
 ```sh
-% cf-terraforming generate --resource-type "cloudflare_record" --zone "ゾーンID" 
+% cf-terraforming generate --resource-type "cloudflare_record" --zone "ゾーンID"
 resource "cloudflare_record" "terraform_managed_resource_xxxxxxxxxxx" {
   name    = "920oj.net"
   proxied = true
@@ -269,14 +269,14 @@ resource "cloudflare_record" "terraform_managed_resource_yyyyyyyyyyy" {
 
 また、zone_idやルートドメイン名は何度か記述することになるので、local変数に定義しておくとミスが減ります。
 
-```sh local.tf
+```tf local.tf
 locals {
   zone_id = "ゾーンID"
   root_domain = "920oj.net"
 }
 ```
 
-```sh record.tf
+```tf record.tf
 resource "cloudflare_record" "cname_root" {
   name    = local.root_domain
   proxied = true
@@ -297,7 +297,7 @@ importするためのコマンドはcf-terraformingを利用して出力でき�
 
 まずはcf-terraformingを利用してコマンドを出力してみましょう。
 
-```
+```sh
  % cf-terraforming import --resource-type "cloudflare_record" --zone "ゾーンID"
 terraform import cloudflare_record.terraform_managed_resource_xxxxxxxxxx ゾーンID/xxxxxxxxxx
 terraform import cloudflare_record.terraform_managed_resource_yyyyyyyyyy ゾーンID/yyyyyyyyyy
@@ -305,7 +305,7 @@ terraform import cloudflare_record.terraform_managed_resource_yyyyyyyyyy ゾー�
 
 出力されたコマンドをもとに、リソース名を変更した上で、シェルスクリプトファイルとして保存します。
 
-```bash import.sh
+```sh import.sh
 terraform import cloudflare_record.terraform_managed_resource_cname_root ゾーンID/xxxxxxxxxx
 terraform import cloudflare_record.terraform_managed_resource_mx_root ゾーンID/yyyyyyyyyy
 ```
@@ -313,7 +313,7 @@ terraform import cloudflare_record.terraform_managed_resource_mx_root ゾーンI
 これを実行してみましょう。 Import successful! と表示されれば、インポート完了です。
 
 ```sh
- % ./import.sh                  
+ % ./import.sh
 cloudflare_record.cname_root: Importing from ID "ゾーンID/xxxxxxxxxx"...
 cloudflare_record.cname_root: Import prepared!
   Prepared cloudflare_record for import
@@ -362,7 +362,7 @@ Cloudflare Pagesは、 `cloudflare_pages_domain` リソースと `cloudflarepage
 
 `cloudflare_pages_project` のインポートでは、 `to` にはimportする対象のリソース名を、 `id` には `<アカウントID>/<プロジェクト名>` を記載します。
 
-```sh import.tf
+```tf import.tf
 # cloudflare_pages_domain のインポート
 import {
   to = cloudflare_pages_domain.domain-920oj-net  # 対象のリソース名
@@ -427,7 +427,7 @@ Plan: 2 to import, 0 to add, 0 to change, 0 to destroy.
 
 内容が正しいか確認するのと、コメントを消したり、local変数に置き換えたりして体裁を整えましょう。また、ファイルもリソースごとに分けておきましょう。
 
-```sh pages_domain.tf
+```tf pages_domain.tf
 resource "cloudflare_pages_domain" "domain-920oj-net" {
   account_id   = local.account_id
   domain       = "920oj.net"
@@ -435,7 +435,7 @@ resource "cloudflare_pages_domain" "domain-920oj-net" {
 }
 ```
 
-```sh generate.tf
+```tf generate.tf
 resource "cloudflare_pages_project" "project-920oj-net" {
   account_id        = local.account_id
   name              = local.project_name

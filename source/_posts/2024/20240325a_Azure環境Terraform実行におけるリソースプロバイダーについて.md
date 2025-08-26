@@ -30,7 +30,7 @@ Azure環境でTerraformを利用する際、裏で動いているリソースプ
 見やすいように改行等追加しています。
 
 ```shell
-Original Error: Cannot register providers: 
+Original Error: Cannot register providers:
 Microsoft.ServiceBus,
 Microsoft.DBforPostgreSQL,
 (中略)...
@@ -86,7 +86,7 @@ AzureにおけるTerraformプロバイダーとしては下記が用意されて
 
 あるいは環境変数`ARM_SKIP_PROVIDER_REGISTRATION`を設定することも可能とのことです。
 
-```sh terraform
+```tf terraform
 provider "azurerm" {
   skip_provider_registration = true
   features {}

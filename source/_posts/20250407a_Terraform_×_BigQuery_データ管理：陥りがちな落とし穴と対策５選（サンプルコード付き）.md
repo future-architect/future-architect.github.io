@@ -43,9 +43,7 @@ Terraformは、リソースのライフサイクルをコードで管理でき�
 
 ある程度で変更頻度が落ち着いた頃、あるいは、データの保持が必要になった頃に導入することがおすすめです。
 
-```bash
-Terraform
-
+```tf
 resource "google_bigquery_table" "my_table" {
   dataset_id = google_bigquery_dataset.my_dataset.dataset_id
   table_id   = "my_table"
@@ -70,9 +68,7 @@ Terraformで管理する場合、スキーマ定義の不整合や変更に伴�
 
 また、`for_each`機能を利用して、各テーブルの差分（別々に管理したいプロパティ）のみをパラメータ化し、テーブルの設定に一貫性をもたせます。
 
-```bash
-table_settings.tf
-
+```tf table_settings.tf
 locals {
   table_setting = toset([
     {
@@ -86,9 +82,7 @@ locals {
 }
 ```
 
-```bash
-bigquery_tables.tf
-
+```tf bigquery_tables.tf
 resource "google_bigquery_table" "my_table" {
   for_each   = {for k, v in local.table_setting : k.table_name => v }
   dataset_id = each.value.dataset_name
@@ -126,8 +120,7 @@ BigQueryのスキーマは柔軟に変更できますが、その反面、テー
 
 Terraformの`google_bigquery_table`リソースを利用して、データ型、制約、説明などのメタデータを検証したうえで適切に定義します。また、定義可能な型の範囲もプロジェクトごとにしっかり決めておくこともおすすめです。
 
-```diff
-my_table.json
+```diff my_table.json
 [
   {
     "name": "id",
@@ -153,9 +146,7 @@ Terraformの`time_partitioning`と`clustering`引数を適切に設定し、パ�
 
 https://cloud.google.com/bigquery/quotas?hl=ja#partitioned_tables
 
-```bash
-Terraform
-
+```tf
 resource "google_bigquery_table" "my_partitioned_table" {
   dataset_id = google_bigquery_dataset.my_dataset.dataset_id
   table_id   = "my_partitioned_table"
@@ -185,9 +176,7 @@ BigQueryの権限管理は、データセキュリティ・データ活用の面
 
 初期設定として、テーブルグループの中で自動的に規定した各データオーナー部門のみを招待し、日頃の運用上、データオーナーがコードやリポジトリーではなく、グループ画面だけでデータ閲覧者の管理を行えるようになります。
 
-```bash
-Terraform
-
+```tf
 resource "google_bigquery_dataset_access" "my_dataset_viewer" {
   dataset_id = google_bigquery_dataset.my_dataset.dataset_id
 

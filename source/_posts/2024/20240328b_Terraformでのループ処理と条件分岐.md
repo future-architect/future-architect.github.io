@@ -49,7 +49,7 @@ AWS上に10.10.0.0/16 のVPC1つと、10.10.0.0/24 ～ 10.10.3.0/24 でサブネ
 まずはベースとして、シンプルにresource blockを羅列したものを記載しています。
 （以降、サブネット部分の処理がメインのため、VPC部分の記述は省略します）。
 
-```sh
+```tf
 resource "aws_vpc" "test-vpc" {
   cidr_block        = "10.10.0.0/16"
 }
@@ -87,7 +87,7 @@ resource "aws_subnet" "private-2" {
 
 `count = x`とカウント回数を定義し、`count.index` で0からx回カウントアップする引数を指定できます。
 
-```sh
+```tf
 resource "aws_subnet" "public" {
   count             = 2
   vpc_id            = aws_vpc.test-vpc.id
@@ -109,7 +109,7 @@ publicとprivateの区別が無ければ、`count = 4`としてresource blockを
 
 簡単な話ではありますが、以下のように`count`の値を3に修正することで、増やすことができます。
 
-```sh
+```tf
 resource "aws_subnet" "public" {
   count             = 3
   vpc_id            = aws_vpc.test-vpc.id
@@ -165,7 +165,7 @@ setやmapの値は`each.key`（setの値やmapのkey）や`each.value`（setの�
 
 mapが多重構造になっている場合は、以下のように`each.value.xxx`と書くことで変数に定義できます。
 
-```sh
+```tf
 resource "aws_subnet" "subnet" {
   for_each = tomap({
     public-1a = {
@@ -211,7 +211,7 @@ resource "aws_subnet" "subnet" {
 
 以下の例は無理やり`for`を使いに行ってるので良い例ではありませんが、`local values`に条件となる値を設定しておき、resource blockではその条件によって構築や設定をするかを振り分ける、ということが可能です。
 
-```sh
+```tf
 locals {
   subnet = {
     public-1a = {
@@ -262,7 +262,7 @@ resource "aws_subnet" "private" {
 
 以下の`local.allow_cidr_block`のように記載することで、publicサブネットとprivateサブネットのCIDRブロック一覧が簡単に取得できます。
 
-```sh
+```tf
 locals {
   subnet = {
     public = {
@@ -331,7 +331,7 @@ resource "aws_security_group" "private_resource" {
 
 この場合は、`ingress`のブロックを複製すると簡単に構築できるため、以下のように`dynamic block`が利用して書くことができます。
 
-```sh
+```tf
 locals {
   subnet = {
     public = {
@@ -403,7 +403,7 @@ resource "aws_security_group" "public_resource" {
 
 また、それぞれのセキュリティグループにはルールはいくつか存在し、CIDRブロックでなくセキュリティグループがソースになったり、ポートやプロトコルが異なっていたりもするでしょう。そうなると、以下のように全ての設定値を`local values`にmapとしてまとめておくのが良いでしょう（長くなるのでサブネット部分の記述も省略しました）。
 
-```sh
+```tf
 locals {
   subnet = {
     public = {
@@ -519,7 +519,7 @@ Terraformでは条件分岐を行いたい場合は基本1通りで、この三�
 例えば本番環境は冗長化したいのでマルチAZで構築するが、開発/検証環境はシングルAZで良い場合などに、環境名ごとにcountの値を変えるような操作が可能です。
 以下のように書くことで、環境名（`local.env`）の値を変えるだけで本番環境と開発/検証環境で、リソース数の切り替えができます。
 
-```sh
+```tf
 locals {
   env = "prod"
   az = [

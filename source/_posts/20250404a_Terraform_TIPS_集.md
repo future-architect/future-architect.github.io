@@ -153,7 +153,7 @@ Terraform でリソース作成、削除するときに何かしらの理由で�
 これを利用することで想定以上の時間が経過している時に`処理失敗`としてエラーにできます。
 例えば、以下のように設定することで最大40分まで待機し、処理がその時間内に完了しなければエラーとします。
 
-```bash
+```tf
 resource "google_sql_database_instance" "example_db" {
   name             = "my-example-db"
   database_version = "POSTGRES_15"
@@ -205,4 +205,5 @@ $ export TF_CLI_ARGS_apply="--parallelism=30"
 # さいごに
 
 様々なTerraform のTIPS を記載しました。
+
 今回ご紹介したTIPSが少しでもお役に立てれば幸いです。

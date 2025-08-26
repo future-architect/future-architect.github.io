@@ -66,7 +66,7 @@ Terraformのポリシーチェックとしては、過去にFuture技術ブロ�
 
 下記のようにS3バケットを作成するHCLファイルがあったとしましょう。
 
-```sh
+```tf
 # provider等は省略します
 resource "aws_s3_bucket" "my_bucket" {
   bucket = "my-bucket"
@@ -167,8 +167,8 @@ rule aws_s3_bucket_rule when %aws_s3_bucket_resources !empty {
   %aws_s3_bucket_resources.values.bucket == /^test-.*/
 
   # "env" タグが必ず含まれること
-  let required_tags = %aws_s3_bucket_resources.values.tags_all[ 
-      Key == 'env' ] 
+  let required_tags = %aws_s3_bucket_resources.values.tags_all[
+      Key == 'env' ]
   %required_tags[*] {
       Value IN ['dev', 'stg', 'prod', 'demo']
       <<Tag must have a permitted value>>

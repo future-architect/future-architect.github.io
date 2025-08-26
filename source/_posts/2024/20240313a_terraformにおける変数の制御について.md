@@ -50,7 +50,7 @@ Terraformには型による制約の他に、下記3種類の変数の制御方�
 
 このブロックの`condition`の内容で真偽を判定し、偽の場合`error_message`で指定のエラーメッセージを出力できます。
 
-```sh
+```tf
 resource "aws_instance" "example" {
   ami           = "ami-020283e959651b381"
   instance_type = "t2.micro"
@@ -102,7 +102,7 @@ variable "ebs_encryption" {
 
 `lifecycle`ブロック内に`precondition`ブロックを作成し、`condition`の条件で真偽を判定し、偽の場合に`error_message`に記載されているメッセージを出力できます。
 
-```sh
+```tf
 data "aws_ec2_instance_type" "example" {
   instance_type = "c5.xlarge"
 }
@@ -150,7 +150,7 @@ resource "aws_instance" "example" {
 
 例としてオートスケーリンググループを作成する際、AZが２つ以上あるかどうかをチェックしたい場合を考えます。書き方は`precondition`と同様で、`postcondition`ブロックの`condition`でAZの数が1よりも大きくない場合に指定のエラーメッセージを出力するようにします。
 
-```sh
+```tf
 resource "aws_launch_configuration" "example" {
   image_id      = "ami-020283e959651b381"
   instance_type = "t2.micro"
@@ -252,7 +252,7 @@ Plan: 2 to add, 0 to change, 0 to destroy.
 
 インスタンスタイプの選定で`precondition`を使いましたが、`precondition`→`postcondition`と単純に置き換えてみたらどうなるでしょうか？
 
-```sh
+```tf
 data "aws_ec2_instance_type" "example" {
   instance_type = "c5.xlarge"
 }
