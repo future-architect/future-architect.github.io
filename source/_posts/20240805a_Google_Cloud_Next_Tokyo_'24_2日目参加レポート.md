@@ -5,6 +5,7 @@ postid: a
 tag:
   - GCP
   - GoogleCloudNext
+  - GoogleCloudNext2024
   - 参加レポート
   - Spanner
 category:
