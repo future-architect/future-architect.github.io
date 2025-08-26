@@ -6,6 +6,7 @@ tag:
   - GCP
   - 参加レポート
   - GoogleCloudNext
+  - GoogleCloudNext2024
   - Snyk
   - Gemini
 category:
