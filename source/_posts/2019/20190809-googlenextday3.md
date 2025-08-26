@@ -6,6 +6,7 @@ tag:
   - GCP
   - 参加レポート
   - GoogleCloudNext
+  - GoogleCloudNext2019
   - カンファレンス
 category:
   - Infrastructure
