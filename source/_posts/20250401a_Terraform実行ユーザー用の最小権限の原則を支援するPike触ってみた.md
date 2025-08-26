@@ -708,7 +708,7 @@ lambda_function_name = "pile-test-function"
 
 以下のように、`local-exec` 経由でS3バケットを作成してみるコードを追加します。
 
-```bash main.tf
+```tf main.tf
 # ...中略 ...
 
 locals {

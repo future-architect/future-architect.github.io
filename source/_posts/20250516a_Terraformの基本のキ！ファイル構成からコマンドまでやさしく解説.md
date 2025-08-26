@@ -124,7 +124,6 @@ resource "aws_instance" "example" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
 }
-
 ```
 
 `var.ami_id` や `var.instance_type` ってなってますよね？
@@ -205,7 +204,7 @@ data ブロックについては、私が躓いた部分でもあるので次の
 
 OS のイメージ（AMI）を取得します。filter で名前やタイプを検索でき、当てはまる AMI を取得できます。
 
-```sh 例
+```tf 例
 data "aws_ami" "example" {
   most_recent = true
   owners      = ["amazon"]
@@ -227,7 +226,7 @@ IAM ポリシーは JSON 形式ですが、resource ブロック内で複雑な�
 
 また data ブロックにすることで可読性も期待できるため、何らかのポリシーを作成する際は、data ブロックに分けて作成することをお勧めします。
 
-```sh 例
+```tf 例
 data "aws_iam_policy_document" "example_policy_document" {
   statement {
     actions   = ["s3:*"]

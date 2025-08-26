@@ -24,7 +24,7 @@ Terraformファイルをコード生成するため、hclwriteというGoパッ�
 
 ある複数のリソースをセットで定義する設計開発ルールがあったとします。AWSの例ですが、以下のようにDynamoDBとその監視をCloudwatch Metricsを用いてセットで行いたいとします。
 
-```sh
+```tf
 # DynamoDB
 resource "aws_dynamodb_table" "myproduct_read" {
   name         = "${terraform.workspace}-myproduct-read"
@@ -159,7 +159,7 @@ Blockとはなにかですが、 `resource`、`module`、`locals` のようなTe
 
 次のようなファイルがあるとします。
 
-```sh dynamodb_table.tf
+```tf dynamodb_table.tf
 resource "aws_dynamodb_table" "myproduct_read" {
   name         = "${terraform.workspace}-myproduct-read"
   billing_mode = "PAY_PER_REQUEST"

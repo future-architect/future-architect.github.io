@@ -46,7 +46,7 @@ IaCを利用してインフラを構成することで、構築忘れや設定�
 
 以下のように環境、リージョン[^1]をそれぞれディレクトリ分けして管理します。
 
-```
+```sh
 envs
 ├── modules
 │   └── ...
@@ -89,7 +89,7 @@ data "google_project" "my_project" {
 
 以下のように環境をそれぞれディレクトリ分けして管理します。
 
-```
+```sh
 envs
 ├── modules
 │   └── ...
@@ -149,7 +149,7 @@ Terraform Workspaceは機能として存在するものの、開発環境を区�
 ちょっとした亜種ですが、Workspace名をそのまま変数として持ってきてリソースに適用することも可能です。
 **※この場合は、Workspace名に`asia-northeast1`や`australia-southeast1`を使う必要があります。**
 
-```sh storage_bucket.tf
+```tf storage_bucket.tf
 resource "google_storage_bucket" "bucket" {
 ...
   location      = terraform.workspace
@@ -160,7 +160,7 @@ resource "google_storage_bucket" "bucket" {
 
 以下のようなディレクトリ構成で管理します。
 
-```
+```sh
 envs
 ├── modules
 │   └── ...
@@ -196,7 +196,7 @@ usage () {
   cat <<"EOM"
 Options:
   -h: Show this help
-  -c: city: Specify region's city name 
+  -c: city: Specify region's city name
   -e: environment: Specify enviroment
 EOM
   exit 1
