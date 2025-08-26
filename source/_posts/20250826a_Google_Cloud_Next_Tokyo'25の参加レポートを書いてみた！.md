@@ -15,7 +15,9 @@ thumbnail: /images/20250826a/thumbnail.jpg
 author: 村井 俊介
 lede: "2025年8月5日に開催されたGoogle Cloud Next Tokyo'25に参加してきましたので、当日の様子をレポートします！"
 ---
+
 # はじめに
+
 みなさん、初めまして。入社1年目、製造・エネルギー事業部の村井 俊介です。
 
 2025年8月5日(火)、6日(水)に東京ビッグサイトで開催された[Google Cloud Next Tokyo'25](https://www.googlecloudevents.com/next-tokyo/)に参加してきましたので、当日の様子をレポートします！

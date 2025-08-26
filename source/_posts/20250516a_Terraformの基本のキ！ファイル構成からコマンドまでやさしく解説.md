@@ -29,7 +29,7 @@ lede: "IT未経験での入社だったため、インフラって何？とい�
 
 Infrastructure as Code (IaC) ツールの一種で、クラウドやオンプレミス環境のインフラリソースをコードで定義し、自動的にプロビジョニング、管理できるツールです。
 
-プロビジョニングの詳しい記事:[【Terraform】プロビジョニングとはなんぞや？](/articles/20250403a/) 
+プロビジョニングの詳しい記事:[【Terraform】プロビジョニングとはなんぞや？](/articles/20250403a/)
 
 ## 1.2 IaC を使う理由
 
@@ -119,7 +119,7 @@ Terraform ではモジュールで作った各リソースを main に呼び出�
 
 例えばモジュール EC2 の中に EC2 インスタンスのリソースを次の様に作成します。
 
-```sh module/EC2/ec2_instance.tf
+```tf module/EC2/ec2_instance.tf
 resource "aws_instance" "example" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
@@ -131,7 +131,7 @@ resource "aws_instance" "example" {
 
 この var は ↓ の `variables.tf` で定義してますよという意味です。
 
-```sh module/EC2/valicables.tf
+```tf module/EC2/valicables.tf
 variable "ami_id" {
   type        = string
   description = "A String of ami_id"
@@ -144,7 +144,7 @@ variable "instance_type" {
 
 `variables.tf` で定義してるって言ったのに、string と説明欄しかない！ ってなりますが、環境ごとに値を変えたい場合は実際に値を入れるのは main.tf になります。
 
-```sh project2/dev/main.tf
+```tf project2/dev/main.tf
 module "EC2" {
 source = "../../module/EC2"
   ami                         = "ami-✖✖✖✖✖✖✖✖✖"
@@ -183,10 +183,8 @@ Terraform には様々なブロックタイプがあります。
 - **リソース名**
   Terraform の設定ファイル内でこのリソースを一意に識別するための名前。この名前を使って他の場所から参照するため、必ず一意のものにしましょう。
 
-  ```sh 例
-  resource "リソースタイプ" "リソース名" {
-    ...
-  }
+  ```tf 例
+  resource "リソースタイプ" "リソース名" { ... }
   ```
 
 ## 3.2 data
@@ -195,7 +193,7 @@ Terraform には様々なブロックタイプがあります。
 
 Terraform の設定の外部にある既存のリソースの情報を読み込んで利用するために使います。Terraform は data ブロックで定義されたものを管理 (作成・変更・削除) しません。
 
-```sh 例
+```tf 例
 data "データソースタイプ" "データソース名" {
   // データをフィルタリング引数
 }
@@ -254,7 +252,7 @@ Terraform の設定を柔軟にするために、外部から値を注入した�
 
 基本的には下記のような形になります。
 
-```sh 例
+```tf 例
 variable "変数名" {
   type        = <型>
   description = "<変数の説明>"
@@ -268,7 +266,7 @@ variable "変数名" {
 
 Terraform が管理するリソースから得られる情報 (例: 作成された EC2 インスタンスの IP アドレス、S3 バケットの名前など) を、`terraform apply` の実行後に出力したり、他の Terraform 設定から参照できるようになります。
 
-```sh 例
+```tf 例
 output "出力名" {
   value       = <出力したい値>
   description = "<出力の説明>"
@@ -371,7 +369,7 @@ Terraform は公式ドキュメントにリソースの作成方法や使い方�
 
 また勉強する中で、下記の記事がとても分かりやすかったのでお勧めです。
 
-[Terraform に入門して 1 ヶ月経ったので、初心者が気をつけるべきポイントを書いてみる](/articles/20230406a/) 
+[Terraform に入門して 1 ヶ月経ったので、初心者が気をつけるべきポイントを書いてみる](/articles/20230406a/)
 
 ## 5.2 おすすめ参考書
 
