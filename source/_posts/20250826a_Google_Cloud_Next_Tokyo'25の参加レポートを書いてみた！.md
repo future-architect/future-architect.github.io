@@ -4,6 +4,8 @@ date: 2025/08/26 00:00:00
 postid: a
 tag:
   - GoogleCloud
+  - GoogleCloudNext
+  - GoogleCloudNext2025
   - 生成AI
   - AIエージェント
   - 参加レポート
