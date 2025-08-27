@@ -73,7 +73,7 @@ KMS マスタキーの定義だけでなく、エイリアスも同時に定義�
 
 公式: [エイリアスの使用](https://docs.aws.amazon.com/ja_jp/kms/latest/developerguide/kms-alias.html)
 
-```go kms
+```tf kms
 resource "aws_kms_key" "demo" {
   description             = "for demo"
   key_usage               = "ENCRYPT_DECRYPT"
@@ -192,7 +192,7 @@ KMS の復号化には `kms:Decrypt` のポリシーが必須なので、demo �
 
 Terraformでのlambdaのリソース構築設定に`kms_key_arn`を追記することで、lambdaはデフォルトのAWS KMSキーではなく作成したKMSのキーを利用するようになります。
 
-```go lambda
+```tf lambda
 resource "aws_lambda_function" "kms_lambda" {
   filename      = "lambda_initial_script.zip"
   function_name = "kms-lambda"
