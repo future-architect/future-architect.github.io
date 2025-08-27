@@ -41,7 +41,7 @@ AWS、Google Cloud、Azureなど、日進月歩で新しいサービス、新機
 
 通常は `terraform apply`で呼ばれるスクリプトを定義できますが、 `when=destory` と合わせると `terraform destroy` に対応させることもできます。さらにがんばるなら `null_resource`の`triggers` で実行スクリプトなどのハッシュ値を管理しておくことで、実行スクリプトに更新をトリガーにすることもできます（もちろん、実行スクリプトは冪等に作る必要があります）。書き出してみると複雑に見えますが、大部分は `local-exec` で初期作成時に呼び出すスクリプトを作れば事足りることが多いため、こだわらず簡易的にリソースをTerraform管理下に置くときは、よく使われると思います。
 
-```sh local-execイメージ
+```tf local-execイメージ
 resource "null_resource" "my_custom_resource" {
   # ...
 
@@ -76,7 +76,7 @@ resource "null_resource" "my_custom_resource" {
 export TF_VAR_qiita_token=xxxxxxxxxxxxxxx
 ```
 
-```sh main.tf
+```tf main.tf
 terraform {
   required_providers {
     terracurl = {
@@ -193,7 +193,7 @@ qiita_article_response = "6410f22e585d0907005e"
 
 Qiita APIの記事投稿に関して、IDは公開後に分かります（APIで指定すれば固定できるかも知れませんが）。そのため、以下のような `output` で取得した値を、`destory_url` に指定できると良いのですが、これは `terraform apply` に決定する値ですので、循環参照となり指定できません。このあたりはどうするか一工夫が必要そうです。
 
-```sh
+```tf
 resource "terracurl_request" "qiita_article" {
   # 中略
 
