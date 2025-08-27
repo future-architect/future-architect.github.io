@@ -144,7 +144,7 @@ Terraform Server に送るためのアクションの定義は以下です。大
 
 コアな部分をまずは説明しますね。
 
-```bash compute_instance.tf
+```tf compute_instance.tf
 resource "google_compute_instance" "GCE_instances" {
   count        = length(var.gce_instances_list)
   name         = var.gce_instances_list[count.index]
@@ -182,14 +182,14 @@ resource "google_compute_disk" "GCE_disk" {
 }
 ```
 
-```bash variables.tf
+```tf variables.tf
 variable "project_suffix" {}
 variable "project" {}
 variable "gce_instances_list" {}
 variable "gcs_buckets_list" {}
 ```
 
-```bash terraform.tfvars
+```tf terraform.tfvars
 gce_instances_list = [
   "test-instance-11"
 ]
@@ -209,19 +209,19 @@ gcs_buckets_list = [
 そして、**GCE と GCS は別メニューだから、お互いに干渉したくない** ということなんです。
 Go で書き切る手段もあったんですが、**実装をリーズナブルにするためにファイルを分けて bash で結合する方法を選択**しました。それが vars ディレクトリ配下のお話です。
 
-```bash vars/compute_instance.tfvars
+```tf vars/compute_instance.tfvars
 gce_instances_list = [
   "test-instance-11"
 ]
 ```
 
-```bash vars/storage_bucket.tfvars
+```tf vars/storage_bucket.tfvars
 gcs_buckets_list = [
   "test-bucket01"
 ]
 ```
 
-```bash vars/project.tfvars
+```tf vars/project.tfvars
 project_suffix = "project-a"
 project = {
   name = "project-a"
@@ -229,7 +229,7 @@ project = {
 }
 ```
 
-```terraform vars/filejoin.sh
+```sh vars/filejoin.sh
 cat *.tfvars > ../terraform.tfvars
 ```
 
@@ -249,7 +249,7 @@ cat *.tfvars > ../terraform.tfvars
 始めに言い訳しておきますが、初めて Go を書いた関係で、あまりソースコードには自信がありません。
 本質的に必要な部分だけを書いているので、エラー処理・認証・暗号化の処理も実装していないので、検証用途と割り切って見てください。
 
-```golang api-sv.go
+```go api-sv.go
 package main
 
 import (
@@ -373,11 +373,11 @@ func execTF(project, action string) string {
 }
 ```
 
-```bash tfplan.sh
+```sh tfplan.sh
 terraform plan -no-color
 ```
 
-```bash tfapply.sh
+```sh tfapply.sh
 terraform apply -auto-approve -no-color
 ```
 
