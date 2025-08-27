@@ -51,7 +51,7 @@ terraform workspace select {workspace名}
 * workspace名を変数のkey名に設定することで、環境依存の変数のみ切り出せるので可読性が高くなります。
 * また、環境間でソースを共用するという性質上、特定環境のみへの設定抜け・漏れが発生しにくいです。
 
-```bash
+```tf
 ## 変数定義側
 locals {
   instance_web = {
@@ -89,7 +89,7 @@ resource "google_compute_disk" "web" {
 
 以下の例は、本番環境のみに存在するリソースと検証環境のみに存在するリソースをcountを使って制御しています。見通しが悪いですね。
 
-```bash 環境間で構成の差異が大きい場合の例
+```tf 環境間で構成の差異が大きい場合の例
 locals {
   instance_web = {
     production = {
@@ -171,7 +171,7 @@ module自体は、複数リソースから構成されるサービス(たとえ�
 
 以下の例はGCEをmodule化した例です。instance、internal ip、diskといった個別リソースをひとつのmoduleとして定義することで、モジュール呼び出し側は、リソース間の依存関係やパラメータ以外の固定値を意識しなくてよいのは嬉しいですね。
 
-```bash module/gce/main.tf(モジュール定義側)
+```tf module/gce/main.tf(モジュール定義側)
 resource "google_compute_address" "template" {
   name = "${var.name}-internal"
 
