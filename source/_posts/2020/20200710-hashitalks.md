@@ -37,7 +37,7 @@ lede: "本記事の内容はHashiTalks: Japanに登壇したのでその時に�
 Terraformは各クラウドプロバイダーのリソースをコードで管理できるInfrastructure as Code(IaC)を実現するツールとして使われています。AWSのCloudFormation、GCPのDeployment Managerではなくクラウドに依存しないツールとしてマルチクラウド戦略を行うところではTerraformを採用されているのではないでしょうか？
 基本的にクラウド(今回ではGCP)のリソースは全てTerraformで管理されていることが望ましく、それは監視ツールであるCloud Monitoringも例外ではありません。特に私が大変だと感じているのは特定のメトリクスを抽出するためのフィルターです。
 
-```sh
+```tf
 resource "google_monitoring_alert_policy" "someone_alert_policy" {
   ....
   conditions {
@@ -58,7 +58,7 @@ resource "google_monitoring_alert_policy" "someone_alert_policy" {
 
 TerraformerはGCPに限らず、AWSなどのメジャークラウドに存在するリソースをコマンド1つでコードに落とせる便利なツールです。とても便利ではある反面、Terraformでのリソース名はわかりにくいものになっています。
 
-```sh
+```tf
 resource "google_monitoring_alert_policy" "tfer--projects--project-name--alertPolicies--17320504" {
   ....
   conditions {
@@ -81,7 +81,7 @@ Cloud Monitoringにはアラート設定をしたときに、その通知先を�
 
 などがあるので、これらを使えばコードとして書かざるを得ない状況は回避できます。しかし、今回は「**コードにはしないけど、リソースとしてはある**」状態を目指してちょっと安全にTerraformでリソースを管理する方法を考えてみます。
 
-```sh
+```tf
 resource "google_monitoring_alert_policy" "someone_alert_policy" {
  ....
   display_name = "use-80-percent-resource-disk"
