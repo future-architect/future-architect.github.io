@@ -4,7 +4,7 @@ date: 2021/07/15 00:00:00
 postid: a
 tag:
   - Flutter
-  - Proxy
+  - プロキシ
   - 環境構築
 category:
   - Programming
