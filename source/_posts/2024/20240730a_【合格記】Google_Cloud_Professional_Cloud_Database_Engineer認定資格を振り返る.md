@@ -4,8 +4,8 @@ date: 2024/07/30 00:00:00
 postid: a
 tag:
   - GoogleCloud
-  - 認定資格
-  - 資格試験
+  - 資格
+  - Cloud Professional Cloud Database Engineer
 category:
   - Infrastructure
 thumbnail: /images/20240730a/thumbnail.png
