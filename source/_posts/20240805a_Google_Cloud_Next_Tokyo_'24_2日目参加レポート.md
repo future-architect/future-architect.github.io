@@ -23,16 +23,16 @@ lede: "8/1-8/2にパシフィコ横浜で開催されているGoogle Cloud Next 
 
 この記事はDay2（8/2）の参加レポートです。
 
-Day1のレポートは[Google Cloud Next Tokyo '24 1日目参加レポート](https://future-architect.github.io/articles/20240802a/)です。
+Day1のレポートは[Google Cloud Next Tokyo '24 1日目参加レポート](/articles/20240802a/)です。
 
 ## 基調講演
 
 Day1と比較すると企業でのGoogle Cloud、主にGeminiの活用事例の話がメインでしたが、Day1に引き続き「生成AIを試す時代から実用化する時代への変化」というテーマが感じられる基調講演でした。活用事例としては以下が紹介されていました。
 
-- 日本テレビ放送網株式会社におけるGeminiを活用した動画像解析
-- ヤマト運輸株式会社におけるGoogle Maps Platformを活用した配送計画
-- トヨタ自動車株式会社における現場での利用を目指したAIプラットフォーム構築でのGemini Code Assistの活用
-- 株式会社三井住友フィナンシャルグループにおけるIT活用戦略とOffice365とGoogle Workspaceのハイブリッド利用
+- 日本テレビ放送網さんにおけるGeminiを活用した動画像解析
+- ヤマト運輸さんにおけるGoogle Maps Platformを活用した配送計画
+- トヨタ自動車様における現場での利用を目指したAIプラットフォーム構築でのGemini Code Assistの活用
+- 三井住友フィナンシャルグループ様におけるIT活用戦略とOffice365とGoogle Workspaceのハイブリッド利用
 
 また、基調講演内で発表されたGoogle Cloudのアップデートとしては以下がありました。
 
@@ -63,7 +63,7 @@ Day2では5つのセッション講演を聞くことができました。ざっ
   - データの取り込みにOCRが主流だったが、LLM（Gemini）の活用を進めている
 - OCRとGeminiの比較
   - それぞれチューニングしたうえで認識結果を比較したところ、Geminiが圧勝
-  - Geminiはfew-shot learningによって更なる性能向上可能性が見られた
+  - Geminiはfew-shot learningによって更なる性能向上の可能性が見られた
   - Geminiに対するリクエストコストと精度のバランスが大事
     - 図面全体をスキャンさせると精度は上がるが、お金もかかる
 

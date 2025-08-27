@@ -96,7 +96,7 @@ destroy                 🧨 Destroy everything in Azure
 
 具体的に処理の分岐は `code/backend/batch/utilities/orchestrator/strategies.py` で行われています。
 
-選択肢としては以下の4つになります
+選択肢としては以下の4つです。
 
 - openai_function
 - langchain
