@@ -6,7 +6,7 @@ tag:
   - Swift
   - iOS
   - 機械学習
-  - 画像認識
+  - 画像処理
 category:
   - DataScience
 thumbnail: /images/20230831a/thumbnail.png
