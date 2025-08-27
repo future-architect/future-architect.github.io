@@ -104,7 +104,7 @@ Terraformで管理出来る様になると以下の点で便利になります�
 
 作業ディレクトリにmain.tfを作成して以下の様に記載します。
 
-```sh main.tf
+```tf main.tf
 terraform {
   required_providers {
     auth0 = {
@@ -248,7 +248,7 @@ locals {
 
 main.tfのプロパイダ設定を以下の様に変えます。
 
-```sh main.tf
+```tf main.tf
 provider "auth0" {
   domain        = local.environments[terraform.workspace]["auth0_domain"]
   client_id     = local.environments[terraform.workspace]["auth0_client_id"]
