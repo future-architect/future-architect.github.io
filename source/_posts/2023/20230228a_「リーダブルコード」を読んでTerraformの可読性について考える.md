@@ -50,7 +50,7 @@ Terraformにおいては、if文やgotoなどは存在はしません。です�
 
 countは、以下の例（1）のようにリソースを単純に複製する使い方はもちろん、例（2）のような使い方をすることで、リソースの作成要否を担うこともできます。
 
-```sh
+```tf
 # 例①
 resource "null_resource" "count" {
   count = 3
@@ -76,7 +76,7 @@ locals {
 例（2）では`create_resource`という変数にbool値を渡し、リソースを作るかどうかを決めています。ここではtrueを渡しているため、作成され、「このリソースはtrueなので、作成されます」というテキストが出力されます。また、この書き方であれば変数も直接的で一通りソースを読むことで「いつ」必要な変数を渡すかがある程度明確になります。
 一方、次のケースを見てみましょう。
 
-```sh
+```tf
 resource "null_resource" "bool_count" {
   count = local.unnessesary_resource ? 0 : 1
   provisioner "local-exec" {
@@ -93,7 +93,7 @@ resource "null_resource" "bool_count" {
 
 Terraformの`count`や`for_each`はリソースそのものを繰り返し、複数リソースを作成する際に利用します。一方、Dynamic構文についてはリソース内で同様の設定をするときに利用する構文です。以下の例ではdynamicを使ってセキュリティグループを作成します。
 
-```sh
+```tf
 locals {
   ingress_web = {
     https = {
@@ -135,7 +135,7 @@ resource "aws_security_group" "web" {
 
 一方、公式でも記載されているdynamicブロックを[複数ネストさせるケース](https://developer.hashicorp.com/terraform/language/expressions/dynamic-blocks#multi-level-nested-block-structures)をみてみます。(以下、公式より引用)
 
-```sh
+```tf
   dynamic "origin_group" {
     for_each = var.load_balancer_origin_groups
     content {
