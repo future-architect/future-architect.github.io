@@ -45,7 +45,7 @@ hoge-project
 
 インスタンスをコードしている`compute_instance.tf`、あとは埋める鍵を置いています。`compute_instance.tf`の中身は以下になります。
 
-```sh compute_instance.tf
+```tf compute_instance.tf
 resource "google_compute_instance" "instance" {
   name         = "sample-instance"
   machine_type = "n1-standard-1"
@@ -120,7 +120,7 @@ hoge-project
 
 このディレクトリ構成もおそらくTerraform + Ansibleの組み合わせの時にはオーソドックスではないでしょうか？ ここで、`compute_instance.tf`は
 
-```sh compute_instance.tf
+```tf compute_instance.tf
 resource "google_compute_instance" "instance" {
   name         = "sample-instance"
   machine_type = "n1-standard-1"
@@ -154,7 +154,7 @@ resource "google_compute_instance" "instance" {
 
 と書きました。`metadata`でインスタンスに埋め込む公開鍵を設定しています。そして最終段にある
 
-```sh tf
+```tf
   provisioner "local-exec" {
     working_dir = "./ansible/"
     command     = "ansible-playbook -i inventory nginx.yaml"
