@@ -111,7 +111,7 @@ spec:
 main.tfは以下のように定義されています。`location="us-central1-a"` と設定しています
 (その他 variable.tf, provider.tf等は省略)
 
-```terraform
+```tf main.tf
 resource "google_storage_bucket" "validator_trial" {
       project       = <your project>
       name          = "validator-trial"
