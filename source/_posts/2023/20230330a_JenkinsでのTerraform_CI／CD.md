@@ -66,7 +66,7 @@ locals.tfの中身はGoogle Cloudのプロジェクト名や、自宅外部IPが
 
 <details><summary>backend.tf</summary>
 
-```sh backend.tf
+```tf backend.tf
 terraform {
  backend "gcs" {
    bucket  = "xxxxxxxxxxxxx"
@@ -79,7 +79,7 @@ terraform {
 
 <details><summary>comute_engine.tf</summary>
 
-```sh comute_engine.tf
+```tf comute_engine.tf
 resource "google_compute_instance" "jenkins" {
   name         = local.jenkins.name
   machine_type = local.jenkins.machine_type
@@ -185,7 +185,7 @@ resource "google_compute_managed_ssl_certificate" "jenkins" {
 
 <details><summary>comute_firewall.tf</summary>
 
-```sh comute_firewall.tf
+```tf comute_firewall.tf
 resource "google_compute_firewall" "jenkins_iap" {
   name    = "allow-iap-jenkins-instance-ssh"
   network = data.google_compute_network.vpc.self_link
@@ -238,7 +238,7 @@ data "google_compute_subnetwork" "pri" {
 
 <details><summary>project_iam_member.tf</summary>
 
-```sh project_iam_member.tf
+```tf project_iam_member.tf
 resource "google_project_iam_member" "jenkins" {
   project = local.project.project_id
   for_each = toset([
@@ -253,7 +253,7 @@ resource "google_project_iam_member" "jenkins" {
 
 <details><summary>security_policy.tf</summary>
 
-```sh security_policy.tf
+```tf security_policy.tf
 resource "google_compute_security_policy" "jenkins" {
   name = local.jenkins.name
 
@@ -287,7 +287,7 @@ resource "google_compute_security_policy" "jenkins" {
 
 <details><summary>service_account.tf</summary>
 
-```sh
+```tf
 resource "google_service_account" "jenkins" {
   account_id   = "tky-jenkins-sa"
   display_name = "tky-jenkins-sa"
@@ -298,7 +298,7 @@ resource "google_service_account" "jenkins" {
 
 <details><summary>versions.tf</summary>
 
-```sh versions.tf
+```tf versions.tf
 terraform {
   required_version = "~> 1.4.0"
   required_providers {
