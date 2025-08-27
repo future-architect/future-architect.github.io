@@ -131,7 +131,7 @@ https://cloud.google.com/about/locations?hl=ja#network
 
 ## Terraform コード
 
-```sh gce.tf
+```tf gce.tf
 resource "google_compute_instance" "GCE_instances" {
   count        = length(local.gce_instances_list)
   name         = local.gce_instances_list[count.index].name
@@ -176,7 +176,7 @@ resource "google_compute_disk" "GCE_disks" {
 }
 ```
 
-```sh network.tf
+```tf network.tf
 resource "google_compute_network" "test_network" {
   project                 = local.project.id
   name                    = "test-network"
@@ -230,7 +230,7 @@ resource "google_project_iam_member" "nw_tester" {
 
 ```
 
-```sh veriable.tf
+```tf veriable.tf
 locals {
   project = {
     id = "project_id"
@@ -269,7 +269,7 @@ locals {
 }
 ```
 
-```sh versions.tf
+```tf versions.tf
 terraform {
   required_version = ">= 0.12"
 }
