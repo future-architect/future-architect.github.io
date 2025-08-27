@@ -4,8 +4,8 @@ date: 2024/07/31 00:00:00
 postid: a
 tag:
   - GoogleCloud
-  - 認定資格
-  - 資格試験
+  - 資格
+  - Cloud Professional Cloud DevOps Engineer
 category:
   - Infrastructure
 thumbnail: /images/20240731a/thumbnail.png
