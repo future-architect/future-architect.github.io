@@ -150,7 +150,7 @@ localstack_main   docker-entrypoint.sh   Up      127.0.0.1:4566->4566/tcp, 4567/
 
 Terraform定義に、Localstackへplan,applyを打ち込むための設定を記入します。
 
-```sh terraform main.tf
+```tf terraform main.tf
 # backend
 terraform {
   backend "local" {}
@@ -219,7 +219,7 @@ backendとproviderの定義は完了したので、次は各種リソースを�
 
 Terraform自体の説明は本記事の目的ではないので、一気に追加します
 
-```sh terraform resources.tf
+```tf terraform resources.tf
 resource "aws_kinesis_stream" "local_stream" {
   name             = "local-stream"
   shard_count      = 1
