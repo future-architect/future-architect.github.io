@@ -6,7 +6,7 @@ tag:
   - VSCode
   - Git
   - GitLens
-  - CodeReading
+  - コードリーディング
 category:
   - Programming
 thumbnail: /images/20240415a/thumbnail.png
