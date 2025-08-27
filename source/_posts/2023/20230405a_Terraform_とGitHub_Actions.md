@@ -39,7 +39,7 @@ OIDC プロバイダの追加をTerraform で行います。
 
 参考: [Configuring OpenID Connect in Amazon Web Services](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
 
-```sh openid_connect_provider.tf
+```tf openid_connect_provider.tf
 data "http" "github_actions_openid_configuration" {
   url = "https://token.actions.githubusercontent.com/.well-known/openid-configuration"
 }
@@ -66,7 +66,7 @@ ID プロバイダ設定をクリックし、追加されていることを確�
 ここではサンプル的に作成しておりますので、管理者権限を付与しています。
 実際には、運用に合わせてポリシの設定をして頂ければと思います。
 
-```sh module_iam_github_actions.tf
+```tf module_iam_github_actions.tf
 module "iam_role_github_actions" {
   source = "{任意の場所指定}/modules/github_actions"
 
@@ -77,7 +77,7 @@ module "iam_role_github_actions" {
 }
 ```
 
-```sh main.tf
+```tf main.tf
 variable "project_name" {}
 variable "account_id" {}
 variable "github_org" {}
@@ -105,7 +105,7 @@ resource "aws_iam_role_policy_attachment" "github_actions" {
 }
 ```
 
-```sh assume_role.json
+```tf assume_role.json
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -125,7 +125,7 @@ resource "aws_iam_role_policy_attachment" "github_actions" {
 }
 ```
 
-```sh administrator.json
+```tf administrator.json
 {
   "Version": "2012-10-17",
   "Statement": [
