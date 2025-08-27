@@ -5,7 +5,7 @@ postid: a
 tag:
   - Flutter
   - Dart
-  - GoogleMapsAPI
+  - GoogleMap
 category:
   - Infrastructure
 thumbnail: /images/20211224a/thumbnail.png
