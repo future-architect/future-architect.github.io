@@ -137,9 +137,7 @@ Terraform v0.13.2
 
 まずはプロバイダの設定をしておきます。
 
-* provider.tf
-
-```bash
+```tf provider.tf
 provider "aws" {
   region = "ap-northeast-1"
   alias = "ap-northeast-1"
@@ -171,9 +169,7 @@ commands will detect it and remind you to do so if necessary.
 
 続いてAPI GatewayとLambda関数を実装します。まずはLambda関数とAPI Gatewayで必要なIAMを記述します。API GatewayはLambda関数を呼び出す操作、Lambda関数ではCloudWatch Logsにログを書き込む操作、DynamoDBを操作するIAMを定義します。
 
-* iam_policy_document.tf
-
-```bash
+```tf iam_policy_document.tf
 data "aws_iam_policy_document" "example_api_policy" {
   statement {
     effect = "Allow"
@@ -207,9 +203,7 @@ data "aws_iam_policy_document" "example_lambda" {
 
 上記のポリシードキュメントをIAMポリシーとして定義します。
 
-* iam_policy.tf
-
-```bash
+```tf iam_policy.tf
 resource "aws_iam_policy" "example_lambda" {
   name   = "example-lambda"
   policy = data.aws_iam_policy_document.example_lambda.json
@@ -218,9 +212,7 @@ resource "aws_iam_policy" "example_lambda" {
 
 IAMロールを定義します。
 
-* iam_role.tf
-
-```bash
+```tf iam_role.tf
 resource "aws_iam_role" "example_lambda" {
   name               = "example-lambda"
   assume_role_policy = file("assume_role/lambda.json")
@@ -229,9 +221,7 @@ resource "aws_iam_role" "example_lambda" {
 
 信頼ポリシーは以下のようになります。
 
-* assume_role/lambda.json
-
-```json
+```json assume_role/lambda.json
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -249,9 +239,7 @@ resource "aws_iam_role" "example_lambda" {
 
 先程記述したIAMロールにIAMポリシーをアタッチします。
 
-* iam_role_policy_attachment.tf
-
-```bash
+```tf iam_role_policy_attachment.tf
 resource "aws_iam_role_policy_attachment" "example_api" {
   role       = aws_iam_role.example_lambda.name
   policy_arn = aws_iam_policy.example_lambda.arn
@@ -262,9 +250,7 @@ IAMの設定は以上で完了です。
 
 続いてAPI GatewayのRESTのリソースを作っていきましょう。先程作成したIAMポリシードキュメントを使います。
 
-* api_gateway_rest_api.tf
-
-```bash
+```tf api_gateway_rest_api.tf
 resource "aws_api_gateway_rest_api" "example_api" {
   name        = "example-api"
   description = "example serverless api"
@@ -272,9 +258,7 @@ resource "aws_api_gateway_rest_api" "example_api" {
 }
 ```
 
-* api_gateway_resource.tf
-
-```bash
+```tf api_gateway_resource.tf
 resource "aws_api_gateway_resource" "example_api" {
   rest_api_id = aws_api_gateway_rest_api.example_api.id
   parent_id   = aws_api_gateway_rest_api.example_api.root_resource_id
@@ -284,9 +268,7 @@ resource "aws_api_gateway_resource" "example_api" {
 
 APIリクエストに対する認可はなしにします。必要な場合は `authorization` パラメータを用いて設定します。
 
-* api_gateway_method.tf
-
-```bash
+```tf api_gateway_method.tf
 resource "aws_api_gateway_method" "example_api_get" {
   authorization = "NONE"
   http_method   = "GET"
@@ -304,9 +286,7 @@ resource "aws_api_gateway_method" "example_api_post" {
 
 Lambdaプロキシ統合のGETリクエストを実装する場合においても `integration_http_method` パラメータは `POST` と設定する必要があります。
 
-* api_gateway_integration.tf
-
-```bash
+```tf api_gateway_integration.tf
 resource "aws_api_gateway_integration" "example_api_get" {
   rest_api_id             = aws_api_gateway_rest_api.example_api.id
   resource_id             = aws_api_gateway_method.example_api_get.resource_id
@@ -327,9 +307,7 @@ resource "aws_api_gateway_integration" "example_api_post" {
 }
 ```
 
-* api_gateway_deployment.tf
-
-```bash
+```tf api_gateway_deployment.tf
 resource "aws_api_gateway_deployment" "example_api" {
   depends_on = [
     aws_api_gateway_integration.example_api_get,
@@ -347,9 +325,7 @@ Lambda関数はアプリケーション側からデプロイできるようにTe
 
 Lambdaの `handler` パラメータは、ビルドして生成した実行可能なファイル名と同じである必要があります。
 
-* lambda_function.tf
-
-```bash
+```tf lambda_function.tf
 resource "aws_lambda_function" "example_api" {
   filename      = "dummy_function.zip"
   function_name = "example-api"
@@ -364,9 +340,7 @@ resource "aws_lambda_function" "example_api" {
 
 Lambda関数をAPI Gatewayから呼び出せるように明示的に許可します。
 
-* lambda_permission.tf
-
-```bash
+```tf lambda_permission.tf
 resource "aws_lambda_permission" "example_apigateway_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.example_api.function_name
@@ -378,9 +352,7 @@ resource "aws_lambda_permission" "example_apigateway_lambda" {
 
 `dummy_function.zip` はビルド可能な適当な `main.go` を `dummy_function` に格納してzip化しておきます。ファイルが存在しないとエラーになります。
 
-* dummy_function/main.go
-
-```go
+```go dummy_function/main.go
 package main
 
 import (
@@ -535,9 +507,7 @@ commit: f032690aab0634d97e2861a708d8fd9365ba77d2
 
 ついでにTerraformを用いてAWS上にリソースを作成しましょう。キャパシティはオンデマンドモードにしておきます。
 
-* dynamodb_table.tf
-
-```bash
+```tf dynamodb_table.tf
 resource "aws_dynamodb_table" "example_users" {
   name         = "example-users"
   billing_mode = "PAY_PER_REQUEST"
@@ -553,9 +523,7 @@ resource "aws_dynamodb_table" "example_users" {
 
 Lambda関数の環境変数からDynamoDBのテーブル名を取得できるようにLambda関数の環境変数に追加しておきます。環境変数でDynamoDBのテーブル名を設定できるようにしておくと、ローカルでのテストする際にAWS上に構築するテーブル名と別の名前を指定でき、便利です。
 
-* lambda_function.tf
-
-```diff
+```diff lambda_function.tf
 resource "aws_lambda_function" "example_api" {
   filename      = "dummy_function.zip"
   function_name = "example-api"
@@ -631,9 +599,7 @@ mkdir cmd\lambda gen testdata
 
 ビルドなどのタスクはMakefileに記述しておきます。
 
-* Makefile
-
-```bash
+```bash Makefile
 .PHONY: deps
 deps:
 	go mod download
@@ -705,9 +671,7 @@ go get github.com/jessevdk/go-flags
 go get github.com/guregu/dynamo
 ```
 
-* db.go
-
-```go
+```go db.go
 package example
 
 import (
@@ -750,9 +714,7 @@ DynamoDBから登録されているすべてのユーザを取得する処理を
 
 DynamoDBとマッピングするモデルは以下です。
 
-* dynamo_model.go
-
-```go
+```go dynamo_model.go
 package example
 
 type User struct {
@@ -763,9 +725,7 @@ type User struct {
 
 テーブルから全アイテム取得するためにScanを行います。
 
-* user_handler_db.go
-
-```go
+```go user_handler_db.go
 package example
 
 import (
@@ -791,9 +751,7 @@ func scanUsers(ctx context.Context) ([]User, error) {
 
 続いて上記を使ったハンドラを実装します。
 
-* user_handler.go
-
-```go
+```go user_handler.go
 package example
 
 import (
@@ -828,9 +786,7 @@ func GetUsers(p operations.GetUsersParams) middleware.Responder {
 
 単体テストは実装の詳細をテストしないように、粒度を粗めにしておきます。ハンドラのリクエストに対して想定するJSONのレスポンスが取得できているかどうか確認します。テストファイルは `want_get_users_1.json` `want_get_users_2.json` としておきます。
 
-* user_handler_test.go
-
-```go
+```go user_handler_test.go
 package example
 
 import (
@@ -932,9 +888,7 @@ func TestGetUsers(t *testing.T) {
 }
 ```
 
-* testdata/want_get_users_1.json
-
-```json
+```json testdata/want_get_users_1.json
 [
   {
     "user_id": "001",
@@ -1034,9 +988,7 @@ Lambda関数はAPI Gatewayのリクエストをトリガーに起動します。
 
 を用いると簡単に変換できます。もちろん `go-swagger` だけでなく主要なGoのWebアプリケーションフレームに対応しています。
 
-* cmd/lambda/main.go
-
-```go
+```go cmd/lambda/main.go
 package main
 
 import (
