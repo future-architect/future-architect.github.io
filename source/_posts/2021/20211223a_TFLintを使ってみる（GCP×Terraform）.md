@@ -63,7 +63,7 @@ TFLint version 0.34.0
 - `.tflint.hcl`はホームディレクトリか、カレントディレクトリに配置する必要がある
   - 今回は、ホームディレクトリに配置とする
 
-```js .tflint.hcl
+```tf .tflint.hcl
 plugin "google" {
   enabled = true
   version = "0.15.0"
@@ -88,7 +88,7 @@ tflint --init
 
 1. `google_compute_instance`の`machine_type`に存在しないインスタンスタイプを記載してみます。
 
-```js example.tf
+```tf example.tf
 resource "google_compute_instance" "gce_test" {
   project      = "testest"
   name         = "testtest-gce001"
@@ -161,7 +161,7 @@ rule terraform_unused_declarations {
 
 使っていないlocalsを宣言したtfファイルを追加します。
 
-```js example-valiable.tf
+```tf example-valiable.tf
 locals {
   unused = "test"
 }
@@ -190,7 +190,7 @@ TFLintを使っていくなかで、注意しなければと思ったものを�
 
 [TFLint skips expressions that reference static local values #571](https://github.com/terraform-linters/tflint/issues/571)にも記載があります。以下のように不正なインスタンスタイプをlocalsで定義してもエラーにならないです。
 
-```js example.tf
+```tf example.tf
 locals {
   machine_type = "n2-standard-200"
 }
@@ -245,7 +245,7 @@ plugin "google" {
 
 ※Projectは、providerのprojectを参照している
 
-```sh example.tf
+```tf example.tf
 provider "google" {
   project = "testtest"
 }
@@ -259,7 +259,7 @@ provider "google" {
 - [TFLint Rules Google](https://github.com/terraform-linters/tflint-ruleset-google/blob/master/docs/rules/README.md)
   - ※Deep Checkingの`google_disabled_api`は除いています
 
-```js .tflint.hcl
+```tf .tflint.hcl
 config {
   module = true
 }
