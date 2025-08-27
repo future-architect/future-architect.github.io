@@ -35,7 +35,7 @@ https://github.com/hashicorp/terraform/releases/tag/v1.4.0
 
 plan/apply時にインタラクティブに入力を求めることができるvariableですが、以下のように`sensitive`フラグを指定できます。
 
-```sh
+```tf
 resource "google_sql_user" "test_user" {
   project  = google_project.project_one.project_id
   name     = "test-user"
@@ -123,7 +123,7 @@ https://github.com/carlpett/terraform-provider-sops
 
 - roles/cloudkms.cryptoKeyEncrypterDecrypter
 
-```sh kms.tf
+```tf kms.tf
 resource "google_kms_key_ring" "key_ring" {
   project  = google_project.project_one.project_id
   name     = "test-key-ring"
@@ -165,7 +165,7 @@ sops --input-type json --encrypt --gcp-kms projects/<PROJECT_ID>/locations/globa
 
 今回、sops-providerを利用して自動で復号化を行うため、providerの追加を行います（terraform initを忘れずに）。
 
-```sh versions.tf
+```tf versions.tf
 terraform {
   required_providers {
     google = {
@@ -183,7 +183,7 @@ terraform {
 
 これで準備が整ったので、API Keyを使うCloud Functionを書いてみます。
 
-```sh cloud_function.tf
+```tf cloud_function.tf
 resource "google_cloudfunctions_function" "test-fnc" {
   project     = google_project.project_one.project_id
   name        = "test-fnc"
