@@ -61,7 +61,7 @@ Terraformを運用に乗せて利用していく場合、インフラの組み�
 
 `modules/web`配下の2ファイルについては以下であるとしましょう。
 
-```sh modules/web/instance.tf
+```tf modules/web/instance.tf
 resource "aws_instance" "web" {
   ami           = var.ami
   instance_type = var.instance_type
@@ -72,7 +72,7 @@ resource "aws_instance" "web" {
 }
 ```
 
-```sh modules/web/variable.tf
+```tf modules/web/variable.tf
 variable "ami" {
   description = "A string of AMI ID"
   type        = string
@@ -95,7 +95,7 @@ variable "porject" {
 modules内部ではリソースの宣言とそのリソースで利用する変数の定義します。この時、変数の型も定義できるので、長期的に運用する時にコードの変異を防ぐこともできます。
 次に、`projects`配下のコードを書きます。
 
-```sh projects/main.tf
+```tf projects/main.tf
 module "ec" {
   source = "../modules/web"
 
@@ -136,7 +136,7 @@ TerraformにはLoop処理として、countとfor_each(for)と大きく2つの機
 
 countは以下のように1つのコードから複数のリソースを生み出す時に大いに役に立ちます。
 
-```sh
+```tf
 resource "aws_instance" "web" {
   count         = 5                 # 5台EC2インスタンスを立てるようにする
   ami           = "ami-xxxxxxxxx"
@@ -182,7 +182,7 @@ aws_route53_zone.this[0]
 
 このように単純なリソース作成やスイッチであればとても便利なcountですが、以下のコードではどうでしょうか？
 
-```sh
+```tf
 locals {
   azs = [
     "ap-northeast-1a",
@@ -214,7 +214,7 @@ aws_instance.web[2]
 
 ここで上記のような運用時におけるリスクを少しでも減らすために、for_eachを使ってリファクタリングしてみます。
 
-```sh
+```tf
 locals {
   azs = [
     "ap-northeast-1a",
@@ -254,7 +254,7 @@ countは理解しやすく、かつ簡単に使えるために、リソースの
 
 ここで例とするのはAWSのセキュリティグループです。後述しますが、冗長にも書くことができるし、より効率的に書くことも可能なリソースです。まずはそのまま書いた時の例を見てみましょう。
 
-```sh
+```tf
 resource "aws_security_group" "web" {
   name        = "allow-web"
   vpc_id      = aws_vpc.main.id
@@ -298,7 +298,7 @@ resource "aws_security_group" "web" {
 
 ここで`dynamic`ブロックを利用します。例として、上のコードをリファクタリングします。
 
-```sh
+```tf
 locals {
   ingress_web = [
   # [description, from_port, to_port, protocol, cidr_blocks]
