@@ -6,7 +6,7 @@ tag:
   - Gemini
   - AI
   - 生成AI
-  - カレンダー
+  - Googleカレンダー
   - タスク管理
 category:
   - Infrastructure
