@@ -6,7 +6,7 @@ tag:
   - dbt
   - GCP
   - BigQuery
-  - データ基盤
+  - データエンジニアリング
 category:
   - Programming
 thumbnail: /images/20250515a/thumbnail.png
