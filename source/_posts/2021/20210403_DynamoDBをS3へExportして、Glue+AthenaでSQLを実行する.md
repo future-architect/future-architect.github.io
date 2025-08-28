@@ -10,7 +10,7 @@ tag:
   - AWS
   - SQL
 category:
-  - Programming
+  - DB
 thumbnail: /images/20210403/thumbnail.png
 author: 棚井龍之介
 lede: "DynamoDBを頻繁に利用しており、連日DynamoDBコンソール画面と睨めっこをしています。DynamoDBのコンソール画面は特定のデータをピンポイントで探すには優秀ですが、データ集計には全く向いていません。"
