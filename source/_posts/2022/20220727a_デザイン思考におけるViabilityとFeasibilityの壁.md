@@ -5,7 +5,7 @@ postid: a
 tag:
   - デザイン思考
   - デザインワーク
-  - UX
+  - UI/UX
   - ビジネス
 category:
   - Business
