@@ -4,12 +4,12 @@ date: 2021/07/08 00:00:00
 postid: a
 tag:
   - GitHub
-  - 自動化
   - CircleCI
-  - ChangeLog
+  - CI/CD
   - リリースノート
+  - ドキュメント
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/20210708a/thumbnail.png
 author: 富山龍之介
 lede: "リリースした際に、機能強化や不具合修正の内容などをユーザーや他開発メンバーに示すために、ChangeLogを作成されている方も多いと思います。読者の皆さんはどのようにChangeLogを作成されていますか？"
