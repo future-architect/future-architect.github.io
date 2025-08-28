@@ -4,7 +4,7 @@ date: 2021/11/19 00:00:00
 postid: a
 tag:
   - Go
-  - CodeReading
+  - コードリーディング
   - GoConference
   - 登壇レポート
   - カンファレンス
