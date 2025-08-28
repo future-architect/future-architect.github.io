@@ -4,7 +4,7 @@ date: 2016-05-30 08:40:24
 postid: ""
 tag:
   - ハッカソン
-  - DesignThinking
+  - デザイン思考
   - IoT
 category:
   - IoT
