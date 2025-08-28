@@ -34,4 +34,60 @@ const totalCount = (posts) => {
   return posts.map(post => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur);
 }
 
+/**
+ * カスタムタグクラウドヘルパー
+ * @param {object} options - オプション
+ * @param {number} [options.min_font=12] - 最小フォントサイズ
+ * @param {number} [options.max_font=26] - 最大フォントサイズ
+ * @param {string} [options.font_unit='px'] - フォントサイズの単位
+ * @param {number} [options.boost_ratio=0.7] - 上昇ペースの度合い（1未満で序盤のペースが上がる）
+ * @returns {string} - タグクラウドのHTML文字列
+ */
+function customTagCloudHelper(options) {
+  const hexo = this;
+  const { site } = hexo;
+  const tags = site.tags.sort('name', 1);
 
+  if (!tags.length) {
+    return '';
+  }
+
+  // オプションのデフォルト値を設定
+  options = options || {};
+  const minFont = options.min_font || 12;
+  const maxFont = options.max_font || 26;
+  const fontUnit = options.font_unit || 'px';
+  const boostRatio = options.boost_ratio || 0.7; // 上昇ペースのオプション
+
+  const sizes = tags.map(tag => tag.length);
+  const maxSize = Math.max(...sizes) || 1;
+  const minSize = Math.min(...sizes) || 1;
+  const spread = maxSize - minSize;
+
+  let result = '';
+
+  tags.forEach(tag => {
+    // ▼▼▼ フォントサイズ計算ロジックの変更箇所 ▼▼▼
+
+    // 1. 基本となる線形の比率(0.0 〜 1.0)を算出
+    const ratio = spread === 0 ? 0.5 : (tag.length - minSize) / spread;
+
+    // 2. 比率を累乗して上昇ペースを調整 (boostRatio乗する)
+    //    boostRatioが 0.5 の場合、平方根と同じ効果になり、序盤の上昇が急になります。
+    const adjustedRatio = Math.pow(ratio, boostRatio);
+
+    // 3. 調整後の比率を元にフォントサイズを決定
+    const fontSize = minFont + (maxFont - minFont) * adjustedRatio;
+
+    // ▲▲▲ ここまで ▲▲▲
+
+    const tagName = tag.name.replace(/ /g, '-');
+    const tagLink = hexo.url_for(tag.path);
+
+    result += `<a href="${tagLink}" style="font-size: ${fontSize.toFixed(2)}${fontUnit};">${tagName}</a>\n`;
+  });
+
+  return result;
+}
+
+hexo.extend.helper.register('custom_tagcloud', customTagCloudHelper);
