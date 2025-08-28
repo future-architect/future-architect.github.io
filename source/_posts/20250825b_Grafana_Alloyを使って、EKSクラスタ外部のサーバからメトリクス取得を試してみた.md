@@ -6,7 +6,7 @@ tag:
   - Grafana
   - Grafana Alloy
   - EKS
-  - 初心者
+  - 初心者向け
   - Docker
   - オブサーバビリティ
 category:
