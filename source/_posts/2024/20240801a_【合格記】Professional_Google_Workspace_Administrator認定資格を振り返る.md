@@ -4,8 +4,8 @@ date: 2024/08/01 00:00:00
 postid: a
 tag:
   - GoogleCloud
-  - 認定資格
-  - 資格試験
+  - 資格
+  - Professional Google Workspace Administrator
 category:
   - Infrastructure
 thumbnail: /images/20240801a/thumbnail.png

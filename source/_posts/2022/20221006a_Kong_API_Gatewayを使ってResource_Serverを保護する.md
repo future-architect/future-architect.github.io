@@ -5,7 +5,7 @@ postid: a
 tag:
   - Kong
   - OAuth
-  - openid_connect
+  - OIDC
   - APIGateway
 category:
   - 認証認可

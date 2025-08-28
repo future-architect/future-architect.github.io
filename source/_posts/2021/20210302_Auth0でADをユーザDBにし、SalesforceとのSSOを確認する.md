@@ -6,7 +6,7 @@ tag:
   - Auth0
   - Salesforce
   - SSO
-  - ActiveDirectory
+  - AD
   - Auth0Rules
 category:
   - 認証認可

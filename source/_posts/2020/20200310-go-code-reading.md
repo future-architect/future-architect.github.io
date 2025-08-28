@@ -4,7 +4,7 @@ date: 2020/03/10 08:55:28
 postid: ""
 tag:
   - Go
-  - CodeReading
+  - コードリーディング
   - 勉強会
   - 社内勉強会
 category:

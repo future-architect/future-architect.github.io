@@ -6,7 +6,7 @@ tag:
   - GCP
   - 資格
   - 合格記
-  - MachineLearning
+  - Google Cloud Professional Machine Learning Engineer
   - 機械学習
 category:
   - DataScience

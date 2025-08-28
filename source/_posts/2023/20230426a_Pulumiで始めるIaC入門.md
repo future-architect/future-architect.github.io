@@ -5,8 +5,7 @@ postid: a
 tag:
   - IaC
   - Pulumi
-  - Infrastructure as Code
-  - IaC
+  - 入門
 category:
   - Infrastructure
 thumbnail: /images/20230426a/thumbnail.png

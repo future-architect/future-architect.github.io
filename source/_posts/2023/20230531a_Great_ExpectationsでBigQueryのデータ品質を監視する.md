@@ -3,7 +3,7 @@ title: "Great ExpectationsでBigQueryのデータ品質を監視する"
 date: 2023/05/31 00:00:00
 postid: a
 tag:
-  - GreatExpectations
+  - Great Expectations
   - BigQuery
   - AI監視
   - バリデーション

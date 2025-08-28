@@ -4,7 +4,7 @@ date: 2024/03/26 00:00:00
 postid: a
 tag:
   - Terraform
-  - CodeReading
+  - コードリーディング
   - Go
   - Copilot
 category:
