@@ -7,7 +7,7 @@ tag:
   - Glue
   - ETL
   - Glue Python Shell
-  - 初心者
+  - 初心者向け
 category:
   - Programming
 thumbnail: /images/20250822a/thumbnail.jpg
