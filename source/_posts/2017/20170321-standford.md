@@ -4,7 +4,7 @@ date: 2017/03/21 12:00:00
 postid: ""
 tag:
   - Elastic{ON}
-  - DesignThinking
+  - デザイン思考
 category:
   - Culture
 author: 前原応光
