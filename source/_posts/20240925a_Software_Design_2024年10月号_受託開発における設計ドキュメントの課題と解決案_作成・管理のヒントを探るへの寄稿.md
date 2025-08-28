@@ -4,8 +4,9 @@ date: 2024/09/25 00:00:00
 postid: a
 tag:
   - SoftwareDesign
-  - 設計ドキュメント
+  - ドキュメント
   - 寄稿
+  - Markdown
 category:
   - Programming
 thumbnail: /images/20240925a/thumbnail.jpg
