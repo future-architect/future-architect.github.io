@@ -1,5 +1,5 @@
 ---
-title: "Google Calendar の予定を取得するMCP サーバを作ってみた"
+title: "Googleカレンダーの予定を取得するMCP サーバを作ってみた"
 date: 2025/04/21 00:00:00
 postid: a
 tag:
@@ -7,7 +7,7 @@ tag:
   - ClaudeDesktop
   - Claude
   - OAuth
-  - GoogleCalendar
+  - Googleカレンダー
   - TypeScript
 category:
   - DataScience
