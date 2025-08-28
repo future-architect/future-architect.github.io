@@ -7,7 +7,6 @@ tag:
   - Network
   - DIY
   - 育児
-  - 子ども
 category:
   - Infrastructure
 thumbnail: /images/20250623a/thumbnail.png
