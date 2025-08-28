@@ -5,7 +5,7 @@ postid: a
 tag:
   - PDE
   - GCP
-  - DataEngineer
+  - データエンジニアリング
   - 合格記
   - 資格
   - Udemy
