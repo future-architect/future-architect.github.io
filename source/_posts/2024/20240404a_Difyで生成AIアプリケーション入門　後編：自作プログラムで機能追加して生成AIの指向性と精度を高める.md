@@ -6,7 +6,7 @@ tag:
   - 生成AI
   - Dify
   - ノーコード
-  - "Anthropic Claude"
+  - Claude
   - Java
 category:
   - Programming
