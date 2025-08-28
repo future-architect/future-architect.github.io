@@ -1,5 +1,5 @@
 ---
-title: "Future Tech Night #9 ～運用で後悔しないためのAWS設計術～　を開催しました。"
+title: "Future Tech Night #9 ～運用で後悔しないためのAWS設計術～を開催しました。"
 date: 2021/05/27 00:00:00
 postid: a
 tag:
@@ -7,7 +7,7 @@ tag:
   - TechNight
   - 保守運用
   - 登壇レポート
-  - AWS設計
+  - 設計
 category:
   - Infrastructure
 thumbnail: /images/20210527a/thumbnail.png
