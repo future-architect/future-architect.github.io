@@ -4,10 +4,11 @@ date: 2022/09/06 00:00:00
 postid: a
 tag:
   - DynamoDB
-  - Transaction
+  - トランザクション
+  - 排他制御
   - 設計
 category:
-  - Infrastructure
+  - DB
 thumbnail: /images/20220906a/thumbnail.png
 author: 武田大輝
 lede: "一般的に複数のトランザクションが並行して同じオブジェクトに対してアクセスを行う場合には、トランザクションの分離レベル（SERIALIZABLE/REPEATABLE READ/READ COMMITTED/READ UNCOMMITTED）によって様々な問題が発生します。DynamoDBは2018年にトランザクションがサポートされましたが、本記事ではファントムリードによる書き込みスキューの問題とその対応について取り上げたいと思います。"
