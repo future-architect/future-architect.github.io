@@ -6,7 +6,6 @@ tag:
   - インターン
   - インターン2024
   - NLP
-  - 自然言語処理
 category:
   - DataScience
 thumbnail: /images/20250424a/thumbnail.jpg
