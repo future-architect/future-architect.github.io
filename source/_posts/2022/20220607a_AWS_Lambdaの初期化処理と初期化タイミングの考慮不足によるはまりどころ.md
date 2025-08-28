@@ -6,7 +6,7 @@ tag:
   - AWS
   - 失敗談
   - Lambda
-  - TCP
+  - TCP/IP
 category:
   - Programming
 thumbnail: /images/20220607a/thumbnail.png
