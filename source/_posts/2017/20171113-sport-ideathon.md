@@ -3,9 +3,10 @@ title: "最新テクノロジーでスポーツアイデアソンをやって中
 date: 2017/11/13 13:08:13
 postid: ""
 tag:
-  - DesignThinking
+  - デザイン思考
   - CoSpaces
   - プログラミング教育
+  - アイデアソン
 category:
   - VR
 thumbnail: /images/20171113/thumbnail_20171113.png
