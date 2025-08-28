@@ -6,7 +6,7 @@ tag:
   - PostgreSQL
   - IDENTITY
 category:
-  - Infrastructure
+  - DB
 thumbnail: /images/20241113a/thumbnail.png
 author: 真野隼記
 lede: "PostgreSQLのIDENTITYに設定したカラムの挙動について不明点があったので調べてみました"
