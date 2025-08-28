@@ -5,7 +5,7 @@ postid: a
 tag:
   - Flutter
   - FlutterFlow
-  - Design
+  - UI/UX
   - ノーコード
   - ローコード
 category:
