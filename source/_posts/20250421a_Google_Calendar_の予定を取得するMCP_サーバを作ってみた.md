@@ -5,6 +5,7 @@ postid: a
 tag:
   - MCP
   - ClaudeDesktop
+  - Claude
   - OAuth
   - GoogleCalendar
   - TypeScript
