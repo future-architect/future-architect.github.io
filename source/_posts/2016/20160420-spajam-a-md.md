@@ -4,7 +4,9 @@ date: 2016-04-20 21:25:28
 postid: ""
 tag:
   - IoT
-  - DesignThinking
+  - デザイン思考
+  - SPAJAM
+  - SPAJAM2016
   - ハッカソン
 category:
   - IoT
