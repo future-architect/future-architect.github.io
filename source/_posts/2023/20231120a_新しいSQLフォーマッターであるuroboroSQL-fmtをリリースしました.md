@@ -5,7 +5,7 @@ postid: a
 tag:
   - フォーマッター
   - uroboroSQL
-  - wasm
+  - WebAssembly
   - SQL
   - Rust
 category:
