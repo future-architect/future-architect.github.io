@@ -6,7 +6,7 @@ tag:
   - 生成AI
   - Dify
   - ノーコード
-  - "Anthropic Claude"
+  - Claude
 category:
   - Programming
 thumbnail: /images/20240402a/thumbnail.png
