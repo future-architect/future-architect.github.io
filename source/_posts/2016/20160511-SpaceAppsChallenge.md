@@ -3,7 +3,7 @@ title: "ハッカソン道中記#3～社会人2年目のリケジョがハッカ
 date: 2016-05-11 15:07:34
 postid: ""
 tag:
-  - DesignThinking
+  - デザイン思考
   - Unity
   - ハッカソン
 category:
