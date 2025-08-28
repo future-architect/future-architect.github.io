@@ -5,7 +5,7 @@ postid: a
 tag:
   - Next.js
   - Go
-  - WASM
+  - WebAssembly
   - フロントエンド
 category:
   - Programming

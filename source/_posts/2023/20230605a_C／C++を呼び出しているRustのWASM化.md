@@ -3,7 +3,7 @@ title: "C/C++を呼び出しているRustのWASM化"
 date: 2023/06/05 00:00:00
 postid: a
 tag:
-  - wasm
+  - WebAssembly
   - Rust
   - C/C++
 category:

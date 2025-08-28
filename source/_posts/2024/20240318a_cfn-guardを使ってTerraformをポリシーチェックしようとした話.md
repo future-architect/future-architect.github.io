@@ -5,7 +5,7 @@ postid: a
 tag:
   - Terraform
   - cfn-guard
-  - Policy-as-Cod
+  - Policy-as-Code
   - CloudFormation
 category:
   - Infrastructure

@@ -3,9 +3,10 @@ title: "Goのnet/httpパッケージに出てくるTemporary()がなにか調べ
 date: 2022/02/03 00:00:00
 postid: a
 tag:
-  - ソースコードリーディング
+  - コードリーディング
   - Go
   - Go1.18
+  - net/http
 category:
   - Programming
 thumbnail: /images/20220203a/thumbnail.png

@@ -4,7 +4,7 @@ date: 2023/06/19 00:00:01
 postid: b
 tag:
   - wasmCloud
-  - wasm
+  - WebAssembly
   - CNCF
 category:
   - Infrastructure
