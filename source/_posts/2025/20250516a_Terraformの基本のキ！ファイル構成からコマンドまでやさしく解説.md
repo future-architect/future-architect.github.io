@@ -327,7 +327,7 @@ project2
    Terraform は、管理するインフラの状態を **状態ファイル（state file、通常は terraform.tfstate）** に保存します。
    init は状態ファイルを読み書きできるように準備します。
 
-   ::: note info
+::: note info
 状態ファイルとは？Terraform が管理するインフラストラクチャの現在の実際の状態を記録・追跡するための重要なファイル
 :::
 
