@@ -89,12 +89,11 @@ minikube start
 kubectl apply -f https://github.com/kserve/kserve/releases/download/v0.13.0/kserve.yaml
 ```
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
+::: note warn
 注意
 
 公式サイトではkindを利用してインストールすることをすすめしていますが、今回minikube上で動かすには、minikubeの作法に合わせた手順（例えば、minikubeのDockerデーモンを利用してイメージをビルドする、またはyamlで構築するなど）に読み替える必要がありました。
-
-</div>
+:::
 
 ## 4. ローカルDockerとminikubeでテストデプロイ
 
@@ -182,11 +181,9 @@ kubectl apply -f inferenceservice.yaml -n mlflow-kserve-test
 kubectl get inferenceservice mlflow-model -n mlflow-kserve-test
 ```
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 もし、gke-gcloud-auth-pluginがないと怒られたら、```gcloud components install gke-gcloud-auth-plugin```でインストールしましょう。それでも怒られたら、gcloud sdkのパスが通っていない可能性あるので、```export PATH="/path/to/google-cloud-sdk/bin:$PATH"```でパスを通してあげましょう。
-
-</div>
+:::
 
 以上がデプロイの流れとなりました！
 

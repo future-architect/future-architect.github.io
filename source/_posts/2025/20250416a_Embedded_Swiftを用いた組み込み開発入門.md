@@ -24,11 +24,9 @@ lede: "Embedded Swiftを用いてRaspberry Pi Pico WをLチカさせてみまし
 
 実際に、サンプルプロジェクトを動作させるまでに組み込み開発初心者視点で詰まった箇所や知らなかったことなども一緒に紹介したいと思います。
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 注意: Embedded Swiftはまだ試験的な段階のため、この記事の情報は古くなっている可能性があります。
-
-</div>
+:::
 
 ## Embedded Swiftとは
 
@@ -71,11 +69,9 @@ Embededed Swiftでは、以下のSwiftが提供する動的機能を制限する
 
 このプロジェクトは、公式が提供しているPico-sdkを用いることで、基本的な機能等はSDKに持たせ、どのように動作させるかなどはEmbedded Swiftで実装していくようなものです。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 推奨: Embedded Swiftを試す前に、[Raspberry Pi公式のチュートリアル](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf)を参考にRaspberry Pi Pico WでLチカさせることをおすすめします。Embedded Swiftのドキュメンテーションでも、推奨されています。
-
-</div>
+:::
 
 ### 実行環境
 
@@ -153,11 +149,9 @@ HomeBrewを使ってそれぞれインストールします。
     brew install ninja
     ```
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 注意: Homebrewのcore tapではなく、ARMmbedが管理するtapの`arm-none-eabi-gcc`をインストールしてください。
-
-</div>
+:::
 
 ## 環境変数の設定
 

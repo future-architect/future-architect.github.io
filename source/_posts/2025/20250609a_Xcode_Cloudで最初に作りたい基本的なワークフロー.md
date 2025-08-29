@@ -48,11 +48,11 @@ Xcode Cloud は、Xcode に組み込まれた継続的インテグレーショ�
   - App Store Connect でも同じ情報を閲覧でき、Workflow の編集も行えます
 - Apple Developer Program メンバーシップ加入者は、毎月25時間分のコンピューティング時間を無料で利用できます
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>注意
+::: note warn
+注意
 
 Xcode Cloud の毎月25時間分無料枠は、2025年6月時点の情報になります。今後変更される可能性があります。最新情報は Apple 公式ページをご確認ください。
-
-</div>
+:::
 
 # Pull Request Workflow
 

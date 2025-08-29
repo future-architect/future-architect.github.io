@@ -165,8 +165,7 @@ GPIO（General Purpose Input/Output）は、「汎用入力/出力ピン」を�
 | 39       | GND          | グラウンド                                                           |
 | 40       | VBUS         | USBバス電源（5V）                                                   |
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 重要な電源系ピンの使い分け
 
 1. **3V3 ピン**
@@ -177,8 +176,7 @@ GPIO（General Purpose Input/Output）は、「汎用入力/出力ピン」を�
    - Pico が外部機器の供給源として機能する際に便利
 3. **GND ピン**
    - どの回路にも必ず接続します。電子回路の基礎となるため、忘れずに取り扱います
-
-</div>
+:::
 
 ### 3.3.2 ブレッドボード電子回路
 
@@ -224,8 +222,7 @@ GPIO（General Purpose Input/Output）は、「汎用入力/出力ピン」を�
 
 回路が完成したら Raspberry Pi Pico W の電源をオンにして動作をチェックします。
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 **注意点:**
 
 1. **部品がショートしないようにする**
@@ -234,8 +231,7 @@ GPIO（General Purpose Input/Output）は、「汎用入力/出力ピン」を�
    - LEDを使う場合、過電流防止のために 200Ω〜220Ω の抵抗を入れる必要があります。
 3. **電圧や電流を確認**
    - ブレッドボード回路で使用する部品の動作電圧を確認してください。例えばRaspberry Pi Pico W は 3.3V に対応しています。
-
-</div>
+:::
 
 ### 3.3.3 「Lチカ」をやってみよう
 

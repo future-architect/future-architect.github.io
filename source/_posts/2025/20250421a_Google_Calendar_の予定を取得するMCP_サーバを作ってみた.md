@@ -145,11 +145,9 @@ MCPの機能としては、 `Resource`, `Prompt`, `tools` の3つが用意され
   - **引数**: カレンダー取得期間
   - **返り値**: 取得期間内の予定一覧
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 Google Calendar から情報を取得することを目的としてMCPサーバを作成したため、　あまり凝った実装はしていません。例えば、リフレッシュトークンによるアクセストークン再発行処理は実装していません。また、認証・トークン情報もどこかのクラウドサービスに預ける形ではなく、ローカルに保存する形です。
-
-</div>
+:::
 
 `index.ts` のコードのみ載せておきます。
 

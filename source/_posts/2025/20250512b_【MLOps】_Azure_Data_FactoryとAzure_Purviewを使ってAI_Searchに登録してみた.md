@@ -17,10 +17,10 @@ author: 菅野滉大
 lede: "MLOpsを推進するためのツールとして、Azure Data FactoryとAzure Purviewについて検証していきます。"
 ---
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
+::: note warn
 ※担当チーム都合で、記事の公開が執筆次期から期間を空けてしまいました。
 当時から変更がある可能性がある旨はご承知おきください。
-</div>
+:::
 
 # 初めに
 
@@ -107,7 +107,8 @@ Azure Data Factoryは、Microsoftが提供するクラウド型のデータ統�
 
 <img src="/images/2025/20250512b/image_2.png" alt="" width="1200" height="753" loading="lazy">
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>　Azure Logic Appsとの違い
+::: note info
+Azure Logic Appsとの違い
 
 データの統合や自動化を目的としたツールとして、Azure Data Factoryに類似したツールであるLogic Appsがあります。ユースケースに合わせて使い分ける必要があります（[参考](https://learn.microsoft.com/ja-jp/azure/logic-apps/azure-integration-services-choose-capabilities)）
 
@@ -119,8 +120,7 @@ Azure Data Factoryは、Microsoftが提供するクラウド型のデータ統�
 | データ処理のスケーラビリティ | 軽量なデータ処理・リアルタイムイベントの処理 | 高スループットのデータ処理・バッチ処理   |
 | コネクタとサービスの統合 | SaaSアプリ・APIとの広範な統合                | データの移動と変換を中心に多くのデータソースに対応 |
 | ワークフローの自動化 | ビジネスプロセスの多段階自動化                | データパイプラインの設計・自動実行       |
-
-</div>
+:::
 
 ## Azure Purviewとは
 

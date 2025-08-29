@@ -29,15 +29,13 @@ SATでも、主にセキュリティの観点から、次々に出てくるAIサ
 
 この記事では、GitLabに組み込んでみた実例を元に、PR-Agentでできることを紹介したいと思います。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 GitLabの公式AIソリューションとしては、[GitLab Duo](https://about.gitlab.com/ja-jp/gitlab-duo/)が既にエンタープライズ向けに提供されています。
 
 [参考:GitLab Duoエンタープライズを提供開始](https://about.gitlab.com/ja-jp/blog/2024/09/03/gitlab-duo-enterprise-is-now-available/)
 
 **本記事執筆時点（2025年4月）** においては、前述の社内環境内ではまだ利用できません。
-
-</div>
+:::
 
 # PR-Agentとは
 
@@ -53,11 +51,9 @@ Qodo(旧CodiumAI)によって開発が進められており、Apache 2.0ライ�
 
 PR-Agentとのやり取りは、Pythonで実装されたCLIツール(後述)、またはPull Request上のコメントから以下のようなスラッシュコマンドを経由して行います。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 **以下の情報は、本記事執筆時点（2025年4月）のものです。**
-
-</div>
+:::
 
 - Describe
   - slash_command: `/describe`

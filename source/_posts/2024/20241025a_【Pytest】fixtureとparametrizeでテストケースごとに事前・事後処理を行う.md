@@ -194,11 +194,9 @@ def test_hoge_function(db_setup):  # 引数にfixtureを渡す
 
 <img src="/images/2024/20241025a/fixture_parametrize.drawio.png" alt="fixture_parametrize.drawio.png" width="1122" height="562" loading="lazy">
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 重要: `fixture`を`indirect`に指定する
-
-</div>
+:::
 
 以下の例の場合、`db_setup`を`indirect`に指定しているので、`テストデータx`はfixtureに渡され、「期待値x」はテスト関数に直接渡されます。
 
@@ -222,11 +220,9 @@ def test_hoge_function(db_setup, expected):  # 引数にfixtureを渡す
 
 `fixture`で`parametrize`からの変数を受け取る場合、引数に`request`をとり、`request.param`とすることでアクセスすることができます。
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 重要: `parametrize`で渡される変数にアクセスするには`request.param`でアクセスする
-
-</div>
+:::
 
 ```python
 import pytest

@@ -17,11 +17,9 @@ author: 高山博司
 lede: ".NET MAUIでiOS向けアプリを開発中、WebアプリからiOSアプリを呼び出す必要がでてきたため、ユニバーサルリンクを実装しました。WebサーバーはAzure Blob Storageの静的サイトを利用します。"
 ---
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 この記事はグループ会社であるFutureOneの Qiita Organizationで公開された [記事](https://qiita.com/onigiripudding/items/9ee95b84335ea9794a0b) をクロスポストで公開しています。
-
-</div>
+:::
 
 
 # はじめに

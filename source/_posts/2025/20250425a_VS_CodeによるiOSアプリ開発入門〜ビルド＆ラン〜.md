@@ -234,11 +234,9 @@ xcrun simctl launch booted "com.example.TechBlogSpring2025" # シミュレータ
 
 </details>
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 シミュレータを起動後に、再度起動するタスクを実行すると既に起動しているためエラーとなり、2回目以降はシミュレータの起動をスキップするタスクを別途構成する必要がありそうです。
-
-</div>
+:::
 
 ## 試してみて
 

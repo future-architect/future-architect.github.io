@@ -20,10 +20,10 @@ lede: "AWSを用いた生成AIアプリケーションの実装として、Gener
 
 AWSを用いた生成AIアプリケーションの実装として、Generative AI Use Cases JP (略称:GenU)についての検証を行いました。
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
+::: note warn
 ※担当チーム都合で、記事の公開が執筆次期から期間を空けてしまいました。
 当時から変更がある可能性がある旨はご承知おきください。
-</div>
+:::
 
 # 検証内容
 

@@ -47,9 +47,9 @@ Infrastructure as Code (IaC) ツールの一種で、クラウドやオンプレ
 
 ## 2.1 ファイル構成
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
+::: note info
 構成に関してあくまでもわかりやすい構成図を描いています。開発環境によって異なることをご留意ください。
-</div>
+:::
 
 基本的には `main.tf` を軸にインフラを構築していきます。
 module 配下のディレクトリでリソースタイプ毎に分けていきます。
@@ -327,9 +327,9 @@ project2
    Terraform は、管理するインフラの状態を **状態ファイル（state file、通常は terraform.tfstate）** に保存します。
    init は状態ファイルを読み書きできるように準備します。
 
-   <div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-   状態ファイルとは？Terraform が管理するインフラストラクチャの現在の実際の状態を記録・追跡するための重要なファイル
-   </div>
+   ::: note info
+状態ファイルとは？Terraform が管理するインフラストラクチャの現在の実際の状態を記録・追跡するための重要なファイル
+:::
 
 2. **プロバイダープラグインのダウンロード**
    Terraform は、さまざまなクラウドプロバイダー (AWS, Azure, GCP など) と連携するために「プロバイダープラグイン」を使用します。init は設定ファイル（provider ブロックや terraform ブロック内の required_providers）を元に、必要なプロバイダープラグインをダウンロードします。

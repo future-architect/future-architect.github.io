@@ -103,9 +103,9 @@ Desired location option (enter a number): 1
 
 ```
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
+::: note info
 補足: プロジェクト名やデータベースの設定は、環境に合わせて適切に選択してください。
-</div>
+:::
 
 ## BigQuery に接続する
 
@@ -129,9 +129,9 @@ dbt_trial:
   target: dev
 ```
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
+::: note warn
 注意: project にはご自身の GCP プロジェクト ID を、dataset には dbt でテーブルを作成する BigQuery のデータセット名を指定してください。location はデータセットのロケーションに合わせてください。
-</div>
+:::
 
 作成した dbt プロジェクトフォルダの直下で`dbt debug`コマンドを実行し、BigQuery への接続が正常に確立できるかを確認します。
 
@@ -159,8 +159,7 @@ dbt run
 - 本記事では、売り上げデータの分析として、日付ごとの売上の合計を取得してみようと思います。
 - 実装にあたり、dbt にはレイヤという考え方があり、レイヤの作成方針のベストプラクティスに倣ってデータ変換処理を実装していきます。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 dbt のレイヤの考え方
 
 dbt におけるレイヤは、データの変換プロセスを整理し、管理しやすくするための重要な概念です。以下のようなレイヤ構成がベストプラクティスとされています。
@@ -168,8 +167,7 @@ dbt におけるレイヤは、データの変換プロセスを整理し、管�
 - Staging レイヤ: データソースからロードされた生データに対して、データ型を整えたり、カラム名を分かりやすいように変更するなど、最低限の変換を行います。このレイヤのモデルは、通常、データソースの構造を反映した形になります
 - Intermediate レイヤ : staging レイヤのデータを基に、複数のテーブルを結合したり、ビジネスロジックに基づいた集計や計算を行ったりするなど、より複雑な変換を行います。このレイヤは、分析に必要な基本的なデータセットを準備する役割を担います。
 - Mart レイヤ: Staging・Intermediate レイヤで準備されたデータセットを、特定の分析目的やレポート作成に合わせてさらに集計・加工し、最終的な分析に利用しやすい形に整理します。例えば、日次の売上集計、顧客ごとの購買履歴などがこのレイヤに作成されます。
-
-</div>
+:::
 
 下記のような手順でデータ変換を実施していきます。
 
@@ -183,10 +181,10 @@ dbt におけるレイヤは、データの変換プロセスを整理し、管�
 
 以下の CSV ファイルを、dbt プロジェクト内の dbt_trial/seeds/ ディレクトリ配下にコピー&ペーストします。
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
+::: note warn
 今回は sales.csv のみ利用します。
 それ以外のデータはデータ分析用のサンプルデータとしてご利用ください。（生成 AI を利用して作成しております。）
-</div>
+:::
 
 <details><summary>sales.csv（店舗の売り上げデータ）</summary>
 
@@ -254,9 +252,9 @@ dbt seed
 下記のようにテーブルが作成され、データがロードされていれば OK です。
 <img src="/images/2025/20250515a/image_2.png" alt="image.png" width="993" height="404" loading="lazy">
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
+::: note info
 補足：dbt seed コマンドは、dbt プロジェクトの seeds ディレクトリに配置された CSV ファイルを、データウェアハウス（ここでは BigQuery）にテーブルとしてロードするためのコマンドです。主に、分析に必要な参照テーブルや、頻繁には変更されない比較的小さなデータセットを管理するのに適しています。
-</div>
+:::
 
 ## staging レイヤのモデルを作成する
 
@@ -351,9 +349,9 @@ dbt run --select "dbt_trial.staging.stg_sales"
 下記のような View テーブルが作成されます。
 <img src="/images/2025/20250515a/image_3.png" alt="image.png" width="766" height="392" loading="lazy">
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
+::: note info
 stg_sales.sql などの SQL ファイルには、データの抽出、変換、ロード（ETL の T と L）のロジックを記述し、対応する YAML ファイル（_stgmodels.yml、_stgsources.yml）には、モデルのメタ情報（説明、カラム定義、テストなど）やデータソースの定義を記述します。
-</div>
+:::
 
 ## mart レイヤのモデルを作成する
 
