@@ -12,7 +12,7 @@ category:
   - Programming
 thumbnail: /images/20250829a/thumbnail.png
 author: 澁川喜規
-lede: "全文検索機能がPrismaにも標準で用意されているということを知りました。PostgreSQLで全文検索はというと、PGroongaとか、pg_bigmを使うとかがトップ出てくるし、そもそも検索をしたくなったらElasticSearch使う、みたいに思っていました。標準で全文検索もできるなら運用コストもだいぶ下げられそうです。"
+lede: "全文検索機能がPrismaにも標準で用意されているということを知りました。PostgreSQLで全文検索はというと、PGroongaとか、pg_bigmを使うとかがトップ出てくるし、そもそも検索をしたくなったらElasticsearch使う、みたいに思っていました。標準で全文検索もできるなら運用コストもだいぶ下げられそうです。"
 ---
 
 <img src="/images/20250829a/top.png" alt="" width="600" height="600">
@@ -21,7 +21,7 @@ lede: "全文検索機能がPrismaにも標準で用意されているという�
 
 技術コンサルをしているお客さんとPrismaのドキュメントの読書会をしていて、全文検索機能が[Prismaにも](https://www.prisma.io/dataguide/managing-databases/intro-to-full-text-search)、[PostgreSQLにも](https://www.postgresql.org/docs/current/textsearch.html)標準で用意されているということを知りました。PostgreSQLで全文検索はというと、PGroongaとか、pg_bigmを使うとかがトップ出てくるし、そもそも検索をしたくなったらElasticSearch使う、みたいに思っていました。
 
-標準で全文検索もできるなら運用コストもだいぶ下げられそうです。かつて、Python製ドキュメントツールの、ブラウザで動く全文検索エンジンの日本語対応をやってみたり、[転置インデックスをS3に置く検索エンジン](/articles/20200327/)を作ってみたり~~貧乏~~低コスト検索エンジンの第一人者(自称)としては試してみたいところです。
+標準で全文検索もできるなら運用コストもだいぶ下げられそうです。かつて、Python製ドキュメントツールの、ブラウザで動く全文検索エンジンの日本語対応をやってみたり、FM-indexという[高速文字列解析の世界](https://www.iwanami.co.jp/book/b257894.html)という書籍で紹介されていたアルゴリズムを使ったブラウザで動く検索エンジンを作ったり、[転置インデックスをS3に置く検索エンジン](/articles/20200327/)を作ってみたり~~貧乏~~低コスト検索エンジンの第一人者(自称)としては試してみたいところです。
 
 ものは試しでやってみました。
 
