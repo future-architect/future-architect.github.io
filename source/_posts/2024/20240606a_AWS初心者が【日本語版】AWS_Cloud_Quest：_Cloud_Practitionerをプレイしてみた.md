@@ -1,5 +1,5 @@
 ---
-title: "AWS初心者が【日本語版】AWS Cloud Quest: Cloud Practitionerをプレイしてみた"
+title: 'AWS初心者が【日本語版】AWS Cloud Quest: Cloud Practitionerをプレイしてみた'
 date: 2024/06/06 00:00:00
 postid: a
 tag:
@@ -7,12 +7,12 @@ tag:
   - AWS Cloud Quest
   - 初心者向け
   - Network
-  - Security
 category:
   - Infrastructure
 thumbnail: /images/2024/20240606a/thumbnail.png
 author: 平井隆太
-lede: "AWS Cloud Questの魅力や使い方、そして実際にプレイしてみた感想をAWS初学者の目線でお伝えします。"
+lede: AWS Cloud Questの魅力や使い方、そして実際にプレイしてみた感想をAWS初学者の目線でお伝えします。
+
 ---
 # はじめに
 
