@@ -5,11 +5,12 @@ postid: b
 tag:
   - AWS
   - 合格記
+  - DB
 category:
   - Infrastructure
 thumbnail: /images/2021/20211112b/thumbnail.png
 author: 伊藤真彦
-lede: "AWS Certified Database - Specialtyに合格しました。これにて2021年に受験できる11資格を全て制覇しました。来年SAP on AWS - 専門知識が登場する事が確定していますが、ひとまず完全制覇です。"
+lede: "TIGの伊藤真彦です。AWS Certified Database - Specialtyに合格しました。これにて2021年に受験できる11資格を全て制覇しました。来年SAP on AWS - 専門知識が登場する事が確定していますが、ひとまず完全制覇です。"
 ---
 
 TIGの伊藤真彦です。
@@ -45,7 +46,7 @@ RDS for MySQL DBインスタンスのスナップショットをAurora MySQL DB 
 出題傾向としては下記のような内容が出題されます。
 当然データベースと名の付くものはほぼ全てが出題されます、Amazon Neptuneあたりは唯一の出番かもしれません。
 
-## データベースの知識
+#### データベースの知識
 
 * Amazon Aurora
 * Amazon DocumentDB (MongoDB 互換)
@@ -58,14 +59,14 @@ RDS for MySQL DBインスタンスのスナップショットをAurora MySQL DB 
 * Amazon Redshift
 * Amazon Timestream
 
-## データ移行
+#### データ移行
 
 * AWS Database Migration Service (AWS DMS)
 * AWS DataSync
 * AWS Schema Conversion Tool
 * AWS Snow ファミリー
 
-## セキュリティ、コンプライアンス:
+#### セキュリティ、コンプライアンス:
 
 * AWS CloudHSM
 * AWS Directory Service
@@ -73,7 +74,7 @@ RDS for MySQL DBインスタンスのスナップショットをAurora MySQL DB 
 * AWS Key Management Service (AWS KMS)
 * AWS Secrets Manager
 
-## その他基礎知識
+#### その他基礎知識
 
 * Amazon Simple Notification Service (Amazon SNS)
 * Amazon Simple Queue Service (Amazon SQS)

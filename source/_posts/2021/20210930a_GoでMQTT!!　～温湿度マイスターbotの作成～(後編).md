@@ -62,7 +62,7 @@ AWS IoTを使用したMQTTのチュートリアルはAWS公式からも詳細な
 
 ## 4. AWS IoTで取得した温湿度情報をDynamoDBに連携
 
-DynamoDBについては入門記事などが当社ブログでも投稿されているため説明は割愛いたします。
+DynamoDBについては入門記事などが弊社ブログでも投稿されているため説明は割愛いたします。
 
 * *[DynamoDB の記事一覧 \| フューチャー技術ブログ](https://future-architect.github.io/tags/DynamoDB/)*
 

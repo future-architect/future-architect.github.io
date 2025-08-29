@@ -6,10 +6,8 @@ tag:
   - RDS
   - RDSProxy
   - AWS
-  - 実行計画
-  - pg_hint_plan
 category:
-  - DB
+  - Infrastructure
 thumbnail: /images/2023/20230411a/thumbnail.png
 author: 辻大志郎
 lede: "PostgreSQL を使用する際、最適な実行計画が選択されず、クエリの速度が遅くなることがあります。オプティマイザが最適な実行計画を選択できない理由はいくつかありますが、たとえばバッチ処理で大量のデータを投入した直後、統計情報と実データの乖離により、少ないデータに適した計画が大量のデータでは不適切になることがあります。このような場合、PostgreSQL の拡張モジュールである pg_hint_plan により実行計画を固定することで、チューニングが可能です。"

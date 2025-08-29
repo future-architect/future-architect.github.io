@@ -19,11 +19,11 @@ lede: "新しいSQLフォーマッターであるuroboroSQL-fmtをリリース�
 コアテクノロジーグループの山田です。
 
 先日、新しいSQLフォーマッターである[uroboroSQL-fmt](https://github.com/future-architect/uroborosql-fmt)をリリースしました 🎉
-このツールは当社が公開している[PostgreSQL向けのSQLコーディング規約](https://future-architect.github.io/coding-standards/documents/forSQL/SQL%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E8%A6%8F%E7%B4%84%EF%BC%88PostgreSQL%EF%BC%89.html)に基づき、SQL文をフォーマットするツールです。
+このツールは弊社が公開している[PostgreSQL向けのSQLコーディング規約](https://future-architect.github.io/coding-standards/documents/forSQL/SQL%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E8%A6%8F%E7%B4%84%EF%BC%88PostgreSQL%EF%BC%89.html)に基づき、SQL文をフォーマットするツールです。  
 
-### 当社でのSQLフォーマッター開発の取り組み
+### 弊社でのSQLフォーマッター開発の取り組み
 
-元々当社では[uroboroSQL Formatter](/articles/20170228/)（以下uroboroSQL Formatterを旧版、uroboroSQL-fmtを新版と呼ぶ）というSQLフォーマッターを公開していました。旧版は
+元々弊社では[uroboroSQL Formatter](/articles/20170228/)（以下uroboroSQL Formatterを旧版、uroboroSQL-fmtを新版と呼ぶ）というSQLフォーマッターを公開していました。旧版は
 
 - 字句解析して得られたトークンを基にフォーマットするという設計になっていたため、SELECT句のエイリアス補完といった文法を考慮する必要のある機能の追加が困難
 - Pythonで書かれておりVSCodeの拡張機能として動作させるのが難しい
@@ -32,7 +32,7 @@ lede: "新しいSQLフォーマッターであるuroboroSQL-fmtをリリース�
 
 #### ANTLR+TypeScriptによるSQLフォーマッターの開発
 
-[Engineer Camp2020](/articles/20200606/)でANTLRとTypeScriptによるSQLフォーマッターを開発しました。インターンシップ中にSQLがフォーマットできるようになり、この方向性で旧版が抱えていた課題は解決できそうに思えましたが、SQLの構文解析が著しく遅いという問題点がありました。当社太田が[ANTLRのJavaScript runtimeの不具合を発見](https://github.com/antlr/antlr4/issues/2902)し、かなり高速化されたものの実用的な速さにはならなかったこともありANTLRを用いたSQLフォーマッターの開発はストップしました。
+[Engineer Camp2020](/articles/20200606/)でANTLRとTypeScriptによるSQLフォーマッターを開発しました。インターンシップ中にSQLがフォーマットできるようになり、この方向性で旧版が抱えていた課題は解決できそうに思えましたが、SQLの構文解析が著しく遅いという問題点がありました。弊社太田が[ANTLRのJavaScript runtimeの不具合を発見](https://github.com/antlr/antlr4/issues/2902)し、かなり高速化されたものの実用的な速さにはならなかったこともありANTLRを用いたSQLフォーマッターの開発はストップしました。
 
 インターンシップで行ったことについては以下の記事をご覧ください。
 
@@ -120,7 +120,7 @@ select
 		,	param2
 		)
 	,	param2
-	) as func_col
+	) as func_col 
 ,   t.col1
 from
     tbl t

@@ -13,13 +13,13 @@ category:
 thumbnail: /images/2016/20160420/thumbnail_20160420.jpg
 author: 清田侑
 lede: "こんにちは。FutureArchitectの清田です。
-先日、当社デザインワークスチームにて、2度目のハッカソン挑戦となるSPAJAM2016に参加しました。
+先日、弊社デザインワークスチームにて、2度目のハッカソン挑戦となるSPAJAM2016に参加しました。
 今回はその様子をお伝えしたいと思います。"
 ---
 # 始章　二度目の挑戦
 
 こんにちは。FutureArchitectの清田です。
-先日、当社デザインワークスチームにて、 2度目のハッカソンとなる[SPAJAM2016](http://spajam.jp/)に参加しました。
+先日、弊社デザインワークスチームにて、 2度目のハッカソンとなる[SPAJAM2016](http://spajam.jp/)に参加しました。
 今回はその様子をお伝えしたいと思います。
 （前回挑戦したサバフェスの様子は[こちら](http://future-architect.github.io/articles/20160406/)）。
 <img src="/images/2016/20160420/photo_20160420_01.jpg" class="img-small-size" loading="lazy">
