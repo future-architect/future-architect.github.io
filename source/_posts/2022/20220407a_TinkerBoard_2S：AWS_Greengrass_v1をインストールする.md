@@ -3,8 +3,10 @@ title: "TinkerBoard 2S：AWS Greengrass v1をインストールする"
 date: 2022/04/07 00:00:00
 postid: a
 tag:
+  - AWS
   - TinkerBoard2S
-  - AWSGreengrass
+  - Greengrass
+  - 電子工作
 category:
   - IoT
 thumbnail: /images/2022/20220407a/thumbnail.png

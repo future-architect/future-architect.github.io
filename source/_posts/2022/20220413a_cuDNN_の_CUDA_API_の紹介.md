@@ -6,6 +6,7 @@ tag:
   - CUDA
   - GPGPU
   - cuDNN
+  - DeepLearning
 category:
   - DataScience
 thumbnail: /images/2022/20220413a/thumbnail.png
