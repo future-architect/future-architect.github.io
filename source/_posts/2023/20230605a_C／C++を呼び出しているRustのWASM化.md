@@ -206,7 +206,7 @@ C/C++を呼んでいる場合はこちらの方法をオススメします。
       ```
 
       ::: note warn
-Windowsで[公式ページのインストーラ](https://www.python.org/downloads/)を用いてPythonのインストールを行なっており、かつGit Bashなどを使っている場合はemsdkの実行がうまくいかない場合があります。
+     Windowsで[公式ページのインストーラ](https://www.python.org/downloads/)を用いてPythonのインストールを行なっており、かつGit Bashなどを使っている場合はemsdkの実行がうまくいかない場合があります。
       WindowsではデフォルトでPython3コマンドが入っていますが、そのコマンドはPython3ではなくMicrosoftのPython3インストールページが起動します。また、[Python公式ページのインストーラ](https://www.python.org/downloads/)を用いてインストールされるPython3は`python`コマンドで起動します。よって、**無効な`python3`コマンドと有効な`python`コマンドが存在している状態になります。**
       emsdkではまず`python3`コマンドを探し、存在しなければ`python`コマンドを探します。そのため、先に述べた環境の場合は無効な`python3`コマンドが使用されてしまいます。
       対応方法は以下の3つです。
