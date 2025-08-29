@@ -11,6 +11,9 @@ fix:
 	node_modules/.bin/textlint --fix source/_posts/*.md
 	node_modules/.bin/textlint --fix source/_posts/**/*.md
 
+g:
+	node_modules/.bin/hexo g
+
 clean:
 	node_modules/.bin/hexo clean
 
