@@ -347,7 +347,7 @@ Dapr Agents を通して、AI Agentic な時代のワークフローについて
 
 Dapr Agents はデコレーターと Dapr の SDK を使用することで直感的に書けるのが非常に興味深いプロダクトでした。README.md を見る限り、これからも色々な機能が追加されるようなので、しばらくはエキサイティングな時間が続くと思います。
 
-Dapr Agents 以外にもマルチエージェントを見越したフレームワークは数多く出ています。弊社の引き合いの多さで言えば Amazon Bedrock ですが、去年プレビューで[マルチエージェントコラボレーション機能](https://aws.amazon.com/jp/blogs/news/introducing-multi-agent-collaboration-capability-for-amazon-bedrock/)をリリースしています。これらの機能を使用する際にも生かせるノウハウになるでしょう。
+Dapr Agents 以外にもマルチエージェントを見越したフレームワークは数多く出ています。当社の引き合いの多さで言えば Amazon Bedrock ですが、去年プレビューで[マルチエージェントコラボレーション機能](https://aws.amazon.com/jp/blogs/news/introducing-multi-agent-collaboration-capability-for-amazon-bedrock/)をリリースしています。これらの機能を使用する際にも生かせるノウハウになるでしょう。
 
 以上、Dapr Agents の紹介記事でした。
 
