@@ -4,7 +4,7 @@ date: 2023/09/21 00:00:00
 postid: a
 tag:
   - PCSE
-  - GCP
+  - GoogleCloud
   - 合格記
   - 資格
   - Udemy

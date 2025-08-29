@@ -4,7 +4,7 @@ date: 2023/12/26 00:00:00
 postid: a
 tag:
   - 合格記
-  - GCP
+  - GoogleCloud
   - CloudDigitalLeader
 category:
   - Infrastructure

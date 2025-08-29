@@ -3,7 +3,7 @@ title: "【合格記】Google Cloud Professional Data Engineer認定資格を振
 date: 2021/10/13 00:00:00
 postid: a
 tag:
-  - GCP
+  - GoogleCloud
   - 合格記
   - データエンジニアリング
 category:

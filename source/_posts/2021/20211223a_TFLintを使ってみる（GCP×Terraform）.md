@@ -4,7 +4,7 @@ date: 2021/12/23 00:00:00
 postid: a
 tag:
   - Terraform
-  - GCP
+  - GoogleCloud
   - TFLint
 category:
   - Infrastructure

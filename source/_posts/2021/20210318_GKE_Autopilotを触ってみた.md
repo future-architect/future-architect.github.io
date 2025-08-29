@@ -4,7 +4,8 @@ date: 2021/03/18 00:00:00
 postid: ""
 tag:
   - Kubernetes
-  - GCP
+  - GoogleCloud
+  - GKE Autopilot
 category:
   - Programming
 thumbnail: /images/2021/20210318/thumbnail.jpg

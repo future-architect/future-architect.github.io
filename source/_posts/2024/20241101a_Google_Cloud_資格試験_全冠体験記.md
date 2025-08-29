@@ -4,7 +4,6 @@ date: 2024/11/01 00:00:00
 postid: a
 tag:
   - GoogleCloud
-  - GCP
   - 合格記
   - 全冠
 category:

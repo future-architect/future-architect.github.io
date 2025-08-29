@@ -3,7 +3,6 @@ title: "【合格記】Google Cloud Professional Developer認定資格を振り�
 date: 2024/01/17 00:00:00
 postid: a
 tag:
-  - GCP
   - GoogleCloud
   - 合格記
 category:

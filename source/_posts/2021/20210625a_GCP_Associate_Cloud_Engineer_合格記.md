@@ -3,7 +3,7 @@ title: "GCP Associate Cloud Engineer 合格記"
 date: 2021/06/25 00:00:00
 postid: a
 tag:
-  - GCP
+  - GoogleCloud
   - 合格記
 category:
   - Infrastructure

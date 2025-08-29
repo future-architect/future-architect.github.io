@@ -3,7 +3,7 @@ title: "Google Cloud BuildpacksとCloud Runで簡単コンテナアプリ開発"
 date: 2021/03/17 00:00:00
 postid: ""
 tag:
-  - GCP
+  - GoogleCloud
   - Buildpacks
   - CloudRun
   - Docker

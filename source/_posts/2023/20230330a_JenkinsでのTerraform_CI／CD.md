@@ -3,7 +3,7 @@ title: "JenkinsでのTerraform CI/CD"
 date: 2023/03/30 00:00:00
 postid: a
 tag:
-  - GCP
+  - GoogleCloud
   - Jenkins
   - Terraform
   - CI/CD

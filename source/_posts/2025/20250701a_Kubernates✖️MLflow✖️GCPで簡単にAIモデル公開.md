@@ -6,7 +6,7 @@ tag:
   - CNCF
   - MLflow
   - MLOps
-  - GCP
+  - GoogleCloud
 category:
   - Programming
 thumbnail: /images/2025/20250701a/thumbnail.png

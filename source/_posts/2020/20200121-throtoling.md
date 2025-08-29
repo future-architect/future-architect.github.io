@@ -4,7 +4,7 @@ date: 2020/01/21 08:52:16
 postid: ""
 tag:
   - AWS
-  - GCP
+  - GoogleCloud
   - リトライ
   - スロットリング
 category:

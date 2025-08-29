@@ -3,7 +3,7 @@ title: "Google Cloud Professional Cloud Architectの再認定に合格しまし�
 date: 2022/04/11 00:00:00
 postid: a
 tag:
-  - GCP
+  - GoogleCloud
   - 合格記
 category:
   - Infrastructure

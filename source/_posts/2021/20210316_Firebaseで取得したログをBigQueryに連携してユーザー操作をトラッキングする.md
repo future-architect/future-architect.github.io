@@ -3,7 +3,7 @@ title: "Firebaseで取得したログをBigQueryに連携してユーザー操�
 date: 2021/03/16 00:00:00
 postid: ""
 tag:
-  - GCP
+  - GoogleCloud
   - Java
   - Firebase
   - GoogleAnalytics

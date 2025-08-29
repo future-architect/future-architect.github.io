@@ -3,7 +3,7 @@ title: "GCP Professional Cloud Network Engineer に合格しました"
 date: 2020/09/02 00:00:00
 postid: ""
 tag:
-  - GCP
+  - GoogleCloud
   - 合格記
   - Network
 category:

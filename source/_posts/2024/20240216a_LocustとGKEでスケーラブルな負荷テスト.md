@@ -4,7 +4,7 @@ date: 2024/02/16 00:00:00
 postid: a
 tag:
   - GoogleCloudArchitectureCenter
-  - GCP
+  - GoogleCloud
   - locust
   - 性能検証
   - 負荷テスト

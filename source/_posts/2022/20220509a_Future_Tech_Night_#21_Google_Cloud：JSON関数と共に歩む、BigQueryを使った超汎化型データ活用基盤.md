@@ -3,7 +3,7 @@ title: "Future Tech Night #21 Google Cloud：JSON関数と共に歩む、BigQuer
 date: 2022/05/09 00:00:00
 postid: a
 tag:
-  - GCP
+  - GoogleCloud
   - BigQuery
   - TechNight
   - 登壇レポート

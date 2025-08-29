@@ -4,7 +4,7 @@ date: 2020/08/05 00:00:00
 postid: ""
 tag:
   - Terraform
-  - GCP
+  - GoogleCloud
   - Ansible
   - Packer
   - IaC

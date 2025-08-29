@@ -7,7 +7,7 @@ tag:
   - GoogleWorkspace
   - サービスアカウント
   - Go
-  - GCP
+  - GoogleCloud
 category:
   - Programming
 thumbnail: /images/2021/20211022a/thumbnail.png

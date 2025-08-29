@@ -5,7 +5,7 @@ postid: a
 tag:
   - BigQuery
   - IAM
-  - GCP
+  - GoogleCloud
   - アクセス制御
 category:
   - Infrastructure

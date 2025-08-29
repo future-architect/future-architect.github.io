@@ -1,9 +1,10 @@
 ---
-title: "GCP連載#9 初めてのGCP 画像AI(Vision API)をさわってみた"
+title: "初めてのGCP 画像AI(Vision API)をさわってみた"
 date: 2020/02/18 10:16:55
 postid: ""
 tag:
-  - GCP
+  - Google Cloud
+  - 画像処理
 category:
   - DataScience
 author: 村瀬善則

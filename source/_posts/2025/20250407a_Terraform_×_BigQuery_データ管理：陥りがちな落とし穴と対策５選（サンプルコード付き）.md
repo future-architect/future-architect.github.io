@@ -4,7 +4,7 @@ date: 2025/04/07 00:00:00
 postid: a
 tag:
   - Terraform
-  - GCP
+  - GoogleCloud
   - BigQuery
   - データマネジメント
   - データエンジニアリング

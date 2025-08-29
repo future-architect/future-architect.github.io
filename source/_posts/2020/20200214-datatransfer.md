@@ -3,7 +3,7 @@ title: "GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQ
 date: 2020/02/14 09:39:28
 postid: ""
 tag:
-  - GCP
+  - Google Cloud
   - S3
   - BigQuery
 category:

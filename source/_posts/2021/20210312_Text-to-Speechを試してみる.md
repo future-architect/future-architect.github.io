@@ -3,7 +3,7 @@ title: "Text-to-Speechを試してみる"
 date: 2021/03/12 00:00:00
 postid: ""
 tag:
-  - GCP
+  - GoogleCloud
   - TextToSpeech
 category:
   - Infrastructure

@@ -1,9 +1,9 @@
 ---
-title: "GCP連載#1 Stackdriver Loggingへ良い感じのログ出力方法を考える"
+title: "Stackdriver Loggingへ良い感じのログ出力方法を考える"
 date: 2020/02/05 09:23:10
 postid: ""
 tag:
-  - GCP
+  - Google Cloud
   - OpenCensus
   - Go
   - CloudOperations
@@ -11,7 +11,7 @@ tag:
 category:
   - Infrastructure
 author: 真野隼記
-lede: "GCPをテーマにした連載企画を始めるということで、初回はStackdriver Loggingの活用方法をまとめます。
+lede: "Google Cloudをテーマにした連載企画を始めるということで、初回はStackdriver Loggingの活用方法をまとめます。
 
 1記事でまとめるには手が余るほど様々な機能があるため、初回はログの出力とビューア周りといったアプリケーション開発者視点での機能に絞って説明していきます。利用コードはGoで書かれていますが、汎用的な内容なので他の言語でもある程度通じる内容にしているつもりです。"
 ---

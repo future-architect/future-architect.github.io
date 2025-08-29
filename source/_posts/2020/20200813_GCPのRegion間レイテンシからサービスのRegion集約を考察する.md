@@ -3,7 +3,7 @@ title: "GCPのRegion間レイテンシからサービスのRegion集約を考察
 date: 2020/08/13 00:00:00
 postid: ""
 tag:
-  - GCP
+  - GoogleCloud
   - Network
   - Terraform
 category:
