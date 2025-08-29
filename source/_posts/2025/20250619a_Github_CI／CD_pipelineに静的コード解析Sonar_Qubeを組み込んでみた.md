@@ -1,18 +1,19 @@
 ---
-title: "GitHub ActionsのCI/CDパイプラインに静的コード解析Sonar Qubeを組み込んでみた"
+title: GitHub ActionsのCI/CDパイプラインに静的コード解析Sonar Qubeを組み込んでみた
 date: 2025/06/19 00:00:00
 postid: a
 tag:
-  - CI/CD
-  - SonarQube
-  - GitHubActions
-  - Security
-  - DevSecOps
+- CI/CD
+- SonarQube
+- GitHubActions
+- DevSecOps
 category:
-  - Security
+- Security
 thumbnail: /images/2025/20250619a/thumbnail.png
 author: 松本朝香
-lede: "１か月前、情報安全確保支援士を受験してきまして、問題の選択肢にあった SonarQube という初耳ワードがどんなOSSなのか気になりました。タイミングよくこの『CI/CD pipeline』企画を目にしたので、これは私に書けと言っている！と思い、このブログ記事の題材にすることに決め、ミニマム版を実装構築してみました。"
+lede: １か月前、情報安全確保支援士を受験してきまして、問題の選択肢にあった SonarQube という初耳ワードがどんなOSSなのか気になりました。タイミングよくこの『CI/CD
+  pipeline』企画を目にしたので、これは私に書けと言っている！と思い、このブログ記事の題材にすることに決め、ミニマム版を実装構築してみました。
+
 ---
 
 [CI/CD連載](/articles/20250603a/) 4本目の記事です。
