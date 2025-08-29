@@ -185,13 +185,11 @@ spec:
           restartPolicy: Never
 ```
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 BigQueryの認証方式について
 
 上記の例では、ローカル開発環境での簡易性を考慮し、ホストPCの gcloud コマンドで設定された認証情報（OAuth）を hostPath ボリュームとしてコンテナにマウントしています。実運用環境のKubernetesクラスタでBigQueryと連携する場合は、GCPサービスアカウントキーをSecretとして安全にマウントしたり、Workload IdentityのようなKubernetesネイティブな認証方式を利用することが推奨されます。
-
-</div>
+:::
 
 ## 4.3 Kubernetesにデプロイするコマンド
 

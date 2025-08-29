@@ -132,22 +132,18 @@ Linux version 6.8.11-amd64 (devel@kali.org) (x86_64-linux-gnu-gcc-13 (Debian 13.
 
 Questions は3つありますが、どれも `What is key 1?` といった形式で、特に調べる場所のヒントはなさそうです。
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 Walkthrough の途中で IP の値が変わっています。これは時間を跨いだせいで、サーバが再起動したためです。Walkthrough だけ読むとスラスラと解いてるように見えるかもしれませんが、裏では試行錯誤したり情報を調べたりと、ずっと多くの時間がかかってます。
 ああ、苦戦したんやな（笑）と思ってください。
-
-</div>
+:::
 
 ---
 
 まずは恒例 `nmap` でターゲットの偵察をしていきます。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 使用コマンドは使ってるうちに段々と慣れて覚えられます。忘れた場合は潔く参考書を開いたりネットで調べます。どのようなツールがあり、それで何ができるのかを覚えておくことが大事で、あとは適宜 option を調べてなんとかなります。
-
-</div>
+:::
 
 ```sh
 ┌──(kali㉿kali)-[~/tryhackme/MrRobotCTF]
@@ -286,12 +282,10 @@ I like where you head is at. However I'm not going to help you.
 
 <img src="/images/2024/20241030a/MrRobotCTF_login.png" alt="MrRobotCTF_login.png" width="1200" height="627" loading="lazy">
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 以下でやるように、「`Username` が異なります」 という詳細なエラーを返すと、「`Username` が正しいか」という判断が可能になり、ブルートフォース攻撃が可能となる脆弱性を埋め込むことになります。
 「`Username` または `Password` が異なります」や「認証情報が違います」といった汎用的な表現に留めましょう。
-
-</div>
+:::
 
 developer tool で確認してみると、`log: test, pwd: password` というパラメータで POST していることが分かりました。
 この `log` の候補となる情報がないか調べてみます。
@@ -397,12 +391,10 @@ Progress Time: 00:00:49 <=====================================                  
 
 <img src="/images/2024/20241030a/MrRobotCTF_editor.png" alt="MrRobotCTF_editor.png" width="1200" height="625" loading="lazy">
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 **リバースシェル**は、ターゲットから自分のローカルマシンに向けた接続を行う仕組みです。サーバは基本的に外部から内部への通信は厳しく制限しますが、内部から外部への通信は比較的ゆるい場合が多いです。
 そこで、ローカルマシンではあるポート（今回は`12345`） で接続を Listen しておきます。ターゲットマシンに侵入後、リバースシェルのプログラムにこのIP・ポートへ接続する設定をして、このプログラムが実行されるように仕込みます。プログラムが実行されると、ローカルマシンへの接続が発生して、ターゲットマシンのシェルを取得できます。
-
-</div>
+:::
 
 Kali にもともとある php のリバースシェルのスクリプトをコピーしてきます（ちなみに私は php のコードは読めません...）
 
@@ -485,11 +477,9 @@ robot
 
 robot ユーザでのログインに成功したので、次は権限昇格を狙います。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 このように、取得したログイン情報を足掛かりにして別のアカウントへ侵入することを横展開やラテラルムーブメントなどと呼びます。上位の権限を取得できる場合は権限昇格と呼びます。
-
-</div>
+:::
 
 robot では sudo でのコマンド実行はできないようです。
 
@@ -503,11 +493,9 @@ Sorry, user robot may not run sudo on linux.
 
 そこで、 `LinPEAS` というツールを使って、特権昇格に使えそうな設定不備がないかを調べてみます。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 [LinPEAS](https://github.com/peass-ng/PEASS-ng) は侵入後に特権昇格を狙うための設定不備がないかを表示してくれる強力なツールです。シェルを取得できている場合、スクリプトを持ってくるだけで実行でき、様々な情報を見やすい形で表示してくれます。マスコットがかわいいのに、強力で恐ろしい。
-
-</div>
+:::
 
 ローカルマシンで別タブを開き、 `cp /usr/share/peass/linpeas/linpeas.sh .` でスクリプトをコピーしてきます。ターゲットマシンで取得したいので `python3 -m http.server 12346` でサーバを起動します。
 

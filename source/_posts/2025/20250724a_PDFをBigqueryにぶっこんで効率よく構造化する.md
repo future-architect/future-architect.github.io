@@ -211,11 +211,9 @@ REMOTE WITH CONNECTION `us.gemini-flash-connection`
 OPTIONS (ENDPOINT = "gemini-2.0-flash-exp");
 ```
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 現時点、Gemini利用可能なリージョンはUSのみです。それ以外のリージョンを選択してモデルすると、エラーが出ます。
-
-</div>
+:::
 
 ```sql Cloud StorageのPDFを外部テーブルとして作成.sql
 CREATE EXTERNAL TABLE gemini_us.pdf_table
@@ -251,14 +249,12 @@ FROM ML.GENERATE_TEXT(
 );
 ```
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 ML.GENERATE_TEXT関数のMAX_OUTPUT_TOKENSがデフォルトで1024です。ユースケースに応じてMAX_OUTPUT_TOKENSを明示的に定義しました。
 
 こちらでGENERATE_TEXTのsyntaxを確認できます。
 https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-generate-text#syntax_for_standard_tables
-
-</div>
+:::
 
 # PDF抽出結果
 

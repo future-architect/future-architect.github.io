@@ -67,11 +67,9 @@ visionOS対応もしており、Apple Vision Proユーザーの方は、会場�
 
 私が視聴して良かった・役に立った・もっと理解したいと思ったセッションをいくつか紹介します。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 try! Swift Tokyo 2025の全セッションはtry!Swift TokyoのHPの[タイムテーブル](https://tryswift.jp/#timetable)からご確認ください。
-
-</div>
+:::
 
 ## iOS17,16,15での新機能(セッション動画は[こちら](https://youtu.be/qY09lmDo7GU?si=AMweGOy0GHKfX0Sz))
 

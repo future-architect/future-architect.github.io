@@ -26,11 +26,9 @@ lede: "Dapr Agentsの検討記事です。Dapr Agents の技術的背景や意�
 
 Dapr Agents の技術的背景や意義を「Agentic AI」や「ワークフロー」の側面から探ります。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 実際に触ってみたまでが長いですが、読み物としてお付き合いください。
-
-</div>
+:::
 
 ## Dapr について
 
@@ -95,11 +93,9 @@ Dapr Agents の開発元である Datagrid は、Anthropic のレポートに触
 
 たとえば、生成 LLM のレスポンスは通常の会話モードでは奔放的ですがこちらから型式を指定して返すようにするモードがあります。エンタープライズ業界のワークフローでは後者が重要なのは言うまでもないでしょう。Dapr Agents では後述する `@task` デコレーターなどで直感的に書くことができます。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 Anthropic はワークフローの実装にあたり「最初はできるだけシンプルに、必要な場面でだけ複雑さ（＝自律性）を追加せよ」とも推奨しています[^4]。Agentic AI 時代のワークフローの開発スタイルと言えるでしょう。
-
-</div>
+:::
 
 ## 8 つのワークフローパターン
 
@@ -355,15 +351,13 @@ Dapr Agents 以外にもマルチエージェントを見越したフレーム�
 
 以上、Dapr Agents の紹介記事でした。
 
-:<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+:::: note info
 今回 Claude Code を使い倒してワークフローを実装しました。CLAUDE.md(いわゆる指示書)に `dapr run` (ワークフローを実行するコマンド)を書いてその結果を踏まえてバグってたら直してという ReAct 的な内容を書いていたら、勝手にコード修正&実行&リトライのループ作業を始めたので個人的には驚きで白目向きました。やっていること、もう人間と一緒じゃん。
 
 `Agent` クラスや `@task` デコレーターの使い方はクイックスタート以上のことをしようとすると、実装内容を直接読み解く必要があったのですが、Claude Code はそんな時も刺さりました。具体的には使い方とオプションを全部 markdown に出力するようにお願いし、その結果を「Claude Code が」実装でも使いまわせるようにしたら、正確にコーディングしてくれるようになりました。開発ドキュメントが不足している過渡期だからこそ必要とされるノウハウではありますが、確実に LLM にインデックスされていないフレームワークを使用するケースでも十分役に立つことがわかりました。
 
 「Claude Code」はいいぞ。
-
-</div>
+:::
 
 [^1]: 「いい感じに」は言葉の綾であることに注意が必要です。「Claude Code」ユーザーの共通認識として、その言葉から想定されるより、ものすごく丁寧に細かくプロンプトで入力しないと思い通りに動かないよね、概要設計や方針は事前に細かく明文化しないとだめだねっていうことが経験値的にわかってきました。
 [^2]: あえて本文には書きませんでしたがマルチエージェントシステムにおける一番の問題はコストです。上記の Anthropic の事例紹介でも、単一エージェントと比較してトークン(コストにあたるもの)を 15 倍消費するので、バリューを発揮する検索システムでしか採用できなかったという身もふたもない話が書かれていました。

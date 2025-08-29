@@ -38,11 +38,9 @@ lede: "システムの性能テストを実施する際、テスト用の大量�
 
 以下、生成スクリプトでデータ生成した際に直面した課題と解決策を紹介します。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 ※実際に使ったコードではOpenSearch用、DynamoDB用のJSONファイルを作成しましたが、記事の簡略化のためにOpenSearch用のもののみ記載いたします。また実際には1億5千万件のデータを生成しましたが、スクリプト実行時の軽量化のために、本記事のコード上では1万件で処理時間の計測をしています。
-
-</div>
+:::
 
 # ダミーデータ生成スクリプト
 

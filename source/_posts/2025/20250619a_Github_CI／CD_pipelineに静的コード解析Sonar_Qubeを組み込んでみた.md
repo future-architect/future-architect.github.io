@@ -254,21 +254,17 @@ jobs:
           path: htmlcov/
 ```
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 **Shallow Clone とは？**
 
 "Gitリポジトリをクローン（複製）する際に、リポジトリの完全な履歴を取得する" という意味です。通常、CI/CD環境ではビルド時間を短縮するために、Gitリポジトリの最新のコミットから数個分だけを取得する「シャロークローン」が行われることがあります。例えば、「最新の1コミットだけ取得する」といった設定です。これにより、ダウンロードするデータ量が減り、クローンにかかる時間が短縮されます。GitHub Actionsの actions/checkout アクションでは、デフォルトでシャロークローン（fetch-depth: 1、つまり最新の1コミットのみ）が行われます。これを無効化（fetch-depth: 0）することで、SonarCloud (や SonarQube) は、ソースコードを静的解析する際に、コードの変更履歴を深く分析することができ、より多くの有益な情報を提供します。
+:::
 
-</div>
-
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 **ワークフローファイルのカスタマイズ**
 
 トリガー (on:): どのブランチへの push や pull_request で実行したいか、または特定のタグが作成されたときなど、実行条件を細かく設定できます。
-
-</div>
+:::
 
 ### ３．sonar-project.properties ファイルの作成
 
@@ -316,8 +312,7 @@ sonar.python.coverage.reportPaths=coverage.xml
 # sonar.verbose=true # 詳細ログ (デバッグ用)
 ```
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 **記載する上での注意点**
 
 完成したワークフローがパースの影響で誤認識され回らなかった時がありました。
@@ -325,8 +320,7 @@ sonar.python.coverage.reportPaths=coverage.xml
 <img src="/images/2025/20250619a/image.png" alt="image.png" width="1156" height="242" loading="lazy">
 
 特に `sonar.tests=tests # ...` のようにプロパティ値の直後に # でコメントを続けている場合、# がパスの一部として解釈されたり、あるいはその前のスペースと合わせて問題を引き起こすことがあるようです。最も安全なのは、プロパティ定義の行には値のみを記述し、コメントは独立した行に記述することです。
-
-</div>
+:::
 
 ### ４．解析対象レポジトリの準備
 

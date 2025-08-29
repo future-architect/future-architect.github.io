@@ -12,11 +12,9 @@ thumbnail: /images/2025/20250509b/thumbnail.png
 author: 三浦克之
 lede: "Azure Bicepは、Microsoft Azureのリソースを効率的に管理するために開発された宣言型の言語です。Azure上のインフラストラクチャをコードとして定義し、デプロイすることを可能にします。Azure Bicepは便利で強力なツールですが..."
 ---
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 グループ会社であるFutureOneの Qiita Organizationで公開された [記事](https://qiita.com/Miura597/items/b83e3371ec97b8dea74c) をクロスポストで公開しています。
-
-</div>
+:::
 
 # はじめに
 

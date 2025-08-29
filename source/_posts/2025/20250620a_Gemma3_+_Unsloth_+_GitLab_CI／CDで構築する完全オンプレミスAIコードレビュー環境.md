@@ -29,11 +29,9 @@ lede: "Gemma3とUnslothを組み合わせて、完全オンプレミス環境で
 
 結果として、プロジェクト固有のコードレビューAIを構築し、Merge Request連動での自動レビューするというフローを実装できました。本記事では、GitLab CE環境での具体的な構築手順などを紹介します。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 PR-Agentや外部APIを活用したアプローチについては、弊社SATの高橋さんの[GitLabのレビューにPR-Agentを組み込んでみた](/articles/20250417a/) 記事もご参照ください
-
-</div>
+:::
 
 # 背景
 
@@ -143,14 +141,12 @@ GitLab Duo Self-Hosted（Premium/Ultimate + Duo Enterprise）がとても魅力�
 
 ここからは、実際にGitLab環境の構築から、Gemma3の組み込みなどを行っていきます。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 紹介するコード例の一部は、AI（Claude）の助けを借りて作成しています。
 
 内容の正確性には注意を払っていますが、AIによる生成物には意図しない誤りや、最適なコードではない可能性も含まれます。
 また、文字数の関係上記事の上では記載しきれなかった部分もあり、実装例として記載しているものもあるため、ご認識ください。
-
-</div>
+:::
 
 ## 検証環境（ローカルPC）
 
@@ -325,9 +321,9 @@ sudo systemctl restart docker
 
 ここまででGitLabの設定、Runnerの設定周りは完了です！次からは、プロジェクト固有の設定をしていきます。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
+::: note info
 本記事では割愛しますが、Bot用のユーザー発行やAccess Tokenの作成、CI/CDの環境変数への設定なども追加で行っています。
-</div>
+:::
 
 ## プロジェクトの作成と学習データ準備
 
