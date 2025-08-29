@@ -9,7 +9,7 @@ tag:
   - Googleカレンダー
   - タスク管理
 category:
-  - Infrastructure
+  - DataScience
 thumbnail: /images/20250728a/thumbnail.png
 author: 清水雄一郎
 lede: "普段の業務で使っているGeminiアプリで感じた「AIって、これまでの文脈を忘れちゃうな…」という壁と、それをGoogleカレンダーで解決できそう、というお話をご紹介したいと思います。"
