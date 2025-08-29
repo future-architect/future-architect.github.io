@@ -70,7 +70,7 @@ MacOs, Linuxの場合は、[dbt VS Code拡張機能](https://marketplace.visuals
 
 詳しい手順は、公式サイト（[dbt VS Code拡張をインストールする](https://docs.getdbt.com/docs/fusion/install-dbt-extension)）をご参考ください。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
+::: note info
 
 **Windowsにおけるインストール**
 
@@ -80,7 +80,7 @@ Windowsの場合は、VS Code拡張機能を経由してFusionのインストー
 irm https://public.cdn.getdbt.com/fs/install/install.ps1 | iex
 ```
 
-</div>
+:::
 
 ### ２．インストール後の対応
 
@@ -108,7 +108,7 @@ dbt init --fusion-upgrade
 
 例えば、過去に3分実行時間が必要なパイプラインがおおよそ1分で終わりました。
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
+::: note warn
 
 よくよく考えてみると、dbt fusionはあくまでSQL実行計画をしてくれるツールであり、30倍早くならなかった理由は以下の様に考えられます。
 
@@ -116,7 +116,7 @@ dbt init --fusion-upgrade
 - そもそもSQLの依存関係が複雑すぎる
 - marcos テンプレートの多用により解析時間がかかる
 
-</div>
+:::
 
 ### 気になった点
 
@@ -129,11 +129,9 @@ dbt init --fusion-upgrade
 - バグがまだまだあります
   - たとえば、データウェアハウス内にデータがない場合、今までdbt-coreではエラーが出なかったのに、Fusionで同じ実行すると、`Parquet ArrowWriter Error`が出ました
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 上記のエラーが[公式Github](https://github.com/dbt-labs/dbt-fusion/issues?page=1)のIssueとして発行されておりました。もし謎のバグに出合った際、Issue一覧から類似するバグがないか、一度調べてみるとよいです。
-
-</div>
+:::
 
 ## いつ正式運用できるか？
 

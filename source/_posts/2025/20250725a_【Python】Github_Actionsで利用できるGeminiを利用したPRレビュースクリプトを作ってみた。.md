@@ -39,9 +39,9 @@ GitHub CopilotにもAIレビュー機能は実装されていますが、現状�
 
 - [GoogleのLLM「Gemini」でコードレビューをするGitHub Actionsを自力で構築してみた - NTT docomo Business Engineers' Blog](https://engineers.ntt.com/entry/202503-gemini-cicd-code-review/entry)
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
+::: note info
 Github ActionsのWorkflow定義やプロンプトの実装に関しては↑の記事を参照してください。
-</div>
+:::
 
 # PRへのAIレビュースクリプト
 
@@ -208,12 +208,12 @@ if __name__ == "__main__":
    - Geminiが生成したレビューコメント（JSON形式）を解析し、start_line (指摘箇所の開始行)、severity (重要度)、comment (具体的なコメント内容) などの情報を取り出します。
    - これらの情報を用いて、pr.create_review_comment() メソッドを通じて、GitHubのプルリクエストの該当行にAIによるレビューコメントを自動的に投稿します。
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
+::: note warn
 
 - GITHUB_TOKENは、workflow定義にて、`GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}`を環境変数に追加してください。
 - gemini apiを利用するにあたっては、workflow定義にて、サービスアカウント認証が必要になります。
 
-</div>
+:::
 
 # スクリプトの実行結果
 
