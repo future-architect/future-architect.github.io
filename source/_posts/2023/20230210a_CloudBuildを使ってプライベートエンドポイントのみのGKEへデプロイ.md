@@ -5,8 +5,8 @@ postid: a
 tag:
   - Kubernetes
   - GKE
-  - GCP
   - GoogleCloud
+  - CloudBuild
 category:
   - Infrastructure
 thumbnail: /images/2023/20230210a/thumbnail.png

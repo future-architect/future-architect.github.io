@@ -3,8 +3,9 @@ title: "GCP連載#10 Terraform ではなくCloud Deployment Manager を使って
 date: 2020/02/19 10:05:30
 postid: ""
 tag:
-  - GCP
+  - Google Cloud
   - IaC
+  - Cloud Deployment Manager
 category:
   - Infrastructure
 author: 前原応光

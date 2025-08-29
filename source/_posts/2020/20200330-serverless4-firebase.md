@@ -4,7 +4,7 @@ date: 2020/03/30 09:45:42
 postid: ""
 tag:
   - サーバーレス
-  - GCP
+  - GoogleCloud
   - Firebase
   - Android
   - モバイルアプリ

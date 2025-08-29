@@ -3,7 +3,8 @@ title: "Future Tech Night #15 ~GCPのサーバーレスサービスを利用し�
 date: 2021/09/10 00:00:00
 postid: a
 tag:
-  - GCP
+  - GoogleCloud
+  - サーバレス
   - TechNight
   - 登壇レポート
 category:

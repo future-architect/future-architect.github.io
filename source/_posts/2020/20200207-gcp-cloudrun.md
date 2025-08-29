@@ -4,7 +4,7 @@ date: 2020/02/07 10:54:41
 postid: ""
 tag:
   - Go
-  - GCP
+  - Google Cloud
   - サーバーレス
   - CloudRun
   - go-chi

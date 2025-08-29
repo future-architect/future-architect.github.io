@@ -5,7 +5,7 @@ postid: ""
 tag:
   - サーバーレス
   - Go
-  - GCP
+  - GoogleCloud
   - CloudFunctions
   - CloudEvents
 category:

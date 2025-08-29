@@ -4,7 +4,7 @@ date: 2022/09/20 00:00:01
 postid: b
 tag:
   - Dataflow
-  - GCP
+  - GoogleCloud
   - ApacheBeam
   - インターン
   - インターン2022

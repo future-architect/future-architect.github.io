@@ -5,7 +5,8 @@ postid: ""
 tag:
   - Terraform
   - HashiTalks
-  - GCP
+  - Google Cloud
+  - 登壇レポート
 category:
   - Infrastructure
 thumbnail: /images/2020/20200710/thumbnail.png

@@ -3,7 +3,7 @@ title: "Google Cloud Next ’19 in Tokyo Day2 セッションレポート"
 date: 2019/08/04 09:00:00
 postid: ""
 tag:
-  - GCP
+  - GoogleCloud
   - 参加レポート
   - GoogleCloudNext
   - GoogleCloudNext2019
@@ -103,7 +103,7 @@ kubectlでのクラスタ切り替えや、gcloudでのクラスタ情報を取�
 
 - サーバーレスとは？
   - No infra management、Fully managed security、Pay only for usage の3点
-- GCPのサーバーレス
+- Google Cloudのサーバーレス
   - Functions(Cloud Functions)、Apps(App Engine)、Containers(Cloud Run)
 - これまでの課題
   - 対応言語や対応ライブラリに依存すること、ベンダーロックイン、GPU/TPUなどの特定リソースにアクセスできないことの3点
@@ -358,7 +358,7 @@ DXチームは日頃からGKEをバリバリ使っているので、GKE×セキ�
 - gVisor
   - ホストとコンテナ間に1枚かますことで脅威の影響範囲を狭めセキュアに保つ
 - Event Threat Detection
-  - GCP環境に存在する脅威を検出
+  - Google Cloud環境に存在する脅威を検出
   - クラウドベースの脅威を迅速に検出
 
 ### ユーザ管理
@@ -392,7 +392,7 @@ Twitter好きなので参加しました。このセッションのハッシュ�
 **Partly Cloudy** というPJ名が指す通り、まずはHadoopクラスタから段階的なクラウドリフトをしたそうです。
 
 - Twitterにとって戦略的な決断で、Googleであればずっと一緒に成長し続けられると信じた
-- GCP移行でHadoopのクラスタの、ストレージとコンピュートを分離できた
+- Google Cloud移行でHadoopのクラスタの、ストレージとコンピュートを分離できた
 - オンプレミスとGCPの接続のため、1.6Tbpsのネットワーク帯域幅が必要！
 - クラスタの規模をどうするか。10ノードだと細かすぎるし、1000ノードだと大きすぎる
 - [cloud.google.com/twitter](https://cloud.google.com/twitter/) にも移行について記載しているよ

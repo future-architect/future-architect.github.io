@@ -4,7 +4,7 @@ date: 2022/06/09 00:00:00
 postid: a
 tag:
   - GoogleWorkspace
-  - GCP
+  - GoogleCloud
   - スロットリング
   - 失敗談
 category:

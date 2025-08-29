@@ -5,7 +5,7 @@ postid: a
 tag:
   - 書評
   - 書籍
-  - GCP
+  - GoogleCloud
   - 入門
 category:
   - Infrastructure

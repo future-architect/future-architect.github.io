@@ -5,7 +5,8 @@ postid: a
 tag:
   - Gemini
   - BigQuery
-  - GCP
+  - GoogleCloud
+  - PDF
   - BigQueryML
 category:
   - DataScience

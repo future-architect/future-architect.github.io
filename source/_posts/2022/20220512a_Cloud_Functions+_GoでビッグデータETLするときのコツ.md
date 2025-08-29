@@ -3,7 +3,7 @@ title: "Cloud Functions+ GoでビッグデータETLするときのコツ"
 date: 2022/05/12 00:00:00
 postid: a
 tag:
-  - GCP
+  - GoogleCloud
   - ETL
   - CloudFunctions
   - サーバーレス

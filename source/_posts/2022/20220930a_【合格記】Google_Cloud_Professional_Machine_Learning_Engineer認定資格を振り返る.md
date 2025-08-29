@@ -3,7 +3,7 @@ title: "【合格記】Google Cloud Professional Machine Learning Engineer認定
 date: 2022/09/30 00:00:00
 postid: a
 tag:
-  - GCP
+  - GoogleCloud
   - 資格
   - 合格記
   - Google Cloud Professional Machine Learning Engineer

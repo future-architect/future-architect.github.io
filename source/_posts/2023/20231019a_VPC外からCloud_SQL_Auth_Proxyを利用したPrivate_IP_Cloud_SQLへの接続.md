@@ -4,7 +4,7 @@ date: 2023/10/19 00:00:00
 postid: a
 tag:
   - CloudSQL
-  - GCP
+  - GoogleCloud
   - CloudSQLAuthProxy
 category:
   - Infrastructure

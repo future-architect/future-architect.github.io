@@ -5,7 +5,7 @@ postid: a
 tag:
   - MLOps
   - VertexAI
-  - GCP
+  - GoogleCloud
   - TechNight
   - 登壇レポート
 category:

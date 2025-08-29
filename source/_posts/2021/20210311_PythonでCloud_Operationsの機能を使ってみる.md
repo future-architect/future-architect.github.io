@@ -3,7 +3,7 @@ title: "PythonでCloud Operationsの機能を使ってみる"
 date: 2021/03/11 00:00:00
 postid: ""
 tag:
-  - GCP
+  - GoogleCloud
   - Python
   - OpenCensus
   - OpenTelemetry

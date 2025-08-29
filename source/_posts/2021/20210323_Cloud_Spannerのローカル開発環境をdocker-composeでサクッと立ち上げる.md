@@ -4,7 +4,7 @@ date: 2021/03/23 00:00:00
 postid: ""
 tag:
   - Spanner
-  - GCP
+  - GoogleCloud
   - DockerCompose
   - エミュレータ
 category:

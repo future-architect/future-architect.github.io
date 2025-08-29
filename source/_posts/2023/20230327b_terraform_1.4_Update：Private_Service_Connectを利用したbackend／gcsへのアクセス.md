@@ -3,7 +3,7 @@ title: "Terraform 1.4 Update:Private Service Connectを利用したbackend/gcs�
 date: 2023/03/27 00:00:01
 postid: b
 tag:
-  - GCP
+  - GoogleCloud
   - Terraform
   - Terraform1.4
 category:

@@ -1,9 +1,9 @@
 ---
-title: "GCP連載#6 Terraform Validatorを使って、GCPのセキュリティポリシーの自動チェックを行う"
+title: "Terraform Validatorを使って、GCPのセキュリティポリシーの自動チェックを行う"
 date: 2020/02/13 10:26:28
 postid: ""
 tag:
-  - GCP
+  - Google Cloud
   - Terraform
   - Policy-as-Code
 category:

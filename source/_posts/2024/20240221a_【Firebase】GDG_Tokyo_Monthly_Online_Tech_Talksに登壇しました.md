@@ -7,7 +7,7 @@ tag:
   - Firebase
   - Flutter
   - GDG
-  - GCP
+  - GoogleCloud
 category:
   - Infrastructure
 thumbnail: /images/2024/20240221a/thumbnail.png

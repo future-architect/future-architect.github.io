@@ -8,7 +8,7 @@ tag:
   - 合同勉強会
   - LT
   - AWS
-  - GCP
+  - GoogleCloud
 category:
   - Culture
 thumbnail: /images/2021/20211004a/thumbnail.png

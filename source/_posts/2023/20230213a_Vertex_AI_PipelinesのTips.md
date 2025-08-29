@@ -4,7 +4,7 @@ date: 2023/02/13 00:00:00
 postid: a
 tag:
   - VertexAI
-  - GCP
+  - GoogleCloud
   - MLOps
   - ナレッジ
   - Tips

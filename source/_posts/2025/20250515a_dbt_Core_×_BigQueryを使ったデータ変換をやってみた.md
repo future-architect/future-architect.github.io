@@ -4,7 +4,7 @@ date: 2025/05/15 00:00:00
 postid: a
 tag:
   - dbt
-  - GCP
+  - GoogleCloud
   - BigQuery
   - データエンジニアリング
 category:

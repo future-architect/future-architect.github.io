@@ -3,7 +3,7 @@ title: "Google Cloud Next Tokyo '24 1日目参加レポート"
 date: 2024/08/02 00:00:00
 postid: a
 tag:
-  - GCP
+  - GoogleCloud
   - 参加レポート
   - GoogleCloudNext
   - GoogleCloudNext2024

@@ -4,7 +4,7 @@ date: 2023/06/13 00:00:00
 postid: a
 tag:
   - PubSub
-  - GCP
+  - GoogleCloud
   - 初心者向け
 category:
   - Infrastructure

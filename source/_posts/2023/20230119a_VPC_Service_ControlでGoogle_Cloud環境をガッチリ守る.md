@@ -3,7 +3,7 @@ title: "VPC Service ControlでGoogle Cloud環境をガッチリ守る"
 date: 2023/01/19 00:00:00
 postid: a
 tag:
-  - GCP
+  - GoogleCloud
   - VPC
   - Network
 category:

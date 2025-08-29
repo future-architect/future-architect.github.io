@@ -3,7 +3,7 @@ title: "GKEでIdentity-Aware Proxyを利用したWebアプリケーション認�
 date: 2023/01/13 00:00:00
 postid: a
 tag:
-  - GCP
+  - GoogleCloud
   - GKE
   - "Identity-Aware Proxy"
 category:

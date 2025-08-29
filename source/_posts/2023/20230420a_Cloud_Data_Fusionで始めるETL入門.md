@@ -4,7 +4,7 @@ date: 2023/04/20 00:00:00
 postid: a
 tag:
   - CloudDataFusion
-  - GCP
+  - GoogleCloud
   - ETL
 category:
   - Infrastructure

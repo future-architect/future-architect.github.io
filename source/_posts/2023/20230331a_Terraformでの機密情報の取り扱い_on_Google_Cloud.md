@@ -3,7 +3,7 @@ title: "Terraformでの機密情報の取り扱い on Google Cloud"
 date: 2023/03/31 00:00:00
 postid: a
 tag:
-  - GCP
+  - GoogleCloud
   - sops
   - Terraform
   - Terraform1.4
