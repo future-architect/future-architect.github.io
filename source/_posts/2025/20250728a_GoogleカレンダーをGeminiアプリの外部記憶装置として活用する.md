@@ -127,7 +127,7 @@ Geminiアプリから呼び出せる、かつ、読み書きができるGoogle W
 
 |チャット画面|カレンダー画面|
 | --- | --- |
-| <img src="/images/2025/20250728a/スクリーンショット_2025-07-28_12.12.01.png" alt="" width="800" height="771" loading="lazy"> | <img src="/images/20250728a/calendar.avif" alt="" width="840" height="1274" loading="lazy"> |
+| <img src="/images/2025/20250728a/スクリーンショット_2025-07-28_12.12.01.png" alt="" width="800" height="771" loading="lazy"> | <img src="/images/2025/20250728a/calendar.avif" alt="" width="840" height="1274" loading="lazy"> |
 
 ## 読み込む
 
