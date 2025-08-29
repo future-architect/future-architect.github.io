@@ -9,7 +9,7 @@ tag:
   - モバイルアプリ
 category:
   - Programming
-thumbnail: /images/20210517a/thumbnail.png
+thumbnail: /images/2021/20210517a/thumbnail.png
 author: 越島亮介
 lede: "MONETマーケットプレイスで購入したAPIとFlutterを使って簡単なスマホアプリを作ってみます。"
 ---
@@ -23,7 +23,7 @@ MONETマーケットプレイスAPIを使ってみた連載の第1弾では[MONE
 
 # MONETマーケットプレイスとは
 
-<img src="/images/20210517a/top_page_20210316.png" alt="MONETマーケットプレイストップページ" width="1200" height="554" loading="lazy">
+<img src="/images/2021/20210517a/top_page_20210316.png" alt="MONETマーケットプレイストップページ" width="1200" height="554" loading="lazy">
 
 MONETマーケットプレイスAPIを使ってみた連載の[第1弾](/articles/20210404/)でも触れていますが、ここでもう一度MONETマーケットプレイスのおさらいをします。
 
@@ -35,7 +35,7 @@ MONETマーケットプレイスでは、APIを利用するために、APIキー
 
 **X-MONET-APIKey**を用いたAPIの認証ができていれば、あとは各商品ページのエンドポイントの情報を元にAPIを利用していくだけです。
 （APIの利用・認証の詳しい手順については、MONETマーケットプレイスの[ディベロッパーガイド](https://developer.monet-technologies.co.jp/docs?tab=service-2)を参照ください）。。
-<img src="/images/20210517a/api_endpoint.png" alt="API定義画面" width="532" height="552" loading="lazy">
+<img src="/images/2021/20210517a/api_endpoint.png" alt="API定義画面" width="532" height="552" loading="lazy">
 
 # APIを使ってアプリを作成
 
@@ -43,11 +43,11 @@ MONETマーケットプレイスでは、APIを利用するために、APIキー
 
 ## アプリデモ
 
-<img src="/images/20210517a/app_gif.gif" alt="アプリデモ" width="329" height="593" loading="lazy">
+<img src="/images/2021/20210517a/app_gif.gif" alt="アプリデモ" width="329" height="593" loading="lazy">
 
 ## アプリ詳細
 
-<img src="/images/20210517a/app_flow.png" alt="アプリ画面遷移図" width="1122" height="490" loading="lazy">
+<img src="/images/2021/20210517a/app_flow.png" alt="アプリ画面遷移図" width="1122" height="490" loading="lazy">
 
 今回作成したアプリの利用の流れと、各画面で用いているAPI・サービスは上記のようになっています。
 APIは以下のように利用しています。

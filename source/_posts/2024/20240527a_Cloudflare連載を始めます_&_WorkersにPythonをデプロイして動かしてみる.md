@@ -8,11 +8,11 @@ tag:
   - Python
 category:
   - Programming
-thumbnail: /images/20240527a/thumbnail.jpg
+thumbnail: /images/2024/20240527a/thumbnail.jpg
 author: 伊藤太斉
 lede: "Cloudflareは、インターネット上で運営されている最大のネットワークの1つです。ユーザーは、Webサイトやサービスのセキュリティとパフォーマンスを向上させる目的でCloudflareサービスを利用しています。"
 ---
-<img src="/images/20240527a/CF_logo_stacked_blktype.jpg" alt="" width="1200" height="405" loading="lazy">
+<img src="/images/2024/20240527a/CF_logo_stacked_blktype.jpg" alt="" width="1200" height="405" loading="lazy">
 
 ロゴは https://www.cloudflare.com/ja-jp/press-kit/ より引用
 
@@ -91,7 +91,7 @@ yes deploy via `npm run deploy` # Workersに初期プロジェクトをデプロ
 
 デプロイまで完了すると、以下の画面に遷移します。
 
-<img src="/images/20240527a/スクリーンショット_2024-05-26_21.59.14.png" alt="スクリーンショット_2024-05-26_21.59.14.png" width="1200" height="775" loading="lazy">
+<img src="/images/2024/20240527a/スクリーンショット_2024-05-26_21.59.14.png" alt="スクリーンショット_2024-05-26_21.59.14.png" width="1200" height="775" loading="lazy">
 
 この時デプロイされているソースコードは`./src/entry.py`に格納されています。
 

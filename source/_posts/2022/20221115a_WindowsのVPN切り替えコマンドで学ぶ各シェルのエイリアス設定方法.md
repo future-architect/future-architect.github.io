@@ -7,7 +7,7 @@ tag:
   - VPN
 category:
   - Infrastructure
-thumbnail: /images/20221115a/thumbnail.png
+thumbnail: /images/2022/20221115a/thumbnail.png
 author: ダワージャルガルオチラル
 lede: "WindowsでのVPN切り替えコマンド及び各シェルにエイリアスを貼る方法を紹介します。エイリアスを貼れば、好きなコマンドで好きなスクリプトを実行できるようになります。"
 ---
@@ -141,7 +141,7 @@ vpncli -s < %HOMEPATH%\.vpn\CISCO_VPN.cre connect ${CISCO_VPN_NAME}
 Gitbashでエイリアスの設定まで成功するとこういったログが表示されます。
 `hogevpn`が「Cisco Anyconnect切断　➔　Windows標準接続」で`backToTheFutureVpn`がその逆です（普段はもっと短いエイリアス設定してます）。
 
-<img src="/images/20221115a/無題3.png" alt="無題3.png" width="990" height="1893" loading="lazy">
+<img src="/images/2022/20221115a/無題3.png" alt="無題3.png" width="990" height="1893" loading="lazy">
 
 ### エイリアス設定
 
@@ -214,13 +214,13 @@ doskey {CISCO_ALIAS_NAME} = "%HOMEPATH%\ShellScripts\ciscoVPN.bat"
 
 `%windir%\system32\cmd.exe /q /k "%HOMEPATH%\ShellScripts\cmdProfile.bat"`
 
-<img src="/images/20221115a/無題.png" alt="" width="648" height="987" loading="lazy">
+<img src="/images/2022/20221115a/無題.png" alt="" width="648" height="987" loading="lazy">
 
 これで無事、設定ファイルを読み込みながらを起動するコマンドプロンプトのショートカットができました。ここで作成したショートカット以外を経由しないでコマンドプロンプトを開いた場合作成したプロファイルが読み込まれないので注意して下さい。適宜、タスクバーなどに追加して利用して下さい。
 
 Windows Terminalを使っている方は、 **設定　→　全般　→　コマンドライン** の箇所に同様のオプションで設定ファイルを読み込むようにすればいいです（筆者はこっちを使ってます）。
 
-<img src="/images/20221115a/無題2.png" alt="" width="1200" height="658" loading="lazy">
+<img src="/images/2022/20221115a/無題2.png" alt="" width="1200" height="658" loading="lazy">
 
 ## まとめ
 

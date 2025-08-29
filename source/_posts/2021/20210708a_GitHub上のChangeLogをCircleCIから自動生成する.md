@@ -10,12 +10,12 @@ tag:
   - ドキュメント
 category:
   - DevOps
-thumbnail: /images/20210708a/thumbnail.png
+thumbnail: /images/2021/20210708a/thumbnail.png
 author: 富山龍之介
 lede: "リリースした際に、機能強化や不具合修正の内容などをユーザーや他開発メンバーに示すために、ChangeLogを作成されている方も多いと思います。読者の皆さんはどのようにChangeLogを作成されていますか？"
 ---
 
-<img src="/images/20210708a/space-1951858_960_720.png" alt="" title="Onur Ömer Yavuzによる[Pixabay]からの画像" width="960" height="540">
+<img src="/images/2021/20210708a/space-1951858_960_720.png" alt="" title="Onur Ömer Yavuzによる[Pixabay]からの画像" width="960" height="540">
 
 ## はじめに
 
@@ -40,13 +40,13 @@ ChangeLogとは、機能拡張や不具合修正の内容などをユーザー�
 
 https://github.com/future-architect/vuls/releases
 
-<img src="/images/20210708a/スクリーンショット_2021-06-27_13.55.17.png" alt="Vuls ChangeLog" width="1200" height="695">
+<img src="/images/2021/20210708a/スクリーンショット_2021-06-27_13.55.17.png" alt="Vuls ChangeLog" width="1200" height="695">
 
 ## 今回作成するChangelog
 
 今回は、以下のようなChangeLogを作成していきます。
 
-<img src="/images/20210708a/Screen_Shot_2021-06-27_at_12.42.40.png" alt="ChangeLog出力例" width="1200" height="549">
+<img src="/images/2021/20210708a/Screen_Shot_2021-06-27_at_12.42.40.png" alt="ChangeLog出力例" width="1200" height="549">
 
 今回作成するChangeLogに含ませる情報は以下の2つとします。
 
@@ -88,7 +88,7 @@ CircleCIの環境変数の設定方法は、[コンテキストの使用](https:
 
 以下のように、 `GITHUB_TOKEN` を定義し、個人アクセストークンを設定しましょう。
 
-<img src="/images/20210708a/スクリーンショット_2021-06-27_8.19.12.png" alt="アクセストークンの設定" width="853" height="471">
+<img src="/images/2021/20210708a/スクリーンショット_2021-06-27_8.19.12.png" alt="アクセストークンの設定" width="853" height="471">
 
 ##### 3. `.circleci/config.yml` を編集する
 

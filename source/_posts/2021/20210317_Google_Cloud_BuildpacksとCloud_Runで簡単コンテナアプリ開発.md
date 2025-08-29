@@ -10,14 +10,14 @@ tag:
   - コンテナデプロイ
 category:
   - Programming
-thumbnail: /images/20210317/thumbnail.png
+thumbnail: /images/2021/20210317/thumbnail.png
 author: 伊藤太斉
 lede: "みなさん、コンテナを利用してアプリケーション開発していますか？最近は新規開発になると大体アーキテクチャを検討する段階で「アプリケーションをコンテナ化するか」と話題になるのではないでしょうか？単純にコンテナをデプロイして利用するだけならまだしも、Kubernetesをベースとしてアプリケーションを動かすとなると..."
 ---
 こんにちは。TIGの[伊藤太斉](https://twitter.com/kaedemalu)です。
 [GCP連載2021](/articles/20210307)第7弾です。
 
-<img src="/images/20210317/GCP_Containers_Kubernetes.png" loading="lazy">
+<img src="/images/2021/20210317/GCP_Containers_Kubernetes.png" loading="lazy">
 
 > https://cloud.google.com/blog/ja/products/containers-kubernetes/google-cloud-now-supports-buildpacks より
 
@@ -93,7 +93,7 @@ Cloud Runにデプロイする時はContainer Registryからデプロイを行�
 1. Cloud BuildでコンテナをビルドしてContainer Registryへ保存する
 2. ローカルでビルドしてContainer Registryへpushする。
 
-<img src="/images/20210317/builcpack.png" loading="lazy">
+<img src="/images/2021/20210317/builcpack.png" loading="lazy">
 
 １の方がローカルを汚さずに済んだり、ローカルPCの能力に依存せずにビルドできるので、今回は前者で進めます。
 
@@ -121,7 +121,7 @@ gcloud run deploy --image=gcr.io/[project-id]/node --platform managed
 これでデプロイが終わればコンソールからCloud Runの画面に遷移して、URLをクリックすると、ローカルで見ていた画面と同じく`hello, world`が出力されているかと思います。
 これで、ローカル、コンテナアプリ、Cloud Runの３つの状態で同じアプリを利用できました。
 
-<img src="/images/20210317/image.png" loading="lazy">
+<img src="/images/2021/20210317/image.png" loading="lazy">
 
 ## まとめ
 

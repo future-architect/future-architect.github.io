@@ -9,7 +9,7 @@ tag:
   - 可視化
 category:
   - Infrastructure
-thumbnail: /images/20211015a/thumbnail.png
+thumbnail: /images/2021/20211015a/thumbnail.png
 author: 中山楓太
 lede: "AWSの利用料金をSlackに通知する仕組みを作成したので共有したいと思います。私が参加しているプロジェクトでは、毎月AWSにいくらかかっているのか、加えてそれぞれのサービスは全体のコストの内どのぐらいの割合を占めているのか知りたいという話があり、今回AWSから利用額を取得しSlackに通知する仕組みを作る流れとなりました。"
 ---
@@ -39,7 +39,7 @@ lede: "AWSの利用料金をSlackに通知する仕組みを作成したので�
 
 Webhookは、各サービスの利用料金を箇条書きで通知するために利用しており、files.uploadは円グラフをアップロードするために利用しています。
 
-<img src="/images/20211015a/cost-explorer.drawio.png" alt="cost-explorer.drawio.png" width="570" height="352" loading="lazy">
+<img src="/images/2021/20211015a/cost-explorer.drawio.png" alt="cost-explorer.drawio.png" width="570" height="352" loading="lazy">
 
 ## 投稿例
 
@@ -62,7 +62,7 @@ Tax: 50.00(5)%
 
 ### 利用料金円グラフ
 
-<img src="/images/20211015a/output.png" alt="output.png" width="512" height="512" loading="lazy">
+<img src="/images/2021/20211015a/output.png" alt="output.png" width="512" height="512" loading="lazy">
 
 ## GetCostAndUsage API
 

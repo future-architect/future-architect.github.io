@@ -9,7 +9,7 @@ tag:
   - LocalStack
 category:
   - Programming
-thumbnail: /images/20240709a/thumbnail.png
+thumbnail: /images/2024/20240709a/thumbnail.png
 author: 真野隼記
 lede: "AWS SDK for Go を使ったコードをクラウドサービスに依存無しでローカルにてテストするとき、次のような手法が考えられます。"
 ---
@@ -30,7 +30,7 @@ AWS SDK for Go を使ったコードをクラウドサービスに依存無し�
 
 フューチャーで実績が多いのはLocalStackですが、例えばECS (Elastic Container Service)は2024年7月時点でProイメージでしか利用できません。
 
-<img src="/images/20240709a/image.png" alt="image.png" width="1200" height="468" loading="lazy">
+<img src="/images/2024/20240709a/image.png" alt="image.png" width="1200" height="468" loading="lazy">
 
 https://docs.localstack.cloud/references/coverage/coverage_ecs/
 
@@ -144,14 +144,14 @@ func TestBatchTaskCallHandle(t *testing.T) {
 
 APIリファレンスのSample Requestにサンプルのリクエストが記載されているため、その値を設定します。
 
-<img src="/images/20240709a/image_2.png" alt="image.png" width="1200" height="497" loading="lazy">
+<img src="/images/2024/20240709a/image_2.png" alt="image.png" width="1200" height="497" loading="lazy">
 
 - https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RunTask.html#API_RunTask_Examples
 - https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeTaskDefinition.html#API_DescribeTaskDefinition_Examples
 
 振り分けられた先には、モックしたい応答結果として外部ファイルを指定します。このファイルの中身ですが、同様にAPIリファレンスの「Sample Response」を参考にします。
 
-<img src="/images/20240709a/image_3.png" alt="image.png" width="1200" height="700" loading="lazy">
+<img src="/images/2024/20240709a/image_3.png" alt="image.png" width="1200" height="700" loading="lazy">
 
 アプリケーションで利用しない項目はそのままで大丈夫です（もちろん、テスト上はなるべく本番に近しい値に書き換えた方が好ましいでしょう）。
 

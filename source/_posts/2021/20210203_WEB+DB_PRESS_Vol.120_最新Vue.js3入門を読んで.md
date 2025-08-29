@@ -10,7 +10,7 @@ tag:
   - WEB+DBPRESS
 category:
   - Programming
-thumbnail: /images/20210203/thumbnail.jpg
+thumbnail: /images/2021/20210203/thumbnail.jpg
 author: 久保勇暉
 lede: "私はフロントエンドエンジニアとして約1年くらいVue2でのフロントエンド開発を行っています。そんなVue3を全く触ったことにのないエンジニアが読んだ｢WEB+DB PRESS Vol.120｣に掲載されている｢最新Vue.js3入門｣の記事感想文となります｡ "
 ---
@@ -22,7 +22,7 @@ lede: "私はフロントエンドエンジニアとして約1年くらいVue2�
 
 とても面白く良い雑誌なので是非定期購入をおすすめします。
 
-<img src="/images/20210203/TH320_9784297118112.jpg" class="img-small-size" loading="lazy">
+<img src="/images/2021/20210203/TH320_9784297118112.jpg" class="img-small-size" loading="lazy">
 
 * https://gihyo.jp/magazine/wdpress/archive/2021/vol120
 

@@ -8,7 +8,7 @@ tag:
   - HTTF
 category:
   - Programming
-thumbnail: /images/20220201a/thumbnail.png
+thumbnail: /images/2022/20220201a/thumbnail.png
 author: 山田修路
 lede: "HACK TO THE FUTURE 2022本選のビジュアライザ開発担当したのでその体験記を残しておきます。HACK TO THE FUTUREはフューチャーグループが2018年からAtCoderで開催しているオンライン競技プログラミングコンテストで、全国から高度なプログラミングスキルを持つユース世代を発掘し、交流を図り切磋琢磨し合う場を提供することを目的として開催しています[^1]。"
 ---
@@ -46,13 +46,13 @@ output欄に1文字ずつ「r」と入力→simulateボタン押下→「r」の
 ※実際には作成したプログラムで出力した文字を貼り付けるとsimulateボタンを押下せず一気にロボット動かせます。
 
 入力前のビジュアライザの状態
-<img src="/images/20220201a/2022-01-20_11h20_48.png" alt="2022-01-20_11h20_48.png" width="982" height="918" loading="lazy">
+<img src="/images/2022/20220201a/2022-01-20_11h20_48.png" alt="2022-01-20_11h20_48.png" width="982" height="918" loading="lazy">
 
 入力後のビジュアライザの状態
-<img src="/images/20220201a/2022-01-20_11h15_49.png" alt="2022-01-20_11h15_49.png" width="987" height="915" loading="lazy">
+<img src="/images/2022/20220201a/2022-01-20_11h15_49.png" alt="2022-01-20_11h15_49.png" width="987" height="915" loading="lazy">
 
 アニメーション
-<img src="/images/20220201a/Animation.gif" alt="Animation.gif" width="1200" height="843" loading="lazy">
+<img src="/images/2022/20220201a/Animation.gif" alt="Animation.gif" width="1200" height="843" loading="lazy">
 
 ## ビジュアライザ開発業務の流れ
 
@@ -82,19 +82,19 @@ cypressも導入できるとpush時にリグレッションテストを行った
 
 今回使用したいただいた元素材は以下の通りです。
 
-<img src="/images/20220201a/pipo-fog004a.png" alt="ホコリに使った素材" width="640" height="480" loading="lazy">
+<img src="/images/2022/20220201a/pipo-fog004a.png" alt="ホコリに使った素材" width="640" height="480" loading="lazy">
 
 部屋の埃を表現に使用しました。埃っぽさを増すために明度をあげて使用しました。
 
-<img src="/images/20220201a/tiles_-_コピー.png" alt="タイル" width="256" height="192" loading="lazy">
+<img src="/images/2022/20220201a/tiles_-_コピー.png" alt="タイル" width="256" height="192" loading="lazy">
 
 壁付きの部屋を表現するのに使用した素材です。後述の素材のフローリング部分と合成して洋風の部屋にしています。
 
-<img src="/images/20220201a/32x32mapchip_20190721.png" alt="床" width="640" height="480" loading="lazy">
+<img src="/images/2022/20220201a/32x32mapchip_20190721.png" alt="床" width="640" height="480" loading="lazy">
 
 部屋の床をフローリングにするため、右下の部屋の床部分を切り出して前述の素材と合成しました。
 
-<img src="/images/20220201a/robot_-_コピー.png" alt="お掃除ロボット" width="96" height="128" loading="lazy">
+<img src="/images/2022/20220201a/robot_-_コピー.png" alt="お掃除ロボット" width="96" height="128" loading="lazy">
 
 お掃除ロボットです。目の部分を書き換えて使用しています。
 
@@ -113,15 +113,15 @@ cypressも導入できるとpush時にリグレッションテストを行った
 
 ツイート内のURLの解析の正規表現は下図のように、`validUrlQueryChars` と `validUrlQueryEndingChars` が分かれているため、クエリ文字列として使用可能だが終端には置けない文字が存在します。
 
-<img src="/images/20220201a/2022-01-13_19h09_50.png" alt="正規表現" width="556" height="426" loading="lazy">
+<img src="/images/2022/20220201a/2022-01-13_19h09_50.png" alt="正規表現" width="556" height="426" loading="lazy">
 
 クエリ文字列として使用可能な文字集合
 
-<img src="/images/20220201a/2022-01-13_19h12_21.png" alt="正規表現" width="527" height="37" loading="lazy">
+<img src="/images/2022/20220201a/2022-01-13_19h12_21.png" alt="正規表現" width="527" height="37" loading="lazy">
 
 クエリ文字列の終端として使用可能な文字集合
 
-<img src="/images/20220201a/2022-01-13_19h13_34.png" alt="正規表現" width="399" height="40" loading="lazy">
+<img src="/images/2022/20220201a/2022-01-13_19h13_34.png" alt="正規表現" width="399" height="40" loading="lazy">
 
 今回問題となった`)`はクエリ文字列として使用可能だが、終端として使用可能な文字ではないためこのような現象が起きてしまったようです。今後共有機能を使う際には`#`などの文字を番兵として配置しておくのが無難でしょう。
 

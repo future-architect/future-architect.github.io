@@ -10,7 +10,7 @@ tag:
   - JVN
 category:
   - Security
-thumbnail: /images/20220414a/thumbnail.png
+thumbnail: /images/2022/20220414a/thumbnail.png
 author: 八田奈子
 lede: "今回はIT未経験で入社した私が技術面のキャッチアップとして取り組んだ、脆弱性への攻撃および対策方法を共有したいと思います。本記事で、読者の皆さんのセキュリティ分野への関心・理解を深められたり、「文系・IT未経験でも入社半年でこのレベルのことができるようになるのだ！」ということを伝えられたら嬉しいです。今回扱ったのは、WordPressのプラグインFile Managerの脆弱性で、CVE-2020-25213が割り当てられているものです。"
 ---
@@ -65,7 +65,7 @@ lede: "今回はIT未経験で入社した私が技術面のキャッチアッ�
 検証に使うPoCは[こちら](https://github.com/w4fz5uck5/wp-file-manager-0day/blob/master/elFinder.py)で公開されているコードを使用しました。
 
 このPoCは、攻撃対象サーバのconnector.minimal.phpというファイルに対してPOSTし、connector.minimal.phpを介してelFinder（サーバ内のファイルを扱うもの）インスタンスを呼び出すことで、x.phpというWebShellを配置します。そして配置したx.phpに対して任意のコマンドを送ります。
-<img src="/images/20220414a/攻撃仕組み4_2022-04-08_085527.png" alt="攻撃仕組み4_2022-04-08_085527.png" width="934" height="631" loading="lazy">
+<img src="/images/2022/20220414a/攻撃仕組み4_2022-04-08_085527.png" alt="攻撃仕組み4_2022-04-08_085527.png" width="934" height="631" loading="lazy">
 
 したがって、今回のFile Managerの脆弱性はconnector.minimal.phpが外部から実行できてしまうことに原因があると言えるでしょう。
 
@@ -89,7 +89,7 @@ lede: "今回はIT未経験で入社した私が技術面のキャッチアッ�
 の3つです。
 
 ※上の黒いウィンドウが攻撃対象（192.168.10.6）、下の青いウィンドウが攻撃クライアントです。
-<img src="/images/20220414a/攻撃実行タイトルフレーム付_0408.gif" alt="攻撃実行タイトルフレーム付_0408" width="959" height="984" loading="lazy">
+<img src="/images/2022/20220414a/攻撃実行タイトルフレーム付_0408.gif" alt="攻撃実行タイトルフレーム付_0408" width="959" height="984" loading="lazy">
 
 このように、非常に簡単にWordPressサーバ内のファイル配置や削除、変更が可能であることがわかります。
 これを利用すれば、WordPress関連の設定ファイルの改ざんや悪意のあるスクリプトが記載されたファイルをアップロードするといった不正が行われてしまいます。
@@ -102,7 +102,7 @@ lede: "今回はIT未経験で入社した私が技術面のキャッチアッ�
 
 しかし、他のソフトウェアとの互換性がなくなってしまう、などの事情でアップデートできない場合も考えられます。そこで今回は、他に行うことができる対策として複数のセキュリティツールで対策を行う、多層防御を実施しました。
 
-<img src="/images/20220414a/対策図_2022-04-08_104452.png" alt="対策図_2022-04-08_104452" width="837" height="478" loading="lazy">
+<img src="/images/2022/20220414a/対策図_2022-04-08_104452.png" alt="対策図_2022-04-08_104452" width="837" height="478" loading="lazy">
 
 複数の層で対策をすることで、一か所の防御が破られても他のレイヤでカバーできセキュリティレベルが高まります。
 
@@ -136,7 +136,7 @@ Tripwireとはホスト型IDSで、あらかじめ作成したベースライン
 レポートを見てみるとテストファイルがなくなっていることがわかります。*➀
 また、Modifiedの欄にあるPHPファイルが攻撃クライアントから送られてきたものです。*➁（何度も攻撃しているのでModified欄に入っていますが、攻撃初回はAddedの欄に表示されると思います）。
 
-<img src="/images/20220414a/TWレポート_再_2022-04-01_102943_(4).png" alt="TWレポート_再" width="686" height="342" loading="lazy">
+<img src="/images/2022/20220414a/TWレポート_再_2022-04-01_102943_(4).png" alt="TWレポート_再" width="686" height="342" loading="lazy">
 
 今回は手動で差分検知を実施しましたが、cronで設定することで定期的な自動検知が可能となります。
 また、ポリシーファイル内でEmailアドレスを設定すれば、ルール違反が発生した際に通知が送信されるので、更に管理が容易になり被害を抑える迅速な対応が可能となるでしょう。
@@ -164,9 +164,9 @@ WordPressプラグインの脆弱性ということで、WordPress関連の脆�
 ```/opt/vuls-saas/vuls-saas.sh```
 スキャン後しばらくするとポータルサイトにスキャン結果が表示されました。
 CVE-2020-25213が検知されていることが確認できます。
-<img src="/images/20220414a/FV_ポータルサイト1_2022-03-25_092729.png" alt="FV_ポータルサイト1" width="1200" height="542" loading="lazy">
+<img src="/images/2022/20220414a/FV_ポータルサイト1_2022-03-25_092729.png" alt="FV_ポータルサイト1" width="1200" height="542" loading="lazy">
 管理画面では検知された脆弱性情報がまとめられています。
-<img src="/images/20220414a/FV_脆弱性詳細タブ_2022-04-01_112205.png" alt="FV_脆弱性詳細タブ" width="1200" height="636" loading="lazy">
+<img src="/images/2022/20220414a/FV_脆弱性詳細タブ_2022-04-01_112205.png" alt="FV_脆弱性詳細タブ" width="1200" height="636" loading="lazy">
 
 冒頭で触れましたが、CVE-2020-25213が重大なリスクのある脆弱性としてCISAのKEVに登録されていることが詳細タブからも確認できます。*➀
 また、どこから攻撃可能なのかを表す攻撃元区分や攻撃の複雑さといったCVSSの評価も表示されます。*➁　今回の脆弱性では攻撃の複雑さが「低」となっており、攻撃が容易であるということが推測できます。
@@ -198,11 +198,11 @@ Cloud One Workload Securityとは、以前Deep Securityという名称で販売�
 
 まず、攻撃対象サーバ上でCloud Oneのエージェント（ds_agent）のステータスがactiveになっていることを確認します。その後、攻撃クライアントから攻撃を仕掛けると、エラーが出て攻撃対象サーバに接続できません。
 
-<img src="/images/20220414a/WS_攻撃失敗_2022-03-25_140743.png" alt="WS_攻撃失敗" width="1200" height="520" loading="lazy">
+<img src="/images/2022/20220414a/WS_攻撃失敗_2022-03-25_140743.png" alt="WS_攻撃失敗" width="1200" height="520" loading="lazy">
 
 Workload Securityのポータルサイトの侵入防御イベントを見てみると、不正なアクセスが検知されブロックしたことが確認できました。*➀　イベントを選択し関連する情報を見てみると、CVE-2020-25213の脆弱性を理由に侵入防御されていることがわかります。*➁
 
-<img src="/images/20220414a/WS_侵入防御イベント_2022-04-01_121633.png" alt="WS_侵入防御イベント" width="1200" height="633" loading="lazy">
+<img src="/images/2022/20220414a/WS_侵入防御イベント_2022-04-01_121633.png" alt="WS_侵入防御イベント" width="1200" height="633" loading="lazy">
 
 ## 4. アクセス制御
 
@@ -223,7 +223,7 @@ Enforcing
 ```
 
 これで準備ができたので、攻撃をしていきます。
-<img src="/images/20220414a/Enforcing_攻撃失敗確認.gif" alt="Enforcing_攻撃失敗確認" width="959" height="987" loading="lazy">
+<img src="/images/2022/20220414a/Enforcing_攻撃失敗確認.gif" alt="Enforcing_攻撃失敗確認" width="959" height="987" loading="lazy">
 ファイルが削除されていないことが確認できました。
 SELinuxのEnforcingモードを使うことによって、リモートからのコマンドを防御できました。
 
@@ -255,12 +255,12 @@ Analytics → Dashboardと進み、検索から[Filebeat Auditd]Audit Events ECS
 
 SELinuxによるアクセス制御の動作はAVC(Access-Vector-Cache)というフィールドを見れば確認できます。
 avcがdeniedとなっており、アクセス拒否のログが出力されたことがわかります。Permissiveなので実際にアクセスはブロックされずテストファイルは削除されています。
-<img src="/images/20220414a/ES_KibanaAVCdenied_2022-03-29_153632.png" alt="ES_KibanaAVCdenied" width="1200" height="609" loading="lazy">
+<img src="/images/2022/20220414a/ES_KibanaAVCdenied_2022-03-29_153632.png" alt="ES_KibanaAVCdenied" width="1200" height="609" loading="lazy">
 
 ちなみにEnforcingモードの場合は実際にアクセスをブロックするため、audit logに加えApacheのエラーログも出力されます。
 Analytics → Dashboardより確認してみると、Apacheのエラーが出ていることがわかります。
 
-<img src="/images/20220414a/ES_Apacheerrorlogcheck_2022-03-30_114834.png" alt="ES_Apacheerrorlogcheck" width="1200" height="570" loading="lazy">
+<img src="/images/2022/20220414a/ES_Apacheerrorlogcheck_2022-03-30_114834.png" alt="ES_Apacheerrorlogcheck" width="1200" height="570" loading="lazy">
 
 このように、Elasticsearch、Kibana、Filebeat Moduleを導入することによって、確認したいログをダッシュボードで視覚的に表示できます。
 

@@ -9,12 +9,12 @@ tag:
   - 失敗談
 category:
   - Programming
-thumbnail: /images/20220609a/thumbnail.png
+thumbnail: /images/2022/20220609a/thumbnail.png
 author: 岸下優介
 lede: "Google Workspace Admin SDKのDirectory APIを使った開発を行いました。本記事では、APIを利用した際に500エラーを頻発させてしまった件について執筆していこうと思います。"
 ---
 
-<img src="/images/20220609a/googleworkspace.png" alt="" width="708" height="402">
+<img src="/images/2022/20220609a/googleworkspace.png" alt="" width="708" height="402">
 
 ## はじめに
 

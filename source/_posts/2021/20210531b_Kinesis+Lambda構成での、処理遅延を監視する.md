@@ -9,7 +9,7 @@ tag:
   - 保守運用
 category:
   - Infrastructure
-thumbnail: /images/20210531b/thumbnail.png
+thumbnail: /images/2021/20210531b/thumbnail.png
 author: 棚井龍之介
 lede: "「Kinesis+Lambda構成」でのメトリクス監視について取り上げます。データ流入量が徐々に増加する見込みのとき、各リソースのどのメトリクスを重点チェックすべきか。また、メトリクスがリソースの制限にぶつかった場合やアラート検知された場合にどのような対応アクションを取るべきか。KinesisやLambdaのリソース監視設定から得た知見を、本ブログに整理しました。そもそもの「サーバレスって、何が便利なんだっけ？」から整理したい勉強熱心なエンジニアは、[AWS公式のグラレコ解説記事]をご覧ください。"
 ---
@@ -29,7 +29,7 @@ lede: "「Kinesis+Lambda構成」でのメトリクス監視について取り�
 
 AWS本家の[形で考えるサーバレス設計](https://aws.amazon.com/jp/serverless/patterns/serverless-pattern/)でも「流入データの連続処理」として取り上げられおり、サーバレスという用語に馴染みのないエンジニアにもよく知られたデータフロー構成ではないでしょうか。
 
-<img src="/images/20210531b/Pattern-Streaming.7b2876deed217d21f4e4e326fe1535be25cb9603.png" alt="Kinesisで受けてLambdaからS3へ書き込む図" width="832" height="218" loading="lazy">
+<img src="/images/2021/20210531b/Pattern-Streaming.7b2876deed217d21f4e4e326fe1535be25cb9603.png" alt="Kinesisで受けてLambdaからS3へ書き込む図" width="832" height="218" loading="lazy">
 
 大量データの受信にはKinesisを使い、受信データのコンピュートはLambdaでやりくりする。この構成はシンプルで分かりやすく、かつ、各リソースをスケールしやすいため、データ連携やデータ保存などのあらゆるケースに応用が効く、ベーシックなインフラ構成だと思います。
 
@@ -43,7 +43,7 @@ Amazon CloudWatchを利用することにより、AWSリソースサービスの
 
 各リソースの出力する情報は「メトリクス(Metrics)」としてAWSサービス内に集約されています。CloudWatchに追加設定を入れることで「このメトリクスが急上昇した場合には、社員にメールで通知して」や「あのメトリクスが80％を上回ったら、自動でリソースを増強して」などを登録し、緊急時のシステム対応に備えることができます。
 
-<img src="/images/20210531b/CW-Overview.png" alt="CloudWatchサービスの概念図" width="604" height="385" loading="lazy">
+<img src="/images/2021/20210531b/CW-Overview.png" alt="CloudWatchサービスの概念図" width="604" height="385" loading="lazy">
 
 EC2やRDSの運用経験があれば、メトリクス監視は「当たり前に実施すべき」と言われても違和感は無いと思います。
 しかし、システムの運用経験が「エンジニアになってこのかた、サーバレスのみ」だと、「フルマネージドサービスなのだから、メトリクスの監視設定はいらないよね。エラー監視は当然だとしても、リソース増強は全て自動でしょ」と勘違いしてしまうケースが見受けられます。

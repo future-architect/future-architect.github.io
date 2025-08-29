@@ -34,7 +34,7 @@ lede: "GCPをテーマにした連載企画を始めるということで、初�
 
 # Stackdriver Loggingについて
 
-<img src="/images/20200205/photo_20200205_01.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200205/photo_20200205_01.png" class="img-small-size" loading="lazy">
 
 [Stackdriver Logging](https://cloud.google.com/logging)は、GCPやAWS(!)からのログの収集、検索、分析、モニタリング、通知といった機能を持つGCPのマネージドサービスの1つです。ユーザからするとログの収集・蓄積し、それらを検索するためのログ基盤を自前で構築するのはかなり大変ですが、全てStackdriver Loggingサービス側が面倒見てくれるため、よりアプリケーションなど自分たちの関心事に集中できるようになります。
 
@@ -56,7 +56,7 @@ Logging Client Librariesを利用しなくても、CloudRunやFunction上にア�
 
 ログレベル（Stackdriver Loggingのコンテキストではseverity）によって、ビューアで表示する見た目を変更できます。
 
-<img src="/images/20200205/photo_20200205_02.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200205/photo_20200205_02.png" style="border:solid 1px #000000" loading="lazy">
 <br>
 
 上から、DEBUG、INFO、WARN、ERROR、CRITICALです。Stackdriverは各種検索Filterも充実していますが、ログ量が増えるとちょっとしたことで見落としが発生しうるので、障害時の運用フローを整備する前にSeverityは正しく設定したほうが良いでしょう。
@@ -93,7 +93,7 @@ func FmtJSON(logLevel, message string) string {
 
 そうすると、ビューアの `textPayload` から `severity` の項目が除去され、上位のフィールドにセットされていることがわかると思います。
 
-<img src="/images/20200205/photo_20200205_03.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200205/photo_20200205_03.png" style="border:solid 1px #000000" loading="lazy">
 
 ちなみに、[利用できる Severityのレベルは以下の種類](https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#logseverity)です。
 
@@ -128,7 +128,7 @@ func StartFunc(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-<img src="/images/20200205/photo_20200205_04.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200205/photo_20200205_04.png" style="border:solid 1px #000000" loading="lazy">
 
 上記のキャプチャ画像を見るとseverity は空っぽなので、見た目も特に色が付いていません。
 ログエントリをドリルダウンして、`severity` のレベルを確認しても空っぽです。
@@ -143,7 +143,7 @@ func StartFunc(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-<img src="/images/20200205/photo_20200205_05.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200205/photo_20200205_05.png" style="border:solid 1px #000000" loading="lazy">
 
 こういったログ出力ポリシーになっている場合は、文字列ではERRORというラベルが見えますが、ビューア上は何も変化しないため見落としに注意ください。
 
@@ -173,13 +173,13 @@ func FmtJSON(logLevel, message string) string {
 
 このようにすると、先程の severityと同様に、textPayloaのJSONからtimeフィールドが消え、上位のtimestampが書き換えられます。
 
-<img src="/images/20200205/photo_20200205_06.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200205/photo_20200205_06.png" style="border:solid 1px #000000" loading="lazy">
 
 timeフィールドは任意項目ですが、ローカル実行での確認時にも便利なため特に理由がなければ付けたほうが良いと思います。
 
 # Stackdriver Traceとは
 
-<img src="/images/20200205/trace.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200205/trace.png" class="img-small-size" loading="lazy">
 
 Stackdriver Traceはアプリケーションからレイテンシ データを収集して Google Cloud Platform Console に表示する、分散トレースシステムです。
 https://cloud.google.com/trace/
@@ -189,7 +189,7 @@ https://future-architect.github.io/articles/20190604/
 
 分散トレースの機能の1つには、下図のようなウォーターフォールチャートを出すことができます。これを利用して、アプリケーションのボトルネック調査などに活かすことできます。
 
-<img src="/images/20200205/photo_20200205_07.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200205/photo_20200205_07.png" style="border:solid 1px #000000" loading="lazy">
 
 ## Stackdriver TraceとStackdriver Loggingの連携
 
@@ -252,11 +252,11 @@ func StartFunc(w http.ResponseWriter, r *http.Request) {
 
 Stackdriver Trace側のログのリンクを見ると、Stackdriver Loggingでログを確認できます。
 
-<img src="/images/20200205/photo_20200205_08.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200205/photo_20200205_08.png" style="border:solid 1px #000000" loading="lazy">
 
 リンクをクリックすると、Stackdriver Logging側の該当するログに遷移できます。
 
-<img src="/images/20200205/photo_20200205_09.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200205/photo_20200205_09.png" style="border:solid 1px #000000" loading="lazy">
 
 今回のサンプルコードには記載していないですが、ログ側に検索条件や処理件数を出力しておくと、その処理時間が妥当なのか、想定外なのか判断ができるため、性能調査などを行う場合には非常に有用だと思います。
 

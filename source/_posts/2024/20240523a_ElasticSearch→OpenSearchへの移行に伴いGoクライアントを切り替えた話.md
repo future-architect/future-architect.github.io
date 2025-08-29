@@ -8,11 +8,11 @@ tag:
   - Elasticsearch
 category:
   - Programming
-thumbnail: /images/20240523a/thumbnail.png
+thumbnail: /images/2024/20240523a/thumbnail.png
 author: 大江聖太郎
 lede: "ElasticsearchからOpenSearchに移行した際のGo用クライアントの実装についてまとめます。"
 ---
-<img src="/images/20240523a/top.png" alt="" width="1000" height="484">
+<img src="/images/2024/20240523a/top.png" alt="" width="1000" height="484">
 
 # はじめに
 

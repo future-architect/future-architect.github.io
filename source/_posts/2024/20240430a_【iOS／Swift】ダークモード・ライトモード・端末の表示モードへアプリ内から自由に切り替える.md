@@ -8,7 +8,7 @@ tag:
   - SwiftUI
 category:
   - Infrastructure
-thumbnail: /images/20240430a/thumbnail.jpeg
+thumbnail: /images/2024/20240430a/thumbnail.jpeg
 author: 橋本竜我
 lede: みなさん、お使いのiPhoneではダークモードorライトモードどちらに設定していますか。それとも、Automaticに設定していますか。
 ---
@@ -22,7 +22,7 @@ HealthCare Innovation Group(HIG)[^1]所属の橋本です。
 
 それとも、Automaticに設定していますか。
 
-<img src="/images/20240430a/46491578-7e42-ab93-f1eb-793c2d70c499.jpeg" alt="" width="863" height="721" loading="lazy">
+<img src="/images/2024/20240430a/46491578-7e42-ab93-f1eb-793c2d70c499.jpeg" alt="" width="863" height="721" loading="lazy">
 
 私は、単純に黒っぽい画面にテンションが上がるタイプなので常時ダークモードで使っています。
 
@@ -40,7 +40,7 @@ HealthCare Innovation Group(HIG)[^1]所属の橋本です。
 
 今回作成する表示モードをピッカーで選択できる設定画面です。
 
-<img src="/images/20240430a/Simulator_Screen_Recording_-_iPhone_15_Pro_-_2024-04-12_at_23.16.27.gif" alt="Simulator_Screen_Recording_-_iPhone_15_Pro_-_2024-04-12_at_23.16.27.gif" width="240" height="520" loading="lazy">
+<img src="/images/2024/20240430a/Simulator_Screen_Recording_-_iPhone_15_Pro_-_2024-04-12_at_23.16.27.gif" alt="Simulator_Screen_Recording_-_iPhone_15_Pro_-_2024-04-12_at_23.16.27.gif" width="240" height="520" loading="lazy">
 
 # 実装方法
 

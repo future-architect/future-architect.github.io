@@ -12,13 +12,13 @@ tag:
   - SoftwareDesign
 category:
   - DataScience
-thumbnail: /images/20211026b/thumbnail.jpeg
+thumbnail: /images/2021/20211026b/thumbnail.jpeg
 author: 玉木竜二
 lede: "先日10月18日に発売された[Software Design 2021年11月号]の第一特集、「Kaggleで知る機械学習 前処理から学習モデルの構築，スコアの上げ方までわかる」をフューチャーの農見、玉木、金子が担当しました。数日経ってしまいましたが、簡単に紹介させていただきます。"
 ---
 ## はじめに
 
-<img src="/images/20211026b/642111.jpeg" alt="642111.jpeg" width="600" height="847" loading="lazy">
+<img src="/images/2021/20211026b/642111.jpeg" alt="642111.jpeg" width="600" height="847" loading="lazy">
 
 TIGの玉木です。先日10月18日に発売された[Software Design 2021年11月号](https://gihyo.jp/magazine/SD/archive/2021/202111)の第一特集、「Kaggleで知る機械学習 前処理から学習モデルの構築，スコアの上げ方までわかる」をフューチャーの農見、玉木、金子が担当しました。数日経ってしまいましたが、簡単に紹介させていただきます。
 

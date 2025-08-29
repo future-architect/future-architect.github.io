@@ -9,7 +9,7 @@ tag:
   - クラウドリフト
 category:
   - Infrastructure
-thumbnail: /images/20231025a/thumbnail.png
+thumbnail: /images/2023/20231025a/thumbnail.png
 author: 都筑博紀
 lede: "本検証はAWS環境を用いて行っております。AWSサービス名をそのまま記載している部分が多いですがご了承ください。調査・検証が不十分で内容に不備・誤りがあるかもしれません。あらかじめご了承ください。"
 ---
@@ -65,7 +65,7 @@ Rundeckを構築するにあたりいくつかの構成を試してみました�
 
 Rundeckのジョブ管理の使用感などを試したいのであれば最も適しています。
 
-<img src="/images/20231025a/image.png" alt="" width="264" height="258" loading="lazy">
+<img src="/images/2023/20231025a/image.png" alt="" width="264" height="258" loading="lazy">
 
 ### 2. シングルインスタンス構成　＋　外部データベース
 
@@ -73,7 +73,7 @@ Rundeckのジョブ管理の使用感などを試したいのであれば最も�
 
 検証ではEC2上に作成したmariadbを利用しましたがRDSを用いることも可能です。基本構成からデータベースの堅牢性向上を狙ったものです。
 
-<img src="/images/20231025a/image_2.png" alt="" width="583" height="236" loading="lazy">
+<img src="/images/2023/20231025a/image_2.png" alt="" width="583" height="236" loading="lazy">
 
 ### 3. デュアルインスタンス構成　＋　外部データベース　＋　ELB
 
@@ -83,7 +83,7 @@ Rundeckサービスを冗長構成としたものです。
 
 **結果としてはCommunity版では可用性の向上は計れませんでした。**ジョブ実行に関してはジョブ実行指示を行ったサーバを識別(rundeck.server.uuid)していて特定のインスタンスで実行されてしまうようです。Enterprise版ではクラスタ関連機能(High Availability Clusters、Auto Takeover)が利用でき排他的に複数のサーバで実行可能となるようです。
 
-<img src="/images/20231025a/image_3.png" alt="" width="874" height="361" loading="lazy">
+<img src="/images/2023/20231025a/image_3.png" alt="" width="874" height="361" loading="lazy">
 
 ### 4. シングルコンテナ構成　＋　外部データベース
 
@@ -93,7 +93,7 @@ Rundeckはコンテナ環境でも利用可能です。基本構成としては�
 
 コンテナ化によってRundeckそのものの構成管理が容易になります。
 
-<img src="/images/20231025a/image_4.png" alt="" width="757" height="269" loading="lazy">
+<img src="/images/2023/20231025a/image_4.png" alt="" width="757" height="269" loading="lazy">
 
 ### 5. シングルコンテナ構成　＋　外部データベース　＋　ノード
 
@@ -101,7 +101,7 @@ Rundeckはコンテナ環境でも利用可能です。基本構成としては�
 
 ジョブの実行環境をRundeckから排除することでRundeck側のSW構成が簡素化できます。RundeckからノードはSSH接続ができればよいです。
 
-<img src="/images/20231025a/image_5.png" alt="" width="895" height="278" loading="lazy">
+<img src="/images/2023/20231025a/image_5.png" alt="" width="895" height="278" loading="lazy">
 
 ### 6. 伝統的なクラスタ構成(クラスタウェア＋ミラーディスクによるHAクラスタ)
 
@@ -109,7 +109,7 @@ Rundeckはコンテナ環境でも利用可能です。基本構成としては�
 
 Actinve/StandbyのHAクラスタリング方式。パブリッククラウド環境ではストレージミラーリング機能を用いて実装することは一般的だと思います。クラスタソフトウェアが必要になるためRundeck構成が複雑になりがちです。データベースを同居させるか否かでも構成が変わってきます。
 
-<img src="/images/20231025a/image_6.png" alt="" width="830" height="396" loading="lazy">
+<img src="/images/2023/20231025a/image_6.png" alt="" width="830" height="396" loading="lazy">
 
 ### 構成検証における考察
 
@@ -146,7 +146,7 @@ Community版ではEnterprise版で実装されている多くの機能が利用�
 
 リカバリポイントを加味した並列ジョブワークフローを作成してみました。
 
-<img src="/images/20231025a/image_7.png" alt="" width="1153" height="629" loading="lazy">
+<img src="/images/2023/20231025a/image_7.png" alt="" width="1153" height="629" loading="lazy">
 
 もう少しうまいやり方があるかもしれません。ご存知の方がいらっしゃればコメントをいただければです。
 
@@ -176,7 +176,7 @@ RundeckにはいくつかのIaC関連ツールへのプラグインが実装さ�
 - Terraformをインストールしたコンテナを作成
 - TerraformコンテナをRundeckのノードとして追加
 
-<img src="/images/20231025a/image_8.png" alt="" width="1131" height="629" loading="lazy">
+<img src="/images/2023/20231025a/image_8.png" alt="" width="1131" height="629" loading="lazy">
 
 ### IaCワークフロー操作
 
@@ -186,7 +186,7 @@ RundeckにはいくつかのIaC関連ツールへのプラグインが実装さ�
     - Terraformでインフラ環境を構築ジョブ
     - Ansiblleでサービスパッケージの導入及びコンフィグレーヨンジョブ
 
-<img src="/images/20231025a/image_9.png" alt="" width="977" height="449" loading="lazy">
+<img src="/images/2023/20231025a/image_9.png" alt="" width="977" height="449" loading="lazy">
 
 #### IaCワークフロージョブ例
 
@@ -202,7 +202,7 @@ RundeckにはいくつかのIaC関連ツールへのプラグインが実装さ�
 
 **※実運用では、terraform planやAnsible dryrunなどで実行前に検証を行いますが、実行検証のため省略しております。**
 
-<img src="/images/20231025a/image_10.png" alt="" width="1116" height="412" loading="lazy">
+<img src="/images/2023/20231025a/image_10.png" alt="" width="1116" height="412" loading="lazy">
 
 ### IaCワークフロー環境でのコンテナ化のメリット
 

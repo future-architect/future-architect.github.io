@@ -8,7 +8,7 @@ tag:
   - Git
 category:
   - Programming
-thumbnail: /images/20220221a/thumbnail.png
+thumbnail: /images/2022/20220221a/thumbnail.png
 author: 田中雅大
 lede: "こんにちは、TIG コアテクノロジーユニットの田中です。ファイルの最終更新日時を上書きするスクリプトをGroovyで書く機会があったので紹介します。* Groovy 4.0.0* JVM 1.8.0_121* Perl 5.32.1"
 ---
@@ -121,7 +121,7 @@ close FH;
   * ターミナルやコマンドプロンプトでGit ls-files -z してもNULは見えないのですが、Groovyで`'git ls-files -z'.execute().text`の実行結果をファイルに出力後、[Windows版Sublime Text](https://www.sublimetext.com/3)で確認しました。
 エディタやビューアによってはNUL文字表示をサポートしていないものがあるようです。
 
-<img src="/images/20220221a/image.png" alt="NUL文字表示" width="941" height="162" loading="lazy">
+<img src="/images/2022/20220221a/image.png" alt="NUL文字表示" width="941" height="162" loading="lazy">
 
 * `git log -m -r --name-only --no-color --pretty=raw -z`
   * `--name-only`で更新ファイルの情報を表示します。
@@ -130,7 +130,7 @@ close FH;
   * `<0x00>`の箇所にASCII NULが入っています。
   * この出力の見方は、`git ls-files`の出力の見方と同様です。
 
-<img src="/images/20220221a/image_2.png" alt="git log出力" width="1124" height="785" loading="lazy">
+<img src="/images/2022/20220221a/image_2.png" alt="git log出力" width="1124" height="785" loading="lazy">
 
 # Groovyスクリプト
 
@@ -282,7 +282,7 @@ for (log in logs) {
 
 * `git log -m -r --name-only --no-color --pretty=format:"update_time:%ct" -z`
 
-<img src="/images/20220221a/image_3.png" alt="git log出力例" width="1200" height="205" loading="lazy">
+<img src="/images/2022/20220221a/image_3.png" alt="git log出力例" width="1200" height="205" loading="lazy">
 
 # まとめ
 

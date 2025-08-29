@@ -9,7 +9,7 @@ tag:
   - SQL
 category:
   - Programming
-thumbnail: /images/20210928a/thumbnail.png
+thumbnail: /images/2021/20210928a/thumbnail.png
 author: 真野隼記
 lede: "TIG DXユニット真野です。Python連載の2本目です。データリネージという概念に興味をもったのと、それをサポートするためのPytnon製ツールがあったので触ってみます。データリネージとは.."
 ---
@@ -19,7 +19,7 @@ TIG DXユニット真野です。[Python連載](/articles/20210927b/)の2本目�
 
 ## データリネージとは
 
-<img src="/images/20210928a/データリネージ概念.png" alt="データリネージ概念.png" width="1200" height="503" loading="lazy">
+<img src="/images/2021/20210928a/データリネージ概念.png" alt="データリネージ概念.png" width="1200" height="503" loading="lazy">
 
 DWHのようなデータ基盤を整える上で必要になってくる概念で、保持するデータの発生源や、どのシステムがどう加工して保存されたかと言った流れを追跡できるようにすることです。データのトレーサビリティとも言うかなと思います。追跡可能にすることで、異常データの追跡（要はどこのETL処理で考慮漏れがでたりバグっちゃったのか）や依存関係などを捉えることができます。何かしらの分析にそのデータを利用すべきかどうかの重要な材料になるのは間違いないでしょう。システム開発においての影響度調査などにも便利かもしれませんね。
 
@@ -79,7 +79,7 @@ $ sqllineage -g -e "insert into db1.table1 select * from db2.table2"
 
 コンソールに出力されたURLを開くと、次のような `db2.table2` から `db1.table1` にデータが流れていることが表示されます。素敵そう！
 
-<img src="/images/20210928a/sqllineageのサンプル実行結果.png" alt="sqllineageのサンプル実行結果.png" width="1200" height="367" loading="lazy">
+<img src="/images/2021/20210928a/sqllineageのサンプル実行結果.png" alt="sqllineageのサンプル実行結果.png" width="1200" height="367" loading="lazy">
 
 ### 内部結合SQL
 
@@ -102,7 +102,7 @@ $ sqllineage -g -f join.sql
 * SQLLineage Running on http://localhost:5000/?f=join.sql
 ```
 
-<img src="/images/20210928a/内部結合SQLのグラフ表示.png" alt="内部結合SQLのグラフ表示.png" width="1200" height="359" loading="lazy">
+<img src="/images/2021/20210928a/内部結合SQLのグラフ表示.png" alt="内部結合SQLのグラフ表示.png" width="1200" height="359" loading="lazy">
 
 table2, table3がtable1の入力になっていることがわかります。
 
@@ -128,7 +128,7 @@ $ sqllineage -g -f oracle.sql
 
 この記法でも認識してくれるようです。凄い。
 
-<img src="/images/20210928a/Oracle記法の結合も表示されている図.png" alt="Oracle記法の結合も表示されている図.png" width="1200" height="517" loading="lazy">
+<img src="/images/2021/20210928a/Oracle記法の結合も表示されている図.png" alt="Oracle記法の結合も表示されている図.png" width="1200" height="517" loading="lazy">
 
 sqllineageは内部的には[andialbrecht/sqlparse](https://github.com/andialbrecht/sqlparse)を利用しているので、対応具合はそちらを見るのが良さそうです。例えば、[Oracle 11gのPivot/Unpivot](https://github.com/andialbrecht/sqlparse/issues/311)は2021.09.28時点だとまだ対応して無さそうなのがわかります。
 
@@ -166,7 +166,7 @@ INSERT INTO tbl5 (name, text)
 
 結果は次のように、`;`で区切られた複数のSQLのフローをまとめて表示してくれます。
 
-<img src="/images/20210928a/複数SQLの表示結果.png" alt="複数SQLの表示結果.png" width="1200" height="517" loading="lazy">
+<img src="/images/2021/20210928a/複数SQLの表示結果.png" alt="複数SQLの表示結果.png" width="1200" height="517" loading="lazy">
 
 解析したい単位でSQLをまとめると、分析部分はsqllineageに頼れるということです。良い棲み分けだなと感じました。
 

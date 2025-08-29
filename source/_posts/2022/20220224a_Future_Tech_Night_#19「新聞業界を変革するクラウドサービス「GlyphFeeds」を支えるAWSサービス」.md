@@ -10,12 +10,12 @@ tag:
   - GlyphFeeds
 category:
   - Infrastructure
-thumbnail: /images/20220224a/thumbnail.png
+thumbnail: /images/2022/20220224a/thumbnail.png
 author: 岡田珠美
 lede: "2022年1月28日にFuture Tech Night #19 AWS CodePipelineと新聞向けCMS構築事例]を開催しました。こちらの勉強会で「新聞業界を変革するクラウドサービス「GlyphFeeds」を支えるAWSサービスというテーマで発表させていただきました。GlyphFeedsとは、フューチャーが独自開発したメディア業界向けのクラウドサービスです。新聞メディアCMS（基幹システム）をAWSフルクラウド＆Webアーキテクチャで実現しています。"
 ---
 
-<img src="/images/20220224a/glyphfeeds_top.png" alt="" width="800" height="363">
+<img src="/images/2022/20220224a/glyphfeeds_top.png" alt="" width="800" height="363">
 
 ## はじめに
 

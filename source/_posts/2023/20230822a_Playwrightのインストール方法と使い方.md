@@ -7,7 +7,7 @@ tag:
   - 環境構築
 category:
   - Programming
-thumbnail: /images/20230822a/thumbnail.png
+thumbnail: /images/2023/20230822a/thumbnail.png
 author: 藤戸四恩
 lede: "Playwrightは、Microsoftが開発したE2Eテストフレームワークです。Cypressと同様に、Chromium、Firefox、Safariなどのブラウザ上でE2Eテストの実行を自動化できます。 "
 ---
@@ -117,7 +117,7 @@ npx playwright codegen https://playwright.dev/
 
 実行すると下図のように playwright.devが立ち上がります。
 
-<img src="/images/20230822a/画像2.png" alt="" width="1200" height="750" loading="lazy">
+<img src="/images/2023/20230822a/画像2.png" alt="" width="1200" height="750" loading="lazy">
 
 今回はGitHubのアイコンをカーソルを当てると`getByLabel('GitHub repository')`と表示されます。
 
@@ -230,7 +230,7 @@ npx playwright show-report
 
 実行するとブラウザ上で下図のように表示されます。
 
-<img src="/images/20230822a/画像1.png" alt="" width="1060" height="346" loading="lazy">
+<img src="/images/2023/20230822a/画像1.png" alt="" width="1060" height="346" loading="lazy">
 
 ## 終わりに
 

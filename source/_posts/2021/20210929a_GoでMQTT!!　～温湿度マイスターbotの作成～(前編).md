@@ -12,11 +12,11 @@ tag:
   - ハンズオン
 category:
   - IoT
-thumbnail: /images/20210929a/thumbnail.png
+thumbnail: /images/2021/20210929a/thumbnail.png
 author: 宮永崇史
 lede: "今回はAWSサービスのうちの一つAWS IoTを使用してRaspberryPiとのMQTTによる通信を行います。最終的には室内の快適な温湿度を教えてくれる「温湿度マイスターbot」を作成します。"
 ---
-<img src="/images/20210929a/サムネイル1.png" alt="Louis Reed on unsplash.com Unsplash" title="" width="1200" height="676" loading="lazy">
+<img src="/images/2021/20210929a/サムネイル1.png" alt="Louis Reed on unsplash.com Unsplash" title="" width="1200" height="676" loading="lazy">
 
 # はじめに
 
@@ -31,7 +31,7 @@ AWS IoTを使用したMQTTのチュートリアルはAWS公式からも詳細な
 本記事はこちらのハンズオンを基にGo言語を使用してMQTTによる通信を行いました。(公式の記事はPythonで実装されています。)
 
 最終的には室内の快適な温湿度を教えてくれる「温湿度マイスターbot」を作成します。
-<img src="/images/20210929a/image.png" alt="image.png" width="647" height="457" loading="lazy">
+<img src="/images/2021/20210929a/image.png" alt="image.png" width="647" height="457" loading="lazy">
 
 なお、本記事で作成したコードは
 
@@ -54,7 +54,7 @@ MQTTはHTTPリクエストのようなリクエスト/レスポンスといっ�
 
 Publisherはセンシングの情報（温度や湿度、速度など）をBrokerに配信します。SubscriberはBrokerをSubscribeし、一定間隔で情報を受け取ります。このような構成から、PublisherとSubscriberは疎な結合となっています。拡張性が高く、軽量であるという点でIoTデバイスを使用した通信プロトコルとして注目されているとのことです。
 
-<img src="/images/20210929a/image_2.png" alt="image.png" width="1200" height="688" loading="lazy">
+<img src="/images/2021/20210929a/image_2.png" alt="image.png" width="1200" height="688" loading="lazy">
 
 # AWS IoTとは
 >
@@ -73,7 +73,7 @@ DHT22という温湿度センサをRaspberryPi3B+に取り付けて2時間ごと
 また、RaspberryPiではPythonスクリプトも同時に起動しておきます。PythonではBoto3を使用してDynamoDBに向けて定期的にQueryを行います。受け取った情報からtimestampを横軸、温度湿度を縦軸にとったプロット図を作成します。作成したプロット図は2時間ごとにSlackに投稿するという仕組みにしています。
 （※冒頭のプロット図は便宜的に１分毎のデータをプロットしています）。
 
-<img src="/images/20210929a/image_3.png" alt="image.png" width="1200" height="849" loading="lazy">
+<img src="/images/2021/20210929a/image_3.png" alt="image.png" width="1200" height="849" loading="lazy">
 
 # 開発環境
 
@@ -121,7 +121,7 @@ DHT22という温湿度センサをRaspberryPi3B+に取り付けて2時間ごと
 使用した温湿度センサはこちらです。
 [DSD TECH DHT22 温湿度センサーモジュール AM2302チップ付き](https://aax-fe.amazon-adsystem.com/x/c/Qr8CAcIgUZEla94kNzcQWMkAAAF8AoohIgcAAAIAAZlrWxE/http://www.amazon.co.jp/gp/slredirect/picassoRedirect.html?ie=UTF8&adId=A3TSWYUGZXCE00&qualifier=1632130179&id=8652485946611051&widgetName=sd_onsite_desktop&url=%2Fdp%2FB06ZXXJL2B%2Fref%3Dsyn_sd_onsite_desktop_95%3Fpsc%3D1)
 
-<img src="/images/20210929a/DHT22.JPG" alt="DHT22.JPG" width="1200" height="676" loading="lazy">
+<img src="/images/2021/20210929a/DHT22.JPG" alt="DHT22.JPG" width="1200" height="676" loading="lazy">
 
 まずはこちらの温湿度センサをジャンパワイヤーを使用してRaspberryPiに接続します。
 
@@ -338,7 +338,7 @@ func newTLSConfig() (*tls.Config, error) {
 
 `main.go`の実行とともにコンソール上でも配信を受け取っていることが確認できます。
 
-<img src="/images/20210929a/mqttdemo.gif" alt="mqttdemo.gif" width="859" height="601" loading="lazy">
+<img src="/images/2021/20210929a/mqttdemo.gif" alt="mqttdemo.gif" width="859" height="601" loading="lazy">
 
 メッセージの送受信が確認できたところで、次に先ほどの実装で取得した温湿度をpayloadとして配信します。
 
@@ -406,7 +406,7 @@ func main() {
 
 TimeStampに注目すると、2秒毎に新規データが蓄積されていることがわかります。
 
-<img src="/images/20210929a/mqttdemo2.gif" alt="mqttdemo2.gif" width="859" height="662" loading="lazy">
+<img src="/images/2021/20210929a/mqttdemo2.gif" alt="mqttdemo2.gif" width="859" height="662" loading="lazy">
 
 # 前編まとめ
 

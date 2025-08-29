@@ -18,7 +18,7 @@ lede: "こんにちは。TIG の辻です。先日開催された golang.tokyo #
 
 LT 景品で頂いた CNCF のキャラクターです。かわいいです。
 
-<img src="/images/20191212/1.jpg" class="img-small-size" loading="lazy">
+<img src="/images/2019/20191212/1.jpg" class="img-small-size" loading="lazy">
 
 https://www.cncf.io/phippy/
 
@@ -36,7 +36,7 @@ LT の資料は以下です。
 
 <script async class="speakerdeck-embed" data-id="e2a29b8f2b3c43c1b1f10a73f1e0d343" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
 
-<img src="/images/20191212/2.jpg" class="img-middle-size" loading="lazy">
+<img src="/images/2019/20191212/2.jpg" class="img-middle-size" loading="lazy">
 
 いろいろな反応をいただきました！ 聞いていただき、ありがとうございます！
 

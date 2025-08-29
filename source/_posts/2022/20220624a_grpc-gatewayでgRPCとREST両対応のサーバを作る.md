@@ -9,7 +9,7 @@ tag:
   - ProtocolBuffers
 category:
   - Programming
-thumbnail: /images/20220624a/thumbnail.png
+thumbnail: /images/2022/20220624a/thumbnail.png
 author:  関靖秀
 lede: "TIGの関です。[サービス間通信とIDL（インタフェース記述言語）連載]の3本目です。昨日に続き、gRPCネタです。この記事では次のネタを扱います。- gRPCの概観- gRPCとWebブラウザの関係性"
 ---
@@ -77,7 +77,7 @@ HTTP APIにマッピングする方法はさらに2つに分けられ、RPC定�
 
 次の図のように、protoファイルよりproxy用のコードを生成し、それを利用したリバースプロキシを実装することで、gRPCサーバにREST APIとしてのインタフェースを設けることが可能です。
 
-<img src="/images/20220624a/image.png" alt="image.png" width="1200" height="813" loading="lazy">
+<img src="/images/2022/20220624a/image.png" alt="image.png" width="1200" height="813" loading="lazy">
 
 ※図は [公式リポジトリ](https://github.com/grpc-ecosystem/grpc-gateway) より引用
 
@@ -203,38 +203,38 @@ evans --host grpc-server --port 50051 --path proto,include example/example.proto
 ホスト名grpc-serverのポート50051で動作するgrpcサーバに接続します。protoファイルを指定することで、それに記述されたRPC定義のクライアントとして動作します。--パスオプションに指定しているのはprotoファイルが含まれるディレクトリです。このリポジトリでは独自定義のものを`proto`ディレクトリに、サードパーティからコピーしてきたものを`include`ディレクトリに配置しています。
 
 コマンドを打つと次のような表示がされます。
-<img src="/images/20220624a/image_2.png" alt="Evans more expressive universal gRPC client" width="1200" height="334" loading="lazy">
+<img src="/images/2022/20220624a/image_2.png" alt="Evans more expressive universal gRPC client" width="1200" height="334" loading="lazy">
 
 `call`と打つと補完候補が表示され、タブキーで選択できます。試しにGetしてみましょう。id=1はプログラムにハードコードしているのでCreateしなくても取れます。
 
-<img src="/images/20220624a/image_3.png" alt="call GetMessage" width="1200" height="334" loading="lazy">
+<img src="/images/2022/20220624a/image_3.png" alt="call GetMessage" width="1200" height="334" loading="lazy">
 
 リクエストのidフィールドに設定する値をプロンプトで聞かれるので、1を入力しエンターを押下します。
 
-<img src="/images/20220624a/image_4.png" alt="id (TYPE_INT64) => 1 {...}" width="1200" height="334" loading="lazy">
+<img src="/images/2022/20220624a/image_4.png" alt="id (TYPE_INT64) => 1 {...}" width="1200" height="334" loading="lazy">
 
 返ってきましたね。ちなみに存在しない値を入力すると次のようなエラーになります。
 
-<img src="/images/20220624a/image_5.png" alt="command call: rpc error: code = NotFound desc = Not Found" width="1200" height="334" loading="lazy">
+<img src="/images/2022/20220624a/image_5.png" alt="command call: rpc error: code = NotFound desc = Not Found" width="1200" height="334" loading="lazy">
 
 次にREST APIを見てみましょう。
 
 ブラウザから`http://localhost:8080/docs`にアクセスします。すると次のようにswagger-uiで仕様の確認ができます。上のprotoファイルの記述からコメントを抜き出して反映されているのがわかるでしょう。
 
-<img src="/images/20220624a/image_6.png" alt="Swagger example/example.proto Excample Api" width="1200" height="1033" loading="lazy">
+<img src="/images/2022/20220624a/image_6.png" alt="Swagger example/example.proto Excample Api" width="1200" height="1033" loading="lazy">
 
 このページはdocker-compose.ymlの中では`docs-server`コンテナがホストしていますが、ブラウザからのリクエストは`gateway-server`コンテナ経由でアクセスしています。このようにしたのは`gateway-server`コンテナをリバースプロキシとして扱うことで、同一オリジンにして、swagger-ui上から試せるようにしたかったからです。
 
 さて、POSTでExampleMessageを作ってみます。swagger-ui上で値を入力できます。
 
-<img src="/images/20220624a/image_7.png" alt="body Edit value" width="1200" height="1033" loading="lazy">
+<img src="/images/2022/20220624a/image_7.png" alt="body Edit value" width="1200" height="1033" loading="lazy">
 
 Executeすると、レスポンスが返ってきて、これもui上で確認できます。
 
-<img src="/images/20220624a/image_8.png" alt="Response" width="1200" height="1033" loading="lazy">
+<img src="/images/2022/20220624a/image_8.png" alt="Response" width="1200" height="1033" loading="lazy">
 
 Evansから見てみましょう。
-<img src="/images/20220624a/image_9.png" alt="call GetMessageによるJSON結果" width="1200" height="334" loading="lazy">
+<img src="/images/2022/20220624a/image_9.png" alt="call GetMessageによるJSON結果" width="1200" height="334" loading="lazy">
 
 先ほどエラーだった値を入力して返却されており、ちゃんと反映されてますね。REST APIで作成したリソースがgRPCでも取得でき、同一サーバで動いていることがわかります。
 

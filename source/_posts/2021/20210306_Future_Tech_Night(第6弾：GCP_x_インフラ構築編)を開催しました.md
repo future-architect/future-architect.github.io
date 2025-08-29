@@ -8,7 +8,7 @@ tag:
   - TechNight
 category:
   - Infrastructure
-thumbnail: /images/20210306/thumbnail.png
+thumbnail: /images/2021/20210306/thumbnail.png
 author: 村田靖拓
 lede: "こんにちは、TIGの西田、村田です。先日2021.01.29にオンラインにてFuture Tech Nightという社外勉強会を開催しました。第6弾はGCP×インフラというテーマで事例を紹介しました。1. [メディア業界変革編]2. [MaaS ビジネス編]3. [船舶IoT Platform編]"
 ---
@@ -26,7 +26,7 @@ lede: "こんにちは、TIGの西田、村田です。先日2021.01.29にオン
 
 # 概要
 
-<img src="/images/20210306/hero-cloud-infrastructure.png" loading="lazy">
+<img src="/images/2021/20210306/hero-cloud-infrastructure.png" loading="lazy">
 
 > https://cloud.google.com/training/cloud-infrastructure より
 
@@ -43,11 +43,11 @@ lede: "こんにちは、TIGの西田、村田です。先日2021.01.29にオン
 
 まずはエンプラ領域で求められる要件を説明しました。システムの数が膨大なので、（セキュリティ監査などの対応も相まって）管理する方の視点が強く出てきます。
 
-<img src="/images/20210306/2021-03-10_103811.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210306/2021-03-10_103811.png" style="border:solid 1px #000000" loading="lazy">
 
 上記に対して設計例をベースにお話し、まとめとしてGCPできちんと構築が可能であるということを説明しました。
 
-<img src="/images/20210306/2021-03-10_103053.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210306/2021-03-10_103053.png" style="border:solid 1px #000000" loading="lazy">
 
 前半のエンプラ領域の課題設定がどこまで聞いてくださった方に伝わったのか心配ではありましたが、アンケート的には満足頂けた方が多く、とても嬉しかったです。聴いてくださった方、本当にありがとうございました:blush:
 
@@ -59,11 +59,11 @@ lede: "こんにちは、TIGの西田、村田です。先日2021.01.29にオン
 
 タイトルを若干盛っているのは否めないですが(笑)、皆さんもお世話になっているマネージドサービスをネタに、私のしくじり体験を紹介しました。
 
-<img src="/images/20210306/image.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210306/image.png" style="border:solid 1px #000000" loading="lazy">
 
 GKEのPrivateクラスタ作成時にはVPC Peeringが自動的に作成されるんですが、そのPeeringはGCPコンソール上でユーザが編集・削除できてしまうので気をつけなければならない、というお話でした。
 
-<img src="/images/20210306/image_2.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210306/image_2.png" style="border:solid 1px #000000" loading="lazy">
 
 事の経緯は[Qiita：あなたの大切なGKEクラスタを崩壊させてしまう前に](https://qiita.com/famipapamart/items/1a207f90d7dd9ec85d5d)にもまとめてあります。詳細興味湧いた方はぜひ覗いてみてください。
 

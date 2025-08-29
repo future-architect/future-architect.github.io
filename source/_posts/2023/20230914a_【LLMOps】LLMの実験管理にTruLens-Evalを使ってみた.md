@@ -9,11 +9,11 @@ tag:
   - TruLens-Eval
 category:
   - DataScience
-thumbnail: /images/20230914a/thumbnail.png
+thumbnail: /images/2023/20230914a/thumbnail.png
 author: 吉田尚暉
 lede: "LLMの実験管理ツール候補として、TruLens-Evalを検証しました。合わせて、LLMの実験管理についてまとめてみました。"
 ---
-<img src="/images/20230914a/top.png" alt="" width="800" height="418" loading="lazy">
+<img src="/images/2023/20230914a/top.png" alt="" width="800" height="418" loading="lazy">
 
 ## はじめに
 
@@ -29,7 +29,7 @@ LLMの実験管理ツール候補として、TruLens-Evalを検証しました�
 
 LLMOpsは、LLMを組み込んだアプリケーション開発・運用の効率化を目指すプラクティスです。アプリケーションの種類や開発規模などによってLLMOpsのワークフローは大きく変わりますが、いずれの場合もLLMの性能評価や挙動の解析のために度重なる実験が必要となります。開発過程で行われる実験を適切に管理することは、LLMアプリケーションの開発を効率化させます。
 
-<img src="/images/20230914a/68747470733a2f2.png" alt="" width="960" height="540" loading="lazy">
+<img src="/images/2023/20230914a/68747470733a2f2.png" alt="" width="960" height="540" loading="lazy">
 
 引用：[LLM開発のフロー](/articles/20230912a/)
 
@@ -48,7 +48,7 @@ LLMに対してタスクを実行させるためには、その処理結果を�
 
 以下の図は、プロンプトエンジニアリングにおける主な実験の流れです。
 
-<img src="/images/20230914a/image.png" alt="" width="1200" height="548" loading="lazy">
+<img src="/images/2023/20230914a/image.png" alt="" width="1200" height="548" loading="lazy">
 
 プロンプトエンジニアリングのための実験管理は以下の項目を中心に管理することになると考えます。
 
@@ -81,7 +81,7 @@ TruLensは大規模言語モデルを含むニューラルネットの開発お�
 
 図はTruLens-Evalの概要について説明したものです。
 
-<img src="/images/20230914a/68747470733a2f2_2.png" alt="" width="1200" height="551" loading="lazy">
+<img src="/images/2023/20230914a/68747470733a2f2_2.png" alt="" width="1200" height="551" loading="lazy">
 
 引用：[Evaluate and Track your LLM Experiments: Introducing TruLens](https://medium.com/trulens/evaluate-and-track-your-llm-experiments-introducing-trulens-86028fe9b59a)
 
@@ -93,7 +93,7 @@ TruLensは大規模言語モデルを含むニューラルネットの開発お�
 
 昨今LLM開発が注目を集めているため、TruLens-EvalのGitHubリポジトリのスター数は現在急増しています。
 
-<img src="/images/20230914a/star-history-202391.png" alt="star-history-202391.png" width="1200" height="836" loading="lazy">
+<img src="/images/2023/20230914a/star-history-202391.png" alt="star-history-202391.png" width="1200" height="836" loading="lazy">
 
 ### なぜTruLens-Evalか
 
@@ -119,7 +119,7 @@ TruLens-Evalは、LLMアプリケーションの性能に対する評価をサ�
   - 合計トークン数
   - 評価スコア
 
-<img src="/images/20230914a/コメント_2023-09-01_144334.png" alt="" width="1200" height="578" loading="lazy">
+<img src="/images/2023/20230914a/コメント_2023-09-01_144334.png" alt="" width="1200" height="578" loading="lazy">
 
 - 実験の詳細をテーブルとして表示できます。アプリケーション名によるフィルタリングや評価スコアによる並び替え機能などが用意されています。比較できる情報は次の通りです。
   - 入力プロンプト（現在日本語(Unicode)に未対応）
@@ -130,7 +130,7 @@ TruLens-Evalは、LLMアプリケーションの性能に対する評価をサ�
   - タグ
   - 評価スコア（色付き）　など
 
-<img src="/images/20230914a/コメント_2023-09-01_144410.png" alt="" width="1200" height="579" loading="lazy">
+<img src="/images/2023/20230914a/コメント_2023-09-01_144410.png" alt="" width="1200" height="579" loading="lazy">
 
 - 実験毎に詳細を確認できます。
   - 入力プロンプト
@@ -138,12 +138,12 @@ TruLens-Evalは、LLMアプリケーションの性能に対する評価をサ�
   - コンポーネント毎の実行時間
   - 評価スコア　など
 
-<img src="/images/20230914a/コメント_2023-09-01_144443.png" alt="" width="1200" height="580" loading="lazy">
+<img src="/images/2023/20230914a/コメント_2023-09-01_144443.png" alt="" width="1200" height="580" loading="lazy">
 
 また、LangChainを用いた場合は、モデル毎の入出力とハイパーパラメータを確認できます（未検証）
 
-<img src="/images/20230914a/Leaderboard.png" alt="Leaderboard.png" width="1200" height="568" loading="lazy">
-<img src="/images/20230914a/Chain_Explore.png" alt="Chain_Explore.png" width="1200" height="605" loading="lazy">
+<img src="/images/2023/20230914a/Leaderboard.png" alt="Leaderboard.png" width="1200" height="568" loading="lazy">
+<img src="/images/2023/20230914a/Chain_Explore.png" alt="Chain_Explore.png" width="1200" height="605" loading="lazy">
 
 ### TruLens-Eval & LangChain（未検証）
 
@@ -308,13 +308,13 @@ ModerationはOpenAIが提供しているAPIである[openai.Moderation](https://
 各評価指標における良いプロンプトは何か、整理して検討することに役立ちます。評価指標については、ルールベースなものからLLMを用いた評価、人による評価についても対応できます。また、あらかじめ評価指標を決定する必要はなく、後から遡って実験結果を評価することもできます。
 
 実験結果を各評価指標によって並べ替えることができます。
-<img src="/images/20230914a/コメント_2023-09-06_163018.png" alt="コメント_2023-09-06_163018.png" width="1200" height="586" loading="lazy">
+<img src="/images/2023/20230914a/コメント_2023-09-06_163018.png" alt="コメント_2023-09-06_163018.png" width="1200" height="586" loading="lazy">
 
 各評価指標のヒストグラムを作成できます。アプリケーション名によるフィルタリングができます。
-<img src="/images/20230914a/コメント_2023-09-06_163113.png" alt="コメント_2023-09-06_163113.png" width="1200" height="441" loading="lazy">
+<img src="/images/2023/20230914a/コメント_2023-09-06_163113.png" alt="コメント_2023-09-06_163113.png" width="1200" height="441" loading="lazy">
 
 各アプリケーションの評価スコアの平均値を一覧できます。
-<img src="/images/20230914a/コメント_2023-09-06_163146.png" alt="コメント_2023-09-06_163146.png" width="1200" height="568" loading="lazy">
+<img src="/images/2023/20230914a/コメント_2023-09-06_163146.png" alt="コメント_2023-09-06_163146.png" width="1200" height="568" loading="lazy">
 
 ### 新しい評価指標の検討
 

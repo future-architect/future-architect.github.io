@@ -8,7 +8,7 @@ tag:
   - IaC
 category:
   - Infrastructure
-thumbnail: /images/20240327a/thumbnail.png
+thumbnail: /images/2024/20240327a/thumbnail.png
 author: 大岩潤矢
 lede: "Cloudflareで管理しているドメインのDNS設定や、Cloudflare Pages等のサービスの設定を、Terraform管理に移行した際の手順等を、備忘録がてら記載します。"
 ---
@@ -50,17 +50,17 @@ https://future-architect.github.io/articles/20231016a/
 
 まずはCloudflareの管理画面にログインし、R2を選択→「Add R2 subscription to my account」を押下します。
 
-<img src="/images/20240327a/image.png" alt="Add R2 subscription to my accountをクリック" width="1200" height="615" loading="lazy">
+<img src="/images/2024/20240327a/image.png" alt="Add R2 subscription to my accountをクリック" width="1200" height="615" loading="lazy">
 
 「Create bucket」 を押下します。
 
-<img src="/images/20240327a/image_2.png" alt="Create bucketをクリック" width="965" height="405" loading="lazy">
+<img src="/images/2024/20240327a/image_2.png" alt="Create bucketをクリック" width="965" height="405" loading="lazy">
 
 バケット名を入力し、Locationは「Automatic」を選択します。最後に「Create bucket」を押下すれば、バケットが出来上がります。
 
-<img src="/images/20240327a/image_3.png" alt="oj-cf-tfstateというバケット名を入力" width="952" height="832" loading="lazy">
+<img src="/images/2024/20240327a/image_3.png" alt="oj-cf-tfstateというバケット名を入力" width="952" height="832" loading="lazy">
 
-<img src="/images/20240327a/image_4.png" alt="Automaticのチェックボックスを選択" width="1200" height="612" loading="lazy">
+<img src="/images/2024/20240327a/image_4.png" alt="Automaticのチェックボックスを選択" width="1200" height="612" loading="lazy">
 
 ### APIトークンを発行する
 
@@ -68,11 +68,11 @@ CloudflareをTerraform管理、すなわちAPIで操作する場合、APIトー�
 
 右上ユーザアイコンより「My Profile」を押下→左メニューからAPI Tokensを選び、「Create Token」を押下します。
 
-<img src="/images/20240327a/image_5.png" alt="Cretate Tokenをクリック" width="1200" height="615" loading="lazy">
+<img src="/images/2024/20240327a/image_5.png" alt="Cretate Tokenをクリック" width="1200" height="615" loading="lazy">
 
 Create Custom Tokenの「Get started」を押下します。
 
-<img src="/images/20240327a/image_6.png" alt="Get startedボタンをクリック" width="866" height="217" loading="lazy">
+<img src="/images/2024/20240327a/image_6.png" alt="Get startedボタンをクリック" width="866" height="217" loading="lazy">
 
 各種設定値を入力します。
 
@@ -84,31 +84,31 @@ Create Custom Tokenの「Get started」を押下します。
 - Client IP Address Filtering: 仮に操作されるIPアドレスが決まっている場合はここで指定する。何も入力しなければ、すべてのIPアドレスからアクセスを許容する
 - すべて入力できたら「Continue to summary」を押下
 
-<img src="/images/20240327a/image_7.png" alt="" width="1200" height="764" loading="lazy">
+<img src="/images/2024/20240327a/image_7.png" alt="" width="1200" height="764" loading="lazy">
 
-<img src="/images/20240327a/image_8.png" alt="" width="1136" height="784" loading="lazy">
+<img src="/images/2024/20240327a/image_8.png" alt="" width="1136" height="784" loading="lazy">
 
 設定内容が表示されるので、問題なければ「Create Token」を押下します。
 
-<img src="/images/20240327a/image_9.png" alt="Create Tokneをクリック" width="1155" height="561" loading="lazy">
+<img src="/images/2024/20240327a/image_9.png" alt="Create Tokneをクリック" width="1155" height="561" loading="lazy">
 
 APIトークンが表示されますが、このままではR2のAccess KeyおよびSecretが表示されないため、再度作り直します。このページでのコピーは不要です。
 
-<img src="/images/20240327a/image_10.png" alt="ima" width="1200" height="550" loading="lazy">
+<img src="/images/2024/20240327a/image_10.png" alt="ima" width="1200" height="550" loading="lazy">
 
 R2の管理ページを開き、右側メニューより「Manage R2 API Tokens」を選びます。
 
-<img src="/images/20240327a/image_11.png" alt="" width="1200" height="615" loading="lazy">
+<img src="/images/2024/20240327a/image_11.png" alt="" width="1200" height="615" loading="lazy">
 
 先ほど作成したトークンの「・・・」を押下し、「Roll」を選択。注意書きを読み、「Roll」を押下します。
 
-<img src="/images/20240327a/image_12.png" alt="" width="1200" height="404" loading="lazy">
+<img src="/images/2024/20240327a/image_12.png" alt="" width="1200" height="404" loading="lazy">
 
-<img src="/images/20240327a/image_13.png" alt="" width="775" height="540" loading="lazy">
+<img src="/images/2024/20240327a/image_13.png" alt="" width="775" height="540" loading="lazy">
 
 「API Token」「Access Key ID」「Secret Access Key」「R2のエンドポイント」が表示されるので、これらをすべてコピーしておきましょう。
 
-<img src="/images/20240327a/image_14.png" alt="" width="1200" height="680" loading="lazy">
+<img src="/images/2024/20240327a/image_14.png" alt="" width="1200" height="680" loading="lazy">
 
 ### 環境変数の設定
 
@@ -352,7 +352,7 @@ Pagesはドメイン（ゾーン）単位でなくアカウント単位での管
 
 自分の場合、 `920oj.net` のドメインで、プロジェクト `920oj-net` を設定しています。これをインポートしてみましょう。
 
-<img src="/images/20240327a/image_15.png" alt="image.png" width="873" height="200" loading="lazy">
+<img src="/images/2024/20240327a/image_15.png" alt="image.png" width="873" height="200" loading="lazy">
 
 Cloudflare Pagesは、 `cloudflare_pages_domain` リソースと `cloudflarepages_project` リソースから構築されます。
 

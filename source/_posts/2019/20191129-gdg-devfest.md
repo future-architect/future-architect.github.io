@@ -15,7 +15,7 @@ lede: "普段はGCPの開発支援を行なっているインフラエンジニ�
 
 こんにちは。TIG/DXユニットの伊藤です。普段はGCPの開発支援を行なっているインフラエンジニアです。今回は私の地元である長野で開催された[GDG Devfest 信州](https://gdg-shinshu.connpass.com/event/151084/)に参加しました。今回でこちらの勉強会の参加は2回目になるのですが、登壇する機会をいただいたのでその時のことを書いていきます。
 
-<img src="/images/20191129/photo_20191129_01.jpeg" class="img-small-size" loading="lazy">
+<img src="/images/2019/20191129/photo_20191129_01.jpeg" class="img-small-size" loading="lazy">
 
 ## GDG信州について
 

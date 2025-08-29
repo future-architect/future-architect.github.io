@@ -11,12 +11,12 @@ tag:
   - Go
 category:
   - Programming
-thumbnail: /images/20210914a/thumbnail.png
+thumbnail: /images/2021/20210914a/thumbnail.png
 author: 伊藤真彦
 lede: "普段からAWS Lambdaにはお世話になっているのですが、初めてカスタムランタイムを動かす仕事が舞い込んできました。AWS Lambdaでは下記のランタイムがサポートされています。"
 ---
 
-<img src="/images/20210914a/lambdadocker.png" alt="" width="1000" height="465" loading="lazy">
+<img src="/images/2021/20210914a/lambdadocker.png" alt="" width="1000" height="465" loading="lazy">
 
 TIGの伊藤真彦です。
 

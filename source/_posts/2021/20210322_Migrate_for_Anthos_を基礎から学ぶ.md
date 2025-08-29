@@ -8,7 +8,7 @@ tag:
   - Anthos
 category:
   - Infrastructure
-thumbnail: /images/20210322/thumbnail.png
+thumbnail: /images/2021/20210322/thumbnail.png
 author: 村田靖拓
 lede: "前回は越島さんによる分かりやすい Anthos 概要紹介記事でしたが、今回も前回に続いての Anthos ネタです"
 ---
@@ -101,7 +101,7 @@ Windows 向けの診断ツールは Linux 向けに比べて簡素に結果を�
 ## 移行処理クラスタの作成
 
 Migrate for Anthos の実処理を行う GKE あるいは Anthos クラスタの設定を進めていきます。
-<img src="/images/20210322/setting-up-workflow.png" loading="lazy">
+<img src="/images/2021/20210322/setting-up-workflow.png" loading="lazy">
 
 ※図は[こちらの公式Doc](https://cloud.google.com/migrate/anthos/docs/setting-up-overview)から拝借しました
 
@@ -248,7 +248,7 @@ $ migctl doctor
 
 ## ワークロードの Migration
 
-<img src="/images/20210322/image.png" loading="lazy">
+<img src="/images/2021/20210322/image.png" loading="lazy">
 
 ※図は[こちらの公式Doc](https://cloud.google.com/migrate/anthos/docs/migrating-linux-vm-overview)から拝借しました
 

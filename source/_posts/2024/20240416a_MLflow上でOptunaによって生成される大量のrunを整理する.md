@@ -9,7 +9,7 @@ tag:
   - Python
 category:
   - DataScience
-thumbnail: /images/20240416a/thumbnail.png
+thumbnail: /images/2024/20240416a/thumbnail.png
 author: 齋藤智和
 lede: "MLflowはハイパーパラメータを自動調整するツールとしてともに広く使用されているツールです。MLflowとOptunaを同時に利用した際に、Optunaが複数回試行することによってMLflow上にrunが大量に生成され、MLflow上で試行結果が見づらくなります。"
 ---
@@ -29,7 +29,7 @@ MLflowは機械学習の管理について幅広く扱うツールであり、�
 
 これらは大変便利なツールなのですが、これらを組み合わせて使用した際、画像のようにMLflow上で結果を見た際に大量のrunが生成されて、結果一覧が見づらくなります。特に、条件を変化させてOptunaによる最適化を実行させた場合に、前回までのOptunaによって生成されたrunと今回分のrunの見分けが付けにくくなるという問題が発生します。
 
-<img src="/images/20240416a/image.png" alt="image.png" width="1200" height="421" loading="lazy">
+<img src="/images/2024/20240416a/image.png" alt="image.png" width="1200" height="421" loading="lazy">
 
 ## 課題の解決
 
@@ -138,7 +138,7 @@ if __name__ == "__main__":
 
 Web UI上では画像のように表示され、Optunaの実行単位ごとにrunがネストして表示されるので見やすくなりました。
 
-<img src="/images/20240416a/image_2.png" alt="image.png" width="1200" height="391" loading="lazy">
+<img src="/images/2024/20240416a/image_2.png" alt="image.png" width="1200" height="391" loading="lazy">
 
 ## おわりに
 

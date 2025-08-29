@@ -10,7 +10,7 @@ tag:
   - マインドセット
 category:
   - Culture
-thumbnail: /images/20210422a/thumbnail.jpg
+thumbnail: /images/2021/20210422a/thumbnail.jpg
 author: 須田桂伍
 lede: "私は新卒でフューチャーへ入社しITの世界でのキャリアが始まりました。その後、一度フューチャーを離れIoTプラットフォーマーのソリューションアーキテクトとして多くのお客様へ自社サービスの導入支援やIoTシステムの設計や構築の支援をしておりました。そうしたソリューションアーキテクトとしてのロールを通じて、多くの経験や学びを得ることができたのですが、その中でも特にTechnical Credibilityというキーワードについて自分の経験を交えて本ブログにて書いてみたいと思います。"
 ---
@@ -27,7 +27,7 @@ lede: "私は新卒でフューチャーへ入社しITの世界でのキャリ�
 
 ## Technical Credibilityとはなにか
 
-<img src="/images/20210422a/climbing-4514507_640.jpg"　alt="" title="Rappellingusaによるixabayからの画像
+<img src="/images/2021/20210422a/climbing-4514507_640.jpg"　alt="" title="Rappellingusaによるixabayからの画像
 " class="img-middle-size" loading="lazy">
 
 Technical Credibilityとは無理やり日本語に訳すと技術的信頼？ 信頼度？ となります。Technical Credibilityの厳密な説明や定義が少ししにくいのですが、技術力やそのナレッジを通して信頼を得ていくこと、そのプロセス、と自分は解釈しています。

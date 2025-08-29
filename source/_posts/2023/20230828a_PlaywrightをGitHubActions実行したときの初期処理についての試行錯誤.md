@@ -7,7 +7,7 @@ tag:
   - GitHubActions
 category:
   - Programming
-thumbnail: /images/20230828a/thumbnail.png
+thumbnail: /images/2023/20230828a/thumbnail.png
 author: 枇榔晃裕
 lede: "近年PlaywrightやCypressを用いたE2Eテスト（エンドツーエンドテスト）が行われるようになってきました。E2Eテストとはソフトウェアやシステムの全体的な動作や機能をテストする手法で..."
 ---
@@ -83,7 +83,7 @@ jobs:
 
 こちらをGitHub Actionsで実行してみると33秒かかりました。インストール時のGitHub Action側の混み具合やDL速度によって時間は上下するかと思いますので、実行時間に関してはあくまで目安としてご覧ください。
 
-<img src="/images/20230828a/image.png" alt="image.png" width="654" height="457" loading="lazy">
+<img src="/images/2023/20230828a/image.png" alt="image.png" width="654" height="457" loading="lazy">
 
 今回の場合テストしか入っていないリポジトリなので、`npm ci` (Install dependencies) の時間が最小限に収まっています。例えば、フロントエンドのリポジトリにE2Eテストを相乗りさせている場合には依存ライブラリのインストール時間が余計にかかってしまいます。
 
@@ -115,7 +115,7 @@ jobs:
 
 こちらをGitHub Actionsで実行してみると29秒かかりました。
 
-<img src="/images/20230828a/image_2.png" alt="" width="658" height="462" loading="lazy">
+<img src="/images/2023/20230828a/image_2.png" alt="" width="658" height="462" loading="lazy">
 
 こちらも実行時間はその1とほぼ同程度。Playwightでのテストリポジトリであればその1の構成、そうでない場合は、依存ライブラリのインストール時間を削減するためにもその2の構成が良いのではと考えています。
 
@@ -171,7 +171,7 @@ Playwrightのインストール部分(`npx playwright install --with-deps chromi
 
 最新版となるようインストールを行い、GitHub Actionsで実行してみると76秒かかりました。
 
-<img src="/images/20230828a/image_3.png" alt="" width="657" height="504" loading="lazy">
+<img src="/images/2023/20230828a/image_3.png" alt="" width="657" height="504" loading="lazy">
 
 `microsoft/playwright-github-action` と `npx playwright install` で二度手間となり長くなった、と考えることもできますが、`microsoft/playwright-github-action` 単体でもほどほどに掛かっています。
 
@@ -208,7 +208,7 @@ jobs:
 
 こちらをGitHub Actionsで実行してみると54秒かかりました。
 
-<img src="/images/20230828a/image_4.png" alt="" width="656" height="540" loading="lazy">
+<img src="/images/2023/20230828a/image_4.png" alt="" width="656" height="540" loading="lazy">
 
 その1・その2と比較すると、`Install Playwright Browsers` の実行時間が大幅に短縮されています。
 

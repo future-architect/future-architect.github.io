@@ -11,12 +11,12 @@ tag:
   - BigQuery
 category:
   - Programming
-thumbnail: /images/20220920b/thumbnail.png
+thumbnail: /images/2022/20220920b/thumbnail.png
 author: "平野甫"
 lede: "Dataflowを使うための事前準備からパイプライン実行までの一連の流れについて説明します。次の手順で進めていきます。APIの有効化、IAMの設定、Apache Beam SDKのインストール..."
 ---
 
-<img src="/images/20220920b/dataflow_top2.png" alt="" width="1000" height="663">
+<img src="/images/2022/20220920b/dataflow_top2.png" alt="" width="1000" height="663">
 
 # はじめに
 
@@ -65,7 +65,7 @@ Compute Engine API, Dataflow API, Cloud Storage APIとその他必要な（連�
 
 APIを有効化するとIAMに**Compute Engine default service account**という名前のアカウントが追加されているはずです。
 Dataflowを利用するにはそのサービスアカウントに**Dataflowワーカー**、**Dataflow管理者**、**Storageオブジェクト管理者**のロールを追加して保存します。以下の画像のようになっていればOKです。
-<img src="/images/20220920b/IAM_setting.png" alt="IAM_setting.png" width="1200" height="164" loading="lazy">
+<img src="/images/2022/20220920b/IAM_setting.png" alt="IAM_setting.png" width="1200" height="164" loading="lazy">
 なお、ロールを付与するには、**resourcemanager.projects.setIamPolicy**の権限を持っている必要があります。持っていない場合はプロジェクトの管理者に権限を付与してもらうか、サービスアカウントへのロールの付与を代わりにやってもらってください。
 
 ## Apache Beam SDKのインストール
@@ -81,7 +81,7 @@ pip3 install apache-beam[gcp]
 Dataflowでパイプライン処理を行う場合、一時ファイルや出力ファイルを保存するためにCloud Storageのバケットを作成する必要があります。
 バケットの作成はコンソール画面から作成する方法とPythonから作成する方法があります。
 コンソール画面からは以下のように作成できます。
-<img src="/images/20220920b/make_bucket_new.gif" alt="make_bucket_new.gif" width="1200" height="665" loading="lazy">
+<img src="/images/2022/20220920b/make_bucket_new.gif" alt="make_bucket_new.gif" width="1200" height="665" loading="lazy">
 
 Pythonからバケットを作成する際は以下のコードを参考にしてください（`pip3 install google-cloud-storage`が必要です）。
 
@@ -684,10 +684,10 @@ if __name__ == "__main__":
 ## Pub/Sub・BigQueryの準備
 
 まず、Pub/Subのトピック作成から始めていきます。Pub/Subのページ上部にある「トピックを作成」から、トピックIDを設定してトピックを作成します。そのほかの設定に関しては今回はデフォルトのままで大丈夫です。
-<img src="/images/20220920b/make_topic.png" alt="make_topic.png" width="1200" height="691" loading="lazy">
+<img src="/images/2022/20220920b/make_topic.png" alt="make_topic.png" width="1200" height="691" loading="lazy">
 
 続いて、BigQueryのデータセット・テーブルの作成に入ります。BigQueryのデータセット・テーブルは以下のようにして作成できます。
-<img src="/images/20220920b/make_dataset.gif" alt="make_dataset.gif" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20220920b/make_dataset.gif" alt="make_dataset.gif" width="1200" height="675" loading="lazy">
 
 なお、今回使用しているスキーマは以下の通りです。
 
@@ -766,7 +766,7 @@ python publish_iris_local2pubsub.py \
 ## 結果
 
 BigQueryの画面からクエリを実行して結果を確認します。クエリは下図の赤枠の部分を順にクリックして
-<img src="/images/20220920b/make_query.png" alt="make_query.png" width="702" height="486" loading="lazy">
+<img src="/images/2022/20220920b/make_query.png" alt="make_query.png" width="702" height="486" loading="lazy">
 
 開いたエディタに
 
@@ -777,7 +777,7 @@ SELECT * FROM `{プロジェクトID}.{データセットの名前}.{テーブ�
 を入力して実行します。
 
 今回の例では以下のような結果が得られました。
-<img src="/images/20220920b/pubsub2bq_result.png" alt="pubsub2bq_result" width="1164" height="822" loading="lazy">
+<img src="/images/2022/20220920b/pubsub2bq_result.png" alt="pubsub2bq_result" width="1164" height="822" loading="lazy">
 
 # 最後に
 

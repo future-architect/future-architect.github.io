@@ -9,7 +9,7 @@ tag:
   - TechnologyRadar
 category:
   - Infrastructure
-thumbnail: /images/20230523a/thumbnail.png
+thumbnail: /images/2023/20230523a/thumbnail.png
 author: 小橋昌明
 lede: "IT業界に身を置いていると、今の技術トレンドが気になるときがありますよね。業界の潮流を把握する方法の1つとしてTechnology Radarという文書があるので、今回紹介します。"
 ---
@@ -27,7 +27,7 @@ IT業界に身を置いていると、今の技術トレンドが気になると
 
 Technology Radarではその名の通り、レーダー状の円の中に個々の注目する技術を表記しています。
 
-<img src="/images/20230523a/image.png" alt="" width="681" height="674" loading="lazy">
+<img src="/images/2023/20230523a/image.png" alt="" width="681" height="674" loading="lazy">
 
 https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/2023/04/tr_technology_radar_vol_28_en.pdf より引用
 

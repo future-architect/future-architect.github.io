@@ -7,7 +7,7 @@ tag:
   - OSS
 category:
   - Programming
-thumbnail: /images/20210528a/thumbnail.png
+thumbnail: /images/2021/20210528a/thumbnail.png
 author: 多賀聡一朗
 lede: "OSS として Airflow へ貢献するにあたり、ローカルでの実行やテストの環境整備が必要になります。また、 Airflow を利用するにあたってもローカルでの動作確認をしたいケースは多いかと思います。Airflow では、 Airflow Breeze と呼ばれる環境が整備され、公式より提供されています。当記事では、 Airflow Breeze について概要を記載し、 Airflow への OSS 貢献の入り口となれば良いと考えています。"
 ---
@@ -23,7 +23,7 @@ Airflow では、 `Airflow Breeze` と呼ばれる環境が整備され、公式
 
 Airflow Breeze とは、ローカルで Airflow を簡単に実行できるように整備された環境を指します。実態はコンテナベースで構築され、Docker Compose が利用されています。
 
-<img src="/images/20210528a/AirflowBreeze_logo.png" alt="Airflow Breezeロゴ" loading="lazy">
+<img src="/images/2021/20210528a/AirflowBreeze_logo.png" alt="Airflow Breezeロゴ" loading="lazy">
 
 [airflow/AirflowBreeze_logo.png at master · apache/airflow](https://github.com/apache/airflow/blob/master/images/AirflowBreeze_logo.png)
 
@@ -89,7 +89,7 @@ clone した Airflow リポジトリへ移動して、Breeze をインストー�
 
 自動で tmux のセッションが開始され、以下のような画面が出てきます。
 
-<img src="/images/20210528a/スクリーンショット_2021-05-20_10.45.22.png" alt="tmuxの画面" loading="lazy">
+<img src="/images/2021/20210528a/スクリーンショット_2021-05-20_10.45.22.png" alt="tmuxの画面" loading="lazy">
 
 各 Pane ごとに整理すると以下のようになります。
 
@@ -103,7 +103,7 @@ clone した Airflow リポジトリへ移動して、Breeze をインストー�
 Airflow の実行と tmux を終了したい場合は、 `airflow_stop` コマンドをコンテナ内で実行することで終了できます。
 ブラウザで  `http://127.0.0.1:28080` へリクエストすると Airflow UI へアクセスできます。(ログインは ユーザー/パスワード 共に `admin` です。)
 
-<img src="/images/20210528a/スクリーンショット_2021-05-20_10.35.21.png" alt="Airflow管理画面" loading="lazy">
+<img src="/images/2021/20210528a/スクリーンショット_2021-05-20_10.35.21.png" alt="Airflow管理画面" loading="lazy">
 
 ### Breeze 環境
 
@@ -116,7 +116,7 @@ Airflow の実行と tmux を終了したい場合は、 `airflow_stop` コマ�
 
 ファイルを配置してから Airflow UI への反映は5分程度ラグがあります。
 
-<img src="/images/20210528a/スクリーンショット_2021-05-20_11.13.08.png" alt="Airflow UI" loading="lazy">
+<img src="/images/2021/20210528a/スクリーンショット_2021-05-20_11.13.08.png" alt="Airflow UI" loading="lazy">
 
 **※ 補足**
 UI 反映のラグを短くしたい場合は、 コンテナ内 `/root/airflow/airflow.cfg` の以下設定値を修正の上、airflow webserver/scheduler を再起動することで反映できます。
@@ -258,7 +258,7 @@ Cluster が起動したら、Airflow を Kubernetes へデプロイします。(
 デプロイが完了すると Airflow が Kubernetes 上で起動してます。
 `http://127.0.0.1:8080` へアクセスすると Airflow UI が確認できます。(※ ポートが Breeze と違うので注意してください。ユーザー/パスは `admin` です。)
 
-<img src="/images/20210528a/Pasted_image_20210520175955.png" alt="Airflow UI" loading="lazy">
+<img src="/images/2021/20210528a/Pasted_image_20210520175955.png" alt="Airflow UI" loading="lazy">
 
 テストを実行してみます。テストはローカル端末上で以下コマンドで実行できます。
 (ローカル端末上に仮想環境が作成されます。コマンド内で `./scripts/ci/kubernetes/ci_run_kubernetes_tests.sh` ([参照](https://github.com/apache/airflow/blob/master/scripts/ci/kubernetes/ci_run_kubernetes_tests.sh))を実行しています。)

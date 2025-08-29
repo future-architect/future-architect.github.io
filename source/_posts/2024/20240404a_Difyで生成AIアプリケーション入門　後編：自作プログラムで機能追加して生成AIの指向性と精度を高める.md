@@ -10,7 +10,7 @@ tag:
   - Java
 category:
   - Programming
-thumbnail: /images/20240404a/thumbnail.png
+thumbnail: /images/2024/20240404a/thumbnail.png
 author: 前川喜洋
 lede: "前編のチュートリアル1で作ったSQL生成チャットbotをベースに、セルフレビュー機能を追加し、間違ったSQL文や存在しないテーブルやカラムを使用しようとした時に自動でやり直すように改修します。"
 ---
@@ -162,13 +162,13 @@ OpenAPI (Swagger) 準拠のスキーマが必要になります。上の例で�
 
 画面上部のメニュー右端の[ツール](http://localhost/tools?category=api)をクリックし、左上の「カスタムツールを作成する」をクリックします。
 
-<img src="/images/20240404a/image.png" alt="" width="573" height="143" loading="lazy">
+<img src="/images/2024/20240404a/image.png" alt="" width="573" height="143" loading="lazy">
 
 名前は適当につけて、APIのスキーマは手動でコピー&ペーストするか、（Dockerの設定でホスト名 `host.docker.internal` を有効にしているなら） [http://host.docker.internal:8080/v3/api-docs](http://host.docker.internal:8080/v3/api-docs) 等を使ってインポートします。ここで念のためテストして通れば準備OKです。保存してください。
 
-<img src="/images/20240404a/image_2.png" alt="" width="581" height="694" loading="lazy">
+<img src="/images/2024/20240404a/image_2.png" alt="" width="581" height="694" loading="lazy">
 
-<img src="/images/20240404a/image_3.png" alt="" width="450" height="362" loading="lazy">
+<img src="/images/2024/20240404a/image_3.png" alt="" width="450" height="362" loading="lazy">
 
 ### AIアプリケーションを開発
 
@@ -176,7 +176,7 @@ OpenAPI (Swagger) 準拠のスキーマが必要になります。上の例で�
 
 画面中央のツールの「+追加」をクリックし「カスタム」を選択すると、先ほど登録した自作ツールが表示されているので選択して「追加」ボタンをクリックします。
 
-<img src="/images/20240404a/image_4.png" alt="" width="588" height="228" loading="lazy">
+<img src="/images/2024/20240404a/image_4.png" alt="" width="588" height="228" loading="lazy">
 
 「手順」はチュートリアル2の内容に1行追加し、ツールを使うように指示します。変数 `{{DDL}}` `{{DataModelDescriptions}}` は前回同様「段落」に変更するのをお忘れなく。
 
@@ -198,23 +198,23 @@ Generated SQL must be validated using the tool `sqlReview`, then respond only wi
 
 チュートリアル2で使用したDDLとデータモデル概要を設定しつつ、「全売上金額を合計するSQL」のようにごく単純な要件でテストすると、ツールを使用してから回答する様子が確認できます。
 
-<img src="/images/20240404a/image_5.png" alt="" width="436" height="451" loading="lazy">
+<img src="/images/2024/20240404a/image_5.png" alt="" width="436" height="451" loading="lazy">
 
 ところが、少し複雑な要求に変更すると途端に回答が破綻します。
 
-<img src="/images/20240404a/image_6.png" alt="" width="820" height="645" loading="lazy">
+<img src="/images/2024/20240404a/image_6.png" alt="" width="820" height="645" loading="lazy">
 
 出力をよく見ると、　`"action_input": " ~ "}` の中身が改行付きのSQL文のため、JSONとして破綻しています。 `{"action": $TOOL_NAME, "action_input": $ACTION_INPUT}` の部分が（ReAct方式での）ツール呼び出しのキモなので、この部分に異常があると上手くツールを使用できないようです。
 
 プロンプトに「SQLは1行に纏めよ」と付け加えれば動作はするのですが……。Function Calling 方式を指定できないモデルでは現状スマートな解決策は無さそうです。 [^1]
 
-<img src="/images/20240404a/image_7.png" alt="" width="827" height="259" loading="lazy">
+<img src="/images/2024/20240404a/image_7.png" alt="" width="827" height="259" loading="lazy">
 
 さて、SQLのレビューに失敗した場合はどうなるのか？ 少し意地悪をして、変数 `DDL` をオプション扱いにして、空欄にして実行してみます。
 
-<img src="/images/20240404a/image_8.png" alt="" width="608" height="147" loading="lazy">
+<img src="/images/2024/20240404a/image_8.png" alt="" width="608" height="147" loading="lazy">
 
-<img src="/images/20240404a/image_9.png" alt="" width="821" height="872" loading="lazy">
+<img src="/images/2024/20240404a/image_9.png" alt="" width="821" height="872" loading="lazy">
 
 本来なら「カラム名が分からないから答えられない」と回答させるようコンテキストで誘導するのがベストな場面ではありますが、ともあれこれでセルフレビューによりAIが試行錯誤する様子を確認できました。
 
@@ -237,4 +237,4 @@ RAG（ユーザが入力したプロンプトをAIに投げる前に、関連す
 
 ちなみにただ”RAGとやらを作って使ってみたい”だけであれば Dify では画面上部メニューの「ナレッジ」で作成してアプリ側で「コンテキスト」に追加してやるだけなのですぐにでもできます。RAGの品質を問わなければの話ですが…今回はここまでです。
 
-[^1]: 4月5日に、GPT の Function Calling に相当する機能 "Tool" が Claude に追加されました。 Dify も当日中(!)に対応しました。4月6日現在、まだバージョン付けされた Docker イメージは有りませんが、 `docker-compose.yaml` で `api`,`worker`,`web` の `image` のタグの部分を `main` にすれば一応動作確認はできますので自己責任でどうぞ。複数行に跨るSQLもちゃんとツールに渡されてますね！ <img src="/images/20240404a/image_10.png" alt="" width="759" height="446" loading="lazy">
+[^1]: 4月5日に、GPT の Function Calling に相当する機能 "Tool" が Claude に追加されました。 Dify も当日中(!)に対応しました。4月6日現在、まだバージョン付けされた Docker イメージは有りませんが、 `docker-compose.yaml` で `api`,`worker`,`web` の `image` のタグの部分を `main` にすれば一応動作確認はできますので自己責任でどうぞ。複数行に跨るSQLもちゃんとツールに渡されてますね！ <img src="/images/2024/20240404a/image_10.png" alt="" width="759" height="446" loading="lazy">

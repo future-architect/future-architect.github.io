@@ -10,7 +10,7 @@ tag:
   - 心理的安全性
 category:
   - Infrastructure
-thumbnail: /images/20230518b/thumbnail.png
+thumbnail: /images/2023/20230518b/thumbnail.png
 author: 原木翔
 lede: "SLOconfという、Nobl9社が主催する、サービスレベル目標（SLO）に特化したカンファレンスがあります。今までオンラインでやってきたのですが、三回目になる今回、初めてオフラインで開催&世界各地でローカルなコミュニティイベントを同時開催する運びになりました。"
 mathjax: true
@@ -150,7 +150,7 @@ SLOを満たせない状況の大半は、インシデント、つまり予期�
 
 そもそも、SLOに対するインシデントの影響が小さくなったことはどのように判断すれば良いでしょうか？
 
-<img src="/images/20230518b/図1_インシデントとSLOの関係図.png" alt="図1_インシデントとSLOの関係図" width="1200" height="438" loading="lazy">
+<img src="/images/2023/20230518b/図1_インシデントとSLOの関係図.png" alt="図1_インシデントとSLOの関係図" width="1200" height="438" loading="lazy">
 
 上記の図はインシデントとSLOの関係について説明したものです。インシデントの発生によるSLIの減少を最小限に抑えるためには、横軸が時間、縦軸がSLIを表すこの図の面積を小さくする必要があります。つまり、時間軸（横軸）とSLI軸（縦軸）のいずれかを縮小する必要があります。
 
@@ -278,7 +278,7 @@ Luupさんには自分も上京した時にはよくお世話になっており�
 
 そのスタンスを表現したのが、次のスライドでした。
 
-<img src="/images/20230518b/20230516_SLOconTokyo-15.png" alt="" width="1200" height="675" loading="lazy">
+<img src="/images/2023/20230518b/20230516_SLOconTokyo-15.png" alt="" width="1200" height="675" loading="lazy">
 
 通常のSREの文脈でよく使われるCUJ(Critical User Journey)を用いつつも、Luup独自のCMC(Critical Machine Communication)という計測対象を独自に定義し、CUJ(人)とCMC(マシン)の両側面からSLIを策定したそうです。
 
@@ -290,7 +290,7 @@ Luupさんには自分も上京した時にはよくお世話になっており�
 
 Luupの電動キックボードや自転車を利用するためには、スマホアプリを使って遠隔操作でロックを解除する必要があります。この遠隔操作の可用性に関するサービスレベル目標を定めたものが「Unlock Availability SLO」ですが、見直した結果、エラーバジェットに影響を及ぼしている2つの要因が分かったそうです。
 
-<img src="/images/20230518b/20230516_SLOconTokyo-34.png" alt="" width="1200" height="675" loading="lazy">
+<img src="/images/2023/20230518b/20230516_SLOconTokyo-34.png" alt="" width="1200" height="675" loading="lazy">
 
 特に後者のような、実機が絡み、リトライによって自動的に解決されるような問題は、なかなか適切なSLOの設定が難しいところです。「How I learned to stop worrying and love burn rates」でもフレイキーページとして説明されていたエラーイベントですね。
 

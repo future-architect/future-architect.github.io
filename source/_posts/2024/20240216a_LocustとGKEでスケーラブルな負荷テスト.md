@@ -10,7 +10,7 @@ tag:
   - 負荷テスト
 category:
   - Infrastructure
-thumbnail: /images/20240216a/thumbnail.png
+thumbnail: /images/2024/20240216a/thumbnail.png
 author: 岸下優介
 lede: "負荷テストツールであるLocustとGKEを組み合わせて負荷テストを体感します。Kubernetesの柔軟なスケールアップ・ダウン能力によって、負荷の大きさを変えながらテストを行うことが可能となります。"
 ---
@@ -114,7 +114,7 @@ gcloud app deploy sample-webapp/app.yaml --project=${PROJECT}
 
 App Engineへのデプロイが完了後、表示されたURLへ移動すると以下のような画面が表示されます。
 
-<img src="/images/20240216a/image.png" alt="image.png" width="1084" height="283" loading="lazy">
+<img src="/images/2024/20240216a/image.png" alt="image.png" width="1084" height="283" loading="lazy">
 <AppEngineの画面>
 
 次にGKEにLocustと負荷テスト用のタスクをデプロイしたいので、まずはLocustのイメージをビルドします。
@@ -129,7 +129,7 @@ gcloud builds submit \
 
 Cloud Buildを利用することでイメージのビルドとプッシュがgcloudコマンド1回でできるので便利ですね。
 イメージがちゃんとビルドできているかどうかをコンソールから確認してみましょう。
-<img src="/images/20240216a/image_2.png" alt="image.png" width="1200" height="465" loading="lazy">
+<img src="/images/2024/20240216a/image_2.png" alt="image.png" width="1200" height="465" loading="lazy">
 
 イメージのビルドができたのでデプロイしていきます。
 
@@ -174,7 +174,7 @@ kubectl port-forward svc/locust-master-web -n default 8080:8089
 
 http://127.0.0.1:8080/
 にアクセスして、以下の画面が表示されることを確認します。
-<img src="/images/20240216a/image_3.png" alt="image.png" width="1200" height="709" loading="lazy">
+<img src="/images/2024/20240216a/image_3.png" alt="image.png" width="1200" height="709" loading="lazy">
 
 ## 負荷テストしてみる
 
@@ -184,7 +184,7 @@ http://127.0.0.1:8080/
 
 - Number of users: 10
 - Spawn rate: 1
-<img src="/images/20240216a/image_4.png" alt="image.png" width="1200" height="237" loading="lazy">
+<img src="/images/2024/20240216a/image_4.png" alt="image.png" width="1200" height="237" loading="lazy">
 
 右上のSTATUSの部分では現在接続中のユーザー数（5 Users）が表示されており、10Usersまで増えていきます。RPSはRequest Per Secondで、秒間のリクエスト数を表しております。
 また、各種タブを切り替えることでテストに関する情報を見ることができます。
@@ -207,9 +207,9 @@ http://127.0.0.1:8080/
 
 シンプルなUIの作りになっているため、直観的でわかりやすいです。
 また、"Download Data"にてレポートを出力できるのですが、テスト結果に対して自動でサマリした状態で出力してくれるので非常に便利です。
-<img src="/images/20240216a/image_5.png" alt="image.png" width="1200" height="735" loading="lazy">
-<img src="/images/20240216a/image_6.png" alt="image.png" width="1200" height="897" loading="lazy">
-<img src="/images/20240216a/image_7.png" alt="image.png" width="1200" height="776" loading="lazy">
+<img src="/images/2024/20240216a/image_5.png" alt="image.png" width="1200" height="735" loading="lazy">
+<img src="/images/2024/20240216a/image_6.png" alt="image.png" width="1200" height="897" loading="lazy">
+<img src="/images/2024/20240216a/image_7.png" alt="image.png" width="1200" height="776" loading="lazy">
 
 また、かなり大きめの負荷をかけたい場合は、Podの数を増やすことで対応可能です。Kubernetesならではですね。
 Podを増やしたい場合は以下のコマンドで増やします。

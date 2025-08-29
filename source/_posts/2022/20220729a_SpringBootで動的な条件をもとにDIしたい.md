@@ -8,7 +8,7 @@ tag:
   - Java
 category:
   - Programming
-thumbnail: /images/20220729a/thumbnail.png
+thumbnail: /images/2022/20220729a/thumbnail.png
 author: 澁川喜規
 lede: "SpringBootのDependency Injection（DI）は便利ですよね？利用する側にコンストラクタインジェクションやら、フィールドインジェクションやらセッターインジェクションやらの形式で書いておくと、DIコンテナが勝手に実行時に対象となるクラスをもってきてインスタンスの生成をしてくれますし、インスタンスのライフサイクルをインジェクションされるクラス側に書けます。実行時にDIしてくれるとはいっても..."
 ---
@@ -37,7 +37,7 @@ public class MyService {
 
 動的というのは、例えば、リクエストしてくるユーザーのランクを見て、VIPユーザー用ロジックを選択したい、みたいなストラテジーパターンです。ユーザーのランクの種類は動的に増えたりするのでハードコードしたくない、みたいな感じの要件だとします。
 
-<img src="/images/20220729a/名称未設定ファイル.drawio.png" alt="名称未設定ファイル.drawio.png" width="460" height="191" loading="lazy">
+<img src="/images/2022/20220729a/名称未設定ファイル.drawio.png" alt="名称未設定ファイル.drawio.png" width="460" height="191" loading="lazy">
 
 # まずはロジックの登録機構
 

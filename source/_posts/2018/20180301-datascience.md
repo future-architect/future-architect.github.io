@@ -7,7 +7,7 @@ tag:
   - 機械学習
 category:
   - DataScience
-thumbnail: /images/20180301/thumbnail_20180301.jpeg
+thumbnail: /images/2018/20180301/thumbnail_20180301.jpeg
 author: 貞光九月
 lede: "Future AI EXPO 開催！"
 ---
@@ -48,6 +48,6 @@ Future AI EXPO は、今回が初開催となるAI/IoT技術の社内向け展�
 なお、３月に言語処理学会全国大会、６月に人工知能学会全国大会にスポンサーとしても参加する予定ですので、
 もし参加される方がいらっしゃいましたら是非お話しましょう！
 
-<img src="/images/20180301/photo_20180301_01.jpeg" loading="lazy">
+<img src="/images/2018/20180301/photo_20180301_01.jpeg" loading="lazy">
 
-<img src="/images/20180301/photo_20180301_02.jpeg" loading="lazy">
+<img src="/images/2018/20180301/photo_20180301_02.jpeg" loading="lazy">

@@ -7,11 +7,11 @@ tag:
   - Azure
 category:
   - Infrastructure
-thumbnail: /images/20240325a/thumbnail.png
+thumbnail: /images/2024/20240325a/thumbnail.png
 author: 真鍋優
 lede: "昨今のOpenAI需要によって、Azure環境の利用を本格的に始める方も多いかと思います。今回はAzure環境でTerraformを利用する際、裏で動いているリソースプロバイダーについてご紹介します。"
 ---
-<img src="/images/20240325a/top.png" alt="" width="800" height="515">
+<img src="/images/2024/20240325a/top.png" alt="" width="800" height="515">
 
 [Terraform連載2024を](/articles/20240311a/) の8本目です。
 

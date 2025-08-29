@@ -10,7 +10,7 @@ tag:
   - メディア業界
 category:
   - Business
-thumbnail: /images/20200914/thumbnail.jpg
+thumbnail: /images/2020/20200914/thumbnail.jpg
 author: 山上燦
 lede: "はじめまして。2012年新卒入社の山上です。TIGメディアユニットのリーダーを務めています。AWSをフル活用したコンテンツマネジメントシステム（以下、CMS）を中核に持つクラウドサービス「GlyphFeeds」を開発し、様々なクライアントへの導入をリードしています。今回の連載では、GlyphFeedsの技術について紹介していきます。"
 ---
@@ -29,17 +29,17 @@ AWSをフル活用した**コンテンツマネジメントシステム（以下
 
 つまり新聞社にとって非常に重要な基幹システムであり、ある意味ミッションクリティカルなシステムです。
 
-<img src="/images/20200914/原稿.gif" loading="lazy">
+<img src="/images/2020/20200914/原稿.gif" loading="lazy">
 
-<img src="/images/20200914/画像編集.gif" loading="lazy">
+<img src="/images/2020/20200914/画像編集.gif" loading="lazy">
 
 # GlyphFeedsとは
 
-<img src="/images/20200914/GlyphFeedsLogo.jpg" loading="lazy">
+<img src="/images/2020/20200914/GlyphFeedsLogo.jpg" loading="lazy">
 
 GlyphFeedsは、[毎日新聞社プロジェクト](https://prtimes.jp/main/html/rd/p/000000324.000004374.html)でゼロから構築したCMS（システム名：MIRAI）をベースに、
 新聞業界、メディア業界の標準サービスとして展開可能な形に進化させたクラウドサービスです👍
-<img src="/images/20200914/スクリーンショット_2020-09-08_18.11.19.png" loading="lazy">
+<img src="/images/2020/20200914/スクリーンショット_2020-09-08_18.11.19.png" loading="lazy">
 
 新聞社の心臓部とも言えるCMS（＝基幹システム）を**AWSフルクラウド**＆**Webアーキテクチャ**で実装しました。
 システム完成までには様々な苦労があり💪、5日間の連載では表現しきれない程多くの技術的チャレンジを行ってきましたが、特徴的な部分を中心にぎゅぎゅっと凝縮してGlyphFeedsの技術についてお届けします！！

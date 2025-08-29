@@ -10,7 +10,7 @@ tag:
   - S3
 category:
   - Infrastructure
-thumbnail: /images/20200916/thumbnail.png
+thumbnail: /images/2020/20200916/thumbnail.png
 author: 出口豊
 lede: "はじめまして、2017年新卒入社、TIG所属の出口です。今回は、GlyphFeedsの素材受信インターフェース構築を介してAmazon Simple Queue Service  の検証について紹介します。"
 ---
@@ -45,7 +45,7 @@ SQSを使用することで、素材を一度キューイングした後でCMS�
 ## 構成概要
 
 今回構成した素材受信インタフェースの構成概要図は以下になります。
-<img src="/images/20200916/図1.png" loading="lazy">
+<img src="/images/2020/20200916/図1.png" loading="lazy">
 
 大まかな流れとしては、
 
@@ -76,7 +76,7 @@ FIFOキューは名前の通り、最初に入ったメッセージが最初に�
 ## FIFOキューでS3～SQS連携する工夫
 
 素材受信インタフェース構築当時は、S3イベント通知の送信先として、SQSの標準キューは選択できましたが、FIFOキューは選択できませんでした。そのため、FIFOキューではSQSに連携するのに一工夫いるため、標準キューかFIFOキューかによって、S3～SQS間の構成は下図のように異なります。
-<img src="/images/20200916/図2.png" loading="lazy">
+<img src="/images/2020/20200916/図2.png" loading="lazy">
 
 FIFOキューの場合は、S3オブジェクトputをトリガーにLambdaを実行し、その処理でFIFOキューにメッセージを積んでいきます。
 
@@ -98,7 +98,7 @@ PoCでは、素材が取り込まれるまでの時間や、短時間で大量�
 
 標準キューとFIFOキューそれぞれを使用した場合のロスト率を確認したところ、想定以上に明確な差異が見られました。
 
-<img src="/images/20200916/図3.png" loading="lazy">
+<img src="/images/2020/20200916/図3.png" loading="lazy">
 
 (※FIFOキューでは常にロスト率0％だったのでグラフは省きます。)
 

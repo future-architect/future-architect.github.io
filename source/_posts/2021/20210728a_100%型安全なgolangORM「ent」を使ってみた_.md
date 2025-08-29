@@ -7,7 +7,7 @@ tag:
   - ORM
 category:
   - Programming
-thumbnail: /images/20210728a/thumbnail.png
+thumbnail: /images/2021/20210728a/thumbnail.png
 author: 宮崎将太
 lede: "golang ORM連載の2記事目となります。はじめまして、TIGの宮崎将太です。突然ですがみなさん、ORMは何を使用していますか？"
 ---
@@ -23,7 +23,7 @@ golangだとGORMがデファクトスタンダードの位置を勝ち取りつ�
 
 # entとは
 
-<img src="/images/20210728a/ent_doc_top.png" alt="entドキュメントトップページ" width="1200" height="583" loading="lazy">
+<img src="/images/2021/20210728a/ent_doc_top.png" alt="entドキュメントトップページ" width="1200" height="583" loading="lazy">
 
 公式から引用してくると以下の通りとのこと。
 

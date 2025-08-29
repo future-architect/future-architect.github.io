@@ -10,12 +10,12 @@ tag:
   - グラフ
 category:
   - Management
-thumbnail: /images/20160920/thumbnail_20160920.jpg
+thumbnail: /images/2016/20160920/thumbnail_20160920.jpg
 author: 近藤雅章
 lede: "Redmineにはデータの可視化機能が標準で搭載されていないという課題があります。そこで、Kibana＋Timelionを使ってRedmineデータをグラフ表示する方法を紹介します"
 ---
 
-<img src="/images/20160920/photo_20160920_00.jpg" alt="">
+<img src="/images/2016/20160920/photo_20160920_00.jpg" alt="">
 
 ## はじめに
 
@@ -29,14 +29,14 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 
 例えばこれが、標準のサマリ画面。グラフがないから傾向とか分かりづらいんですよね。。
 
-<img src="/images/20160920/photo_20160920_01.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_01.png" loading="lazy">
 参考:[redmine.org](http://www.redmine.org/projects/redmine/issues/report)
 
 そこで、本日はKibana＋Timelionを使ってRedmineデータをグラフ表示する方法を紹介します。
 
 例えば、Kibana+Timelionを利用すると、チケット発生件数の4週移動平均を簡単に表示できるのです。
 
-<img src="/images/20160920/photo_20160920_02.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_02.png" loading="lazy">
 
 これがあれば、平均して毎週どれくらいのタスクが発生しているかが分かりますね（このテストデータの場合は9月時点で毎週28件のタスクが発生している）
 
@@ -65,7 +65,7 @@ Elastic Search＋Logstash＋Kibanaそれぞれの頭文字をとって、ELKと�
 
 今回、ELKを利用して、Redmineデータの可視化環境を構築します。
 
-<img src="/images/20160920/photo_20160920_03.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_03.png" loading="lazy">
 
 ではまず、Elastic Searchをダウンロードします。
 
@@ -95,7 +95,7 @@ Elastic Search＋Logstash＋Kibanaそれぞれの頭文字をとって、ELKと�
 
 最終的には下記のようなフォルダ構成になります。
 
-<img src="/images/20160920/photo_20160920_04.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_04.png" loading="lazy">
 
 ## 2.RedmineデータをELKに取り込む
 
@@ -140,23 +140,23 @@ output {
 
 結果的に、下記のようなフォルダ構成になります。
 
-<img src="/images/20160920/photo_20160920_05.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_05.png" loading="lazy">
 
 では、ElasticSearchを実行します。ElasticSearchのbinフォルダで下記のコマンドを実行。
 
 `elasticsearch.bat`
 
-<img src="/images/20160920/photo_20160920_06.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_06.png" loading="lazy">
 
 次にLogstashを使って、RedmineのデータをElasticSearchへ取り込みます。Logstashのbinフォルダで下記コマンドを実行。
 
 `logstash.bat -f redmine.txt`
 
-<img src="/images/20160920/photo_20160920_07.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_07.png" loading="lazy">
 
 取り込みが完了しました。
 
-<img src="/images/20160920/photo_20160920_08.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_08.png" loading="lazy">
 
 ## 3.グラフ表示
 
@@ -164,39 +164,39 @@ output {
 
 `kibana plugin -i elastic/timelion`
 
-<img src="/images/20160920/photo_20160920_09.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_09.png" loading="lazy">
 
 次に、Kibanaを起動します。下記のコマンドを実行。
 
 `kibana.bat`
 
-<img src="/images/20160920/photo_20160920_10.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_10.png" loading="lazy">
 
 Kibanaが起動しました。
 
-<img src="/images/20160920/photo_20160920_11.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_11.png" loading="lazy">
 
 では、Kibanaを表示します。ブラウザで `http://localhost:5601`を開く。
 
-<img src="/images/20160920/photo_20160920_12.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_12.png" loading="lazy">
 
 [Configure an index pattern]という画面が開くので、[Time-field name]に"created_on"を指定します。
 
 そして、[Create]をクリック。
 
-<img src="/images/20160920/photo_20160920_13.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_13.png" loading="lazy">
 
 [★logstash-*]という画面が開くので、画面上部一番右のブロックボタンをクリック。
 
 次に[Timelion]ボタンをクリックします。
 
-<img src="/images/20160920/photo_20160920_14.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_14.png" loading="lazy">
 
 [Welcome to timelion]という画面が開きます。
 
 [Don't show again]をクリック。
 
-<img src="/images/20160920/photo_20160920_15.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_15.png" loading="lazy">
 
 これでグラフ表示は完了です。
 
@@ -208,13 +208,13 @@ Kibanaが起動しました。
 
 そうすると、直近1年間以内に登録されたチケットの情報が表示されます。
 
-<img src="/images/20160920/photo_20160920_16.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_16.png" loading="lazy">
 
 次に、右側の"auto"を"1w"に変更。
 
 左下の"Full screen"をクリックします。
 
-<img src="/images/20160920/photo_20160920_17.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_17.png" loading="lazy">
 
 そして、`.es(*)`という記載を
 `.es(metric='count:id', timefield='created_on').label('【週別】open').bars()`
@@ -222,7 +222,7 @@ Kibanaが起動しました。
 
 すると、週ごとの発生チケット数が棒グラフで表示されます。
 
-<img src="/images/20160920/photo_20160920_18.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_18.png" loading="lazy">
 
 次に、
 `.es(metric='count:id', timefield='created_on').label('【週別】open').bars(),.es(metric='count:id', timefield='created_on').movingaverage(4).label('【4週移動平均】open')`
@@ -232,13 +232,13 @@ Kibanaが起動しました。
 
 timelion便利ですね！
 
-<img src="/images/20160920/photo_20160920_19.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_19.png" loading="lazy">
 
 そして、
 `.es(metric='count:id', timefield='created_on').label('【週別】open').bars(),.es(metric='count:id', timefield='created_on').movingaverage(4).label('【4週移動平均】open'),.es(metric='count:id', timefield='created_on').cusum().label('[累積]open'),.es(metric='count:id', timefield='closed_on').cusum().label('[累積]close')`
 という記載に変更すると、累積のチケット発生数、累積のチケットクローズ数が表示されます。
 
-<img src="/images/20160920/photo_20160920_20.png" loading="lazy">
+<img src="/images/2016/20160920/photo_20160920_20.png" loading="lazy">
 
 これがあると、
 

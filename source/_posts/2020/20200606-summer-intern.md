@@ -7,12 +7,12 @@ tag:
   - インターン2020
 category:
   - Culture
-thumbnail: /images/20200606/thumbnail.png
+thumbnail: /images/2020/20200606/thumbnail.png
 author: 真野隼記
 lede: "フューチャーのサマーインターン🌞Summer Camp🏄が6月より募集を開始しました。夏季インターンを「Summer Camp」と称して提供しており、現在2つのコースがあります。それぞれに良いところがありますが、せっかく技術ブログで紹介するので Engineer Camp について細かく説明します。"
 ---
 
-<img src="/images/20200606/photo_20200606_01.png" loading="lazy">
+<img src="/images/2020/20200606/photo_20200606_01.png" loading="lazy">
 
 https://www.future.co.jp/recruit/new/internship/
 

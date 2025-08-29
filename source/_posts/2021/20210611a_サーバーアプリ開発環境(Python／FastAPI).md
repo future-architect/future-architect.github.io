@@ -9,7 +9,7 @@ tag:
   - FastAPI
 category:
   - Programming
-thumbnail: /images/20210611a/thumbnail.png
+thumbnail: /images/2021/20210611a/thumbnail.png
 author: 澁川喜規
 lede: "Pythonでお仕事する前提で、現在のところで自分が最適と考えるチーム開発のための環境整備についてまとめてみました。今までももろもろ散発的に記事に書いたりしていたのですが、Poetryで環境を作ってみたのと、過去のもろもろの情報がまとまったものが個人的にも欲しかったのでまとめました。"
 ---
@@ -213,7 +213,7 @@ INFO:     Application startup complete.```
 
 これを作っておくと、Run and DebugアイコンをクリックしたときにRUNのところに表示されますので、▷ボタンを押すとデバッガーでアプリが起動します。あとはブレークポイントを置いたりステップ実行したり、変数をみたり、自由自在です。
 
-<img src="/images/20210611a/スクリーンショット_2021-06-11_12.35.24.png" alt="デバッガーでアプリの起動" loading="lazy">
+<img src="/images/2021/20210611a/スクリーンショット_2021-06-11_12.35.24.png" alt="デバッガーでアプリの起動" loading="lazy">
 
 # サーバーのDocker化
 

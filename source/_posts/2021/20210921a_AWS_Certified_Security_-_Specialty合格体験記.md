@@ -7,7 +7,7 @@ tag:
   - 合格記
 category:
   - Infrastructure
-thumbnail: /images/20210921a/thumbnail.png
+thumbnail: /images/2021/20210921a/thumbnail.png
 author: 伊藤真彦
 lede: "TIGの伊藤真彦です。先日AWS Certified Security - Specialtyに合格しました。今回も合格体験記を残しておきます。"
 ---
@@ -16,7 +16,7 @@ TIGの伊藤真彦です。
 先日[AWS Certified Security - Specialty](https://aws.amazon.com/jp/certification/certified-security-specialty/?ch=sec&sec=rmg&d=1)に合格しました。
 今回も合格体験記を残しておきます。
 
-<img src="/images/20210921a/image.png" alt="合格ロゴ" width="300" height="300" loading="lazy">
+<img src="/images/2021/20210921a/image.png" alt="合格ロゴ" width="300" height="300" loading="lazy">
 
 # AWS Certified Security - Specialtyとは
 

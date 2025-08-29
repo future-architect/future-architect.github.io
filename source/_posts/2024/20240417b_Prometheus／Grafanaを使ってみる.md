@@ -7,7 +7,7 @@ tag:
   - Grafana
 category:
   - Infrastructure
-thumbnail: /images/20240417b/thumbnail.png
+thumbnail: /images/2024/20240417b/thumbnail.png
 author: 伊藤太斉
 lede: "PrometheusはSoundCloud社によって開発されたオープンソースの監視ソフトウェアです。GoogleでKubernetesの前身となったBorgという分散システムがあり..."
 ---
@@ -22,7 +22,7 @@ lede: "PrometheusはSoundCloud社によって開発されたオープンソー�
 
 https://grafana-meetup-japan.connpass.com/event/314500/
 
-[![From connpass: Grafana Meetup Japan #1 - connpass | ## Grafana Meetup Japanへようこそ！  このイベントは、オープンソースの監視・可視化ツールであるGrafanaについて、互いに学び、発信し、交流することを目的としています。  Grafanaは、ITインフラやアプリケーションの監視から、IoTデバイス、ビジネス指標、工場、物流、自然災害、宇宙に至るまで、あらゆる分野でのデータ可視化と監視を支援するツールです。  日本でも広く利用されつつありますが、Grafanaの最新情報や導入事例、プラクティスを学んだり発信したりする場は多くありませんでした。そこで、Grafana Labsと共にGrafana Meetup Jap...](/images/20240417b/2024-04-17_Grafana_Meetup_Japan_1___connpass.jpg)](https://grafana-meetup-japan.connpass.com/event/314500/)
+[![From connpass: Grafana Meetup Japan #1 - connpass | ## Grafana Meetup Japanへようこそ！  このイベントは、オープンソースの監視・可視化ツールであるGrafanaについて、互いに学び、発信し、交流することを目的としています。  Grafanaは、ITインフラやアプリケーションの監視から、IoTデバイス、ビジネス指標、工場、物流、自然災害、宇宙に至るまで、あらゆる分野でのデータ可視化と監視を支援するツールです。  日本でも広く利用されつつありますが、Grafanaの最新情報や導入事例、プラクティスを学んだり発信したりする場は多くありませんでした。そこで、Grafana Labsと共にGrafana Meetup Jap...](/images/2024/20240417b/2024-04-17_Grafana_Meetup_Japan_1___connpass.jpg)](https://grafana-meetup-japan.connpass.com/event/314500/)
 
 知り合いが告知していたことや、登壇される方々に興味を持って参加しました。しかし、「Grafanaほぼ触ったことない」の丸腰で行っても得るものが少なくなりそうなので、せっかくならと記事を書いています。
 
@@ -43,7 +43,7 @@ PrometheusはSoundCloud社によって開発されたオープンソースの監
 仕組みとしては、従来の監視システムでよく使われるZabbixをはじめとしてエージェントを利用してメトリクスを取得、監視するものではなく、管理サーバ側が指定されたサーバに対しメトリクスを取得するPull型となっているのが大きな違いでしょう。
 (今回の話では、だいたい下半分くらいが対象の記事となっています）。
 
-<img src="/images/20240417b/prom_architecture.png" alt="prom_architecture.png" width="1200" height="721" loading="lazy">
+<img src="/images/2024/20240417b/prom_architecture.png" alt="prom_architecture.png" width="1200" height="721" loading="lazy">
 
 > [Prometheus Overview](https://prometheus.io/docs/introduction/overview/)より引用
 
@@ -152,11 +152,11 @@ scrape_configs:
 ソースレベルの設定、確認はここまでで、具体的にPrometheusの設定をしていきましょう。
 コンテナを立ち上げた状態で `http://localhost:9090/graph`にアクセスすると、以下のような画面になります。
 
-<img src="/images/20240417b/スクリーンショット_2024-04-17_1.01.38.png" alt="" width="1192" height="797" loading="lazy">
+<img src="/images/2024/20240417b/スクリーンショット_2024-04-17_1.01.38.png" alt="" width="1192" height="797" loading="lazy">
 
 そして、検索バーにFastAPIのコンテナの`/health`に対して受けたパスの合計が出力される `http_requests_total`を入れてみてみましょう。
 
-<img src="/images/20240417b/スクリーンショット_2024-04-17_1.10.32.png" alt="" width="1200" height="950" loading="lazy">
+<img src="/images/2024/20240417b/スクリーンショット_2024-04-17_1.10.32.png" alt="" width="1200" height="950" loading="lazy">
 
 手打ちでcURLを実行してはいますが、リクエストした数だけグラフが上がってきていることがわかります。
 
@@ -174,27 +174,27 @@ PrometheusでできることはわざわざGrafanaでまたやらなくていい
 
 コンテナを立ち上げたあと　`http://localhost:3000/login`にアクセスすると、ログイン画面になるので、初期ユーザ/パスワードである admin / adminを打ち込んで、ログインしましょう。(そのあと、初期パスワードの変更を求められますが、今回の検証の本題からは外れるので割愛します）
 
-<img src="/images/20240417b/スクリーンショット_2024-04-17_1.19.48.png" alt="" width="1200" height="950" loading="lazy">
+<img src="/images/2024/20240417b/スクリーンショット_2024-04-17_1.19.48.png" alt="" width="1200" height="950" loading="lazy">
 
 さて、ログインまでできたので、次はGrafanaからPrometheusを参照できるようにしましょう。サイドバーにある Connections > Add new connection を押下しましょう。たくさんのツールをデータソースにできることがわかります。今回は検索バーにPrometheusと入力し、必要なものを選択しましょう。
 
-<img src="/images/20240417b/スクリーンショット_2024-04-17_11.52.25.png" alt="" width="1200" height="459" loading="lazy">
+<img src="/images/2024/20240417b/スクリーンショット_2024-04-17_11.52.25.png" alt="" width="1200" height="459" loading="lazy">
 
 Promehteusを選択し、Add new data sourceを押下してホストの設定をしましょう。Prometheus Server URLに `http://prometheus:9090`を入力して画面下部にある　Save & testを押下して保存しましょう。
 
 保存ができたら、今度はサイドバーにある、Dashboardsを押下し、Create Dashboard > Add visualization からダッシュボードを作りましょう。ここで、先ほど登録したデータソースが使えるようになります。メトリクスの追加ですが、下のスクリーンショットのように入力できる欄があるので、Metricに先ほどPrometheusでも利用した `http_requests_total`を入力して　Run queriesを押してみましょう。
 
-<img src="/images/20240417b/スクリーンショット_2024-04-17_12.00.23.png" alt="" width="793" height="280" loading="lazy">
+<img src="/images/2024/20240417b/スクリーンショット_2024-04-17_12.00.23.png" alt="" width="793" height="280" loading="lazy">
 
 そうすると、こちらでもグラフを表示できました（先ほどと概形が異なるのは取得時間が異なるためです）。
 
-<img src="/images/20240417b/スクリーンショット_2024-04-17_12.03.30.png" alt="" width="793" height="351" loading="lazy">
+<img src="/images/2024/20240417b/スクリーンショット_2024-04-17_12.03.30.png" alt="" width="793" height="351" loading="lazy">
 
 Metricの欄では、Prometheusが取得可能なすべてのメトリクスが使えるので、ものによっては2つ以上取得できるものがありますが、これは Label filtersで絞ることが可能です。
 
 そして、右上の Apply を押下してダッシュボード化しましょう。
 
-<img src="/images/20240417b/スクリーンショット_2024-04-17_12.06.32.png" alt="" width="1200" height="588" loading="lazy">
+<img src="/images/2024/20240417b/スクリーンショット_2024-04-17_12.06.32.png" alt="" width="1200" height="588" loading="lazy">
 
 ### どんなことに使えそうか
 

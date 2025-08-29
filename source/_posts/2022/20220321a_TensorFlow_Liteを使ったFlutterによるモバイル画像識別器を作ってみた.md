@@ -9,7 +9,7 @@ tag:
   - Flutter
 category:
   - Programming
-thumbnail: /images/20220321a/thumbnail.png
+thumbnail: /images/2022/20220321a/thumbnail.png
 author: 岸下優介
 lede: "初めまして、2022年中途入社でTIG所属の岸下です。FlutterとTensorFlow Liteを使ったモバイル画像識別について執筆させて頂きます。TensorFlow Liteとは..."
 ---
@@ -46,7 +46,7 @@ AIモデルの中身では入力された特徴量に対して重み付け演算
 
 # FlutterとTFLiteを用いてホットドッグ識別器を作ってみる
 
-<img src="/images/20220321a/eca77278-952d-59c0-aa1b-97aa98a5d453.png" alt="ホットドッグ画像" width="533" height="1113" loading="lazy">
+<img src="/images/2022/20220321a/eca77278-952d-59c0-aa1b-97aa98a5d453.png" alt="ホットドッグ画像" width="533" height="1113" loading="lazy">
 
 前置きはここまでにして、早速本題へ入っていきましょう！
 元ネタは海外ドラマの[シリコンバレー](https://www.amazon.co.jp/gp/video/detail/B07D43SV5F/ref=atv_dp_season_select_s4)です。
@@ -333,7 +333,7 @@ AIモデルの中では、画像の色合いや配色パターンの特徴から
 
 # 推論してみる
 
-<img src="/images/20220321a/fa8d1a39-a1b8-044e-4faa-04523e5bf10f.gif" alt="" width="532" height="1118" loading="lazy">
+<img src="/images/2022/20220321a/fa8d1a39-a1b8-044e-4faa-04523e5bf10f.gif" alt="" width="532" height="1118" loading="lazy">
 
 お！ うまくホットドッグを識別できていますね！
 

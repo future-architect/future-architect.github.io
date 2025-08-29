@@ -11,7 +11,7 @@ tag:
   - uroboroSQL
 category:
   - Programming
-thumbnail: /images/20240627a/thumbnail
+thumbnail: /images/2024/20240627a/thumbnail
 author: 星賢一
 lede: "筆者自身もコミッターとして関わるJavaのDB永続化ライブラリ「uroboroSQL」の紹介です。"
 ---
@@ -21,7 +21,7 @@ lede: "筆者自身もコミッターとして関わるJavaのDB永続化ライ�
 
 筆者自身もコミッターとして関わるJavaのDB永続化ライブラリ「uroboroSQL」の紹介です。
 
-<img src="/images/20240627a/uroboroSQL.png" alt="" width="1200" height="288" loading="lazy">
+<img src="/images/2024/20240627a/uroboroSQL.png" alt="" width="1200" height="288" loading="lazy">
 
 https://github.com/future-architect/uroborosql
 
@@ -76,14 +76,14 @@ uroboroSQLは、JavaにおけるDB永続化ライブラリの1つであり、基
 2Way-SQLでの開発時にビルド不要で即試すことが可能です。
 
 <a href="https://asciinema.org/a/122312" rel="nofollow noopener" target="_blank">
-<img src="/images/20240627a/asciicast.png" alt="asciicast" width="1200" height="558" loading="lazy">
+<img src="/images/2024/20240627a/asciicast.png" alt="asciicast" width="1200" height="558" loading="lazy">
 </a>
 
 ### カバレッジレポート
 
 SQL文の条件分岐を集計してカバレッジレポートを行うことが可能です。
 
-<img src="/images/20240627a/coverage.png" alt="" width="1200" height="1133" loading="lazy">
+<img src="/images/2024/20240627a/coverage.png" alt="" width="1200" height="1133" loading="lazy">
 
 ## その他の特徴
 

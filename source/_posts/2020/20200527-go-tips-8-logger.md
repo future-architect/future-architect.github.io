@@ -8,13 +8,13 @@ tag:
   - ログ
 category:
   - Programming
-thumbnail: /images/20200527/thumbnail.png
+thumbnail: /images/2020/20200527/thumbnail.png
 author: 澁川喜規
 lede: "Go tipsということで、シンプルネタを投稿します。
 
 検索窓に入れると「printデバッグでいつまで消耗しているの？」とか「printデバッグにさようなら」とかサジェストされつつも、根強く生き残っているのがprintデバッグです。むしろ、非同期だったり並列処理が増えてくると、同期的に動くデバッガーが逆に使いにくかったりもありますし、デバッガーを使うにしてもブレークポイントを仕掛ける場所のあたりをつけるためにprintデバッグの力を借りたりもあるし、いっそのことprintデバッグの方が進化しろ、と個人的には思っています。"
 ---
-<img src="/images/20200527/top.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200527/top.png" class="img-small-size" loading="lazy">
 
 [Go Tips連載](/tags/GoTips%E9%80%A3%E8%BC%89/)の第8弾です。
 
@@ -59,7 +59,7 @@ func main() {
 
 フォルダはデフォルトではフルパス表示されますが、いまどきは``-tirmpath``つけてビルドするでしょうし、そうなるとパッケージ名＋相対パスだけになります。
 
-<img src="/images/20200527/1.png" loading="lazy">
+<img src="/images/2020/20200527/1.png" loading="lazy">
 
 # 出力先とかログに決まった文字列を追加
 
@@ -97,4 +97,4 @@ func (w OrigWriter) Write(b []byte) (int, error) {
 
 ファイル名の出力を入れると便利です。また、絵文字を今回サンプルに使いましたが、絵文字って色がつくので（たとえ[go playground](https://play.golang.org/p/-wnBrYmGqwI)であっても）視認性がいいんですよね。絵文字を``log.SetPrefix()``に入れてあげるのもおすすめです。絵文字を使う場合はグリフが半角相当の幅か全角相当の幅かはターミナルの設定によって出力のされ方が変わることがあり、半角の幅だと絵に次の文字がめり込んでよみにくくなるため、絵文字の後ろには半角スペースを入れておくのをおすすめします。
 
-<img src="/images/20200527/2.png" loading="lazy">
+<img src="/images/2020/20200527/2.png" loading="lazy">

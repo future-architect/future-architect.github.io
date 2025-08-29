@@ -8,12 +8,12 @@ tag:
   - Qiita
 category:
   - Culture
-thumbnail: /images/20211129a/thumbnail.jpg
+thumbnail: /images/2021/20211129a/thumbnail.jpg
 author: 宮永崇史
 lede: "こんにちは。TIG/DXユニット所属の宮永です。2021年も残すところ１か月、本年を振り返るとオリンピックやコロナなど様々なことがありました。私事で恐縮ですが、2021年はフューチャーで社会人の第1歩を踏み出した年でもあり、個人としても非常に思い出深い1年となりました。"
 ---
 
-<img src="/images/20211129a/pexels-torsten-dettlaff-195030.jpg" alt="" title="PexelsのTorsten Dettlaffによる写真" width="1200" height="800" loading="lazy">
+<img src="/images/2021/20211129a/pexels-torsten-dettlaff-195030.jpg" alt="" title="PexelsのTorsten Dettlaffによる写真" width="1200" height="800" loading="lazy">
 
 # はじめに
 
@@ -50,7 +50,7 @@ Qiitaが主催するアドベントカレンダーは上記のアドベントカ
 
 中でも注目すべきは12月24日に投稿されている真野さんの[「テックリードになって気をつけていること」](https://qiita.com/ma91n/items/207f32db1b51754d6933)でしょう。LGTM数508という驚異的な数字をたたき出しています。記事は9500文字の大作でタイトルの通り「テックリードになって気を付けていること」をアーキテクチャ設計や開発生産性、メンバーのマネジメントなどの観点からまとめています。
 
-<img src="/images/20211129a/image.png" alt="2020年カレンダー" width="1200" height="789" loading="lazy">
+<img src="/images/2021/20211129a/image.png" alt="2020年カレンダー" width="1200" height="789" loading="lazy">
 
 ## 2021年のカレンダー
 
@@ -60,7 +60,7 @@ Qiitaが主催するアドベントカレンダーは上記のアドベントカ
 
 参加者は毎年参加しているベテラン勢から今年新卒入社した方(自分含む)まで幅広いです。
 私も12月19日に「量子コンピュータとジャンケンする」というテーマで参加する予定です。読んでいただけると大変嬉しいです。
-<img src="/images/20211129a/image_2.png" alt="2021年カレンダー" width="1088" height="625" loading="lazy">
+<img src="/images/2021/20211129a/image_2.png" alt="2021年カレンダー" width="1088" height="625" loading="lazy">
 
 # 発表テーマについて
 

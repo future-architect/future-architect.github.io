@@ -8,7 +8,7 @@ tag:
   - C/C++
 category:
   - Infrastructure
-thumbnail: /images/20230602a/thumbnail.png
+thumbnail: /images/2023/20230602a/thumbnail.png
 author: 川渕皓太
 lede: "C/C++を呼び出しているRustのwasm化について説明します。結論から述べるとemscriptenを使用することでうまくいきました。"
 ---
@@ -143,7 +143,7 @@ Rustのwasm化において一番メジャーで簡単な方法です。wasm-pack
 
     ブラウザで[http://localhost:8080/](http://localhost:8080/)にアクセスすると画面上にアラートボックスが現れ、`Hello, hello-wasm-pack!`と表示されたら成功です。
 
-<img src="/images/20230602a/スクリーンショット_2023-03-24_18.40.13.png" alt="" width="1200" height="739" loading="lazy">
+<img src="/images/2023/20230602a/スクリーンショット_2023-03-24_18.40.13.png" alt="" width="1200" height="739" loading="lazy">
 
 ### wasm-packは何をしてくれているのか
 
@@ -352,11 +352,11 @@ C/C++を呼んでいる場合はこちらの方法をオススメします。
     ```
 
     ブラウザで[http://localhost:8080/](http://localhost:8080/)にアクセスすると以下のようなページが表示されます。
-<img src="/images/20230602a/スクリーンショット_2023-03-24_15.53.38.png" alt="greet" width="986" height="624" loading="lazy">
+<img src="/images/2023/20230602a/スクリーンショット_2023-03-24_15.53.38.png" alt="greet" width="986" height="624" loading="lazy">
     テキストボックスに適当なテキストを入力し、下部のボタンを押します。
     コンソールに"Hello, (入力したテキスト)!"と表示されれば成功です。
 
-<img src="/images/20230602a/スクリーンショット_2023-03-24_15.59.58.png" alt="Hello, Tom!" width="917" height="611" loading="lazy">
+<img src="/images/2023/20230602a/スクリーンショット_2023-03-24_15.59.58.png" alt="Hello, Tom!" width="917" height="611" loading="lazy">
 
 ## SQLフォーマッタのwasm化をやってみる
 
@@ -407,7 +407,7 @@ cargo build --target wasm32-unknown-emscripten --release
 </div>
 
 ローカルサーバを立てて実行してみるとちゃんと動きました 🎉
-<img src="/images/20230602a/format.gif" alt="format.gif" width="1200" height="675" loading="lazy">
+<img src="/images/2023/20230602a/format.gif" alt="format.gif" width="1200" height="675" loading="lazy">
 
 ## 速度検証
 

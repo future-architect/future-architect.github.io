@@ -8,11 +8,11 @@ tag:
   - 海外展開
 category:
   - Infrastructure
-thumbnail: /images/20240315a/thumbnail.png
+thumbnail: /images/2024/20240315a/thumbnail.png
 author: 岸下優介
 lede: "IaCを利用してインフラを構成することで、構築忘れや設定ミスといったイージーなミスが減らせるようになりました。とはいえ、展開していく範囲が増えれば増えるほどコードの量も増えていくので、このリソースはどこで作ったっけ…みたいなことが起きてしまいます。"
 ---
-<img src="/images/20240315a/image.png" alt="" width="1088" height="542" loading="lazy">
+<img src="/images/2024/20240315a/image.png" alt="" width="1088" height="542" loading="lazy">
 
 [Terraform連載2024](/articles/20240311a/)の5日目です。
 

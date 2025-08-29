@@ -8,12 +8,12 @@ tag:
   - Pyright
 category:
   - Programming
-thumbnail: /images/20220303a/thumbnail.png
+thumbnail: /images/2022/20220303a/thumbnail.png
 author: 空閑康太
 lede: "Pyright を LSP  サーバとした自作クライアントを実装しますが、その前に経緯について説明します。アルバイトの前は、Future のインターン Engineer Camp で Python のソースコード解析に取り組んでいました。当時は Python の AST モジュールを活用する方針で、それ以外は自前で解析を行っていました。アルバイトでも引き続き解析に取り組んでいますが、次第に型推論などの技術が必要になってきており、全てを自前で実装することは困難な状況です。そこで現在は、既存のツールを拡張する方針を取っています。ツールの候補としては、Mypy および Pyright が挙がりましたが..."
 ---
 
-<img src="/images/20220303a/PyrightLarge.png" alt="" width="565" height="234">
+<img src="/images/2022/20220303a/PyrightLarge.png" alt="" width="565" height="234">
 
 # はじめに
 

@@ -10,7 +10,7 @@ tag:
   - Tips
 category:
   - DataScience
-thumbnail: /images/20230213a/thumbnail.png
+thumbnail: /images/2023/20230213a/thumbnail.png
 author: 平野甫
 lede: "Vertex AI Pipelinesを利用してみて分かったTipsについて、いくつかピックアップしてまとめました。なお、コードは全てPython・Kubeflowを用いた場合を記載しています。Vertex AI Pipelinesとは、GCP上でMLパイプライン機能を提供するサービスです。サーバーレス方式でMLワークフローをオーケストレートします。"
 mathjax: true
@@ -47,7 +47,7 @@ Vertex AI Pipelinesを使う際に参照することになる、Kubeflowの公�
   * （3） **Google Cloudパイプラインコンポーネント**を使う
     よく利用される処理についてはGoogle側がすでに用意してくれているため、事前に関数一発で呼び出して実行してくれるものになっています。
 
-<img src="/images/20230213a/pipeline_example.png" alt="pipeline_example.png" width="960" height="540" loading="lazy">
+<img src="/images/2023/20230213a/pipeline_example.png" alt="pipeline_example.png" width="960" height="540" loading="lazy">
 
 ### 参考
 
@@ -272,7 +272,7 @@ if __name__ == "__main__":
     job.run()
 ```
 
-<img src="/images/20230213a/dependancy.png" alt="dependancy.png" width="413" height="408" loading="lazy">
+<img src="/images/2023/20230213a/dependancy.png" alt="dependancy.png" width="413" height="408" loading="lazy">
 
 （2）パイプラインの実行順序を明示的に制御したい場合には、`ContainerOp.after`関数を使うことで可能です。
 
@@ -288,7 +288,7 @@ def pipeline() -> None:
 ```
 
 上のようなコードの場合、以下の図のようなパイプラインとなります。
-<img src="/images/20230213a/dependancy1.png" alt="dependancy1.png" width="396" height="376" loading="lazy">
+<img src="/images/2023/20230213a/dependancy1.png" alt="dependancy1.png" width="396" height="376" loading="lazy">
 
 また、`after`関数は複数のコンポーネントを受け取ることもできます。
 
@@ -304,7 +304,7 @@ def pipeline() -> None:
 
 この場合、以下のようなパイプラインとなります。
 
-<img src="/images/20230213a/dependancy2.png" alt="dependancy2.png" width="792" height="246" loading="lazy">
+<img src="/images/2023/20230213a/dependancy2.png" alt="dependancy2.png" width="792" height="246" loading="lazy">
 
 ### 参考
 
@@ -441,9 +441,9 @@ def pipeline() -> None:
 
 キャッシュが利用されたかどうかは、パイプラインのGUIから確認できます。キャッシュが利用されている場合にはコンポーネントの右に以下のような矢印マークが付きます。また、ノード情報からもキャッシュ済みかを確認できます。
 
-<img src="/images/20230213a/cached.png" alt="cached.png" width="380" height="127" loading="lazy">
+<img src="/images/2023/20230213a/cached.png" alt="cached.png" width="380" height="127" loading="lazy">
 
-<img src="/images/20230213a/component_detail_cached.png" alt="component_detail_cached.png" width="641" height="317" loading="lazy">
+<img src="/images/2023/20230213a/component_detail_cached.png" alt="component_detail_cached.png" width="641" height="317" loading="lazy">
 
 ### 参考
 
@@ -685,7 +685,7 @@ def pipeline(learning_rate: float = 0.1, max_depth: int = 10) -> None:
     ...
 ```
 
-<img src="/images/20230213a/param.png" alt="param.png" width="647" height="220" loading="lazy">
+<img src="/images/2023/20230213a/param.png" alt="param.png" width="647" height="220" loading="lazy">
 
 ### データセット、モデル、指標の保存
 
@@ -730,9 +730,9 @@ def evaluate(dataset: Input[Dataset], model: Input[Model], metrics: Output[Metri
     metrics.log_metric("framework", "Scikit Learn")
 ```
 
-<img src="/images/20230213a/metrics.png" alt="metrics.png" width="612" height="156" loading="lazy">
+<img src="/images/2023/20230213a/metrics.png" alt="metrics.png" width="612" height="156" loading="lazy">
 →各データについて、後から確認したくなった場合、Vertex AI Pipelinesでは、どのようなパイプラインの中で生成されたのかをGUIで見ることができます。
-<img src="/images/20230213a/data_lineage_modified.png" alt="data_lineage_modified.png" width="1200" height="382" loading="lazy">
+<img src="/images/2023/20230213a/data_lineage_modified.png" alt="data_lineage_modified.png" width="1200" height="382" loading="lazy">
 
 ## ログを確認するには？
 
@@ -745,9 +745,9 @@ Vertex AI Pipelinesのコンソールからログを見たいパイプライン�
 ## 処理時間・起動時間（Pythonスクリプト・Docker image）を確認するには？
 
 パイプラインの処理時間や開始時刻、終了時刻はパイプライン一覧のページから確認できます。
-<img src="/images/20230213a/time.png" alt="time.png" width="1200" height="306" loading="lazy">
+<img src="/images/2023/20230213a/time.png" alt="time.png" width="1200" height="306" loading="lazy">
 また、パイプラインの詳細のページからは各コンポーネントの処理時間、開始時刻、終了時刻を確認できます。
-<img src="/images/20230213a/time_component.png" alt="time_component.png" width="515" height="468" loading="lazy">
+<img src="/images/2023/20230213a/time_component.png" alt="time_component.png" width="515" height="468" loading="lazy">
 
 ## パイプラインのグループ分け・実行結果を比較するには？
 
@@ -788,17 +788,17 @@ if __name__ == "__main__":
 
 experimentはサイドバーの「テスト」から見ることができます。
 
-<img src="/images/20230213a/experiment.png" alt="experiment.png" width="752" height="318" loading="lazy">
+<img src="/images/2023/20230213a/experiment.png" alt="experiment.png" width="752" height="318" loading="lazy">
 
 ### パイプラインの比較
 
 パイプラインを比較する方法はVertex AI PipelinesのGUIから行う方法と、Vertex AI Experimentsから行う方法の2種類あります。
 
 Vertex AI PipelinesのGUIから行う場合は、パイプライン一覧のページから比較したいパイプラインを選択後、比較を押すことで以下の図のような比較が可能です。
-<img src="/images/20230213a/compare_pipelines_modified.png" alt="compare_pipelines_modified.png" width="1200" height="408" loading="lazy">
+<img src="/images/2023/20230213a/compare_pipelines_modified.png" alt="compare_pipelines_modified.png" width="1200" height="408" loading="lazy">
 Vertex AI Experimentsから行う場合は、サイドバーの「テスト」から見たいexperimentを選ぶと、以下のように比較ができます。
-<img src="/images/20230213a/experiment_2.png" alt="experiment.png" width="752" height="318" loading="lazy">
-<img src="/images/20230213a/compare_pipelines_in_vertex_ai_experiments.png" alt="compare_pipelines_in_vertex_ai_experiments.png" width="1200" height="258" loading="lazy">
+<img src="/images/2023/20230213a/experiment_2.png" alt="experiment.png" width="752" height="318" loading="lazy">
+<img src="/images/2023/20230213a/compare_pipelines_in_vertex_ai_experiments.png" alt="compare_pipelines_in_vertex_ai_experiments.png" width="1200" height="258" loading="lazy">
 また、Pythonスクリプトでターミナル上から比較することも可能です。以下のスクリプトを実行することで対象のexperiment内のパイプラインを比較できます。
 
 ```python
@@ -828,7 +828,7 @@ if __name__ == "__main__":
 ```
 
 以下が実行結果です。
-<img src="/images/20230213a/compare_pipelines_in_terminal.png" alt="compare_pipelines_in_terminal.png" width="1200" height="49" loading="lazy">
+<img src="/images/2023/20230213a/compare_pipelines_in_terminal.png" alt="compare_pipelines_in_terminal.png" width="1200" height="49" loading="lazy">
 
 ## Vertex AI Pipelinesを利用するコストは？
 
@@ -880,7 +880,7 @@ if __name__ == "__main__":
 ```
 
 ログ
-<img src="/images/20230213a/startuptime.png" alt="startuptime.png" width="686" height="42" loading="lazy">
+<img src="/images/2023/20230213a/startuptime.png" alt="startuptime.png" width="686" height="42" loading="lazy">
 
 ## ディレクトリ構成はどうすればよい？
 

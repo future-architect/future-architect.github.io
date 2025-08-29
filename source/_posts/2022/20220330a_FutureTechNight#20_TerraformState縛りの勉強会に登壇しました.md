@@ -8,7 +8,7 @@ tag:
   - 登壇レポート
 category:
   - Infrastructure
-thumbnail: /images/20220330a/thumbnail.png
+thumbnail: /images/2022/20220330a/thumbnail.png
 author: 棚井龍之介
 lede: "Terraform stateをテーマにした勉強会が開かれました。私は後半パートでクラウドリソース自体をdestroy/createdせずに、Terraformリソース定義の記述場所を変更する方法について話しました。"
 ---
@@ -34,11 +34,11 @@ TIGの棚井龍之介です。
 
 （1）Terraformを運用していると、↓画像のように「.tfファイルの場所を移動」したくなることがあります。何も考えずに移動すると、リソースはdestroy/createdされてしまうのですが、データベースや24/365の稼働要件があるリソースはdestroyすべきではありません。
 
-<img src="/images/20220330a/Screen_Shot_2022-03-28_at_23.03.47.png" alt="リソースを再作成せずTerraform記述を移動する" width="1200" height="588" loading="lazy">
+<img src="/images/2022/20220330a/Screen_Shot_2022-03-28_at_23.03.47.png" alt="リソースを再作成せずTerraform記述を移動する" width="1200" height="588" loading="lazy">
 
 （2）そんな時は、terraform stateコマンドを活用することで、実リソースに手をつけることなく定義場所のディレクトリ移動ができます。さらに、↓画像のモデルをベースとすれば、リソース操作状況を視覚的にイメージしながら作業ができます。
 
-<img src="/images/20220330a/Screen_Shot_2022-03-28_at_23.00.36.png" alt=".tfstateの移植操作" width="1200" height="586" loading="lazy">
+<img src="/images/2022/20220330a/Screen_Shot_2022-03-28_at_23.00.36.png" alt=".tfstateの移植操作" width="1200" height="586" loading="lazy">
 
 という内容でした。
 

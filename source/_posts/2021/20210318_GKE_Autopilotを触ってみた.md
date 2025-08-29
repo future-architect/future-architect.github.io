@@ -7,7 +7,7 @@ tag:
   - GCP
 category:
   - Programming
-thumbnail: /images/20210318/thumbnail.jpg
+thumbnail: /images/2021/20210318/thumbnail.jpg
 author: 関靖秀
 lede: "テーマは、2021年2月24日に公開されたGKE Autopilotです。この記事は、Kubernetesに触ったことがない方でもわかるように、最も簡単な構成で試してみました。Kubernetesを触ったことがない方にもみていただけるとありがたく思います。"
 ---
@@ -45,7 +45,7 @@ GKE(Google Kubernetes Engine)とは、GoogleがGCPのプロダクトの1つと�
 
 # GKE Autopilot
 
-<img src="/images/20210318/aircraft.jpg" alt="" title="Ralph KleinによるPixabayからの画像" loading="lazy">
+<img src="/images/2021/20210318/aircraft.jpg" alt="" title="Ralph KleinによるPixabayからの画像" loading="lazy">
 
 さて、ここからが本題です。
 
@@ -84,19 +84,19 @@ Kuberntesを触ったことがない方でも、なんとなく雰囲気は掴�
 クラスタを作りましょう。Autopilotの設定はクラスタを作る際に行えます。
 新機能ですし、ここではGUIでどのように設定できるのかをみていきましょう。
 
-<img src="/images/20210318/image.png" loading="lazy">
+<img src="/images/2021/20210318/image.png" loading="lazy">
 作成を押します。
 ポップアップが出て、モードを選択できるようになっていました。
 もちろん、Autopilotを選択します。
-<img src="/images/20210318/image_2.png" loading="lazy">
+<img src="/images/2021/20210318/image_2.png" loading="lazy">
 
 ネットワーキングオプションなど、選択項目もありますが、今回はひとまず触るのが目的なため、デフォルトのまま変更しないことにします。
 画面下方の"コマンドライン"のリンクを押すとgcloudコマンドを表示可能です。記録を残したりするのに使えそう。
-<img src="/images/20210318/image_3.png" loading="lazy">
+<img src="/images/2021/20210318/image_3.png" loading="lazy">
 
 作成を押します。クラスタの作成が始まります。
 5min以上待つ必要があります。
-<img src="/images/20210318/image_4.png" loading="lazy">
+<img src="/images/2021/20210318/image_4.png" loading="lazy">
 
 ## gcloudコマンドを導入する
 
@@ -128,10 +128,10 @@ gcloud auth login --no-launch-browser
 
 GCPのコンソール に戻ります。
 こちらの"接続"を選択します。
-<img src="/images/20210318/image_5.png" loading="lazy">
+<img src="/images/2021/20210318/image_5.png" loading="lazy">
 
 コマンドが表示されるので、それをターミナルに貼り付けて実行します。
-<img src="/images/20210318/image_6.png" loading="lazy">
+<img src="/images/2021/20210318/image_6.png" loading="lazy">
 
 今回の場合、こんな感じ。実行すると、kubectlコマンドの対象クラスタがこのクラスタに切り替わってくれます。
 
@@ -212,7 +212,7 @@ kubectl apply -f deployment.yaml
 GCPコンソールで、サイドメニューのワークロードを選択するとみれます。
 エラーになっていますね、、、
 あれこれ試しているうちに、ワーカーノードのリソースが小さくなってしまったのかもしれません。
-<img src="/images/20210318/image_7.png" loading="lazy">
+<img src="/images/2021/20210318/image_7.png" loading="lazy">
 しばらく待ってみましょう。
 
 しばらくして、「nodeどうなっているんだろう？」という疑問が湧いてきました。
@@ -229,7 +229,7 @@ gk3-autopilot-cluster-1-default-pool-da3faeda-ndl1   Ready    <none>   3m49s   v
 ```
 
 少し待ったところ、、、
-<img src="/images/20210318/image_8.png" loading="lazy">
+<img src="/images/2021/20210318/image_8.png" loading="lazy">
 
 できました！！！リソース作成成功です！！！
 
@@ -299,14 +299,14 @@ EXTERNAL-IPと書かれているのが、LoadBalancerのIPです。
 LoadBalancer Serviceを作成すると、コントロールプレーンでそれを認識し、GCPのロードバランサを自動で作成してくれます。これはAutopilot限定の機能ではなく、これまでも可能だった機能です。
 
 ロードバランサができていることをGCPコンソールで確認してみましょう。
-<img src="/images/20210318/image_9.png" loading="lazy">
+<img src="/images/2021/20210318/image_9.png" loading="lazy">
 
 いかにも自動生成な名前でロードバランサが作成されているのがわかります。
 
 さて、先ほどのEXTERNAL-IPにブラウザからアクセスしてみましょう。
 もちろん、インターネットオーバーでのアクセスです。
 
-<img src="/images/20210318/image_10.png" loading="lazy">
+<img src="/images/2021/20210318/image_10.png" loading="lazy">
 
 できました！！！
 
@@ -325,7 +325,7 @@ kubectl delete -f service.yaml
 
 クラスタの再構成がなされるので、完了まで待ちましょう。
 次のように、削除を選択し、しばらく待てばクラスタが削除できます。
-<img src="/images/20210318/image_11.png" loading="lazy">
+<img src="/images/2021/20210318/image_11.png" loading="lazy">
 
 ## おまけ
 

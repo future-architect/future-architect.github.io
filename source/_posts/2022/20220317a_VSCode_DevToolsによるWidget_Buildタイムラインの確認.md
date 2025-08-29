@@ -7,7 +7,7 @@ tag:
   - VSCode
 category:
   - Programming
-thumbnail: /images/20220317a/thumbnail.png
+thumbnail: /images/2022/20220317a/thumbnail.png
 author: 藤田春佳
 lede: "VS CodeのDevToolsをを使用したWidget Buildの可視化についてご紹介します。Flutterアプリの開発では、Widgetのビルド単位を考えてコードを記述/改修すると思います。AndroidStudioのPerformance機能を使ってWidgetのリビルドを確認している例は見かけるのですが、VSCodeでの確認方法を見かけなかったため調べてみました。予想以上に高機能で、今回使わなかった機能も含めて活用どころがありそうです。"
 ---
@@ -34,9 +34,9 @@ Flutter公式の[DevTools](https://docs.flutter.dev/development/tools/devtools/o
 
 1. devTools起動: [公式手順](https://docs.flutter.dev/development/tools/devtools/vscode)に従って、アプリの起動後にDevToolsを起動します。
 2. DevToolsのPerformanceタブを開きます。
-<img src="/images/20220317a/performance_tab.png" alt="performance_tab.png" width="1200" height="355" loading="lazy">
+<img src="/images/2022/20220317a/performance_tab.png" alt="performance_tab.png" width="1200" height="355" loading="lazy">
 3. 「Enhance Tracing」から、Widget Builds, Layouts, PaintsをTrackするように設定します。
-<img src="/images/20220317a/EnhanceTracing.png" alt="EnhanceTracing.png" width="797" height="262" loading="lazy">
+<img src="/images/2022/20220317a/EnhanceTracing.png" alt="EnhanceTracing.png" width="797" height="262" loading="lazy">
 4. アプリを実行すると、タイムラインにFrameごとの処理時間が表示されます（#１）。Frame Time(UI)は、Dart VM内でビルドされるLayer treeと描画コマンドを含む軽量オブジェクトの作成時間を表しています。これらオブジェクトがGPUに渡されることでレンダリングが行われ、その実行時間が、Frame Time(Raster)になります。
 5. バーグラフをクリックすると、UIイベント, Raster(GPU)イベントそれぞれの内訳を確認することができます。UIイベントは、実装Dartコードを直接反映していて、Widgetレベルで実行イベントを確認できます。（#2）
 6. Raster(GPU)イベント（#3）は、UIイベントから作成されます。アプリのパフォーマンスを考える上では、UIグラフに課題がなくても、GPUグラフに課題があることもあります。
@@ -44,7 +44,7 @@ Flutter公式の[DevTools](https://docs.flutter.dev/development/tools/devtools/o
 
 【補足】 公式ページに紹介される[パフォーマンス診断](https://docs.flutter.dev/perf/rendering/ui-performance#diagnosing-performance-problems)では、UIスレッドとGPUスレッドのプロファイルから実装に落とし込んで対処することを説明しており、実機を使用した[profile mode](https://docs.flutter.dev/testing/build-modes#profile)にて行うことを前提としています。今回はiOSシミュレータにて、DevToolsの使い方と、ソースコードがプロファイルに与える影響の確認方法を見てみたいと思います。
 
-<img src="/images/20220317a/image.png" alt="image.png" width="963" height="749" loading="lazy">
+<img src="/images/2022/20220317a/image.png" alt="image.png" width="963" height="749" loading="lazy">
 
 # 実装の`Widget Build`への影響を確認
 
@@ -115,18 +115,18 @@ class PageState extends State<Page> with TickerProviderStateMixin {
 
 画面はこのようになります。Overlayされたグラフの上段がRaster(GPU)スレッド, 下段がUIスレッドを表しています。16msおきに補助ラインが引かれていますが、[おおよそ16msを超えるFrameは描画されずにJankとなります](https://docs.flutter.dev/perf/rendering/ui-performance#interpreting-the-graphs)。UIスレッド側に多くのJankが見られることから、この実装には課題がありそうだと分かります。
 
-<img src="/images/20220317a/83854e5c-c719-6331-6f55-ef03e48c3359.gif" alt="" width="560" height="2000" loading="lazy">
+<img src="/images/2022/20220317a/83854e5c-c719-6331-6f55-ef03e48c3359.gif" alt="" width="560" height="2000" loading="lazy">
 
 Frame実行時間のタイムラインを見ても、UIグラフに赤色のJank（slow frame）が多くなっています。
-<img src="/images/20220317a/test1.png" alt="test1.png" width="1200" height="141" loading="lazy">
+<img src="/images/2022/20220317a/test1.png" alt="test1.png" width="1200" height="141" loading="lazy">
 
 UIイベントの内訳を見てみましょう。連続する2Frameをクローズアップしていますが、アニメーションには関係のないAppBarやFloatingActionButtonも、Frame毎にビルドしてしまっていることが分かります。今回はビルド対象が小さいですが、対象が大きければ更にコストがかかりそうです。
 
-<img src="/images/20220317a/test1_ui.png" alt="test1_ui.png" width="1200" height="457" loading="lazy">
+<img src="/images/2022/20220317a/test1_ui.png" alt="test1_ui.png" width="1200" height="457" loading="lazy">
 
 GPUイベントも確認してみます。こちらは、赤いグラフが見られなかったことからも大きな課題はなさそうです。
 
-<img src="/images/20220317a/test1_raster.png" alt="test1_raster.png" width="1200" height="339" loading="lazy">
+<img src="/images/2022/20220317a/test1_raster.png" alt="test1_raster.png" width="1200" height="339" loading="lazy">
 
 ２） コードの改善
 Frame毎のビルド範囲をアニメーション部分に限定するには[AnimatedBuilder](https://api.flutter.dev/flutter/widgets/AnimatedBuilder-class.html)等を用いる方法があります。ただし今回のケースは、以下のように[Image](https://api.flutter.dev/flutter/widgets/Image-class.html) ウィジェットを使用することで、Frame毎のビルドをなくすことができます。
@@ -184,16 +184,16 @@ class PageState extends State<Page> with TickerProviderStateMixin {
 ```
 
 アプリ画面は以下になります。下段UIスレッドから、Jankがほぼなくなりました。少し見にくいですが、各グラフに平均実行時間が表示されていて、GPUスレッドは5.4ms/frame, UIスレッドは7.9ms/frameとなっています（改修前は、GPUスレッドが4.1ms/frame, UIスレッドが19.7ms/frameでした）。。
-<img src="/images/20220317a/5538b10a-158a-bd17-b27f-09f0f4c22222.gif" alt="" width="480" height="1000" loading="lazy">
+<img src="/images/2022/20220317a/5538b10a-158a-bd17-b27f-09f0f4c22222.gif" alt="" width="480" height="1000" loading="lazy">
 
 Frame実行時間のタイムラインを見ても、UIグラフに赤色のJank（slow frame）が見られません。平均43FPSとなっており、改修前の28FPSより改善しています。
-<img src="/images/20220317a/test4.png" alt="test4.png" width="1200" height="129" loading="lazy">
+<img src="/images/2022/20220317a/test4.png" alt="test4.png" width="1200" height="129" loading="lazy">
 
 UIイベントの内訳を見てみると、Frame毎の「Build」処理自体がなくなっていることが分かります。
-<img src="/images/20220317a/test4_ui.png" alt="test4_ui.png" width="1200" height="455" loading="lazy">
+<img src="/images/2022/20220317a/test4_ui.png" alt="test4_ui.png" width="1200" height="455" loading="lazy">
 
 GPUイベントについては、画面Overlayグラフからもわかるように、改修前より少し実行時間が増えていますが、Jankは見られず課題はなさそうです。
-<img src="/images/20220317a/test4_raster.png" alt="test4_raster.png" width="1200" height="320" loading="lazy">
+<img src="/images/2022/20220317a/test4_raster.png" alt="test4_raster.png" width="1200" height="320" loading="lazy">
 
 # まとめ
 

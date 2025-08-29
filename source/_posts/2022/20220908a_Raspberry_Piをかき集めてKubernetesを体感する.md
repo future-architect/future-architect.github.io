@@ -7,7 +7,7 @@ tag:
   - RaspberryPi
 category:
   - Infrastructure
-thumbnail: /images/20220908a/thumbnail.png
+thumbnail: /images/2022/20220908a/thumbnail.png
 author: 岸下優介
 lede: "業務でGKE（Google Kubernetes Engine）を利用することがあるのですが、Kubernetesの挙動や仕組みなど如何せん理解が難しいです。そこで今回は、自分の手でイチからKubernetesを構築することで勉強しようと思ったのが本記事のモチベーションです。ちょうど自宅にRaspberry Piが3台あったのでRaspberry Piでクラスタを構築していこうと思います。基本的には以下の記事を参考に設定を行っていき、自分の理解を深めるために解説を挟みながら書いていこうと思います。"
 ---
@@ -65,9 +65,9 @@ sudo apt upgrade -y
 
 ### 物理的な構成図
 
-<img src="/images/20220908a/Screenshot_from_2022-09-04_20-54-30.png" alt="Screenshot_from_2022-09-04_20-54-30.png" width="1200" height="732" loading="lazy">
+<img src="/images/2022/20220908a/Screenshot_from_2022-09-04_20-54-30.png" alt="Screenshot_from_2022-09-04_20-54-30.png" width="1200" height="732" loading="lazy">
 
-<img src="/images/20220908a/image.png" alt="image.png" width="939" height="730" loading="lazy">
+<img src="/images/2022/20220908a/image.png" alt="image.png" width="939" height="730" loading="lazy">
 
 **※Desktop PCはラズパイ達とSSHするために繋いでいます。Kubernetesの構成には必要ありません。**
 
@@ -125,7 +125,7 @@ IPアドレスの固定化が完了したので、ここからはSSHで操作を
 
 デスクトップPCにてVSCodeをインストールして、「拡張機能」から[Remote - SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh)をインストールしてください。
 
-<img src="/images/20220908a/Screenshot_from_2022-09-03_15-19-08.png" alt="Screenshot_from_2022-09-03_15-19-08.png" width="1200" height="233" loading="lazy">
+<img src="/images/2022/20220908a/Screenshot_from_2022-09-03_15-19-08.png" alt="Screenshot_from_2022-09-03_15-19-08.png" width="1200" height="233" loading="lazy">
 
 #### SSH構成ファイルを用意
 
@@ -355,7 +355,7 @@ sudo apt-mark hold kubelet kubeadm kubectl
 
 kubeletを理解する前に、クラスターの全体像をまず理解する必要がありそうです。
 
-<img src="/images/20220908a/9e8e89cf-751b-32cf-e060-c445acc0784c.png" alt="" width="1200" height="561" loading="lazy">
+<img src="/images/2022/20220908a/9e8e89cf-751b-32cf-e060-c445acc0784c.png" alt="" width="1200" height="561" loading="lazy">
 
 画像引用先： [Kubernetesのコンポーネント](https://kubernetes.io/ja/docs/concepts/overview/components/)
 

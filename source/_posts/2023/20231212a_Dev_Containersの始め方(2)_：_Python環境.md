@@ -11,7 +11,7 @@ tag:
   - rye
 category:
   - Programming
-thumbnail: /images/20231212a/thumbnail.png
+thumbnail: /images/2023/20231212a/thumbnail.png
 author: 澁川喜規
 lede: "Dev ContainersのPython環境を作っていきます。"
 ---
@@ -31,7 +31,7 @@ git init
 
 基本のPython3を選びます。公式を選んでおくのが吉。オプションでPythonバージョンを選びます。Apple Silliconは-busterついているのを選べって言ってますね。半年前にスクリーンショットを撮ったときは3.11までしかありませんでしたが、今は3.12も選べます。
 
-<img src="/images/20231212a/スクリーンショット_2023-04-17_20.53.40.png" alt="スクリーンショット_2023-04-17_20.53.40.png" width="787" height="226" loading="lazy">
+<img src="/images/2023/20231212a/スクリーンショット_2023-04-17_20.53.40.png" alt="スクリーンショット_2023-04-17_20.53.40.png" width="787" height="226" loading="lazy">
 
 Pythonのイメージをインストールすると、有名どころのツールはすでにインストール済みとなっていますこの辺りは特にインストールする必要はありません。
 
@@ -109,7 +109,7 @@ Poetryが--user相当のオプションを用意してくれれば良かった�
 
 [Even Better TOML](https://marketplace.visualstudio.com/items?itemName=tamasfe.even-better-toml)といった拡張機能を入れると、JSON Schemaを使ってTOMLのバリデーションができます。これで多少は楽にpyproject.tomlが作成できます。インストールしてpyproject.tomlファイルを開いたら、右下のところからスキーマ選択を起動し、pyproject.jsonというのを選択します。これでOK。
 
-<img src="/images/20231212a/スクリーンショット_2023-11-21_20.56.27.png" alt="スクリーンショット_2023-11-21_20.56.27.png" width="932" height="323" loading="lazy">
+<img src="/images/2023/20231212a/スクリーンショット_2023-11-21_20.56.27.png" alt="スクリーンショット_2023-11-21_20.56.27.png" width="932" height="323" loading="lazy">
 
 大体、最小限だと内容的にはこんな感じかと思います。[PEP-0621の定義](https://peps.python.org/pep-0621/)やら[もっと大きなサンプル](https://github.com/python-jsonschema/jsonschema/blob/main/pyproject.toml)などもみつつ充実させていけば良いでしょう。
 

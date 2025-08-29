@@ -8,11 +8,11 @@ tag:
   - Systemd
 category:
   - Infrastructure
-thumbnail: /images/20240412a/thumbnail.jpg
+thumbnail: /images/2024/20240412a/thumbnail.jpg
 author: 森大作
 lede: "Linuxのsystemdにおけるservice unitの起動と停止のフローに関して説明します"
 ---
-<img src="/images/20240412a/IMG_8598.jpg" alt="" width="1200" height="831" loading="lazy">
+<img src="/images/2024/20240412a/IMG_8598.jpg" alt="" width="1200" height="831" loading="lazy">
 
 [春の入門連載2024](/articles/20240408a/) の4本目です。
 

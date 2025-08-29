@@ -7,12 +7,12 @@ tag:
   - Terraform1.4
 category:
   - Infrastructure
-thumbnail: /images/20230407a/thumbnail.png
+thumbnail: /images/2023/20230407a/thumbnail.png
 author: 伊藤太斉
 lede: "Terraformのv1.0が出て約2年弱、ついにv1.4までやってきました。Terraformのv1.4のリリースノートの、ENHANCEMENTのうち、私個人が特に気になった機能を見つつ、ユースケースが考えられるものについて探れればと思います。"
 ---
 
-<img src="/images/20230407a/top.png" alt="" width="700" height="239">
+<img src="/images/2023/20230407a/top.png" alt="" width="700" height="239">
 
 こんにちは。TIGの伊藤です。
 

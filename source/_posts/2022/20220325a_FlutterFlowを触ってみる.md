@@ -10,11 +10,11 @@ tag:
   - ローコード
 category:
   - Programming
-thumbnail: /images/20220325a/thumbnail.png
+thumbnail: /images/2022/20220325a/thumbnail.png
 author: 宮崎将太
 lede: "Flutter連載6回目としてFlutterFlowについて調べてみました。GoogleI/O'21でFlutterFlowというFlutterのノーコードのサービスが発表されました。"
 ---
-<img src="/images/20220325a/image.png" alt="image.png" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20220325a/image.png" alt="image.png" width="1200" height="675" loading="lazy">
 
 # はじめに
 
@@ -66,17 +66,17 @@ https://app.flutterflow.io/create-account
 テンプレートからプロジェクトを作成するかblankプロジェクトを作成するか選択可能です。
 Freeプランで利用可能なテンプレートは現時点で8種類あり、大半がFirebase利用を前提としていました。
 
-<img src="/images/20220325a/ec121a83-71d8-4a99-c03a-edc8e266c128.png" alt="プロジェクト作成の流れ1" width="1200" height="931" loading="lazy">
+<img src="/images/2022/20220325a/ec121a83-71d8-4a99-c03a-edc8e266c128.png" alt="プロジェクト作成の流れ1" width="1200" height="931" loading="lazy">
 
-<img src="/images/20220325a/ad4b708f-b9d3-769c-2fb4-645c88d5d69f.png" alt="プロジェクト作成の流れ2" width="848" height="620" loading="lazy">
+<img src="/images/2022/20220325a/ad4b708f-b9d3-769c-2fb4-645c88d5d69f.png" alt="プロジェクト作成の流れ2" width="848" height="620" loading="lazy">
 
-<img src="/images/20220325a/909972bf-5d96-3dc5-4a1e-22fc212e209d.png" alt="プロジェクト作成の流れ3" width="816" height="646" loading="lazy">
+<img src="/images/2022/20220325a/909972bf-5d96-3dc5-4a1e-22fc212e209d.png" alt="プロジェクト作成の流れ3" width="816" height="646" loading="lazy">
 
 ## 画面デザイン
 
 メインのデザイン画面はこんな感じです
 
-<img src="/images/20220325a/image_2.png" alt="画面デザイン" width="1200" height="563" loading="lazy">
+<img src="/images/2022/20220325a/image_2.png" alt="画面デザイン" width="1200" height="563" loading="lazy">
 
 コンポーネント選択パネルから部品をDrag&Dropで画面に配置できます。
 TextやColumn、RowなどおなじみのWigdetがデフォルトで登録されています。
@@ -87,14 +87,14 @@ TextやColumn、RowなどおなじみのWigdetがデフォルトで登録され�
 
 ナビゲーションバーでタブを切り替えると画面ごとの表示やウィジェットのツリー表示も可能です。
 
-<img src="/images/20220325a/image_3.png" alt="画面ごとの表示やWidgetのツリー表示" width="354" height="906" loading="lazy">
+<img src="/images/2022/20220325a/image_3.png" alt="画面ごとの表示やWidgetのツリー表示" width="354" height="906" loading="lazy">
 
 ## Action設定
 
 配置した部品にGUIでActionを設定できます。
 設定可能なActionはデフォルトで用意されているものとカスタムで作成できるものがあり、Navigatorの使用やAlertなんかはデフォルトで用意されています。
 
-<img src="/images/20220325a/image_4.png" alt="GUIを用いたAction設定" width="1200" height="515" loading="lazy">
+<img src="/images/2022/20220325a/image_4.png" alt="GUIを用いたAction設定" width="1200" height="515" loading="lazy">
 
 ## コンポーネント作成
 
@@ -102,7 +102,7 @@ GUIとコードベースでコンポーネントを作成できます。
 部品として永続化してDRYに書くことは問題なくできそうです。
 ※コンポーネントとは別にCustom ウィジェットという概念もありますが、こちらはコードベースで作成するコンポーネントを指すようです。
 
-<img src="/images/20220325a/ezgif.com-gif-maker.gif" alt="コンポーネント作成のGifどうが" width="800" height="544" loading="lazy">
+<img src="/images/2022/20220325a/ezgif.com-gif-maker.gif" alt="コンポーネント作成のGifどうが" width="800" height="544" loading="lazy">
 
 ## LocalState
 
@@ -110,7 +110,7 @@ GUIとコードベースでコンポーネントを作成できます。
 ローカルDBへの永続化も可能です。
 ActionやCustomFunctionから適宜参照、設定ができます。
 
-<img src="/images/20220325a/image_5.png" alt="アプリケーショングローバルな値をLocalStateとして設定" width="1200" height="734" loading="lazy">
+<img src="/images/2022/20220325a/image_5.png" alt="アプリケーショングローバルな値をLocalStateとして設定" width="1200" height="734" loading="lazy">
 
 ## APICall
 
@@ -118,16 +118,16 @@ ActionやCustomFunctionから適宜参照、設定ができます。
 FreePlan/Standardでは任意のAPICall設定ができません。Backendを簡単に使用する場合はFirebaseを使うことが縛りになってしまうよう。
 ※CustomFunctionとしてAPICallをコーディングしておけばなんとでもなる気がするけど、そこまでやるとFlutterFlowを使用する理由が消失する。
 
-<img src="/images/20220325a/image_6.png" alt="API呼び出し" width="1200" height="745" loading="lazy">
+<img src="/images/2022/20220325a/image_6.png" alt="API呼び出し" width="1200" height="745" loading="lazy">
 
 ## 生成ソースコード
 
 最後に、FreePlanでも画面のソース閲覧は可能です（プロジェクト全体のダウンロードやGithub接続は不可）。
 ちょっとコードを眺めてみましょう。
 
-<img src="/images/20220325a/image_7.png" alt="コード出力ボタン" width="1154" height="376" loading="lazy">
+<img src="/images/2022/20220325a/image_7.png" alt="コード出力ボタン" width="1154" height="376" loading="lazy">
 ↓
-<img src="/images/20220325a/image_8.png" alt="生成されたコード" width="1200" height="518" loading="lazy">
+<img src="/images/2022/20220325a/image_8.png" alt="生成されたコード" width="1200" height="518" loading="lazy">
 
 ```dart
 import '../backend/api_requests/api_calls.dart';

@@ -7,7 +7,7 @@ tag:
   - ライセンス
 category:
   - Infrastructure
-thumbnail: /images/20220124a/thumbnail.png
+thumbnail: /images/2022/20220124a/thumbnail.png
 author: 澁川喜規
 lede: "大きな組織でのDocker Desktop有料化が発表されて、いよいよFreeからの切り替え期限が今月末に迫っています。「Docker DesktopだからLinux版は無償だからWSL2に入れれば無料」みたいな解説もされていますが、Linux版のDocker Desktopもすでにベータリリースされており、そのうちLinux版も遅かれ早かれ有償化されるかと思います。で、ライセンスもいくつかあるけど、どれを選べばよいのかを検討した記録を公開します。"
 ---
@@ -21,7 +21,7 @@ https://www.docker.com/pricing
 
 Freeはフューチャーの規模では使えませんので、除外してみると、Pro, Team, Businessがあります。2022年1月時点の一人/月あたりの金額は以下の通りです。
 
-<img src="/images/20220124a/image.png" alt="ライセンス一覧" width="1200" height="725" loading="lazy">
+<img src="/images/2022/20220124a/image.png" alt="ライセンス一覧" width="1200" height="725" loading="lazy">
 
 | Type  | 年契約 | 月契約 | メモ |
 |--- |:-:|:-:|:-|
@@ -33,7 +33,7 @@ Freeはフューチャーの規模では使えませんので、除外してみ�
 
 Proアカウントはボタンを押すといきなりクレジットカード入力画面が出てきます。個人ごとにチャージですので、会社で全員が各自ぽちぽち購入申請を上げて・・・みたいなのが必要です。全員がコーポレートカード持っているとかであればこれでもいいかもしれません。
 
-<img src="/images/20220124a/image_2.png" alt="支払い方法" width="951" height="719" loading="lazy">
+<img src="/images/2022/20220124a/image_2.png" alt="支払い方法" width="951" height="719" loading="lazy">
 
 Teamは組織名を決めて、人数（シート数、最小5ライセンス）を入れて、その後クレジットカード番号を入れることになります。複数人数分まとめて支払える点がProよりも良いですね。ただ、組織名はユニークでなければならず、チームごとに決済を分けたい、となるとチーム名も分かれることになるし、複数チームに所属する人はその分お金がかかるというのはデメリットです。まあDocker Hubにイメージをpushしたり、そこでプロジェクトのイメージ管理をしようとかしないで、ローカルでDocker Desktop使うだけなら、仕事上は複数チームでも1つのTeamに所属してお金を払っていたらまあ問題はないかと思います。大きなチーム（org）を内部でチームに分けることは可能っぽく、その場合は複数チームに入ってもお金は重複してかからなそうなので、なるべく多くのチームにして支払いをまとめたほうがよさそうです。プロジェクト按分とかを事後に行う必要があると思いますが。
 
@@ -41,7 +41,7 @@ Teamは組織名を決めて、人数（シート数、最小5ライセンス）
 
 https://docs.docker.com/subscription/add-seats/
 
-<img src="/images/20220124a/image_3.png" alt="組織設定" width="952" height="673" loading="lazy">
+<img src="/images/2022/20220124a/image_3.png" alt="組織設定" width="952" height="673" loading="lazy">
 
 Businessは試してないですが、おそらく営業とやりとりして見積して・・・という流れになるかと思います。請求書払いができるってのがBusinessのメリットしてあげられていますね。あとは、長らくComing Soonだったシングルサインオンが1/7ぐらいに突然やってきたので、それがあったほうが管理が楽、というのがあればBusinessがいいんじゃないでしょうか。
 

@@ -9,7 +9,7 @@ tag:
   - コアテク
 category:
   - Infrastructure
-thumbnail: /images/20210927a/thumbnail.png
+thumbnail: /images/2021/20210927a/thumbnail.png
 author: 高橋健
 lede: "こんにちは、TIGコアテクノロジーユニットの高橋・小松です。Gitlabのマークはきつねではなくたぬきだったんですね...。今回はRedmine Slack Integration Pluginにメンション機能を追加したので紹介させていただきます。"
 ---
@@ -51,7 +51,7 @@ Gitlabのマークはきつねではなくたぬきだったんですね...。
 
 もしSlackに登録しているメールアドレスがRedmineに登録しているものと異なる場合はSlack User IDを適宜手動で設定するようにしてください。
 
-<img src="/images/20210927a/メールアドレス設定.png" alt="メールアドレス設定.png" width="753" height="564" loading="lazy">
+<img src="/images/2021/20210927a/メールアドレス設定.png" alt="メールアドレス設定.png" width="753" height="564" loading="lazy">
 
 ## 動作確認
 
@@ -62,7 +62,7 @@ Gitlabのマークはきつねではなくたぬきだったんですね...。
 
 実際にメンションがついたSlack画面の例はこちらです。
 
-<img src="/images/20210927a/メンションがついたSlackのコメント.png" alt="メンションがついたSlackのコメント.png" width="994" height="595" loading="lazy">
+<img src="/images/2021/20210927a/メンションがついたSlackのコメント.png" alt="メンションがついたSlackのコメント.png" width="994" height="595" loading="lazy">
 
 ## おわりに
 

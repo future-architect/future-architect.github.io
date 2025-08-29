@@ -9,11 +9,11 @@ tag:
   - IDE
 category:
   - Programming
-thumbnail: /images/20240712a/thumbnail.png
+thumbnail: /images/2024/20240712a/thumbnail.png
 author: 真野隼記
 lede: "Go開発者向けIDEであるGoLandの、Windows WSL2サポートを試しました。"
 ---
-<img src="/images/20240712a/top.png" alt="" width="1200" height="548" loading="lazy">
+<img src="/images/2024/20240712a/top.png" alt="" width="1200" height="548" loading="lazy">
 
 https://www.jetbrains.com/go/
 
@@ -75,11 +75,11 @@ Goのアプリ開発においても、 `C:\\` 配下のファイルに対して�
 
 Go > GOROOT の設定にて、ローカルのディレクトリ追加で、`C:` と `\\wsl.localhost\Ubuntu22.04` が選択できます。
 
-<img src="/images/20240712a/img_2.png" alt="" width="645" height="316" loading="lazy">
+<img src="/images/2024/20240712a/img_2.png" alt="" width="645" height="316" loading="lazy">
 
 Goのインストールフォルダを指定すれば認識してくれます。
 
-<img src="/images/20240712a/image.png" alt="Go 1.22.0を選択" width="1200" height="385" loading="lazy">
+<img src="/images/2024/20240712a/image.png" alt="Go 1.22.0を選択" width="1200" height="385" loading="lazy">
 
 GOPATH設定については何も違和感なく利用できます。
 
@@ -87,7 +87,7 @@ GOPATH設定については何も違和感なく利用できます。
 
 同じ設定画面で、プラスボタン > ダウンロードを選択してIDE経由でGo環境をインストールできます。
 
-<img src="/images/20240712a/image_2.png" alt="" width="722" height="272" loading="lazy">
+<img src="/images/2024/20240712a/image_2.png" alt="" width="722" height="272" loading="lazy">
 
 デフォルトインストール先は `\\wsl.localhost\Ubuntu-22.04\home\YOURNAME\sdk` でした。`go1.23.rc1` を選択してインストールしました。IDEのターミナルにも反映されてるので便利。
 
@@ -102,17 +102,17 @@ Go SDKのIDE経由のダウンロードも、ストレス無く快適に設定�
 
 過去のバージョン（の一部？）で、認証付きプロキシの設定が使われず依存パッケージの更新がエラーになるケースがありました。プロキシ利用は読み込むものの、ID・パスワード認証がダメな挙動でした。↓が残っていたキャプチャです。
 
-<img src="/images/20240712a/image_3.png" alt="" width="1200" height="273" loading="lazy">
+<img src="/images/2024/20240712a/image_3.png" alt="" width="1200" height="273" loading="lazy">
 
 `GoLand 2024.1.3` では完全に解決していました。使う上で支障はなくこの点でストレスはゼロです（↓のキャプチャだとフォント色が赤でエラーのようですが、無事 `go get` が成功しています。
 
-<img src="/images/20240712a/image_4.png" alt="" width="1200" height="252" loading="lazy">
+<img src="/images/2024/20240712a/image_4.png" alt="" width="1200" height="252" loading="lazy">
 
 ### テスト実行
 
-<img src="/images/20240712a/image_5.png" alt="" width="1106" height="436" loading="lazy">
+<img src="/images/2024/20240712a/image_5.png" alt="" width="1106" height="436" loading="lazy">
 
-<img src="/images/20240712a/image_6.png" alt="" width="469" height="121" loading="lazy">
+<img src="/images/2024/20240712a/image_6.png" alt="" width="469" height="121" loading="lazy">
 
 エディタ上からもテスト実行でき、結果もスムーズに確認でき問題なしです。これは過去のどのバージョンでも上手く動かなかったところを見たことがないので、安定している機能な気がします。
 
@@ -122,7 +122,7 @@ Go SDKのIDE経由のダウンロードも、ストレス無く快適に設定�
 
 `GoLand 2024.1.3` では問題ゼロで動作します。
 
-<img src="/images/20240712a/image_7.png" alt="" width="1200" height="708" loading="lazy">
+<img src="/images/2024/20240712a/image_7.png" alt="" width="1200" height="708" loading="lazy">
 
 以下のわたしが期待していることが全て実行できます。
 
@@ -138,7 +138,7 @@ Go SDKのIDE経由のダウンロードも、ストレス無く快適に設定�
 
 左クリック > 開く > 関連アプリケーションで開くからExcelを起動することはできます。
 
-<img src="/images/20240712a/image_8.png" alt="" width="1006" height="969" loading="lazy">
+<img src="/images/2024/20240712a/image_8.png" alt="" width="1006" height="969" loading="lazy">
 
 ダブルクリックすると、GoLand組み込みのExcelビューアが起動するようです。ファイル拡張子に関連アプリケーションを紐づけて開けそうですが、設定方法が分からず放置しています。過去のあるバージョンは、この関連アプリケーションで開くことすらできず、起動に失敗していた記憶があるので、順調に不具合がなくなっているなと感じました。
 
@@ -146,7 +146,7 @@ Go SDKのIDE経由のダウンロードも、ストレス無く快適に設定�
 
 開く > GitHubで開くで、現在エディタで開いているリソースの、GitHub上のページをブラウザで開くことができます。プライベートリポジトリでも可です。実装について質問を受けた際のリプライに便利なので上手く動いて良かったです。
 
-<img src="/images/20240712a/image_9.png" alt="" width="837" height="337" loading="lazy">
+<img src="/images/2024/20240712a/image_9.png" alt="" width="837" height="337" loading="lazy">
 
 ※昔のバージョンでは、サードパーティ製や標準パッケージのファイルに対しても、GitHubで開くができたと思いますが、そちらはできなくなった（？）ようです。WSL、Windows側のプロジェクト両方で表示が消えていました。
 
@@ -154,11 +154,11 @@ Go SDKのIDE経由のダウンロードも、ストレス無く快適に設定�
 
 GoLandのMarkdownプレビューでPlantUMLを有効にするためには、言語 & フレームワーク > Markdownの設定で、PlantUMLのチェックを有効にします。
 
-<img src="/images/20240712a/img_3.png" alt="" width="1200" height="571" loading="lazy">
+<img src="/images/2024/20240712a/img_3.png" alt="" width="1200" height="571" loading="lazy">
 
 以下のようにPlantUMLのシーケンス図が表示されました。`sudo apt install -y graphviz openjdk-21-jre-headless` など個別のインストール無しでレンダリングに成功したので、ちょっと驚きました（優しいですね）。
 
-<img src="/images/20240712a/img_4.png" alt="" width="1200" height="536" loading="lazy">
+<img src="/images/2024/20240712a/img_4.png" alt="" width="1200" height="536" loading="lazy">
 
 ## つかってみての感想
 

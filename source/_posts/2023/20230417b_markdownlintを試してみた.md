@@ -9,12 +9,12 @@ tag:
   - ドキュメント
 category:
   - DevOps
-thumbnail: /images/20230417b/thumbnail.png
+thumbnail: /images/2023/20230417b/thumbnail.png
 author: 真野隼記
 lede: "Markdownで設計書を充実させようとすればするほど、設計書間やメンバー間のちょっとした揺れで、本質的なレビューがしにくく感じるようになりました。そこでMarkdownのLintツールを導入するモチベーションが高まりました。"
 ---
 
-<img src="/images/20230417b/Microsoft.VisualStudio.Services.Icons.png" alt="" width="128" height="128">
+<img src="/images/2023/20230417b/Microsoft.VisualStudio.Services.Icons.png" alt="" width="128" height="128">
 
 ## はじめに
 

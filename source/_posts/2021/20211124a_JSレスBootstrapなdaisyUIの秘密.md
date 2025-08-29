@@ -9,7 +9,7 @@ tag:
   - フロントエンド
 category:
   - Programming
-thumbnail: /images/20211124a/thumbnail.png
+thumbnail: /images/2021/20211124a/thumbnail.png
 author: 澁川喜規
 lede: "最近、趣味開発でフロントエンドをいじる場合とか、Reactの技術サポートで手っ取り早く使い捨ての環境を作る場合は次の組み合わせで作っています。[Vite.jsでReact + TypeScriptプロジェクト作成。Tailwind CSS。これにESLintとPrettierを入れて完了です。。"
 ---
@@ -22,7 +22,7 @@ lede: "最近、趣味開発でフロントエンドをいじる場合とか、R
 
 UI部品は[MUI](https://mui.com/)（以前のMaterial UI)を使ったり、Web Componentsベースのものとかいろいろ試していましたが、最近お気に入りなのは[daisyUI](https://daisyui.com/)です。
 
-<img src="/images/20211124a/スクリーンショット_2021-11-17_19.39.55.png" alt="daisyUIトップページ" width="1200" height="842">
+<img src="/images/2021/20211124a/スクリーンショット_2021-11-17_19.39.55.png" alt="daisyUIトップページ" width="1200" height="842">
 
 本記事の執筆にあたっては、[@wozozo](https://twitter.com/wozozo), [@moriyoshit](https://twitter.com/moriyoshit), [@aodag](https://twitter.com/aodag)が雑談に乗ってくれましたので、感謝申し上げます。
 
@@ -49,7 +49,7 @@ module.exports = {
 <button class="btn btn-link">link</button>
 ```
 
-<img src="/images/20211124a/スクリーンショット_2021-11-17_19.50.40.png" alt="ボタン" width="1200" height="134" loading="lazy">
+<img src="/images/2021/20211124a/スクリーンショット_2021-11-17_19.50.40.png" alt="ボタン" width="1200" height="134" loading="lazy">
 
 優れている点は、Tailwind CSSに乗っかっているので、CSSの最適化がTailwind CSSのお作法で適切に行われて、サイズが小さいCSSが出力される点と、CSSだけなので、Reactだろうが、Vue.jsだろうが、Svelteだろうが、どんなフレームワークとも食い合わせが悪くなくて、ラッパーライブラリとか不要な点です。標準のHTMLのinput要素とかタグを扱う使い方で自然と扱えます。
 

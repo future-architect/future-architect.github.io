@@ -9,7 +9,7 @@ tag:
   - DevOps
 category:
   - DevOps
-thumbnail: /images/20180209/thumbnail_20180209.png
+thumbnail: /images/2018/20180209/thumbnail_20180209.png
 author: 齋場俊太朗
 lede: "エンプラ&オンプレでもAnsible導入成功したのでユーザー会で発表してきた"
 ---
@@ -39,35 +39,35 @@ Ansible？ な方に対して、軽く説明させていただきます。Ansibl
 
 * Infrastructure as Codeとは「自動実行可能なコードの形でインフラの状態を記述し、インフラ構築を自動化するプロセス」です。
 
-<img src="/images/20180209/photo_20180209_03.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_03.png" loading="lazy">
 
 * インフラ構築を3つに分類すると以下のようになり、それぞれの分類に対応する自動化ツールがあります。
 
-<img src="/images/20180209/photo_20180209_04.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_04.png" loading="lazy">
 
 ## Ansibleとは
 
 * Ansibleとはオープンソースのサーバ構成管理ツールです。
 * 上図のように主にOS/ミドルウェア設定に主に用いられます。 (実際はサーバ管理だけではなく多くの機能があります)
 
-<img src="/images/20180209/photo_20180209_05.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_05.png" loading="lazy">
 
 * よくAnsibleと比較されるのが以下の2つです。
   * Ansibleは**エージェントレス**ということもあり、比較的に簡単に導入できます
   * あとは定義ファイルの形式がyamlかjsonかの違いというのも大きなポイントです
 
-<img src="/images/20180209/photo_20180209_06.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_06.png" loading="lazy">
 
 * Ansibleの使い方は非常にシンプルです。基本の構成要素は以下になります
   * **Invetroy**ファイル: (管理対象のサーバを定義するファイル)
   * **Playbook**ファイル: (サーバのあるべき状態を定義するファイル)
 
-<img src="/images/20180209/photo_20180209_07.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_07.png" loading="lazy">
 
 Ansibleでサーバのあるべき状態をコードとして定義して、Playbookを実行するとサーバは定義した状態に収束します。(冪統性がある)
 なんとも便利そうです。これなら数百台あるサーバであっても**構築の自動化**と**高品質な構成管理**ができそうですね。 以下のようにInfrastructure as Codeを導入すれば今までの課題が解決することは明らかだと思います。
 
-<img src="/images/20180209/photo_20180209_08.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_08.png" loading="lazy">
 
 # エンプラ&オンプレへの導入へのチャレンジ!!
 
@@ -89,7 +89,7 @@ Infrastructure as Codeでインフラ構築の自動化！ 高品質な構成管
 
 個人的に、**エンプラ&オンプレの領域って、Infrastructure as Codeの導入が一番困難だと思っています。**
 
-<img src="/images/20180209/photo_20180209_09.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_09.png" loading="lazy">
 
 まず、**オンプレ** これが相性が悪い。その大きな要因は**Mutable(可変)**であるためです。
 クラウドであればサーバを都度破棄して、新規に構築する **"Immutable"**であるので、Infrastructure as Code本来の使い方に準じて利用できると思うのですが、オンプレだと作り直しができない"Mutable"であり、手入れをしながら長く付き合っていくことになります。その点を考慮してInfrastructure as Codeを利用しなければいけません。
@@ -97,7 +97,7 @@ Infrastructure as Codeでインフラ構築の自動化！ 高品質な構成管
 (※ オンプレでも仮想マシンで、かつ"Immutable"な使い方をすれば話は別です)
 (※ 逆に言えばクラウドでもMutableな使い方をしていると相性悪いと思います)
 
-<img src="/images/20180209/photo_20180209_10.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_10.png" loading="lazy">
 
 そして、**エンプラ** これも相性が悪い。**"制約"**とか**"いままでの文化"**が導入の大きな障壁になります。簡単に言うなら大きくて動きずらい。
 
@@ -108,7 +108,7 @@ Infrastructure as Codeでインフラ構築の自動化！ 高品質な構成管
 
 出典: [Where is the “EA” in DevOps?](https://www.cloudtp.com/doppler/where-is-the-ea-in-devops/)
 
-<img src="/images/20180209/photo_20180209_11.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_11.png" loading="lazy">
 
 # どのようにして導入したか
 
@@ -124,7 +124,7 @@ Infrastructure as Codeでインフラ構築の自動化！ 高品質な構成管
 オンプレ(Mutable)だからこその考慮点がこれで、変更履歴を付けずに誰かが手でサーバを葬っちゃうともう**Infrastructure as Codeの意味ってなくなっちゃう**んですよね。クラウド(Immutable)だと、常に破棄→新規作成の繰り返しなのでこの点は考慮しなくてもよいですから。
 私自身も含め**「ちょっとの変更だし、あとで直せばよいから手で設定いじっちゃお。変更履歴は適当なメモで」**って考えでサーバに変更を加える輩は絶対に存在します。だからこそ、そこを拾えるように実環境とソースコードの自動突合の部分にもこだわりました。
 
-<img src="/images/20180209/photo_20180209_12.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_12.png" loading="lazy">
 
 ## 作り上げたフレームワーク
 
@@ -134,12 +134,12 @@ Infrastructure as Codeでインフラ構築の自動化！ 高品質な構成管
   * 手順書
   * ワークフロー
 
-<img src="/images/20180209/photo_20180209_13.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_13.png" loading="lazy">
 
 * 構成は以下のようなイメージです。
 * JenkinsとGitlabを駆使して、継続的にAnsible実行&フィードバックができるような仕組みを心掛けました。
 
-<img src="/images/20180209/photo_20180209_14.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_14.png" loading="lazy">
 
 後述する"特に工夫したこと"で詳細記載します。
 
@@ -170,7 +170,7 @@ Infrastructure as Codeでインフラ構築の自動化！ 高品質な構成管
 
 ※ このせいで、taskファイルや静的ファイルが二重管理になってしまいますが、それは後述のtaskファイル自動生成で補うことができました。
 
-<img src="/images/20180209/photo_20180209_15.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_15.png" loading="lazy">
 
 ### **2. メンバーみんなにキャッチアップを求められない。みんなが利用できる仕組みを作る**
 
@@ -187,7 +187,7 @@ Infrastructure as Codeでインフラ構築の自動化！ 高品質な構成管
 * ただでさえAnsibleという新しいツールを導入するのに、Gitも、、は厳しそうだったのでGit操作はJenkinsに任せることにしました。
 * 歩み寄って、AnsibleファイルもSVNで管理、、、も考えましたがここだけは譲れませんでした。
 
-<img src="/images/20180209/photo_20180209_16.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_16.png" loading="lazy">
 
 ### **3. あきらめない**
 
@@ -212,11 +212,11 @@ Ansibleは簡単に使いやすいとは言え、いままでのサーバ管理�
 
 * 導入のために作った説明資料の数々
 
-<img src="/images/20180209/photo_20180209_17.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_17.png" loading="lazy">
 
 * 併せてDevOps勉強会も実施しました
 
-<img src="/images/20180209/photo_20180209_18.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_18.png" loading="lazy">
 
 # 導入の成果
 
@@ -228,8 +228,8 @@ Ansibleは簡単に使いやすいとは言え、いままでのサーバ管理�
 
 * 今までの手順書と新しい手順書
 
-<img src="/images/20180209/photo_20180209_19.png" loading="lazy">
-<img src="/images/20180209/photo_20180209_20.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_19.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_20.png" loading="lazy">
 
 ## 構成管理
 
@@ -239,11 +239,11 @@ Ansibleは簡単に使いやすいとは言え、いままでのサーバ管理�
 
 * Postfixの設定を変更した際の例
 
-<img src="/images/20180209/photo_20180209_21.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_21.png" loading="lazy">
 
 # 補足：導入までの時間
 
-<img src="/images/20180209/photo_20180209_22.png" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_22.png" loading="lazy">
 
 導入までの歩みをまとめてみました。開発(Dev)は一人でガンガン作りこんでいってしまえばよいだけなのでそんなに大変ではありませんでしたが、運用(Ops)でも使えるように、いろいろな関係者を巻き込んでいくのはなかなか骨が折れました。ただ、保守・運用チームが積極的に協力してくれたので、なんとか運用でも使えるようになるまでこぎつけることができました。感謝です。
 

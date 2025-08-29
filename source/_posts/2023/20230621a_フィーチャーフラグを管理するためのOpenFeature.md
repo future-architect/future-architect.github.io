@@ -8,11 +8,11 @@ tag:
   - フィーチャーフラグ
 category:
   - DevOps
-thumbnail: /images/20230621a/thumbnail.png
+thumbnail: /images/2023/20230621a/thumbnail.png
 author: 真野隼記
 lede: "クラウドネイティブなフィーチャーフラグの標準とAPI、SDKを提供するOpenFeatureについてです"
 ---
-<img src="/images/20230621a/top.png" alt="" width="1200" height="600" loading="lazy">
+<img src="/images/2023/20230621a/top.png" alt="" width="1200" height="600" loading="lazy">
 
 ## はじめに
 
@@ -65,7 +65,7 @@ OpenFeatureは、機能フラグ管理のオープンな標準です。特定の
 
 [OpenFeatureのintro](https://openfeature.dev/docs/reference/intro)に載っている図がそういった構造を示していて、アプリケーションはOpenFeatureのSDK（汎化されたAPI）を呼び出すことで、その裏側のProviderが固有のバックエンドからフィーチャーフラグ値を取得する仕組みであることが分かります。Providerが例えばセルフホストかクラウドホストなどのプロダクト差異とか環境差異を吸収しているということです。
 
-<img src="/images/20230621a/of-architecture-a49b167df4037d936bd6623907d84de1.png" alt="of-architecture-a49b167df4037d936bd6623907d84de1.png" width="1200" height="401" loading="lazy">
+<img src="/images/2023/20230621a/of-architecture-a49b167df4037d936bd6623907d84de1.png" alt="of-architecture-a49b167df4037d936bd6623907d84de1.png" width="1200" height="401" loading="lazy">
 
 OpenFeatureを利用するアプリケーションとしては、固有のプロダクトにロックインされないこと、でも便利なAPIは提供して欲しいといった相反することを期待しますし、仕様検討側はそういったことを加味しつつフィーチャーフラグの標準を作るとしてAPI設計を考え、各SDKを開発促進するという、CNCFのプロダクトとして少し異色なプロダクトに感じます。純粋なプロダクト開発ではないというか。
 
@@ -75,11 +75,11 @@ OpenFeatureを利用するアプリケーションとしては、固有のプロ
 
 ## Goで触ってみた
 
-<img src="/images/20230621a/image.png" alt="image.png" width="1200" height="458" loading="lazy">
+<img src="/images/2023/20230621a/image.png" alt="image.png" width="1200" height="458" loading="lazy">
 
 フィーチャーフラグの値は、[GO Feature Flag](https://gofeatureflag.org/)から取ってくるProviderを利用して、OpenFeatureのGo SDKを利用してみます。名前がややこしいですが、 「Go Feature Flag」という個別のプロダクト名です。構成は次のような[Getting Started](https://gofeatureflag.org/docs/getting_started/using-openfeature)に記載された構成で動かします。
 
-<img src="/images/20230621a/concepts-d23b05d83bb936d1d2cf17b34ec1d505.jpg" alt="concepts-d23b05d83bb936d1d2cf17b34ec1d505.jpg" width="1200" height="396" loading="lazy">
+<img src="/images/2023/20230621a/concepts-d23b05d83bb936d1d2cf17b34ec1d505.jpg" alt="concepts-d23b05d83bb936d1d2cf17b34ec1d505.jpg" width="1200" height="396" loading="lazy">
 
 動作に当たって、YAML定義を元にフィーチャーフラグの値を返す設定を入れます。
 今回は、リクエストに `role` というキーの値が `admin` の場合に、`flag-only-for-admin` = `true` を返す設定とします。

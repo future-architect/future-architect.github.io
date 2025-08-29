@@ -10,13 +10,13 @@ tag:
   - 登壇レポート
 category:
   - Programming
-thumbnail: /images/20210630a/thumbnail.jpg
+thumbnail: /images/2021/20210630a/thumbnail.jpg
 author: 藤野圭一
 lede: "こんにちは。TIG藤野です。2021/5/21を開催しました。私は、Tomcatコミッタがお送りするちょっとマニアックなTomcatのコンフィグレーション10選というタイトルでお話させていただきました。"
 ---
 ## はじめに
 
-<img src="/images/20210630a/cat-3937880_1280.jpg" alt="" width="1280" height="790">
+<img src="/images/2021/20210630a/cat-3937880_1280.jpg" alt="" width="1280" height="790">
 
 こんにちは。TIG藤野です。
 

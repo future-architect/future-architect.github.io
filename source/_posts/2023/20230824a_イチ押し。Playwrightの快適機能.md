@@ -8,7 +8,7 @@ tag:
   - フロントエンド
 category:
   - Programming
-thumbnail: /images/20230824a/thumbnail.png
+thumbnail: /images/2023/20230824a/thumbnail.png
 author: 木戸俊輔
 lede: "Playwright連載3日目の今回は、その便利機能たちをCypressと比較しながら紹介します。Cypressで馴染みの便利機能がPlaywrightではどう実現されているのか、E2Eテストに関わる関係者の悩みを解決するどんな便利機能が備わっているのか、詳しく見てみましょう。"
 ---
@@ -35,7 +35,7 @@ npx playwright codegen アクセス先のURL
 npx playwright codegen https://www.google.com/
 ```
 
-<img src="/images/20230824a/image.png" alt="" width="1200" height="566" loading="lazy">
+<img src="/images/2023/20230824a/image.png" alt="" width="1200" height="566" loading="lazy">
 
 検索フォームにマウスオーバーすると、
 
@@ -55,7 +55,7 @@ getByLabel('検索', { exact: true })
 
 を実際に操作します。すると、`codegen`コマンド実行時にブラウザとは別に開くもう1つのウィンドウ（Playwright Inspector）にて、上記の操作を実行するテストコードが自動生成されました。
 
-<img src="/images/20230824a/image_2.png" alt="" width="879" height="336" loading="lazy">
+<img src="/images/2023/20230824a/image_2.png" alt="" width="879" height="336" loading="lazy">
 
 例えば今回生成されたコードの5行目は不要なので、生成されたコードを微修正する必要がありますが、0からコードを書くよりも圧倒的に簡単にテストコードが作れました。
 
@@ -130,11 +130,11 @@ npx playwright test --ui
 
 実行すると画像のように専用のウィンドウが立ち上がりました。
 
-<img src="/images/20230824a/image_3.png" alt="" width="1200" height="523" loading="lazy">
+<img src="/images/2023/20230824a/image_3.png" alt="" width="1200" height="523" loading="lazy">
 
 画面左に、プロジェクト内で作成したテストの一覧が並んでいます。それぞれのディレクトリやファイルの再生マークをクリックすることで、任意の単位でテストを実行できます。テスト実行の様子は画面右のウィンドウで確認でき、時間を戻したり進めたり、エラーが起きた箇所を確認したりできます。
 
-<img src="/images/20230824a/image_4.png" alt="" width="1038" height="669" loading="lazy">
+<img src="/images/2023/20230824a/image_4.png" alt="" width="1038" height="669" loading="lazy">
 
 ## CLI実行し後からレポートを確認する
 
@@ -150,15 +150,15 @@ npx playwright test --trace on
 npx playwright show-report
 ```
 
-<img src="/images/20230824a/image_5.png" alt="" width="1041" height="337" loading="lazy">
+<img src="/images/2023/20230824a/image_5.png" alt="" width="1041" height="337" loading="lazy">
 
 例えば、失敗しているテストファイルを開くと、レポートの標準機能として表示される「エラーログ」や「各テストステップごとのログ」に加えて、「トレース」欄が表示されています。
 
-<img src="/images/20230824a/image_6.png" alt="" width="1058" height="708" loading="lazy">
+<img src="/images/2023/20230824a/image_6.png" alt="" width="1058" height="708" loading="lazy">
 
 これをクリックするとUIモードでの実行時と同じような画面で、テストの実際の進行の様子を確認できます。
 
-<img src="/images/20230824a/image_7.png" alt="" width="1200" height="669" loading="lazy">
+<img src="/images/2023/20230824a/image_7.png" alt="" width="1200" height="669" loading="lazy">
 
 ## Cypressとの比較
 

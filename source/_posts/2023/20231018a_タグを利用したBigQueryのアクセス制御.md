@@ -9,7 +9,7 @@ tag:
   - アクセス制御
 category:
   - Infrastructure
-thumbnail: /images/20231018a/thumbnail.png
+thumbnail: /images/2023/20231018a/thumbnail.png
 author: 岸下優介
 lede: "BigQueryは完全マネージドな、ペタバイトスケールかつコスパのよいデータウェアハウスとして知られております。便利なツールである一方、BigQueryで取り扱うデータには個人情報が含まれていることもあり、適切なアクセス制御が望まれます。Resource Managerのタグ機能を利用して…"
 ---
@@ -65,7 +65,7 @@ resource "google_tags_tag_value" "prd_tag" {
 ```
 
 適用後、コンソールを見てみましょう。
-<img src="/images/20231018a/71638260-a888-a69d-56d2-bcb92fb94825.png" alt="" width="1200" height="489" loading="lazy">
+<img src="/images/2023/20231018a/71638260-a888-a69d-56d2-bcb92fb94825.png" alt="" width="1200" height="489" loading="lazy">
 
 `environment`に対して、`dev`, `stg`, `prd`というkey-valueペアが生成されました。
 
@@ -172,15 +172,15 @@ gcloud alpha resource-manager tags bindings create \
 BigQueryのページから、データセットをクリックすると以下のようなデータセット情報が表示されます。
 この画面から詳細を編集に移動して下さい。
 
-<img src="/images/20231018a/fe171bd5-fe90-8ef9-cb20-1eeb945b2560.png" alt="" width="1200" height="499" loading="lazy">
+<img src="/images/2023/20231018a/fe171bd5-fe90-8ef9-cb20-1eeb945b2560.png" alt="" width="1200" height="499" loading="lazy">
 
 タグを追加を押すことで、所望のタグを付与できます。
 
-<img src="/images/20231018a/4358d88e-757f-d924-3c7f-a6a0a59ae98c.png" alt="" width="852" height="1222" loading="lazy">
+<img src="/images/2023/20231018a/4358d88e-757f-d924-3c7f-a6a0a59ae98c.png" alt="" width="852" height="1222" loading="lazy">
 
 付与されたタグは「タグ」の箇所に記載されるようになります。
 
-<img src="/images/20231018a/a310bef6-a3e4-fa3f-713c-4118f1f30511.png" alt="" width="1200" height="492" loading="lazy">
+<img src="/images/2023/20231018a/a310bef6-a3e4-fa3f-713c-4118f1f30511.png" alt="" width="1200" height="492" loading="lazy">
 
 ## IAMを付与する
 
@@ -202,7 +202,7 @@ resource "google_project_iam_member" "test_user" {
 
 適用後、BigQueryを見てみるとちゃんとdevのデータセットのみが見えていることがわかります。
 
-<img src="/images/20231018a/aab47fe7-e64b-ad96-2772-2434b2a716fd.png" alt="" width="1200" height="616" loading="lazy">
+<img src="/images/2023/20231018a/aab47fe7-e64b-ad96-2772-2434b2a716fd.png" alt="" width="1200" height="616" loading="lazy">
 
 ## まとめ
 

@@ -6,12 +6,12 @@ tag:
   - ShellScript
 category:
   - Infrastructure
-thumbnail: /images/20210401/thumbnail.png
+thumbnail: /images/2021/20210401/thumbnail.png
 author: 市川諒
 lede: "過去Shell Scriptでゴリゴリスクリプトを書いたりしていましたが（環境が許せば）Pythonで書くことが個人的に増えてきました。いざShell Scriptに戻ってきたときに配列と連想配列について調べ直すコトがままあったので、ここに記したいと思います。"
 ---
 
-<img src="/images/20210401/アイキャッチ.webp" alt="" title="Marcel LangthimによるPixabayからの画像">
+<img src="/images/2021/20210401/アイキャッチ.webp" alt="" title="Marcel LangthimによるPixabayからの画像">
 
 ## はじめに
 

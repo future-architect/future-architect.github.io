@@ -9,7 +9,7 @@ tag:
   - APIGateway
 category:
   - 認証認可
-thumbnail: /images/20221006a/thumbnail.png
+thumbnail: /images/2022/20221006a/thumbnail.png
 author: 李光焄
 lede: "API Gatewayのミドルウェア製品となるKongを使ってResource Serverを構築する方法について話します。"
 ---
@@ -24,7 +24,7 @@ https://future-architect.github.io/articles/20210610a/
 
 # Kong Gateway
 
-<img src="/images/20221006a/gateway_overview.png" alt="gateway_overview.png" width="1200" height="507" loading="lazy">
+<img src="/images/2022/20221006a/gateway_overview.png" alt="gateway_overview.png" width="1200" height="507" loading="lazy">
 
 [Kong](https://github.com/Kong/kong)はOSSから始まったAPIサーバのトラフィックを管理するためのミドルウェアです。
 
@@ -45,7 +45,7 @@ Enterprise版が登場してからはAPIGateway以外にも様々さサービス
 
 構築にあたり、まずはOIDCの役者を揃えましょう。Front/Backで分離された認証認可設計のためには、少なくとも下記3つのActorが必要になります。
 
-<img src="/images/20221006a/kong-jwt.drawio.png" alt="kong-jwt.drawio.png" width="928" height="501" loading="lazy">
+<img src="/images/2022/20221006a/kong-jwt.drawio.png" alt="kong-jwt.drawio.png" width="928" height="501" loading="lazy">
 
 ## [Keycloak](https://www.keycloak.org/) as OpenID Provider (Authorization Server)
 
@@ -160,7 +160,7 @@ Keycloakは同じRealmのユーザには同じ公開鍵でJWTを署名してい�
 普通アプリを作るならばここでClientであるVue上でKeycloakから取得したAccessToken(JWT)を`Authorization`ヘッダーに載せ、KongのAPIにアクセスするコードを書くことになります。
 しかし、ここではKongの機能を確認するだけでいいので、Vueが保持するKeycloakのインスタンスをダンプさせAccessTokenを取得し、curlを使います。
 
-<img src="/images/20221006a/スクリーンショット_2022-10-06_4.38.57.png" alt="スクリーンショット_2022-10-06_4.38.57.png" width="1200" height="707" loading="lazy">
+<img src="/images/2022/20221006a/スクリーンショット_2022-10-06_4.38.57.png" alt="スクリーンショット_2022-10-06_4.38.57.png" width="1200" height="707" loading="lazy">
 
 ```sh
 curl http://localhost:8000/mock/requests -H "Authorization: Bearer eyJhbGciOiJS..." | jq .

@@ -25,7 +25,7 @@ IaCが当たり前になった今、インフラの構成管理はもう問題�
 
 例えば、"GCSのバケットを全世界に公開してしまっている" という誤った設定も本番環境にデプロイされてしまうかもしれません。
 
-<img src="/images/20200213/photo_20200213_01.png" loading="lazy">
+<img src="/images/2020/20200213/photo_20200213_01.png" loading="lazy">
 
 GCPだけではなく、多くのクラウド管理者が同じような悩みを抱えているかと思います。私もその一人です。各チームの開発者がクラウドインフラに熟知しているわけではありません。では、クラウド管理者がすべてソースコードをレビューすればよいか、いやいや、それも現実的ではない。
 
@@ -37,7 +37,7 @@ IaCがアプリケーション開発やっと同じ土俵に立った今、同�
 
 以下が概要の図です。
 
-<img src="/images/20200213/photo_20200213_02.png" loading="lazy">
+<img src="/images/2020/20200213/photo_20200213_02.png" loading="lazy">
 
 仕組みはごく単純です
 
@@ -61,7 +61,7 @@ Constraint allow_some_storage_location on resource //storage.googleapis.com/vali
 * `storage_location.yaml` : (ポリシーを定義するコード)
 * `main.tf` : (terraformのコード)
 
-<img src="/images/20200213/photo_20200213_03.png" loading="lazy">
+<img src="/images/2020/20200213/photo_20200213_03.png" loading="lazy">
 
 ## Terraform Validator インストール
 
@@ -207,7 +207,7 @@ No violations found
 実行方法とポリシーの定義方法が分かったところで、実際の運用方法についてです。
 以下のように、TerraformのソースコードのPRに対して、Terraform Validatorを実行し、結果をPRにフィードバックさせるようにするのが良いと思います。Githubと連携が可能であれば、CloudBuildで以下のようにCIを回すのが簡単でよいです。
 
-<img src="/images/20200213/photo_20200213_04.png" loading="lazy">
+<img src="/images/2020/20200213/photo_20200213_04.png" loading="lazy">
 
 Cloud BuildのSteps イメージ
 
@@ -238,13 +238,13 @@ steps:
 ```
 
 PR上でのフィードバックのイメージ
-<img src="/images/20200213/photo_20200213_05.png" loading="lazy">
+<img src="/images/2020/20200213/photo_20200213_05.png" loading="lazy">
 
 # 最後に
 
 本記事ではあまり触れませんでしたが、実は、[Forseti](https://forsetisecurity.org/)というツールを用いてOngoingでの監視も可能です。こちらもGCPが公開しているオープンソースのツールです。これを用いれば、一元管理されたポリシーでTerraform経由ではない手作業によるポリシー違反の発生も検知できます。
 
-<img src="/images/20200213/photo_20200213_06.png" loading="lazy">
+<img src="/images/2020/20200213/photo_20200213_06.png" loading="lazy">
 
 GCPのプロジェクト数がスケールする際に必ずぶち当たるであろうこの課題、私たちもTerraform Validatorを用いて解決しようと現在、試行錯誤中です。導入自体はシンプルにできるため、まずは簡単なポリシーのチェックから始めてみてはいかがでしょうか。
 

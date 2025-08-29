@@ -9,7 +9,7 @@ tag:
   - UML
 category:
   - Programming
-thumbnail: /images/20221028a/thumbnail.png
+thumbnail: /images/2022/20221028a/thumbnail.png
 author: 澁川喜規
 lede: "前回の記事ではMermaid.jsをレンダリングしましたが、次はPlantUMLをレンダリングしてみます。こちらも、前回のMermaid.js同様、メンテナンスされているPlantUML対応コンポーネントはありません。PlantUMLもMermaid.js同様、多様なダイアグラムをサポートしています。"
 ---
@@ -136,7 +136,7 @@ User }o--o{ Job
 @enduml
 ```
 
-<img src="/images/20221028a/スクリーンショット_2022-10-24_9.04.50.png" alt="スクリーンショット_2022-10-24_9.04.50.png" width="940" height="1086" loading="lazy">
+<img src="/images/2022/20221028a/スクリーンショット_2022-10-24_9.04.50.png" alt="スクリーンショット_2022-10-24_9.04.50.png" width="940" height="1086" loading="lazy">
 
 # 日本語対応
 
@@ -228,7 +228,7 @@ NEXT_PUBLIC_PLANTUML_SERVER=http://localhost:18080 npm run dev
 
 開発者ツールで見てみると、きちんとローカルホストのサーバーにアクセスしていることがわかります。
 
-<img src="/images/20221028a/スクリーンショット_2022-10-28_13.05.31.png" alt="スクリーンショット_2022-10-28_13.05.31.png" width="1200" height="286" loading="lazy">
+<img src="/images/2022/20221028a/スクリーンショット_2022-10-28_13.05.31.png" alt="スクリーンショット_2022-10-28_13.05.31.png" width="1200" height="286" loading="lazy">
 
 # まとめ
 

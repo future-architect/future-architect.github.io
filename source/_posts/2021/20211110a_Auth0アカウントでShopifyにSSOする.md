@@ -9,11 +9,11 @@ tag:
   - Auth0Rules
 category:
   - 認証認可
-thumbnail: /images/20211110a/thumbnail.png
+thumbnail: /images/2021/20211110a/thumbnail.png
 author: 武田拓己
 lede: "私が参画した案件で、Auth0に登録されているエンドユーザ向けのアカウントを用いてShopifyにSSOする検証を行ったので、今回はその方法をご紹介します。"
 ---
-<img src="/images/20211110a/サムネイル.png" alt="サムネイル.png" width="462" height="288" loading="lazy">
+<img src="/images/2021/20211110a/サムネイル.png" alt="サムネイル.png" width="462" height="288" loading="lazy">
 
 # はじめに
 
@@ -58,14 +58,14 @@ Auth0のアカウントも必要になります。こちらも無料のものが
 
 Shopifyストアにログインし、 `設定`に移動して `チェックアウト`ウィンドウをクリックします。顧客アカウントを、任意または必須に設定することで、ストアでマルチパスを有効にできます。
 
-<img src="/images/20211110a/技術ブログ①.png" alt="技術ブログ①.png" width="908" height="512" loading="lazy">
+<img src="/images/2021/20211110a/技術ブログ①.png" alt="技術ブログ①.png" width="908" height="512" loading="lazy">
 
 このシークレットキーはマルチパスリクエストが正当であることを確認するための暗号を作成するために使用されます。シークレットキーを再発行したい場合、マルチパスを無効にしてから再度有効にすることで、新たなシークレットキーが生成され、以前のものは無効化されます（上記画像のシークレットキーは既に無効化済みです）。
 
 ## Auth0アプリケーションを作成し、URIを設定する
 
 Auth0ダッシュボード内で`Applications`に移動し、`Create Application`をクリックして適当な名前を付け（「Shopify Store」など）、`Regular Web Applications`を選択し、`CREATE`します。
-<img src="/images/20211110a/技術ブログ②.png" alt="技術ブログ②.png" width="782" height="689" loading="lazy">
+<img src="/images/2021/20211110a/技術ブログ②.png" alt="技術ブログ②.png" width="782" height="689" loading="lazy">
 
 `Settings`に移動します。
 
@@ -75,13 +75,13 @@ Application URIsを以下のように設定します。
 - **Application Login URI**：https://{shopify-domain}/account/login
 - **Allowed Callback URLs**：https://{shopify-domain}/account
 - **Allowed Logout URLs**：https://{shopify-domain}/account/logout
-<img src="/images/20211110a/技術ブログ④.png" alt="技術ブログ④.png" width="976" height="755" loading="lazy">
+<img src="/images/2021/20211110a/技術ブログ④.png" alt="技術ブログ④.png" width="976" height="755" loading="lazy">
 
 `Advanced Settings`セクションを展開し、Application Metadataに次の2つのKeyとValueのペアを追加します。
 
 - **Key**：shopify_domain ; **Value**：{shopify-domain}
 - **Key**：shopify_multipass_secret ; **Value**：{multipass-secret}
-<img src="/images/20211110a/技術ブログ③.png" alt="技術ブログ③.png" width="969" height="648" loading="lazy">
+<img src="/images/2021/20211110a/技術ブログ③.png" alt="技術ブログ③.png" width="969" height="648" loading="lazy">
 
 ## Auth0ルールを追加して、マルチパストークンを作成する
 
@@ -136,13 +136,13 @@ function (user, context, callback) {
 - **32〜34行目**：これにより、認証されたユーザの宛先が設定されます。
 このルールが実行されると、ユーザはShopifyストアにリダイレクトされます。このルールの後にAuth0ルールがある場合、それらは完全にスキップされてしまうため、お気をつけください。
 
-<img src="/images/20211110a/技術ブログ⑤.png" alt="技術ブログ⑤.png" width="1059" height="856" loading="lazy">
+<img src="/images/2021/20211110a/技術ブログ⑤.png" alt="技術ブログ⑤.png" width="1059" height="856" loading="lazy">
 
 ## ShopifyテーマにAuth0リンクを設定する
 
 Shopifyテーマを編集してログイン/ログアウトするためのリンクを追加していきます。
 Shopifyストアの現在のテーマの`コードを編集`をクリックします。
-<img src="/images/20211110a/技術ブログ⑥.png" alt="技術ブログ⑥.png" width="975" height="361" loading="lazy">
+<img src="/images/2021/20211110a/技術ブログ⑥.png" alt="技術ブログ⑥.png" width="975" height="361" loading="lazy">
 
 まずは、ログインページを編集してログインリンクを追加します。`Templates`フォルダ内の`customers/login.liquid`ファイルを開き、リンクを追加するのに適した場所を見つけます。今回は、`アカウント作成`リンクの下に以下のリンクを配置します。
 
@@ -150,7 +150,7 @@ Shopifyストアの現在のテーマの`コードを編集`をクリックし�
 <a href="{{ settings.auth0_login_url }}">Log in with Auth0</a>
 ```
 
-<img src="/images/20211110a/技術ブログ⑦.png" alt="技術ブログ⑦.png" width="878" height="753" loading="lazy">
+<img src="/images/2021/20211110a/技術ブログ⑦.png" alt="技術ブログ⑦.png" width="878" height="753" loading="lazy">
 
 次に、アカウントページを編集してログアウトリンクをAuth0のログアウトリンクに置き換えます。`Templates`フォルダ内の`customers/account.liquid`ファイルを開き、ログアウトリンクを以下のリンクに置き換えます。テーマ内の他の場所にもログアウトリンクがある場合は、それも同様に置き換える必要があります。
 
@@ -158,7 +158,7 @@ Shopifyストアの現在のテーマの`コードを編集`をクリックし�
 <a href="{{ settings.auth0_logout_url }}">log_out</a>
 ```
 
-<img src="/images/20211110a/技術ブログ⑧.png" alt="技術ブログ⑧.png" width="943" height="328" loading="lazy">
+<img src="/images/2021/20211110a/技術ブログ⑧.png" alt="技術ブログ⑧.png" width="943" height="328" loading="lazy">
 
 続いて、ユーザがログインURLとログアウトURLを貼り付けることができるようにテーマ設定を追加します。`Config`フォルダ内の`settings_schema.json`ファイルを開き、以下のスニペットを配列の最後に貼り付けます。
 
@@ -184,14 +184,14 @@ Shopifyストアの現在のテーマの`コードを編集`をクリックし�
 }
 ```
 
-<img src="/images/20211110a/技術ブログ⑨.png" alt="技術ブログ⑨.png" width="937" height="331" loading="lazy">
+<img src="/images/2021/20211110a/技術ブログ⑨.png" alt="技術ブログ⑨.png" width="937" height="331" loading="lazy">
 
 続いて、URLを作成していきます。
 まずは、以下のようにログインURLを作成します。
 
 上記で作成したAuth0アプリケーションのClient IDを取得します。
 
-<img src="/images/20211110a/技術ブログ⑩.png" alt="技術ブログ⑩.png" width="764" height="95" loading="lazy">
+<img src="/images/2021/20211110a/技術ブログ⑩.png" alt="技術ブログ⑩.png" width="764" height="95" loading="lazy">
 
 - `auth0-instance`：Auth0ドメイン（例：sample.jp.auth0.com）
 - `clientid`：Auth0アプリケーションからの値。
@@ -210,20 +210,20 @@ Shopifyストアの現在のテーマの`コードを編集`をクリックし�
 
 テーマページに戻り、`カスタマイズ`をクリックして、画面左下に出てくる`テーマ設定`をクリック、`Auth0 Config`セクションを展開して、作成したURLを貼り付けます。
 
-<img src="/images/20211110a/技術ブログ⑪.png" alt="技術ブログ⑪.png" width="1166" height="763" loading="lazy">
+<img src="/images/2021/20211110a/技術ブログ⑪.png" alt="技術ブログ⑪.png" width="1166" height="763" loading="lazy">
 
 以上で実装完了です！
 
 # 実際の画面遷移
 
 ログインページにて、`Log in with Auth0`をクリックする。
-<img src="/images/20211110a/技術ブログ⑫.png" alt="技術ブログ⑫.png" width="1200" height="707" loading="lazy">
+<img src="/images/2021/20211110a/技術ブログ⑫.png" alt="技術ブログ⑫.png" width="1200" height="707" loading="lazy">
 
 上記で作ったShopify StoreというAuth0アプリケーションの認証画面が出てくるので、認証情報を入力してログインする。
-<img src="/images/20211110a/技術ブログ⑬.png" alt="技術ブログ⑬.png" width="842" height="479" loading="lazy">
+<img src="/images/2021/20211110a/技術ブログ⑬.png" alt="技術ブログ⑬.png" width="842" height="479" loading="lazy">
 
 ログインに成功！
-<img src="/images/20211110a/技術ブログ⑭.png" alt="技術ブログ⑭.png" width="1200" height="643" loading="lazy">
+<img src="/images/2021/20211110a/技術ブログ⑭.png" alt="技術ブログ⑭.png" width="1200" height="643" loading="lazy">
 
 # さいごに
 

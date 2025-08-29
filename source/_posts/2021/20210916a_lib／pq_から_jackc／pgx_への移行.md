@@ -9,12 +9,12 @@ tag:
   - jackc/pgx
 category:
   - Programming
-thumbnail: /images/20210916a/thumbnail.png
+thumbnail: /images/2021/20210916a/thumbnail.png
 author: 筒井悠平
 lede: "GoのORマッパー連載、おまけ記事です。特に示し合わせた訳では無いのですが、RDBは全員がPostgreSQLを使っていましたね。さて、今回の連載記事のいくつかでも言及されていた、jackc/pgx について簡単に紹介します。"
 ---
 
-<img src="/images/20210916a/top.png" alt="" width="1000" height="378" loading="lazy">
+<img src="/images/2021/20210916a/top.png" alt="" width="1000" height="378" loading="lazy">
 
 ライブリッツの筒井です。
 

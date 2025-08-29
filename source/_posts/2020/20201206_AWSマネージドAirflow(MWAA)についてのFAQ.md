@@ -9,7 +9,7 @@ tag:
   - ジョブ設計
 category:
   - Programming
-thumbnail: /images/20201206/thumbnail.png
+thumbnail: /images/2020/20201206/thumbnail.png
 author: 多賀聡一朗
 lede: "AWS マネージド Airflow  が 2020/11/24 にリリースされました。 [Introducing Amazon Managed Workflows for Apache Airflow サービスを利用するにあたって知りたかったことを調査し、FAQ ベースで整理しましたので公開します。"
 ---
@@ -24,7 +24,7 @@ AWS マネージド Airflow (MWAA) が 2020/11/24 にリリースされました
 
 サービスを利用するにあたって知りたかったことを調査し、FAQ ベースで整理しましたので公開します。
 
-<img src="/images/20201206/wordmark_1.png" loading="lazy">
+<img src="/images/2020/20201206/wordmark_1.png" loading="lazy">
 [Airflow logos](https://cwiki.apache.org/confluence/display/AIRFLOW/Airflow+logos) からの画像
 
 ## MWAA (Managed Workflow for Apache Airflow) とは?
@@ -57,7 +57,7 @@ AWS マネージド Airflow (MWAA) が 2020/11/24 にリリースされました
 [Celery Executor](https://airflow.apache.org/docs/stable/executor/celery.html) を利用している旨が、[公式ドキュメント](https://docs.aws.amazon.com/mwaa/latest/userguide/what-is-mwaa.html)に記載されています。
 
 Celery Executor の構成は以下の図の通りです。
-<img src="/images/20201206/graphviz-91fd3ca4f3dc01a69b3f84fbcd6b5c7975945ba4.png" loading="lazy">
+<img src="/images/2020/20201206/graphviz-91fd3ca4f3dc01a69b3f84fbcd6b5c7975945ba4.png" loading="lazy">
 [Architecture-Celery Executor](https://airflow.apache.org/docs/stable/_images/graphviz-91fd3ca4f3dc01a69b3f84fbcd6b5c7975945ba4.png) からの画像
 
 プロセスの種類は全部で3つで、webserver, scheduler と worker になります。
@@ -72,13 +72,13 @@ DAGファイルは S3 に配置することで、自動で読み込みを実施�
 配置先は、MWAA 作成時に指定します(更新も可能です)。plugin も同様に S3 に配置します。 配置する際は、plugin のみ zip に固めます。
 
 ※ S3 バケット名は、 `airflow-` プレフィックスで始まる必要があります。
-<img src="/images/20201206/スクリーンショット_2020-12-03_21.32.58のコピー.png" loading="lazy">
+<img src="/images/2020/20201206/スクリーンショット_2020-12-03_21.32.58のコピー.png" loading="lazy">
 
 ### Python のライブラリの取得方法は？
 
 `requirements.txt` を S3 に配置することで、ライブラリを読み込んでくれます。
 配置先は MWAA に設定します。
-<img src="/images/20201206/スクリーンショット_2020-12-03_21.32.58のコピー2.png" loading="lazy">
+<img src="/images/2020/20201206/スクリーンショット_2020-12-03_21.32.58のコピー2.png" loading="lazy">
 
 ### 階層化した dag の読み込みは可能か?
 
@@ -112,13 +112,13 @@ S3 への配置方法は、以下です。
 ### Airflow UI へのアクセス方法は?
 
 AWS コンソール上に UI へのリンクが表示されます。
-<img src="/images/20201206/スクリーンショット_2020-12-03_22.22.23.png" loading="lazy">
+<img src="/images/2020/20201206/スクリーンショット_2020-12-03_22.22.23.png" loading="lazy">
 
 上記リンクを押下すると、認証を自動で実施後に以下の画面が表示されます。
-<img src="/images/20201206/スクリーンショット_2020-12-03_22.23.47.png" loading="lazy">
+<img src="/images/2020/20201206/スクリーンショット_2020-12-03_22.23.47.png" loading="lazy">
 
 ちなみに IAM での認証が必須のため、直接URLにアクセスするとログインを求められます。
-<img src="/images/20201206/image.png" loading="lazy">
+<img src="/images/2020/20201206/image.png" loading="lazy">
 
 ### metadata DBの移行は可能?
 

@@ -8,7 +8,7 @@ tag:
   - 入門
 category:
   - Infrastructure
-thumbnail: /images/20230426a/thumbnail.png
+thumbnail: /images/2023/20230426a/thumbnail.png
 author: 渡邉光
 lede: "春の入門ということで、改めてIaCのメリット・デメリットについて整理してみました。また、PulumiというIaCツールに入門してみたので、皆さんと一緒にPulumiについて理解していきたいと思います。"
 ---
@@ -68,10 +68,10 @@ Pulumiは無料で利用できますが、複数人での利用や、企業単�
 
 詳しくは[公式ドキュメント](https://www.pulumi.com/pricing/)を参照ください。
 
-<img src="/images/20230426a/image.png" alt="" width="1200" height="779" loading="lazy">
+<img src="/images/2023/20230426a/image.png" alt="" width="1200" height="779" loading="lazy">
 
 Pulumiは以下の構成をとります。詳しくは[公式ドキュメント](https://www.pulumi.com/docs/intro/concepts/)を参照ください。
-<img src="/images/20230426a/image_2.png" alt="" width="617" height="440" loading="lazy">
+<img src="/images/2023/20230426a/image_2.png" alt="" width="617" height="440" loading="lazy">
 
 - Project：Programや他ファイルを含むディレクトリ
 - Program：インフラリソースのあるべき姿を定義したもの
@@ -120,13 +120,13 @@ Enter authorization code:
 
 表示されたURLをブラウザに入力すると、「Googleログイン画面」に遷移します。
 
-<img src="/images/20230426a/image_3.png" alt="" width="449" height="503" loading="lazy">
+<img src="/images/2023/20230426a/image_3.png" alt="" width="449" height="503" loading="lazy">
 
 「許可」をクリックします。
-<img src="/images/20230426a/image_4.png" alt="" width="453" height="833" loading="lazy">
+<img src="/images/2023/20230426a/image_4.png" alt="" width="453" height="833" loading="lazy">
 
 表示された認証コードをコピーします。
-<img src="/images/20230426a/image_5.png" alt="" width="360" height="558" loading="lazy">
+<img src="/images/2023/20230426a/image_5.png" alt="" width="360" height="558" loading="lazy">
 
 コピーした認証情報を入力し、「Enter」を押します。
 
@@ -163,7 +163,7 @@ Enter your access token from https://app.pulumi.com/account/tokens
 
 上記のURLへアクセスするとPulumiのSign In画面へ遷移します。
 まだ、アカウントを作成していないので`Create an accout`をクリックします。
-<img src="/images/20230426a/image_6.png" alt="" width="1200" height="888" loading="lazy">
+<img src="/images/2023/20230426a/image_6.png" alt="" width="1200" height="888" loading="lazy">
 
 アカウントを作成するため、今回はE-Mailを利用してアカウントを作成しようと思います。
 
@@ -173,16 +173,16 @@ Enter your access token from https://app.pulumi.com/account/tokens
 
 を入力し`Create Account`をクリックします。
 
-<img src="/images/20230426a/image_7.png" alt="" width="1200" height="895" loading="lazy">
+<img src="/images/2023/20230426a/image_7.png" alt="" width="1200" height="895" loading="lazy">
 
 `Personal access tokens`の作成を求められるので、`Create Token`をクリックします。
-<img src="/images/20230426a/image_8.png" alt="" width="1191" height="382" loading="lazy">
+<img src="/images/2023/20230426a/image_8.png" alt="" width="1191" height="382" loading="lazy">
 
 `description`に任意の値を入力します。
-<img src="/images/20230426a/image_9.png" alt="" width="241" height="252" loading="lazy">
+<img src="/images/2023/20230426a/image_9.png" alt="" width="241" height="252" loading="lazy">
 
 アクセストークンが生成されるので、メモしておきます。
-<img src="/images/20230426a/image_10.png" alt="" width="1200" height="481" loading="lazy">
+<img src="/images/2023/20230426a/image_10.png" alt="" width="1200" height="481" loading="lazy">
 
 先ほどのCLI画面に戻り、生成したアクセストークンを入力します。
 するとWelcome to Pulumi!と表示されます。
@@ -355,7 +355,7 @@ Duration: 5s
 ```
 
 Google Cloudのコンソール画面からCloud Storageを確認すると、バケットが作成されていることが確認できました。
-<img src="/images/20230426a/image_11.png" alt="" width="1200" height="631" loading="lazy">
+<img src="/images/2023/20230426a/image_11.png" alt="" width="1200" height="631" loading="lazy">
 
 スタックのアウトプットを確認したい場合は、以下のコマンドを実行すると確認できます。
 
@@ -366,7 +366,7 @@ gs://my-bucket-0cae339
 
 また、自身のPulumi Cloudのアカウントを確認しに行くと以下のように、Web上でもリソースの状態を確認できます。
 
-<img src="/images/20230426a/image_12.png" alt="" width="1200" height="670" loading="lazy">
+<img src="/images/2023/20230426a/image_12.png" alt="" width="1200" height="670" loading="lazy">
 
 # リソースの変更
 
@@ -593,7 +593,7 @@ $ curl $(pulumi stack output bucketEndpoint)
 オブジェクトを取得できました。
 Chromeでアクセスするとブラウザ上でindex.htmlの内容が表示されることも確認できました。
 
-<img src="/images/20230426a/image_13.png" alt="" width="296" height="57" loading="lazy">
+<img src="/images/2023/20230426a/image_13.png" alt="" width="296" height="57" loading="lazy">
 
 ## リソースの削除
 
@@ -708,7 +708,7 @@ If you want to remove the stack completely, run `pulumi stack rm dev`.
 
 無事削除されました。
 
-<img src="/images/20230426a/image_14.png" alt="" width="1200" height="624" loading="lazy">
+<img src="/images/2023/20230426a/image_14.png" alt="" width="1200" height="624" loading="lazy">
 
 スタック自体を削除するには、`pulumi stack rm`を実行します。このコマンドによりすべての更新履歴とともに、Pulumi Cloud からスタックが完全に削除されます。
 
@@ -720,7 +720,7 @@ Stack 'dev' has been removed!
 ```
 
 Pulumi Cloudを確認すると、dev stackが削除されていることが確認できました。
-<img src="/images/20230426a/image_15.png" alt="" width="1200" height="474" loading="lazy">
+<img src="/images/2023/20230426a/image_15.png" alt="" width="1200" height="474" loading="lazy">
 
 # [外伝] Pulumi AI
 
@@ -745,7 +745,7 @@ Create GCP Resource.
 
 上記の入力を与えたときには下記のようにPulumi AIが入力内容をもとにPulumiのGoのコードを生成していきます（す、すごい）。。。
 
-<img src="/images/20230426a/ezgif.com-video-to-gif_(4).gif" alt="ezgif.com-video-to-gif_(4).gif" width="600" height="338" loading="lazy">
+<img src="/images/2023/20230426a/ezgif.com-video-to-gif_(4).gif" alt="ezgif.com-video-to-gif_(4).gif" width="600" height="338" loading="lazy">
 
 以下が、Pulumi AIによって生成されたコードになります。
 きちんと作成するリソースごとにコメントアウトも入れてくれて助かります。
@@ -982,7 +982,7 @@ Google Cloudのマネジメントコンソールから「VMインスタンス」
 
 ブラウザがたちが上がり、しばらくすると無事にIAP経由でSSHできることを確認できました。
 
-<img src="/images/20230426a/image.jpg" alt="image.jpg" width="1200" height="841" loading="lazy">
+<img src="/images/2023/20230426a/image.jpg" alt="image.jpg" width="1200" height="841" loading="lazy">
 
 # 最後に
 

@@ -8,7 +8,7 @@ tag:
   - Rego
 category:
   - Programming
-thumbnail: /images/20240703a/thumbnail.png
+thumbnail: /images/2024/20240703a/thumbnail.png
 author: 関靖秀
 lede: "Open Policy Agentを実際にどうやって判定をリクエストするのかやポリシーの管理方法についてはまとまった情報が少なかったため、こちらにまとめようと思いました。"
 ---
@@ -52,7 +52,7 @@ OPAは、ポリシー管理を必要とするソフトウェアとは別プロ�
 
 ここまでは、ポリシーを主体に、OPAができることを述べてきました。ここでは、OPAによるポリシー判定の流れを概念的に説明します。図にすると以下のようになります。
 
-<img src="/images/20240703a/overview.drawio.png" alt="overview.drawio.png" width="522" height="333" loading="lazy">
+<img src="/images/2024/20240703a/overview.drawio.png" alt="overview.drawio.png" width="522" height="333" loading="lazy">
 
 OPAは判定リクエストを受け付ける前に、インメモリにPolicyとDataをロードします。Policyは判定に使われるルール群、Dataはポリシーの判定に使われるリクエスト間で共通するデータです。ロードのやり方は別で説明します。Queryは判定リクエストです。この中には、JSONの値（input）と、レスポンスとして受け取りたい項目の指定が含まれています。レスポンスとして受け取りたい項目を指定することで、どのPolicyで評価するかが決まります。Queryを受け取ったOPAは、inputとDataを、レスポンスを構成するために必要なポリシーで評価し、その結果であるDecisionをJSONとして返却します。
 

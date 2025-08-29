@@ -10,12 +10,12 @@ tag:
   - モック
 category:
   - Infrastructure
-thumbnail: /images/20221018a/thumbnail.jpg
+thumbnail: /images/2022/20221018a/thumbnail.jpg
 author: 真野隼記
 lede: Songmuさんのflextimeにはずっとお世話になっています。素晴らしいライブラリですが、SQLを用いて結果を永続化するようなテストでの利用する時に冗長性を感じました。PostgreSQL関数 を作成して代用できないか考えてみました。
 ---
 
-<img src="/images/20221018a/safari-gb655953e6_640.jpg" alt="" width="640" height="426">
+<img src="/images/2022/20221018a/safari-gb655953e6_640.jpg" alt="" width="640" height="426">
 
 TIG 真野です。
 

@@ -9,7 +9,7 @@ tag:
   - "Prompt Flow"
 category:
   - DataScience
-thumbnail: /images/20230919a/thumbnail.png
+thumbnail: /images/2023/20230919a/thumbnail.png
 author: 板野竜也
 lede: "AzureのPrompt Flowを使ってLLMに入力するプロンプト評価の管理を行います。プロンプト評価の管理を行いたい背景として..."
 ---
@@ -84,7 +84,7 @@ AzureのPrompt Flowにはいくつか組み込みの評価指標が用意され�
 
 このうちの大半はLLMが評価を下す仕組みとなっています。
 
-<img src="/images/20230919a/Alt_text.png" alt="Alt_text" width="1200" height="540" loading="lazy">
+<img src="/images/2023/20230919a/Alt_text.png" alt="Alt_text" width="1200" height="540" loading="lazy">
 
 [Source](https://speakerdeck.com/nohanaga/azure-machine-learning-prompt-flow-ping-jia-metorikusujie-shuo?slide=8)
 
@@ -144,11 +144,11 @@ LLMベースの評価は、プロンプト次第であらゆる評価結果を�
 
 Prompt Flowでは標準フローではなく、評価フローと呼ばれるフローを実装していきます。
 
-<img src="/images/20230919a/01.png" alt="" width="1200" height="346" loading="lazy">
+<img src="/images/2023/20230919a/01.png" alt="" width="1200" height="346" loading="lazy">
 
 今回実装した評価フローの概略です。
 
-<img src="/images/20230919a/image.png" alt="" width="1200" height="725" loading="lazy">
+<img src="/images/2023/20230919a/image.png" alt="" width="1200" height="725" loading="lazy">
 
 以下、入出力および各要素について説明します。
 
@@ -158,7 +158,7 @@ Prompt Flowでは標準フローではなく、評価フローと呼ばれるフ
 
 `question`は質問文、`answer`はLLMの回答を表します。
 
-<img src="/images/20230919a/image-2.png" alt="" width="1200" height="311" loading="lazy">
+<img src="/images/2023/20230919a/image-2.png" alt="" width="1200" height="311" loading="lazy">
 
 `line_number`と`variant_id`についてはAzureのドキュメントに以下のような記載がありました。
 
@@ -180,7 +180,7 @@ LLMを使って「質問に対する回答の一貫性」を評価する部分�
 
 実装は以下画像の通りです。
 
-<img src="/images/20230919a/image-3.png" alt="image" width="1200" height="822" loading="lazy">
+<img src="/images/2023/20230919a/image-3.png" alt="image" width="1200" height="822" loading="lazy">
 
 <details><summary>プロンプト例</summary>
 
@@ -216,7 +216,7 @@ LLMを使って「回答の分かりやすさ」を評価する部分です。`�
 
 実装は`calc_consistency`と同様です。
 
-<img src="/images/20230919a/image_(1).png" alt="" width="1200" height="699" loading="lazy">
+<img src="/images/2023/20230919a/image_(1).png" alt="" width="1200" height="699" loading="lazy">
 
 <details><summary>プロンプト例</summary>
 
@@ -257,7 +257,7 @@ user:
 
 ※手順解説のため、サンプルとして簡易なロジックを実装
 
-<img src="/images/20230919a/image_(2).png" alt="" width="1200" height="466" loading="lazy">
+<img src="/images/2023/20230919a/image_(2).png" alt="" width="1200" height="466" loading="lazy">
 
 <details><summary>コード例</summary>
 
@@ -282,7 +282,7 @@ def check_source(question: str, answer: str) -> str:
 
 `calc_consistency`, `calc_easiness`, `has_source`の各出力を集約し、1つの辞書型として出力するPythonコードです。
 
-<img src="/images/20230919a/image_(3).png" alt="image_(3).png" width="1200" height="509" loading="lazy">
+<img src="/images/2023/20230919a/image_(3).png" alt="image_(3).png" width="1200" height="509" loading="lazy">
 
 <details><summary>コード例</summary>
 
@@ -308,7 +308,7 @@ Variant毎に結果を集約するPythonコードです。
 
 今回はVariant機能を使っていませんが、評価フローでは、集約（Aggregation）を行うための特別なPythonコードを定義する必要があるので[公式ドキュメント(英語)](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/how-to-develop-an-evaluation-flow?view=azureml-api-2#metrics-logging-and-aggregation-node)を参考に、以下のように実装しました。
 
-<img src="/images/20230919a/image_(4).png" alt="" width="1200" height="862" loading="lazy">
+<img src="/images/2023/20230919a/image_(4).png" alt="" width="1200" height="862" loading="lazy">
 
 <details><summary>コード例</summary>
 
@@ -363,7 +363,7 @@ def aggregate_variants_results(variant_ids: List[int], line_numbers: List[int], 
 
 出力は以下のように設定します。
 
-<img src="/images/20230919a/image-4.png" alt="" width="1200" height="223" loading="lazy">
+<img src="/images/2023/20230919a/image-4.png" alt="" width="1200" height="223" loading="lazy">
 
 最後に右上の「保存」を押して評価フローの作成は完了です。
 
@@ -377,7 +377,7 @@ def aggregate_variants_results(variant_ids: List[int], line_numbers: List[int], 
 
 以下の画面では一括テストの設定を編集します。一括テストとは、複数の質問文を一括で受けつけて回答を出力してくれる機能です。
 
-<img src="/images/20230919a/image-6.png" alt="image-6.png" width="1200" height="701" loading="lazy">
+<img src="/images/2023/20230919a/image-6.png" alt="image-6.png" width="1200" height="701" loading="lazy">
 
 データは自分で以下のようなCSVファイルを作成し、アップロードします。\
 下例のようにあらゆるケースの質問文を用意したり、同じ質問文を複数記載して結果（評価値）の平均をとってLLMによるばらつきに対処したりもできます。
@@ -397,7 +397,7 @@ question
 
 評価入力マッピングの部分について、`question`のデータソースは`data.question`を選択します。これは一括テストの設定でアップロードしたCSVファイルのquestion列のデータに相当します。`answer`のデータソースは`output.answer`を選択します。これはLLMからの出力に相当します。
 
-<img src="/images/20230919a/02.png" alt="" width="1200" height="710" loading="lazy">
+<img src="/images/2023/20230919a/02.png" alt="" width="1200" height="710" loading="lazy">
 
 「次へ」を押すとレビューの画面が出ますが、最終確認の画面なので問題なければ「送信」を押します。
 
@@ -405,19 +405,19 @@ question
 
 フロー編集画面上部の「一括実行の表示」を押すと過去の実行が見られます。
 
-<img src="/images/20230919a/image-8.png" alt="" width="473" height="74" loading="lazy">
+<img src="/images/2023/20230919a/image-8.png" alt="" width="473" height="74" loading="lazy">
 
 過去の実行は以下のようにリスト化されています。
 
 ここで、いくつかの実行をチェックボックスで選択し、「メトリックの比較」を押してみましょう。
 
-<img src="/images/20230919a/03.png" alt="" width="1200" height="415" loading="lazy">
+<img src="/images/2023/20230919a/03.png" alt="" width="1200" height="415" loading="lazy">
 
 すると、以下のように各実行に対する評価指標を比較できます。
 
 もちろん、任意の評価指標についてソートすることもできます。
 
-<img src="/images/20230919a/04.png" alt="" width="1200" height="268" loading="lazy">
+<img src="/images/2023/20230919a/04.png" alt="" width="1200" height="268" loading="lazy">
 
 以上で今回目標としていたことが達成できました。
 
@@ -427,7 +427,7 @@ question
 
 しかし、Variant機能を使って実行しようとしたところ、記事執筆当時(2023年9月13日)では下図のように列方向に展開されてしまい、結果の比較が行いにくいと感じました。
 
-<img src="/images/20230919a/image-10.png" alt="image-10.png" width="1200" height="210" loading="lazy">
+<img src="/images/2023/20230919a/image-10.png" alt="image-10.png" width="1200" height="210" loading="lazy">
 
 このため今回はVariant機能を使わず、プロンプトを変える毎に逐一実行する方法を取りました。
 

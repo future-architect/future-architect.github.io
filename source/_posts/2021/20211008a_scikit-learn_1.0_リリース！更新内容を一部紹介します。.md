@@ -9,7 +9,7 @@ tag:
   - Python
 category:
   - DataScience
-thumbnail: /images/20211008a/thumbnail.png
+thumbnail: /images/2021/20211008a/thumbnail.png
 author: 玉木竜二
 lede: "2021年9月24日にscikit-learn 1.0がリリースされました。私が大学院生のころ、scikit-learnのサンプルを動かすところから機械学習を勉強したので、ついに1.0かとなんだか感慨深い気持ちがありますから、個人的に気になった以下の4つの内容を紹介しようと思います。"
 ---
@@ -81,7 +81,7 @@ X = pd.DataFrame({
 
 Xは以下のようなデータフレームになります。
 
-<img src="/images/20211008a/X_origin.png" alt="Xのデータフレーム" width="591" height="262" loading="lazy">
+<img src="/images/2021/20211008a/X_origin.png" alt="Xのデータフレーム" width="591" height="262" loading="lazy">
 
 ColumnTransformerを用いて、Xのカテゴリ変数に対してはone-hot encoding、量的変数に対しては標準化を行います。
 
@@ -113,7 +113,7 @@ pd.DataFrame(preprocessor.transform(X), columns=preprocessor.get_feature_names_o
 ```
 
 以下の画像のように変換後のデータを簡単にデータフレームに戻すことができます。
-<img src="/images/20211008a/scikit.png" alt="データフレームに戻した表現" width="1200" height="161" loading="lazy">
+<img src="/images/2021/20211008a/scikit.png" alt="データフレームに戻した表現" width="1200" height="161" loading="lazy">
 
 pandasのget_dummiesメソッドを使っても同様のone-hot encodingは可能です。
 
@@ -122,7 +122,7 @@ pd.get_dummies(X)
 ```
 
 以下get_dummiesの出力です。
-<img src="/images/20211008a/pandas.png" alt="get_dummies出力結果の表" width="1200" height="162" loading="lazy">
+<img src="/images/2021/20211008a/pandas.png" alt="get_dummies出力結果の表" width="1200" height="162" loading="lazy">
 
 ほぼ同じデータフレームが得られました。今回のように数値変換も同時にscikit-learnで行いたい場合などには、scikit-learnの変換器を通してget_feature_names_out()を使うのがいいのかなと思います。
 
@@ -150,7 +150,7 @@ plt.show()
 ```
 
 描画される混合行列は以下になります。
-<img src="/images/20211008a/confusion_matrix.png" alt="描画される混合行列のマトリクス図" width="306" height="266" loading="lazy">
+<img src="/images/2021/20211008a/confusion_matrix.png" alt="描画される混合行列のマトリクス図" width="306" height="266" loading="lazy">
 
 ## 4. StratifiedGroupKFoldの追加
 

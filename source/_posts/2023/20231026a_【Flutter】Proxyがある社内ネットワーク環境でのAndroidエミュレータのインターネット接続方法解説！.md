@@ -9,7 +9,7 @@ tag:
   - Androidエミュレータ
 category:
   - Programming
-thumbnail: /images/20231026a/thumbnail.png
+thumbnail: /images/2023/20231026a/thumbnail.png
 author: 後藤田千里
 lede: "プロキシが存在するネットワーク内で、Androidエミュレータからインターネット接続ができず、頭を悩ませたことはありませんか？"
 ---
@@ -25,7 +25,7 @@ lede: "プロキシが存在するネットワーク内で、Androidエミュレ
 </style>
 
 <a  target="_blank" rel="noopener" class="linkable_img" title="PostPix | 旅行を通じた、ノスタルジックエクスペリエンスサービス" href="https://postpix.jp/" >
-    <img src="/images/20231026a/b6fc4438-8326-63c9-a373-1143d4d88207.png" alt="" width="1200" height="1067" loading="lazy">
+    <img src="/images/2023/20231026a/b6fc4438-8326-63c9-a373-1143d4d88207.png" alt="" width="1200" height="1067" loading="lazy">
 </a>
 
 ## Androidエミュレータからプロキシサーバを超えてインターネットに出たい
@@ -38,7 +38,7 @@ lede: "プロキシが存在するネットワーク内で、Androidエミュレ
 
 最終的な構成は次のようになります。
 
-<img src="/images/20231026a/env.png" alt="" width="945" height="529" loading="lazy">
+<img src="/images/2023/20231026a/env.png" alt="" width="945" height="529" loading="lazy">
 
 なお、開発環境はWindows。プロキシは認証つきで、独自の証明書を利用する前提とします。
 
@@ -204,5 +204,5 @@ void main() async {
 [PostPix](https://postpix.jp/)はFlutterで作成しています。ぜひダウンロードのほどお願いします！
 
 <a  target="_blank" rel="noopener"  class="linkable_img" title="PostPix | 旅行を通じた、ノスタルジックエクスペリエンスサービス" href="https://postpix.jp/">
-    <img src="/images/20231026a/PostPix2.png" alt="" width="1200" height="1067" loading="lazy">
+    <img src="/images/2023/20231026a/PostPix2.png" alt="" width="1200" height="1067" loading="lazy">
 </a>

@@ -9,11 +9,11 @@ tag:
   - TechNight
 category:
   - Culture
-thumbnail: /images/20220517a/thumbnail.png
+thumbnail: /images/2022/20220517a/thumbnail.png
 author: 真野隼記
 lede: "いつの間にかFuture Tech NightというIT勉強会をメインで運営をすることになりました。イベント企画＆実行も楽しいですね。何度か回を重ねることでナレッジが溜まってきたので共有します。"
 ---
-<img src="/images/20220517a/image.png" alt="" width="1200" height="686" loading="lazy">
+<img src="/images/2022/20220517a/image.png" alt="" width="1200" height="686" loading="lazy">
 
 ## はじめに
 

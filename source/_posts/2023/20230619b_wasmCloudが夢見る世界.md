@@ -8,7 +8,7 @@ tag:
   - CNCF
 category:
   - Infrastructure
-thumbnail: /images/20230619b/thumbnail.png
+thumbnail: /images/2023/20230619b/thumbnail.png
 author: 澁川喜規
 lede: "サーバーレスのランタイムに興味があり、CNCFのプロジェクトを見たところ、それに関連しそうなwasmCloudというものがあったので見てみました。ぱっと見wasmで書いたロジックを実行するフレームワークに見えますが、wasm製アプリケーションのためのOSのようなものです。"
 ---
@@ -43,7 +43,7 @@ wasm自身は計算をしたり文字列を処理したり（バイトの配列�
 
 アクターとキャパシティプロバイダーは、「リンク」を使って繋ぎます。そのあたりは管理画面で手でもできますし、washコマンドを使ってもできますし、wadm.yamlという、docker composeみたいな設定を使ってもできます。
 
-<img src="/images/20230619b/名称未設定ファイル-ページ3.drawio.png" alt="名称未設定ファイル-ページ3.drawio.png" width="471" height="271" loading="lazy">
+<img src="/images/2023/20230619b/名称未設定ファイル-ページ3.drawio.png" alt="名称未設定ファイル-ページ3.drawio.png" width="471" height="271" loading="lazy">
 
 # WASIは？
 

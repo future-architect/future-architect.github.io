@@ -10,7 +10,7 @@ tag:
   - 設計
 category:
   - Infrastructure
-thumbnail: /images/20210527a/thumbnail.png
+thumbnail: /images/2021/20210527a/thumbnail.png
 author: 村瀬善則
 lede: "こんにちは。TIG村瀬です。2021/4/21を開催しました。私は、運用まで考慮したクラウドアーキテクチャ設計できていますか？というタイトルでお話させていただきました。発表資料は..."
 ---
@@ -41,9 +41,9 @@ lede: "こんにちは。TIG村瀬です。2021/4/21を開催しました。私�
 
 ## 内容をチラ見せ
 
-<img src="/images/20210527a/p1.png" alt="AWSインフラの問題" width="956" height="536" loading="lazy">
+<img src="/images/2021/20210527a/p1.png" alt="AWSインフラの問題" width="956" height="536" loading="lazy">
 
-<img src="/images/20210527a/p2.png" alt="監視対象の図。LB,EC2,DB" width="959" height="539" loading="lazy">
+<img src="/images/2021/20210527a/p2.png" alt="監視対象の図。LB,EC2,DB" width="959" height="539" loading="lazy">
 
 気になるものがありましたら[発表資料](https://future.connpass.com/event/209778/presentation/)も見てみてください。
 

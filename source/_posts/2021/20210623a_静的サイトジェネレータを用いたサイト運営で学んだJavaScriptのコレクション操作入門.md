@@ -8,13 +8,13 @@ tag:
   - フロントエンド
 category:
   - Programming
-thumbnail: /images/20210623a/thumbnail.png
+thumbnail: /images/2021/20210623a/thumbnail.png
 author: 真野隼記
 lede: "この記事ではこのフューチャー技術ブログを機能拡張する過程で学んだコレクション操作で利用頻度が高い順にまとめます。ブログ運営（？）の保守運用な雰囲気が少しでも伝わればなと思います。"
 ---
 # はじめに
 
-<img src="/images/20210623a/JSアイコン.png" alt="JSアイコン" width="1200" height="630">
+<img src="/images/2021/20210623a/JSアイコン.png" alt="JSアイコン" width="1200" height="630">
 
 TIG DXユニット真野です。[フロントエンド連載](/articles/20210614a/)の7記事目です。
 
@@ -97,7 +97,7 @@ tag:
   - フロントエンド
 category:
   - Programming
-thumbnail: /images/20210614a/thumbnail.jpg
+thumbnail: /images/2021/20210614a/thumbnail.jpg
 author: 真野隼記
 ---
 ```
@@ -144,7 +144,7 @@ console.log(awsArticles);
 
 利用されているタグの利用回数を表示させたい場合があります。2021.06.23時点のフューチャー技術ブログだと以下みたいに表示されていますね。
 
-<img src="/images/20210623a/image.png" alt="タグの件数表示" loading="lazy">
+<img src="/images/2021/20210623a/image.png" alt="タグの件数表示" loading="lazy">
 
 これも `articles` に対して算出します。先程の指定したタグを持つ記事を抽出する処理を用いたヘルパー関数 `flatMap` を用いると楽です。
 

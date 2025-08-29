@@ -8,7 +8,7 @@ tag:
   - SORACOM
 category:
   - Programming
-thumbnail: /images/20191201/thumbnail.png
+thumbnail: /images/2019/20191201/thumbnail.png
 author: 棚井龍之介
 lede: "自動化できる業務ならば極力自動化したいというのは万国共通だとは思いますが、例えばWebページであれば Selenium によるUI操作自動化が可能です。しかし、PCにインストールされたGUIアプリには、Webページの「idタグ」に相当するものがなく、UIの自動化は難しいと考えていました。今回、業務で利用しているWindowsのGUIアプリを「マウスで手動クリック」から「コードで自動操作」に切り替える機会があったので、そのときの試行錯誤を紹介します"
 ---
@@ -42,7 +42,7 @@ lede: "自動化できる業務ならば極力自動化したいというのは�
 
 ### 工場とクラウドを阻む最大の壁
 
-<img src="/images/20191201/products_ux302nc-r.png" class="img-middle-size" loading="lazy">
+<img src="/images/2019/20191201/products_ux302nc-r.png" class="img-middle-size" loading="lazy">
 
 工場現場の機器とインターネットを直接繋ぐのはセキュリティ上よろしくないので、例えば「工場→踏み台PC→クラウド」という構成が考えられます。また、新たに物理的なケーブルを用意するのも大変なので、踏み台PC→クラウドは SORACOM社の提供する USB wi-fi Network Adapter 「NCXX UX302NC-R」という製品を利用してみました。
 
@@ -136,7 +136,7 @@ system(start_driver_cmd)
 
 ex) SORACOM USBドングルの「接続」ボタンの場合
 接続ボタンの名前は「接続」だとわかります。それ以外にも IsEnabled（ボタンが押せるか）が true になっていることもわかります。
-<img src="/images/20191201/photo_20191201_01.png" loading="lazy">
+<img src="/images/2019/20191201/photo_20191201_01.png" loading="lazy">
 
 ### 実装コード
 

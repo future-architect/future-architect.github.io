@@ -9,7 +9,7 @@ tag:
   - コアテク
 category:
   - Infrastructure
-thumbnail: /images/20210413b/thumbnail.png
+thumbnail: /images/2021/20210413b/thumbnail.png
 author: 小松裕二
 lede: "Futureでは約一年前にコミュニケーションツールとして採用され社内外のコミュニケーションにSlackを使うことも増えました。そしてプロジェクト管理で利用しているRedmineは相変わらず現役です。個人的にはRedmine4.2のリリースを心待ちにしています。さて、そうなるとRedmineからSlackへ通知したくなりますね。"
 ---
@@ -107,7 +107,7 @@ Google Hangoutsは任意の値をスレッドIDとできるためRedmineチケ�
    * https://api.slack.com/apps/
 3. Slack App作成
    * 画面右上の「Create New App」をクリックしてください。
-   <img src="/images/20210413b/20210302_050412_MUu9IrrIbg7w.png" alt="2021-03-02_17h02_40.png" loading="lazy">
+   <img src="/images/2021/20210413b/20210302_050412_MUu9IrrIbg7w.png" alt="2021-03-02_17h02_40.png" loading="lazy">
 4. Slack App基本情報の入力
    * 立ち上がったポップアップへ以下情報を入力して、「Create App」をクリックして、保存してください。
    | 項目名 |値 | 説明 |
@@ -115,21 +115,21 @@ Google Hangoutsは任意の値をスレッドIDとできるためRedmineチケ�
    | App Name | Slack App名 ||
    | Development Slack Workspace | 連携するSlackチャンネルのワークスペース ||
 
-   <img src="/images/20210413b/20210311_061735_szaJQUXknPxD.png" alt="2021-03-02_17h35_28.png" loading="lazy">
+   <img src="/images/2021/20210413b/20210311_061735_szaJQUXknPxD.png" alt="2021-03-02_17h35_28.png" loading="lazy">
 5. 「OAuth & Permissions」画面を開く
     * 画面の左側メニューの「Features」->「OAuth & Permissions」をクリックしてください。
-    <img src="/images/20210413b/20210311_061919_Y8ExQo1I03HK.png" alt="2021-03-02_20h17_33.png" loading="lazy">
+    <img src="/images/2021/20210413b/20210311_061919_Y8ExQo1I03HK.png" alt="2021-03-02_20h17_33.png" loading="lazy">
 6. Scopes追加
     * 画面の中央に「Scopes」->「Bot Token Scopes」->「Add an OAuth Scope」をクリックして、chat:write、chat:write.customize、chat:write.publicのscopeを追加してください。
-    <img src="/images/20210413b/20210302_083053_jNMHi35XtJ4D.png" alt="2021-03-02_20h30_16.png" loading="lazy">
+    <img src="/images/2021/20210413b/20210302_083053_jNMHi35XtJ4D.png" alt="2021-03-02_20h30_16.png" loading="lazy">
 7. Bot User OAuth Token作成
     * 画面の上に「OAuth Tokens & Redirect URLs」->「Install to Workspace」をクリックしてください。
-    <img src="/images/20210413b/20210302_084904_6h6zUh2LRNeE.png" alt="2021-03-02_20h39_02.png" loading="lazy">
+    <img src="/images/2021/20210413b/20210302_084904_6h6zUh2LRNeE.png" alt="2021-03-02_20h39_02.png" loading="lazy">
     立ち上がったポップアップの「許可する」をクリックして、Bot User OAuth Tokenを作成します。
-    <img src="/images/20210413b/20210311_062417_BXwWoDuY3G67.png" alt="2021-03-02_20h53_11.png" loading="lazy">
+    <img src="/images/2021/20210413b/20210311_062417_BXwWoDuY3G67.png" alt="2021-03-02_20h53_11.png" loading="lazy">
 8. Bot User OAuth Tokenをコピー
     * 「OAuth Tokens for Your Team」-> 「Bot User OAuth Token」のトークン内容をメモしてください（「Copy」をクリック）
-    <img src="/images/20210413b/20210302_090112_KthIlVZmu6RK.png" alt="2021-03-02_20h56_42.png" loading="lazy">
+    <img src="/images/2021/20210413b/20210302_090112_KthIlVZmu6RK.png" alt="2021-03-02_20h56_42.png" loading="lazy">
 
 ### 3. Redmine設定
 
@@ -142,7 +142,7 @@ Google Hangoutsは任意の値をスレッドIDとできるためRedmineチケ�
 5. 「Slack Disabled」を「いいえ」に選択してください。
 6. 「保存」をクリックして、設定内容を保存してくだくさい。
 
-<img src="/images/20210413b/20210311_063301_O4jfcZ1FSAny.png" alt="2021-03-03_16h38_35.png" loading="lazy">
+<img src="/images/2021/20210413b/20210311_063301_O4jfcZ1FSAny.png" alt="2021-03-03_16h38_35.png" loading="lazy">
 
 #### 3-2. 特定子プロジェクトだけ通知を無効
 
@@ -155,7 +155,7 @@ Google Hangoutsは任意の値をスレッドIDとできるためRedmineチケ�
 3. 「Slack Disabled」を「はい」に選択してください。
 4. 「保存」をクリックして、設定内容を保存してください。
 
-<img src="/images/20210413b/20210311_063536_RFkCB7QcO9e8.png" alt="2021-03-04_11h11_29.png" loading="lazy">
+<img src="/images/2021/20210413b/20210311_063536_RFkCB7QcO9e8.png" alt="2021-03-04_11h11_29.png" loading="lazy">
 
 #### 3-3. 特定ユーザだけ通知を無効
 
@@ -165,23 +165,23 @@ Google Hangoutsは任意の値をスレッドIDとできるためRedmineチケ�
 
 設定はビルドユーザでログインしてビルドユーザの個人設定画面で行ってください。
 
-<img src="/images/20210413b/20210304_111712_yt9XAeY0BE7p.png" alt="2021-03-04_11h14_25.png" loading="lazy">
+<img src="/images/2021/20210413b/20210304_111712_yt9XAeY0BE7p.png" alt="2021-03-04_11h14_25.png" loading="lazy">
 
 ## 動作確認
 
 ### チケット新規起票
 
-<img src="/images/20210413b/20210311_064251_fBozRNNlpJMZ.png" alt="2021-03-04_11h32_12.png" loading="lazy">
+<img src="/images/2021/20210413b/20210311_064251_fBozRNNlpJMZ.png" alt="2021-03-04_11h32_12.png" loading="lazy">
 
 ### チケット更新
 
-<img src="/images/20210413b/20210311_064454_UEQgnwhbNw6p.png" alt="2021-03-04_11h48_25.png" loading="lazy">
+<img src="/images/2021/20210413b/20210311_064454_UEQgnwhbNw6p.png" alt="2021-03-04_11h48_25.png" loading="lazy">
 
 ### Slackスレッドで議論
 
 一例ですが、Redmineの更新を受けてSlackスレッドで議論することで対応をスムーズに進めることができます。
 
-<img src="/images/20210413b/20210316_034609_GO1fXyegzuce.png" alt="2021-03-16_15h18_43.png" loading="lazy">
+<img src="/images/2021/20210413b/20210316_034609_GO1fXyegzuce.png" alt="2021-03-16_15h18_43.png" loading="lazy">
 
 ## おわりに
 

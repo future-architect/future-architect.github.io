@@ -11,11 +11,11 @@ tag:
   - dotenv
 category:
   - Programming
-thumbnail: /images/20231012a/thumbnail.png
+thumbnail: /images/2023/20231012a/thumbnail.png
 author: 真野隼記
 lede: "makeを用いてWebバックエンドアプリをGoで開発するということをテーマに、役立ちそうな情報をまとめます。"
 ---
-<img src="/images/20231012a/gnu-make.png" alt="" width="800" height="418">
+<img src="/images/2023/20231012a/gnu-make.png" alt="" width="800" height="418">
 
 ## はじめに
 

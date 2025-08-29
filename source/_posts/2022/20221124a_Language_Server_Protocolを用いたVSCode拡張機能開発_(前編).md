@@ -11,7 +11,7 @@ tag:
   - フォーマッター
 category:
   - Programming
-thumbnail: /images/20221124a/thumbnail.png
+thumbnail: /images/2022/20221124a/thumbnail.png
 author: 川渕皓太
 lede: "SQLフォーマッタをVSCodeの拡張機能にする作業を行っており、そのための方法を学んでいます。本記事ではLanguage Server Protocolを用いたVSCode拡張機能開発について説明します。。"
 ---
@@ -37,7 +37,7 @@ LSPがない場合は各IDEに対応した言語、仕様で言語サーバを�
 
 つまり、LSPを用いて開発した拡張機能はVSCodeだけでなく、VimやEmacsなどでも使用できます。
 
-<img src="/images/20221124a/lsp-languages-editors.png" alt="lsp-languages-editors.png" width="1162" height="538" loading="lazy">
+<img src="/images/2022/20221124a/lsp-languages-editors.png" alt="lsp-languages-editors.png" width="1162" height="538" loading="lazy">
 
 # 本記事で説明すること
 
@@ -76,24 +76,24 @@ npm install
 
 1. Ctrl+Shift+Bでクライアントとサーバをコンパイル
 1. Ctrl+Shift+Dで「実行とデバッグ」を開き、Launch Clientを選択する
-<img src="/images/20221124a/image.png" alt="" width="1200" height="650" loading="lazy">
+<img src="/images/2022/20221124a/image.png" alt="" width="1200" height="650" loading="lazy">
 1. <font color="MediumSeaGreen">▷</font>をクリックする
 1. 新たにVSCodeのウィンドウが開くのでそのVSCode上で適当なテキストファイルを作成
 1. テキストファイルで以下の機能が確認できれば完了
     * jと入力すると補完の候補としてJavaScriptが表示される
-	<img src="/images/20221124a/image_2.png" alt="" width="682" height="84" loading="lazy">
+	<img src="/images/2022/20221124a/image_2.png" alt="" width="682" height="84" loading="lazy">
     * tと入力すると補完の候補としてTypeScriptが表示される
-	<img src="/images/20221124a/image_3.png" alt="" width="676" height="74" loading="lazy">
+	<img src="/images/2022/20221124a/image_3.png" alt="" width="676" height="74" loading="lazy">
     * 全て大文字、かつ長さが2以上の単語には警告が表示される<br>
-	<img src="/images/20221124a/image_4.png" alt="" width="491" height="202" loading="lazy">
+	<img src="/images/2022/20221124a/image_4.png" alt="" width="491" height="202" loading="lazy">
 
 ### 4. サーバのデバッグ
 
 1. Launch Clientしている状態で「実行とデバッグ」のAttach to Serverを選択
 1. <font color="MediumSeaGreen">▷</font>をクリック
-<img src="/images/20221124a/image_5.png" alt="" width="1200" height="650" loading="lazy">
+<img src="/images/2022/20221124a/image_5.png" alt="" width="1200" height="650" loading="lazy">
 1. サーバのブレークポイントが効くようになる
-<img src="/images/20221124a/image_6.png" alt="" width="1200" height="650" loading="lazy">
+<img src="/images/2022/20221124a/image_6.png" alt="" width="1200" height="650" loading="lazy">
 
 # サンプルコードの解説
 
@@ -262,7 +262,7 @@ export function activate(context: ExtensionContext) {
 	};
 ```
 
-<img src="/images/20221124a/untitled.drawio.png" alt="untitled.drawio.png" width="1200" height="215" loading="lazy">
+<img src="/images/2022/20221124a/untitled.drawio.png" alt="untitled.drawio.png" width="1200" height="215" loading="lazy">
 
 ### 拡張機能の終了時の処理
 
@@ -435,7 +435,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 ```
 
 診断メッセージ、診断の発行元、関連情報は以下のように表示されます。
-<img src="/images/20221124a/warning.drawio.png" alt="warning.drawio.png" width="644" height="268" loading="lazy">
+<img src="/images/2022/20221124a/warning.drawio.png" alt="warning.drawio.png" width="644" height="268" loading="lazy">
 
 ### 補完機能の実装
 
@@ -482,7 +482,7 @@ connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
 ```
 
 補完、追加情報は以下のように表示されます。
-<img src="/images/20221124a/hokan.drawio_(1).png" alt="" width="816" height="205" loading="lazy">
+<img src="/images/2022/20221124a/hokan.drawio_(1).png" alt="" width="816" height="205" loading="lazy">
 
 # まとめ
 

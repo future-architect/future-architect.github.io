@@ -10,7 +10,7 @@ tag:
   - Rust
 category:
   - Programming
-thumbnail: /images/20220916c/thumbnail.png
+thumbnail: /images/2022/20220916c/thumbnail.png
 author: 川渕皓太
 lede: "作成したフォーマッタの実装について説明します。前編でも示しましたが、今回作成したフォーマッタの処理の流れを再度示します。"
 ---
@@ -21,7 +21,7 @@ lede: "作成したフォーマッタの実装について説明します。前�
 
 前編でも示しましたが、今回作成したフォーマッタの処理の流れを再度示します。
 
-<img src="/images/20220916c/nagare.png" alt="" width="960" height="228" loading="lazy">
+<img src="/images/2022/20220916c/nagare.png" alt="" width="960" height="228" loading="lazy">
 
 # 使用した技術
 
@@ -29,7 +29,7 @@ lede: "作成したフォーマッタの実装について説明します。前�
 
 ### Rust
 
-<img src="/images/20220916c/rustacean.png" alt="" width="400" height="266" loading="lazy">
+<img src="/images/2022/20220916c/rustacean.png" alt="" width="400" height="266" loading="lazy">
 
 高速で、かつwasm-packなどのライブラリを用いてWebAssembly化できることから、様々なプラットフォームで動作するため、Rustを採用しました。
 
@@ -138,7 +138,7 @@ SELECT
 
 これらのSQLをtree-sitter-sqlでパースすると、どちらも以下のようなCSTが構築されます。
 
-<img src="/images/20220916c/syntax_tree-Comment_tech.drawio_(3).png" alt="syntax_tree-Comment_tech.drawio_(3).png" width="582" height="222" loading="lazy">
+<img src="/images/2022/20220916c/syntax_tree-Comment_tech.drawio_(3).png" alt="syntax_tree-Comment_tech.drawio_(3).png" width="582" height="222" loading="lazy">
 
 これは、パース時にコメントの位置等を考慮しておらず、コメントの意味まで解釈できないためです。
 下のSQLはこの木構造で問題ありませんが、上のSQLでは、`GRADE`とその末尾コメントである`-- 成績`がまとまっていたほうが直感的です。そこで、私たちのフォーマッタではCSTを走査する段階で、行末コメントとその行の式を対応付けています。
@@ -152,25 +152,25 @@ SELECT
 
 このSQL文をtree-sitter-sqlでパースすると、以下のようなCSTが出力されます。
 
-<img src="/images/20220916c/syntax_tree-Comment_tech.drawio_(2).png" alt="syntax_tree-Comment_tech.drawio_(2).png" width="581" height="222" loading="lazy">
+<img src="/images/2022/20220916c/syntax_tree-Comment_tech.drawio_(2).png" alt="syntax_tree-Comment_tech.drawio_(2).png" width="581" height="222" loading="lazy">
 
 出力されたCSTでは`GRADE`のコメントである`-- 成績`が`ファイル`ノードの子ノードになってしまっています。パーサーではコメントの意味まで解釈できないため、このような直感的でない木構造になってしまうことがあります。
 この離れた位置にある2つのノードを同じ`AlignedExpr`構造体に格納する方法について説明します。
 まずCST上の`GRADE`ノードまで深さ優先探索順に辿ります。
 
-<img src="/images/20220916c/syntax_tree-to_comment.drawio_(1).png" alt="syntax_tree-to_comment.drawio_(1).png" width="581" height="222" loading="lazy">
+<img src="/images/2022/20220916c/syntax_tree-to_comment.drawio_(1).png" alt="syntax_tree-to_comment.drawio_(1).png" width="581" height="222" loading="lazy">
 
 `GRADE`ノードを辿り終わった時点での自作構造体は以下のようになります。
 
-<img src="/images/20220916c/syntax_tree-to_ID.drawio_(3).png" alt="syntax_tree-to_ID.drawio_(3).png" width="381" height="211" loading="lazy">
+<img src="/images/2022/20220916c/syntax_tree-to_ID.drawio_(3).png" alt="syntax_tree-to_ID.drawio_(3).png" width="381" height="211" loading="lazy">
 
 この状態で次のノードへ辿ると、コメントノードが出現します。
 
-<img src="/images/20220916c/syntax_tree-Comment_tech.drawio_(2)_2.png" alt="syntax_tree-Comment_tech.drawio_(2).png" width="581" height="222" loading="lazy">
+<img src="/images/2022/20220916c/syntax_tree-Comment_tech.drawio_(2)_2.png" alt="syntax_tree-Comment_tech.drawio_(2).png" width="581" height="222" loading="lazy">
 
 コメントノードが出現した時点の自作構造体を参照し、自作構造体の一番最後の子とコメントが同じ行であれば`trailing_comment`にコメントを追加します。今回の例では`GRADE`を左辺として持っている`aligned_expr`に`-- 成績`を追加します。
 
-<img src="/images/20220916c/syntax_tree-to_comment.drawio_(2).png" alt="syntax_tree-to_comment.drawio_(2).png" width="396" height="282" loading="lazy">
+<img src="/images/2022/20220916c/syntax_tree-to_comment.drawio_(2).png" alt="syntax_tree-to_comment.drawio_(2).png" width="396" height="282" loading="lazy">
 
 # レンダリング時の処理
 
@@ -184,12 +184,12 @@ FROM
 ,   TABLE1          TB1
 ```
 
-<img src="/images/20220916c/calc_tab_1.png" alt="calc_tab_1.png" width="846" height="183" loading="lazy">
+<img src="/images/2022/20220916c/calc_tab_1.png" alt="calc_tab_1.png" width="846" height="183" loading="lazy">
 
 テーブル名を左辺、エイリアスを右辺として説明します。
 上の行の左辺(`LONGLONGTABLE`)は13文字で、これにタブを1つ加えた16文字の位置から右辺(`LLTB`)が開始します。上の行の右辺の開始位置、すなわち16文字の位置に下の行の右辺(`TB1`)の開始位置が合わさるようにタブ文字を挿入します。
 
-<img src="/images/20220916c/calc_tab_2.png" alt="calc_tab_2.png" width="842" height="231" loading="lazy">
+<img src="/images/2022/20220916c/calc_tab_2.png" alt="calc_tab_2.png" width="842" height="231" loading="lazy">
 
 下の行の左辺(`TABLE1`)は6文字であるため、今回の例ではタブ文字を3つ挿入することで右辺の位置が揃います。
 このように、合わせたい部分における最長の左辺の長さを利用して、以下の式で各行で挿入するタブ文字の数を計算します。求めた数タブ文字を挿入することで縦揃えを実現できます。

@@ -9,12 +9,12 @@ tag:
   - 可読性
 category:
   - Infrastructure
-thumbnail: /images/20211029a/thumbnail.png
+thumbnail: /images/2021/20211029a/thumbnail.png
 author: 伊藤太斉
 lede: "ここ最近はほぼ1からコード設計をして運用まで持っていくこともあり、「より腐りにくい、より息の長いコード」というものを考えるようになりました。Terraformだからこその「定期メンテを簡易にするためには」「より簡単に変更するためには」をひたすら突き詰めていった結果、アツい気持ちが生まれ、今回は筆を取っています。"
 ---
 
-<img src="/images/20211029a/og-image-c18d275f.png" alt="" width="800" height="418">
+<img src="/images/2021/20211029a/og-image-c18d275f.png" alt="" width="800" height="418">
 
 こんにちは。TIGの[伊藤](https://twitter.com/kaedemalu)です。この記事は[秋のブログ週間2021](/articles/20211027a/)の3日目です。
 

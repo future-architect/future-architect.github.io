@@ -7,12 +7,12 @@ tag:
   - Vue.js
 category:
   - Infrastructure
-thumbnail: /images/20200924/thumbnail.png
+thumbnail: /images/2020/20200924/thumbnail.png
 author: 信田和哉
 lede: "こんにちは！今回は[CheetahGrid][cheetahgrid-hp]＋[Vue.js][vue-hp]でエンプラ系システムを構築した際の、採用した理由と実装のポイントのご紹介をしようと思います。[CheetahGrid][cheetahgrid-hp]について存じ上げないよーとか、触ったことがないよーという方は、[入門編][beginner-link]も御覧くださいね。初めての投稿ですが、最後までお付き合いいただければ嬉しいです。"
 ---
 
-<img src="/images/20200924/top.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200924/top.png" class="img-small-size" loading="lazy">
 
 # はじめに
 
@@ -95,7 +95,7 @@ npm install -S cheetah-grid
 ## 実装した画面と全体ソース
 
 今回実装した画面は以下です。
-<img src="/images/20200924/2020-09-23_20h26_14.png" loading="lazy">
+<img src="/images/2020/20200924/2020-09-23_20h26_14.png" loading="lazy">
 この画面全体のソースコードは以下です。
 
 ```html sample.vue
@@ -304,15 +304,15 @@ export default {
 
 以下のようなExcel上のデータをコピーし、
 
-<img src="/images/20200924/2020-09-22_00h23_27.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200924/2020-09-22_00h23_27.png" class="img-small-size" loading="lazy">
 
 `Ctrl+V`でペーストして反映します。
 
-<img src="/images/20200924/capture-range-paste_(1).gif" loading="lazy">
+<img src="/images/2020/20200924/capture-range-paste_(1).gif" loading="lazy">
 
 また、以下のようにExcel操作でよく使う`Ctrl+down`で全選択してコピーするような一括ペーストも`c-grid`上で可能になっています。
 
-<img src="/images/20200924/capture-copy-and-paste-row_(1).gif" loading="lazy">
+<img src="/images/2020/20200924/capture-copy-and-paste-row_(1).gif" loading="lazy">
 
 この範囲ペースト機能を利用すればWeb上でExcelライクな操作が可能となり、既存の仕組みがExcel運用だったとしても`c-grid`へ置き換えることも現実的な選択肢となりうると思います。
 
@@ -354,7 +354,7 @@ export default {
         },
 ```
 
-<img src="/images/20200924/capture-inpute-all.gif" loading="lazy">
+<img src="/images/2020/20200924/capture-inpute-all.gif" loading="lazy">
 
 仕組みは簡単で、一括反映ボタンの`click`イベントにて`c-grid`で表示しているデータセットの値を`c-gird`外の`inputAllColumn1`で置き換えています。
 ここでミソなのが、**再描画**（`vm.$refs.grid.invalidate()`）です。
@@ -414,7 +414,7 @@ export default {
         },
 ```
 
-<img src="/images/20200924/capture-add-row_(1).gif" loading="lazy">
+<img src="/images/2020/20200924/capture-add-row_(1).gif" loading="lazy">
 実装としては、IDの最大値＋１を計算し、`records`へ追加しています。これだけで`c-grid`に新たな行を追加することが可能です。
 
 ### 入力データのバリデーション
@@ -441,7 +441,7 @@ export default {
         },
 ```
 
-<img src="/images/20200924/2020-09-23_21h08_40.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200924/2020-09-23_21h08_40.png" class="img-small-size" loading="lazy">
 
 `:message="validateNumCol"`にてバリデーション用の関数を呼び出し、エラーの場合にエラーメッセージを返却するように実装します。カラム1のいずれかに4桁以内の数字**以外**を入力した場合にエクスクラメーションマークが表示されることが確認できるでしょう。
 
@@ -472,7 +472,7 @@ export default {
         },
 ```
 
-<img src="/images/20200924/2020-09-23_21h14_26.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200924/2020-09-23_21h14_26.png" class="img-middle-size" loading="lazy">
 
 今回は各`c-grid`コンポーネントの`changed-value`イベントの関数（`onChangedValueNumCol($event)`）内でダイアログ表示するようにしています。
 

@@ -11,11 +11,11 @@ tag:
   - BlueGreenDeployment
 category:
   - DevOps
-thumbnail: /images/20220314a/thumbnail.png
+thumbnail: /images/2022/20220314a/thumbnail.png
 author: 渡邉光
 lede: "2022年1月28日にFuture Tech Night #19 AWS CodePipelineと新聞向けCMS構築事例を開催しました。こちらの勉強会で「CodePipelineを用いたECS on EC2でのBlue/Greenデプロイメント」というテーマで発表させていただきました。"
 ---
-<img src="/images/20220314a/top.png" alt="" width="800" height="449">
+<img src="/images/2022/20220314a/top.png" alt="" width="800" height="449">
 
 # はじめに
 

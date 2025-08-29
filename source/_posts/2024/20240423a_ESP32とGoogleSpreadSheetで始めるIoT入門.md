@@ -9,7 +9,7 @@ tag:
   - DS18B20
 category:
   - IoT
-thumbnail: /images/20240423a/thumbnail.png
+thumbnail: /images/2024/20240423a/thumbnail.png
 author: 高世駿
 lede: "IoTという言葉が話題になり始めてから、かなりの時間が経ちました。私自身も身近なIoTに関心を持っていろいろ取り組んできましたが、ソフトウェアだけでなくハードウェアの知識も必要になるなど、初めて挑戦する方にとっては敷居が高いと感じることがしばしばありました。"
 ---
@@ -26,7 +26,7 @@ IoTという言葉が話題になり始めてから、かなりの時間が経�
 
 # 今回やること
 
-<img src="/images/20240423a/image.png" alt="" width="1200" height="607" loading="lazy">
+<img src="/images/2024/20240423a/image.png" alt="" width="1200" height="607" loading="lazy">
 
 今回はESP32というマイコンを利用して温度センサから定期的に温度を計測し、その情報をGoogleSpreadSheet上に保持するシステムを構築します。
 
@@ -34,7 +34,7 @@ IoTという言葉が話題になり始めてから、かなりの時間が経�
 
 ## ESP32とは
 
-<img src="/images/20240423a/115673.jpg" alt="" width="640" height="480" loading="lazy">
+<img src="/images/2024/20240423a/115673.jpg" alt="" width="640" height="480" loading="lazy">
 
 https://akizukidenshi.com/catalog/g/g115673/
 
@@ -46,7 +46,7 @@ https://akizukidenshi.com/catalog/g/g115673/
 
 ## DS18B20とは
 
-<img src="/images/20240423a/image_2.png" alt="" width="438" height="371" loading="lazy">
+<img src="/images/2024/20240423a/image_2.png" alt="" width="438" height="371" loading="lazy">
 
 今回使用する温度センサです。
 Amazonにて5本で1000円というかなり安価に手に入りますし、1-wireインタフェースといって1本の信号線でデータのやりとりができたり、複数のDS18B20を1本の信号線で接続して制御できたりなど使い勝手がかなり良かったです。
@@ -70,7 +70,7 @@ DS18B20から3本の線が出ており、電源線(赤)・信号線(黄)・GND�
 
 余談ですがハンダ付けしたあとの保護のためにホットボンドを利用しています（左下画像）。
 
-<img src="/images/20240423a/image_3.png" alt="" width="704" height="316" loading="lazy">
+<img src="/images/2024/20240423a/image_3.png" alt="" width="704" height="316" loading="lazy">
 
 シンプルな1センサに対しての温度計測と表示を行ってみます。
 
@@ -113,7 +113,7 @@ void loop(void)
 
 実際に書き込みを行い、Arduino IDEのシリアルモニタで見てみます。
 
-<img src="/images/20240423a/sokutei2.gif" alt="sokutei2.gif" width="645" height="321" loading="lazy">
+<img src="/images/2024/20240423a/sokutei2.gif" alt="sokutei2.gif" width="645" height="321" loading="lazy">
 
 温度の変化がわかるようにセンサ部を指で温めています。
 最初`26.44度`からスタートし、指で触り始めると温度が上がっていくことを確認しました。
@@ -124,7 +124,7 @@ GoogleSpreadSheetでPOSTリクエストを受け付けるWebアプリを作っ�
 
 まずスプシを作成し、拡張機能>Apps ScriptからGASを作成します。
 
-<img src="/images/20240423a/image_4.png" alt="" width="783" height="249" loading="lazy">
+<img src="/images/2024/20240423a/image_4.png" alt="" width="783" height="249" loading="lazy">
 
 今回はESP32から計測した温度データをJSONに詰めて、POSTリクエストを飛ばします。
 
@@ -169,11 +169,11 @@ function doPost(e) {
 
 デプロイ方法は簡単で以下手順でボタン押下するだけでURLが発行されます。
 
-<img src="/images/20240423a/image_5.png" alt="" width="1110" height="443" loading="lazy">
+<img src="/images/2024/20240423a/image_5.png" alt="" width="1110" height="443" loading="lazy">
 
-<img src="/images/20240423a/image_6.png" alt="" width="1200" height="631" loading="lazy">
+<img src="/images/2024/20240423a/image_6.png" alt="" width="1200" height="631" loading="lazy">
 
-<img src="/images/20240423a/image_7.png" alt="" width="1200" height="631" loading="lazy">
+<img src="/images/2024/20240423a/image_7.png" alt="" width="1200" height="631" loading="lazy">
 
 このURLにPOSTリクエストを投げれば、先程のスクリプトが実行されます。
 注意点としては、このURLはデプロイするたびに変わるということと、認証などの仕組みはないため、URLが漏洩すると誰でもアクセスできるので取り扱いには注意してください。
@@ -184,7 +184,7 @@ function doPost(e) {
 
 冷蔵庫内部にセンサをマスキングテープで付けて、ケーブルを冷蔵庫の外に出してESP32と接続しました。
 
-<img src="/images/20240423a/image_8.png" alt="" width="507" height="377" loading="lazy">
+<img src="/images/2024/20240423a/image_8.png" alt="" width="507" height="377" loading="lazy">
 
 それではESP32から先程デプロイしたWebアプリに対してPOSTリクエストを送信するプログラムを作成していきます。
 ちょっと長くなってしまいましたが、やってることとしてはWi-Fiの接続設定と1分間隔で温度計測とAPIリクエストの実行となっています。
@@ -301,13 +301,13 @@ void apiRequest(String body) {
 
 するとスプシ側に送信したデータが書き込まれていることを確認できました。
 
-<img src="/images/20240423a/image_9.png" alt="" width="405" height="348" loading="lazy">
+<img src="/images/2024/20240423a/image_9.png" alt="" width="405" height="348" loading="lazy">
 
 試しに1日動かして結果をプロットしてみました。
 室内温度は昼間になるにつれて温度が高くなっていき、15時過ぎごろにピークを迎えます。
 冷蔵庫温度は細かな上がり下がりが確認できますが、1日中一定を保っています。おそらく基準の温度があってそこを超えたら冷却をON、下回ったらOFFにするような制御が入っているのではと予想できます。
 
-<img src="/images/20240423a/image_10.png" alt="" width="590" height="363" loading="lazy">
+<img src="/images/2024/20240423a/image_10.png" alt="" width="590" height="363" loading="lazy">
 
 # まとめ
 

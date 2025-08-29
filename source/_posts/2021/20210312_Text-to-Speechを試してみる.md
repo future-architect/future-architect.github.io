@@ -7,7 +7,7 @@ tag:
   - TextToSpeech
 category:
   - Infrastructure
-thumbnail: /images/20210312/thumbnail.png
+thumbnail: /images/2021/20210312/thumbnail.png
 author: 村瀬善則
 lede: "昨年に続きGCP連載企画の参加です。私個人としてはGCPはほとんど利用したことがないので、せっかくだから面白そうなことを試してみようと思い、今回はText-to-Speechについて試してみることにしました。読んで字のごとくですがテキストを自然な音声に変換するサービスで、40以上の言語と方言で220種類以上の音声から選択できます。話す速度や声の高さも変更することができます。"
 ---
@@ -19,7 +19,7 @@ lede: "昨年に続きGCP連載企画の参加です。私個人としてはGCP�
 
 # Text-to-Speechとは
 
-<img src="/images/20210312/Cloud_Text-to-Speech.png" loading="lazy">
+<img src="/images/2021/20210312/Cloud_Text-to-Speech.png" loading="lazy">
 
 > https://cloud.google.com/blog/ja/products/ai-machine-learning/cloud-text-to-speech-expands-its-number-of-voices-now-covering-33-languages-and-variants より
 
@@ -38,7 +38,7 @@ lede: "昨年に続きGCP連載企画の参加です。私個人としてはGCP�
 
 ## 1.新しいプロジェクトの作成
 
-<img src="/images/20210312/00create_prj.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/00create_prj.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
 適当にプロジェクト名を入力して作成します。
 
@@ -46,19 +46,19 @@ lede: "昨年に続きGCP連載企画の参加です。私個人としてはGCP�
 
 [クイックスタート ページ内](https://cloud.google.com/text-to-speech/docs/quickstart-protocol?hl=ja)のAPIを有効にするボタン]をクリックして有効にします。
 
-<img src="/images/20210312/01pre.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/01pre.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
 ## 3.認証の設定
 
 必要なロールはありませんということなのでロールを選択せず作成します。
 
-<img src="/images/20210312/02pre.png" class="img-large-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/02pre.png" class="img-large-size" style="border:solid 1px #000000" loading="lazy">
 
-<img src="/images/20210312/03pre.png" class="img-large-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/03pre.png" class="img-large-size" style="border:solid 1px #000000" loading="lazy">
 
-<img src="/images/20210312/04pre.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/04pre.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-<img src="/images/20210312/05pre.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/05pre.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
 JSONファイルがダウンロードされるので適切な場所に保存します。のちにこのJSONファイルのパスを環境変数に設定することになります。
 
@@ -66,27 +66,27 @@ JSONファイルがダウンロードされるので適切な場所に保存し�
 
 [このページ](https://cloud.google.com/sdk/docs/install?hl=ja)に則りインストールします。
 
-<img src="/images/20210312/05sdk.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/05sdk.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-<img src="/images/20210312/06sdk.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/06sdk.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-<img src="/images/20210312/07sdk.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/07sdk.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-<img src="/images/20210312/08sdk.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/08sdk.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
 環境にもよると思いますが割と時間かかります。コーヒーでも飲んで待ちましょう。
 
-<img src="/images/20210312/09sdk.png" loading="lazy">
+<img src="/images/2021/20210312/09sdk.png" loading="lazy">
 
 コマンドプロンプトが起動するのでYを入力します。
 
-<img src="/images/20210312/13sdk.png" loading="lazy">
+<img src="/images/2021/20210312/13sdk.png" loading="lazy">
 
-<img src="/images/20210312/14sdk.png" loading="lazy">
+<img src="/images/2021/20210312/14sdk.png" loading="lazy">
 
 ブラウザが起動するのでアクセスを許可します。
 
-<img src="/images/20210312/15sdk.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/15sdk.png" style="border:solid 1px #000000" loading="lazy">
 
 無事に完了しました。
 
@@ -140,7 +140,7 @@ Invoke-WebRequest `
 
 実行すると以下のエラーが発生しました。
 
-<img src="/images/20210312/16err.png" loading="lazy">
+<img src="/images/2021/20210312/16err.png" loading="lazy">
 
 [このページ](https://qiita.com/ponsuke0531/items/4629626a3e84bcd9398f)を参考にしてエラーを解消します。
 
@@ -175,7 +175,7 @@ certutil -decode base64.txt future.mp3
 <br><br>
 
 <audio controls>
-  <source src="/images/20210312/future.mp3">
+  <source src="/images/2021/20210312/future.mp3">
 </audio>
 
 # さいごに

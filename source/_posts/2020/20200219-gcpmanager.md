@@ -113,7 +113,7 @@ test-vm  compute.v1.instance  IN_PREVIEW  []      CREATE_OR_ACQUIRE
 実行結果のステータスが、`IN_PREVIEW`であることからプレビュー状態であることがわかります。
 プレビュー実行後にブラウザで確認すると以下のように構成などを確認できます。
 
-<img src="/images/20200219/photo_20200219_01.png" loading="lazy">
+<img src="/images/2020/20200219/photo_20200219_01.png" loading="lazy">
 
 ブラウザ上からデプロイすることも可能ですが、`gcloud`コマンドから実行したいと思います。
 [update](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/update)を指定し、`DEPLOYMENT_NAME`を指定します（ここではtest）
@@ -133,7 +133,7 @@ test-vm  compute.v1.instance  COMPLETED  []
 
 実際に、GCE コンソールに遷移すると作成されていることが確認できます。
 
-<img src="/images/20200219/photo_20200219_02.png" loading="lazy">
+<img src="/images/2020/20200219/photo_20200219_02.png" loading="lazy">
 
 その他のコマンドを紹介したいと思います。
 [list](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/list)コマンドでデプロイの一覧を表示できます。
@@ -239,7 +239,7 @@ test-vm-02  compute.v1.instance  COMPLETED  []
 
 デプロイ後、ブラウザでも2台作成されていることがわかります。
 
-<img src="/images/20200219/photo_20200219_03.png" loading="lazy">
+<img src="/images/2020/20200219/photo_20200219_03.png" loading="lazy">
 
 このようにYAML で定義ファイルを書いて作成できることがわかりました。
 しかし、このような書き方では冗長さを感じてしまいますね。
@@ -422,7 +422,7 @@ test-vm-02             compute.v1.instance  COMPLETED  []
 
 ブラウザ上でもデプロイされていることが確認できます。
 
-<img src="/images/20200219/photo_20200219_04.png" loading="lazy">
+<img src="/images/2020/20200219/photo_20200219_04.png" loading="lazy">
 
 ## エラーメモ
 

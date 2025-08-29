@@ -9,7 +9,7 @@ tag:
   - Vertex AI Model Monitoring
 category:
   - DataScience
-thumbnail: /images/20230413a/thumbnail.png
+thumbnail: /images/2023/20230413a/thumbnail.png
 author: 板野竜也
 lede: "データ/モデル監視ツールであるVertex AI Model MonitoringとEvidently AIを利用し、両者を様々な観点で検証していきたいと思います。Vertex AIのAutoMLで作成した回帰モデルの監視を想定し、ユースケースを交えて両者をそれぞれ検証していきます。"
 ---
@@ -89,7 +89,7 @@ Output Metricsについては、本記事を読んだ上で、こちらの記事
 `day.csv`ではデータ数が少ないので、`hour.csv`を使うことにします。\
 データの内容は以下のようになっています（最初の5行のみ表示）
 
-<img src="/images/20230413a/image.png" alt="" width="1200" height="107" loading="lazy">
+<img src="/images/2023/20230413a/image.png" alt="" width="1200" height="107" loading="lazy">
 
 主な説明変数として、気温(tmp), 湿度(hum), 風速(windspeed)等があります。目的変数はその時間のシェアバイク利用数(cnt)です。
 
@@ -111,12 +111,12 @@ hour.csvには2011~2012年のデータがまとめて入っているので以下
 AutoMLで学習するためにはデータセットを作成する必要があります。\
 左メニューの「データセット」から作成できます。
 
-<img src="/images/20230413a/image_2.png" alt="" width="1200" height="821" loading="lazy">
+<img src="/images/2023/20230413a/image_2.png" alt="" width="1200" height="821" loading="lazy">
 
 次に、いずれかの方法でCSVファイルをアップロードします。\
 BigQueryのデータをそのままデータセットにすることもできます。
 
-<img src="/images/20230413a/image_3.png" alt="" width="1200" height="547" loading="lazy">
+<img src="/images/2023/20230413a/image_3.png" alt="" width="1200" height="547" loading="lazy">
 
 これでVertex AIのデータセット作成は完了です。
 
@@ -125,17 +125,17 @@ BigQueryのデータをそのままデータセットにすることもできま
 作成したデータセット（2011年の時間毎シェアバイク利用者数のデータ）で学習を行います。\
 左メニューの「トレーニング」からAutoMLでの学習設定ができます。
 
-<img src="/images/20230413a/image_4.png" alt="" width="1200" height="690" loading="lazy">
+<img src="/images/2023/20230413a/image_4.png" alt="" width="1200" height="690" loading="lazy">
 
 モデルの名前は適宜設定し、Target columnには`cnt(INTEGER)`を選択します。\
 目的変数はシェアバイク利用数(cnt)だからです。
 
-<img src="/images/20230413a/image_5.png" alt="" width="1200" height="637" loading="lazy">
+<img src="/images/2023/20230413a/image_5.png" alt="" width="1200" height="637" loading="lazy">
 
 AutoMLでは学習に使う特徴量（説明変数）を選択するといった前処理のようなことができます。\
 今回入手したデータセットには必要のない特徴量もあるため、この画面で特徴量選択しておきます。
 
-<img src="/images/20230413a/image_6.png" alt="" width="1200" height="702" loading="lazy">
+<img src="/images/2023/20230413a/image_6.png" alt="" width="1200" height="702" loading="lazy">
 
 最後に、トレーニングに費やす予算を設定します。
 
@@ -143,7 +143,7 @@ Vertex AIではこの予算の単位には「トレーニング時間」とい�
 
 1トレーニング時間当たり2000~3000円掛かります（[参考](https://cloud.google.com/vertex-ai/pricing?_ga=2.100859905.-1083087641.1678234233&_gac=1.161532622.1678234235.CjwKCAiA3pugBhAwEiwAWFzwdV87TWSYMsS7XAUXked_GSRNHRLhPL2skos9L6jwACckfFioeizOvBoCVf0QAvD_BwE&hl=ja#automl_models)）
 
-<img src="/images/20230413a/image_7.png" alt="" width="1200" height="449" loading="lazy">
+<img src="/images/2023/20230413a/image_7.png" alt="" width="1200" height="449" loading="lazy">
 
 約2時間程で学習が完了し、モデルが完成します。
 
@@ -152,7 +152,7 @@ Vertex AIではこの予算の単位には「トレーニング時間」とい�
 モデルは完成しましたが、そのモデルを使って予測を行う窓口（エンドポイント）を作成する必要があります。\
 左メニューの「エンドポイント」よりエンドポイントを作成できます。
 
-<img src="/images/20230413a/image_8.png" alt="" width="1200" height="651" loading="lazy">
+<img src="/images/2023/20230413a/image_8.png" alt="" width="1200" height="651" loading="lazy">
 
 モデルの設定は以下の通りにします。
 
@@ -160,18 +160,18 @@ Vertex AIではこの予算の単位には「トレーニング時間」とい�
 
 従って、まずは最も低スペックのマシンタイプを選択することをお勧めします。
 
-<img src="/images/20230413a/image_9.png" alt="" width="1200" height="1475" loading="lazy">
+<img src="/images/2023/20230413a/image_9.png" alt="" width="1200" height="1475" loading="lazy">
 
 モデルのモニタリングは後で設定できるので、事前準備中の今は設定しません。
 
-<img src="/images/20230413a/image_10.png" alt="" width="1196" height="458" loading="lazy">
+<img src="/images/2023/20230413a/image_10.png" alt="" width="1196" height="458" loading="lazy">
 
 「作成」を押すと、10分程待てばエンドポイントが作成されます。
 
 [こちら](https://github.com/googleapis/python-aiplatform/blob/main/samples/snippets/prediction_service/predict_tabular_classification_sample.py)のPythonソースコードを参考にし、試しにエンドポイントにリクエストを投げてみます。\
 ※リクエストの投げ方については割愛
 
-<img src="/images/20230413a/image_11.png" alt="" width="1200" height="85" loading="lazy">
+<img src="/images/2023/20230413a/image_11.png" alt="" width="1200" height="85" loading="lazy">
 
 上画像のように予測結果が辞書型（REST API経由でリクエストしたらJSON型）で返ってきます。\
 ※モデルを実運用している現場ではこのような予測リクエストを大量に投げることになります。
@@ -225,13 +225,13 @@ Vertex AIでは二者を以下のように定義しています（[公式サイ�
   * 「モニタリング データ時間」の間に溜まった予測リクエスト履歴のうち何パーセントを特徴量分布の計算に利用するか
   * 大量の予測リクエストが来る環境下では低めに設定
 
-<img src="/images/20230413a/image_12.png" alt="" width="1200" height="1137" loading="lazy">
+<img src="/images/2023/20230413a/image_12.png" alt="" width="1200" height="1137" loading="lazy">
 
 モニタリングの目的は「トレーニング サービングスキューの検出」を選択します。\
 トレーニング データソースにはモデルの訓練に使用したデータを選択します。\
 Cloud Strage上のCSVファイル、BigQueryテーブル、Vertex AIデータセットの中から選べます。
 
-<img src="/images/20230413a/image_13.png" alt="" width="1200" height="1478" loading="lazy">
+<img src="/images/2023/20230413a/image_13.png" alt="" width="1200" height="1478" loading="lazy">
 
 「更新」をクリックすると、モニタリングが有効になります。
 
@@ -241,7 +241,7 @@ Cloud Strage上のCSVファイル、BigQueryテーブル、Vertex AIデータセ
 
 訓練データ分布との距離が大きく開いているため、アラートが発生しています。
 
-<img src="/images/20230413a/image_14.png" alt="" width="1200" height="388" loading="lazy">
+<img src="/images/2023/20230413a/image_14.png" alt="" width="1200" height="388" loading="lazy">
 
 特徴量のうち、temp(気温)をクリックしてみると、分布を可視化できます。
 
@@ -249,11 +249,11 @@ Cloud Strage上のCSVファイル、BigQueryテーブル、Vertex AIデータセ
 
 ※今回はこのようにスキューが起こるように意図的にデータの与え方を工夫しています。
 
-<img src="/images/20230413a/image_15.png" alt="" width="1200" height="1289" loading="lazy">
+<img src="/images/2023/20230413a/image_15.png" alt="" width="1200" height="1289" loading="lazy">
 
 アラートが発生すると以下のようなメールが届きます。
 
-<img src="/images/20230413a/image_16.png" alt="" width="1200" height="591" loading="lazy">
+<img src="/images/2023/20230413a/image_16.png" alt="" width="1200" height="591" loading="lazy">
 
 ### 5.2.2. ドリフトを監視する
 
@@ -265,7 +265,7 @@ Cloud Strage上のCSVファイル、BigQueryテーブル、Vertex AIデータセ
 
 ※比較用の訓練データを指定する必要はありません。
 
-<img src="/images/20230413a/image_17.png" alt="" width="1200" height="866" loading="lazy">
+<img src="/images/2023/20230413a/image_17.png" alt="" width="1200" height="866" loading="lazy">
 
 先程と同様、1時間ごとに2012年のひと月分のデータを予測リクエストとして投げてみました。
 
@@ -273,7 +273,7 @@ Cloud Strage上のCSVファイル、BigQueryテーブル、Vertex AIデータセ
 
 1時間前にリクエストされたデータの分布との距離が大きく開いているため、アラートが発生しています。
 
-<img src="/images/20230413a/image_18.png" alt="" width="1200" height="391" loading="lazy">
+<img src="/images/2023/20230413a/image_18.png" alt="" width="1200" height="391" loading="lazy">
 
 スキュー検出と同様に、特徴量のうちtemp(気温)をクリックすると、分布を可視化できます。
 
@@ -283,7 +283,7 @@ Cloud Strage上のCSVファイル、BigQueryテーブル、Vertex AIデータセ
 
 右側にモニタリングが実施された時間が表示されており、クリックすることで各時間の分布を表示できます。
 
-<img src="/images/20230413a/image_19.png" alt="" width="1200" height="918" loading="lazy">
+<img src="/images/2023/20230413a/image_19.png" alt="" width="1200" height="918" loading="lazy">
 
 ## 5.3. コスト
 
@@ -385,7 +385,7 @@ report.show(mode='inline') # Notebookのセル出力で結果を表示する
 
 一度に複数の特徴量分布の差を比較できる、分かりやすいレポートです。分布間の距離計算アルゴリズムは、データの数や種類に応じて適切なものを自動で選択しているようです（[公式の解説](https://docs.evidentlyai.com/reference/data-drift-algorithm)）
 
-<img src="/images/20230413a/image_20.png" alt="" width="1200" height="934" loading="lazy">
+<img src="/images/2023/20230413a/image_20.png" alt="" width="1200" height="934" loading="lazy">
 
 今回は、ソースコードの`[★1]`の部分に`DataDriftPreset()`を入れてレポートを出力しました。\
 `DataDriftPreset()`は、データのドリフトを検出するためのプリセットであり、これをReportで出力しました。\
@@ -394,9 +394,9 @@ Evidently AIではこのようなプリセットが複数用意されてあり�
 試しに、`DataDriftPreset()`を`DataQualityPreset()`に書き換えてみると、次のようなレポートが得られます。\
 データの統計的情報が可視化されていることが分かります。
 
-<img src="/images/20230413a/image_21.png" alt="" width="1200" height="560" loading="lazy">
+<img src="/images/2023/20230413a/image_21.png" alt="" width="1200" height="560" loading="lazy">
 
-<img src="/images/20230413a/image_22.png" alt="" width="1200" height="580" loading="lazy">
+<img src="/images/2023/20230413a/image_22.png" alt="" width="1200" height="580" loading="lazy">
 
 他に用意されているプリセットなど、詳しくは[公式ドキュメント](https://docs.evidentlyai.com/reference/all-metrics)をご覧ください。
 
@@ -424,11 +424,11 @@ test.show(mode='inline') # Notebookのセル出力で結果を表示する
 すると、以下のようなテスト結果が返ってきます。\
 今回は53個のテスト項目があり、そのうち42件が合格、11件が不合格だったようです。
 
-<img src="/images/20230413a/image_23.png" alt="" width="1200" height="946" loading="lazy">
+<img src="/images/2023/20230413a/image_23.png" alt="" width="1200" height="946" loading="lazy">
 
 Share of Out-of-Range Values（範囲外の値が含まれる割合が一定値を超えていた）という理由で不合格でした。
 
-<img src="/images/20230413a/image_24.png" alt="" width="1200" height="368" loading="lazy">
+<img src="/images/2023/20230413a/image_24.png" alt="" width="1200" height="368" loading="lazy">
 
 今回は`[★2]`で`DataStabilityTestPreset()`を指定しただけで、「完全お任せでテストして！」と言っているようなものなのでいくつか不合格が出てきました。もちろん、使用状況に合わせて合格と不合格の閾値などはカスタマイズできます。
 

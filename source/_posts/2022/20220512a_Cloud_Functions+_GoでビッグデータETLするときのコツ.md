@@ -9,7 +9,7 @@ tag:
   - サーバーレス
 category:
   - Programming
-thumbnail: /images/20220512a/thumbnail.png
+thumbnail: /images/2022/20220512a/thumbnail.png
 author: 鈴木崇史
 lede: "Google Cloud上の大規模なシステムのとあるログがCloud Storageに溜まっており、それらをBigQueryにロードし、分析したい、ということがありました。このログは未加工のままBigQueryに読み込めるフォーマットではなく、いわゆるETL処理が必要でした。運用面を考慮し利用サービスを増やしたくない、ということで使い慣れたCloud Functionsを使うことにしました。"
 ---
@@ -44,7 +44,7 @@ Cloud Storageに大量かつ、大きいログファイルが存在していま�
 
 Cloud Storageからログファイルを取ってきて、テキスト加工する処理は、Cloud FunctionsとPub/Subを使ったファンアウト構成にしました。
 
-<img src="/images/20220512a/CloudFunction_ETL.drawio_(1).png" alt="CloudFunction_ETL" width="616" height="301" loading="lazy">
+<img src="/images/2022/20220512a/CloudFunction_ETL.drawio_(1).png" alt="CloudFunction_ETL" width="616" height="301" loading="lazy">
 
 * 左のCloud Functionsが、Cloud Storageに存在するログファイルのリストを1件ずつPub/Subにpublishします。
 * 真ん中のCloud FunctionsはPub/Subをトリガーにして並行に起動させ、ログファイルをダウンロードして加工し、別のCloud Storageにアップロードします。Cloud Functionsの最大同時実行数までスケールさせることができ、同時に多くのログファイルを処理できます。

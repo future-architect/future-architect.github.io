@@ -8,7 +8,7 @@ tag:
   - Terraform1.4
 category:
   - Infrastructure
-thumbnail: /images/20230327b/thumbnail.png
+thumbnail: /images/2023/20230327b/thumbnail.png
 author: 渡邉光
 lede: "Terraform 1.4.0のENHANCEMENTSで以下の機能が追加されました。backend/gcs: Add storage_custom_endpoint argument, to allow communication with the backend via a Private Service Connect endpoint. 内容はtfstateが保存されているGCSへのアクセスがインターネット経由ではなく.."
 ---
@@ -37,7 +37,7 @@ GCEにTerraformをインストールし、Terraform Serverとしています。T
 
 この構成は皆さんお使いのいつもの構成だと思います。
 
-<img src="/images/20230327b/architecture01.drawio.png" alt="" width="772" height="591" loading="lazy">
+<img src="/images/2023/20230327b/architecture01.drawio.png" alt="" width="772" height="591" loading="lazy">
 
 # Private Service Connectを利用した構成
 
@@ -47,7 +47,7 @@ Private Service Connectを利用した構成はこちらになります。
 
 今回はこの構成を検証します。
 
-<img src="/images/20230327b/architecture02.drawio.png" alt="architecture02.drawio.png" width="772" height="591" loading="lazy">
+<img src="/images/2023/20230327b/architecture02.drawio.png" alt="architecture02.drawio.png" width="772" height="591" loading="lazy">
 
 ## Private Service Connectとは
 
@@ -66,7 +66,7 @@ https://cloud.google.com/vpc/docs/configure-private-service-connect-apis?hl=ja#c
 ネットワークサービス→Private Service Connectをクリックします。
 Private Service Connectから「エンドポイントを接続」をクリックします。
 
-<img src="/images/20230327b/image.png" alt="" width="1200" height="856" loading="lazy">
+<img src="/images/2023/20230327b/image.png" alt="" width="1200" height="856" loading="lazy">
 
 - 対象：すべてのGoogle API
 - エンドポイント名：sampleendpoint
@@ -77,18 +77,18 @@ Private Service Connectから「エンドポイントを接続」をクリック
 
 を設定し、「エンドポイントを追加」をクリックします。
 
-<img src="/images/20230327b/image_2.png" alt="" width="1200" height="847" loading="lazy">
+<img src="/images/2023/20230327b/image_2.png" alt="" width="1200" height="847" loading="lazy">
 
 するとPrivate Service Connectの接続エンドポイントが作成されます。
 
-<img src="/images/20230327b/image_3.png" alt="" width="1200" height="855" loading="lazy">
+<img src="/images/2023/20230327b/image_3.png" alt="" width="1200" height="855" loading="lazy">
 
 Service Directoryも作成されています。
 
-<img src="/images/20230327b/image_4.png" alt="" width="1200" height="851" loading="lazy">
+<img src="/images/2023/20230327b/image_4.png" alt="" width="1200" height="851" loading="lazy">
 
 限定公開DNSゾーンも作成されています。
-<img src="/images/20230327b/image_5.png" alt="" width="1200" height="852" loading="lazy">
+<img src="/images/2023/20230327b/image_5.png" alt="" width="1200" height="852" loading="lazy">
 
 ここまででPrivate Service Connectの設定は完了です。
 

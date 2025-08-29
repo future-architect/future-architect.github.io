@@ -10,14 +10,14 @@ tag:
   - カンファレンス
 category:
   - Infrastructure
-thumbnail: /images/20210313/thumbnail.png
+thumbnail: /images/2021/20210313/thumbnail.png
 author: 伊藤太斉
 lede: "こんにちは。TIGの伊藤太斉です。今回は先日開催されました、CloudNative Days Spring 2021 ONLINEに登壇しましたので、その内容について書いていきます。はじめにイベントの概要について簡単に説明します。"
 ---
 こんにちは。TIGの伊藤太斉です。
 今回は先日開催されました、[CloudNative Days Spring 2021 ONLINE](https://event.cloudnativedays.jp/cndo2021)に登壇しましたので、その内容について書いていきます。
 
-<img src="/images/20210313/CNDO2021@2x.png" loading="lazy">
+<img src="/images/2021/20210313/CNDO2021@2x.png" loading="lazy">
 
 ## CloudNative Daysについて
 
@@ -59,7 +59,7 @@ Infrastructure as Code（以下、IaC）を実践することで以下のメリ�
 
 特に可搬性については大きなメリットであり、新しく社内でプロジェクトが立ち上がったときにはコードの共有を行うことで、開発の高速化も望めます。
 
-<img src="/images/20210313/CNDO_1.png" loading="lazy">
+<img src="/images/2021/20210313/CNDO_1.png" loading="lazy">
 
 このようにメリットの大きいIaCですが、浸透が進むにあたり、デメリットも生じます。
 

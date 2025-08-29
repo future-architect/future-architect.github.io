@@ -6,7 +6,7 @@ tag:
   - cloudflare
 category:
   - Programming
-thumbnail: /images/20240531a/thumbnail.jpg
+thumbnail: /images/2024/20240531a/thumbnail.jpg
 author: 小林弘樹
 lede: "CloudflareをCDNやDNSに利用しているサービスにおいて、CDNレイヤでメンテナンスイン/アウトを実装する方法を書いてみます。"
 ---
@@ -57,11 +57,11 @@ resource "cloudflare_r2_bucket" "maintenance" {
 
 Cloudflare R2の設定画面からパブリックアクセス設定の「ドメインに接続」をクリックし、Cloudflareで管理しているドメインを利用して任意のドメインを入力します
 
-<img src="/images/20240531a/r2_setting_1.jpg" alt="r2_setting_1.jpg" width="1176" height="841" loading="lazy">
+<img src="/images/2024/20240531a/r2_setting_1.jpg" alt="r2_setting_1.jpg" width="1176" height="841" loading="lazy">
 
 ステータスがアクティブになったら完了です。
 
-<img src="/images/20240531a/r2_setting_2.jpg" alt="r2_setting_2.jpg" width="1200" height="291" loading="lazy">
+<img src="/images/2024/20240531a/r2_setting_2.jpg" alt="r2_setting_2.jpg" width="1200" height="291" loading="lazy">
 
 ## htmlファイルアップロード
 
@@ -75,13 +75,13 @@ Cloudflare R2のAPIは、制約は多いですが[AWS S3 APIと互換性](https:
 
 Cloudflare R2の概要画面から「R2 APIトークンの管理」をクリックし、「APIトークンを作成する」をクリックします。
 
-<img src="/images/20240531a/r2_setting_3.jpg" alt="r2_setting_3.jpg" width="1165" height="367" loading="lazy">
+<img src="/images/2024/20240531a/r2_setting_3.jpg" alt="r2_setting_3.jpg" width="1165" height="367" loading="lazy">
 
-<img src="/images/20240531a/r2_setting_4.jpg" alt="r2_setting_4.jpg" width="1168" height="235" loading="lazy">
+<img src="/images/2024/20240531a/r2_setting_4.jpg" alt="r2_setting_4.jpg" width="1168" height="235" loading="lazy">
 
 オブジェクトの書き込み権限を付与して作成します。
 また、バケットはメンテナンスページ用のバケットに特定しておきましょう。
-<img src="/images/20240531a/r2_setting_5.jpg" alt="r2_setting_5.jpg" width="1150" height="838" loading="lazy">
+<img src="/images/2024/20240531a/r2_setting_5.jpg" alt="r2_setting_5.jpg" width="1150" height="838" loading="lazy">
 
 作成完了すると以下の情報が表示されるため控えておきます。
 
@@ -89,7 +89,7 @@ Cloudflare R2の概要画面から「R2 APIトークンの管理」をクリッ�
 - シークレットアクセスキー
 - エンドポイント
 
-<img src="/images/20240531a/r2_setting_6.jpg" alt="r2_setting_6.jpg" width="1114" height="841" loading="lazy">
+<img src="/images/2024/20240531a/r2_setting_6.jpg" alt="r2_setting_6.jpg" width="1114" height="841" loading="lazy">
 
 aws configureでアクセスキーとシークレットアクセスキーを設定し、以下のコマンドを実行します。
 
@@ -109,13 +109,13 @@ aws s3 cp $HTML_PATH s3://$R2_BUCKET_NAME --endpoint-url https://$R2_ENDPOINT --
 
 アカウント管理のリスト管理画面から、「リストを作成する」をクリックして作成します。
 
-<img src="/images/20240531a/rule_setting_1.jpg" alt="rule_setting_1.jpg" width="1149" height="430" loading="lazy">
+<img src="/images/2024/20240531a/rule_setting_1.jpg" alt="rule_setting_1.jpg" width="1149" height="430" loading="lazy">
 
-<img src="/images/20240531a/rule_setting_2.jpg" alt="rule_setting_2.jpg" width="696" height="663" loading="lazy">
+<img src="/images/2024/20240531a/rule_setting_2.jpg" alt="rule_setting_2.jpg" width="696" height="663" loading="lazy">
 
 リスト作成後、許可したいIPアドレスを追加したら完了です。
 
-<img src="/images/20240531a/rule_setting_3.jpg" alt="rule_setting_3.jpg" width="1159" height="627" loading="lazy">
+<img src="/images/2024/20240531a/rule_setting_3.jpg" alt="rule_setting_3.jpg" width="1159" height="627" loading="lazy">
 
 ## リダイレクトルール作成
 
@@ -172,7 +172,7 @@ Workersはより細かく柔軟に設定が可能ですが、今回のような�
 
 プロフィールのAPIトークン画面から「トークンを作成する」をクリックします。
 
-<img src="/images/20240531a/auto_setting_1.jpg" alt="auto_setting_1.jpg" width="1200" height="271" loading="lazy">
+<img src="/images/2024/20240531a/auto_setting_1.jpg" alt="auto_setting_1.jpg" width="1200" height="271" loading="lazy">
 
 権限は動的リダイレクトの編集権限とキャッシュパージの実行権限が必要です。
 
@@ -180,11 +180,11 @@ Workersはより細かく柔軟に設定が可能ですが、今回のような�
 
 その他は極力必要最小権限となるように設定しましょう。
 
-<img src="/images/20240531a/auto_setting_2.jpg" alt="auto_setting_2.jpg" width="820" height="840" loading="lazy">
+<img src="/images/2024/20240531a/auto_setting_2.jpg" alt="auto_setting_2.jpg" width="820" height="840" loading="lazy">
 
 作成が完了したらトークンの値を控えておきます。
 
-<img src="/images/20240531a/auto_setting_3.jpg" alt="auto_setting_3.jpg" width="946" height="439" loading="lazy">
+<img src="/images/2024/20240531a/auto_setting_3.jpg" alt="auto_setting_3.jpg" width="946" height="439" loading="lazy">
 
 ## メンテナンスイン
 

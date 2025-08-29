@@ -9,7 +9,7 @@ tag:
   - 静的解析
 category:
   - Programming
-thumbnail: /images/20220614a/thumbnail.png
+thumbnail: /images/2022/20220614a/thumbnail.png
 author: 山田修路
 lede: "循環的複雑度の計算を題材に、Roslynを用いてVB.NETに対する解析コードをC#で書いてみました。本記事では、メソッド単位の循環的複雑度の計算を、クエリメソッドを用いて構文木を走査する方法とVisualBasicSyntaxWalkerを継承したクラスを用いて構文木を走査する方法の2通りの方法を紹介します。"
 ---
@@ -123,10 +123,10 @@ dotnet new console -o RoslynBlog
 さて、ここまでで C# の開発環境とプロジェクトの作成が済みましたが、まだデバッガが使用出来ない状態です。続いてデバッガの設定をしていきましょう。
 といっても手順は簡単で、Visual Studio Codeのデバッグパネルを開き、 `create a launch.json file` をクリックするだけです。
 これにより、`launch.json`が作成され、このようにデバッグが可能となります。
-<img src="/images/20220614a/2022-06-01_16h51_12.png" alt="2022-06-01_16h51_12.png" width="540" height="256" loading="lazy">
+<img src="/images/2022/20220614a/2022-06-01_16h51_12.png" alt="2022-06-01_16h51_12.png" width="540" height="256" loading="lazy">
 
 これで無事にデバッグできるようになりました。
-<img src="/images/20220614a/2022-06-02_13h23_24.png" alt="2022-06-02_13h23_24.png" width="679" height="223" loading="lazy">
+<img src="/images/2022/20220614a/2022-06-02_13h23_24.png" alt="2022-06-02_13h23_24.png" width="679" height="223" loading="lazy">
 
 ## 開発
 

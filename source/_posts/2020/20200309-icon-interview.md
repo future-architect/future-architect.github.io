@@ -66,7 +66,7 @@ https://future-architect.github.io/articles/20160721/
 フューチャーの誰かが宣伝したというわけではなく、たまたま使っていたようで。プロジェクトメンバーがミーティングの場でお客様が作成したシステム構成図に見覚えがあり、「**これ、木村さんのアイコンでは？**」となって、教えてくれました。
 単純に使ってもらえているのが嬉しかったですし、前回作成から期間も経ちアイコン追加のリクエストもあったので、バージョンアップする話になりました。
 
-<img src="/images/20200308/図①.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200308/図①.png" class="img-middle-size" loading="lazy">
 
 2016年に公開した作ったアイコン
 
@@ -84,7 +84,7 @@ https://future-architect.github.io/articles/20160721/
 
 また社外でも汎用的に使いやすいように、**46種類のアイコンを追加し、色違いを含めてトータルで107種類の様々なバリエーション** のアイコンを、PNG形式とSVG形式で用意しました。
 
-<img src="/images/20200308/図②.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200308/図②.png" class="img-middle-size" loading="lazy">
 
 今回新たに公開したアイコン
 使い勝手を考え、人のデザインはカラーバリエーションを豊富に用意しています。例えば、企業カラーに合わせて使ってもらって、所属会社を区別するような感じで使えるかなと。業界や職種に合わせたデザインを用意する案もあったんですが、種類は無数に存在していて作成しきれないですし、汎用性にも欠けるのであえて色だけにしました。
@@ -140,4 +140,4 @@ https://future-architect.github.io/articles/20160721/
 
 ---
 
-<img src="/images/20200308/インタビュア.jpg" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200308/インタビュア.jpg" class="img-middle-size" loading="lazy">

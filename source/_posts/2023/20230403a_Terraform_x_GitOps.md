@@ -12,7 +12,7 @@ tag:
   - CI/CD
 category:
   - DevOps
-thumbnail: /images/20230403a/thumbnail.png
+thumbnail: /images/2023/20230403a/thumbnail.png
 author: 川口翔大
 lede: "Terraform x GitOps ということで、いつかちゃんと調べておきたいなと思いながらなかなかできていなかったことについて調査していこうかなーと思います。そもそも Terraform x GitOps とはなんぞやということからですが。"
 ---
@@ -167,7 +167,7 @@ PipeCD を扱うためには、 **Control Plane** と **Piped** を [インス�
 
 以下は上記リンクに記載がありました概念図になります。
 
-<img src="/images/20230403a/image.png" alt="" width="1200" height="761" loading="lazy">
+<img src="/images/2023/20230403a/image.png" alt="" width="1200" height="761" loading="lazy">
 
 Control Plane をインストールするには状態を永続化する必要があるため、Kubernetes Cluster の他に **[Data Store（Firestore, MySQL etc...）](https://pipecd.dev/docs-dev/user-guide/managing-controlplane/architecture-overview/#data-store), [File Store（GCS, S3, Minio etc...）](https://pipecd.dev/docs-dev/user-guide/managing-controlplane/architecture-overview/#file-store)** が [必要のようです](https://pipecd.dev/docs-dev/installation/install-controlplane/)。他にも Web コンソールに円滑にアクセスしようとなった場合には、いくつかのネットワークの設定（静的IP アドレスの付与や DNS の設定 etc...）もする必要がありそうですね！
 
@@ -215,11 +215,11 @@ Terraform を設定する際の example もいくつか [公開されていま�
 GitHub と連携する際の各種セットアップに関しては、 [こちら](https://developer.hashicorp.com/terraform/tutorials/automation/github-actions) にチュートリアルとして記載がありました。
 このセットアップ手順により構築できる運用フローは以下のようなものになりそうで、わかりやすいですね！
 
-<img src="/images/20230403a/image_2.png" alt="" width="1006" height="265" loading="lazy">
+<img src="/images/2023/20230403a/image_2.png" alt="" width="1006" height="265" loading="lazy">
 
 PR 上でのプレビューもあり、運用のイメージもしやすいです。
 
-<img src="/images/20230403a/assets.gif" alt="" width="800" height="599" loading="lazy">
+<img src="/images/2023/20230403a/assets.gif" alt="" width="800" height="599" loading="lazy">
 
 もちろん履歴は、Terraform Cloud 上から（この場合だと GitHub Actions 上からも）。わかりやすく確認できるようになっています。
 
@@ -257,7 +257,7 @@ Atlantis も PipeCD と同じように自身で Atlantis の各種コンポー�
 
 基本的なセットアップを行ったのちの運用イメージとしては、ホーム画面にプレビューがありました。
 
-<img src="/images/20230403a/image_3.png" alt="image.png" width="1200" height="2412" loading="lazy">
+<img src="/images/2023/20230403a/image_3.png" alt="image.png" width="1200" height="2412" loading="lazy">
 
 # おわりに
 

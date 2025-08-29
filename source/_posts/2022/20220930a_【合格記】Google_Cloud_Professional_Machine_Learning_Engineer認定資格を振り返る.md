@@ -10,12 +10,12 @@ tag:
   - 機械学習
 category:
   - DataScience
-thumbnail: /images/20220930a/thumbnail.png
+thumbnail: /images/2022/20220930a/thumbnail.png
 author: 岸下優介
 lede: "先日、Google Cloudの認定資格であるProfessional Machine Learning Engineer認定資格を受験し、取得することができました。また、今回はリモート試験にて受験をしてみました。この記事ではProfessional Machine Learning Engineer認定資格の合格に至った学習過程とリモート試験体験記について..."
 ---
 
-<img src="/images/20220930a/tokyo.png" alt="" width="800" height="333">
+<img src="/images/2022/20220930a/tokyo.png" alt="" width="800" height="333">
 
 こんにちは、TIGの岸下です。
 

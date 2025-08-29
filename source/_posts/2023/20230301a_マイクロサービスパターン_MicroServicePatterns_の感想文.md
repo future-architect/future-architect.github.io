@@ -8,11 +8,11 @@ tag:
   - 書評
 category:
   - Programming
-thumbnail: /images/20230301a/thumbnail.jpg
+thumbnail: /images/2023/20230301a/thumbnail.jpg
 author: 川口翔大
 lede: "最初に配属されたチームでは、いわゆるマイクロサービスアーキテクチャが導入されておりました。ただ当時は、マイクロサービスアーキテクチャは経験したことがなく本書を読んで勉強した覚えがあります。それからはまた別でその知見を活かし..."
 ---
-<img src="/images/20230301a/51ChNGhBinL._SX390_BO1,204,203,200_.jpg" alt="51ChNGhBinL._SX390_BO1,204,203,200_.jpg" width="392" height="499" loading="lazy">
+<img src="/images/2023/20230301a/51ChNGhBinL._SX390_BO1,204,203,200_.jpg" alt="51ChNGhBinL._SX390_BO1,204,203,200_.jpg" width="392" height="499" loading="lazy">
 
 積読を消化しようというテーマの、[読書感想文連載](/articles/20230217a/) の 7冊目です。
 

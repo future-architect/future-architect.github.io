@@ -8,12 +8,12 @@ tag:
   - 入門
 category:
   - Programming
-thumbnail: /images/20200824/thumbnail.png
+thumbnail: /images/2020/20200824/thumbnail.png
 author: 伊藤真彦
 lede: "go-swaggerの具体的な実装方法を紹介します。はじめにgo-swaggerのインストールを行います"
 ---
 
-<img src="/images/20200824/top.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200824/top.png" class="img-small-size" loading="lazy">
 
 The Gopher character is based on the Go mascot designed by [Renée French](http://reneefrench.blogspot.com/).
 
@@ -118,7 +118,7 @@ URLのクエリパラメータに`name`を持たせることができる。
 作成したファイルはOpenAPI Previewで確認することが可能です。[Chrome拡張](https://chrome.google.com/webstore/detail/openapi-preview/ijjbiodnicjakhbfkffnlbekpgnmmggo?hl=en-GB)、[vscode向けのプラグイン](https://marketplace.visualstudio.com/items?itemName=zoellner.openapi-preview)などで利用可能です。[editor.swagger.io](https://editor.swagger.io/)のようなウェブサイトとしても公開されています。
 [vimプラグイン](https://github.com/xavierchow/vim-swagger-preview)もありますね...素晴らしい。
 
-<img src="/images/20200824/open_api_preview.jpg" loading="lazy">
+<img src="/images/2020/20200824/open_api_preview.jpg" loading="lazy">
 
 この`swagger.yaml`を元に実際にソースコードをビルドしてみましょう。
 
@@ -157,7 +157,7 @@ go run gen/cmd/factory-server/main.go --host 0.0.0.0 --port 3000
 
 コマンド実行後にブラウザで`localhost:3000/hello`にアクセスしてみましょう。
 
-<img src="/images/20200824/init.jpg" loading="lazy">
+<img src="/images/2020/20200824/init.jpg" loading="lazy">
 
 エラーが出ます、hello worldまではあと一歩ですが、まだやることがあります。
 
@@ -214,7 +214,7 @@ if api.GetGreetingHandler == nil {
 
 api.GetGreetingHandlerがnilのままでは`not yet been implemented`と出力する設定になっています。
 改めて先ほどのエラーを見てみましょう、細かい表示はともかく同じような内容のメッセージが出力されています。
-<img src="/images/20200824/init_2.jpg" loading="lazy">
+<img src="/images/2020/20200824/init_2.jpg" loading="lazy">
 
 この部分を書き換えるか、ここより先に評価される行で下記のようにapi.GetGreetingHandlerを定義しましょう。
 
@@ -248,7 +248,7 @@ go run gen/cmd/factory-server/main.go --host 0.0.0.0 --port 3000
 ```
 
 ブラウザで`localhost:3000/hello?name=hello-go-swagger`にアクセスします。
-<img src="/images/20200824/hello_go_swagger.jpg" loading="lazy">
+<img src="/images/2020/20200824/hello_go_swagger.jpg" loading="lazy">
 
 期待したレスポンスが返ってきました。ちなみに記事の通りの`get_greeting_handler.go`では、nameが与えられていない場合のエラーハンドリングが実装されていないため、`?name=hello-go-swagger`をURLに含めないと500番台のエラーすら返せずに処理に失敗してしまいます。
 

@@ -9,7 +9,7 @@ tag:
   - Vue.js
 category:
   - Programming
-thumbnail: /images/20240501a/thumbnail.png
+thumbnail: /images/2024/20240501a/thumbnail.png
 author: 大岩潤矢
 lede: "Cloudflareが提供するCLIツール「Cloudflare C3」を利用して、Cloudflare Pagesへ簡単に入門する方法について、ハンズオンを中心に紹介します。"
 ---
@@ -26,7 +26,7 @@ Cloudflareが提供するCLIツール「Cloudflare C3」を利用して、Cloudf
 
 Cloudflare Pagesとは、一言で言えば **「Cloudflareが提供するWebサイトのホスティングサービス」** です。
 
-<img src="/images/20240501a/ogp.png" alt="ogp.png" width="1200" height="630" loading="lazy">
+<img src="/images/2024/20240501a/ogp.png" alt="ogp.png" width="1200" height="630" loading="lazy">
 
 みなさんは、静的Webサイトを作成した後どこにデプロイしますか？
 
@@ -42,7 +42,7 @@ Cloudflare Pagesの魅力、それは圧倒的なコストの安さ、CDN基盤�
 
 まずはコストから見てみましょう。[公式サイト](https://www.cloudflare.com/ja-jp/developer-platform/pages/)の価格表の一番上に、「サイト、シート、リクエスト、帯域幅は全プラン無制限」と記載があります。
 
-<img src="/images/20240501a/image.png" alt="image.png" width="1200" height="712" loading="lazy">
+<img src="/images/2024/20240501a/image.png" alt="image.png" width="1200" height="712" loading="lazy">
 
 （[公式サイト](https://www.cloudflare.com/ja-jp/developer-platform/pages/)より引用）
 
@@ -216,25 +216,25 @@ Vue.js - The Progressive JavaScript Framework
 
 ブラウザが立ち上がるので、ログインします。
 
-<img src="/images/20240501a/image_2.png" alt="image.png" width="1200" height="886" loading="lazy">
+<img src="/images/2024/20240501a/image_2.png" alt="image.png" width="1200" height="886" loading="lazy">
 
 権限付与の確認をするコンセントページが表示されます。ページ下部のAllowを押下し、許可します。
 
-<img src="/images/20240501a/image_3.png" alt="image.png" width="1200" height="801" loading="lazy">
+<img src="/images/2024/20240501a/image_3.png" alt="image.png" width="1200" height="801" loading="lazy">
 
-<img src="/images/20240501a/image_4.png" alt="image.png" width="1200" height="618" loading="lazy">
+<img src="/images/2024/20240501a/image_4.png" alt="image.png" width="1200" height="618" loading="lazy">
 
 ここまで来たら、ブラウザは閉じてもOKです。
 
-<img src="/images/20240501a/image_5.png" alt="image.png" width="1200" height="744" loading="lazy">
+<img src="/images/2024/20240501a/image_5.png" alt="image.png" width="1200" height="744" loading="lazy">
 
 裏ではデプロイが走ったままになっているので、このままにします。
 
-<img src="/images/20240501a/image_6.png" alt="image.png" width="1200" height="842" loading="lazy">
+<img src="/images/2024/20240501a/image_6.png" alt="image.png" width="1200" height="842" loading="lazy">
 
 少しするとデプロイが完了し、自動でデプロイ先のURLが開きます。
 
-<img src="/images/20240501a/image_7.png" alt="image.png" width="1200" height="777" loading="lazy">
+<img src="/images/2024/20240501a/image_7.png" alt="image.png" width="1200" height="777" loading="lazy">
 
 なんと、たった1コマンド（といくつかの設定）で、Cloudflare Workersへのデプロイまで完了してしまいました。
 
@@ -312,7 +312,7 @@ Use '--' to separate paths from revisions, like this:
 
 ほんの10秒程度でデプロイが完了したようです。表示されているリンクをクリックすると……
 
-<img src="/images/20240501a/image_8.png" alt="image.png" width="1200" height="370" loading="lazy">
+<img src="/images/2024/20240501a/image_8.png" alt="image.png" width="1200" height="370" loading="lazy">
 
 変更が反映されていました！
 デプロイの更新方法が分かれば、あとはガンガンページを更新していって、出来たタイミングでURLを公開するだけですね。

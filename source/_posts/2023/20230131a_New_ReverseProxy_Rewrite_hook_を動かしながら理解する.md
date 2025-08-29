@@ -7,12 +7,12 @@ tag:
   - Go1.20
 category:
   - Programming
-thumbnail: /images/20230131a/thumbnail.png
+thumbnail: /images/2023/20230131a/thumbnail.png
 author: 棚井龍之介
 lede: "- はじめに- 概要を確認- Proposal の内容と RFC の確認- 実際に動かしながら、Go1.19 と Go1.20 の違いを確認- まとめ"
 ---
 
-<img src="/images/20230131a/top.png" alt="" width="800" height="481">
+<img src="/images/2023/20230131a/top.png" alt="" width="800" height="481">
 
 # 目次
 

@@ -9,7 +9,7 @@ tag:
   - 設計
 category:
   - Infrastructure
-thumbnail: /images/20210518a/thumbnail.jpg
+thumbnail: /images/2021/20210518a/thumbnail.jpg
 author: 真野隼記
 lede: "RESTfullとかRESTishな方針でWebAPIの横断検索を設計する際にチーム内で方針について議論したやり取りの備忘記事です。"
 ---
@@ -29,7 +29,7 @@ RESTfullとかRESTishな方針でWebA PIの横断検索を設計する際にチ�
 
 ## 背景と論点
 
-<img src="/images/20210518a/choice-2692575_640.jpg" alt="アイキャッチ" title="Gerd AltmannによるPixabayからの画像" width="640" height="237" loading="lazy">
+<img src="/images/2021/20210518a/choice-2692575_640.jpg" alt="アイキャッチ" title="Gerd AltmannによるPixabayからの画像" width="640" height="237" loading="lazy">
 
 やりたいことの背景です。
 

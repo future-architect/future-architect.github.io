@@ -9,12 +9,12 @@ tag:
   - Docker
 category:
   - Infrastructure
-thumbnail: /images/20230208a/thumbnail.jpg
+thumbnail: /images/2023/20230208a/thumbnail.jpg
 author: 矢野颯太
 lede: "wgrib2がすぐ使えるDockerfileが欲しかったので、作成しました。M1 Macで動くようにARMアーキテクチャ向けに定義しました。"
 ---
 
-<img src="/images/20230208a/images.jpg" alt="" width="400" height="107">
+<img src="/images/2023/20230208a/images.jpg" alt="" width="400" height="107">
 
 こんにちは。フューチャーの矢野です。
 

@@ -11,7 +11,7 @@ tag:
   - CI/CD
 category:
   - DevOps
-thumbnail: /images/20240507a/thumbnail.png
+thumbnail: /images/2024/20240507a/thumbnail.png
 author: 太田寛明
 lede: "本番環境のAmazon RDS DBインスタンスを別アカウントの検証環境にバックアップリストアする作業を自動化する機会があったので、その手法について紹介します"
 ---
@@ -30,7 +30,7 @@ RDS DBインスタンスをアカウント間でバックアップリストア�
 > [Amazon RDS DB インスタンスを別の VPC またはアカウントに移行する](https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/patterns/migrate-an-amazon-rds-db-instance-to-another-vpc-or-account.html)
 > 別の AWS アカウントに移行
 > 次の図は、Amazon RDS DB インスタンスを別の AWS アカウントに移行するワークフローを示しています。
-<img src="/images/20240507a/5536e69e-3965-4ca2-8a0b-2573659b5f8f.png" alt="5536e69e-3965-4ca2-8a0b-2573659b5f8f.png" width="1200" height="520" loading="lazy">
+<img src="/images/2024/20240507a/5536e69e-3965-4ca2-8a0b-2573659b5f8f.png" alt="5536e69e-3965-4ca2-8a0b-2573659b5f8f.png" width="1200" height="520" loading="lazy">
 
 この手法を踏まえて、本番環境のDBを別アカウントの検証環境にコピーしたい場合は、次のプロセスを踏むことになります。
 

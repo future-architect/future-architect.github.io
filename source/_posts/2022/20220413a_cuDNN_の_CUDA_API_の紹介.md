@@ -8,7 +8,7 @@ tag:
   - cuDNN
 category:
   - DataScience
-thumbnail: /images/20220413a/thumbnail.png
+thumbnail: /images/2022/20220413a/thumbnail.png
 author: 松崎功也
 lede: "NVIDIA 社が提供するディープラーニング用の GPGPU ライブラリ「cuDNN」の CUDA API を紹介したいと思います。cuDNN は TensorFlow や Keras で学習や推論を高速化するためのバックエンドとしてよく使われていますが、CUDA API を直接たたいたことがある方は少ないのではないでしょうか？個人的に作成したアプリケーションで CUDA API を叩く機会があり、社内の技術勉強会で紹介したところ好評だったため、こちらにも寄稿することにしました。"
 ---
@@ -22,7 +22,7 @@ cuDNN は TensorFlow や Keras で学習や推論を高速化するためのバ�
 
 個人的に作成したアプリケーションで CUDA API を叩く機会があり、社内の技術勉強会で紹介したところ好評だったため、こちらにも寄稿します。
 
-<img src="/images/20220413a/ファイル名.png" alt="システム概念図" width="1200" height="591" loading="lazy">
+<img src="/images/2022/20220413a/ファイル名.png" alt="システム概念図" width="1200" height="591" loading="lazy">
 
 # cuDNN を叩くことになったきっかけ
 
@@ -69,7 +69,7 @@ cudnnCreate(&cudnn_handle);
 
 今回は JSON 形式で保存されているモデルのフィルタの重みを、[picojson]("https://github.com/kazuho/picojson") で読込みました。
 
-<img src="/images/20220413a/0cda6e32-95a9-385b-22fb-726db27156b6.png" alt="モデルをRAMに読み込む概念図" width="1089" height="523" loading="lazy">
+<img src="/images/2022/20220413a/0cda6e32-95a9-385b-22fb-726db27156b6.png" alt="モデルをRAMに読み込む概念図" width="1089" height="523" loading="lazy">
 
 ```c++ 重みの読込み
 // picojson で kernels に JSON ファイルを読込んでおく　
@@ -97,7 +97,7 @@ for (int i = 0; i < layer.nOutputPlane_; i++) {
 
 VRAM のメモリを確保して、読み込んだモデルのフィルタを VRAM へ転送します。
 メモリ管理はスマートポインタで行っているので、それに合わせたラッパーを自作し使用しています（cuda_memory_allocate）。
-<img src="/images/20220413a/ファイル名_2.png" alt="VRAMへ転送する" width="1200" height="454" loading="lazy">
+<img src="/images/2022/20220413a/ファイル名_2.png" alt="VRAMへ転送する" width="1200" height="454" loading="lazy">
 
 ```c++ VRAM へ重みを転送する
 // VRAM のメモリを確保
@@ -130,7 +130,7 @@ device_unique_ptr cuda_memory_allocate(size_t n) {
 ## 4. フィルタ記述子（フィルターのサイズなどを定義）の準備
 
 フィルタ記述子では、フィルタの枚数やサイズなどを設定します。
-<img src="/images/20220413a/ファイル名_3.png" alt="フィルタ記述子" width="1200" height="577" loading="lazy">
+<img src="/images/2022/20220413a/ファイル名_3.png" alt="フィルタ記述子" width="1200" height="577" loading="lazy">
 
 ```c++ フィルタ記述子の準備
 // 生のフィルタ記述子を作成
@@ -148,7 +148,7 @@ cudnnSetFilter4dDescriptor(filter_desc_.get(), CUDNN_DATA_FLOAT, CUDNN_TENSOR_NC
 
 畳込み処理後に加算するバイアスの準備を行います。バイアスは1次元ベクトルなので、テンソルの記述子を流用します。
 
-<img src="/images/20220413a/バイアス.png" alt="バイアス" width="1200" height="409" loading="lazy">
+<img src="/images/2022/20220413a/バイアス.png" alt="バイアス" width="1200" height="409" loading="lazy">
 
 ```c++ バイアス記述子の準備
 // 生のテンソル記述子の準備
@@ -186,7 +186,7 @@ cuDNN ではデフォルトで ReLU や Swish などの活性化関数が準備�
 
 そのため、活性化関数には IDENTITY（何もしない恒等関数）を指定し、CUDA で leakyReLU を実装しました。
 
-<img src="/images/20220413a/ファイル名_4.png" alt="活性化関数の記述子" width="1200" height="679" loading="lazy">
+<img src="/images/2022/20220413a/ファイル名_4.png" alt="活性化関数の記述子" width="1200" height="679" loading="lazy">
 
 ```c++ 活性化関数の記述子の準備
 // 生の活性化関数の記述子を作成

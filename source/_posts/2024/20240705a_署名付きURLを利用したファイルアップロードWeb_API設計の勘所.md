@@ -9,7 +9,7 @@ tag:
   - WebAPI
 category:
   - Programming
-thumbnail: /images/20240705a/thumbnail.png
+thumbnail: /images/2024/20240705a/thumbnail.png
 author: 武田大輝
 lede: "現代のWebアプリケーションにおいて、ユーザが写真や動画などのファイルをアップロードする機能は、しばしば求められます。本記事では、ファイルアップロードを実現するための一手段として、「署名付きURL」を利用した方式を取り上げ、その設計について詳しく解説します。"
 ---
@@ -60,7 +60,7 @@ GitHubの[Contents API](https://docs.github.com/ja/rest/repos/contents?apiVersio
 
 署名付きURLを用いたファイルアップロードを行う場合、次のような処理フローが一般的です。各処理について詳しく説明していきます。
 
-<img src="/images/20240705a/image.png" alt="image.png" width="800" height="380" loading="lazy">
+<img src="/images/2024/20240705a/image.png" alt="image.png" width="800" height="380" loading="lazy">
 
 ### 1. 署名付きURLの生成
 
@@ -180,7 +180,7 @@ presign, err := client.PresignPutObject(ctx, &s3.PutObjectInput{
 
 具体的には、署名付きURLによるファイルアップロードは一時的なテンポラリバケットに対して行い、後続のファイルメタデータ登録のAPIの中で、テンポラリバケットから本バケットにファイルをコピーする設計が考えられます。
 
-<img src="/images/20240705a/image_2.png" alt="image.png" width="800" height="380" loading="lazy">
+<img src="/images/2024/20240705a/image_2.png" alt="image.png" width="800" height="380" loading="lazy">
 
 テンポラリバケットを設ける理由としては2つあります。
 

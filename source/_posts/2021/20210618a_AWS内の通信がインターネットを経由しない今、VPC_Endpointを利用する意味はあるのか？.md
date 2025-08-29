@@ -9,7 +9,7 @@ tag:
   - 技術選定
 category:
   - Infrastructure
-thumbnail: /images/20210618a/thumbnail.png
+thumbnail: /images/2021/20210618a/thumbnail.png
 author: 村瀬善則
 lede: "AWS内の通信においてインターネットを経由しないことが最近になって公式ドキュメントに明記されたことを受け、改めてVPC Endpointの必要性について調べてみました。"
 ---
@@ -82,7 +82,7 @@ VPC Endpoint(ゲートウェイ型)に関しては、なんと無料！
 | NAT Gateway + VPC Endpoint(インタフェース型)  |0.062 * 24 * 31 * 2 + 0.014 * 24 * 31 * 2 + 0.0035 * n  | 113.09  | 113.44  | 116.59  | 148.09  |
 | NAT Gateway + VPC Endpoint(ゲートウェイ型)  | 0.062 * 24 * 31 * 2 + 0 * n  | 92.26 |92.26 |92.26 |92.26 |
 
-<img src="/images/20210618a/vpcendpoint.png" alt="通信費用の資産" loading="lazy">
+<img src="/images/2021/20210618a/vpcendpoint.png" alt="通信費用の資産" loading="lazy">
 
 通信量が少ないとインタフェース自体の料金が掛かる分、メリットが無いですが通信量が増えれば増えるほどVPC Endpointのありがたみが実感できますね！
 

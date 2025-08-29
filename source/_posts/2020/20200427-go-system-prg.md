@@ -8,14 +8,14 @@ tag:
   - 書籍
 category:
   - Programming
-thumbnail: /images/20200427/thumbnail.jpeg
+thumbnail: /images/2020/20200427/thumbnail.jpeg
 author: 澁川喜規
 lede: "Goならわかるシステムプログラミングが増刷されました。増刷される場合にはたいてい誤字が修正されたりするんですが、今回12ページほど増量しております。前回の3刷でも16ページ増えたので、初版と比べると28ページ増です。写真は1刷〜4刷の比較です。"
 ---
 
 Goならわかるシステムプログラミングが増刷されました。増刷される場合にはたいてい誤字が修正されたりするんですが、今回12ページほど増量しております。[前回の3刷でも16ページ増えた](http://blog.shibu.jp/article/185504106.html)ので、初版と比べると28ページ増です。写真は1刷〜4刷の比較です。
 
-<img src="/images/20200427/photo_20200427_01.jpeg" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200427/photo_20200427_01.jpeg" class="img-middle-size" loading="lazy">
 
 なぜか、Real World HTTP 第2版の原稿の締め切りも、レビューの締め切りも、最終的な印刷所に原稿が運ばれて行くタイミングもだだ被りで、ちょっと忙しかったのですが、無事みなさまにお届けできる運びとなりました。
 

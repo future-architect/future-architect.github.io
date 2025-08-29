@@ -8,7 +8,7 @@ tag:
   - GoogleMap
 category:
   - Infrastructure
-thumbnail: /images/20211224a/thumbnail.png
+thumbnail: /images/2021/20211224a/thumbnail.png
 author: 伊藤真彦
 lede: "Flutterの実践的なアプリケーションの作り込みも試してみました。FlutterではGoogleマップを表示するためのウィジェットが存在するため、どのくらい簡単に実現できるか検証してみました。"
 ---
@@ -141,13 +141,13 @@ class MapSampleState extends State<MapSample> {
 
 `main.dart`を上記コードに置き換えてアプリケーションを起動すると画像のような状態になります。
 
-<img src="/images/20211224a/image.png" alt="Google Mapサンプルアプリ" width="628" height="719" loading="lazy">
+<img src="/images/2021/20211224a/image.png" alt="Google Mapサンプルアプリ" width="628" height="719" loading="lazy">
 
 実際のアプリケーションではGoogle Mapsウィジェットを全画面に表示するだけのものを作ることにはならないと思います。
 サンプルの様々な部分を参考に何らかの機能を追加したり、他のウィジェットと組み合わせたりと拡張していきましょう。
 
 例えば他の情報を表示する余白を作るためにContainerウィジェットでGoogle Mapsウィジェットをラッピングするようなことができます。
-<img src="/images/20211224a/image_2.png" alt="ウィジェットを用いてラッピングしたマップ" width="1200" height="1278" loading="lazy">
+<img src="/images/2021/20211224a/image_2.png" alt="ウィジェットを用いてラッピングしたマップ" width="1200" height="1278" loading="lazy">
 
 README記載のサンプルで表示される地図の場所はGoogle本社オフィスのようです、近くにゴルフ場やコンピュータ歴史博物館があるんですね、楽しそうです。
 
@@ -165,7 +165,7 @@ GoogleMap(
 )
 ```
 
-<img src="/images/20211224a/image_3.png" alt="地図画像" width="1200" height="909" loading="lazy">
+<img src="/images/2021/20211224a/image_3.png" alt="地図画像" width="1200" height="909" loading="lazy">
 
 # 地図にマーカーを表示する
 
@@ -190,7 +190,7 @@ GoogleMap(
 )
 ```
 
-<img src="/images/20211224a/image_4.png" alt="地図上にマーカー" width="1200" height="616" loading="lazy">
+<img src="/images/2021/20211224a/image_4.png" alt="地図上にマーカー" width="1200" height="616" loading="lazy">
 
 # 地図に線を引く
 
@@ -229,7 +229,7 @@ GoogleMap(
 
 `Set<Polyline>`のデータを用意することで青い線を引くことができました。
 
-<img src="/images/20211224a/image_5.png" alt="2点間で線を引く" width="1200" height="770" loading="lazy">
+<img src="/images/2021/20211224a/image_5.png" alt="2点間で線を引く" width="1200" height="770" loading="lazy">
 
 しかしこれではスタートとゴールの間に山があろうと谷があろうと乗り越え直進するという無茶なルートしか表示できません。
 
@@ -289,7 +289,7 @@ Future<List<LatLng>> getPolylineResult(
 
 `Drection API`の実行結果を地図に反映させると画像のようになります。完璧なルートが出力されました、当たり前のように使ってるGoogle Mapsって改めて考えると凄いなと感じますね。
 
-<img src="/images/20211224a/image_6.png" alt="image.png" width="1200" height="1337" loading="lazy">
+<img src="/images/2021/20211224a/image_6.png" alt="image.png" width="1200" height="1337" loading="lazy">
 
 なおFlutter on the Webとして動かす場合、`maps.googleapis.com`へのGETリクエストはCORS設定の都合で失敗してしまいます。ウェブサイトとして完成させるには同一ドメインで`maps.googleapis.com`へのリクエストを代行してくれるプロキシ的なバックエンドを作る必要があります。単にローカルでは一旦ブラウザで動かしたい、という場合は`chromium`をインストールして、オプション付きで起動すると動作します。
 
@@ -312,11 +312,11 @@ Flutter on the Webは、対象プラットフォームがモバイルアプリ�
 
 最低限やれることはわかってきました。ウィジェットとしてリファクタリングする、データの取得と画面描画をリファクタリングする、オンクリックイベントの実装などアプリケーションとして作り込んでいきます。サンプルアプリケーションを見るとGoogle MapsウィジェットはExpandウィジェットなどと組み合わせて利用されています。今回はColumnウィジェットの一要素としてGoogle Mapsウィジェットを読み込んでみるスタイルにしてみます。Columnウィジェットに積み込む他のウィジェットは適当にflutterロゴを出してみます。
 
-<img src="/images/20211224a/image_7.png" alt="image.png" width="1200" height="730" loading="lazy">
+<img src="/images/2021/20211224a/image_7.png" alt="image.png" width="1200" height="730" loading="lazy">
 
 オンクリックイベントの実験と、infoWindowより自由度の高いUIを実現したい、という観点で、マーカーをタップするとサイドバーが表示されるような作り込みもしてみました。
 
-<img src="/images/20211224a/image_8.png" alt="image.png" width="1200" height="728" loading="lazy">
+<img src="/images/2021/20211224a/image_8.png" alt="image.png" width="1200" height="728" loading="lazy">
 
 サンプルを試していた時にはマーカーやルートの位置情報をソースコードに愚直に書きましたが、実際にアプリケーションとして作り込むにあたっては、ウィジェットのレイアウトとビジネスロジックはなるべく切り分けたいですね。
 

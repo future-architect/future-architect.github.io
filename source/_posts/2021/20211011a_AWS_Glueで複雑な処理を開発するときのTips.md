@@ -12,12 +12,12 @@ tag:
   - Tips
 category:
   - Infrastructure
-thumbnail: /images/20211011a/thumbnail.png
+thumbnail: /images/2021/20211011a/thumbnail.png
 author: 藤田春佳
 lede: "PySparkを使用したGlueジョブ開発のお話をします。ETLツールとして使用されるAWS Glueですが、業務バッチで行うような複雑な処理も実行できます。また、処理はGlueジョブとして、Apache Spark分散・並列処理のジョブフローに簡単に乗せることができます！"
 ---
 
-<img src="/images/20211011a/glue_python_spark.png" alt="" width="790" height="260" loading="lazy">
+<img src="/images/2021/20211011a/glue_python_spark.png" alt="" width="790" height="260" loading="lazy">
 
 ## はじめに
 

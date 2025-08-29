@@ -44,7 +44,7 @@ Strategic AI GroupのChief AI Officierである貞光とともに以下の3つ�
 
 まず全体像をつかんだ後に、各ライブラリの高度な使い方を学んでいくと躓きにくいと思います。この考え方は、ライブラリの習得に限らず機械学習のアルゴリズムを学ぶ際にも通じるところがあります。いきなり難しい教科書の先頭から完璧に理解していこうとすると挫折してしまいがちですが、まずは全体像を学んだ後に、各手法の詳細を勉強していくとスッキリ理解できることがあります。
 
-<img src="/images/20191016/sd9.png" style="border:solid 1px #000000"  loading="lazy">
+<img src="/images/2019/20191016/sd9.png" style="border:solid 1px #000000"  loading="lazy">
 
 以上のように、Pythonの豊富なライブラリを使うと高度な処理を実現できるのですが、機械学習の仕組みをキチンと理解して論文を読みこなすためにはどうしても数学を避けては通れません。
 
@@ -56,12 +56,12 @@ Strategic AI GroupのChief AI Officierである貞光とともに以下の3つ�
 
 線形代数では行列の積がたくさん登場します。行列の積は形に着目すると計算を追いやすくなります。下図の同じ色の部分はサイズが一致しているということを意識しておくことがポイントです。
 
-<img src="/images/20191016/matrix.png" style="border:solid 1px #000000"  loading="lazy">
+<img src="/images/2019/20191016/matrix.png" style="border:solid 1px #000000"  loading="lazy">
 
 記事のなかでは、まず自然言語処理での応用事例として潜在意味インデキシング(LSI)と潜在意味解析(LDA)、そしてword2vecを紹介しました。次に、画像処理での応用事例として非負値行列因子分解(NMF)とAutoencoderを紹介しました。
 実は、これらの手法は下の表に示すタテの繋がりもあります。タテとヨコ、両方の繋がりを意識すると、様々な手法が有機的に繋がって、おもしろいです。
 
-<img src="/images/20191016/sd1_1.png" style="border:solid 1px #000000"  loading="lazy">
+<img src="/images/2019/20191016/sd1_1.png" style="border:solid 1px #000000"  loading="lazy">
 
 では、この表の行と列を増やしてみるとどんな手法が考えられるでしょうか？
 
@@ -69,7 +69,7 @@ Strategic AI GroupのChief AI Officierである貞光とともに以下の3つ�
 
 このようにタテとヨコの視点を意識すると新しい気づきがあるかもしれません。
 
-<img src="/images/20191016/sd1_2.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2019/20191016/sd1_2.png" style="border:solid 1px #000000" loading="lazy">
 
 ## 3月号：微分でつなぐ、機械学習とニューラルネットワーク ～データ分析も画像処理も最小二乗法で！ ～
 
@@ -79,7 +79,7 @@ Strategic AI GroupのChief AI Officierである貞光とともに以下の3つ�
 
 しかし、初心者を卒業してもう一歩踏み込んだ理解をするためには微分が必要になります。実は、Kerasなどの高水準フレームワークを利用していると、画像分類などの典型的なタスクにおいては、学習の仕組みをほとんど意識することなく学習を実行できるのですが、精度向上のためにチューニングしたり、あるいは最新の論文を理解するためにはニューラルネットワークの学習の仕組みの理解はとても役に立ちます。
 
-<img src="/images/20191016/BP.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2019/20191016/BP.png" style="border:solid 1px #000000" loading="lazy">
 
 例えば、敵対的生成ネットワーク(GAN)の学習は典型的なニューラルネットワークの学習よりも複雑です。
 
@@ -89,7 +89,7 @@ GANは鮮明な顔画像などを生成できることで、最近注目され�
 
 このように、基礎をキチンと学んでおくと、最新の手法の理解にも繋がります。簡単の意味の基礎ではなく多くの手法の土台となる基礎をしっかりと学んでおくとよいと思います。
 
-<img src="/images/20191016/GAN.gif" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2019/20191016/GAN.gif" style="border:solid 1px #000000" loading="lazy">
 
 ## まとめ
 

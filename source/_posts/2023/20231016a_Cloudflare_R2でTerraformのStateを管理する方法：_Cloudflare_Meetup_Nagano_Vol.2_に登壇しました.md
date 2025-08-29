@@ -8,11 +8,11 @@ tag:
   - 登壇レポート
 category:
   - Infrastructure
-thumbnail: /images/20231016a/thumbnail.png
+thumbnail: /images/2023/20231016a/thumbnail.png
 author: 伊藤太斉
 lede: "10/14に開催されたCloudflare Meetup Naganoに登壇したので発表内容のサマリとイベントのレポートです。"
 ---
-<img src="/images/20231016a/cloudflare_nagano.png" alt="" width="660" height="371" loading="lazy">
+<img src="/images/2023/20231016a/cloudflare_nagano.png" alt="" width="660" height="371" loading="lazy">
 
 イベントリンク： https://cfm-cts.connpass.com/event/295067/
 
@@ -181,7 +181,7 @@ https://github.com/koda-masaru/chat-bot
 
 今回、長野のイベントに参加するきっかけは帰省しながら参加できることにつきますが、これに限らず地方で開催される勉強会も改めて足をのばすと良いなと思いました。普段足を伸ばすきっかけがない土地でも、技術やイベントに誘われて参加しつつ、近隣の観光やその土地の料理を味わえるのも地方勉強会ならではの良さだと考えています。今回は懇親会で長野の日本酒をたくさん楽しめました。
 
-<img src="/images/20231016a/IMG_3553.jpg" alt="" width="1200" height="1093" loading="lazy">
+<img src="/images/2023/20231016a/IMG_3553.jpg" alt="" width="1200" height="1093" loading="lazy">
 
 ## 参考
 

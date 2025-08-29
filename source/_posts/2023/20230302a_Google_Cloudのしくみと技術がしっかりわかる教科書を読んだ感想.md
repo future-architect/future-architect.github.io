@@ -9,7 +9,7 @@ tag:
   - 入門
 category:
   - Infrastructure
-thumbnail: /images/20230302a/thumbnail.png
+thumbnail: /images/2023/20230302a/thumbnail.png
 author: 藤戸四恩
 lede: "積読消化目的で参加させていただきました。図解即戦力 Google Cloudのしくみと技術がこれ1冊でしっかりわかる教科書を選んだ理由としては、CCoEメンバーに参加しGoogle Cloud に触れる機会があったのですが、いままではCloudというものに触れてこなかったため掴みたいと考えたからです"
 ---
@@ -17,7 +17,7 @@ lede: "積読消化目的で参加させていただきました。図解即戦�
 
 金融グループ所属、新人の藤戸四恩です。
 インデックス記事に書かせていただきましたが、積読消化目的で参加させていただきました。
-<img src="/images/20230302a/image.png" alt="" width="400" height="564" loading="lazy">
+<img src="/images/2023/20230302a/image.png" alt="" width="400" height="564" loading="lazy">
 
 [読書感想文連載](/articles/20230217a/) の8冊目は、技術評論社から出版されている [図解即戦力 Google Cloudのしくみと技術がこれ1冊でしっかりわかる教科書](https://gihyo.jp/book/2021/978-4-297-12301-7) です。
 
@@ -52,7 +52,7 @@ Publickey社の記事内では[^1]、Canalys社が調査した、2022年度第2�
 
 ※Google Cloud は2022年6月に Google Cloud Platform から Goolge Cloud に[名称変更](https://cloud.google.com/blog/ja/topics/developers-practitioners/introducing-new-homepage-google-cloud)されたため、Google Cloud Platform をトピックにいれています。
 
-<img src="/images/20230302a/スクリーンショット_2023-02-27_19.54.39.png" alt="" width="1160" height="686" loading="lazy">
+<img src="/images/2023/20230302a/スクリーンショット_2023-02-27_19.54.39.png" alt="" width="1160" height="686" loading="lazy">
 
 個人的には、Google Cloud のシェアが思っていたよりも低く驚きました。
 
@@ -70,7 +70,7 @@ Compute Engineは仮想マシンのことで、AWSだとAmazon EC2、Azureだと
 
 `ライブマイグレーション`という単語は初めて知ったのですが、　Compute Engineはどのようにライブマイグレーションを実現しているのか調べてみました。[^3]
 
-<img src="/images/20230302a/image_2.png" alt="" width="875" height="661" loading="lazy">
+<img src="/images/2023/20230302a/image_2.png" alt="" width="875" height="661" loading="lazy">
 ※ライブマイグレーションのコンポーネントの図を引用[^3]
 
 VMの移行は3つのステップで行われます。

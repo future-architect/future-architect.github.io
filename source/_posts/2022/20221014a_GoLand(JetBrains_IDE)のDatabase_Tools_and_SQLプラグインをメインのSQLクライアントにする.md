@@ -9,7 +9,7 @@ tag:
   - SQL
 category:
   - DB
-thumbnail: /images/20221014a/thumbnail.png
+thumbnail: /images/2022/20221014a/thumbnail.png
 author: 真野隼記
 lede: "RDB（ここでは社内でも実績が多いPostgreSQLとさせてください）のGUIクライアントツールと言えば何を利用していますか？ チーム内で聞くと様々なプロダクトの名前が挙がりました。そんな中で私が推したいのは、 GoLand（JetBrainsの有償ライセンスを購入している人）を利用している人に対しては、Database Tools and SQLプラグインを利用することです"
 ---
@@ -33,7 +33,7 @@ RDB（ここでは社内でも実績が多いPostgreSQLとさせてください�
 
 上記の4つのツールはどれも素晴らしいし、名前がたまたま挙がらなかったけど優れているツールもあるかと思います。そんな中で私が推したいのは、 **GoLand（JetBrainsの有償ライセンスを購入している人）を利用している人に対しては、Database Tools and SQLプラグインを利用する** ことです。GoLandはJetBrainsの提供するIDEの、Go言語版です。Python版のPyCharm(Professional)、Java（JVM）版のIntelliJ(Ultimate)などでも同様の機能を有すると思います
 
-<img src="/images/20221014a/image.png" alt="" width="1200" height="659" loading="lazy">
+<img src="/images/2022/20221014a/image.png" alt="" width="1200" height="659" loading="lazy">
 
 私がちょうど開発で用いているGoLand 2022.2.3 のバージョンで説明していきます。
 
@@ -49,7 +49,7 @@ GoLandでDatabase Tools and SQLを使うためには、プラグインをイン�
 
 Pluginから検索して追加ください。
 
-<img src="/images/20221014a/image_2.png" alt="" width="1200" height="582" loading="lazy">
+<img src="/images/2022/20221014a/image_2.png" alt="" width="1200" height="582" loading="lazy">
 
 JetBrains製品に詳しい人は、[DataGrip](https://www.jetbrains.com/datagrip/) との違い何？ と思うでしょう。ぶっちゃけ同じです。このプラグインを入れると DataGrip で利用可能なすべての機能のサポートしてくれるそうです。DataGripも30日より長く利用する場合は有償なのでお得ですね。
 
@@ -80,21 +80,21 @@ Database Tools and SQLプラグインがDataGripと同等と伝えてしまっ�
 
 いったんDBに接続できてしまえば、ドリルダウン的にテーブル定義を確認できます。キーの定義などをさっと確認したいときに便利です。
 
-<img src="/images/20221014a/スキーマ探索.gif" alt="スキーマ探索" width="1200" height="569" loading="lazy">
+<img src="/images/2022/20221014a/スキーマ探索.gif" alt="スキーマ探索" width="1200" height="569" loading="lazy">
 
 DDLを見たほうが嬉しいという人にも、サクッと生成する機能があります。テーブルを右クリック＞SQLスクリプト＞SQLジェネレータ
 
-<img src="/images/20221014a/DDL生成.gif" alt="DDL生成" width="1200" height="926" loading="lazy">
+<img src="/images/2022/20221014a/DDL生成.gif" alt="DDL生成" width="1200" height="926" loading="lazy">
 
 ### SQLの実行
 
 何かしらのSQLを選択肢、 `ctrl + Enter`で実行できます。
 
-<img src="/images/20221014a/SQL実行.gif" alt="SQL実行" width="1200" height="648" loading="lazy">
+<img src="/images/2022/20221014a/SQL実行.gif" alt="SQL実行" width="1200" height="648" loading="lazy">
 
 JetBrains製のIDEらしく、補完もバッチリしていて、テーブル名、列名、ファンクションなどもバッチリです。
 
-<img src="/images/20221014a/補完.gif" alt="補完" width="1200" height="641" loading="lazy">
+<img src="/images/2022/20221014a/補完.gif" alt="補完" width="1200" height="641" loading="lazy">
 
 他にも次の点が個人的に気に入っています。
 
@@ -109,7 +109,7 @@ JetBrains製のIDEらしく、補完もバッチリしていて、テーブル�
 
 Insert, Updateなどの基本的なSQL生成もできます。
 
-<img src="/images/20221014a/SQL生成.gif" alt="SQL生成" width="1200" height="392" loading="lazy">
+<img src="/images/2022/20221014a/SQL生成.gif" alt="SQL生成" width="1200" height="392" loading="lazy">
 
 この辺はまぁ..大抵のツールに備わっていそうだなという感想です。
 
@@ -123,7 +123,7 @@ Insert, Updateなどの基本的なSQL生成もできます。
 
 「ツール＞データべース＞クエリと実行＞ユーザーパラメータ」に、 `$1` の場合は、`\$(\d+)`、 `@id` の場合は `@(\w+)` を追加。
 
-<img src="/images/20221014a/image_3.png" alt="" width="1200" height="857" loading="lazy">
+<img src="/images/2022/20221014a/image_3.png" alt="" width="1200" height="857" loading="lazy">
 
 ### 背景色の変更
 
@@ -131,11 +131,11 @@ Insert, Updateなどの基本的なSQL生成もできます。
 
 「データベースエクスプローラから右クリック＞ツール＞色設定」変更できます。
 
-<img src="/images/20221014a/背景色変更.png" alt="背景色変更" width="751" height="374" loading="lazy">
+<img src="/images/2022/20221014a/背景色変更.png" alt="背景色変更" width="751" height="374" loading="lazy">
 
 例えば、本番環境は背景色をオレンジにした例です。GIFだとタブ色だけ変えていますが、エディタ全体の色を変えることもできます。
 
-<img src="/images/20221014a/background-color.gif" alt="オレンジにした例" width="1200" height="604" loading="lazy">
+<img src="/images/2022/20221014a/background-color.gif" alt="オレンジにした例" width="1200" height="604" loading="lazy">
 
 個人的にはツールを選ぶ上で最重要にしている機能かもしれません。
 

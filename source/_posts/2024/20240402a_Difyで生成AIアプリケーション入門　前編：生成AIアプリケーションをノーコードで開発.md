@@ -9,7 +9,7 @@ tag:
   - Claude
 category:
   - Programming
-thumbnail: /images/20240402a/thumbnail.png
+thumbnail: /images/2024/20240402a/thumbnail.png
 author: 前川喜洋
 lede: "DifyとAnthropic Claudeを使って簡単に生成AIアプリケーションを構築する方法をご紹介します。"
 ---
@@ -72,7 +72,7 @@ http://localhost/ にアクセスすると初回は「管理者アカウント�
 
 サインインしたら、右上のアカウント名をクリックして設定→モデルプロバイダー→Anthropicにマウスオーバーしてセットアップ、と進んでAPIキーを入力します。そのままだとシステムモデルに Claude 3 Opus が使われてしまうので Haiku を選択します。寄稿時点では `claude-3-haiku-20240307` というモデル名でした。ここでClaudeシリーズが選択できない場合は何かしらエラーが発生しています。原因が分からなければAPIキーを再発行＆再入力してください。
 
-<img src="/images/20240402a/image.png" alt="" width="891" height="530" loading="lazy">
+<img src="/images/2024/20240402a/image.png" alt="" width="891" height="530" loading="lazy">
 
 ちなみに OpenRouter を使用するなどして OpenAI 互換のモデルを使用する場合は一番下の `Model providers compatible with OpenAI's API standard, such as LM Studio.` で使用できます。が、恐らくDifyの不具合でそれだけではモデルとして使用可能になりません。一度保存したモデル情報を開いて保存しなおすと使用可能になります。
 
@@ -98,8 +98,8 @@ Data model descriptions:
 ```
 ````
 
-<img src="/images/20240402a/image_2.png" alt="" width="873" height="321" loading="lazy">
-<img src="/images/20240402a/image_3.png" alt="" width="768" height="465" loading="lazy">
+<img src="/images/2024/20240402a/image_2.png" alt="" width="873" height="321" loading="lazy">
+<img src="/images/2024/20240402a/image_3.png" alt="" width="768" height="465" loading="lazy">
 
 ### 動作確認
 
@@ -110,7 +110,7 @@ Data model descriptions:
 3. 画面右下に薄っすらと入力欄が有るのでそこにSQL生成を依頼するプロンプトを入力してください。
 4. 速い安い旨いの Haiku でも3，4テーブル程度の結合・集約なども結構な高精度で生成してくれます。
 
-<img src="/images/20240402a/image_4.png" alt="" width="914" height="862" loading="lazy">
+<img src="/images/2024/20240402a/image_4.png" alt="" width="914" height="862" loading="lazy">
 
 参考までに私が使用した変数の値を下記に貼り付けておきます。少し実務みのある区分値やリレーションを設定してあります。
 <details><summary>DDL</summary>
@@ -334,8 +334,8 @@ comment on column product.product_name is '商品名';
 ここまでの操作で（公開をクリックした時点で）既にDify上で動作するアプリケーションが完成し公開されています。
 画面左のメニューで「概要」で下記の画面が表示されます。UIもAPIも使用可能な上にAPIキー管理機能まで自動で提供されていてまさに至れり尽くせり。プレビューをクリックするとアプリケーションの画面が開きます。
 
-<img src="/images/20240402a/image_5.png" alt="" width="632" height="519" loading="lazy">
-<img src="/images/20240402a/image_6.png" alt="" width="795" height="562" loading="lazy">
+<img src="/images/2024/20240402a/image_5.png" alt="" width="632" height="519" loading="lazy">
+<img src="/images/2024/20240402a/image_6.png" alt="" width="795" height="562" loading="lazy">
 
 ## チュートリアル2：外部ツールの使用
 
@@ -345,20 +345,20 @@ comment on column product.product_name is '商品名';
 
 1. また画面上部のメニューからスタジオ→新しいアプリを作成する→アシスタントを選択して適当な名前で作成してください。
 2. 「基本アシスタント」をクリックして「エージェントアシスタント」を選択します。
-<img src="/images/20240402a/image_7.png" alt="" width="465" height="337" loading="lazy">
+<img src="/images/2024/20240402a/image_7.png" alt="" width="465" height="337" loading="lazy">
 3. 画面左側に「ツール」エリアが出現するので、「＋追加」をクリックして、 Wikipedia と ChartGenerator の Pie Chart を追加します。
-<img src="/images/20240402a/image_8.png" alt="" width="1157" height="644" loading="lazy">
+<img src="/images/2024/20240402a/image_8.png" alt="" width="1157" height="644" loading="lazy">
 4. 「手順」に `ユーザの入力したプロンプトについてWikipediaで検索し、数値の情報をもとにパイチャートを作成してください。` と入力します。無くても動作はしますがそのままだと LLM が Wikipedia を参照せず手持ちの情報で回答してしまいがちなので念を押しておきます。
 
 ### 動作確認
 
 「公開」をクリックしてプロンプトに「アメリカの全人口における州ごとの人口のパイチャート」と入力すると若干怪しい動きを見せつつ作図されます。
-<img src="/images/20240402a/image_9.png" alt="" width="510" height="692" loading="lazy">
+<img src="/images/2024/20240402a/image_9.png" alt="" width="510" height="692" loading="lazy">
 
 実は残念ながら現時点では Anthropic の Functions & external tools には直接対応していないらしく、エージェント設定を見るとエージェントモードが ReAct になっています（GPTやGPT互換だと Function Calling のはず）。どうもこの場合Difyは、「LLMが生成した文字列からツール用パラメータっぽい部分をパースしてツールに中継する」という形で Function Calling を模した機能を提供するようで、生成された文字列が一部でもJSONとして破綻（値の中で改行など）していると失敗します。ツールの呼び出しに失敗するとツールを呼び出そうとした文字列がそのまま最終回答文として出力されます。
 
-<img src="/images/20240402a/image_10.png" alt="" width="437" height="358" loading="lazy">
-<img src="/images/20240402a/image_11.png" alt="" width="603" height="603" loading="lazy">
+<img src="/images/2024/20240402a/image_10.png" alt="" width="437" height="358" loading="lazy">
+<img src="/images/2024/20240402a/image_11.png" alt="" width="603" height="603" loading="lazy">
 
 ## 後編に続く
 

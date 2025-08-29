@@ -8,7 +8,7 @@ tag:
   - クラウドマイグレーション
 category:
   - Infrastructure
-thumbnail: /images/20201021/thumbnail.png
+thumbnail: /images/2020/20201021/thumbnail.png
 author: 八巻達紀
 lede: "こんにちは。2020年1月中途入社、TIGの八巻です。現在、クラウドリフトのプロジェクトにて、オンプレミス環境のサーバーをクラウドへ移行するため、AWSの移行サービスであるCloudEndureについて調査しました。"
 ---
@@ -59,7 +59,7 @@ CloudEndure Migrationの仕様と利用開始まで、以下の順番で説明�
 # CloudEndure Migrationの全体像
 
 全体像を掴むには、以下の図が参考になります。
-<img src="/images/20201021/00_00_NETWORK_DIAGRAM.png" loading="lazy">
+<img src="/images/2020/20201021/00_00_NETWORK_DIAGRAM.png" loading="lazy">
 画像引用元： [Network Diagram](https://docs.cloudendure.com/#Preparing_Your_Environments/Network_Diagram/Network_Diagram.htm#Network_Diagram%3FTocPath%3DNavigation%7CPreparing%2520Your%2520Environments%7C_____2)
 
 主要なアクターは以下の通りです。
@@ -107,7 +107,7 @@ CloudEndure Migrationの操作は、基本的にこのコンソールを使用�
 [CloudEndureDocumentation](https://docs.cloudendure.com/CloudEndure%20Documentation.htm)の「Glossary(用語集)」にある説明では、「The CloudEndure server」のみですが、
 CloudEndureのメインサービスを提供しているサーバーだと推測できます。
 「CloudEndure User Console」は、このサーバから提供されています。
-<img src="/images/20201021/Glossary-CloudEndureServiceManager.png" loading="lazy">
+<img src="/images/2020/20201021/Glossary-CloudEndureServiceManager.png" loading="lazy">
 
 # ネットワーク要件
 
@@ -176,17 +176,17 @@ CloudEndureの利用にはアカウントの登録が必要です。以下のリ
 [Create a CloudEndure Migration Account to Get Free Licenses](https://console.cloudendure.com/#/register/register)
 
 ライセンスを取得するメールアドレスとパスワードを入力して、「Continue」ボタンをクリックしてください。
-<img src="/images/20201021/01_01_CloudEndureRegister.jpg" loading="lazy">
+<img src="/images/2020/20201021/01_01_CloudEndureRegister.jpg" loading="lazy">
 
 以下のようなメールが届くので、「 confirm your account request 」にあるリンクにアクセスして登録は完了です。
-<img src="/images/20201021/01_02_仮登録メール.jpg" loading="lazy">
+<img src="/images/2020/20201021/01_02_仮登録メール.jpg" loading="lazy">
 
 以下URLにアクセスして、登録したメールアドレスとパスワードを使ってコンソールにログインします。
 https://console.cloudendure.com/#/signIn
-<img src="/images/20201021/01_04_Login.jpg" loading="lazy">
+<img src="/images/2020/20201021/01_04_Login.jpg" loading="lazy">
 
 以下のような画面に遷移すれば、ログイン完了です。
-<img src="/images/20201021/01_05_Login完了.png" loading="lazy">
+<img src="/images/2020/20201021/01_05_Login完了.png" loading="lazy">
 
 ## 2. プロジェクト作成
 
@@ -195,7 +195,7 @@ CloudEndurteは、プロジェクトという単位で管理が可能です。�
 この「Default Project」だけで管理することも可能ですが、移行先のAWSアカウントが複数存在する場合や、複数のベンダーで移行を行う場合には、プロジェクトの分割が有効です。なお、1つのCloudEndureアカウントで管理可能なプロジェクトの最大数は100です。
 
 プロジェクトの作成は、サイドメニュー上部の「＋」マークから作成が可能です。今回は「CloudEndure-Test」というプロジェクトを作成します。
-<img src="/images/20201021/01_06_プロジェクト作成.png" loading="lazy">
+<img src="/images/2020/20201021/01_06_プロジェクト作成.png" loading="lazy">
 「CREATE PROJECT」ボタンをクリックして、プロジェクトの作成は完了です。
 
 ## 3. セットアップ
@@ -226,7 +226,7 @@ IAM Userの作成手順は、以下のURLを参照ください。
 * 参考: [Generating the Required AWS Credentials](https://docs.cloudendure.com/#Generating_and_Using_Your_Credentials/Working_with_AWS_Credentials/Generating_the_Required_AWS_Credentials/Generating_the_Required_AWS_Credentials.htm?Highlight=PassRole)
 
 作成したIAM UserのAccess key IDとSecret access keyを設定して「SAVE」をクリックします。
-<img src="/images/20201021/01_07_Credentials.jpg" loading="lazy">
+<img src="/images/2020/20201021/01_07_Credentials.jpg" loading="lazy">
 
 ### REPLICATION SETTINGS
 
@@ -239,7 +239,7 @@ IAM Userの作成手順は、以下のURLを参照ください。
 * Other Infrastructure
 * AWSのリージョン
 
-<img src="/images/20201021/MigrationSource.png" loading="lazy">
+<img src="/images/2020/20201021/MigrationSource.png" loading="lazy">
 
 ##### Other Infrastructureを選択した場合
 
@@ -256,7 +256,7 @@ AWSやオンプレミス環境、その他クラウド環境にあるサーバ�
 #### Migration Target
 
 移行先AWSのリージョンを選択します。
-<img src="/images/20201021/MigrationTarget.png" loading="lazy">
+<img src="/images/2020/20201021/MigrationTarget.png" loading="lazy">
 
 #### Replication Servers
 
@@ -270,12 +270,12 @@ AWSやオンプレミス環境、その他クラウド環境にあるサーバ�
 ##### Choose the Replication Server instance type
 
 レプリケーションサーバーのインスタンスタイプを設定します。Defaultを選択した場合は「t3.small」で起動されます。
-<img src="/images/20201021/Replication_Server_Type.png" loading="lazy">
+<img src="/images/2020/20201021/Replication_Server_Type.png" loading="lazy">
 
 ##### Choose the Converter instance type
 
 コンバーターサーバーのインスタンスタイプを選択します。
-<img src="/images/20201021/Converter_Type.png" loading="lazy">
+<img src="/images/2020/20201021/Converter_Type.png" loading="lazy">
 
 コンバーターサーバーとは、ターゲットマシンを起動する際に、ディスクを変換する役割を持つサーバーで、ターゲットマシン起動時に一時的に起動されます。
 ディスクの変換後、すぐにTerminateされます。
@@ -292,7 +292,7 @@ AWSやオンプレミス環境、その他クラウド環境にあるサーバ�
 
 レプリケーションサーバーのディスクタイプを選設定します。
 移行元サーバーにマウントされているディスクのサイズによって、ディスクタイプが自動で選択されます。
-<img src="/images/20201021/StagingDiskType.png" loading="lazy">
+<img src="/images/2020/20201021/StagingDiskType.png" loading="lazy">
 「Use fast SSD data disks」を選択した場合
 500 GiB 未満のディスクには マグネティックボリューム(standard)が選択され、500 GiB を超えるディスクには 汎用SSDボリューム(gp2)が選択されます。
 
@@ -313,7 +313,7 @@ AWSやオンプレミス環境、その他クラウド環境にあるサーバ�
 ##### Choose how data is sent from the CloudEndure Agent to the Replication Servers ※この項目はオプションです。
 
 CloudEndureエージェントからレプリケーションサーバーへのデータ送信方法を設定します。「Use VPN or DirectConnect (using a private IP)」チェックボックスをオンにした場合、PrivateIPアドレスを使用した通信となります。VPNやDirectConnect経由で通信を行う場合はチェックボックスをオンにしてください。
-<img src="/images/20201021/Use_VPN_or_DirectConnect_(using_a_private_IP).png" loading="lazy">
+<img src="/images/2020/20201021/Use_VPN_or_DirectConnect_(using_a_private_IP).png" loading="lazy">
 また、PublicIPの無効化の設定が選択可能になります。要件に応じて設定してください。
 
 ##### Define whether to route communication from the Replication Server via a proxy ※この項目はオプションです。
@@ -333,12 +333,12 @@ CloudEndureによって作成されたリソースに付与するタグを設定
 移行元のサーバーからレプリケーションサーバーへデータを送信する際に使用する、ネットワークの帯域幅制限を設定します。
 
 デフォルトでは、「Disabled」のチェックボックスがオンとなっています。チェックボックスを外すことで、TCPポート1500のトラフィックで使用する帯域幅を設定可能となります。
-<img src="/images/20201021/Network_Bandwidth_Throttling.png" loading="lazy">
+<img src="/images/2020/20201021/Network_Bandwidth_Throttling.png" loading="lazy">
 データ転送速度はMbpsで指定可能です。実施する環境に合わせて設定してください。
 
 今回は、以下の図のように設定しました。
 ※後から変更も可能です。
-<img src="/images/20201021/ReplicationSettings完了.png" loading="lazy">
+<img src="/images/2020/20201021/ReplicationSettings完了.png" loading="lazy">
 
 「SAVE REPLICATION SETTINGS」のボタンをクリックして、セットアップは完了です。
 

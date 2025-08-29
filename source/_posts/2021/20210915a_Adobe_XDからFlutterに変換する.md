@@ -7,7 +7,7 @@ tag:
   - Flutter
 category:
   - Design
-thumbnail: /images/20210915a/thumbnail.png
+thumbnail: /images/2021/20210915a/thumbnail.png
 author: 澁川喜規
 lede: "モバイル開発をする場合、デザインはAdobe XDかFigmaか何かしらのワイヤフレームツールを使うと思います。本エントリーではそれらをもとにアプリケーションを作成したときのTipsを紹介します。なお、デザインする人はステークホルダーの人に共有したりすると思うので有料版のXDの方が良いと思いますが、Flutter開発する人はXDファイルを持っている or 共有してもらえたら、スターター版で大丈夫です。"
 ---
@@ -20,7 +20,7 @@ lede: "モバイル開発をする場合、デザインはAdobe XDかFigmaか何
 
 スターターパックをインストールしたら、Creative Cloudアプリ（タスクバーに常駐していると思います）のマーケットプレースから、XD to Flutterというプラグインを入れます。[AdobeとGoogleが協力して開発している](https://blog.adobe.com/jp/publish/2020/09/25/cc-web-xd-flutter-plugin-now-available.html)プラグインで、これがあるのとないのでは開発効率が大きく変わります。なお、この常駐アプリ、結構CPUを持っていくっぽいので、プラグインを入れた後は終了させたほうが良いかも？ プラグインのインストール以外はXDのバージョンアップでは使いましたが、使うのはそれぐらいかと。
 
-<img src="/images/20210915a/スクリーンショット_2021-09-08_17.06.46.png" alt="XD to Flutterプラグイン" width="1136" height="752" loading="lazy">
+<img src="/images/2021/20210915a/スクリーンショット_2021-09-08_17.06.46.png" alt="XD to Flutterプラグイン" width="1136" height="752" loading="lazy">
 
 # 基本はCopy Selected
 
@@ -28,11 +28,11 @@ lede: "モバイル開発をする場合、デザインはAdobe XDかFigmaか何
 
 あくまでもXDはお絵描きツールなので、内部のコンテンツの量や数が可変になったときのレイアウトの挙動とか、そのままフリーハンドで再現できるわけではありません。高機能なUI部品をそのまま再現できません。もしかしたら.NetのExpression Blendが世界を制覇する世界線であればそういう開発もできたかもしれませんが、基本は１要素を選択して、左下のCopy Selectedボタンを使って、コードをクリップボードに入れて、Android Studioに貼り付けていくのが良いでしょう。
 
-<img src="/images/20210915a/スクリーンショット_2021-09-08_17.00.35.png" alt="Copy Selectedボタン" width="812" height="1144" loading="lazy">
+<img src="/images/2021/20210915a/スクリーンショット_2021-09-08_17.00.35.png" alt="Copy Selectedボタン" width="812" height="1144" loading="lazy">
 
 テキストとかもフォーマットつきで取り出せますので、それをぺたぺた貼り付けていけば良い感じに再現できます。こういう影付き角丸長方形とかも・・・
 
-<img src="/images/20210915a/スクリーンショット_2021-09-08_18.07.10.png" alt="う影付き角丸長方形" width="279" height="603" loading="lazy">
+<img src="/images/2021/20210915a/スクリーンショット_2021-09-08_18.07.10.png" alt="う影付き角丸長方形" width="279" height="603" loading="lazy">
 
 こんな感じのコードになります。
 
@@ -73,13 +73,13 @@ Flutterはプラグインを入れればSVGが使えます。adobe_xdパッケ�
 
 書き出すときは、ファイルメニューの書き出しを選択し、フォーマットでSVGを選ぶと出力できます。PNGをここから書き出すのもできますが、どうもXDに配置されたサイズでの書き出しになるっぽくて、かなり荒い画像になってしまったのでSVGでエクスポートしています。
 
-<img src="/images/20210915a/スクリーンショット_2021-09-08_17.39.23.png" alt="ファイルメニューの書き出し" width="695" height="428" loading="lazy">
+<img src="/images/2021/20210915a/スクリーンショット_2021-09-08_17.39.23.png" alt="ファイルメニューの書き出し" width="695" height="428" loading="lazy">
 
-<img src="/images/20210915a/スクリーンショット_2021-09-08_17.39.48.png" alt="SVGエクスポート" width="632" height="342" loading="lazy">
+<img src="/images/2021/20210915a/スクリーンショット_2021-09-08_17.39.48.png" alt="SVGエクスポート" width="632" height="342" loading="lazy">
 
 その後はOSSの[Inkscape](https://inkscape.org/ja/)で、DPIを180とか大きめにしてPNGに書き出しています。ちょっと不安定だったり、ウェルカムウィンドウが開いているとウィンドウ操作ができなかったり、DPIを変更してフォーカスを変換してからエクスポート先、の方を押さないとサイズが反映されなかったり、ちょっと癖はありますが、根気よくがんばりましょう。
 
-<img src="/images/20210915a/スクリーンショット_2021-09-08_17.49.11.png" alt="PNGに書き出し" width="498" height="909" loading="lazy">
+<img src="/images/2021/20210915a/スクリーンショット_2021-09-08_17.49.11.png" alt="PNGに書き出し" width="498" height="909" loading="lazy">
 
 生成されたらassetフォルダにいれて、pubspec.yamlのassetsの項目に格納先のフォルダに入れてあげて再ビルドします。画像の追加はホットリロードでは対応してくれないので、一度アプリを停止させて再ビルドが必要です。
 

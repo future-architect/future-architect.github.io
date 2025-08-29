@@ -7,7 +7,7 @@ tag:
   - 合格記
 category:
   - Infrastructure
-thumbnail: /images/20200629/thumbnail.png
+thumbnail: /images/2020/20200629/thumbnail.png
 author: 伊藤太斉
 lede: "5/24に受験したHashiCorpから出た資格の1つである、Terraform Associateを受験したときの記事になります。結果としては無事に合格したので、受験前、そして受験当日のことを今回取り扱おうと思います。"
 ---
@@ -15,7 +15,7 @@ lede: "5/24に受験したHashiCorpから出た資格の1つである、Terrafor
 # はじめに
 
 こんにちは。TIG/DXユニットの[伊藤](https://twitter.com/kaedemalu)です。今回は、5/24に受験したHashiCorpから出た資格の1つである、Terraform Associateを受験したときの記事になります。結果としては無事に合格したので、受験前、そして受験当日のことを今回取り扱おうと思います。私はTerraform以外にも準備が必要だったので、この記事がこれから受験する人の一助となれば幸いです。
-<img src="/images/20200629/1.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200629/1.png" class="img-small-size" loading="lazy">
 
 # 本人のスペック
 
@@ -82,7 +82,7 @@ PC自体は順当にMacやWindowsなら受験が可能で、Webカメラやマ�
 
 無事合格しました。スコアを見ると他の合格体験記と見比べて割とギリギリだったようです。今までAWSやらGCPやら受けてきましたが、また違った緊張感でした。試験終了直後は受かったというメールのみ来て、10日くらいあけるとデジタルバッジが来ます。やはり、何かしら形になるのは嬉しいですね。
 合格してから数日でデジタルバッジが取得できるので、より実感が湧きます。素直に嬉しかったです。
-<img src="/images/20200629/photo_20200629_01.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200629/photo_20200629_01.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
 # まとめ
 

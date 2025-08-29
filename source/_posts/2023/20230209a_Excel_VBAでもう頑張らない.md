@@ -8,7 +8,7 @@ tag:
   - Excel
 category:
   - Programming
-thumbnail: /images/20230209a/thumbnail.png
+thumbnail: /images/2023/20230209a/thumbnail.png
 author: 澁川喜規
 lede: "Excelは開発者もそうじゃない人も使う広く使われているツールです。Excelに詳しい人も多く、データの可視化はとりあえずExcelの表にデータを入れてしまえば、あとはグラフ化はユーザーにおまかせ、とかいろいろできます。ただ、そのかなり使われているのと裏腹に、20世紀で時代で止まっているのがVisual Basic for Applicationです。"
 ---
@@ -24,15 +24,15 @@ PowerShellもWindows 10以上を使っていればインストールしなくて
 
 久々すぎて(20年ぶり？ )色々忘れてたので備忘のために手順を書き残しておきます。まずはオプションで「リボンのユーザー設定」で「開発」を表示するようにします。
 
-<img src="/images/20230209a/image.png" alt="リボンのユーザー設定" width="936" height="405" loading="lazy">
+<img src="/images/2023/20230209a/image.png" alt="リボンのユーザー設定" width="936" height="405" loading="lazy">
 
 そうするとリボンに「開発」が出てくるので、一番右のVisual Basicボタンを押すと開発環境が出てきます。
 
-<img src="/images/20230209a/image_2.png" alt="Visual Basicの開発環境" width="615" height="191" loading="lazy">
+<img src="/images/2023/20230209a/image_2.png" alt="Visual Basicの開発環境" width="615" height="191" loading="lazy">
 
 ユーザーが実行する起点となるUIボタンなどは、開発の挿入から選べます。ボタンを置くと、置いた時のコールバックのサブルーチンを作るウィンドウが出て、起動するコードが生成できます。古き良き、WYSIWYGなビジュアルプログラミングです。1995年ぐらいには輝いていましたね。
 
-<img src="/images/20230209a/image_3.png" alt="古き良き、WYSIWYGなビジュアルプログラミング" width="257" height="274" loading="lazy">
+<img src="/images/2023/20230209a/image_3.png" alt="古き良き、WYSIWYGなビジュアルプログラミング" width="257" height="274" loading="lazy">
 
 あとは、ここにコードを書いていけばOKです。
 

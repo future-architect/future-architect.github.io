@@ -8,7 +8,7 @@ tag:
   - デスクトップアプリ
 category:
   - Programming
-thumbnail: /images/20220318a/thumbnail.png
+thumbnail: /images/2022/20220318a/thumbnail.png
 author: 澁川喜規
 lede: "FlutterのWindows対応が正式版になったので軽く試してみました。Flutterのいつものインストール手順でインストールします。"
 ---
@@ -31,11 +31,11 @@ Flutterのいつものインストール手順でインストールします。
 
 他の環境と違うのは、Visual Studio（Codeじゃない方）が必要なことですね。インストーラを起動したらC++を使ったデスクトップ開発を選択してインストールします。
 
-<img src="/images/20220318a/スクリーンショット_2022-03-06_092832.png" alt="スクリーンショット_2022-03-06_092832.png" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20220318a/スクリーンショット_2022-03-06_092832.png" alt="スクリーンショット_2022-03-06_092832.png" width="1200" height="675" loading="lazy">
 
 今回の検証ではなくてもよいのですが、IDEとしてはAndroid Studioが便利なのでそれも入れました。FlutterとDartのプラグインも入れます。全部緑色になると気持ち良いですね。
 
-<img src="/images/20220318a/image.png" alt="Visual Studioインストール" width="1200" height="311" loading="lazy">
+<img src="/images/2022/20220318a/image.png" alt="Visual Studioインストール" width="1200" height="311" loading="lazy">
 
 # Windowsデスクトップの有効化
 
@@ -67,11 +67,11 @@ Your application code is in .\lib\main.dart.
 
 Android Studioでプロジェクトを作ります。New Flutter Pojectでプロジェクトを作成します。僕はターゲットの追加でLinuxとかmacOSも試しに追加してみたのでいろいろプラットフォームが多いですが、いくらつけてもAndroid Studio上で選択できるわけではありません。クロスコンパイルとかできると便利なんですけどね。
 
-<img src="/images/20220318a/image_2.png" alt="Android Studioプロジェクト作成" width="862" height="660" loading="lazy">
+<img src="/images/2022/20220318a/image_2.png" alt="Android Studioプロジェクト作成" width="862" height="660" loading="lazy">
 
 プロジェクトができたら、上段から``Windows (Desktop)``を選んで実行すればWindowsのアプリがビルドされます。
 
-<img src="/images/20220318a/image_3.png" alt="Windows (Desktop)の選択" width="462" height="203" loading="lazy">
+<img src="/images/2022/20220318a/image_3.png" alt="Windows (Desktop)の選択" width="462" height="203" loading="lazy">
 
 サンプルにテキストフィールドだけ追加してみた感じのものがこちらです。何事もなく普通ですね。IMEも普通に使える。``flutter build windows``でプロダクションビルドをしてみました。
 
@@ -84,11 +84,11 @@ $ du -h
 21M     .
 ```
 
-<img src="/images/20220318a/image_4.png" alt="デモ画面" width="750" height="478" loading="lazy">
+<img src="/images/2022/20220318a/image_4.png" alt="デモ画面" width="750" height="478" loading="lazy">
 
 リソース使用量はかなり少ないですね。GPUはモバイルのRyzen 4900HSの内蔵GPUなのでそこまで強いわけじゃないですが、負荷はかなり小さいです。メモリ使用量もQt並み。そのうちソフトウェアの二酸化炭素排出量が・・・みたいな話になったらFlutterは良さそう。
 
-<img src="/images/20220318a/image_5.png" alt="PCリソース利用量" width="1200" height="178" loading="lazy">
+<img src="/images/2022/20220318a/image_5.png" alt="PCリソース利用量" width="1200" height="178" loading="lazy">
 
 # ついでにLinuxのコードも見てみる
 
@@ -212,6 +212,6 @@ import 'package:system_tray/system_tray.dart';
 
 ビルドして動かしてみると、以下のようにアイコンがトレイに表示され、クリックしたら表示されることがわかります。
 
-<img src="/images/20220318a/image_6.png" alt="アイコン" width="229" height="104" loading="lazy">
+<img src="/images/2022/20220318a/image_6.png" alt="アイコン" width="229" height="104" loading="lazy">
 
 うまく用途にあうニーズが見つけられればFlutterでやろう！ というのは説得できそうな感じがします。使えるチャンスをうかがっていきたいですね。

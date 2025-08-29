@@ -8,13 +8,13 @@ tag:
   - TFLint
 category:
   - Infrastructure
-thumbnail: /images/20211223a/thumbnail.png
+thumbnail: /images/2021/20211223a/thumbnail.png
 author: 川端一輝
 featured: false
 lede: "terraform validateやterraform planでは検知できないエラーを見つけるために、TFLintを利用してみました。例えば、インスタンスタイプの誤りや命名規約違反を検知できます。本記事では、インストールから利用方法までを記載しています。"
 ---
 
-<img src="/images/20211223a/top.png" alt="" width="800" height="431">
+<img src="/images/2021/20211223a/top.png" alt="" width="800" height="431">
 
 # はじめに
 

@@ -8,7 +8,7 @@ tag:
   - 参戦記
 category:
   - DataScience
-thumbnail: /images/20220602b/thumbnail.png
+thumbnail: /images/2022/20220602b/thumbnail.png
 author: 金子剛士
 lede: "Strategic AI Group所属の金子です。普段は推薦に関連する実装やデータ分析を行っています。先日Kaggleで開催された[H&M Personalized Fashion Recommendations]コンペに単独で参加し、2952チーム中46位をとりました。今回の参加記では以下の内容を紹介します。"
 ---
@@ -70,7 +70,7 @@ implicitなデータとは、ユーザーから明示的(=explicit)なフィー�
 # 解法のサマリ
 
 今回私はこの問題に対し、候補を高速に絞り込むretrievalステージと精度よく予測を行うrankingステージの二段階で予測を行う[two-tower model](https://research.google/pubs/pub48840/)を構築しました。解法については[kaggleのdiscussion](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations/discussion/324205)にも投稿したので、ここではサマリで割愛させていただきます。
-<img src="/images/20220602b/H&M_46th_solution_overview.drawio.png" alt="H&M_46th_solution_overview.drawio" width="811" height="531" loading="lazy">
+<img src="/images/2022/20220602b/H&M_46th_solution_overview.drawio.png" alt="H&M_46th_solution_overview.drawio" width="811" height="531" loading="lazy">
 
 ## Retrieval Stage
 

@@ -8,7 +8,7 @@ tag:
   - CloudSQLAuthProxy
 category:
   - Infrastructure
-thumbnail: /images/20231019a/thumbnail.png
+thumbnail: /images/2023/20231019a/thumbnail.png
 author: 岸下優介
 lede: "Private IPしか持たないCloud SQLへ接続する方法として、Cloud SQL Auth Proxyを利用した接続方法について紹介致します。"
 ---
@@ -39,12 +39,12 @@ SQLインスタンスをインターネット上に晒したくないという�
 があります。
 1の場合は、Cloud SQLインスタンスのプライベートIPに対して直接接続できるので一番手っ取り早い方法かと思います。
 
-<img src="/images/20231019a/image.png" alt="image.png" width="782" height="550" loading="lazy">
+<img src="/images/2023/20231019a/image.png" alt="image.png" width="782" height="550" loading="lazy">
 
 2の場合は、Cloud SQLが存在するVPC内へアクセス経路を持つ必要があるため、VPC PeeringやCloud VPN、Cloud Interconnectによって接続元が利用するVPCがお互いに経路を確保し、Cloud SQLのPrivate IPが広報される必要があります。
 ※本記事では[HA-VPN構成](https://cloud.google.com/network-connectivity/docs/vpn/concepts/topologies?hl=ja)を例に取り扱わせて頂きます。
 
-<img src="/images/20231019a/image_2.png" alt="image.png" width="1200" height="394" loading="lazy">
+<img src="/images/2023/20231019a/image_2.png" alt="image.png" width="1200" height="394" loading="lazy">
 
 但し、Cloud SQLのプライベートIPアドレスが既に割り振られている場合、広報先のVPC内でそのIPアドレスが既に使われている場合は多々あります。そのような状況で広報をしてしまうと、IPアドレスが被ってしまい広報できない、もしくはネットワーク事故につながることになります。さて、この場合どうしましょう🤔
 
@@ -56,7 +56,7 @@ SQLインスタンスをインターネット上に晒したくないという�
 
 ## Cloud SQL Auth Proxyを利用した接続
 
-<img src="/images/20231019a/image_3.png" alt="image.png" width="1200" height="397" loading="lazy">
+<img src="/images/2023/20231019a/image_3.png" alt="image.png" width="1200" height="397" loading="lazy">
 
 アーキテクチャ上で変わった部分としては黄色の箇所で、Cloud SQLインスタンスが存在するVPC-AにCloud SQL Auth Proxyを立てておくためのDB Bastion VMを構築しておく必要があります。また、Cloud SQLインスタンスは複数あることを想定しております。
 

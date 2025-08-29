@@ -10,11 +10,11 @@ tag:
   - psql
 category:
   - Programming
-thumbnail: /images/20231024a/thumbnail.png
+thumbnail: /images/2023/20231024a/thumbnail.png
 author: 真野隼記
 lede: "PostgreSQLには timestamp with time zone型が存在します。一見、タイムゾーン付きで日時データを保持してくれそうな名称ですが、そうではないよという話をさせてください。"
 ---
-<img src="/images/20231024a/postgresql_logo.png" alt="" width="610" height="280">
+<img src="/images/2023/20231024a/postgresql_logo.png" alt="" width="610" height="280">
 
 ## はじめに
 

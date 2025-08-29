@@ -11,7 +11,7 @@ tag:
   - グラフ
 category:
   - Programming
-thumbnail: /images/20210303/thumbnail.png
+thumbnail: /images/2021/20210303/thumbnail.png
 author: 山田修路
 lede: "業務で階層グラフを可視化する機会があったので、階層グラフの可視化について共有させていただこうと思います。グラフとは関係を抽象化したもので、線グラフや棒グラフなどのチャートとは異なる概念です。"
 ---
@@ -112,7 +112,7 @@ const options = {
 
 上記のノード定義、エッジ定義、オプション定義を元に可視化できます。実際に可視化した例です。
 
-<img src="/images/20210303/2021-01-19_14h29_14.png" loading="lazy">
+<img src="/images/2021/20210303/2021-01-19_14h29_14.png" loading="lazy">
 ソースコードは [Edit fiddle \- JSFiddle \- Code Playground](https://jsfiddle.net/0bxLo6wt/) にて確認できます。
 
 これだけでは寂しいので、少しグラフを加工していきましょう。
@@ -138,7 +138,7 @@ const nodes = new vis.DataSet([
 ]);
 ```
 
-<img src="/images/20210303/2021-01-19_14h31_46.png" loading="lazy">
+<img src="/images/2021/20210303/2021-01-19_14h31_46.png" loading="lazy">
 ソースコードは [Edit fiddle \- JSFiddle \- Code Playground](https://jsfiddle.net/3nkac917/) にて確認できます。
 
 ## tooltip
@@ -166,7 +166,7 @@ const nodes = new vis.DataSet([
 ]);
 ```
 
-<img src="/images/20210303/2021-01-19_14h34_43.png" loading="lazy">
+<img src="/images/2021/20210303/2021-01-19_14h34_43.png" loading="lazy">
 ソースコードは [Edit fiddle \- JSFiddle \- Code Playground](https://jsfiddle.net/rg50c2jh/) にて確認できます。
 
 ## イベント
@@ -174,7 +174,7 @@ const nodes = new vis.DataSet([
 `on`メソッドで指定したイベントを処理するCallbackを登録することが出来ます。
 下記のサンプルではクリックしたノードの`color`属性を変更します。
 
-<img src="/images/20210303/ノードクリックイベント.gif" loading="lazy">
+<img src="/images/2021/20210303/ノードクリックイベント.gif" loading="lazy">
 ソースコードは [Edit fiddle \- JSFiddle \- Code Playground](https://jsfiddle.net/hu2kts5y/) にて確認できます。
 
 イベント一覧は [vis\.js \- Network documentation\.](https://almende.github.io/vis/docs/network/#Events) に記載されています。
@@ -184,7 +184,7 @@ const nodes = new vis.DataSet([
 
 Vis NetworkではGephiからエクスポートしたデータやdot言語をインポートできます。今回は私が先日Graphvizを用いて可視化したグラフ [^3]をVis Networkで表示してみます。
 
-<img src="/images/20210303/名称未設定2.png" loading="lazy">
+<img src="/images/2021/20210303/名称未設定2.png" loading="lazy">
 
 ソースコードは [Edit fiddle \- JSFiddle \- Code Playground](https://jsfiddle.net/kon2cL8r/10/) にて確認できます。
 
@@ -200,13 +200,13 @@ Graphvizほど洗練されたレイアウトにはなりませんが、非常に
 
 当初Vis Networkを使用していましたが、大きめの階層グラフを表示するとエッジの交差が非常に多くなってしまうことがわかりました。例えば下図はこれまでサンプルとして表示していたグラフにオレンジのエッジを一本追加しただけなのですが、エッジの交差が必要以上に多くなってしまっています。
 
-<img src="/images/20210303/2021-01-21_10h44_39.png" loading="lazy">
+<img src="/images/2021/20210303/2021-01-21_10h44_39.png" loading="lazy">
 
 ソースコードは [Edit fiddle \- JSFiddle \- Code Playground](https://jsfiddle.net/2801wrud/2/) にて確認できます。
 
 私の所属しているプロジェクトでは比較的大きな階層グラフを表示する必要があり、この課題を解消するためmxGraphに乗り換えました。mxGraphではこのようにエッジの交差を減らすことができます。
 
-<img src="/images/20210303/image_(4).png" loading="lazy">
+<img src="/images/2021/20210303/image_(4).png" loading="lazy">
 
 次回の記事ではmxGraphをご紹介いたします。
 

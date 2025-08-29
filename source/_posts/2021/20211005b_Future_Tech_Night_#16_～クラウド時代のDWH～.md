@@ -10,12 +10,12 @@ tag:
   - Snowflake
 category:
   - DB
-thumbnail: /images/20211005b/thumbnail.jpg
+thumbnail: /images/2021/20211005b/thumbnail.jpg
 author: 中山祐一
 lede: "今回の投稿は、先日TIG」の登壇後記です。以前に実施した社内勉強会のコンテンツを外部発信向けに整理したものとなります。私は元の資料の作成に関わっていなかったため、整理に際して一から目を通しました。"
 ---
 
-<img src="/images/20211005b/archive-g39b73f1f8.jpg" alt="PexelsによるPixabayからの画像" title="800" width="533" height="">
+<img src="/images/2021/20211005b/archive-g39b73f1f8.jpg" alt="PexelsによるPixabayからの画像" title="800" width="533" height="">
 
 ## はじめに
 

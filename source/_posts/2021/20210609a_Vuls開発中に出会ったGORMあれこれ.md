@@ -9,7 +9,7 @@ tag:
   - GORM
 category:
   - Programming
-thumbnail: /images/20210609a/thumbnail.png
+thumbnail: /images/2021/20210609a/thumbnail.png
 author: MaineK00n
 lede: "はじめまして、中岡と申します。現在はフューチャー発OSSのVuls開発をメインに、CSIGでアルバイトをしています。- ORMを触るときは発行されるクエリが意図したものか確認する"
 ---
@@ -34,7 +34,7 @@ Vulsでは、以下のようにsqlite3などの形式で保存されたVulnerabi
 
 FYI: Vulsのスキャンアーキテクチャは[こちら](https://vuls.io/docs/en/architecture-fast-deep.html)に詳しく書かれています。
 
-<img src="/images/20210609a/vuls-arch.png" alt="Vulsアーキテクチャ図" loading="lazy"
+<img src="/images/2021/20210609a/vuls-arch.png" alt="Vulsアーキテクチャ図" loading="lazy"
 
 Reference: [future-architect/vuls](https://github.com/future-architect/vuls)
 
@@ -175,7 +175,7 @@ SELECT
 すると、ほとんどの検索の場合、0-499個のクエリしか発行しないことが分かりました。
 つまり、linux unfixes cvesの場合のように、`GORM v2 + query tuning`のクエリ数だけがとても増加して、検索にかかる時間が大きくなる事象によるロスより、それ以外の場合による高速化が大きく現れやすいということです。
 
-<img src="/images/20210609a/query_count.png" alt="クエリ発行数" loading="lazy">
+<img src="/images/2021/20210609a/query_count.png" alt="クエリ発行数" loading="lazy">
 
 これが、Vulsのスキャン時間にどれくらいの影響を与えるかを、スキャン時間の90％ileで見てみます。
 スキャン先のDebianにはパッケージが218個インストールされています。

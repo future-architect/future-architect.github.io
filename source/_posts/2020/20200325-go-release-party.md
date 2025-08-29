@@ -7,7 +7,7 @@ tag:
   - 登壇レポート
 category:
   - Programming
-thumbnail: /images/20200325/thumbnail.png
+thumbnail: /images/2020/20200325/thumbnail.png
 author: 辻大志郎
 lede: "こんにちは。TIG の辻です。先日開催された Go 1.14 Release Party に TIG DX ユニットから渋川、辻が登壇しました。今回の Release Party は COVID-19 により初のオンラインでの開催になりました。見逃した方は youtube にアップロードされている動画: https://www.youtube.com/watch?v=IWyDR08pUU4&feature=youtu.be を見てみてください！"
 ---
@@ -22,9 +22,9 @@ Go 1.14 のリリースノートは以下です。
 
 ## 発表1: hash/maphash コードリーディング
 
-<img src="/images/20200325/3.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200325/3.png" class="img-middle-size" loading="lazy">
 
-<img src="/images/20200325/4.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200325/4.png" class="img-middle-size" loading="lazy">
 
 辻さんのコメントにもある、社内のコードリーディングで紹介したGo 1.14で追加されたhash/maphashパッケージについて紹介しました。今回追加された唯一の新パッケージではあるものの、Hashインタフェースを使った使い方もすでにあるものですし、機能もGo内部で文字列やバイト列をハッシュのキーに使うときに使われていたアルゴリズムを公開したものなので、特に真新しさはありません。なので、よくある新パッケージの機能紹介というよりも、コードを読んでいて面白いと思ったところを紹介する、という発表にしました。
 
@@ -40,9 +40,9 @@ https://qiita.com/shibukawa/items/d483889731c34d3e5faa
 
 ## 発表2: context の話
 
-<img src="/images/20200325/1.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200325/1.png" class="img-middle-size" loading="lazy">
 
-<img src="/images/20200325/2.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200325/2.png" class="img-middle-size" loading="lazy">
 
 辻からは Go1.14 の context についてお話しました。リリースノートには記載されていないのですが、Go1.14 の context パッケージは内部的な挙動が改善されています。
 

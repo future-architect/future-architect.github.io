@@ -8,12 +8,12 @@ tag:
   - チーム開発
 category:
   - Programming
-thumbnail: /images/20200709/thumbnail.png
+thumbnail: /images/2020/20200709/thumbnail.png
 author: 真野隼記
 lede: "最近Goで主にバックエンドのWebAPIや、AWS Lambdaで動くETLアプリ、たまにCLIツールを開発する時に、2回以上同じ指摘したコメントをまとめてます。Go言語特有ぽいところを中心にしています。レビュイーのスキルセットは.."
 ---
 
-<img src="/images/20200709/photo_20200709_01.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200709/photo_20200709_01.png" class="img-small-size" loading="lazy">
 
 The Gopher character is based on the Go mascot designed by [Renée French](http://reneefrench.blogspot.com/).
 

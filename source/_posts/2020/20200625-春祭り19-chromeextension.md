@@ -7,13 +7,13 @@ tag:
   - ChromeExtension
 category:
   - Programming
-thumbnail: /images/20200625/thumbnail.png
+thumbnail: /images/2020/20200625/thumbnail.png
 author: 彩花谷田
 lede: "現在業務では直接開発をする機会はないのですが、業務の合間を縫って日々プログラミングを勉強中です。
 そんな中、お世話になっている先輩から手始めに、Google Chromeの拡張機能の作成方法を教えて頂いたので、拡張機能の作成方法入門を書いていこうと思います。"
 ---
 
-<img src="/images/20200625/top.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200625/top.png" class="img-small-size" loading="lazy">
 
 [春の入門祭り](/articles/20200529/)の第19弾です
 
@@ -132,7 +132,7 @@ MDNにも詳しく載っています。
 ここまでできたら、実際に自分のChromeの拡張機能に追加していきます。
 「右上のその他のアイコンを右クリック→その他のツール→拡張機能」を選択もしくは、URLバーに「chrome://extensions」と入力して拡張機能の管理画面を表示したら、右上のデベロッパーモードをオンにして、
 
-<img src="/images/20200625/photo_20200625_01.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200625/photo_20200625_01.png" style="border:solid 1px #000000" loading="lazy">
 
 左上に出現する「パッケージ化されていない拡張機能を読み込む」を選択します。
 ここで、作成した拡張機能が入っているフォルダ（今回は/desktop/Myextension）を選択すると追加できます。
@@ -141,7 +141,7 @@ MDNにも詳しく載っています。
 
 注意点としては、拡張機能を編集したらその都度読み込みし直すことです。
 
-<img src="/images/20200625/photo_20200625_02.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200625/photo_20200625_02.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
 ちなみに、以下のkuma.html、kuma.pngを同一フォルダに配置し、"default_popup"をkuma.htmlに変更すると、こうなります。
 
@@ -151,7 +151,7 @@ MDNにも詳しく載っています。
 </body>
 ```
 
-<img src="/images/20200625/kuma.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200625/kuma.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
 ## jQueryを用いた拡張
 
@@ -222,7 +222,7 @@ Myextension
 ```
 
 拡張機能を読み込み直し、”matches”で指定したhttps://www.google.com/ を開くと、カレンダーを表示できました。
-<img src="/images/20200625/photo_20200625_03.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200625/photo_20200625_03.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
 今回は以上です。いかがでしたでしょうか？
 

@@ -8,7 +8,7 @@ tag:
   - プロキシ
 category:
   - Infrastructure
-thumbnail: /images/20221227a/thumbnail.png
+thumbnail: /images/2022/20221227a/thumbnail.png
 author: 澁川喜規
 lede: "ちょっとローカルでPostgreSQLの最新バージョンを試したいけどDocker Desktopの稟議が間に合わない！みたいなときのためのメモです。Docker Desktopの有償化と契約すべきライセンスについては以前書きました。その後..."
 ---
@@ -20,7 +20,7 @@ Docker Desktopの有償化と契約すべきライセンスについては以前
 
 [Docker Desktop](https://www.docker.com/products/docker-desktop/)の代替のものがいくつかでています。[Rancher Desktop](https://rancherdesktop.io/)と、[Podman Desktop](https://podman-desktop.io/)があります。Rancher Desktopは会社のプロキシの裏で動かすのが難しく、ちょっと苦戦した上に、WSLのコンテナが再作成されるタイミングでプロキシ設定がリセットされるということを聞いて、Podman Desktopを使ってみました。PodmanはRed Hatが開発しているコンテナのエコシステムで、コンテナエンジン（以下サーバーとします）、CLIツールで構成されます。それにデスクトップのUIとPodman自身のインストーラを組み合わせたものがPodman Desktopです。
 
-<img src="/images/20221227a/image.png" alt="" width="1200" height="978" loading="lazy">
+<img src="/images/2022/20221227a/image.png" alt="" width="1200" height="978" loading="lazy">
 
 # インストール
 
@@ -30,7 +30,7 @@ Docker Desktopの有償化と契約すべきライセンスについては以前
 
 起動したら、左下のSettings→Proxyと進んでプロキシの設定ダイアログに設定します。認証が必要な場合は、`http://ユーザー:パスワード@ホスト:ポート`という形式で入れます。
 
-<img src="/images/20221227a/image_2.png" alt="" width="1200" height="687" loading="lazy">
+<img src="/images/2022/20221227a/image_2.png" alt="" width="1200" height="687" loading="lazy">
 
 これだけで済めばDocker同等なのですが、残念ながらもうひと手間必要です。
 
@@ -132,7 +132,7 @@ podman machine start
 podman run --rm -it -p 8888:80 nginx
 ```
 
-<img src="/images/20221227a/image_3.png" alt="image.png" width="1200" height="548" loading="lazy">
+<img src="/images/2022/20221227a/image_3.png" alt="image.png" width="1200" height="548" loading="lazy">
 
 # まとめ
 

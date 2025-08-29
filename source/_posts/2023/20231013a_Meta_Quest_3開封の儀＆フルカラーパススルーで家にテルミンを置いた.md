@@ -7,7 +7,7 @@ tag:
   - MetaQuest3
 category:
   - VR
-thumbnail: /images/20231013a/thumbnail.jpg
+thumbnail: /images/2023/20231013a/thumbnail.jpg
 author: 藤井亮佑
 lede: "2023年10月10日、とうとう発売されましたね。Meta Quest 3（以下 Quest3 と略記）が。しっかり予約して発売日に手に入れようとしたんですが、何故か配達日がズレて 1 日遅れで入手しました。"
 ---
@@ -27,13 +27,13 @@ lede: "2023年10月10日、とうとう発売されましたね。Meta Quest 3�
 それでは早速開封していきます。
 ケースと箱はシンプルで、思ったよりコンパクトでした（ダンボールに梱包されて届いた時点で想像より小さかったのでちょっと驚きました）。
 
-<img src="/images/20231013a/box.jpg" alt="box.jpg" width="1200" height="1091" loading="lazy">
+<img src="/images/2023/20231013a/box.jpg" alt="box.jpg" width="1200" height="1091" loading="lazy">
 
 箱から取り出して Quest2 と比較してみます。
 
 まずは本体を上から見た図です（右が Quest3）
 
-<img src="/images/20231013a/up.jpg" alt="up.jpg" width="1200" height="841" loading="lazy">
+<img src="/images/2023/20231013a/up.jpg" alt="up.jpg" width="1200" height="841" loading="lazy">
 
 ディスプレイ部分が明らかに薄くなっており、全体的にコンパクトに感じます。
 レンズをパンケーキレンズに変更したことでサイズダウンするとは聞いていましたが、思ったより大幅に薄くなっていました。
@@ -46,7 +46,7 @@ lede: "2023年10月10日、とうとう発売されましたね。Meta Quest 3�
 
 次に前から見た図がこちらです（下が Quest3）ついでにコントローラーも並べています。
 
-<img src="/images/20231013a/front.jpg" alt="front.jpg" width="1200" height="1155" loading="lazy">
+<img src="/images/2023/20231013a/front.jpg" alt="front.jpg" width="1200" height="1155" loading="lazy">
 
 本体には特徴的な3つ目がついており、左右のそれぞれに RGB カメラと IR カメラが1つずつ、真ん中には深度センサーが取り付けられています。これらを用いてフルカラーパススルー及び MR のための空間認識機能を提供しているようです。
 また、これに加えて、底面側に 2 つカメラがついているので、トータルで 6 つのカメラと 1 つの深度センサーが搭載されています。
@@ -81,13 +81,13 @@ Oculus Integration のパッケージを導入していましたが、かなり�
 
 今回は Camera Rig と Hand Tracking（以前テルミンシミュレータを作ったときのもとと競合するので、そちらは削除してから）を導入し、加えてパススルーを提供してくれる、Background Passthrough を導入します。
 
-<img src="/images/20231013a/image.png" alt="image.png" width="1200" height="906" loading="lazy">
+<img src="/images/2023/20231013a/image.png" alt="image.png" width="1200" height="906" loading="lazy">
 
 あとはテルミン側のスクリプトから、ハンドトラッキングの参照を設定し直せば準備完了です。ビルドして動かしてみましょう。
 
 我が家にテルミンが来た！（思ったより大きい）
 
-<img src="/images/20231013a/6e962269ed7aea050fd5c2cf96faf4fa.png" alt="6e962269ed7aea050fd5c2cf96faf4fa.png" width="1200" height="1066" loading="lazy">
+<img src="/images/2023/20231013a/6e962269ed7aea050fd5c2cf96faf4fa.png" alt="6e962269ed7aea050fd5c2cf96faf4fa.png" width="1200" height="1066" loading="lazy">
 
 床にもちゃんと接してますね（画像だとわかりにくいですが）
 

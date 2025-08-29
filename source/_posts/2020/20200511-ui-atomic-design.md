@@ -8,7 +8,7 @@ tag:
   - Figma
 category:
   - Design
-thumbnail: /images/20200511/thumbnail.png
+thumbnail: /images/2020/20200511/thumbnail.png
 author: 平川裕蔵
 lede: "今回はPJの現場でUXとUIのデザインを通して、Atomic Designの導入はどのような結果を生んだのか、Atomic Design導入に際しての課題や取り組み方のコツなんかをお伝えできればと思います。z"
 ---
@@ -82,7 +82,7 @@ Atomic Designという言葉を知り、調べ始めました。
 
 UIコンポーネントは減れば減るほど良いというものでもありませんが、小さいUXのバリエーションを減らすことによってユーザーに対してアプリケーションの利用負荷を下げる効果はあると思います。
 
-<img src="/images/20200511/photo_20200511_01.png" loading="lazy">
+<img src="/images/2020/20200511/photo_20200511_01.png" loading="lazy">
 
 ## UIの体系的な管理
 
@@ -90,7 +90,7 @@ UIコンポーネントは減れば減るほど良いというものでもあり
 
 UIの機能性ではなく利用方法という単位がコンポーネント化されていることもあり、煩雑になりがちなCSSもスッキリしていくと思います。アプリケーションが成長するにつれ、言語仕様的にオブジェクト指向で管理できないCSSはどんどんメンテナンスコストが上がっていきますが、BEMとAtomic Designを組み合わせることでかなりメンテナンスコストを低減可能になりました。個人的にはCSSのメンテコスト削減が一番コストメリットを感じています。
 
-<img src="/images/20200511/photo_20200511_02.png" loading="lazy">
+<img src="/images/2020/20200511/photo_20200511_02.png" loading="lazy">
 
 ## 原子多すぎ問題の発生
 

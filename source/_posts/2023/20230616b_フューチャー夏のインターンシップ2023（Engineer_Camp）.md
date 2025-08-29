@@ -7,7 +7,7 @@ tag:
   - インターン2023
 category:
   - Infrastructure
-thumbnail: /images/20230616b/thumbnail.jpg
+thumbnail: /images/2023/20230616b/thumbnail.jpg
 author: 真野隼記
 lede: "インターン生募集の告知です"
 ---

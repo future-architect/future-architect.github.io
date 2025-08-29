@@ -8,11 +8,11 @@ tag:
   - Emscripten
 category:
   - Infrastructure
-thumbnail: /images/20230517a/thumbnail.png
+thumbnail: /images/2023/20230517a/thumbnail.png
 author: 森直也
 lede: "EmscriptenはC/C++をWebAssemblyにコンパイルするツールである、Emscriptenに入門した際の流れや気付きについて紹介します。"
 ---
-<img src="/images/20230517a/Emscripten_logo_full.png" alt="" width="612" height="167" loading="lazy">
+<img src="/images/2023/20230517a/Emscripten_logo_full.png" alt="" width="612" height="167" loading="lazy">
 
 ## はじめに
 
@@ -133,7 +133,7 @@ JavaScriptからコンパイルされたCの関数を呼び出す2種類の方�
 </html>
 ```
 
-<img src="/images/20230517a/image.png" alt="" width="509" height="159" loading="lazy">
+<img src="/images/2023/20230517a/image.png" alt="" width="509" height="159" loading="lazy">
 
 addボタンを押すたびに `Module.ccall()` によってCプログラムで定義した `add()` が呼び出され和を計算しています。
 
@@ -163,7 +163,7 @@ addボタンを押すたびに `Module.ccall()` によってCプログラムで�
 </html>
 ```
 
-<img src="/images/20230517a/image_2.png" alt="" width="849" height="182" loading="lazy">
+<img src="/images/2023/20230517a/image_2.png" alt="" width="849" height="182" loading="lazy">
 
 コンソールに計算結果が表示されていることが確認できます。`cwrap` はCの関数の"関数名"、"戻り値の型"、"引数の型"を引数とし、Cの関数を実行するJavaScriptの関数を返します。
 

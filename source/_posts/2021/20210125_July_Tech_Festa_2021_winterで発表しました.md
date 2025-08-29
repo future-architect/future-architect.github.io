@@ -10,7 +10,7 @@ tag:
   - Vue.js
 category:
   - Programming
-thumbnail: /images/20210125/thumbnail.png
+thumbnail: /images/2021/20210125/thumbnail.png
 author: 伊藤真彦
 lede: "先日July Tech Festa 2021 winterに登壇させていただきました。一足先にElectronの使い方 Web開発の技術でデスクトップアプリを作ろうというタイトルで入門記事を技術ブログでも書きました。その内容と重複する部分も..."
 ---
@@ -21,7 +21,7 @@ TIGの伊藤真彦です。
 
 昨今の情勢的に当然のごとくオンラインイベントでの参加です、手軽で良いのですが少し寂しさもあります。
 
-<img src="/images/20210125/photo_20210125_01.png" loading="lazy">
+<img src="/images/2021/20210125/photo_20210125_01.png" loading="lazy">
 
 ## July Tech Festaとは
 
@@ -49,12 +49,12 @@ July Tech Festaは有志のボランティアにより開催されるイベン�
 
 その内容と重複する部分もありますが、発表ではサンプルアプリケーションのコードを深堀りして、どのようにフレームワークが動いているかをお話しさせていただきました。
 
-<img src="/images/20210125/photo_20210125_02.png" loading="lazy">
+<img src="/images/2021/20210125/photo_20210125_02.png" loading="lazy">
 
 July Tech Festaは元々システム管理、インフラエンジニア向けのイベントであるという側面を意識し、
 業務観点でのデスクトップアプリケーションとクラウドインフラの構築における工夫についても発表しました。
 
-<img src="/images/20210125/photo_20210125_03.png" loading="lazy">
+<img src="/images/2021/20210125/photo_20210125_03.png" loading="lazy">
 
 ITコンサルタントとしての働き方、アルバイトが驚異的に優秀である文化といった会社のカルチャーも自己紹介として少し長めに説明させていただきました。
 フューチャーって結局どんな会社なんだろう、と思った方はぜひ[アーカイブ動画](https://www.youtube.com/channel/UCKLoUvohjwyohYzKTRyeUBQ)を見ていただければと思います。

@@ -9,7 +9,7 @@ tag:
   - 共通処理
 category:
   - Programming
-thumbnail: /images/20240329a/thumbnail.png
+thumbnail: /images/2024/20240329a/thumbnail.png
 author: 真野隼記
 lede: "AWS SDK for Goを用いてAWS Lambdaを実装する際に、共通的に行いたいミドルウェア的な処理をデコレータで実装する方法を説明します"
 ---
@@ -83,7 +83,7 @@ func Handle(ctx context.Context) error {
 
 デコレータの処理イメージですが、次のようなイメージです。先ほどの `plain/handler.go` で実装した `Handle()` 関数が真ん中のビジネスロジックの部分で、外側を1つ以上の共通処理でラップするようなことを行います。
 
-<img src="/images/20240329a/godecorator.drawio.png" alt="godecorator.drawio.png" width="1030" height="459" loading="lazy">
+<img src="/images/2024/20240329a/godecorator.drawio.png" alt="godecorator.drawio.png" width="1030" height="459" loading="lazy">
 
 次の章からは具体的に実装例を紹介していきます。
 

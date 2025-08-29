@@ -8,7 +8,7 @@ tag:
   - Helidon
 category:
   - Programming
-thumbnail: /images/20230308a/thumbnail.png
+thumbnail: /images/2023/20230308a/thumbnail.png
 author: 澁川喜規
 lede: "JavaでWebサービス開発というと、SpringBoot、という時代が長く続いていますが、Javaの世界もいろいろ進歩があるよ、ということで、MicroProfileというのを教えてもらいました。豆蔵さんの技術ブログや、masatarouさんのJJUGのレポートが詳しいです。"
 ---
@@ -30,15 +30,15 @@ JavaでWebサービス開発というと、SpringBoot、という時代が長く
 
 フォークしたけど、どちらもEclipse Foundationに入り、2020年からは仲良く歩調を合わせている、という感じですかね。Java EEやJakartaEEは過去との互換性を重視している感じで、MicroProfileの方はイケイケな感じということを当初狙っていたみたいですが、2022年12月に出た6.0では、含まれるプロファイルにJakartaEE 10 Core Profileという文字が見えます。
 
-<img src="/images/20230308a/スクリーンショット_2023-02-21_18.44.43.png" alt="スクリーンショット_2023-02-21_18.44.43.png" width="1200" height="447" loading="lazy">
+<img src="/images/2023/20230308a/スクリーンショット_2023-02-21_18.44.43.png" alt="スクリーンショット_2023-02-21_18.44.43.png" width="1200" height="447" loading="lazy">
 
 これまではJakartaEEの要素でもあったJSON-B、JSON-P、JAX-RS、CDIなどが個別に指定されていたのですが、最新版ではJakartaEE 10とも歩調を合わせた、と言う感じみたいです。それにしても、OpenTelemetry対応とか、イケイケですね。参考までにMicroProfile 5.0はこんな感じ。
 
-<img src="/images/20230308a/スクリーンショット_2023-02-21_18.48.43.png" alt="スクリーンショット_2023-02-21_18.48.43.png" width="1200" height="428" loading="lazy">
+<img src="/images/2023/20230308a/スクリーンショット_2023-02-21_18.48.43.png" alt="スクリーンショット_2023-02-21_18.48.43.png" width="1200" height="428" loading="lazy">
 
 ソフトウェアの歴史で何度か見たことがあるような流れではあります。[Jakarta EE 10の仕様の構成要素の図](https://jakarta.ee/release/10/)にMicroProfile 6.0の項目も合わせてみたのが以下の図です。クラウドネイティブなフレームワークとなるために、どのような部分を切りすてて、何が必要とされているのかが一目瞭然ですね。これは他の言語のユーザーがフレームワークを考えるうえでも興味深い図なんじゃないでしょうか？ ちょっと補足すると、Interceptorsというのは他の言語のフレームワークではDIコンテナと呼んでいるやつですね。
 
-<img src="/images/20230308a/image.png" alt="image.png" width="870" height="684" loading="lazy">
+<img src="/images/2023/20230308a/image.png" alt="image.png" width="870" height="684" loading="lazy">
 
 # Helidon
 

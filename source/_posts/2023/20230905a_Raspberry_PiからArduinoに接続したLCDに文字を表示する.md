@@ -9,7 +9,7 @@ tag:
   - 電子工作
 category:
   - IoT
-thumbnail: /images/20230905a/thumbnail.png
+thumbnail: /images/2023/20230905a/thumbnail.png
 author: 水田祐介
 lede: "Raspberry Piに立てたWebサーバのブラウザから好きな文字列を入力してArduinoに接続したLCDに表示するまでをやっていきます"
 ---
@@ -41,7 +41,7 @@ lede: "Raspberry Piに立てたWebサーバのブラウザから好きな文字�
 
 最終的に以下の図のような構成を予定しています。
 
-<img src="/images/20230905a/image.png" alt="" width="987" height="197" loading="lazy">
+<img src="/images/2023/20230905a/image.png" alt="" width="987" height="197" loading="lazy">
 
 ## Arduino→LCDへの表示
 
@@ -55,7 +55,7 @@ lede: "Raspberry Piに立てたWebサーバのブラウザから好きな文字�
 
 以下、実際につないで動かしてみた画像と使用したソースコードです。
 
-<img src="/images/20230905a/lcd.jpg" alt="" width="1200" height="900" loading="lazy">
+<img src="/images/2023/20230905a/lcd.jpg" alt="" width="1200" height="900" loading="lazy">
 
 ```cpp Arduino
 // LCDを使用するためのライブラリをインクルード
@@ -185,7 +185,7 @@ void loop() {
 ```
 
 以下、結果です。
-<img src="/images/20230905a/2.jpg" alt="" width="1200" height="1600" loading="lazy">
+<img src="/images/2023/20230905a/2.jpg" alt="" width="1200" height="1600" loading="lazy">
 
 ### うまくいっているように見えますが
 
@@ -241,7 +241,7 @@ sleepを入れない方向でもいいのでは？ と考えています。
 まず、Webサーバの方に必要なモジュールをブラウザに表示する内容から考えると以下のようになると考えています。
 
 **ブラウザ表示（仮）**
-<img src="/images/20230905a/image_2.png" alt="" width="597" height="301" loading="lazy">
+<img src="/images/2023/20230905a/image_2.png" alt="" width="597" height="301" loading="lazy">
 
 - シリアル通信開始（接続ボタン押下）
 - シリアル通信終了（切断ボタン押下）

@@ -8,7 +8,7 @@ tag:
   - Terraform
 category:
   - Infrastructure
-thumbnail: /images/20200813/thumbnail.png
+thumbnail: /images/2020/20200813/thumbnail.png
 author: 西田好孝
 lede: "フューチャー夏休みの自由研究連載の9回目です。こんにちは、TIG DXユニットの西田と申します。業務では `GCP` のインフラの設計/構築/運用を担当しております。私は前職でネットワーク領域のキャリアが長かった事もあり、現職では `GCP` の中でも特にネットワークに関する部分を見ています。今回の自由研究もそれに関連する考察をしていきます。クラウド上で、ワールドワイドのサービスを作るとき、『どれくらいの密度でどの Region にサーバを立てればよいのか？』って、悩みませんか？インターネット向けのWebサービスだったら `CDN` で対処すれば基本的にはOKですが、イントラネットだけからアクセスさせたい社内サービス、Backend 系のサービス、Webサービスではないアプリケーションなどはインスタンスを用意する必要が出てきますよね。"
 ---
@@ -71,7 +71,7 @@ https://cloud.google.com/about/locations?hl=ja#network
 
 こちらの [Compute Engine リージョンとゾーン](https://cloud.google.com/compute/docs/regions-zones?hl=ja) に記載の全Region を対象にします。
 ※すいません、ムンバイだけ、QuotaがデフォルトでCPUS:0となっており、上げるリクエストを出したんですが、拒否されてしまいました。その関係で、ムンバイだけ計測が出来ませんでした🙇‍♂️
-<img src="/images/20200813/2020-08-02_233921.png" loading="lazy">
+<img src="/images/2020/20200813/2020-08-02_233921.png" loading="lazy">
 
 ###
 
@@ -88,7 +88,7 @@ https://cloud.google.com/about/locations?hl=ja#network
 - 青：20ms。サクサク
 - 黄：60ms。ギリギリ我慢できるレベル
 - 赤：それ以上。これはサービスとしてはよろしくない
-<img src="/images/20200813/2020-08-02_231622.jpg" loading="lazy">
+<img src="/images/2020/20200813/2020-08-02_231622.jpg" loading="lazy">
 
 # 考察
 

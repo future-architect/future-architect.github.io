@@ -8,12 +8,12 @@ tag:
   - Playwright
 category:
   - Infrastructure
-thumbnail: /images/20231128a/thumbnail.png
+thumbnail: /images/2023/20231128a/thumbnail.png
 author: 澁川喜規
 lede: "Playwrightあるいはそのロケーターの元ネタとなっているTesting Libraryでは、DOMを指定する方法として data-testid 属性を扱ったクエリーを提供しています。"
 ---
 
-<img src="/images/20231128a/top.png" alt="" width="329" height="153">
+<img src="/images/2023/20231128a/top.png" alt="" width="329" height="153">
 
 Playwrightあるいはそのロケーターの元ネタとなっているTesting Libraryでは、DOMを指定する方法として ``data-testid`` 属性を扱ったクエリーを提供しています。どちらでも ``getByTestId(ID文字列)`` メソッドを使い、この属性値を使った要素の取得が行えます。しかし、ドキュメントを見ると、PlaywrightもTesting Libraryも、「他の手法が使えないときの最終手段」としています。
 

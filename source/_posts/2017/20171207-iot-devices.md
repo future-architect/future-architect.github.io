@@ -7,7 +7,7 @@ tag:
   - FutureIoT
 category:
   - IoT
-thumbnail: /images/20171207/thumbnail_20171207.png
+thumbnail: /images/2017/20171207/thumbnail_20171207.png
 author: 山本力世
 lede: "今年、社内のR&Dチームにて開発し利用を開始した汎用IoTデバイスについて紹介したいと思います。"
 ---
@@ -22,10 +22,10 @@ lede: "今年、社内のR&Dチームにて開発し利用を開始した汎用I
 デバイスの各辺の長さは約4.5cmの立方体で、異なる拡張モジュールを最大8つ内蔵、もしくはGroveコネクタ準拠のセンサーなどを外付けできる形になっています。
 
 こんな感じのサイコロ型のデバイスです。
-<img src="/images/20171207/photo_20171207_02.jpeg" loading="lazy">
+<img src="/images/2017/20171207/photo_20171207_02.jpeg" loading="lazy">
 
 アップすると FutureIoT のロゴが印字されています。
-<img src="/images/20171207/asset_20171207_01.png" loading="lazy">
+<img src="/images/2017/20171207/asset_20171207_01.png" loading="lazy">
 
 ちなみに、なんで鶴なんだ？ とよく聞かれるのでこの場をお借りして回答しておきます。
 
@@ -57,7 +57,7 @@ lede: "今年、社内のR&Dチームにて開発し利用を開始した汎用I
 
 ## ハードウェア
 
-<img src="/images/20171207/photo_20171207_03.jpeg" loading="lazy">
+<img src="/images/2017/20171207/photo_20171207_03.jpeg" loading="lazy">
 
 ### [MPU](https://ja.wikipedia.org/wiki/%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD%E3%83%97%E3%83%AD%E3%82%BB%E3%83%83%E3%82%B5)
 
@@ -124,9 +124,9 @@ MPUとしては、Wi-Fi、BLEも内蔵した比較的安価なESP32を採用し�
   * C++
   * C
 
-<img width="400" alt="Blocklyの編集画面" src="/images/20171207/asset_20171207_04.jpeg">
+<img width="400" alt="Blocklyの編集画面" src="/images/2017/20171207/asset_20171207_04.jpeg">
 
-<img width="400" alt="JavaScriptの編集画面" src="/images/20171207/asset_20171207_05.png">
+<img width="400" alt="JavaScriptの編集画面" src="/images/2017/20171207/asset_20171207_05.png">
 
 ## クラウド
 

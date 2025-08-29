@@ -10,7 +10,7 @@ tag:
   - カンファレンス
 category:
   - Programming
-thumbnail: /images/20211122a/thumbnail.png
+thumbnail: /images/2021/20211122a/thumbnail.png
 author: 辻大志郎
 lede: "Go Conference Online 2021 Autumnに登壇しました。Go Conference Autumn には2019年にも登壇しているので、2年ぶり2度目の出場になります。2019年はGoの特徴である並行処理に焦点を当てた、Goによる並列のシミュレーテッドアニーニングの実装、というマニアックな内容でしたが、今回はGoの静的解析、という身近なテーマで登壇しました。"
 ---
@@ -18,7 +18,7 @@ lede: "Go Conference Online 2021 Autumnに登壇しました。Go Conference Aut
 
 2019年はGoの特徴である並行処理に焦点を当てた、[Goによる並列のシミュレーテッドアニーニングの実装](/articles/20191120/)、というマニアックな内容でしたが、今回はGoの静的解析、という身近なテーマで登壇しました。
 
-<img src="/images/20211122a/image.png" alt="image.png" width="1200" height="619">
+<img src="/images/2021/20211122a/image.png" alt="image.png" width="1200" height="619">
 
 スライドは以下です。
 

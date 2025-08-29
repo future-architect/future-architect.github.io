@@ -8,7 +8,7 @@ tag:
   - クラウドマイグレーション
 category:
   - Infrastructure
-thumbnail: /images/20201120/thumbnail.png
+thumbnail: /images/2020/20201120/thumbnail.png
 author: 八巻達紀
 lede: "前回記事「[CloudEndure Migration - 導入編]」の続きです。今回は、実際にCloudEndure Migrationを使った移行を実践したいと思います。"
 ---
@@ -25,7 +25,7 @@ lede: "前回記事「[CloudEndure Migration - 導入編]」の続きです。�
 # 今回の環境構成図
 
 CloudEndure Migrationを実施する環境は以下の通りです。
-<img src="/images/20201120/CloudEndure-Diagram.png" loading="lazy">
+<img src="/images/2020/20201120/CloudEndure-Diagram.png" loading="lazy">
 
 GCPに用意したGCEのVMインスタンスを、AWSへ移行してみます。
 移行元のサーバーとして、以下のVMインスタンスを用意しました。
@@ -39,8 +39,8 @@ GCPに用意したGCEのVMインスタンスを、AWSへ移行してみます。
 |アプリケーション|WordPress 5.5.3|
 
 AWSへ移行後、Wordpressにアクセスするまでを実践します。
-<img src="/images/20201120/GCE-Info(Care).jpg" loading="lazy">
-<img src="/images/20201120/GCE-WordPress画面.png" loading="lazy">
+<img src="/images/2020/20201120/GCE-Info(Care).jpg" loading="lazy">
+<img src="/images/2020/20201120/GCE-WordPress画面.png" loading="lazy">
 
 # 作業の流れ
 
@@ -144,7 +144,7 @@ Typeにxfsとありますが、NGとなるか検証したいと思います。
 ## CentOS固有の要件・注意点確認
 
 最後に、CentOS固有の要件を確認します。
-<img src="/images/20201120/CentOS-Note.png" loading="lazy">
+<img src="/images/2020/20201120/CentOS-Note.png" loading="lazy">
 
 引用元： [Supported Operating Systems](https://docs.cloudendure.com/Content/Getting_Started_with_CloudEndure/Supported_Operating_Systems/Supported_Operating_Systems.htm)
 
@@ -178,7 +178,7 @@ rootのファイルシステムがxfsなのが気になりますが、移行で�
 マシンの登録がない初期は、CloudEndureコンソールの「Machines」に記載があります。
 また、画面上部にある「MACHINE ACTIONS...」の「Add Machines」からも確認が可能です。
 ※インストール用のTokenは、アカウント固有の情報のため伏せています。
-<img src="/images/20201120/AgentInstall方法.jpg" loading="lazy">
+<img src="/images/2020/20201120/AgentInstall方法.jpg" loading="lazy">
 
 ### エージェントのインストーラーを取得
 
@@ -236,33 +236,33 @@ Installation finished successfully.
 
 `--no-replication`を使ってインストールが完了すると、CloudEnduereコンソールの「Machines」にマシンの登録のみ行われます。
 レプリケーションを開始するには、「Machines」> 「MACHINE ACTIONS」メニューから、「Start/resume Data Replication」をクリックすることで実施可能です。
-<img src="/images/20201120/DataReplicationStart.png" loading="lazy">
+<img src="/images/2020/20201120/DataReplicationStart.png" loading="lazy">
 
 # データのレプリケーション
 
 エージェントのインストール完了後、CloudEndureコンソールの「Machines」に登録され、レプリケーションが開始します。
-<img src="/images/20201120/Insrall直後.png" loading="lazy">
+<img src="/images/2020/20201120/Insrall直後.png" loading="lazy">
 また、AWSコンソールでは、レプリケーションサーバの起動が確認できます。※今回はt3.smallで起動
-<img src="/images/20201120/ReplicationServerStart.png" loading="lazy">
+<img src="/images/2020/20201120/ReplicationServerStart.png" loading="lazy">
 
 登録されたマシンをクリックするとレプリケーションの状況が表示されます。
 進捗状況は、パーセンテージと容量で表示されます。
-<img src="/images/20201120/Replication-8%.png" loading="lazy">
+<img src="/images/2020/20201120/Replication-8%.png" loading="lazy">
 
 補足ですが、登録されたマシン毎に、レプリケーションサーバーのスペックを変更することも可能です。
 変更については「REPLICATION SETTINGS」から可能です。
 今回は、レプリケーションサーバーのインスタンスタイプを「t3.medium」に変更してみます。
-<img src="/images/20201120/ReplicationSettings-Machines.png" loading="lazy">
+<img src="/images/2020/20201120/ReplicationSettings-Machines.png" loading="lazy">
 
 インスタンスタイプを変更して設定を保存すると、
 指定したインスタンスタイプのレプリケーションサーバが起動されます。
-<img src="/images/20201120/AddReplicationServer.png" loading="lazy">
+<img src="/images/2020/20201120/AddReplicationServer.png" loading="lazy">
 
 変更後のレプリケーションサーバーの起動後、
 変更前のインスタンスがレプリケーションで使用されていない場合、インスタンスは終了されます。
 
 レプリケーションが完了すると以下のような画面が表示されます。
-<img src="/images/20201120/Replication-Finish.png" loading="lazy">
+<img src="/images/2020/20201120/Replication-Finish.png" loading="lazy">
 
 ちなみに、インスタンスタイプがt3.small、EBSのボリュームタイプがStandardのレプリケーションサーバだと、レプリケーション完了まで約20分かかりました。また、インスタンスタイプがt3.medium、EBSのボリュームタイプがStandardのレプリケーションサーバだと、約17分でレプリケーションが完了しました。
 
@@ -284,7 +284,7 @@ Installation finished successfully.
 
 データのレプリケーションが完了したら、ターゲットマシンの設定を行います。
 登録されたマシンのページにある「BLUE PRINT」から設定を行います。
-<img src="/images/20201120/Machine-BLUE_PRINT.png" loading="lazy">
+<img src="/images/2020/20201120/Machine-BLUE_PRINT.png" loading="lazy">
 AWSに移行後のEC2は、ここで設定した内容で起動されます。
 
 EC2インスタンスを起動する際の設定項目と類似しているため、
@@ -341,40 +341,40 @@ EC2インスタンスを起動する際の設定項目と類似しているた�
 実際にテストモードでターゲットマシンを起動してみます。
 
 「LAUNCH TARGET MACHINE」から、「Test Mode」をクリックする。
-<img src="/images/20201120/CloudEndureコンソール-Launch(TestMode).png" loading="lazy">
+<img src="/images/2020/20201120/CloudEndureコンソール-Launch(TestMode).png" loading="lazy">
 「CONTINUE」をクリックすると、ターゲットマシンが起動されます。
-<img src="/images/20201120/LaunchTarget(TestMode)確認.png" loading="lazy">
+<img src="/images/2020/20201120/LaunchTarget(TestMode)確認.png" loading="lazy">
 
 CloudEndureコンソールの「JobProgress」を確認すると、開始していることがわかります。
-<img src="/images/20201120/JobProgress_Start.png" loading="lazy">
+<img src="/images/2020/20201120/JobProgress_Start.png" loading="lazy">
 
 CloudEndureの裏の動きについては、AWSコンソールを観察してみます。
 
 まず、コンバーターサーバーが起動されます。
-<img src="/images/20201120/ConverterServer起動.png" loading="lazy">
+<img src="/images/2020/20201120/ConverterServer起動.png" loading="lazy">
 
 コンバーターサーバーは、ディスクの変換処理を担っています。
 変換処理が終わるとすぐに終了されます。
-<img src="/images/20201120/ConverterServer終了.png" loading="lazy">
+<img src="/images/2020/20201120/ConverterServer終了.png" loading="lazy">
 
 コンバーターサーバーの終了後、ターゲットマシンが起動されます
-<img src="/images/20201120/TargetMachine(TestMode)起動.png" loading="lazy">
+<img src="/images/2020/20201120/TargetMachine(TestMode)起動.png" loading="lazy">
 
 ターゲットマシンは、起動直後に停止されます。
 よく見ると、1GBのストレージがアタッチされています。
-<img src="/images/20201120/TargetMachine(TestMode)停止1GB.png" loading="lazy">
+<img src="/images/2020/20201120/TargetMachine(TestMode)停止1GB.png" loading="lazy">
 
 停止されると、1GBのストレージがデタッチされ、インスタンスの情報からは見れなくなります。
-<img src="/images/20201120/TargetMachine(TestMode)停止デタッチ.png" loading="lazy">
+<img src="/images/2020/20201120/TargetMachine(TestMode)停止デタッチ.png" loading="lazy">
 
 最後にレプリケーション済みのボリュームがアタッチされた状態でインスタンスが起動されて完了です。
-<img src="/images/20201120/TargetMachine(TestMode)起動成功.png" loading="lazy">
+<img src="/images/2020/20201120/TargetMachine(TestMode)起動成功.png" loading="lazy">
 
 CloudEndureコンソールの「JobProgress」を確認すると、終了していることがわかります。
-<img src="/images/20201120/JobProgress_Finish.png" loading="lazy">
+<img src="/images/2020/20201120/JobProgress_Finish.png" loading="lazy">
 
 テストモードで起動したターゲットマシンに、SSHログインしてみます。
-<img src="/images/20201120/TargetMachine(TestMode)成功GIP.png" loading="lazy">
+<img src="/images/2020/20201120/TargetMachine(TestMode)成功GIP.png" loading="lazy">
 
 ```bash 実行結果
 $ ssh -i key-pair.pem yamaki@18.179.11.231
@@ -451,7 +451,7 @@ MariaDB [wordpress]> select * from wp_options where option_name = 'siteurl';
 ```
 
 Apacheを再起動して、WordPressにアクセス/ログインしてみます。
-<img src="/images/20201120/EC2-WordPress画面.png" loading="lazy">
+<img src="/images/2020/20201120/EC2-WordPress画面.png" loading="lazy">
 
 アクセスできました。
 
@@ -471,27 +471,27 @@ Apacheを再起動して、WordPressにアクセス/ログインしてみます�
 カットオーバーの方法も、テストモードと同じです。
 
 「LAUNCH TARGET MACHINE」から、「Cutover」をクリックする。
-<img src="/images/20201120/Launch_Target(CutOver)start.png" loading="lazy">
+<img src="/images/2020/20201120/Launch_Target(CutOver)start.png" loading="lazy">
 
 「CONTINUE」をクリックすると、ターゲットマシンが起動されます。
-<img src="/images/20201120/Launch_Target(CutOver)確認.png" loading="lazy">
+<img src="/images/2020/20201120/Launch_Target(CutOver)確認.png" loading="lazy">
 
 CloudEndureコンソールの「JobProgress」を確認すると、CutOverが開始されていることがわかります。
-<img src="/images/20201120/JobProgress_Start(CutOver).png" loading="lazy">
+<img src="/images/2020/20201120/JobProgress_Start(CutOver).png" loading="lazy">
 
 AWSのコンソールを確認すると、テストモードで起動したEC2インスタンスが終了後されていることがわかります。
-<img src="/images/20201120/TestMode_Machine終了.png" loading="lazy">
+<img src="/images/2020/20201120/TestMode_Machine終了.png" loading="lazy">
 （後続の動作は、テストモードと同一であるため、省略します）。
 
 カットオーバーが完了しました。
-<img src="/images/20201120/Launch_Target(CutOver)成功.png" loading="lazy">
+<img src="/images/2020/20201120/Launch_Target(CutOver)成功.png" loading="lazy">
 
 ### 起動後の設定修正
 
 テストモードと同じく、SSHでログインして、
 WordPressの設定を変更したあと、アクセスしてみます。
 (作業内容はテストモードと同一であるため、省略します。)
-<img src="/images/20201120/EC2_WordPress(CutOver).png" loading="lazy">
+<img src="/images/2020/20201120/EC2_WordPress(CutOver).png" loading="lazy">
 アクセスできました。
 
 # ターゲットマシンからエージェントのアンインストール

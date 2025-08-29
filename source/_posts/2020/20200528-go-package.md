@@ -7,7 +7,7 @@ tag:
   - Go
 category:
   - Programming
-thumbnail: /images/20200528/thumbnail.png
+thumbnail: /images/2020/20200528/thumbnail.png
 author: 澁川喜規
 lede: "Goでプロジェクトのフォルダ構成どうしよう、とググると見つかるStandard Go Project Layout(https://github.com/golang-standards/project-layout)。とはいえ、これはかなりコード量を増やしてしまう恐れがありますので、導入する場合のデメリットも考えておく方が良いです。"
 ---
@@ -81,25 +81,25 @@ cmdもなくして、全部をmainパッケージにしてしまうというさ�
 
 単純にフォルダを切ってコードをそっちに持っていくと、共通の定数やら型定義が`<projectroot>`にいるので、この`<projectroot>`と、サブフォルダで循環しちゃうのですよね。対策はいくつかあります。
 
-<img src="/images/20200528/photo_20200528_01.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200528/photo_20200528_01.png" class="img-small-size" loading="lazy">
 
 ## common的なパッケージを作る
 
 ナイーブに設計していくと登場しがちなのがこのパターンです。循環参照しちゃった場合、両方から参照されうるものを切り出して移動することで解消します。`common`という名前は良くない、と言われることが多いのですが、もし、その切り出したものを表すきちんとしたパッケージ名が編み出せるならありです。
 
-<img src="/images/20200528/photo_20200528_02.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200528/photo_20200528_02.png" class="img-small-size" loading="lazy">
 
 [commonとかbaseとかutilという名前を付けるぐらいなら1つのパッケージにまとめてしまえ](https://dave.cheney.net/2019/01/08/avoid-package-names-like-base-util-or-common)という人もいます。
 
 ## ルートのロジックを廃していく
 
-<img src="/images/20200528/photo_20200528_03.png"  class="img-small-size" loading="lazy">
+<img src="/images/2020/20200528/photo_20200528_03.png"  class="img-small-size" loading="lazy">
 
 HTTPのハンドラーの初期化は`handlers`パッケージ、DB初期化コードは`repositories`パッケージ、のように切り分けて、コードを全部サブフォルダ側に移動します。欠点としてはエントリーポイントの`main.go`が太りやすい点ですかね。
 
 ## ルートの定数や共通のものを末端パッケージに移動する
 
-<img src="/images/20200528/photo_20200528_04.png"  class="img-small-size" loading="lazy">
+<img src="/images/2020/20200528/photo_20200528_04.png"  class="img-small-size" loading="lazy">
 
 起動後のちょっとした処理（DB初期化とか）がルートにあったとして、`<projectroot>`から`handlers`などのサブフォルダに一部ロジックとともに定数定義などもまるごと移譲する方法があります。うまくいけば、完全に一方的に利用されるだけの疎なパッケージができます。ここでは`handlers`みたいなアプリケーションの一部を例に説明していますが、独立した機能でパッケージが構成できれば、そのまま切り出してgo getで利用する独立パッケージ化して他のプロジェクトから利用したり、OSS化できたりもするでしょう。
 

@@ -7,7 +7,7 @@ tag:
   - Java
 category:
   - Programming
-thumbnail: /images/20210129/thumbnail.png
+thumbnail: /images/2021/20210129/thumbnail.png
 author: 多賀聡一朗
 lede: "Azure が提供されている Event Hubs の Consumer 処理実装の EventProcessorClient について調査する機会があったため、整理した内容を公開いたします。EventHubs_logo.png> Azure アーキテクチャ アイコン"
 ---
@@ -15,7 +15,7 @@ lede: "Azure が提供されている Event Hubs の Consumer 処理実装の Ev
 
 Azure が提供されている Event Hubs の Consumer 処理実装の EventProcessorClient について調査する機会があったため、整理した内容を公開いたします。
 
-<img src="/images/20210129/EventHubs_logo.png" class="img-small-size" loading="lazy">
+<img src="/images/2021/20210129/EventHubs_logo.png" class="img-small-size" loading="lazy">
 
 > [Azure アーキテクチャ アイコン](https://docs.microsoft.com/ja-jp/azure/architecture/icons/) からの画像
 
@@ -61,7 +61,7 @@ Consumer group とは、複数の Consumer をまとめて扱う単位で、Even
 例えば、メール配信用とSlack配信用で同一 Event Hub から別々に受信処理をしたい場合は、Consumer group Mail と Consumer group Slack と分けて作成することで実現できます。その際、offset 管理を別々に実施しないとメッセージが欠けたり重複したりしてしまいます。
 
 そのため、offset の管理単位として Consumer group が利用されています。
-<img src="/images/20210129/azure_eventhubs_consumer_group.png" loading="lazy">
+<img src="/images/2021/20210129/azure_eventhubs_consumer_group.png" loading="lazy">
 
 > [Azure アーキテクチャ アイコン-コンシューマーグループ](https://docs.microsoft.com/ja-jp/azure/event-hubs/event-hubs-features#consumer-groups) からの画像
 

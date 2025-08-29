@@ -9,11 +9,11 @@ tag:
   - コードリーディング
 category:
   - Programming
-thumbnail: /images/20240415a/thumbnail.png
+thumbnail: /images/2024/20240415a/thumbnail.png
 author: 棚井龍之介
 lede: "VSCodeの拡張機能である「GitLens — Supercharge Git in VS Codeを取り上げます"
 ---
-<img src="/images/20240415a/gitlens-logo-anybg.png" alt="" width="952" height="300" loading="lazy">
+<img src="/images/2024/20240415a/gitlens-logo-anybg.png" alt="" width="952" height="300" loading="lazy">
 
 [春の入門連載2024](/articles/20240408a/)、5本目の記事です。
 
@@ -76,7 +76,7 @@ Visual StudioのMarketplaceで「[GitLens — Git supercharged](https://marketpl
 
 ■ 拡張機能 > `@id:eamodio.gitlens`
 
-<img src="/images/20240415a/コメント_2024-04-15_080229.png" alt="" width="1200" height="385" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_080229.png" alt="" width="1200" height="385" loading="lazy">
 
 GitLensが提供するほとんどの機能は、無料で利用可能です。
 一部、プライベートリポジトリでの利用が制限されている機能や、使用には `GitKraken account` が必要な機能があります。
@@ -100,7 +100,7 @@ VSCode内でのGitLens操作方法、設定状況が分からなくなった場�
 
 GitLesnの基本操作内容や、各種チュートリアルへのリンクが記載されています。
 
-<img src="/images/20240415a/コメント_2024-04-15_081358.png" alt="コメント_2024-04-15_081358.png" width="1200" height="610" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_081358.png" alt="コメント_2024-04-15_081358.png" width="1200" height="610" loading="lazy">
 
 「[Tutorial Video](https://www.youtube.com/watch?v=UQPb73Zz9qk)」へのリンクも付与されています。
 
@@ -112,7 +112,7 @@ GitLesnの基本操作内容や、各種チュートリアルへのリンクが�
 
 GitLens専用のカスタマイズ画面です。「[GitLens Documentation](https://help.gitkraken.com/gitlens/gitlens-settings/)」に記載された設定値のカスタマイズや、`Ctrl + ,`で開けるユーザ設定値の変更が可能です。
 
-<img src="/images/20240415a/コメント_2024-04-15_082147.png" alt="コメント_2024-04-15_082147.png" width="1200" height="989" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_082147.png" alt="コメント_2024-04-15_082147.png" width="1200" height="989" loading="lazy">
 
 次の章で説明する「アノテーションの表示」について、その表示フォーマットのカスタマイズも可能です。
 
@@ -138,17 +138,17 @@ GitLensにより「ソースコードの編集履歴をエディタ内で確認�
 * 改修時期
 * コミットメッセージ
 
-<img src="/images/20240415a/コメント_2024-04-15_090706.png" alt="" width="1175" height="135" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_090706.png" alt="" width="1175" height="135" loading="lazy">
 
 実装対応箇所: [https://github.com/hashicorp/terraform/blob/main/main.go#L64](https://github.com/hashicorp/terraform/blob/main/main.go#L64)
 
 エディタ下部にも同様のメッセージが表示され、クリックするとさらに追加情報を確認できます。
 
-<img src="/images/20240415a/コメント_2024-04-15_095554.png" alt="" width="307" height="36" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_095554.png" alt="" width="307" height="36" loading="lazy">
 
 ↓
 
-<img src="/images/20240415a/コメント_2024-04-15_091340.png" alt="" width="861" height="917" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_091340.png" alt="" width="861" height="917" loading="lazy">
 
 エディタ内の操作として、複数の方法が提供されていることが分かります。
 
@@ -156,15 +156,15 @@ GitLensにより「ソースコードの編集履歴をエディタ内で確認�
 
 【1】で表示されたアノテーションにマウスをホバーすると、コミット内容の詳細が表示されます。
 
-<img src="/images/20240415a/コメント_2024-04-15_091623.png" alt="" width="1132" height="475" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_091623.png" alt="" width="1132" height="475" loading="lazy">
 
 Changes -> Opens Changesを選択すると、該当行数でのbefore / afterを視覚的に確認できます。
 
-<img src="/images/20240415a/コメント_2024-04-15_091703.png" alt="" width="1200" height="165" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_091703.png" alt="" width="1200" height="165" loading="lazy">
 
 もちろん、差分の作成元となったPull Request（[PR #29825](https://github.com/hashicorp/terraform/pull/29825)）にもダイレクトで飛べます。
 
-<img src="/images/20240415a/コメント_2024-04-15_092104.png" alt="" width="1200" height="1371" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_092104.png" alt="" width="1200" height="1371" loading="lazy">
 
 Pull Requestでの説明内容を確認すると「実装コードだけ」を見ていた場合と比較して、膨大な情報が得られることが分かります。
 
@@ -177,16 +177,16 @@ Inline Bar Blameをファイル内のコードブロック単位で表示しま�
 エディタ右上の「File Annotations」ボタンを選択して、オンオフの切り替えができます。
 
 ■ オフ
-<img src="/images/20240415a/コメント_2024-04-15_093234.png" alt="" width="240" height="40" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_093234.png" alt="" width="240" height="40" loading="lazy">
 
 ■ オン
-<img src="/images/20240415a/コメント_2024-04-15_093252.png" alt="" width="235" height="46" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_093252.png" alt="" width="235" height="46" loading="lazy">
 
 ブロック単位で誰がどの行を編集したのか、サイドバーの内容とソースコードを対応させながら確認できます。
 
-<img src="/images/20240415a/コメント_2024-04-15_093327.png" alt="" width="1200" height="278" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_093327.png" alt="" width="1200" height="278" loading="lazy">
 
-<img src="/images/20240415a/コメント_2024-04-15_093416.png" alt="" width="1200" height="287" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_093416.png" alt="" width="1200" height="287" loading="lazy">
 
 ## 【4】Revision Navigation
 
@@ -199,15 +199,15 @@ Inline Bar Blameをファイル内のコードブロック単位で表示しま�
 * Open Changes with Previous Revision
   * 「指定したファイル」の差分を表示
 
-<img src="/images/20240415a/コメント_2024-04-15_100132.png" alt="" width="1200" height="396" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_100132.png" alt="" width="1200" height="396" loading="lazy">
 
 `func main() {` （指定した行）の差分を表示すると
 
-<img src="/images/20240415a/コメント_2024-04-15_095101.png" alt="" width="1200" height="825" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_095101.png" alt="" width="1200" height="825" loading="lazy">
 
 `main.go`（指定したファイル）の差分を表示すると
 
-<img src="/images/20240415a/コメント_2024-04-15_095031.png" alt="" width="1200" height="819" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_095031.png" alt="" width="1200" height="819" loading="lazy">
 
 差分は複数回遡れるため、対象のファイルや行数が「どのような経緯で更新され続け、現在に至るのか」を視覚的に確認できます。
 
@@ -219,11 +219,11 @@ VSCodeで開いているファイルに対して、対応するホスティン�
   * Open on Remote (Web)
     * Open File on Remote
 
-<img src="/images/20240415a/コメント_2024-04-15_100953.png" alt="" width="915" height="287" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_100953.png" alt="" width="915" height="287" loading="lazy">
 
 上記操作により、エディタに対応するページ（[https://github.com/hashicorp/terraform/blob/main/main.go#L63](https://github.com/hashicorp/terraform/blob/main/main.go#L63)）がブラウザで表示され、リンクが取得できます。
 
-<img src="/images/20240415a/コメント_2024-04-15_101215.png" alt="" width="938" height="92" loading="lazy">
+<img src="/images/2024/20240415a/コメント_2024-04-15_101215.png" alt="" width="938" height="92" loading="lazy">
 
 エディタでソースコードを確認しながら、かつ、ファイルのリンクを共有したい場合に、この機能は非常に便利で私は多用しています。
 

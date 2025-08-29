@@ -8,7 +8,7 @@ tag:
   - Docker
 category:
   - Programming
-thumbnail: /images/20230105a/thumbnail.png
+thumbnail: /images/2023/20230105a/thumbnail.png
 author: 村上知優
 lede: "この記事はフューチャー Advent Calendar 2022の14日目の記事です。PythonのWeb APIをLambdaにデプロイする方法について解説します。"
 ---
@@ -24,7 +24,7 @@ PythonでWeb APIを構築する方法は[OpenAPI GeneratorでPython Web API構�
 
 本記事ではPython Web APIのアプリ実装は完成している前提で、下図の流れでデプロイする手順を解説します。
 
-<img src="/images/20230105a/image.png" alt="PythonアプリをDockerコンテナイメージビルド→ECR→Lambdaにデプロイする" width="778" height="495" loading="lazy">
+<img src="/images/2023/20230105a/image.png" alt="PythonアプリをDockerコンテナイメージビルド→ECR→Lambdaにデプロイする" width="778" height="495" loading="lazy">
 
 # Lambda起動用のモジュール
 

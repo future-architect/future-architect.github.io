@@ -12,13 +12,13 @@ tag:
   - Web
 category:
   - Infrastructure
-thumbnail: /images/20240513a/thumbnail.jpg
+thumbnail: /images/2024/20240513a/thumbnail.jpg
 author: 澁川喜規
 lede: "ひとえに読者の皆さんが買ってくれたおかげで、Real World HTTPを改訂し、このたび3版を上梓しました。ありがとうございます。"
 ---
 
 <a href="https://www.oreilly.co.jp/books/9784814400669/">
-<img src="/images/20240513a/PXL_20240404_001054780.jpg" alt="" width="1200" height="901" loading="lazy">
+<img src="/images/2024/20240513a/PXL_20240404_001054780.jpg" alt="" width="1200" height="901" loading="lazy">
 </a>
 
 https://www.oreilly.co.jp/books/9784814400669/

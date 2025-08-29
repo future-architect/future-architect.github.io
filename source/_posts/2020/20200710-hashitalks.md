@@ -8,12 +8,12 @@ tag:
   - GCP
 category:
   - Infrastructure
-thumbnail: /images/20200710/thumbnail.png
+thumbnail: /images/2020/20200710/thumbnail.png
 author: 伊藤太斉
 lede: "本記事の内容はHashiTalks: Japanに登壇したのでその時に話したことを書いていきます。大きめなイベントには初の登壇だったのでなかなかドキドキしましたが、なんとかやりきりました。"
 ---
 
-<img src="/images/20200710/top.png" loading="lazy">
+<img src="/images/2020/20200710/top.png" loading="lazy">
 
 ## はじめに
 

@@ -8,7 +8,7 @@ tag:
   - フロントエンド
 category:
   - Programming
-thumbnail: /images/20210614b/thumbnail.png
+thumbnail: /images/2021/20210614b/thumbnail.png
 author: 中川旭
 lede: "フロントエンド記事連載の1記事目です。Vue Testing LibraryはVue.js公式のライブラリであるvue-test-utilをベースとする、DOM Testing LibraryのVue.js用拡張です。Vue Testing Libraryを用いると、Vue.js公式ライブラリであるvue-test-utilと比較して内部構造を意識せずにテストを作成できます。"
 ---
@@ -140,7 +140,7 @@ No issues found.
 
 ブラウザで `http://localhost:8080/` を開くと以下のページが表示されます。
 
-<img src="/images/20210614b/image.png" alt="Vue起動画面" height="1200" width="993" loading="lazy">
+<img src="/images/2021/20210614b/image.png" alt="Vue起動画面" height="1200" width="993" loading="lazy">
 
 ### Jestの単体テストを動かす
 
@@ -220,7 +220,7 @@ npm run test
 ```
 
 以下のようにテスト結果が表示されます。テスト成功です！
-<img src="/images/20210614b/image_2.png" alt="テスト成功ログ" width="722" height="316" loading="lazy">
+<img src="/images/2021/20210614b/image_2.png" alt="テスト成功ログ" width="722" height="316" loading="lazy">
 
 ## Vue Testing Libraryを動かす
 
@@ -394,7 +394,7 @@ module.exports = {
 
 `npm run test`を実行します。
 
-<img src="/images/20210614b/image_3.png" alt="Vue Testing Libraryのテスト実行結果で成功した様子" width="699" height="285" loading="lazy">
+<img src="/images/2021/20210614b/image_3.png" alt="Vue Testing Libraryのテスト実行結果で成功した様子" width="699" height="285" loading="lazy">
 
 やっと動きました！
 

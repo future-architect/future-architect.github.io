@@ -9,11 +9,11 @@ tag:
   - Go
 category:
   - Programming
-thumbnail: /images/20230329a/thumbnail.jpg
+thumbnail: /images/2023/20230329a/thumbnail.jpg
 author: 宮永崇史
 lede: "Terraformのtargetオプションを簡単に実行するためのCLIツールを紹介します。このCLIツールを開発するきっかけとなった経緯もご紹介します。"
 ---
-<img src="/images/20230329a/tftarget-eyecatch.jpg" alt="" width="960" height="540" loading="lazy">
+<img src="/images/2023/20230329a/tftarget-eyecatch.jpg" alt="" width="960" height="540" loading="lazy">
 
 # 1 はじめに
 
@@ -35,7 +35,7 @@ lede: "Terraformのtargetオプションを簡単に実行するためのCLIツ�
 この状況下で、各開発者が無条件で`terraform apply`を実行すると、リソースが突然消えることがあります。
 
 ▼開発環境における各人の開発の様子
-<img src="/images/20230329a/image.png" alt="" width="1200" height="826" loading="lazy">
+<img src="/images/2023/20230329a/image.png" alt="" width="1200" height="826" loading="lazy">
 
 そこで、新しい機能を作成する際は、まず`terraform plan`を実行し、自分の変更点以外の差分が出た場合は`terraform apply -target=`コマンドを用意するようにしていました。
 
@@ -58,7 +58,7 @@ https://github.com/future-architect/tftarget/releases
 
 動作を直接見る方がわかりやすいと思いますので、tftargetを利用して`terraform apply`を実行するデモ画像を添付します。
 
-<img src="/images/20230329a/tftarget-apply.gif" alt="tftarget-apply.gif" width="854" height="431" loading="lazy">
+<img src="/images/2023/20230329a/tftarget-apply.gif" alt="tftarget-apply.gif" width="854" height="431" loading="lazy">
 
 `terraform apply`の代わりに`tftarget apply`を実行します。
 実行後、しばらく待つと`terraform plan`によって出力された差分がリソース名とアクション（`create`や`destroy`など）ともに表示されます。ユーザーは、`terraform apply`を適用したいリソースにチェックを入れてEnterを押すことで、選択的に`terraform apply`を実行できます。
@@ -114,17 +114,17 @@ tftarget plan
 
 しばらく待つと、チェックボックスが表示されます。これは、`terraform plan`を実行した結果をリソース名とアクションとして表示したものです。
 
-<img src="/images/20230329a/simple-usage-1.png" alt="simple-usage-1.png" width="1079" height="297" loading="lazy">
+<img src="/images/2023/20230329a/simple-usage-1.png" alt="simple-usage-1.png" width="1079" height="297" loading="lazy">
 
 Spaceキーを押すことでチェックを付けることができます。右方向キーで全選択、左方向キーで選択解除ができます。上下方向キーとスペースキーで、`plan`を実行したいリソースを選択してください。
 
 赤字で示しているexitのチェックを選択すると、何も実行せずに処理が終了します。
 
-<img src="/images/20230329a/simple-usage-2.png" alt="simple-usage-2.png" width="1079" height="297" loading="lazy">
+<img src="/images/2023/20230329a/simple-usage-2.png" alt="simple-usage-2.png" width="1079" height="297" loading="lazy">
 
 リソースの選択が完了したら、Enterキーを押して処理を進めます。
 
-<img src="/images/20230329a/simple-usage-3.png" alt="simple-usage-3.png" width="1074" height="165" loading="lazy">
+<img src="/images/2023/20230329a/simple-usage-3.png" alt="simple-usage-3.png" width="1074" height="165" loading="lazy">
 
 `plan`の場合は、`terraform plan`の実行だけが行われます。そのため、処理はここで終了します。通常の`terraform plan`を実行した際の出力結果と共に、最後に選択したリソースのサマリが表示されます。
 
@@ -137,11 +137,11 @@ Spaceキーを押すことでチェックを付けることができます。右
 `tftarget plan`とリソース選択する部分までは同じです。
 
 リソースを選択してEnterキーを押すと、通常の`terraform apply`のように実行確認のプロンプトが表示されます。内容に問題がなければ、`yes`を選択してください。
-<img src="/images/20230329a/simple-usage-4.png" alt="simple-usage-4.png" width="1074" height="134" loading="lazy">
+<img src="/images/2023/20230329a/simple-usage-4.png" alt="simple-usage-4.png" width="1074" height="134" loading="lazy">
 
 `apply`が成功すると、`plan`の時と同様に、通常の`terraform apply`の出力結果に加えて、以下のようなサマリが出力されます。
 
-<img src="/images/20230329a/simple-usage-5.png" alt="simple-usage-5.png" width="1074" height="147" loading="lazy">
+<img src="/images/2023/20230329a/simple-usage-5.png" alt="simple-usage-5.png" width="1074" height="147" loading="lazy">
 
 ### tftarget destroy
 
@@ -195,7 +195,7 @@ tftarget apply -p 30
 
 `--summary`オプションでは、選択したリソースのサマリ表示を有効または無効にできます。デフォルトでは、`plan`や`apply`の結果にサマリが表示されますが、このオプションを使用してサマリ表示をオフにできます。
 
-<img src="/images/20230329a/simple-usage-5_2.png" alt="simple-usage-5.png" width="1074" height="147" loading="lazy">
+<img src="/images/2023/20230329a/simple-usage-5_2.png" alt="simple-usage-5.png" width="1074" height="147" loading="lazy">
 
 ```shell
 tftarget apply -s false

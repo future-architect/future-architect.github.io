@@ -8,13 +8,13 @@ tag:
   - 文字列処理
 category:
   - Programming
-thumbnail: /images/20200807/thumbnail.png
+thumbnail: /images/2020/20200807/thumbnail.png
 author: 辻大志郎
 lede: "Go は標準ライブラリが充実しているとよく言われます。標準ライブラリだけで、HTTP サーバを作れたり、暗号化処理や、JSON や CSV といったデータ形式を扱うことができます"
 mathjax: true
 ---
 
-<img src="/images/20200807/suffixarray.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200807/suffixarray.png" class="img-small-size" loading="lazy">
 
 [フューチャー夏休みの自由研究連載](/articles/20200726/)の5回目です。
 

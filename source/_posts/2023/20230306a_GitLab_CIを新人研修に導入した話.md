@@ -9,12 +9,12 @@ tag:
   - GitLab CI
 category:
   - DevOps
-thumbnail: /images/20230306a/thumbnail.png
+thumbnail: /images/2023/20230306a/thumbnail.png
 author: 柳澤隆太郎
 lede: "「HRなのに技術ブログ？」と思われる方がいるかもしれません。この新人研修を通して、当社には 現場の人間がバックオフィスに回り、現場で得た知見を還元できる 環境が整っていることの宣伝として執筆させていただくことにしました。"
 ---
 
-<img src="/images/20230306a/gitlab-ci-cd-logo_2x.png" alt="" width="340" height="380">
+<img src="/images/2023/20230306a/gitlab-ci-cd-logo_2x.png" alt="" width="340" height="380">
 
 ## はじめに
 

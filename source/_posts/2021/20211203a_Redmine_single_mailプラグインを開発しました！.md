@@ -9,7 +9,7 @@ tag:
   - メール
 category:
   - Infrastructure
-thumbnail: /images/20211203a/thumbnail.png
+thumbnail: /images/2021/20211203a/thumbnail.png
 author: 高橋健
 lede: "Redmine4系からメール送信仕様が変わっていることが判明しました。そこで3系と同等のメール送信方式となるようなRedmine_single_mailプラグインを開発しましたので紹介させていただきます。"
 ---
@@ -58,7 +58,7 @@ https://redmine.tokyo/issues/1083
 
 プラグインのインストール後に設定画面で以下のようにチェックを入れることで設定できます。
 
-<img src="/images/20211203a/インストール設定画面.png" alt="インストール設定画面.png" width="633" height="288" loading="lazy">
+<img src="/images/2021/20211203a/インストール設定画面.png" alt="インストール設定画面.png" width="633" height="288" loading="lazy">
 
 ## 実装のポイント
 

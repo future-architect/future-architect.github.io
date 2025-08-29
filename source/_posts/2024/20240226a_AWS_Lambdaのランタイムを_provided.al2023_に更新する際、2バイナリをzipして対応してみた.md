@@ -8,7 +8,7 @@ tag:
   - Makefile
 category:
   - Programming
-thumbnail: /images/20240226a/thumbnail.png
+thumbnail: /images/2024/20240226a/thumbnail.png
 author: 真野隼記
 lede: "2023年末にAWS Lambda界隈で話題だった「AWS LambdaのGo 1.xランタイムのサポートが2023年12月31日で終了する」への対応を、あまりネットに無い特殊なやり方を採用して行ったので、考え方や実施メモを残します。"
 ---
@@ -61,7 +61,7 @@ TIG真野です。
     * そのタイミングで利用されるハンドは `bootstrap` になり切り替わる
 4. 移行ステップ3では、動作が問題なければ、利用しなくなった `lambda` というバイナリはなくして、 `bootstrap` のみのzipに絞る。これは後々の対応で問題ない
 
-<img src="/images/20240226a/lambda_runtime更新.drawio_(2).png" alt="lambda_runtime更新.drawio_(2).png" width="1200" height="1044" loading="lazy">
+<img src="/images/2024/20240226a/lambda_runtime更新.drawio_(2).png" alt="lambda_runtime更新.drawio_(2).png" width="1200" height="1044" loading="lazy">
 
 ポイントとして、zipに2つのバイナリを同梱しちゃっても、Lambdaとしては問題なく動く（zip時の50MBサイズ上限はありますが、利用するハンドラ以外のバイナリを渡しても問題ありませんでした）。それにより、Lambdaランタイム更新をコマンドで行っても、上モノのzipには新旧両方のランタイムで動くバイナリが存在するため、ダウンタイム無しで切り替え可能になったということです。
 

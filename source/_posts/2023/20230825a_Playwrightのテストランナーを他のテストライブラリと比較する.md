@@ -14,7 +14,7 @@ tag:
   - Mocha
 category:
   - Programming
-thumbnail: /images/20230825a/thumbnail.png
+thumbnail: /images/2023/20230825a/thumbnail.png
 author: 澁川喜規
 lede: "テスティングフレームワークには大きく2つの流派があります。ひとつはJUnit、あるいはその祖先の　SUnitをベースにしたTDDスタイルものです。TDDスタイルはテスト関数、もしくはメソッドを実行します。"
 ---
@@ -106,7 +106,7 @@ Jestはユニットテスト用途でPlaywrightやCypressと同時に使うこ�
 
 `.skip`は逆に特定のテストの実行をスキップする場合に使います。`.fixme`も同様ですが、名前の通り不具合で一時的に実行を中止している意図を表現するのに使います。テストUIやCLIの実行結果ではこの2つはどちらもスキップ扱いで機能的な差はありません。
 
-<img src="/images/20230825a/スクリーンショット_2023-07-18_15.09.32.png" alt="" width="251" height="125" loading="lazy">
+<img src="/images/2023/20230825a/スクリーンショット_2023-07-18_15.09.32.png" alt="" width="251" height="125" loading="lazy">
 
 これらはCypressやJestにも類似の機能があるため、Playwrightを使っていない人にも便利でしょう。
 
@@ -126,7 +126,7 @@ await test.step("名前", async () => {
 
 テストUI上ではこのような感じでステップが表現されます。
 
-<img src="/images/20230825a/スクリーンショット_2023-07-18_14.22.39.png" alt="" width="304" height="263" loading="lazy">
+<img src="/images/2023/20230825a/スクリーンショット_2023-07-18_14.22.39.png" alt="" width="304" height="263" loading="lazy">
 
 2段以上ネストさせることもできます。
 
@@ -152,7 +152,7 @@ test("", () => {
 
 ただし、通常の実行やUIを使った実行ではこのメタデータは表示されません。HTMLのレポート出力では表示されます。
 
-<img src="/images/20230825a/スクリーンショット_2023-07-18_14.54.55.png" alt="" width="1032" height="597" loading="lazy">
+<img src="/images/2023/20230825a/スクリーンショット_2023-07-18_14.54.55.png" alt="" width="1032" height="597" loading="lazy">
 
 ## タイムアウト時間を伸ばす
 

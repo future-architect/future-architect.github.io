@@ -8,7 +8,7 @@ tag:
   - ノーコード
 category:
   - Infrastructure
-thumbnail: /images/20230509a/thumbnail.png
+thumbnail: /images/2023/20230509a/thumbnail.png
 author: 佐藤更星
 lede: "2023/03/07から一般提供が開始された新サービス「AWS Application Composer」を使ってみて、どんな人向けか、強み・弱みは何かというところを見ていきます。"
 ---
@@ -37,7 +37,7 @@ Infrastructure as Code は、AWS CloudFormation と AWS サーバーレスアプ
 
 具体的には以下の画像のように、あるサービスから別のサービスを呼びます、というのをより視覚的に、直感的に表現できます。
 
-<img src="/images/20230509a/スクリーンショット_2023-05-07_23.07.19.png" alt="" width="1200" height="453" loading="lazy">
+<img src="/images/2023/20230509a/スクリーンショット_2023-05-07_23.07.19.png" alt="" width="1200" height="453" loading="lazy">
 
 ※ドラッグ&ドロップでサービスを配置して、サービス同士を線で繋いでいくイメージ
 
@@ -58,7 +58,7 @@ AWS Application Composer は追加料金なしで使用できます。
 
 現時点でGUI上で確認できるサービスは以下です。
 
-<img src="/images/20230509a/スクリーンショット_2023-05-07_23.37.44.png" alt="" width="1200" height="651" loading="lazy">
+<img src="/images/2023/20230509a/スクリーンショット_2023-05-07_23.37.44.png" alt="" width="1200" height="651" loading="lazy">
 
 ※API gateway / Cognito UserPool / Cognito UserPoolClient / DynamoDB Table / EventBridge Event rule / EventBridge Schedule / Kinesis Stream / Lambda Function / Lambda Layer / S3 Bucket / SNS Topic / SQS Queue / Step Functions State machine
 
@@ -105,39 +105,39 @@ AWS Application Composer は追加料金なしで使用できます。
 #### やりたい構成
 
 以下のようなSPAを使ったwebアプリを想定して作ってみようと思います。
-<img src="/images/20230509a/スクリーンショット_2023-05-09_1.02.00.png" alt="スクリーンショット_2023-05-09_1.02.00.png" width="520" height="431" loading="lazy">
+<img src="/images/2023/20230509a/スクリーンショット_2023-05-09_1.02.00.png" alt="スクリーンショット_2023-05-09_1.02.00.png" width="520" height="431" loading="lazy">
 
 #### やってみた
 
 1. まずはAWSコンソールの検索窓で`Application Composer`と検索
-<img src="/images/20230509a/スクリーンショット_2023-05-09_1.48.43.png" alt="スクリーンショット_2023-05-09_1.48.43.png" width="1200" height="611" loading="lazy">
+<img src="/images/2023/20230509a/スクリーンショット_2023-05-09_1.48.43.png" alt="スクリーンショット_2023-05-09_1.48.43.png" width="1200" height="611" loading="lazy">
 
 1. Application Composerのホーム画面が開けました
-<img src="/images/20230509a/スクリーンショット_2023-05-08_0.33.05.png" alt="スクリーンショット_2023-05-08_0.33.05.png" width="1200" height="615" loading="lazy">
+<img src="/images/2023/20230509a/スクリーンショット_2023-05-08_0.33.05.png" alt="スクリーンショット_2023-05-08_0.33.05.png" width="1200" height="615" loading="lazy">
 
 1. `プロジェクトの作成`を押下して、もろもろの設定をして空のプロジェクトを`Create`してみます
-<img src="/images/20230509a/スクリーンショット_2023-05-08_0.32.47.png" alt="スクリーンショット_2023-05-08_0.32.47.png" width="1200" height="615" loading="lazy">
+<img src="/images/2023/20230509a/スクリーンショット_2023-05-08_0.32.47.png" alt="スクリーンショット_2023-05-08_0.32.47.png" width="1200" height="615" loading="lazy">
 
 1. 編集画面っぽいのが開けました
-<img src="/images/20230509a/スクリーンショット_2023-05-09_1.03.16.png" alt="スクリーンショット_2023-05-09_1.03.16.png" width="1200" height="611" loading="lazy">
+<img src="/images/2023/20230509a/スクリーンショット_2023-05-09_1.03.16.png" alt="スクリーンショット_2023-05-09_1.03.16.png" width="1200" height="611" loading="lazy">
 
 1. `やりたい構成`を見つつ、左のメニューからリソースを雑にドラッグ&ドロップしましょう
-<img src="/images/20230509a/スクリーンショット_2023-05-09_1.18.55.png" alt="スクリーンショット_2023-05-09_1.18.55.png" width="1200" height="611" loading="lazy">
+<img src="/images/2023/20230509a/スクリーンショット_2023-05-09_1.18.55.png" alt="スクリーンショット_2023-05-09_1.18.55.png" width="1200" height="611" loading="lazy">
 
 1. 論理IDを設定してよりそれっぽくします
-<img src="/images/20230509a/スクリーンショット_2023-05-09_1.26.39.png" alt="スクリーンショット_2023-05-09_1.26.39.png" width="1200" height="611" loading="lazy">
+<img src="/images/2023/20230509a/スクリーンショット_2023-05-09_1.26.39.png" alt="スクリーンショット_2023-05-09_1.26.39.png" width="1200" height="611" loading="lazy">
 
 1. APIgatewayの中身が寂しかったのでAuthorizer(認可)とエンドポイントの設定を追加します
-<img src="/images/20230509a/スクリーンショット_2023-05-09_1.31.59.png" alt="スクリーンショット_2023-05-09_1.31.59.png" width="1200" height="611" loading="lazy">
+<img src="/images/2023/20230509a/スクリーンショット_2023-05-09_1.31.59.png" alt="スクリーンショット_2023-05-09_1.31.59.png" width="1200" height="611" loading="lazy">
 
 1. 再度`やりたい構成`を見て、アクセスを許可したいリソース同士を線で繋ぎます
-<img src="/images/20230509a/スクリーンショット_2023-05-09_1.34.49.png" alt="スクリーンショット_2023-05-09_1.34.49.png" width="1200" height="611" loading="lazy">
+<img src="/images/2023/20230509a/スクリーンショット_2023-05-09_1.34.49.png" alt="スクリーンショット_2023-05-09_1.34.49.png" width="1200" height="611" loading="lazy">
 
 1. 見た目が汚いので`Arrange`ボタンを押して整形します
-<img src="/images/20230509a/スクリーンショット_2023-05-09_1.36.28.png" alt="スクリーンショット_2023-05-09_1.36.28.png" width="1200" height="611" loading="lazy">
+<img src="/images/2023/20230509a/スクリーンショット_2023-05-09_1.36.28.png" alt="スクリーンショット_2023-05-09_1.36.28.png" width="1200" height="611" loading="lazy">
 
 1. あっという間にこれで完成です。最後にTemplateを押して出来上がったテンプレートを見てみましょう
-<img src="/images/20230509a/スクリーンショット_2023-05-09_1.38.04.png" alt="スクリーンショット_2023-05-09_1.38.04.png" width="1200" height="611" loading="lazy">
+<img src="/images/2023/20230509a/スクリーンショット_2023-05-09_1.38.04.png" alt="スクリーンショット_2023-05-09_1.38.04.png" width="1200" height="611" loading="lazy">
 
 ※全文は長いので折りたたみで添付しておきます（見たい人向け）。クリックしてください。
 

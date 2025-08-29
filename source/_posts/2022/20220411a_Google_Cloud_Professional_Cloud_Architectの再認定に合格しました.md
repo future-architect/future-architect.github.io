@@ -7,7 +7,7 @@ tag:
   - 合格記
 category:
   - Infrastructure
-thumbnail: /images/20220411a/thumbnail.png
+thumbnail: /images/2022/20220411a/thumbnail.png
 author: 伊藤太斉
 lede: "2022/2/4にGoogle CloudのProfessional Cloud Architectの再認定に合格したので、前回受験からの差分や受験にあたっての勉強について書いていきます。技術ブログでは以前に合格体験記をいくつか出しているので、そちらも是非みていただければと思います。有効期限が迫ってくると、メールで再認定を受ける旨が送られてきます。"
 ---
@@ -75,7 +75,7 @@ https://googlecloudcertified.credential.net/?name=taisei%20ito
 $100で受験できて、ノベルティまでもらえるのは、もしかしたらノベルティの方が高いのかもしれません。
 私は、リュックを選びました。Google Cloudチョットワカルことが背中から知られるようになります。
 
-<img src="/images/20220411a/スクリーンショット_2022-03-29_18.42.30.png" alt="ノベルティ" width="1200" height="434" loading="lazy">
+<img src="/images/2022/20220411a/スクリーンショット_2022-03-29_18.42.30.png" alt="ノベルティ" width="1200" height="434" loading="lazy">
 
 ## まとめ
 

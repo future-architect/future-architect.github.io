@@ -9,7 +9,7 @@ tag:
   - Slack
 category:
   - Management
-thumbnail: /images/20210806b/thumbnail.png
+thumbnail: /images/2021/20210806b/thumbnail.png
 author: 伊藤真彦
 lede: "私のチームではタスク管理でバックログを使っています。タスクのカテゴリ、マイルストーンやそれらを組み合わせた検索機能が充実している事や、タスクを入力するとバーンダウンチャートが自動で出来上がるところなど素晴らしいツールだと思っています。チケット消化に貢献すると褒めてくれるのも良いですね。"
 ---
@@ -21,7 +21,7 @@ TIGの伊藤真彦です。
 タスクのカテゴリ、マイルストーンやそれらを組み合わせた検索機能が充実している事や、タスクを入力するとバーンダウンチャートが自動で出来上がるところなど素晴らしいツールだと思っています。
 
 チケット消化に貢献すると褒めてくれるのも良いですね。
-<img src="/images/20210806b/image.png" alt="Backlogのチャート" width="1200" height="558" loading="lazy">
+<img src="/images/2021/20210806b/image.png" alt="Backlogのチャート" width="1200" height="558" loading="lazy">
 
 さてチケット管理を行うとチケットを監視する仕事が産まれますが、それをある程度自動化するためのツールを作成しました。
 
@@ -37,7 +37,7 @@ Slackと連携するものをslackifyと呼ぶのはRuby on Rails開発者時代
 
 READMEに記載していますが、未完了のBacklogチケットのURL、リンク、担当者を画像のようにSlackに投稿してくれます。
 
-<img src="/images/20210806b/image_2.png" alt="ツールイメージ" width="946" height="322" loading="lazy">
+<img src="/images/2021/20210806b/image_2.png" alt="ツールイメージ" width="946" height="322" loading="lazy">
 
 GoでBacklogチケットを取り扱うロジックは[公式ドキュメント](https://developer.nulab.com/ja/docs/backlog/libraries/#)にも紹介されている事から、[kenzo0107さんのライブラリ](https://github.com/kenzo0107/backlog)を安心して利用でき、仕事の片手間にササっと作ることができました、ありがとうございます。
 
@@ -103,7 +103,7 @@ APIリファレンスは[こちら](https://developer.nulab.com/ja/docs/backlog/
 
 Slackに投稿されると何が嬉しいかというと、画像のようなノリで楽に終わってないチケットにツッコミを入れることができます。
 
-<img src="/images/20210806b/image_3.png" alt="" width="759" height="585" loading="">
+<img src="/images/2021/20210806b/image_3.png" alt="" width="759" height="585" loading="">
 
 未完了のチケットを調べて、誰の担当になっているかを確認して、適宜終わっているか確認するのは単純に手間がかかるだけでなく、急かしているような印象を与えないための配慮など、人対人のコミュニケーションには時間とスタミナを奪われがちです。
 

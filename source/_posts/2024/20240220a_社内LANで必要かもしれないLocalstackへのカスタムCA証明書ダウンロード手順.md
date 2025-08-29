@@ -8,12 +8,12 @@ tag:
   - プロキシ
 category:
   - Infrastructure
-thumbnail: /images/20240220a/thumbnail.png
+thumbnail: /images/2024/20240220a/thumbnail.png
 author: 真野隼記
 lede: "2023年3月31日にリリースされたLocalStack v2.0.0から、LocalStackのイメージ構成に変更が入りました。"
 ---
 
-<img src="/images/20240220a/localstack.png" alt="" width="800" height="400">
+<img src="/images/2024/20240220a/localstack.png" alt="" width="800" height="400">
 
 # はじめに
 

@@ -9,7 +9,7 @@ tag:
   - iOS16
 category:
   - Programming
-thumbnail: /images/20230720a/thumbnail.png
+thumbnail: /images/2023/20230720a/thumbnail.png
 author: 橋本竜我
 lede: "はじめまして!2022年5月キャリア入社、HealthCare Innovation Group[^1]の橋本です。本記事が技術ブログ初投稿なので、お手柔らかにお願い致します！今回は、iOS16からApple標準で利用できるようになったSwift Chartsというグラフ等を作成できるフレームワークを取り上げたいと思います。"
 ---
@@ -48,11 +48,11 @@ Swift Chartsとは、WWDC2022で発表されたカスタマイズされたグラ
 https://developer.apple.com/documentation/charts
 
 イメージとしては、以下のように様々なグラフを描くことができます。
-<img src="/images/20230720a/image.png" alt="" width="1200" height="424" loading="lazy">
+<img src="/images/2023/20230720a/image.png" alt="" width="1200" height="424" loading="lazy">
 
 また、WWDC2023のセッション([Explore pie charts and interactivity in Swift Charts](https://developer.apple.com/videos/play/wwdc2023/10037/))で7つ目となる`SectorMark`が発表されました。`SectorMark`を使うことで簡単にPie Chartを作ることがiOS17から可能になるとのことです。
 
-<img src="/images/20230720a/image_2.png" alt="" width="1200" height="472" loading="lazy">
+<img src="/images/2023/20230720a/image_2.png" alt="" width="1200" height="472" loading="lazy">
 
 https://developer.apple.com/videos/play/wwdc2023/10037/
 
@@ -106,7 +106,7 @@ struct ContentView: View {
         }
 ```
 
-<img src="/images/20230720a/5fd9a545-cb98-f283-f114-5216698e0097.png" alt="" width="564" height="432" loading="lazy">
+<img src="/images/2023/20230720a/5fd9a545-cb98-f283-f114-5216698e0097.png" alt="" width="564" height="432" loading="lazy">
 
 BarMark内の`x: .value("Fruit", "Apple")`でx軸のラベル自体を`Fruit`と定義し、表示されている1つのバー要素が`Apple`であることを示しています。`y: .value("Price", 100)`も同様に、y軸のラベル自体を`Price`と定義し、表示されている1つのバー要素が`100`であることを示しています。
 
@@ -131,7 +131,7 @@ BarMark内の`x: .value("Fruit", "Apple")`でx軸のラベル自体を`Fruit`と
         }
 ```
 
-<img src="/images/20230720a/4616977c-472b-b182-8dea-58c0b452892c.png" alt="" width="558" height="430" loading="lazy">
+<img src="/images/2023/20230720a/4616977c-472b-b182-8dea-58c0b452892c.png" alt="" width="558" height="430" loading="lazy">
 
 これで完成イメージ通りのグラフが完成しました。しかし、この方法ですとBarMarkを要素が1つ追加するごとに増えていくので、数が多くなると大変見づらくなってしまいます。
 
@@ -180,12 +180,12 @@ struct ContentView: View {
 
 |  名前 |  説明　 |　イメージ　|
 | ---- | ---- | ---- |
-| AreaMark | 面グラフ|　　<img src="/images/20230720a/image_3.png" alt="image.png" width="312" height="214" loading="lazy">　　|
-| LineMark  | 折れ線グラフ|　<img src="/images/20230720a/image_4.png" alt="image.png" width="311" height="211" loading="lazy">　　|
-| PointMark | 散布図|　<img src="/images/20230720a/image_5.png" alt="image.png" width="319" height="212" loading="lazy">　　|
-| RectangleMark | ヒートマップ|　<img src="/images/20230720a/image_6.png" alt="image.png" width="308" height="213" loading="lazy">　　|
-| RuleMark | 水平線、垂直線|　<img src="/images/20230720a/image_7.png" alt="image.png" width="320" height="218" loading="lazy">　　|
-| BarMark | 棒グラフ|　<img src="/images/20230720a/image_8.png" alt="image.png" width="314" height="213" loading="lazy">　　|
+| AreaMark | 面グラフ|　　<img src="/images/2023/20230720a/image_3.png" alt="image.png" width="312" height="214" loading="lazy">　　|
+| LineMark  | 折れ線グラフ|　<img src="/images/2023/20230720a/image_4.png" alt="image.png" width="311" height="211" loading="lazy">　　|
+| PointMark | 散布図|　<img src="/images/2023/20230720a/image_5.png" alt="image.png" width="319" height="212" loading="lazy">　　|
+| RectangleMark | ヒートマップ|　<img src="/images/2023/20230720a/image_6.png" alt="image.png" width="308" height="213" loading="lazy">　　|
+| RuleMark | 水平線、垂直線|　<img src="/images/2023/20230720a/image_7.png" alt="image.png" width="320" height="218" loading="lazy">　　|
+| BarMark | 棒グラフ|　<img src="/images/2023/20230720a/image_8.png" alt="image.png" width="314" height="213" loading="lazy">　　|
 
 BarMarkの使い方は、すでに紹介しましたので、残りの5つのMarkのサンプルコードを次に記載します。
 
@@ -384,7 +384,7 @@ struct ScreenTimeWidgetView: View {
 }
 ```
 
-<img src="/images/20230720a/c82576c7-af28-9a39-950c-a5b1206ef480.png" alt="" width="872" height="828" loading="lazy">
+<img src="/images/2023/20230720a/c82576c7-af28-9a39-950c-a5b1206ef480.png" alt="" width="872" height="828" loading="lazy">
 
 本物にかなり似たグラフを実装できたと思います。
 

@@ -10,12 +10,12 @@ tag:
   - 出版
 category:
   - Programming
-thumbnail: /images/20230714a/thumbnail.png
+thumbnail: /images/2023/20230714a/thumbnail.png
 author: 真野隼記
 lede: "2023年6月16日に発売された、Software Design 2023年7月号の特集である、「gRPCで始めるWeb API開発」の3章をフューチャーメンバーである、渋川、武田、真野の3名で寄稿させていただきました。"
 ---
 
-<img src="/images/20230714a/top.png" alt="" width="400" height="564" loading="lazy">
+<img src="/images/2023/20230714a/top.png" alt="" width="400" height="564" loading="lazy">
 
 ## はじめに
 

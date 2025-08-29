@@ -9,7 +9,7 @@ tag:
   - Grayskull e150
 category:
   - Infrastructure
-thumbnail: /images/20240417a/thumbnail.jpg
+thumbnail: /images/2024/20240417a/thumbnail.jpg
 author: 山本力世
 lede: "先日リリースされたTenstorrent製のAI推論アクセラレーションボード[Grayskull e150]を早速入手しましたので、そちらの開封をしたいと思います。カナダのトロントに本社がある、知る人ぞ知る、[ジム・ケラー]/AIチップベンダーです。日本法人も昨年に設立されています。"
 ---
@@ -30,25 +30,25 @@ Tenstorrent社が開発した、AI推論アクセラレーションチップで�
 # 開封
 
 手前がブロアー（冷却ファン）の、奥がボード本体が入っている箱になります。
-<img src="/images/20240417a/IMG_3148.jpg" alt="" width="1200" height="900" loading="lazy">
+<img src="/images/2024/20240417a/IMG_3148.jpg" alt="" width="1200" height="900" loading="lazy">
 
 ブロアーは、ボードと接合部分のパーツは３Dプリンタで出力したものを使ってます。
-<img src="/images/20240417a/IMG_3150.jpg" alt="" width="1200" height="900" loading="lazy">
+<img src="/images/2024/20240417a/IMG_3150.jpg" alt="" width="1200" height="900" loading="lazy">
 
 ボードの表側。
-<img src="/images/20240417a/IMG_3151.jpg" alt="" width="1200" height="537" loading="lazy">
+<img src="/images/2024/20240417a/IMG_3151.jpg" alt="" width="1200" height="537" loading="lazy">
 
 ボードの裏側。
-<img src="/images/20240417a/IMG_3153.jpg" alt="" width="1200" height="587" loading="lazy">
+<img src="/images/2024/20240417a/IMG_3153.jpg" alt="" width="1200" height="587" loading="lazy">
 
 ボードを覆っている囲いを取り除くと大きなヒートシンクが見える。
-<img src="/images/20240417a/Image_20240412_190127_987.jpeg" alt="" width="1200" height="540" loading="lazy">
+<img src="/images/2024/20240417a/Image_20240412_190127_987.jpeg" alt="" width="1200" height="540" loading="lazy">
 
 ヒートシンクを取り外すとAIチップやRAMが確認できる。
-<img src="/images/20240417a/Image_20240412_190127_922.jpeg" alt="jpeg" width="1200" height="502" loading="lazy">
+<img src="/images/2024/20240417a/Image_20240412_190127_922.jpeg" alt="jpeg" width="1200" height="502" loading="lazy">
 
 その他、同梱されていたシールなど。黒い紙片はセットアップのオンラインマニュアルのURLのみ書かれていました。
-<img src="/images/20240417a/IMG_3152.jpg" alt="" width="1200" height="862" loading="lazy">
+<img src="/images/2024/20240417a/IMG_3152.jpg" alt="" width="1200" height="862" loading="lazy">
 
 # セットアップ
 
@@ -70,13 +70,13 @@ NVIDIA向けにはnvidia-smiというコマンドがありますが、Tenstorren
 具体的には、次のような画面になります。
 
 TT-SMI: デバイス情報画面
-<img src="/images/20240417a/SCR-20240412-pthf.png" alt="" width="1200" height="522" loading="lazy">
+<img src="/images/2024/20240417a/SCR-20240412-pthf.png" alt="" width="1200" height="522" loading="lazy">
 
 TT-SMI: デバイス計測画面
-<img src="/images/20240417a/SCR-20240412-pucp.png" alt="" width="1200" height="529" loading="lazy">
+<img src="/images/2024/20240417a/SCR-20240412-pucp.png" alt="" width="1200" height="529" loading="lazy">
 
 TT-SMI: ファームウェア画面
-<img src="/images/20240417a/SCR-20240412-pulb.png" alt="" width="1200" height="531" loading="lazy">
+<img src="/images/2024/20240417a/SCR-20240412-pulb.png" alt="" width="1200" height="531" loading="lazy">
 
 # 終わりに
 

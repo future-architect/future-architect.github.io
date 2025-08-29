@@ -11,11 +11,11 @@ tag:
   - iOS
 category:
   - Programming
-thumbnail: /images/20240605a/thumbnail.png
+thumbnail: /images/2024/20240605a/thumbnail.png
 author: 橋本竜我
 lede: "AirPods Proの空間オーディオ機能にあるヘッドトラッキングを用いることで、頭の角度の取得をしてみました"
 ---
-<img src="/images/20240605a/image.png" alt="" width="1200" height="390" loading="lazy">
+<img src="/images/2024/20240605a/image.png" alt="" width="1200" height="390" loading="lazy">
 
 # はじめに
 
@@ -23,7 +23,7 @@ HealthCare Innovation Group(HIG)[^1]の橋本です。
 
 先週末注文していたAirPods Pro第2世代が今日手元に届きました!
 
-<img src="/images/20240605a/4f1c2557-bc97-063a-4e10-7f75b16d2449.jpeg" alt="" width="1200" height="923" loading="lazy">
+<img src="/images/2024/20240605a/4f1c2557-bc97-063a-4e10-7f75b16d2449.jpeg" alt="" width="1200" height="923" loading="lazy">
 
 約4年間使っていたAirPods Pro第1世代の調子が悪くなってしまったため、買い換えました。
 
@@ -46,11 +46,11 @@ AirPods(第３世代)、AirPods Pro(全世代)、AirPods Max
 
 AirPodsProで取得した頭の角度でリアルタイムにキャラクター動かせるミニアプリ。
 
-<img src="/images/20240605a/headTracking_2_(1).gif" alt="" width="154" height="334" loading="lazy">
+<img src="/images/2024/20240605a/headTracking_2_(1).gif" alt="" width="154" height="334" loading="lazy">
 
 キャラクターが動いている部分は、次のように、私がAirPods Proをつけた状態で頭を傾けたり、回転したりしています。かなりよい感度で表示できているなと感じます。
 
-<img src="/images/20240605a/画面収録_2024-05-30_23.08.00.gif" alt="" width="310" height="178" loading="lazy">
+<img src="/images/2024/20240605a/画面収録_2024-05-30_23.08.00.gif" alt="" width="310" height="178" loading="lazy">
 
 このミニアプリで使用したフレームワークや各種APIを紹介していきたいと思います。
 
@@ -96,7 +96,7 @@ CoreMotionフレームワークが使えるように、Info.plistに`NSMotionUsa
 
 Info.plist
 
-<img src="/images/20240605a/image_2.png" alt="image.png" width="1200" height="253" loading="lazy">
+<img src="/images/2024/20240605a/image_2.png" alt="image.png" width="1200" height="253" loading="lazy">
 
 project.pbxproj
 
@@ -106,7 +106,7 @@ INFOPLIST_KEY_NSMotionUsageDescription = "To sync the movements of the character
 
 これで、次のようにモーションデータを取得する前に、許可を求められるポップアップが表示されます。
 
-<img src="/images/20240605a/d972ec41-263c-c9de-0ebf-3dfce17b2334.jpeg" alt="" width="400" height="866" loading="lazy">
+<img src="/images/2024/20240605a/d972ec41-263c-c9de-0ebf-3dfce17b2334.jpeg" alt="" width="400" height="866" loading="lazy">
 
 ## HeadTrackingを管理するクラスを用意する
 

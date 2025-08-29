@@ -9,11 +9,11 @@ tag:
   - UML
 category:
   - Design
-thumbnail: /images/20211108a/thumbnail.png
+thumbnail: /images/2021/20211108a/thumbnail.png
 author: ヴーホアン・ミン
 lede: "PlantUMLで使えるテーマについてのご紹介です。以前、チームで機能設計するためのPlantUML標準化の記事でも書かせていただきましたが、PlantUMLのデフォルトカラーって少しドライですよね。色の好みは人それぞれで、あれはあれでカッコよさはありますが、複雑な図は少しでも可愛く描きたい・楽しく見たいものです。"
 ---
-<img src="/images/20211108a/example_vibrant.png" alt="example_vibrant.png" width="641" height="424" loading="lazy">
+<img src="/images/2021/20211108a/example_vibrant.png" alt="example_vibrant.png" width="641" height="424" loading="lazy">
 
 [秋のブログ週間](/articles/20211027a/)連載の7本目です。
 
@@ -23,7 +23,7 @@ PlantUMLで使えるテーマについてのご紹介です。
 
 以前、[チームで機能設計するためのPlantUML標準化](/articles/20200203/)の記事でも書かせていただきましたが、PlantUMLのデフォルトカラーって少しドライですよね。
 
-<img src="/images/20211108a/image.png" alt="image.png" width="253" height="448" loading="lazy">
+<img src="/images/2021/20211108a/image.png" alt="image.png" width="253" height="448" loading="lazy">
 
 色の好みは人それぞれで、あれはあれでカッコよさはありますが、複雑な図は少しでも可愛く描きたい・楽しく見たいものです。
 
@@ -37,7 +37,7 @@ PlantUMLで使えるテーマについてのご紹介です。
 
 ## オリジナルテーマ
 
-<img src="/images/20211108a/image_2.png" alt="image.png" width="563" height="460" loading="lazy">
+<img src="/images/2021/20211108a/image_2.png" alt="image.png" width="563" height="460" loading="lazy">
 
 出典：[Future Tech Blog](https://future-architect.github.io/articles/20200203/)
 
@@ -75,7 +75,7 @@ Foo -> Foo7: To queue
 @enduml
 ```
 
-<img src="/images/20211108a/example_toy.png" alt="example_toy.png" width="641" height="424" loading="lazy">
+<img src="/images/2021/20211108a/example_toy.png" alt="example_toy.png" width="641" height="424" loading="lazy">
 
 ### vibrantの使用例
 
@@ -103,13 +103,13 @@ Foo -> Foo7: To queue
 @enduml
 ```
 
-<img src="/images/20211108a/example_vibrant_2.png" alt="example_vibrant.png" width="641" height="424" loading="lazy">
+<img src="/images/2021/20211108a/example_vibrant_2.png" alt="example_vibrant.png" width="641" height="424" loading="lazy">
 
 フューチャーリポジトリに公開されているテーマは、フューチャー社内のプロジェクトでも使われており、日々のブラッシュアップはもちろん（最近はアクセシビリティを考慮したコントラスト比やボーダーの微調整等）、外部からのコントリビューションも大歓迎です！（先日、「queueの定義がないぞ！」と[フランスからプルリクエスト](https://github.com/future-architect/puml-themes/pull/5)が上がりました）
 
 ## PlantUML公式テーマ
 
-<img src="/images/20211108a/image_3.png" alt="image.png" width="1085" height="452" loading="lazy">
+<img src="/images/2021/20211108a/image_3.png" alt="image.png" width="1085" height="452" loading="lazy">
 
 出典：[PlantUML](https://plantuml.com/en/)
 
@@ -119,15 +119,15 @@ Foo -> Foo7: To queue
 
 ちなみに、現在公式で提供しているテーマはPlantUMLの[公式ホームページ](https://plantuml.com/en/theme)で紹介されています↓
 
-<img src="/images/20211108a/image_4.png" alt="image.png" width="639" height="785" loading="lazy">
+<img src="/images/2021/20211108a/image_4.png" alt="image.png" width="639" height="785" loading="lazy">
 
 ん？
 
-<img src="/images/20211108a/image_5.png" alt="image.png" width="225" height="375" loading="lazy">
+<img src="/images/2021/20211108a/image_5.png" alt="image.png" width="225" height="375" loading="lazy">
 
 ・・・
 
-<img src="/images/20211108a/image_6.png" alt="image.png" width="321" height="242" loading="lazy">
+<img src="/images/2021/20211108a/image_6.png" alt="image.png" width="321" height="242" loading="lazy">
 
 ## フューチャーオリジナルテーマがPlantUML公式テーマに！
 
@@ -155,7 +155,7 @@ Foo -> Foo7: To queue
 
 ### marsのサンプル
 
-<img src="/images/20211108a/example_mars.png" alt="example_mars.png" width="641" height="424" loading="lazy">
+<img src="/images/2021/20211108a/example_mars.png" alt="example_mars.png" width="641" height="424" loading="lazy">
 
 ```sql mars_example.pu
 @startuml

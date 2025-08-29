@@ -9,11 +9,11 @@ tag:
   - net/http
 category:
   - Programming
-thumbnail: /images/20220203a/thumbnail.png
+thumbnail: /images/2022/20220203a/thumbnail.png
 author: 真野隼記
 lede: "net/httpパッケージのコードを呼んでいると、Temporary() 関数だけをもった temporary インターフェースが登場します。HTTP周りでtemporaryと聞くと、 307 Temporary Redirect のステータスコードのことかと思いますが、ちょっと違いそうです。どういったものでどういった場合に出てくるのか、調べました。"
 ---
-<img src="/images/20220203a/top.png" alt="" width="500" height="208" loading="lazy">
+<img src="/images/2022/20220203a/top.png" alt="" width="500" height="208" loading="lazy">
 
 ## はじめに
 

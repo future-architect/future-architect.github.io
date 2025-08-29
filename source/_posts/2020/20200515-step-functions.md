@@ -10,7 +10,7 @@ tag:
   - バッチ処理
 category:
   - Programming
-thumbnail: /images/20200515/thumbnail.png
+thumbnail: /images/2020/20200515/thumbnail.png
 author: 真野隼記
 lede: "AWS StepFunctionsとLambdaを活用してバッチ処理を行う記事です。"
 ---
@@ -56,7 +56,7 @@ ecs-run-taskで非同期（または定期的）にECSを呼び出す方法を�
 1. Lambdaの実行時間をアプリ上で計測し、シンデレラタイムが近づきそうであれば自分で処理を中断、オフセットを引数にSQSに投げるか、非同期で次のLambdaをInvokeして処理を継続する(下図のLambda延命イメージ)
 2. 入力データを一定の大きさでパーティション化して、1と同じくSQSやLambdaをInvokeして後続の複数のLambdaで処理を行う（下図のLambda入力パーティションイメージ）
 
-<img src="/images/20200515/photo_20200515_01.png" loading="lazy">
+<img src="/images/2020/20200515/photo_20200515_01.png" loading="lazy">
 
 入力データを上手く分割実行できないものに関しては1でシーケンシャルに行う必要がありますが、そうでない場合は2のアプローチのほうが、後々並列実行したい場合にも転用できるので便利だと思いますので、2の方針で進めます。
 
@@ -75,7 +75,7 @@ DynamoDBはKVSという印象が強いですが、非常に多くの機能を持
 
 1のフルスキャンですがアプリケーション側でPartitionKeyのようなものを持たせること無く、DynamoDBの機能として下図のように [並列スキャン](https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Scan.html#Scan.ParallelScan)が可能です。
 
-<img src="/images/20200515/photo_20200515_02.png" loading="lazy">
+<img src="/images/2020/20200515/photo_20200515_02.png" loading="lazy">
 
 AWSのドキュメントから引っ張って来ましたが、 `TotalSegments` と `Segment` をリクエストに指定することで、DynamoDB側がデータを論理的にTotalSegmentsの数に分割してくれます。アプリケーション側では以下のように指定するだけでOKです。
 
@@ -300,7 +300,7 @@ if err := resp.EventStream.Err(); err != nil {
 
 ワークフローをJSONベースの構造化言語である[Amazon States Language](https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html)で記載するという点がツラミとして挙げられることが大きもしますが、定義したワークフローは即座にプレビューで可視化されますしそれをSVGなどでExportもできるので、JSON力を鍛えながら開発できます。
 
-<img src="/images/20200515/photo_20200515_03.png" loading="lazy">
+<img src="/images/2020/20200515/photo_20200515_03.png" loading="lazy">
 
 ※HelloWorldのStep Functionsの開発イメージ
 
@@ -310,7 +310,7 @@ Lambdaの実行時間制約をStep Functionsで突破しようという試みで
 
 DynamoDBやLambdaの場合はスケールアウトさせやすいサービスのため、固定であればParallelステートを利用して並列実行できます。
 
-<img src="/images/20200515/photo_20200515_04.png" loading="lazy">
+<img src="/images/2020/20200515/photo_20200515_04.png" loading="lazy">
 
 ただ、Parallelステートだと分散するタスク自体をJSONで定義する必要があり、同時実行数を増やすたびにStepFunctionsの定義を更新する必要があり手間です。次の動的並列の機能を今回は利用したいと思います。
 
@@ -320,7 +320,7 @@ Step Functionsは [Amazon Web Services ブログ - 新機能 – Step Functions 
 
 今回はこちらを採用して、最初にScatterLambdaというタスクで、分散情報を動的に生成し、TaskLambdaでDynamoDBをScanし、最後にGatherLambdaで実行件数をカウントするというフローを組むことにします（下図）。
 
-<img src="/images/20200515/photo_20200515_05.png" loading="lazy">
+<img src="/images/2020/20200515/photo_20200515_05.png" loading="lazy">
 
 ※水色のオブジェクトが重なっているところが並列実行されるタスクです。この各LambdaでDynamoDBのあるSegment数だけ担当させるイメージです。
 
@@ -328,7 +328,7 @@ Step Functionsは [Amazon Web Services ブログ - 新機能 – Step Functions 
 
 3つのLambdaを利用しますが、概念的にそれぞれの入力・出力を示します。
 
-<img src="/images/20200515/photo_20200515_06.png" loading="lazy">
+<img src="/images/2020/20200515/photo_20200515_06.png" loading="lazy">
 
 ## 実装について
 

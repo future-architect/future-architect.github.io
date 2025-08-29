@@ -9,7 +9,7 @@ tag:
   - 技術選定
 category:
   - Programming
-thumbnail: /images/20211021a/thumbnail.png
+thumbnail: /images/2021/20211021a/thumbnail.png
 author: 越島亮介
 lede: "フューチャーでは、FigmaやAdobe XDなどのデザインツールの利用が以前よりも少しづつ増えています。今回の題材はFigmaです。先月の「[Adobe XDからFlutterに変換する]プラグインがあるため、変換ツールの選択肢で迷うことはあまり無いのかなと思います。"
 ---
@@ -38,7 +38,7 @@ FigmaをFlutterに変換できると謳っているプラグインは複数存�
 
 **（1） Figma to Code（HTML, Tailwind, Flutter, SwiftUI）**
 
-<img src="/images/20211021a/Figma_to_Code.png" alt="Figmaからコード生成イメージ" width="1200" height="600" loading="lazy">
+<img src="/images/2021/20211021a/Figma_to_Code.png" alt="Figmaからコード生成イメージ" width="1200" height="600" loading="lazy">
 
 インストール数：28.5k
 最終更新日：2021年3月9日
@@ -46,7 +46,7 @@ FigmaをFlutterに変換できると謳っているプラグインは複数存�
 [Figma to Code (HTML, Tailwind, Flutter, SwiftUI](https://www.figma.com/community/plugin/842128343887142055/Figma-to-Code-(HTML%2C-Tailwind%2C-Flutter%2C-SwiftUI))は、Bernardo Ferrariという人が主に開発をしているプラグインで、ソースが[githubに公開](https://github.com/bernaferrari/FigmaToCode)されています。Figma→Flutter以外にもSwiftUI、tailwindcss、HTML5にも対応しているようですが、今回はFlutterの出力のみを試してみます。
 
 **（2） Flutter Export**
-<img src="/images/20211021a/thumbnail-1.png" alt="Flutter Exportアイコン" width="1200" height="600" loading="lazy">
+<img src="/images/2021/20211021a/thumbnail-1.png" alt="Flutter Exportアイコン" width="1200" height="600" loading="lazy">
 インストール数：11.3k
 最終更新日：2019年11月22日
 
@@ -54,14 +54,14 @@ FigmaをFlutterに変換できると謳っているプラグインは複数存�
 （インストール数が少し多い理由が謎です）。
 
 **（3） FigmaToFlutter**
-<img src="/images/20211021a/thumbnail-2.png" alt="thumbnail-2.png" width="1200" height="600" loading="lazy">
+<img src="/images/2021/20211021a/thumbnail-2.png" alt="thumbnail-2.png" width="1200" height="600" loading="lazy">
 インストール数：10.8k
 最終更新日：2021年1月2日
 
 [FigmaToFlutter](https://www.figma.com/community/plugin/844008530039534144/FigmaToFlutter)は、1つ目のFigma to Codeと同様に個人が開発しているプラグインで、使い方も非常に似ています。今回の**比較対象**とします。
 
 **（4） Assistant by Grida**
-<img src="/images/20211021a/thumbnail-3.png" alt="Assistant by Gridaイメージ" width="1200" height="600" loading="lazy">
+<img src="/images/2021/20211021a/thumbnail-3.png" alt="Assistant by Gridaイメージ" width="1200" height="600" loading="lazy">
 インストール数：4.7k
 最終更新日：2021年8月25日
 
@@ -75,12 +75,12 @@ Figmaのプラグインを使う方法以外にも、Figmaからコードを生�
 以下2つを紹介します。
 
 **（5） Flutlab.io**
-<img src="/images/20211021a/スクリーンショット_2021-10-08_14.29.55.png" alt="Flutlab.ioイメージ" width="1031" height="460" loading="lazy">
+<img src="/images/2021/20211021a/スクリーンショット_2021-10-08_14.29.55.png" alt="Flutlab.ioイメージ" width="1031" height="460" loading="lazy">
 
 [FlutLab.io](https://flutlab.io/)は、Flutter用のオンラインIDE（総合開発環境）で、その中の機能としてFigma to Flutter Converterというものがあるようです。オンラインIDEは、セキュリティ等のポリシー上、実際のPJで利用できるかが不透明なため、今回は**比較対象外**とします。
 
 **（6） Bravo Studio**
-<img src="/images/20211021a/スクリーンショット_2021-10-08_14.30.51.png" alt="Bravo Studioイメージ図" width="927" height="432" loading="lazy">
+<img src="/images/2021/20211021a/スクリーンショット_2021-10-08_14.30.51.png" alt="Bravo Studioイメージ図" width="927" height="432" loading="lazy">
 
 [Bravo Studio](https://www.bravostudio.app/)は、デザインツールで作成したデザインをノーコードでアプリに変換するサービスです。最終的にネイティブコードを出力できたり、APIを叩く等の機能性を持たせることができたりするようで面白そうです。
 ただし、このツール自体の使い方のキャッチアップが割と必要そうな印象を受けた（コードを上手く出力するためにFigma側のLayerの命名を調整する必要がある等）のと、実際のPJで利用できるだけの自由度があるかが未知数だったので、今回は**比較対象外**とします。
@@ -100,11 +100,11 @@ Figmaのプラグインを使う方法以外にも、Figmaからコードを生�
 ### 比較で使うFigmaとエクスポートの粒度
 
 今回は、Figma上で作った以下のログイン画面をFlutterのコードに変換できるかを試していきます。
-<img src="/images/20211021a/スクリーンショット_2021-10-08_14.44.54.png" alt="スクリーンショット_2021-10-08_14.44.54.png" width="543" height="434" loading="lazy">
+<img src="/images/2021/20211021a/スクリーンショット_2021-10-08_14.44.54.png" alt="スクリーンショット_2021-10-08_14.44.54.png" width="543" height="434" loading="lazy">
 「[Adobe XDからFlutterに変換する](https://future-architect.github.io/articles/20210915a/)」の記事では、1つの画面を丸ごとエクスポートするのは、AdobeとGoogleが協力して開発しているプラグインであっても中々上手くいかないことが多く、要素ごとにエクスポートをして貼り付けていくことを推奨していました。
 
 よって、今回のFigma→Flutterの検証では様々な粒度でのエクスポートを試していきます。具体的には下記の**（1）〜（3）**を試していきます。下図の**画面全体**は、OS側で描画するホームバー等もFigma上で表現してしまっていて、それらの要素を省くと**（1）ログインフォーム全体**との差分があまり無くなるので今回の検証では省略します。
-<img src="/images/20211021a/スクリーンショット_2021-10-11_15.24.18.png" alt="スクリーンショット_2021-10-11_15.24.18.png" width="911" height="525" loading="lazy">
+<img src="/images/2021/20211021a/スクリーンショット_2021-10-11_15.24.18.png" alt="スクリーンショット_2021-10-11_15.24.18.png" width="911" height="525" loading="lazy">
 
 また**（1）〜（3）**のUIパーツ生成の検証に加え、画像の扱いについても比較検証を行いたいと思います。
 
@@ -131,7 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 |出力対象(Figma)|Figma to Code|FigmaToFlutter|Assistant by Grida|
 |---|---|---|---|
-|<img src="/images/20211021a/スクリーンショット_2021-10-11_13.47.58.png" alt="ログインフォーム" width="340" height="231" loading="lazy">| <img src="/images/20211021a/login_figma2code.png" alt="figma to code結果" width="357" height="698" loading="lazy"> |  <img src="/images/20211021a/login_figma2flutter.png" alt="figma to flutter" width="357" height="698" loading="lazy"> | <img src="/images/20211021a/login_assistantByGrida.png" alt="assistanbe by grid結果" width="357" height="698" loading="lazy"> |
+|<img src="/images/2021/20211021a/スクリーンショット_2021-10-11_13.47.58.png" alt="ログインフォーム" width="340" height="231" loading="lazy">| <img src="/images/20211021a/login_figma2code.png" alt="figma to code結果" width="357" height="698" loading="lazy"> |  <img src="/images/20211021a/login_figma2flutter.png" alt="figma to flutter" width="357" height="698" loading="lazy"> | <img src="/images/20211021a/login_assistantByGrida.png" alt="assistanbe by grid結果" width="357" height="698" loading="lazy"> |
 
 ログインフォーム全体を出力対象として、各プラグインで出力した結果を上に示しています。
 出力結果がプラグインによって全く異なるため、1つづつ見てきましょう。
@@ -147,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 |出力対象(Figma)|Figma to Code|FigmaToFlutter|Assistant by Grida|
 |---|---|---|---|
-|<img src="/images/20211021a/スクリーンショット_2021-10-11_14.00.39.png" alt="ログインボタン" width="338" height="154" loading="lazy">| <img src="/images/20211021a/button_figma2code.png" alt="figma to code結果" width="357" height="698" loading="lazy">| <img src="/images/20211021a/button_figma2flutter.png" alt="figma to flutter結果" width="357" height="698" loading="lazy"> | <img src="/images/20211021a/button_assistantByGrida.png" alt="Assistant by Grida結果" width="357" height="698" loading="lazy">    |
+|<img src="/images/2021/20211021a/スクリーンショット_2021-10-11_14.00.39.png" alt="ログインボタン" width="338" height="154" loading="lazy">| <img src="/images/20211021a/button_figma2code.png" alt="figma to code結果" width="357" height="698" loading="lazy">| <img src="/images/20211021a/button_figma2flutter.png" alt="figma to flutter結果" width="357" height="698" loading="lazy"> | <img src="/images/20211021a/button_assistantByGrida.png" alt="Assistant by Grida結果" width="357" height="698" loading="lazy">    |
 
 ログインのボタン（青いボタンとログインのテキスト）を出力対象として、各プラグインで出力した結果を上に示しています。出力結果を1つづつ見てきましょう。
 
@@ -161,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 |出力対象(Figma)|Figma to Code|FigmaToFlutter|Assistant by Grida|
 |---|---|---|---|
-|<img src="/images/20211021a/スクリーンショット_2021-10-11_14.05.06.png" alt="Figmaログインボックスのみ" width="338" height="73" loading="lazy"> | <img src="/images/20211021a/box_figma2code.png" alt="figma to code結果" width="357" height="698" loading="lazy"> | <img src="/images/20211021a/box_figma2flutter.png" alt="figma to flutter結果" width="357" height="698" loading="lazy"> | <img src="/images/20211021a/box_assistantByGrida.png" alt="assistant by grida結果" width="357" height="698" loading="lazy"> |
+|<img src="/images/2021/20211021a/スクリーンショット_2021-10-11_14.05.06.png" alt="Figmaログインボックスのみ" width="338" height="73" loading="lazy"> | <img src="/images/20211021a/box_figma2code.png" alt="figma to code結果" width="357" height="698" loading="lazy"> | <img src="/images/20211021a/box_figma2flutter.png" alt="figma to flutter結果" width="357" height="698" loading="lazy"> | <img src="/images/20211021a/box_assistantByGrida.png" alt="assistant by grida結果" width="357" height="698" loading="lazy"> |
 
 最後に、ログインのボタンの箱（青い角丸の四角）部分のみを出力対象として、各プラグインで出力した結果を上に示しています。
 
@@ -175,8 +175,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
 |出力対象(Figma)|Figma to Code|FigmaToFlutter|Assistant by Grida|
 |---|---|---|---|
-|<img src="/images/20211021a/Logo.png" alt="ロゴ" width="1200" height="513" loading="lazy">|<img src="/images/20211021a/png_figma2code.png" alt="figma to code結果" width="357" height="698" loading="lazy"> |<img src="/images/20211021a/png_figma2flutter.png" alt="figma to flutter結果" width="357" height="698" loading="lazy"> | <img src="/images/20211021a/png_assistantByGrida.png" alt="assistant by grida結果" width="357" height="698" loading="lazy"> |
-|<img src="/images/20211021a/SVGロゴ.png" alt="svgロゴ" width="74" height="67" loading="lazy">|<img src="/images/20211021a/svg_figma2code.png" alt="figma to code結果" width="357" height="698" loading="lazy"> |<img src="/images/20211021a/svg_figma2flutter.png" alt="figma to flutter結果" width="357" height="698" loading="lazy"> |<img src="/images/20211021a/svg_assistantByGrida.png" alt="assistant by grida結果" width="357" height="698" loading="lazy"> |
+|<img src="/images/2021/20211021a/Logo.png" alt="ロゴ" width="1200" height="513" loading="lazy">|<img src="/images/20211021a/png_figma2code.png" alt="figma to code結果" width="357" height="698" loading="lazy"> |<img src="/images/20211021a/png_figma2flutter.png" alt="figma to flutter結果" width="357" height="698" loading="lazy"> | <img src="/images/20211021a/png_assistantByGrida.png" alt="assistant by grida結果" width="357" height="698" loading="lazy"> |
+|<img src="/images/2021/20211021a/SVGロゴ.png" alt="svgロゴ" width="74" height="67" loading="lazy">|<img src="/images/20211021a/svg_figma2code.png" alt="figma to code結果" width="357" height="698" loading="lazy"> |<img src="/images/20211021a/svg_figma2flutter.png" alt="figma to flutter結果" width="357" height="698" loading="lazy"> |<img src="/images/20211021a/svg_assistantByGrida.png" alt="assistant by grida結果" width="357" height="698" loading="lazy"> |
 
 ラスター画像、ベクター画像をそれぞれ出力対象として、各プラグインで出力した結果を上に示しています。
 
@@ -188,7 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 ```dart
 Image.network(
-  "grida://assets-reservation/images/13902:10114",
+  "grida://assets-reservation/images/1390/13902:10114",
   width: 315,
   height: 134,
 );

@@ -6,12 +6,12 @@ tag:
   - セミナー
 category:
   - Culture
-thumbnail: /images/20210227/thumbnail.jpg
+thumbnail: /images/2021/20210227/thumbnail.jpg
 author: 松本妹子
 lede: "『現場力を活かす最適化とは？～企業の成長を阻害する“属人化した業務”からの脱却～』と題しまして、ウェビナー配信を行います。「最適化」というと皆さん、どのようなイメージを持たれるでしょうか？DX推進の一環として.."
 ---
 
-<img src="/images/20210227/top.png" loading="lazy">
+<img src="/images/2021/20210227/top.png" loading="lazy">
 
 こんにちは、Strategic AI Group松本妹子です。
 
@@ -48,7 +48,7 @@ SESSION3は、パネルディスカッション形式で「最適化ツールや
 それぞれ違った専門領域のプロによる、生の声が聞けるセミナーとなっております。
 ぜひお申込みの上、ご参加くださいませ。
 
-<img src="/images/20210227/登壇者.jpg" class="img-middle-size" loading="lazy">
+<img src="/images/2021/20210227/登壇者.jpg" class="img-middle-size" loading="lazy">
 
 登壇者：
 (左)  塚本 祥太  フューチャー株式会社 Strategic AI Group アーキテクト

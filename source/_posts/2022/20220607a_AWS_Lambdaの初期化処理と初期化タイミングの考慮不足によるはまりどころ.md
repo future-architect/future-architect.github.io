@@ -9,7 +9,7 @@ tag:
   - TCP/IP
 category:
   - Programming
-thumbnail: /images/20220607a/thumbnail.png
+thumbnail: /images/2022/20220607a/thumbnail.png
 author: 辻大志郎
 lede: "失敗談をテーマにした連載の5本目です。AWS Lambdaで、予約済同時実行数を1に制限して使っていたときに、初期化処理と初期化タイミングの考慮不足により、はまったことがありました。本記事ではLambdaの初期化処理についておさらいした後、はまったケースの事例や原因、対応した方法を紹介します。"
 ---
@@ -31,7 +31,7 @@ AWS Lambda（以下Lambda）は様々なユースケースで利用できる、�
 
 Lambda実行環境のライフサイクルは3つに分かれています。INITとINVOKEとSHUTDOWNです。
 
-<img src="/images/20220607a/Overview-Successful-Invokes.png" alt="Overview-Successful-Invokes.png" width="1200" height="225" loading="lazy">
+<img src="/images/2022/20220607a/Overview-Successful-Invokes.png" alt="Overview-Successful-Invokes.png" width="1200" height="225" loading="lazy">
 
 https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/lambda-runtime-environment.html より
 
@@ -106,7 +106,7 @@ func main() {
 
 イメージ図は以下になります。
 
-<img src="/images/20220607a/before.png" alt="対向システムが同時接続数が1" width="872" height="462" loading="lazy">
+<img src="/images/2022/20220607a/before.png" alt="対向システムが同時接続数が1" width="872" height="462" loading="lazy">
 
 ログから原因は以下のように推測しています。
 
@@ -121,7 +121,7 @@ func main() {
 
 結果として、この対応以降は同様のTCP通信が確立できなくなる事象は発生しておらず、期待した動作を得ることができました。
 
-<img src="/images/20220607a/after.png" alt="毎回TCPコネクションをオープン・クローズする" width="872" height="462" loading="lazy">
+<img src="/images/2022/20220607a/after.png" alt="毎回TCPコネクションをオープン・クローズする" width="872" height="462" loading="lazy">
 
 ## まとめ
 

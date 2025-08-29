@@ -10,7 +10,7 @@ tag:
   - 共通処理
 category:
   - Programming
-thumbnail: /images/20221021a/thumbnail.png
+thumbnail: /images/2022/20221021a/thumbnail.png
 author: 辻大志郎
 lede: "システム間のデータ連携として、他システムが出力した CSV ファイルを Go で読み込んでリレーショナルデータベースにファイルのデータを保存する、という処理がありました。CSV の値をデコードしたあとに共通的な処理を差し込みたいユースケースで Decorator パターンを使って実装をしました。"
 ---
@@ -25,7 +25,7 @@ Technogoly Innovation Group 辻です。
 
 他システムが出力した CSV ファイルを Go でデコードして、PostgreSQL にデータを投入するような処理がありました。簡略化したイメージは以下です。
 
-<img src="/images/20221021a/abstract.png" alt="" width="666" height="156" loading="lazy">
+<img src="/images/2022/20221021a/abstract.png" alt="" width="666" height="156" loading="lazy">
 
 このとき、連携元システムが出力した CSV ファイルにヌル文字（NUL）[^1] が稀に含まれることがわかりました。ヌル文字は PostgreSQL では扱えません。ヌル文字が含まれるデータを PostgreSQL に投入しようとするとエラーになります。
 

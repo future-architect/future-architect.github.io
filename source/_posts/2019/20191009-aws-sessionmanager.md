@@ -35,23 +35,23 @@ https://docs.aws.amazon.com/ja_jp/systems-manager/latest/userguide/session-manag
 
 ### 手順1　サービスメニューからSystems Managerをクリック
 
-<img src="/images/20191009/1-a.png" style="border:solid 1px #000000"  loading="lazy">
+<img src="/images/2019/20191009/1-a.png" style="border:solid 1px #000000"  loading="lazy">
 
 ### 手順2　セッションマネージャーをクリック
 
-<img src="/images/20191009/2-a.png" style="border:solid 1px #000000"  loading="lazy">
+<img src="/images/2019/20191009/2-a.png" style="border:solid 1px #000000"  loading="lazy">
 
 ### 手順3　セッションの開始をクリック
 
-<img src="/images/20191009/3.png" style="border:solid 1px #000000"  loading="lazy">
+<img src="/images/2019/20191009/3.png" style="border:solid 1px #000000"  loading="lazy">
 
 ### 手順4　似たような画面で同名のボタンですがインスタンスを選択してセッションの開始をクリック
 
-<img src="/images/20191009/5.png" style="border:solid 1px #000000"  loading="lazy">
+<img src="/images/2019/20191009/5.png" style="border:solid 1px #000000"  loading="lazy">
 
 するとセッション Managerのコンソールが表示されます。
 あとはSSHと同じ要領でコマンドが実行できます。
-<img src="/images/20191009/6.png" style="border:solid 1px #000000"  loading="lazy">
+<img src="/images/2019/20191009/6.png" style="border:solid 1px #000000"  loading="lazy">
 
 # メリット
 
@@ -98,13 +98,13 @@ d.同時に複数の接続をしているから？
 
 複数AWSアカウントやユーザを利用しているときに起きるこれ↓を起こしてみます。
 
-<img src="/images/20191009/7.png" class="img-small-size" style="border:solid 1px #000000"  loading="lazy">
+<img src="/images/2019/20191009/7.png" class="img-small-size" style="border:solid 1px #000000"  loading="lazy">
 
 切断されず、影響ありませんでした。
 
 ## c.マネジメントコンソールを使用しているから？ CLIを使用すると切断されない？
 
-<img src="/images/20191009/8.png" class="img-small-size" style="border:solid 1px #000000"  loading="lazy">
+<img src="/images/2019/20191009/8.png" class="img-small-size" style="border:solid 1px #000000"  loading="lazy">
 
 そんなこともありませんでした。
 

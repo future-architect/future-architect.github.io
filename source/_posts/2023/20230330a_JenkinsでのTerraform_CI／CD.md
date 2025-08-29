@@ -9,7 +9,7 @@ tag:
   - CI/CD
 category:
   - DevOps
-thumbnail: /images/20230330a/thumbnail.png
+thumbnail: /images/2023/20230330a/thumbnail.png
 author: 渡邉光
 lede: "プロジェクトでJenikisを利用する機会があり、初めてJenkinsfileでTerraformのCI/CD環境を構築する機会があったので記事に残そうと思います。クラウドを使っているとAWSではCodeBuild、Google CloudではCloudBuildのサービスをCI/CD環境として利用するのでyamlでのCI/CDスクリプトには慣れていましたが..."
 ---
@@ -31,7 +31,7 @@ lede: "プロジェクトでJenikisを利用する機会があり、初めてJen
 
 今回のアーキテクチャ図は以下の通りです。
 
-<img src="/images/20230330a/architecture.drawio.png" alt="architecture.drawio.png" width="1200" height="492" loading="lazy">
+<img src="/images/2023/20230330a/architecture.drawio.png" alt="architecture.drawio.png" width="1200" height="492" loading="lazy">
 
 まず、JenkinsサーバやJenkinsサーバに付随するリソース（Cloud Load Balancing/Cloud Armorなど）はローカルPCからTerraformを実行して作成していきます。Jenkinsサーバを構築後、諸々Jenkinsの設定を終えたのちはJenkins Consoleからボタンポチポチでterraform planからterraform applyを実行してほかのGoogle Cloudのリソースたちを構築できるようになります。
 
@@ -373,14 +373,14 @@ Jenkinsサーバが構築出来たら、ローカルPCからCloud Load Balancing
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
 
-<img src="/images/20230330a/jenkins_setting_1.png" alt="" width="991" height="911" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_setting_1.png" alt="" width="991" height="911" loading="lazy">
 
 次にJenkins Pluginの設定を求められるので、Jenkinsが推奨している「Install suggested plugins」を選択します。
 
-<img src="/images/20230330a/jenkins_setting_2.png" alt="" width="995" height="910" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_setting_2.png" alt="" width="995" height="910" loading="lazy">
 
 Jenkinsが推奨しているPluginをインストールされるまで待ちます。
-<img src="/images/20230330a/jenkins_setting_3.png" alt="" width="993" height="915" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_setting_3.png" alt="" width="993" height="915" loading="lazy">
 
 次に、Jenkins初期Admin Userの設定を求められるので
 
@@ -391,23 +391,23 @@ Jenkinsが推奨しているPluginをインストールされるまで待ちま�
 - メールアドレス
 
 を入力して「Save and Continue」をクリックします。
-<img src="/images/20230330a/jenkins_setting_4.png" alt="" width="987" height="911" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_setting_4.png" alt="" width="987" height="911" loading="lazy">
 
 Jenkins ルートURLの確認が求められるので、変更がなければ「Save and Finish」をクリックします。
-<img src="/images/20230330a/jenkins_setting_5.png" alt="" width="994" height="909" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_setting_5.png" alt="" width="994" height="909" loading="lazy">
 
 これでJenkinsの初期設定が完了したので、「Start using Jenkins」をクリックします。
 
-<img src="/images/20230330a/jenkins_setting_6.png" alt="" width="992" height="912" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_setting_6.png" alt="" width="992" height="912" loading="lazy">
 
 その後、Jenkins Consoleの画面にアクセスできるようになります。
 
-<img src="/images/20230330a/jenkins_setting_7.png" alt="" width="1200" height="890" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_setting_7.png" alt="" width="1200" height="890" loading="lazy">
 
 # Terraform/AnsiColor プラグインのインストール
 
 「Jenkinsの管理」をクリックし、「プライグインの管理」をクリックします。
-<img src="/images/20230330a/global_tool_configuration_1.png" alt="" width="1200" height="895" loading="lazy">
+<img src="/images/2023/20230330a/global_tool_configuration_1.png" alt="" width="1200" height="895" loading="lazy">
 
 JenkinsからTerraformを実行するためにTerraformをインストールします。
 
@@ -417,23 +417,23 @@ Jenkins実行ログに色を付けたいので、AnsiColorをインストール�
 
 「Availavle plugins」をクリックし、検索欄から「AnsiColor」を入力、Installにチェックし、「Download now and install after restart」をクリックします。
 
-<img src="/images/20230330a/global_tool_configuration_2.png" alt="" width="1200" height="890" loading="lazy">
+<img src="/images/2023/20230330a/global_tool_configuration_2.png" alt="" width="1200" height="890" loading="lazy">
 
-<img src="/images/20230330a/global_tool_configuration_8.png" alt="" width="1200" height="893" loading="lazy">
+<img src="/images/2023/20230330a/global_tool_configuration_8.png" alt="" width="1200" height="893" loading="lazy">
 
 その後、「Installed plugins」をクリックし、「ジョブが実行中でなければ再起動」をクリックし、Jenkinsサーバを再起動します。
 
-<img src="/images/20230330a/global_tool_configuration_4.png" alt="" width="1200" height="892" loading="lazy">
+<img src="/images/2023/20230330a/global_tool_configuration_4.png" alt="" width="1200" height="892" loading="lazy">
 
 再起動すると、再度ログインが求められるのでログイン情報を入力し、ログインします。
 
-<img src="/images/20230330a/global_tool_configuration_5.png" alt="" width="1200" height="896" loading="lazy">
+<img src="/images/2023/20230330a/global_tool_configuration_5.png" alt="" width="1200" height="896" loading="lazy">
 
 # Global Tool Configurationの設定
 
 「Jenkinsの管理」をクリックし、「Global Tool Configuration」をクリックします。
 
-<img src="/images/20230330a/image.png" alt="" width="1200" height="899" loading="lazy">
+<img src="/images/2023/20230330a/image.png" alt="" width="1200" height="899" loading="lazy">
 
 Terraformプラグインをインストールしている状態だと、Global Tool ConfigurationにTerraformが表示されるので、設定します。
 
@@ -442,7 +442,7 @@ Terraformプラグインをインストールしている状態だと、Global T
 
 を設定し、「Save」をクリックします。
 
-<img src="/images/20230330a/image_2.png" alt="" width="1200" height="899" loading="lazy">
+<img src="/images/2023/20230330a/image_2.png" alt="" width="1200" height="899" loading="lazy">
 
 # Terraform Plan/Applyジョブの作成
 
@@ -452,11 +452,11 @@ Terraformプラグインをインストールしている状態だと、Global T
 
 「新規ジョブ作成」をクリックします。
 
-<img src="/images/20230330a/jenkins_job_setting_1.png" alt="" width="1200" height="893" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_job_setting_1.png" alt="" width="1200" height="893" loading="lazy">
 
 まず、Terraformジョブをまとめるフォルダを作成します。
 ジョブ名「terraform」と入力し、「フォルダ」を選択し、「OK」を入力します。
-<img src="/images/20230330a/jenkins_job_setting_8.png" alt="" width="1200" height="893" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_job_setting_8.png" alt="" width="1200" height="893" loading="lazy">
 
 ConfigurationでGeneralから
 
@@ -464,28 +464,28 @@ ConfigurationでGeneralから
 - 説明：terraform planジョブとterraform applyジョブを管理します
 
 と入力し「保存」をクリックします。
-<img src="/images/20230330a/jenkins_job_setting_9.png" alt="" width="1200" height="895" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_job_setting_9.png" alt="" width="1200" height="895" loading="lazy">
 
 ## Terraform planジョブの作成
 
 terraformフォルダが作成されたので、terraform planジョブの作成を行っていきます。
 「新規アイテムの作成」をクリックします。
-<img src="/images/20230330a/jenkins_job_setting_10.png" alt="" width="1200" height="894" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_job_setting_10.png" alt="" width="1200" height="894" loading="lazy">
 
 ジョブ名「terraform-plan」と入力し、「Multibranch Pipeline」を選択し、「OK」と入力します。
-<img src="/images/20230330a/jenkins_job_setting_2.png" alt="" width="1200" height="894" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_job_setting_2.png" alt="" width="1200" height="894" loading="lazy">
 
 ConfigurationでGeneralから
 
 - 表示名：terraform-plan
 - 説明：terraform planを実行するジョブです。
 
-<img src="/images/20230330a/jenkins_job_setting_3.png" alt="jenkins_job_setting_3.png" width="923" height="410" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_job_setting_3.png" alt="jenkins_job_setting_3.png" width="923" height="410" loading="lazy">
 
 Branch SorucesでGitHubとの連携の設定を行っていきます。
 Credentialsから「追加」をクリックし、GitHub認証情報の設定を行います。
 
-<img src="/images/20230330a/jenkins_job_setting_4.png" alt="jenkins_job_setting_4.png" width="849" height="608" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_job_setting_4.png" alt="jenkins_job_setting_4.png" width="849" height="608" loading="lazy">
 
 Folder Credentials Providerで
 
@@ -496,7 +496,7 @@ Folder Credentials Providerで
 
 を入力します。
 
-<img src="/images/20230330a/jenkins_job_setting_5.png" alt="" width="948" height="712" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_job_setting_5.png" alt="" width="948" height="712" loading="lazy">
 
 上記設定後、Credentialsに設定したCredentialが表示されるので選択します。
 Repository Scan - Deprecated Visualization　から
@@ -512,7 +512,7 @@ Behavioursは
 
 を選択します。
 
-<img src="/images/20230330a/jenkins_job_setting_6.png" alt="" width="888" height="845" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_job_setting_6.png" alt="" width="888" height="845" loading="lazy">
 
 Build Configurationから
 
@@ -520,10 +520,10 @@ Build Configurationから
 - script Path：Jenkinsfileが存在するパス
 を入力して「保存」をクリックします。
 
-<img src="/images/20230330a/jenkins_job_setting_7.png" alt="" width="908" height="291" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_job_setting_7.png" alt="" width="908" height="291" loading="lazy">
 
 設定後、terraform-planジョブが作成されます。
-<img src="/images/20230330a/jenkins_job_setting_12.png" alt="" width="1200" height="903" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_job_setting_12.png" alt="" width="1200" height="903" loading="lazy">
 実際のJenkinsfileはこちらです。
 
 ```sh
@@ -595,7 +595,7 @@ pipeline {
 
 terraform-planジョブが作成できたので、同様の設定でterraform-applyジョブを作成していきます。
 
-<img src="/images/20230330a/jenkins_job_setting_13.png" alt="" width="1200" height="895" loading="lazy">
+<img src="/images/2023/20230330a/jenkins_job_setting_13.png" alt="" width="1200" height="895" loading="lazy">
 
 実際のJenkinsfileはこちらです。
 
@@ -743,14 +743,14 @@ resource "google_storage_bucket" "bucket" {
 作成したTerraform Planジョブを実行してみましょう。
 「ビルド実行」をクリックします。
 
-<img src="/images/20230330a/image_3.png" alt="" width="1200" height="901" loading="lazy">
+<img src="/images/2023/20230330a/image_3.png" alt="" width="1200" height="901" loading="lazy">
 
 ジョブが実行されています。
-<img src="/images/20230330a/image_4.png" alt="" width="1200" height="893" loading="lazy">
+<img src="/images/2023/20230330a/image_4.png" alt="" width="1200" height="893" loading="lazy">
 
 ジョブが正常終了したので、ログを確認するとplan結果が表示されています。
 事前準備でgcsバケットを作成するtfファイルを準備したので、plan結果に「1 to add」と表示されました。
-<img src="/images/20230330a/plan.png" alt="" width="1200" height="904" loading="lazy">
+<img src="/images/2023/20230330a/plan.png" alt="" width="1200" height="904" loading="lazy">
 
 ## Terraform Applyジョブの実行
 
@@ -758,28 +758,28 @@ resource "google_storage_bucket" "bucket" {
 
 「ビルド実行」をクリックします。
 
-<img src="/images/20230330a/image_5.png" alt="" width="1200" height="907" loading="lazy">
+<img src="/images/2023/20230330a/image_5.png" alt="" width="1200" height="907" loading="lazy">
 
 ジョブが実行されています。
 
-<img src="/images/20230330a/image_6.png" alt="" width="1200" height="904" loading="lazy">
+<img src="/images/2023/20230330a/image_6.png" alt="" width="1200" height="904" loading="lazy">
 
 planフェーズでジョブが一時停止し、Apply Plan？ と表示されます。
 
-<img src="/images/20230330a/image_7.png" alt="" width="772" height="236" loading="lazy">
+<img src="/images/2023/20230330a/image_7.png" alt="" width="772" height="236" loading="lazy">
 
 ここでジョブのログを確認しに行き、Applyする前の内容を確認し、問題ないければ「Apply」をクリックしてTerraform Applyを実行します。もし、ここで問題があれば「Abort」をクリックすればジョブはTerraform Applyを実行することなく停止します。
 
-<img src="/images/20230330a/image_8.png" alt="" width="1200" height="858" loading="lazy">
+<img src="/images/2023/20230330a/image_8.png" alt="" width="1200" height="858" loading="lazy">
 
 「Apply」をクリックしてジョブが正常終了しました。
-<img src="/images/20230330a/image_9.png" alt="" width="782" height="222" loading="lazy">
+<img src="/images/2023/20230330a/image_9.png" alt="" width="782" height="222" loading="lazy">
 
 ここでジョブのログを確認しに行くと「Apply complete! Resources: 1 added, 0 changed, 0 destroyed.」と表示され、正常終了したことが確認できました。
-<img src="/images/20230330a/image_10.png" alt="" width="1200" height="899" loading="lazy">
+<img src="/images/2023/20230330a/image_10.png" alt="" width="1200" height="899" loading="lazy">
 
 Google Cloudのコンソール画面を確認すると、Terraform Applyを実行したときに作成されたGCSバケットが確認できました。
-<img src="/images/20230330a/image_11.png" alt="png" width="1200" height="846" loading="lazy">
+<img src="/images/2023/20230330a/image_11.png" alt="png" width="1200" height="846" loading="lazy">
 
 # 最後に
 

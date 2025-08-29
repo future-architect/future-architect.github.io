@@ -9,7 +9,7 @@ tag:
   - VPC
 category:
   - Programming
-thumbnail: /images/20210924a/thumbnail.png
+thumbnail: /images/2021/20210924a/thumbnail.png
 author: 真野隼記
 lede: " Gateway+Lambda という構成でWebAPI開発を行う際、ちょっと便利に使える疎通方法をまとめます。API GatewayですがPublicなエンドポイントがあれば `curl`コマンドや`Postman`を用いての動作検証も容易だと思います。"
 ---
@@ -27,7 +27,7 @@ API GatewayですがPublicなエンドポイントがあれば `curl`コマン�
 
 API Gatewayのマネジメントコンソールには動作確認用の[テスト呼び出し機能](https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/how-to-test-method.html)が存在します。
 
-<img src="/images/20210924a/image.png" alt="マネジメントコンソールのテスト呼び出し" width="1200" height="601" loading="lazy">
+<img src="/images/2021/20210924a/image.png" alt="マネジメントコンソールのテスト呼び出し" width="1200" height="601" loading="lazy">
 
 こちらと同等の機能がawscliにも提供されています。[api gateway test-invoke-method](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/apigateway/test-invoke-method.html)コマンドです。これを利用することでマネジメントコンソール上と同等のリクエストをコマンドラインから確認できます。
 
@@ -53,7 +53,7 @@ aws apigateway --profile <my_profile> test-invoke-method --rest-api-id <12341234
 
 API GatewayでLambdaオーソライザーが設定されている構成の場合があります。オーソライザー側についてはこのブログにも[AWS APIGateway Custom Authorizer入門](https://future-architect.github.io/articles/20210610a/)という記事がありますのでぜひ参照ください。
 
-<img src="/images/20210924a/オーソライザー.png" alt="API Gatewayのカスタムオーソライザーの構成図" width="575" height="251" loading="lazy">
+<img src="/images/2021/20210924a/オーソライザー.png" alt="API Gatewayのカスタムオーソライザーの構成図" width="575" height="251" loading="lazy">
 
 https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html
 

@@ -7,11 +7,11 @@ tag:
   - Rust
 category:
   - Programming
-thumbnail: /images/20220831a/thumbnail.png
+thumbnail: /images/2022/20220831a/thumbnail.png
 author: 中川旭
 lede: "夏の自由研究ということで、趣味で作ったものを一部改変して記事化しました。コードのサンプルを以下のリポジトリに配置しました。記事には重要な部分を記載しているので、コード全体を見たい場合にはリポジトリを参照してください。"
 ---
-<img src="/images/20220831a/beach-g4cba82d86_640.png" alt="" width="600" height="404">
+<img src="/images/2022/20220831a/beach-g4cba82d86_640.png" alt="" width="600" height="404">
 
 TIG DXユニットの中川旭です。
 

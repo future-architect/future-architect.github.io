@@ -8,7 +8,7 @@ tag:
   - C#
 category:
   - Programming
-thumbnail: /images/20220412a/thumbnail.png
+thumbnail: /images/2022/20220412a/thumbnail.png
 author: 清水
 lede: "WebおよびモバイルインターフェースのプロトタイプアプリをBlazor WebAssemblyを用いて開発した経験を通して感じたことなどを簡単に紹介したいと思います。Blazor WebAssemblyとは..."
 ---
@@ -97,7 +97,7 @@ D:\xxx\future_one_demo\future_one_demo.sln で ' dotnet restore ' を実行し�
 以下のように`Client/Server/Share`と役割が容易に分かるようにプロジェクトが構成されています。
 フロントエンドとバックエンドで開発部署が分かれているの場合などに好ましい構成ですね。
 
-<img src="/images/20220412a/プロジェクト構成.png" alt="プロジェクト構成.png" width="302" height="760" loading="lazy">
+<img src="/images/2022/20220412a/プロジェクト構成.png" alt="プロジェクト構成.png" width="302" height="760" loading="lazy">
 
 `Client`フォルダはフロントエンドのプロジェクトです。拡張子が`.razor`のファイルがありますが、これはRazorコンポーネントと呼ばれており、コンポーネントを組み合わせてWebページを作成するイメージとなります。[^1]
 
@@ -114,25 +114,25 @@ Vue.jsなどで起こりがちな`Client`と`Server`でデータクラスを個�
 アプリを起動してみます。左がデスクトップPCの表示。右はモバイル端末の表示です。
 デフォルトでレスポンシブデザインが採用されている点も良いです。
 
-<img src="/images/20220412a/アプリ.png" alt="アプリ.png" width="1200" height="749" loading="lazy">
+<img src="/images/2022/20220412a/アプリ.png" alt="アプリ.png" width="1200" height="749" loading="lazy">
 
 アプリを起動した直後、ブラウザのDevToolsで見たネットワークの状態です。
 `System.xxx.dll`という.NETランタイムのアセンブリ群がダウンロードされていることが分かります。全体のサイズで約4MBでした（参考：.NET SDK v6.0.201）
 
 モバイルなど非力な端末の場合、ネックになるかもしれません。
 
-<img src="/images/20220412a/DevTools.png" alt="DevTools.png" width="954" height="710" loading="lazy">
+<img src="/images/2022/20220412a/DevTools.png" alt="DevTools.png" width="954" height="710" loading="lazy">
 
 ただし、２回目以降に起動した際はダウンロードは発生しません。ランタイム関係のアセンブリはキャッシュストレージへ保存され、キャッシュしたものが使われているようです。この辺りは工夫がされているのですね。
 
-<img src="/images/20220412a/DevTools_2.png" alt="DevTools.png" width="872" height="724" loading="lazy">
+<img src="/images/2022/20220412a/DevTools_2.png" alt="DevTools.png" width="872" height="724" loading="lazy">
 
 DevToolsのソースを見てます。
 `_framework`コンテンツ内に複数の`.js`ファイルがあります。
 また、`wasm`内には`WebAssembly`のテキストコードのようなものがあります。
 この辺りは深追いしておりませんが、本格的に仕組みを理解したい場合はこの辺りを研究する必要がありそうです。
 
-<img src="/images/20220412a/DevTools_3.png" alt="DevTools.png" width="956" height="850" loading="lazy">
+<img src="/images/2022/20220412a/DevTools_3.png" alt="DevTools.png" width="956" height="850" loading="lazy">
 
 ## 開発ポイント
 

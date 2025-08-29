@@ -8,7 +8,7 @@ tag:
   - Go
 category:
   - Programming
-thumbnail: /images/20240409a/thumbnail.png
+thumbnail: /images/2024/20240409a/thumbnail.png
 author: 真野隼記
 lede: "Testcontainers を用いて、単体テスト実行前に docker compose up -d 無しで、PostgreSQLにアクセスする単体テストを行う、入門記事です。"
 ---
@@ -51,7 +51,7 @@ TestcontainersのAPIとしてはDockerfileを読み込んで起動させるこ�
 
 「Set Up」にてTestcontainers経由でコンテナを取り上げ、テストでそれら立ち上げたサービスにアクセスし、テスト終了後にコンテナを削除する、という流れです。
 
-<img src="/images/20240409a/test-workflow.png" alt="test-workflow.png" width="820" height="326" loading="lazy">
+<img src="/images/2024/20240409a/test-workflow.png" alt="test-workflow.png" width="820" height="326" loading="lazy">
 
 テストコード上でコンテナを起動するという発想がない場合は、手動でコンテナを起動したり、テストスクリプト上（MakefileやTaskfile）に記載していたかと思いますが、単なる起動はともかく、コンテナの破棄を含めたライフサイクル管理は少し手間でした。また、よくありがちなミスは、コンテナは起動したけど、必要なリソースリソース（例えばRDBだとテーブル、S3だとバケットなど）の作成が終わっていないのに、テストが実行されてFailになってしまうというミスも私はやりがちです。
 

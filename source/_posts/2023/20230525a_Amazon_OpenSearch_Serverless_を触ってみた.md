@@ -9,7 +9,7 @@ tag:
   - AWS
 category:
   - Programming
-thumbnail: /images/20230525a/thumbnail.png
+thumbnail: /images/2023/20230525a/thumbnail.png
 author: 齊藤英比古
 lede: "Amazon OpenSearch Service  を触る機会があり、興味があったのでプレビューで公開されていたServerless版でいろいろ試していました"
 ---
@@ -74,7 +74,7 @@ https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-i
 - 少しの手順、数分で構築が可能 (入門におすすめの理由)
 - Hot node、UltraWarm node とノードに種類があり、時系列コレクションの場合に直近24時間のデータはHot nodeにいれ、それ以降はUltraWarm nodeにいれることでノードの増大を防ぐ (Serverless版のいいところと思われ)
 
-<img src="/images/20230525a/Black_Belt_Amazon_OpenSearch_Serverless_27スライド.png" alt="Black_Belt_Amazon_OpenSearch_Serverless_27スライド" width="1200" height="679" loading="lazy">
+<img src="/images/2023/20230525a/Black_Belt_Amazon_OpenSearch_Serverless_27スライド.png" alt="Black_Belt_Amazon_OpenSearch_Serverless_27スライド" width="1200" height="679" loading="lazy">
 [引用元 2023/01 [AWS Black Belt Online Seminar] Amazon OpenSearch Serverless 27スライド目](https://pages.awscloud.com/rs/112-TZM-766/images/AWS-Black-Belt_2023_AmazonOpenSearchServerless_0131_v1.pdf)
 
 ### 公式ページはこちら
@@ -101,55 +101,55 @@ https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-i
 1. **Amazon OpenSearch Serverless の TOP**
    - Amazon OpenSearch Service のトップにサーバーレスのメニューが追加されておりそこからサーバーレス版にアクセスができる
    ※画像のオレンジ枠が該当箇所
-   <img src="/images/20230525a/サーバーレス版へのアクセス.png" alt="サーバーレス版へのアクセス" width="1200" height="599" loading="lazy">
+   <img src="/images/2023/20230525a/サーバーレス版へのアクセス.png" alt="サーバーレス版へのアクセス" width="1200" height="599" loading="lazy">
 2. **インデックスを格納するのはコレクション**
    - インデックスというのは、RDBで言うところのテーブルのようなもの。OpenSearch Service では、EC2インスタンスに対しインデックスを格納する
    - OpenSearch Serverlessでは、コレクションという単位で作成しコレクションに対しインデックスを作成する
-   <img src="/images/20230525a/サーバーレスダッシュボード.png" alt="サーバーレスダッシュボード" width="1200" height="532" loading="lazy">
+   <img src="/images/2023/20230525a/サーバーレスダッシュボード.png" alt="サーバーレスダッシュボード" width="1200" height="532" loading="lazy">
 3. **コレクションを作成してみる**
    - コレクションの名前、説明、コレクションタイプの設定ができる。コレクションタイプは、時系列と検索の2種類から選べる。
    名前と説明はいい感じのものを入れて、コレクションタイプは検索を選びましょう。
    (時系列を選ぶと、前述の通り直近24時間分のデータしか検索対象とならない)
-   <img src="/images/20230525a/Add_new_collection.png" alt="Add_new_collection" width="921" height="637" loading="lazy">
+   <img src="/images/2023/20230525a/Add_new_collection.png" alt="Add_new_collection" width="921" height="637" loading="lazy">
    - 暗号化
    初学者の方は、「AWS 所有キーを使用する」でAWSにおまかせしましょう。自前で用意したい方は、もう1つの方で。
-   <img src="/images/20230525a/encryption.png" alt="encryption" width="905" height="410" loading="lazy">
+   <img src="/images/2023/20230525a/encryption.png" alt="encryption" width="905" height="410" loading="lazy">
    - ネットワークアクセス
    今回はアクセスタイプにVPCは使わずにパブリックを利用します。 ~~VPCの説明までするとめんどくさいので~~ OpenSearch に絞って学べるようパブリックです。後ほどアクセスポリシー内でIAMユーザーでのアクセスとするので、誰でも触れる！ というわけではないので安心してください。
    ※説明でAPIのエンドポイントとダッシュボードのエンドポイントで異なるネットワーク設定をできるような記述があるが、注釈の方で同じ設定にするよう記載がある
-   <img src="/images/20230525a/network_access.png" alt="network_access" width="909" height="521" loading="lazy">
+   <img src="/images/2023/20230525a/network_access.png" alt="network_access" width="909" height="521" loading="lazy">
    - データのアクセスポリシー
    データへのアクセス権のルールを作成できます。
    わかりやすくビジュアルエディタで作成していきます。
-   <img src="/images/20230525a/Configure_data_access_1.png" alt="Configure_data_access_1" width="945" height="367" loading="lazy">
+   <img src="/images/2023/20230525a/Configure_data_access_1.png" alt="Configure_data_access_1" width="945" height="367" loading="lazy">
    - テンプレートやインデックス、ドキュメントに対し権限を付与できます
    「エイリアスとテンプレートの許可」「インデックスの許可」どちらもすべてチェックします。
-   <img src="/images/20230525a/Configure_data_access_2.png" alt="Configure_data_access_2" width="937" height="669" loading="lazy">
+   <img src="/images/2023/20230525a/Configure_data_access_2.png" alt="Configure_data_access_2" width="937" height="669" loading="lazy">
    - プリンシパルにはIAMとSAMLを選択できる。
-   <img src="/images/20230525a/Configure_data_access_2-1.png" alt="Configure_data_access_2-1" width="938" height="203" loading="lazy">
+   <img src="/images/2023/20230525a/Configure_data_access_2-1.png" alt="Configure_data_access_2-1" width="938" height="203" loading="lazy">
    - 「IAM ユーザーとロール」を選択するとダイアログが開かれます
-   <img src="/images/20230525a/image.png" alt="image.png" width="820" height="253" loading="lazy">
+   <img src="/images/2023/20230525a/image.png" alt="image.png" width="820" height="253" loading="lazy">
    - 「ユーザー」を選択すると……
-   <img src="/images/20230525a/image_2.png" alt="image.png" width="819" height="253" loading="lazy">
+   <img src="/images/2023/20230525a/image_2.png" alt="image.png" width="819" height="253" loading="lazy">
    - IAMユーザーの一覧が表示されるので、そこから選んでください
-   <img src="/images/20230525a/image_3.png" alt="image.png" width="823" height="288" loading="lazy"><br>
+   <img src="/images/2023/20230525a/image_3.png" alt="image.png" width="823" height="288" loading="lazy"><br>
    ビジュアルエディタの場合、最後にアクセス権のルールに名前をつける模様。あとから名前を変えたり、削除したりできるので「新しいデータアクセスポリシーとして作成する」を選択し、いい感じのアクセスポリシー名をつけてください。
-   <img src="/images/20230525a/Configure_data_access_3.png" alt="Configure_data_access_3" width="940" height="651" loading="lazy">
+   <img src="/images/2023/20230525a/Configure_data_access_3.png" alt="Configure_data_access_3" width="940" height="651" loading="lazy">
    最後に確認画面が出るので、「送信」ボタンを押して続行！数分でステータスがアクティブになり、あちこちにダッシュボードへのリンクが表示されました。
 4. **作成したコレクションのOpenSearchダッシュボードにアクセスする**
    - ダッシュボードにアクセス
    オレンジ枠の各所をクリックしましたが、画面が表示されず……
    青枠のURLをコピーして「https\://xxxxxxxxxxxxxxxxxxxx.ap-northeast-1.aoss.amazonaws.com/_dashboards」とURLの末尾に「/_dashboards」をつけることでアクセスできました。
-   <img src="/images/20230525a/image_4.png" alt="image.png" width="1200" height="486" loading="lazy">
+   <img src="/images/2023/20230525a/image_4.png" alt="image.png" width="1200" height="486" loading="lazy">
    こんな感じでOpenSearchダッシュボードが表示されます。
    (以前はログイン画面が出ていたのですが、AWSにログインしていると自動でログインされました。便利)
-   <img src="/images/20230525a/image_5.png" alt="image.png" width="1200" height="500" loading="lazy"><br>
+   <img src="/images/2023/20230525a/image_5.png" alt="image.png" width="1200" height="500" loading="lazy"><br>
 5. **Dev Tools から OpenSearch API を実行する**
    - DevToolsからAPI実行
    先程のOpenSearchダッシュボードの画面にて、右上の「Dev tools」のリンクをクリックします。
-   <img src="/images/20230525a/image_6.png" alt="image.png" width="1200" height="382" loading="lazy"><br>
+   <img src="/images/2023/20230525a/image_6.png" alt="image.png" width="1200" height="382" loading="lazy"><br>
    DevToolsの画面が開くので好きにAPIを実行しちゃってください。
-   <img src="/images/20230525a/image_7.png" alt="image.png" width="1200" height="275" loading="lazy"><br>
+   <img src="/images/2023/20230525a/image_7.png" alt="image.png" width="1200" height="275" loading="lazy"><br>
    - 試しに[デベロッパーガイドのチュートリアル](https://docs.aws.amazon.com/ja_jp/opensearch-service/latest/developerguide/serverless-getting-started.html#serverless-gsg-index)の「ステップ3: データをアップロードして検索する」にならってインデックスの作成を行う
    以下を入力し、列の右側に再生ボタンのようなアイコンが出るのでクリック
 
@@ -163,15 +163,15 @@ https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-i
    ```
 
    作成できた旨のメッセージが出ます。
-   <img src="/images/20230525a/image_8.png" alt="image.png" width="1200" height="283" loading="lazy">
+   <img src="/images/2023/20230525a/image_8.png" alt="image.png" width="1200" height="283" loading="lazy">
    - `GET /movies-index/_doc/1` を入力、実行してデータが登録できることを確認
-   <img src="/images/20230525a/image_9.png" alt="image.png" width="1200" height="309" loading="lazy">
+   <img src="/images/2023/20230525a/image_9.png" alt="image.png" width="1200" height="309" loading="lazy">
    いい感じですね。
 6. **あとかたづけ**
    - 作ったコレクションの削除
    削除は簡単で、AWS コンソールの画面に戻りトップにある削除ボタンから押し確認ダイアログで削除すれば完了！
    <font color="red">アカウントとパスワードで制御されておりアクセスできないとは言え、インターネット上に公開状態のままなのは良くないため、不要であれば必ず消しましょう。</font>
-   <img src="/images/20230525a/image_10.png" alt="image.png" width="1200" height="138" loading="lazy">
+   <img src="/images/2023/20230525a/image_10.png" alt="image.png" width="1200" height="138" loading="lazy">
 
 ## まとめ
 

@@ -11,7 +11,7 @@ tag:
   - Kinesis
 category:
   - Programming
-thumbnail: /images/20200727/thumbnail.png
+thumbnail: /images/2020/20200727/thumbnail.png
 author: 真野隼記
 lede: "[サーバレス連載企画]の8回目です。TIG DXユニットの真野です。ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。[工場をハックするための基本知識] の記事を書いた棚井さんと同じチームに所属しています。[サーバレス連載企画] の第8弾目として、Serverlessの代表格であるAWS LambdaでGoを用いてKinesisに対するKPL/KCL相当の処理についてまとめていきます。"
 ---
@@ -27,7 +27,7 @@ TIG DXユニットの真野です。ここ数年は産業向けのIoT（例え�
 
 某IoTをテーマとした案件で、Kinesisを用いたストリーミングETLなパイプラインを構築するにあたって、下図のようにKinesisの後段はGoとLambdaを採用しました。Kinesisが多段になっているのは、Rawデータと加工済みデータを別システムで利用したかったためです。
 
-<img src="/images/20200727/serverless-kinesis-aggregate-format.png" loading="lazy">
+<img src="/images/2020/20200727/serverless-kinesis-aggregate-format.png" loading="lazy">
 
 最初にKinesisにPublishするECSはJavaのKPL（Kinesis Producer Library）を用いており、当然Aggregation Format(後述します)を利用していますが、後続のGoアプリでレコードを **DeAggregation** する処理と、後続のKinesisへの再度レコードを **Aggregation** する方法があまり見当たらなかったので、実装例を残します。
 
@@ -238,7 +238,7 @@ func main() {
 
 下図のような環境を構築して動かしてみます。デプロイ方法はリポジトリのREADMEを参考ください。
 
-<img src="/images/20200727/abstract.png" loading="lazy">
+<img src="/images/2020/20200727/abstract.png" loading="lazy">
 
 最初のKinesisにはawscli経由で3件データを投入します。
 

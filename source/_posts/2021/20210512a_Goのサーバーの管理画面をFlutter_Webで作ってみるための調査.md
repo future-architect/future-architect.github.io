@@ -10,7 +10,7 @@ tag:
   - flutter_web
 category:
   - Programming
-thumbnail: /images/20210512a/thumbnail.png
+thumbnail: /images/2021/20210512a/thumbnail.png
 author: 澁川喜規
 lede: "Flutter連載の3本目はFlutter Webを紹介します。Flutter 2になって、Web向けに出力する機能もStableになりました。Flutter for Webは標準のHTMLにするHTMLレンダラーと、CanvasKitレンダラーと2種類あります。後者はSkiaという2DグラフィックスのライブラリをWebAssembly化したものを使います。Skiaは..."
 ---
@@ -111,7 +111,7 @@ class DetailScreen extends StatelessWidget {
 
 こちらができあがりです。Android Studioで作った環境でウェブで表示してみたものになります。
 
-<img src="/images/20210512a/スクリーンショット_2021-05-11_8.49.21.png" alt="Routerのデモをウェブ表示" width="1200" height="1659"  loading="lazy">
+<img src="/images/2021/20210512a/スクリーンショット_2021-05-11_8.49.21.png" alt="Routerのデモをウェブ表示" width="1200" height="1659"  loading="lazy">
 
 なお、URLの一部がエンティティのIDとしてパスパラメータとして使いたい場合は、RouteInformationParserを継承したクラスを作ってアプリに渡す必要があります。上記のmediumのページの中でRouteInformationParserで検索して見てみれば書き方がわかりますが、面倒です。ここはそのうち改善されるのでは、ということを期待しています。
 
@@ -143,7 +143,7 @@ void main() {
 
 これでパスにハッシュが入ることがなくなりました。
 
-<img src="/images/20210512a/スクリーンショット_2021-05-11_8.56.50.png" alt="URLにハッシュが入っていないデモ画面" width="1006" height="260"  loading="lazy">
+<img src="/images/2021/20210512a/スクリーンショット_2021-05-11_8.56.50.png" alt="URLにハッシュが入っていないデモ画面" width="1006" height="260"  loading="lazy">
 
 # Goのアプリケーションに組み込む
 
@@ -187,7 +187,7 @@ NotFoundHandlerハンドラーは[前回の記事のファイルの配信のハ�
 
 無事、GoでもFlutter Webのビルド結果をホストできました。
 
-<img src="/images/20210512a/スクリーンショット_2021-05-11_18.15.39.png" alt="GoでもFlutter Webのビルド結果をホストしたデモ表示" width="1200" height="1398"  loading="lazy">
+<img src="/images/2021/20210512a/スクリーンショット_2021-05-11_18.15.39.png" alt="GoでもFlutter Webのビルド結果をホストしたデモ表示" width="1200" height="1398"  loading="lazy">
 
 今回のフォルダ構成は次の通りです。Goのコードはserverみたいなサブパッケージを作って入れてもよかったかも。
 
@@ -222,7 +222,7 @@ NotFoundHandlerハンドラーは[前回の記事のファイルの配信のハ�
 
 題材としては今話題沸騰のイケてるWeb APIである[ケンオール](https://kenall.jp/)にアクセスしてみます。
 
-<img src="/images/20210512a/スクリーンショット_2021-05-11_20.34.54.png" alt="ケンオールのサイト画面" width="1200" height="952"  loading="lazy">
+<img src="/images/2021/20210512a/スクリーンショット_2021-05-11_20.34.54.png" alt="ケンオールのサイト画面" width="1200" height="952"  loading="lazy">
 
 ケンオールはアカウント登録するとAPIキーが発行され、これを使ってアクセスします。サンプルと言えど、APIキーはフロントエンドに置きたくないので、サーバー側で中継することとします。
 
@@ -430,7 +430,7 @@ import 'package:http/http.dart' as http;
 
 無事動いたようです。
 
-<img src="/images/20210512a/スクリーンショット_2021-05-11_22.32.50.png" alt="ケンオールAPIを利用したFlutter画面" width="1200" height="1371"  loading="lazy">
+<img src="/images/2021/20210512a/スクリーンショット_2021-05-11_22.32.50.png" alt="ケンオールAPIを利用したFlutter画面" width="1200" height="1371"  loading="lazy">
 
 # まとめ
 

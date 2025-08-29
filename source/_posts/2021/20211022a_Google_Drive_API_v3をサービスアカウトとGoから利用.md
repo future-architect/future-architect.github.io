@@ -10,7 +10,7 @@ tag:
   - GCP
 category:
   - Programming
-thumbnail: /images/20211022a/thumbnail.png
+thumbnail: /images/2021/20211022a/thumbnail.png
 author: 真野隼記
 lede: "Google DriveにアップロードされたExcelファイルを利用したちょっとしたジョブを実装する機会があり、処理を動かしたいのがAWSなど別のプラットフォームであったため、サービスアカウントを用いてGoogle Drive APIにアクセスするGoプログラムを作りました。"
 ---
@@ -41,15 +41,15 @@ Google Drive APIを使うための[認証方式](https://cloud.google.com/docs/a
 
 続いて、Projectの[Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) から、Google Drive APIを有効にします。有効にしないとこのProjectから払い出したサービスアカウントの認証情報では、Google Drive APIを利用できないです。
 
-<img src="/images/20211022a/Google_Drive_APIの有効化.png" alt="Google_Drive_APIの有効化.png" width="1200" height="640" loading="lazy">
+<img src="/images/2021/20211022a/Google_Drive_APIの有効化.png" alt="Google_Drive_APIの有効化.png" width="1200" height="640" loading="lazy">
 
 続いて、[APIとサービスにある、Google Drive APIの認証情報](https://console.cloud.google.com/apis/api/drive.googleapis.com/credentials)タブから、「認証情報を作成」をクリックして、サービスアカウントの作成を行います。今回は適当に、google-drive-exampleという名前にしました。
 
-<img src="/images/20211022a/認証情報を作成.png" alt="認証情報を作成.png" width="1200" height="470" loading="lazy">
+<img src="/images/2021/20211022a/認証情報を作成.png" alt="認証情報を作成.png" width="1200" height="470" loading="lazy">
 
 数十秒待つと、サービスアカウントの作成されます。その後は、サービスアカウントの「キー」から、キーを作成します。タイプはJSONで良いと思います。
 
-<img src="/images/20211022a/image.png" alt="image.png" width="1200" height="628" loading="lazy">
+<img src="/images/2021/20211022a/image.png" alt="image.png" width="1200" height="628" loading="lazy">
 
 ダウンロードしたJSONファイルは大事に保存します。AWS上で使う場合は、AWS Systems Manager Parameter StoreにSecureString属性をつけて保存し利用すると良いでしょう。
 
@@ -59,7 +59,7 @@ Google Drive APIを使うための[認証方式](https://cloud.google.com/docs/a
 
 アクセスさせたいフォルダなどを右クリックして、「共有」から先程のアカウントIDを指定します。
 
-<img src="/images/20211022a/権限付与.png" alt="権限付与.png" width="1200" height="388" loading="lazy">
+<img src="/images/2021/20211022a/権限付与.png" alt="権限付与.png" width="1200" height="388" loading="lazy">
 
 これでgoogle-drive-exampleのIDから、Google Drive APIを用いて指定のフォルダにアクセスできるようになりました。
 

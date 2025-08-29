@@ -10,7 +10,7 @@ tag:
   - go-swagger
 category:
   - Programming
-thumbnail: /images/20200630/thumbnail.png
+thumbnail: /images/2020/20200630/thumbnail.png
 author: 真野隼記
 lede: "業務でヘビーユーズしているgo-swaggerについての開発Tipsをまとめました。"
 
@@ -51,7 +51,7 @@ go-swaggerがWAF(Webアプリケーションフレームワーク）というの
 
 TypeScriptのフロントエンド側の生成は[openapi-generator](https://openapi-generator.tech/docs/generators/)を当社では採用することが多いです。あくまでサーバサイドの生成にgo-swaggerを用いています。go-swaggerもクライアントコードは生成でき、こちらはあるWeb APIロジック中で、別のWeb APIを呼び出す時に利用したりもします（下図のイメージ）
 
-<img src="/images/20200630/photo_20200630_01.png" loading="lazy">
+<img src="/images/2020/20200630/photo_20200630_01.png" loading="lazy">
 
 The Gopher character is based on the Go mascot designed by [Renée French](http://reneefrench.blogspot.com/).
 
@@ -130,13 +130,13 @@ go-swaggerが対応しているのは `OAS2` であるので注意です。最�
 
 大事なポイントなのでちゃんとテストします。次の画像↓はOAS2かOAS3のどちらでしょうか？
 
-<img src="/images/20200630/photo_20200630_02.png" loading="lazy">
+<img src="/images/2020/20200630/photo_20200630_02.png" loading="lazy">
 
 ..はい、`OAS2` と書かれているのでOKです。このドキュメントはgo-swaggerで利用できます。
 
 では、次の画像↓はどちらでしょうか？
 
-<img src="/images/20200630/photo_20200630_03.png" loading="lazy">
+<img src="/images/2020/20200630/photo_20200630_03.png" loading="lazy">
 
 ..はい、`OAS3` と書かれていますね。というわけで、このドキュメントはgo-swaggerでは利用できない可能性が高いので、参考にするのはほどほどにしましょう。
 

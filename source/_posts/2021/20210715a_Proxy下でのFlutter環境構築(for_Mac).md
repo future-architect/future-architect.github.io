@@ -8,7 +8,7 @@ tag:
   - 環境構築
 category:
   - Programming
-thumbnail: /images/20210715a/thumbnail.png
+thumbnail: /images/2021/20210715a/thumbnail.png
 author: 斎藤賢太
 lede: "以前、当ブログで連載が行われたFlutterですが、先日業務のためにFlutterの環境構築をしようとしたところ、いくつかの障壁がありました。当記事ではProxyがある環境下でMac上にFlutterの環境構築について、ダウンロードから仮想デバイス上での公式デモアプリ（Android）実行まで紹介いたします。"
 ---
@@ -140,7 +140,7 @@ A problem occurred configuring root project 'android'.
 
 以上の問題が解決され、正常に動作すれば環境構築完了です。以下のようにカウントアップアプリが起動し、操作できると思います。
 
-<img alt="flutter_demo_launch" src="/images/20210715a/flutter_demo_launch.png" width="500" height="894" loading="lazy">
+<img alt="flutter_demo_launch" src="/images/2021/20210715a/flutter_demo_launch.png" width="500" height="894" loading="lazy">
 
 ## まとめ
 

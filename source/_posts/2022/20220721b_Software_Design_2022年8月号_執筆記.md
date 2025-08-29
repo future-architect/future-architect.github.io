@@ -9,12 +9,12 @@ tag:
   - 出版
 category:
   - Programming
-thumbnail: /images/20220721b/thumbnail.jpg
+thumbnail: /images/2022/20220721b/thumbnail.jpg
 author: 武田大輝
 lede: "TIG DX Unitの武田です。先日（2022年7月15日）発売された技術評論社の [Software Design 2022年 8月号] に寄稿させていただきました。まずはじめに、このような寄稿の機会をくださった技術評論社の方々には、心からお礼申し上げます。"
 ---
 
-<img src="/images/20220721b/TH320_642208.jpg" alt="" width="320" height="452">
+<img src="/images/2022/20220721b/TH320_642208.jpg" alt="" width="320" height="452">
 
 ## はじめに
 
@@ -60,7 +60,7 @@ Future Tech BlogでOpenAPIをテーマとして取り扱った記事を見てい
 執筆作業はおおよそ下記のようなスケジュールで進めていく形となりました。
 黒塗りしている矢羽の「原稿作成」と「誌面修正」が弊社の担当となります。
 
-<img src="/images/20220721b/Schedule.png" alt="Schedule.png" width="1162" height="202" loading="lazy">
+<img src="/images/2022/20220721b/Schedule.png" alt="Schedule.png" width="1162" height="202" loading="lazy">
 
 原稿の作成期間はおおよそ3週間程度というスケジュールでした。
 おそらく通常のスケジュールと比べると若干タイトなのかもしれませんが、依頼いただいた8ページという文量を考えると無理のないスケジュールだと思います。

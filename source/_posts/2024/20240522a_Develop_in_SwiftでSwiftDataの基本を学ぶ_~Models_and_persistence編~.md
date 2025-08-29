@@ -9,12 +9,12 @@ tag:
   - モバイルアプリ
 category:
   - Programming
-thumbnail: /images/20240522a/thumbnail.png
+thumbnail: /images/2024/20240522a/thumbnail.png
 author: 橋本竜我
 lede: "公式チュートリアルDevelop in SwiftのModels and persistence、Data editing and navigation、Relationships and queriesという3つのセクションでSwiftDataを学べるとことで実際にやってみました。"
 ---
 
-<img src="/images/20240522a/image.png" alt="" width="1103" height="542" loading="lazy">
+<img src="/images/2024/20240522a/image.png" alt="" width="1103" height="542" loading="lazy">
 
 # はじめに
 
@@ -51,7 +51,7 @@ HealthCare Innovation Group(HIG)[^1]の橋本です。
 
 # SwiftDataとは
 
-<img src="/images/20240522a/image_2.png" alt="" width="1200" height="419" loading="lazy">
+<img src="/images/2024/20240522a/image_2.png" alt="" width="1200" height="419" loading="lazy">
 
 [`SwiftData`](https://developer.apple.com/documentation/swiftdata)とは、データモデリングとデータの永続化のフレームワークです。
 これまで主に使われていた`CoreData`の後継として期待されています。
@@ -474,7 +474,7 @@ struct ContentView: View {
 追加した友達の誕生日のデータがアプリをキルしても、再度立ち上げると残っていることが確認できました！
 `SwiftData`を使って、データを永続化させることに成功！！
 
-<img src="/images/20240522a/Simulator_Screen_Recording_-_iPhone_15_-_2024-05-15_at_20.26.56.gif" alt="" width="218" height="474" loading="lazy">
+<img src="/images/2024/20240522a/Simulator_Screen_Recording_-_iPhone_15_-_2024-05-15_at_20.26.56.gif" alt="" width="218" height="474" loading="lazy">
 
 # おわりに
 

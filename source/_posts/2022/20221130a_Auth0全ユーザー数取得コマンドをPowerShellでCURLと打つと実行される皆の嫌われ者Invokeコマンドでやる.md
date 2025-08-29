@@ -9,7 +9,7 @@ tag:
   - Invoke-Request
 category:
   - 認証認可
-thumbnail: /images/20221130a/thumbnail.png
+thumbnail: /images/2022/20221130a/thumbnail.png
 author: ダワージャルガルオチラル
 lede: "Auth0全ユーザー数取得コマンドをPowerShellのInvokeコマンドで行います。"
 ---
@@ -94,7 +94,7 @@ Auth0にいる総ユーザー数を取得を `Invoke-RestMethod` で記載する
 
 User Management APIの利用権限のあるAPIのtoken取得コマンドが、**API設定のTestタブに**以下の画像のように書いてあるので参照します。tokenを取得する`cURLコマンド`と、すごく親切にバックエンドでよく用いる言語での取得方法まで記載しているので参考になります。
 
-<img src="/images/20221130a/0.png" alt="" width="1200" height="706" loading="lazy">
+<img src="/images/2022/20221130a/0.png" alt="" width="1200" height="706" loading="lazy">
 
 ```bash:curlの実行例
 curl --request POST \
@@ -147,7 +147,7 @@ Invoke-RestMethod
 
 続いてはbodyの記載方法を見ます。
 
-<img src="/images/20221130a/image.png" alt="" width="700" height="1083" loading="lazy">
+<img src="/images/2022/20221130a/image.png" alt="" width="700" height="1083" loading="lazy">
 
 ぱっと見は理解することが難しいですよね。オブジェクトで渡せば良いのかな？ とわかります。
 
@@ -204,7 +204,7 @@ Invoke-RestMethod -Method Post -Uri "https://$domain/oauth/token" -ContentType '
 
 しかし、少し斜め上な結果になります。
 
-<img src="/images/20221130a/1.png" alt="1.png" width="1200" height="181" loading="lazy">
+<img src="/images/2022/20221130a/1.png" alt="1.png" width="1200" height="181" loading="lazy">
 
 #### 出力結果最後まで出ない問題
 
@@ -245,7 +245,7 @@ Return results inside an object that contains the total result count (true) or a
 
 しかし、この説明文だと、表示するページの合計なのか、全体なのか曖昧ですよね。
 
-<img src="/images/20221130a/image_2.png" alt="image.png" width="612" height="200" loading="lazy">
+<img src="/images/2022/20221130a/image_2.png" alt="image.png" width="612" height="200" loading="lazy">
 
 また、概要にある通りユーザーのリストが取得できてしまうが、合計人数だけ知りたいので**ユーザー情報をなくすオプションを探します**。※全パラメータは任意
 

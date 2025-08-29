@@ -7,7 +7,7 @@ tag:
   - リモートワーク
 category:
   - Programming
-thumbnail: /images/20210712a/thumbnail.png
+thumbnail: /images/2021/20210712a/thumbnail.png
 author: 山上燦
 lede: "TIGの山上・村田です。いきなりですが、みなさんはコミュニケーションツール（チャットツール）何を使っていますでしょうか。フューチャーでは2020年のはじめに社内公式のチャットツールとしてSlack Enterprise Gridを導入しました"
 ---
@@ -35,7 +35,7 @@ TIGの山上・[村田](https://twitter.com/famipapamart)です。
 # Slack Enterprise Grid 導入前どうなっていたか？
 
 会社としてはGSuiteが標準だったためHangoutsやChatの利用が大半、TIGを中心とした一部でSlackを利用していました。
-<img src="/images/20210712a/image.png" alt="社内チャットツールのタイムチャート図" width="720" height="405" loading="lazy">
+<img src="/images/2021/20210712a/image.png" alt="社内チャットツールのタイムチャート図" width="720" height="405" loading="lazy">
 
 # Slack Enterprise Grid 導入経緯
 
@@ -45,7 +45,7 @@ TIGの山上・[村田](https://twitter.com/famipapamart)です。
 
 # Slack Enterprise Grid 導入までの道のり
 
-<img src="/images/20210712a/image_2.png" alt="今ワークスペースいくつあるんだろう" width="720" height="405" loading="lazy">
+<img src="/images/2021/20210712a/image_2.png" alt="今ワークスペースいくつあるんだろう" width="720" height="405" loading="lazy">
 
 調べてみると、、、
 
@@ -53,7 +53,7 @@ TIGの山上・[村田](https://twitter.com/famipapamart)です。
 * **400名弱（全社員1,000人程度）** がSlackを利用
 * 結構な額をSlack社に支払っていた！
 
-<img src="/images/20210712a/image_3.png" alt="コスト的にもEnterpriseGridの方がメリット大きいじゃん" width="720" height="405" loading="lazy">
+<img src="/images/2021/20210712a/image_3.png" alt="コスト的にもEnterpriseGridの方がメリット大きいじゃん" width="720" height="405" loading="lazy">
 
 ### 導入に向けて実施したこと
 
@@ -72,7 +72,7 @@ TIGの山上・[村田](https://twitter.com/famipapamart)です。
 TIGを中心に、AIグループやセキュリティグループに展開。
 さらには会社全体のコミュニケーションツールとして認められ、利用範囲はみるみる拡大しました！！
 
-<img src="/images/20210712a/スクリーンショット_2021-07-09_18.06.06.png" alt="Slackの社内展開イメージ" width="811" height="432" loading="lazy">
+<img src="/images/2021/20210712a/スクリーンショット_2021-07-09_18.06.06.png" alt="Slackの社内展開イメージ" width="811" height="432" loading="lazy">
 
 ### 導入後の利用状況
 
@@ -100,7 +100,7 @@ Slack を開発フローに組み込み、 backlog の起票や新規 Pull Reque
 
 以下のスクショは私のチームで管理している GCP プロジェクトのとある月の課金情報ですが、 Slack API を用いたアプリを実装し、 Slack へ課金情報を通知しています。
 
-<img src="/images/20210712a/スクリーンショット_2021-07-04_20.07.56.png" alt="クラウド利用費を毎朝通知" width="811" height="433" loading="lazy">
+<img src="/images/2021/20210712a/スクリーンショット_2021-07-04_20.07.56.png" alt="クラウド利用費を毎朝通知" width="811" height="433" loading="lazy">
 
 コンソールみれば良い、という考えもあるかもですが、 Slack に集約されてるとなにかと便利だなあと日々思っています。このアプリは当社の GitHub リポジトリで公開されているので興味がある方はぜひ使ってみてください。
 
@@ -114,7 +114,7 @@ https://github.com/future-architect/gbilling2slack
 
 真偽は不明ですが、少なくとも担当者がストレスなくコミュニケーションできるプラットフォームとして Slack が機能しており、これはとても好ましい状況です。
 
-<img src="/images/20210712a/スクリーンショット_2021-07-04_20.15.27.png" alt="ビジネスパートナーとの緻密な連携" width="1200" height="637" loading="lazy">
+<img src="/images/2021/20210712a/スクリーンショット_2021-07-04_20.15.27.png" alt="ビジネスパートナーとの緻密な連携" width="1200" height="637" loading="lazy">
 
 ## チームビルディング
 
@@ -122,7 +122,7 @@ https://github.com/future-architect/gbilling2slack
 
 よく使われるリアクションのアイコンが違ったり、ユニークなワークフローが組まれていたり、チームメンバーがbotアプリを開発&導入してたり...
 
-<img src="/images/20210712a/スクリーンショット_2021-07-04_20.20.44.png" alt="チームビルディング" width="1200" height="640" loading="lazy">
+<img src="/images/2021/20210712a/スクリーンショット_2021-07-04_20.20.44.png" alt="チームビルディング" width="1200" height="640" loading="lazy">
 
 そのうちのいくつかはフューチャーの技術ブログで紹介されているので、興味がある方はぜひ見てみてください。
 

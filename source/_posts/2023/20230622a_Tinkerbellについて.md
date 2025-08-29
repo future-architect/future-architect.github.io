@@ -9,7 +9,7 @@ tag:
   - Linux
 category:
   - Infrastructure
-thumbnail: /images/20230622a/thumbnail.png
+thumbnail: /images/2023/20230622a/thumbnail.png
 author: 原木翔
 lede: "CNCFのホスト対象にCloudサービスに関係するプロジェクトは多いですが、全てではありません。オンプレミス環境に関するプロダクトも数多く存在します。今回はそんなオンプレミス環境向けのCNCF sandboxプロジェクトの1つ、Tinkerbellを紹介します。"
 ---
@@ -51,7 +51,7 @@ AWSを普段扱ってる人には正直馴染みがなさそうな...そんな�
 
 ### 明示的なプロビジョニング設定及び自動化～Tinkerbellの仕組み～
 
-<img src="/images/20230622a/構成図.png" alt="" width="743" height="477" loading="lazy">
+<img src="/images/2023/20230622a/構成図.png" alt="" width="743" height="477" loading="lazy">
 
 出典: [Tinkerbell Docs - Architecture](https://docs.tinkerbell.org/architecture/)
 
@@ -164,7 +164,7 @@ yaml形式で、プロビジョニングで実行したいタスクがコンテ�
 
 具体的には、iPXE Bootにより、まず[Hook](https://github.com/tinkerbell/hook)と呼ばれる[LinuxKit](https://github.com/linuxkit/linuxkit)[^4]をベースにしたプロビジョニング用のOSが`initramfs` によりメモリ上で起動します。
 
-<img src="/images/20230622a/このタイミングがちょうど良さそう.jpg" alt="このタイミングがちょうど良さそう.jpg" width="827" height="299" loading="lazy">
+<img src="/images/2023/20230622a/このタイミングがちょうど良さそう.jpg" alt="このタイミングがちょうど良さそう.jpg" width="827" height="299" loading="lazy">
 
 ※Hookが起動した様子。当初、このクジラを見てPXE Bootがうまくいったと喜んでいたら、実はストレージパスの設定ミスでフリーズしてたのはいい思い出
 
@@ -172,7 +172,7 @@ yaml形式で、プロビジョニングで実行したいタスクがコンテ�
 
 `tink-worker` はワークフローに基づいてターゲットサーバー内でコンテナイメージを起動し、必要なタスクを実行していきます。最後にリブートすると、プロビジョニングは完了します。
 
-<img src="/images/20230622a/U32s0wH3KSJCmPM1686998196_1686998464_(1).png" alt="U32s0wH3KSJCmPM1686998196_1686998464_(1).png" width="574" height="401" loading="lazy">
+<img src="/images/2023/20230622a/U32s0wH3KSJCmPM1686998196_1686998464_(1).png" alt="U32s0wH3KSJCmPM1686998196_1686998464_(1).png" width="574" height="401" loading="lazy">
 
 ※tink-worker内で `podman` の `hello-world` コンテナを起動した様子。 ~~ダグトリオ~~ アザラシがお迎えしてくれました。
 
@@ -199,7 +199,7 @@ Tinkerbellはベアメタルサーバー向けのプロビジョニングツー�
 
 イメージに起こすと次のような感じです。Kubernetesの特色を生かしながら、環境構築&管理を容易にしようというわけです。
 
-<img src="/images/20230622a/cluster-apiのイメージ.png" alt="cluster-apiのイメージ.png" width="1146" height="655" loading="lazy">
+<img src="/images/2023/20230622a/cluster-apiのイメージ.png" alt="cluster-apiのイメージ.png" width="1146" height="655" loading="lazy">
 
 本題に戻ると、このプロジェクトのベアメタルサーバー向けに開発が進められているのが、Cluster API Provider Tinkerbell というわけです。すなわち、Tinkerbellでベアメタルサーバーのプロビジョニングを行いつつ、(今回はあまり触れませんでしたが)Tinkerbellの中にあるHegelと呼ばれるメタ・サーバーからcloud-initを配布することでその上でKubernetesも構築してしまおうという試みです。
 

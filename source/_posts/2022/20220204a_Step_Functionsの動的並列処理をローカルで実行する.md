@@ -10,11 +10,11 @@ tag:
   - Pipenv
 category:
   - Programming
-thumbnail: /images/20220204a/thumbnail.png
+thumbnail: /images/2022/20220204a/thumbnail.png
 author: 宮永崇史
 lede: "AWS Step Functionsの動的並列処理をローカルで実行する方法をハンズオン形式でまとめました。"
 ---
-<img src="/images/20220204a/eyecatch_stepfunctions.png" alt="" width="1003" height="498" loading="lazy">
+<img src="/images/2022/20220204a/eyecatch_stepfunctions.png" alt="" width="1003" height="498" loading="lazy">
 
 # はじめに
 
@@ -61,7 +61,7 @@ S3バケットからJSONを取得し、後続のLambdaでETL処理をします�
 
 こちらの拡張機能を利用すれば[ステートメント言語](https://docs.aws.amazon.com/ja_jp/step-functions/latest/dg/concepts-amazon-states-language.html)を下図のビジュアルワークフロー図のように可視化できます。
 
-<img src="/images/20220204a/image.png" alt="ビジュアルワークフロー" width="1200" height="881" loading="lazy">
+<img src="/images/2022/20220204a/image.png" alt="ビジュアルワークフロー" width="1200" height="881" loading="lazy">
 
 ## 実装するアプリの機能詳細
 
@@ -936,7 +936,7 @@ make stepfunctions
 ログを確認したい方はコンテナ起動時に`-d`オプションを付けずに起動してください。
 また`dockcer-compose.yml`の`DEBUG`オプションを`1`とすることで画像のようにタスク定義なども確認できます。
 
-<img src="/images/20220204a/stepfunctions.gif" alt="stepfunctions" width="1200" height="629" loading="lazy">
+<img src="/images/2022/20220204a/stepfunctions.gif" alt="stepfunctions" width="1200" height="629" loading="lazy">
 
 demo-gatherによってアップロードされたExcelファイルをローカルにダウンロードしましょう。
 
@@ -946,7 +946,7 @@ make download
 
 downloadに成功していればプロジェクトプロジェクトルート直下にresultフォルダが生成されtest.xlsxが生成されていると思います。
 
-<img src="/images/20220204a/image_2.png" alt="image.png" width="1200" height="676" loading="lazy">
+<img src="/images/2022/20220204a/image_2.png" alt="image.png" width="1200" height="676" loading="lazy">
 
 想定通りの出力が得られましたね🎉
 今回はデモなので処理もステップ数も大したことはありません。

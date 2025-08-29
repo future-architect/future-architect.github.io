@@ -9,7 +9,7 @@ tag:
   - PlusCode
 category:
   - Infrastructure
-thumbnail: /images/20220726a/thumbnail.png
+thumbnail: /images/2022/20220726a/thumbnail.png
 author: 真野隼記
 lede: "緯度・経度をコード化する技術に興味があったのでOpen Location Code（Plus Code）について調べました。"
 ---
@@ -29,7 +29,7 @@ Google Mapsのヘルプが簡易的でわかりやすかったため引用しま
 
 Google Mapsを開くと出てくる、`JPCG+XX 品川区、東京都` コードのことです（図はフューチャーの本社がある大崎アートヴィレッジタワー）の位置情報です。Google Maps上で表示・及び検索で使えるのは便利です。
 
-<img src="/images/20220726a/image.png" alt="image.png" width="1200" height="761" loading="lazy">
+<img src="/images/2022/20220726a/image.png" alt="image.png" width="1200" height="761" loading="lazy">
 
 Open Location Codeは[google/open-location-code](https://github.com/google/open-location-code)で実装も[仕様](https://github.com/google/open-location-code/blob/main/docs/specification.md)もApache License 2.0で公開されています。変換はこれらの実装を用いればオフラインで可能です。
 
@@ -123,7 +123,7 @@ Open Location Codeは[google/open-location-code](https://github.com/google/open-
   * グローバルコードとも呼ばれます
   * ためしに、 `JPCG+XX ギリシャ` などとすると、山の中？ が特定されます
 
-<img src="/images/20220726a/image_2.png" alt="image.png" width="1200" height="751" loading="lazy">
+<img src="/images/2022/20220726a/image_2.png" alt="image.png" width="1200" height="751" loading="lazy">
 
 ## Web API
 

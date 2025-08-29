@@ -228,7 +228,7 @@ $ gcloud functions deploy berglas-example-go \
 
 ちゃんとBerglasで作成したシークレットが取得できましたね！
 割と道のりが長いですが、GCPのサービスから簡単にアクセスできるのは気持ちが良いですね。
-<img src="/images/20200212/photo_20200212_01.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200212/photo_20200212_01.png" class="img-small-size" loading="lazy">
 
 ## Secret Managerを利用
 
@@ -247,15 +247,15 @@ GUI画面へは`セキュリティ -> シークレット マネージャー`で�
 
 作成画面はかなり簡潔で好感度が高いです。この手のサービスはやたらと入力項目が多くて初見殺しなイメージ（勝手）があったので。
 
-<img src="/images/20200212/photo_20200212_02.png" class="img-small-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200212/photo_20200212_02.png" class="img-small-size" style="border:solid 1px #000000" loading="lazy">
 
 ラベルで整理ができるのも片づけが苦手な私にぴったりです（今回はつけていないですが）。。。
 
 有効化、無効化、破棄も非常に容易にできます。新しいバージョンを選択することで、シークレットの中身の更新と過去のシークレットを一括無効にできます。
 
-<img src="/images/20200212/photo_20200212_03.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200212/photo_20200212_03.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-<img src="/images/20200212/photo_20200212_04.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200212/photo_20200212_04.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
 ### Berglasで登録したシークレットをSecret Managerに移す
 
@@ -292,7 +292,7 @@ Migrating api-pass to projects/my-secret-project/secrets/api-pass... done!
 
 イケてますね！ 当然ですが、最終更新日はUPLOADした時間になります。
 
-<img src="/images/20200212/photo_20200212_05.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200212/photo_20200212_05.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
 ### Cloud FunctionからSecret Managerを使う
 
@@ -342,7 +342,7 @@ $ gcloud functions deploy print_secret \
   --allow-unauthenticated
 ```
 
-<img src="/images/20200212/photo_20200212_06.png" loading="lazy">
+<img src="/images/2020/20200212/photo_20200212_06.png" loading="lazy">
 
 ...ニッコリ😄
 
