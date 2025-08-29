@@ -216,7 +216,7 @@ C/C++を呼んでいる場合はこちらの方法をオススメします。
       2. emsdkの`python3`コマンドを探す箇所を削除する
           * 力技です
           * [`emsdk/emsdk`の33~39行目](https://github.com/emscripten-core/emsdk/blob/da9699832b5df4e123403490e499c87000c22654/emsdk#L33-L39)を削除するとうまくいきます
-:::
+      :::
 
 3. プロジェクトの新規作成
 
