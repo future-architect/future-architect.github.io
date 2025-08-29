@@ -63,13 +63,10 @@ brew install orangekame3/tap/stree
 
 # 使い方
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 **前提**
 aws cliで利用するconfig及びcredentialsは事前に設定しておく必要があります。
-
-</div>
+:::
 
 以降、configとcredentialsが以下の通り設定されているものとします。
 

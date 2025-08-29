@@ -182,12 +182,10 @@ Tinkerbellを動かしたときに、ターゲットマシンで何が起きて�
 
 この手軽さはまさにクラウドネイティブっぽいと言えるのではないでしょうか。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 自分は、このiPXE Boot->Hook(LinuxKit)起動->本体OS起動の二段階の仕組みを見て、BIOSの古き良き多段ブートを連想しました。かつてはハードウェアの制約によるものでしたが、現代では多環境への適応性やプロビジョニング方法を簡単に組み替えられる柔軟性という要件のために採用されたというわけです。
 ここで、必要なスペックについて気になる方もいらっしゃるかもしれませんが、第七世代という結構古いIntel NUCでも問題なく動きました。軽く調べた限りでは[ラズパイでk8sクラスタを構築するためにTinkerbellを利用していた事例](https://github.com/ContainerSolutions/tinkerbell-rpi4-workflow)もあったので、一般のご家庭のPCでも特に問題はなさそうです。
-</div>
+:::
 
 ### Kubernetes構築という応用
 

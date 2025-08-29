@@ -27,13 +27,12 @@ lede: "VSCode Dev Containersを利用してPlaywrightの実行環境をコンテ
 
 ## X Window Systemのセットアップ
 
-<div class="note warn" style="background:#fdf9e2; padding:16px; margin:24px 0; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-  <p>【2024/02/26 追記】</br>
+::: note warn
+<p>【2024/02/26 追記】</br>
     起動したコンテナ内でテストを実行する際 <code>--ui-host</code> オプションに <code>0.0.0.0</code> を指定することで、ホストマシン側のブラウザからGUIにアクセスできます。このオプションを使用することで、本記事記載のX Window System関連の設定は不要となります。</br>
     詳細は<a href="https://playwright.dev/docs/test-ui-mode#docker--github-codespaces">公式ドキュメント</a>を参照してください。</br>
   </p>
-</div>
+:::
 
 Playwrightをデバッグ起動したりUIモードで起動したりする場合、コンテナ上で起動するGUIをホストOS上に表示する必要があるため、X Window Systemを利用します（Playwrightをコマンドラインのみで利用する場合、本手順は不要です）。。
 なお、何も設定をせずにコンテナ上でGUIを起動しようとすると`Missing X server or $DISPLAY`のようなエラーが発生します。

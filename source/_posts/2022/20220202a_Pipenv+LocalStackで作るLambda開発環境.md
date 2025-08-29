@@ -25,12 +25,12 @@ PipenvとLocalStackを使用したLambda開発環境の構築を紹介します�
 
 https://github.com/orangekame3/pipenv-lambda
 
-<div class="note info" style="background: #e5f8e2; padding: 16px;">
-  <span class="fa fa-fw fa-check-circle"></span><p>【本記事で伝えたいこと】</p>
+::: note info
+<p>【本記事で伝えたいこと】</p>
   <p>本記事で最も伝えたいことはデプロイパッケージと開発パッケージの分離です。
 Pipenvを使用することでzipの容量を節約しながらLambdaをデプロイすることができます。
 やや長い記事となっていますので、「LocalStackへのデプロイ」の章だけでも見ていただけると幸いです。</p>
-</div>
+:::
 
 # Pipenvとは
 
@@ -276,10 +276,10 @@ S3バケットには予め以下の構造をもつJSONファイルを配置し�
 
 「ボーナスポイント」は以下の条件で決定します。
 
-<div class="note info" style="background: #e5f8e2; padding: 16px;">
-  <span class="fa fa-fw fa-check-circle"></span><p>【条件】</p>
+::: note info
+<p>【条件】</p>
   <p>会員ランクが「４，５」の会員には「ポイント」×1.25倍のボーナスポイントを、会員ランク「１，２，３」の会員には「ポイント」と同等のボーナスポイントを付与することします。</p>
-</div>
+:::
 
 <br />
 

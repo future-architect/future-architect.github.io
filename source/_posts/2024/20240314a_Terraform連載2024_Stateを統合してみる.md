@@ -144,11 +144,9 @@ tfstate-merge b.tfstate a.tfstate > b'.tfstate
 terraform state push b'.tfstate
 ```
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
+::: note warn
 tfstateファイルは必ずバックアップを取っておくようにしましょう
-
-</div>
+:::
 
 4\. Terraform のコードを統合
 

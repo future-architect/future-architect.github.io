@@ -110,10 +110,10 @@ SegmentLambdaではScatterLambdaで分割されたpickleファイルを取り込
 
 「ボーナスポイント」は以下の条件で決定します。
 
-<div class="note info" style="background: #e5f8e2; padding: 16px;">
-  <span class="fa fa-fw fa-check-circle"></span><p>【条件】</p>
+::: note info
+<p>【条件】</p>
   <p>会員ランクが「4，5」の会員には「ポイント」×1.25倍のボーナスポイントを、会員ランク「1，2，3」の会員には「ポイント」と同等のボーナスポイントを付与することします。</p>
-</div>
+:::
 
 上記の条件に従ってSegmentLambdaの処理前後のテーブルをまとめると以下のようになります。
 
@@ -479,10 +479,10 @@ test-bucketに格納されたsample.jsonを取得して、pandasでDataFrameに�
 
 SegmentLambdaでETL処理を行います。ETL処理時の条件を再度記載します。
 
-<div class="note info" style="background: #e5f8e2; padding: 16px;">
-  <span class="fa fa-fw fa-check-circle"></span><p>【条件】</p>
+::: note info
+<p>【条件】</p>
   <p>会員ランクが「4，5」の会員には「ポイント」×1.25倍のボーナスポイントを、会員ランク「1，2，3」の会員には「ポイント」と同等のボーナスポイントを付与することします。</p>
-</div>
+:::
 
 上記の条件を実装した`segment.py`を以下記載します。
 

@@ -37,12 +37,9 @@ ElasticsearchからOpenSearchへの移行を行った際に、利用するGoの�
 
 それでは、各メソッドの実装の違いについて詳しく見ていきましょう。
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 この記事では分量を少なくする目的で、[ステータスコードのエラーハンドリング](#ステータスコードのエラーハンドリング)の章を除き、エラーハンドリングを全て握りつぶして記載します。
-
-</div>
+:::
 
 ## 追加/更新系メソッド
 

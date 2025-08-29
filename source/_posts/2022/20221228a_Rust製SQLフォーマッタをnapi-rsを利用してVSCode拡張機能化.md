@@ -136,22 +136,20 @@ console.log(sum(3, 4));
 // 7
 ```
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-  <p>ちなみに、Node-APIは元々の名称がN-APIだったのですが、しばしば「NAPI」と発音され、蔑称と間違われる可能性があるとの懸念から現在のNode-APIに名称を変更しました。そのため、napi-rsにおいても、"エヌエーピーアイ"と発音したほうが良さそうです。
+::: note info
+<p>ちなみに、Node-APIは元々の名称がN-APIだったのですが、しばしば「NAPI」と発音され、蔑称と間違われる可能性があるとの懸念から現在のNode-APIに名称を変更しました。そのため、napi-rsにおいても、"エヌエーピーアイ"と発音したほうが良さそうです。
 </p>
 <a href="https://codezine.jp/article/detail/14109">N-APIが「Node-API」へ名称変更、既存のコンパイル済みアドオンへの影響はナシ|CodeZine（コードジン）</a>
-</div>
+:::
 
 ## napi-rsの使い方
 
 napi-rsの使い方を説明します。
 
-<div class="note warn" style="background:#fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-  <p>napi-rsではx86_64-pc-windows-gnuの環境はサポートされていないため、もしwindowsでgnu版rustを使っている方はmsvc版のRustを入れてください。
+::: note warn
+<p>napi-rsではx86_64-pc-windows-gnuの環境はサポートされていないため、もしwindowsでgnu版rustを使っている方はmsvc版のRustを入れてください。
 </p>
-</div>
+:::
 
 ### 1. CLIツールのインストール
 
@@ -612,10 +610,9 @@ connection.onExecuteCommand((params) => {
 
 vsceというツールを使用してパッケージ化を行います。vsceとはVSCode拡張機能のパッケージ化、公開、管理を行うことができるCLIツールです。
 
-<div class="note warn" style="background:#fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-  <p>本記事では拡張機能の公開については説明しません。</p>
-</div>
+::: note warn
+<p>本記事では拡張機能の公開については説明しません。</p>
+:::
 
 ## vsceのインストール
 

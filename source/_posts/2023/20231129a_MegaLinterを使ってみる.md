@@ -83,12 +83,9 @@ MegaLinterにはインタラクティブに設定ファイルを生成するコ�
 
 以下コマンドをプロジェクト直下で実行してください。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 [node.js](https://nodejs.org/en/)はインストールされているものとします。
-
-</div>
+:::
 
 ```shell
 npx mega-linter-runner --install
@@ -151,12 +148,9 @@ FILEIO_REPORTER: false
 
 デフォルトの設定ではLinterが多すぎるため必要なLinterのみ有効化します。今回は初期設定時にGoのプロジェクトを選択したため、Go Flavorを利用しています。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 FlavorとはMegaLinterで用意している言語ごとのプリセットです。
-
-</div>
+:::
 
 Go Flavorに採用されているLinterは[こちら](https://megalinter.io/latest/flavors/go/)で確認できます。
 

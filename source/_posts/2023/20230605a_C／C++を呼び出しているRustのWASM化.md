@@ -158,22 +158,17 @@ wasm-packはビルド時に以下の処理をしてくれています。
 1. `Cargo.toml`を読んで等価な`pakcage.json`を作成
 1. `README.md`が存在する場合は`pkg`にコピー
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 wasm32-unknown-unknownの「wasm32」はアドレス空間が32bitであること、1つ目の「unknown」はコンパイルを行うシステムのこと、2つ目の「unknown」はターゲットとしているシステムのことを示しています。つまり、wasm32-unknown-unknownはコンパイルを行うシステムとターゲットとするシステムの両方に制約がなく、どのような実行環境でも動作することを示します。
-
-</div>
+:::
 
 ### 何故C/C++
 
 完全には理解できませんでしたが、wasm-packはC/C++の標準ライブラリにリンクする機能が含まれていないようです([参考1](https://stackoverflow.com/questions/75025716/can-wasm-pack-compile-a-rust-project-including-c-code-that-uses-stdlib)、[参考2](https://github.com/rustwasm/wasm-pack/issues/741))。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 C/C++を呼び出しているとwasm-packは使用できないと述べましたが、実は[wasm-packでも頑張ればできる](https://zenn.dev/newgyu/articles/8bff73505c7b35)らしいです。しかし、記事では依存元のソースコードをいじって動くようにしており、できる限り依存元のソースコードは触りたくないため選択肢から除外しました。どうしてもwasm-packを使いたい方はこちらの記事の方法を試してみてはいかがでしょうか。
-</div>
+:::
 
 ## wasm32-unknown-emscripten
 
@@ -210,10 +205,8 @@ C/C++を呼んでいる場合はこちらの方法をオススメします。
       # There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
       ```
 
-      <div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
-        <span class="fa fa-fw fa-check-circle"></span>
-
-      Windowsで[公式ページのインストーラ](https://www.python.org/downloads/)を用いてPythonのインストールを行なっており、かつGit Bashなどを使っている場合はemsdkの実行がうまくいかない場合があります。
+      ::: note warn
+Windowsで[公式ページのインストーラ](https://www.python.org/downloads/)を用いてPythonのインストールを行なっており、かつGit Bashなどを使っている場合はemsdkの実行がうまくいかない場合があります。
       WindowsではデフォルトでPython3コマンドが入っていますが、そのコマンドはPython3ではなくMicrosoftのPython3インストールページが起動します。また、[Python公式ページのインストーラ](https://www.python.org/downloads/)を用いてインストールされるPython3は`python`コマンドで起動します。よって、**無効な`python3`コマンドと有効な`python`コマンドが存在している状態になります。**
       emsdkではまず`python3`コマンドを探し、存在しなければ`python`コマンドを探します。そのため、先に述べた環境の場合は無効な`python3`コマンドが使用されてしまいます。
       対応方法は以下の3つです。
@@ -223,8 +216,7 @@ C/C++を呼んでいる場合はこちらの方法をオススメします。
       2. emsdkの`python3`コマンドを探す箇所を削除する
           * 力技です
           * [`emsdk/emsdk`の33~39行目](https://github.com/emscripten-core/emsdk/blob/da9699832b5df4e123403490e499c87000c22654/emsdk#L33-L39)を削除するとうまくいきます
-
-      </div>
+:::
 
 3. プロジェクトの新規作成
 
@@ -400,11 +392,9 @@ cargo build --target wasm32-unknown-emscripten --release
 
 今回はSQLフォーマッタなので、動的にメモリを確保する方法を選択しました。ちなみにメモリサイズのデフォルトの初期値は16MB、最大値は2GBで、こちらもオプション(`INITIAL_MEMORY`, `MAXIMUM_MEMORY`)で変更できます。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 私の環境では大差は見られませんでしたが、動的にメモリを確保する方法は重くなる可能性があるらしい([参考](https://bugs.chromium.org/p/v8/issues/detail?id=3907))ので、動的にメモリを確保する必要がないサービスの場合は避けた方が良いかもしれません。
-</div>
+:::
 
 ローカルサーバを立てて実行してみるとちゃんと動きました 🎉
 <img src="/images/2023/20230602a/format.gif" alt="format.gif" width="1200" height="675" loading="lazy">

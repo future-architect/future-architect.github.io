@@ -23,12 +23,9 @@ lede: "AWS Cloud Questの魅力や使い方、そして実際にプレイして�
 EC2・RDSなどAWS主要サービスの機能・役割に対する知識はあるけど、より実用的な知識を学びたい方、ゲーム感覚で楽しく学びたい方は必見です！
 （上記の知識がないという方はまず[こちら](https://aws.amazon.com/jp/blogs/news/2024-aws-beginner-learning/)を参考に学習を進めることをオススメします！）
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 本記事ではAWS Cloud Quest: **Cloud Practitioner** に絞って解説を行います。
-
-</div>
+:::
 
 # AWS Cloud Questとは
 
@@ -155,12 +152,9 @@ AWS Cloud Questでは、街の中で困っている人達の課題をAWSのク�
 図と動画でソリューションに用いるサービスの学習ができます。
 動画ではEC2とは、EC2に関わるその他サービス、その構成例などを学ぶことが出来ます。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 情報量は結構多いですが、実践フェーズで用いる知識としては最低限で問題ないので完璧に理解しようとしなくても大丈夫です！
-
-</div>
+:::
 
 <img src="/images/2024/20240606a/image.png" alt="" width="1200" height="596" loading="lazy">
 
@@ -202,13 +196,10 @@ EC2の場合は、「実践フェーズで起動したEC2インスタンスと�
   * 初めてAWSコンソールを触る人でも誤った操作をしないように、ワンスクロール、ワンクリック丁寧に解説してくれています。
     これによりガイドに従っていればほとんどミスなくクリアできるでしょう。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 こんな感じで作業の順番が明記されています
 <img src="/images/2024/20240606a/image_(17).png" alt="image_(17).png" width="1200" height="593" loading="lazy">
-
-</div>
+:::
 
 * **DIYフェーズの課題がいい感じの難易度**
   * DIYフェーズでの課題は、実践フェーズの内容を理解していれば容易にクリアできる難易度だったので、「難しすぎて挫折してしまう...」なんてことが無かったのはとてもよかったです。

@@ -66,13 +66,10 @@ CoreMotionフレームワークのひとつのクラスとして、`CMHeadphoneM
 
 使用するためには、`Info.plist`で`NSMotionUsageDescription`キーを追加し、モーションデータを使用する具体的な理由を記載する必要があります。
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 注意
 `NSMotionUsageDescription`キーが存在しない場合、対応するデバイスのモーションデータを更新しようとするとアプリがクラッシュしてしまいます。
-
-</div>
+:::
 
 今回使用する`CMHeadphoneMotionManager`が持つ主なメソッドについて、説明します。
 

@@ -47,10 +47,9 @@ lede: "Terraformのtargetオプションを簡単に実行するためのCLIツ�
 
 https://github.com/future-architect/tftarget/releases
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
+::: note info
 このCLIツールはTerraformコマンドのラッパーであり、内部でTerraformコマンドを呼び出しています。そのため、TerraformのCLIコマンドのインストールが必須です。
-</div>
+:::
 
 # 2 tftargetの概要
 

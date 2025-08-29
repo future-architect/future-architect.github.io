@@ -234,14 +234,11 @@ ColoringMapに戻ってみると、すべてのキューブにマテリアルが
 
 今回はoverlapしたらマテリアルを変更するようにしたいので`Set Material(StaticMeshComponent)`を検索し、クリックします。検索しても出てこない場合は左上の`コンポーネント`で`Static Mesh Component(StaticMeshComponent)`をクリックするか、検索画面の右上にある`状況に合わせた表示`のチェックを外します。
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 検索すると`Set Material(Trigger)`などが出てくることもあります。
 しかし今回overlapした後に変更したいのはキューブ自体のマテリアルです。
 そのため、こちらは選択せずに`set Material(StaticMeshComponent)`を選択するようにしてください。
-
-</div>
+:::
 
 <img src="/images/2023/20231127a/スクリーンショット_(147)_R.jpg" alt="" width="1200" height="675" loading="lazy">
 
